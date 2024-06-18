@@ -1,14 +1,19 @@
-import { CfnOutput, Stack, StackProps, CfnTag } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
+import { CfnOutput, CfnTag, Stack, StackProps } from 'aws-cdk-lib';
 import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as route53 from 'aws-cdk-lib/aws-route53';
-import * as targets from 'aws-cdk-lib/aws-route53-targets';
+import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
+import { Construct } from 'constructs';
 
 const domain = 'charmverse.co';
 
-export class CdkDeployStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+export type DeployStackProps = {
+  scope: Construct;
+  id: string;
+  props?: StackProps;
+}
+
+export class BaseCdkDeployStack extends Stack {
+  constructor({scope, id, props, options = []}: DeployStackProps & {  options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[]}) {
     super(scope, id, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
@@ -57,6 +62,11 @@ export class CdkDeployStack extends Stack {
         value: 'aws-elasticbeanstalk-ec2-role'
       },
       {
+        namespace: 'aws:autoscaling:launchconfiguration',
+        optionName: 'RootVolumeSize',
+        value: '12' // example size in GB
+      },
+      {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
         value: 'LoadBalanced'
@@ -97,41 +107,6 @@ export class CdkDeployStack extends Stack {
         value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
       },
       {
-        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
-        optionName: 'HealthCheckPath',
-        value: '/health_check'
-      },
-      {
-        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
-        optionName: 'Port',
-        value: '3002'
-      },
-      {
-        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
-        optionName: 'Protocol',
-        value: 'HTTP'
-      },
-      {
-        namespace: 'aws:elbv2:listener:3002',
-        optionName: 'ListenerEnabled',
-        value: 'true'
-      },
-      {
-        namespace: 'aws:elbv2:listener:3002',
-        optionName: 'Protocol',
-        value: 'HTTPS'
-      },
-      {
-        namespace: 'aws:elbv2:listener:3002',
-        optionName: 'SSLCertificateArns',
-        value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
-      },
-      {
-        namespace: 'aws:elbv2:listener:3002',
-        optionName: 'DefaultProcess',
-        value: 'websocket'
-      },
-      {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'SecurityGroups',
@@ -140,7 +115,7 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'EC2KeyName',
-        value: 'northshore-webapp'
+        value: 'stg-permission-api'
       },
       {
         namespace: 'aws:autoscaling:asg',
@@ -172,7 +147,8 @@ export class CdkDeployStack extends Stack {
         namespace: 'aws:elasticbeanstalk:application:environment',
         optionName: 'DOMAIN',
         value: 'https://' + deploymentDomain
-      }
+      },
+      ...options
     ];
 
     const resourceTags: CfnTag[] = [

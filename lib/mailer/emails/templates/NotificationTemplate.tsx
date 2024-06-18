@@ -20,17 +20,27 @@ const MAX_CHAR = 60;
 export function PendingNotification({
   notification,
   user,
-  spaceFeatures
+  spaceFeatures,
+  emailBranding
 }: {
+  emailBranding?: {
+    artwork: string;
+    color: string;
+  };
   user: Pick<User, 'id' | 'username' | 'id' | 'avatar'>;
   notification: Notification;
   spaceFeatures: FeatureJson[];
 }) {
   return (
-    <EmailWrapper title='Your open notifications' preview='Your open notifications'>
-      <NotificationSection spaceFeatures={spaceFeatures} user={user} notification={notification} />
+    <EmailWrapper emailBranding={emailBranding} title='Your open notifications' preview='Your open notifications'>
+      <NotificationSection
+        emailBranding={emailBranding}
+        spaceFeatures={spaceFeatures}
+        user={user}
+        notification={notification}
+      />
       <Hr />
-      <Feedback />
+      <Feedback primaryColor={emailBranding?.color} />
     </EmailWrapper>
   );
 }
@@ -38,8 +48,13 @@ export function PendingNotification({
 function NotificationSection({
   notification,
   user,
-  spaceFeatures
+  spaceFeatures,
+  emailBranding
 }: {
+  emailBranding?: {
+    artwork: string;
+    color: string;
+  };
   spaceFeatures: FeatureJson[];
   user: Pick<User, 'id' | 'username' | 'id' | 'avatar'>;
   notification: Notification;
@@ -142,7 +157,9 @@ function NotificationSection({
         }}
       >
         <Column style={{ width: 50 }} />
-        <Button href={link}>View</Button>
+        <Button primaryColor={emailBranding?.color} href={link}>
+          View
+        </Button>
         <Column style={{ width: 50 }} />
       </Row>
     </Section>

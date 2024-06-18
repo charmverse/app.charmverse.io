@@ -9,6 +9,7 @@ import {
   EVALUATION_STATUS_VERB_LABELS,
   proposalStatusColors
 } from 'lib/databases/proposalDbProperties';
+import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import type { ProposalEvaluationStatus } from 'lib/proposals/interfaces';
@@ -83,6 +84,8 @@ function ProposalStatusSelectBase({
   const currentEvaluationResult = proposal.currentStep.result;
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
 
+  const rewardLabel = getFeatureTitle('Rewards');
+
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
     if (currentEvaluationStep === 'draft') {
       return ['passed', 'unpublished'];
@@ -98,9 +101,17 @@ function ProposalStatusSelectBase({
 
   const options: IPropertyOption[] = statusOptions.map((status) => {
     const statusLabel = EVALUATION_STATUS_LABELS[status];
+
+    const value =
+      currentEvaluationStep === 'rewards'
+        ? `${rewardLabel} ${statusLabel}`
+        : currentEvaluationStep === 'credentials'
+        ? `Credentials ${statusLabel}`
+        : statusLabel;
+
     return {
       id: status,
-      value: statusLabel,
+      value,
       dropdownValue: EVALUATION_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
       color: proposalStatusColors[status]
     };

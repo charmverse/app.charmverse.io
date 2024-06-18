@@ -11,6 +11,7 @@ import { isAddress } from 'viem';
 
 import charmClient from 'charmClient';
 import { useRefreshENSName } from 'charmClient/hooks/blockchain';
+import { useFarcasterDisconnect } from 'charmClient/hooks/farcaster';
 import { useAddUserWallets, useSetPrimaryWallet } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -58,7 +59,7 @@ function IdentityModal(props: IdentityModalProps) {
 
 export function UserIdentities() {
   const accountsPopupState = usePopupState({ variant: 'popover', popupId: 'accountsModal' });
-  const { updateUser, user } = useUser();
+  const { updateUser, refreshUser, user } = useUser();
   const identityTypes = useIdentityTypes({
     size: 18
   });
@@ -70,6 +71,7 @@ export function UserIdentities() {
   const { account, requestSignature, verifiableWalletDetected, disconnectWallet } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const { disconnectVerifiedEmailAccount } = useFirebaseAuth();
+  const { trigger: disconnectFarcaster } = useFarcasterDisconnect();
   const { disconnectGoogleAccount } = useGoogleLogin();
   const deleteWalletPopupState = usePopupState({ variant: 'popover', popupId: 'deleteWalletModal' });
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
@@ -252,6 +254,24 @@ export function UserIdentities() {
                               disabled={isIdentityDisconnectDisabled}
                               key='disconnect'
                               onClick={() => disconnectVerifiedEmailAccount(verifiedEmail.email)}
+                            >
+                              Disconnect
+                            </MenuItem>
+                          </div>
+                        </Tooltip>
+                      ]
+                    : item.type === 'Farcaster'
+                    ? [
+                        <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
+                          <div>
+                            <MenuItem
+                              disabled={isIdentityDisconnectDisabled}
+                              key='disconnect'
+                              onClick={() =>
+                                disconnectFarcaster(undefined, {
+                                  onSuccess: () => refreshUser()
+                                })
+                              }
                             >
                               Disconnect
                             </MenuItem>

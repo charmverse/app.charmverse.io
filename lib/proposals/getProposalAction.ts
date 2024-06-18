@@ -53,16 +53,6 @@ export function getProposalAction({
     }
   }
 
-  if (currentEvaluation.type === 'pass_fail' || currentEvaluation.type === 'rubric') {
-    if (currentEvaluation.result === null && isReviewer) {
-      return 'review_required';
-    }
-
-    if (isAuthor && currentEvaluation.result === 'fail') {
-      return 'proposal_failed';
-    }
-  }
-
   const previousEvaluation = currentEvaluation.index > 0 ? proposal.evaluations[currentEvaluation.index - 1] : null;
 
   if (currentEvaluation.result === null && previousEvaluation && previousEvaluation.result === 'pass') {
@@ -71,6 +61,16 @@ export function getProposalAction({
     }
     if (isAuthor) {
       return 'step_passed';
+    }
+  }
+
+  if (currentEvaluation.type === 'pass_fail' || currentEvaluation.type === 'rubric') {
+    if (currentEvaluation.result === null && isReviewer) {
+      return 'review_required';
+    }
+
+    if (isAuthor && currentEvaluation.result === 'fail') {
+      return 'proposal_failed';
     }
   }
 

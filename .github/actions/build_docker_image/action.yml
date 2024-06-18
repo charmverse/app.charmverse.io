@@ -1,10 +1,13 @@
-name: 'Build Docker Image'
+name: 'Build Connect Docker Image'
 
 inputs:
   codebase_sha:
     description: "Your code base sha, if it's different from the sha of the github action event"
     value: ''
     required: false
+  ecr_registry:
+    description: 'ECR registry url'
+    required: true
 
 outputs:
   ecr-registry:
@@ -15,7 +18,7 @@ outputs:
     value: '${{ steps.get_img_tag.outputs.version }}'
   img_repo:
     description: 'Image tag of the image'
-    value: '${{ steps.login-ecr.outputs.registry }}/charmverse-web3-workspace'
+    value: '${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_registry }}'
   full_image_name:
     description: 'Full image repo and tag'
     value: '${{ steps.get_img_tag.outputs.tags }}'
@@ -47,7 +50,7 @@ runs:
       id: get_img_tag
       uses: docker/metadata-action@v4
       with:
-        images: ${{steps.login-ecr.outputs.registry}}/charmverse-web3-workspace
+        images: ${{steps.login-ecr.outputs.registry}}/${{ inputs.ecr_registry }}
         tags: |
           type=sha,prefix=${{github.run_id}}-,format=short
         flavor: |

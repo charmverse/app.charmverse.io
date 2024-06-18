@@ -5,6 +5,8 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Card,
+  Checkbox,
   Chip,
   IconButton,
   ListItemIcon,
@@ -12,6 +14,7 @@ import {
   Menu,
   MenuItem,
   Stack,
+  Switch,
   TextField,
   Tooltip,
   Typography
@@ -28,6 +31,7 @@ import { getDefaultEvaluation } from 'lib/proposals/workflows/defaultEvaluation'
 
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
+import { EvaluationNotificationsRow } from './EvaluationNotifications';
 import { EvaluationPermissionsRow } from './EvaluationPermissions';
 import { EvaluationRow } from './EvaluationRow';
 
@@ -76,6 +80,11 @@ export function ProposalWorkflowItem({
 
   function updateWorkflowTitle(title: string) {
     onUpdate({ ...workflow, title });
+    setUnsavedChanges(true);
+  }
+
+  function updateDraftReminder(draftReminder: boolean) {
+    onUpdate({ ...workflow, draftReminder });
     setUnsavedChanges(true);
   }
 
@@ -237,7 +246,7 @@ export function ProposalWorkflowItem({
         </Box>
       </AccordionSummary>
       <AccordionDetails>
-        <MultiTabs tabs={['Steps', 'Permissions']}>
+        <MultiTabs tabs={['Steps', 'Permissions', 'Notifications']}>
           {({ value }) => (
             <Box pt={2}>
               {value === 'Steps' &&
@@ -266,6 +275,39 @@ export function ProposalWorkflowItem({
                     readOnly={readOnly}
                   />
                 ))}
+
+              {value === 'Notifications' && (
+                <>
+                  <Card variant='outlined' sx={{ mb: 1 }}>
+                    <Stack p={2}>
+                      <Typography variant='h6' sx={{ flexGrow: 1 }}>
+                        Draft
+                      </Typography>
+                      <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                        <Typography variant='body2' sx={{ flexGrow: 1 }}>
+                          Remind authors to submit their draft after 24 hours
+                        </Typography>
+                        <Switch
+                          checked={!!workflow.draftReminder}
+                          onChange={(e) => updateDraftReminder(e.target.checked)}
+                          disabled={readOnly}
+                        />
+                      </Stack>
+                    </Stack>
+                  </Card>
+                  {workflow.evaluations.map((evaluation, index) => (
+                    <EvaluationNotificationsRow
+                      key={evaluation.id}
+                      evaluation={evaluation}
+                      readOnly={readOnly}
+                      onChange={updateEvaluationStep}
+                      nextEvaluationTitle={
+                        workflow.evaluations.length > index + 1 ? workflow.evaluations[index + 1].title : undefined
+                      }
+                    />
+                  ))}
+                </>
+              )}
 
               <Box display='flex' justifyContent='space-between' alignItems='center'>
                 <Button disabled={readOnly} variant='text' onClick={() => openNewEvaluationStepModal()} height='1px'>

@@ -6,15 +6,18 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { FcGoogle } from 'react-icons/fc';
 import { RiFolder2Line } from 'react-icons/ri';
 
+import { Button } from 'components/common/Button';
 import { PageIcon } from 'components/common/PageIcon';
 import { usePages } from 'hooks/usePages';
 import type { Board, DataSourceType, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
+import { ProposalSourceDialogButton } from './viewSourceOptions/components/ProposalSourceProperties/ProposalSourceDialogButton';
 
 export type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source' | 'card-property';
 
@@ -159,6 +162,8 @@ export function ViewSidebarSelect({
           value={sourceTitle}
         />
       )}
+
+      {board && board.fields.sourceType === 'proposals' && <ProposalSourceDialogButton board={board} />}
     </>
   );
 }

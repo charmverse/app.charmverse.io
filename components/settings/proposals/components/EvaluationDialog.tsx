@@ -53,6 +53,10 @@ type FormValues = {
     approve?: string;
     reject?: string;
   } | null;
+  notificationLabels?: {
+    approve?: string;
+    reject?: string;
+  } | null;
   requiredReviews?: number;
   declineReasons?: string[] | null;
   finalStep?: boolean | null;

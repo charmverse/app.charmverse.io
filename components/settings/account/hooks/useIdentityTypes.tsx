@@ -1,9 +1,9 @@
+import type { StatusAPIResponse as FarcasterAccount } from '@farcaster/auth-kit';
 import { useMemo } from 'react';
 
 import type { IdentityIconSize } from 'components/settings/profile/components/IdentityIcon';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import type { IntegrationModel } from 'components/settings/profile/components/IdentityModal';
-import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { matchWalletAddress, shortWalletAddress } from 'lib/utils/blockchain';
@@ -23,7 +23,6 @@ export function useIdentityTypes(
 ) {
   const { user } = useUser();
   const { lensProfile } = useLensProfile();
-  const { farcasterProfile } = useFarcasterUser();
 
   const identityTypes: IntegrationModel[] = useMemo(() => {
     if (!user) {
@@ -94,10 +93,11 @@ export function useIdentityTypes(
       });
     }
 
-    if (farcasterProfile) {
+    if (user.farcasterUser?.account) {
+      const farcasterAccount = user.farcasterUser.account as Partial<FarcasterAccount>;
       types.push({
         type: 'Farcaster',
-        username: farcasterProfile.username ?? '',
+        username: farcasterAccount.username ?? '',
         isInUse: user.identityType === 'Farcaster',
         icon: <IdentityIcon size={size} type='Farcaster' />
       });
@@ -111,7 +111,7 @@ export function useIdentityTypes(
     });
 
     return types;
-  }, [user, lensProfile, farcasterProfile, size]);
+  }, [user, lensProfile, size]);
 
   return identityTypes;
 }

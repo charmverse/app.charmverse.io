@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
-import { useCurrentPage } from 'hooks/useCurrentPage';
-
 export type PageSidebarView = 'comments' | 'suggestions' | 'proposal_evaluation' | 'reward_evaluation';
 
 export type IPageSidebarContext = {

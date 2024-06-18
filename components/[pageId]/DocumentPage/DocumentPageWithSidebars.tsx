@@ -104,6 +104,10 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   useEffect(() => {
     setActiveView(defaultSidebarView);
     setDefaultView(null);
+    return () => {
+      // clear sidebar so we can show left sidebar
+      setActiveView(null);
+    };
   }, []);
 
   return (

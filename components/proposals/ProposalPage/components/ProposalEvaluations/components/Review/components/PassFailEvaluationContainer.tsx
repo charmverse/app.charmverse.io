@@ -103,16 +103,17 @@ export function PassFailEvaluationContainer({
 
   const { showMessage } = useSnackbar();
   const actionLabels = getActionButtonLabels(evaluation);
-
-  async function onSubmitEvaluationReview(
-    declineReason: string | null,
-    result: NonNullable<PopulatedEvaluation['result']>
-  ) {
+  async function onSubmitEvaluationReview(params: {
+    declineReason: string | null;
+    result: NonNullable<PopulatedEvaluation['result']>;
+    declineMessage?: string;
+  }) {
     try {
       await submitEvaluationReview({
         evaluationId: evaluation.id,
-        result,
-        declineReasons: declineReason ? [declineReason] : []
+        result: params.result,
+        declineReasons: params.declineReason ? [params.declineReason] : [],
+        declineMessage: params.declineMessage
       });
       refreshProposal?.();
     } catch (error) {
@@ -120,14 +121,16 @@ export function PassFailEvaluationContainer({
     }
   }
 
-  async function onSubmitEvaluationAppealReview(
-    declineReason: string | null,
-    result: NonNullable<PopulatedEvaluation['result']>
-  ) {
+  async function onSubmitEvaluationAppealReview(params: {
+    result: NonNullable<PopulatedEvaluation['result']>;
+    declineReason: string | null;
+    declineMessage?: string;
+  }) {
     try {
       await submitEvaluationAppealReview({
-        result,
-        declineReasons: declineReason ? [declineReason] : []
+        result: params.result,
+        declineReasons: params.declineReason ? [params.declineReason] : [],
+        declineMessage: params.declineMessage
       });
       refreshProposal?.();
     } catch (error) {

@@ -2637,11 +2637,11 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                                 style="height: 100%;"
                               >
                                 <div
-                                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                                   spellcheck="true"
                                 >
                                   <input
-                                    class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                                     placeholder="Untitled"
                                     type="text"
                                     value="card1"
@@ -2751,11 +2751,11 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                                 style="height: 100%;"
                               >
                                 <div
-                                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                                   spellcheck="true"
                                 >
                                   <input
-                                    class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                                     placeholder="Untitled"
                                     type="text"
                                     value="card2"

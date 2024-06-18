@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { UIBlockWithDetails } from 'lib/databases/block';
 import { createBlock } from 'lib/databases/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -13,6 +14,7 @@ export const proposalPropertyTypesList = [
   'proposalStatus',
   'proposalEvaluatedBy',
   'proposalEvaluationTotal',
+  'proposalRubricCriteriaAverage',
   'proposalRubricCriteriaTotal',
   'proposalEvaluationAverage',
   'proposalAuthor',
@@ -20,7 +22,9 @@ export const proposalPropertyTypesList = [
   'proposalEvaluationType',
   'proposalCreatedAt',
   'proposalStep',
-  'proposalReviewerNotes'
+  'proposalReviewerNotes',
+  'proposalRubricCriteriaReviewerScore',
+  'proposalRubricCriteriaReviewerComment'
 ] as const;
 
 export type ProposalPropertyType = (typeof proposalPropertyTypesList)[number];
@@ -76,6 +80,9 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   readOnly?: boolean; // whether this property cannot be deleted or renamed by users
   readOnlyValues?: boolean; // whether the values of this property are synced and uneditable
   dynamicOptions?: boolean; // do not rely on a static list of options
+  evaluationTitle?: string; // store the title of the evaluation to group properties together
+  criteriaTitle?: string; // store the title of the rubric evaluation criteria to group rubric criteria score properties together
+  reviewerId?: string; // store the reviewer id for rubric evaluation criteria score properties
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals' | 'reward_applications' | 'rewards';

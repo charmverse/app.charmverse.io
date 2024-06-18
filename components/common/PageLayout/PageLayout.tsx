@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import Head from 'next/head';
-import * as React from 'react';
+import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 
+import { PageSidebarProvider, usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -26,12 +28,13 @@ const LayoutContainer = styled.div`
 `;
 
 interface PageLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function PageLayout({ children }: PageLayoutProps) {
   const { user, isLoaded: isUserLoaded } = useUser();
   const { space, isLoading: isSpacesLoading } = useCurrentSpace();
+  const { activeView: rightSidebarOpen, closeSidebar: closeRightSidebar } = usePageSidebar();
 
   const isFreeTierSpace = space?.paidTier === 'free';
   const enableSidebar = !!user || isFreeTierSpace;
@@ -40,9 +43,25 @@ function PageLayout({ children }: PageLayoutProps) {
 
   const { accessChecked, publicPage } = useSharedPage();
 
-  const { open, enableResize, isResizing, sidebarWidth, handleDrawerOpen, handleDrawerClose } = useNavigationSidebar({
+  const {
+    open,
+    enableResize,
+    isResizing,
+    sidebarWidth,
+    handleDrawerOpen,
+    handleDrawerClose: closeLeftSidebar
+  } = useNavigationSidebar({
     enabled: enableSidebar
   });
+  // do not show navigation sidebar when the workflow sidebar is open
+  const leftSidebarOpen =
+    open && rightSidebarOpen !== 'proposal_evaluation' && rightSidebarOpen !== 'reward_evaluation';
+
+  // open left sidebar and close right sidebar if it is open
+  function openLeftSidebar() {
+    closeRightSidebar();
+    handleDrawerOpen();
+  }
 
   // skip access check if space is free tier, since accessChecked becomes false between each page transition
   if (!(accessChecked || isFreeTierSpace) || !isUserLoaded || isSpacesLoading) {
@@ -71,10 +90,10 @@ function PageLayout({ children }: PageLayoutProps) {
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer data-test='space-page-layout' className='app-content'>
-        {open !== null && (
+        {leftSidebarOpen !== null && (
           <>
-            <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
-              <Header open={open} openSidebar={handleDrawerOpen} />
+            <AppBar open={leftSidebarOpen} sidebarWidth={sidebarWidth} position='fixed'>
+              <Header open={leftSidebarOpen} openSidebar={openLeftSidebar} />
               <BlocksExceededBanner />
               <AnnouncementBanner
                 actionLabel='Check it out'
@@ -90,9 +109,9 @@ function PageLayout({ children }: PageLayoutProps) {
               enableSpaceFeatures={true}
               enableResize={enableResize}
               isResizing={isResizing}
-              open={open}
+              open={leftSidebarOpen}
               width={sidebarWidth}
-              closeSidebar={handleDrawerClose}
+              closeSidebar={closeLeftSidebar}
             />
           </>
         )}
@@ -106,4 +125,12 @@ function PageLayout({ children }: PageLayoutProps) {
   );
 }
 
-export default PageLayout;
+function PageLayoutWithSidebarContext(props: PageLayoutProps) {
+  return (
+    <PageSidebarProvider>
+      <PageLayout {...props} />
+    </PageSidebarProvider>
+  );
+}
+
+export default PageLayoutWithSidebarContext;

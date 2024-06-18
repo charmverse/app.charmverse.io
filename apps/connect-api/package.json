@@ -1,0 +1,12 @@
+{
+  "name": "connect-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx tsx --watch ./src/main.ts",
+    "start:prod": "npx tsx ./dist/apps/connect-api/src/main.js",
+    "build": "rm -rf ./dist && ../../node_modules/typescript/bin/tsc --project ./tsconfig.json",
+    "test": "npx jest --config=./jest.config.ts",
+    "echo": "echo \"Builder api\""
+  }
+}

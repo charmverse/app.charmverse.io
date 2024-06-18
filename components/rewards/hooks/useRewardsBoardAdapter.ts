@@ -38,6 +38,7 @@ import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utils/browser';
+import { isUUID } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 
 export type BoardReward = { id?: string; fields: RewardFields };
@@ -303,6 +304,15 @@ function mapApplicationToCard({
     ? [getAbsolutePath(`/${sourceProposalPage.id}`, spaceDomain), sourceProposalPage.title]
     : '';
 
+  const rewardCustomProperties: Record<string, any> = {};
+  const rewardProperties = (reward.fields as RewardFields)?.properties;
+
+  Object.keys(rewardProperties).forEach((rewardPropertyKey) => {
+    if (isUUID(rewardPropertyKey)) {
+      rewardCustomProperties[rewardPropertyKey] = rewardProperties[rewardPropertyKey];
+    }
+  });
+
   applicationFields.properties = {
     ...applicationFields.properties,
     // add default field values on the fly
@@ -329,7 +339,8 @@ function mapApplicationToCard({
     [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
     [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
-    [REWARD_PROPOSAL_LINK]: proposalLinkValue
+    [REWARD_PROPOSAL_LINK]: proposalLinkValue,
+    ...rewardCustomProperties
   };
 
   const isApplication =

@@ -1,5 +1,5 @@
-import type { WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import type { PageType, Prisma, ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
 import type { VoteSettings } from './interfaces';
 

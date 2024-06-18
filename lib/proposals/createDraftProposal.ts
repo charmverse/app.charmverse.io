@@ -20,10 +20,12 @@ export type CreateDraftProposalInput = {
   createdBy: string;
   spaceId: string;
   contentType: ProposalContentType;
-  pageType?: Extract<PageType, 'proposal_template'>;
+  pageType?: Extract<PageType, 'proposal_template' | 'proposal'>;
+  title?: string;
   templateId?: string;
   sourcePageId?: string;
   sourcePostId?: string;
+  authors?: string[];
 };
 
 export async function createDraftProposal(input: CreateDraftProposalInput) {
@@ -79,11 +81,14 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
   // but include authors from templates if they were added
   const authorsFromTemplate = template?.proposal?.authors.map(({ userId }) => userId) || [];
   const authors: string[] =
-    input.pageType === 'proposal_template' ? [] : [...new Set([input.createdBy].concat(authorsFromTemplate))];
+    input.pageType === 'proposal_template'
+      ? [...(input.authors ?? [])]
+      : [...new Set([...(input.authors ?? []), input.createdBy].concat(authorsFromTemplate))];
 
   const evaluations: ProposalEvaluationInput[] =
     template?.proposal?.evaluations.map((evaluation) => ({
       ...evaluation,
+      notificationLabels: evaluation.notificationLabels as WorkflowEvaluationJson['notificationLabels'],
       actionLabels: evaluation.actionLabels as WorkflowEvaluationJson['actionLabels'],
       rubricCriteria: evaluation.rubricCriteria.map((criteria) => ({
         ...criteria,
@@ -139,7 +144,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
       contentText: template?.contentText || sourcePage?.contentText || sourcePost?.contentText || '',
       path: generatePagePathFromPathAndTitle({ title: 'page' }),
       sourceTemplateId: template?.id || undefined,
-      title: sourcePage?.title || sourcePost?.title || '',
+      title: input.title || sourcePage?.title || sourcePost?.title || '',
       type: input.pageType || 'proposal'
     },
     selectedCredentialTemplates: template?.proposal?.selectedCredentialTemplates || undefined,

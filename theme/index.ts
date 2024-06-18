@@ -153,6 +153,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         dark: mode === 'dark' ? backgroundDarkColorDarkMode : backgroundDarkColor
       },
       text: {
+        disabled: 'var(--primary-text)',
         primary: mode === 'dark' ? primaryTextColorDarkMode : primaryTextColor
       },
       textPrimary: {

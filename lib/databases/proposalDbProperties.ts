@@ -92,11 +92,29 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalRubricCriteriaTotal'
   }),
+  proposalRubricCriteriaAverage: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Average',
+    options: [],
+    type: 'proposalRubricCriteriaAverage'
+  }),
   proposalAuthor: ({ name } = {}) => ({
     id: AUTHORS_BLOCK_ID,
     name: name || 'Proposal Authors',
     options: [],
     type: 'proposalAuthor'
+  }),
+  proposalRubricCriteriaReviewerComment: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Reviewer Comment',
+    options: [],
+    type: 'proposalRubricCriteriaReviewerComment'
+  }),
+  proposalRubricCriteriaReviewerScore: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Reviewer Score',
+    options: [],
+    type: 'proposalRubricCriteriaReviewerScore'
   }),
   // This is for only the current reviewers
   proposalReviewer: () => ({
@@ -155,3 +173,15 @@ export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, st
   fail: 'Failed',
   pass: 'Passed'
 };
+
+export const defaultProposalProperties = [
+  proposalDbProperties.proposalReviewerNotes(),
+  proposalDbProperties.proposalStatus(),
+  proposalDbProperties.proposalStep(),
+  proposalDbProperties.proposalUrl(),
+  proposalDbProperties.proposalAuthor(),
+  proposalDbProperties.proposalReviewer(),
+  proposalDbProperties.proposalEvaluationType()
+];
+
+export const defaultProposalPropertyTypes = defaultProposalProperties.map((p) => p.type);

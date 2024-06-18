@@ -1,69 +1,109 @@
 import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
 import type { AnswerData } from 'lib/proposals/rubric/aggregateResults';
 import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 
 import type { IPropertyTemplate } from '../board';
-import type { CardPropertyValue } from '../card';
+
+import type { ProposalData } from './getCardProperties';
 
 export function getCardPropertiesFromRubric({
   properties,
   templates,
-  rubricAnswers,
-  rubricCriteria,
-  step
+  evaluations
 }: {
+  evaluations: ProposalData['proposal']['evaluations'];
   properties: Record<string, ProposalPropertyValue>;
   templates: IPropertyTemplate[];
-  rubricCriteria: { id: string; title: string }[];
-  rubricAnswers: AnswerData[];
-  step: { id: string; title: string };
 }): Record<string, ProposalPropertyValue> {
-  const { allScores, reviewersResults } = aggregateResults({
-    answers: rubricAnswers.filter((a) => a.evaluationId === step.id),
-    criteria: rubricCriteria.filter((c) => c.id !== step.id)
-  });
+  const rubricCriteriaScore: Record<
+    string,
+    {
+      total: number;
+      count: number;
+    }
+  > = {};
 
-  const rubricStepScore: Record<string, number> = {};
+  const allRubricCriterias = evaluations.map((e) => e.rubricCriteria).flat();
+  const allRubricAnswers = evaluations
+    .map((e) => e.rubricAnswers)
+    .flat() as ProposalRubricCriteriaAnswerWithTypedResponse[];
 
-  rubricCriteria.forEach((criteria) => {
-    const totalScore = rubricAnswers
-      .filter((a) => a.rubricCriteriaId === criteria.id)
-      .reduce((acc, answer) => {
-        if (answer.response.score) {
-          acc += answer.response.score;
+  allRubricCriterias.forEach((criteria) => {
+    const filteredRubricAnswers = allRubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
+    filteredRubricAnswers.forEach((rubricCriteriaAnswer) => {
+      templates.forEach((template) => {
+        if (template.criteriaTitle === criteria.title && template.reviewerId === rubricCriteriaAnswer.userId) {
+          if (template.type === 'proposalRubricCriteriaReviewerComment') {
+            properties[template.id] = rubricCriteriaAnswer.comment ?? '';
+          } else if (template.type === 'proposalRubricCriteriaReviewerScore') {
+            properties[template.id] = rubricCriteriaAnswer.response.score ?? '';
+          }
         }
-        return acc;
-      }, 0);
+      });
+    });
+    const totalScore = filteredRubricAnswers.reduce((acc, answer) => {
+      return answer.response.score ? acc + answer.response.score : acc;
+    }, 0);
 
-    rubricStepScore[criteria.title] = (rubricStepScore[criteria.title] ?? 0) + totalScore;
-  });
-
-  templates.forEach((template) => {
-    if (template.type === 'proposalRubricCriteriaTotal') {
-      properties[template.id] = ((properties[template.id] as number) ?? 0) + (rubricStepScore[template.name] ?? 0);
+    if (rubricCriteriaScore[criteria.title]) {
+      rubricCriteriaScore[criteria.title].total += totalScore;
+      rubricCriteriaScore[criteria.title].count += filteredRubricAnswers.length;
+    } else {
+      rubricCriteriaScore[criteria.title] = {
+        total: totalScore,
+        count: filteredRubricAnswers.length
+      };
     }
   });
 
-  const uniqueReviewers = Object.keys(reviewersResults);
+  templates.forEach((template) => {
+    if (template.criteriaTitle && rubricCriteriaScore[template.criteriaTitle]) {
+      if (template.type === 'proposalRubricCriteriaTotal') {
+        properties[template.id] =
+          ((properties[template.id] as number) ?? 0) + rubricCriteriaScore[template.criteriaTitle].total;
+      } else if (template.type === 'proposalRubricCriteriaAverage') {
+        properties[template.id] =
+          ((properties[template.id] as number) ?? 0) +
+          Number(
+            (
+              rubricCriteriaScore[template.criteriaTitle].total / rubricCriteriaScore[template.criteriaTitle].count
+            ).toFixed(2)
+          );
+      }
+    }
+  });
 
-  const proposalEvaluatedByProp = templates.find((p) => p.type === 'proposalEvaluatedBy' && p.name === step.title);
-  const proposalEvaluationTotalProp = templates.find(
-    (p) => p.type === 'proposalEvaluationTotal' && p.name === step.title
-  );
-  const proposalEvaluationAverageProp = templates.find(
-    (p) => p.type === 'proposalEvaluationAverage' && p.name === step.title
-  );
+  for (const evaluation of evaluations) {
+    const { rubricAnswers, rubricCriteria } = evaluation;
+    const { allScores, reviewersResults } = aggregateResults({
+      answers: rubricAnswers.filter((a) => a.evaluationId === evaluation.id) as unknown as AnswerData[],
+      criteria: rubricCriteria.filter((c) => c.id !== evaluation.id)
+    });
 
-  if (proposalEvaluatedByProp) {
-    properties[proposalEvaluatedByProp.id] = uniqueReviewers;
-  }
+    const uniqueReviewers = Object.keys(reviewersResults);
 
-  if (proposalEvaluationTotalProp) {
-    properties[proposalEvaluationTotalProp.id] = allScores.sum ?? '';
-  }
+    const proposalEvaluatedByProp = templates.find(
+      (p) => p.type === 'proposalEvaluatedBy' && p.evaluationTitle === evaluation.title
+    );
+    const proposalEvaluationTotalProp = templates.find(
+      (p) => p.type === 'proposalEvaluationTotal' && p.evaluationTitle === evaluation.title
+    );
+    const proposalEvaluationAverageProp = templates.find(
+      (p) => p.type === 'proposalEvaluationAverage' && p.evaluationTitle === evaluation.title
+    );
 
-  if (proposalEvaluationAverageProp) {
-    properties[proposalEvaluationAverageProp.id] = allScores.average ?? '';
+    if (proposalEvaluatedByProp) {
+      properties[proposalEvaluatedByProp.id] = uniqueReviewers;
+    }
+
+    if (proposalEvaluationTotalProp) {
+      properties[proposalEvaluationTotalProp.id] = allScores.sum ?? '';
+    }
+
+    if (proposalEvaluationAverageProp) {
+      properties[proposalEvaluationAverageProp.id] = allScores.average ?? '';
+    }
   }
 
   return properties;

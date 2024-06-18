@@ -5,7 +5,6 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 
 import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
-import { getPropertyName } from 'lib/databases/getPropertyName';
 
 import { useSortable } from '../../hooks/sortable';
 import type { Mutator } from '../../mutator';
@@ -82,7 +81,7 @@ export function CardDetailProperty({
       }}
       className='octo-propertyrow'
     >
-      {(readOnly || disableEditPropertyOption) && <PropertyLabel readOnly>{getPropertyName(property)}</PropertyLabel>}
+      {(readOnly || disableEditPropertyOption) && <PropertyLabel readOnly>{property.name}</PropertyLabel>}
       {!readOnly && !disableEditPropertyOption && (
         <Box>
           <PropertyNameContainer
@@ -95,7 +94,7 @@ export function CardDetailProperty({
             }}
           >
             <DragIndicatorIcon className='icons' fontSize='small' color='secondary' />
-            <Button>{getPropertyName(property)}</Button>
+            <Button>{property.name}</Button>
           </PropertyNameContainer>
           <Menu {...bindMenu(changePropertyPopupState)}>
             <PropertyMenu

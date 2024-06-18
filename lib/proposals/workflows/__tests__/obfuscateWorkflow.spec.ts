@@ -1,5 +1,5 @@
-import type { WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
 import { obfuscateWorkflow } from '../obfuscateWorkflow';
 

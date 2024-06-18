@@ -1,4 +1,3 @@
-import type { ApiPageKey } from '@charmverse/core/prisma';
 import { chunk } from 'lodash';
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
@@ -28,7 +27,7 @@ export const isNumber = (n: string) => !Number.isNaN(+n);
 export const validDate = (dt: string) => {
   const date = new Date(isNumber(dt) ? +dt : dt);
 
-  if (!Number.isNaN(date.valueOf()) && date.getFullYear() > 1970) {
+  if (!Number.isNaN(date.valueOf()) && date.getFullYear() > 2001) {
     return date;
   }
   return null;
@@ -115,6 +114,11 @@ export function createNewPropertiesForBoard(
 
     return { ...defaultProps, options, type: 'multiSelect' };
   }
+
+  if (propValues.length === 0) {
+    return { ...defaultProps, type: 'text' };
+  }
+
   if (propValues.every(validateAllBlockDates)) {
     return { ...defaultProps, type: 'date' };
   }
@@ -335,7 +339,7 @@ export async function addNewCards({
 }) {
   const apiPageKeys = await charmClient.getApiPageKeys({ pageId: boardPageId });
   // We assume that the first column is the title so we rename it accordingly
-  const { csvData, headers } = transformCsvResults(results, apiPageKeys ? 'Form Response' : undefined);
+  const { csvData, headers } = transformCsvResults(results, apiPageKeys?.length ? 'Form Response' : undefined);
 
   const containsTitleProperty = board.fields.cardProperties.find(
     (cardProperty) => cardProperty.id === Constants.titleColumnId

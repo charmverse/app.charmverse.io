@@ -75,6 +75,7 @@ type Props = {
   readOnlyTitle?: boolean;
   disableDnd?: boolean;
   hideLinkedBounty?: boolean;
+  isApplication?: boolean;
 };
 
 function Kanban(props: Props) {
@@ -386,6 +387,7 @@ function Kanban(props: Props) {
             <KanbanGroupColumn
               group={group}
               board={board}
+              isApplication={props.isApplication}
               visiblePropertyTemplates={visiblePropertyTemplates}
               key={group.id || 'empty'}
               readOnly={props.readOnly}
