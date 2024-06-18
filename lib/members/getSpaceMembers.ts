@@ -70,7 +70,8 @@ export async function getSpaceMembers({
           wallets: true,
           telegramUser: true,
           discordUser: true,
-          googleAccounts: true
+          googleAccounts: true,
+          farcasterUser: true
         }
       },
       spaceRoleToRole: {
@@ -142,7 +143,8 @@ export async function getSpaceMembers({
           properties,
           searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, memberUsernameRecord[spaceRole.id]),
           roles,
-          isBot: userData.isBot ?? undefined
+          isBot: userData.isBot ?? undefined,
+          farcasterUser: userData.farcasterUser || undefined
         };
       })
       // filter out deleted members

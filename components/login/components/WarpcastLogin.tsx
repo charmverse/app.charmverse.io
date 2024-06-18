@@ -12,7 +12,7 @@ import type { LoggedInUser } from 'models';
 
 import { FarcasterLoginModal } from './FarcasterModal';
 
-function WarpcastLoginButton({ type }: { type: LoginType }) {
+export function useWarpcastLogin({ type }: { type: LoginType }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const { showMessage } = useSnackbar();
 
@@ -38,12 +38,25 @@ function WarpcastLoginButton({ type }: { type: LoginType }) {
     popupState.open();
   }, []);
 
-  const { signIn, isLoading, url } = useFarcasterConnection({
+  const { signIn, isLoading, url, connect } = useFarcasterConnection({
     onSuccess: onSuccessCallback,
     onError: onErrorCallback,
     onClick,
     type
   });
+
+  return {
+    isOpen: popupState.isOpen,
+    close: popupState.close,
+    isLoading,
+    signIn,
+    url,
+    connect
+  };
+}
+
+function WarpcastLoginButton({ type }: { type: LoginType }) {
+  const { close, isLoading, isOpen, signIn, url } = useWarpcastLogin({ type });
 
   return (
     <>
@@ -62,7 +75,7 @@ function WarpcastLoginButton({ type }: { type: LoginType }) {
           Connect
         </PrimaryButton>
       )}
-      <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />
+      <FarcasterLoginModal open={isOpen} onClose={close} url={url} />
     </>
   );
 }

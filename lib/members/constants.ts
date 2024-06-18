@@ -57,6 +57,11 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     readonly: true,
     hidden: true
   },
+  farcaster: {
+    label: 'Farcaster',
+    default: true,
+    hidden: true
+  },
   google: {
     label: 'Google',
     default: true,
