@@ -45,7 +45,7 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
 
   const isAuthor = proposal.authors.some((author) => author.userId === userId);
 
-  const { error } = await hasAccessToSpace({
+  const { error, isAdmin } = await hasAccessToSpace({
     spaceId: proposalEvaluation.proposal.spaceId,
     userId,
     adminOnly: false
@@ -59,8 +59,8 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError();
   }
 
-  if (!isAuthor) {
-    throw new ActionNotPermittedError('Only authors can appeal evaluations');
+  if (!isAuthor && !isAdmin) {
+    throw new ActionNotPermittedError('Only authors and admins can appeal evaluations');
   }
 
   if (proposalEvaluation.result !== 'fail') {
