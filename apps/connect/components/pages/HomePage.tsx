@@ -28,7 +28,7 @@ export function HomePage({ user }: { user: any }) {
         </Box>
       </Box>
       <Divider />
-      <Box mt={2}>
+      <Box mt={2} gap={2} display='flex' flexDirection='column'>
         <Typography variant='h5'>Recent Projects</Typography>
         <ProjectsList />
       </Box>
