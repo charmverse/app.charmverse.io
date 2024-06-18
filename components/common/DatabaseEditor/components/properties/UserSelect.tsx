@@ -1,11 +1,13 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
+import type { AutocompleteRenderGetTagProps } from '@mui/material';
 import { IconButton, Box, Stack, TextField } from '@mui/material';
 import { useCallback, useState } from 'react';
 
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
+import type { Member } from 'lib/members/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
@@ -58,30 +60,24 @@ const StyledUserPropertyContainer = styled(Box, {
 `;
 
 function MembersDisplay({
-  memberIds,
+  members,
   readOnly,
-  setMemberIds,
   wrapColumn,
-  disallowEmpty
+  disallowEmpty,
+  getTagProps,
+  onDelete
 }: {
   disallowEmpty?: boolean;
   wrapColumn: boolean;
   readOnly: boolean;
-  memberIds: string[];
-  setMemberIds: (memberIds: string[]) => void;
+  members: Member[];
+  getTagProps?: AutocompleteRenderGetTagProps;
+  onDelete?: (memberId: string) => void; // this prop[ is for components not using Autocomplete
 }) {
-  const { membersRecord } = useMembers();
+  const showDeleteIcon = (disallowEmpty && members.length !== 1) || !disallowEmpty;
 
-  function removeMember(memberId: string) {
-    if (!readOnly) {
-      setMemberIds(memberIds.filter((_memberId) => _memberId !== memberId));
-    }
-  }
-
-  const members = memberIds.map((memberId) => membersRecord[memberId]).filter(isTruthy);
-  const showDeleteIcon = (disallowEmpty && memberIds.length !== 1) || !disallowEmpty;
-
-  const selectedTags = members.map((user) => {
+  const selectedTags = members.map((user, index) => {
+    const tagProps = getTagProps?.({ index });
     return (
       <Stack
         mr={1}
@@ -98,7 +94,7 @@ function MembersDisplay({
       >
         <UserDisplay fontSize={14} avatarSize='xSmall' userId={user.id} wrapName={wrapColumn} />
         {!readOnly && showDeleteIcon && (
-          <IconButton size='small' onClick={() => removeMember(user.id)}>
+          <IconButton size='small' onClick={tagProps ? tagProps.onDelete : () => onDelete!(user.id)}>
             <CloseIcon
               sx={{
                 fontSize: 14
@@ -113,7 +109,7 @@ function MembersDisplay({
     );
   });
 
-  if (memberIds.length === 0) {
+  if (members.length === 0) {
     return null;
   }
 
@@ -178,8 +174,8 @@ export function UserSelectWithoutPreview({
               variant='outlined'
             />
           )}
-          renderTags={() => (
-            <MembersDisplay wrapColumn readOnly={!!readOnly} memberIds={memberIds} setMemberIds={_onChange} />
+          renderTags={(value: Member[], getTagProps) => (
+            <MembersDisplay wrapColumn readOnly={!!readOnly} members={value} getTagProps={getTagProps} />
           )}
         />
       </StyledUserPropertyContainer>
@@ -200,6 +196,7 @@ export function UserSelect({
   disallowEmpty = false
 }: UserSelectProps): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(defaultOpened);
+  const { membersRecord } = useMembers();
 
   const _onChange = useCallback(
     (newMemberIds: string[]) => {
@@ -232,8 +229,8 @@ export function UserSelect({
             <MembersDisplay
               wrapColumn={displayType === 'details' ? false : wrapColumn ?? false}
               readOnly={true}
-              memberIds={memberIds}
-              setMemberIds={_onChange}
+              members={memberIds.map((id) => membersRecord[id]).filter(isTruthy)}
+              onDelete={(memberId) => onChange(memberIds.filter((id) => id !== memberId))}
             />
           )}
         </Stack>
@@ -261,13 +258,13 @@ export function UserSelect({
           placeholder={memberIds.length === 0 ? 'Search for a person...' : ''}
           inputVariant='standard'
           forcePopupIcon={false}
-          renderTags={() => (
+          renderTags={(value: Member[], getTagProps) => (
             <MembersDisplay
               disallowEmpty={disallowEmpty}
               wrapColumn={true}
               readOnly={!!readOnly}
-              memberIds={memberIds}
-              setMemberIds={_onChange}
+              members={value}
+              getTagProps={getTagProps}
             />
           )}
         />
