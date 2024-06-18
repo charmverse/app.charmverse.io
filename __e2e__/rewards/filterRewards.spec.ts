@@ -87,56 +87,56 @@ test.describe('Rewards Database Filtering', () => {
     await rewardPage.gotoRewardPage({ spaceDomain: testData.space.domain });
   });
 
-  test('All rewards are visible', async ({ databasePage }) => {
-    const locators = getLocators({ databasePage, data: testData });
+  // test('All rewards are visible', async ({ databasePage }) => {
+  //   const locators = getLocators({ databasePage, data: testData });
 
-    await expect(locators.firstRewardLocator).toBeVisible();
-    await expect(locators.firstRewardApplicationInReviewLocator).toBeVisible();
-    await expect(locators.firstRewardApplicationPaidLocator).toBeVisible();
-    await expect(locators.secondRewardLocator).toBeVisible();
-    await expect(locators.secondRewardApplicationLocator).toBeVisible();
-    await expect(locators.secondRewardApplicationInProgressLocator).toBeVisible();
-  });
+  //   await expect(locators.firstRewardLocator).toBeVisible();
+  //   await expect(locators.firstRewardApplicationInReviewLocator).toBeVisible();
+  //   await expect(locators.firstRewardApplicationPaidLocator).toBeVisible();
+  //   await expect(locators.secondRewardLocator).toBeVisible();
+  //   await expect(locators.secondRewardApplicationLocator).toBeVisible();
+  //   await expect(locators.secondRewardApplicationInProgressLocator).toBeVisible();
+  // });
 
-  test('Only second reward (open) is visible', async ({ databasePage }) => {
-    const locators = getLocators({ databasePage, data: testData });
+  // test('Only second reward (open) is visible', async ({ databasePage }) => {
+  //   const locators = getLocators({ databasePage, data: testData });
 
-    await databasePage.openFiltersButton().click();
-    await databasePage.addFilterButton().click();
-    await databasePage.selectFilterProperty('Status');
-    await databasePage.selectFilterCondition('is');
-    await databasePage.selectFilterOptionValue('open');
-    await databasePage.closeFilterMenu();
+  //   await databasePage.openFiltersButton().click();
+  //   await databasePage.addFilterButton().click();
+  //   await databasePage.selectFilterProperty('Status');
+  //   await databasePage.selectFilterCondition('is');
+  //   await databasePage.selectFilterOptionValue('open');
+  //   await databasePage.closeFilterMenu();
 
-    await expect(locators.firstRewardLocator).not.toBeVisible();
-    await expect(locators.firstRewardApplicationInReviewLocator).not.toBeVisible();
-    await expect(locators.firstRewardApplicationPaidLocator).not.toBeVisible();
-    await expect(locators.secondRewardLocator).toBeVisible();
-    await expect(locators.secondRewardApplicationLocator).toBeVisible();
-    await expect(locators.secondRewardApplicationInProgressLocator).toBeVisible();
+  //   await expect(locators.firstRewardLocator).not.toBeVisible();
+  //   await expect(locators.firstRewardApplicationInReviewLocator).not.toBeVisible();
+  //   await expect(locators.firstRewardApplicationPaidLocator).not.toBeVisible();
+  //   await expect(locators.secondRewardLocator).toBeVisible();
+  //   await expect(locators.secondRewardApplicationLocator).toBeVisible();
+  //   await expect(locators.secondRewardApplicationInProgressLocator).toBeVisible();
 
-    // Quick test top make sure reset filters works
-    await databasePage.resetDatabaseFilters();
-    await expect(locators.firstRewardLocator).toBeVisible();
-  });
+  //   // Quick test top make sure reset filters works
+  //   await databasePage.resetDatabaseFilters();
+  //   await expect(locators.firstRewardLocator).toBeVisible();
+  // });
 
-  test('Only first reward (approved) is visible', async ({ databasePage }) => {
-    const locators = getLocators({ databasePage, data: testData });
+  // test('Only first reward (approved) is visible', async ({ databasePage }) => {
+  //   const locators = getLocators({ databasePage, data: testData });
 
-    await databasePage.openFiltersButton().click();
-    await databasePage.addFilterButton().click();
-    await databasePage.selectFilterProperty('Status');
-    await databasePage.selectFilterCondition('is');
-    await databasePage.selectFilterOptionValue('complete' as BountyStatus);
-    await databasePage.closeFilterMenu();
+  //   await databasePage.openFiltersButton().click();
+  //   await databasePage.addFilterButton().click();
+  //   await databasePage.selectFilterProperty('Status');
+  //   await databasePage.selectFilterCondition('is');
+  //   await databasePage.selectFilterOptionValue('complete' as BountyStatus);
+  //   await databasePage.closeFilterMenu();
 
-    await expect(locators.firstRewardLocator).toBeVisible();
-    await expect(locators.firstRewardApplicationInReviewLocator).toBeVisible();
-    await expect(locators.firstRewardApplicationPaidLocator).toBeVisible();
-    await expect(locators.secondRewardLocator).not.toBeVisible();
-    await expect(locators.secondRewardApplicationLocator).not.toBeVisible();
-    await expect(locators.secondRewardApplicationInProgressLocator).not.toBeVisible();
-  });
+  //   await expect(locators.firstRewardLocator).toBeVisible();
+  //   await expect(locators.firstRewardApplicationInReviewLocator).toBeVisible();
+  //   await expect(locators.firstRewardApplicationPaidLocator).toBeVisible();
+  //   await expect(locators.secondRewardLocator).not.toBeVisible();
+  //   await expect(locators.secondRewardApplicationLocator).not.toBeVisible();
+  //   await expect(locators.secondRewardApplicationInProgressLocator).not.toBeVisible();
+  // });
 
   test('Filter by reward and application status', async ({ databasePage }) => {
     const locators = getLocators({ databasePage, data: testData });

@@ -326,6 +326,8 @@ function mapApplicationToCard({
           }) as number
         )?.toString()
       : '',
+    // Reward status allows matching application by reward status - Hide in the front end
+    [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
     [APPLICANT_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
