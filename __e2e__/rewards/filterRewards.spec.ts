@@ -1,11 +1,12 @@
 import type { ApplicationStatus, BountyStatus } from '@charmverse/core/dist/cjs/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { test, expect } from '__e2e__/testWithFixtures';
+import type { E2EFixtures } from '__e2e__/testWithFixtures';
+import { expect, test } from '__e2e__/testWithFixtures';
 import { loginBrowserUser } from '__e2e__/utils/mocks';
 
 import { generateBountyApplication, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
-test('Display and filter rewards', async ({ rewardPage, page, databasePage }) => {
+async function setupTestData() {
   const { space, user: admin } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
 
   const firstReward = await generateBountyWithSingleApplication({
@@ -40,111 +41,125 @@ test('Display and filter rewards', async ({ rewardPage, page, databasePage }) =>
     userId: admin.id
   });
 
-  await loginBrowserUser({ browserPage: page, userId: admin.id });
+  return {
+    admin,
+    firstReward,
+    firstRewardSecondApplicationIsPaid,
+    secondReward,
+    secondRewardSecondApplicationIsInProgress,
+    space
+  };
+}
 
-  await rewardPage.gotoRewardPage({ spaceDomain: space.domain });
+export function getLocators({
+  databasePage,
+  data: { firstReward, firstRewardSecondApplicationIsPaid, secondReward, secondRewardSecondApplicationIsInProgress }
+}: Pick<E2EFixtures, 'databasePage'> & { data: Awaited<ReturnType<typeof setupTestData>> }) {
+  const locators = {
+    firstRewardLocator: databasePage.getTableRowByCardId({ cardId: firstReward.page.id }),
+    firstRewardApplicationInReviewLocator: databasePage.getTableRowByCardId({
+      cardId: firstReward.applications[0].id
+    }),
+    firstRewardApplicationPaidLocator: databasePage.getTableRowByCardId({
+      cardId: firstRewardSecondApplicationIsPaid.id
+    }),
+    secondRewardLocator: databasePage.getTableRowByCardId({ cardId: secondReward.page.id }),
+    secondRewardApplicationLocator: databasePage.getTableRowByCardId({
+      cardId: secondReward.applications[0].id
+    }),
+    secondRewardApplicationInProgressLocator: databasePage.getTableRowByCardId({
+      cardId: secondRewardSecondApplicationIsInProgress.id
+    })
+  };
 
-  const firstRewardLocator = databasePage.getTableRowByCardId({ cardId: firstReward.page.id });
+  return locators;
+}
 
-  const firstRewardApplicationInReviewLocator = databasePage.getTableRowByCardId({
-    cardId: firstReward.applications[0].id
+test.describe('Rewards Database Filtering', () => {
+  let testData: Awaited<ReturnType<typeof setupTestData>>;
+
+  test.beforeAll(async () => {
+    testData = await setupTestData();
   });
 
-  const firstRewardApplicationPaidLocator = databasePage.getTableRowByCardId({
-    cardId: firstRewardSecondApplicationIsPaid.id
+  test.beforeEach(async ({ page, rewardPage }) => {
+    await loginBrowserUser({ browserPage: page, userId: testData.admin.id });
+    await rewardPage.gotoRewardPage({ spaceDomain: testData.space.domain });
   });
 
-  const secondRewardLocator = databasePage.getTableRowByCardId({ cardId: secondReward.page.id });
+  test('All rewards are visible', async ({ databasePage }) => {
+    const locators = getLocators({ databasePage, data: testData });
 
-  const secondRewardApplicationLocator = databasePage.getTableRowByCardId({
-    cardId: secondReward.applications[0].id
+    await expect(locators.firstRewardLocator).toBeVisible();
+    await expect(locators.firstRewardApplicationInReviewLocator).toBeVisible();
+    await expect(locators.firstRewardApplicationPaidLocator).toBeVisible();
+    await expect(locators.secondRewardLocator).toBeVisible();
+    await expect(locators.secondRewardApplicationLocator).toBeVisible();
+    await expect(locators.secondRewardApplicationInProgressLocator).toBeVisible();
   });
 
-  const secondRewardApplicationInProgressLocator = databasePage.getTableRowByCardId({
-    cardId: secondRewardSecondApplicationIsInProgress.id
+  test('Only second reward (open) is visible', async ({ databasePage }) => {
+    const locators = getLocators({ databasePage, data: testData });
+
+    await databasePage.openFiltersButton().click();
+    await databasePage.addFilterButton().click();
+    await databasePage.selectFilterProperty('Status');
+    await databasePage.selectFilterCondition('is');
+    await databasePage.selectFilterOptionValue('open');
+    await databasePage.closeFilterMenu();
+
+    await expect(locators.firstRewardLocator).not.toBeVisible();
+    await expect(locators.firstRewardApplicationInReviewLocator).not.toBeVisible();
+    await expect(locators.firstRewardApplicationPaidLocator).not.toBeVisible();
+    await expect(locators.secondRewardLocator).toBeVisible();
+    await expect(locators.secondRewardApplicationLocator).toBeVisible();
+    await expect(locators.secondRewardApplicationInProgressLocator).toBeVisible();
+
+    // Quick test top make sure reset filters works
+    await databasePage.resetDatabaseFilters();
+    await expect(locators.firstRewardLocator).toBeVisible();
   });
 
-  // Case 1 - all rewards are visible
-  await expect(firstRewardLocator).toBeVisible();
-  await expect(firstRewardApplicationInReviewLocator).toBeVisible();
-  await expect(firstRewardApplicationPaidLocator).toBeVisible();
+  test('Only first reward (approved) is visible', async ({ databasePage }) => {
+    const locators = getLocators({ databasePage, data: testData });
 
-  await expect(secondRewardLocator).toBeVisible();
-  await expect(secondRewardApplicationLocator).toBeVisible();
-  await expect(secondRewardApplicationInProgressLocator).toBeVisible();
+    await databasePage.openFiltersButton().click();
+    await databasePage.addFilterButton().click();
+    await databasePage.selectFilterProperty('Status');
+    await databasePage.selectFilterCondition('is');
+    await databasePage.selectFilterOptionValue('complete' as BountyStatus);
+    await databasePage.closeFilterMenu();
 
-  // Case 2 - Only second reward (open) is visible
-  await databasePage.openFiltersButton().click();
+    await expect(locators.firstRewardLocator).toBeVisible();
+    await expect(locators.firstRewardApplicationInReviewLocator).toBeVisible();
+    await expect(locators.firstRewardApplicationPaidLocator).toBeVisible();
+    await expect(locators.secondRewardLocator).not.toBeVisible();
+    await expect(locators.secondRewardApplicationLocator).not.toBeVisible();
+    await expect(locators.secondRewardApplicationInProgressLocator).not.toBeVisible();
+  });
 
-  await databasePage.addFilterButton().click();
+  test('Filter by reward and application status', async ({ databasePage }) => {
+    const locators = getLocators({ databasePage, data: testData });
 
-  await databasePage.selectFilterProperty('Status');
+    await databasePage.openFiltersButton().click();
+    await databasePage.addFilterButton().click();
+    await databasePage.selectFilterProperty('Status');
+    await databasePage.selectFilterCondition('is');
+    await databasePage.selectFilterOptionValue('open' as BountyStatus);
 
-  await databasePage.selectFilterCondition('is');
+    await databasePage.addFilterButton().click();
 
-  await databasePage.selectFilterOptionValue('open');
+    await databasePage.selectFilterProperty('Applicant Status', { index: 1 });
+    await databasePage.selectFilterCondition('is', { index: 1 });
+    await databasePage.selectFilterOptionValue('inProgress' as ApplicationStatus, { index: 1 });
+    await databasePage.closeFilterMenu();
 
-  await databasePage.closeFilterMenu();
-
-  await expect(firstRewardLocator).not.toBeVisible();
-  await expect(firstRewardApplicationInReviewLocator).not.toBeVisible();
-  await expect(firstRewardApplicationPaidLocator).not.toBeVisible();
-
-  await expect(secondRewardLocator).toBeVisible();
-  await expect(secondRewardApplicationLocator).toBeVisible();
-  await expect(secondRewardApplicationInProgressLocator).toBeVisible();
-
-  // Case 3 - Only first reward (approved) is visible
-  await databasePage.resetDatabaseFilters();
-
-  await databasePage.openFiltersButton().click();
-
-  await databasePage.addFilterButton().click();
-
-  await databasePage.selectFilterProperty('Status');
-
-  await databasePage.selectFilterCondition('is');
-
-  await databasePage.selectFilterOptionValue('complete' as BountyStatus);
-
-  await databasePage.closeFilterMenu();
-
-  await expect(firstRewardLocator).toBeVisible();
-  await expect(firstRewardApplicationInReviewLocator).toBeVisible();
-  await expect(firstRewardApplicationPaidLocator).toBeVisible();
-
-  await expect(secondRewardLocator).not.toBeVisible();
-  await expect(secondRewardApplicationLocator).not.toBeVisible();
-  await expect(secondRewardApplicationInProgressLocator).not.toBeVisible();
-
-  // Case 3 - Filter by reward and application status
-  await databasePage.resetDatabaseFilters();
-
-  await databasePage.openFiltersButton().click();
-
-  await databasePage.addFilterButton().click();
-
-  // Select first property (Reward status)
-  await databasePage.selectFilterProperty('Status');
-
-  await databasePage.selectFilterCondition('is');
-
-  await databasePage.selectFilterOptionValue('open' as BountyStatus);
-
-  // Select second property (Reward status)
-  await databasePage.selectFilterProperty('Applicant Status');
-
-  await databasePage.selectFilterCondition('is');
-
-  await databasePage.selectFilterOptionValue('inProgress' as ApplicationStatus);
-
-  await databasePage.closeFilterMenu();
-
-  await expect(firstRewardLocator).not.toBeVisible();
-  await expect(firstRewardApplicationInReviewLocator).not.toBeVisible();
-  await expect(firstRewardApplicationPaidLocator).not.toBeVisible();
-
-  await expect(secondRewardLocator).toBeVisible();
-  await expect(secondRewardApplicationLocator).not.toBeVisible();
-  await expect(secondRewardApplicationInProgressLocator).toBeVisible();
+    await expect(locators.firstRewardLocator).not.toBeVisible();
+    await expect(locators.firstRewardApplicationInReviewLocator).not.toBeVisible();
+    await expect(locators.firstRewardApplicationPaidLocator).not.toBeVisible();
+    await expect(locators.secondRewardLocator).toBeVisible();
+    await expect(locators.secondRewardApplicationLocator).not.toBeVisible();
+    await databasePage.page.pause();
+    await expect(locators.secondRewardApplicationInProgressLocator).toBeVisible();
+  });
 });

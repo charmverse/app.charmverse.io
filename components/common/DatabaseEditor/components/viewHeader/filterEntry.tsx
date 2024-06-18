@@ -362,6 +362,7 @@ function FilterPropertyValue({
           const foundOption = property.options?.find((o) => o.id === selected);
           return foundOption ? (
             <Chip
+              data-test='filter-type-select'
               size='small'
               label={
                 isPropertyTypeEvaluationType

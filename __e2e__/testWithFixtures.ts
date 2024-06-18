@@ -1,3 +1,4 @@
+import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
 
 import { BountyBoardPage } from './po/bountyBoard.po';
@@ -26,7 +27,7 @@ import { SignUpPage } from './po/signup.po';
 import { SpacesDropdown } from './po/spacesDropdown.po';
 import { TokenGatePage } from './po/tokenGate.po';
 
-type Fixtures = {
+export type E2EFixtures = {
   bountyBoardPage: BountyBoardPage;
   bountyPage: BountyPage;
   databasePage: DatabasePage;
@@ -54,13 +55,14 @@ type Fixtures = {
   spacesDropdown: SpacesDropdown;
   tokenGatePage: TokenGatePage;
   projectSettings: ProjectSettings;
+  page: Page;
 };
 
 // Used for reusing a Page Object Model, but scoped to a part of the screen
 // Example case: Dealing with main document page and popup document page
 const dialogSelector = `data-test=dialog`;
 
-export const test = base.extend<Fixtures>({
+export const test = base.extend<E2EFixtures>({
   bountyBoardPage: async ({ page }, use) => use(new BountyBoardPage(page)),
   bountyPage: async ({ page }, use) => use(new BountyPage(page)),
   databasePage: async ({ page }, use) => use(new DatabasePage(page)),

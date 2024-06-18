@@ -13,6 +13,12 @@ type OptionalBoardId = {
   boardId?: string;
 };
 
+type OptionalIndex = {
+  index?: number;
+};
+
+const zeroIndex = 0;
+
 export class DatabasePage extends GlobalPage {
   /**
    * Used for getting localised board props when multiple boards coexist in the UI
@@ -164,18 +170,27 @@ export class DatabasePage extends GlobalPage {
     return this.getPageOrBoardLocator(input).locator('data-test=add-filter-button');
   }
 
-  async selectFilterProperty(propertyName: string, input: OptionalBoardId = {}) {
-    await this.getPageOrBoardLocator(input).locator('data-test=filter-property-button').click();
+  async selectFilterProperty(propertyName: string, input: OptionalBoardId & OptionalIndex = {}) {
+    await this.getPageOrBoardLocator(input)
+      .locator('data-test=filter-property-button')
+      .nth(input.index ?? zeroIndex)
+      .click();
     await this.page.locator(`data-test=filter-property-select-${slugify(propertyName)}`).click();
   }
 
-  async selectFilterCondition(condition: FilterCondition, input: OptionalBoardId = {}) {
-    await this.getPageOrBoardLocator(input).locator('data-test=filter-condition-button').click();
+  async selectFilterCondition(condition: FilterCondition, input: OptionalBoardId & OptionalIndex = {}) {
+    await this.getPageOrBoardLocator(input)
+      .locator('data-test=filter-condition-button')
+      .nth(input.index ?? zeroIndex)
+      .click();
     await this.page.locator(`data-test=filter-condition-option-${condition}`).click();
   }
 
-  async selectFilterOptionValue(optionId: string, input: OptionalBoardId = {}) {
-    await this.getPageOrBoardLocator(input).locator('data-test=filter-type-select').click();
+  async selectFilterOptionValue(optionId: string, input: OptionalBoardId & OptionalIndex = {}) {
+    await this.getPageOrBoardLocator(input)
+      .locator('data-test=filter-type-select')
+      .nth(input.index ?? zeroIndex)
+      .click();
     await this.page.locator(`data-test=filter-option-value-${optionId}`).click();
   }
 
