@@ -63,7 +63,7 @@ async function replace() {
       //     userId: replace.id
       //   }
       // });
-      console.log('updated', { ...row, result });
+      // console.log('updated', { ...row, result });
     }
   }
   console.log('Done!');
