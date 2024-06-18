@@ -110,6 +110,7 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
               <svg
                 aria-hidden="true"
                 class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall css-887v1i-MuiSvgIcon-root"
+                data-test="view-filter-button"
                 data-testid="FilterListIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
