@@ -40,15 +40,17 @@ class CardFilter {
         return true;
       }
 
+      const cardCopy = { ...card };
+
       // Find at least 1 subPage that meets the filter, return matching subpages and parent card
       // Use case: Filtering by status of applications for a reward
-      const filteredSubPages = (card as CardWithRelations)?.subPages?.filter((subPage) =>
+      const filteredSubPages = (cardCopy as CardWithRelations)?.subPages?.filter((subPage) =>
         this.isFilterGroupMet(filterGroup, cardProperties, subPage)
       );
 
-      (card as CardWithRelations).subPages = filteredSubPages;
+      (cardCopy as CardWithRelations).subPages = filteredSubPages;
 
-      return this.isFilterGroupMet(filterGroup, cardProperties, card) || filteredSubPages?.length;
+      return this.isFilterGroupMet(filterGroup, cardProperties, cardCopy) || filteredSubPages?.length;
     });
   }
 
