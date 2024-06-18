@@ -1,3 +1,4 @@
+import type { BountyStatus } from '@charmverse/core/dist/cjs/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { test, expect } from '__e2e__/testWithFixtures';
 import { loginBrowserUser } from '__e2e__/utils/mocks';
@@ -36,8 +37,6 @@ test('Display and filter rewards', async ({ rewardPage, page, databasePage }) =>
 
   await rewardPage.gotoRewardPage({ spaceDomain: space.domain });
 
-  // console.log('First reward page id', firstReward.page.id);
-
   const firstRewardLocator = databasePage.getTableRowByCardId({ cardId: firstReward.page.id });
 
   const firstRewardApplicationInReviewLocator = databasePage.getTableRowByCardId({
@@ -54,10 +53,53 @@ test('Display and filter rewards', async ({ rewardPage, page, databasePage }) =>
     cardId: secondReward.applications[0].id
   });
 
+  // Case 1 - all rewards are visible
   await expect(firstRewardLocator).toBeVisible();
   await expect(firstRewardApplicationInReviewLocator).toBeVisible();
   await expect(firstRewardApplicationPaidLocator).toBeVisible();
 
   await expect(secondRewardLocator).toBeVisible();
   await expect(secondRewardApplicationPaidLocator).toBeVisible();
+
+  // Case 2 - Only second reward (open) is visible
+  await databasePage.openFiltersButton().click();
+
+  await databasePage.addFilterButton().click();
+
+  await databasePage.selectFilterProperty('Status');
+
+  await databasePage.selectFilterCondition('is');
+
+  await databasePage.selectFilterOptionValue('open');
+
+  await page.keyboard.press('Escape');
+
+  await expect(firstRewardLocator).not.toBeVisible();
+  await expect(firstRewardApplicationInReviewLocator).not.toBeVisible();
+  await expect(firstRewardApplicationPaidLocator).not.toBeVisible();
+
+  await expect(secondRewardLocator).toBeVisible();
+  await expect(secondRewardApplicationPaidLocator).toBeVisible();
+
+  // Case 3 - Only first reward (approved) is visible
+  await databasePage.resetDatabaseFilters();
+
+  await databasePage.openFiltersButton().click();
+
+  await databasePage.addFilterButton().click();
+
+  await databasePage.selectFilterProperty('Status');
+
+  await databasePage.selectFilterCondition('is');
+
+  await databasePage.selectFilterOptionValue('complete' as BountyStatus);
+
+  await page.keyboard.press('Escape');
+
+  await expect(firstRewardLocator).toBeVisible();
+  await expect(firstRewardApplicationInReviewLocator).toBeVisible();
+  await expect(firstRewardApplicationPaidLocator).toBeVisible();
+
+  await expect(secondRewardLocator).not.toBeVisible();
+  await expect(secondRewardApplicationPaidLocator).not.toBeVisible();
 });

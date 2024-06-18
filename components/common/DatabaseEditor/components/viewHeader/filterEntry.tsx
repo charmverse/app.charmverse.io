@@ -370,7 +370,7 @@ function FilterPropertyValue({
               color={focalboardColorsMap[foundOption.color]}
             />
           ) : (
-            <Typography fontSize='small' color='secondary'>
+            <Typography data-test='filter-type-select' fontSize='small' color='secondary'>
               Select an option
             </Typography>
           );
@@ -383,7 +383,12 @@ function FilterPropertyValue({
         ) : (
           property.options.map((option) => {
             return (
-              <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)} value={option.id}>
+              <MenuItem
+                data-test={`filter-option-value-${option.id}`}
+                key={option.id}
+                onClick={() => updateSelectValue(option.id)}
+                value={option.id}
+              >
                 <Chip
                   size='small'
                   label={
@@ -461,6 +466,7 @@ function FilterEntry(props: Props) {
                 color='secondary'
                 size='small'
                 variant='outlined'
+                data-test='filter-property-button'
                 endIcon={<KeyboardArrowDownIcon fontSize='small' />}
                 sx={{ minWidth: 125, maxWidth: 125, width: 125, justifyContent: 'space-between' }}
                 {...bindTrigger(popupState)}
@@ -481,6 +487,7 @@ function FilterEntry(props: Props) {
                     key={property.id}
                     id={property.id}
                     selected={property.id === filter.propertyId}
+                    data-test={`filter-property-select-${property.name}`}
                     onClick={() => {
                       const filterGroup = createFilterGroup(currentFilter);
                       const filterClause = filterGroup.filters.find(
@@ -513,6 +520,7 @@ function FilterEntry(props: Props) {
                 size='small'
                 {...bindTrigger(popupState)}
                 variant='outlined'
+                data-test='filter-condition-button'
                 endIcon={<KeyboardArrowDownIcon fontSize='small' />}
               >
                 <EllipsisText fontSize='small' variant='subtitle1'>
@@ -523,10 +531,14 @@ function FilterEntry(props: Props) {
                 {propertyConfigs[template.type].conditions.map((condition) => {
                   return (
                     <MenuItem
+                      data-test={`filter-condition-option-${condition}`}
                       selected={condition === filter.condition}
                       key={condition}
                       id='includes'
-                      onClick={() => props.conditionClicked(condition, filter)}
+                      onClick={() => {
+                        props.conditionClicked(condition, filter);
+                        popupState.close();
+                      }}
                     >
                       <EllipsisText variant='subtitle1'>{formatCondition(condition)}</EllipsisText>
                     </MenuItem>
