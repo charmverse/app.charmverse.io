@@ -2,6 +2,7 @@ import { selectors } from '@playwright/test';
 
 import type { PropertyType } from 'lib/databases/board';
 import type { FilterCondition } from 'lib/databases/filterClause';
+import { slugify } from 'lib/utils/strings';
 
 import { GlobalPage } from './global.po';
 
@@ -165,7 +166,7 @@ export class DatabasePage extends GlobalPage {
 
   async selectFilterProperty(propertyName: string, input: OptionalBoardId = {}) {
     await this.getPageOrBoardLocator(input).locator('data-test=filter-property-button').click();
-    await this.page.locator(`data-test=filter-property-select-${propertyName}`).click();
+    await this.page.locator(`data-test=filter-property-select-${slugify(propertyName)}`).click();
   }
 
   async selectFilterCondition(condition: FilterCondition, input: OptionalBoardId = {}) {
@@ -180,5 +181,9 @@ export class DatabasePage extends GlobalPage {
 
   async resetDatabaseFilters(input: OptionalBoardId = {}) {
     await this.getPageOrBoardLocator(input).locator('data-test=reset-database-filters').click();
+  }
+
+  async closeFilterMenu() {
+    await this.page.keyboard.press('Escape');
   }
 }
