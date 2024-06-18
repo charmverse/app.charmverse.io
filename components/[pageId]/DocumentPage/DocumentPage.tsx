@@ -113,9 +113,10 @@ function DocumentPageComponent({
     proposalId
   });
 
-  const { control, formFields, getFieldState, isLoadingAnswers, projectForm, onSave } = useProposalFormAnswers({
-    proposal
-  });
+  const { control, formFields, getFieldState, isLoadingAnswers, projectForm, onSave, refreshProposalFormAnswers } =
+    useProposalFormAnswers({
+      proposal
+    });
 
   const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
     rewardId
@@ -484,18 +485,17 @@ function DocumentPageComponent({
                               onChangeRewardSettings({
                                 pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
                               });
-
-                              return;
+                            } else {
+                              onChangeRewardSettings({
+                                pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
+                                  if (draft.draftId === pendingReward.draftId) {
+                                    return pendingReward;
+                                  }
+                                  return draft;
+                                })
+                              });
                             }
-
-                            onChangeRewardSettings({
-                              pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
-                                if (draft.draftId === pendingReward.draftId) {
-                                  return pendingReward;
-                                }
-                                return draft;
-                              })
-                            });
+                            refreshProposalFormAnswers();
                           },
                           onDelete: (draftId: string) => {
                             onChangeRewardSettings({
