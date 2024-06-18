@@ -19,6 +19,7 @@ import type { RubricTemplate } from 'lib/proposals/rubric/getRubricTemplates';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposals/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCriteria';
+import type { AppealReviewEvaluationRequest } from 'lib/proposals/submitEvaluationAppealResult';
 import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
@@ -36,8 +37,8 @@ export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest
   return useGET<ProposalWithUsersLite[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }
 
-export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {
-  return useGET<ProposalTemplateMeta[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
+export function useGetProposalTemplatesBySpace(spaceId: MaybeString, detailed?: boolean) {
+  return useGET<ProposalTemplateMeta[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null, { detailed });
 }
 
 export function useGetProposalTemplate(pageId: MaybeString) {
@@ -86,7 +87,7 @@ export function useUpdateProposalEvaluation({ proposalId }: { proposalId: MaybeS
   return usePUT<Partial<Omit<UpdateEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/evaluation`);
 }
 
-export function useSubmitEvaluationResult({ proposalId }: { proposalId: MaybeString }) {
+export function useSubmitEvaluationReview({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Partial<Omit<ReviewEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/submit-result`);
 }
 
@@ -133,9 +134,11 @@ export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: May
   return useGET<FieldAnswerInput[]>(proposalId ? `/api/proposals/${proposalId}/form/answers` : null);
 }
 
-export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
+export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<{ answers: FieldAnswerInput[] }, ProposalRubricCriteriaAnswerWithTypedResponse[]>(
-    `/api/proposals/${proposalId}/form/answers`
+    `/api/proposals/${proposalId}/form/answers`,
+    // dont revalidate the request to retrieve answers on update
+    { revalidate: false }
   );
 }
 
@@ -174,8 +177,22 @@ export function useGetIssuableProposalCredentials({ proposalIds }: { proposalIds
   );
 }
 
-export function useResetProposalReview({ proposalId }: { proposalId: MaybeString }) {
+export function useResetEvaluationReview({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<{
     evaluationId: string;
   }>(`/api/proposals/${proposalId}/reset-review`);
+}
+
+export function useAppealProposalEvaluation({ evaluationId }: { evaluationId: string }) {
+  return usePUT<{ appealReason: string }>(`/api/proposals/evaluations/${evaluationId}/appeal`);
+}
+
+export function useSubmitEvaluationAppealReview({ evaluationId }: { evaluationId: string }) {
+  return usePUT<Omit<AppealReviewEvaluationRequest, 'evaluationId' | 'decidedBy' | 'proposalId'>>(
+    `/api/proposals/evaluations/${evaluationId}/appeal/submit-result`
+  );
+}
+
+export function useResetEvaluationAppealReview({ evaluationId }: { evaluationId: string }) {
+  return usePUT(`/api/proposals/evaluations/${evaluationId}/appeal/reset-review`);
 }

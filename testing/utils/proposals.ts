@@ -13,6 +13,7 @@ import { testUtilsProposals } from '@charmverse/core/test';
 import { sortBy } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { prismaToBlock } from 'lib/databases/block';
 import type { Board } from 'lib/databases/board';
 import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
@@ -195,9 +196,11 @@ type OptionalField = 'id' | 'title' | 'permissions';
 
 export async function generateProposalWorkflow({
   spaceId,
+  draftReminder,
   title,
   evaluations = []
 }: {
+  draftReminder?: boolean;
   spaceId: string;
   title?: string;
   evaluations?: (Omit<WorkflowEvaluationJson, OptionalField> & Partial<Pick<WorkflowEvaluationJson, OptionalField>>)[];
@@ -212,6 +215,7 @@ export async function generateProposalWorkflow({
   return prisma.proposalWorkflow.create({
     data: {
       index: existingFlows,
+      draftReminder,
       title: title ?? `Workflow ${existingFlows + 1}`,
       space: {
         connect: {
@@ -309,7 +313,15 @@ export async function generateProposalWorkflowWithEvaluations(options: {
   });
 }
 
-export async function generateProposalSourceDb({ createdBy, spaceId }: { createdBy: string; spaceId: string }) {
+export async function generateProposalSourceDb({
+  createdBy,
+  spaceId,
+  selectedProperties
+}: {
+  createdBy: string;
+  spaceId: string;
+  selectedProperties?: SelectedProposalProperties;
+}) {
   const database = await generateBoard({
     createdBy,
     spaceId,
@@ -319,7 +331,7 @@ export async function generateProposalSourceDb({ createdBy, spaceId }: { created
   });
 
   // sync board properties
-  const updatedBlock = await updateBoardProperties({ boardId: database.id });
+  const updatedBlock = await updateBoardProperties({ boardId: database.id, selectedProperties });
   const updatedBoard = prismaToBlock(updatedBlock) as Board;
   await updateViews({ board: updatedBoard });
   return updatedBoard;

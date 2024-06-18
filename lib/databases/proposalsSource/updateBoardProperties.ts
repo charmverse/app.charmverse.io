@@ -1,6 +1,7 @@
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { InvalidStateError } from 'lib/middleware/errors';
@@ -8,10 +9,21 @@ import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
 import { getBoardProperties } from './getBoardProperties';
 
-export async function updateBoardProperties({ boardId }: { boardId: string }): Promise<Block> {
+export async function updateBoardProperties({
+  boardId,
+  selectedProperties
+}: {
+  selectedProperties?: SelectedProposalProperties;
+  boardId: string;
+}): Promise<Block> {
   const boardBlock = await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
+    },
+    select: {
+      spaceId: true,
+      fields: true,
+      id: true
     }
   });
 
@@ -30,24 +42,43 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
     prisma.proposalEvaluation.findMany({
       where: {
         proposal: {
-          spaceId: boardBlock.spaceId
+          spaceId: boardBlock.spaceId,
+          page: {
+            deletedAt: null
+          }
         }
       },
       select: {
         type: true,
-        title: true
+        title: true,
+        rubricCriteria: {
+          select: {
+            title: true,
+            description: true,
+            answers: {
+              select: {
+                user: {
+                  select: {
+                    username: true,
+                    id: true
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       orderBy: {
         index: 'asc'
-      },
-      distinct: ['title']
+      }
     }),
     prisma.form.findMany({
       where: {
         proposal: {
           some: {
             page: {
-              type: 'proposal'
+              type: 'proposal',
+              deletedAt: null
             },
             spaceId: boardBlock.spaceId
           }
@@ -87,22 +118,13 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
     .sort((a, b) => (a.proposal[0]?.page?.createdAt.getTime() ?? 0) - (b.proposal[0]?.page?.createdAt.getTime() ?? 0))
     .flatMap((p) => p.formFields.map((field) => ({ ...field, options: field.options as FormFieldInput['options'] })));
 
-  const evaluationStepTitles: Set<string> = new Set();
-  const rubricStepTitles: Set<string> = new Set();
-  evaluationSteps.forEach((e) => {
-    evaluationStepTitles.add(e.title);
-    if (e.type === 'rubric') {
-      rubricStepTitles.add(e.title);
-    }
-  });
-
   const proposalCustomProperties = (proposalBoardBlock?.fields.cardProperties ?? []) as IPropertyTemplate[];
   const boardProperties = getBoardProperties({
-    evaluationStepTitles: Array.from(evaluationStepTitles),
+    evaluationSteps,
     formFields,
     proposalCustomProperties,
     currentCardProperties: boardFields.cardProperties,
-    rubricStepTitles: Array.from(rubricStepTitles)
+    selectedProperties
   });
 
   return prisma.block.update({

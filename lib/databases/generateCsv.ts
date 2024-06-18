@@ -260,7 +260,9 @@ function getCSVColumns({
     } else if (
       propertyTemplate.type === 'number' ||
       propertyTemplate.type === 'proposalEvaluationAverage' ||
-      propertyTemplate.type === 'proposalEvaluationTotal'
+      propertyTemplate.type === 'proposalEvaluationTotal' ||
+      propertyTemplate.type === 'proposalRubricCriteriaTotal' ||
+      propertyTemplate.type === 'proposalRubricCriteriaAverage'
     ) {
       const numericValue = propertyValue ? Number(propertyValue).toString() : '';
       columns.push(numericValue);

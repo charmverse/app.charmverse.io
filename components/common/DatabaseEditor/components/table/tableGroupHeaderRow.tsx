@@ -6,7 +6,6 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { Tooltip, Typography } from '@mui/material';
-import type { MouseEvent } from 'react';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -39,6 +38,7 @@ type Props = {
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDrop: (srcOption: BoardGroup, dstOption?: BoardGroup) => void;
   disableAddingCards?: boolean;
+  isExpandedGroup?: boolean;
   readOnlyTitle?: boolean;
 };
 const TableGroupHeaderRow = memo((props: Props): JSX.Element => {
@@ -67,7 +67,7 @@ const TableGroupHeaderRow = memo((props: Props): JSX.Element => {
   if (isOver) {
     className += ' dragover';
   }
-  const isExpanded = activeView.fields.collapsedOptionIds.indexOf(group.id || 'undefined') < 0;
+  const isExpanded = props.isExpandedGroup;
   if (isExpanded) {
     className += ' expanded';
   }
@@ -90,7 +90,7 @@ const TableGroupHeaderRow = memo((props: Props): JSX.Element => {
           <IconButton
             icon={isExpanded ? <CollapseIcon /> : <ExpandIcon />}
             style={{ width: '24px', height: '24px', marginRight: '4px' }}
-            onClick={() => (props.readOnly ? {} : props.hideGroup(group.id || 'undefined'))}
+            onClick={() => (props.readOnly ? {} : props.hideGroup(group.id || ''))}
           />
           {/** Empty  value */}
           {!group.id && (

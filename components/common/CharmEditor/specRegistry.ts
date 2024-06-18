@@ -6,6 +6,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { spec as bookmarkSpec } from './components/bookmark/bookmarkSpec';
 import * as bulletList from './components/bulletList';
+import * as button from './components/button/button.specs';
 import * as callout from './components/callout/callout';
 import * as columnLayout from './components/columnLayout/columnLayout.schema';
 import { spec as cryptoPriceSpec } from './components/cryptoPrice/cryptoPriceSpec';
@@ -104,6 +105,7 @@ export const specRegistry = new SpecRegistry([
   video.spec(),
   textColor.spec(),
   nft.spec(),
+  button.spec(),
   poll.spec(),
   bookmarkSpec(),
   tableOfContentSpec(),

@@ -9,9 +9,10 @@ import {
   EVALUATION_STATUS_VERB_LABELS,
   proposalStatusColors
 } from 'lib/databases/proposalDbProperties';
+import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
-import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
+import type { ProposalEvaluationStatus } from 'lib/proposals/interfaces';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 
@@ -82,29 +83,39 @@ function ProposalStatusSelectBase({
   const currentEvaluationStepRequiredReviews = proposal.currentStep.requiredReviews;
   const currentEvaluationResult = proposal.currentStep.result;
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
-  const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
+
+  const rewardLabel = getFeatureTitle('Rewards');
 
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
-    const evaluationStep = lastEvaluation && hasPublishedRewards ? lastEvaluation.type : currentEvaluationStep;
-
-    if (evaluationStep === 'draft') {
-      return ['published', 'unpublished'];
-    } else if (evaluationStep === 'rewards' || evaluationStep === 'credentials') {
-      return ['published', 'unpublished'];
-    } else if (evaluationStep === 'feedback') {
-      return ['complete', 'in_progress'];
+    if (currentEvaluationStep === 'draft') {
+      return ['passed', 'unpublished'];
+    } else if (currentEvaluationStep === 'rewards' || currentEvaluationStep === 'credentials') {
+      return ['passed', 'unpublished'];
+    } else if (currentEvaluationStep === 'feedback') {
+      return ['passed', 'in_progress'];
     } else {
       // for vote, rubric, pass_fail, etc
       return ['passed', 'declined', 'in_progress'];
     }
-  }, [currentEvaluationStep, lastEvaluation, hasPublishedRewards]);
+  }, [currentEvaluationStep]);
 
-  const options: IPropertyOption[] = statusOptions.map((status) => ({
-    id: status,
-    value: EVALUATION_STATUS_LABELS[status],
-    dropdownValue: EVALUATION_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
-    color: proposalStatusColors[status]
-  }));
+  const options: IPropertyOption[] = statusOptions.map((status) => {
+    const statusLabel = EVALUATION_STATUS_LABELS[status];
+
+    const value =
+      currentEvaluationStep === 'rewards'
+        ? `${rewardLabel} ${statusLabel}`
+        : currentEvaluationStep === 'credentials'
+        ? `Credentials ${statusLabel}`
+        : statusLabel;
+
+    return {
+      id: status,
+      value,
+      dropdownValue: EVALUATION_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
+      color: proposalStatusColors[status]
+    };
+  });
 
   return (
     <TagSelect
@@ -114,8 +125,9 @@ function ProposalStatusSelectBase({
         proposal.archived ||
         readOnly ||
         currentEvaluationStep === 'vote' ||
-        (currentEvaluationStep === 'pass_fail' && currentEvaluationStepRequiredReviews !== 1) ||
-        hasPublishedRewards
+        hasPublishedRewards ||
+        currentEvaluationStep === 'credentials' ||
+        (currentEvaluationStep === 'pass_fail' && currentEvaluationStepRequiredReviews !== 1)
       }
       options={
         proposal.archived
@@ -132,10 +144,10 @@ function ProposalStatusSelectBase({
       propertyValue={
         proposal.archived
           ? 'archived'
-          : hasPublishedRewards && lastEvaluation
+          : hasPublishedRewards
           ? getProposalEvaluationStatus({
               result: 'pass',
-              step: lastEvaluation.type as ProposalEvaluationStep
+              step: 'rewards'
             })
           : proposal
           ? getProposalEvaluationStatus({

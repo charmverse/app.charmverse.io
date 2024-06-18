@@ -2,7 +2,7 @@ import type { TextProps } from '@react-email/text';
 import { Text as ReactEmailText } from '@react-email/text';
 import type { CSSProperties, ReactNode } from 'react';
 
-import { blueColor, greyColor2, primaryTextColor } from 'theme/colors';
+import { blueColor, primaryTextColor, secondaryTextColor } from 'theme/colors';
 
 // copied from theme/fonts.ts because next/fonts doesnt play well with tsx or ts-node. TODO: maybe remove next/fonts?
 const defaultFont =
@@ -27,13 +27,14 @@ const TextStyleConfig: Record<TextVariant, CSSProperties> = {
     opacity: 0.65
   },
   caption: {
-    fontSize: 12,
-    color: greyColor2
+    fontSize: 14,
+    color: secondaryTextColor
   }
 };
 
 export default function Text({
   primary = false,
+  primaryColor = blueColor,
   children,
   variant = 'body1',
   bold = false,
@@ -41,6 +42,7 @@ export default function Text({
   style = {},
   ...props
 }: {
+  primaryColor?: string;
   hideOverflow?: boolean;
   variant?: TextVariant;
   bold?: boolean;
@@ -52,7 +54,7 @@ export default function Text({
       {...props}
       style={{
         fontFamily: defaultFont,
-        color: primary ? blueColor : primaryTextColor,
+        color: primary ? primaryColor : primaryTextColor,
         fontWeight: bold ? 'bold' : 'normal',
         padding: 0,
         lineHeight: 1.5,

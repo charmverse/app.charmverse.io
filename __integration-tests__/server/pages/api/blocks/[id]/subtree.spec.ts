@@ -7,7 +7,7 @@ import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import type { BlockWithDetails } from 'lib/databases/block';
-import type { BoardFields, DataSourceType, IPropertyTemplate } from 'lib/databases/board';
+import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { getCardPropertyTemplates } from 'lib/databases/proposalsSource/getCardProperties';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -562,7 +562,15 @@ describe('GET /api/blocks/[id]/subtree - proposal databases', () => {
       createdBy: admin.id,
       spaceId: space.id,
       viewDataSource: 'proposals',
-      cardCount: 0
+      cardCount: 0,
+      selectedProperties: {
+        defaults: ['proposalStep', 'proposalEvaluationType'],
+        customProperties: [],
+        formFields: [],
+        project: [],
+        projectMember: [],
+        rubricEvaluations: []
+      }
     });
     const visibleProposal = await testUtilsProposals.generateProposal({
       proposalStatus: 'published',

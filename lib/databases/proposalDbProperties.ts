@@ -1,7 +1,7 @@
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import type { ProposalPropertyType, IPropertyTemplate } from 'lib/databases/board';
+import type { IPropertyTemplate, ProposalPropertyType } from 'lib/databases/board';
 import type { Constants } from 'lib/databases/constants';
 import {
   AUTHORS_BLOCK_ID,
@@ -18,21 +18,17 @@ import type {
 import type { BrandColor } from 'theme/colors';
 
 export const EVALUATION_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = {
-  complete: 'Complete',
   declined: 'Declined',
   in_progress: 'In Progress',
   passed: 'Passed',
-  published: 'Published',
   unpublished: 'Unpublished',
   archived: 'Archived'
 };
 
 export const proposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> = {
-  complete: 'green',
   declined: 'red',
   in_progress: 'yellow',
   passed: 'green',
-  published: 'green',
   unpublished: 'gray',
   archived: 'gray'
 };
@@ -90,11 +86,35 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalEvaluationTotal'
   }),
+  proposalRubricCriteriaTotal: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Total',
+    options: [],
+    type: 'proposalRubricCriteriaTotal'
+  }),
+  proposalRubricCriteriaAverage: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Average',
+    options: [],
+    type: 'proposalRubricCriteriaAverage'
+  }),
   proposalAuthor: ({ name } = {}) => ({
     id: AUTHORS_BLOCK_ID,
     name: name || 'Proposal Authors',
     options: [],
     type: 'proposalAuthor'
+  }),
+  proposalRubricCriteriaReviewerComment: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Reviewer Comment',
+    options: [],
+    type: 'proposalRubricCriteriaReviewerComment'
+  }),
+  proposalRubricCriteriaReviewerScore: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Reviewer Score',
+    options: [],
+    type: 'proposalRubricCriteriaReviewerScore'
   }),
   // This is for only the current reviewers
   proposalReviewer: () => ({
@@ -119,11 +139,9 @@ export const proposalDbProperties: {
 };
 
 export const EVALUATION_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, string> = {
-  complete: 'Complete',
   declined: 'Decline',
   in_progress: 'In Progress',
   passed: 'Pass',
-  published: 'Publish',
   unpublished: 'Unpublish',
   archived: 'Archive'
 };
@@ -135,7 +153,8 @@ export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {
   rubric: 'Rubric',
   vote: 'Vote',
   rewards: 'Rewards',
-  credentials: 'Credentials'
+  credentials: 'Credentials',
+  sign_documents: 'Sign Documents'
 };
 
 export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (typeof Constants)['menuColors']> = {
@@ -145,7 +164,8 @@ export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (type
   vote: 'propColorGray',
   draft: 'propColorGray',
   rewards: 'propColorGray',
-  credentials: 'propColorGray'
+  credentials: 'propColorGray',
+  sign_documents: 'propColorGray'
 };
 
 export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, string> = {
@@ -153,3 +173,15 @@ export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, st
   fail: 'Failed',
   pass: 'Passed'
 };
+
+export const defaultProposalProperties = [
+  proposalDbProperties.proposalReviewerNotes(),
+  proposalDbProperties.proposalStatus(),
+  proposalDbProperties.proposalStep(),
+  proposalDbProperties.proposalUrl(),
+  proposalDbProperties.proposalAuthor(),
+  proposalDbProperties.proposalReviewer(),
+  proposalDbProperties.proposalEvaluationType()
+];
+
+export const defaultProposalPropertyTypes = defaultProposalProperties.map((p) => p.type);

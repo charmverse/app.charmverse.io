@@ -33,6 +33,7 @@ export type ProposalWithJoinedData = {
   status: ProposalStatus;
   evaluations: (Pick<ProposalEvaluation, 'id' | 'index' | 'result'> & {
     finalStep?: boolean | null;
+    appealedAt?: Date | null;
   })[];
   selectedCredentialTemplates: string[];
   authors: IssuableProposalCredentialAuthor[];
@@ -168,7 +169,8 @@ function proposalCredentialInputFieldsSelect() {
         index: true,
         type: true,
         title: true,
-        finalStep: true
+        finalStep: true,
+        appealedAt: true
       }
     },
     issuedCredentials: {

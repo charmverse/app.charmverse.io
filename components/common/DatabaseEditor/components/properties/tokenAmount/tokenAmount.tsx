@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { Box, Stack } from '@mui/material';
 import { useMemo } from 'react';
 
-import TokenLogo from 'components/common/TokenLogo';
+import { TokenLogo } from 'components/common/Icons/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 
@@ -26,11 +26,7 @@ export function TokenAmount({ amount, chainId, symbolOrAddress }: Props): JSX.El
   }, [chainId, methods, symbolOrAddress]);
   return (
     <Stack direction='row' alignItems='center' height='100%' gap={1} className='octo-propertyvalue readonly'>
-      {tokenInfo?.canonicalLogo && (
-        <Box width={20}>
-          <TokenLogo height={20} src={tokenInfo?.canonicalLogo} />
-        </Box>
-      )}
+      {tokenInfo?.canonicalLogo && <TokenLogo src={tokenInfo?.canonicalLogo} />}
       {amount}
     </Stack>
   );

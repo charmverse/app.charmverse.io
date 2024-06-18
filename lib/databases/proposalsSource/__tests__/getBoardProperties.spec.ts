@@ -1,3 +1,5 @@
+import { v4 } from 'uuid';
+
 import type { IPropertyTemplate } from 'lib/databases/board';
 import * as constants from 'lib/projects/formField';
 import { getFieldConfig } from 'lib/projects/formField';
@@ -40,6 +42,177 @@ describe('getBoardProperties', () => {
     );
   });
 
+  it('Should return custom properties from rubric criteria', () => {
+    const user1Id = v4();
+    const user2Id = v4();
+    const properties = getBoardProperties({
+      evaluationSteps: [
+        {
+          rubricCriteria: [
+            {
+              title: 'Rubric Criteria 1',
+              description: 'Rubric Criteria 1 Description',
+              answers: [
+                {
+                  user: {
+                    id: user1Id,
+                    username: 'user1'
+                  }
+                },
+                {
+                  user: {
+                    id: user2Id,
+                    username: 'user2'
+                  }
+                }
+              ]
+            },
+            {
+              title: 'Rubric Criteria 2',
+              answers: []
+            }
+          ],
+          title: 'Rubric Evaluation 1',
+          type: 'rubric'
+        },
+        {
+          rubricCriteria: [
+            {
+              title: 'Rubric Criteria 1',
+              description: 'Rubric Criteria 1 new Description',
+              answers: []
+            },
+            {
+              title: 'Rubric Criteria 2.1',
+              answers: [
+                {
+                  user: {
+                    id: user1Id,
+                    username: 'user1'
+                  }
+                }
+              ]
+            }
+          ],
+          title: 'Rubric Evaluation 2',
+          type: 'rubric'
+        },
+        {
+          rubricCriteria: [],
+          title: 'Feedback',
+          type: 'feedback'
+        }
+      ]
+    });
+
+    const rubricCriteria1Property = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 1' && r.type === 'proposalRubricCriteriaTotal'
+    );
+    const rubricCriteria2Property = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 2' && r.type === 'proposalRubricCriteriaTotal'
+    );
+    const rubricCriteria21Property = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 2.1' && r.type === 'proposalRubricCriteriaTotal'
+    );
+    const rubricCriteria1Reviewer1CommentProperty = properties.find(
+      (r) =>
+        r.criteriaTitle === 'Rubric Criteria 1' &&
+        r.type === 'proposalRubricCriteriaReviewerComment' &&
+        r.reviewerId === user1Id
+    );
+    const rubricCriteria1Reviewer1ScoreProperty = properties.find(
+      (r) =>
+        r.criteriaTitle === 'Rubric Criteria 1' &&
+        r.type === 'proposalRubricCriteriaReviewerScore' &&
+        r.reviewerId === user1Id
+    );
+    const rubricCriteria1Reviewer2CommentProperty = properties.find(
+      (r) =>
+        r.criteriaTitle === 'Rubric Criteria 1' &&
+        r.type === 'proposalRubricCriteriaReviewerComment' &&
+        r.reviewerId === user2Id
+    );
+    const rubricCriteria1Reviewer2ScoreProperty = properties.find(
+      (r) =>
+        r.criteriaTitle === 'Rubric Criteria 1' &&
+        r.type === 'proposalRubricCriteriaReviewerScore' &&
+        r.reviewerId === user2Id
+    );
+    const rubricCriteria2Reviewer1CommentProperty = properties.find(
+      (r) =>
+        r.criteriaTitle === 'Rubric Criteria 2' &&
+        r.type === 'proposalRubricCriteriaReviewerComment' &&
+        r.reviewerId === user1Id
+    );
+    const rubricCriteria2Reviewer1ScoreProperty = properties.find(
+      (r) =>
+        r.criteriaTitle === 'Rubric Criteria 2' &&
+        r.type === 'proposalRubricCriteriaReviewerScore' &&
+        r.reviewerId === user1Id
+    );
+    const rubricCriteria21Reviewer1CommentProperty = properties.find(
+      (r) =>
+        r.criteriaTitle === 'Rubric Criteria 2.1' &&
+        r.type === 'proposalRubricCriteriaReviewerComment' &&
+        r.reviewerId === user1Id
+    );
+    const rubricCriteria21Reviewer1ScoreProperty = properties.find(
+      (r) =>
+        r.criteriaTitle === 'Rubric Criteria 2.1' &&
+        r.type === 'proposalRubricCriteriaReviewerScore' &&
+        r.reviewerId === user1Id
+    );
+    const rubricCriteria21Reviewer2CommentProperty = properties.find(
+      (r) =>
+        r.criteriaTitle === 'Rubric Criteria 2.1' &&
+        r.type === 'proposalRubricCriteriaReviewerComment' &&
+        r.reviewerId === user2Id
+    );
+    const rubricCriteria21Reviewer2ScoreProperty = properties.find(
+      (r) =>
+        r.criteriaTitle === 'Rubric Criteria 2.1' &&
+        r.type === 'proposalRubricCriteriaReviewerScore' &&
+        r.reviewerId === user2Id
+    );
+
+    expect(rubricCriteria1Property).toBeTruthy();
+    expect(rubricCriteria1Reviewer1CommentProperty).toBeTruthy();
+    expect(rubricCriteria1Reviewer1ScoreProperty).toBeTruthy();
+    expect(rubricCriteria1Reviewer2CommentProperty).toBeTruthy();
+    expect(rubricCriteria1Reviewer2ScoreProperty).toBeTruthy();
+    const rubricCriteria1AverageProperty = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 1' && r.type === 'proposalRubricCriteriaAverage'
+    );
+    const rubricCriteria2AverageProperty = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 2' && r.type === 'proposalRubricCriteriaAverage'
+    );
+    const rubricCriteria21AverageProperty = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 2.1' && r.type === 'proposalRubricCriteriaAverage'
+    );
+
+    expect(rubricCriteria1Property).toBeTruthy();
+    expect(rubricCriteria2Property).toBeTruthy();
+    expect(rubricCriteria21Property).toBeTruthy();
+    expect(rubricCriteria1Property).toBeTruthy();
+    expect(rubricCriteria1Property?.tooltip).toEqual('Rubric Criteria 1 Description');
+    expect(rubricCriteria1AverageProperty).toBeTruthy();
+
+    expect(rubricCriteria2Property).toBeTruthy();
+    expect(rubricCriteria2Property?.tooltip).toBe('');
+    expect(rubricCriteria2Reviewer1CommentProperty).toBeFalsy();
+    expect(rubricCriteria2Reviewer1ScoreProperty).toBeFalsy();
+    expect(rubricCriteria2AverageProperty).toBeTruthy();
+
+    expect(rubricCriteria21Property).toBeTruthy();
+    expect(rubricCriteria21Reviewer1CommentProperty).toBeTruthy();
+    expect(rubricCriteria21Reviewer1ScoreProperty).toBeTruthy();
+    expect(rubricCriteria21Reviewer1CommentProperty).toBeTruthy();
+    expect(rubricCriteria21Reviewer1ScoreProperty).toBeTruthy();
+    expect(rubricCriteria21Reviewer2CommentProperty).toBeFalsy();
+    expect(rubricCriteria21Reviewer2ScoreProperty).toBeFalsy();
+    expect(rubricCriteria21AverageProperty).toBeTruthy();
+  });
+
   // in case we change our mind about defaults, since all these fields are readonly
   it('Should override previous configuration of custom properties', () => {
     const customProperty: IPropertyTemplate = {
@@ -76,7 +249,13 @@ describe('getBoardProperties', () => {
 
   it('Should return universal properties for rubric steps', () => {
     const properties = getBoardProperties({
-      rubricStepTitles: ['Rubric Evaluation']
+      evaluationSteps: [
+        {
+          title: 'Rubric Evaluation',
+          type: 'rubric',
+          rubricCriteria: []
+        }
+      ]
     });
     expect(properties.some((r) => r.type === 'proposalEvaluatedBy')).toBeTruthy();
     expect(properties.some((r) => r.type === 'proposalEvaluationTotal')).toBeTruthy();
@@ -85,14 +264,26 @@ describe('getBoardProperties', () => {
 
   it('Should retain the id of an existing property when matching by type', () => {
     const properties = getBoardProperties({
-      rubricStepTitles: ['Rubric Evaluation']
+      evaluationSteps: [
+        {
+          title: 'Rubric Evaluation',
+          type: 'rubric',
+          rubricCriteria: []
+        }
+      ]
     });
     const property = properties.find((r) => r.type === 'proposalEvaluatedBy');
     expect(property?.id).toBeTruthy();
     const originalId = property?.id;
     const newProperties = getBoardProperties({
       currentCardProperties: properties,
-      rubricStepTitles: ['Rubric Evaluation']
+      evaluationSteps: [
+        {
+          title: 'Rubric Evaluation',
+          type: 'rubric',
+          rubricCriteria: []
+        }
+      ]
     });
     const updatedProperty = newProperties.find((r) => r.type === 'proposalEvaluatedBy');
     expect(updatedProperty?.id).toEqual(originalId);
@@ -150,24 +341,6 @@ describe('getBoardProperties', () => {
     const projectWalletProperty = properties.find((r) => r.id === constants.PROJECT_WALLET_ID);
     const projectMemberWalletProperty = properties.find((r) => r.id === constants.PROJECT_MEMBER_WALLETS_ID);
     expect(projectWalletProperty).toBeTruthy();
-    expect(projectWalletProperty?.private).toBeTruthy();
     expect(projectMemberWalletProperty).toBeTruthy();
-    expect(projectMemberWalletProperty?.private).toBeTruthy();
-  });
-
-  it('Should not return hidden properties for project profile', () => {
-    const properties = getBoardProperties({
-      formFields: [
-        getFormInput({
-          id: 'project-profile-id',
-          type: 'project_profile',
-          fieldConfig: getProjectProfileFieldConfig({
-            website: { show: false }
-          })
-        })
-      ]
-    });
-
-    expect(properties.some((r) => r.id === constants.PROJECT_WEBSITE_ID)).toBeFalsy();
   });
 });

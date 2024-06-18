@@ -5,7 +5,6 @@ import { useMemo } from 'react';
 import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
 import { TemplateSelect } from 'components/common/WorkflowSidebar/components/TemplateSelect';
 import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
@@ -19,6 +18,7 @@ import { PrivateEvaluation } from '../Review/components/PrivateEvaluation';
 
 import type { ProposalEvaluationValues } from './components/EvaluationStepSettings';
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
+import { EvaluationStepSettingsRow } from './components/EvaluationStepSettingsRow';
 import { ProposalCredentialSettings } from './components/ProposalCredentialSettings';
 import type { RewardSettingsProps } from './components/RewardSettings';
 import { RewardSettings } from './components/RewardSettings';
@@ -35,8 +35,9 @@ export type Props = {
   onChangeSelectedCredentialTemplates: (templateIds: string[]) => void;
   templateId?: string | null;
   isStructuredProposal: boolean;
-  expanded: boolean;
+  expandedSidebar?: boolean;
 };
+
 export function EvaluationsSettings({
   proposal,
   isTemplate,
@@ -47,7 +48,7 @@ export function EvaluationsSettings({
   onChangeRewardSettings,
   onChangeSelectedCredentialTemplates,
   templateId,
-  expanded: expandedContainer,
+  expandedSidebar,
   isStructuredProposal
 }: Props) {
   const { data: proposalTemplate } = useGetProposalTemplate(templateId);
@@ -66,6 +67,10 @@ export function EvaluationsSettings({
     [proposalTemplates]
   );
 
+  const expanded = useMemo(() => {
+    return expandedSidebar === false ? false : isTemplate || (!isTemplate && !templateId);
+  }, [expandedSidebar]);
+
   // We need to provide all necessary data for the proposal. A private evaluation won't allow users to populate all workflow options
   const filteredWorkflowOptions = isTemplate
     ? workflowOptions
@@ -78,7 +83,7 @@ export function EvaluationsSettings({
   const showRewards = !!isTemplate && !!onChangeRewardSettings;
   return (
     <LoadingComponent isLoading={!proposal} data-test='evaluation-settings-sidebar'>
-      <Collapse in={expandedContainer}>
+      <Collapse in={expandedSidebar}>
         {!isTemplate && (
           <TemplateSelect
             onChange={onChangeTemplate}
@@ -108,11 +113,11 @@ export function EvaluationsSettings({
           )}
         />
       </Collapse>
-      <EvaluationStepRow
-        expanded={expandedContainer}
-        expandedContainer={expandedContainer}
+      <EvaluationStepSettingsRow
+        key={String(expandedSidebar)}
+        expandedSidebar={expandedSidebar}
+        expanded={expanded}
         index={0}
-        result={null}
         title='Draft'
       />
       {proposal && (
@@ -122,11 +127,10 @@ export function EvaluationsSettings({
             const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluation.title);
             const showRubricImport = evaluation.type === 'rubric' && !readOnly && !matchingTemplateStep;
             return (
-              <EvaluationStepRow
-                key={evaluation.id}
-                expanded={expandedContainer}
-                expandedContainer={expandedContainer}
-                result={null}
+              <EvaluationStepSettingsRow
+                key={`${String(expandedSidebar)}.${evaluation.id}`}
+                expandedSidebar={expandedSidebar}
+                expanded={expanded}
                 index={index + 1}
                 title={evaluation.title}
                 actions={
@@ -152,40 +156,40 @@ export function EvaluationsSettings({
                     }}
                   />
                 )}
-              </EvaluationStepRow>
+              </EvaluationStepSettingsRow>
             );
           })}
           {showCredentials && (
             <Box mb={showRewards ? 0 : 8}>
-              <EvaluationStepRow
+              <EvaluationStepSettingsRow
+                key={String(expandedSidebar)}
+                expandedSidebar={expandedSidebar}
                 index={proposal ? proposal.evaluations.length + 1 : 0}
-                result={null}
                 title='Credentials'
-                expanded={expandedContainer}
-                expandedContainer={expandedContainer}
+                expanded={expanded}
               >
                 <ProposalCredentialSettings
                   readOnly={readOnlyCredentials}
                   selectedCredentialTemplates={proposal.selectedCredentialTemplates ?? []}
                   setSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
                 />
-              </EvaluationStepRow>
+              </EvaluationStepSettingsRow>
             </Box>
           )}
           {/* reward settings */}
           {showRewards && (
             <Box mb={8}>
-              <EvaluationStepRow
+              <EvaluationStepSettingsRow
+                key={String(expandedSidebar)}
+                expandedSidebar={expandedSidebar}
                 index={proposal ? proposal.evaluations.length + (showCredentials ? 2 : 1) : 0}
-                result={null}
                 title={mappedFeatures.rewards.title}
-                expanded={expandedContainer}
-                expandedContainer={expandedContainer}
+                expanded={expanded}
               >
                 {(proposal.fields?.enableRewards || !isStructuredProposal) && (
                   <RewardSettings value={proposal.fields} onChange={onChangeRewardSettings} />
                 )}
-              </EvaluationStepRow>
+              </EvaluationStepSettingsRow>
             </Box>
           )}
         </>

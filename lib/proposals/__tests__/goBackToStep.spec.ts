@@ -4,6 +4,7 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { createVote, generateBounty } from 'testing/setupDatabase';
 
 import { goBackToStep } from '../goBackToStep';
+import { submitEvaluationAppealResult } from '../submitEvaluationAppealResult';
 import { submitEvaluationResult } from '../submitEvaluationResult';
 
 describe('goBackToStep()', () => {
@@ -109,7 +110,10 @@ describe('goBackToStep()', () => {
           result: 'pass',
           reviewers: [],
           permissions: [],
-          requiredReviews: 3
+          requiredReviews: 3,
+          appealable: true,
+          appealedAt: new Date(),
+          appealedBy: user.id
         }
       ]
     });
@@ -119,7 +123,8 @@ describe('goBackToStep()', () => {
         id: proposal.evaluations[1].id
       },
       include: {
-        proposalEvaluationReviews: true
+        reviews: true,
+        appealReviews: true
       }
     });
 
@@ -131,13 +136,29 @@ describe('goBackToStep()', () => {
       spaceId: space.id
     });
 
-    const proposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+    await submitEvaluationAppealResult({
+      decidedBy: user.id,
+      evaluation,
+      proposalId: proposal.id,
+      result: 'pass',
+      spaceId: space.id,
+      declineReasons: []
+    });
+
+    const proposalEvaluationReviews = await prisma.proposalEvaluationReview.count({
       where: {
         evaluationId: proposal.evaluations[1].id
       }
     });
 
-    expect(proposalEvaluationReviews.length).toBe(1);
+    const proposalEvaluationAppealReviews = await prisma.proposalEvaluationAppealReview.count({
+      where: {
+        evaluationId: proposal.evaluations[1].id
+      }
+    });
+
+    expect(proposalEvaluationReviews).toBe(1);
+    expect(proposalEvaluationAppealReviews).toBe(1);
 
     await goBackToStep({
       proposalId: proposal.id,
@@ -158,13 +179,27 @@ describe('goBackToStep()', () => {
       }
     });
     expect(updated.evaluations[0].result).toBe(null);
-    expect(updated.evaluations[1].result).toBe(null);
-    const updatedProposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+    expect(updated.evaluations[1]).toMatchObject(
+      expect.objectContaining({
+        result: null,
+        decidedBy: null,
+        completedAt: null,
+        appealedAt: null
+      })
+    );
+
+    const updatedProposalEvaluationReviews = await prisma.proposalEvaluationReview.count({
       where: {
         evaluationId: proposal.evaluations[1].id
       }
     });
-    expect(updatedProposalEvaluationReviews.length).toBe(0);
+    const updatedProposalEvaluationAppealReviews = await prisma.proposalEvaluationAppealReview.count({
+      where: {
+        evaluationId: proposal.evaluations[1].id
+      }
+    });
+    expect(updatedProposalEvaluationReviews).toBe(0);
+    expect(updatedProposalEvaluationAppealReviews).toBe(0);
   });
 
   it('Should delete previous evaluation reviews when moving back to draft state', async () => {
@@ -191,7 +226,7 @@ describe('goBackToStep()', () => {
         id: proposal.evaluations[0].id
       },
       include: {
-        proposalEvaluationReviews: true
+        reviews: true
       }
     });
 

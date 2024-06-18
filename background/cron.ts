@@ -12,8 +12,11 @@ import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { indexPendingCredentialsTask } from './tasks/indexPendingCredentialsTask';
 import { task as processCollablandWebhookMessages } from './tasks/processCollablandWebhookMessages';
 import { task as processGithubWebhookMessages } from './tasks/processGithubWebhookMessages';
+import { task as processMailgunWebhookMessages } from './tasks/processMailgunWebhookMessages';
 import { task as processSynapsWebhookMessages } from './tasks/processSynapsWebhookMessages';
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
+import { sendDraftProposalNotificationTask } from './tasks/sendDraftProposalNotificationTask';
+import { syncOptimismReviewsTask } from './tasks/syncOptimismReviews';
 import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
@@ -33,8 +36,14 @@ processGithubWebhookMessages();
 // Start processing synaps webhook messages
 processSynapsWebhookMessages();
 
+// Start processing mailgun webhook messages
+processMailgunWebhookMessages();
+
 // Delete archived pages once an hour
 cron.schedule('0 * * * *', archiveTask);
+
+// Send notification to draft proposal authors once an hour
+cron.schedule('0 * * * *', sendDraftProposalNotificationTask);
 
 // Index pending gnosis safe credentials every 30 minutes
 cron.schedule('*/30 * * * *', indexPendingCredentialsTask);
@@ -62,6 +71,9 @@ cron.schedule('0 0 * * *', syncSummonSpacesRoles);
 
 // Create external eas credentials for Gitcoin and Questbook every day at midnight
 cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
+
+// Sync op reviews every 15 minutes - remove by July 2024
+cron.schedule('*/15 * * * *', syncOptimismReviewsTask);
 
 const port = process.env.PORT || 4000;
 

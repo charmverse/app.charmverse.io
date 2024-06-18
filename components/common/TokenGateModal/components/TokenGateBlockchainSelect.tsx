@@ -6,7 +6,7 @@ import { forwardRef } from 'react';
 import type { Ref, ReactNode } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
-import TokenLogo from 'components/common/TokenLogo';
+import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { isAnkrChain } from 'lib/blockchain/provider/ankr/config';
 import { isZkSyncChain } from 'lib/blockchain/provider/zksync/config';
@@ -46,7 +46,7 @@ function SelectField(
               sx={isFirstTestnet ? { borderTop: (theme) => `2px solid ${theme.palette.divider}`, pt: 1 } : undefined}
             >
               <ListItemIcon>
-                <TokenLogo height={20} src={_chain.iconUrl} />
+                <BlockchainLogo height={20} src={_chain.iconUrl} />
               </ListItemIcon>
               <ListItemText>{_chain.chainName}</ListItemText>
             </MenuItem>

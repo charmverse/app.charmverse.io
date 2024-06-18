@@ -1,6 +1,7 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box, useMediaQuery } from '@mui/material';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
@@ -84,13 +85,19 @@ export function DialogContainer({
 
 export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
   const { refreshPropertyValues } = useMemberPropertyValues(userId);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { control, errors, isValid, isDirty, isSubmitting, onSubmit, onFormChange } = useRequiredMemberPropertiesForm({
+  const { control, isValid, isDirty, onSubmit, onFormChange } = useRequiredMemberPropertiesForm({
     userId
   });
 
   async function saveForm() {
-    await onSubmit();
+    setIsSubmitting(true);
+    try {
+      await onSubmit();
+    } finally {
+      setIsSubmitting(false);
+    }
     onClose();
   }
 
@@ -102,7 +109,6 @@ export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
     <DialogContainer title='Edit profile' onClose={onClose}>
       <MemberPropertiesForm
         control={control}
-        errors={errors}
         userId={userId}
         refreshPropertyValues={refreshPropertyValues}
         onChange={onMemberDetailsChange}

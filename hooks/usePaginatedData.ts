@@ -8,7 +8,7 @@ type Config = {
 };
 
 export function usePaginatedData<T>(sourceData: T[], config: Config = {}) {
-  const pageSize = config.pageSize || DEFAULT_PAGE_SIZE;
+  const [pageSize, setPageSize] = useState(config.pageSize || DEFAULT_PAGE_SIZE);
   const [visiblePagesCount, setVisiblePagesCount] = useState(config.initialPage || 1);
 
   useEffect(() => {
@@ -30,5 +30,5 @@ export function usePaginatedData<T>(sourceData: T[], config: Config = {}) {
     }
   }, [hasNextPage]);
 
-  return { data, visiblePagesCount, hasNextPage, showNextPage, moreCount };
+  return { data, visiblePagesCount, hasNextPage, showNextPage, moreCount, pageSize, setPageSize };
 }

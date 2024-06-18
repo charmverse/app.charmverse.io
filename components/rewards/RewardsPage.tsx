@@ -13,6 +13,7 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEdit
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import AddViewMenu from 'components/common/DatabaseEditor/components/addViewMenu';
 import { getVisibleAndHiddenGroups } from 'components/common/DatabaseEditor/components/centerPanel';
+import { CreateLinkedView } from 'components/common/DatabaseEditor/components/createLinkedView';
 import Kanban from 'components/common/DatabaseEditor/components/kanban/kanban';
 import Table from 'components/common/DatabaseEditor/components/table/table';
 import { ViewFilterControl } from 'components/common/DatabaseEditor/components/ViewFilterControl';
@@ -44,8 +45,8 @@ import { createBoard } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
 import { viewTypeToBlockId } from 'lib/databases/customBlocks/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
-import { defaultRewardViews, supportedRewardViewTypes } from 'lib/rewards/blocks/views';
+import { APPLICANT_STATUS_BLOCK_ID, DUE_DATE_ID, REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
+import { supportedRewardViewTypes } from 'lib/rewards/blocks/views';
 
 import { RewardsHeaderRowsMenu } from './components/RewardsHeaderRowsMenu';
 import { useRewards } from './hooks/useRewards';
@@ -85,11 +86,20 @@ export function RewardsPage({ title }: { title: string }) {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
     if ((!_groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
-      _groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
+      if (activeView.fields.sourceType === 'reward_applications') {
+        _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === APPLICANT_STATUS_BLOCK_ID);
+      } else {
+        _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === REWARD_STATUS_BLOCK_ID);
+      }
     }
 
     return _groupByProperty;
-  }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
+  }, [
+    activeBoard?.fields.cardProperties,
+    activeView?.fields.groupById,
+    activeView?.fields.viewType,
+    activeView.fields.sourceType
+  ]);
 
   const { visible: visibleGroups, hidden: hiddenGroups } = useMemo(
     () =>
@@ -105,7 +115,6 @@ export function RewardsPage({ title }: { title: string }) {
   );
 
   useRewardsBoardMutator();
-
   const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
 
@@ -285,10 +294,9 @@ export function RewardsPage({ title }: { title: string }) {
                   activeView={activeView}
                   disableUpdatingUrl
                   maxTabsShown={3}
-                  readOnlyViewIds={defaultRewardViews}
                   supportedViewTypes={supportedRewardViewTypes}
                 />
-                {isAdmin && !!views.length && views.length <= 3 && (
+                {isAdmin && views.length <= 3 && (
                   <Stack mb='-5px'>
                     <AddViewMenu
                       board={activeBoard}
@@ -340,7 +348,17 @@ export function RewardsPage({ title }: { title: string }) {
       ) : (
         <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
           <Stack>
-            {rewards && rewards?.length > 0 ? (
+            {!activeView?.fields?.sourceType && activeView.fields.viewType === 'board' ? (
+              <Box width='100%'>
+                <CreateLinkedView
+                  rootBoard={activeBoard}
+                  views={views}
+                  showView={showView}
+                  isReward
+                  view={activeView}
+                />
+              </Box>
+            ) : rewards && rewards?.length > 0 ? (
               <Box width='100%'>
                 {activeView.fields.viewType === 'table' && (
                   <Table
@@ -396,7 +414,8 @@ export function RewardsPage({ title }: { title: string }) {
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     addCard={async () => {}}
-                    onCardClicked={(e, card) => showRewardOrApplication(card.id)}
+                    isApplication={activeView.fields.sourceType === 'reward_applications'}
+                    onCardClicked={(_e, card) => showRewardOrApplication(card.id, card?.parentId)}
                     showCard={showRewardOrApplication}
                     disableAddingCards
                     readOnlyTitle
@@ -429,12 +448,12 @@ export function RewardsPage({ title }: { title: string }) {
                 closeSidebar={() => setShowSidebar(false)}
                 hideLayoutOptions
                 hideLayoutSelectOptions={undefined}
-                hideSourceOptions
                 groupByProperty={groupByProperty}
                 page={undefined}
                 pageId={undefined}
                 showView={() => {}}
                 supportedViewTypes={supportedRewardViewTypes}
+                isReward
               />
             )}
           </Stack>

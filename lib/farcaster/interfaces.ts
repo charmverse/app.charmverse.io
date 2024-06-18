@@ -20,3 +20,5 @@ export interface SignedKeyRequest {
   signerUser?: object;
   signerUserMetadata?: object;
 }
+
+export type LoginType = 'login' | 'connect';

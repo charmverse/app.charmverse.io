@@ -22,6 +22,8 @@ import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { DatePicker } from 'components/common/DatePicker';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -32,10 +34,11 @@ import type { FilterClause, FilterCondition } from 'lib/databases/filterClause';
 import { propertyConfigs } from 'lib/databases/filterClause';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import { createFilterGroup } from 'lib/databases/filterGroup';
-import { getPropertyName } from 'lib/databases/getPropertyName';
 import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
+import { REWARD_REVIEWERS_BLOCK_ID } from 'lib/rewards/blocks/constants';
+import { slugify } from 'lib/utils/strings';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -181,7 +184,10 @@ function FilterPropertyValue({
     updatePropertyValueDebounced(currentFilter, newFilterValue);
   };
 
-  const propertyDataType = propertyConfigs[propertyRecord[filter.propertyId].type].datatype;
+  const propertyDataType =
+    REWARD_REVIEWERS_BLOCK_ID === filter.propertyId
+      ? 'user_roles'
+      : propertyConfigs[propertyRecord[filter.propertyId].type].datatype;
 
   if (filter.condition === 'is_empty' || filter.condition === 'is_not_empty') {
     return null;
@@ -204,6 +210,15 @@ function FilterPropertyValue({
     );
   } else if (propertyDataType === 'boolean') {
     return <Checkbox checked={filter.values[0] === 'true'} onChange={updateBooleanValue} />;
+  } else if (propertyDataType === 'user_roles') {
+    return (
+      <UserAndRoleSelect
+        onChange={async (values) => {
+          updateMultiSelect(values.map((value) => value.id));
+        }}
+        value={filter.values}
+      />
+    );
   } else if (propertyDataType === 'multi_select') {
     if (isPropertyTypePerson) {
       return (
@@ -342,11 +357,12 @@ function FilterPropertyValue({
     return (
       <Select<string>
         displayEmpty
-        value={filter.values[0]}
+        value={filter.values[0] || ''}
         renderValue={(selected) => {
           const foundOption = property.options?.find((o) => o.id === selected);
           return foundOption ? (
             <Chip
+              data-test='filter-type-select'
               size='small'
               label={
                 isPropertyTypeEvaluationType
@@ -356,7 +372,7 @@ function FilterPropertyValue({
               color={focalboardColorsMap[foundOption.color]}
             />
           ) : (
-            <Typography fontSize='small' color='secondary'>
+            <Typography data-test='filter-type-select' fontSize='small' color='secondary'>
               Select an option
             </Typography>
           );
@@ -369,7 +385,12 @@ function FilterPropertyValue({
         ) : (
           property.options.map((option) => {
             return (
-              <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)}>
+              <MenuItem
+                data-test={`filter-option-value-${option.id}`}
+                key={option.id}
+                onClick={() => updateSelectValue(option.id)}
+                value={option.id}
+              >
                 <Chip
                   size='small'
                   label={
@@ -439,7 +460,7 @@ function FilterEntry(props: Props) {
 
   return (
     <Stack flexDirection='row' justifyContent='space-between' flex={1}>
-      <Stack gap={0.5} flexDirection='row'>
+      <Stack gap={0.5} flexDirection='row' width='100%'>
         <PopupState variant='popover' popupId='view-filter'>
           {(popupState) => (
             <>
@@ -447,6 +468,7 @@ function FilterEntry(props: Props) {
                 color='secondary'
                 size='small'
                 variant='outlined'
+                data-test='filter-property-button'
                 endIcon={<KeyboardArrowDownIcon fontSize='small' />}
                 sx={{ minWidth: 125, maxWidth: 125, width: 125, justifyContent: 'space-between' }}
                 {...bindTrigger(popupState)}
@@ -458,7 +480,7 @@ function FilterEntry(props: Props) {
                   sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
                 >
                   {iconForPropertyType(template.type, { color: 'secondary' })}
-                  <EllipsisText fontSize='small'>{getPropertyName(template)}</EllipsisText>
+                  <EllipsisText fontSize='small'>{template.name}</EllipsisText>
                 </Stack>
               </Button>
               <Menu {...bindMenu(popupState)} sx={{ maxWidth: 350 }}>
@@ -467,6 +489,7 @@ function FilterEntry(props: Props) {
                     key={property.id}
                     id={property.id}
                     selected={property.id === filter.propertyId}
+                    data-test={`filter-property-select-${slugify(property.name)}`}
                     onClick={() => {
                       const filterGroup = createFilterGroup(currentFilter);
                       const filterClause = filterGroup.filters.find(
@@ -483,7 +506,7 @@ function FilterEntry(props: Props) {
                     }}
                   >
                     <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-                    <EllipsisText fontSize='small'>{getPropertyName(property)}</EllipsisText>
+                    <EllipsisText fontSize='small'>{property.name}</EllipsisText>
                   </MenuItem>
                 ))}
               </Menu>
@@ -499,6 +522,7 @@ function FilterEntry(props: Props) {
                 size='small'
                 {...bindTrigger(popupState)}
                 variant='outlined'
+                data-test='filter-condition-button'
                 endIcon={<KeyboardArrowDownIcon fontSize='small' />}
               >
                 <EllipsisText fontSize='small' variant='subtitle1'>
@@ -509,10 +533,14 @@ function FilterEntry(props: Props) {
                 {propertyConfigs[template.type].conditions.map((condition) => {
                   return (
                     <MenuItem
+                      data-test={`filter-condition-option-${condition}`}
                       selected={condition === filter.condition}
                       key={condition}
                       id='includes'
-                      onClick={() => props.conditionClicked(condition, filter)}
+                      onClick={() => {
+                        props.conditionClicked(condition, filter);
+                        popupState.close();
+                      }}
                     >
                       <EllipsisText variant='subtitle1'>{formatCondition(condition)}</EllipsisText>
                     </MenuItem>

@@ -31,6 +31,7 @@ type Props = {
   // eslint-disable-next-line
   showCard: (cardId: string | null) => void;
   hideLinkedBounty?: boolean;
+  isApplication?: boolean;
 };
 
 const BountyFooter = styled.div`
@@ -132,7 +133,9 @@ const KanbanCard = React.memo((props: Props) => {
           }}
           data-test={`kanban-card-${card.id}`}
         >
-          {!props.readOnly && <KanbanPageActionsMenuButton page={card} onClickDelete={deleteCard} />}
+          {!props.readOnly && (
+            <KanbanPageActionsMenuButton isApplication={props.isApplication} page={card} onClickDelete={deleteCard} />
+          )}
 
           <div className='octo-icontitle'>
             <div>

@@ -6,7 +6,10 @@ import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoa
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
+import type { PropertyType } from 'lib/databases/board';
+import { REWARD_PROPOSAL_LINK } from 'lib/rewards/blocks/constants';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 
 import { mapRewardToCard } from '../../hooks/useRewardsBoardAdapter';
@@ -26,6 +29,7 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
   const { getRewardPage } = useRewardPage();
   const { membersRecord } = useMembers();
   const { board, cards, activeView, views } = useRewardsBoardAndBlocks();
+  const { getFeatureTitle } = useSpaceFeatures();
 
   const mutator = usePropertiesMutator({ onChange });
 
@@ -37,6 +41,7 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
       reward,
       rewardPage,
       spaceId: space.id,
+      spaceDomain: space.domain,
       members: membersRecord
     });
 
@@ -47,7 +52,17 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
         fields: {
           ...board.fields,
           // extract non-custom properties
-          cardProperties: board.fields.cardProperties.filter((p) => !p.id.startsWith('__'))
+          cardProperties: [
+            ...board.fields.cardProperties.filter((p) => !p.id.startsWith('__')),
+            // Add proposal link as a custom property
+            {
+              readOnly: true,
+              options: [],
+              id: REWARD_PROPOSAL_LINK,
+              name: getFeatureTitle('Proposal'),
+              type: 'proposalUrl' as PropertyType
+            }
+          ]
         }
       };
     }

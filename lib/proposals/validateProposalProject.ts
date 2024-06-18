@@ -20,10 +20,8 @@ export function validateProposalProject({
   project: ProjectWithMembers;
   formFields?: Pick<FormFieldInput, 'type' | 'fieldConfig' | 'id'>[];
 }) {
-  const projectField = formFields?.find((field) => field.type === 'project_profile');
-  const projectFieldAnswer = formAnswers?.find((answer) => answer.fieldId === projectField?.id)
-    ?.value as FormFieldValue;
-
+  const projectField = formFields?.find((f) => f.type === 'project_profile');
+  const projectFieldAnswer = formAnswers?.find((a) => a.fieldId === projectField?.id)?.value as FormFieldValue;
   if (!project) {
     throw new InvalidInputError(`Project does not exist`);
   }

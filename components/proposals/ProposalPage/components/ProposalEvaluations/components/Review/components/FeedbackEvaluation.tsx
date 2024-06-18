@@ -1,6 +1,6 @@
 import { Box, Card, Stack, FormLabel, Typography } from '@mui/material';
 
-import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
+import { useSubmitEvaluationReview } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
@@ -20,7 +20,7 @@ export type Props = {
 
 export function FeedbackEvaluation({ proposalId, evaluation, isCurrent, nextStep, onSubmit, archived }: Props) {
   const { showMessage } = useSnackbar();
-  const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
+  const { trigger, isMutating } = useSubmitEvaluationReview({ proposalId });
   const reviewerOptions: SelectOption[] = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
@@ -57,8 +57,9 @@ export function FeedbackEvaluation({ proposalId, evaluation, isCurrent, nextStep
         </FormLabel>
         <UserAndRoleSelect
           data-test='evaluation-reviewer-select'
+          wrapColumn
           systemRoles={[authorSystemRole, allMembersSystemRole]}
-          readOnly={true}
+          readOnly
           value={reviewerOptions}
           onChange={() => {}}
         />

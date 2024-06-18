@@ -10,7 +10,9 @@ import type {
   ProposalEvaluationResult,
   ProposalEvaluationType,
   Vote,
-  ProposalEvaluationReview
+  ProposalEvaluationReview,
+  ProposalAppealReviewer,
+  ProposalEvaluationAppealReview
 } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
@@ -23,14 +25,7 @@ import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import type { ProposalPropertiesField } from './blocks/interfaces';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from './rubric/interfaces';
 
-export type ProposalEvaluationStatus =
-  | 'in_progress'
-  | 'complete'
-  | 'passed'
-  | 'declined'
-  | 'unpublished'
-  | 'published'
-  | 'archived';
+export type ProposalEvaluationStatus = 'in_progress' | 'passed' | 'declined' | 'unpublished' | 'archived';
 export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'credentials' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 
@@ -63,12 +58,18 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   rubricCriteria: RubricCriteriaTyped[];
   permissions: ProposalEvaluationPermission[];
   reviewers: ProposalReviewer[];
+  appealReviewers?: ProposalAppealReviewer[] | null;
   voteSettings: VoteSettings | null;
   isReviewer?: boolean; // added by the webapp api
+  isAppealReviewer?: boolean; // added by the webapp api
   requiredReviews: number;
+  appealable?: boolean | null;
+  appealRequiredReviews?: number | null;
   declineReasonOptions: string[];
   reviews?: ProposalEvaluationReview[];
+  appealReviews?: ProposalEvaluationAppealReview[];
   actionLabels?: WorkflowEvaluationJson['actionLabels'];
+  notificationLabels?: WorkflowEvaluationJson['notificationLabels'];
   type: ConcealableEvaluationType;
 };
 

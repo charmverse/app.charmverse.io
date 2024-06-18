@@ -140,13 +140,14 @@ export function NewRewardPage({
     const workflow =
       workflowOptions && template.fields && inferRewardWorkflow(workflowOptions, template.fields as RewardFields);
     if (workflow) {
-      applyWorkflow(workflow, template.assignedSubmitters);
+      applyWorkflow(workflow, template.assignedSubmitters, template.fields);
     }
   }
 
-  function applyWorkflow(workflow: RewardWorkflow, assignedSubmitters?: string[] | null) {
+  function applyWorkflow(workflow: RewardWorkflow, assignedSubmitters?: string[] | null, fields?: Prisma.JsonValue) {
     const updatedFields = {
       ...(rewardValues.fields as object | undefined | null),
+      ...(fields as object | undefined | null),
       workflowId: workflow.id
     };
 
@@ -194,6 +195,10 @@ export function NewRewardPage({
     setPageTitle('');
     setActiveView('reward_evaluation');
     setDefaultView(null);
+    return () => {
+      // clear sidebar so we
+      setActiveView(null);
+    };
   }, []);
 
   useEffect(() => {

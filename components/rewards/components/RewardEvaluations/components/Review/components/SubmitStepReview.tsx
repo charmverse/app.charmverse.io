@@ -56,6 +56,7 @@ export function SubmitStepReview({ reward }: { reward: RewardWithUsers }) {
               type='role'
               readOnly
               variant='standard'
+              wrapColumn
               value={(reward?.allowedSubmitterRoles ?? []).map((roleId) => ({ group: 'role', id: roleId }))}
               onChange={() => {}}
             />

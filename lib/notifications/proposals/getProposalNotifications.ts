@@ -8,7 +8,21 @@ import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
 export async function getProposalNotifications({ id, userId }: QueryCondition): Promise<ProposalNotification[]> {
   const proposalNotifications = await prisma.proposalNotification.findMany({
-    where: queryCondition({ id, userId }),
+    where: {
+      ...queryCondition({ id, userId }),
+      proposal: {
+        space: {
+          spaceRoles: {
+            some: {
+              userId
+            }
+          }
+        },
+        page: {
+          deletedAt: null
+        }
+      }
+    },
     select: {
       id: true,
       type: true,
@@ -18,6 +32,7 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
           evaluations: {
             select: {
               actionLabels: true,
+              notificationLabels: true,
               title: true
             },
             orderBy: {
@@ -37,7 +52,8 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
         select: {
           title: true,
           index: true,
-          actionLabels: true
+          actionLabels: true,
+          notificationLabels: true
         }
       },
       notificationMetadata: {
@@ -69,11 +85,13 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
       evaluation: notification.evaluation
         ? {
             actionLabels: notification.evaluation.actionLabels,
+            notificationLabels: notification.evaluation.notificationLabels,
             title: notification.evaluation.title
           }
         : null,
       previousEvaluation: previousEvaluation
         ? {
+            notificationLabels: previousEvaluation.notificationLabels,
             title: previousEvaluation.title,
             actionLabels: previousEvaluation.actionLabels
           }

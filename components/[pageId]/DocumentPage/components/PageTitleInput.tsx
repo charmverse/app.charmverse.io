@@ -107,7 +107,11 @@ export function PageTitleInput({
   }, [value, updatedAtExternal, updatedAt, setTitle]);
 
   if (readOnly) {
-    return <StyledReadOnlyTitle data-test='editor-page-title'>{value || 'Untitled'}</StyledReadOnlyTitle>;
+    return (
+      <StyledReadOnlyTitle variant='h1' data-test='editor-page-title'>
+        {value || 'Untitled'}
+      </StyledReadOnlyTitle>
+    );
   }
   return (
     <StyledPageTitle

@@ -1,12 +1,17 @@
 import { BountyOperation } from '@charmverse/core/prisma';
+import type { Prisma, BountyPermissionLevel, BountyPermission } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { assignRole } from 'lib/roles';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utils/errors';
 import { typedKeys } from 'lib/utils/objects';
+import type { BountyPermissions } from 'testing/setupDatabase';
 import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
-import { addBountyPermissionGroup } from '../addBountyPermissionGroup';
+import type { TargetPermissionGroup, Resource } from '../../interfaces';
 import { computeBountyPermissions } from '../computeBountyPermissions';
 import type { BountyPermissionFlags } from '../interfaces';
 import { bountyPermissionMapping } from '../mapping';
@@ -375,3 +380,175 @@ describe('computeBountyPermissions', () => {
     });
   });
 });
+
+export function mapBountyPermissions(bountyPermissions: BountyPermission[]): BountyPermissions {
+  const mapping: BountyPermissions = {
+    creator: [],
+    reviewer: [],
+    submitter: []
+  };
+
+  for (const permission of bountyPermissions) {
+    const targetGroup: TargetPermissionGroup | null =
+      permission.public === true
+        ? {
+            group: 'public'
+          }
+        : permission.userId
+        ? {
+            group: 'user',
+            id: permission.userId
+          }
+        : permission.roleId
+        ? {
+            group: 'role',
+            id: permission.roleId
+          }
+        : permission.spaceId
+        ? {
+            group: 'space',
+            id: permission.spaceId
+          }
+        : null;
+
+    if (targetGroup) {
+      // TODO: better separation between permission levels and groups
+      mapping[permission.permissionLevel].push(targetGroup as { id: string; group: 'role' });
+    }
+  }
+
+  return mapping;
+}
+
+type BountyPermissionAssignment = {
+  level: BountyPermissionLevel;
+  assignee: TargetPermissionGroup;
+} & Resource;
+
+async function addBountyPermissionGroup({
+  assignee,
+  level,
+  resourceId
+}: BountyPermissionAssignment): Promise<BountyPermissions> {
+  const bounty = await prisma.bounty.findUnique({
+    where: {
+      id: resourceId
+    },
+    select: {
+      permissions: true,
+      spaceId: true
+    }
+  });
+
+  if (!bounty) {
+    throw new DataNotFoundError(`Reward with id ${resourceId} not found`);
+  }
+
+  if (assignee.group === 'public') {
+    throw new InsecureOperationError('No reward permissions can be assigned to the public.');
+  }
+
+  if (!assignee.id) {
+    throw new InvalidInputError(`Please provide a valid ${assignee.group} id`);
+  }
+
+  if (assignee.group === 'space' && bounty.spaceId !== assignee.id) {
+    throw new InsecureOperationError(
+      'You cannot assign permissions to a different space than the one the reward belongs to.'
+    );
+  } else if (assignee.group === 'role') {
+    const role = await prisma.role.findUnique({
+      where: {
+        id: assignee.id
+      },
+      select: {
+        spaceId: true
+      }
+    });
+
+    if (!role) {
+      throw new DataNotFoundError(`Role with id ${assignee.id} not found`);
+    } else if (role.spaceId !== bounty.spaceId) {
+      throw new InsecureOperationError(
+        'You cannot assign permissions to a different space from the one this bounty belongs to.'
+      );
+    }
+  } else if (assignee.group === 'user') {
+    const { error } = await hasAccessToSpace({
+      spaceId: bounty.spaceId,
+      adminOnly: false,
+      userId: assignee.id as string
+    });
+
+    if (error) {
+      throw new InsecureOperationError(
+        'You cannot assign permissions to a user who is not a member of the space the bounty belongs to'
+      );
+    }
+  }
+
+  const existingPermission = bounty.permissions.find((p) => {
+    if (assignee.group === 'space') {
+      return p.spaceId === assignee.id && p.permissionLevel === level;
+    } else if (assignee.group === 'role') {
+      return p.roleId === assignee.id && p.permissionLevel === level;
+    } else if (assignee.group === 'user') {
+      return p.userId === assignee.id && p.permissionLevel === level;
+      // We should never get here, but just in case
+    } else if ((assignee as TargetPermissionGroup).group === 'public') {
+      return p.public === true && p.permissionLevel === level;
+    }
+
+    return false;
+  });
+
+  if (existingPermission) {
+    return mapBountyPermissions(bounty.permissions);
+  }
+
+  const insert: Prisma.BountyPermissionCreateInput = {
+    permissionLevel: level,
+    bounty: {
+      connect: {
+        id: resourceId
+      }
+    },
+    user:
+      assignee.group === 'user'
+        ? {
+            connect: {
+              id: assignee.id
+            }
+          }
+        : undefined,
+    role:
+      assignee.group === 'role'
+        ? {
+            connect: {
+              id: assignee.id
+            }
+          }
+        : undefined,
+    space:
+      assignee.group === 'space'
+        ? {
+            connect: {
+              id: assignee.id
+            }
+          }
+        : undefined
+  };
+
+  const newPermission = await prisma.bountyPermission.create({
+    data: insert,
+    select: {
+      bounty: {
+        select: {
+          permissions: true
+        }
+      }
+    }
+  });
+
+  return mapBountyPermissions(newPermission.bounty.permissions);
+}

@@ -9,7 +9,19 @@ import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
 export async function getDocumentNotifications({ id, userId }: QueryCondition): Promise<DocumentNotification[]> {
   const documentNotifications = await prisma.documentNotification.findMany({
-    where: queryCondition({ id, userId }),
+    where: {
+      ...queryCondition({ id, userId }),
+      page: {
+        deletedAt: null,
+        space: {
+          spaceRoles: {
+            some: {
+              userId
+            }
+          }
+        }
+      }
+    },
     select: {
       id: true,
       type: true,

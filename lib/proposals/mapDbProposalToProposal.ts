@@ -8,7 +8,12 @@ import type {
   ProposalRubricCriteria,
   ProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma';
-import type { ProposalEvaluation, ProposalEvaluationReview } from '@charmverse/core/prisma-client';
+import type {
+  ProposalAppealReviewer,
+  ProposalEvaluation,
+  ProposalEvaluationAppealReview,
+  ProposalEvaluationReview
+} from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
@@ -33,16 +38,19 @@ export function mapDbProposalToProposal({
   permissions,
   permissionsByStep,
   proposalEvaluationReviews,
-  workflow
+  workflow,
+  proposalEvaluationAppealReviews
 }: {
   workflow: {
     evaluations: WorkflowEvaluationJson[];
   } | null;
   proposalEvaluationReviews?: ProposalEvaluationReview[];
+  proposalEvaluationAppealReviews?: ProposalEvaluationAppealReview[];
   proposal: Proposal &
     FormFieldsIncludeType & {
       authors: ProposalAuthor[];
       evaluations: (ProposalEvaluation & {
+        appealReviewers: ProposalAppealReviewer[];
         reviewers: ProposalReviewer[];
         rubricAnswers: ProposalRubricCriteriaAnswer[];
         rubricCriteria: ProposalRubricCriteria[];
@@ -78,17 +86,22 @@ export function mapDbProposalToProposal({
       (e) => e.title === evaluation.title && e.type === evaluation.type
     );
     const reviews = proposalEvaluationReviews?.filter((review) => review.evaluationId === evaluation.id);
+    const appealReviews = proposalEvaluationAppealReviews?.filter((review) => review.evaluationId === evaluation.id);
     const stepPermissions = permissionsByStep?.[evaluation.id];
     if (!stepPermissions?.evaluate) {
       evaluation.draftRubricAnswers = [];
       evaluation.rubricAnswers = [];
     }
+
     return {
       ...evaluation,
+      appealReviewers: evaluation.appealReviewers || [],
       reviews,
+      appealReviews,
       declineReasonOptions: workflowEvaluation?.declineReasons ?? [],
-      isReviewer: !!stepPermissions?.evaluate
-    } as unknown as PopulatedEvaluation;
+      isReviewer: !!stepPermissions?.evaluate,
+      isAppealReviewer: !!stepPermissions?.evaluate_appeal
+    } as PopulatedEvaluation;
   });
   const pageFields = page?.type === 'proposal_template' ? page : { sourceTemplateId: page?.sourceTemplateId };
 

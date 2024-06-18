@@ -7,6 +7,7 @@ import type { Reward } from 'lib/rewards/interfaces';
 export type ProposalWithEvaluation = Pick<Proposal, 'status'> & {
   evaluations: (Pick<ProposalEvaluation, 'index' | 'result' | 'type' | 'id'> & {
     finalStep?: boolean | null;
+    appealedAt?: Date | null;
   })[];
   rewards: Pick<Reward, 'id'>[];
 };
@@ -29,7 +30,12 @@ export function getProposalAction({
     return null;
   }
 
-  if ((currentEvaluation.index === proposal.evaluations.length - 1 || currentEvaluation.finalStep) && isAuthor) {
+  if (
+    (currentEvaluation.index === proposal.evaluations.length - 1 ||
+      currentEvaluation.finalStep ||
+      currentEvaluation.appealedAt) &&
+    isAuthor
+  ) {
     if (currentEvaluation.result === 'pass') {
       return proposal.rewards.length > 0 ? 'reward_published' : 'proposal_passed';
     } else if (currentEvaluation.result === 'fail') {
@@ -47,16 +53,6 @@ export function getProposalAction({
     }
   }
 
-  if (currentEvaluation.type === 'pass_fail' || currentEvaluation.type === 'rubric') {
-    if (currentEvaluation.result === null && isReviewer) {
-      return 'review_required';
-    }
-
-    if (isAuthor && currentEvaluation.result === 'fail') {
-      return 'proposal_failed';
-    }
-  }
-
   const previousEvaluation = currentEvaluation.index > 0 ? proposal.evaluations[currentEvaluation.index - 1] : null;
 
   if (currentEvaluation.result === null && previousEvaluation && previousEvaluation.result === 'pass') {
@@ -65,6 +61,16 @@ export function getProposalAction({
     }
     if (isAuthor) {
       return 'step_passed';
+    }
+  }
+
+  if (currentEvaluation.type === 'pass_fail' || currentEvaluation.type === 'rubric') {
+    if (currentEvaluation.result === null && isReviewer) {
+      return 'review_required';
+    }
+
+    if (isAuthor && currentEvaluation.result === 'fail') {
+      return 'proposal_failed';
     }
   }
 

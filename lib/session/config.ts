@@ -50,6 +50,7 @@ export const sessionUserRelations = {
   },
   discordUser: true,
   telegramUser: true,
+  farcasterUser: true,
   notificationState: true,
   verifiedEmails: {
     select: {

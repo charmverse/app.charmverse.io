@@ -28,8 +28,7 @@ describe('getRewardTemplates', () => {
       },
       reviewers: [
         {
-          id: nonAdminUser.id,
-          group: 'user'
+          userId: nonAdminUser.id
         }
       ]
     };
@@ -70,8 +69,7 @@ describe('getRewardTemplates', () => {
       },
       reviewers: [
         {
-          id: rewardAuthor.id,
-          group: 'user'
+          userId: rewardAuthor.id
         }
       ]
     };

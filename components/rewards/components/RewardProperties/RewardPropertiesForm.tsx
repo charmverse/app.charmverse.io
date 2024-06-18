@@ -1,15 +1,15 @@
 import type { BountyStatus, Prisma } from '@charmverse/core/prisma-client';
-import { Box, Collapse, Divider, Stack } from '@mui/material';
+import { KeyboardArrowDown } from '@mui/icons-material';
+import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
-import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
-import { TemplateSelect } from 'components/common/WorkflowSidebar/components/TemplateSelect';
-import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { REWARD_PROPOSAL_LINK } from 'lib/rewards/blocks/constants';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
-import { getRewardType } from 'lib/rewards/getRewardType';
-import type { RewardType } from 'lib/rewards/interfaces';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+import { getAbsolutePath } from 'lib/utils/browser';
 import { isTruthy } from 'lib/utils/types';
 
 import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
@@ -44,9 +44,8 @@ export function RewardPropertiesForm({
   readOnlyTemplate,
   rewardStatus
 }: Props) {
+  const { space } = useCurrentSpace();
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
-  const { templates: rewardTemplates = [] } = useRewardTemplates();
-
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {
       const customReward = updates.customReward;
@@ -59,30 +58,11 @@ export function RewardPropertiesForm({
 
     onChange(updates);
   }
-
-  function setRewardType(rewardType: RewardType) {
-    if (rewardType === 'none' && rewardStatus !== 'paid') {
-      applyUpdates({
-        rewardAmount: null,
-        chainId: null,
-        rewardToken: null,
-        customReward: null
-      });
-    }
-
-    onChange({
-      rewardType,
-      customReward: rewardType === 'custom' ? values.customReward : null,
-      rewardAmount: rewardType === 'token' ? values.rewardAmount : null,
-      rewardToken: rewardType === 'token' ? values.rewardToken : null,
-      chainId: rewardType === 'token' ? values.chainId : null
-    });
-  }
-
-  if (!values) {
-    return null;
-  }
-
+  const sourceProposalPage = (values as RewardWithUsers).sourceProposalPage;
+  const proposalLinkValue = sourceProposalPage
+    ? [getAbsolutePath(`/${sourceProposalPage.id}`, space?.domain), sourceProposalPage.title]
+    : '';
+  const rewards = values as unknown as BoardReward;
   return (
     <Box
       className='CardDetail content'
@@ -107,45 +87,42 @@ export function RewardPropertiesForm({
           readOnly={readOnly || !pageId}
         />
 
-        <Collapse in={isExpanded} timeout='auto' unmountOnExit>
-          <>
-            {/* {!isTemplate && isNewReward && (
-              <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-                <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                  <PropertyLabel readOnly highlighted>
-                    Template
-                  </PropertyLabel>
-                  <Box display='flex' flex={1}>
-                    <TemplateSelect
-                      options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
-                      disabled={readOnlyTemplate || readOnly}
-                      value={templateId}
-                      onChange={(templatePage) => {
-                        if (!templatePage) {
-                          selectTemplate(null);
-                        }
-                        const selected = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
-                        if (selected && selectTemplate) {
-                          selectTemplate(selected);
-                        }
-                        setRewardType(getRewardType(selected || values, isNewReward, !!templatePage));
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </Box>
-            )} */}
-
-            <CustomPropertiesAdapter
-              readOnly={readOnly}
-              reward={values as unknown as BoardReward}
-              onChange={(properties: RewardPropertiesField) => {
-                applyUpdates({
-                  fields: { properties: properties ? { ...properties } : {} } as Prisma.JsonValue
-                });
-              }}
+        <Stack
+          direction='row'
+          gap={1}
+          data-test='reward-properties-details'
+          alignItems='center'
+          sx={{ cursor: 'pointer' }}
+          onClick={() => setIsExpanded((v) => !v)}
+        >
+          <Typography fontWeight='bold'>Details</Typography>
+          <IconButton size='small'>
+            <KeyboardArrowDown
+              fontSize='small'
+              sx={{ transform: `rotate(${isExpanded ? 180 : 0}deg)`, transition: 'all 0.2s ease' }}
             />
-          </>
+          </IconButton>
+        </Stack>
+
+        <Collapse in={isExpanded} timeout='auto' unmountOnExit>
+          <CustomPropertiesAdapter
+            readOnly={readOnly}
+            reward={{
+              ...rewards,
+              fields: {
+                ...rewards.fields,
+                properties: {
+                  ...rewards.fields?.properties,
+                  [REWARD_PROPOSAL_LINK]: proposalLinkValue
+                }
+              }
+            }}
+            onChange={(properties: RewardPropertiesField) => {
+              applyUpdates({
+                fields: { properties: { ...properties } } as Prisma.JsonValue
+              });
+            }}
+          />
         </Collapse>
       </Stack>
     </Box>

@@ -33,7 +33,8 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
           result: true,
           id: true,
           reviewers: true,
-          finalStep: true
+          finalStep: true,
+          appealedAt: true
         },
         orderBy: {
           index: 'asc'
@@ -76,18 +77,7 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
         ...(reward.fields as RewardFields),
         workflowId: assignedWorkflow.id
       } as Prisma.JsonObject,
-      reviewers: uniqBy(
-        reviewers
-          .map((reviewer) =>
-            reviewer.roleId
-              ? { group: 'role', id: reviewer.roleId }
-              : reviewer.userId
-              ? { group: 'user', id: reviewer.userId }
-              : null
-          )
-          .filter(isTruthy) as RewardReviewer[],
-        'id'
-      ),
+      reviewers: uniqBy(reviewers, (reviewer) => reviewer.userId || reviewer.roleId),
       allowedSubmitterRoles: [],
       pageProps: page || {},
       spaceId: proposal.spaceId,

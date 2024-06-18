@@ -30,12 +30,15 @@ import {
   REWARD_CUSTOM_VALUE,
   REWARD_TOKEN,
   REWARD_APPLICANTS_COUNT,
-  REWARD_PROPOSAL_LINK
+  REWARD_PROPOSAL_LINK,
+  APPLICANT_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
 import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
+import { getAbsolutePath } from 'lib/utils/browser';
+import { isUUID } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 
 export type BoardReward = { id?: string; fields: RewardFields };
@@ -85,7 +88,7 @@ export function useRewardsBoardAdapter() {
   }, [views, activeViewId, space?.id]);
 
   const sortedCards = useMemo(() => {
-    let cards = (rewards || [])
+    let cards: CardWithRelations[] = (rewards || [])
       .map((reward) => {
         const page = getRewardPage(reward.id);
         if (!page || !space) return null;
@@ -94,23 +97,36 @@ export function useRewardsBoardAdapter() {
           ...mapRewardToCard({
             reward,
             spaceId: space.id,
+            spaceDomain: space.domain,
             rewardPage: page,
-            members: membersRecord
+            members: membersRecord,
+            isSubmissionSource: activeView.fields.sourceType === 'reward_applications'
           }),
           reward: {
             id: reward.id,
-            rewardType: reward.rewardType
+            rewardType: reward.rewardType,
+            applications: reward.applications.map((app) => ({ createdBy: app.createdBy }))
           }
-        } as CardWithRelations;
+        };
       })
       .filter(isTruthy);
 
+    const _applications = cards
+      .map((card) => {
+        return card.subPages || [];
+      })
+      .flat();
+
+    if (activeView.fields.sourceType === 'reward_applications') {
+      cards = _applications;
+    }
+
     const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
-    if (activeView.fields.filter && board) {
-      const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cards).map((c) => c.id);
+    if (filter && board) {
+      const filteredCards = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cards);
 
-      cards = cards.filter((cp) => filteredCardsIds.includes(cp.id));
+      cards = filteredCards;
     }
     const sortedCardPages = board
       ? sortCards(cards, board, activeView, membersRecord, {}, localViewSettings?.localSort)
@@ -118,7 +134,8 @@ export function useRewardsBoardAdapter() {
 
     return sortedCardPages;
   }, [
-    activeView,
+    activeView.fields.sortOptions,
+    activeView?.fields.filter,
     board,
     getRewardPage,
     localViewSettings?.localFilters,
@@ -137,33 +154,39 @@ export function useRewardsBoardAdapter() {
   };
 }
 
+type RewardProps =
+  | Pick<BoardReward, 'fields' | 'id'>
+  | Pick<
+      RewardWithUsers,
+      | 'applications'
+      | 'fields'
+      | 'id'
+      | 'assignedSubmitters'
+      | 'dueDate'
+      | 'maxSubmissions'
+      | 'reviewers'
+      | 'rewardAmount'
+      | 'rewardToken'
+      | 'customReward'
+      | 'status'
+      | 'sourceProposalPage'
+    >;
+
 // build mock card from reward and page data
 export function mapRewardToCard({
   reward,
   rewardPage,
   spaceId,
-  members
+  spaceDomain,
+  members,
+  isSubmissionSource
 }: {
-  reward:
-    | Pick<BoardReward, 'fields' | 'id'>
-    | Pick<
-        RewardWithUsers,
-        | 'applications'
-        | 'fields'
-        | 'id'
-        | 'assignedSubmitters'
-        | 'dueDate'
-        | 'maxSubmissions'
-        | 'reviewers'
-        | 'rewardAmount'
-        | 'rewardToken'
-        | 'customReward'
-        | 'status'
-        | 'sourceProposalPage'
-      >;
+  reward: RewardProps;
   rewardPage?: Pick<PageMeta, 'id' | 'createdAt' | 'createdBy' | 'title' | 'path' | 'updatedBy' | 'updatedAt'>;
   spaceId: string;
+  spaceDomain: string;
   members?: Record<string, Member>;
+  isSubmissionSource?: boolean;
 }): CardWithRelations {
   const rewardFields = (reward.fields || { properties: {} }) as RewardFields;
   const validApplications =
@@ -174,7 +197,9 @@ export function mapRewardToCard({
       : [];
 
   const sourceProposalPage = (reward as RewardWithUsers).sourceProposalPage;
-  const proposalLinkValue = sourceProposalPage ? [sourceProposalPage.title, `/${sourceProposalPage.id}`] : '';
+  const proposalLinkValue = sourceProposalPage
+    ? [getAbsolutePath(`/${sourceProposalPage.id}`, spaceDomain), sourceProposalPage.title]
+    : '';
   const assignedSubmitters =
     reward && 'assignedSubmitters' in reward && reward.assignedSubmitters ? reward.assignedSubmitters : null;
   const isAssignedReward = !!assignedSubmitters && assignedSubmitters.length > 0;
@@ -207,7 +232,8 @@ export function mapRewardToCard({
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
     [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
     [REWARD_APPLICANTS_COUNT]: isAssignedReward ? 1 : validApplications.length.toString(),
-    [REWARD_PROPOSAL_LINK]: proposalLinkValue
+    [REWARD_PROPOSAL_LINK]: proposalLinkValue,
+    [APPLICANT_STATUS_BLOCK_ID]: ''
   };
 
   const card: CardWithRelations = {
@@ -231,9 +257,12 @@ export function mapRewardToCard({
             .map((application) =>
               mapApplicationToCard({
                 application,
-                rewardId: reward.id,
+                pageTitle: rewardPage.title,
+                reward,
                 spaceId,
-                members
+                spaceDomain,
+                members,
+                isSubmissionSource
               })
             )
         : undefined
@@ -245,35 +274,87 @@ export function mapRewardToCard({
 // build mock card from reward and page data
 function mapApplicationToCard({
   application,
-  rewardId,
+  pageTitle,
+  reward,
   spaceId,
-  members
+  spaceDomain,
+  members,
+  isSubmissionSource
 }: {
   application: ApplicationMeta;
-  rewardId: string;
+  pageTitle?: string;
+  reward: RewardProps;
   members?: Record<string, Member>;
   spaceId: string;
+  spaceDomain: string;
+  isSubmissionSource?: boolean;
 }) {
   const applicationFields = { properties: {} };
+  const assignedSubmitters =
+    reward && 'assignedSubmitters' in reward && reward.assignedSubmitters ? reward.assignedSubmitters : null;
+  const isAssignedReward = !!assignedSubmitters && assignedSubmitters.length > 0;
+  const validApplications =
+    reward && 'applications' in reward
+      ? members
+        ? reward.applications.filter((_application) => members[_application.createdBy])
+        : reward.applications
+      : [];
+  const sourceProposalPage = (reward as RewardWithUsers).sourceProposalPage;
+  const proposalLinkValue = sourceProposalPage
+    ? [getAbsolutePath(`/${sourceProposalPage.id}`, spaceDomain), sourceProposalPage.title]
+    : '';
+
+  const rewardCustomProperties: Record<string, any> = {};
+  const rewardProperties = (reward.fields as RewardFields)?.properties ?? {};
+
+  Object.keys(rewardProperties).forEach((rewardPropertyKey) => {
+    if (isUUID(rewardPropertyKey)) {
+      rewardCustomProperties[rewardPropertyKey] = rewardProperties[rewardPropertyKey];
+    }
+  });
 
   applicationFields.properties = {
     ...applicationFields.properties,
     // add default field values on the fly
-    [REWARDS_AVAILABLE_BLOCK_ID]: null,
+    [REWARDS_AVAILABLE_BLOCK_ID]: isAssignedReward
+      ? 1
+      : reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
+      ? (
+          countRemainingSubmissionSlots({
+            applications: validApplications,
+            limit: reward.maxSubmissions
+          }) as number
+        )?.toString()
+      : '',
+    // Reward status allows matching application by reward status - Hide in the front end
+    [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
-    [REWARD_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
+    [APPLICANT_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
-    [DUE_DATE_ID]: null,
-    [REWARD_REVIEWERS_BLOCK_ID]: [],
-    [REWARD_APPLICANTS_COUNT]: null
+    [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
+    [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
+    [REWARD_APPLICANTS_COUNT]: isAssignedReward ? 1 : validApplications.length.toString(),
+    [CREATED_AT_ID]:
+      reward && 'createdAt' in reward && reward.createdAt ? new Date(reward.createdAt as string).getTime() : '',
+    [REWARD_AMOUNT]: (reward && 'rewardAmount' in reward && reward.rewardAmount) || '',
+    [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
+    [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
+    [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
+    [REWARD_PROPOSAL_LINK]: proposalLinkValue,
+    ...rewardCustomProperties
   };
+
+  const isApplication =
+    application.status === 'applied' || application.status === 'inProgress' || application.status === 'rejected';
 
   const authorName = members?.[application.createdBy]?.username;
   const card: Card = {
     id: application.id || '',
     spaceId,
-    parentId: rewardId,
-    title: `Application ${authorName ? `from ${authorName}` : ''}`,
+    parentId: reward.id,
+    title: isSubmissionSource
+      ? pageTitle || 'Untitled'
+      : `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
     rootId: spaceId,
     type: 'card' as const,
     customIconType: 'applicationStatus',

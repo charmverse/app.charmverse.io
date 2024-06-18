@@ -2,11 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 
 import type { BoardFields } from 'lib/databases/board';
-import {
-  DEFAULT_BOARD_VIEW_BLOCK_ID,
-  DEFAULT_CALENDAR_VIEW_BLOCK_ID,
-  DEFAULT_TABLE_VIEW_BLOCK_ID
-} from 'lib/databases/customBlocks/constants';
+import { DEFAULT_BOARD_VIEW_BLOCK_ID, DEFAULT_TABLE_VIEW_BLOCK_ID } from 'lib/databases/customBlocks/constants';
 
 import { DEFAULT_BOARD_BLOCK_ID } from '../constants';
 import { upsertDefaultRewardsBoard } from '../upsertDefaultRewardsBoard';
@@ -49,15 +45,6 @@ describe('reward blocks - upsertDefaultRewardsBoard', () => {
       }
     });
 
-    const defaultRewardCalendarView = await prisma.rewardBlock.findUniqueOrThrow({
-      where: {
-        id_spaceId: {
-          id: DEFAULT_CALENDAR_VIEW_BLOCK_ID,
-          spaceId: space.id
-        }
-      }
-    });
-
     expect(defaultRewardBoard).toBeTruthy();
     expect((defaultRewardBoard.fields as unknown as BoardFields).viewIds.sort()).toStrictEqual(
       defaultRewardViews.sort()
@@ -65,7 +52,6 @@ describe('reward blocks - upsertDefaultRewardsBoard', () => {
 
     expect(defaultRewardTableView).toBeTruthy();
     expect(defaultRewardBoardView).toBeTruthy();
-    expect(defaultRewardCalendarView).toBeTruthy();
   });
 
   it('Should keep existing board data when board already exists', async () => {

@@ -23,6 +23,7 @@ export type StaticPageType =
   | 'settings/credentials'
   | 'settings/proposals'
   | 'settings/integrations'
+  | 'settings/notifications'
   | 'billing/marketing'
   | 'billing/checkout'
   | 'billing/settings';

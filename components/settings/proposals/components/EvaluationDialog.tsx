@@ -16,7 +16,6 @@ import {
   Stack,
   Switch,
   TextField,
-  Tooltip,
   Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -54,15 +53,21 @@ type FormValues = {
     approve?: string;
     reject?: string;
   } | null;
+  notificationLabels?: {
+    approve?: string;
+    reject?: string;
+  } | null;
   requiredReviews?: number;
   declineReasons?: string[] | null;
-  finalStep?: boolean;
+  finalStep?: boolean | null;
   permissions: {
     operation: ProposalOperation;
     userId?: string | null;
     roleId?: string | null;
     systemRole?: ProposalSystemRole | null;
   }[];
+  appealable?: boolean | null;
+  appealRequiredReviews?: number | null;
 };
 
 function StepActionButtonLabel({
@@ -76,39 +81,32 @@ function StepActionButtonLabel({
 }) {
   return customLabelEvaluationTypes.includes(type) ? (
     <Box className='octo-propertyrow'>
-      <FieldLabel>Action labels</FieldLabel>
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' mb={1}>
-        <Box width={150}>
-          <PropertyLabel readOnly>Pass</PropertyLabel>
-        </Box>
-        <TextField
-          placeholder='Pass'
-          onChange={(e) => {
-            setValue('actionLabels', {
-              ...actionLabels,
-              approve: e.target.value
-            });
-          }}
-          fullWidth
-          value={actionLabels?.approve}
-        />
-      </Stack>
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-        <Box width={150}>
-          <PropertyLabel readOnly>Decline</PropertyLabel>
-        </Box>
-        <TextField
-          placeholder='Decline'
-          onChange={(e) => {
-            setValue('actionLabels', {
-              ...actionLabels,
-              reject: e.target.value
-            });
-          }}
-          fullWidth
-          value={actionLabels?.reject}
-        />
-      </Stack>
+      <FieldLabel>Decision Labels</FieldLabel>
+      <TextField
+        placeholder='Pass'
+        onChange={(e) => {
+          setValue('actionLabels', {
+            ...actionLabels,
+            approve: e.target.value
+          });
+        }}
+        fullWidth
+        value={actionLabels?.approve}
+        sx={{
+          mb: 1
+        }}
+      />
+      <TextField
+        placeholder='Decline'
+        onChange={(e) => {
+          setValue('actionLabels', {
+            ...actionLabels,
+            reject: e.target.value
+          });
+        }}
+        fullWidth
+        value={actionLabels?.reject}
+      />
     </Box>
   ) : null;
 }
@@ -204,87 +202,114 @@ function StepRequiredReviews({
   );
 }
 
-function EvaluationFinalStepToggle({
+function EvaluationAppealSettings({
   setValue,
-  finalStep,
-  isLastEvaluation
+  formValues
 }: {
-  isLastEvaluation: boolean;
-  finalStep: WorkflowEvaluationJson['finalStep'];
+  formValues: FormValues;
   setValue: UseFormSetValue<FormValues>;
 }) {
+  const { appealable, appealRequiredReviews, finalStep } = formValues;
   const { getFeatureTitle } = useSpaceFeatures();
   return (
-    <Box>
-      <FieldLabel>Final step</FieldLabel>
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-        <Typography color='textSecondary' variant='body2'>
-          If this step passes, the entire {getFeatureTitle('proposal')} passes
-        </Typography>
-        <Tooltip title={isLastEvaluation ? 'Last evaluation is always the final step' : ''} arrow>
-          <div>
-            <Switch
-              checked={isLastEvaluation ? true : finalStep}
-              disabled={isLastEvaluation}
-              onChange={(e) => setValue('finalStep', e.target.checked)}
-            />
-          </div>
-        </Tooltip>
-      </Stack>
-    </Box>
+    <Stack gap={1}>
+      <Box>
+        <FieldLabel>Priority Step</FieldLabel>
+        <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+          <Typography color='textSecondary' variant='body2'>
+            If this Step passes, the entire proposal passes
+          </Typography>
+          <Switch
+            checked={!!finalStep}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              setValue('finalStep', checked);
+              setValue('appealRequiredReviews', null);
+              setValue('appealable', false);
+            }}
+          />
+        </Stack>
+      </Box>
+      <Box>
+        <FieldLabel>Appeal</FieldLabel>
+        <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+          <Typography color='textSecondary' variant='body2'>
+            Authors can appeal the decision. The results of the appeal are final.
+          </Typography>
+          <Switch
+            checked={!!appealable}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              setValue('appealRequiredReviews', !checked ? null : 1);
+              setValue('finalStep', null);
+              setValue('appealable', checked);
+            }}
+          />
+        </Stack>
+      </Box>
+      {appealable && (
+        <Box>
+          <FieldLabel>Appeal required reviews</FieldLabel>
+          <TextField
+            disabled={!appealable}
+            type='number'
+            onChange={(e) => {
+              setValue('appealRequiredReviews', Math.max(1, Number(e.target.value)));
+            }}
+            fullWidth
+            value={appealRequiredReviews ?? ''}
+          />
+        </Box>
+      )}
+    </Stack>
   );
 }
 
 function EvaluationAdvancedSettingsAccordion({
   formValues,
-  isLastEvaluation,
-  evaluationId,
   setValue
 }: {
   formValues: FormValues;
-  isLastEvaluation: boolean;
-  evaluationId?: string;
   setValue: UseFormSetValue<FormValues>;
 }) {
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
   const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
   const declineReasons = (formValues?.declineReasons as WorkflowEvaluationJson['declineReasons']) ?? [];
-
   return (
-    <Accordion expanded={isAdvancedSettingsOpen} onChange={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}>
-      <AccordionSummary expandIcon={<ExpandMore />}>
-        <Typography>Advanced settings</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Stack gap={2}>
-          <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
-          {formValues.type === 'pass_fail' && (
-            <>
-              <EvaluationFinalStepToggle
-                isLastEvaluation={isLastEvaluation || !evaluationId}
-                finalStep={formValues.finalStep}
-                setValue={setValue}
-              />
-              <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
-              <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
-            </>
-          )}
-        </Stack>
-      </AccordionDetails>
-    </Accordion>
+    <Box>
+      <Accordion
+        style={{ marginBottom: '20px' }}
+        expanded={isAdvancedSettingsOpen}
+        onChange={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}
+      >
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography>Advanced settings</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Stack gap={2}>
+            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+            {formValues.type === 'pass_fail' && (
+              <>
+                <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+                <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
+                <EvaluationAppealSettings formValues={formValues} setValue={setValue} />
+              </>
+            )}
+          </Stack>
+        </AccordionDetails>
+      </Accordion>
+    </Box>
   );
 }
 
 export function EvaluationDialog({
   evaluation,
   isFirstEvaluation,
-  isLastEvaluation,
   onClose,
   onSave
 }: {
   evaluation: EvaluationTemplateFormItem | null;
   isFirstEvaluation: boolean;
-  isLastEvaluation: boolean;
   onClose: VoidFunction;
   onSave: (evaluation: WorkflowEvaluationJson) => void;
 }) {
@@ -314,7 +339,9 @@ export function EvaluationDialog({
       actionLabels: evaluation?.actionLabels,
       requiredReviews: evaluation?.requiredReviews ?? 1,
       declineReasons: evaluation?.declineReasons ?? [],
-      finalStep: evaluation?.finalStep ?? false
+      finalStep: evaluation?.finalStep ?? false,
+      appealable: evaluation?.appealable ?? false,
+      appealRequiredReviews: evaluation?.appealRequiredReviews
     });
   }, [evaluation?.id]);
 
@@ -375,14 +402,7 @@ export function EvaluationDialog({
             )}
           />
         </div>
-        {evaluation?.id && (
-          <EvaluationAdvancedSettingsAccordion
-            formValues={formValues}
-            isLastEvaluation={isLastEvaluation}
-            evaluationId={evaluation.id}
-            setValue={setValue}
-          />
-        )}
+        {evaluation?.id && <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />}
         {!evaluation?.id && (
           <>
             <div>
@@ -432,11 +452,7 @@ export function EvaluationDialog({
                 />
               )}
             </Stack>
-            <EvaluationAdvancedSettingsAccordion
-              formValues={formValues}
-              isLastEvaluation={isLastEvaluation}
-              setValue={setValue}
-            />
+            <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />
           </>
         )}
       </Stack>

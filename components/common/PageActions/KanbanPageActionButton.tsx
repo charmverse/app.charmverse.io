@@ -11,9 +11,10 @@ type Props = {
   readOnly?: boolean;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
+  isApplication?: boolean;
 };
 
-export function KanbanPageActionsMenuButton({ page, onClickDelete, onClickEdit, readOnly }: Props) {
+export function KanbanPageActionsMenuButton({ isApplication, page, onClickDelete, onClickEdit, readOnly }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -31,6 +32,7 @@ export function KanbanPageActionsMenuButton({ page, onClickDelete, onClickEdit, 
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}
           page={page}
+          isApplication={isApplication}
           onClickDelete={onClickDelete}
           onClickEdit={onClickEdit}
           readOnly={readOnly}

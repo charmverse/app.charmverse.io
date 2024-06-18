@@ -1,14 +1,25 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CdkDeployStack } from '../staging-stack';
+import { CharmVerseStagingStack } from '../charmverse-staging-stack';
+import { ConnectAppStagingStack } from '../connect-staging-stack';
 
 const app = new cdk.App();
 
 const stackName = 'stg-charmverse-' + process.env.STAGE;
 
-new CdkDeployStack(app, stackName, {
-  env: { account: '310849459438', region: 'us-east-1' }
+const account = '310849459438';
+const region = 'us-east-1';
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
-});
+const deployProps: cdk.StackProps = {
+  env: { account, region }
+};
+
+var deployedStack;
+
+if (process.env.DEPLOYED_APP === 'connect') {
+  deployedStack = new ConnectAppStagingStack({ scope: app, id: stackName, props: deployProps });
+} else {
+  deployedStack = new CharmVerseStagingStack({ scope: app, id: stackName, props: deployProps });
+}

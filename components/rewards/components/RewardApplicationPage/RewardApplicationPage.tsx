@@ -73,6 +73,10 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
   useEffect(() => {
     setActiveView(defaultSidebarView);
     setDefaultView(null);
+    return () => {
+      // clear sidebar so we
+      setActiveView(null);
+    };
   }, []);
 
   async function updateReward(updateContent: UpdateableRewardFields) {

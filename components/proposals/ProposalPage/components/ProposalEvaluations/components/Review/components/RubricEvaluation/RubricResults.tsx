@@ -24,7 +24,7 @@ import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import { isNumber } from 'lib/utils/numbers';
 
-import { PassFailEvaluation } from '../PassFailEvaluation';
+import { PassFailEvaluationContainer } from '../PassFailEvaluationContainer';
 
 type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
@@ -34,6 +34,7 @@ type Props = {
   evaluation?: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
   archived?: boolean;
+  authors: string[];
 };
 
 type CriteriaSummaryType = 'sum' | 'average';
@@ -68,7 +69,8 @@ export function RubricResults({
   refreshProposal,
   isCurrent,
   proposalId,
-  archived
+  archived,
+  authors
 }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
@@ -234,9 +236,10 @@ export function RubricResults({
               Decision
             </Typography>
 
-            <PassFailEvaluation
+            <PassFailEvaluationContainer
               isCurrent={isCurrent}
               hideReviewer
+              authors={authors}
               archived={archived}
               key='results'
               evaluation={evaluation}

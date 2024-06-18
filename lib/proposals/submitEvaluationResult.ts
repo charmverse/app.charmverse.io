@@ -13,6 +13,7 @@ export type ReviewEvaluationRequest = {
   evaluationId: string;
   result: ProposalEvaluationResult;
   declineReasons?: string[];
+  declineMessage?: string;
 };
 
 export async function updateEvaluationResult({
@@ -41,7 +42,8 @@ export async function updateEvaluationResult({
     data: {
       result: finalResult,
       decidedBy,
-      completedAt: new Date()
+      completedAt: new Date(),
+      declinedAt: finalResult === 'fail' ? new Date() : undefined
     }
   });
 
@@ -73,7 +75,8 @@ export async function submitEvaluationResult({
   result,
   spaceId,
   evaluation,
-  declineReasons
+  declineReasons,
+  declineMessage
 }: Omit<ReviewEvaluationRequest, 'evaluationId'> & {
   spaceId: string;
   evaluation: {
@@ -81,7 +84,7 @@ export async function submitEvaluationResult({
     type: ProposalEvaluationType;
     title: string;
     requiredReviews: number;
-    proposalEvaluationReviews: {
+    reviews: {
       result: ProposalEvaluationResult;
     }[];
   };
@@ -95,19 +98,20 @@ export async function submitEvaluationResult({
         evaluationId,
         result,
         reviewerId: decidedBy,
-        declineReasons
+        declineReasons,
+        declineMessage
       }
     });
   }
 
-  if (evaluation.proposalEvaluationReviews.length + 1 >= requiredReviews) {
+  if (evaluation.reviews.length + 1 >= requiredReviews) {
     await updateEvaluationResult({
       decidedBy,
       proposalId,
       evaluationId,
       result,
       spaceId,
-      existingEvaluationReviews: evaluation.proposalEvaluationReviews
+      existingEvaluationReviews: evaluation.reviews
     });
   }
 }

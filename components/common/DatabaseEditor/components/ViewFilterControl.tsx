@@ -26,7 +26,9 @@ export function ViewFilterControl({ activeBoard, activeView }: Props) {
     <>
       <IconButton
         tooltip='Filter'
-        icon={<FilterList color={hasFilter ? 'primary' : 'secondary'} fontSize='small' />}
+        icon={
+          <FilterList data-test='view-filter-button' color={hasFilter ? 'primary' : 'secondary'} fontSize='small' />
+        }
         style={{ width: '32px' }}
         {...bindTrigger(viewFilterPopup)}
       />
@@ -38,6 +40,16 @@ export function ViewFilterControl({ activeBoard, activeView }: Props) {
         }}
         sx={{
           overflow: 'auto'
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              overflowX: {
+                xs: 'auto',
+                sm: 'hidden'
+              }
+            }
+          }
         }}
       >
         <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />

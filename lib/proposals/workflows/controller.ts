@@ -80,7 +80,11 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
             title: workflowEvaluation.title,
             type: workflowEvaluation.type,
             index,
-            requiredReviews: workflowEvaluation.requiredReviews
+            notificationLabels: workflowEvaluation.notificationLabels as Prisma.InputJsonValue,
+            appealable: workflowEvaluation.appealable,
+            appealRequiredReviews: workflowEvaluation.appealRequiredReviews,
+            finalStep: workflowEvaluation.finalStep,
+            requiredReviews: workflowEvaluation.requiredReviews || 1
           }
         });
         processedIds.push(originalTemplateEvaluation.id);
@@ -92,7 +96,11 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
             title: workflowEvaluation.title,
             type: workflowEvaluation.type,
             index,
-            requiredReviews: workflowEvaluation.requiredReviews
+            notificationLabels: workflowEvaluation.notificationLabels as Prisma.InputJsonValue,
+            appealable: workflowEvaluation.appealable,
+            appealRequiredReviews: workflowEvaluation.appealRequiredReviews,
+            finalStep: workflowEvaluation.finalStep,
+            requiredReviews: workflowEvaluation.requiredReviews || 1
           }
         });
       }

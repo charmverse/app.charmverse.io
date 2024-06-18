@@ -36,8 +36,10 @@ export function DatabaseRowActionsMenu({
   anchorEl,
   page,
   setAnchorEl,
-  readOnly
+  readOnly,
+  isApplication
 }: {
+  isApplication?: boolean;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   children?: ReactNode;
@@ -61,7 +63,10 @@ export function DatabaseRowActionsMenu({
   const updatedAt = typeof page.updatedAt === 'number' ? new Date(page.updatedAt) : page.updatedAt;
 
   function getPageLink() {
-    return getAbsolutePath(pagePath, router.query.domain as string | undefined);
+    return getAbsolutePath(
+      isApplication ? `/rewards/applications/${page.id}` : pagePath,
+      router.query.domain as string | undefined
+    );
   }
 
   function onClickOpenInNewTab() {
@@ -115,7 +120,7 @@ export function DatabaseRowActionsMenu({
           pagePermissions={pagePermissions}
         />
       )}
-      <CopyPageLinkAction path={pagePath} />
+      <CopyPageLinkAction isApplication={isApplication} path={pagePath} />
       <MenuItem dense onClick={onClickOpenInNewTab}>
         <ListItemIcon>
           <LaunchIcon fontSize='small' />

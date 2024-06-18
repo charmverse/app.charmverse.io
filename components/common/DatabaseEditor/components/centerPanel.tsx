@@ -205,13 +205,13 @@ function CenterPanel(props: Props) {
     () =>
       activeView
         ? getVisibleAndHiddenGroups(
-            _cards,
+            sortedCards,
             activeView.fields.visibleOptionIds,
             activeView.fields.hiddenOptionIds,
             groupByProperty
           )
         : { visible: [], hidden: [] },
-    [_cards, activeView, groupByProperty]
+    [sortedCards, activeView, groupByProperty]
   );
 
   const backgroundRef = React.createRef<HTMLDivElement>();
@@ -672,7 +672,7 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     readOnly={props.readOnly}
                     cardIdToFocusOnRender={state.cardIdToFocusOnRender}
-                    showCard={(cardId) => showCard(cardId)}
+                    showCard={showCard}
                     addCard={kanbanAddCard}
                     onCardClicked={cardClicked}
                     disableAddingCards={disableAddingNewCards}
@@ -748,7 +748,7 @@ export function groupCardsByOptions(
     const valueMap: Record<string, Card[]> = {};
     for (const card of cards) {
       const cardValue = card.fields.properties[groupByProperty.id];
-      const proposalTitle = typeof cardValue === 'string' ? cardValue : Array.isArray(cardValue) ? cardValue[0] : null;
+      const proposalTitle = typeof cardValue === 'string' ? cardValue : Array.isArray(cardValue) ? cardValue[1] : null;
       if (typeof proposalTitle === 'string') {
         if (!valueMap[proposalTitle]) {
           valueMap[proposalTitle] = [];

@@ -7,7 +7,6 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useResizeObserver } from 'usehooks-ts';
 
-import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -20,13 +19,14 @@ import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/D
 import { blockLoad, databaseViewsLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import { makeSelectSortedViews } from 'components/common/DatabaseEditor/store/views';
+import { FormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import LoadingComponent from 'components/common/LoadingComponent';
+import { useProposalFormAnswers } from 'components/proposals/hooks/useProposalFormAnswers';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
-import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
 import { RewardStickyFooter } from 'components/rewards/components/RewardStickyFooter';
-import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -35,8 +35,6 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
-import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utils/types';
 import { fontClassName } from 'theme/fonts';
@@ -115,13 +113,15 @@ function DocumentPageComponent({
     proposalId
   });
 
+  const { control, formFields, getFieldState, isLoadingAnswers, projectForm, onSave, refreshProposalFormAnswers } =
+    useProposalFormAnswers({
+      proposal
+    });
+
   const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
     rewardId
   });
 
-  const { data: proposalFormFieldAnswers = [] } = useGetProposalFormFieldAnswers({
-    proposalId
-  });
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly || !!proposal?.archived;
 
@@ -261,22 +261,11 @@ function DocumentPageComponent({
   }
 
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
-  const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const projectId = proposal?.projectId;
-  const projectFormFieldAnswer = proposalFormFieldAnswers.find((answer) => answer.fieldId === projectProfileField?.id)
-    ?.value as { projectId: string; selectedMemberIds: string[] } | undefined;
-
-  const form = useProjectForm({
-    initialProjectValues: proposal?.project,
-    projectId,
-    selectedMemberIds: projectFormFieldAnswer?.selectedMemberIds,
-    fieldConfig:
-      (projectProfileField?.fieldConfig as ProjectAndMembersFieldConfig) ?? createDefaultProjectAndMembersFieldConfig()
-  });
 
   return (
     <Box id='file-drop-container' display='flex' flexDirection='column' height='100%'>
-      <FormProvider {...form}>
+      <FormProvider {...projectForm}>
         <Box
           ref={printRef}
           className={`document-print-container ${fontClassName} drag-area-container`}
@@ -314,7 +303,7 @@ function DocumentPageComponent({
               <ProposalBanner type='page' proposalId={page.convertedProposalId} />
             </AlertContainer>
           )}
-          {board?.fields.sourceType && (
+          {(board?.fields.sourceType === 'proposals' || board?.fields.sourceType === 'rewards') && (
             <AlertContainer>
               <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
             </AlertContainer>
@@ -478,53 +467,58 @@ function DocumentPageComponent({
                       formFields={proposal.form?.formFields ?? []}
                     />
                   ) : (
-                    <ProposalFormFieldAnswers
-                      pageId={page.id}
-                      enableComments={proposal.permissions.comment}
-                      proposalId={proposal.id}
-                      formFields={proposal.form?.formFields ?? []}
-                      readOnly={!proposal.permissions.edit}
-                      threads={threads}
-                      project={proposal.project}
-                      isDraft={proposal?.status === 'draft'}
-                      milestoneProps={{
-                        containerWidth,
-                        pendingRewards: proposal.fields?.pendingRewards || [],
-                        requiredTemplateId: proposal.fields?.rewardsTemplateId,
-                        reviewers: proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat(),
-                        assignedSubmitters: proposal.authors.map((a) => a.userId),
-                        readOnly: !proposal.permissions.edit,
-                        rewardIds: proposal.rewardIds || [],
-                        onSave: (pendingReward) => {
-                          const isExisting = proposal.fields?.pendingRewards?.find(
-                            (r) => r.draftId === pendingReward.draftId
-                          );
-                          if (!isExisting) {
+                    <LoadingComponent isLoading={isLoadingAnswers}>
+                      <FormFieldAnswers
+                        milestoneProps={{
+                          containerWidth,
+                          pendingRewards: proposal.fields?.pendingRewards || [],
+                          requiredTemplateId: proposal.fields?.rewardsTemplateId,
+                          reviewers: proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat(),
+                          assignedSubmitters: proposal.authors.map((a) => a.userId),
+                          readOnly: !proposal.permissions.edit,
+                          rewardIds: proposal.rewardIds || [],
+                          onSave: (pendingReward) => {
+                            const isExisting = proposal.fields?.pendingRewards?.find(
+                              (r) => r.draftId === pendingReward.draftId
+                            );
+                            if (!isExisting) {
+                              onChangeRewardSettings({
+                                pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                              });
+                            } else {
+                              onChangeRewardSettings({
+                                pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
+                                  if (draft.draftId === pendingReward.draftId) {
+                                    return pendingReward;
+                                  }
+                                  return draft;
+                                })
+                              });
+                            }
+                            refreshProposalFormAnswers();
+                          },
+                          onDelete: (draftId: string) => {
                             onChangeRewardSettings({
-                              pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                              pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
+                                (draft) => draft.draftId !== draftId
+                              )
                             });
-
-                            return;
                           }
-
-                          onChangeRewardSettings({
-                            pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
-                              if (draft.draftId === pendingReward.draftId) {
-                                return pendingReward;
-                              }
-                              return draft;
-                            })
-                          });
-                        },
-                        onDelete: (draftId: string) => {
-                          onChangeRewardSettings({
-                            pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
-                              (draft) => draft.draftId !== draftId
-                            )
-                          });
-                        }
-                      }}
-                    />
+                        }}
+                        control={control}
+                        disabled={!proposal.permissions.edit}
+                        enableComments={proposal.permissions.comment}
+                        formFields={formFields}
+                        getFieldState={getFieldState}
+                        onSave={onSave}
+                        pageId={page.id}
+                        threads={threads}
+                        // This is required to reinstate the form field state after the proposal is published, necessary to show the correct project id
+                        key={proposal?.status === 'draft' ? 'draft' : 'published'}
+                        project={proposal.project}
+                        proposalId={proposal.id}
+                      />
+                    </LoadingComponent>
                   )
                 ) : (
                   <CharmEditor
@@ -571,12 +565,11 @@ function DocumentPageComponent({
             )}
           </PageEditorContainer>
         </Box>
-        {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
+        {proposal?.status === 'draft' && (
           <ProposalStickyFooter
             page={page}
-            hasProjectField={!!projectProfileField}
             proposal={proposal}
-            formAnswers={proposalFormFieldAnswers}
+            formAnswersControl={control}
             isStructuredProposal={isStructuredProposal}
           />
         )}

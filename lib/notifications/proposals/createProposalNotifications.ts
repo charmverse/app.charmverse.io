@@ -38,13 +38,6 @@ export async function createProposalNotifications(webhookData: {
             }
           },
           evaluations: {
-            select: {
-              index: true,
-              result: true,
-              type: true,
-              id: true,
-              finalStep: true
-            },
             orderBy: {
               index: 'asc'
             }
@@ -112,15 +105,6 @@ export async function createProposalNotifications(webhookData: {
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
         const isReviewer = proposalPermissions.evaluate;
 
-        // Only notify reviewers for hidden evaluations
-        if (
-          proposal.workflow?.privateEvaluations &&
-          !isReviewer &&
-          privateEvaluationSteps.includes(currentEvaluation.type)
-        ) {
-          continue;
-        }
-
         // New proposal permissions .vote is invalid
         const isVoter = proposalPermissions.evaluate;
         const canComment = proposalPermissions.comment && proposalPermissions.view;
@@ -134,6 +118,19 @@ export async function createProposalNotifications(webhookData: {
         });
 
         if (!action) {
+          continue;
+        }
+
+        // Only notify reviewers for hidden evaluations
+        if (
+          proposal.workflow?.privateEvaluations &&
+          !isReviewer &&
+          // Allow these following notifications for proposal authors
+          action !== 'proposal_passed' &&
+          action !== 'proposal_failed' &&
+          action !== 'reward_published' &&
+          privateEvaluationSteps.includes(currentEvaluation.type)
+        ) {
           continue;
         }
 
@@ -151,6 +148,214 @@ export async function createProposalNotifications(webhookData: {
           userId: spaceRole.userId,
           type: action,
           evaluationId: currentEvaluation.id
+        });
+
+        ids.push(id);
+      }
+
+      break;
+    }
+    case WebhookEventNames.ProposalCredentialCreated: {
+      const userId = webhookData.event.user.id;
+      const spaceId = webhookData.spaceId;
+      const proposalId = webhookData.event.proposal.id;
+
+      const proposal = await prisma.proposal.findUniqueOrThrow({
+        where: {
+          id: proposalId
+        }
+      });
+
+      const space = await prisma.space.findUniqueOrThrow({
+        where: {
+          id: spaceId
+        },
+        select: {
+          notificationToggles: true
+        }
+      });
+
+      // check notification preferences
+      const notificationToggles = space.notificationToggles as NotificationToggles;
+      if (notificationToggles.proposals__credential_created === false) {
+        break;
+      }
+
+      const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
+        resourceId: proposalId,
+        userId
+      });
+
+      if (!proposalPermissions.view) {
+        break;
+      }
+
+      const { id } = await saveProposalNotification({
+        createdAt: webhookData.createdAt,
+        createdBy: proposal.createdBy,
+        proposalId,
+        spaceId,
+        userId,
+        type: 'credential_created',
+        evaluationId: null
+      });
+
+      ids.push(id);
+
+      break;
+    }
+
+    case WebhookEventNames.ProposalAppealed: {
+      const userId = webhookData.event.user.id;
+      const spaceId = webhookData.spaceId;
+      const proposalId = webhookData.event.proposal.id;
+
+      const proposal = await prisma.proposal.findUniqueOrThrow({
+        where: {
+          id: proposalId
+        },
+        select: {
+          workflow: {
+            select: {
+              privateEvaluations: true
+            }
+          },
+          page: {
+            select: {
+              deletedAt: true
+            }
+          },
+          evaluations: {
+            select: {
+              index: true,
+              result: true,
+              type: true,
+              id: true,
+              finalStep: true,
+              appealReviewers: true,
+              appealedAt: true
+            },
+            orderBy: {
+              index: 'asc'
+            }
+          }
+        }
+      });
+
+      const space = await prisma.space.findUniqueOrThrow({
+        where: {
+          id: spaceId
+        },
+        select: {
+          notificationToggles: true
+        }
+      });
+
+      const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+      const isProposalDeleted = proposal.page?.deletedAt;
+
+      if (!currentEvaluation || isProposalDeleted) {
+        break;
+      }
+
+      const spaceRoles = await prisma.spaceRole.findMany({
+        where: {
+          spaceId
+        },
+        select: {
+          userId: true
+        }
+      });
+
+      const notificationToggles = space.notificationToggles as NotificationToggles;
+      if (notificationToggles.proposals__review_required === false) {
+        break;
+      }
+
+      for (const spaceRole of spaceRoles) {
+        // The user who triggered the event should not receive a notification
+        if (spaceRole.userId === userId) {
+          continue;
+        }
+        const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
+          resourceId: proposalId,
+          userId: spaceRole.userId
+        });
+
+        const isAppealReviewer = proposalPermissions.evaluate_appeal;
+
+        // Only notify reviewers for hidden evaluations
+        if (
+          proposal.workflow?.privateEvaluations &&
+          !isAppealReviewer &&
+          privateEvaluationSteps.includes(currentEvaluation.type)
+        ) {
+          continue;
+        }
+
+        const { id } = await saveProposalNotification({
+          createdAt: webhookData.createdAt,
+          createdBy: userId,
+          proposalId,
+          spaceId,
+          userId: spaceRole.userId,
+          type: 'proposal_appealed',
+          evaluationId: currentEvaluation.id
+        });
+
+        ids.push(id);
+      }
+
+      break;
+    }
+
+    case WebhookEventNames.ProposalPublished: {
+      const userId = webhookData.event.user.id;
+      const spaceId = webhookData.spaceId;
+      const proposalId = webhookData.event.proposal.id;
+
+      const proposal = await prisma.proposal.findUniqueOrThrow({
+        where: {
+          id: proposalId
+        },
+        select: {
+          authors: true,
+          page: {
+            select: {
+              deletedAt: true
+            }
+          }
+        }
+      });
+
+      const space = await prisma.space.findUniqueOrThrow({
+        where: {
+          id: spaceId
+        },
+        select: {
+          notificationToggles: true
+        }
+      });
+
+      const isProposalDeleted = proposal.page?.deletedAt;
+
+      if (isProposalDeleted) {
+        break;
+      }
+
+      const notificationToggles = space.notificationToggles as NotificationToggles;
+      if (notificationToggles.proposals__proposal_published === false) {
+        break;
+      }
+
+      for (const author of proposal.authors) {
+        const { id } = await saveProposalNotification({
+          createdAt: webhookData.createdAt,
+          createdBy: userId,
+          proposalId,
+          spaceId,
+          userId: author.userId,
+          type: 'proposal_published'
         });
 
         ids.push(id);

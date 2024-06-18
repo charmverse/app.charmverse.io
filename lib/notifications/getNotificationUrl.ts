@@ -3,6 +3,7 @@ import { log } from '@charmverse/core/log';
 import type {
   BountyNotification,
   CardNotification,
+  CustomNotification,
   DocumentNotification,
   PostNotification,
   ProposalNotification,
@@ -71,6 +72,7 @@ export function getNotificationUrl(
     | Pick<BountyNotification | CardNotification | ProposalNotification, 'pagePath' | 'group'>
     | Pick<PostNotification, 'postPath' | 'group'>
     | Pick<VoteNotification, 'voteId' | 'pagePath' | 'pageType' | 'group'>
+    | Pick<CustomNotification, 'content' | 'type' | 'group'>
 ) {
   try {
     switch (notification.group) {
@@ -99,6 +101,13 @@ export function getNotificationUrl(
         return `/${notification.pageType === 'post' ? 'forum/post/' : ''}${notification.pagePath}?voteId=${
           notification.voteId
         }`;
+      }
+
+      case 'custom': {
+        if (notification.type === 'orange-dao') {
+          return `/${notification.content.pageId}`;
+        }
+        return '';
       }
 
       default: {

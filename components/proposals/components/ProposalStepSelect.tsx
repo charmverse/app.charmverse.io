@@ -4,7 +4,6 @@ import { TagSelect } from 'components/common/DatabaseEditor/components/propertie
 import type { PropertyValueDisplayType } from 'components/common/DatabaseEditor/interfaces';
 import type { IPropertyOption } from 'lib/databases/board';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
-import { prettyPrint } from 'lib/utils/strings';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 
@@ -80,6 +79,7 @@ export function ProposalStepSelectBase({
   const currentEvaluationStepRequiredReviews = proposal.currentStep.requiredReviews;
   const isCurrentEvaluationFinalStep =
     proposal.currentStep.finalStep ||
+    proposal.currentStep.appealedAt ||
     proposal.currentEvaluationId === proposal.evaluations[proposal.evaluations.length - 1]?.id;
 
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
@@ -150,8 +150,6 @@ export function ProposalStepSelectBase({
     currentEvaluationIndex,
     currentEvaluationResult
   ]);
-
-  prettyPrint(proposal);
 
   return (
     <TagSelect

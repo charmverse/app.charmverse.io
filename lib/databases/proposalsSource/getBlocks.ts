@@ -2,11 +2,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { IssuableProposalCredentialSpace } from 'lib/credentials/findIssuableProposalCredentials';
 import type { BlockWithDetails } from 'lib/databases/block';
-import type { BoardFields } from 'lib/databases/board';
+import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { permissionsApiClient } from 'lib/permissions/api/client';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
 import { applyPropertiesToCardsAndFilter } from './applyPropertiesToCards';
 import { createMissingCards } from './createMissingCards';
+import { createSelectedPropertiesStateFromBoardProperties } from './createSelectedPropertiesFromBoardProperties';
 import { getCardPropertiesFromProposals } from './getCardProperties';
 import { updateBoardProperties } from './updateBoardProperties';
 
@@ -52,7 +54,26 @@ export async function getBlocks(
 // Does the same as above but refreshes the board properties and creates missing cards
 export async function getBlocksAndRefresh(board: BlockWithDetails, blocks: BlockWithDetails[]) {
   // Update board and view blocks before computing proposal cards
-  const updatedBoard = await updateBoardProperties({ boardId: board.id });
+  const proposalBoardBlock = (await prisma.proposalBlock.findUnique({
+    where: {
+      id_spaceId: {
+        id: DEFAULT_BOARD_BLOCK_ID,
+        spaceId: board.spaceId
+      }
+    },
+    select: {
+      fields: true
+    }
+  })) as null | { fields: BoardFields };
+
+  const proposalCustomProperties = (proposalBoardBlock?.fields.cardProperties ?? []) as IPropertyTemplate[];
+  const updatedBoard = await updateBoardProperties({
+    boardId: board.id,
+    selectedProperties: createSelectedPropertiesStateFromBoardProperties({
+      cardProperties: board.fields.cardProperties ?? [],
+      proposalCustomProperties
+    })
+  });
 
   const space: IssuableProposalCredentialSpace = await prisma.space.findUniqueOrThrow({
     where: {

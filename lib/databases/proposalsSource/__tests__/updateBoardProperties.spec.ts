@@ -138,6 +138,135 @@ describe('updateBoardProperties()', () => {
     expect(evaluationAverageProp).toBeDefined();
   });
 
+  it('should create unique proposalRubricCriteriaTotal properties for all unique rubric criteria in the space based on title', async () => {
+    const { user: spaceUser, space: spaceWithRubrics } = await testUtilsUser.generateUserAndSpace();
+
+    const rootId = uuid();
+
+    await testUtilsProposals.generateProposal({
+      spaceId: spaceWithRubrics.id,
+      userId: spaceUser.id,
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          permissions: [],
+          reviewers: [],
+          title: 'Feedback'
+        },
+        {
+          evaluationType: 'rubric',
+          permissions: [],
+          reviewers: [],
+          title: 'Rubric 1',
+          rubricCriteria: [
+            {
+              title: 'Criteria 1'
+            },
+            {
+              title: 'Criteria 2'
+            }
+          ]
+        },
+        {
+          evaluationType: 'rubric',
+          permissions: [],
+          reviewers: [],
+          title: 'Rubric 2',
+          rubricCriteria: [
+            {
+              title: 'Criteria 1'
+            },
+            {
+              title: 'Criteria 2.1'
+            }
+          ]
+        }
+      ]
+    });
+
+    const proposal2 = await testUtilsProposals.generateProposal({
+      spaceId: spaceWithRubrics.id,
+      userId: spaceUser.id,
+      evaluationInputs: [
+        {
+          evaluationType: 'rubric',
+          permissions: [],
+          reviewers: [],
+          title: 'Rubric 2',
+          rubricCriteria: [
+            {
+              title: 'Criteria 3'
+            }
+          ]
+        }
+      ]
+    });
+
+    await prisma.page.updateMany({
+      where: {
+        proposalId: proposal2.id
+      },
+      data: {
+        deletedAt: new Date()
+      }
+    });
+
+    await prisma.block.create({
+      data: {
+        parentId: rootId,
+        rootId,
+        id: rootId,
+        schema: -1,
+        title: 'Example',
+        type: 'board',
+        updatedBy: user.id,
+        fields: {
+          sourceType: 'proposals'
+        },
+        space: { connect: { id: spaceWithRubrics.id } },
+        user: { connect: { id: spaceUser.id } }
+      }
+    });
+
+    await updateBoardProperties({
+      boardId: rootId
+    });
+
+    const updatedBlock = await prisma.block.findUnique({
+      where: {
+        id: rootId
+      }
+    });
+
+    const properties = (updatedBlock?.fields as any).cardProperties as IPropertyTemplate[];
+    // Check status
+    const rubricCriteria1TotalProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria2TotalProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.criteriaTitle === 'Criteria 2'
+    );
+    const rubricCriteria21TotalProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.criteriaTitle === 'Criteria 2.1'
+    );
+    const rubricCriteria1AverageProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaAverage' && p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria2AverageProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaAverage' && p.criteriaTitle === 'Criteria 2'
+    );
+    const rubricCriteria21AverageProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaAverage' && p.criteriaTitle === 'Criteria 2.1'
+    );
+
+    expect(rubricCriteria1TotalProperty).toBeDefined();
+    expect(rubricCriteria2TotalProperty).toBeDefined();
+    expect(rubricCriteria21TotalProperty).toBeDefined();
+    expect(rubricCriteria1AverageProperty).toBeDefined();
+    expect(rubricCriteria2AverageProperty).toBeDefined();
+    expect(rubricCriteria21AverageProperty).toBeDefined();
+  });
+
   it('should leave existing property IDs and options unchanged', async () => {
     const rootId = uuid();
 

@@ -25,7 +25,7 @@ import { EditStepButton } from './components/EditStepButton';
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
-import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { PassFailEvaluationContainer } from './components/PassFailEvaluationContainer';
 import { PrivateEvaluation } from './components/PrivateEvaluation';
 import { ProposalCredentials } from './components/ProposalCredentials/ProposalCredentials';
 import { RewardReviewStep } from './components/RewardReviewStep';
@@ -217,10 +217,9 @@ export function EvaluationsReview({
             result={evaluation.result}
             title={evaluation.title}
             showDash={
-              currentEvaluation
-                ? evaluation.index > currentEvaluation.index && currentEvaluation.result === 'pass'
-                : false
+              currentEvaluation ? evaluation.index > currentEvaluation.index && !!currentEvaluation.result : false
             }
+            isAppealActive={!!evaluation.appealedAt && evaluation.result === null}
             actions={
               evaluation.type !== 'private_evaluation' && (
                 <EvaluationStepActions
@@ -248,9 +247,10 @@ export function EvaluationsReview({
               />
             )}
             {evaluation.type === 'pass_fail' && (
-              <PassFailEvaluation
+              <PassFailEvaluationContainer
                 archived={proposal?.archived ?? false}
                 key={evaluation.id}
+                authors={proposal.authors.map((a) => a.userId)}
                 evaluation={evaluation}
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
