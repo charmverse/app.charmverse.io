@@ -31,27 +31,33 @@ class CardFilter {
       ? templates
       : [...templates, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
 
-    return cards.filter((card) => {
-      const cardMeetsFilter = this.isFilterGroupMet(filterGroup, cardProperties, card);
+    return cards
+      .map((card) => {
+        const cardMeetsFilter = this.isFilterGroupMet(filterGroup, cardProperties, card);
 
-      // Return the card along with all subPages that meet the filter
-      // Use case: Filtering by reward status
-      if (cardMeetsFilter) {
-        return true;
-      }
+        // Return the card along with all subPages that meet the filter
+        // Use case: Filtering by reward status
+        if (cardMeetsFilter) {
+          return card;
+        }
 
-      const cardCopy = { ...card };
+        const cardCopy = { ...card } as CardWithRelations;
 
-      // Find at least 1 subPage that meets the filter, return matching subpages and parent card
-      // Use case: Filtering by status of applications for a reward
-      const filteredSubPages = (cardCopy as CardWithRelations)?.subPages?.filter((subPage) =>
-        this.isFilterGroupMet(filterGroup, cardProperties, subPage)
-      );
+        // Find at least 1 subPage that meets the filter, return matching subpages and parent card
+        // Use case: Filtering by status of applications for a reward
+        const filteredSubPages = (cardCopy as CardWithRelations)?.subPages?.filter((subPage) =>
+          this.isFilterGroupMet(filterGroup, cardProperties, subPage)
+        );
 
-      (cardCopy as CardWithRelations).subPages = filteredSubPages;
+        (cardCopy as CardWithRelations).subPages = filteredSubPages;
 
-      return this.isFilterGroupMet(filterGroup, cardProperties, cardCopy) || filteredSubPages?.length;
-    });
+        if (filteredSubPages?.length) {
+          return cardCopy;
+        }
+
+        return null;
+      })
+      .filter((card) => card !== null) as Card[];
   }
 
   static isFilterGroupMet(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], card: Card): boolean {
