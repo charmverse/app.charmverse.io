@@ -1,10 +1,13 @@
-import Box from '@mui/material/Box';
 import getInitColorSchemeScript from '@mui/system/cssVars/getInitColorSchemeScript';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
+import { Main } from 'components/common/Main';
+
 import { NavBar } from '../components/Header/Navbar/NavBar';
 import { AppProviders } from '../components/providers/AppProviders';
+
+import './cssVariables.scss';
 
 export const metadata: Metadata = {
   title: 'Connect App',
@@ -22,7 +25,7 @@ export default function RootLayout({
         {getInitColorSchemeScript()}
         <AppProviders>
           <NavBar />
-          <Box component='main'>{children}</Box>
+          <Main>{children}</Main>
         </AppProviders>
       </body>
     </html>

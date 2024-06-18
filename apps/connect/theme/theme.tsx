@@ -152,10 +152,11 @@ const extendedTheme = extendTheme({
         root: {
           textTransform: 'none'
         },
-        text: ({ theme }) => ({
+        text: ({ theme, variant, color }) => ({
           '&:hover': {
             backgroundColor: theme.vars.palette.inputBackground.main
-          }
+          },
+          color: color || (variant === 'outlined' || variant === 'text' ? theme.vars.palette.primary.main : 'inherit')
         })
       }
     },
@@ -174,6 +175,11 @@ const extendedTheme = extendTheme({
     MuiMenuItem: {
       defaultProps: {
         dense: true
+      }
+    },
+    MuiTypography: {
+      defaultProps: {
+        color: 'text.primary'
       }
     },
     MuiTooltip: {
