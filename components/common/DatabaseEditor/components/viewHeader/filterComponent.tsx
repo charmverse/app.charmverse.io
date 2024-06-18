@@ -142,6 +142,7 @@ const FilterComponent = React.memo((props: Props) => {
         variant='outlined'
         color='secondary'
         size='small'
+        data-test='add-filter-button'
         onClick={addFilterClicked}
         sx={{ mt: filters.length !== 0 ? 1 : 0 }}
       >

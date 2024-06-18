@@ -305,7 +305,7 @@ function mapApplicationToCard({
     : '';
 
   const rewardCustomProperties: Record<string, any> = {};
-  const rewardProperties = (reward.fields as RewardFields)?.properties;
+  const rewardProperties = (reward.fields as RewardFields)?.properties ?? {};
 
   Object.keys(rewardProperties).forEach((rewardPropertyKey) => {
     if (isUUID(rewardPropertyKey)) {
@@ -326,8 +326,9 @@ function mapApplicationToCard({
           }) as number
         )?.toString()
       : '',
-    [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
+    // Reward status allows matching application by reward status - Hide in the front end
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
+    [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
     [APPLICANT_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',

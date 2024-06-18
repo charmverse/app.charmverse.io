@@ -23,7 +23,7 @@ import type {
 import { Prisma } from '@charmverse/core/prisma';
 import type { Application, FarcasterUser, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 } from 'uuid';
+import { v4 as uuid, v4 } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { DataSourceType } from 'lib/databases/board';
@@ -503,7 +503,8 @@ export async function generateBountyWithSingleApplication({
   customReward,
   deletedAt,
   selectedCredentialTemplateIds,
-  approveSubmitters = false
+  approveSubmitters = false,
+  allowMultipleApplications = false
 }: {
   customReward?: string;
   applicationStatus: ApplicationStatus;
@@ -518,7 +519,9 @@ export async function generateBountyWithSingleApplication({
   deletedAt?: Date | null;
   selectedCredentialTemplateIds?: string[];
   approveSubmitters?: boolean;
+  allowMultipleApplications?: boolean;
 }): Promise<Bounty & { applications: Application[]; page: Page }> {
+  const id = uuid();
   const createdBounty = (await prisma.bounty.create({
     data: {
       createdBy: userId,
@@ -529,6 +532,7 @@ export async function generateBountyWithSingleApplication({
       status: bountyStatus ?? 'open',
       spaceId,
       approveSubmitters,
+      allowMultipleApplications,
       selectedCredentialTemplates: selectedCredentialTemplateIds,
       // Important variable
       maxSubmissions: bountyCap,
