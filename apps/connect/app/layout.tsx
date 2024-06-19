@@ -4,7 +4,6 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import { AppProviders } from 'components/layout/AppProviders';
-import { NavBar } from 'components/layout/NavBar';
 
 import 'theme/cssVariables.scss';
 

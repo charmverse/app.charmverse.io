@@ -18,9 +18,12 @@ serverless/*.node
 
 # connect app
 /apps/connect/.next/
+/apps/connect/dist/
+/apps/connect/node_modules/
 
 # connect api
 /apps/connect-api/dist/
+/apps/connect/node_modules/
 
 # Tests
 /__e2e-dist__/
