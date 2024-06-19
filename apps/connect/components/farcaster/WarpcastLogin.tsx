@@ -6,14 +6,12 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback } from 'react';
 
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { warpcastConfig } from 'lib/farcaster/config';
 
 import { FarcasterLoginModal } from './WarpcastModal';
 
 function WarpcastLoginButton() {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
-  const { showMessage } = useSnackbar();
 
   const onSuccessCallback = useCallback(async () => {
     popupState.close();
@@ -21,7 +19,6 @@ function WarpcastLoginButton() {
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
     popupState.close();
-    showMessage(err?.message || 'Error connecting to Warpcast. Please try again.', 'error');
   }, []);
 
   const onClick = useCallback(() => {

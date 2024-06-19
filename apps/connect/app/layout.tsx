@@ -6,7 +6,7 @@ import { Main } from 'components/common/Main';
 import { NavBar } from 'components/Header/Navbar/NavBar';
 import { AppProviders } from 'components/providers/AppProviders';
 
-import './cssVariables.scss';
+import 'theme/cssVariables.scss';
 
 export const metadata: Metadata = {
   title: 'Charm Connect - onchain builder network',
