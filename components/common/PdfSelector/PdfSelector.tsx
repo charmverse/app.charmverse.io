@@ -1,6 +1,7 @@
-import { Button, Box } from '@mui/material';
-import type { ReactNode } from 'react';
+import { Box } from '@mui/material';
+import { useState, type ReactNode } from 'react';
 
+import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
@@ -15,6 +16,7 @@ interface PdfSelectorProps {
 
 export default function PdfSelector({ autoOpen = false, children, onPdfSelect }: PdfSelectorProps) {
   const tabs: [string, ReactNode][] = [];
+  const [isUploading, setIsUploading] = useState(false);
 
   return (
     <PopperPopup
@@ -35,7 +37,7 @@ export default function PdfSelector({ autoOpen = false, children, onPdfSelect }:
                     width: '100%'
                   }}
                 >
-                  <Button component='label' variant='contained'>
+                  <Button component='label' variant='contained' loading={isUploading}>
                     Choose a PDF
                     <input
                       type='file'
@@ -44,8 +46,13 @@ export default function PdfSelector({ autoOpen = false, children, onPdfSelect }:
                       onChange={async (e) => {
                         const firstFile = e.target.files?.[0];
                         if (firstFile) {
-                          const { url } = await uploadToS3(firstFile);
-                          onPdfSelect(url);
+                          try {
+                            setIsUploading(true);
+                            const { url } = await uploadToS3(firstFile);
+                            onPdfSelect(url);
+                          } finally {
+                            setIsUploading(false);
+                          }
                         }
                       }}
                     />
