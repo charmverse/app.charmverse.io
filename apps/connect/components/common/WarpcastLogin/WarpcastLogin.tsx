@@ -8,7 +8,7 @@ import { useCallback } from 'react';
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
 import { warpcastConfig } from 'lib/farcaster/config';
 
-import { FarcasterLoginModal } from './WarpcastModal';
+import { FarcasterLoginModal } from './components/WarpcastModal';
 
 function WarpcastLoginButton() {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });

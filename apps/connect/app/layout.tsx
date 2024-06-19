@@ -1,10 +1,10 @@
+import Box from '@mui/material/Box';
 import getInitColorSchemeScript from '@mui/system/cssVars/getInitColorSchemeScript';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-import { Main } from 'components/common/Main';
-import { NavBar } from 'components/Header/Navbar/NavBar';
-import { AppProviders } from 'components/providers/AppProviders';
+import { AppProviders } from 'components/layout/AppProviders';
+import { NavBar } from 'components/layout/NavBar';
 
 import 'theme/cssVariables.scss';
 
@@ -24,7 +24,9 @@ export default function RootLayout({
         {getInitColorSchemeScript()}
         <AppProviders>
           <NavBar />
-          <Main>{children}</Main>
+          <Box component='main' bgcolor='background.default' overflow='auto'>
+            {children}
+          </Box>
         </AppProviders>
       </body>
     </html>

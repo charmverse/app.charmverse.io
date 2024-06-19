@@ -15,12 +15,10 @@ import Typography from '@mui/material/Typography';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
-import { ThemeModeButton } from 'theme/ThemeModeButton';
-
 const pages = ['Projects'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-export function AppBar() {
+export function NavBar() {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -51,10 +49,6 @@ export function AppBar() {
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
               textDecoration: 'none'
             }}
           >
@@ -105,8 +99,7 @@ export function AppBar() {
               mr: 2,
               display: { xs: 'flex', md: 'none' },
               flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
+
               letterSpacing: '.3rem',
               color: 'inherit',
               textDecoration: 'none'
@@ -136,7 +129,6 @@ export function AppBar() {
                 </Box>
               </Button>
             </Tooltip>
-            <ThemeModeButton />
             <Menu
               sx={{ mt: '45px' }}
               id='menu-appbar'

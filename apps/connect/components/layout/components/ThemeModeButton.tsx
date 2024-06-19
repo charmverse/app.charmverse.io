@@ -1,10 +1,10 @@
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness';
-import { Button, IconButton } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
 import { useColorScheme } from '@mui/material/styles';
 import type { Mode } from '@mui/system/cssVars/useCurrentColorScheme';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 
 export function ThemeModeButton() {
   const { mode, setMode } = useColorScheme();

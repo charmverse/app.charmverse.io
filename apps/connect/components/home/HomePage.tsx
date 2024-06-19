@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import { Suspense } from 'react';
 
 import { PageWrapper } from 'components/common/PageWrapper';
-import { WarpcastLogin } from 'components/farcaster/WarpcastLogin';
+import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 import { ProjectItemSkeleton } from 'components/projects/ProjectItemSkeleton';
 import { ProjectsList } from 'components/projects/ProjectsList';
 
