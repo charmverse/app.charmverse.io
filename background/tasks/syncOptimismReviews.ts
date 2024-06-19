@@ -18,7 +18,8 @@ export async function syncOptimismReviewsTask() {
     include: {
       evaluations: {
         include: {
-          reviews: true
+          reviews: true,
+          reviewers: true
         }
       }
     }
@@ -32,8 +33,12 @@ export async function syncOptimismReviewsTask() {
     if (!firstEvaluation || !secondEvaluation) {
       throw new Error(`Could not find evaluations to update: ${proposal.id}`);
     }
+
     const reviewsToAdd = firstEvaluation.reviews.filter(
-      (review) => !secondEvaluation.reviews.some((r) => r.reviewerId === review.reviewerId)
+      (review) =>
+        !secondEvaluation.reviews.some((r) => r.reviewerId === review.reviewerId) &&
+        // only add a review if the reviewer is in the second evaluation
+        secondEvaluation.reviewers.some((r) => r.userId === review.reviewerId)
     );
 
     for (const { id, declineMessage, declineReasons, ...review } of reviewsToAdd) {
