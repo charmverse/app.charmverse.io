@@ -1,3 +1,3 @@
-export function Welcome() {
+export default async function Welcome() {
   return null;
 }

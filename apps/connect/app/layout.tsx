@@ -23,7 +23,6 @@ export default function RootLayout({
       <body>
         {getInitColorSchemeScript()}
         <AppProviders>
-          <NavBar />
           <Box component='main' bgcolor='background.default' overflow='auto'>
             {children}
           </Box>
