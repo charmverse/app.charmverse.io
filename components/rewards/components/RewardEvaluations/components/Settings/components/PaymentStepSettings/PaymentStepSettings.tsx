@@ -102,7 +102,7 @@ export function PaymentStepSettings({
             data-test='custom-reward-input'
             onChange={(e) => {
               onChange({
-                customReward: e.target.value.trim()
+                customReward: e.target.value
               });
             }}
             value={rewardInput?.customReward ?? ''}
