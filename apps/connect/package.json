@@ -9,6 +9,7 @@
     "lint": "npx next lint"
   },
   "dependencies": {
-    "@mui/material-nextjs": "^5.15.11"
+    "@mui/material-nextjs": "^5.15.11",
+    "material-ui-popup-state": "^5.1.2"
   }
 }
