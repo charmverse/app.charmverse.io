@@ -9,9 +9,8 @@ function getApiPath() {
   const callerPath = callerLine.match(/\((.*):[0-9]+:[0-9]+\)/)![1];
 
   const __filename = path.resolve(callerPath);
-  const __dirname = path.dirname(__filename);
-  const apiDir = path.resolve(__dirname, '../..');
-  let relativePath = path.relative(apiDir, __filename);
+
+  let relativePath = __filename.split('/connect-api/src')[1];
 
   relativePath = relativePath.replace(/\\/g, '/'); // For Windows compatibility
   if (relativePath.endsWith('/index.ts')) {
