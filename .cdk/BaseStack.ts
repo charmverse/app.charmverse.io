@@ -6,14 +6,10 @@ import { Construct } from 'constructs';
 
 const domain = 'charmverse.co';
 
-export type DeployStackProps = {
-  scope: Construct;
-  id: string;
-  props?: StackProps;
-}
+type CustomOptions = { options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] };
 
-export class BaseCdkDeployStack extends Stack {
-  constructor({scope, id, props, options = []}: DeployStackProps & {  options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[]}) {
+export class BaseStack extends Stack {
+  constructor(scope: Construct, id: string, props: StackProps, { options = [] }: CustomOptions) {
     super(scope, id, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {

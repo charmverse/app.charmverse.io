@@ -13,8 +13,9 @@ concurrency:
 jobs:
   deploy:
     if: |
-      (github.event.action == 'labeled' && (github.event.label.name == ':rocket: deploy' || github.event.label.name == 'deploy-ceramic')) ||
-      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, 'deploy-ceramic')))
+      (github.event.action == 'labeled' && startsWith(github.event.label.name, ':rocket: deploy')) ||
+      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic')))
+
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
     concurrency: deploy-pr-app-${{ github.head_ref }}
@@ -39,6 +40,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           REACT_APP_APP_ENV: 'staging'
+          NEXT_PUBLIC_CONNECT_API_HOST: https://${{ env.STAGE }}.charmverse.co:4000
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -97,6 +99,12 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
 
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_connect/00_env_vars.config
+
       - name: Run specific version of permission api if SELECTED_PERMISSION_API_TAG exists
         if: env.SELECTED_PERMISSION_API_TAG && env.GITHUB_HEAD_REF_SLUG == env.SELECTED_PERMISSION_API_TAG
         uses: mikefarah/yq@master
@@ -138,16 +146,26 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Upload static assets to S3
+        run: |
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
+          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+
       - name: Package
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
-          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
+
+      - name: Update and Package connect app
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Deploy to staging
         id: cdk_deploy
+        # npm run deploy:staging
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npm run deploy:staging
+          npx cdk deploy -c stack=stg-webapp --outputs-file cdk.out.json
 
       - name: update the github deployment status
         uses: bobheadxi/deployments@v1
@@ -168,7 +186,6 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_ceramic .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
 
-      
       - name: Deploy ceramic to Beanstalk
         if: >
           (github.event.action == 'labeled' && github.event.label.name == 'deploy-ceramic') ||

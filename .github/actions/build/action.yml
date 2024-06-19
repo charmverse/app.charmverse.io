@@ -1,11 +1,14 @@
 name: 'Build application'
 
 inputs:
+  save_cache:
+    description: 'Whether to save the cache'
+    required: false
   REACT_APP_APP_ENV:
     description: '...'
     required: false
-  save_cache:
-    description: 'Whether to save the cache'
+  NEXT_PUBLIC_CONNECT_API_HOST:
+    description: '...'
     required: false
 
 runs:
@@ -26,13 +29,21 @@ runs:
           .env.test.local
           dist
           background/ceramicServer/generated
-        # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}
+          apps/connect/.next
+          apps/connect-api/dist
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!dont_cache') }}
 
     - name: Build
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
       run: npm run build
+
+    - name: Build Connect
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      env:
+        NEXT_PUBLIC_CONNECT_API_HOST: ${{ inputs.NEXT_PUBLIC_CONNECT_API_HOST }}
+      run: npm run connect:all:build
 
     # building cache key takes almost a minute, so we only run this if we are saving the cache
     - name: Cache build

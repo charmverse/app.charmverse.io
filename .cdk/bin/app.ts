@@ -1,25 +1,28 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CharmVerseStagingStack } from '../charmverse-staging-stack';
-import { ConnectAppStagingStack } from '../connect-staging-stack';
-
-const app = new cdk.App();
-
-const stackName = 'stg-charmverse-' + process.env.STAGE;
-
-const account = '310849459438';
-const region = 'us-east-1';
+import { WebappStagingStack } from '../WebappStagingStack';
+import { ConnectStagingStack } from '../ConnectStagingStack';
 
 /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 const deployProps: cdk.StackProps = {
-  env: { account, region }
+  env: { account: '310849459438', region: 'us-east-1' }
 };
 
-var deployedStack;
+const stacks = ['stg-webapp', 'stg-connect', 'prd-connect'] as const;
 
-if (process.env.DEPLOYED_APP === 'connect') {
-  deployedStack = new ConnectAppStagingStack({ scope: app, id: stackName, props: deployProps });
-} else {
-  deployedStack = new CharmVerseStagingStack({ scope: app, id: stackName, props: deployProps });
+const app = new cdk.App();
+
+const stackParam: (typeof stacks)[number] = app.node.tryGetContext('stack');
+
+if (!stacks.includes(stackParam)) {
+  throw new Error('Invalid stack or stackEnv parameter: ' + stackParam);
+}
+
+if (stackParam === 'prd-connect') {
+  new ConnectStagingStack(app, 'prd-connect', deployProps);
+} else if (stackParam === 'stg-connect') {
+  new ConnectStagingStack(app, 'stg-connect-' + process.env.STAGE, deployProps);
+} else if (stackParam === 'stg-webapp') {
+  new WebappStagingStack(app, 'stg-webapp-' + process.env.STAGE, deployProps);
 }
