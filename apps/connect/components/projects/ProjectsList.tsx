@@ -1,11 +1,11 @@
 import Typography from '@mui/material/Typography';
 
-import { getProjectsWithMembers } from 'lib/projects/getProjectsWithMembers';
+import { getRecentProjectsWithMembers } from 'lib/projects/getRecentProjectsWithMembers';
 
 import { ProjectItem } from './ProjectItem';
 
 export async function ProjectsList() {
-  const projectsList = await getProjectsWithMembers();
+  const projectsList = await getRecentProjectsWithMembers();
 
   if (projectsList.length === 0) {
     return <Typography mt={1}>There are no new projects</Typography>;

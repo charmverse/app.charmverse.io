@@ -1,6 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-export async function getProjectsWithMembers() {
+/**
+ * Get recent projects with members
+ * @param resultsNo How many results to be returned
+ * @returns Project & Project Members for each project
+ */
+export async function getRecentProjectsWithMembers(resultsNo: number = 10) {
   return prisma.project.findMany({
     where: {
       deletedAt: null
@@ -8,7 +13,7 @@ export async function getProjectsWithMembers() {
     orderBy: {
       createdAt: 'desc'
     },
-    take: 5,
+    take: resultsNo,
     include: {
       projectMembers: {
         include: {
