@@ -27,12 +27,12 @@
     "incremental": true,
     "isolatedModules": true,
     "paths": {
+      "connect-api/*": ["./apps/connect-api/src/*"],
       "config/*": ["./config/*"],
       "scripts/*": ["./scripts/*"],
       "lib/*": ["./lib/*"],
       "adapters/*": ["./adapters/*"],
       "connectors": ["./connectors"],
-      "connectors/*": ["./connectors/*"],
       "components/*": ["./components/*"],
       "hooks/*": ["./hooks/*"],
       "abis/*": ["./abis/*"],

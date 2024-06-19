@@ -1,10 +1,12 @@
 import { log } from '@charmverse/core/log';
 
-import { app } from './server';
+import { prepareServer } from './prepareServer';
 
 const port = process.env.PORT || 4000;
 const host = '0.0.0.0';
 
-app.listen(typeof port === 'string' ? parseInt(port) : port, host, () => {
-  log.info(`Builder API server is running on http://localhost:${port}`);
-});
+prepareServer().then((app) =>
+  app.listen(typeof port === 'string' ? parseInt(port) : port, host, () => {
+    log.info(`Builder API server is running on http://localhost:${port}`);
+  })
+);
