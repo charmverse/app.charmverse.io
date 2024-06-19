@@ -11,7 +11,7 @@ import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUsersAndRubric }) {
-  const { data: answers } = useGetProposalFormFieldAnswers({
+  const { data: answers, mutate: refreshProposalFormAnswers } = useGetProposalFormFieldAnswers({
     proposalId: proposal?.id
   });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId: proposal?.id });
@@ -73,6 +73,7 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
   return {
     control,
     formFields,
+    refreshProposalFormAnswers,
     onSave,
     getFieldState,
     isLoadingAnswers,

@@ -13,6 +13,7 @@ import {
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import MultiTabs from 'components/common/MultiTabs';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -68,7 +69,7 @@ export function PassFailEvaluationContainer({
     variant: 'dialog'
   });
   const [appealReason, setAppealReason] = useState<string | null>(null);
-
+  const isAdmin = useIsAdmin();
   const [evaluationTab, setEvaluationTab] = useState<number>(0);
   const { user } = useUser();
   const { membersRecord } = useMembers();
@@ -78,7 +79,7 @@ export function PassFailEvaluationContainer({
     isCurrent &&
     evaluation.result === 'fail' &&
     user &&
-    authors.includes(user.id);
+    (authors.includes(user.id) || isAdmin);
   const { trigger: submitEvaluationReview, isMutating: isSubmittingEvaluationReview } = useSubmitEvaluationReview({
     proposalId
   });

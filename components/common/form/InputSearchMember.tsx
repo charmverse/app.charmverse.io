@@ -3,7 +3,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps } from '@mui/material';
 import { Autocomplete, TextField } from '@mui/material';
 import type { ReactNode } from 'react';
-import { createRef, useMemo } from 'react';
+import { createRef, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
 import UserDisplay from 'components/common/UserDisplay';
@@ -63,6 +63,7 @@ function InputSearchMemberBase({
   const inputRef = createRef<HTMLInputElement>();
 
   const filteredOptions = filter ? filterMembers(options, filter) : options;
+  // console.log('filteredOptions', filteredOptions);
   return (
     <StyledAutocomplete
       PopperComponent={popupField ? renderDiv : undefined}
@@ -147,29 +148,37 @@ export function InputSearchMemberMultiple({
   multiple = true,
   ...props
 }: IInputSearchMemberMultipleProps) {
-  const { members, membersRecord } = useMembers();
-  const selectedMembers = useMemo(
-    () => (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean),
-    [defaultValue, membersRecord]
-  );
+  const { members, isLoading, membersRecord } = useMembers();
+  const [value, setValue] = useState<Member[]>([]);
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
+    setValue(users);
     onChange(
       users.map((user) => (user.id.startsWith('email') ? user.username : user.id)),
       reason
     );
   }
 
+  useEffect(() => {
+    if (!isLoading) {
+      const defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
+      if (defaultMembers.length > 0) {
+        setValue(defaultMembers);
+      }
+    }
+    // only run once members are loaded
+  }, [isLoading]);
+
   return (
     <InputSearchMemberBase
       filterSelectedOptions
       multiple={multiple}
-      value={selectedMembers}
+      value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}
       isOptionEqualToValue={(option, val) => option.id === val.id}
       {...props}
-      placeholder={defaultValue?.length ? undefined : props.placeholder ?? 'Select members'}
+      placeholder={defaultValue?.length || value.length ? undefined : props.placeholder ?? 'Select members'}
       options={members.filter((member) => !member.isBot)}
     />
   );

@@ -6,7 +6,7 @@ import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishProposalEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
+import { publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -45,7 +45,7 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
 
   const isAuthor = proposal.authors.some((author) => author.userId === userId);
 
-  const { error } = await hasAccessToSpace({
+  const { error, isAdmin } = await hasAccessToSpace({
     spaceId: proposalEvaluation.proposal.spaceId,
     userId,
     adminOnly: false
@@ -59,8 +59,8 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError();
   }
 
-  if (!isAuthor) {
-    throw new ActionNotPermittedError('Only authors can appeal evaluations');
+  if (!isAuthor && !isAdmin) {
+    throw new ActionNotPermittedError('Only authors and admins can appeal evaluations');
   }
 
   if (proposalEvaluation.result !== 'fail') {

@@ -4,12 +4,12 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { sortBy } from 'lodash';
 import { writeFileSync } from 'fs';
 import { spaceId, templateId, getProjectsFromFile } from './retroData';
-
+import { uniq } from 'lodash';
 type SummaryRow = {};
 
 const summaryFile = './op-review-summary.csv';
-const fullReviewsummaryFile = './op-full-review-june-17.csv';
-const reviewersFile = './op-reviewers-june-17-midday.csv';
+const fullReviewsummaryFile = './op-full-review-june-18.csv';
+const reviewersFile = './op-reviewers-june-18.csv';
 
 async function exportSummary() {
   const proposals = await prisma.proposal.findMany({
@@ -52,7 +52,11 @@ async function exportSummary() {
     })
     .sort((a, b) => parseInt(a.Reviews) - parseInt(b.Reviews));
 
-  const csvString = stringify(csvData, { header: true, columns: ['Proposals', 'Reviews'] });
+  const csvString = stringify(csvData, {
+    delimiter: '\t',
+    header: true,
+    columns: ['Proposals', 'Reviews']
+  });
 
   if (csvData.length) {
     for (const row of csvData) {
@@ -94,6 +98,7 @@ async function exportFullReviewSummary() {
     Link: string;
     'Project Id': string;
     Rejected: number;
+    'Rejected Reasons': string;
     Approved: number;
     Pending: number;
   }[] = proposals.map((proposal) => {
@@ -101,13 +106,19 @@ async function exportFullReviewSummary() {
     if (rawProjects.length !== 1) {
       console.log('could not find project', rawProjects, proposal.page?.title);
     }
-    const rawProject = rawProjects[0].id;
+    const rawProject = rawProjects[0]?.id;
     const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
     const evaluation = proposal.evaluations.find((evaluation) => evaluation.title === 'Full Review');
     if (!evaluation || !currentEvaluation) throw new Error('missing evaluations?');
     const isRuleViolation = currentEvaluation.title === 'Rule Violation Check';
     const approved = evaluation.reviews.filter((review) => review.result === 'pass').length;
     const rejected = evaluation.reviews.filter((review) => review.result === 'fail').length;
+    const rejectedMessages = uniq(
+      evaluation.reviews
+        .map((review) => review.declineReasons.concat(review.declineMessage || ''))
+        .flat()
+        .filter(Boolean)
+    );
     let status: string;
     if (isRuleViolation) {
       if (currentEvaluation.result === 'pass') {
@@ -128,9 +139,10 @@ async function exportFullReviewSummary() {
       'Full Review Status': status,
       Link: 'https://app.charmverse.io/op-retrofunding-review-process/' + proposal.page?.path,
       Rejected: rejected,
+      'Rejected Reasons': rejectedMessages.join(', '),
       Approved: approved,
       Pending: 5 - approved - rejected,
-      'Project Id': rawProject
+      'Project Id': rawProject || 'N/A'
     };
   });
 
@@ -151,14 +163,15 @@ async function exportFullReviewSummary() {
   });
 
   const csvString = stringify(csvData, {
+    delimiter: '\t',
     header: true,
-    columns: ['Project Id', 'Link', 'Full Review Status', 'Approved', 'Rejected', 'Pending']
+    columns: ['Project Id', 'Link', 'Full Review Status', 'Approved', 'Rejected', 'Rejected Reasons', 'Pending']
   });
 
   writeFileSync(fullReviewsummaryFile, csvString);
 }
 
-async function exportMembers() {
+async function exportReviewers() {
   const proposals = await prisma.proposal.findMany({
     where: {
       status: 'published',
@@ -222,8 +235,14 @@ async function exportMembers() {
     })
     .sort((a, b) => b.Reviews - a.Reviews);
 
-  const csvString = stringify(csvData, { header: true, columns: ['Reviewer', 'Reviews', 'Assigned proposals'] });
+  const csvString = stringify(csvData, {
+    delimiter: '\t',
+    header: true,
+    columns: ['Reviewer', 'Reviews', 'Assigned proposals']
+  });
   writeFileSync(reviewersFile, csvString);
 }
 
-exportFullReviewSummary().catch(console.error);
+// exportFullReviewSummary().catch(console.error);
+
+exportReviewers().catch(console.error);
