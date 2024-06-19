@@ -167,7 +167,13 @@ export function PaymentStepReview({
               minHeight: '30px'
             }}
           >
-            <RewardAmount truncatePrecision={4} noRewardText='No reward available' fullForm reward={reward} />
+            <RewardAmount
+              truncatePrecision={4}
+              noRewardText='No reward available'
+              fullForm
+              showFullCustomRewardText
+              reward={reward}
+            />
           </Box>
         </Grid>
       </Grid>
