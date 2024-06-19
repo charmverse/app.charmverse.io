@@ -9,7 +9,7 @@ import Koa from 'koa';
 import Router from 'koa-router';
 
 function logRoutes(router: Router) {
-  log.info('List of routes available:');
+  log.info('---- List of routes available ----');
   router.stack.forEach((layer) => {
     const _path = layer.opts.prefix || layer.path || '';
     const methods = layer.methods.filter((method) => method !== 'HEAD');
@@ -17,6 +17,7 @@ function logRoutes(router: Router) {
       log.info(`${_path}: ${methods.join(', ')}`);
     }
   });
+  log.info('---- Finished checking routes ----');
 }
 
 async function loadRoutes(dir: string, rootRouter: Router) {

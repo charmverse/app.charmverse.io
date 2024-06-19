@@ -1,7 +1,11 @@
-import { app } from 'connect-api/src/server';
+import { prepareServer } from 'connect-api/src/prepareServer';
 import request from 'supertest';
 
-beforeAll(async () => {});
+let app: Awaited<ReturnType<typeof prepareServer>>;
+
+beforeAll(async () => {
+  app = await prepareServer();
+});
 
 describe('GET /api/random-number', () => {
   // Simple heuristic, admin can always see everything
