@@ -27,4 +27,20 @@ export class PathBasedRouter extends Router {
   constructor() {
     super({ prefix: getApiPath() });
   }
+
+  GET(...handlers: Router.IMiddleware[]) {
+    super.get('/', ...handlers);
+  }
+
+  POST(...handlers: Router.IMiddleware[]) {
+    super.post('/', ...handlers);
+  }
+
+  PUT(...handlers: Router.IMiddleware[]) {
+    super.put('/', ...handlers);
+  }
+
+  DELETE(...handlers: Router.IMiddleware[]) {
+    super.delete('/', ...handlers);
+  }
 }

@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import cors from '@koa/cors';
 import Koa from 'koa';
@@ -60,6 +61,27 @@ export async function prepareServer(): Promise<Koa> {
       credentials: true
     })
   );
+
+  // Error handling middleware
+  app.use(async (ctx, next) => {
+    try {
+      await next();
+    } catch (err) {
+      log.error(err);
+      if (err instanceof SystemError) {
+        ctx.body = {
+          message: err.message,
+          severity: err.severity
+        };
+        ctx.status = err.code;
+      } else {
+        ctx.body = {
+          message: (err as any).message ?? 'Internal Server Error'
+        };
+        ctx.status = 500;
+      }
+    }
+  });
 
   await loadRoutes(apiDir, rootRouter);
 
