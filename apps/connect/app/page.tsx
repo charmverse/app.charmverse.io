@@ -1,29 +1,13 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-// import { connectApiClient } from 'connect/api/apiClient';
-import { useState } from 'react';
-
-import { connectApiClient } from '../apiClient/apiClient';
-
-import styles from './page.module.css';
+import { HomePage } from 'components/home/HomePage';
 
 export default function Home() {
-  const [number, setNumber] = useState<number | null>(null);
+  const user = undefined; // server action
 
-  async function showRandomNumber() {
-    const response = await connectApiClient.test.getRandomNumber();
-    setNumber(response.number);
+  if (user) {
+    redirect('/dashboard');
   }
 
-  return (
-    <div className={styles.main}>
-      {/** Center content */}
-      <div className={styles.center}>
-        <div className='button' onClick={() => showRandomNumber()}>
-          Show Random Number
-          {number !== null && <p>Random Number: {number}</p>}
-        </div>
-      </div>
-    </div>
-  );
+  return <HomePage user={user} />;
 }

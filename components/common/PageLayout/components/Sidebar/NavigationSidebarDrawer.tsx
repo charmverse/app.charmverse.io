@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
-import type { Theme } from '@mui/material';
-import { Tooltip, Box } from '@mui/material';
+import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
+import type { Theme } from '@mui/material/styles';
+import Tooltip from '@mui/material/Tooltip';
 import { useMemo } from 'react';
 
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -17,7 +18,7 @@ const openedMixin = (theme: Theme, sidebarWidth: number) => ({
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen
   }),
-  overflowX: 'hidden',
+  overflowX: 'hidden' as const,
   border: 'none'
 });
 
@@ -27,33 +28,28 @@ const closedMixin = (theme: Theme) =>
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
     }),
-    overflowX: 'hidden',
+    overflowX: 'hidden' as const,
     width: 0,
     border: 'none'
   } as const);
 
 const Drawer = styled(MuiDrawer, {
-  shouldForwardProp: (prop) => prop !== 'open' && prop !== 'sidebarWidth'
-})<{ open: boolean; sidebarWidth: number }>(
-  // eslint-disable-next-line no-unexpected-multiline
-  // @ts-ignore mixin isnt typesafe
-  ({ sidebarWidth, theme, open }) => ({
-    width: sidebarWidth,
-    flexShrink: 0,
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme, sidebarWidth),
-      '& .MuiDrawer-paper': openedMixin(theme, sidebarWidth)
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme)
-    }),
-    paddingRight: 3
-  })
-);
-
+  shouldForwardProp: (prop) => prop !== 'sidebarWidth'
+})<{ sidebarWidth: number }>(({ sidebarWidth, theme, open }) => ({
+  width: sidebarWidth,
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
+  boxSizing: 'border-box',
+  ...(open && {
+    ...openedMixin(theme, sidebarWidth),
+    '& .MuiDrawer-paper': openedMixin(theme, sidebarWidth)
+  }),
+  ...(!open && {
+    ...closedMixin(theme),
+    '& .MuiDrawer-paper': closedMixin(theme)
+  }),
+  paddingRight: 3
+}));
 const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
   position: absolute;
   width: 5px;
@@ -125,7 +121,7 @@ export function NavigationSidebarDrawer({
       </Box>
     </MuiDrawer>
   ) : (
-    <Drawer sidebarWidth={sidebarWidth} open={open} variant='permanent'>
+    <Drawer sidebarWidth={sidebarWidth} open={open} variant='permanent' sx={{ overflowX: 'auto' }}>
       {drawerContent}
       <Tooltip title={!enableResizing || isResizing ? '' : 'Drag to resize'} placement='right' followCursor>
         <DraggableHandle onMouseDown={(e) => enableResize(e)} isActive={isResizing} disabled={!enableResizing} />

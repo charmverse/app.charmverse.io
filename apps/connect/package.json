@@ -7,5 +7,8 @@
     "build": "npx next build",
     "start:prod": "npx next start",
     "lint": "npx next lint"
+  },
+  "dependencies": {
+    "@mui/material-nextjs": "^5.15.11"
   }
 }
