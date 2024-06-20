@@ -3,11 +3,11 @@ import ImportExportIcon from '@mui/icons-material/ImportExport';
 import { Box, Divider, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useCallback, useMemo, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useMemo, useState } from 'react';
 import type { UseFormGetFieldState } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 
-import { useCreateProject, useGetProjects, useImportOpProject } from 'charmClient/hooks/projects';
+import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
@@ -51,7 +51,6 @@ export function ProjectProfileInputField({
   const { user } = useUser();
   const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(project ?? null);
   const { data: projectsWithMembers, mutate } = useGetProjects();
-  const { trigger: importOpProject } = useImportOpProject();
   const projectId = project?.id;
   const { reset } = useFormContext<ProjectAndMembersPayload>();
   const { trigger: createProject } = useCreateProject();
@@ -61,56 +60,47 @@ export function ProjectProfileInputField({
 
   const onChangeDebounced = useMemo(() => debounce(_onChangeDebounced, 300), [_onChangeDebounced]);
 
-  const onChange = useCallback(
-    async (updatedValue: FormFieldValue) => {
-      // make sure to await so that validation has a chance to run
-      await _onChange(updatedValue);
-      // do not save updates if field is invalid. we call getFieldState instead of the error passed in from props because it is not updated yet
-      const fieldError = getFieldState(formFieldId).error;
-      if (!fieldError) {
-        onChangeDebounced({
-          id: formFieldId,
-          value: updatedValue
-        });
-      }
-    },
-    [formFieldId]
-  );
+  async function onChange(updatedValue: FormFieldValue) {
+    // make sure to await so that validation has a chance to run
+    await _onChange(updatedValue);
+    // do not save updates if field is invalid. we call getFieldState instead of the error passed in from props because it is not updated yet
+    const fieldError = getFieldState(formFieldId).error;
+    if (!fieldError) {
+      onChangeDebounced({
+        id: formFieldId,
+        value: updatedValue
+      });
+    }
+  }
 
-  const onOptionClick = useCallback(
-    (_selectedProject: ProjectWithMembers) => {
-      if (proposalId) {
-        updateProposal({
-          projectId: _selectedProject.id
-        });
-      }
-      // update the projectId field of the form, it might be for a new structured proposal form
-      onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
-      setSelectedProject(_selectedProject);
-      reset(
-        convertToProjectValues({
-          ..._selectedProject,
-          // Just add the team lead to the project members since selectedMemberIds is empty
-          projectMembers: [_selectedProject.projectMembers[0]]
-        })
-      );
-    },
-    [proposalId]
-  );
+  function onOptionClick(_selectedProject: ProjectWithMembers) {
+    if (proposalId) {
+      updateProposal({
+        projectId: _selectedProject.id
+      });
+    }
+    // update the projectId field of the form, it might be for a new structured proposal form
+    onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
+    setSelectedProject(_selectedProject);
+    reset(
+      convertToProjectValues({
+        ..._selectedProject,
+        // Just add the team lead to the project members since selectedMemberIds is empty
+        projectMembers: [_selectedProject.projectMembers[0]]
+      })
+    );
+  }
 
-  const onFormFieldChange = useCallback(
-    (newProjectMemberIds: string[]) => {
-      if (selectedProject) {
-        onChange({
-          projectId: selectedProject.id,
-          selectedMemberIds: newProjectMemberIds
-        });
-      }
-    },
-    [selectedProject?.id]
-  );
+  function onFormFieldChange(newProjectMemberIds: string[]) {
+    if (selectedProject) {
+      onChange({
+        projectId: selectedProject.id,
+        selectedMemberIds: newProjectMemberIds
+      });
+    }
+  }
 
-  const createAndSelectProject = useCallback(() => {
+  function createAndSelectProject() {
     createProject(createDefaultProjectAndMembersPayload(), {
       onSuccess: async (createdProject) => {
         mutate(
@@ -124,9 +114,9 @@ export function ProjectProfileInputField({
         onOptionClick(createdProject);
       }
     });
-  }, []);
+  }
 
-  const onImportProject = useCallback((importedProject: ProjectWithMembers) => {
+  function onImportProject(importedProject: ProjectWithMembers) {
     mutate(
       (_projects) => {
         return [...(_projects ?? []), importedProject];
@@ -137,7 +127,7 @@ export function ProjectProfileInputField({
     );
     onOptionClick(importedProject);
     importOpProjectPopupState.close();
-  }, []);
+  }
 
   return (
     <Stack gap={1} width='100%' mb={1}>

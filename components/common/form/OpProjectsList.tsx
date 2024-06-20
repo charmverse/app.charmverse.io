@@ -59,7 +59,7 @@ export function OpProjectsList({ onImportProject }: { onImportProject: (project:
   return (
     <Stack gap={2}>
       <Stack gap={1}>
-        {[...projects, ...projects, ...projects].map((project) => (
+        {projects.map((project) => (
           <Stack key={project.attestationUid}>
             <MenuItem
               selected={selectedProjectId === project.attestationUid}
