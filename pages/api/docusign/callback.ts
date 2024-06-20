@@ -14,6 +14,8 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.get(docusignCallback);
 
 async function docusignCallback(req: NextApiRequest, res: NextApiResponse) {
+  const authError = req.query.error as string;
+
   const sealedSpaceId = req.query.state as string;
 
   const state = await decodeDocusignState(sealedSpaceId);
@@ -22,6 +24,19 @@ async function docusignCallback(req: NextApiRequest, res: NextApiResponse) {
     spaceId: state.spaceId,
     userId: state.userId
   });
+
+  // Early return if the user rejected signin
+  if (authError) {
+    const space = await prisma.space.findUniqueOrThrow({
+      where: {
+        id: state.spaceId
+      },
+      select: {
+        domain: true
+      }
+    });
+    return res.status(302).redirect(`/${space.domain}`);
+  }
 
   if (!spaceRole?.isAdmin) {
     throw new ActionNotPermittedError('Only admins can connect Docusign');
