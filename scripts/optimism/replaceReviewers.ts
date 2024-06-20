@@ -29,12 +29,12 @@ async function replaceReviewer(originalUser: string, newUser: string) {
     })
     .catch((e) => {
       console.error('could not update space role');
-      // return prisma.spaceRole.deleteMany({
-      //   where: {
-      //     spaceId,
-      //     userId: originalUser
-      //   }
-      // });
+      return prisma.spaceRole.deleteMany({
+        where: {
+          spaceId,
+          userId: originalUser
+        }
+      });
     });
   const appealreviewers = await prisma.proposalAppealReviewer.updateMany({
     where: {
@@ -71,17 +71,25 @@ async function replaceReviewer(originalUser: string, newUser: string) {
 }
 
 async function search() {
-  const original = await prisma.user.findMany({
-    where: {},
+  const original = await prisma.user.findFirstOrThrow({
+    where: {
+      verifiedEmails: {
+        some: {
+          email: 'rev@limitless.network'
+        }
+      }
+    },
     include: {
       verifiedEmails: true,
-      googleAccounts: true,
       wallets: true,
+      googleAccounts: true,
       spaceRoles: true
     }
   });
-  const replacement = await prisma.user.findMany({
-    where: {},
+  const replacement = await prisma.user.findFirstOrThrow({
+    where: {
+      email: 'rev@revmiller.com'
+    },
     include: {
       verifiedEmails: true,
       wallets: true,
@@ -90,7 +98,15 @@ async function search() {
     }
   });
 
-  // await replaceReviewer(original[0].id, replacement[0].id);
+  await replaceReviewer(original.id, replacement.id);
+  await prisma.user.update({
+    where: {
+      id: original.id
+    },
+    data: {
+      deletedAt: new Date()
+    }
+  });
 }
 
 search().then(() => console.log('Done'));
