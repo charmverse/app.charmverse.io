@@ -14,6 +14,7 @@ export type ProjectPayload = Pick<
   | 'otherUrl'
   | 'walletAddress'
   | 'deletedAt'
+  | 'optimismId'
 >;
 
 export type ProjectMemberPayload = Pick<

@@ -7,7 +7,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { UseFormGetFieldState } from 'react-hook-form';
 
-import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
+import { useCreateProject, useGetProjects, useImportOpProject } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
@@ -40,7 +40,7 @@ export function ProjectProfileInputField({
   disabled?: boolean;
   fieldConfig?: ProjectAndMembersFieldConfig;
   project?: ProjectWithMembers | null;
-  onChange: (updatedValue: FormFieldValue) => void;
+  onChange: (updatedValue: FormFieldValue) => Promise<void>;
   getFieldState: UseFormGetFieldState<Record<string, FormFieldValue>>;
   onChangeDebounced: (updatedValue: { id: string; value: FormFieldValue }) => void;
 }) {
@@ -51,6 +51,7 @@ export function ProjectProfileInputField({
   const { user } = useUser();
   const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(project ?? null);
   const { data: projectsWithMembers, mutate } = useGetProjects();
+  const { trigger: importOpProject } = useImportOpProject();
   const projectId = project?.id;
   const { reset } = useFormContext<ProjectAndMembersPayload>();
   const { trigger: createProject } = useCreateProject();
@@ -59,36 +60,43 @@ export function ProjectProfileInputField({
   const isTeamLead = !!selectedProject?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
 
   const onChangeDebounced = useMemo(() => debounce(_onChangeDebounced, 300), [_onChangeDebounced]);
-  const onChange = async (updatedValue: FormFieldValue) => {
-    // make sure to await so that validation has a chance to run
-    await _onChange(updatedValue);
-    // do not save updates if field is invalid. we call getFieldState instead of the error passed in from props because it is not updated yet
-    const fieldError = getFieldState(formFieldId).error;
-    if (!fieldError) {
-      onChangeDebounced({
-        id: formFieldId,
-        value: updatedValue
-      });
-    }
-  };
 
-  function onOptionClick(_selectedProject: ProjectWithMembers) {
-    if (proposalId) {
-      updateProposal({
-        projectId: _selectedProject.id
-      });
-    }
-    // update the projectId field of the form, it might be for a new structured proposal form
-    onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
-    setSelectedProject(_selectedProject);
-    reset(
-      convertToProjectValues({
-        ..._selectedProject,
-        // Just add the team lead to the project members since selectedMemberIds is empty
-        projectMembers: [_selectedProject.projectMembers[0]]
-      })
-    );
-  }
+  const onChange = useCallback(
+    async (updatedValue: FormFieldValue) => {
+      // make sure to await so that validation has a chance to run
+      await _onChange(updatedValue);
+      // do not save updates if field is invalid. we call getFieldState instead of the error passed in from props because it is not updated yet
+      const fieldError = getFieldState(formFieldId).error;
+      if (!fieldError) {
+        onChangeDebounced({
+          id: formFieldId,
+          value: updatedValue
+        });
+      }
+    },
+    [formFieldId]
+  );
+
+  const onOptionClick = useCallback(
+    (_selectedProject: ProjectWithMembers) => {
+      if (proposalId) {
+        updateProposal({
+          projectId: _selectedProject.id
+        });
+      }
+      // update the projectId field of the form, it might be for a new structured proposal form
+      onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
+      setSelectedProject(_selectedProject);
+      reset(
+        convertToProjectValues({
+          ..._selectedProject,
+          // Just add the team lead to the project members since selectedMemberIds is empty
+          projectMembers: [_selectedProject.projectMembers[0]]
+        })
+      );
+    },
+    [proposalId]
+  );
 
   const onFormFieldChange = useCallback(
     (newProjectMemberIds: string[]) => {
@@ -101,6 +109,35 @@ export function ProjectProfileInputField({
     },
     [selectedProject?.id]
   );
+
+  const createAndSelectProject = useCallback(() => {
+    createProject(createDefaultProjectAndMembersPayload(), {
+      onSuccess: async (createdProject) => {
+        mutate(
+          (_projects) => {
+            return [...(_projects ?? []), createdProject];
+          },
+          {
+            revalidate: false
+          }
+        );
+        onOptionClick(createdProject);
+      }
+    });
+  }, []);
+
+  const onImportProject = useCallback((importedProject: ProjectWithMembers) => {
+    mutate(
+      (_projects) => {
+        return [...(_projects ?? []), importedProject];
+      },
+      {
+        revalidate: false
+      }
+    );
+    onOptionClick(importedProject);
+    importOpProjectPopupState.close();
+  }, []);
 
   return (
     <Stack gap={1} width='100%' mb={1}>
@@ -142,24 +179,7 @@ export function ProjectProfileInputField({
             );
           })}
           <Divider />
-          <MenuItem
-            data-test='project-option-new'
-            onClick={() => {
-              createProject(createDefaultProjectAndMembersPayload(), {
-                onSuccess: async (createdProject) => {
-                  mutate(
-                    (_projects) => {
-                      return [...(_projects ?? []), createdProject];
-                    },
-                    {
-                      revalidate: false
-                    }
-                  );
-                  onOptionClick(createdProject);
-                }
-              });
-            }}
-          >
+          <MenuItem data-test='project-option-new' onClick={createAndSelectProject}>
             <Stack flexDirection='row' alignItems='center' gap={0.5}>
               <MuiAddIcon fontSize='small' />
               <Typography>Add a new project profile</Typography>
@@ -201,7 +221,7 @@ export function ProjectProfileInputField({
           <Link href='https://www.agora.xyz/deploy' target='_blank'>
             Create a project on Agora
           </Link>
-          <OpProjectsList />
+          <OpProjectsList onImportProject={onImportProject} />
         </Stack>
       </Modal>
     </Stack>

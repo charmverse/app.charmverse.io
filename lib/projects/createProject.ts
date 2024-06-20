@@ -55,6 +55,7 @@ export async function createProject(payload: {
       website: project.website,
       createdBy: payload.userId,
       updatedBy: payload.userId,
+      optimismId: project.optimismId,
       projectMembers: {
         createMany: {
           data: [

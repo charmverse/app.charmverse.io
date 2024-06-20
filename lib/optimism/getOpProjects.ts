@@ -1,5 +1,4 @@
 import * as http from 'adapters/http';
-import { prettyPrint } from 'lib/utils/strings';
 
 export type OPProjectData = {
   avatarUrl: string;

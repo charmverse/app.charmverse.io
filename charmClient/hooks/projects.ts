@@ -5,6 +5,7 @@ import type { OPProjectData } from 'lib/optimism/getOpProjects';
 import type { AddProjectMemberPayload } from 'lib/projects/addProjectMember';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateProjectPayload } from 'lib/projects/updateProject';
+import type { ImportOpProjectPayload } from 'pages/api/projects/op/import';
 
 export function useCreateProject() {
   return usePOST<ProjectAndMembersPayload, ProjectWithMembers>('/api/projects');
@@ -28,4 +29,8 @@ export function useAddProjectMember(projectId: string) {
 
 export function useGetOpProjects() {
   return useGET<OPProjectData[]>('/api/projects/op');
+}
+
+export function useImportOpProject() {
+  return usePOST<ImportOpProjectPayload, ProjectWithMembers>('/api/projects/op/import');
 }
