@@ -54,6 +54,7 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     const _isDiscordRequired = _requiredProperties.find((p) => p.type === 'discord');
     const _isWalletRequired = _requiredProperties.find((p) => p.type === 'wallet');
     const _isTelegramRequired = _requiredProperties.find((p) => p.type === 'telegram');
+    const _isFarcasterRequired = _requiredProperties.find((p) => p.type === 'farcaster');
 
     const userDetailsSocial = userDetails?.social as Social;
 
@@ -85,20 +86,26 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
       requiredPropertiesWithoutValue.push('github');
     }
 
-    if (currentUser && _isWalletRequired && (currentUser.wallets ?? []).length === 0) {
-      requiredPropertiesWithoutValue.push('wallet');
-    }
+    if (currentUser) {
+      if (_isWalletRequired && (currentUser.wallets ?? []).length === 0) {
+        requiredPropertiesWithoutValue.push('wallet');
+      }
 
-    if (currentUser && _isGoogleRequired && (currentUser.googleAccounts ?? []).length === 0) {
-      requiredPropertiesWithoutValue.push('google');
-    }
+      if (_isGoogleRequired && (currentUser.googleAccounts ?? []).length === 0) {
+        requiredPropertiesWithoutValue.push('google');
+      }
 
-    if (currentUser && _isDiscordRequired && !currentUser.discordUser) {
-      requiredPropertiesWithoutValue.push('discord');
-    }
+      if (_isDiscordRequired && !currentUser.discordUser) {
+        requiredPropertiesWithoutValue.push('discord');
+      }
 
-    if (currentUser && _isTelegramRequired && !currentUser.telegramUser) {
-      requiredPropertiesWithoutValue.push('telegram');
+      if (_isTelegramRequired && !currentUser.telegramUser) {
+        requiredPropertiesWithoutValue.push('telegram');
+      }
+
+      if (_isFarcasterRequired && !currentUser.farcasterUser) {
+        requiredPropertiesWithoutValue.push('farcaster');
+      }
     }
 
     return {
@@ -114,7 +121,8 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
       isGoogleRequired: !!_isGoogleRequired,
       isDiscordRequired: !!_isDiscordRequired,
       isWalletRequired: !!_isWalletRequired,
-      isTelegramRequired: !!_isTelegramRequired
+      isTelegramRequired: !!_isTelegramRequired,
+      isFarcasterRequired: !!_isFarcasterRequired
     };
   }, [userDetails, memberPropertyValues, currentSpace?.id, currentUser]);
 

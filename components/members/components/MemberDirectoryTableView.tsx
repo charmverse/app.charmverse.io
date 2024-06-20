@@ -23,6 +23,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useUser } from 'hooks/useUser';
+import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import type { Member, Social } from 'lib/members/interfaces';
 
 import { useMemberProfileDialog } from '../hooks/useMemberProfileDialog';
@@ -170,6 +171,13 @@ function MemberDirectoryTableRow({
               return (
                 <TableCell key={property.id}>
                   <Typography variant='body2'>{(memberProperty.value as string) ?? '-'}</Typography>
+                </TableCell>
+              );
+            }
+            case 'farcaster': {
+              return (
+                <TableCell key={property.id}>
+                  <Typography variant='body2'>{member.farcasterUser ? member.farcasterUser.username : '-'}</Typography>
                 </TableCell>
               );
             }

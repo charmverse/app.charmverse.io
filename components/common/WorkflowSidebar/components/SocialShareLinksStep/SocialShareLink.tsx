@@ -1,17 +1,28 @@
 import TelegramIcon from '@mui/icons-material/Telegram';
-import { Box } from '@mui/material';
+import { Box, SvgIcon } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import type { ReactNode } from 'react';
 import { BsTwitterX } from 'react-icons/bs';
 
 import Link from 'components/common/Link';
 import { capitalize } from 'lib/utils/strings';
+import FarcasterLogo from 'public/images/logos/farcaster.svg';
 
 type ShareSite = 'x' | 'telegram' | 'warpcast';
 
 const siteIconsRecord: Record<ShareSite, ReactNode> = {
   x: <BsTwitterX style={{ fill: 'white', fontSize: 16 }} />,
-  warpcast: <img src='/images/logos/farcaster.svg' width={20} height={20} />,
+  warpcast: (
+    <SvgIcon
+      sx={{
+        fill: '#fff'
+      }}
+      viewBox='0 0 20 20'
+      fontSize='small'
+    >
+      <FarcasterLogo />
+    </SvgIcon>
+  ),
   telegram: <TelegramIcon fontSize='small' sx={{ fill: 'white' }} />
 };
 

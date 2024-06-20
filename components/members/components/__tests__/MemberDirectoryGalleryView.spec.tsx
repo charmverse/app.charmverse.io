@@ -176,6 +176,7 @@ const propertyValues: PropertyValueWithDetails[] = [textPropertyValue, selectPro
 
 const mockMember: Member = {
   ...createMockUser(),
+  farcasterUser: undefined,
   avatar: 'https://example.com/avatar.png',
   isBot: false,
   deletedAt: undefined,
