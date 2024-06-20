@@ -31,7 +31,8 @@ jobs:
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
-          echo "STAGE=stg-webapp-pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+          echo "STACK=stg-webapp >> $GITHUB_ENV
+          echo "STAGE_NAME=${{env.STACK}}-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         uses: ./.github/actions/install
@@ -40,7 +41,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           REACT_APP_APP_ENV: 'staging'
-          NEXT_PUBLIC_CONNECT_API_HOST: https://${{ env.STAGE }}.charmverse.co:4000
+          NEXT_PUBLIC_CONNECT_API_HOST: https://${{ env.STAGE_NAME }}.charmverse.co:4000
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -72,7 +73,7 @@ jobs:
           rm .ebextensions*/06_cloudwatch_alarm.config
 
           # substituting the websocket domain name
-          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
+          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -135,7 +136,7 @@ jobs:
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
-          env: ${{ env.STAGE }}
+          env: ${{ env.STAGE_NAME }}
           ref: ${{ github.head_ref }}
           override: true
 
@@ -165,8 +166,9 @@ jobs:
         # npm run deploy:staging
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c stack=stg-webapp -c name=${{env.STAGE}} --outputs-file cdk.out.json
-          node --eval \"console.log('env_url=' + require('./cdk.out.json')['${{env.STAGE}}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT
+          npx cdk deploy -c stack=${{env.STACK}} -c name=${{env.STAGE_NAME}} --outputs-file cdk.out.json
+          env_url=$(jq '.[$ENV.STAGE_NAME].DeploymentUrl' ./cdk.out.json)
+          echo "env_url=$env_url" >> $GITHUB_OUTPUT
 
       - name: update the github deployment status
         uses: bobheadxi/deployments@v1
