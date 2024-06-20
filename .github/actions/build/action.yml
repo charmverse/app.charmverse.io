@@ -45,13 +45,10 @@ runs:
         NEXT_PUBLIC_CONNECT_API_HOST: ${{ inputs.NEXT_PUBLIC_CONNECT_API_HOST }}
       run: |
         npm run connect:build
-        npm run connect-api:build
 
     - name: Build Connect API
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
-      env:
-        NEXT_PUBLIC_CONNECT_API_HOST: ${{ inputs.NEXT_PUBLIC_CONNECT_API_HOST }}
       run: |
         npm run connect-api:build
 
