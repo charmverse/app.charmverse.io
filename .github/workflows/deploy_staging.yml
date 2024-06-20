@@ -31,7 +31,7 @@ jobs:
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
-          stack=stg-webapp
+          stack=$(( case ${{ github.event.label.name }} in ':rocket: deploy') echo 'stg-webapp';; ':rocket: deploy-connect') echo 'stg-connect';; *) echo 'stg-default';; esac ))
           echo "STACK=$stack" >> $GITHUB_ENV
           echo "STAGE_NAME=$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
@@ -153,14 +153,14 @@ jobs:
           aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
           aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
+      - name: Override config with Connect app
+        if: contains(github.event.label.name, 'deploy-connect')
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
+
       - name: Package
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
-
-      # - name: Update and Package connect app
-      #   run: |
-      #     rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
-      #     cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Deploy to staging
         id: cdk_deploy
