@@ -9,20 +9,23 @@ const deployProps: cdk.StackProps = {
   env: { account: '310849459438', region: 'us-east-1' }
 };
 
-const stacks = ['stg-webapp', 'stg-connect', 'prd-connect'] as const;
-
 const app = new cdk.App();
 
-const stackParam: (typeof stacks)[number] = app.node.tryGetContext('stack');
+// Command example: cdk deploy --context stack=stg-connect
+const stackParam: string = app.node.tryGetContext('stack');
+const stackNameParam: string = app.node.tryGetContext('name');
 
-if (!stacks.includes(stackParam)) {
-  throw new Error('Invalid stack or stackEnv parameter: ' + stackParam);
-}
-
+// Connect production
 if (stackParam === 'prd-connect') {
-  new ConnectStagingStack(app, 'prd-connect', deployProps);
-} else if (stackParam === 'stg-connect') {
-  new ConnectStagingStack(app, 'stg-connect-' + process.env.STAGE, deployProps);
-} else if (stackParam === 'stg-webapp') {
-  new WebappStagingStack(app, 'stg-webapp-' + process.env.STAGE, deployProps);
+  new ConnectStagingStack(app, stackNameParam, deployProps);
+}
+// Connect staging
+else if (stackParam === 'stg-connect') {
+  new ConnectStagingStack(app, stackNameParam, deployProps);
+}
+// Webapp staging
+else if (stackParam === 'stg-webapp') {
+  new WebappStagingStack(app, stackNameParam, deployProps);
+} else {
+  throw new Error('Invalid stack parameter: ' + stackParam);
 }

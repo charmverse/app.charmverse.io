@@ -1,8 +1,10 @@
-import { BaseStack } from './BaseStack';
+import { StagingStack } from './StagingStack';
 import { StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-export class ConnectStagingStack extends BaseStack {
+const domain = 'charmverse.co';
+
+export class ConnectStagingStack extends StagingStack {
   constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props, {
       options: [

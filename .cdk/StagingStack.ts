@@ -8,7 +8,7 @@ const domain = 'charmverse.co';
 
 type CustomOptions = { options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] };
 
-export class BaseStack extends Stack {
+export class StagingStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps, { options = [] }: CustomOptions) {
     super(scope, id, props);
 
@@ -16,7 +16,7 @@ export class BaseStack extends Stack {
       path: `${__dirname}/../deploy.zip`
     });
     // Create a ElasticBeanStalk app. - must be 40 characters or less
-    const appName = sanitizeAppName('stg-charmverse-' + process.env.STAGE);
+    const appName = sanitizeAppName(id);
 
     const deploymentDomain = `${process.env.STAGE || ''}.${domain}`;
 
