@@ -89,7 +89,10 @@
     "connect:all:build": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect:build\" \"npm run connect-api:build\""
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
+    "apps/connect-api/**/*.{ts,tsx}": [
+      "npm run lint -w=connect-api"
+    ],
+    "(!apps)/**/*.{ts,tsx}": [
       "eslint --fix"
     ]
   },
@@ -387,6 +390,7 @@
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-next": "^13.1.1",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.33.1",

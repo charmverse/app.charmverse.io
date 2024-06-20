@@ -17,7 +17,8 @@ const jestConfig: JestConfigWithTsJest = {
     ]
   },
   moduleNameMapper: {
-    '^lib/(.*)$': '<rootDir>/../../lib/$1' // Adjust this according to your project structure
+    '^lib/(.*)$': '<rootDir>/../../lib/$1', // Adjust this according to your project structure
+    '^connect-api/(.*)$': '<rootDir>/src/$1'
   },
   extensionsToTreatAsEsm: ['.ts'],
   testEnvironment: 'jest-environment-node', // Change to node environment for simplicity
