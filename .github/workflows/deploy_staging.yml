@@ -77,36 +77,39 @@ jobs:
           # substituting the websocket domain name
           sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
 
+      - name: Install yq
+        run: |
+          sudo wget -O /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/3.3.0/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
       - name: Set the docker compose env variables
-        uses: mikefarah/yq@master
-        with:
-          cmd: |
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/00_env_vars.config
+        run: |
+          yq -I 4 -i '
+            with(.option_settings."aws:elasticbeanstalk:application:environment";
+                  .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
+                  .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+            ' .ebextensions/00_env_vars.config
 
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_cron/00_env_vars.config
+          yq -I 4 -i '
+            with(.option_settings."aws:elasticbeanstalk:application:environment";
+                  .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+            ' .ebextensions_cron/00_env_vars.config
 
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_ceramic/00_env_vars.config
+          yq -I 4 -i '
+            with(.option_settings."aws:elasticbeanstalk:application:environment";
+                  .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+            ' .ebextensions_ceramic/00_env_vars.config
 
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_websockets/00_env_vars.config
+          yq -I 4 -i '
+            with(.option_settings."aws:elasticbeanstalk:application:environment";
+                  .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+            ' .ebextensions_websockets/00_env_vars.config
 
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_connect/00_env_vars.config
+          yq -I 4 -i '
+            with(.option_settings."aws:elasticbeanstalk:application:environment";
+                  .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
+                  .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+            ' .ebextensions_connect/00_env_vars.config
 
       - name: Run specific version of permission api if SELECTED_PERMISSION_API_TAG exists
         if: env.SELECTED_PERMISSION_API_TAG && env.GITHUB_HEAD_REF_SLUG == env.SELECTED_PERMISSION_API_TAG
