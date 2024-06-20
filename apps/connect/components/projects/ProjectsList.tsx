@@ -1,3 +1,5 @@
+import 'server-only';
+
 import Typography from '@mui/material/Typography';
 
 import { getRecentProjectsWithMembers } from 'lib/projects/getRecentProjectsWithMembers';

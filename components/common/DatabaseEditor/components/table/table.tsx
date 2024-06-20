@@ -307,7 +307,7 @@ function Table(props: Props): JSX.Element {
   );
 
   return (
-    <div className='Table' ref={drop}>
+    <div className='Table' ref={drop as any}>
       <div className='octo-table-body'>
         <TableHeaders
           board={board}

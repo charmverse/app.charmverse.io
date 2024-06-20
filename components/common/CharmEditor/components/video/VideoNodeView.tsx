@@ -162,6 +162,10 @@ export function VideoNodeView({
             }}
             streamType='on-demand'
             controls
+            // the following properties are to make React types happy
+            placeholder={null}
+            onPointerEnterCapture={() => {}}
+            onPointerLeaveCapture={() => {}}
           />
         </BlockAligner>
       );
