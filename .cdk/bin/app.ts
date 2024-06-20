@@ -12,8 +12,8 @@ const deployProps: cdk.StackProps = {
 const app = new cdk.App();
 
 // Command example: cdk deploy --context stack=stg-connect
-const stackParam: string = app.node.tryGetContext('stack');
-const stackNameParam: string = app.node.tryGetContext('name');
+const stackParam: string = app.node.getContext('stack');
+const stackNameParam: string = app.node.getContext('name');
 
 // Connect production
 if (stackParam === 'prd-connect') {

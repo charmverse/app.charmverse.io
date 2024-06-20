@@ -165,7 +165,7 @@ jobs:
         # npm run deploy:staging
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c stack=stg-webapp name=stg-webapp-${{env.STAGE}} --outputs-file cdk.out.json
+          npx cdk deploy -c stack=stg-webapp -c name=stg-webapp-${{env.STAGE}} --outputs-file cdk.out.json
           npm run postdeploy:staging
 
       - name: update the github deployment status
