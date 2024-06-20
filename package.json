@@ -235,7 +235,7 @@
     "mailgun.js": "^10.2.1",
     "markdown-it": "^13.0.1",
     "marked": "^4.0.12",
-    "material-ui-popup-state": "^5.0.4",
+    "material-ui-popup-state": "^5.1.2",
     "millify": "^4.0.0",
     "mixpanel": "^0.17.0",
     "msw-storybook-addon": "^2.0.0",
