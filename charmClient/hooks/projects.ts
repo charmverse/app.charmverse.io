@@ -1,6 +1,7 @@
 import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
 
 import { useGET, usePOST, usePUT } from 'charmClient/hooks/helpers';
+import type { OPProjectData } from 'lib/optimism/getOpProjects';
 import type { AddProjectMemberPayload } from 'lib/projects/addProjectMember';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateProjectPayload } from 'lib/projects/updateProject';
@@ -23,4 +24,8 @@ export function usePatchProject(projectId: string) {
 
 export function useAddProjectMember(projectId: string) {
   return usePOST<AddProjectMemberPayload, ProjectMember>(`/api/projects/${projectId}/members`);
+}
+
+export function useGetOpProjects() {
+  return useGET<OPProjectData[]>('/api/projects/op');
 }

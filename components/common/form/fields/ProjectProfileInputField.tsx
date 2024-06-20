@@ -1,12 +1,16 @@
 import MuiAddIcon from '@mui/icons-material/Add';
-import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
+import ImportExportIcon from '@mui/icons-material/ImportExport';
+import { Box, Divider, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 import { debounce } from 'lodash';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { UseFormGetFieldState } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
+import Link from 'components/common/Link';
+import Modal from 'components/common/Modal';
 import { ProposalProjectFormAnswers } from 'components/settings/projects/components/ProjectForm';
 import { useUser } from 'hooks/useUser';
 import type { FormFieldValue } from 'lib/forms/interfaces';
@@ -14,6 +18,8 @@ import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
+
+import { OpProjectsList } from '../OpProjectsList';
 
 export function ProjectProfileInputField({
   onChange: _onChange,
@@ -48,6 +54,7 @@ export function ProjectProfileInputField({
   const projectId = project?.id;
   const { reset } = useFormContext<ProjectAndMembersPayload>();
   const { trigger: createProject } = useCreateProject();
+  const importOpProjectPopupState = usePopupState({ variant: 'dialog' });
 
   const isTeamLead = !!selectedProject?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
 
@@ -153,11 +160,21 @@ export function ProjectProfileInputField({
               });
             }}
           >
-            <Stack flexDirection='row' alignItems='center' gap={0.05}>
+            <Stack flexDirection='row' alignItems='center' gap={0.5}>
               <MuiAddIcon fontSize='small' />
               <Typography>Add a new project profile</Typography>
             </Stack>
           </MenuItem>
+          <Tooltip title={!user?.farcasterUser ? 'Connect your farcaster account to import projects from OP' : ''}>
+            <div>
+              <MenuItem onClick={importOpProjectPopupState.open} disabled={!user?.farcasterUser}>
+                <Stack flexDirection='row' alignItems='center' gap={0.5}>
+                  <ImportExportIcon fontSize='small' />
+                  <Typography>Import project from OP</Typography>
+                </Stack>
+              </MenuItem>
+            </div>
+          </Tooltip>
         </Select>
         {/** Required for support form field comments */}
         {inputEndAdornment}
@@ -174,6 +191,19 @@ export function ProjectProfileInputField({
           />
         </Box>
       )}
+      <Modal
+        size='large'
+        open={importOpProjectPopupState.isOpen}
+        onClose={importOpProjectPopupState.close}
+        title='Import project from OP'
+      >
+        <Stack gap={1}>
+          <Link href='https://www.agora.xyz/deploy' target='_blank'>
+            Create a project on Agora
+          </Link>
+          <OpProjectsList />
+        </Stack>
+      </Modal>
     </Stack>
   );
 }
