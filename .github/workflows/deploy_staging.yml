@@ -31,7 +31,8 @@ jobs:
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
-          stack=$(( case '${{ github.event.label.name }}' in ':rocket: deploy') echo 'stg-webapp';; ':rocket: deploy-connect') echo 'stg-connect';; *) echo 'stg-default';; esac ))
+          if [ ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy')}} ]; then stack='stg-webapp'; fi
+          if [ ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect')}} ]; then stack='stg-connect'; fi
           echo "STACK=$stack" >> $GITHUB_ENV
           echo "STAGE_NAME=$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
