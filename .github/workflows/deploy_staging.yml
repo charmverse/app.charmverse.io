@@ -157,10 +157,10 @@ jobs:
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
-      - name: Update and Package connect app
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+      # - name: Update and Package connect app
+      #   run: |
+      #     rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
+      #     cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Deploy to staging
         id: cdk_deploy
