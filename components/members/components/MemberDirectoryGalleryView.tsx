@@ -165,14 +165,12 @@ function MemberDirectoryGalleryCard({
             }
             case 'farcaster': {
               return (
-                member.farcasterUser?.account && (
+                member.farcasterUser && (
                   <Stack key={property.id}>
                     <Typography fontWeight='bold' variant='subtitle2'>
                       Farcaster
                     </Typography>
-                    <Typography variant='body2'>
-                      {(member.farcasterUser.account as FarcasterProfile['body']).username}
-                    </Typography>
+                    <Typography variant='body2'>{member.farcasterUser.username}</Typography>
                   </Stack>
                 )
               );

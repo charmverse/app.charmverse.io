@@ -177,11 +177,7 @@ function MemberDirectoryTableRow({
             case 'farcaster': {
               return (
                 <TableCell key={property.id}>
-                  <Typography variant='body2'>
-                    {member.farcasterUser?.account
-                      ? (member.farcasterUser.account as FarcasterProfile['body']).username
-                      : '-'}
-                  </Typography>
+                  <Typography variant='body2'>{member.farcasterUser ? member.farcasterUser.username : '-'}</Typography>
                 </TableCell>
               );
             }

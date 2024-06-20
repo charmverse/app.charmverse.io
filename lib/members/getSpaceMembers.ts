@@ -2,6 +2,7 @@ import type { MemberProperty } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
+import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import {
   getAccessibleMemberPropertiesBySpace,
   getAllMemberPropertiesBySpace
@@ -144,7 +145,11 @@ export async function getSpaceMembers({
           searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, memberUsernameRecord[spaceRole.id]),
           roles,
           isBot: userData.isBot ?? undefined,
-          farcasterUser: userData.farcasterUser || undefined
+          farcasterUser: userData.farcasterUser?.account
+            ? {
+                username: (userData.farcasterUser?.account as unknown as FarcasterProfile['body']).username
+              }
+            : undefined
         };
       })
       // filter out deleted members

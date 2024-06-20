@@ -1,13 +1,9 @@
-import { AuthKitProvider } from '@farcaster/auth-kit';
 import { Stack, Typography } from '@mui/material';
-import { type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 
 import { useAddUserWallets } from 'charmClient/hooks/profile';
-import { Button } from 'components/common/Button';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
-import { FarcasterLoginModal } from 'components/login/components/FarcasterModal';
 import { WalletSign } from 'components/login/components/WalletSign';
-import { useWarpcastLogin } from 'components/login/components/WarpcastLogin';
 import { TelegramLoginIframe } from 'components/settings/account/components/TelegramLoginIframe';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
@@ -17,44 +13,20 @@ import { useUser } from 'hooks/useUser';
 import { useAccount } from 'hooks/wagmi';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { warpcastConfig } from 'lib/farcaster/config';
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import { shortenHex } from 'lib/utils/blockchain';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useRequiredMemberProperties } from '../../members/hooks/useRequiredMemberProperties';
 
-function ConnectedAccount({
-  icon,
-  label,
-  required,
-  disabled,
-  children,
-  onClick,
-  loading
-}: {
-  required: boolean;
-  label: string;
-  icon: ReactNode;
-  disabled?: boolean;
-  children?: ReactNode;
-  onClick?: VoidFunction;
-  loading?: boolean;
-}) {
-  return (
-    <Stack gap={1} minWidth={275} width='fit-content'>
-      <FieldWrapper label={label} required={required}>
-        <Button loading={loading} onClick={onClick} color='secondary' variant='outlined' disabled={disabled}>
-          <Stack flexDirection='row' alignItems='center' justifyContent='space-between' width='100%' gap={2}>
-            {children}
-            {!loading ? icon : null}
-          </Stack>
-        </Button>
-      </FieldWrapper>
-    </Stack>
-  );
-}
+import { ConnectedAccount } from './ConnectedAccount';
+
+const FarcasterConnect = dynamic(
+  () => import('./FarcasterConnect').then((module) => module.FarcasterConnectWithProvider),
+  {
+    ssr: false
+  }
+);
 
 function DiscordAccountConnect({
   isDiscordRequired,
@@ -189,43 +161,6 @@ function TelegramAccountConnect({
   );
 }
 
-function FarcasterConnect({
-  isFarcasterRequired,
-  connectedFarcasterAccount,
-  setIsOnboardingModalOpen
-}: {
-  setIsOnboardingModalOpen: (isOpen: boolean) => void;
-  isFarcasterRequired: boolean;
-  connectedFarcasterAccount?: LoggedInUser['farcasterUser'];
-}) {
-  const { close, isLoading, isOpen, signIn, url } = useWarpcastLogin({
-    type: 'connect'
-  });
-
-  const farcasterProfile = connectedFarcasterAccount?.account as FarcasterProfile['body'];
-
-  return (
-    <ConnectedAccount
-      label='Farcaster'
-      required={isFarcasterRequired}
-      disabled={!!connectedFarcasterAccount || isLoading}
-      onClick={() => {
-        setIsOnboardingModalOpen(true);
-        signIn();
-      }}
-      loading={isLoading}
-      icon={<IdentityIcon type='Farcaster' size='small' />}
-    >
-      {!farcasterProfile ? (
-        <Typography variant='subtitle1'>Connect with Farcaster</Typography>
-      ) : (
-        <Typography variant='subtitle1'>Connected as {farcasterProfile.username}</Typography>
-      )}
-      <FarcasterLoginModal open={isOpen} onClose={close} url={url} />
-    </ConnectedAccount>
-  );
-}
-
 function GoogleAccountConnect({
   isGoogleRequired,
   connectedGoogleAccount,
@@ -298,13 +233,7 @@ export function ConnectedAccounts({
         isWalletRequired={isWalletRequired}
         connectedWallet={connectedWallet}
       />
-      <AuthKitProvider config={warpcastConfig}>
-        <FarcasterConnect
-          isFarcasterRequired={isFarcasterRequired}
-          connectedFarcasterAccount={connectedFarcaster}
-          setIsOnboardingModalOpen={setIsOnboardingModalOpen}
-        />
-      </AuthKitProvider>
+      <FarcasterConnect isFarcasterRequired={isFarcasterRequired} connectedFarcasterAccount={connectedFarcaster} />
     </Stack>
   );
 }
