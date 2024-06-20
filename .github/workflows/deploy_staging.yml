@@ -155,7 +155,9 @@ jobs:
           aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Override config with Connect app
-        if: contains(github.event.label.name, 'deploy-connect')
+        # wrap the condition in "${{}}" because the string includes a colon
+        # see https://github.com/actions/runner/issues/1019
+        if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') }}"
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
 
@@ -165,7 +167,6 @@ jobs:
 
       - name: Deploy to staging
         id: cdk_deploy
-        # npm run deploy:staging
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
           npx cdk deploy -c stack=${{env.STACK}} -c name=${{env.STAGE_NAME}} --outputs-file cdk.out.json

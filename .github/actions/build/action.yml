@@ -62,5 +62,6 @@ runs:
           .env.test.local
           dist
           background/ceramicServer/generated
-        # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
+          apps/connect/.next
+          apps/connect-api/dist
         key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!dont_cache') }}
