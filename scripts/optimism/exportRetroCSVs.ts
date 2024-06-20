@@ -243,6 +243,6 @@ async function exportReviewers() {
   writeFileSync(reviewersFile, csvString);
 }
 
-// exportFullReviewSummary().catch(console.error);
+exportFullReviewSummary().catch(console.error);
 
 exportReviewers().catch(console.error);

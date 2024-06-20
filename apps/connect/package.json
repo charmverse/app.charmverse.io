@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mui/material-nextjs": "^5.15.11",
-    "material-ui-popup-state": "^5.1.2"
+    "material-ui-popup-state": "^5.1.2",
+    "server-only": "^0.0.1"
   }
 }
