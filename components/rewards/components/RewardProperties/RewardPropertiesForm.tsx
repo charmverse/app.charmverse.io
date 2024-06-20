@@ -3,9 +3,13 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { REWARD_PROPOSAL_LINK } from 'lib/rewards/blocks/constants';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+import { getAbsolutePath } from 'lib/utils/browser';
 import { isTruthy } from 'lib/utils/types';
 
 import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
@@ -40,6 +44,7 @@ export function RewardPropertiesForm({
   readOnlyTemplate,
   rewardStatus
 }: Props) {
+  const { space } = useCurrentSpace();
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {
@@ -53,7 +58,11 @@ export function RewardPropertiesForm({
 
     onChange(updates);
   }
-
+  const sourceProposalPage = (values as RewardWithUsers).sourceProposalPage;
+  const proposalLinkValue = sourceProposalPage
+    ? [getAbsolutePath(`/${sourceProposalPage.id}`, space?.domain), sourceProposalPage.title]
+    : '';
+  const rewards = values as unknown as BoardReward;
   return (
     <Box
       className='CardDetail content'
@@ -98,10 +107,19 @@ export function RewardPropertiesForm({
         <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <CustomPropertiesAdapter
             readOnly={readOnly}
-            reward={values as unknown as BoardReward}
+            reward={{
+              ...rewards,
+              fields: {
+                ...rewards.fields,
+                properties: {
+                  ...rewards.fields?.properties,
+                  [REWARD_PROPOSAL_LINK]: proposalLinkValue
+                }
+              }
+            }}
             onChange={(properties: RewardPropertiesField) => {
               applyUpdates({
-                fields: { properties: properties ? { ...properties } : {} } as Prisma.JsonValue
+                fields: { properties: { ...properties } } as Prisma.JsonValue
               });
             }}
           />

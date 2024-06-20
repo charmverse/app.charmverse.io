@@ -26,7 +26,8 @@ export function RewardAmount({
   fullForm,
   noRewardText,
   noAmountText,
-  requireTokenAmount
+  requireTokenAmount,
+  showFullCustomRewardText
 }: {
   noRewardText?: string;
   noAmountText?: string;
@@ -35,6 +36,7 @@ export function RewardAmount({
   truncatePrecision?: number;
   typographyProps?: TypographyProps;
   requireTokenAmount?: boolean;
+  showFullCustomRewardText?: boolean;
 }) {
   const [paymentMethods] = usePaymentMethods();
 
@@ -43,7 +45,9 @@ export function RewardAmount({
       <Tooltip title={reward.customReward}>
         <Stack flexDirection='row' gap={0.5} alignItems='center'>
           <RewardIcon fontSize='small' color='secondary' />
-          <Typography {...typographyProps}>{fancyTrim(reward.customReward, 15)}</Typography>
+          <Typography {...typographyProps}>
+            {showFullCustomRewardText ? reward.customReward : fancyTrim(reward.customReward, 15)}
+          </Typography>
         </Stack>
       </Tooltip>
     );

@@ -23,6 +23,12 @@ type EvaluationStep = {
   rubricCriteria: {
     title: string;
     description?: string | null;
+    answers: {
+      user: {
+        id: string;
+        username: string;
+      };
+    }[];
   }[];
 };
 
@@ -85,9 +91,7 @@ export function getBoardProperties({
   // properties related to project profile
   applyProjectProfileProperties(boardProperties);
 
-  boardProperties.forEach((property) => {
-    property.name = getPropertyName(property);
-  });
+  applyRubricEvaluationReviewerProperties(boardProperties, evaluationSteps);
 
   if (!selectedProperties) {
     return boardProperties;
@@ -97,6 +101,59 @@ export function getBoardProperties({
     boardProperties,
     proposalCustomProperties,
     selectedProperties
+  });
+}
+
+function applyRubricEvaluationReviewerProperties(
+  boardProperties: IPropertyTemplate[],
+  evaluationSteps: EvaluationStep[]
+) {
+  evaluationSteps.forEach((evaluationStep) => {
+    if (evaluationStep.type === 'rubric') {
+      evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
+        rubricCriteria.answers.forEach((answer) => {
+          const existingCriteriaReviewerScorePropIndex = boardProperties.findIndex(
+            (p) =>
+              p.type === 'proposalRubricCriteriaReviewerScore' &&
+              p.evaluationTitle === evaluationStep.title &&
+              p.criteriaTitle === rubricCriteria.title &&
+              p.reviewerId === answer.user.id
+          );
+          if (existingCriteriaReviewerScorePropIndex === -1) {
+            boardProperties.push({
+              id: uuid(),
+              type: 'proposalRubricCriteriaReviewerScore',
+              name: `${evaluationStep.title} - ${rubricCriteria.title} - ${answer.user.username} - Score`,
+              evaluationTitle: evaluationStep.title,
+              criteriaTitle: rubricCriteria.title,
+              reviewerId: answer.user.id,
+              private: false,
+              options: []
+            });
+          }
+
+          const existingCriteriaReviewerCommentPropIndex = boardProperties.findIndex(
+            (p) =>
+              p.type === 'proposalRubricCriteriaReviewerComment' &&
+              p.evaluationTitle === evaluationStep.title &&
+              p.criteriaTitle === rubricCriteria.title &&
+              p.reviewerId === answer.user.id
+          );
+          if (existingCriteriaReviewerCommentPropIndex === -1) {
+            boardProperties.push({
+              id: uuid(),
+              type: 'proposalRubricCriteriaReviewerComment',
+              name: `${evaluationStep.title} - ${rubricCriteria.title} - ${answer.user.username} - Comment`,
+              evaluationTitle: evaluationStep.title,
+              criteriaTitle: rubricCriteria.title,
+              reviewerId: answer.user.id,
+              private: false,
+              options: []
+            });
+          }
+        });
+      });
+    }
   });
 }
 
@@ -129,7 +186,19 @@ function applyRubricEvaluationQuestionProperties(
       applyToPropertiesByTypeAndName(boardProperties, {
         id: uuid(),
         type: 'proposalRubricCriteriaTotal',
-        name: `${evaluationTitle}: ${rubricCriteriaTitle}`,
+        name: `${evaluationTitle}: ${rubricCriteriaTitle} (Criteria total)`,
+        tooltip: rubricCriteriaDescription,
+        readOnly: true,
+        readOnlyValues: true,
+        evaluationTitle,
+        criteriaTitle: rubricCriteriaTitle,
+        private: false
+      });
+
+      applyToPropertiesByTypeAndName(boardProperties, {
+        id: uuid(),
+        type: 'proposalRubricCriteriaAverage',
+        name: `${evaluationTitle}: ${rubricCriteriaTitle} (Criteria average)`,
         tooltip: rubricCriteriaDescription,
         readOnly: true,
         readOnlyValues: true,
@@ -219,21 +288,21 @@ function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[],
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluatedBy',
-      name: rubricStepTitle,
+      name: `${rubricStepTitle} (Step reviewers)`,
       evaluationTitle: rubricStepTitle
     });
 
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationTotal',
-      name: rubricStepTitle,
+      name: `${rubricStepTitle} (Step total)`,
       evaluationTitle: rubricStepTitle
     });
 
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationAverage',
-      name: rubricStepTitle,
+      name: `${rubricStepTitle} (Step average)`,
       evaluationTitle: rubricStepTitle
     });
   }
@@ -299,16 +368,4 @@ function applyFormFieldToProperties(
     const existingProp = boardProperties[existingPropIndex];
     boardProperties[existingPropIndex] = { id: existingProp.id, ...defaultOptions, ...fieldProperty };
   }
-}
-
-function getPropertyName(property: IPropertyTemplate) {
-  return property.type === 'proposalEvaluatedBy'
-    ? `${property.name} (Step reviewers)`
-    : property.type === 'proposalEvaluationAverage'
-    ? `${property.name} (Step average)`
-    : property.type === 'proposalEvaluationTotal'
-    ? `${property.name} (Step total)`
-    : property.type === 'proposalRubricCriteriaTotal'
-    ? `${property.name} (Criterial total)`
-    : property.name;
 }

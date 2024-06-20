@@ -1,6 +1,6 @@
 
 # dependencies
-/node_modules
+/**/node_modules
 jspm_packages
 
 /prisma
@@ -15,6 +15,15 @@ serverless/*.node
 /.next/
 /out/
 /dist/
+
+# connect app
+/apps/connect/.next/
+/apps/connect/dist/
+/apps/connect/node_modules/
+
+# connect api
+/apps/connect-api/dist/
+/apps/connect/node_modules/
 
 # Tests
 /__e2e-dist__/
@@ -65,3 +74,5 @@ storybook-static
 build-storybook.log
 # Storybook dev server cache folder
 .cache
+
+

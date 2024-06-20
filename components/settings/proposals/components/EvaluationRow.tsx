@@ -1,4 +1,4 @@
-import type { ProposalEvaluationType } from '@charmverse/core/dist/cjs/prisma-client';
+import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { privateEvaluationSteps, type WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import { DragIndicator } from '@mui/icons-material';

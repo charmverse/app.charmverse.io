@@ -1,5 +1,7 @@
 import { log } from '@charmverse/core/log';
+import type { StatusAPIResponse as FarcasterAccount } from '@farcaster/auth-kit';
 import List from '@mui/material/List';
+import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 
 import { useAddUserWallets } from 'charmClient/hooks/profile';
@@ -23,6 +25,11 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 import IdentityProviderItem from './IdentityProviderItem';
 import { TELEGRAM_BOT_ID } from './TelegramLoginIframe';
 
+const WarpcastLogin = dynamic(
+  () => import('components/login/components/WarpcastLogin').then((module) => module.WarpcastLogin),
+  { ssr: false }
+);
+
 type Props = {
   isOpen: boolean;
   onClose: () => void;
@@ -42,6 +49,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const sendingMagicLink = useRef(false);
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
+  const farcasterAccount = user?.farcasterUser?.account as Partial<FarcasterAccount> | undefined;
   const [identityToAdd, setIdentityToAdd] = useState<'email' | 'wallet' | null>(null);
   const isUserWalletActive = !!user?.wallets?.some((w) => lowerCaseEqual(w.address, account));
   const { isOnCustomDomain } = useCustomDomain();
@@ -154,6 +162,11 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               >
                 Connect
               </PrimaryButton>
+            </IdentityProviderItem>
+          )}
+          {!farcasterAccount && (
+            <IdentityProviderItem type='Farcaster'>
+              <WarpcastLogin type='connect' />
             </IdentityProviderItem>
           )}
           {(!user?.googleAccounts || user.googleAccounts.length === 0) && (

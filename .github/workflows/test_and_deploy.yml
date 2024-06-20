@@ -117,6 +117,8 @@ jobs:
             test_command: 'npm run test:browser'
           - test_name: 'Serverless tests'
             test_command: 'npm run serverless:start & sleep 10 && npm run test:serverless'
+          - test_name: 'Connect API - Tests'
+            test_command: 'npm run connect-api:test'
 
     steps:
       - uses: actions/checkout@v4
@@ -333,6 +335,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
+        with:
+          ecr_registry: charmverse-web3-workspace
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master

@@ -195,6 +195,10 @@ export function NewRewardPage({
     setPageTitle('');
     setActiveView('reward_evaluation');
     setDefaultView(null);
+    return () => {
+      // clear sidebar so we
+      setActiveView(null);
+    };
   }, []);
 
   useEffect(() => {

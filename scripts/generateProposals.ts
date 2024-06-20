@@ -45,7 +45,11 @@ async function generateRubricProposals({ spaceIdOrDomain, amount, complete, sele
 
     await prisma.proposalRubricCriteriaAnswer.create({
       data: {
-        userId: space.createdBy,
+        user: {
+          connect: {
+            id: space.createdBy
+          }
+        },
         comment: 'test',
         evaluation: { connect: { id: evaluation.id } },
         proposal: { connect: { id: proposal.id } },

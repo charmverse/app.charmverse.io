@@ -65,7 +65,13 @@ export function ViewSettingsRow({ activeView, canSaveGlobally, sx }: Props) {
   return (
     <Stack flex={1} direction='row' justifyContent='flex-end' mx={2} gap={1} sx={sx}>
       <Tooltip title={`Reset local ${getSettingsLabel()} to global default`}>
-        <Button onClick={resetLocalSettings} variant='text' color='secondary' size='small'>
+        <Button
+          data-test='reset-database-filters'
+          onClick={resetLocalSettings}
+          variant='text'
+          color='secondary'
+          size='small'
+        >
           {canSaveGlobally ? 'Reset' : `Reset default ${getSettingsLabel()}`}
         </Button>
       </Tooltip>

@@ -1,3 +1,5 @@
+'use client';
+
 import styled from '@emotion/styled';
 import { Tooltip } from '@mui/material';
 import MaterialButton from '@mui/material/Button';

@@ -45,7 +45,7 @@ export function ProposalEvaluations({
   templateId,
   isProposalTemplate,
   isStructuredProposal,
-  expanded = true,
+  expanded,
   pageLensPostLink,
   refreshPage
 }: ProposalEvaluationsProps) {
@@ -57,10 +57,10 @@ export function ProposalEvaluations({
         proposal={proposalInput}
         readOnly={!!readOnlyProposalPermissions}
         templateId={templateId}
+        expandedSidebar={expanded}
         onChangeEvaluation={onChangeEvaluation}
         onChangeTemplate={onChangeTemplate}
         onChangeWorkflow={onChangeWorkflow}
-        expanded={expanded}
         isTemplate={isProposalTemplate}
         onChangeRewardSettings={onChangeRewardSettings}
         onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
@@ -81,7 +81,7 @@ export function ProposalEvaluations({
         refreshProposal={refreshProposal}
         refreshPage={refreshPage}
         templateId={templateId}
-        expanded={expanded}
+        expanded={expanded ?? true}
       />
     );
   }

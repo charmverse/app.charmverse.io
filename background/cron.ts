@@ -17,6 +17,7 @@ import { task as processSynapsWebhookMessages } from './tasks/processSynapsWebho
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
 import { refreshDocusignOAuthTask } from './tasks/refreshDocusignOAuthTask';
 import { sendDraftProposalNotificationTask } from './tasks/sendDraftProposalNotificationTask';
+import { syncOptimismReviewsTask } from './tasks/syncOptimismReviews';
 import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
@@ -74,6 +75,8 @@ cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
 
 // Refresh docusign credentials every 6 hours
 cron.schedule('0 */6 * * *', refreshDocusignOAuthTask);
+// Sync op reviews every 15 minutes - remove by July 2024
+cron.schedule('*/15 * * * *', syncOptimismReviewsTask);
 
 const port = process.env.PORT || 4000;
 

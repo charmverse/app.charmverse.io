@@ -6,57 +6,17 @@ import { prisma } from '@charmverse/core/prisma-client';
  */
 
 async function search() {
-
-  const proposals = await prisma.proposal.findMany({
+  const result = await prisma.user.findFirst({
     where: {
-      space: {domain: 'op-grants'},
+      username: 'mattcasey.eth'
     },
-    select: {
-      status: true,
-      archived: true,
-      evaluations: {
-        select: {
-          index: true,
-          result: true,
-          type: true,
-        }
-      }
+    include: {
+      verifiedEmails: true,
+      wallets: true,
+      googleAccounts: true,
+      spaceRoles: true
     }
   });
-
-  const totalProposals = proposals.length;
-
-  const proposalsByStatus = proposals.reduce((acc, proposal) => {
-
-    if (proposal.archived) {
-      acc.archived++;
-      return acc;
-    } 
-
-
-    if (proposal.status === 'draft') {
-      acc.draft++;
-      return acc;
-    }
-
-    const currentStep = getCurrentEvaluation(proposal.evaluations);
-
-    if (currentStep) {
-       if (currentStep.result === 'pass') {
-        acc.pass++;
-      } else if (currentStep.result === 'fail') {
-        acc.fail++;
-      } else if (currentStep.result === null) {
-        acc.pending++;
-      } 
-    }
-
-    return acc;
-
-  }, {draft: 0, pending: 0, pass: 0, fail: 0, archived: 0});
-
-  console.log('Total proposals:', totalProposals);
-  console.log('Proposals by status:', proposalsByStatus);
-
+  console.log(result);
 }
 search().then(() => console.log('Done'));

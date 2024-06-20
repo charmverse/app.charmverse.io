@@ -1,5 +1,6 @@
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
+import { prettyPrint } from 'lib/utils/strings';
 
 import type { IPropertyTemplate } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';
@@ -20,67 +21,76 @@ export function filterBoardProperties({
   const proposalCustomPropertyIds = proposalCustomProperties.map((p) => p.id);
 
   return boardProperties.filter((p) => {
-    if (p.formFieldId && selectedFormFields.includes(p.formFieldId)) {
-      return true;
+    if (p.formFieldId) {
+      return selectedFormFields.includes(p.formFieldId);
     }
 
     const matchedProjectFieldProperty = projectFieldProperties.find((field) => field.columnPropertyId === p.id);
 
-    if (matchedProjectFieldProperty && selectedProjectProperties.includes(matchedProjectFieldProperty.field)) {
-      return true;
+    if (matchedProjectFieldProperty) {
+      return selectedProjectProperties.includes(matchedProjectFieldProperty.field);
     }
 
     const matchedProjectMemberFieldProperty = projectMemberFieldProperties.find(
       (field) => field.columnPropertyId === p.id
     );
 
-    if (
-      matchedProjectMemberFieldProperty &&
-      selectedProjectMemberProperties.includes(matchedProjectMemberFieldProperty.field)
-    ) {
-      return true;
+    if (matchedProjectMemberFieldProperty) {
+      return selectedProjectMemberProperties.includes(matchedProjectMemberFieldProperty.field);
     }
 
-    if (proposalCustomPropertyIds.includes(p.id) && selectedCustomProperties.includes(p.id)) {
-      return true;
+    if (proposalCustomPropertyIds.includes(p.id)) {
+      return selectedCustomProperties.includes(p.id);
     }
 
     const isDefaultProposalProperty = defaultProposalPropertyTypes.includes(p.type);
 
-    if (
-      isDefaultProposalProperty &&
-      selectedProperties.defaults.includes(p.type as SelectedProposalProperties['defaults'][number])
-    ) {
-      return true;
+    if (isDefaultProposalProperty) {
+      return selectedProperties.defaults.includes(p.type as SelectedProposalProperties['defaults'][number]);
     }
 
     if (
       p.type === 'proposalEvaluationAverage' ||
       p.type === 'proposalEvaluationTotal' ||
       p.type === 'proposalEvaluatedBy' ||
-      p.type === 'proposalRubricCriteriaTotal'
+      p.type === 'proposalRubricCriteriaTotal' ||
+      p.type === 'proposalRubricCriteriaReviewerComment' ||
+      p.type === 'proposalRubricCriteriaReviewerScore' ||
+      p.type === 'proposalRubricCriteriaAverage'
     ) {
       const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
       if (!rubricEvaluation) {
         return false;
       }
-      if (rubricEvaluation.average && p.type === 'proposalEvaluationAverage') {
-        return true;
+      if (p.type === 'proposalEvaluationAverage') {
+        return !!rubricEvaluation.average;
       }
 
-      if (rubricEvaluation.total && p.type === 'proposalEvaluationTotal') {
-        return true;
+      if (p.type === 'proposalEvaluationTotal') {
+        return !!rubricEvaluation.total;
       }
 
-      if (rubricEvaluation.reviewers && p.type === 'proposalEvaluatedBy') {
-        return true;
+      if (p.type === 'proposalEvaluatedBy') {
+        return !!rubricEvaluation.reviewers;
       }
 
-      if (rubricEvaluation.criteriaTotal && p.type === 'proposalRubricCriteriaTotal') {
-        return true;
+      if (p.type === 'proposalRubricCriteriaTotal') {
+        return !!rubricEvaluation.criteriaTotal;
+      }
+
+      if (p.type === 'proposalRubricCriteriaReviewerComment') {
+        return !!rubricEvaluation.reviewerComment;
+      }
+
+      if (p.type === 'proposalRubricCriteriaReviewerScore') {
+        return !!rubricEvaluation.reviewerScore;
+      }
+
+      if (p.type === 'proposalRubricCriteriaAverage') {
+        return !!rubricEvaluation.criteriaAverage;
       }
     }
-
-    return false;
+    // Custom proposal source board properties, so always show them
+    return true;
   });
 }

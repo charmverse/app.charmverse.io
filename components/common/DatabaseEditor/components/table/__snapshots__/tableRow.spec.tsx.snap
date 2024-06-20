@@ -67,11 +67,11 @@ exports[`components/table/TableRow should match snapshot 1`] = `
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                     placeholder="Untitled"
                     type="text"
                     value="Page Title"
@@ -171,11 +171,11 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                     placeholder="Untitled"
                     type="text"
                     value="Page Title"
@@ -342,11 +342,11 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                     placeholder="Untitled"
                     type="text"
                     value="Page Title"
@@ -421,11 +421,11 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-readOnly MuiInputBase-readOnly css-2umbt5-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-readOnly MuiInputBase-readOnly css-t4vlgn-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Mui-readOnly Editable readonly octo-propertyvalue MuiInputBase-readOnly css-yz9k0d-MuiInputBase-input"
+                    class="MuiInputBase-input Mui-readOnly Editable readonly octo-propertyvalue MuiInputBase-readOnly css-l7ze9l-MuiInputBase-input"
                     placeholder="Untitled"
                     readonly=""
                     type="text"
@@ -526,11 +526,11 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                     placeholder="Untitled"
                     type="text"
                     value="Page Title"
@@ -679,11 +679,11 @@ exports[`components/table/TableRow should match snapshots with a nested row 1`] 
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                     placeholder="Untitled"
                     type="text"
                     value="Page Title"

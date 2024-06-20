@@ -89,32 +89,46 @@ describe('filterBoardProperties', () => {
   });
 
   it('Should filter out custom properties that are not selected', () => {
-    const customPropertyId = v4();
+    const customProperty1Id = v4();
+    const customProperty3Id = v4();
     const properties = filterBoardProperties({
       boardProperties: [
         {
-          id: customPropertyId,
+          id: customProperty1Id,
           type: 'text',
           name: 'Custom property 1',
           options: []
         },
+        // Custom proposal source board properties
         {
           id: v4(),
           type: 'text',
           name: 'Custom property 2',
           options: []
+        },
+        {
+          id: customProperty3Id,
+          type: 'text',
+          name: 'Custom property 3',
+          options: []
         }
       ],
       proposalCustomProperties: [
         {
-          id: customPropertyId,
+          id: customProperty1Id,
           type: 'text',
           name: 'Custom property 1',
+          options: []
+        },
+        {
+          id: customProperty3Id,
+          type: 'text',
+          name: 'Custom property 3',
           options: []
         }
       ],
       selectedProperties: {
-        customProperties: [customPropertyId],
+        customProperties: [customProperty1Id],
         defaults: [],
         formFields: [],
         project: [],
@@ -123,8 +137,11 @@ describe('filterBoardProperties', () => {
       }
     });
 
-    expect(properties.length).toBe(1);
-    expect(properties[0].name).toBe('Custom property 1');
+    expect(properties.length).toBe(2);
+    const customProperty1 = properties.find((p) => p.id === customProperty1Id);
+    const customProperty2 = properties.find((p) => p.name === 'Custom property 2');
+    expect(customProperty1).toBeTruthy();
+    expect(customProperty2).toBeTruthy();
   });
 
   it('Should filter out default properties that are not selected', () => {
@@ -138,8 +155,8 @@ describe('filterBoardProperties', () => {
         },
         {
           id: v4(),
-          type: 'text',
-          name: 'Default property 2',
+          type: 'proposalStep',
+          name: 'Proposal step',
           options: []
         }
       ],
@@ -203,12 +220,161 @@ describe('filterBoardProperties', () => {
     expect(properties[0].type).toBe('proposalEvaluationAverage');
   });
 
+  it('Should filter out rubric evaluations criteria reviewer properties that are not selected', () => {
+    const user1Id = v4();
+    const user2Id = v4();
+
+    const properties = filterBoardProperties({
+      boardProperties: [
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaReviewerComment',
+          name: 'Rubric 1 - Criteria 1 - User 1 - Comment',
+          options: [],
+          criteriaTitle: 'Criteria 1',
+          reviewerId: user1Id,
+          evaluationTitle: 'Rubric 1'
+        },
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaReviewerScore',
+          name: 'Rubric 1 - Criteria 1 - User 1 - Score',
+          options: [],
+          criteriaTitle: 'Criteria 1',
+          reviewerId: user1Id,
+          evaluationTitle: 'Rubric 1'
+        },
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaReviewerScore',
+          name: 'Rubric 1 - Criteria 1 - User 2 - Score',
+          options: [],
+          criteriaTitle: 'Criteria 1',
+          reviewerId: user2Id,
+          evaluationTitle: 'Rubric 1'
+        },
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaReviewerComment',
+          name: 'Rubric 2 - Criteria 1 - User 1 - Comment',
+          options: [],
+          criteriaTitle: 'Criteria 2',
+          reviewerId: user1Id,
+          evaluationTitle: 'Rubric 2'
+        },
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaReviewerScore',
+          name: 'Rubric 2 - Criteria 1 - User 1 - Score',
+          options: [],
+          criteriaTitle: 'Criteria 2',
+          reviewerId: user1Id,
+          evaluationTitle: 'Rubric 2'
+        }
+      ],
+      proposalCustomProperties: [],
+      selectedProperties: {
+        customProperties: [],
+        defaults: [],
+        formFields: [],
+        project: [],
+        projectMember: [],
+        rubricEvaluations: [
+          {
+            title: 'Rubric 1',
+            reviewerComment: true,
+            reviewerScore: true
+          },
+          {
+            title: 'Rubric 2',
+            reviewerComment: true,
+            reviewerScore: false
+          }
+        ]
+      }
+    });
+
+    const rubricCriteria1Reviewer1Comment = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 1' &&
+        p.reviewerId === user1Id &&
+        p.type === 'proposalRubricCriteriaReviewerComment' &&
+        p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria1Reviewer1Score = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 1' &&
+        p.reviewerId === user1Id &&
+        p.type === 'proposalRubricCriteriaReviewerScore' &&
+        p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria1Reviewer2Comment = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 1' &&
+        p.reviewerId === user2Id &&
+        p.type === 'proposalRubricCriteriaReviewerComment' &&
+        p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria1Reviewer2Score = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 1' &&
+        p.reviewerId === user2Id &&
+        p.type === 'proposalRubricCriteriaReviewerScore' &&
+        p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria2Reviewer1Comment = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 2' &&
+        p.reviewerId === user1Id &&
+        p.type === 'proposalRubricCriteriaReviewerComment' &&
+        p.criteriaTitle === 'Criteria 2'
+    );
+    const rubricCriteria2Reviewer1Score = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 2' &&
+        p.reviewerId === user1Id &&
+        p.type === 'proposalRubricCriteriaReviewerScore' &&
+        p.criteriaTitle === 'Criteria 2'
+    );
+    const rubricCriteria2Reviewer2Comment = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 2' &&
+        p.reviewerId === user2Id &&
+        p.type === 'proposalRubricCriteriaReviewerComment' &&
+        p.criteriaTitle === 'Criteria 2'
+    );
+    const rubricCriteria2Reviewer2Score = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 2' &&
+        p.reviewerId === user2Id &&
+        p.type === 'proposalRubricCriteriaReviewerScore' &&
+        p.criteriaTitle === 'Criteria 2'
+    );
+
+    expect(rubricCriteria1Reviewer1Comment).toBeTruthy();
+    expect(rubricCriteria1Reviewer1Score).toBeTruthy();
+    expect(rubricCriteria1Reviewer2Comment).toBeFalsy();
+    expect(rubricCriteria1Reviewer2Score).toBeTruthy();
+
+    expect(rubricCriteria2Reviewer1Comment).toBeTruthy();
+    expect(rubricCriteria2Reviewer1Score).toBeFalsy();
+    expect(rubricCriteria2Reviewer2Comment).toBeFalsy();
+    expect(rubricCriteria2Reviewer2Score).toBeFalsy();
+  });
+
   it(`Should filter out rubric criterial total properties that are not selected`, () => {
     const properties = filterBoardProperties({
       boardProperties: [
         {
           id: v4(),
           type: 'proposalRubricCriteriaTotal',
+          name: 'Rubric 1',
+          options: [],
+          evaluationTitle: 'Rubric 1'
+        },
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaAverage',
           name: 'Rubric 1',
           options: [],
           evaluationTitle: 'Rubric 1'
@@ -231,13 +397,21 @@ describe('filterBoardProperties', () => {
         rubricEvaluations: [
           {
             title: 'Rubric 1',
-            criteriaTotal: true
+            criteriaTotal: true,
+            criteriaAverage: true
           }
         ]
       }
     });
 
-    expect(properties.length).toBe(1);
-    expect(properties[0].type).toBe('proposalRubricCriteriaTotal');
+    const rubric1CriteriaTotalProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.evaluationTitle === 'Rubric 1'
+    );
+    const rubric1CriteriaAverageProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaAverage' && p.evaluationTitle === 'Rubric 1'
+    );
+    expect(properties.length).toBe(2);
+    expect(rubric1CriteriaTotalProperty).toBeTruthy();
+    expect(rubric1CriteriaAverageProperty).toBeTruthy();
   });
 });

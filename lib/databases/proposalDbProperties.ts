@@ -92,11 +92,29 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalRubricCriteriaTotal'
   }),
+  proposalRubricCriteriaAverage: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Average',
+    options: [],
+    type: 'proposalRubricCriteriaAverage'
+  }),
   proposalAuthor: ({ name } = {}) => ({
     id: AUTHORS_BLOCK_ID,
     name: name || 'Proposal Authors',
     options: [],
     type: 'proposalAuthor'
+  }),
+  proposalRubricCriteriaReviewerComment: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Reviewer Comment',
+    options: [],
+    type: 'proposalRubricCriteriaReviewerComment'
+  }),
+  proposalRubricCriteriaReviewerScore: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Reviewer Score',
+    options: [],
+    type: 'proposalRubricCriteriaReviewerScore'
   }),
   // This is for only the current reviewers
   proposalReviewer: () => ({

@@ -14,6 +14,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useUser } from 'hooks/useUser';
+import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import type { Member, Social } from 'lib/members/interfaces';
 
 import { MemberPropertyTextMultiline } from './MemberPropertyTextMultiline';
@@ -41,7 +42,6 @@ function MemberDirectoryGalleryCard({
   member: Member;
 }) {
   const { formatDate } = useDateFormatter();
-
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
   const { openEditProfile } = useMemberProfileDialog();
@@ -159,6 +159,18 @@ function MemberDirectoryGalleryCard({
                 member.profile?.timezone && (
                   <Stack flexDirection='row' gap={1} key={property.id}>
                     <TimezoneDisplay showTimezone timezone={member.profile.timezone} />
+                  </Stack>
+                )
+              );
+            }
+            case 'farcaster': {
+              return (
+                member.farcasterUser && (
+                  <Stack key={property.id}>
+                    <Typography fontWeight='bold' variant='subtitle2'>
+                      Farcaster
+                    </Typography>
+                    <Typography variant='body2'>{member.farcasterUser.username}</Typography>
                   </Stack>
                 )
               );

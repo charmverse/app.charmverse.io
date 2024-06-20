@@ -10,8 +10,10 @@ export function CopyPageLinkAction({
   path,
   onComplete,
   message,
-  typographyProps
+  typographyProps,
+  isApplication
 }: {
+  isApplication?: boolean;
   path: string;
   onComplete?: VoidFunction;
   message?: string;
@@ -26,7 +28,13 @@ export function CopyPageLinkAction({
   }
 
   return (
-    <CopyToClipboard text={getAbsolutePath(path, router.query.domain as string | undefined)} onCopy={onClick}>
+    <CopyToClipboard
+      text={getAbsolutePath(
+        isApplication ? `/rewards/applications${path}` : path,
+        router.query.domain as string | undefined
+      )}
+      onCopy={onClick}
+    >
       <MenuItem data-testid='copy-link-page-action' dense>
         <ListItemIcon>
           <LinkIcon fontSize='small' />

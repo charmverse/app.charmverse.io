@@ -302,6 +302,10 @@ function PropertyValueElement(props: Props) {
       />
     );
   } else if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID || propertyTemplate.id === APPLICANT_STATUS_BLOCK_ID) {
+    if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID && !reward) {
+      return <EmptyPlaceholder>--</EmptyPlaceholder>;
+    }
+
     if (REWARD_APPLICATION_STATUS_LABELS[propertyValue as ApplicationStatus]) {
       propertyValueElement = <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     } else {

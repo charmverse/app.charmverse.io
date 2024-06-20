@@ -5,7 +5,7 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import PersonIcon from '@mui/icons-material/Person';
 import TextIcon from '@mui/icons-material/TextFields';
-import { ListItemIcon, ListItemText } from '@mui/material';
+import { ListItemIcon, ListItemText, SvgIcon } from '@mui/material';
 import type { ReactNode } from 'react';
 import { FaGoogle, FaTelegramPlane, FaWallet } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
@@ -14,6 +14,7 @@ import { iconForPropertyType } from 'components/common/DatabaseEditor/widgets/ic
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { MEMBER_PROPERTY_CONFIG, PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
 import DiscordIcon from 'public/images/logos/discord_logo.svg';
+import FarcasterLogo from 'public/images/logos/farcaster.svg';
 
 export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   text: <TextIcon fontSize='small' />,
@@ -35,7 +36,12 @@ export const MemberPropertyIcons: Record<MemberPropertyType, ReactNode> = {
   join_date: iconForPropertyType('date'),
   google: <FaGoogle fontSize='small' />,
   telegram: <FaTelegramPlane fontSize='small' />,
-  wallet: <FaWallet fontSize='small' />
+  wallet: <FaWallet fontSize='small' />,
+  farcaster: (
+    <SvgIcon viewBox='0 0 20 20' fontSize='small'>
+      <FarcasterLogo />
+    </SvgIcon>
+  )
 };
 
 type Props = {

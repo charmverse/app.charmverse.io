@@ -38,6 +38,7 @@ import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utils/browser';
+import { isUUID } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 
 export type BoardReward = { id?: string; fields: RewardFields };
@@ -123,9 +124,9 @@ export function useRewardsBoardAdapter() {
     const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
     if (filter && board) {
-      const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cards).map((c) => c.id);
+      const filteredCards = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cards);
 
-      cards = cards.filter((cp) => filteredCardsIds.includes(cp.id));
+      cards = filteredCards;
     }
     const sortedCardPages = board
       ? sortCards(cards, board, activeView, membersRecord, {}, localViewSettings?.localSort)
@@ -303,6 +304,15 @@ function mapApplicationToCard({
     ? [getAbsolutePath(`/${sourceProposalPage.id}`, spaceDomain), sourceProposalPage.title]
     : '';
 
+  const rewardCustomProperties: Record<string, any> = {};
+  const rewardProperties = (reward.fields as RewardFields)?.properties ?? {};
+
+  Object.keys(rewardProperties).forEach((rewardPropertyKey) => {
+    if (isUUID(rewardPropertyKey)) {
+      rewardCustomProperties[rewardPropertyKey] = rewardProperties[rewardPropertyKey];
+    }
+  });
+
   applicationFields.properties = {
     ...applicationFields.properties,
     // add default field values on the fly
@@ -316,8 +326,9 @@ function mapApplicationToCard({
           }) as number
         )?.toString()
       : '',
-    [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
+    // Reward status allows matching application by reward status - Hide in the front end
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
+    [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
     [APPLICANT_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
@@ -329,7 +340,8 @@ function mapApplicationToCard({
     [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
     [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
     [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
-    [REWARD_PROPOSAL_LINK]: proposalLinkValue
+    [REWARD_PROPOSAL_LINK]: proposalLinkValue,
+    ...rewardCustomProperties
   };
 
   const isApplication =

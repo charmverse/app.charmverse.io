@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 
 import { Utils } from 'components/common/DatabaseEditor/utils';
 import type { IPropertyTemplate } from 'lib/databases/board';
-import type { Card, CardPropertyValue } from 'lib/databases/card';
+import type { Card, CardPropertyValue, CardWithRelations } from 'lib/databases/card';
 import { propertyConfigs } from 'lib/databases/filterClause';
 import type {
   NumberDataTypeConditions,
@@ -21,12 +21,43 @@ import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'l
 import { Constants } from './constants';
 
 class CardFilter {
-  static applyFilterGroup(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], cards: Card[]): Card[] {
+  static applyFilterGroup(
+    filterGroup: FilterGroup,
+    templates: readonly IPropertyTemplate[],
+    cards: (Card | CardWithRelations)[]
+  ): Card[] {
     const hasTitleProperty = templates.find((o) => o.id === Constants.titleColumnId);
     const cardProperties: readonly IPropertyTemplate[] = hasTitleProperty
       ? templates
       : [...templates, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
-    return cards.filter((card) => this.isFilterGroupMet(filterGroup, cardProperties, card));
+
+    return cards
+      .map((card) => {
+        const cardMeetsFilter = this.isFilterGroupMet(filterGroup, cardProperties, card);
+
+        // Return the card along with all subPages that meet the filter
+        // Use case: Filtering by reward status
+        if (cardMeetsFilter) {
+          return card;
+        }
+
+        const cardCopy = { ...card } as CardWithRelations;
+
+        // Find at least 1 subPage that meets the filter, return matching subpages and parent card
+        // Use case: Filtering by status of applications for a reward
+        const filteredSubPages = (cardCopy as CardWithRelations)?.subPages?.filter((subPage) =>
+          this.isFilterGroupMet(filterGroup, cardProperties, subPage)
+        );
+
+        (cardCopy as CardWithRelations).subPages = filteredSubPages;
+
+        if (filteredSubPages?.length) {
+          return cardCopy;
+        }
+
+        return null;
+      })
+      .filter((card) => card !== null) as Card[];
   }
 
   static isFilterGroupMet(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], card: Card): boolean {
