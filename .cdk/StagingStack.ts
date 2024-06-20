@@ -111,7 +111,7 @@ export class StagingStack extends Stack {
       {
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'EC2KeyName',
-        value: 'stg-permission-api'
+        value: 'northshore-webapp'
       },
       {
         namespace: 'aws:autoscaling:asg',
