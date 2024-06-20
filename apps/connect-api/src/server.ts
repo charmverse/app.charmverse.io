@@ -2,8 +2,9 @@ import cors from '@koa/cors';
 import Koa from 'koa';
 import Router from 'koa-router';
 
-import { isDevEnv, isTestEnv } from 'config/constants';
 import { randomIntFromInterval } from 'lib/utils/random';
+
+import { isDevEnv, isTestEnv } from './constants';
 
 export const app = new Koa();
 const router = new Router();
