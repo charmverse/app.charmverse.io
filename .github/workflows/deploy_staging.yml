@@ -31,7 +31,7 @@ jobs:
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
-          echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+          echo "STAGE=stg-webapp-pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         uses: ./.github/actions/install
@@ -165,8 +165,8 @@ jobs:
         # npm run deploy:staging
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c stack=stg-webapp -c name=stg-webapp-${{env.STAGE}} --outputs-file cdk.out.json
-          node --eval \"console.log('env_url=' + require('./cdk.out.json')['stg-webapp-${{env.STAGE}}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT
+          npx cdk deploy -c stack=stg-webapp -c name=${{env.STAGE}} --outputs-file cdk.out.json
+          node --eval \"console.log('env_url=' + require('./cdk.out.json')['${{env.STAGE}}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT
 
       - name: update the github deployment status
         uses: bobheadxi/deployments@v1
