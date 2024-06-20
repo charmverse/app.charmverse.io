@@ -38,12 +38,12 @@ runs:
       if: steps.restore_build.outputs.cache-hit != 'true'
       run: npm run build
 
-    # - name: Build Connect
-    #   shell: bash
-    #   if: steps.restore_build.outputs.cache-hit != 'true'
-    #   env:
-    #     NEXT_PUBLIC_CONNECT_API_HOST: ${{ inputs.NEXT_PUBLIC_CONNECT_API_HOST }}
-    #   run: npm run connect:all:build
+    - name: Build Connect
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      env:
+        NEXT_PUBLIC_CONNECT_API_HOST: ${{ inputs.NEXT_PUBLIC_CONNECT_API_HOST }}
+      run: npm run connect:all:build
 
     # building cache key takes almost a minute, so we only run this if we are saving the cache
     - name: Cache build
