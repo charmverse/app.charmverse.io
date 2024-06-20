@@ -10,10 +10,15 @@ export type DeployStackProps = {
   scope: Construct;
   id: string;
   props?: StackProps;
-}
+};
 
 export class BaseCdkDeployStack extends Stack {
-  constructor({scope, id, props, options = []}: DeployStackProps & {  options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[]}) {
+  constructor({
+    scope,
+    id,
+    props,
+    options = []
+  }: DeployStackProps & { options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] }) {
     super(scope, id, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
@@ -115,7 +120,7 @@ export class BaseCdkDeployStack extends Stack {
       {
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'EC2KeyName',
-        value: 'stg-permission-api'
+        value: 'staging_keys'
       },
       {
         namespace: 'aws:autoscaling:asg',
