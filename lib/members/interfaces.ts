@@ -1,4 +1,5 @@
 import type {
+  FarcasterUser,
   MemberProperty,
   MemberPropertyPermission,
   MemberPropertyType,
@@ -54,6 +55,9 @@ export type Member = Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'username'> &
   roles: Pick<Role, 'name' | 'id'>[];
   onboarded: boolean;
   searchValue: string;
+  farcasterUser?: {
+    username: string;
+  };
 };
 
 export type CreateMemberPropertyPayload = Pick<MemberProperty, 'index' | 'name' | 'options' | 'type'>;
