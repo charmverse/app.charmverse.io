@@ -14,6 +14,7 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers): 
     walletAddress: projectWithMembers.walletAddress,
     website: projectWithMembers.website,
     deletedAt: projectWithMembers.deletedAt,
+    optimismId: projectWithMembers.optimismId,
     projectMembers: projectWithMembers.projectMembers.map((projectMember) => {
       return {
         warpcast: projectMember.warpcast,

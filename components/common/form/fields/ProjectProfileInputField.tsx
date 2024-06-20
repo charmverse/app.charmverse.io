@@ -40,7 +40,7 @@ export function ProjectProfileInputField({
   disabled?: boolean;
   fieldConfig?: ProjectAndMembersFieldConfig;
   project?: ProjectWithMembers | null;
-  onChange: (updatedValue: FormFieldValue) => Promise<void>;
+  onChange: (updatedValue: FormFieldValue) => void;
   getFieldState: UseFormGetFieldState<Record<string, FormFieldValue>>;
   onChangeDebounced: (updatedValue: { id: string; value: FormFieldValue }) => void;
 }) {

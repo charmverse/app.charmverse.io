@@ -16,6 +16,7 @@ export function createDefaultProjectAndMembersPayload(): ProjectAndMembersPayloa
     communityUrl: '',
     otherUrl: '',
     walletAddress: '',
+    optimismId: null,
     projectMembers: [
       {
         name: '',
