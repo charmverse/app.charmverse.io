@@ -19,6 +19,7 @@ export type ImportOpProjectPayload = {
   website: string;
   externalLink: string;
   team: OPProjectData['team'];
+  github: string;
 };
 
 async function importOpProjectController(req: NextApiRequest, res: NextApiResponse<ProjectWithMembers>) {

@@ -34,7 +34,8 @@ export function OpProjectsList({ onImportProject }: { onImportProject: (project:
         name: selectedProject.name,
         team: selectedProject.team,
         twitter: selectedProject.socialLinks.twitter,
-        website: selectedProject.socialLinks.website
+        website: selectedProject.socialLinks.website,
+        github: selectedProject.repositories[0]
       }).then(onImportProject);
     }
   }, [projects, selectedProjectId]);

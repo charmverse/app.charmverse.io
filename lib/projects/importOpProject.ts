@@ -12,7 +12,7 @@ export async function importOpProject(opProject: ImportOpProjectPayload, userId:
       demoUrl: '',
       description: opProject.description,
       excerpt: '',
-      github: '',
+      github: opProject.github,
       name: opProject.name,
       otherUrl: opProject.externalLink,
       projectMembers: [
