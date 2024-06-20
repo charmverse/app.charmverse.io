@@ -18,7 +18,7 @@ export class StagingStack extends Stack {
     // Create a ElasticBeanStalk app. - must be 40 characters or less
     const appName = sanitizeAppName(id);
 
-    const deploymentDomain = `${process.env.STAGE || ''}.${domain}`;
+    const deploymentDomain = `${appName}.${domain}`;
 
     const ebApp = new elasticbeanstalk.CfnApplication(this, 'Application', {
       applicationName: appName
