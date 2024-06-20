@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { PageWrapper } from 'components/common/PageWrapper';
-import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
+import { CreateProjectButton } from 'components/projects/CreateProjectButton';
 import { ProjectItemSkeleton } from 'components/projects/ProjectItemSkeleton';
 import { ProjectsList } from 'components/projects/ProjectsList';
 
@@ -38,6 +38,11 @@ export function HomePage({ user }: { user: any }) {
         <Suspense fallback={<ProjectItemSkeleton />}>
           <ProjectsList />
         </Suspense>
+      </Box>
+
+      <Box mt={2} gap={2} display='flex' flexDirection='column'>
+        <Typography variant='h5'>Your Projects</Typography>
+        <CreateProjectButton />
       </Box>
     </PageWrapper>
   );
