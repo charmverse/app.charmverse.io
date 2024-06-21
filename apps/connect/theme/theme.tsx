@@ -279,7 +279,8 @@ const extendedTheme = extendTheme({
           color: theme.vars.palette.primary.main,
           '&:hover': {
             color: theme.vars.palette.primary.dark
-          }
+          },
+          fontFamily: defaultFont
         })
       },
       defaultProps: {

@@ -9,7 +9,7 @@ export default function Home() {
   const user = undefined; // server action
 
   if (user) {
-    redirect('/dashboard');
+    redirect('/profile');
   }
 
   return <HomePage user={user} />;
