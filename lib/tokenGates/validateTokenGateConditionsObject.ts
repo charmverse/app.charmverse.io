@@ -42,6 +42,10 @@ const TokenGateConditionsSchema = yup.object().shape({
   })
 });
 
+export const TokenGateSchema = yup.object().shape({
+  conditions: TokenGateConditionsSchema
+});
+
 export async function validateTokenGateConditionsObject(tokenGate: TokenGate) {
   await TokenGateConditionsSchema.validate(tokenGate.conditions);
 }

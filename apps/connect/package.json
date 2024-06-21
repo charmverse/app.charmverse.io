@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@mui/material-nextjs": "^5.15.11",
+    "@typeschema/yup": "^0.13.3",
+    "next-safe-action": "^7.1.0",
     "server-only": "^0.0.1"
   }
 }
