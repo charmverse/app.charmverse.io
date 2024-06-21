@@ -80,7 +80,6 @@ export function SpaceAccessGateWithSearch({ defaultValue, goBack }: Props) {
         disablePortal
         inputValue={spaceDomain}
         options={spacesInfo}
-        placeholder='my-space'
         value={selectedSpace}
         onChange={(_e, _space) => {
           setSelectedSpace(_space);

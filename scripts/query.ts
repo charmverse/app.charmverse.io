@@ -7,7 +7,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 async function search() {
   const result = await prisma.user.findFirst({
     where: {
-      username: 'mattcasey.eth'
+      verifiedEmails: {
+        some: {
+          email: 'rev@limitless.network'
+        }
+      }
     },
     include: {
       verifiedEmails: true,
@@ -17,6 +21,18 @@ async function search() {
     }
   });
   console.log(result);
+  const result2 = await prisma.user.findFirst({
+    where: {
+      email: 'rev@revmiller.com'
+    },
+    include: {
+      verifiedEmails: true,
+      wallets: true,
+      googleAccounts: true,
+      spaceRoles: true
+    }
+  });
+  console.log(result2);
 }
 
 search().then(() => console.log('Done'));

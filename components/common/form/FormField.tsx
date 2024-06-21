@@ -342,7 +342,7 @@ export function FormField(
       }}
     >
       {!readOnly && (
-        <div ref={readOnly ? null : drag}>
+        <div ref={readOnly ? () => {} : (drag as any)}>
           <DragIndicatorIcon
             fontSize='small'
             color='secondary'

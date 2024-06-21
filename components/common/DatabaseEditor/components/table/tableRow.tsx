@@ -228,7 +228,7 @@ function TableRow(props: Props) {
             <div
               className='icons row-actions'
               onClick={handleClick}
-              ref={drag}
+              ref={drag as any}
               style={{
                 padding: 0
               }}

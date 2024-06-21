@@ -1,23 +1,25 @@
-import { log } from '@charmverse/core/log';
 import cors from '@koa/cors';
 import Koa from 'koa';
 import Router from 'koa-router';
 
 import { randomIntFromInterval } from 'lib/utils/random';
 
+import { isDevEnv, isTestEnv } from './constants';
+
 export const app = new Koa();
 const router = new Router();
-
-const allowedOrigins = process.env.ALLOWED_CONNECT_ORIGINS?.split(',') ?? ['http://localhost:3000'];
 
 // CORS middleware configuration
 app.use(
   cors({
     origin: (ctx) => {
       const origin = ctx.request.headers.origin as string;
-      const isAllowed = allowedOrigins.includes(origin as string);
-      if (isAllowed) {
-        return origin; // Allow the request from this origin
+      if (isDevEnv || isTestEnv) {
+        return origin;
+      }
+      // support any subdomain for staging
+      else if (origin.endsWith('.charmverse.co') || origin.endsWith('.charmverse.io')) {
+        return origin;
       }
       return ''; // Disallow the request if the origin is not allowed
     },

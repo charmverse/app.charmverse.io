@@ -6,5 +6,5 @@ const port = process.env.PORT || 4000;
 const host = '0.0.0.0';
 
 app.listen(typeof port === 'string' ? parseInt(port) : port, host, () => {
-  log.info(`Builder API server is running on http://localhost:${port}`);
+  log.info(`Connect API server is running on http://localhost:${port}`);
 });
