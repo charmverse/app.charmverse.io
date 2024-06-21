@@ -1,6 +1,16 @@
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { ListItemIcon, ListItemText, Divider, Menu, MenuItem, TextField, Typography, Stack } from '@mui/material';
+import {
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Menu,
+  MenuItem,
+  TextField,
+  Typography,
+  Stack,
+  Tooltip
+} from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -56,15 +66,22 @@ const PropertyMenu = React.memo((props: Props) => {
         }}
       />
       <MenuItem
-        {...bindTrigger(changePropertyTypePopupState)}
+        // Don't allow changing the property type of a relation property
+        {...(propertyType === 'relation' ? {} : bindTrigger(changePropertyTypePopupState))}
         sx={{
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between'
         }}
       >
-        <ListItemText>Type: {typeDisplayName(intl, propertyType)}</ListItemText>
-        <ArrowRightIcon fontSize='small' />
+        <Tooltip
+          title={propertyType === 'relation' ? 'You cannot change the property type of a relation property' : ''}
+        >
+          <>
+            <ListItemText>Type: {typeDisplayName(intl, propertyType)}</ListItemText>
+            {propertyType !== 'relation' && <ArrowRightIcon fontSize='small' />}
+          </>
+        </Tooltip>
       </MenuItem>
       <Divider sx={{ my: '0 !important' }} />
       <MenuItem onClick={() => props.onDelete(propertyId)}>
