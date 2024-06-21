@@ -1,10 +1,21 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
-import { Button, FormLabel, IconButton, Stack, TextField } from '@mui/material';
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  IconButton,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
+import { CATEGORIES } from './utils/constants';
 import type { FormValues } from './utils/form';
 import { schema } from './utils/form';
 
@@ -124,6 +135,29 @@ export function ProjectForm({ onCancel }: { onCancel: VoidFunction }) {
       <Stack>
         <FormLabel>Project avatar and cover image</FormLabel>
         <TextField multiline rows={3} placeholder='A description of your project' />
+      </Stack>
+      <Stack>
+        <FormLabel>Category</FormLabel>
+        <Controller
+          control={control}
+          name='category'
+          render={({ field, fieldState }) => (
+            <Select
+              displayEmpty
+              fullWidth
+              aria-labelledby='project-category'
+              renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
+              error={!!fieldState.error}
+              {...field}
+            >
+              {CATEGORIES.map((category) => (
+                <MenuItem key={category} value={category}>
+                  {category}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
+        />
       </Stack>
       <MultiTextValueFields control={control} name='website' label='Website' placeholder='https://acme-inc.com' />
       <MultiTextValueFields control={control} name='farcaster' label='Farcaster' placeholder='https://farcaster.xyz' />
