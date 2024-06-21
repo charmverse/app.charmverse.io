@@ -285,14 +285,6 @@ const extendedTheme = extendTheme({
       defaultProps: {
         underline: 'none'
       }
-    },
-    MuiInputLabel: {
-      styleOverrides: {
-        root: ({ theme }) => ({
-          fontWeight: 600,
-          marginBottom: theme.spacing(0.5)
-        })
-      }
     }
   }
 });
