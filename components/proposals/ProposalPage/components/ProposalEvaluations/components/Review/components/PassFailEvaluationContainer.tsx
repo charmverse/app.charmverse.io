@@ -211,7 +211,13 @@ export function PassFailEvaluationContainer({
                         Appeal reason
                       </Typography>
                     </FormLabel>
-                    <Typography>{evaluation.appealReason}</Typography>
+                    <Typography
+                      sx={{
+                        wordBreak: 'break-word'
+                      }}
+                    >
+                      {evaluation.appealReason}
+                    </Typography>
                   </Box>
                 )}
                 <PassFailEvaluation
@@ -226,6 +232,12 @@ export function PassFailEvaluationContainer({
                   evaluationResult={evaluation.result}
                   evaluationReviews={evaluation.appealReviews}
                   requiredReviews={evaluation.appealRequiredReviews ?? 1}
+                  reviewerOptions={
+                    evaluation.appealReviewers?.map((reviewer) => ({
+                      group: reviewer.roleId ? 'role' : 'user',
+                      id: (reviewer.roleId ?? reviewer.userId) as string
+                    })) ?? []
+                  }
                 />
               </Stack>
             )}
@@ -256,6 +268,8 @@ export function PassFailEvaluationContainer({
           <Modal open={appealReasonPopupState.isOpen} onClose={closeAppealReasonPopup} title='Reason for Appeal'>
             <Stack gap={1}>
               <TextField
+                multiline
+                rows={5}
                 fullWidth
                 data-test='appeal-reason-input'
                 placeholder='Enter your reason for appealing'
