@@ -1,4 +1,7 @@
 scripts/
 dist/
 
+apps/connect-api/dist/
+apps/connect/.next/
+
 background/ceramicServer/generated/

@@ -1,5 +1,6 @@
-import { app } from '@connect-api/';
 import request from 'supertest';
+
+import { app } from '@connect-api/server';
 
 describe('GET /api/random-number', () => {
   // Simple heuristic, admin can always see everything

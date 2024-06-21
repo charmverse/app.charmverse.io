@@ -1,7 +1,7 @@
 {
   "extends": "../../.eslintrc.json",
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "project": ["./tsconfig.json", "apps/connect-api/tsconfig.json", "../../tsconfig.json"]
   },
   "rules": {
     "@next/next/no-html-link-for-pages": "off",
@@ -10,6 +10,7 @@
       {
         "devDependencies": true,
         "packageDir": [
+          "./",
           "../../"
         ]
       }

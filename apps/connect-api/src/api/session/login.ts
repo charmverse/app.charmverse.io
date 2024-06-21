@@ -1,4 +1,4 @@
-import { PathBasedRouter } from 'connect-api/lib/pathBasedRouter';
+import { PathBasedRouter } from '@connect-api/lib/pathBasedRouter';
 
 const router = new PathBasedRouter();
 
