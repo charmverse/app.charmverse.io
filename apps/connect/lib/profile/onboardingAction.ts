@@ -12,10 +12,11 @@ export async function onboardingAction(_prevState: FormValues, formData: FormDat
 
   // Still working on this one
 
-  return { message: 'dsadsa' };
   const user = { id: v4() };
   const data = Object.fromEntries(formData);
   const validatedData = await schema.validate(data);
+
+  return { ...validatedData };
 
   if (validatedData.wallet) {
     await prisma.userWallet.create({
@@ -25,8 +26,6 @@ export async function onboardingAction(_prevState: FormValues, formData: FormDat
       }
     });
   }
-
-  await prisma.user.update({});
 
   redirect('/profile');
 }
