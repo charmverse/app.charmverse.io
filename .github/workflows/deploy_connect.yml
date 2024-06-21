@@ -97,12 +97,12 @@ jobs:
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
           npx cdk deploy -c stack=prd-connect -c name=prd-connect-api
 
-      # - name: Package Connect App
-      #   run: |
-      #     rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
-      #     cat files_to_zip.txt | zip --symlinks -r@ prd-connect.zip
+      - name: Package Connect App
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ prd-connect.zip
 
-      # - name: Deploy Connect App to production
-      #   run: |
-      #     npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-      #     npx cdk deploy -c stack=prd-connect -c name=prd-connect
+      - name: Deploy Connect App to production
+        run: |
+          npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
+          npx cdk deploy -c stack=prd-connect -c name=prd-connect
