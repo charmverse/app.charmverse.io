@@ -1,24 +1,12 @@
 import { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import cors from '@koa/cors';
+import type { ParameterizedContext } from 'koa';
 import Koa from 'koa';
-import type Router from 'koa-router';
 
 import { isDevEnv, isTestEnv } from './constants';
+import { logRoutes } from './logRoutes';
 import mountedRoutes from './routes';
-
-function logRoutes(router: Router) {
-  log.info('---- List of routes available ----');
-  router.stack.forEach((layer) => {
-    const _path = layer.opts.prefix || layer.path || '';
-    const methods = layer.methods.filter((method) => method !== 'HEAD');
-
-    if (_path && methods.length) {
-      log.info(`${_path}: ${methods.join(', ')}`);
-    }
-  });
-  log.info('---- Finished checking routes ----');
-}
 
 export const app = new Koa();
 
@@ -59,6 +47,30 @@ app.use(async (ctx, next) => {
       ctx.status = 500;
     }
   }
+});
+
+// JSON Body parser middleware
+app.use(async (ctx, next) => {
+  let data = '';
+  await new Promise<void>((resolve, reject) => {
+    ctx.req.on('data', (chunk) => {
+      data += chunk;
+    });
+    ctx.req.on('end', () => {
+      resolve();
+    });
+    ctx.req.on('error', (err) => {
+      reject(err);
+    });
+  });
+
+  try {
+    ctx.request.body = JSON.parse(data);
+  } catch (err) {
+    ctx.request.body = data;
+  }
+
+  await next();
 });
 
 app.use(mountedRoutes.routes()).use(mountedRoutes.allowedMethods());
