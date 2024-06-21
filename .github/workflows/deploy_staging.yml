@@ -163,7 +163,7 @@ jobs:
 
       - name: Package
         run: |
-          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+          cat files_to_zip.txt | zip --symlinks -r@ ${{env.STAGE_NAME}}.zip
 
       - name: Deploy to staging
         id: cdk_deploy

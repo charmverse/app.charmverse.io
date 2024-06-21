@@ -3,6 +3,7 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { WebappStagingStack } from '../WebappStagingStack';
 import { ConnectStagingStack } from '../ConnectStagingStack';
+import { ProductionStack } from '../ProductionStack';
 
 /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 const deployProps: cdk.StackProps = {
@@ -17,7 +18,7 @@ const stackNameParam: string = app.node.getContext('name');
 
 // Connect production
 if (stackParam === 'prd-connect') {
-  new ConnectStagingStack(app, stackNameParam, deployProps);
+  new ProductionStack(app, stackNameParam, deployProps);
 }
 // Connect staging
 else if (stackParam === 'stg-connect') {
