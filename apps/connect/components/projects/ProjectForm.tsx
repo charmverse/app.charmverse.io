@@ -1,19 +1,14 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
-import {
-  Button,
-  FormControl,
-  FormLabel,
-  IconButton,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material';
+import { Button, FormLabel, IconButton, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import type { Control, FieldArrayPath } from 'react-hook-form';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useController, useFieldArray, useForm } from 'react-hook-form';
+
+import { Avatar } from 'components/common/Avatar';
+import { useS3UploadInput } from 'hooks/useS3UploadInput';
+import { ResizeType } from 'lib/utils/file';
+import { inputBackground } from 'theme/colors';
 
 import { CATEGORIES } from './utils/constants';
 import type { FormValues } from './utils/form';
@@ -26,13 +21,13 @@ function MultiTextValueFields({
   placeholder
 }: {
   control: Control<FormValues>;
-  name: FieldArrayPath<FormValues>;
+  name: keyof FormValues;
   label: string;
   placeholder: string;
 }) {
   const { fields, append, remove } = useFieldArray({
     control,
-    name
+    name: name as FieldArrayPath<FormValues>
   });
 
   return (
@@ -92,6 +87,113 @@ function MultiTextValueFields({
   );
 }
 
+function AvatarField({ control }: { control: Control<FormValues> }) {
+  const { field } = useController({
+    name: 'avatar',
+    control
+  });
+
+  const { inputRef, isUploading, onFileChange } = useS3UploadInput({
+    onFileUpload: ({ url }) => {
+      field.onChange(url);
+    },
+    resizeType: ResizeType.Artwork
+  });
+
+  return (
+    <Controller
+      name='avatar'
+      control={control}
+      render={() => (
+        <div
+          style={{
+            position: 'relative'
+          }}
+        >
+          <input
+            disabled={isUploading}
+            type='file'
+            accept={'image/*'}
+            ref={inputRef}
+            onChange={onFileChange}
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+              opacity: 0,
+              zIndex: 1,
+              cursor: 'pointer'
+            }}
+          />
+          <Avatar
+            size='xLarge'
+            avatar={field.value}
+            sx={{
+              backgroundColor: !field.value ? inputBackground : undefined
+            }}
+          />
+        </div>
+      )}
+    />
+  );
+}
+
+function CoverImageField({ control }: { control: Control<FormValues> }) {
+  const { field } = useController({
+    name: 'cover',
+    control
+  });
+
+  const { inputRef, isUploading, onFileChange } = useS3UploadInput({
+    onFileUpload: ({ url }) => {
+      field.onChange(url);
+    },
+    resizeType: ResizeType.Artwork
+  });
+
+  return (
+    <Controller
+      name='cover'
+      control={control}
+      render={() => (
+        <div
+          style={{
+            width: '100%',
+            height: 96,
+            position: 'relative'
+          }}
+        >
+          <input
+            disabled={isUploading}
+            type='file'
+            accept={'image/*'}
+            ref={inputRef}
+            onChange={onFileChange}
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+              opacity: 0,
+              zIndex: 1,
+              cursor: 'pointer'
+            }}
+          />
+          <img
+            src={field.value}
+            style={{
+              width: '100%',
+              height: '100%',
+              background: inputBackground
+            }}
+          />
+        </div>
+      )}
+    />
+  );
+}
+
 export function ProjectForm({ onCancel }: { onCancel: VoidFunction }) {
   const {
     control,
@@ -134,7 +236,10 @@ export function ProjectForm({ onCancel }: { onCancel: VoidFunction }) {
       </Stack>
       <Stack>
         <FormLabel>Project avatar and cover image</FormLabel>
-        <TextField multiline rows={3} placeholder='A description of your project' />
+        <Stack direction='row' gap={1}>
+          <AvatarField control={control} />
+          <CoverImageField control={control} />
+        </Stack>
       </Stack>
       <Stack>
         <FormLabel>Category</FormLabel>
