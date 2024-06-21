@@ -8,9 +8,9 @@ export function PageWrapper({ children, ...restProps }: BoxProps & { children: R
       p={2}
       borderRadius={10}
       bgcolor='background.default'
-      boxShadow={3}
-      maxWidth='70rem'
-      mx={{ xs: 2, md: 4, lg: 'auto' }}
+      border={{ xs: 'none', md: '1px solid var(--charm-palette-divider)' }}
+      maxWidth='50rem'
+      mx={{ xs: 2, md: 'auto' }}
       my={{ xs: 2, md: 8 }}
       {...restProps}
     >

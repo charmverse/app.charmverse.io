@@ -19,14 +19,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body>
+      <Box component='body' bgcolor={{ xs: 'background.default', md: 'grey.200' }}>
         {getInitColorSchemeScript()}
         <AppProviders>
-          <Box component='main' bgcolor='background.default' overflow='auto'>
-            {children}
-          </Box>
+          <Box component='main'>{children}</Box>
         </AppProviders>
-      </body>
+      </Box>
     </html>
   );
 }
