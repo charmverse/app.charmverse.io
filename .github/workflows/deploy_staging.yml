@@ -13,8 +13,9 @@ concurrency:
 jobs:
   deploy:
     if: |
-      (github.event.action == 'labeled' && (github.event.label.name == ':rocket: deploy' || github.event.label.name == 'deploy-ceramic')) ||
-      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, 'deploy-ceramic')))
+      (github.event.action == 'labeled' && startsWith(github.event.label.name, ':rocket: deploy')) ||
+      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic')))
+
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
     concurrency: deploy-pr-app-${{ github.head_ref }}
@@ -30,7 +31,10 @@ jobs:
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
-          echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+          if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy')}}; then stack='stg-webapp'; fi
+          if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect')}}; then stack='stg-connect'; fi
+          echo "STACK=$stack" >> $GITHUB_ENV
+          echo "STAGE_NAME=$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         uses: ./.github/actions/install
@@ -39,6 +43,7 @@ jobs:
         uses: ./.github/actions/build
         with:
           REACT_APP_APP_ENV: 'staging'
+          NEXT_PUBLIC_CONNECT_API_HOST: https://${{ env.STAGE_NAME }}.charmverse.co:4000
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -70,7 +75,7 @@ jobs:
           rm .ebextensions*/06_cloudwatch_alarm.config
 
           # substituting the websocket domain name
-          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
+          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -96,6 +101,12 @@ jobs:
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
+
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_connect/00_env_vars.config
 
       - name: Run specific version of permission api if SELECTED_PERMISSION_API_TAG exists
         if: env.SELECTED_PERMISSION_API_TAG && env.GITHUB_HEAD_REF_SLUG == env.SELECTED_PERMISSION_API_TAG
@@ -127,7 +138,7 @@ jobs:
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
-          env: ${{ env.STAGE }}
+          env: ${{ env.STAGE_NAME }}
           ref: ${{ github.head_ref }}
           override: true
 
@@ -138,16 +149,29 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Upload static assets to S3
+        run: |
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
+          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+
+      - name: Override config with Connect app
+        # wrap the condition in "${{}}" because the string includes a colon
+        # see https://github.com/actions/runner/issues/1019
+        if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') }}"
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
+
       - name: Package
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
-          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Deploy to staging
         id: cdk_deploy
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npm run deploy:staging
+          npx cdk deploy -c stack=${{env.STACK}} -c name=${{env.STAGE_NAME}} --outputs-file cdk.out.json
+          env_url=$(jq --raw-output '.[$ENV.STAGE_NAME].DeploymentUrl' ./cdk.out.json)
+          echo "env_url=$env_url" >> $GITHUB_OUTPUT
 
       - name: update the github deployment status
         uses: bobheadxi/deployments@v1
@@ -168,7 +192,6 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_ceramic .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
 
-      
       - name: Deploy ceramic to Beanstalk
         if: >
           (github.event.action == 'labeled' && github.event.label.name == 'deploy-ceramic') ||

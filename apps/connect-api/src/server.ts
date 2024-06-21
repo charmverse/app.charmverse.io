@@ -4,8 +4,7 @@ import cors from '@koa/cors';
 import Koa from 'koa';
 import type Router from 'koa-router';
 
-import { prettyPrint } from 'lib/utils/strings';
-
+import { isDevEnv, isTestEnv } from './constants';
 import mountedRoutes from './routes';
 
 function logRoutes(router: Router) {
@@ -23,16 +22,17 @@ function logRoutes(router: Router) {
 
 export const app = new Koa();
 
-const allowedOrigins = process.env.ALLOWED_CONNECT_ORIGINS?.split(',') ?? ['http://localhost:3000'];
-
 // CORS middleware configuration
 app.use(
   cors({
     origin: (ctx) => {
       const origin = ctx.request.headers.origin as string;
-      const isAllowed = allowedOrigins.includes(origin as string);
-      if (isAllowed) {
-        return origin; // Allow the request from this origin
+      if (isDevEnv || isTestEnv) {
+        return origin;
+      }
+      // support any subdomain for staging
+      else if (origin.endsWith('.charmverse.co') || origin.endsWith('.charmverse.io')) {
+        return origin;
       }
       return ''; // Disallow the request if the origin is not allowed
     },

@@ -46,6 +46,7 @@ interface Props extends Omit<AutocompleteProps<Member, boolean, boolean, boolean
   helperText?: ReactNode;
   error?: boolean;
   popupField?: boolean;
+  placeholder?: string;
 }
 
 function InputSearchMemberBase({
@@ -139,6 +140,7 @@ interface IInputSearchMemberMultipleProps
   helperText?: ReactNode;
   error?: boolean;
   popupField?: boolean;
+  placeholder?: string;
 }
 
 export function InputSearchMemberMultiple({

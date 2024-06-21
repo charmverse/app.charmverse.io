@@ -29,7 +29,7 @@ const KanbanColumn = React.memo((props: Props) => {
     className += ' dragover';
   }
   return (
-    <div ref={drop} className={className}>
+    <div ref={drop as any} className={className}>
       {props.children}
     </div>
   );

@@ -1,8 +1,7 @@
 import { Stack, Typography } from '@mui/material';
-import { type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 
 import { useAddUserWallets } from 'charmClient/hooks/profile';
-import { Button } from 'components/common/Button';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { WalletSign } from 'components/login/components/WalletSign';
 import { TelegramLoginIframe } from 'components/settings/account/components/TelegramLoginIframe';
@@ -20,36 +19,14 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useRequiredMemberProperties } from '../../members/hooks/useRequiredMemberProperties';
 
-function ConnectedAccount({
-  icon,
-  label,
-  required,
-  disabled,
-  children,
-  onClick,
-  loading
-}: {
-  required: boolean;
-  label: string;
-  icon: ReactNode;
-  disabled?: boolean;
-  children?: ReactNode;
-  onClick?: VoidFunction;
-  loading?: boolean;
-}) {
-  return (
-    <Stack gap={1} minWidth={275} width='fit-content'>
-      <FieldWrapper label={label} required={required}>
-        <Button loading={loading} onClick={onClick} color='secondary' variant='outlined' disabled={disabled}>
-          <Stack flexDirection='row' alignItems='center' justifyContent='space-between' width='100%' gap={2}>
-            {children}
-            {!loading ? icon : null}
-          </Stack>
-        </Button>
-      </FieldWrapper>
-    </Stack>
-  );
-}
+import { ConnectedAccount } from './ConnectedAccount';
+
+const FarcasterConnect = dynamic(
+  () => import('./FarcasterConnect').then((module) => module.FarcasterConnectWithProvider),
+  {
+    ssr: false
+  }
+);
 
 function DiscordAccountConnect({
   isDiscordRequired,
@@ -223,17 +200,19 @@ export function ConnectedAccounts({
   user: LoggedInUser;
   setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
-  const { isGoogleRequired, isDiscordRequired, isWalletRequired, isTelegramRequired } = useRequiredMemberProperties({
-    userId: user.id
-  });
+  const { isGoogleRequired, isDiscordRequired, isWalletRequired, isTelegramRequired, isFarcasterRequired } =
+    useRequiredMemberProperties({
+      userId: user.id
+    });
 
   const connectedGoogleAccount = user.googleAccounts?.[0];
   const connectedDiscordAccount = user.discordUser;
   const connectedTelegramAccount = user.telegramUser;
   const connectedWallet = user.wallets?.[0];
+  const connectedFarcaster = user.farcasterUser;
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1.5}>
       <DiscordAccountConnect
         setIsOnboardingModalOpen={setIsOnboardingModalOpen}
         isDiscordRequired={isDiscordRequired}
@@ -254,6 +233,7 @@ export function ConnectedAccounts({
         isWalletRequired={isWalletRequired}
         connectedWallet={connectedWallet}
       />
+      <FarcasterConnect isFarcasterRequired={isFarcasterRequired} connectedFarcasterAccount={connectedFarcaster} />
     </Stack>
   );
 }

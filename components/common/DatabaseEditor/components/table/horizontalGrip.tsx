@@ -12,7 +12,9 @@ function HorizontalGrip(props: Props): JSX.Element {
     item: { id: props.templateId }
   }));
 
-  return <div ref={drag} className='HorizontalGrip' onDoubleClick={() => props.onAutoSizeColumn(props.templateId)} />;
+  return (
+    <div ref={drag as any} className='HorizontalGrip' onDoubleClick={() => props.onAutoSizeColumn(props.templateId)} />
+  );
 }
 
 export default React.memo(HorizontalGrip);

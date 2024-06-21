@@ -121,7 +121,7 @@ const KanbanCard = React.memo((props: Props) => {
     <>
       <Link href={fullPageUrl} draggable={false} color='inherit'>
         <StyledBox
-          ref={props.readOnly ? () => null : cardRef}
+          ref={props.readOnly ? () => {} : cardRef}
           className={className}
           draggable={!props.readOnly}
           style={{ opacity: isDragging ? 0.5 : 1 }}
