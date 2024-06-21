@@ -34,7 +34,7 @@ router.get('/api/hello', (ctx) => {
   ctx.body = 'Hello from Koa!';
 });
 
-router.get('/health-check', (ctx) => {
+router.get('/api/health', (ctx) => {
   ctx.body = { success: true };
   ctx.status = 200;
 });
