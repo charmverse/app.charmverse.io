@@ -480,23 +480,17 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Package Connect API
+      - name: Package and deploy Connect API to production
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect_api .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-connect-api.zip
-
-      - name: Deploy Connect API to production
-        run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
           npx cdk deploy -c name=prd-connect-api
 
-      - name: Package Connect App
+      - name: Package and deploy Connect App to production
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-connect.zip
-
-      - name: Deploy Connect App to production
-        run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
           npx cdk deploy -c name=prd-connect
 
