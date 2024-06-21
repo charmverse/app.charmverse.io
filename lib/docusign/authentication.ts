@@ -58,6 +58,7 @@ async function getUserDocusignAccountInfo({
   })
     .then((userProfile) => {
       return {
+        // TBD - handle multiple accounts
         docusignAccountId: userProfile.accounts[0].account_id,
         docusignApiBaseUrl: userProfile.accounts[0].base_uri,
         docusignAccountName: userProfile.accounts[0].account_name
