@@ -95,7 +95,7 @@ jobs:
       - name: Deploy Connect API to production
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c stack=prd-connect -c name=prd-connect-api
+          npx cdk deploy -c name=prd-connect-api
 
       - name: Package Connect App
         run: |
@@ -105,4 +105,4 @@ jobs:
       - name: Deploy Connect App to production
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c stack=prd-connect -c name=prd-connect
+          npx cdk deploy -c name=prd-connect

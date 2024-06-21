@@ -12,21 +12,20 @@ const deployProps: cdk.StackProps = {
 
 const app = new cdk.App();
 
-// Command example: cdk deploy --context stack=stg-connect
-const stackParam: string = app.node.getContext('stack');
+// Command example: cdk deploy --context name=stg-connect
 const stackNameParam: string = app.node.getContext('name');
 
 // Connect production
-if (stackParam === 'prd-connect') {
+if (stackNameParam.startsWith('prd')) {
   new ProductionStack(app, stackNameParam, deployProps);
 }
 // Connect staging
-else if (stackParam === 'stg-connect') {
+else if (stackNameParam.startsWith('stg-connect')) {
   new ConnectStagingStack(app, stackNameParam, deployProps);
 }
 // Webapp staging
-else if (stackParam === 'stg-webapp') {
+else if (stackNameParam.startsWith('stg-webapp')) {
   new WebappStagingStack(app, stackNameParam, deployProps);
 } else {
-  throw new Error('Invalid stack parameter: ' + stackParam);
+  throw new Error('Invalid stack name parameter: ' + stackNameParam);
 }
