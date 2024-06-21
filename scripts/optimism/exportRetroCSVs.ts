@@ -8,8 +8,8 @@ import { uniq } from 'lodash';
 type SummaryRow = {};
 
 const summaryFile = './op-review-summary.csv';
-const fullReviewsummaryFile = './op-full-review-june-19.csv';
-const reviewersFile = './op-reviewers-june-19.csv';
+const fullReviewsummaryFile = './op-full-review-june-21.csv';
+const reviewersFile = './op-reviewers-june-21.csv';
 
 async function exportSummary() {
   const proposals = await prisma.proposal.findMany({

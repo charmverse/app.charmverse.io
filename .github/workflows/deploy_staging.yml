@@ -163,13 +163,13 @@ jobs:
 
       - name: Package
         run: |
-          cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
+          cat files_to_zip.txt | zip --symlinks -r@ ${{env.STAGE_NAME}}.zip
 
       - name: Deploy to staging
         id: cdk_deploy
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c stack=${{env.STACK}} -c name=${{env.STAGE_NAME}} --outputs-file cdk.out.json
+          npx cdk deploy -c name=${{env.STAGE_NAME}} --outputs-file cdk.out.json
           env_url=$(jq --raw-output '.[$ENV.STAGE_NAME].DeploymentUrl' ./cdk.out.json)
           echo "env_url=$env_url" >> $GITHUB_OUTPUT
 

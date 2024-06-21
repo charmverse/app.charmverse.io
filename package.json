@@ -16,7 +16,6 @@
     "build:analyze": "cross-env ANALYZE=true next build",
     "esbuild": "tsx esbuild.config.ts && tsx esbuild.ceramic.ts",
     "verifydeps": "npx depcruise --ts-config ./tsconfig.json --config .dependency-cruiser.js -- ./",
-    "deploy:staging": "npx cdk deploy \"stg-charmverse-${STAGE}\" --outputs-file cdk.out.json",
     "postdeploy:staging": "node --eval \"console.log('env_url=' + require('./cdk.out.json')['stg-charmverse-${STAGE}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT",
     "destroy:staging": "npx cdk destroy \"stg-charmverse-${STAGE}\" --force",
     "lint": "npx next lint",
