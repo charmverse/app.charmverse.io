@@ -17,14 +17,14 @@ export const actionOnboarding = authActionClient
 
     return { message: 'success' };
 
-    if (validatedData.wallet) {
-      await prisma.userWallet.create({
-        data: {
-          address: validatedData.wallet,
-          userId: user.id
-        }
-      });
-    }
+    // if (validatedData.wallet) {
+    //   await prisma.userWallet.create({
+    //     data: {
+    //       address: validatedData.wallet,
+    //       userId: user.id
+    //     }
+    //   });
+    // }
 
-    redirect('/profile');
+    // redirect('/profile');
   });

@@ -9,13 +9,10 @@ import * as yup from 'yup';
 import { getIronOptions } from 'lib/session/getIronOptions';
 import type { SessionData } from 'lib/session/types';
 
+import { handleServerError } from './onError';
+
 export const actionClient = createSafeActionClient({
-  handleServerErrorLog: async (e) => {
-    log.error(e.message, { error: e });
-  },
-  handleReturnedServerError(e) {
-    throw e;
-  },
+  handleReturnedServerError: handleServerError,
   // @ts-ignore
   defineMetadataSchema: () => {
     return yup.object({

@@ -4,8 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
-import { useFormState } from 'react-dom';
+import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
 
 import { actionOnboarding } from 'lib/profile/onboardingAction';
@@ -14,10 +13,13 @@ import { WelcomeButton } from './components/WelcomeButton';
 import type { FormValues } from './utils/form';
 import { schema } from './utils/form';
 
-const defaultValues = { email: '', emailOption: 'notify' };
+const defaultValues = { email: '', emailOption: 'notify' } as const;
 
 export function ExtraDetails() {
-  const [state, formAction] = useFormState(actionOnboarding, defaultValues);
+  const { execute, executeAsync, result, status, reset, isIdle, isExecuting, hasSucceeded, hasErrored } =
+    useAction(actionOnboarding);
+
+  // console.dir('worksss', { result, status, isIdle, isExecuting, hasSucceeded, hasErrored });
 
   const {
     control,
@@ -31,7 +33,7 @@ export function ExtraDetails() {
   });
 
   return (
-    <form action={actionOnboarding} onSubmit={(elem) => handleSubmit(() => elem.currentTarget.submit())}>
+    <form onSubmit={handleSubmit((data) => execute({ data }))}>
       <FormControl sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
         <FormLabel id='form-email'>Email</FormLabel>
         <Controller
