@@ -23,9 +23,9 @@ export const actionClient = createSafeActionClient({
   /**
    * Middleware used for logging purposes.
    */
-  .use(async ({ next, metadata }) => {
+  .use(async ({ next }) => {
     const result = await next({ ctx: null });
-    log.info('LOGGING MIDDLEWARE FOR ACTION', metadata);
+    // log.info('LOGGING MIDDLEWARE FOR ACTION', metadata);
     return result;
   })
   /**
