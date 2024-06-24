@@ -1,11 +1,13 @@
 import { Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
+import type { ReactNode } from 'react';
 import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 
-type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number; maxRows?: number };
+type Props = ControlFieldProps &
+  FieldProps & { multiline?: boolean; rows?: number; maxRows?: number; InputProps?: any };
 
 export const TextInputField = forwardRef<HTMLDivElement, Props>(
   (
