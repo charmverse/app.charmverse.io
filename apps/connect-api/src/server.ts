@@ -16,8 +16,6 @@ app.use(
     origin: (ctx) => {
       const origin = ctx.request.headers.origin;
       log.info('origin headers', ctx.request.headers);
-      // eslint-disable-next-line no-console
-      console.log('origin request', ctx.request);
       if (origin && (isDevEnv || isTestEnv)) {
         return origin;
       }
