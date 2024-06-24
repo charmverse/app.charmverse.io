@@ -264,8 +264,13 @@ export function ProjectForm({ onCancel }: { onCancel: VoidFunction }) {
           )}
         />
       </Stack>
-      <MultiTextValueFields control={control} name='website' label='Website' placeholder='https://acme-inc.com' />
-      <MultiTextValueFields control={control} name='farcaster' label='Farcaster' placeholder='https://farcaster.xyz' />
+      <MultiTextValueFields control={control} name='websites' label='Websites' placeholder='https://acme-inc.com' />
+      <MultiTextValueFields
+        control={control}
+        name='farcasterIds'
+        label='Farcaster'
+        placeholder='https://farcaster.xyz'
+      />
       <Stack>
         <FormLabel>X.com</FormLabel>
         <Controller

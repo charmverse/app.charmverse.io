@@ -7,9 +7,9 @@ export const schema = yup.object({
   description: yup.string(),
   avatar: yup.string(),
   cover: yup.string(),
-  category: yup.string().required().oneOf(CATEGORIES),
-  website: yup.array(yup.string().required().url()),
-  farcaster: yup.array(yup.string().required()),
+  category: yup.string().oneOf(CATEGORIES),
+  websites: yup.array(yup.string().url()),
+  farcasterIds: yup.array(yup.string()),
   github: yup.string().url(),
   twitter: yup.string().url(),
   mirror: yup.string().url()
