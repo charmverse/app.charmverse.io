@@ -1,6 +1,7 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { IronSession } from 'iron-session';
 import { getIronSession } from 'iron-session';
 import { cookies, headers } from 'next/headers';
 import { createSafeActionClient } from 'next-safe-action/typeschema';
@@ -57,7 +58,7 @@ export const authActionClient = actionClient.use(async ({ next, ctx }) => {
   //   throw new UnauthorisedActionError('user is not is not valid!');
   // }
 
-  const session = { ...ctx.session, user: { id: userId } };
+  const session: IronSession<Required<SessionData>> = { ...ctx.session, user: { id: userId } };
 
   return next({ ctx: { ...ctx, session } });
 });
