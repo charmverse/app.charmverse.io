@@ -13,7 +13,7 @@ export class StagingStack extends Stack {
     super(scope, id, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
-      path: `${__dirname}/../deploy.zip`
+      path: `${__dirname}/../${id}.zip`
     });
     // Create a ElasticBeanStalk app. - must be 40 characters or less
     const appName = sanitizeAppName(id);
