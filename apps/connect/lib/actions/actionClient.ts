@@ -10,8 +10,11 @@ import { getIronOptions } from 'lib/session/getIronOptions';
 import type { SessionData } from 'lib/session/types';
 
 export const actionClient = createSafeActionClient({
-  handleServerErrorLog: async (err) => {
-    log.error('errrr', err);
+  handleServerErrorLog: async (e) => {
+    log.error(e.message, { error: e });
+  },
+  handleReturnedServerError(e) {
+    throw e;
   },
   // @ts-ignore
   defineMetadataSchema: () => {
@@ -40,7 +43,11 @@ export const actionClient = createSafeActionClient({
   });
 
 export const authActionClient = actionClient.use(async ({ next, ctx }) => {
-  const userId = ctx.session.user.id;
+  const userId = ctx.session.user?.id;
+
+  if (!userId) {
+    throw new UnauthorisedActionError('You are not logged in. Please try to login');
+  }
 
   const user = await prisma.user.findUnique({
     where: { id: userId }

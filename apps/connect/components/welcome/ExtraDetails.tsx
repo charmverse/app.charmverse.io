@@ -1,7 +1,7 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from '@mui/material';
+import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
@@ -10,6 +10,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { actionOnboarding } from 'lib/profile/onboardingAction';
 
+import { WelcomeButton } from './components/WelcomeButton';
 import type { FormValues } from './utils/form';
 import { schema } from './utils/form';
 
@@ -30,7 +31,7 @@ export function ExtraDetails() {
   });
 
   return (
-    <form action={formAction} onSubmit={(elem) => handleSubmit(() => elem.currentTarget.submit())}>
+    <form action={actionOnboarding} onSubmit={(elem) => handleSubmit(() => elem.currentTarget.submit())}>
       <FormControl sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
         <FormLabel id='form-email'>Email</FormLabel>
         <Controller
@@ -53,10 +54,9 @@ export function ExtraDetails() {
           )}
         />
       </FormControl>
-
-      <Button sx={{ mb: 4 }} type='submit' disabled={!isValid}>
+      <WelcomeButton sx={{ mb: 4 }} type='submit' disabled={!isValid}>
         Next
-      </Button>
+      </WelcomeButton>
     </form>
   );
 }

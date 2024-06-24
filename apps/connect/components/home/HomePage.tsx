@@ -1,8 +1,9 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import Link from '@mui/material/Link';
+import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { PageWrapper } from 'components/common/PageWrapper';
@@ -23,10 +24,12 @@ export function HomePage({ user }: { user: any }) {
         <Typography>Create your profile, add projects and compete for 540K OP in total prizes on Gitcoin.</Typography>
         {/* <WarpcastLogin /> */}
         <Box gap={2} display='flex' flexDirection='column' my={2} alignItems='center'>
-          <Button fullWidth>Connect with Farcaster</Button>
-          <Link href='https://warpcast.com' target='_blank' rel='noopener'>
+          <Button fullWidth href='/welcome' LinkComponent={Link}>
+            Connect with Farcaster
+          </Button>
+          <MuiLink href='https://warpcast.com' target='_blank' rel='noopener'>
             Don't have a Farcaster acccount?
-          </Link>
+          </MuiLink>
         </Box>
       </Box>
       <Divider />
