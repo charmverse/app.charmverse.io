@@ -16,7 +16,7 @@ export default function NotFound() {
       gap={5}
     >
       <Bolt />
-      <Typography variant='subtitle1'>Sorry! there was an error</Typography>
+      <Typography variant='subtitle1'>The page you are looking for does not exist!</Typography>
     </Box>
   );
 }
