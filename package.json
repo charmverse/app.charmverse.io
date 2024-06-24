@@ -358,6 +358,7 @@
     "@types/luxon": "^2.0.9",
     "@types/markdown-it": "^12.2.3",
     "@types/marked": "^4.0.2",
+    "@types/nanoid-dictionary": "^4.2.3",
     "@types/node": "^20.6.3",
     "@types/node-cron": "^3.0.1",
     "@types/papaparse": "^5.3.5",

@@ -20,12 +20,9 @@
       }
     ],
     "paths": {
+      "@connect/*": ["./*"],
       "adapters/*": ["../../adapters/*"],
-      "lib/*": ["./lib/*"],
-      "components/*": ["./components/*"],
-      "hooks/*": ["./hooks/*"],
-      "public/*": ["./public/*"],
-      "theme/*": ["./theme/*"],
+      "lib/*": ["../../lib/*"],
       "config/*": ["../../config/*"],
       "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
       "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],

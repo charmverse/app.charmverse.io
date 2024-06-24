@@ -1,6 +1,5 @@
 'use client';
 
-import type {} from '@mui/material/themeCssVarsAugmentation';
 import { darken, experimental_extendTheme as extendTheme } from '@mui/material/styles';
 
 import {

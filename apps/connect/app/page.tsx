@@ -1,6 +1,5 @@
+import { HomePage } from '@connect/components/home/HomePage';
 import { redirect } from 'next/navigation';
-
-import { HomePage } from 'components/home/HomePage';
 
 // tell Next that this route loads dynamic data
 export const dynamic = 'force-dynamic';

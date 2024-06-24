@@ -1,12 +1,11 @@
 'use client';
 
+import { CanvasQRCode } from '@connect/components/common/CanvasQrCode';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import type { ModalProps } from '@mui/material/Modal';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-
-import { CanvasQRCode } from 'components/common/CanvasQrCode';
 
 export function FarcasterLoginModal({ url, ...props }: Omit<ModalProps, 'children'> & { url?: string }) {
   return (

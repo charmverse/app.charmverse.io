@@ -1,14 +1,13 @@
+import { PageWrapper } from '@connect/components/common/PageWrapper';
+import { WarpcastLogin } from '@connect/components/common/WarpcastLogin/WarpcastLogin';
+import { ProjectItemSkeleton } from '@connect/components/projects/ProjectItemSkeleton';
+import { ProjectsList } from '@connect/components/projects/ProjectsList';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { Suspense } from 'react';
-
-import { PageWrapper } from 'components/common/PageWrapper';
-import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
-import { ProjectItemSkeleton } from 'components/projects/ProjectItemSkeleton';
-import { ProjectsList } from 'components/projects/ProjectsList';
 
 export function HomePage({ user }: { user: any }) {
   return (

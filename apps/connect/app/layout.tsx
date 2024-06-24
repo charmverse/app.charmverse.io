@@ -1,9 +1,8 @@
+import { AppProviders } from '@connect/components/layout/AppProviders';
 import Box from '@mui/material/Box';
 import getInitColorSchemeScript from '@mui/system/cssVars/getInitColorSchemeScript';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-
-import { AppProviders } from 'components/layout/AppProviders';
 
 import 'theme/cssVariables.scss';
 

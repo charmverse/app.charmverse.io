@@ -1,11 +1,11 @@
 'use client';
 
+import { useFarcasterConnection } from '@connect/hooks/useFarcasterConnection';
 import { AuthKitProvider, type AuthClientError } from '@farcaster/auth-kit';
 import Button from '@mui/material/Button';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback } from 'react';
 
-import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
 import { warpcastConfig } from 'lib/farcaster/config';
 
 import { FarcasterLoginModal } from './components/WarpcastModal';
