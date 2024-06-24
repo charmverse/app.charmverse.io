@@ -111,10 +111,10 @@ describe('loadAndGenerateCsv()', () => {
         .split('\n')
         .map((c) => c.trim())
     ).toStrictEqual([
-      'Title,Text,Select',
-      '"Card 1","Card 1 Text","Blue"',
-      '"Card 2","Card 2 Text","Red"',
-      '"Card 3","Card 3 Text",""'
+      'Title\tText\tSelect',
+      '"Card 1"\t"Card 1 Text"\t"Blue"',
+      '"Card 2"\t"Card 2 Text"\t"Red"',
+      '"Card 3"\t"Card 3 Text"\t""'
     ]);
   });
 
@@ -202,6 +202,6 @@ describe('loadAndGenerateCsv()', () => {
     expect(firstRow).toContain('In Progress');
     expect(firstRow).toContain('Feedback');
     expect(firstRow).toContain('Test project');
-    expect(firstRow).toContain('first guy|second guy');
+    expect(firstRow).toContain('first guy,second guy');
   });
 });

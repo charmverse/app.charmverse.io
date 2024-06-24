@@ -1,15 +1,10 @@
-import { CfnOutput, CfnTag, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnTag, Stack, StackProps } from 'aws-cdk-lib';
 import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
-import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import { Construct } from 'constructs';
 
-const domain = 'charmverse.co';
-
-type CustomOptions = { options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] };
-
-export class StagingStack extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps, { options = [] }: CustomOptions) {
+export class ProductionStack extends Stack {
+  constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
@@ -17,8 +12,6 @@ export class StagingStack extends Stack {
     });
     // Create a ElasticBeanStalk app. - must be 40 characters or less
     const appName = sanitizeAppName(id);
-
-    const deploymentDomain = `${appName}.${domain}`;
 
     const ebApp = new elasticbeanstalk.CfnApplication(this, 'Application', {
       applicationName: appName
@@ -106,17 +99,17 @@ export class StagingStack extends Stack {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'SecurityGroups',
-        value: 'staging-db-client'
+        value: 'prd-db-client'
       },
       {
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'EC2KeyName',
-        value: 'staging_keys'
+        value: 'northshore-webapp'
       },
       {
         namespace: 'aws:autoscaling:asg',
         optionName: 'MaxSize',
-        value: '1'
+        value: '3'
       },
       {
         namespace: 'aws:autoscaling:asg',
@@ -138,19 +131,13 @@ export class StagingStack extends Stack {
         namespace: 'aws:elasticbeanstalk:application',
         optionName: 'Application Healthcheck URL',
         value: '/api/health'
-      },
-      {
-        namespace: 'aws:elasticbeanstalk:application:environment',
-        optionName: 'DOMAIN',
-        value: 'https://' + deploymentDomain
-      },
-      ...options
+      }
     ];
 
     const resourceTags: CfnTag[] = [
       {
         key: 'env',
-        value: 'stg'
+        value: 'prd'
       }
     ];
 
@@ -163,38 +150,13 @@ export class StagingStack extends Stack {
     }
 
     // Create an Elastic Beanstalk environment to run the application
-    const ebEnv = new elasticbeanstalk.CfnEnvironment(this, 'Environment', {
+    new elasticbeanstalk.CfnEnvironment(this, 'Environment', {
       environmentName: appName,
       applicationName: ebApp.applicationName || appName,
       solutionStackName: '64bit Amazon Linux 2 v3.5.0 running Docker',
       optionSettings: optionSettingProperties,
       tags: resourceTags,
       versionLabel: appVersionProps.ref
-    });
-
-    const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
-      domainName: domain
-    });
-
-    new route53.ARecord(this, 'ARecord', {
-      zone,
-      recordName: deploymentDomain + '.',
-      //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
-      target: route53.RecordTarget.fromAlias({
-        bind: (): route53.AliasRecordTargetConfig => ({
-          dnsName: ebEnv.attrEndpointUrl,
-          // get hosted zone for elbs based on region: https://docs.aws.amazon.com/general/latest/gr/elb.html
-          hostedZoneId: 'Z35SXDOTRQ7X7K'
-        })
-      })
-    });
-
-    /**
-     * Output the distribution's url so we can pass it to external systems
-     *  Note: something at the end of the path is required or the Load balancer url never resolves
-     */
-    new CfnOutput(this, 'DeploymentUrl', {
-      value: 'https://' + deploymentDomain + '/'
     });
   }
 }

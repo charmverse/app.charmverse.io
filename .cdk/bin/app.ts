@@ -3,6 +3,7 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { WebappStagingStack } from '../WebappStagingStack';
 import { ConnectStagingStack } from '../ConnectStagingStack';
+import { ProductionStack } from '../ProductionStack';
 
 /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 const deployProps: cdk.StackProps = {
@@ -11,21 +12,20 @@ const deployProps: cdk.StackProps = {
 
 const app = new cdk.App();
 
-// Command example: cdk deploy --context stack=stg-connect
-const stackParam: string = app.node.getContext('stack');
+// Command example: cdk deploy --context name=stg-connect
 const stackNameParam: string = app.node.getContext('name');
 
 // Connect production
-if (stackParam === 'prd-connect') {
-  new ConnectStagingStack(app, stackNameParam, deployProps);
+if (stackNameParam.startsWith('prd')) {
+  new ProductionStack(app, stackNameParam, deployProps);
 }
 // Connect staging
-else if (stackParam === 'stg-connect') {
+else if (stackNameParam.startsWith('stg-connect')) {
   new ConnectStagingStack(app, stackNameParam, deployProps);
 }
 // Webapp staging
-else if (stackParam === 'stg-webapp') {
+else if (stackNameParam.startsWith('stg-webapp')) {
   new WebappStagingStack(app, stackNameParam, deployProps);
 } else {
-  throw new Error('Invalid stack parameter: ' + stackParam);
+  throw new Error('Invalid stack name parameter: ' + stackNameParam);
 }
