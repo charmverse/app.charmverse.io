@@ -103,8 +103,7 @@ const extendedTheme = extendTheme({
           ...(ownerState?.variant === 'rounded' && {
             borderRadius: 10
           }),
-          fontWeight: 500,
-          color: 'background.default'
+          fontWeight: 500
         })
       }
     },
