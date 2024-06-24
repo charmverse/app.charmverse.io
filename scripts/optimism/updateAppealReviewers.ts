@@ -43,6 +43,11 @@ export async function updateAppealReviewers() {
       select: {
         spaceId: true,
         id: true,
+        page: {
+          select: {
+            createdBy: true
+          }
+        },
         evaluations: {
           orderBy: {
             index: 'asc'
@@ -55,6 +60,8 @@ export async function updateAppealReviewers() {
     if (!currentEvaluation) {
       throw new Error(`Proposal ${proposal.id} is not appealable`);
     }
+    console.log(proposal.page?.createdBy);
+    console.log(currentEvaluation);
     // if (!currentEvaluation?.appealedAt) {
     //   throw new Error(`Proposal ${proposal.id} has not been appealed`);
     //}
@@ -131,5 +138,23 @@ export async function updateAppealReviewers() {
     console.log(`Updated ${updatedProposals}/${appealRows.length} proposal appeal reviewers`);
   }
 }
+
+async function markAppealed() {
+  const appealReason = '';
+
+  await prisma.proposalEvaluation.update({
+    where: {
+      id: '974710bf-d53d-45c1-8732-9a0bcf3f64ef'
+    },
+    data: {
+      appealedAt: new Date(),
+      result: null,
+      appealedBy: '1e530166-2a3e-4aee-9d86-cfa199784d28',
+      appealReason,
+      completedAt: null
+    }
+  });
+}
+// markAppealed();
 
 updateAppealReviewers();
