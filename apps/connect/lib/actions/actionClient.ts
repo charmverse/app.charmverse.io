@@ -35,10 +35,10 @@ export const actionClient = createSafeActionClient({
    * Middleware used for auth purposes.
    * Returns the context with the session object.
    */
-  .use(async ({ next }) => {
+  .use(async ({ next, clientInput }) => {
     const session = await getIronSession<SessionData>(cookies(), getIronOptions());
     return next({
-      ctx: { session }
+      ctx: { session, clientInput }
     });
   });
 

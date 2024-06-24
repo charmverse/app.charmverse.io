@@ -6,7 +6,7 @@ import { getRecentProjectsWithMembers } from 'lib/projects/getRecentProjectsWith
 
 import { ProjectItem } from './ProjectItem';
 
-export async function ProjectsList() {
+export async function ProjectsList({ userProjects }: { userProjects?: boolean }) {
   const projectsList = await getRecentProjectsWithMembers();
 
   if (projectsList.length === 0) {
