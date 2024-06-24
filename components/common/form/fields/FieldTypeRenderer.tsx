@@ -22,6 +22,7 @@ import { FieldWrapper } from './FieldWrapper';
 import { FileField } from './FileField';
 import { ImageField } from './ImageField';
 import { LabelField } from './LabelField';
+import { OptimismProjectSelector } from './OptimismProjectSelector';
 import { PersonInputField } from './PersonInputField';
 
 type TextInputConfig = {
@@ -199,6 +200,10 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
 
       case 'file': {
         return <FileField {...fieldProps} value={fieldProps.value as UploadedFileInfo} />;
+      }
+
+      case 'op_project': {
+        return <OptimismProjectSelector {...fieldProps} value={fieldProps.value as string} />;
       }
 
       default: {

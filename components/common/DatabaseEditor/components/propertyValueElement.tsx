@@ -34,6 +34,7 @@ import {
   PROPOSAL_STEP_LABELS,
   proposalStatusColors
 } from 'lib/databases/proposalDbProperties';
+import type { OpProjectFieldValue } from 'lib/forms/interfaces';
 import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { ProposalReviewerProperty } from 'lib/proposals/blocks/interfaces';
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
@@ -70,6 +71,7 @@ import { EmptyPlaceholder } from './properties/EmptyPlaceholder';
 import LastModifiedAt from './properties/lastModifiedAt/lastModifiedAt';
 import LastModifiedBy from './properties/lastModifiedBy/lastModifiedBy';
 import URLProperty from './properties/link/link';
+import { OptimismProjectLink } from './properties/OptimismProjectLink';
 import { ProposalNotesLink } from './properties/ProposalNotesLink';
 import { RelationPropertyPagesAutocomplete } from './properties/RelationPropertyPagesAutocomplete';
 import { RewardsDueDatePicker } from './properties/RewardsDueDatePicker';
@@ -161,7 +163,6 @@ function PropertyValueElement(props: Props) {
   const cardProperties = board.fields.cardProperties;
   const cardProperty = cardProperties.find((_cardProperty) => _cardProperty.id === propertyTemplate.id);
   const readOnly = proposal?.archived || props.readOnly || !!cardProperty?.readOnlyValues;
-
   const displayValue = OctoUtils.propertyDisplayValue({
     block: card,
     propertyValue,
@@ -178,7 +179,6 @@ function PropertyValueElement(props: Props) {
     propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID && value.toString() === '' ? 'Unlimited' : '';
   const router = useRouter();
   const domain = router.query.domain as string;
-
   const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
 
   const commonProps = {
@@ -695,6 +695,8 @@ function PropertyValueElement(props: Props) {
         centerContent={displayType !== 'table'}
       />
     );
+  } else if ((propertyTemplate as any).type === 'op_project' && typeof value === 'object') {
+    propertyValueElement = <OptimismProjectLink value={value as unknown as OpProjectFieldValue} />;
   }
 
   if (editableFields.includes(propertyTemplate.type)) {

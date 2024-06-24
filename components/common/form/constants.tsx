@@ -15,7 +15,10 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import ShortTextIcon from '@mui/icons-material/ShortText';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
+import { SvgIcon } from '@mui/material';
 import type { ReactNode } from 'react';
+
+import OptimismIcon from 'public/images/cryptoLogos/optimism.svg';
 
 export const formFieldTypes = [
   'project_profile',
@@ -33,11 +36,12 @@ export const formFieldTypes = [
   'label',
   'image',
   'file',
-  'milestone'
+  'milestone',
+  'op_project'
 ] as FormFieldType[];
 
 export const nonDuplicateFieldTypes = ['project_profile', 'milestone'] as FormFieldType[];
-export const nonPrivateFieldTypes = ['label', 'project_profile', 'milestone'] as FormFieldType[];
+export const nonPrivateFieldTypes = ['label', 'project_profile', 'op_project', 'milestone'] as FormFieldType[];
 
 export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   date: 'Date',
@@ -55,7 +59,8 @@ export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   image: 'Image',
   file: 'File',
   project_profile: 'Project Profile',
-  milestone: 'Milestone'
+  milestone: 'Milestone',
+  op_project: 'Optimism Project'
 };
 
 export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
@@ -74,7 +79,12 @@ export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
   image: <ImageIcon fontSize='small' />,
   file: <AttachFileIcon fontSize='small' />,
   project_profile: <AccountBoxIcon fontSize='small' />,
-  milestone: <BountyIcon fontSize='small' />
+  milestone: <BountyIcon fontSize='small' />,
+  op_project: (
+    <SvgIcon viewBox='0 0 20 20' fontSize='small'>
+      <OptimismIcon />
+    </SvgIcon>
+  )
 };
 
 export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
@@ -93,5 +103,6 @@ export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
   image: 'Upload an image',
   file: 'Upload a file',
   project_profile: 'Fill up project profile',
-  milestone: 'Add up milestone'
+  milestone: 'Add up milestone',
+  op_project: 'Optimism Project'
 };

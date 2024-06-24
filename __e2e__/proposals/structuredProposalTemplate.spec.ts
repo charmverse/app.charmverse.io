@@ -47,7 +47,8 @@ const testValues: Record<TestedFormFieldTypes, string> = {
   date: '2022-12-31',
   label: 'Label',
   project_profile: 'Project profile',
-  milestone: 'Milestone'
+  milestone: 'Milestone',
+  op_project: 'Op project'
 };
 
 test.beforeAll(async () => {

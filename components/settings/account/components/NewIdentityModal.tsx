@@ -5,8 +5,8 @@ import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 
 import { useAddUserWallets } from 'charmClient/hooks/profile';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import PrimaryButton from 'components/common/PrimaryButton';
 import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
 import { WalletSign } from 'components/login/components/WalletSign';
 import { AddWalletStep } from 'components/settings/account/components/AddWalletStep';
@@ -129,14 +129,20 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
             </IdentityProviderItem>
           ) : (
             <IdentityProviderItem type='Wallet' loading={isConnectingWallet} text='Add wallet address'>
-              <PrimaryButton size='small' onClick={() => setIdentityToAdd('wallet')} disabled={isConnectingWallet}>
+              <Button
+                color='primary'
+                size='small'
+                onClick={() => setIdentityToAdd('wallet')}
+                disabled={isConnectingWallet}
+              >
                 Connect
-              </PrimaryButton>
+              </Button>
             </IdentityProviderItem>
           )}
           {!isConnected && (
             <IdentityProviderItem type='Discord'>
-              <PrimaryButton
+              <Button
+                color='primary'
                 size='small'
                 onClick={() => {
                   popupLogin('/', 'connect');
@@ -145,12 +151,13 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
                 disabled={isDiscordLoading}
               >
                 Connect
-              </PrimaryButton>
+              </Button>
             </IdentityProviderItem>
           )}
           {!telegramAccount && !isOnCustomDomain && (
             <IdentityProviderItem type='Telegram'>
-              <PrimaryButton
+              <Button
+                color='primary'
                 disabled={!TELEGRAM_BOT_ID}
                 loading={isConnectingToTelegram}
                 disabledTooltip='Telegram bot is not configured'
@@ -161,7 +168,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
                 }}
               >
                 Connect
-              </PrimaryButton>
+              </Button>
             </IdentityProviderItem>
           )}
           {!farcasterAccount && (
@@ -171,7 +178,8 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
           )}
           {(!user?.googleAccounts || user.googleAccounts.length === 0) && (
             <IdentityProviderItem type='Google'>
-              <PrimaryButton
+              <Button
+                color='primary'
                 size='small'
                 onClick={() => {
                   loginWithGooglePopup({ type: 'connect' });
@@ -180,15 +188,20 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
                 disabled={isConnectingGoogle}
               >
                 Connect
-              </PrimaryButton>
+              </Button>
             </IdentityProviderItem>
           )}
 
           {!isOnCustomDomain && (
             <IdentityProviderItem type='VerifiedEmail'>
-              <PrimaryButton size='small' onClick={() => setIdentityToAdd('email')} disabled={isConnectingGoogle}>
+              <Button
+                color='primary'
+                size='small'
+                onClick={() => setIdentityToAdd('email')}
+                disabled={isConnectingGoogle}
+              >
                 Connect
-              </PrimaryButton>
+              </Button>
             </IdentityProviderItem>
           )}
         </List>
