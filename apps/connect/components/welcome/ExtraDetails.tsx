@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useFormState } from 'react-dom';
 import { Controller, useForm } from 'react-hook-form';
 
-import { onboardingAction } from 'lib/profile/onboardingAction';
+import { actionOnboarding } from 'lib/profile/onboardingAction';
 
 import type { FormValues } from './utils/form';
 import { schema } from './utils/form';
@@ -16,7 +16,7 @@ import { schema } from './utils/form';
 const defaultValues = { email: '', emailOption: 'notify' };
 
 export function ExtraDetails() {
-  const [state, formAction] = useFormState(onboardingAction, defaultValues);
+  const [state, formAction] = useFormState(actionOnboarding, defaultValues);
 
   const {
     control,

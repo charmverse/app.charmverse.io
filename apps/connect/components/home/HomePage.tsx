@@ -23,7 +23,7 @@ export function HomePage({ user }: { user: any }) {
         <Typography>Create your profile, add projects and compete for 540K OP in total prizes on Gitcoin.</Typography>
         {/* <WarpcastLogin /> */}
         <Box gap={2} display='flex' flexDirection='column' my={2} alignItems='center'>
-          <Button>Connect with Farcaster</Button>
+          <Button fullWidth>Connect with Farcaster</Button>
           <Link href='https://warpcast.com' target='_blank' rel='noopener'>
             Don't have a Farcaster acccount?
           </Link>
