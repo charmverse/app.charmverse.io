@@ -19,6 +19,8 @@ const socketServer = new Server(httpServer, {
     allowedHeaders: ['authorization'],
     credentials: true,
     origin: async (requestOrigin, callback) => {
+      // eslint-disable-next-line no-console
+      console.log('origin header', requestOrigin);
       // support any subdomain for staging
       if (
         requestOrigin?.endsWith('.charmverse.co') ||
