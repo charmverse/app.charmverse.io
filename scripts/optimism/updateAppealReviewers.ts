@@ -1,26 +1,43 @@
-
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
 import fs from 'fs';
 import path from 'path';
 import { isTruthy } from 'lib/utils/types';
+import { getCsvData } from './retroData';
 
 // Put the appeal-reviewers.json file in the same level as this file
-const proposalConfigs: {
-  // proposal page path
-  path: string
-  // Reviewer identifiers list
-  reviewers: string[]
-}[] = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'appeal-reviewers.json'), 'utf-8'))
+// const proposalConfigs: {
+//   // proposal page path
+//   path: string;
+//   // Reviewer identifiers list
+//   reviewers: string[];
+// }[] = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'appeal-reviewers.json'), 'utf-8'));
+
+const appealRows = getCsvData<{
+  'Charmverse link': string;
+  'Reviewer 1': string;
+  'Reviewer 2': string;
+  'Reviewer 3': string;
+  'Reviewer 4': string;
+  'Reviewer 5': string;
+}>('../optimism-data/appeals.csv');
 
 export async function updateAppealReviewers() {
-  const totalProposals = proposalConfigs.length;
   let updatedProposals = 0;
-  for (const proposalConfig of proposalConfigs) {
+  for (const proposalConfig of appealRows) {
+    const path = proposalConfig['Charmverse link'].split('/').pop();
+    const reviewerEmails = [
+      proposalConfig['Reviewer 1'],
+      proposalConfig['Reviewer 2'],
+      proposalConfig['Reviewer 3'],
+      proposalConfig['Reviewer 4'],
+      proposalConfig['Reviewer 5']
+    ].map((name) => name.split(' ')[0]);
+
     const proposal = await prisma.proposal.findFirstOrThrow({
       where: {
         page: {
-          path: proposalConfig.path
+          path
         }
       },
       select: {
@@ -28,81 +45,90 @@ export async function updateAppealReviewers() {
         id: true,
         evaluations: {
           orderBy: {
-            index: "asc"
+            index: 'asc'
           }
         }
       }
     });
 
-    const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-    if (currentEvaluation?.title !== "Full Review") {
-      throw new Error(`Proposal ${proposal.id} does not have a Full Review evaluation`);
-    }
-    if (!currentEvaluation?.appealable) {
+    const currentEvaluation = proposal.evaluations.find((evaluation) => evaluation.title === 'Full Review');
+    if (!currentEvaluation) {
       throw new Error(`Proposal ${proposal.id} is not appealable`);
     }
-    if (!currentEvaluation?.appealedAt) {
-      throw new Error(`Proposal ${proposal.id} has not been appealed`);
-    }
-    const reviewers = (await Promise.all(proposalConfig.reviewers.map(reviewer => prisma.user.findFirst({
-      where: {
-        spaceRoles: {
-          some: {
-            space: {
-              id: proposal.spaceId
+    // if (!currentEvaluation?.appealedAt) {
+    //   throw new Error(`Proposal ${proposal.id} has not been appealed`);
+    //}
+    const reviewers = (
+      await Promise.all(
+        reviewerEmails.map((reviewer) =>
+          prisma.user.findFirst({
+            where: {
+              spaceRoles: {
+                some: {
+                  space: {
+                    id: proposal.spaceId
+                  }
+                }
+              },
+              OR: [
+                {
+                  username: reviewer
+                },
+                {
+                  wallets: {
+                    some: {
+                      address: reviewer.toLowerCase()
+                    }
+                  }
+                },
+                {
+                  wallets: {
+                    some: {
+                      ensname: reviewer
+                    }
+                  }
+                },
+                {
+                  verifiedEmails: {
+                    some: {
+                      email: reviewer.toLowerCase()
+                    }
+                  }
+                }
+              ]
             },
-          }
-        },
-        OR: [
-          {
-            username: reviewer
-          },
-          {
-            wallets: {
-              some: {
-                address: reviewer.toLowerCase()
-              }
+            include: {
+              wallets: true,
+              verifiedEmails: true
             }
-          },
-          {
-            wallets: {
-              some: {
-                ensname: reviewer.toLowerCase()
-              }
-            }
-          },
-          {
-            verifiedEmails: {
-              some: {
-                email: reviewer
-              }
-            }
-          },
-        ]
-      }
-    })))).filter(isTruthy);
+          })
+        )
+      )
+    ).filter(isTruthy);
 
-    if (reviewers.length !== proposalConfig.reviewers.length) {
+    if (reviewers.length !== reviewerEmails.length) {
+      console.log(JSON.stringify(reviewers, null, 2));
+      console.log(reviewerEmails);
       throw new Error(`Could not find all reviewers for proposal ${proposal.id}`);
     }
 
-    await prisma.$transaction([
-      prisma.proposalAppealReviewer.deleteMany({
-        where: {
-          proposalId: proposal.id,
-          evaluationId: currentEvaluation.id
-        }
-      }),
-      prisma.proposalAppealReviewer.createMany({
-        data: reviewers.map(reviewer => ({
-          evaluationId: currentEvaluation.id,
-          userId: reviewer.id,
-          proposalId: proposal.id,
-        }))
-      })
-    ])
+    // await prisma.$transaction([
+    //   prisma.proposalAppealReviewer.deleteMany({
+    //     where: {
+    //       proposalId: proposal.id,
+    //       evaluationId: currentEvaluation.id
+    //     }
+    //   }),
+    //   prisma.proposalAppealReviewer.createMany({
+    //     data: reviewers.map((reviewer) => ({
+    //       evaluationId: currentEvaluation.id,
+    //       userId: reviewer.id,
+    //       proposalId: proposal.id
+    //     }))
+    //   })
+    // ]);
     updatedProposals++;
-    console.log(`Updated ${updatedProposals}/${totalProposals} proposal appeal reviewers`);
+    console.log(`Updated ${updatedProposals}/${appealRows.length} proposal appeal reviewers`);
   }
 }
 
