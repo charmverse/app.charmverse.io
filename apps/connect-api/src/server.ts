@@ -15,7 +15,7 @@ app.use(
   cors({
     origin: (ctx) => {
       const origin = ctx.request.headers.origin;
-      log.info('origin headers', ctx.request.headers);
+      log.info('origin headers', ctx.request);
       if (origin && (isDevEnv || isTestEnv)) {
         return origin;
       }

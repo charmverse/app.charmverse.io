@@ -219,4 +219,6 @@ services:
       - prd-cron
       - prd-webapp
       - prd-sockets
+      - prd-connect
+      - prd-connect-api
       - ddtst
