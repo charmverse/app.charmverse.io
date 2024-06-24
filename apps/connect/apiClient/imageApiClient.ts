@@ -1,5 +1,4 @@
-import { POST, GET, DELETE, PUT } from 'adapters/http';
-import { baseUrl } from 'config/constants';
+import { POST, GET } from 'adapters/http';
 import { encodeFilename } from 'lib/utils/file';
 
 import { BaseConnectApiClient } from './baseConnectApiClient';

@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { PageWrapper } from 'components/common/PageWrapper';
-import { CreateProjectButton } from 'components/projects/CreateProjectButton';
 import { ProjectItemSkeleton } from 'components/projects/ProjectItemSkeleton';
 import { ProjectsList } from 'components/projects/ProjectsList';
 
@@ -28,7 +27,7 @@ export function HomePage({ user }: { user: any }) {
             Connect with Farcaster
           </Button>
           <MuiLink href='https://warpcast.com' target='_blank' rel='noopener'>
-            Don't have a Farcaster acccount?
+            Don't have a Farcaster account?
           </MuiLink>
         </Box>
       </Box>
@@ -38,11 +37,6 @@ export function HomePage({ user }: { user: any }) {
         <Suspense fallback={<ProjectItemSkeleton />}>
           <ProjectsList />
         </Suspense>
-      </Box>
-
-      <Box mt={2} gap={2} display='flex' flexDirection='column'>
-        <Typography variant='h5'>Your Projects</Typography>
-        <CreateProjectButton />
       </Box>
     </PageWrapper>
   );

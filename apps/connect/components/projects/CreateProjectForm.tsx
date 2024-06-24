@@ -7,6 +7,7 @@ import { Controller, useController, useFieldArray, useForm } from 'react-hook-fo
 
 import { Avatar } from 'components/common/Avatar';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
+import { actionCreateProject } from 'lib/projects/createProjectAction';
 import { ResizeType } from 'lib/utils/file';
 import { inputBackground } from 'theme/colors';
 
@@ -32,7 +33,7 @@ function MultiTextValueFields({
 
   return (
     <Stack>
-      <FormLabel>{label}</FormLabel>
+      <FormLabel id={`project-${name.toLowerCase().replaceAll(' ', '')}`}>{label}</FormLabel>
       <Controller
         control={control}
         name={`${name}.0` as FieldArrayPath<FormValues>}
@@ -194,7 +195,7 @@ function CoverImageField({ control }: { control: Control<FormValues> }) {
   );
 }
 
-export function ProjectForm({ onCancel }: { onCancel: VoidFunction }) {
+export function CreateProjectForm({ onCancel }: { onCancel: VoidFunction }) {
   const {
     control,
     formState: { isValid },
@@ -207,121 +208,140 @@ export function ProjectForm({ onCancel }: { onCancel: VoidFunction }) {
   });
 
   return (
-    <Stack gap={2}>
-      <Stack>
-        <FormLabel>Name</FormLabel>
-        <Controller
-          control={control}
-          name='name'
-          render={({ field, fieldState }) => (
-            <TextField placeholder='Acme Inc.' aria-labelledby='project-name' error={!!fieldState.error} {...field} />
-          )}
-        />
-      </Stack>
-      <Stack>
-        <FormLabel>Description</FormLabel>
-        <Controller
-          control={control}
-          name='description'
-          render={({ field }) => (
-            <TextField
-              multiline
-              rows={3}
-              aria-labelledby='project-description'
-              placeholder='A description of your project'
-              {...field}
+    <>
+      <Typography variant='h5'>Create a Project</Typography>
+      <form
+        action={actionCreateProject}
+        onSubmit={() => {
+          handleSubmit(() => {
+            actionCreateProject({ parsedInput: getValues(), ctx: {} });
+          });
+        }}
+      >
+        <Stack gap={2}>
+          <Stack>
+            <FormLabel id='project-name'>Name</FormLabel>
+            <Controller
+              control={control}
+              name='name'
+              render={({ field, fieldState }) => (
+                <TextField
+                  placeholder='Acme Inc.'
+                  aria-labelledby='project-name'
+                  error={!!fieldState.error}
+                  {...field}
+                />
+              )}
             />
-          )}
-        />
-      </Stack>
-      <Stack>
-        <FormLabel>Project avatar and cover image</FormLabel>
-        <Stack direction='row' gap={1}>
-          <AvatarField control={control} />
-          <CoverImageField control={control} />
+          </Stack>
+          <Stack>
+            <FormLabel id='project-description'>Description</FormLabel>
+            <Controller
+              control={control}
+              name='description'
+              render={({ field }) => (
+                <TextField
+                  multiline
+                  rows={3}
+                  aria-labelledby='project-description'
+                  placeholder='A description of your project'
+                  {...field}
+                />
+              )}
+            />
+          </Stack>
+          <Stack>
+            <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
+            <Stack direction='row' gap={1}>
+              <AvatarField control={control} />
+              <CoverImageField control={control} />
+            </Stack>
+          </Stack>
+          <Stack>
+            <FormLabel id='project-category'>Category</FormLabel>
+            <Controller
+              control={control}
+              name='category'
+              render={({ field, fieldState }) => (
+                <Select
+                  displayEmpty
+                  fullWidth
+                  aria-labelledby='project-category'
+                  renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
+                  error={!!fieldState.error}
+                  {...field}
+                >
+                  {CATEGORIES.map((category) => (
+                    <MenuItem key={category} value={category}>
+                      {category}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+          </Stack>
+          <MultiTextValueFields control={control} name='websites' label='Websites' placeholder='https://acme-inc.com' />
+          <MultiTextValueFields
+            control={control}
+            name='farcasterIds'
+            label='Farcaster'
+            placeholder='https://farcaster.xyz'
+          />
+          <Stack>
+            <FormLabel id='project-twitter'>X.com</FormLabel>
+            <Controller
+              control={control}
+              name='twitter'
+              render={({ field, fieldState }) => (
+                <TextField
+                  placeholder='https://x.com/acme-inc'
+                  aria-labelledby='project-twitter'
+                  error={!!fieldState.error}
+                  {...field}
+                />
+              )}
+            />
+          </Stack>
+          <Stack>
+            <FormLabel id='project-github'>Github</FormLabel>
+            <Controller
+              control={control}
+              name='github'
+              render={({ field, fieldState }) => (
+                <TextField
+                  placeholder='https://github.com/acme-inc'
+                  aria-labelledby='project-github'
+                  error={!!fieldState.error}
+                  {...field}
+                />
+              )}
+            />
+          </Stack>
+          <Stack>
+            <FormLabel id='project-mirror'>Mirror</FormLabel>
+            <Controller
+              control={control}
+              name='mirror'
+              render={({ field, fieldState }) => (
+                <TextField
+                  placeholder='https://mirror.xyz/acme-inc'
+                  aria-labelledby='project-mirror'
+                  error={!!fieldState.error}
+                  {...field}
+                />
+              )}
+            />
+          </Stack>
+          <Stack justifyContent='space-between' flexDirection='row'>
+            <Button color='error' variant='outlined' onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button type='submit' disabled={!isValid}>
+              Next
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
-      <Stack>
-        <FormLabel>Category</FormLabel>
-        <Controller
-          control={control}
-          name='category'
-          render={({ field, fieldState }) => (
-            <Select
-              displayEmpty
-              fullWidth
-              aria-labelledby='project-category'
-              renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
-              error={!!fieldState.error}
-              {...field}
-            >
-              {CATEGORIES.map((category) => (
-                <MenuItem key={category} value={category}>
-                  {category}
-                </MenuItem>
-              ))}
-            </Select>
-          )}
-        />
-      </Stack>
-      <MultiTextValueFields control={control} name='websites' label='Websites' placeholder='https://acme-inc.com' />
-      <MultiTextValueFields
-        control={control}
-        name='farcasterIds'
-        label='Farcaster'
-        placeholder='https://farcaster.xyz'
-      />
-      <Stack>
-        <FormLabel>X.com</FormLabel>
-        <Controller
-          control={control}
-          name='twitter'
-          render={({ field, fieldState }) => (
-            <TextField
-              placeholder='https://x.com/acme-inc'
-              aria-labelledby='project-twitter'
-              error={!!fieldState.error}
-              {...field}
-            />
-          )}
-        />
-      </Stack>
-      <Stack>
-        <FormLabel>Github</FormLabel>
-        <Controller
-          control={control}
-          name='github'
-          render={({ field, fieldState }) => (
-            <TextField
-              placeholder='https://github.com/acme-inc'
-              aria-labelledby='project-github'
-              error={!!fieldState.error}
-              {...field}
-            />
-          )}
-        />
-      </Stack>
-      <Stack>
-        <FormLabel>Mirror</FormLabel>
-        <Controller
-          control={control}
-          name='mirror'
-          render={({ field, fieldState }) => (
-            <TextField
-              placeholder='https://mirror.xyz/acme-inc'
-              aria-labelledby='project-mirror'
-              error={!!fieldState.error}
-              {...field}
-            />
-          )}
-        />
-      </Stack>
-      <Stack justifyContent='space-between' flexDirection='row'>
-        <Button color='error' variant='outlined' onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button disabled={!isValid}>Next</Button>
-      </Stack>
-    </Stack>
+      </form>
+    </>
   );
 }
