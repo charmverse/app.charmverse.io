@@ -2,6 +2,8 @@ import { log } from '@charmverse/core/log';
 import type Koa from 'koa';
 
 export async function healthCheck(ctx: Koa.Context) {
+  // eslint-disable-next-line no-console
+  console.log('health check', ctx.headers);
   ctx.body = 'hello world';
 }
 
