@@ -42,7 +42,7 @@ export default function KanbanHiddenColumnItem(props: Props): JSX.Element {
   }
 
   return (
-    <div ref={drop} key={group.id || 'empty'} className={className}>
+    <div ref={drop as any} key={group.id || 'empty'} className={className}>
       <MenuWrapper disabled={props.readOnly}>
         <Label key={group.id || 'empty'} color={group.option?.color}>
           {group.option?.value || group.value}

@@ -141,7 +141,7 @@ function generateCSV(
   let csvContent = '';
 
   rows.forEach((row) => {
-    const encodedRow = row.join(',');
+    const encodedRow = row.join('\t');
     csvContent += `${encodedRow}\r\n`;
   });
 
@@ -266,7 +266,7 @@ function getCSVColumns({
       propertyTemplate.type === 'proposalReviewer' ||
       propertyTemplate.type === 'relation'
     ) {
-      const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('|');
+      const multiSelectValue = (((displayValue as unknown) || []) as string[]).join(',');
       columns.push(multiSelectValue);
     } else if (propertyTemplate.type === 'proposalUrl') {
       // proposalUrl is an array on the Rewards database of [title, url], and only a string on database-as-a-source

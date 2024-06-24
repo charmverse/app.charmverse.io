@@ -76,16 +76,44 @@ services:
     profiles:
       - stg-ceramic
 
+  prd-connect:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/connect --keepAliveTimeout 70000'
+      ]
+    profiles:
+      - prd-connect
+
   stg-connect:
     extends:
       service: defaults
     ports:
       - '80:3000'
-    command: ['sh', '-c', 'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/connect --keepAliveTimeout 70000']
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/connect --keepAliveTimeout 70000'
+      ]
     environment:
       - REACT_APP_APP_ENV=staging
     profiles:
       - stg-connect
+
+  prd-connect-api:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'npm run connect-api:start:prod']
+    ports:
+      - '80:3000'
+    profiles:
+      - prd-connect-api
 
   stg-connect-api:
     extends:
@@ -191,4 +219,6 @@ services:
       - prd-cron
       - prd-webapp
       - prd-sockets
+      - prd-connect
+      - prd-connect-api
       - ddtst

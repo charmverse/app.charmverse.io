@@ -200,7 +200,11 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
             const { inputValue } = params;
 
             // Suggest the creation of a new value
-            const isExisting = options.some((option) => inputValue.toLowerCase() === option.name?.toLocaleLowerCase());
+            const isExisting = options.some(
+              (option) =>
+                // Check exists in case a field has non string values but we ended up here (changing type of an incompatible property)
+                typeof option.name === 'string' && inputValue.toLowerCase() === option.name?.toLocaleLowerCase()
+            );
             if (inputValue !== '' && !isExisting && onCreateOption && canEditOptions) {
               filtered.push({
                 temp: true,

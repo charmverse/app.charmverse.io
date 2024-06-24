@@ -1,25 +1,31 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CharmVerseStagingStack } from '../charmverse-staging-stack';
-import { ConnectAppStagingStack } from '../connect-staging-stack';
-
-const app = new cdk.App();
-
-const stackName = 'stg-charmverse-' + process.env.STAGE;
-
-const account = '310849459438';
-const region = 'us-east-1';
+import { WebappStagingStack } from '../WebappStagingStack';
+import { ConnectStagingStack } from '../ConnectStagingStack';
+import { ProductionStack } from '../ProductionStack';
 
 /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 const deployProps: cdk.StackProps = {
-  env: { account, region }
+  env: { account: '310849459438', region: 'us-east-1' }
 };
 
-var deployedStack;
+const app = new cdk.App();
 
-if (process.env.DEPLOYED_APP === 'connect') {
-  deployedStack = new ConnectAppStagingStack({ scope: app, id: stackName, props: deployProps });
+// Command example: cdk deploy --context name=stg-connect
+const stackNameParam: string = app.node.getContext('name');
+
+// Connect production
+if (stackNameParam.startsWith('prd')) {
+  new ProductionStack(app, stackNameParam, deployProps);
+}
+// Connect staging
+else if (stackNameParam.startsWith('stg-connect')) {
+  new ConnectStagingStack(app, stackNameParam, deployProps);
+}
+// Webapp staging
+else if (stackNameParam.startsWith('stg-webapp')) {
+  new WebappStagingStack(app, stackNameParam, deployProps);
 } else {
-  deployedStack = new CharmVerseStagingStack({ scope: app, id: stackName, props: deployProps });
+  throw new Error('Invalid stack name parameter: ' + stackNameParam);
 }
