@@ -2,7 +2,7 @@ import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { createSafeActionClient } from 'next-safe-action/typeschema';
 import * as yup from 'yup';
 
@@ -34,8 +34,10 @@ export const actionClient = createSafeActionClient({
    */
   .use(async ({ next }) => {
     const session = await getIronSession<SessionData>(cookies(), getIronOptions());
+    const headerList = headers();
+
     return next({
-      ctx: { session }
+      ctx: { session, headers: headerList }
     });
   });
 
@@ -55,5 +57,7 @@ export const authActionClient = actionClient.use(async ({ next, ctx }) => {
   //   throw new UnauthorisedActionError('user is not is not valid!');
   // }
 
-  return next({ ctx });
+  const session = { ...ctx.session, user: { id: userId } };
+
+  return next({ ctx: { ...ctx, session } });
 });
