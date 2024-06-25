@@ -49,7 +49,7 @@ export function logRoutes(router: Router) {
   let endpointCount = 0;
 
   // Log the routes
-  routeMap.forEach((methods, path) => {
+  routeMap.forEach((methods, path: string) => {
     routesCount += 1;
     const coloredMethods = Array.from(methods)
       .map((method) => {
@@ -59,7 +59,7 @@ export function logRoutes(router: Router) {
       })
       .join(' ');
 
-    log.info(`${BOLD}${path}${RESET} ${coloredMethods}`);
+    log.info(`${BOLD}${path.replace('.js', '')}${RESET} ${coloredMethods}`);
   });
 
   // eslint-disable-next-line no-console
