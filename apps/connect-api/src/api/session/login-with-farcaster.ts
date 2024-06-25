@@ -18,10 +18,6 @@ router.POST(async (ctx: RouterContext<FarcasterBody, LoggedInUser>) => {
   await ctx.request.session.save();
 
   ctx.body = loggedInUser;
-  // ctx.body = {
-  //   messages: 'Hello!',
-  //   received: ctx.request.body.message
-  // };
 });
 
 export default router;
