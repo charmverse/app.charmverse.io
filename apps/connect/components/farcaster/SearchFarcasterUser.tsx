@@ -16,7 +16,6 @@ export function SearchFarcasterUser({
 }) {
   const [farcasterProfile, setFarcasterProfile] = useState<FarcasterProfile | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
-
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((_searchTerm: string) => {
       getFarcasterProfile({
@@ -35,7 +34,7 @@ export function SearchFarcasterUser({
   }, []);
 
   useEffect(() => {
-    if (searchTerm && searchTerm.length > 3) {
+    if (searchTerm && searchTerm.length >= 3) {
       debouncedGetPublicSpaces(searchTerm);
     } else {
       setFarcasterProfile(null);

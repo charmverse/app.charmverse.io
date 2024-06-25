@@ -1,3 +1,6 @@
+import { customAlphabet } from 'nanoid';
+import * as dictionaries from 'nanoid-dictionary';
+
 // generate a color based on a string. Copied from https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
 export function stringToColor(name: string, saturation = 50, lightness = 60) {
   if (name === '') {
@@ -17,4 +20,10 @@ export function stringToHue(name: string) {
 
   const h = hash % 360;
   return h;
+}
+
+const uidGenerator = customAlphabet(dictionaries.lowercase + dictionaries.numbers, 8);
+
+export function uid(): string {
+  return uidGenerator();
 }

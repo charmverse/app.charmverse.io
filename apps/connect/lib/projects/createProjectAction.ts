@@ -1,10 +1,14 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
+import { redirect } from 'next/navigation';
+import { v4 } from 'uuid';
 
 import type { FormValues } from 'components/projects/utils/form';
 import { schema } from 'components/projects/utils/form';
 import { authActionClient } from 'lib/actions/actionClient';
+import { getFarcasterProfile } from 'lib/farcaster/getFarcasterUser';
+import { uid } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/type';
 
 export type FarcasterAccount = {
@@ -46,6 +50,77 @@ export const actionCreateProject = authActionClient
       {}
     );
 
+    const projectMembers = (
+      await Promise.all(
+        input.projectMembers.slice(1).map(async (member) => {
+          if (farcasterAccountsUserIdRecord[member.farcasterId]) {
+            return {
+              userId: farcasterAccountsUserIdRecord[member.farcasterId],
+              name: member.name,
+              farcasterId: member.farcasterId
+            };
+          } else {
+            try {
+              const farcasterProfile = await getFarcasterProfile({
+                fid: member.farcasterId
+              });
+              if (farcasterProfile) {
+                const farcasterWalletUser = await prisma.user.findFirst({
+                  where: {
+                    wallets: {
+                      some: {
+                        address: {
+                          in: farcasterProfile.connectedAddresses.map((address) => address.toLowerCase())
+                        }
+                      }
+                    }
+                  }
+                });
+                if (farcasterWalletUser) {
+                  farcasterAccountsUserIdRecord[member.farcasterId] = farcasterWalletUser.id;
+                } else {
+                  const username = farcasterProfile.body.username;
+                  const displayName = farcasterProfile.body.displayName;
+                  const bio = farcasterProfile.body.bio;
+                  const pfpUrl = farcasterProfile.body.avatarUrl;
+                  const fid = member.farcasterId;
+
+                  const newUser = await prisma.user.create({
+                    data: {
+                      id: v4(),
+                      username,
+                      identityType: 'Farcaster',
+                      claimed: false,
+                      avatar: farcasterProfile.body.avatarUrl,
+                      farcasterUser: {
+                        create: {
+                          account: { username, displayName, bio, pfpUrl },
+                          fid
+                        }
+                      },
+                      path: uid(),
+                      profile: {
+                        create: {
+                          ...(bio && { description: bio || '' }),
+                          social: {
+                            farcasterUrl: `https://warpcast.com/${username}`
+                          }
+                        }
+                      }
+                    }
+                  });
+
+                  farcasterAccountsUserIdRecord[member.farcasterId] = newUser.id;
+                }
+              }
+            } catch (err) {
+              return null;
+            }
+          }
+        })
+      )
+    ).filter(isTruthy);
+
     await prisma.project.create({
       data: {
         name: input.name,
@@ -71,7 +146,7 @@ export const actionCreateProject = authActionClient
                 name: input.projectMembers[0].name,
                 farcasterId: input.projectMembers[0].farcasterId
               },
-              ...input.projectMembers.slice(1).map((member) => ({
+              ...projectMembers.map((member) => ({
                 teamLead: false,
                 updatedBy: currentUserId,
                 userId: farcasterAccountsUserIdRecord[member.farcasterId] ?? undefined,
@@ -83,4 +158,6 @@ export const actionCreateProject = authActionClient
         }
       }
     });
+
+    redirect('/projects');
   });

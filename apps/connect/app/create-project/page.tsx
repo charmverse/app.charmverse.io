@@ -21,9 +21,10 @@ export default function CreateProject() {
     defaultValues: {
       name: '',
       projectMembers: [
+        // Chris Carella
         {
-          farcasterId: 1,
-          name: 'ccarella.eth'
+          farcasterId: 472,
+          name: 'ccarella'
         }
       ]
     },
