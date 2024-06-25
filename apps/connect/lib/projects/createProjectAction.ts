@@ -59,63 +59,70 @@ export const actionCreateProject = authActionClient
               name: member.name,
               farcasterId: member.farcasterId
             };
-          } else {
-            try {
-              const farcasterProfile = await getFarcasterProfile({
-                fid: member.farcasterId
-              });
-              if (farcasterProfile) {
-                const farcasterWalletUser = await prisma.user.findFirst({
-                  where: {
-                    wallets: {
-                      some: {
-                        address: {
-                          in: farcasterProfile.connectedAddresses.map((address) => address.toLowerCase())
-                        }
-                      }
-                    }
-                  }
-                });
-                if (farcasterWalletUser) {
-                  farcasterAccountsUserIdRecord[member.farcasterId] = farcasterWalletUser.id;
-                } else {
-                  const username = farcasterProfile.body.username;
-                  const displayName = farcasterProfile.body.displayName;
-                  const bio = farcasterProfile.body.bio;
-                  const pfpUrl = farcasterProfile.body.avatarUrl;
-                  const fid = member.farcasterId;
-
-                  const newUser = await prisma.user.create({
-                    data: {
-                      id: v4(),
-                      username,
-                      identityType: 'Farcaster',
-                      claimed: false,
-                      avatar: farcasterProfile.body.avatarUrl,
-                      farcasterUser: {
-                        create: {
-                          account: { username, displayName, bio, pfpUrl },
-                          fid
-                        }
-                      },
-                      path: uid(),
-                      profile: {
-                        create: {
-                          ...(bio && { description: bio || '' }),
-                          social: {
-                            farcasterUrl: `https://warpcast.com/${username}`
-                          }
-                        }
-                      }
-                    }
-                  });
-
-                  farcasterAccountsUserIdRecord[member.farcasterId] = newUser.id;
-                }
-              }
-            } catch (err) {
+          }
+          try {
+            const farcasterProfile = await getFarcasterProfile({
+              fid: member.farcasterId
+            });
+            if (!farcasterProfile) {
               return null;
             }
+            const farcasterWalletUser = await prisma.user.findFirst({
+              where: {
+                wallets: {
+                  some: {
+                    address: {
+                      in: farcasterProfile.connectedAddresses.map((address) => address.toLowerCase())
+                    }
+                  }
+                }
+              }
+            });
+            if (farcasterWalletUser) {
+              return {
+                userId: farcasterWalletUser.id,
+                name: member.name,
+                farcasterId: member.farcasterId
+              };
+            }
+            const username = farcasterProfile.body.username;
+            const displayName = farcasterProfile.body.displayName;
+            const bio = farcasterProfile.body.bio;
+            const pfpUrl = farcasterProfile.body.avatarUrl;
+            const fid = member.farcasterId;
+
+            const newUser = await prisma.user.create({
+              data: {
+                id: v4(),
+                username,
+                identityType: 'Farcaster',
+                claimed: false,
+                avatar: farcasterProfile.body.avatarUrl,
+                farcasterUser: {
+                  create: {
+                    account: { username, displayName, bio, pfpUrl },
+                    fid
+                  }
+                },
+                path: uid(),
+                profile: {
+                  create: {
+                    ...(bio && { description: bio || '' }),
+                    social: {
+                      farcasterUrl: `https://warpcast.com/${username}`
+                    }
+                  }
+                }
+              }
+            });
+
+            return {
+              userId: newUser.id,
+              name: member.name,
+              farcasterId: member.farcasterId
+            };
+          } catch (err) {
+            return null;
           }
         })
       )
