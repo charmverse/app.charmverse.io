@@ -3,6 +3,7 @@ import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { LoginWithFarcasterParams } from 'lib/farcaster/loginWithFarcaster';
 import { loginWithFarcaster } from 'lib/farcaster/loginWithFarcaster';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
@@ -21,7 +22,7 @@ async function loginWarpcastHandler(req: NextApiRequest, res: NextApiResponse<Lo
   const user = await loginWithFarcaster({
     ...body,
     signupAnalytics
-  });
+  } as LoginWithFarcasterParams);
 
   req.session.anonymousUserId = undefined;
 
