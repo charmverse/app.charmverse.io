@@ -78,102 +78,101 @@ export async function loginWithFarcaster({
     trackUserAction('sign_in', { userId: farcasterUser.user.id, identityType: 'Farcaster' });
 
     return farcasterUser.user;
-  } else {
-    const userWithWallet = await prisma.user.findFirst({
-      where: {
-        wallets: {
-          some: {
-            address: {
-              in: verifications
-            }
+  }
+  const userWithWallet = await prisma.user.findFirst({
+    where: {
+      wallets: {
+        some: {
+          address: {
+            in: verifications
           }
         }
-      },
-      include: {
-        profile: true
       }
-    });
-
-    const userId = userWithWallet?.id ?? uuid();
-
-    let avatar: string | null = null;
-    if (pfpUrl) {
-      try {
-        ({ url: avatar } = await uploadUrlToS3({
-          pathInS3: getUserS3FilePath({ userId, url: pfpUrl }),
-          url: pfpUrl
-        }));
-      } catch (error) {
-        log.warn('Error while uploading avatar to S3', error);
-      }
+    },
+    include: {
+      profile: true
     }
+  });
 
-    if (userWithWallet) {
-      const updatedUser = await prisma.user.update({
-        where: {
-          id: userWithWallet.id
-        },
-        data: {
-          profile: {
-            upsert: {
-              create: {
-                description: bio || '',
-                social: {
-                  farcasterUrl: `https://warpcast.com/${username}`
-                }
-              },
-              update: {
-                description: userWithWallet.profile?.description || bio || '',
-                locale: userWithWallet.profile?.locale,
-                timezone: userWithWallet.profile?.timezone,
-                social: {
-                  farcasterUrl: `https://warpcast.com/${username}`
-                }
-              }
-            }
-          },
-          farcasterUser: {
+  if (userWithWallet) {
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userWithWallet.id
+      },
+      data: {
+        profile: {
+          upsert: {
             create: {
-              account: { username, displayName, bio, pfpUrl },
-              fid
+              description: bio || '',
+              social: {
+                farcasterUrl: `https://warpcast.com/${username}`
+              }
+            },
+            update: {
+              description: userWithWallet.profile?.description || bio || '',
+              locale: userWithWallet.profile?.locale,
+              timezone: userWithWallet.profile?.timezone,
+              social: {
+                farcasterUrl: `https://warpcast.com/${username}`
+              }
             }
           }
         },
-        include: sessionUserRelations
-      });
-
-      trackUserAction('sign_in', { userId: userWithWallet.id, identityType: 'Farcaster' });
-
-      return updatedUser;
-    }
-
-    const newUser = await prisma.user.create({
-      data: {
-        id: userId,
-        username,
-        identityType: 'Farcaster',
-        avatar,
         farcasterUser: {
           create: {
             account: { username, displayName, bio, pfpUrl },
             fid
-          }
-        },
-        path: uid(),
-        profile: {
-          create: {
-            ...(bio && { description: bio || '' }),
-            social: {
-              farcasterUrl: `https://warpcast.com/${username}`
-            }
           }
         }
       },
       include: sessionUserRelations
     });
 
-    postUserCreate({ user: newUser, identityType: 'Farcaster', signupAnalytics });
+    trackUserAction('sign_in', { userId: userWithWallet.id, identityType: 'Farcaster' });
 
-    return newUser;
+    return updatedUser;
   }
+
+  const userId = uuid();
+
+  let avatar: string | null = null;
+  if (pfpUrl) {
+    try {
+      ({ url: avatar } = await uploadUrlToS3({
+        pathInS3: getUserS3FilePath({ userId, url: pfpUrl }),
+        url: pfpUrl
+      }));
+    } catch (error) {
+      log.warn('Error while uploading avatar to S3', error);
+    }
+  }
+
+  const newUser = await prisma.user.create({
+    data: {
+      id: userId,
+      username,
+      identityType: 'Farcaster',
+      avatar,
+      farcasterUser: {
+        create: {
+          account: { username, displayName, bio, pfpUrl },
+          fid
+        }
+      },
+      path: uid(),
+      profile: {
+        create: {
+          ...(bio && { description: bio || '' }),
+          social: {
+            farcasterUrl: `https://warpcast.com/${username}`
+          }
+        }
+      }
+    },
+    include: sessionUserRelations
+  });
+
+  postUserCreate({ user: newUser, identityType: 'Farcaster', signupAnalytics });
+
+  return newUser;
 }
