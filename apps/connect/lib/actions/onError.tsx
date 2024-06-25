@@ -1,6 +1,5 @@
 import { DataNotFoundError, SystemError, UnknownError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import { Prisma } from '@charmverse/core/prisma';
 import { getIronSession } from 'iron-session';
 import { headers, cookies } from 'next/headers';
 
@@ -13,7 +12,7 @@ export async function handleServerError(err: any) {
   // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
   // P2025 is thrown when a record is not found
   if (err.code === 'P2025') {
-    return new DataNotFoundError(`Data not found`);
+    throw new DataNotFoundError(`Data not found`);
   }
 
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
@@ -47,5 +46,5 @@ export async function handleServerError(err: any) {
     });
   }
 
-  return { ...errorAsSystemError };
+  return err.message;
 }

@@ -1,26 +1,17 @@
+import { WelcomePage } from '@connect/components/welcome/WelcomePage';
+import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
 import { redirect } from 'next/navigation';
 
-import { WelcomePage } from 'components/welcome/WelcomePage';
-import { getUserProfile } from 'lib/profile/getUser';
-import { getSession } from 'lib/session/getSession';
-
 export default async function Welcome() {
-  const session = await getSession();
-  const userId = session?.user?.id;
+  const user = await getCurrentUser();
 
-  if (!userId) {
+  if (!user?.data) {
     redirect('/');
   }
 
-  const user = await getUserProfile('id', userId);
-
-  if (!user) {
-    redirect('/');
+  if (user.data?.connectOnboarded) {
+    redirect('/profile');
   }
 
-  if (user.connectOnboarded) {
-    redirect('/dashboard');
-  }
-
-  return <WelcomePage user={user} />;
+  return <WelcomePage user={user.data} />;
 }
