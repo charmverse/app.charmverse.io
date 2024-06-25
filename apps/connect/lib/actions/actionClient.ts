@@ -1,21 +1,19 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { IronSession } from 'iron-session';
 import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { createSafeActionClient } from 'next-safe-action/typeschema';
 import * as yup from 'yup';
 
 import { getIronOptions } from 'lib/session/getIronOptions';
 import type { SessionData } from 'lib/session/types';
 
+import { handleServerError } from './onError';
+
 export const actionClient = createSafeActionClient({
-  handleServerErrorLog: async (e) => {
-    log.error(e.message, { error: e });
-  },
-  handleReturnedServerError(e) {
-    throw e;
-  },
+  handleReturnedServerError: handleServerError,
   // @ts-ignore
   defineMetadataSchema: () => {
     return yup.object({
@@ -26,19 +24,21 @@ export const actionClient = createSafeActionClient({
   /**
    * Middleware used for logging purposes.
    */
-  .use(async ({ next, metadata }) => {
+  .use(async ({ next }) => {
     const result = await next({ ctx: null });
-    log.info('LOGGING MIDDLEWARE FOR ACTION', metadata);
+    // log.info('LOGGING MIDDLEWARE FOR ACTION', metadata);
     return result;
   })
   /**
    * Middleware used for auth purposes.
    * Returns the context with the session object.
    */
-  .use(async ({ next, clientInput }) => {
+  .use(async ({ next }) => {
     const session = await getIronSession<SessionData>(cookies(), getIronOptions());
+    const headerList = headers();
+
     return next({
-      ctx: { session, clientInput }
+      ctx: { session, headers: headerList }
     });
   });
 
@@ -58,5 +58,7 @@ export const authActionClient = actionClient.use(async ({ next, ctx }) => {
   //   throw new UnauthorisedActionError('user is not is not valid!');
   // }
 
-  return next({ ctx });
+  const session: IronSession<Required<SessionData>> = { ...ctx.session, user: { id: userId } };
+
+  return next({ ctx: { ...ctx, session } });
 });
