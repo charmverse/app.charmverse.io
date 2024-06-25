@@ -13,6 +13,7 @@ export function createMockProposal(input: ProposalInput = {}): OptionalNullable<
   return {
     workflowId: 'test',
     issuedCredentials: [],
+    isPublic: false,
     publishToLens: null,
     archived: false,
     createdBy: '',
