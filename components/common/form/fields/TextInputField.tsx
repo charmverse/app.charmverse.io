@@ -1,13 +1,12 @@
-import { Box } from '@mui/material';
+import LinkIcon from '@mui/icons-material/Link';
+import { Box, IconButton } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import type { ReactNode } from 'react';
 import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 
-type Props = ControlFieldProps &
-  FieldProps & { multiline?: boolean; rows?: number; maxRows?: number; InputProps?: any };
+type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number; maxRows?: number };
 
 export const TextInputField = forwardRef<HTMLDivElement, Props>(
   (
@@ -26,6 +25,15 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
     },
     ref
   ) => {
+    const InputProps = (inputProps.value as string)?.startsWith('http')
+      ? {
+          endAdornment: (
+            <IconButton color='secondary' href={inputProps.value as string} target='_blank' size='small' sx={{ p: 0 }}>
+              <LinkIcon />
+            </IconButton>
+          )
+        }
+      : undefined;
     return (
       <FieldWrapper
         inputEndAdornmentAlignItems={multiline ? 'flex-start' : 'center'}
@@ -46,6 +54,7 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
           fullWidth
           required={required}
           multiline={multiline}
+          InputProps={InputProps}
           {...inputProps}
           ref={ref}
         />
