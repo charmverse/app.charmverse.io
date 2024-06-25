@@ -78,7 +78,7 @@
     "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes",
     "connect": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect-app\" \"npm run connect-api\"",
     "connect:build": "concurrently --names \"build-connect,build-connect-api\" -c \"green,yellow\" \"npm run connect-app:build\" \"npm run connect-api:build\"",
-    "connect:start:prod": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect:start:prod\" \"npm run connect-api:start:prod\"",
+    "connect:start:prod": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect-app:start:prod\" \"npm run connect-api:start:prod\"",
     "connect-app": "dotenv -e .env.local -- npm run start --workspace=apps/connect",
     "connect-app:build": "dotenv -e .env.local -- npx next build ./apps/connect",
     "connect-app:start:prod": "npm run start:prod --workspace=apps/connect",

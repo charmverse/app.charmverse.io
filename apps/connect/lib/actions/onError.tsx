@@ -1,11 +1,10 @@
 import { DataNotFoundError, SystemError, UnknownError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import { Prisma } from '@charmverse/core/prisma';
 import { getIronSession } from 'iron-session';
-import { headers, cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
+import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
-import type { SessionData } from 'lib/session/types';
 
 const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
 
