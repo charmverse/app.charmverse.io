@@ -1,6 +1,8 @@
 import { DisabledAccountError, ExternalServiceError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { verifySignInMessage } from '@farcaster/auth-kit';
 
+import { InvalidStateError } from 'lib/middleware';
 import { generateFarcasterUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { LoginWithFarcasterParams } from '../loginWithFarcaster';
@@ -11,6 +13,8 @@ jest.mock('@farcaster/auth-kit', () => ({
   viemConnector: jest.fn().mockReturnValue({ rpcUrls: ['http://localhost:8545'] }),
   createAppClient: jest.fn().mockReturnValue({})
 }));
+
+const mockedVerifySignInMessage = jest.mocked(verifySignInMessage);
 
 const defaultBody = {
   bio: 'biooo',
@@ -28,7 +32,12 @@ describe('loginWithFarcaster', () => {
     await prisma.farcasterUser.deleteMany({});
   });
 
-  test('should fail if the signature cannot be verified', async () => {});
+  test('should fail if the signature cannot be verified', async () => {
+    mockedVerifySignInMessage.mockResolvedValueOnce({ success: false } as any);
+    const body = { ...defaultBody, fid: Math.floor(Math.random() * 1000), username: '@test' };
+
+    await expect(loginWithFarcaster(body)).rejects.toThrow(InvalidStateError);
+  });
 
   test('should fail if no fid or no username in the body', async () => {
     const body = { ...defaultBody };
