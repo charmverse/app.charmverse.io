@@ -1,16 +1,34 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
+import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-kit';
+import { getChainById } from 'connectors/chains';
 import { v4 as uuid } from 'uuid';
+import { optimism } from 'viem/chains';
 
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { InvalidStateError } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { postUserCreate } from 'lib/users/postUserCreate';
 import { DisabledAccountError, ExternalServiceError } from 'lib/utils/errors';
 import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
+
+const appClient = createAppClient({
+  ethereum: viemConnector({
+    rpcUrl: getChainById(optimism.id)!.rpcUrls[0]
+  })
+});
+
+export type LoginWithFarcasterParams = FarcasterBody &
+  Required<Pick<FarcasterBody, 'nonce' | 'message' | 'signature'>> & {
+    signupAnalytics?: Partial<SignupAnalytics>;
+    nonce: string;
+    message: string;
+    signature: string;
+  };
 
 export async function loginWithFarcaster({
   fid,
@@ -19,10 +37,26 @@ export async function loginWithFarcaster({
   displayName,
   bio,
   verifications = [],
-  signupAnalytics = {}
-}: FarcasterBody & { signupAnalytics?: Partial<SignupAnalytics> }): Promise<LoggedInUser> {
+  signupAnalytics = {},
+  nonce,
+  message,
+  signature
+}: LoginWithFarcasterParams): Promise<LoggedInUser> {
   if (!fid || !username) {
     throw new ExternalServiceError('Farcaster id missing');
+  }
+
+  const { success, error: farcasterLoginError } = await verifySignInMessage(appClient, {
+    nonce,
+    message,
+    signature,
+    domain: 'charmverse.io'
+  });
+
+  if (farcasterLoginError) {
+    throw new InvalidStateError(farcasterLoginError.message || 'Invalid signature');
+  } else if (!success) {
+    throw new InvalidStateError('Invalid signature');
   }
 
   const farcasterUser = await prisma.farcasterUser.findUnique({

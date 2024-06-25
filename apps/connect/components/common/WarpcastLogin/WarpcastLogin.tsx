@@ -17,7 +17,7 @@ function WarpcastLoginButton({ onSuccess }: { onSuccess: () => void }) {
   const onSuccessCallback = useCallback(async () => {
     popupState.close();
     onSuccess();
-  }, [onSuccess]);
+  }, [onSuccess, popupState.close]);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
     popupState.close();
