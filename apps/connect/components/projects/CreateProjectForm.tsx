@@ -7,7 +7,6 @@ import { Controller, useController, useFieldArray } from 'react-hook-form';
 
 import { Avatar } from 'components/common/Avatar';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
-import { ResizeType } from 'lib/utils/file';
 import { inputBackground } from 'theme/colors';
 
 import { CATEGORIES } from './utils/constants';
@@ -95,8 +94,7 @@ function AvatarField({ control }: { control: Control<FormValues> }) {
   const { inputRef, isUploading, onFileChange } = useS3UploadInput({
     onFileUpload: ({ url }) => {
       field.onChange(url);
-    },
-    resizeType: ResizeType.Artwork
+    }
   });
 
   return (
@@ -147,8 +145,7 @@ function CoverImageField({ control }: { control: Control<FormValues> }) {
   const { inputRef, isUploading, onFileChange } = useS3UploadInput({
     onFileUpload: ({ url }) => {
       field.onChange(url);
-    },
-    resizeType: ResizeType.Artwork
+    }
   });
 
   return (

@@ -2,7 +2,6 @@ import { log } from '@charmverse/core/log';
 import { useState } from 'react';
 
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import type { ResizeType } from 'lib/utils/file';
 import { DEFAULT_MAX_FILE_SIZE_MB } from 'lib/utils/file';
 import { replaceS3Domain } from 'lib/utils/url';
 
@@ -14,13 +13,11 @@ export type UploadedFileCallback = (info: UploadedFileInfo) => void;
 export const useS3UploadInput = ({
   onFileUpload,
   fileSizeLimitMB = DEFAULT_MAX_FILE_SIZE_MB,
-  resizeType,
   onError
 }: {
   onError?: (message: string) => void;
   onFileUpload: UploadedFileCallback;
   fileSizeLimitMB?: number;
-  resizeType?: ResizeType;
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
