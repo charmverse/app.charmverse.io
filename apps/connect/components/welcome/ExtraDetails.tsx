@@ -62,7 +62,7 @@ export function ExtraDetails() {
           )}
         />
       </FormControl>
-      <Link href='/projects'>
+      <Link href='/profile'>
         <WelcomeButton sx={{ mb: 4, my: 2 }} type='submit' disabled={!isValid}>
           Next
         </WelcomeButton>

@@ -1,7 +1,9 @@
 'use server';
 
+import { redirect } from 'next/navigation';
+
 import { schema } from 'components/welcome/utils/form';
-import { authActionClient, actionClient } from 'lib/actions/actionClient';
+import { authActionClient } from 'lib/actions/actionClient';
 import { delay } from 'lib/utils/delay';
 
 export const actionOnboarding = authActionClient
@@ -11,7 +13,7 @@ export const actionOnboarding = authActionClient
     const userId = ctx.session.user.id;
     await delay(2000);
 
-    return { message: 'success' };
+    redirect('/profile');
 
     // if (validatedData.wallet) {
     //   await prisma.userWallet.create({

@@ -166,5 +166,5 @@ export const actionCreateProject = authActionClient
       }
     });
 
-    redirect('/projects');
+    redirect('/profile');
   });

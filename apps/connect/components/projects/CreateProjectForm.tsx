@@ -313,7 +313,7 @@ export function CreateProjectForm({
         />
       </Stack>
       <Stack justifyContent='space-between' flexDirection='row'>
-        <Link href='/projects' passHref>
+        <Link href='/profile' passHref>
           <Button color='error' variant='outlined'>
             Cancel
           </Button>
