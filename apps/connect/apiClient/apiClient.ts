@@ -1,9 +1,15 @@
 'use client';
 
-import { TestApiClient } from './testApiClient';
+import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 
-class ConnectApiClient {
-  test = new TestApiClient();
+import type { LoggedInUser } from 'models/index';
+
+import { BaseConnectApiClient } from './baseConnectApiClient';
+
+class ConnectApiClient extends BaseConnectApiClient {
+  async loginViaFarcaster(req: FarcasterBody): Promise<LoggedInUser> {
+    return this.POST('/api/session/login-with-farcaster', req);
+  }
 }
 
 export const connectApiClient = new ConnectApiClient();
