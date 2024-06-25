@@ -7,6 +7,7 @@ import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { sessionUserRelations } from 'lib/session/config';
+import { getUserProfile } from 'lib/users/getUser';
 import { postUserCreate } from 'lib/users/postUserCreate';
 import { DataNotFoundError, DisabledAccountError, ExternalServiceError } from 'lib/utils/errors';
 import { uid } from 'lib/utils/strings';
@@ -31,7 +32,11 @@ export async function loginWithFarcaster({
     },
     include: {
       user: {
-        include: sessionUserRelations
+        select: {
+          id: true,
+          deletedAt: true,
+          claimed: true
+        }
       }
     }
   });
@@ -41,9 +46,20 @@ export async function loginWithFarcaster({
       throw new DisabledAccountError();
     }
 
+    if (!farcasterUser.user.claimed) {
+      await prisma.user.update({
+        where: {
+          id: farcasterUser.userId
+        },
+        data: {
+          claimed: true
+        }
+      });
+    }
+
     trackUserAction('sign_in', { userId: farcasterUser.user.id, identityType: 'Farcaster' });
 
-    return farcasterUser.user;
+    return getUserProfile('id', farcasterUser.userId);
   } else {
     const userWithWallet = await prisma.user.findFirst({
       where: {

@@ -156,7 +156,7 @@ export const actionCreateProject = authActionClient
               ...projectMembers.map((member) => ({
                 teamLead: false,
                 updatedBy: currentUserId,
-                userId: farcasterAccountsUserIdRecord[member.farcasterId] ?? undefined,
+                userId: member.userId,
                 name: member.name,
                 farcasterId: member.farcasterId
               }))
