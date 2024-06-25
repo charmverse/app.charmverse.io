@@ -39,11 +39,13 @@ export function mapDbProposalToProposal({
   permissionsByStep,
   proposalEvaluationReviews,
   workflow,
-  proposalEvaluationAppealReviews
+  proposalEvaluationAppealReviews,
+  isPublicPage
 }: {
   workflow: {
     evaluations: WorkflowEvaluationJson[];
   } | null;
+  isPublicPage?: boolean;
   proposalEvaluationReviews?: ProposalEvaluationReview[];
   proposalEvaluationAppealReviews?: ProposalEvaluationAppealReview[];
   proposal: Proposal &
@@ -116,6 +118,7 @@ export function mapDbProposalToProposal({
     status: proposal.status,
     rewardIds: rewards.map((r) => r.id) || null,
     issuedCredentials: issuedCredentials || [],
+    isPublic: !!isPublicPage,
     form: form
       ? {
           formFields: (formFields as TypedFormField[]) || null,
