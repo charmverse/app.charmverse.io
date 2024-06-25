@@ -1,8 +1,12 @@
-import { Box, Button, Card, CardContent, Stack, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/AddOutlined';
+import { Box, Button, Card, CardContent, Divider, Stack, Typography } from '@mui/material';
 import { useAction } from 'next-safe-action/hooks';
-import type { Control, UseFormHandleSubmit } from 'react-hook-form';
+import { useState } from 'react';
+import { useFieldArray, type Control, type UseFormHandleSubmit } from 'react-hook-form';
 
 import { Avatar } from 'components/common/Avatar';
+import { SearchFarcasterUser } from 'components/farcaster/SearchFarcasterUser';
+import type { FarcasterProfile } from 'lib/farcaster/getFarcasterUser';
 import { actionCreateProject } from 'lib/projects/createProjectAction';
 
 import type { FormValues } from './utils/form';
@@ -18,6 +22,12 @@ export function AddProjectMembersForm({
   isValid: boolean;
   handleSubmit: UseFormHandleSubmit<FormValues>;
 }) {
+  const { append } = useFieldArray({
+    name: 'projectMembers',
+    control
+  });
+  const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] = useState<FarcasterProfile[]>([]);
+  const [selectedFarcasterProfile, setSelectedFarcasterProfile] = useState<FarcasterProfile | null>(null);
   const { executeAsync, isExecuting } = useAction(actionCreateProject);
 
   return (
@@ -37,6 +47,58 @@ export function AddProjectMembersForm({
           </Box>
         </CardContent>
       </Card>
+      <Stack gap={2}>
+        <Typography variant='h6'>Team</Typography>
+        <Divider />
+        <SearchFarcasterUser
+          selectedProfile={selectedFarcasterProfile}
+          setSelectedProfile={(farcasterProfile) => {
+            if (farcasterProfile) {
+              setSelectedFarcasterProfile(farcasterProfile);
+            }
+          }}
+        />
+        <Stack flexDirection='row' justifyContent='center'>
+          <Button
+            disabled={!selectedFarcasterProfile}
+            onClick={() => {
+              if (selectedFarcasterProfile) {
+                append({
+                  farcasterId: selectedFarcasterProfile.body.id,
+                  name: selectedFarcasterProfile.body.username
+                });
+                setSelectedFarcasterProfiles([...selectedFarcasterProfiles, selectedFarcasterProfile]);
+                setSelectedFarcasterProfile(null);
+              }
+            }}
+            startIcon={<AddIcon fontSize='small' />}
+          >
+            Add a team member
+          </Button>
+        </Stack>
+      </Stack>
+      <Stack gap={2} mb={2}>
+        {selectedFarcasterProfiles.map((farcasterProfile) => (
+          <Card
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              flexDirection: 'row',
+              p: 2
+            }}
+            key={farcasterProfile.body.id}
+          >
+            <Avatar src={farcasterProfile.body.avatarUrl} size='large' />
+            <Stack gap={0}>
+              <Typography variant='h6'>{farcasterProfile.body.displayName}</Typography>
+              <Typography variant='subtitle1' color='secondary'>
+                {farcasterProfile.body.username} #{farcasterProfile.body.id}
+              </Typography>
+            </Stack>
+          </Card>
+        ))}
+      </Stack>
       <Stack direction='row' justifyContent='space-between'>
         <Button variant='outlined' color='secondary' onClick={onBack}>
           Back

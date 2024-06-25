@@ -16,10 +16,17 @@ export default function CreateProject() {
   const {
     control,
     formState: { isValid },
-    handleSubmit,
-    setValue
+    handleSubmit
   } = useForm({
-    defaultValues: {},
+    defaultValues: {
+      name: '',
+      projectMembers: [
+        {
+          farcasterId: 1,
+          name: 'ccarella.eth'
+        }
+      ]
+    },
     resolver: yupResolver(schema),
     mode: 'onChange'
   });
@@ -33,13 +40,6 @@ export default function CreateProject() {
             control={control}
             isValid={isValid}
             onNext={() => {
-              setValue('projectMembers', [
-                // Get from current user
-                {
-                  farcasterId: 1,
-                  name: 'ccarella.eth'
-                }
-              ]);
               setShowTeamMemberForm(true);
             }}
           />
