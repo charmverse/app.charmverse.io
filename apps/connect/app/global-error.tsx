@@ -1,12 +1,11 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import Bolt from '@connect/public/images/lightning_bolt.svg';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useEffect } from 'react';
-
-import Bolt from 'public/images/lightning_bolt.svg';
 
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
