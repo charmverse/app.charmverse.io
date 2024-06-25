@@ -36,6 +36,7 @@
       "components/*": ["./components/*"],
       "hooks/*": ["./hooks/*"],
       "abis/*": ["./abis/*"],
+      "models/*": ["./models/*"],
       "pages/*": ["./pages/*"],
       "shared/*": ["./shared/*"],
       "public/*": ["./public/*"],
