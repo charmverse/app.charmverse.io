@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { FormControl, FormControlLabel, FormLabel, Checkbox, TextField } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -61,9 +62,11 @@ export function ExtraDetails() {
           )}
         />
       </FormControl>
-      <WelcomeButton sx={{ mb: 4, my: 2 }} type='submit' disabled={!isValid}>
-        Next
-      </WelcomeButton>
+      <Link href='/projects'>
+        <WelcomeButton sx={{ mb: 4, my: 2 }} type='submit' disabled={!isValid}>
+          Next
+        </WelcomeButton>
+      </Link>
     </form>
   );
 }

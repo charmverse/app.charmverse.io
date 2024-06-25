@@ -2,6 +2,8 @@
 
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { FormValues } from 'components/projects/utils/form';
+import { schema } from 'components/projects/utils/form';
 import { authActionClient } from 'lib/actions/actionClient';
 
 export type FarcasterAccount = {
@@ -18,54 +20,63 @@ export type FarcasterAccount = {
 };
 
 export const actionCreateProject = authActionClient
+  .schema(schema)
   .metadata({ actionName: 'create-project' })
-  .action(async ({ ctx }) => {
-    const formData = ctx.clientInput as FormData;
-    const name = formData.get('name') as string;
-    const description = formData.get('description') as string;
-    const category = formData.get('category') as string;
-    const avatar = formData.get('avatar') as string;
-    const coverImage = formData.get('cover') as string;
-    const websites = formData.getAll('websites') as string[];
-    const farcasterIds = formData.getAll('farcasterIds') as string[];
-    const twitter = formData.get('twitter') as string;
-    const github = formData.get('github') as string;
-    const mirror = formData.get('mirror') as string;
-    const userId = ctx.session.user!.id;
-    const farcasterUser = await prisma.farcasterUser.findUniqueOrThrow({
+  .action(async ({ parsedInput, ctx }) => {
+    const input = parsedInput as FormValues;
+    const currentUserId = ctx.session.user!.id;
+    const farcasterAccounts = await prisma.farcasterUser.findMany({
       where: {
-        userId
+        fid: {
+          in: input.projectMembers.slice(1).map(({ farcasterId }) => farcasterId)
+        }
       },
       select: {
-        account: true
+        userId: true,
+        fid: true
       }
     });
 
-    const farcasterUserAccount = farcasterUser.account as FarcasterAccount;
+    const farcasterAccountsUserIdRecord: Record<number, string> = farcasterAccounts.reduce<Record<number, string>>(
+      (acc, { userId, fid }) => {
+        acc[fid] = userId;
+        return acc;
+      },
+      {}
+    );
+
     await prisma.project.create({
       data: {
-        name,
-        updatedBy: userId,
-        createdBy: userId,
-        description,
-        category,
-        websites,
-        farcasterIds,
-        twitter,
-        github,
-        mirror,
-        avatar,
-        coverImage,
+        name: input.name,
+        updatedBy: currentUserId,
+        createdBy: currentUserId,
+        description: input.description,
+        category: input.category,
+        websites: input.websites,
+        farcasterIds: input.farcasterIds,
+        twitter: input.twitter,
+        github: input.github,
+        mirror: input.mirror,
+        avatar: input.avatar,
+        coverImage: input.cover,
+        source: 'connect',
         projectMembers: {
           createMany: {
             data: [
               {
                 teamLead: true,
-                updatedBy: userId,
-                userId,
-                name: farcasterUserAccount.displayName,
-                walletAddress: farcasterUserAccount.address
-              }
+                updatedBy: currentUserId,
+                userId: currentUserId,
+                name: input.projectMembers[0].name,
+                farcasterId: input.projectMembers[0].farcasterId
+              },
+              ...input.projectMembers.slice(1).map((member) => ({
+                teamLead: false,
+                updatedBy: currentUserId,
+                userId: farcasterAccountsUserIdRecord[member.farcasterId] ?? undefined,
+                name: member.name,
+                farcasterId: member.farcasterId
+              }))
             ]
           }
         }
