@@ -1,9 +1,7 @@
 'use client';
 
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormControl, FormControlLabel, FormLabel, Checkbox, TextField } from '@mui/material';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import { Checkbox, FormControl, FormControlLabel, FormLabel, TextField } from '@mui/material';
 import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
@@ -20,13 +18,10 @@ export function ExtraDetails() {
   const { execute, executeAsync, result, status, reset, isIdle, isExecuting, hasSucceeded, hasErrored } =
     useAction(actionOnboarding);
 
-  // console.dir('worksss', { result, status, isIdle, isExecuting, hasSucceeded, hasErrored });
-
   const {
     control,
     formState: { errors, isValid },
-    handleSubmit,
-    getValues
+    handleSubmit
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -34,7 +29,7 @@ export function ExtraDetails() {
   });
 
   return (
-    <form onSubmit={handleSubmit(async (data) => execute(data))}>
+    <form onSubmit={handleSubmit(executeAsync)}>
       <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
         <FormLabel id='form-email'>Email</FormLabel>
         <Controller
