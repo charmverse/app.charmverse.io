@@ -222,7 +222,6 @@
     "graphql": "^16.8.1",
     "hot-shots": "^9.0.0",
     "html-to-text": "^8.2.0",
-    "iconv-lite": "^0.6.3",
     "immutable": "^4.0.0",
     "iron-session": "^8.0.1",
     "jose": "^4.15.5",
