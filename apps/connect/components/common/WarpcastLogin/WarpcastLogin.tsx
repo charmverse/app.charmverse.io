@@ -11,13 +11,15 @@ import { warpcastConfig } from 'lib/farcaster/config';
 
 import { FarcasterLoginModal } from './components/WarpcastModal';
 
-function WarpcastLoginButton({ onSuccess }: { onSuccess: () => void }) {
+function WarpcastLoginButton() {
+  const router = useRouter();
+
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
 
   const onSuccessCallback = useCallback(async () => {
     popupState.close();
-    onSuccess();
-  }, [onSuccess, popupState.close]);
+    router.push('/welcome');
+  }, [popupState.close]);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
     popupState.close();
@@ -44,15 +46,9 @@ function WarpcastLoginButton({ onSuccess }: { onSuccess: () => void }) {
 }
 
 export function WarpcastLogin() {
-  const router = useRouter();
-
   return (
     <AuthKitProvider config={warpcastConfig}>
-      <WarpcastLoginButton
-        onSuccess={() => {
-          router.push('/welcome');
-        }}
-      />
+      <WarpcastLoginButton />
     </AuthKitProvider>
   );
 }

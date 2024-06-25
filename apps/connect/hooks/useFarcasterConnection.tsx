@@ -14,18 +14,17 @@ export function useFarcasterConnection({
   onError?: (error: any) => void;
   onClick?: () => void;
 }) {
-  const onSuccessCallback = useCallback(
+  const onWarpcastSuccessCallback = useCallback(
     async (res: StatusAPIResponse) => {
       await connectApiClient.loginViaFarcaster(res);
       onSuccess?.();
-      // on success handler
     },
     [onSuccess, onError]
   );
 
   const signInProps = useSignIn({
     onError,
-    onSuccess: onSuccessCallback
+    onSuccess: onWarpcastSuccessCallback
   });
 
   const { signIn, connect, reconnect, isError, channelToken } = signInProps;

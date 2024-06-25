@@ -7,7 +7,7 @@ import { sessionUserRelations } from 'lib/session/config';
 import type { LoggedInUser } from 'models/User';
 
 export const getCurrentUser = authActionClient
-  .metadata({ actionName: 'onboarding' })
+  .metadata({ actionName: 'getCurrentUser' })
   .action<LoggedInUser | null>(async ({ ctx }) => {
     const userId = ctx.session.user.id;
 
