@@ -1,26 +1,24 @@
 'use server';
 
+import { prisma } from '@charmverse/core/prisma-client';
+
 import { schema } from 'components/welcome/utils/form';
-import { authActionClient, actionClient } from 'lib/actions/actionClient';
-import { delay } from 'lib/utils/delay';
+import { authActionClient } from 'lib/actions/actionClient';
 
 export const actionOnboarding = authActionClient
-  .schema(schema)
   .metadata({ actionName: 'onboarding' })
+  .schema(schema)
   .action(async ({ parsedInput, ctx }) => {
     const userId = ctx.session.user.id;
-    await delay(2000);
 
-    return { message: 'success' };
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        connectOnboarded: true,
+        email: parsedInput.email,
+        emailNewsletter: parsedInput.notify
+      }
+    });
 
-    // if (validatedData.wallet) {
-    //   await prisma.userWallet.create({
-    //     data: {
-    //       address: validatedData.wallet,
-    //       userId: user.id
-    //     }
-    //   });
-    // }
-
-    // redirect('/profile');
+    return null;
   });

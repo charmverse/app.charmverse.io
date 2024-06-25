@@ -1,15 +1,24 @@
-import type { User } from '@charmverse/core/prisma-client';
 import { redirect } from 'next/navigation';
 
 import { WelcomePage } from 'components/welcome/WelcomePage';
+import { getUserProfile } from 'lib/profile/getUser';
+import { getSession } from 'lib/session/getSession';
 
 export default async function Welcome() {
-  const user: Partial<User> & { onboarded: boolean } = { onboarded: false };
+  const session = await getSession();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    redirect('/');
+  }
+
+  const user = await getUserProfile('id', userId);
+
   if (!user) {
     redirect('/');
   }
 
-  if (user.onboarded) {
+  if (user.connectOnboarded) {
     redirect('/dashboard');
   }
 
