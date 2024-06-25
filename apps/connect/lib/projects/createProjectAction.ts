@@ -107,10 +107,7 @@ export const actionCreateProject = authActionClient
                 path: uid(),
                 profile: {
                   create: {
-                    ...(bio && { description: bio || '' }),
-                    social: {
-                      farcasterUrl: `https://warpcast.com/${username}`
-                    }
+                    ...(bio && { description: bio || '' })
                   }
                 }
               }

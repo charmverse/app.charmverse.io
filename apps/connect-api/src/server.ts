@@ -6,6 +6,7 @@ import Router from 'koa-router';
 import { randomIntFromInterval } from 'lib/utils/random';
 
 import { isDevEnv, isTestEnv } from './constants';
+import imageRouter from './imageRouter';
 
 export const app = new Koa();
 const router = new Router();
@@ -47,5 +48,7 @@ router.get('/api/health', (ctx) => {
 router.get('/api/random-number', (ctx) => {
   ctx.body = { number: randomIntFromInterval(1, 100) };
 });
+
+router.use('/api/image', imageRouter.routes());
 
 app.use(router.routes()).use(router.allowedMethods());

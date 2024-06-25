@@ -265,16 +265,16 @@ export function CreateProjectForm({
         control={control}
         name='farcasterIds'
         label='Farcaster'
-        placeholder='https://farcaster.xyz'
+        placeholder='https://warpcast.xyz/acme-inc'
       />
       <Stack>
-        <FormLabel id='project-twitter'>X.com</FormLabel>
+        <FormLabel id='project-twitter'>X</FormLabel>
         <Controller
           control={control}
           name='twitter'
           render={({ field, fieldState }) => (
             <TextField
-              placeholder='https://x.com/acme-inc'
+              placeholder='https://twitter.com/acme-inc'
               aria-labelledby='project-twitter'
               error={!!fieldState.error}
               {...field}

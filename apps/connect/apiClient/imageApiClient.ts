@@ -1,23 +1,15 @@
-import { POST, GET } from 'adapters/http';
 import { encodeFilename } from 'lib/utils/file';
 
 import { BaseConnectApiClient } from './baseConnectApiClient';
 
 export class ImageApiClient extends BaseConnectApiClient {
-  async resize(formData: FormData) {
-    return POST<{ url: string }>(`${baseUrl}/api/image/resize`, formData, {
-      noHeaders: true,
-      skipStringifying: true
-    });
-  }
-
   upload(file: File) {
-    return GET<{
+    return this.GET<{
       token: any;
       region: string;
       bucket: string;
       key: string;
-    }>(`${baseUrl}/api/aws/s3-upload`, {
+    }>(`/api/image/upload`, {
       filename: encodeFilename(file.name)
     });
   }
