@@ -4,18 +4,20 @@ import { useFarcasterConnection } from '@connect/hooks/useFarcasterConnection';
 import { AuthKitProvider, type AuthClientError } from '@farcaster/auth-kit';
 import Button from '@mui/material/Button';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 import { warpcastConfig } from 'lib/farcaster/config';
 
 import { FarcasterLoginModal } from './components/WarpcastModal';
 
-function WarpcastLoginButton() {
+function WarpcastLoginButton({ onSuccess }: { onSuccess: () => void }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
 
   const onSuccessCallback = useCallback(async () => {
     popupState.close();
-  }, []);
+    onSuccess();
+  }, [onSuccess]);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
     popupState.close();
@@ -34,7 +36,7 @@ function WarpcastLoginButton() {
   return (
     <>
       <Button size='small' onClick={signIn}>
-        Connect
+        Connect with Farcaster
       </Button>
       <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />
     </>
@@ -42,9 +44,15 @@ function WarpcastLoginButton() {
 }
 
 export function WarpcastLogin() {
+  const router = useRouter();
+
   return (
     <AuthKitProvider config={warpcastConfig}>
-      <WarpcastLoginButton />
+      <WarpcastLoginButton
+        onSuccess={() => {
+          router.push('/welcome');
+        }}
+      />
     </AuthKitProvider>
   );
 }

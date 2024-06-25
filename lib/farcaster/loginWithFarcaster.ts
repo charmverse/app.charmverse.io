@@ -1,14 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { sessionUserRelations } from 'lib/session/config';
 import { postUserCreate } from 'lib/users/postUserCreate';
-import { DataNotFoundError, DisabledAccountError, ExternalServiceError } from 'lib/utils/errors';
+import { DisabledAccountError, ExternalServiceError } from 'lib/utils/errors';
 import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
@@ -54,16 +54,13 @@ export async function loginWithFarcaster({
             }
           }
         }
+      },
+      include: {
+        profile: true
       }
     });
 
-    if (userWithWallet) {
-      throw new DataNotFoundError(
-        'Your wallet address associated with Farcaster has already an user account. Please login with your wallet and add farcaster as a second login method.'
-      );
-    }
-
-    const userId = v4();
+    const userId = userWithWallet?.id ?? uuid();
 
     let avatar: string | null = null;
     if (pfpUrl) {
@@ -75,6 +72,45 @@ export async function loginWithFarcaster({
       } catch (error) {
         log.warn('Error while uploading avatar to S3', error);
       }
+    }
+
+    if (userWithWallet) {
+      const updatedUser = await prisma.user.update({
+        where: {
+          id: userWithWallet.id
+        },
+        data: {
+          profile: {
+            upsert: {
+              create: {
+                description: bio || '',
+                social: {
+                  farcasterUrl: `https://warpcast.com/${username}`
+                }
+              },
+              update: {
+                description: userWithWallet.profile?.description || bio || '',
+                locale: userWithWallet.profile?.locale,
+                timezone: userWithWallet.profile?.timezone,
+                social: {
+                  farcasterUrl: `https://warpcast.com/${username}`
+                }
+              }
+            }
+          },
+          farcasterUser: {
+            create: {
+              account: { username, displayName, bio, pfpUrl },
+              fid
+            }
+          }
+        },
+        include: sessionUserRelations
+      });
+
+      trackUserAction('sign_in', { userId: userWithWallet.id, identityType: 'Farcaster' });
+
+      return updatedUser;
     }
 
     const newUser = await prisma.user.create({

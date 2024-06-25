@@ -4,7 +4,7 @@ import getInitColorSchemeScript from '@mui/system/cssVars/getInitColorSchemeScri
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-import 'theme/cssVariables.scss';
+import '@connect/theme/cssVariables.scss';
 
 export const metadata: Metadata = {
   title: 'Charm Connect - onchain builder network',

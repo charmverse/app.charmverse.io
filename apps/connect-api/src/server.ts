@@ -1,9 +1,13 @@
 import { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import cors from '@koa/cors';
+import { getIronSession } from 'iron-session';
 import Koa from 'koa';
 
-import { isDevEnv, isTestEnv } from './constants';
+import type { SessionData } from 'lib/session/config';
+import { getIronOptions } from 'lib/session/getIronOptions';
+
+import { isDevEnv, isStagingEnv, isTestEnv } from './constants';
 import { logRoutes } from './logRoutes';
 import rootRouter from './routes';
 
@@ -14,7 +18,6 @@ app.use(
   cors({
     origin: (ctx) => {
       const origin = ctx.request.headers.origin;
-      log.info('origin headers', ctx.request.headers);
       if (origin && (isDevEnv || isTestEnv)) {
         return origin;
       }
@@ -28,6 +31,12 @@ app.use(
     credentials: true
   })
 );
+
+// Session middleware
+app.use(async (ctx, next) => {
+  ctx.request.session = await getIronSession<SessionData>(ctx.req, ctx.res, getIronOptions());
+  await next();
+});
 
 // Error handling middleware
 app.use(async (ctx, next) => {

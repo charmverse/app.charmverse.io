@@ -3,13 +3,12 @@ import { WarpcastLogin } from '@connect/components/common/WarpcastLogin/Warpcast
 import { ProjectItemSkeleton } from '@connect/components/projects/ProjectItemSkeleton';
 import { ProjectsList } from '@connect/components/projects/ProjectsList';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { Suspense } from 'react';
 
-export function HomePage({ user }: { user: any }) {
+export function HomePage() {
   return (
     <PageWrapper>
       <Box textAlign='center'>
@@ -20,9 +19,10 @@ export function HomePage({ user }: { user: any }) {
           Powered by CharmVerse
         </Typography>
         <Typography>Create your profile, add projects and compete for 540K OP in total prizes on Gitcoin.</Typography>
-        <WarpcastLogin />
+
         <Box gap={2} display='flex' flexDirection='column' my={2} alignItems='center'>
-          <Button>Connect with Farcaster</Button>
+          <WarpcastLogin />
+
           <Link href='https://warpcast.com' target='_blank' rel='noopener'>
             Don't have a Farcaster acccount?
           </Link>

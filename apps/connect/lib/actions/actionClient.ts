@@ -1,6 +1,7 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { SessionData } from '@connect/lib/session/types';
 import type { IronSession } from 'iron-session';
 import { getIronSession } from 'iron-session';
 import { cookies, headers } from 'next/headers';
@@ -8,7 +9,6 @@ import { createSafeActionClient } from 'next-safe-action/typeschema';
 import * as yup from 'yup';
 
 import { getIronOptions } from 'lib/session/getIronOptions';
-import type { SessionData } from 'lib/session/types';
 
 import { handleServerError } from './onError';
 
