@@ -15,12 +15,17 @@ app.use(
   cors({
     origin: (ctx) => {
       const origin = ctx.request.headers.origin;
-      log.info('origin headers', ctx.request.headers);
-      if (origin && (isDevEnv || isTestEnv)) {
+      const path = ctx.request.path;
+      // always pass health check. (the AWS load balancer does not send origin header)
+      if (path === '/api/health') {
+        return '*';
+      }
+      // support any subdomain for staging and production
+      else if (origin?.endsWith('.charmverse.co') || origin?.endsWith('.charmverse.io')) {
         return origin;
       }
-      // support any subdomain for staging
-      else if (origin?.endsWith('.charmverse.co') || origin?.endsWith('.charmverse.io')) {
+      // dev environments allow any origin
+      else if (origin && (isDevEnv || isTestEnv)) {
         return origin;
       }
       log.warn('Origin not allowed', ctx.request.headers);
