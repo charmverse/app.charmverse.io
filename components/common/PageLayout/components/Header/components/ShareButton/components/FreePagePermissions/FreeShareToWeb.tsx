@@ -1,5 +1,6 @@
 import { useGetPage } from 'charmClient/hooks/pages';
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import ShareToWeb from '../common/ShareToWeb';
 
@@ -11,11 +12,15 @@ export default function FreeShareToWeb({ pageId }: Props) {
   const { data: currentPage } = useGetPage(pageId);
   const { data: proposal } = useGetProposalDetails(currentPage?.proposalId);
 
+  const { getFeatureTitle } = useSpaceFeatures();
+
+  const proposalsLabel = getFeatureTitle('proposals');
+
   const shareAlertMessage =
     currentPage?.type === 'proposal' && proposal?.status === 'draft'
-      ? 'This draft is only visible to authors and reviewers until it is progressed to the discussion stage.'
+      ? 'This draft is only visible to authors and reviewers until it is published.'
       : currentPage?.type === 'proposal' && proposal?.status !== 'draft'
-      ? 'Proposals in discussion stage and beyond are publicly visible.'
+      ? `Published ${proposalsLabel}  are publicly visible.`
       : null;
 
   const isChecked =
