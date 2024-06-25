@@ -80,6 +80,7 @@ export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {
   fields: ProposalFields | null;
   page?: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
   permissions: ProposalPermissionFlags;
+  isPublic: boolean;
   currentEvaluationId?: string;
   form: {
     id: string;
