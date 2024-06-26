@@ -1,5 +1,5 @@
 import LaunchIcon from '@mui/icons-material/Launch';
-import { FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 
 import { useGetOpProject, useGetOpProjects } from 'charmClient/hooks/optimism';
 import { Avatar } from 'components/common/Avatar';
@@ -8,6 +8,7 @@ import { WarpcastLogin } from 'components/login/components/WarpcastLogin';
 import { useUser } from 'hooks/useUser';
 import type { OpProjectFieldValue } from 'lib/forms/interfaces';
 import type { OPProjectData } from 'lib/optimism/getOpProjects';
+import { isValidUrl } from 'lib/utils/isValidUrl';
 
 import type { ControlFieldProps, FieldProps } from '../interfaces';
 
@@ -18,46 +19,120 @@ type Props = Omit<ControlFieldProps, 'value'> &
     value?: OpProjectFieldValue;
   };
 
+function OptimismProjectFields({ value, label }: { label: string; value: string | string[] }) {
+  return (
+    <Stack>
+      <Typography fontWeight='bold' variant='subtitle2'>
+        {label}
+      </Typography>
+      {Array.isArray(value) ? (
+        <Stack gap={1}>
+          {value.map((v) =>
+            isValidUrl(v) || v.startsWith('http') ? (
+              <Link external key={v} href={v} target='_blank'>
+                {v}
+              </Link>
+            ) : (
+              <Typography key={v}>{v}</Typography>
+            )
+          )}
+        </Stack>
+      ) : isValidUrl(value) || value.startsWith('http') ? (
+        <Link external href={value} target='_blank'>
+          {value}
+        </Link>
+      ) : (
+        <Typography>{value}</Typography>
+      )}
+    </Stack>
+  );
+}
+
 function OptimismProjectDisplay({ project }: { project: OPProjectData }) {
   return (
-    <Stack mt={1} bgcolor={(theme) => theme.palette.background.paper} gap={1} p={1}>
+    <Stack mt={1} bgcolor={(theme) => theme.palette.background.paper} gap={1.5} p={1.5}>
+      {project.coverImageUrl && isValidUrl(project.coverImageUrl) && (
+        <img
+          src={project.coverImageUrl}
+          alt={project.name}
+          style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+        />
+      )}
       <Stack gap={1} direction='row' alignItems='center'>
-        <Avatar avatar={project.coverImageUrl} name={project.name} size='large' />
+        <Avatar
+          avatar={isValidUrl(project.avatarUrl) ? project.avatarUrl : undefined}
+          name={project.name}
+          size='medium'
+          variant='rounded'
+        />
         <Typography variant='h6'>{project.name}</Typography>
       </Stack>
-      <Stack>
-        <FormLabel>Project description</FormLabel>
-        <Typography>{project.description}</Typography>
-      </Stack>
-      <Stack>
-        <FormLabel>Project Attestation id</FormLabel>
-        <Typography>{project.attestationUid}</Typography>
-      </Stack>
-      <Stack>
-        <FormLabel>External link</FormLabel>
-        <Typography>{project.externalLink}</Typography>
-      </Stack>
-      <Stack>
-        <FormLabel>Repositories</FormLabel>
-        {project.repositories.map((repository) => (
-          <Link external key={repository} href={repository} target='_blank'>
-            {repository}
-          </Link>
+      <OptimismProjectFields label='Project description' value={project.description} />
+      <OptimismProjectFields label='Project attestation id' value={project.attestationUid} />
+      <OptimismProjectFields label='External link' value={project.externalLink} />
+      <OptimismProjectFields label='Repositories' value={project.repositories} />
+      <Divider />
+      <Typography fontWeight='bold' variant='h6'>
+        Social links
+      </Typography>
+      <OptimismProjectFields label='Farcaster' value={project.socialLinks.farcaster} />
+      <OptimismProjectFields label='Categories' value={project.categories.map((c) => c.name)} />
+      {project.socialLinks.twitter && <OptimismProjectFields label='X' value={project.socialLinks.twitter} />}
+      {project.socialLinks.website && <OptimismProjectFields label='Website' value={project.socialLinks.website} />}
+      {project.socialLinks.mirror && <OptimismProjectFields label='Mirror' value={project.socialLinks.mirror} />}
+      <Divider />
+      <Typography fontWeight='bold' variant='h6'>
+        Deployed contracts
+      </Typography>
+      {project.deployedContracts.map((contract, index) => (
+        <Stack key={contract.address} gap={1} mt={index !== 0 ? 2 : 0}>
+          <OptimismProjectFields label='Address' value={contract.address} />
+          <OptimismProjectFields label='Chain id' value={contract.chainId} />
+          <OptimismProjectFields label='Deployer' value={contract.deployer} />
+          <OptimismProjectFields label='Creation block' value={contract.creationBlock} />
+          <OptimismProjectFields label='Transaction id' value={contract.transactionId} />
+          <OptimismProjectFields label='Verification proof' value={contract.verificationProof} />
+          <OptimismProjectFields label='Open source observer slug' value={contract.openSourceObserverSlug} />
+        </Stack>
+      ))}
+      <Divider />
+      <Typography fontWeight='bold' variant='h6'>
+        Funding
+      </Typography>
+      <Stack gap={1}>
+        <Typography fontWeight='bold'>Venture capital</Typography>
+        {project.funding.ventureCapital.map((funding) => (
+          <Stack key={funding.amount} gap={1}>
+            <OptimismProjectFields label='Amount' value={funding.amount} />
+            <OptimismProjectFields label='Source' value={funding.source} />
+            <OptimismProjectFields label='Date' value={funding.date} />
+            <OptimismProjectFields label='Details' value={funding.details} />
+          </Stack>
         ))}
-      </Stack>
-      <Stack>
-        <FormLabel>Farcaster</FormLabel>
-        <Typography>{project.socialLinks.farcaster}</Typography>
-      </Stack>
-      <Stack>
-        <FormLabel>X</FormLabel>
-        <Typography>{project.socialLinks.twitter}</Typography>
-      </Stack>
-      <Stack>
-        <FormLabel>Website</FormLabel>
-        <Link external href={project.socialLinks.website} target='_blank'>
-          <Typography>{project.socialLinks.website}</Typography>
-        </Link>
+        <Typography fontWeight='bold' mt={2}>
+          Grants
+        </Typography>
+        {project.funding.grants.map((funding) => (
+          <Stack key={funding.amount} gap={1}>
+            <OptimismProjectFields label='Amount' value={funding.amount} />
+            <OptimismProjectFields label='Source' value={funding.source} />
+            <OptimismProjectFields label='Date' value={funding.date} />
+            <OptimismProjectFields label='Details' value={funding.details} />
+          </Stack>
+        ))}
+        <Typography fontWeight='bold' mt={2}>
+          Optimism grants
+        </Typography>
+        {project.funding.optimismGrants.map((funding) => (
+          <Stack key={funding.amount} gap={1}>
+            <OptimismProjectFields label='Amount' value={funding.amount} />
+            <OptimismProjectFields label='Source' value={funding.source} />
+            <OptimismProjectFields label='Date' value={funding.date} />
+            <OptimismProjectFields label='Details' value={funding.details} />
+            <OptimismProjectFields label='Link' value={funding.link} />
+            <OptimismProjectFields label='Type' value={funding.type} />
+          </Stack>
+        ))}
       </Stack>
     </Stack>
   );
