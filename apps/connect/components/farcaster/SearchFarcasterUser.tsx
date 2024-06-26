@@ -1,11 +1,10 @@
+import { Avatar } from '@connect/components/common/Avatar';
+import { getFarcasterProfile, type FarcasterProfile } from '@connect/lib/farcaster/getFarcasterUser';
 import type { BoxProps } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
-
-import { Avatar } from 'components/common/Avatar';
-import { getFarcasterProfile, type FarcasterProfile } from 'lib/farcaster/getFarcasterUser';
 
 export function SearchFarcasterUser({
   selectedProfile,

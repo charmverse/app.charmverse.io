@@ -81,6 +81,5 @@ export const sessionUserRelations = {
       timezone: true,
       locale: true
     }
-  },
-  connectOnboarded: true
+  }
 } satisfies Prisma.UserSelect;

@@ -1,11 +1,10 @@
+import { Avatar } from '@connect/components/common/Avatar';
+import { PageWrapper } from '@connect/components/common/PageWrapper';
+import { ProjectsList } from '@connect/components/projects/ProjectsList';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import { Button, Card, CardContent, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import Link from 'next/link';
-
-import { Avatar } from 'components/common/Avatar';
-import { PageWrapper } from 'components/common/PageWrapper';
-import { ProjectsList } from 'components/projects/ProjectsList';
 
 export default function Projects() {
   return (

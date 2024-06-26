@@ -1,13 +1,12 @@
+import { Avatar } from '@connect/components/common/Avatar';
+import { useS3UploadInput } from '@connect/hooks/useS3UploadInput';
+import { inputBackground } from '@connect/theme/colors';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { Button, FormLabel, IconButton, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { Controller, useController, useFieldArray } from 'react-hook-form';
-
-import { Avatar } from 'components/common/Avatar';
-import { useS3UploadInput } from 'hooks/useS3UploadInput';
-import { inputBackground } from 'theme/colors';
 
 import { CATEGORIES } from './utils/constants';
 import type { FormValues } from './utils/form';

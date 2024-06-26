@@ -4,7 +4,7 @@
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { XhrHttpHandler } from '@aws-sdk/xhr-http-handler';
 
-import charmClient from 'charmClient';
+import charmClient from 'charmClient/index';
 
 type Config = {
   onUploadPercentageProgress?: (progress: number) => void;

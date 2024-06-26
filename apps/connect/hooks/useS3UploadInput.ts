@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
+import { DEFAULT_MAX_FILE_SIZE_MB } from '@connect/lib/utils/file';
 import { useState } from 'react';
 
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { DEFAULT_MAX_FILE_SIZE_MB } from 'lib/utils/file';
 import { replaceS3Domain } from 'lib/utils/url';
 
 import { useFilePicker } from './useFilePicker';

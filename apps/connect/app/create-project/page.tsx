@@ -1,14 +1,13 @@
 'use client';
 
+import { PageWrapper } from '@connect/components/common/PageWrapper';
+import { AddProjectMembersForm } from '@connect/components/projects/AddProjectMembersForm';
+import { CreateProjectForm } from '@connect/components/projects/CreateProjectForm';
+import { schema } from '@connect/components/projects/utils/form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-
-import { PageWrapper } from 'components/common/PageWrapper';
-import { AddProjectMembersForm } from 'components/projects/AddProjectMembersForm';
-import { CreateProjectForm } from 'components/projects/CreateProjectForm';
-import { schema } from 'components/projects/utils/form';
 
 export default function CreateProject() {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);

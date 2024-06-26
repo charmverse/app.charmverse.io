@@ -1,15 +1,15 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
+import type { FormValues } from '@connect/components/projects/utils/form';
+import { schema } from '@connect/components/projects/utils/form';
+import { authActionClient } from '@connect/lib/actions/actionClient';
+import { getFarcasterProfile } from '@connect/lib/farcaster/getFarcasterUser';
+import { isTruthy } from '@connect/lib/utils/type';
 import { redirect } from 'next/navigation';
 import { v4 } from 'uuid';
 
-import type { FormValues } from 'components/projects/utils/form';
-import { schema } from 'components/projects/utils/form';
-import { authActionClient } from 'lib/actions/actionClient';
-import { getFarcasterProfile } from 'lib/farcaster/getFarcasterUser';
 import { uid } from 'lib/utils/strings';
-import { isTruthy } from 'lib/utils/type';
 
 export type FarcasterAccount = {
   id: number;
@@ -133,7 +133,7 @@ export const actionCreateProject = authActionClient
         description: input.description,
         category: input.category,
         websites: input.websites?.filter(isTruthy),
-        farcasterIds: input.farcasterIds?.filter(isTruthy),
+        farcasterValues: input.farcasterIds?.filter(isTruthy),
         twitter: input.twitter,
         github: input.github,
         mirror: input.mirror,

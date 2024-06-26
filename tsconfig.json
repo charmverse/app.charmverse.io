@@ -42,6 +42,7 @@
       "public/*": ["./public/*"],
       "theme/*": ["./theme/*"],
       "testing/*": ["./testing/*"],
+      "charmClient/*": ["./charmClient/*"],
       "__e2e__/*": ["./__e2e__/*"],
       "@charmverse/core/prisma": ["node_modules/@charmverse/core/dist/cjs/prisma"],
       "@charmverse/core/prisma-client": ["node_modules/@charmverse/core/dist/cjs/prisma-client"],

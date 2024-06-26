@@ -1,13 +1,12 @@
+import { Avatar } from '@connect/components/common/Avatar';
+import { SearchFarcasterUser } from '@connect/components/farcaster/SearchFarcasterUser';
+import type { FarcasterProfile } from '@connect/lib/farcaster/getFarcasterUser';
+import { actionCreateProject } from '@connect/lib/projects/createProjectAction';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Card, CardContent, Divider, Stack, Typography } from '@mui/material';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useFieldArray, type Control, type UseFormHandleSubmit } from 'react-hook-form';
-
-import { Avatar } from 'components/common/Avatar';
-import { SearchFarcasterUser } from 'components/farcaster/SearchFarcasterUser';
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterUser';
-import { actionCreateProject } from 'lib/projects/createProjectAction';
 
 import type { FormValues } from './utils/form';
 
