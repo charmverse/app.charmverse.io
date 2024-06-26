@@ -22,6 +22,7 @@
     "paths": {
       "@connect/*": ["./*"],
       "adapters/*": ["../../adapters/*"],
+      "charmClient/*": ["../../charmClient/*"],
       "lib/*": ["../../lib/*"],
       "config/*": ["../../config/*"],
       "models/*": ["../../models/*"],
