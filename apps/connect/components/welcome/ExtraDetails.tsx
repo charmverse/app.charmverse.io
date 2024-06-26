@@ -1,21 +1,14 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { schema } from '@connect/lib/profile/form';
+import type { FormValues } from '@connect/lib/profile/form';
 import { actionOnboarding } from '@connect/lib/profile/onboardingAction';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormHelperText from '@mui/material/FormHelperText';
-import FormLabel from '@mui/material/FormLabel';
-import TextField from '@mui/material/TextField';
+import { Button, Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
-
-import type { FormValues } from './utils/form';
-import { schema } from './utils/form';
 
 const defaultValues = { email: '', terms: false, notify: true } as const;
 
@@ -32,7 +25,7 @@ export function ExtraDetails() {
 
   const {
     control,
-    formState: { errors, isValid },
+    formState: { isValid },
     handleSubmit
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
@@ -55,8 +48,8 @@ export function ExtraDetails() {
         <Controller
           control={control}
           name='email'
-          render={({ field }) => (
-            <TextField aria-labelledby='form-email' error={!!errors.email} {...field} sx={{ mb: 1 }} />
+          render={({ field, fieldState: { error } }) => (
+            <TextField aria-labelledby='form-email' error={!!error?.message} {...field} sx={{ mb: 1 }} />
           )}
         />
         <Controller

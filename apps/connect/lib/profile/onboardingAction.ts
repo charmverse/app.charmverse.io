@@ -1,8 +1,9 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
-import { schema } from '@connect/components/welcome/utils/form';
 import { authActionClient } from '@connect/lib/actions/actionClient';
+
+import { schema } from './form';
 
 export const actionOnboarding = authActionClient
   .metadata({ actionName: 'onboarding' })
