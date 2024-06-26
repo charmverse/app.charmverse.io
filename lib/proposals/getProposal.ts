@@ -45,7 +45,9 @@ export async function getProposal({
         }
       },
       authors: true,
-      page: { select: { id: true, content: true, contentText: true, sourceTemplateId: true, type: true } },
+      page: {
+        select: { permissions: true, id: true, content: true, contentText: true, sourceTemplateId: true, type: true }
+      },
       rewards: true,
       project: {
         include: projectInclude
@@ -57,6 +59,12 @@ export async function getProposal({
               index: 'asc'
             }
           }
+        }
+      },
+      space: {
+        select: {
+          paidTier: true,
+          publicProposals: true
         }
       }
     }
@@ -107,6 +115,11 @@ export async function getProposal({
     }
   });
 
+  const isPublicPage =
+    proposal.space.publicProposals ||
+    proposal.space.paidTier === 'free' ||
+    !!proposal.page?.permissions.some((perm) => perm.public);
+
   return mapDbProposalToProposal({
     proposalEvaluationReviews,
     proposalEvaluationAppealReviews,
@@ -117,6 +130,7 @@ export async function getProposal({
       : null,
     proposal: { ...proposal, issuedCredentials: credentials },
     permissions: currentPermissions,
+    isPublicPage,
     permissionsByStep
   });
 }

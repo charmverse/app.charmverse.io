@@ -41,6 +41,7 @@ export type Props = {
     ProposalWithUsersAndRubric,
     | 'archived'
     | 'id'
+    | 'isPublic'
     | 'authors'
     | 'evaluations'
     | 'permissions'
@@ -343,7 +344,7 @@ export function EvaluationsReview({
           />
         </EvaluationStepRow>
       )}
-      {pagePath && pageId && pageTitle && proposal && expandedContainer && (
+      {pagePath && pageId && pageTitle && proposal && expandedContainer && proposal?.isPublic && (
         <>
           <Divider />
           <SocialShareLinksStep
