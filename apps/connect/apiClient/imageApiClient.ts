@@ -1,4 +1,4 @@
-import { encodeFilename } from 'lib/utils/file';
+import { encodeFilename } from '../lib/utils/file';
 
 import { BaseConnectApiClient } from './baseConnectApiClient';
 
