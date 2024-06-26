@@ -4,14 +4,21 @@
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { XhrHttpHandler } from '@aws-sdk/xhr-http-handler';
 
-import charmClient from 'charmClient';
-
 type Config = {
   onUploadPercentageProgress?: (progress: number) => void;
 };
 
-export async function uploadToS3(file: File, config?: Config) {
-  const data = await charmClient.uploadToS3(file);
+export async function uploadToS3(
+  fileUploader: (file: File) => Promise<{
+    token: any;
+    bucket: string;
+    key: string;
+    region: string;
+  }>,
+  file: File,
+  config?: Config
+) {
+  const data = await fileUploader(file);
   const trackProgress = !!config?.onUploadPercentageProgress;
 
   const { S3Client } = await import('@aws-sdk/client-s3');

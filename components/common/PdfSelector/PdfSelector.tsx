@@ -2,6 +2,7 @@ import { Box } from '@mui/material';
 import { useState, type ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
+import charmClient from 'charmClient';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';

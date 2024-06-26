@@ -11,8 +11,9 @@ import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent'
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
+import { getUserProfile } from 'lib/users/getUser';
 import { postUserCreate } from 'lib/users/postUserCreate';
-import { DisabledAccountError, ExternalServiceError } from 'lib/utils/errors';
+import { DisabledAccountError, InvalidInputError } from 'lib/utils/errors';
 import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
@@ -43,7 +44,7 @@ export async function loginWithFarcaster({
   signature
 }: LoginWithFarcasterParams): Promise<LoggedInUser> {
   if (!fid || !username) {
-    throw new ExternalServiceError('Farcaster id missing');
+    throw new InvalidInputError('Farcaster id missing');
   }
 
   const { success, error: farcasterLoginError } = await verifySignInMessage(appClient, {
@@ -65,7 +66,11 @@ export async function loginWithFarcaster({
     },
     include: {
       user: {
-        include: sessionUserRelations
+        select: {
+          id: true,
+          deletedAt: true,
+          claimed: true
+        }
       }
     }
   });
@@ -75,9 +80,20 @@ export async function loginWithFarcaster({
       throw new DisabledAccountError();
     }
 
+    if (!farcasterUser.user.claimed) {
+      await prisma.user.update({
+        where: {
+          id: farcasterUser.userId
+        },
+        data: {
+          claimed: true
+        }
+      });
+    }
+
     trackUserAction('sign_in', { userId: farcasterUser.user.id, identityType: 'Farcaster' });
 
-    return farcasterUser.user;
+    return getUserProfile('id', farcasterUser.userId);
   }
   const userWithWallet = await prisma.user.findFirst({
     where: {
