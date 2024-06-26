@@ -14,6 +14,7 @@ import { handleServerError } from './onError';
 export const actionClient = createSafeActionClient({
   handleReturnedServerError: handleServerError,
   defaultValidationErrorsShape: 'flattened',
+  // @ts-ignore
   defineMetadataSchema: () => {
     return yup.object({
       actionName: yup.string()
