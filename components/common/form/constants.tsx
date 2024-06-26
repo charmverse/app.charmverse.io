@@ -58,7 +58,7 @@ export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   file: 'File',
   project_profile: 'Project Profile',
   milestone: 'Milestone',
-  op_project: 'Optimism Project'
+  optimism_project_profile: 'Optimism Project'
 };
 
 export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
@@ -78,7 +78,7 @@ export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
   file: <AttachFileIcon fontSize='small' />,
   project_profile: <AccountBoxIcon fontSize='small' />,
   milestone: <BountyIcon fontSize='small' />,
-  op_project: <img width={20} height={20} src='/images/cryptoLogos/optimism.svg' alt='Optimism' />
+  optimism_project_profile: <img width={20} height={20} src='/images/cryptoLogos/optimism.svg' alt='Optimism' />
 };
 
 export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
@@ -98,5 +98,5 @@ export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
   file: 'Upload a file',
   project_profile: 'Fill up project profile',
   milestone: 'Add up milestone',
-  op_project: 'Optimism Project'
+  optimism_project_profile: 'Optimism Project'
 };

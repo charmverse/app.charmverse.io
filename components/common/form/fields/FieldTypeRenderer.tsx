@@ -186,7 +186,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
         return <FileField {...fieldProps} value={fieldProps.value as UploadedFileInfo} />;
       }
 
-      case 'op_project': {
+      case 'optimism_project_profile': {
         return <OptimismProjectSelector {...fieldProps} value={fieldProps.value as OpProjectFieldValue} />;
       }
 

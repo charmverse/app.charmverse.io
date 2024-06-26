@@ -108,7 +108,7 @@ function ExpandedFormField({
 
     return formFieldTypes.filter((_formFieldType) => {
       const nonDuplicateFieldType = nonDuplicateFieldTypes.includes(_formFieldType);
-      if (_formFieldType === 'op_project') {
+      if (_formFieldType === 'optimism_project_profile') {
         return isCharmverseSpace;
       }
       if (nonDuplicateFieldType) {
