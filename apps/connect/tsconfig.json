@@ -24,6 +24,7 @@
       "adapters/*": ["../../adapters/*"],
       "charmClient/*": ["../../charmClient/*"],
       "components/*": ["../../components/*"],
+      "connectors/*": ["../../connectors/*"],
       "lib/*": ["../../lib/*"],
       "config/*": ["../../config/*"],
       "models/*": ["../../models/*"],
