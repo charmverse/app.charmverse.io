@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { Box } from '@mui/material';
 import { useState, type ReactNode } from 'react';
 
@@ -51,6 +52,8 @@ export default function PdfSelector({ autoOpen = false, children, onPdfSelect }:
                             setIsUploading(true);
                             const { url } = await uploadToS3(firstFile);
                             onPdfSelect(url);
+                          } catch (error) {
+                            log.error('Failed to upload PDF', { error });
                           } finally {
                             setIsUploading(false);
                           }
