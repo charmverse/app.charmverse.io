@@ -1,5 +1,4 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { IronSession } from 'iron-session';
 import { getIronSession } from 'iron-session';
@@ -8,7 +7,8 @@ import { createSafeActionClient } from 'next-safe-action/typeschema';
 import * as yup from 'yup';
 
 import { getIronOptions } from 'lib/session/getIronOptions';
-import type { SessionData } from 'lib/session/types';
+
+import type { SessionData } from '../session/types';
 
 import { handleServerError } from './onError';
 
@@ -49,16 +49,12 @@ export const authActionClient = actionClient.use(async ({ next, ctx }) => {
     throw new UnauthorisedActionError('You are not logged in. Please try to login');
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId }
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    select: { id: true }
   });
 
-  // @TODO - add this back when user login with session is ready
-  // if (!user) {
-  //   throw new UnauthorisedActionError('user is not is not valid!');
-  // }
-
-  const session: IronSession<Required<SessionData>> = { ...ctx.session, user: { id: userId } };
+  const session: IronSession<Required<Pick<SessionData, 'user'>>> = { ...ctx.session, user };
 
   return next({ ctx: { ...ctx, session } });
 });

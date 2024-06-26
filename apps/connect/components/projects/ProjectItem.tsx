@@ -1,4 +1,5 @@
 import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
+import { Avatar } from '@connect/components/common/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -7,8 +8,6 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-
-import { Avatar } from 'components/common/Avatar';
 
 export function ProjectItem({
   project

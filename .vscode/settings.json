@@ -1,4 +1,14 @@
 {
+  "eslint.options": {
+    "overrideConfigFile": ".eslintrc.json",
+    "resolvePluginsRelativeTo": "."
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {

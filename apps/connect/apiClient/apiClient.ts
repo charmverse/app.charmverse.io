@@ -1,10 +1,16 @@
 'use client';
 
-import { ImageApiClient } from './imageApiClient';
-import { TestApiClient } from './testApiClient';
+import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 
-class ConnectApiClient {
-  test = new TestApiClient();
+import type { LoggedInUser } from 'models/index';
+
+import { BaseConnectApiClient } from './baseConnectApiClient';
+import { ImageApiClient } from './imageApiClient';
+
+class ConnectApiClient extends BaseConnectApiClient {
+  async loginViaFarcaster(req: FarcasterBody): Promise<LoggedInUser> {
+    return this.POST('/api/session/login-with-farcaster', req);
+  }
 
   image = new ImageApiClient();
 }

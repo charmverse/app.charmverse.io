@@ -35,4 +35,5 @@ export interface LoggedInUser extends User {
     timezone?: string | null;
     locale?: string | null;
   } | null;
+  connectOnboarded: boolean | null;
 }

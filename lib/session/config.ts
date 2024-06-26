@@ -81,5 +81,6 @@ export const sessionUserRelations = {
       timezone: true,
       locale: true
     }
-  }
+  },
+  connectOnboarded: true
 } as const;

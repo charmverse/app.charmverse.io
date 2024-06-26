@@ -1,12 +1,12 @@
 import 'server-only';
 
+import { getRecentProjectsWithMembers } from '@connect/lib/projects/getRecentProjectsWithMembers';
 import Typography from '@mui/material/Typography';
 import { getIronSession } from 'iron-session';
 import { cookies } from 'next/headers';
 
-import { getRecentProjectsWithMembers } from 'lib/projects/getRecentProjectsWithMembers';
+import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
-import type { SessionData } from 'lib/session/types';
 
 import { ProjectItem } from './ProjectItem';
 
