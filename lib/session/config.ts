@@ -1,4 +1,4 @@
-import type { IdentityType } from '@charmverse/core/prisma-client';
+import type { IdentityType, Prisma } from '@charmverse/core/prisma-client';
 import type { IronSession } from 'iron-session';
 
 export type SessionData = {
@@ -83,4 +83,4 @@ export const sessionUserRelations = {
     }
   },
   connectOnboarded: true
-} as const;
+} satisfies Prisma.UserSelect;
