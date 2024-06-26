@@ -13,7 +13,7 @@ export default async function Profile() {
   const user = await getCurrentUser();
 
   if (!user?.data) {
-    return null;
+    redirect('/');
   }
 
   if (!user?.data?.connectOnboarded) {

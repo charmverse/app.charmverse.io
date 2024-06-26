@@ -2,6 +2,8 @@
 
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 
+import { GET } from 'adapters/http';
+import { connectApiHost } from 'config/constants';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { LoggedInUser } from 'models/index';
 
@@ -13,12 +15,14 @@ class ConnectApiClient extends BaseConnectApiClient {
   }
 
   async uploadImage(file: File) {
-    return this.GET<{
+    // Using this causes issue during upload
+    // can't read property 'GET' of undefined
+    return GET<{
       token: any;
       region: string;
       bucket: string;
       key: string;
-    }>(`/api/image/upload`, {
+    }>(`${connectApiHost}/api/image/upload`, {
       filename: encodeFilename(file.name)
     });
   }
