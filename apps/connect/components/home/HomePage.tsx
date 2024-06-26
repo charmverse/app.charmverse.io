@@ -4,7 +4,7 @@ import { ProjectItemSkeleton } from '@connect/components/projects/ProjectItemSke
 import { ProjectsList } from '@connect/components/projects/ProjectsList';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Link from '@mui/material/Link';
+import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { Suspense } from 'react';
 
@@ -19,13 +19,11 @@ export function HomePage() {
           Powered by CharmVerse
         </Typography>
         <Typography>Create your profile, add projects and compete for 540K OP in total prizes on Gitcoin.</Typography>
-
         <Box gap={2} display='flex' flexDirection='column' my={2} alignItems='center'>
           <WarpcastLogin />
-
-          <Link href='https://warpcast.com' target='_blank' rel='noopener'>
+          <MuiLink href='https://warpcast.com' target='_blank' rel='noopener'>
             Don't have a Farcaster acccount?
-          </Link>
+          </MuiLink>
         </Box>
       </Box>
       <Divider />

@@ -19,7 +19,7 @@ export function useFarcasterConnection({
       await connectApiClient.loginViaFarcaster(res);
       onSuccess?.();
     },
-    [onSuccess, onError]
+    [onSuccess]
   );
 
   const signInProps = useSignIn({

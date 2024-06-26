@@ -102,8 +102,7 @@ const extendedTheme = extendTheme({
           ...(ownerState?.variant === 'rounded' && {
             borderRadius: 10
           }),
-          fontWeight: 500,
-          color: 'background.default'
+          fontWeight: 500
         })
       }
     },
@@ -278,7 +277,8 @@ const extendedTheme = extendTheme({
           color: theme.vars.palette.primary.main,
           '&:hover': {
             color: theme.vars.palette.primary.dark
-          }
+          },
+          fontFamily: defaultFont
         })
       },
       defaultProps: {
