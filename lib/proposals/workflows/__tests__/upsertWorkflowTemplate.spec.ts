@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
-import { upsertWorkflowTemplate } from '../controller';
+import { upsertWorkflowTemplate } from '../upsertWorkflowTemplate';
 
 let user: User;
 let space: Space;

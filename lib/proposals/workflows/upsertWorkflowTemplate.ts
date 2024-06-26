@@ -3,23 +3,6 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
-export async function getWorkflowTemplates(spaceId: string) {
-  const dbWorkflows = await prisma.proposalWorkflow.findMany({
-    where: {
-      spaceId
-    }
-  });
-  return dbWorkflows as ProposalWorkflowTyped[];
-}
-
-export async function deleteWorkflowTemplate({ spaceId, workflowId }: { spaceId: string; workflowId: string }) {
-  return prisma.proposalWorkflow.delete({
-    where: {
-      id: workflowId,
-      spaceId
-    }
-  });
-}
 export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
   const originalWorkflow = await prisma.proposalWorkflow.findUnique({
     where: {
@@ -30,14 +13,12 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
   const originalEvaluations = (originalWorkflow ? originalWorkflow.evaluations : []) as WorkflowEvaluationJson[];
 
   const hasChangedActionButtonLabels = workflow.evaluations.some((evaluation) => {
-    const workflowEvaluation = originalEvaluations.find((e) => e.id === evaluation.id);
-    if (
-      workflowEvaluation?.actionLabels?.approve !== evaluation.actionLabels?.approve ||
-      workflowEvaluation?.actionLabels?.reject !== evaluation.actionLabels?.reject
-    ) {
-      return true;
-    }
-    return false;
+    const original = originalEvaluations.find((e) => e.id === evaluation.id);
+    return (
+      original &&
+      (original.actionLabels?.approve !== evaluation.actionLabels?.approve ||
+        original.actionLabels?.reject !== evaluation.actionLabels?.reject)
+    );
   });
 
   if (hasChangedActionButtonLabels) {
@@ -124,7 +105,7 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
   }
 }
 
-export async function upsertWorkflowActionButtonLabels(workflow: ProposalWorkflowTyped) {
+async function upsertWorkflowActionButtonLabels(workflow: ProposalWorkflowTyped) {
   const originalWorkflow = await prisma.proposalWorkflow.findUnique({
     where: {
       id: workflow.id
