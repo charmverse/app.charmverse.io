@@ -9,7 +9,7 @@ export class ConnectStagingStack extends StagingStack {
         {
           namespace: 'aws:elasticbeanstalk:environment:process:connectapi',
           optionName: 'HealthCheckPath',
-          value: '/health-check'
+          value: '/api/health'
         },
         {
           namespace: 'aws:elasticbeanstalk:environment:process:connectapi',

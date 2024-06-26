@@ -13,7 +13,7 @@ import { InvalidStateError } from 'lib/middleware';
 import { sessionUserRelations } from 'lib/session/config';
 import { getUserProfile } from 'lib/users/getUser';
 import { postUserCreate } from 'lib/users/postUserCreate';
-import { DisabledAccountError, ExternalServiceError } from 'lib/utils/errors';
+import { DisabledAccountError, InvalidInputError } from 'lib/utils/errors';
 import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
@@ -44,7 +44,7 @@ export async function loginWithFarcaster({
   signature
 }: LoginWithFarcasterParams): Promise<LoggedInUser> {
   if (!fid || !username) {
-    throw new ExternalServiceError('Farcaster id missing');
+    throw new InvalidInputError('Farcaster id missing');
   }
 
   const { success, error: farcasterLoginError } = await verifySignInMessage(appClient, {
