@@ -120,18 +120,16 @@ const PDF = memo((props: PDFViewerProps) => {
   }
 
   return (
-    <Box style={{ lineHeight: 'auto' /* override line-height 0 from BlockAligner */ }}>
-      <Box mb={1}>
-        <PDFViewer onLoadSuccess={onDocumentLoadSuccess} pageNumber={pageNumber} url={url} width={width} />
-      </Box>
+    <Box style={{ lineHeight: 'initial' /* override line-height 0 from BlockAligner */ }}>
+      <PDFViewer onLoadSuccess={onDocumentLoadSuccess} pageNumber={pageNumber} url={url} width={width} />
       <div>
         <p>
           Page {pageNumber || (pageCount ? 1 : '--')} of {pageCount || '--'}
         </p>
-        <IconButton onClick={previousPage} disabled={pageNumber <= 1}>
+        <IconButton onClick={previousPage} disabled={pageNumber <= 1} size='small'>
           <NavigateBeforeIcon fontSize='small' />
         </IconButton>
-        <IconButton onClick={nextPage} disabled={!pageCount || pageNumber >= pageCount}>
+        <IconButton onClick={nextPage} disabled={!pageCount || pageNumber >= pageCount} size='small'>
           <NavigateNextIcon fontSize='small' />
         </IconButton>
       </div>
