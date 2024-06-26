@@ -1,30 +1,46 @@
 'use client';
 
+import { log } from '@charmverse/core/log';
+import { schema } from '@connect/lib/profile/form';
+import type { FormValues } from '@connect/lib/profile/form';
 import { actionOnboarding } from '@connect/lib/profile/onboardingAction';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, TextField } from '@mui/material';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
-
-import type { FormValues } from './utils/form';
-import { schema } from './utils/form';
 
 const defaultValues = { email: '', terms: false, notify: true } as const;
 
 export function ExtraDetails() {
-  const { execute, executeAsync, result, status, reset, isIdle, isExecuting, hasSucceeded, hasErrored } =
-    useAction(actionOnboarding);
+  const router = useRouter();
+  // @ts-ignore
+  const { executeAsync, result, isExecuting, hasErrored } = useAction(actionOnboarding, {
+    onSuccess() {
+      router.push('/profile');
+    },
+    onError(err) {
+      log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
+    }
+  });
 
   const {
     control,
-    formState: { errors, isValid },
+    formState: { isValid },
     handleSubmit
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues
   });
+
+  const validationErrors =
+    result.validationErrors?.fieldErrors?.email ||
+    result.validationErrors?.fieldErrors.notify ||
+    result.validationErrors?.fieldErrors.terms ||
+    [];
+
+  const validationError = validationErrors.map((err) => <span key={err}>{err}</span>);
 
   return (
     <form onSubmit={handleSubmit(executeAsync)}>
@@ -33,8 +49,8 @@ export function ExtraDetails() {
         <Controller
           control={control}
           name='email'
-          render={({ field }) => (
-            <TextField aria-labelledby='form-email' error={!!errors.email} {...field} sx={{ mb: 1 }} />
+          render={({ field, fieldState: { error } }) => (
+            <TextField aria-labelledby='form-email' error={!!error?.message} {...field} sx={{ mb: 1 }} />
           )}
         />
         <Controller
@@ -54,13 +70,14 @@ export function ExtraDetails() {
             <FormControlLabel control={<Checkbox onChange={onChange} checked={!!value} />} label='Terms and Service' />
           )}
         />
+        {hasErrored && validationErrors?.length > 0 && (
+          <FormHelperText error={hasErrored}>{validationError}</FormHelperText>
+        )}
+        <FormHelperText error={!!hasErrored}>{result.serverError?.message || result.fetchError}</FormHelperText>
       </FormControl>
-      <Link href='/profile'>
-        <Button sx={{ mb: 4, my: 2 }} type='submit' disabled={!isValid || isExecuting}>
-          Next
-        </Button>
-      </Link>
-      <FormHelperText error={!!hasErrored}></FormHelperText>
+      <Button sx={{ mb: 4, my: 2 }} type='submit' disabled={!isValid || isExecuting}>
+        Next
+      </Button>
     </form>
   );
 }

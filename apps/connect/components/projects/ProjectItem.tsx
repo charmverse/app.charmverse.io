@@ -28,11 +28,8 @@ export function ProjectItem({
         <CardMedia
           component='img'
           alt={projectName}
-          src={
-            project.avatar ??
-            'https://cdn.charmverse.io/user-content/f50534c5-22e7-47ee-96cb-54f4ce1a0e3e/9b2b00af-9644-43aa-add1-cde22f0253c3/breaking_wave.jpg'
-          }
-          sx={{ maxWidth: '100px', minWidth: '100px', height: '100px', borderRadius: 3, objectFit: 'cover' }}
+          src='https://cdn.charmverse.io/user-content/f50534c5-22e7-47ee-96cb-54f4ce1a0e3e/9b2b00af-9644-43aa-add1-cde22f0253c3/breaking_wave.jpg'
+          sx={{ maxWidth: '100px', minWidth: '100px', height: '100px', borderRadius: 3 }}
         />
         <CardContent
           component={Box}

@@ -9,11 +9,7 @@ export default async function Home() {
   const user = await getCurrentUser({});
 
   if (user?.data) {
-    if (user?.data.connectOnboarded) {
-      redirect('/profile');
-    } else {
-      redirect('/welcome');
-    }
+    redirect('/profile');
   }
 
   return <HomePage />;

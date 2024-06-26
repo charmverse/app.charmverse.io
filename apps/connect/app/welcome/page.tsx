@@ -3,13 +3,13 @@ import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
 import { redirect } from 'next/navigation';
 
 export default async function Welcome() {
-  const user = await getCurrentUser({});
+  const user = await getCurrentUser();
 
   if (!user?.data) {
-    redirect('/');
+    return null;
   }
 
-  if (user.data?.connectOnboarded) {
+  if (user?.data?.connectOnboarded) {
     redirect('/profile');
   }
 

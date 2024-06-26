@@ -11,7 +11,7 @@ import { ExtraDetails } from './ExtraDetails';
 
 export function WelcomePage({ user }: { user: LoggedInUser }) {
   const farcasterDetails = user.farcasterUser?.account as
-    | Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>
+    | Required<Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>>
     | undefined;
 
   return (
@@ -24,7 +24,13 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
           This is your profile. You can use it to create projects which can be used with Optimism's grant programs.
         </Typography>
       </Box>
-      {farcasterDetails && <FarcasterCard {...farcasterDetails} />}
+      {farcasterDetails && (
+        <FarcasterCard
+          avatar={farcasterDetails.pfpUrl}
+          bio={farcasterDetails.bio}
+          username={farcasterDetails.username}
+        />
+      )}
       <Box mt={2} display='flex' gap={2} flexDirection='column'>
         <ExtraDetails />
       </Box>
