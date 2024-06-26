@@ -1,4 +1,4 @@
-import { DisabledAccountError, ExternalServiceError } from '@charmverse/core/errors';
+import { DisabledAccountError, ExternalServiceError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { verifySignInMessage } from '@farcaster/auth-kit';
 
@@ -42,7 +42,7 @@ describe('loginWithFarcaster', () => {
   test('should fail if no fid or no username in the body', async () => {
     const body = { ...defaultBody };
 
-    await expect(loginWithFarcaster(body)).rejects.toThrowError(ExternalServiceError);
+    await expect(loginWithFarcaster(body)).rejects.toThrowError(InvalidInputError);
   });
 
   test('should fail if user was deleted', async () => {
