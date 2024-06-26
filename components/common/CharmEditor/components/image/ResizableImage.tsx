@@ -4,14 +4,14 @@ import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import type { Node } from 'prosemirror-model';
 import type { HTMLAttributes } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
 
+import charmClient from 'charmClient';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 import { replaceS3Domain } from 'lib/utils/url';
 
 import { enableDragAndDrop } from '../../utils';
@@ -111,7 +111,7 @@ function ResizableImage({
             });
           }
         }, 0);
-        uploadToS3(file)
+        uploadToS3(charmClient.uploadToS3, file)
           .then(({ url }) => {
             updateAttrs({
               src: url

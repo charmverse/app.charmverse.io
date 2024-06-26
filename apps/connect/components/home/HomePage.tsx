@@ -22,7 +22,7 @@ export function HomePage() {
         <Box gap={2} display='flex' flexDirection='column' my={2} alignItems='center'>
           <WarpcastLogin />
           <MuiLink href='https://warpcast.com' target='_blank' rel='noopener'>
-            Don't have a Farcaster acccount?
+            Don't have a Farcaster account?
           </MuiLink>
         </Box>
       </Box>
