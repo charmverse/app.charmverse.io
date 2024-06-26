@@ -18,8 +18,6 @@ import TextFieldsIcon from '@mui/icons-material/TextFields';
 import { SvgIcon } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import OptimismIcon from 'public/images/cryptoLogos/optimism.svg';
-
 export const formFieldTypes = [
   'project_profile',
   'short_text',
@@ -80,11 +78,7 @@ export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
   file: <AttachFileIcon fontSize='small' />,
   project_profile: <AccountBoxIcon fontSize='small' />,
   milestone: <BountyIcon fontSize='small' />,
-  op_project: (
-    <SvgIcon viewBox='0 0 20 20' fontSize='small'>
-      <OptimismIcon />
-    </SvgIcon>
-  )
+  op_project: <img width={20} height={20} src='/images/cryptoLogos/optimism.svg' alt='Optimism' />
 };
 
 export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
