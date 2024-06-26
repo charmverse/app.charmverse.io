@@ -1,7 +1,7 @@
 import { POST, GET, DELETE, PUT } from 'adapters/http';
 import { connectApiHost } from 'config/constants';
 
-export class BaseConnectApiClient {
+export class HttpClient {
   readonly baseUrl: string;
 
   constructor() {
