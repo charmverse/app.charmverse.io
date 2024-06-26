@@ -695,7 +695,7 @@ function PropertyValueElement(props: Props) {
         centerContent={displayType !== 'table'}
       />
     );
-  } else if ((propertyTemplate as any).type === 'op_project' && typeof value === 'object') {
+  } else if ((propertyTemplate as any).type === 'optimism_project_profile' && typeof value === 'object') {
     propertyValueElement = <OptimismProjectLink value={value as unknown as OpProjectFieldValue} />;
   }
 

@@ -35,11 +35,16 @@ export const formFieldTypes = [
   'image',
   'file',
   'milestone',
-  'op_project'
+  'optimism_project_profile'
 ] as FormFieldType[];
 
 export const nonDuplicateFieldTypes = ['project_profile', 'milestone'] as FormFieldType[];
-export const nonPrivateFieldTypes = ['label', 'project_profile', 'op_project', 'milestone'] as FormFieldType[];
+export const nonPrivateFieldTypes = [
+  'label',
+  'project_profile',
+  'optimism_project_profile',
+  'milestone'
+] as FormFieldType[];
 
 export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   date: 'Date',
