@@ -8,7 +8,14 @@ import { getIronOptions } from 'lib/session/getIronOptions';
 
 const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
 
-export async function handleServerError(err: any) {
+type ErrorResponse = {
+  message: string;
+  errorType: string;
+  severity: string;
+  status: number;
+};
+
+export async function handleServerError(err: any): Promise<ErrorResponse> {
   // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
   // P2025 is thrown when a record is not found
   if (err.code === 'P2025') {
@@ -53,5 +60,10 @@ export async function handleServerError(err: any) {
     });
   }
 
-  return { message: err.message, severity: err.severity, status: err.code, type: err.errorType };
+  return {
+    message: err.message || 'Something went wrong',
+    severity: err.severity || 'error',
+    status: err.code || 500,
+    errorType: err.errorType || 'Unknown'
+  };
 }
