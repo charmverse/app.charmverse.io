@@ -30,7 +30,7 @@ app.use(
       } else if (origin?.endsWith('.charmverse.co') || origin?.endsWith('.charmverse.io')) {
         return origin;
       }
-      log.warn('Origin not allowed', ctx.request.headers);
+      log.warn('Origin not allowed', { path, headers: ctx.request.headers });
       return ''; // Disallow the request if the origin is not allowed
     },
     credentials: true
