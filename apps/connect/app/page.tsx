@@ -1,16 +1,16 @@
+import { HomePage } from '@connect/components/home/HomePage';
+import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
 import { redirect } from 'next/navigation';
-
-import { HomePage } from 'components/home/HomePage';
 
 // tell Next that this route loads dynamic data
 export const dynamic = 'force-dynamic';
 
-export default function Home() {
-  const user = undefined; // server action
+export default async function Home() {
+  const user = await getCurrentUser();
 
-  if (user) {
-    redirect('/dashboard');
+  if (user?.data) {
+    redirect('/profile');
   }
 
-  return <HomePage user={user} />;
+  return <HomePage />;
 }

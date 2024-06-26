@@ -65,10 +65,7 @@
         "multilineDetection": "brackets"
       }
     ],
-    "@typescript-eslint/object-curly-spacing": [
-      "error",
-      "always"
-    ],
+    "@typescript-eslint/object-curly-spacing": ["error", "always"],
     "object-curly-spacing": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
@@ -88,8 +85,8 @@
         "devDependencies": true,
         "packageDir": [
           "./",
-          "./apps/connect",
-          "./apps/connect-api"
+          "./apps/connect-api",
+          "./apps/connect"
         ]
       }
     ],

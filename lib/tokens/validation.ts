@@ -1,4 +1,4 @@
-import { getAddress } from 'viem';
+import { getAddress } from 'viem/utils';
 
 /**
  * Checks if the format of a given Ethereum address is acceptable

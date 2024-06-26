@@ -1,5 +1,5 @@
-import LinkIcon from '@mui/icons-material/Link';
-import { Box, type SxProps, IconButton } from '@mui/material';
+import type { SxProps } from '@mui/material';
+import { Box } from '@mui/material';
 import { debounce } from 'lodash';
 import { forwardRef, useMemo } from 'react';
 import type { UseFormGetFieldState } from 'react-hook-form';
@@ -103,23 +103,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'url':
       case 'phone':
       case 'short_text': {
-        const InputProps =
-          type === 'url'
-            ? {
-                endAdornment: (
-                  <IconButton
-                    color='secondary'
-                    href={fieldProps.value as string}
-                    target='_blank'
-                    size='small'
-                    sx={{ p: 0 }}
-                  >
-                    <LinkIcon />
-                  </IconButton>
-                )
-              }
-            : undefined;
-        return <TextInputField {...fieldProps} InputProps={InputProps} ref={ref} multiline />;
+        return <TextInputField {...fieldProps} ref={ref} multiline />;
       }
       case 'wallet': {
         return (

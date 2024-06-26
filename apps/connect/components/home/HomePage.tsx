@@ -1,16 +1,14 @@
+import { PageWrapper } from '@connect/components/common/PageWrapper';
+import { WarpcastLogin } from '@connect/components/common/WarpcastLogin/WarpcastLogin';
+import { ProjectItemSkeleton } from '@connect/components/projects/ProjectItemSkeleton';
+import { ProjectsList } from '@connect/components/projects/ProjectsList';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import Link from '@mui/material/Link';
+import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { Suspense } from 'react';
 
-import { PageWrapper } from 'components/common/PageWrapper';
-import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
-import { ProjectItemSkeleton } from 'components/projects/ProjectItemSkeleton';
-import { ProjectsList } from 'components/projects/ProjectsList';
-
-export function HomePage({ user }: { user: any }) {
+export function HomePage() {
   return (
     <PageWrapper>
       <Box textAlign='center'>
@@ -21,12 +19,11 @@ export function HomePage({ user }: { user: any }) {
           Powered by CharmVerse
         </Typography>
         <Typography>Create your profile, add projects and compete for 540K OP in total prizes on Gitcoin.</Typography>
-        {/* <WarpcastLogin /> */}
         <Box gap={2} display='flex' flexDirection='column' my={2} alignItems='center'>
-          <Button>Connect with Farcaster</Button>
-          <Link href='https://warpcast.com' target='_blank' rel='noopener'>
+          <WarpcastLogin />
+          <MuiLink href='https://warpcast.com' target='_blank' rel='noopener'>
             Don't have a Farcaster acccount?
-          </Link>
+          </MuiLink>
         </Box>
       </Box>
       <Divider />
