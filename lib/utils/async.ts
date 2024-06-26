@@ -14,3 +14,9 @@ export async function paginatedCall<R, Q = object | null>(
   } while (query);
   return results;
 }
+
+export async function delay(ms: number = 1000) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}

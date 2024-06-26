@@ -1,7 +1,6 @@
+import Bolt from '@connect/public/images/lightning_bolt.svg';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-
-import Bolt from 'public/images/lightning_bolt.svg';
 
 export default function NotFound() {
   return (

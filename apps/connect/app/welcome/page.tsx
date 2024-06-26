@@ -1,29 +1,17 @@
-import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
+import { WelcomePage } from '@connect/components/welcome/WelcomePage';
+import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
 import { redirect } from 'next/navigation';
 
-import { WelcomePage } from 'components/welcome/WelcomePage';
-import { getUserProfile } from 'lib/profile/getUser';
-import { getIronOptions } from 'lib/session/getIronOptions';
-import type { SessionData } from 'lib/session/types';
-
 export default async function Welcome() {
-  const session = await getIronSession<SessionData>(cookies(), getIronOptions());
-  const userId = session?.user?.id;
+  const user = await getCurrentUser({});
 
-  if (!userId) {
+  if (!user?.data) {
     redirect('/');
   }
 
-  const user = await getUserProfile('id', userId);
-
-  if (!user) {
-    redirect('/');
-  }
-
-  if (user.connectOnboarded) {
+  if (user.data?.connectOnboarded) {
     redirect('/profile');
   }
 
-  return <WelcomePage user={user} />;
+  return <WelcomePage user={user.data} />;
 }

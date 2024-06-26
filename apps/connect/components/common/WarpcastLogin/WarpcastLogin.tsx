@@ -18,7 +18,7 @@ function WarpcastLoginButton() {
 
   const onSuccessCallback = useCallback(async () => {
     popupState.close();
-    router.push('/welcome');
+    router.push('/profile');
   }, [popupState.close]);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {

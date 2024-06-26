@@ -1,14 +1,12 @@
 'use client';
 
+import { actionOnboarding } from '@connect/lib/profile/onboardingAction';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Checkbox, FormControl, FormControlLabel, FormLabel, TextField } from '@mui/material';
+import { Button, Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, TextField } from '@mui/material';
 import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
 
-import { actionOnboarding } from 'lib/profile/onboardingAction';
-
-import { WelcomeButton } from './components/WelcomeButton';
 import type { FormValues } from './utils/form';
 import { schema } from './utils/form';
 
@@ -58,10 +56,11 @@ export function ExtraDetails() {
         />
       </FormControl>
       <Link href='/profile'>
-        <WelcomeButton sx={{ mb: 4, my: 2 }} type='submit' disabled={!isValid}>
+        <Button sx={{ mb: 4, my: 2 }} type='submit' disabled={!isValid || isExecuting}>
           Next
-        </WelcomeButton>
+        </Button>
       </Link>
+      <FormHelperText error={!!hasErrored}></FormHelperText>
     </form>
   );
 }

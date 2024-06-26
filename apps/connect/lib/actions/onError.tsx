@@ -3,9 +3,8 @@ import { log } from '@charmverse/core/log';
 import { getIronSession } from 'iron-session';
 import { cookies, headers } from 'next/headers';
 
+import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
-
-import type { SessionData } from '../session/types';
 
 const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
 
@@ -13,7 +12,7 @@ export async function handleServerError(err: any) {
   // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
   // P2025 is thrown when a record is not found
   if (err.code === 'P2025') {
-    return new DataNotFoundError(`Data not found`);
+    throw new DataNotFoundError(`Data not found`);
   }
 
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
@@ -47,5 +46,5 @@ export async function handleServerError(err: any) {
     });
   }
 
-  return { ...errorAsSystemError };
+  return err.message;
 }
