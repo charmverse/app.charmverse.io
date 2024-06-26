@@ -1,8 +1,5 @@
 import { Avatar } from '@connect/components/common/Avatar';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
+import { Box, Card, CardContent, Typography } from '@mui/material';
 
 export function FarcasterCard({ username, avatar, bio }: { bio: string; username: string; avatar: string }) {
   return (
