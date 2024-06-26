@@ -19,5 +19,5 @@ export const actionOnboarding = authActionClient
       }
     });
 
-    return null;
+    return { success: true };
   });

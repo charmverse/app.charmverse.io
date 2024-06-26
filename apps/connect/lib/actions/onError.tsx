@@ -12,7 +12,14 @@ export async function handleServerError(err: any) {
   // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
   // P2025 is thrown when a record is not found
   if (err.code === 'P2025') {
-    throw new DataNotFoundError(`Data not found`);
+    const error = new DataNotFoundError('Data not found');
+
+    return {
+      message: error.message,
+      errorType: error.errorType,
+      severity: error.severity,
+      status: error.code
+    };
   }
 
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
@@ -46,5 +53,5 @@ export async function handleServerError(err: any) {
     });
   }
 
-  return err.message;
+  return { message: err.message, severity: err.severity, status: err.code, type: err.errorType };
 }
