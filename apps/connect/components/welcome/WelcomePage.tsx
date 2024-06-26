@@ -26,6 +26,7 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
       </Box>
       {farcasterDetails && (
         <FarcasterCard
+          name={farcasterDetails.displayName}
           avatar={farcasterDetails.pfpUrl}
           bio={farcasterDetails.bio}
           username={farcasterDetails.username}
