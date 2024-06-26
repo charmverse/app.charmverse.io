@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mui/material-nextjs": "^5.15.11",
+    "@hookform/resolvers": "^3.6.0",
     "@typeschema/yup": "^0.13.3",
     "next-safe-action": "^7.1.2",
     "server-only": "^0.0.1"
