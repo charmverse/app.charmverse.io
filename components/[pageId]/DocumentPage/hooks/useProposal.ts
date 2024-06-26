@@ -23,7 +23,6 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { trigger: applyProposalWorkflow } = useUpdateWorkflow({ proposalId });
   const { subscribe } = useWebSocketClient();
   const { refreshIssuableCredentials } = useProposalCredentials({ proposalId });
-
   useEffect(() => {
     function handleUpdateEvent(proposals: WebSocketPayload<'proposals_updated'>) {
       const match = proposals.find(({ id }) => id === proposal?.id);

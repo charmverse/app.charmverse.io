@@ -15,6 +15,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import ShortTextIcon from '@mui/icons-material/ShortText';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
+import { SvgIcon } from '@mui/material';
 import type { ReactNode } from 'react';
 
 export const formFieldTypes = [
@@ -33,11 +34,17 @@ export const formFieldTypes = [
   'label',
   'image',
   'file',
-  'milestone'
+  'milestone',
+  'optimism_project_profile'
 ] as FormFieldType[];
 
 export const nonDuplicateFieldTypes = ['project_profile', 'milestone'] as FormFieldType[];
-export const nonPrivateFieldTypes = ['label', 'project_profile', 'milestone'] as FormFieldType[];
+export const nonPrivateFieldTypes = [
+  'label',
+  'project_profile',
+  'optimism_project_profile',
+  'milestone'
+] as FormFieldType[];
 
 export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   date: 'Date',
@@ -55,7 +62,8 @@ export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   image: 'Image',
   file: 'File',
   project_profile: 'Project Profile',
-  milestone: 'Milestone'
+  milestone: 'Milestone',
+  optimism_project_profile: 'Optimism Project'
 };
 
 export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
@@ -74,7 +82,8 @@ export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
   image: <ImageIcon fontSize='small' />,
   file: <AttachFileIcon fontSize='small' />,
   project_profile: <AccountBoxIcon fontSize='small' />,
-  milestone: <BountyIcon fontSize='small' />
+  milestone: <BountyIcon fontSize='small' />,
+  optimism_project_profile: <img width={20} height={20} src='/images/cryptoLogos/optimism.svg' alt='Optimism' />
 };
 
 export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
@@ -93,5 +102,6 @@ export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
   image: 'Upload an image',
   file: 'Upload a file',
   project_profile: 'Fill up project profile',
-  milestone: 'Add up milestone'
+  milestone: 'Add up milestone',
+  optimism_project_profile: 'Optimism Project'
 };

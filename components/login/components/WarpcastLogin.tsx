@@ -1,7 +1,7 @@
 import { AuthKitProvider } from '@farcaster/auth-kit';
 
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
-import PrimaryButton from 'components/common/PrimaryButton';
+import { Button } from 'components/common/Button';
 import { warpcastConfig } from 'lib/farcaster/config';
 import type { LoginType } from 'lib/farcaster/interfaces';
 
@@ -9,7 +9,15 @@ import { useWarpcastLogin } from '../hooks/useWarpcastLogin';
 
 import { FarcasterLoginModal } from './FarcasterModal';
 
-function WarpcastLoginButton({ type }: { type: LoginType }) {
+function WarpcastLoginButton({
+  size = 'medium',
+  type,
+  label = 'Connect'
+}: {
+  size?: string;
+  type: LoginType;
+  label?: string;
+}) {
   const { close, isLoading, isOpen, signIn, url } = useWarpcastLogin({ type });
 
   return (
@@ -25,19 +33,19 @@ function WarpcastLoginButton({ type }: { type: LoginType }) {
           icon={<img src='/images/logos/warpcast.png' style={{ width: '30px', height: '30px', marginLeft: '3px' }} />}
         />
       ) : (
-        <PrimaryButton disabled={isLoading} loading={isLoading} size='small' onClick={signIn}>
-          Connect
-        </PrimaryButton>
+        <Button size={size} color='primary' disabled={isLoading} loading={isLoading} onClick={signIn}>
+          {label}
+        </Button>
       )}
       <FarcasterLoginModal open={isOpen} onClose={close} url={url} />
     </>
   );
 }
 
-export function WarpcastLogin({ type }: { type: LoginType }) {
+export function WarpcastLogin({ size, type, label }: { size?: string; type: LoginType; label?: string }) {
   return (
     <AuthKitProvider config={warpcastConfig}>
-      <WarpcastLoginButton type={type} />
+      <WarpcastLoginButton size={size} type={type} label={label} />
     </AuthKitProvider>
   );
 }
