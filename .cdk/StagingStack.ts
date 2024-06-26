@@ -60,7 +60,7 @@ export class StagingStack extends Stack {
       {
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'RootVolumeSize',
-        value: '12' // example size in GB
+        value: '24' // example size in GB
       },
       {
         namespace: 'aws:elasticbeanstalk:environment',
