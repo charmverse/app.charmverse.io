@@ -1,6 +1,5 @@
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
-import { prettyPrint } from 'lib/utils/strings';
 
 import type { IPropertyTemplate } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';
@@ -21,6 +20,11 @@ export function filterBoardProperties({
   const proposalCustomPropertyIds = proposalCustomProperties.map((p) => p.id);
 
   return boardProperties.filter((p) => {
+    // This column is always necessary to find the value/label for the proposal status column
+    if (p.type === 'proposalEvaluationType') {
+      return true;
+    }
+
     if (p.formFieldId) {
       return selectedFormFields.includes(p.formFieldId);
     }

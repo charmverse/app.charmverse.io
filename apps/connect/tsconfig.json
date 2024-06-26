@@ -20,8 +20,11 @@
       }
     ],
     "paths": {
+      "@connect/*": ["./*"],
       "adapters/*": ["../../adapters/*"],
+      "lib/*": ["../../lib/*"],
       "config/*": ["../../config/*"],
+      "models/*": ["../../models/*"],
       "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
       "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
       "@charmverse/core/shared": ["../../node_modules/@charmverse/core/dist/cjs/shared"],

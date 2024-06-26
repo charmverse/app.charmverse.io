@@ -1,29 +1,16 @@
-'use client';
+import { HomePage } from '@connect/components/home/HomePage';
+import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
+import { redirect } from 'next/navigation';
 
-// import { connectApiClient } from 'connect/api/apiClient';
-import { useState } from 'react';
+// tell Next that this route loads dynamic data
+export const dynamic = 'force-dynamic';
 
-import { connectApiClient } from '../apiClient/apiClient';
+export default async function Home() {
+  const user = await getCurrentUser();
 
-import styles from './page.module.css';
-
-export default function Home() {
-  const [number, setNumber] = useState<number | null>(null);
-
-  async function showRandomNumber() {
-    const response = await connectApiClient.test.getRandomNumber();
-    setNumber(response.number);
+  if (user?.data) {
+    redirect('/profile');
   }
 
-  return (
-    <div className={styles.main}>
-      {/** Center content */}
-      <div className={styles.center}>
-        <div className='button' onClick={() => showRandomNumber()}>
-          Show Random Number
-          {number !== null && <p>Random Number: {number}</p>}
-        </div>
-      </div>
-    </div>
-  );
+  return <HomePage />;
 }

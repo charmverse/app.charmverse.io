@@ -8,7 +8,7 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { FieldAnswerInput, FormFieldValue } from 'lib/forms/interfaces';
+import type { FormFieldValue } from 'lib/forms/interfaces';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { ProposalToErrorCheck } from 'lib/proposals/getProposalErrors';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';

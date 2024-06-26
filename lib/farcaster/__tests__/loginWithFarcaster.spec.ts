@@ -1,23 +1,42 @@
-import { DataNotFoundError, DisabledAccountError, ExternalServiceError } from '@charmverse/core/errors';
+import { DisabledAccountError, ExternalServiceError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { StatusAPIResponse } from '@farcaster/auth-kit';
+import { verifySignInMessage } from '@farcaster/auth-kit';
 
+import { InvalidStateError } from 'lib/middleware';
 import { generateFarcasterUser, generateUserAndSpace } from 'testing/setupDatabase';
 
+import type { LoginWithFarcasterParams } from '../loginWithFarcaster';
 import { loginWithFarcaster } from '../loginWithFarcaster';
+
+jest.mock('@farcaster/auth-kit', () => ({
+  verifySignInMessage: jest.fn().mockResolvedValue({ success: true }),
+  viemConnector: jest.fn().mockReturnValue({ rpcUrls: ['http://localhost:8545'] }),
+  createAppClient: jest.fn().mockReturnValue({})
+}));
+
+const mockedVerifySignInMessage = jest.mocked(verifySignInMessage);
 
 const defaultBody = {
   bio: 'biooo',
   displayName: 'My name',
   state: 'completed',
   nonce: '1235',
-  url: 'https://example.com'
-} as const;
+  url: 'https://example.com',
+  signature: '0x1234',
+  message: 'message'
+} as LoginWithFarcasterParams;
 
 describe('loginWithFarcaster', () => {
   afterEach(async () => {
     await prisma.userWallet.deleteMany({});
     await prisma.farcasterUser.deleteMany({});
+  });
+
+  test('should fail if the signature cannot be verified', async () => {
+    mockedVerifySignInMessage.mockResolvedValueOnce({ success: false } as any);
+    const body = { ...defaultBody, fid: Math.floor(Math.random() * 1000), username: '@test' };
+
+    await expect(loginWithFarcaster(body)).rejects.toThrow(InvalidStateError);
   });
 
   test('should fail if no fid or no username in the body', async () => {
@@ -54,25 +73,27 @@ describe('loginWithFarcaster', () => {
     expect(await loginWithFarcaster(body)).toHaveProperty('id', user.id);
   });
 
-  test('should fail if wallet address associated with Farcaster has already an user account', async () => {
+  test('should add the farcaster account to a user which already has the a wallet address verified in Farcaster connected account', async () => {
     const walletAddress = '0x1234';
-    const body: StatusAPIResponse = {
+    const body: LoginWithFarcasterParams = {
       ...defaultBody,
       fid: Math.floor(Math.random() * 1000),
       username: '@test',
       verifications: [walletAddress]
     };
 
-    await generateUserAndSpace({
+    const { user } = await generateUserAndSpace({
       walletAddress
     });
 
-    await expect(loginWithFarcaster(body)).rejects.toThrowError(DataNotFoundError);
+    const loggedInViaFarcaster = await loginWithFarcaster(body);
+
+    expect(loggedInViaFarcaster.id).toBe(user.id);
   });
 
   test('should create a new user', async () => {
     const walletAddress = '0x1234543266';
-    const body: StatusAPIResponse = {
+    const body: LoginWithFarcasterParams = {
       ...defaultBody,
       fid: Math.floor(Math.random() * 1000),
       username: '@test',

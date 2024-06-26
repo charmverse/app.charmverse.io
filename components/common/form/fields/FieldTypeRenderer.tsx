@@ -1,4 +1,5 @@
-import { Box, type SxProps } from '@mui/material';
+import type { SxProps } from '@mui/material';
+import { Box } from '@mui/material';
 import { debounce } from 'lodash';
 import { forwardRef, useMemo } from 'react';
 import type { UseFormGetFieldState } from 'react-hook-form';
@@ -11,7 +12,7 @@ import { AttachRewardButton } from 'components/proposals/ProposalPage/components
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
-import type { FormFieldValue, FieldType } from 'lib/forms/interfaces';
+import type { FormFieldValue, FieldType, OpProjectFieldValue } from 'lib/forms/interfaces';
 
 import { InputSearchBlockchain } from '../InputSearchBlockchain';
 
@@ -21,6 +22,7 @@ import { FieldWrapper } from './FieldWrapper';
 import { FileField } from './FileField';
 import { ImageField } from './ImageField';
 import { LabelField } from './LabelField';
+import { OptimismProjectSelector } from './OptimismProjectSelector';
 import { PersonInputField } from './PersonInputField';
 
 type TextInputConfig = {
@@ -182,6 +184,10 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
 
       case 'file': {
         return <FileField {...fieldProps} value={fieldProps.value as UploadedFileInfo} />;
+      }
+
+      case 'optimism_project_profile': {
+        return <OptimismProjectSelector {...fieldProps} value={fieldProps.value as OpProjectFieldValue} />;
       }
 
       default: {

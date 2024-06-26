@@ -23,6 +23,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { ProjectFormEditor } from 'components/settings/projects/components/ProjectForm';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
@@ -90,6 +91,7 @@ function ExpandedFormField({
   formFieldTypeFrequencyCount
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
+  const isCharmverseSpace = useIsCharmverseSpace();
   const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
   // Auto focus on title text field when expanded
   useEffect(() => {
@@ -106,13 +108,16 @@ function ExpandedFormField({
 
     return formFieldTypes.filter((_formFieldType) => {
       const nonDuplicateFieldType = nonDuplicateFieldTypes.includes(_formFieldType);
+      if (_formFieldType === 'optimism_project_profile') {
+        return isCharmverseSpace;
+      }
       if (nonDuplicateFieldType) {
         return !formFieldTypeFrequencyCount[_formFieldType] || _formFieldType === formFieldType;
       }
 
       return true;
     });
-  }, [formFieldTypeFrequencyCount, formFieldType]);
+  }, [formFieldTypeFrequencyCount, formFieldType, isCharmverseSpace]);
 
   return (
     <>
@@ -342,7 +347,7 @@ export function FormField(
       }}
     >
       {!readOnly && (
-        <div ref={readOnly ? null : drag}>
+        <div ref={readOnly ? () => {} : (drag as any)}>
           <DragIndicatorIcon
             fontSize='small'
             color='secondary'

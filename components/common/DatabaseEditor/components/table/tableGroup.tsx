@@ -63,7 +63,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
   }
 
   return (
-    <div ref={drop} className={className} key={group.option?.id || group.value}>
+    <div ref={drop as any} className={className} key={group.option?.id || group.value}>
       <TableGroupHeaderRow
         group={group}
         board={board}

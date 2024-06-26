@@ -1,49 +1,24 @@
-import { AuthKitProvider, type AuthClientError } from '@farcaster/auth-kit';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useCallback } from 'react';
+import { AuthKitProvider } from '@farcaster/auth-kit';
 
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
-import PrimaryButton from 'components/common/PrimaryButton';
-import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
-import { useSnackbar } from 'hooks/useSnackbar';
+import { Button } from 'components/common/Button';
 import { warpcastConfig } from 'lib/farcaster/config';
 import type { LoginType } from 'lib/farcaster/interfaces';
-import type { LoggedInUser } from 'models';
+
+import { useWarpcastLogin } from '../hooks/useWarpcastLogin';
 
 import { FarcasterLoginModal } from './FarcasterModal';
 
-function WarpcastLoginButton({ type }: { type: LoginType }) {
-  const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
-  const { showMessage } = useSnackbar();
-
-  const onSuccessCallback = useCallback(async (res: LoggedInUser | { otpRequired: true }) => {
-    popupState.close();
-
-    if ('id' in res) {
-      if (type === 'login') {
-        window.location.reload();
-        showMessage(`Logged in with Warpcast. Redirecting you now`, 'success');
-      } else {
-        showMessage(`Connected to Warpcast.`, 'success');
-      }
-    }
-  }, []);
-
-  const onErrorCallback = useCallback((err?: AuthClientError) => {
-    popupState.close();
-    showMessage(err?.message || 'Error connecting to Warpcast. Please try again.', 'error');
-  }, []);
-
-  const onClick = useCallback(() => {
-    popupState.open();
-  }, []);
-
-  const { signIn, isLoading, url } = useFarcasterConnection({
-    onSuccess: onSuccessCallback,
-    onError: onErrorCallback,
-    onClick,
-    type
-  });
+function WarpcastLoginButton({
+  size = 'medium',
+  type,
+  label = 'Connect'
+}: {
+  size?: string;
+  type: LoginType;
+  label?: string;
+}) {
+  const { close, isLoading, isOpen, signIn, url } = useWarpcastLogin({ type });
 
   return (
     <>
@@ -58,19 +33,19 @@ function WarpcastLoginButton({ type }: { type: LoginType }) {
           icon={<img src='/images/logos/warpcast.png' style={{ width: '30px', height: '30px', marginLeft: '3px' }} />}
         />
       ) : (
-        <PrimaryButton disabled={isLoading} loading={isLoading} size='small' onClick={signIn}>
-          Connect
-        </PrimaryButton>
+        <Button size={size} color='primary' disabled={isLoading} loading={isLoading} onClick={signIn}>
+          {label}
+        </Button>
       )}
-      <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />
+      <FarcasterLoginModal open={isOpen} onClose={close} url={url} />
     </>
   );
 }
 
-export function WarpcastLogin({ type }: { type: LoginType }) {
+export function WarpcastLogin({ size, type, label }: { size?: string; type: LoginType; label?: string }) {
   return (
     <AuthKitProvider config={warpcastConfig}>
-      <WarpcastLoginButton type={type} />
+      <WarpcastLoginButton size={size} type={type} label={label} />
     </AuthKitProvider>
   );
 }

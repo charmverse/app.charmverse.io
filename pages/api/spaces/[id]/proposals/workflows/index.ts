@@ -4,12 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireSpaceMembership } from 'lib/middleware';
 import { defaultHandler } from 'lib/middleware/handler';
-import {
-  getWorkflowTemplates,
-  upsertWorkflowTemplate,
-  deleteWorkflowTemplate
-} from 'lib/proposals/workflows/controller';
+import { deleteWorkflowTemplate } from 'lib/proposals/workflows/deleteWorkflowTemplate';
+import { getWorkflowTemplates } from 'lib/proposals/workflows/getWorkflowTemplates';
 import { obfuscateWorkflow } from 'lib/proposals/workflows/obfuscateWorkflow';
+import { upsertWorkflowTemplate } from 'lib/proposals/workflows/upsertWorkflowTemplate';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utils/errors';
 

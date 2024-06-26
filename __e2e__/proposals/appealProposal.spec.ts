@@ -127,7 +127,10 @@ test.describe('Appeal proposal evaluation step', async () => {
 
     await proposalPage.page.locator('data-test=evaluation-appeal-button').nth(0).click();
 
-    await proposalPage.page.locator('data-test=appeal-reason-input >> input').fill('I disagree with the evaluation');
+    await proposalPage.page
+      .locator('data-test=appeal-reason-input >> textarea')
+      .first()
+      .fill('I disagree with the evaluation');
 
     await proposalPage.page.locator('data-test=appeal-reason-submit-button').click();
 
@@ -202,7 +205,10 @@ test.describe('Appeal proposal evaluation step', async () => {
 
     await proposalPage.page.locator('data-test=evaluation-appeal-button').nth(0).click();
 
-    await proposalPage.page.locator('data-test=appeal-reason-input >> input').fill('I disagree with the evaluation');
+    await proposalPage.page
+      .locator('data-test=appeal-reason-input >> textarea')
+      .first()
+      .fill('I disagree with the evaluation');
 
     await proposalPage.page.locator('data-test=appeal-reason-submit-button').click();
 
@@ -337,7 +343,10 @@ test.describe('Appeal proposal evaluation step', async () => {
 
     await proposalPage.page.locator('data-test=evaluation-appeal-button').nth(0).click();
 
-    await proposalPage.page.locator('data-test=appeal-reason-input >> input').fill('I disagree with the evaluation');
+    await proposalPage.page
+      .locator('data-test=appeal-reason-input >> textarea')
+      .first()
+      .fill('I disagree with the evaluation');
 
     await proposalPage.page.locator('data-test=appeal-reason-submit-button').click();
 

@@ -180,8 +180,7 @@ export const defaultProposalProperties = [
   proposalDbProperties.proposalStep(),
   proposalDbProperties.proposalUrl(),
   proposalDbProperties.proposalAuthor(),
-  proposalDbProperties.proposalReviewer(),
-  proposalDbProperties.proposalEvaluationType()
+  proposalDbProperties.proposalReviewer()
 ];
 
 export const defaultProposalPropertyTypes = defaultProposalProperties.map((p) => p.type);

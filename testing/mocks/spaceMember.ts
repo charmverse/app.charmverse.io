@@ -8,6 +8,7 @@ export function createMockSpaceMember(user = createMockUser()): Member {
   const username = user.username.toLocaleLowerCase().replace(' ', '_');
   return {
     ...user,
+    farcasterUser: undefined,
     avatarTokenId: user.avatarTokenId ?? undefined,
     avatar: user.avatar ?? undefined,
     deletedAt: user.deletedAt ?? undefined,

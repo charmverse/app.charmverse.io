@@ -139,7 +139,7 @@ export function PassFailEvaluation({
           <Box mb={2}>
             <FormLabel>
               <Typography sx={{ mb: 1 }} variant='subtitle1'>
-                Reviewers
+                {isAppealProcess ? 'Appeal Reviewers' : 'Reviewers'}
               </Typography>
             </FormLabel>
             <UserAndRoleSelect

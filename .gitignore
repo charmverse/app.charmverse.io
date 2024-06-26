@@ -18,9 +18,12 @@ serverless/*.node
 
 # connect app
 /apps/connect/.next/
+/apps/connect/dist/
+/apps/connect/node_modules/
 
 # connect api
 /apps/connect-api/dist/
+/apps/connect/node_modules/
 
 # Tests
 /__e2e-dist__/
@@ -35,6 +38,7 @@ playwright-report
 .DS_Store
 *.env*
 !.env.*.example
+!.ebstalk.apps.env/*.env
 *.tsbuildinfo
 
 ./pages/api/script/*
