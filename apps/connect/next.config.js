@@ -3,7 +3,7 @@
 const nextConfig = {
   webpack(_config) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
-    _config.resolve.alias.canvas = false;
+    // _config.resolve.alias.canvas = false;
 
     _config.module.rules.push({
       test: /\.svg$/,
