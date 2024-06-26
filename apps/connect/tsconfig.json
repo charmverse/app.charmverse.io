@@ -23,6 +23,7 @@
       "@connect/*": ["./*"],
       "adapters/*": ["../../adapters/*"],
       "charmClient/*": ["../../charmClient/*"],
+      "components/*": ["../../components/*"],
       "lib/*": ["../../lib/*"],
       "config/*": ["../../config/*"],
       "models/*": ["../../models/*"],
