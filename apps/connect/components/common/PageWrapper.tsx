@@ -10,7 +10,7 @@ export function PageWrapper({ children, ...restProps }: BoxProps & { children: R
       borderRadius={8}
       bgcolor='background.default'
       border={{ xs: 'none', md: '1px solid var(--charm-palette-divider)' }}
-      maxWidth='600px'
+      maxWidth='500px'
       mx='auto'
       my={2}
       {...restProps}

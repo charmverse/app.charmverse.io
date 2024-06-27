@@ -16,7 +16,7 @@ export async function ProjectsList({ userProjects }: { userProjects?: boolean })
   const projectsList = await getRecentProjectsWithMembers({
     userId: userProjects ? session.user?.id : undefined
   });
-  console.log(projectsList);
+
   if (projectsList.length === 0) {
     return <Typography>There are no new projects</Typography>;
   }
