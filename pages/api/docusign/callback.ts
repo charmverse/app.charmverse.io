@@ -74,11 +74,7 @@ async function docusignCallback(req: NextApiRequest, res: NextApiResponse) {
   } catch (err: any) {
     return res
       .status(302)
-      .redirect(
-        `/${space.domain}?settingTab=integrations&docusignError=${encodeURIComponent(
-          err.message ?? 'Docusign connection failed'
-        )}`
-      );
+      .redirect(`/${space.domain}?callbackError=${encodeURIComponent(err.message ?? 'Docusign connection failed')}`);
   }
 }
 
