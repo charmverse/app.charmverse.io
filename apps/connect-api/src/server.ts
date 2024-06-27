@@ -58,7 +58,7 @@ app.use(async (ctx, next) => {
     if (ctx.status < 500) {
       _log = log.warn;
     }
-    _log('Route error', {
+    _log('Client error', {
       error: err,
       body: ctx.body,
       requestUrl: ctx.originalUrl,
@@ -71,12 +71,16 @@ app.use(async (ctx, next) => {
       };
       ctx.status = err.code;
     } else {
+      if (ctx.status < 400) {
+        ctx.status = 500;
+      } else {
+        // set ctx.status so that koa does not override it to be 200 when we define the body
+        // eslint-disable-next-line no-self-assign
+        ctx.status = ctx.status;
+      }
       ctx.body = {
         message: (err as any).message ?? 'Internal Server Error'
       };
-      if (ctx.status < 400) {
-        ctx.status = 500;
-      }
     }
   }
 });

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "mount-routes": "npx tsx ./src/scripts/generateRoutes.ts && npm run lint",
+    "mount-routes": "npx tsx ./src/scripts/generateRoutes.ts",
     "start": "npm run mount-routes && npx tsx --watch ./src/main.ts",
     "start:prod": "npx tsx ./dist/apps/connect-api/src/main.js",
     "lint": "npx eslint ./src --fix -c  ./.eslintrc.json",

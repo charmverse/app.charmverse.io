@@ -13,7 +13,7 @@ function gracefulShutdown() {
   log.info('Received shutdown instruction. Closing down server');
   // We use server.close to finish processing existing requests
   server.close(() => {
-    log.info('Permissions API shutdown completed');
+    log.info('Server shutdown completed');
     process.exit(0);
   });
 }
