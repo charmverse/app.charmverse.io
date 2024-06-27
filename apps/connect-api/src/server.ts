@@ -4,6 +4,7 @@ import cors from '@koa/cors';
 import { getIronSession } from 'iron-session';
 import Koa from 'koa';
 
+import { authSecret, baseUrl, cookieName, isProdEnv } from 'config/constants';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
 
@@ -39,9 +40,12 @@ app.use(
   })
 );
 
+// for now, make sure we set cross-subdomain cookies
+const domain = isProdEnv ? 'charmverse.io' : undefined;
+
 // Session middleware
 app.use(async (ctx, next) => {
-  ctx.request.session = await getIronSession<SessionData>(ctx.req, ctx.res, getIronOptions());
+  ctx.request.session = await getIronSession<SessionData>(ctx.req, ctx.res, getIronOptions({ domain }));
   await next();
 });
 
