@@ -51,7 +51,7 @@ export interface IChainDetails {
   shortName: string;
   unlockNetwork?: boolean;
   hypersubNetwork?: boolean;
-  viem: Chain;
+  viem?: Chain;
 }
 
 // Gnosis endpoints: https://docs.safe.global/safe-core-api/available-services
@@ -417,12 +417,12 @@ export const RPC: Record<string, IChainDetails> = {
       name: 'Kyoto',
       symbol: 'KYOTO',
       decimals: 18,
-      address: '0x0000000000000000000000000000000000000000'
-      // logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: '/images/cryptoLogos/kyoto-logo.svg'
     },
     rpcUrls: ['https://rpc.kyotochain.io'],
     blockExplorerUrls: ['https://kyotoscan.io'],
-    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
+    iconUrl: '/images/cryptoLogos/kyoto-logo.svg',
     shortName: 'kyoto'
   },
   KYOTO_DEV: {
@@ -433,12 +433,12 @@ export const RPC: Record<string, IChainDetails> = {
       name: 'Kyoto',
       symbol: 'KYOTO',
       decimals: 18,
-      address: '0x0000000000000000000000000000000000000000'
-      // logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: '/images/cryptoLogos/kyoto-logo.svg'
     },
     rpcUrls: ['https://rpc.testnet.kyotoprotocol.io:8545'],
     blockExplorerUrls: ['https://testnet.kyotoscan.io'],
-    // iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
+    iconUrl: '/images/cryptoLogos/kyoto-logo.svg',
     shortName: 'kyoto',
     testnet: true
   },

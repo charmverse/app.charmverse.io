@@ -8,11 +8,12 @@ import { createConfig } from 'wagmi';
 
 import 'viem/window';
 import { isTestEnv } from 'config/constants';
+import { isTruthy } from 'lib/utils/types';
 
 const allChains = getChainList({ enableTestnets: true });
 
 // map our RPC list to the wagmi chain list
-const viemChains = allChains.map((rpc) => rpc.viem) as [Chain, ...Chain[]];
+const viemChains = allChains.map((rpc) => rpc.viem).filter(isTruthy) as [Chain, ...Chain[]];
 
 const connectors = [
   injected({
@@ -31,8 +32,8 @@ export const wagmiConfig = createConfig({
   chains: viemChains,
   connectors,
   ssr: true, // prevents error: "localStorage not defined"  during npm run build
-  transports: viemChains.reduce<Record<string, Transport>>((acc, chain) => {
-    acc[chain.id] = http();
+  transports: allChains.reduce<Record<string, Transport>>((acc, { chainId }) => {
+    acc[chainId] = http();
     return acc;
   }, {})
 });
