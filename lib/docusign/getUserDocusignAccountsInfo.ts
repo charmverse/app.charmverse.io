@@ -42,21 +42,33 @@ async function isDocusignAccountAdmin({
   return docusignUserProfile.isAdmin === 'True';
 }
 
+export type UserDocusignAccountsInfo = Pick<
+  DocusignCredential,
+  'docusignAccountId' | 'docusignAccountName' | 'docusignApiBaseUrl'
+> & {
+  isAdmin: boolean;
+  isDefaultAccount: boolean;
+};
+
 /**
  * Provides baseUri and accountId for the user's Docusign account
  */
-export async function getUserDocusignAccountsInfo({ accessToken }: { accessToken: string }): Promise<
-  (Pick<DocusignCredential, 'docusignAccountId' | 'docusignAccountName' | 'docusignApiBaseUrl'> & {
-    isAdmin: boolean;
-    isDefaultAccount: boolean;
-  })[]
-> {
+export async function getUserDocusignAccountsInfo({
+  accessToken,
+  adminOnly
+}: {
+  accessToken: string;
+  adminOnly?: boolean;
+}): Promise<UserDocusignAccountsInfo[]> {
   const redisKey = `docusign-accounts-${accessToken}`;
 
   const existingData = await redisClient?.get(redisKey);
 
   if (existingData) {
-    return JSON.parse(existingData);
+    const parsed = JSON.parse(existingData) as UserDocusignAccountsInfo[];
+    if (adminOnly) {
+      return parsed.filter((account) => account.isAdmin);
+    }
   }
 
   const profileUri = `${docusignOauthBaseUri}/oauth/userinfo`;
@@ -86,6 +98,10 @@ export async function getUserDocusignAccountsInfo({ accessToken }: { accessToken
 
   // Cache for an hour
   await redisClient?.set(redisKey, JSON.stringify(accountInfos), { EX: docusignPeriodBetweenRequestsInSeconds });
+
+  if (adminOnly) {
+    return accountInfos.filter((account) => account.isAdmin);
+  }
 
   return accountInfos;
 }

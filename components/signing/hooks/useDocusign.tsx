@@ -1,13 +1,15 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-import { DELETE, GET, POST } from 'adapters/http';
+import { DELETE, GET, POST, PUT } from 'adapters/http';
 import {
+  useGetDocusignAccounts,
   useGetDocusignProfile,
   useGetSearchSpaceDocusignEnvelopes,
   useGetSpaceDocusignEnvelopes
 } from 'charmClient/hooks/docusign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { EvaluationDocumentToSign } from 'lib/proposals/documentsToSign/addEnvelopeToEvaluation';
 import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 
@@ -34,6 +36,13 @@ export function useDocusign() {
     isLoading: isSearchingEnvelopes,
     error: envelopeSearchError
   } = useGetSearchSpaceDocusignEnvelopes(docusignQuery);
+
+  const { data: availableDocusignAccounts } = useGetDocusignAccounts({ spaceId: space?.id });
+
+  async function updateSelectedDocusignAccount(input: { spaceId: string; docusignAccountId: string }) {
+    await PUT('/api/docusign/accounts', input);
+    refreshDocusignProfile();
+  }
 
   function searchDocusign(query: DocusignSearchRequest) {
     setDocusignQuery(query);
@@ -71,6 +80,8 @@ export function useDocusign() {
     envelopeSearchError,
     disconnectDocusign,
     addDocumentToEvaluation,
-    removeDocumentFromEvaluation
+    removeDocumentFromEvaluation,
+    availableDocusignAccounts,
+    updateSelectedDocusignAccount
   };
 }

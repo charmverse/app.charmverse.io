@@ -51,32 +51,37 @@ export async function setSpaceDocusignAccount({
     }
   });
 
-  if (existingCredentials) {
-    await prisma.docusignCredential.update({
-      where: {
-        id: existingCredentials.id
-      },
-      data: {
-        accessToken,
-        refreshToken,
-        docusignAccountId,
-        docusignAccountName: selectedAccount.docusignAccountName,
-        docusignApiBaseUrl: selectedAccount.docusignApiBaseUrl
-      }
-    });
-  } else {
-    await prisma.docusignCredential.create({
-      data: {
-        docusignAccountId,
-        docusignAccountName: selectedAccount.docusignAccountName,
-        docusignApiBaseUrl: selectedAccount.docusignApiBaseUrl,
-        accessToken,
-        refreshToken,
-        userId,
-        spaceId
-      }
-    });
-  }
+  const updatedCreds = await prisma.$transaction(async (tx) => {
+    if (existingCredentials) {
+      await tx.docusignCredential.update({
+        where: {
+          id: existingCredentials.id
+        },
+        data: {
+          accessToken,
+          refreshToken,
+          docusignAccountId,
+          docusignAccountName: selectedAccount.docusignAccountName,
+          docusignApiBaseUrl: selectedAccount.docusignApiBaseUrl
+        }
+      });
+    } else {
+      await tx.docusignCredential.create({
+        data: {
+          docusignAccountId,
+          docusignAccountName: selectedAccount.docusignAccountName,
+          docusignApiBaseUrl: selectedAccount.docusignApiBaseUrl,
+          accessToken,
+          refreshToken,
+          userId,
+          spaceId
+        }
+      });
+    }
+    const credsWithWebhook = await ensureSpaceWebhookExists({ spaceId, tx });
 
-  return ensureSpaceWebhookExists({ spaceId });
+    return credsWithWebhook;
+  });
+
+  return updatedCreds;
 }

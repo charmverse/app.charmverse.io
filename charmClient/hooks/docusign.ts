@@ -1,8 +1,9 @@
 import type { DocusignEnvelope } from 'lib/docusign/api';
 import type { PublicDocuSignProfile } from 'lib/docusign/authentication';
+import type { UserDocusignAccountsInfo } from 'lib/docusign/getUserDocusignAccountsInfo';
 import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 
-import { useGET, usePOST, type MaybeString } from './helpers';
+import { useGET, usePOST, type MaybeString, usePUT } from './helpers';
 
 export function useGetDocusignProfile({ spaceId }: { spaceId: MaybeString }) {
   return useGET<PublicDocuSignProfile | null>(spaceId ? '/api/docusign/profile' : null, { spaceId });
@@ -14,6 +15,10 @@ export function useGetSpaceDocusignEnvelopes({ spaceId }: { spaceId: MaybeString
 
 export function useGetSearchSpaceDocusignEnvelopes(query: DocusignSearchRequest | null) {
   return useGET<DocusignEnvelope[]>(query ? '/api/docusign/search' : null, query);
+}
+
+export function useGetDocusignAccounts({ spaceId }: { spaceId: MaybeString }) {
+  return useGET<UserDocusignAccountsInfo[]>(spaceId ? '/api/docusign/accounts' : null, { spaceId });
 }
 
 // export function useGetDocusignTemplates({ spaceId }: { spaceId: MaybeString }) {

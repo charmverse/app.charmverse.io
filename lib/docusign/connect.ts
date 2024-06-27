@@ -1,4 +1,5 @@
-import type { DocusignCredential } from '@charmverse/core/prisma-client';
+import { ExternalServiceError } from '@charmverse/core/errors';
+import type { DocusignCredential, OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
@@ -39,11 +40,14 @@ async function getDocusignWebhook({
  * Full config of the webhook
  * https://developers.docusign.com/docs/esign-rest-api/reference/connect/connectconfigurations/create/
  */
-export async function createSpaceDocusignWebhook({ spaceId }: { spaceId: string }): Promise<DocusignCredential> {
-  let credentials = await getSpaceDocusignCredentials({ spaceId });
+export async function createSpaceDocusignWebhook({
+  spaceId,
+  tx = prisma
+}: { spaceId: string } & OptionalPrismaTransaction): Promise<DocusignCredential> {
+  let credentials = await getSpaceDocusignCredentials({ spaceId, tx });
 
   if (!credentials.webhookApiKey) {
-    credentials = await prisma.docusignCredential.update({
+    credentials = await tx.docusignCredential.update({
       where: {
         id: credentials.id
       },
@@ -75,9 +79,11 @@ export async function createSpaceDocusignWebhook({ spaceId }: { spaceId: string 
     {
       headers: docusignUserOAuthTokenHeader({ accessToken: credentials.accessToken })
     }
-  );
+  ).catch((err: any) => {
+    throw new ExternalServiceError(err.message ?? 'Error creating webhook');
+  });
 
-  return prisma.docusignCredential.update({
+  return tx.docusignCredential.update({
     where: {
       id: credentials.id
     },
@@ -89,12 +95,13 @@ export async function createSpaceDocusignWebhook({ spaceId }: { spaceId: string 
 
 export async function ensureSpaceWebhookExists({
   spaceId,
-  credentials
+  credentials,
+  tx = prisma
 }: {
   spaceId: string;
   credentials?: RequiredDocusignCredentials & Pick<DocusignCredential, 'docusignWebhookId' | 'id'>;
-}): Promise<DocusignCredential> {
-  credentials = credentials ?? (await getSpaceDocusignCredentials({ spaceId }));
+} & OptionalPrismaTransaction): Promise<DocusignCredential> {
+  credentials = credentials ?? (await getSpaceDocusignCredentials({ spaceId, tx }));
 
   if (credentials.docusignWebhookId) {
     const webhook = await getDocusignWebhook({
@@ -105,7 +112,7 @@ export async function ensureSpaceWebhookExists({
     });
 
     if (!webhook?.configurations.length) {
-      await prisma.docusignCredential.update({
+      await tx.docusignCredential.update({
         where: {
           id: credentials.id
         },
@@ -113,11 +120,11 @@ export async function ensureSpaceWebhookExists({
           docusignWebhookId: null
         }
       });
-      await createSpaceDocusignWebhook({ spaceId });
+      await createSpaceDocusignWebhook({ spaceId, tx });
     }
   } else {
-    await createSpaceDocusignWebhook({ spaceId });
+    await createSpaceDocusignWebhook({ spaceId, tx });
   }
 
-  return getSpaceDocusignCredentials({ spaceId });
+  return getSpaceDocusignCredentials({ spaceId, tx });
 }

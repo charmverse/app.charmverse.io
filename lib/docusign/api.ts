@@ -167,7 +167,6 @@ export async function searchDocusignDocs({
   const cachedResults = await redisClient?.get(`docusign-search-${searchResultsKey}`);
 
   if (cachedResults) {
-    log.info('Returning cached search results');
     return JSON.parse(cachedResults);
   }
 
@@ -175,7 +174,7 @@ export async function searchDocusignDocs({
 
   const apiUrl = `${spaceCreds.docusignApiBaseUrl}/restapi/v2.1/accounts/${spaceCreds.docusignAccountId}/envelopes`;
 
-  const envelopes = await GET<{ envelopes: DocusignEnvelope[] }>(
+  const result = await GET<{ envelopes: DocusignEnvelope[] }>(
     apiUrl,
     { search_text: query.title, from_date: new Date('2021-01-01').toISOString(), include: 'recipients' },
     {
@@ -183,7 +182,9 @@ export async function searchDocusignDocs({
     }
   );
 
+  const envelopes = result.envelopes ?? [];
+
   await redisClient?.set(searchResultsKey, JSON.stringify(envelopes), { EX: 60 * 16 });
 
-  return envelopes.envelopes;
+  return envelopes;
 }

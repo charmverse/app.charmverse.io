@@ -1,26 +1,97 @@
 import type { Space } from '@charmverse/core/prisma-client';
+import EditIcon from '@mui/icons-material/EditOutlined';
 import { Alert, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
+import { minWidth } from '@mui/system';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+import { ConfirmationModal } from 'components/_app/components/ConfirmationModal';
 import { Button } from 'components/common/Button';
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectField } from 'components/common/form/fields/SelectField';
 import { useDocusign } from 'components/signing/hooks/useDocusign';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { UserDocusignAccountsInfo } from 'lib/docusign/getUserDocusignAccountsInfo';
 
 import { IntegrationContainer } from '../IntegrationContainer';
 
+function SelectDocusignAccount({
+  currentAccountId,
+  accounts,
+  onClick
+}: {
+  currentAccountId: string;
+  accounts: UserDocusignAccountsInfo[];
+  onClick: (accountId: string) => void;
+}) {
+  const { showConfirmation } = useConfirmationModal();
+
+  async function handleAccountSelection(account: UserDocusignAccountsInfo) {
+    const message = `Are you sure you want to switch to ${account.docusignAccountName}?\r\nAny existing proposals with linked Docusign documents will not be updated.`;
+
+    const result = await showConfirmation(message);
+
+    if (result.confirmed) {
+      onClick(account.docusignAccountId);
+    }
+  }
+
+  return (
+    <Stack gap={1} my={2}>
+      {accounts.map((account) => {
+        const isCurrentAccount = account.docusignAccountId === currentAccountId;
+
+        if (isCurrentAccount) {
+          return null;
+        }
+        return (
+          <Box key={account.docusignAccountId} display='flex' alignItems='center' justifyContent='space-between'>
+            <Typography variant='body2'>{account.docusignAccountName}</Typography>
+            <Button
+              onClick={() => handleAccountSelection(account)}
+              variant='outlined'
+              disabled={isCurrentAccount}
+              size='small'
+              color='secondary'
+              sx={{
+                minWidth: '130px'
+              }}
+            >
+              {isCurrentAccount ? 'Connected' : 'Use this account'}
+            </Button>
+          </Box>
+        );
+      })}
+
+      <ConfirmationModal />
+    </Stack>
+  );
+}
+
 export function DocumentSettings({ isAdmin }: { isAdmin: boolean }) {
   const [expanded, setExpanded] = useState(false);
-  const { docusignProfile, connectDocusignAccount, disconnectDocusign } = useDocusign();
+  const {
+    docusignProfile,
+    connectDocusignAccount,
+    disconnectDocusign,
+    availableDocusignAccounts,
+    updateSelectedDocusignAccount
+  } = useDocusign();
 
   const router = useRouter();
+
+  const { space } = useCurrentSpace();
 
   const { updateURLQuery } = useCharmRouter();
 
   const { showMessage } = useSnackbar();
+
+  const [showSelectAccount, setShowSelectAccount] = useState(false);
 
   useEffect(() => {
     if (router.query.docusignError) {
@@ -28,6 +99,14 @@ export function DocumentSettings({ isAdmin }: { isAdmin: boolean }) {
       updateURLQuery({ ...router.query, docusignError: undefined });
     }
   }, [router.query.docusignError]);
+
+  async function handleAccountSelection(accountId: string) {
+    try {
+      await updateSelectedDocusignAccount({ spaceId: space?.id as string, docusignAccountId: accountId });
+    } catch (err: any) {
+      showMessage(err.message ?? 'Failed to update Docusign account', 'error');
+    }
+  }
 
   return (
     <IntegrationContainer
@@ -40,20 +119,48 @@ export function DocumentSettings({ isAdmin }: { isAdmin: boolean }) {
       onCancel={() => setExpanded(false)}
     >
       <Stack spacing={2}>
-        <Typography variant='body2'>
-          Connect your Docusign account and allow users to sign documents inside CharmVerse.
-        </Typography>
-        <Alert severity='info' sx={{ width: 'fit-content' }}>
-          The connected Docusign user should be an admin of your company Docusign account.
-        </Alert>
         {docusignProfile ? (
-          <Button onClick={disconnectDocusign} color='error' variant='outlined' sx={{ width: 'fit-content' }}>
-            Disconnect
-          </Button>
+          <Box>
+            <Box display='flex' alignItems='center' justifyContent='space-between'>
+              <Typography variant='body2' display='flex'>
+                Connected Docusign Account: {docusignProfile.docusignAccountName}
+              </Typography>
+              {availableDocusignAccounts?.length && isAdmin && (
+                <Button
+                  color='secondary'
+                  variant='outlined'
+                  onClick={() => setShowSelectAccount(!showSelectAccount)}
+                  sx={{ ml: 1, minWidth: '130px' }}
+                  size='small'
+                >
+                  {showSelectAccount ? 'Cancel' : 'Change account'}
+                </Button>
+              )}
+            </Box>
+            {showSelectAccount && availableDocusignAccounts && (
+              <SelectDocusignAccount
+                currentAccountId={docusignProfile.docusignAccountId}
+                accounts={availableDocusignAccounts}
+                onClick={handleAccountSelection}
+              />
+            )}
+            <Button onClick={disconnectDocusign} color='error' variant='outlined' sx={{ width: 'fit-content', mt: 2 }}>
+              Disconnect
+            </Button>
+          </Box>
         ) : (
-          <Button onClick={connectDocusignAccount} color='primary' sx={{ width: 'fit-content' }}>
-            Connect Docusign
-          </Button>
+          <Box>
+            <Typography variant='body2'>
+              Connect your Docusign account and allow users to sign documents inside CharmVerse.
+            </Typography>
+            <Alert severity='info' sx={{ width: 'fit-content' }}>
+              The connected Docusign user should be an admin of your company Docusign account.
+            </Alert>
+
+            <Button onClick={connectDocusignAccount} color='primary' sx={{ width: 'fit-content' }}>
+              Connect Docusign
+            </Button>
+          </Box>
         )}
       </Stack>
     </IntegrationContainer>
