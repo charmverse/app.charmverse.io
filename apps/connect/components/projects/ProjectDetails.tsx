@@ -53,35 +53,46 @@ export async function ProjectDetails({ projectId }: { projectId: string }) {
         variant='rounded'
       />
       <Stack p={3} mt={4}>
-        <Typography variant='h5'>{project.name}</Typography>
-        {project.github && (
-          <Stack direction='row' gap={1}>
-            <GitHubIcon color='secondary' />
-            <Link href={project.github} passHref target='_blank'>
-              <Typography variant='body1'>{project.github}</Typography>
-            </Link>
-          </Stack>
+        <Typography variant='h5' mb={2}>
+          {project.name}
+        </Typography>
+        <Stack gap={1}>
+          {project.github && (
+            <Stack direction='row' gap={1}>
+              <GitHubIcon />
+              <Link href={project.github} passHref target='_blank'>
+                <Typography variant='body1'>{project.github.replace('https://github.com/', '')}</Typography>
+              </Link>
+            </Stack>
+          )}
+          {project.websites.length > 0 && (
+            <Stack direction='row' gap={1}>
+              <LanguageIcon color='secondary' />
+              <Link href={project.websites[0]} passHref target='_blank'>
+                <Typography variant='body1'>{project.websites[0].replace(/https?:\/\//, '')}</Typography>
+              </Link>
+            </Stack>
+          )}
+        </Stack>
+        {project.description && (
+          <Typography variant='body1' mt={2}>
+            {project.description}
+          </Typography>
         )}
-        {project.websites.length > 0 && (
-          <Stack direction='row' gap={1}>
-            <LanguageIcon color='secondary' />
-            <Link href={project.websites[0]} passHref target='_blank'>
-              <Typography variant='body1'>{project.websites[0]}</Typography>
-            </Link>
-          </Stack>
-        )}
-        {project.description && <Typography variant='body1'>{project.description}</Typography>}
         <Divider sx={{ my: 2 }} />
         <Typography variant='h6'>Members</Typography>
-        {project.projectMembers.map((member) => (
-          <FarcasterCard
-            key={member.farcasterUser.fid}
-            name={member.farcasterUser.displayName}
-            username={member.farcasterUser.username}
-            avatar={member.farcasterUser.pfpUrl}
-            bio={member.farcasterUser.bio}
-          />
-        ))}
+        <Stack gap={1}>
+          {project.projectMembers.map((member) => (
+            <FarcasterCard
+              fid={member.farcasterUser.fid}
+              key={member.farcasterUser.fid}
+              name={member.farcasterUser.displayName}
+              username={member.farcasterUser.username}
+              avatar={member.farcasterUser.pfpUrl}
+              bio={member.farcasterUser.bio}
+            />
+          ))}
+        </Stack>
       </Stack>
     </PageWrapper>
   );

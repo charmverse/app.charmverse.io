@@ -6,11 +6,13 @@ export function FarcasterCard({
   name,
   username,
   avatar,
-  bio
+  bio,
+  fid
 }: {
-  name: string;
+  name?: string;
   bio?: string;
-  username: string;
+  username?: string;
+  fid?: number;
   avatar?: string;
 }) {
   return (
@@ -31,11 +33,13 @@ export function FarcasterCard({
             sm: 'flex-start'
           }}
         >
-          <Avatar size='xLarge' name={username} avatar={avatar} />
+          <Avatar size='xLarge' name={username || 'N/A'} avatar={avatar} />
         </Stack>
         <Box>
-          <Typography variant='h6'>{name}</Typography>
-          <Typography>{username}</Typography>
+          <Typography variant='h6'>{name || 'N/A'}</Typography>
+          <Typography variant='subtitle1' color='secondary'>
+            {username || 'N/A'} #{fid || 'N/A'}
+          </Typography>
           <Typography>{bio}</Typography>
         </Box>
       </CardContent>

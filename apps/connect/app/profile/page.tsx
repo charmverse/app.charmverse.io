@@ -21,7 +21,7 @@ export default async function Profile() {
   }
 
   const farcasterDetails = user.data.farcasterUser?.account as Required<
-    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>
+    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl' | 'fid'>
   >;
 
   return (
@@ -31,6 +31,7 @@ export default async function Profile() {
           Onchain Summer
         </Typography>
         <FarcasterCard
+          fid={farcasterDetails.fid}
           name={farcasterDetails.displayName}
           username={farcasterDetails.username}
           avatar={farcasterDetails.pfpUrl}

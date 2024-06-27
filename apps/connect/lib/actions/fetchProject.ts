@@ -37,11 +37,11 @@ export async function fetchProject(projectId: string) {
       return {
         ...member.user,
         farcasterUser: {
-          fid: farcasterUser.fid!,
+          fid: member.user!.farcasterUser?.fid,
           pfpUrl: farcasterUser.pfpUrl,
           bio: farcasterUser.bio,
-          username: farcasterUser.username!,
-          displayName: farcasterUser.displayName!
+          username: farcasterUser.username,
+          displayName: farcasterUser.displayName
         }
       };
     })

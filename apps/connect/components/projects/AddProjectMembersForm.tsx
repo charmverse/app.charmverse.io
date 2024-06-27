@@ -1,11 +1,10 @@
 import { log } from '@charmverse/core/log';
-import { Avatar } from '@connect/components/common/Avatar';
 import { SearchFarcasterUser } from '@connect/components/farcaster/SearchFarcasterUser';
 import { actionCreateProject } from '@connect/lib/actions/createProject';
 import type { FormValues } from '@connect/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import AddIcon from '@mui/icons-material/AddOutlined';
-import { Button, Card, Divider, Stack, Typography } from '@mui/material';
+import { Button, Divider, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -50,7 +49,7 @@ export function AddProjectMembersForm({
   });
 
   const farcasterDetails = user.farcasterUser?.account as Required<
-    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>
+    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl' | 'fid'>
   >;
 
   return (
@@ -61,6 +60,7 @@ export function AddProjectMembersForm({
     >
       <Stack gap={1}>
         <FarcasterCard
+          fid={farcasterDetails.fid}
           name={farcasterDetails.displayName}
           username={farcasterDetails.username}
           avatar={farcasterDetails.pfpUrl}
@@ -98,24 +98,14 @@ export function AddProjectMembersForm({
         </Stack>
         <Stack gap={2} mb={2}>
           {selectedFarcasterProfiles.map((farcasterProfile) => (
-            <Card
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1.5,
-                flexDirection: 'row',
-                p: 2
-              }}
+            <FarcasterCard
+              fid={farcasterProfile.fid}
               key={farcasterProfile.fid}
-            >
-              <Avatar src={farcasterProfile.pfpUrl} size='large' />
-              <Stack gap={0}>
-                <Typography variant='h6'>{farcasterProfile.displayName}</Typography>
-                <Typography variant='subtitle1' color='secondary'>
-                  {farcasterProfile.username} #{farcasterProfile.fid}
-                </Typography>
-              </Stack>
-            </Card>
+              name={farcasterProfile.displayName}
+              username={farcasterProfile.username}
+              avatar={farcasterProfile.pfpUrl}
+              bio={farcasterProfile.bio}
+            />
           ))}
         </Stack>
         <Stack direction='row' justifyContent='space-between'>

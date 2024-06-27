@@ -11,7 +11,7 @@ import { ExtraDetails } from './ExtraDetails';
 
 export function WelcomePage({ user }: { user: LoggedInUser }) {
   const farcasterDetails = user.farcasterUser?.account as
-    | Required<Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>>
+    | Required<Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl' | 'fid'>>
     | undefined;
 
   return (
@@ -26,6 +26,7 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
       </Box>
       {farcasterDetails && (
         <FarcasterCard
+          fid={farcasterDetails.fid}
           name={farcasterDetails.displayName}
           avatar={farcasterDetails.pfpUrl}
           bio={farcasterDetails.bio}
