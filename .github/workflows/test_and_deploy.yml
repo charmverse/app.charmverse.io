@@ -342,6 +342,7 @@ jobs:
       - name: Validate code
         run: |
           npm run lint -w apps/connect
+          npm run typecheck -w apps/connect
           npm run lint -w apps/connect-api
 
   deploy-docker:

@@ -6,7 +6,8 @@
     "start": "npx next dev",
     "build": "npx next build",
     "start:prod": "npx next start",
-    "lint": "npx next lint"
+    "lint": "npx next lint",
+    "typecheck": "../../node_modules/typescript/bin/tsc --project tsconfig.json --noEmit"
   },
   "dependencies": {
     "@mui/material-nextjs": "^5.15.11",
