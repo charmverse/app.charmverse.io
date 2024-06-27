@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { PublicDocuSignProfile } from 'lib/docusign/authentication';
-import { getSpaceDocusignCredentials } from 'lib/docusign/authentication';
+import { getSpaceDocusignCredentials } from 'lib/docusign/getSpaceDocusignCredentials';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

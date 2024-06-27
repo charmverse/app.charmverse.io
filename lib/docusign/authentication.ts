@@ -1,12 +1,11 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
 
-import { DELETE, GET, POST } from 'adapters/http';
-import { docusignClientId, docusignClientSecret, docusignOauthBaseUri } from 'config/constants';
-import { prettyPrint } from 'lib/utils/strings';
+import { DELETE, POST } from 'adapters/http';
+import { docusignOauthBaseUri } from 'config/constants';
+
+import { getSpaceDocusignCredentials } from './getSpaceDocusignCredentials';
+import { docusignIntegrationAuthHeader, docusignUserOAuthTokenHeader } from './headers';
 
 type DocusignAccount = {
   account_id: string;
@@ -15,80 +14,15 @@ type DocusignAccount = {
   base_uri: string;
 };
 
-type DocusignUserProfile = {
-  sub: string;
-  name: string;
-  given_name: string;
-  family_name: string;
-  created: string;
-  email: string;
-  accounts: DocusignAccount[];
-};
-
-function docusignIntegrationAuthHeader() {
-  return {
-    Authorization: `Basic ${btoa(`${docusignClientId}:${docusignClientSecret}`)}`
-  };
-}
-
-export function docusignUserOAuthTokenHeader({ accessToken }: { accessToken: string }) {
-  return {
-    Authorization: `Bearer ${accessToken}`
-  };
-}
-
-/**
- * Provides baseUri and accountId for the user's Docusign account
- */
-async function getUserDocusignAccountInfo({
-  accessToken
-}: {
-  accessToken: string;
-}): Promise<Pick<DocusignCredential, 'docusignAccountId' | 'docusignAccountName' | 'docusignApiBaseUrl'>> {
-  const profileUri = `${docusignOauthBaseUri}/oauth/userinfo`;
-
-  return GET<DocusignUserProfile>(profileUri, undefined, {
-    headers: docusignUserOAuthTokenHeader({ accessToken })
-  }).then((userProfile) => {
-    prettyPrint({
-      userProfile
-    });
-    const defaultAccount = userProfile.accounts.find((account) => account.is_default) ?? userProfile.accounts[0];
-
-    return {
-      // TBD - handle multiple accounts
-      docusignAccountId: defaultAccount.account_id,
-      docusignApiBaseUrl: defaultAccount.base_uri,
-      docusignAccountName: defaultAccount.account_name
-    };
-  });
-}
-
 type DocusignOauthResponse = {
   access_token: string;
   token_type: 'Bearer';
   refresh_token: string;
   expires_in: number;
 };
-export async function saveUserDocusignOAuthToken({
-  code,
-  spaceId,
-  userId
-}: {
-  code: string;
-  userId: string;
-  spaceId: string;
-}): Promise<DocusignCredential> {
+
+export async function getUserDocusignOAuthTokenFromCode({ code }: { code: string }): Promise<DocusignOauthResponse> {
   const oauthUri = `${docusignOauthBaseUri}/oauth/token`;
-
-  const { spaceRole } = await hasAccessToSpace({
-    spaceId,
-    userId
-  });
-
-  if (!spaceRole?.isAdmin) {
-    throw new InvalidInputError('Only admin users can save credentials for the space');
-  }
 
   const token = await POST<DocusignOauthResponse>(oauthUri, undefined, {
     headers: docusignIntegrationAuthHeader(),
@@ -98,40 +32,7 @@ export async function saveUserDocusignOAuthToken({
     }
   });
 
-  const profile = await getUserDocusignAccountInfo({ accessToken: token.access_token });
-
-  const existingCredentials = await prisma.docusignCredential.findFirst({
-    where: {
-      spaceId
-    }
-  });
-
-  if (existingCredentials) {
-    return prisma.docusignCredential.update({
-      where: {
-        id: existingCredentials.id
-      },
-      data: {
-        accessToken: token.access_token,
-        refreshToken: token.refresh_token,
-        docusignAccountId: profile.docusignAccountId,
-        docusignAccountName: profile.docusignAccountName,
-        docusignApiBaseUrl: profile.docusignApiBaseUrl
-      }
-    });
-  } else {
-    return prisma.docusignCredential.create({
-      data: {
-        docusignAccountId: profile.docusignAccountId,
-        docusignAccountName: profile.docusignAccountName,
-        docusignApiBaseUrl: profile.docusignApiBaseUrl,
-        accessToken: token.access_token,
-        refreshToken: token.refresh_token,
-        userId,
-        spaceId
-      }
-    });
-  }
+  return token;
 }
 
 export async function refreshDocusignAccessToken({
@@ -179,20 +80,6 @@ export async function refreshDocusignAccessToken({
 }
 
 export type PublicDocuSignProfile = Pick<DocusignCredential, 'docusignAccountId' | 'docusignAccountName' | 'spaceId'>;
-
-export async function getSpaceDocusignCredentials({ spaceId }: { spaceId: string }): Promise<DocusignCredential> {
-  if (!stringUtils.isUUID(spaceId)) {
-    throw new InvalidInputError(`Invalid spaceId: ${spaceId}`);
-  }
-
-  const credentials = await prisma.docusignCredential.findFirstOrThrow({
-    where: {
-      spaceId
-    }
-  });
-
-  return credentials;
-}
 
 export async function disconnectDocusignAccount({ spaceId }: { spaceId: string }): Promise<void> {
   const credentials = await getSpaceDocusignCredentials({ spaceId });

@@ -2,24 +2,16 @@
  * Below methods are the API reference links for the Docusign API
  */
 
-import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { GET, POST, PUT } from 'adapters/http';
+import { GET } from 'adapters/http';
 import { redisClient } from 'adapters/redis/redisClient';
-import { baseUrl } from 'config/constants';
-import { InvalidStateError } from 'lib/middleware';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
-import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
 import type { RequiredDocusignCredentials } from './constants';
 import { docusignPeriodBetweenRequestsInSeconds } from './constants';
-
-type DocusignApiRequest = {
-  authToken: string;
-  apiBaseUrl: string;
-};
+import { getSpaceDocusignCredentials } from './getSpaceDocusignCredentials';
+import { docusignUserOAuthTokenHeader } from './headers';
 
 export type DocusignRecipient = {
   creationReason: string;

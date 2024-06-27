@@ -3,14 +3,14 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { GET, POST } from 'adapters/http';
-import { baseUrl } from 'config/constants';
 
-import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
 import type { RequiredDocusignCredentials } from './constants';
+import { getSpaceDocusignCredentials } from './getSpaceDocusignCredentials';
+import { docusignUserOAuthTokenHeader } from './headers';
 
 // Change this to match the base url in prod
-// const webhookBaseUrl = 'https://3954-2003-f1-c726-abc8-5de7-ecff-54f1-5f98.ngrok-free.app';
-const webhookBaseUrl = baseUrl;
+const webhookBaseUrl = 'https://1bd8-2001-861-3385-87c0-b5ea-9099-6827-716e.ngrok-free.app';
+// const webhookBaseUrl = baseUrl;
 
 async function getDocusignWebhook({
   docusignWebhookId,
@@ -93,7 +93,7 @@ export async function ensureSpaceWebhookExists({
 }: {
   spaceId: string;
   credentials?: RequiredDocusignCredentials & Pick<DocusignCredential, 'docusignWebhookId' | 'id'>;
-}) {
+}): Promise<DocusignCredential> {
   credentials = credentials ?? (await getSpaceDocusignCredentials({ spaceId }));
 
   if (credentials.docusignWebhookId) {
@@ -118,4 +118,6 @@ export async function ensureSpaceWebhookExists({
   } else {
     await createSpaceDocusignWebhook({ spaceId });
   }
+
+  return getSpaceDocusignCredentials({ spaceId });
 }

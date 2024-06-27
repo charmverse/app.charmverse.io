@@ -2,8 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { listSpaceEnvelopes } from 'lib/docusign/api';
-import { getSpaceDocusignCredentials } from 'lib/docusign/authentication';
-import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

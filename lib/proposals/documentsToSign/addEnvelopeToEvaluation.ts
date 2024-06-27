@@ -2,7 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getEnvelope } from 'lib/docusign/api';
-import { getSpaceDocusignCredentials } from 'lib/docusign/authentication';
+import { getSpaceDocusignCredentials } from 'lib/docusign/getSpaceDocusignCredentials';
 import { userByEmailOrGoogleAccountQuery } from 'lib/users/getUser';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
