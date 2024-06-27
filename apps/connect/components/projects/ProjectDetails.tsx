@@ -1,7 +1,8 @@
 import { fetchProject } from '@connect/lib/actions/fetchProject';
+import { Person } from '@mui/icons-material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
-import { Divider, Stack, Typography } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
 
@@ -31,6 +32,27 @@ export async function ProjectDetails({ projectId }: { projectId: string }) {
         p: 0
       }}
     >
+      <Box
+        sx={{
+          top: 0,
+          p: 2,
+          width: '499px',
+          borderRight: {
+            xs: 'none',
+            md: '1px solid var(--charm-palette-divider)'
+          },
+          zIndex: 1,
+          backgroundColor: 'white',
+          position: 'fixed'
+        }}
+      >
+        <Link href='/profile' passHref>
+          <Stack direction='row' gap={0.5} alignItems='center' sx={{ cursor: 'pointer' }}>
+            <Person fontSize='small' />
+            <Typography>Back to profile</Typography>
+          </Stack>
+        </Link>
+      </Box>
       <img
         src={
           project.coverImage ||
@@ -40,6 +62,7 @@ export async function ProjectDetails({ projectId }: { projectId: string }) {
         width='100%'
         height='150px'
         style={{
+          marginTop: 8,
           objectFit: 'cover',
           objectPosition: 'center'
         }}
