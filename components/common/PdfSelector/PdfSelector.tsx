@@ -2,8 +2,8 @@ import { log } from '@charmverse/core/log';
 import { Box } from '@mui/material';
 import { useState, type ReactNode } from 'react';
 
-import { Button } from 'components/common/Button';
 import charmClient from 'charmClient';
+import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
@@ -50,7 +50,7 @@ export default function PdfSelector({ autoOpen = false, children, onPdfSelect }:
                         if (firstFile) {
                           try {
                             setIsUploading(true);
-                            const { url } = await uploadToS3(firstFile);
+                            const { url } = await uploadToS3(charmClient.uploadToS3, firstFile);
                             onPdfSelect(url);
                           } catch (error) {
                             log.error('Failed to upload PDF', { error });

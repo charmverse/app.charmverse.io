@@ -48,7 +48,7 @@ app.use(async (ctx, next) => {
   try {
     await next();
   } catch (err) {
-    log.error(err);
+    log.error('Route error', { error: err, body: ctx.body, requestUrl: ctx.request.url });
     if (err instanceof SystemError) {
       ctx.body = {
         message: err.message,
