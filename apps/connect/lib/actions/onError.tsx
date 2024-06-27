@@ -47,7 +47,9 @@ export function handleServerErrorLog(
     returnedError: ErrorResponse;
   }
 ): MaybePromise<void> {
-  const { clientInput, metadata, ctx, returnedError } = utils;
+  const clientInput = utils?.clientInput;
+  const metadata = utils?.metadata;
+  const ctx = utils?.ctx;
 
   // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
   // P2025 is thrown when a record is not found
