@@ -14,13 +14,10 @@ export function HomePage() {
     <PageWrapper>
       <Box display='flex' gap={2} flexDirection='column'>
         <PageTitle>Onchain Summer</PageTitle>
-        <Typography align='center' variant='caption'>
-          Powered by CharmVerse
-        </Typography>
         <Typography align='center' my={2}>
           Create your profile, add projects and compete for 540K OP in total prizes on Gitcoin.
         </Typography>
-        <Box gap={2} display='flex' flexDirection='column' alignItems='center'>
+        <Box gap={1} display='flex' flexDirection='column' alignItems='center'>
           <WarpcastLogin />
           <MuiLink href='https://warpcast.com' target='_blank' rel='noopener'>
             <Typography variant='caption'>Don't have a Farcaster account?</Typography>
@@ -33,6 +30,9 @@ export function HomePage() {
         <Suspense fallback={<ProjectItemSkeleton />}>
           <ProjectsList />
         </Suspense>
+        <Typography align='left' variant='caption' component='p'>
+          Powered by CharmVerse
+        </Typography>
       </Box>
     </PageWrapper>
   );
