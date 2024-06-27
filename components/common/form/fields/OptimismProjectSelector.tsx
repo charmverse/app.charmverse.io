@@ -4,6 +4,7 @@ import { Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useGetOpProject, useGetOpProjects } from 'charmClient/hooks/optimism';
 import { Avatar } from 'components/common/Avatar';
 import Link from 'components/common/Link';
+import MultiTabs from 'components/common/MultiTabs';
 import { WarpcastLogin } from 'components/login/components/WarpcastLogin';
 import { useUser } from 'hooks/useUser';
 import type { OpProjectFieldValue } from 'lib/forms/interfaces';
@@ -67,73 +68,84 @@ function OptimismProjectDisplay({ project }: { project: OPProjectData }) {
         />
         <Typography variant='h6'>{project.name}</Typography>
       </Stack>
-      <OptimismProjectFields label='Project description' value={project.description} />
-      <OptimismProjectFields label='Project attestation id' value={project.attestationUid} />
-      <OptimismProjectFields label='External link' value={project.externalLink} />
-      <OptimismProjectFields label='Repositories' value={project.repositories} />
-      <Divider />
-      <Typography fontWeight='bold' variant='h6'>
-        Social links
-      </Typography>
-      <OptimismProjectFields label='Farcaster' value={project.socialLinks.farcaster} />
-      <OptimismProjectFields label='Categories' value={project.categories.map((c) => c.name)} />
-      {project.socialLinks.twitter && <OptimismProjectFields label='X' value={project.socialLinks.twitter} />}
-      {project.socialLinks.website && <OptimismProjectFields label='Website' value={project.socialLinks.website} />}
-      {project.socialLinks.mirror && <OptimismProjectFields label='Mirror' value={project.socialLinks.mirror} />}
-      <Divider />
-      <Typography fontWeight='bold' variant='h6'>
-        Deployed contracts
-      </Typography>
-      {project.deployedContracts.map((contract, index) => (
-        <Stack key={contract.address} gap={1} mt={index !== 0 ? 2 : 0}>
-          <OptimismProjectFields label='Address' value={contract.address} />
-          <OptimismProjectFields label='Chain id' value={contract.chainId} />
-          <OptimismProjectFields label='Deployer' value={contract.deployer} />
-          <OptimismProjectFields label='Creation block' value={contract.creationBlock} />
-          <OptimismProjectFields label='Transaction id' value={contract.transactionId} />
-          <OptimismProjectFields label='Verification proof' value={contract.verificationProof} />
-          <OptimismProjectFields label='Open source observer slug' value={contract.openSourceObserverSlug} />
-        </Stack>
-      ))}
-      <Divider />
-      <Typography fontWeight='bold' variant='h6'>
-        Funding
-      </Typography>
-      <Stack gap={1}>
-        <Typography fontWeight='bold'>Venture capital</Typography>
-        {project.funding.ventureCapital.map((funding) => (
-          <Stack key={funding.amount} gap={1}>
-            <OptimismProjectFields label='Amount' value={funding.amount} />
-            <OptimismProjectFields label='Source' value={funding.source} />
-            <OptimismProjectFields label='Date' value={funding.date} />
-            <OptimismProjectFields label='Details' value={funding.details} />
-          </Stack>
-        ))}
-        <Typography fontWeight='bold' mt={2}>
-          Grants
-        </Typography>
-        {project.funding.grants.map((funding) => (
-          <Stack key={funding.amount} gap={1}>
-            <OptimismProjectFields label='Amount' value={funding.amount} />
-            <OptimismProjectFields label='Source' value={funding.source} />
-            <OptimismProjectFields label='Date' value={funding.date} />
-            <OptimismProjectFields label='Details' value={funding.details} />
-          </Stack>
-        ))}
-        <Typography fontWeight='bold' mt={2}>
-          Optimism grants
-        </Typography>
-        {project.funding.optimismGrants.map((funding) => (
-          <Stack key={funding.amount} gap={1}>
-            <OptimismProjectFields label='Amount' value={funding.amount} />
-            <OptimismProjectFields label='Source' value={funding.source} />
-            <OptimismProjectFields label='Date' value={funding.date} />
-            <OptimismProjectFields label='Details' value={funding.details} />
-            <OptimismProjectFields label='Link' value={funding.link} />
-            <OptimismProjectFields label='Type' value={funding.type} />
-          </Stack>
-        ))}
-      </Stack>
+
+      <MultiTabs
+        tabs={[
+          [
+            'Overview',
+            <Stack gap={1.5} key='overview'>
+              <OptimismProjectFields label='Project description' value={project.description} />
+              <OptimismProjectFields label='Project attestation id' value={project.attestationUid} />
+              <OptimismProjectFields label='Categories' value={project.categories.map((c) => c.name)} />
+              <OptimismProjectFields label='External link' value={project.externalLink} />
+              <OptimismProjectFields label='Repositories' value={project.repositories} />
+            </Stack>
+          ],
+          [
+            'Social',
+            <Stack gap={1.5} key='social'>
+              <OptimismProjectFields label='Farcaster' value={project.socialLinks.farcaster} />
+              <OptimismProjectFields label='Twitter' value={project.socialLinks.twitter} />
+              <OptimismProjectFields label='Website' value={project.socialLinks.website} />
+              <OptimismProjectFields label='Mirror' value={project.socialLinks.mirror} />
+            </Stack>
+          ],
+          [
+            'Contracts',
+            <Stack gap={1.5} key='contracts'>
+              {project.deployedContracts.map((contract, index) => (
+                <Stack key={contract.address} gap={1} mt={index !== 0 ? 2 : 0}>
+                  <OptimismProjectFields label='Address' value={contract.address} />
+                  <OptimismProjectFields label='Chain id' value={contract.chainId} />
+                  <OptimismProjectFields label='Deployer' value={contract.deployer} />
+                  <OptimismProjectFields label='Creation block' value={contract.creationBlock} />
+                  <OptimismProjectFields label='Transaction id' value={contract.transactionId} />
+                  <OptimismProjectFields label='Verification proof' value={contract.verificationProof} />
+                  <OptimismProjectFields label='Open source observer slug' value={contract.openSourceObserverSlug} />
+                </Stack>
+              ))}
+            </Stack>
+          ],
+          [
+            'Funding',
+            <Stack gap={1} key='funding'>
+              <Typography fontWeight='bold'>Venture capital</Typography>
+              {project.funding.ventureCapital.map((funding) => (
+                <Stack key={funding.amount} gap={1}>
+                  <OptimismProjectFields label='Amount' value={funding.amount} />
+                  <OptimismProjectFields label='Source' value={funding.source} />
+                  <OptimismProjectFields label='Date' value={funding.date} />
+                  <OptimismProjectFields label='Details' value={funding.details} />
+                </Stack>
+              ))}
+              <Typography fontWeight='bold' mt={2}>
+                Grants
+              </Typography>
+              {project.funding.grants.map((funding) => (
+                <Stack key={funding.amount} gap={1}>
+                  <OptimismProjectFields label='Amount' value={funding.amount} />
+                  <OptimismProjectFields label='Source' value={funding.source} />
+                  <OptimismProjectFields label='Date' value={funding.date} />
+                  <OptimismProjectFields label='Details' value={funding.details} />
+                </Stack>
+              ))}
+              <Typography fontWeight='bold' mt={2}>
+                Optimism grants
+              </Typography>
+              {project.funding.optimismGrants.map((funding) => (
+                <Stack key={funding.amount} gap={1}>
+                  <OptimismProjectFields label='Amount' value={funding.amount} />
+                  <OptimismProjectFields label='Source' value={funding.source} />
+                  <OptimismProjectFields label='Date' value={funding.date} />
+                  <OptimismProjectFields label='Details' value={funding.details} />
+                  <OptimismProjectFields label='Link' value={funding.link} />
+                  <OptimismProjectFields label='Type' value={funding.type} />
+                </Stack>
+              ))}
+            </Stack>
+          ]
+        ]}
+      />
     </Stack>
   );
 }

@@ -184,12 +184,20 @@ export function CreateProjectForm({
   return (
     <Stack gap={2}>
       <Stack>
-        <FormLabel id='project-name'>Name</FormLabel>
+        <FormLabel required id='project-name'>
+          Name
+        </FormLabel>
         <Controller
           control={control}
           name='name'
           render={({ field, fieldState }) => (
-            <TextField placeholder='Acme Inc.' aria-labelledby='project-name' error={!!fieldState.error} {...field} />
+            <TextField
+              autoFocus
+              placeholder='Acme Inc.'
+              aria-labelledby='project-name'
+              error={!!fieldState.error}
+              {...field}
+            />
           )}
         />
       </Stack>
@@ -293,11 +301,11 @@ export function CreateProjectForm({
       </Stack>
       <Stack justifyContent='space-between' flexDirection='row'>
         <Link href='/profile' passHref>
-          <Button color='error' variant='outlined'>
+          <Button size='large' color='secondary' variant='outlined'>
             Cancel
           </Button>
         </Link>
-        <Button disabled={!isValid} onClick={onNext}>
+        <Button size='large' disabled={!isValid} onClick={onNext}>
           Next
         </Button>
       </Stack>

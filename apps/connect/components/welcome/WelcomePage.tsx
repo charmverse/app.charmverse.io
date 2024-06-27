@@ -1,3 +1,4 @@
+import { PageTitle } from '@connect/components/common/PageTitle';
 import { PageWrapper } from '@connect/components/common/PageWrapper';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import Box from '@mui/material/Box';
@@ -15,25 +16,22 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
     | undefined;
 
   return (
-    <PageWrapper display='flex' gap={2} flexDirection='column'>
-      <Box textAlign='center'>
-        <Typography variant='h3' component='h1' my={2}>
-          Welcome
-        </Typography>
-        <Typography>
+    <PageWrapper>
+      <Box display='flex' gap={2} flexDirection='column'>
+        <PageTitle>Welcome</PageTitle>
+        <Typography align='center' my={2}>
           This is your profile. You can use it to create projects which can be used with Optimism's grant programs.
         </Typography>
-      </Box>
-      {farcasterDetails && (
-        <FarcasterCard
-          fid={farcasterDetails.fid}
-          name={farcasterDetails.displayName}
-          avatar={farcasterDetails.pfpUrl}
-          bio={farcasterDetails.bio}
-          username={farcasterDetails.username}
-        />
-      )}
-      <Box mt={2} display='flex' gap={2} flexDirection='column'>
+        {farcasterDetails && (
+          <FarcasterCard
+            name={farcasterDetails.displayName}
+            avatar={farcasterDetails.pfpUrl}
+            bio={farcasterDetails.bio}
+            username={farcasterDetails.username}
+            fid={farcasterDetails.fid}
+          />
+        )}
+        <br />
         <ExtraDetails />
       </Box>
     </PageWrapper>

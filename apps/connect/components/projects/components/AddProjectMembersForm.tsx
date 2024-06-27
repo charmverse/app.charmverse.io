@@ -1,19 +1,20 @@
 import { log } from '@charmverse/core/log';
-import { SearchFarcasterUser } from '@connect/components/farcaster/SearchFarcasterUser';
 import { actionCreateProject } from '@connect/lib/actions/createProject';
 import type { FormValues } from '@connect/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import AddIcon from '@mui/icons-material/AddOutlined';
-import { Button, Divider, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, useWatch } from 'react-hook-form';
 
 import type { LoggedInUser } from 'models/User';
 
-import { FarcasterCard } from '../common/FarcasterCard';
+import { FarcasterCard } from '../../common/FarcasterCard';
+
+import { SearchFarcasterUser } from './SearchFarcasterUser';
 
 type FarcasterProfile = Pick<FarcasterBody, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
@@ -31,6 +32,8 @@ export function AddProjectMembersForm({
   handleSubmit: UseFormHandleSubmit<FormValues>;
 }) {
   const router = useRouter();
+
+  const formValues = useWatch({ control });
 
   const { append } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
@@ -59,6 +62,7 @@ export function AddProjectMembersForm({
       })}
     >
       <Stack gap={1}>
+        <Typography variant='h6'>Team</Typography>
         <FarcasterCard
           fid={farcasterDetails.fid}
           name={farcasterDetails.displayName}
@@ -67,8 +71,6 @@ export function AddProjectMembersForm({
           bio={farcasterDetails.bio}
         />
         <Stack gap={2}>
-          <Typography variant='h6'>Team</Typography>
-          <Divider />
           <SearchFarcasterUser
             selectedProfile={selectedFarcasterProfile}
             setSelectedProfile={(farcasterProfile) => {
@@ -104,7 +106,7 @@ export function AddProjectMembersForm({
               name={farcasterProfile.displayName}
               username={farcasterProfile.username}
               avatar={farcasterProfile.pfpUrl}
-              bio={farcasterProfile.bio}
+              bio=''
             />
           ))}
         </Stack>
