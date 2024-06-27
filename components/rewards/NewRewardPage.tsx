@@ -330,7 +330,7 @@ export function NewRewardPage({
                         </div>
                       </div>
                       <CharmEditor
-                        placeholderText={`Describe the reward. Type '/' to see the list of available commands`}
+                        placeholderText={`Type '/' to see the list of available commands`}
                         content={pageData.content as PageContent}
                         autoFocus={false}
                         enableVoting={false}
