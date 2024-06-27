@@ -52,7 +52,7 @@ export function AddProjectMembersForm({
   });
 
   const farcasterDetails = user.farcasterUser?.account as Required<
-    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl' | 'fid'>
+    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>
   >;
 
   return (
@@ -64,7 +64,7 @@ export function AddProjectMembersForm({
       <Stack gap={1}>
         <Typography variant='h6'>Team</Typography>
         <FarcasterCard
-          fid={farcasterDetails.fid}
+          fid={user.farcasterUser?.fid}
           name={farcasterDetails.displayName}
           username={farcasterDetails.username}
           avatar={farcasterDetails.pfpUrl}

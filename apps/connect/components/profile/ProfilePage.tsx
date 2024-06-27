@@ -12,7 +12,7 @@ import { NewProjectItem } from './components/NewProjectItem';
 
 export async function ProfilePage({ user }: { user: LoggedInUser }) {
   const farcasterDetails = user.farcasterUser?.account as Required<
-    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl' | 'fid'>
+    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>
   >;
 
   return (
@@ -20,7 +20,7 @@ export async function ProfilePage({ user }: { user: LoggedInUser }) {
       <Box gap={2} display='flex' flexDirection='column'>
         <PageTitle>My Profile</PageTitle>
         <FarcasterCard
-          fid={farcasterDetails.fid}
+          fid={user.farcasterUser?.fid}
           name={farcasterDetails.displayName}
           username={farcasterDetails.username}
           avatar={farcasterDetails.pfpUrl}

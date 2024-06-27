@@ -12,7 +12,7 @@ import { ExtraDetails } from './ExtraDetails';
 
 export function WelcomePage({ user }: { user: LoggedInUser }) {
   const farcasterDetails = user.farcasterUser?.account as
-    | Required<Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl' | 'fid'>>
+    | Required<Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>>
     | undefined;
 
   return (
@@ -28,7 +28,7 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
             avatar={farcasterDetails.pfpUrl}
             bio={farcasterDetails.bio}
             username={farcasterDetails.username}
-            fid={farcasterDetails.fid}
+            fid={user.farcasterUser?.fid}
           />
         )}
         <br />
