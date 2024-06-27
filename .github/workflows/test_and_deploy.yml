@@ -141,6 +141,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
           mask-aws-account-id: 'no'
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -553,6 +554,9 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
         with:
@@ -561,6 +565,13 @@ jobs:
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_connect/00_env_vars.config
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Package and deploy
         run: |
@@ -582,6 +593,9 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
         with:
@@ -590,6 +604,13 @@ jobs:
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_connect_api/00_env_vars.config
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Package and deploy
         run: |
