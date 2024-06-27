@@ -13,6 +13,8 @@ export async function fetchProject(projectId: string) {
       name: true,
       farcasterValues: true,
       github: true,
+      mirror: true,
+      twitter: true,
       websites: true,
       projectMembers: {
         select: {

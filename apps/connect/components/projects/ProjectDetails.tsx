@@ -1,9 +1,9 @@
 import { fetchProject } from '@connect/lib/actions/fetchProject';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
-import ShareIcon from '@mui/icons-material/Share';
-import { Button, Divider, Stack, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
+import { FaXTwitter } from 'react-icons/fa6';
 
 import { Avatar } from '../common/Avatar';
 import { FarcasterCard } from '../common/FarcasterCard';
@@ -60,20 +60,51 @@ export async function ProjectDetails({ projectId }: { projectId: string }) {
           <Typography variant='h5'>{project.name}</Typography>
           <ShareButton />
         </Stack>
-        <Stack gap={1}>
+        <Stack gap={1.5}>
           {project.github && (
-            <Stack direction='row' gap={1}>
+            <Stack direction='row' gap={1} alignItems='center'>
               <GitHubIcon />
               <Link href={project.github} passHref target='_blank'>
-                <Typography variant='body1'>{project.github.replace('https://github.com/', '')}</Typography>
+                <Typography variant='body1'>{project.github.replace(/https?:\/\/github\.com\/?/, '')}</Typography>
               </Link>
             </Stack>
           )}
           {project.websites.length > 0 && (
-            <Stack direction='row' gap={1}>
+            <Stack direction='row' gap={1} alignItems='center'>
               <LanguageIcon color='secondary' />
               <Link href={project.websites[0]} passHref target='_blank'>
                 <Typography variant='body1'>{project.websites[0].replace(/https?:\/\//, '')}</Typography>
+              </Link>
+            </Stack>
+          )}
+          {project.mirror && (
+            <Stack direction='row' gap={1} alignItems='center'>
+              <img src='/images/mirror-xyz.png' width={25} height={25} />
+              <Link href={project.mirror} passHref target='_blank'>
+                <Typography variant='body1'>{project.mirror.replace(/https?:\/\/mirror.xyz\//, '')}</Typography>
+              </Link>
+            </Stack>
+          )}
+          {project.farcasterValues.length > 0 && (
+            <Stack direction='row' gap={1} alignItems='center'>
+              <img src='/images/farcaster.png' width={25} height={25} />
+              <Link href={project.farcasterValues[0]} passHref target='_blank'>
+                <Typography variant='body1'>
+                  {project.farcasterValues[0].replace(/https?:\/\/warpcast\.com\//, '')}
+                </Typography>
+              </Link>
+            </Stack>
+          )}
+          {project.twitter && (
+            <Stack direction='row' gap={1} alignItems='center'>
+              <FaXTwitter
+                style={{
+                  width: 24,
+                  height: 24
+                }}
+              />
+              <Link href={project.twitter} passHref target='_blank'>
+                <Typography variant='body1'>{project.twitter.replace(/https?:\/\/twitter\.com\//, '')}</Typography>
               </Link>
             </Stack>
           )}
