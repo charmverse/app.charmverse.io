@@ -287,4 +287,4 @@ const extendedTheme = extendTheme({
   }
 });
 
-export default responsiveFontSizes(extendedTheme);
+export default responsiveFontSizes(extendedTheme) as typeof extendedTheme;
