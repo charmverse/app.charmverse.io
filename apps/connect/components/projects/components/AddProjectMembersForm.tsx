@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { Avatar } from '@connect/components/common/Avatar';
-import { SearchFarcasterUser } from '@connect/components/farcaster/SearchFarcasterUser';
+import { SearchFarcasterUser } from '@connect/components/projects/components/SearchFarcasterUser';
 import { actionCreateProject } from '@connect/lib/actions/createProject';
 import type { FormValues } from '@connect/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
@@ -10,11 +10,11 @@ import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, useWatch } from 'react-hook-form';
 
 import type { LoggedInUser } from 'models/User';
 
-import { FarcasterCard } from '../common/FarcasterCard';
+import { FarcasterCard } from '../../common/FarcasterCard';
 
 type FarcasterProfile = Pick<FarcasterBody, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
@@ -32,6 +32,8 @@ export function AddProjectMembersForm({
   handleSubmit: UseFormHandleSubmit<FormValues>;
 }) {
   const router = useRouter();
+
+  const formValues = useWatch({ control });
 
   const { append } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
@@ -60,15 +62,14 @@ export function AddProjectMembersForm({
       })}
     >
       <Stack gap={1}>
+        <Typography variant='h6'>Team</Typography>
         <FarcasterCard
-          name={farcasterDetails.displayName}
-          username={farcasterDetails.username}
-          avatar={farcasterDetails.pfpUrl}
-          bio={farcasterDetails.bio}
+          name={formValues.name || 'Untitled'}
+          username=''
+          avatar={formValues.avatar || farcasterDetails.pfpUrl}
+          bio=''
         />
         <Stack gap={2}>
-          <Typography variant='h6'>Team</Typography>
-          <Divider />
           <SearchFarcasterUser
             selectedProfile={selectedFarcasterProfile}
             setSelectedProfile={(farcasterProfile) => {
