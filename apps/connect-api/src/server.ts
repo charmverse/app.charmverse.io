@@ -49,8 +49,16 @@ app.use(async (ctx, next) => {
 app.use(async (ctx, next) => {
   try {
     await next();
+    if (ctx.status === 404) {
+      ctx.throw(404, 'Path not found!');
+    }
   } catch (err) {
-    log.error('Route error', { error: err, body: ctx.body, requestUrl: ctx.request.url });
+    log.error('Route error', {
+      error: err,
+      body: ctx.body,
+      requestUrl: ctx.originalUrl,
+      userId: ctx.request.session?.user?.id
+    });
     if (err instanceof SystemError) {
       ctx.body = {
         message: err.message,
@@ -92,6 +100,11 @@ app.use(async (ctx, next) => {
 
 rootRouter.get('/api/health', (ctx) => {
   ctx.body = { success: true };
+  ctx.status = 200;
+});
+
+// respond to favicon.ico so it doesn't trigger an error if you load the api in a browser
+rootRouter.get('/favicon.ico', (ctx) => {
   ctx.status = 200;
 });
 
