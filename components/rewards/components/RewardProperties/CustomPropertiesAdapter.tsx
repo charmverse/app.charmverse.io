@@ -47,22 +47,23 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
 
   const boardCustomProperties = useMemo(() => {
     if (board) {
+      // extract non-custom properties
+      const cardProperties = board.fields.cardProperties.filter((p) => !p.id.startsWith('__'));
+      // Add proposal link as a custom property
+      if (reward.sourceProposalPage) {
+        cardProperties.push({
+          readOnly: true,
+          options: [],
+          id: REWARD_PROPOSAL_LINK,
+          name: getFeatureTitle('Proposal'),
+          type: 'proposalUrl' as PropertyType
+        });
+      }
       return {
         ...board,
         fields: {
           ...board.fields,
-          // extract non-custom properties
-          cardProperties: [
-            ...board.fields.cardProperties.filter((p) => !p.id.startsWith('__')),
-            // Add proposal link as a custom property
-            {
-              readOnly: true,
-              options: [],
-              id: REWARD_PROPOSAL_LINK,
-              name: getFeatureTitle('Proposal'),
-              type: 'proposalUrl' as PropertyType
-            }
-          ]
+          cardProperties
         }
       };
     }
