@@ -608,7 +608,7 @@ jobs:
         deploy-docker,
         deploy-main,
         deploy-connect,
-        deploy-connect_api
+        deploy-connect-api
       ]
     steps:
       - name: If any of prev jobs failed notify discord
