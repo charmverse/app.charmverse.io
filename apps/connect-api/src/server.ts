@@ -41,6 +41,7 @@ app.use(
 );
 
 // for now, make sure we set cross-subdomain cookies
+// be careful not to use this when the app serves multiple domains
 const domain = isProdEnv ? 'charmverse.io' : undefined;
 
 // Session middleware
