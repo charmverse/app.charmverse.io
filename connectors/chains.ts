@@ -19,6 +19,7 @@ import {
   polygon,
   polygonZkEvm,
   polygonMumbai,
+  polygonAmoy,
   sepolia,
   zkSync,
   zora,
@@ -221,6 +222,24 @@ export const RPC: Record<string, IChainDetails> = {
     shortName: 'maticmum',
     unlockNetwork: true
   },
+  AMOY: {
+    chainId: polygonAmoy.id,
+    viem: polygonAmoy,
+    chainName: 'Polygon - Amoy',
+    nativeCurrency: {
+      name: 'Polygon',
+      symbol: 'MATIC',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+    },
+    alchemyUrl: 'https://polygon-amoy.g.alchemy.com',
+    rpcUrls: polygonAmoy.rpcUrls.default.http,
+    blockExplorerUrls: ['https://amoy.polygonscan.com/'],
+    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
+    testnet: true,
+    shortName: 'maticamoy'
+  },
   ARBITRUM: {
     ...EVM_DEFAULT,
     chainId: arbitrum.id,
@@ -388,6 +407,39 @@ export const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://explorer.ps.hmny.io'],
     iconUrl: '/images/cryptoLogos/harmony-one-logo.svg',
     shortName: 'hmy-ps-s0',
+    testnet: true
+  },
+  KYOTO: {
+    chainId: 1997,
+    // viem: polygonAmoy,
+    chainName: 'Kyoto',
+    nativeCurrency: {
+      name: 'Kyoto',
+      symbol: 'KYOTO',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000'
+      // logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+    },
+    rpcUrls: ['https://rpc.kyotochain.io'],
+    blockExplorerUrls: ['https://kyotoscan.io'],
+    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
+    shortName: 'kyoto'
+  },
+  KYOTO_DEV: {
+    chainId: 1998,
+    // viem: polygonAmoy,
+    chainName: 'Kyoto - Testnet',
+    nativeCurrency: {
+      name: 'Kyoto',
+      symbol: 'KYOTO',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000'
+      // logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+    },
+    rpcUrls: ['https://rpc.testnet.kyotoprotocol.io:8545'],
+    blockExplorerUrls: ['https://testnet.kyotoscan.io'],
+    // iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
+    shortName: 'kyoto',
     testnet: true
   },
   TAIKO: {
