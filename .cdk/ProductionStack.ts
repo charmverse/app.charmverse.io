@@ -88,7 +88,7 @@ export class ProductionStack extends Stack {
       {
         namespace: 'aws:elbv2:listener:443',
         optionName: 'SSLCertificateArns',
-        value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
+        value: 'arn:aws:acm:us-east-1:310849459438:certificate/b960ff5c-ed3e-4e65-b2c4-ecc64e696902'
       },
       {
         namespace: 'aws:elbv2:listener:443',
