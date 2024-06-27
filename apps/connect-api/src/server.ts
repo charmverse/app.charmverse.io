@@ -4,6 +4,7 @@ import cors from '@koa/cors';
 import { getIronSession } from 'iron-session';
 import Koa from 'koa';
 
+import { isProdEnv } from 'config/constants';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
 
