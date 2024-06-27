@@ -4,7 +4,7 @@ import { log } from '@charmverse/core/log';
 import QRCode from 'qrcode';
 import { useEffect, useRef } from 'react';
 
-export function CanvasQRCode({ uri, scale = 5 }: { uri: string; scale?: number }) {
+export function CanvasQRCode({ uri, scale = 4.5 }: { uri: string; scale?: number }) {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -15,6 +15,7 @@ export function CanvasQRCode({ uri, scale = 5 }: { uri: string; scale?: number }
         node,
         uri,
         {
+          margin: 0,
           scale
         },
         (error) => {
