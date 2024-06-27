@@ -92,7 +92,6 @@ export function useRewardsBoardAdapter() {
       .map((reward) => {
         const page = getRewardPage(reward.id);
         if (!page || !space) return null;
-
         return {
           ...mapRewardToCard({
             reward,
@@ -182,7 +181,10 @@ export function mapRewardToCard({
   isSubmissionSource
 }: {
   reward: RewardProps;
-  rewardPage?: Pick<PageMeta, 'id' | 'createdAt' | 'createdBy' | 'title' | 'path' | 'updatedBy' | 'updatedAt'>;
+  rewardPage?: Pick<
+    PageMeta,
+    'id' | 'createdAt' | 'createdBy' | 'title' | 'path' | 'updatedBy' | 'updatedAt' | 'galleryImage'
+  >;
   spaceId: string;
   spaceDomain: string;
   members?: Record<string, Member>;
@@ -244,6 +246,7 @@ export function mapRewardToCard({
     title: rewardPage?.title || '',
     rootId: spaceId,
     type: 'card' as const,
+    galleryImage: rewardPage?.galleryImage || '',
     updatedBy: rewardPage?.updatedBy || '',
     createdBy: rewardPage?.createdBy || '',
     createdAt: rewardPage?.createdAt ? new Date(rewardPage.createdAt).getTime() : Date.now(),
@@ -258,6 +261,7 @@ export function mapRewardToCard({
               mapApplicationToCard({
                 application,
                 pageTitle: rewardPage.title,
+                galleryImage: rewardPage.galleryImage,
                 reward,
                 spaceId,
                 spaceDomain,
@@ -275,6 +279,7 @@ export function mapRewardToCard({
 function mapApplicationToCard({
   application,
   pageTitle,
+  galleryImage,
   reward,
   spaceId,
   spaceDomain,
@@ -283,6 +288,7 @@ function mapApplicationToCard({
 }: {
   application: ApplicationMeta;
   pageTitle?: string;
+  galleryImage?: string | null;
   reward: RewardProps;
   members?: Record<string, Member>;
   spaceId: string;
@@ -352,6 +358,7 @@ function mapApplicationToCard({
     id: application.id || '',
     spaceId,
     parentId: reward.id,
+    galleryImage: galleryImage || '',
     title: isSubmissionSource
       ? pageTitle || 'Untitled'
       : `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
