@@ -1,13 +1,12 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { DELETE, GET, POST } from 'adapters/http';
-import { docusignClientId, docusignClientSecret, docusignOauthBaseUri, isDevEnv, isStagingEnv } from 'config/constants';
-import { isCharmVerseSpace } from 'lib/featureFlag/isCharmVerseSpace';
+import { docusignClientId, docusignClientSecret, docusignOauthBaseUri } from 'config/constants';
+import { prettyPrint } from 'lib/utils/strings';
 
 type DocusignAccount = {
   account_id: string;
@@ -26,9 +25,6 @@ type DocusignUserProfile = {
   accounts: DocusignAccount[];
 };
 
-const demoAccountId = process.env.DEMO_DOCUSIGN_ACCOUNT_ID as string;
-const demoBaseUrl = 'https://demo.docusign.net';
-
 function docusignIntegrationAuthHeader() {
   return {
     Authorization: `Basic ${btoa(`${docusignClientId}:${docusignClientSecret}`)}`
@@ -45,17 +41,18 @@ export function docusignUserOAuthTokenHeader({ accessToken }: { accessToken: str
  * Provides baseUri and accountId for the user's Docusign account
  */
 async function getUserDocusignAccountInfo({
-  accessToken,
-  spaceId
+  accessToken
 }: {
   accessToken: string;
-  spaceId: string;
 }): Promise<Pick<DocusignCredential, 'docusignAccountId' | 'docusignAccountName' | 'docusignApiBaseUrl'>> {
   const profileUri = `${docusignOauthBaseUri}/oauth/userinfo`;
 
-  return GET<DocusignUserProfile>(profileUri, {
+  return GET<DocusignUserProfile>(profileUri, undefined, {
     headers: docusignUserOAuthTokenHeader({ accessToken })
   }).then((userProfile) => {
+    prettyPrint({
+      userProfile
+    });
     const defaultAccount = userProfile.accounts.find((account) => account.is_default) ?? userProfile.accounts[0];
 
     return {
@@ -65,28 +62,6 @@ async function getUserDocusignAccountInfo({
       docusignAccountName: defaultAccount.account_name
     };
   });
-  // This code branch is only required if using a developer key
-  // .catch(async (err) => {
-  //   log.error('Failed to fetch user Docusign profile', err);
-
-  //   const space = await prisma.space.findUniqueOrThrow({
-  //     where: {
-  //       id: spaceId
-  //     },
-  //     select: {
-  //       domain: true
-  //     }
-  //   });
-
-  //   if (isDevEnv || isStagingEnv || isCharmVerseSpace({ space })) {
-  //     return {
-  //       docusignAccountId: demoAccountId,
-  //       docusignApiBaseUrl: demoBaseUrl,
-  //       docusignAccountName: 'CharmVerse'
-  //     };
-  //   }
-  //   throw new InvalidInputError('Failed to fetch user profile');
-  // });
 }
 
 type DocusignOauthResponse = {
@@ -123,7 +98,7 @@ export async function saveUserDocusignOAuthToken({
     }
   });
 
-  const profile = await getUserDocusignAccountInfo({ accessToken: token.access_token, spaceId });
+  const profile = await getUserDocusignAccountInfo({ accessToken: token.access_token });
 
   const existingCredentials = await prisma.docusignCredential.findFirst({
     where: {

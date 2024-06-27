@@ -1,6 +1,17 @@
 import CloseIcon from '@mui/icons-material/Close';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import { Chip, Divider, FormLabel, Grid, ListItemIcon, ListItemText, MenuItem, Stack, TextField } from '@mui/material';
+import {
+  Alert,
+  Chip,
+  Divider,
+  FormLabel,
+  Grid,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Stack,
+  TextField
+} from '@mui/material';
 import Box from '@mui/material/Box';
 import { useState } from 'react';
 
@@ -44,7 +55,7 @@ type Props = {
 };
 
 export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposalId }: Props) {
-  const { searchDocusign, envelopeSearchResults } = useDocusign();
+  const { searchDocusign, envelopeSearchResults, envelopeSearchError } = useDocusign();
 
   const options = envelopeSearchResults?.filter((e) => !selectedEnvelopeIds?.includes(e.envelopeId));
 
@@ -66,7 +77,7 @@ export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposal
 
   return (
     <Grid container gap={2}>
-      <Grid item width='100%'>
+      <Grid item xs={12}>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <FormLabel>Search documents to add</FormLabel>
           <IconButton icon={<CloseIcon fontSize='small' />} onClick={() => setShowSearch(false)} />
@@ -78,6 +89,13 @@ export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposal
           onChange={(ev) => searchDocusign({ proposalId, title: ev.target.value })}
         />
       </Grid>
+      {envelopeSearchError && (
+        <Grid item xs={12}>
+          <Alert sx={{ width: '100%' }} severity='error'>
+            {envelopeSearchError.message}
+          </Alert>
+        </Grid>
+      )}
 
       <Grid item gap={1} width='100%'>
         {options?.map((e) => (

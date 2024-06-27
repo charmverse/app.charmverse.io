@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import { Prisma } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { DataNotFoundError, SystemError } from 'lib/utils/errors';

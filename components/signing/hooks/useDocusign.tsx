@@ -14,8 +14,6 @@ import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 export function useDocusign() {
   const { space } = useCurrentSpace();
 
-  const router = useRouter();
-
   async function connectDocusignAccount() {
     const redirectUri = await GET('/api/docusign/request-oauth-url', { spaceId: space?.id });
 
@@ -33,7 +31,8 @@ export function useDocusign() {
   const {
     data: envelopeSearchResults,
     mutate: refreshEnvelopeSearchResults,
-    isLoading: isSearchingEnvelopes
+    isLoading: isSearchingEnvelopes,
+    error: envelopeSearchError
   } = useGetSearchSpaceDocusignEnvelopes(docusignQuery);
 
   function searchDocusign(query: DocusignSearchRequest) {
@@ -69,6 +68,7 @@ export function useDocusign() {
     isSearchingEnvelopes,
     envelopeSearchResults,
     searchDocusign,
+    envelopeSearchError,
     disconnectDocusign,
     addDocumentToEvaluation,
     removeDocumentFromEvaluation
