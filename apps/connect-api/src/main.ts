@@ -9,6 +9,10 @@ const server = app.listen(typeof port === 'string' ? parseInt(port) : port, host
   log.info(`🚀 Connect API up on http://localhost:${port}`);
 });
 
+// Extending the timeouts addresses 502 errors on AWS Load balancer
+server.keepAliveTimeout = 61 * 1000; // load balancer has a 60s timeout
+server.headersTimeout = 65 * 1000; // This should be bigger than `keepAliveTimeout + your server's expected response time`
+
 function gracefulShutdown() {
   log.info('Received shutdown instruction. Closing down server');
   // We use server.close to finish processing existing requests
