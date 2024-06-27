@@ -1,5 +1,7 @@
 'use client';
 
+import { PageTitle } from '@connect/components/common/PageTitle';
+import { PageWrapper } from '@connect/components/common/PageWrapper';
 import type { FormValues } from '@connect/lib/projects/form';
 import { schema } from '@connect/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -11,12 +13,11 @@ import { useForm } from 'react-hook-form';
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import type { LoggedInUser } from 'models/User';
 
-import { PageWrapper } from '../common/PageWrapper';
+import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 
-import { AddProjectMembersForm } from './AddProjectMembersForm';
-import { CreateProjectForm } from './CreateProjectForm';
+import { CreateProjectForm } from './components/CreateProjectForm';
 
-export default function CreateProject({ user }: { user: LoggedInUser }) {
+export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
 
   const {
@@ -40,8 +41,8 @@ export default function CreateProject({ user }: { user: LoggedInUser }) {
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <Box mt={2} gap={2} display='flex' flexDirection='column'>
-          <Typography variant='h5'>Create a Project</Typography>
+        <Box gap={2} display='flex' flexDirection='column'>
+          <PageTitle>Create a Project</PageTitle>
           <CreateProjectForm
             control={control}
             isValid={isValid}
@@ -56,8 +57,8 @@ export default function CreateProject({ user }: { user: LoggedInUser }) {
 
   return (
     <PageWrapper>
-      <Box mt={2} gap={2} display='flex' flexDirection='column'>
-        <Typography variant='h5'>Add Team Members</Typography>
+      <Box gap={2} display='flex' flexDirection='column'>
+        <PageTitle>Add Team Members</PageTitle>
         <AddProjectMembersForm
           user={user}
           onBack={() => {

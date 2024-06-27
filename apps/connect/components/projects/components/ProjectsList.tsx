@@ -18,7 +18,7 @@ export async function ProjectsList({ userProjects }: { userProjects?: boolean })
   });
 
   if (projectsList.length === 0) {
-    return <Typography mt={1}>There are no new projects</Typography>;
+    return <Typography>There are no new projects</Typography>;
   }
 
   return projectsList.map((project) => {

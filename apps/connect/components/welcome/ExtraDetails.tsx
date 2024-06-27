@@ -5,7 +5,16 @@ import { schema } from '@connect/lib/profile/form';
 import type { FormValues } from '@connect/lib/profile/form';
 import { actionOnboarding } from '@connect/lib/profile/onboardingAction';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  FormLabel,
+  TextField
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
@@ -50,7 +59,15 @@ export function ExtraDetails() {
           control={control}
           name='email'
           render={({ field, fieldState: { error } }) => (
-            <TextField aria-labelledby='form-email' error={!!error?.message} {...field} sx={{ mb: 1 }} />
+            <TextField
+              placeholder='Your email'
+              autoFocus
+              aria-labelledby='form-email'
+              type='email'
+              error={!!error?.message}
+              {...field}
+              sx={{ mb: 1 }}
+            />
           )}
         />
         <Controller
@@ -75,9 +92,11 @@ export function ExtraDetails() {
         )}
         <FormHelperText error={!!hasErrored}>{result.serverError?.message || result.fetchError}</FormHelperText>
       </FormControl>
-      <Button sx={{ mb: 4, my: 2 }} type='submit' disabled={!isValid || isExecuting}>
-        Next
-      </Button>
+      <Box display='flex' justifyContent='flex-end'>
+        <Button size='large' type='submit' disabled={!isValid || isExecuting}>
+          Next
+        </Button>
+      </Box>
     </form>
   );
 }
