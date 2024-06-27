@@ -1,12 +1,15 @@
 import { fetchProject } from '@connect/lib/actions/fetchProject';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
-import { Divider, Stack, Typography } from '@mui/material';
+import ShareIcon from '@mui/icons-material/Share';
+import { Button, Divider, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 
 import { Avatar } from '../common/Avatar';
 import { FarcasterCard } from '../common/FarcasterCard';
 import { PageWrapper } from '../common/PageWrapper';
+
+import { ShareButton } from './ProjectShareButton';
 
 export async function ProjectDetails({ projectId }: { projectId: string }) {
   const project = await fetchProject(projectId);
@@ -42,7 +45,7 @@ export async function ProjectDetails({ projectId }: { projectId: string }) {
       />
       <Avatar
         avatar={project.avatar ?? undefined}
-        name={project.name}
+        name={!project.avatar ? project.name : undefined}
         alt={project.name}
         size='xLarge'
         sx={{
@@ -53,9 +56,10 @@ export async function ProjectDetails({ projectId }: { projectId: string }) {
         variant='rounded'
       />
       <Stack p={3} mt={4}>
-        <Typography variant='h5' mb={2}>
-          {project.name}
-        </Typography>
+        <Stack direction='row' mb={2} justifyContent='space-between' alignItems='center'>
+          <Typography variant='h5'>{project.name}</Typography>
+          <ShareButton />
+        </Stack>
         <Stack gap={1}>
           {project.github && (
             <Stack direction='row' gap={1}>
