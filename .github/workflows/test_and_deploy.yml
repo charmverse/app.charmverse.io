@@ -490,14 +490,14 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_connect_api .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-connect-api.zip
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c name=prd-connect-api
+          npx cdk deploy --method=direct -c name=prd-connect-api
 
       - name: Package and deploy Connect App to production
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-connect.zip
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c name=prd-connect
+          npx cdk deploy --method=direct -c name=prd-connect
 
   discord_alert:
     name: Notify discord of failure

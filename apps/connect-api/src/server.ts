@@ -49,8 +49,21 @@ app.use(async (ctx, next) => {
 app.use(async (ctx, next) => {
   try {
     await next();
+
+    if (ctx.status === 404) {
+      ctx.throw(404, 'Path not found!');
+    }
   } catch (err) {
-    log.error('Route error', { error: err, body: ctx.body, requestUrl: ctx.request.url });
+    let _log = log.error;
+    if (ctx.status < 500) {
+      _log = log.warn;
+    }
+    _log('Client error', {
+      error: err,
+      body: ctx.body,
+      requestUrl: ctx.originalUrl,
+      userId: ctx.request.session?.user?.id
+    });
     if (err instanceof SystemError) {
       ctx.body = {
         message: err.message,
@@ -58,10 +71,16 @@ app.use(async (ctx, next) => {
       };
       ctx.status = err.code;
     } else {
+      if (ctx.status < 400) {
+        ctx.status = 500;
+      } else {
+        // set ctx.status so that koa does not override it to be 200 when we define the body
+        // eslint-disable-next-line no-self-assign
+        ctx.status = ctx.status;
+      }
       ctx.body = {
         message: (err as any).message ?? 'Internal Server Error'
       };
-      ctx.status = 500;
     }
   }
 });
@@ -92,6 +111,11 @@ app.use(async (ctx, next) => {
 
 rootRouter.get('/api/health', (ctx) => {
   ctx.body = { success: true };
+  ctx.status = 200;
+});
+
+// respond to favicon.ico so it doesn't trigger an error if you load the api in a browser
+rootRouter.get('/favicon.ico', (ctx) => {
   ctx.status = 200;
 });
 

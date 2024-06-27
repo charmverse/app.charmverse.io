@@ -12,11 +12,13 @@ function getApiPath() {
 
   let relativePath = __filename.split('/connect-api/src')[1];
 
-  relativePath = relativePath.replace(/\\/g, '/'); // For Windows compatibility
-  if (relativePath.endsWith('/index.ts')) {
-    relativePath = relativePath.replace('/index.ts', '');
-  } else {
-    relativePath = relativePath.replace('.ts', '');
+  relativePath = relativePath
+    // For Windows compatibility
+    .replace(/\\/g, '/')
+    .replace('.ts', '')
+    .replace('.js', '');
+  if (relativePath.endsWith('/index')) {
+    relativePath = relativePath.replace('/index', '');
   }
 
   return `${relativePath.startsWith('/') ? '' : '/'}${relativePath}`;

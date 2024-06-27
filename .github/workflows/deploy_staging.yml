@@ -169,7 +169,7 @@ jobs:
         id: cdk_deploy
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c name=${{env.STAGE_NAME}} --outputs-file cdk.out.json
+          npx cdk deploy -c name=${{env.STAGE_NAME}} --method=direct --outputs-file cdk.out.json
           env_url=$(jq --raw-output '.[$ENV.STAGE_NAME].DeploymentUrl' ./cdk.out.json)
           echo "env_url=$env_url" >> $GITHUB_OUTPUT
 
