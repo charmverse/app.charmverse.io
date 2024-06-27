@@ -22,16 +22,18 @@ app.use(
       if (path === '/api/health') {
         return '*';
       }
-      const origin = ctx.request.headers.origin;
-      // allow all origins in development and test environments
-      if (origin && (isDevEnv || isTestEnv)) {
-        return origin;
-        // support any subdomain for staging and production
-      } else if (origin?.endsWith('.charmverse.co') || origin?.endsWith('.charmverse.io')) {
-        return origin;
-      }
-      log.warn('Origin not allowed', { path, headers: ctx.request.headers });
-      return ''; // Disallow the request if the origin is not allowed
+      // TODO: fix CORS
+      return '*';
+      // const origin = ctx.request.headers.origin;
+      // // allow all origins in development and test environments
+      // if (origin && (isDevEnv || isTestEnv)) {
+      //   return origin;
+      //   // support any subdomain for staging and production
+      // } else if (origin?.endsWith('.charmverse.co') || origin?.endsWith('.charmverse.io')) {
+      //   return origin;
+      // }
+      // log.warn('Origin not allowed', { path, headers: ctx.request.headers });
+      // return ''; // Disallow the request if the origin is not allowed
     },
     credentials: true
   })
