@@ -49,11 +49,16 @@ app.use(async (ctx, next) => {
 app.use(async (ctx, next) => {
   try {
     await next();
+
     if (ctx.status === 404) {
       ctx.throw(404, 'Path not found!');
     }
   } catch (err) {
-    log.error('Route error', {
+    let _log = log.error;
+    if (ctx.status < 500) {
+      _log = log.warn;
+    }
+    _log('Route error', {
       error: err,
       body: ctx.body,
       requestUrl: ctx.originalUrl,
@@ -69,7 +74,9 @@ app.use(async (ctx, next) => {
       ctx.body = {
         message: (err as any).message ?? 'Internal Server Error'
       };
-      ctx.status = 500;
+      if (ctx.status < 400) {
+        ctx.status = 500;
+      }
     }
   }
 });
