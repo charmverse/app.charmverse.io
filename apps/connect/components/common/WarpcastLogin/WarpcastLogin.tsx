@@ -37,7 +37,7 @@ function WarpcastLoginButton() {
 
   return (
     <>
-      <Button size='large' onClick={signIn}>
+      <Button size='large' onClick={signIn} fullWidth>
         Connect with Farcaster
       </Button>
       <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />
