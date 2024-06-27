@@ -5,6 +5,28 @@ import { app } from './server';
 const port = process.env.PORT || 4000;
 const host = '0.0.0.0';
 
-app.listen(typeof port === 'string' ? parseInt(port) : port, host, () => {
+const server = app.listen(typeof port === 'string' ? parseInt(port) : port, host, () => {
   log.info(`🚀 Connect API up on http://localhost:${port}`);
+});
+
+function gracefulShutdown() {
+  log.info('Received shutdown instruction. Closing down server');
+  // We use server.close to finish processing existing requests
+  server.close(() => {
+    log.info('Permissions API shutdown completed');
+    process.exit(0);
+  });
+}
+
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
+
+process.on('uncaughtException', (err) => {
+  log.error(`Uncaught Exception: ${err.message}`, err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  log.error('Unhandled rejection at: ', promise, `reason: ${reason}`);
+  process.exit(1);
 });

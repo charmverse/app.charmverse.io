@@ -2,16 +2,18 @@ import { log } from '@charmverse/core/log';
 import type { ParameterizedContext } from 'koa';
 import type Router from 'koa-router';
 
+import { isDevEnv } from './constants';
+
 // Define terminal color codes
-const RESET = '\x1b[0m';
-const BOLD = '\x1b[1m';
-const BLUE = '\x1b[34m';
-const GREEN = '\x1b[32m';
-const YELLOW = '\x1b[33m';
-const RED = '\x1b[31m';
-const WHITE = '\x1b[37m';
-const MAGENTA = '\x1b[35m';
-const CYAN = '\x1b[36m';
+const RESET = isDevEnv ? '\x1b[0m' : '';
+const BOLD = isDevEnv ? '\x1b[1m' : '';
+const BLUE = isDevEnv ? '\x1b[34m' : '';
+const GREEN = isDevEnv ? '\x1b[32m' : '';
+const YELLOW = isDevEnv ? '\x1b[33m' : '';
+const RED = isDevEnv ? '\x1b[31m' : '';
+const WHITE = isDevEnv ? '\x1b[37m' : '';
+const MAGENTA = isDevEnv ? '\x1b[35m' : '';
+const CYAN = isDevEnv ? '\x1b[36m' : '';
 
 function getMethodColor(method: string) {
   switch (method.toUpperCase()) {
