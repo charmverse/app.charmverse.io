@@ -9,6 +9,7 @@ import { Avatar } from '../common/Avatar';
 import { FarcasterCard } from '../common/FarcasterCard';
 import { PageWrapper } from '../common/PageWrapper';
 
+import { ProjectDescription } from './components/ProjectDescription';
 import { ShareButton } from './ProjectShareButton';
 
 export async function ProjectDetails({ projectId }: { projectId: string }) {
@@ -109,11 +110,7 @@ export async function ProjectDetails({ projectId }: { projectId: string }) {
             </Stack>
           )}
         </Stack>
-        {project.description && (
-          <Typography variant='body1' mt={2}>
-            {project.description}
-          </Typography>
-        )}
+        {project.description && <ProjectDescription description={project.description} />}
         <Divider sx={{ my: 2 }} />
         <Typography variant='h6'>Members</Typography>
         <Stack gap={1}>
