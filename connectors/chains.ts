@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 // ref: https://wagmi.sh/core/chains
+import { defineChain } from 'viem';
 import type { Chain } from 'viem/chains';
 import {
   arbitrum,
@@ -51,7 +52,7 @@ export interface IChainDetails {
   shortName: string;
   unlockNetwork?: boolean;
   hypersubNetwork?: boolean;
-  viem?: Chain;
+  viem: Chain;
 }
 
 // Gnosis endpoints: https://docs.safe.global/safe-core-api/available-services
@@ -66,6 +67,44 @@ const EVM_DEFAULT = {
     logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
   }
 };
+
+const kyoto = defineChain({
+  id: 1997,
+  name: 'Kyoto',
+  nativeCurrency: {
+    name: 'Kyoto',
+    decimals: 18,
+    address: '0x0000000000000000000000000000000000000000',
+    symbol: 'KYOTO'
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.kyotochain.io']
+    }
+  },
+  blockExplorers: {
+    default: { name: 'Explorer', url: 'https://kyotoscan.io' }
+  }
+});
+
+const kyotoTestnet = defineChain({
+  id: 1998,
+  name: 'Kyoto - Testnet',
+  nativeCurrency: {
+    name: 'Kyoto',
+    decimals: 18,
+    address: '0x0000000000000000000000000000000000000000',
+    symbol: 'KYOTO'
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.testnet.kyotoprotocol.io:8545']
+    }
+  },
+  blockExplorers: {
+    default: { name: 'Explorer', url: 'https://testnet.kyotoscan.io' }
+  }
+});
 
 /**
  * EIP-155 specifies developer and transaction shortnames for each network. You can find the list here
@@ -410,34 +449,28 @@ export const RPC: Record<string, IChainDetails> = {
     testnet: true
   },
   KYOTO: {
-    chainId: 1997,
-    // viem: polygonAmoy,
-    chainName: 'Kyoto',
+    chainId: kyoto.id,
+    viem: kyoto,
+    chainName: kyoto.name,
     nativeCurrency: {
-      name: 'Kyoto',
-      symbol: 'KYOTO',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
+      ...kyoto.nativeCurrency,
       logoURI: '/images/cryptoLogos/kyoto-logo.svg'
     },
-    rpcUrls: ['https://rpc.kyotochain.io'],
-    blockExplorerUrls: ['https://kyotoscan.io'],
+    rpcUrls: kyoto.rpcUrls.default.http,
+    blockExplorerUrls: [kyoto.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/kyoto-logo.svg',
     shortName: 'kyoto'
   },
   KYOTO_DEV: {
-    chainId: 1998,
-    // viem: polygonAmoy,
-    chainName: 'Kyoto - Testnet',
+    chainId: kyotoTestnet.id,
+    viem: kyotoTestnet,
+    chainName: kyotoTestnet.name,
     nativeCurrency: {
-      name: 'Kyoto',
-      symbol: 'KYOTO',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
+      ...kyotoTestnet.nativeCurrency,
       logoURI: '/images/cryptoLogos/kyoto-logo.svg'
     },
-    rpcUrls: ['https://rpc.testnet.kyotoprotocol.io:8545'],
-    blockExplorerUrls: ['https://testnet.kyotoscan.io'],
+    rpcUrls: kyotoTestnet.rpcUrls.default.http,
+    blockExplorerUrls: [kyotoTestnet.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/kyoto-logo.svg',
     shortName: 'kyoto',
     testnet: true
