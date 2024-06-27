@@ -339,10 +339,13 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
 
-      - name: Validate code
+      - name: Validate Webapp
         run: |
           npm run lint -w apps/connect
           npm run typecheck -w apps/connect
+
+      - name: Validate API
+        run: |
           npm run lint -w apps/connect-api
 
   deploy-docker:
