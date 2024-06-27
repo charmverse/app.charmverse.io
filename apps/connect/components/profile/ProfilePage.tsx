@@ -3,10 +3,8 @@ import { PageTitle } from '@connect/components/common/PageTitle';
 import { PageWrapper } from '@connect/components/common/PageWrapper';
 import { ProjectsList } from '@connect/components/projects/components/ProjectsList';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import AddIcon from '@mui/icons-material/AddOutlined';
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import Link from 'next/link';
 
 import type { LoggedInUser } from 'models/User';
 

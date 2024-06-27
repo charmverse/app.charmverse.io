@@ -9,17 +9,19 @@ import * as yup from 'yup';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
 
-import { handleServerError } from './onError';
+import { handleReturnedServerError, handleServerErrorLog } from './onError';
+
+export const defineMetadataSchema = () =>
+  yup.object({
+    actionName: yup.string()
+  });
 
 export const actionClient = createSafeActionClient({
-  handleReturnedServerError: handleServerError,
-  defaultValidationErrorsShape: 'flattened',
+  handleReturnedServerError,
+  handleServerErrorLog,
   // @ts-ignore
-  defineMetadataSchema: () => {
-    return yup.object({
-      actionName: yup.string()
-    });
-  }
+  defineMetadataSchema,
+  defaultValidationErrorsShape: 'flattened'
 })
   /**
    * Middleware used for auth purposes.
