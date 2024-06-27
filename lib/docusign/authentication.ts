@@ -55,36 +55,38 @@ async function getUserDocusignAccountInfo({
 
   return GET<DocusignUserProfile>(profileUri, {
     headers: docusignUserOAuthTokenHeader({ accessToken })
-  })
-    .then((userProfile) => {
-      return {
-        // TBD - handle multiple accounts
-        docusignAccountId: userProfile.accounts[0].account_id,
-        docusignApiBaseUrl: userProfile.accounts[0].base_uri,
-        docusignAccountName: userProfile.accounts[0].account_name
-      };
-    })
-    .catch(async (err) => {
-      log.error('Failed to fetch user Docusign profile', err);
+  }).then((userProfile) => {
+    const defaultAccount = userProfile.accounts.find((account) => account.is_default) ?? userProfile.accounts[0];
 
-      const space = await prisma.space.findUniqueOrThrow({
-        where: {
-          id: spaceId
-        },
-        select: {
-          domain: true
-        }
-      });
+    return {
+      // TBD - handle multiple accounts
+      docusignAccountId: defaultAccount.account_id,
+      docusignApiBaseUrl: defaultAccount.base_uri,
+      docusignAccountName: defaultAccount.account_name
+    };
+  });
+  // This code branch is only required if using a developer key
+  // .catch(async (err) => {
+  //   log.error('Failed to fetch user Docusign profile', err);
 
-      if (isDevEnv || isStagingEnv || isCharmVerseSpace({ space })) {
-        return {
-          docusignAccountId: demoAccountId,
-          docusignApiBaseUrl: demoBaseUrl,
-          docusignAccountName: 'CharmVerse'
-        };
-      }
-      throw new InvalidInputError('Failed to fetch user profile');
-    });
+  //   const space = await prisma.space.findUniqueOrThrow({
+  //     where: {
+  //       id: spaceId
+  //     },
+  //     select: {
+  //       domain: true
+  //     }
+  //   });
+
+  //   if (isDevEnv || isStagingEnv || isCharmVerseSpace({ space })) {
+  //     return {
+  //       docusignAccountId: demoAccountId,
+  //       docusignApiBaseUrl: demoBaseUrl,
+  //       docusignAccountName: 'CharmVerse'
+  //     };
+  //   }
+  //   throw new InvalidInputError('Failed to fetch user profile');
+  // });
 }
 
 type DocusignOauthResponse = {
