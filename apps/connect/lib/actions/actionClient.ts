@@ -11,10 +11,11 @@ import { getIronOptions } from 'lib/session/getIronOptions';
 
 import { handleReturnedServerError, handleServerErrorLog } from './onError';
 
-export const defineMetadataSchema = () =>
-  yup.object({
+export function defineMetadataSchema() {
+  return yup.object({
     actionName: yup.string()
   });
+}
 
 export const actionClient = createSafeActionClient({
   handleReturnedServerError,
