@@ -6,7 +6,7 @@ import nc from 'next-connect';
 import { getEnvelope } from 'lib/docusign/api';
 import { onError, onNoMatch } from 'lib/middleware';
 import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
-import { passDocumentEvaluationStepIfNecessary } from 'lib/proposals/documentsToSign/passDocumentStepIfNecessary';
+import { passDocumentEvaluationStepIfNecessaryOrReopenEvaluation } from 'lib/proposals/documentsToSign/passDocumentEvaluationStepIfNecessaryOrReopenEvaluation';
 import { userByEmailOrGoogleAccountQuery } from 'lib/users/getUser';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -185,7 +185,7 @@ export async function docusignEventHandler(req: NextApiRequestWithApiPageKey, re
         }
       });
 
-      await passDocumentEvaluationStepIfNecessary({
+      await passDocumentEvaluationStepIfNecessaryOrReopenEvaluation({
         evaluationId: documentInDb.evaluationId,
         tx
       });

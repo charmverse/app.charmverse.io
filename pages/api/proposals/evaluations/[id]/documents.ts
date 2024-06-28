@@ -7,6 +7,7 @@ import {
   type EvaluationDocumentToSign
 } from 'lib/proposals/documentsToSign/addEnvelopeToEvaluation';
 import { checkUserHasEditLegalDocumentAccess } from 'lib/proposals/documentsToSign/checkUserHasEditLegalDocumentAccess';
+import { passDocumentEvaluationStepIfNecessaryOrReopenEvaluation } from 'lib/proposals/documentsToSign/passDocumentEvaluationStepIfNecessaryOrReopenEvaluation';
 import { removeEnvelopeFromEvaluation } from 'lib/proposals/documentsToSign/removeEnvelopeFromEvaluation';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -36,6 +37,10 @@ async function addProposalDocumentHandler(req: NextApiRequest, res: NextApiRespo
     evaluationId
   });
 
+  await passDocumentEvaluationStepIfNecessaryOrReopenEvaluation({
+    evaluationId
+  });
+
   // TODO: Add your logic for adding a proposal document here
   return res.status(200).end();
 }
@@ -55,6 +60,10 @@ async function removeProposalDocumentHandler(req: NextApiRequest, res: NextApiRe
 
   await removeEnvelopeFromEvaluation({
     envelopeId,
+    evaluationId
+  });
+
+  await passDocumentEvaluationStepIfNecessaryOrReopenEvaluation({
     evaluationId
   });
 
