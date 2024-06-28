@@ -5,17 +5,12 @@ import cors from '@koa/cors';
 import { getIronSession } from 'iron-session';
 import Koa from 'koa';
 
-import { isProdEnv, isStagingEnv, isDevEnv, isTestEnv } from '@connect-api/constants';
-import * as constants from 'config/constants';
+import { isProdEnv } from 'config/constants';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
 
 import { logRoutes } from './logRoutes';
 import rootRouter from './routes';
-
-console.log('REACT_APP_APP_ENV', process.env.REACT_APP_APP_ENV);
-console.log('root constants', { idProd: constants.isProdEnv, isStaging: constants.isStagingEnv });
-console.log('connect app constants', { isProdEnv, isStagingEnv, isDevEnv, isTestEnv });
 
 export const app = new Koa();
 
