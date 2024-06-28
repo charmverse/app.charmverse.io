@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import CircleIcon from '@mui/icons-material/Circle';
 import Alert from '@mui/material/Alert';
@@ -53,6 +54,7 @@ export type ShareToWebProps = {
   handleDiscovery?: (newValue: boolean) => void;
   disabledTooltip?: string | null;
   shareAlertMessage?: string | null;
+  pageType?: PageType;
 };
 
 export default function ShareToWeb({
@@ -64,7 +66,8 @@ export default function ShareToWeb({
   handlePublish,
   handleDiscovery,
   shareAlertMessage,
-  disabledTooltip
+  disabledTooltip,
+  pageType
 }: ShareToWebProps) {
   const [copied, setCopied] = useState<boolean>(false);
 
@@ -99,6 +102,8 @@ export default function ShareToWeb({
     }
   }
 
+  const hideAllowDiscovery = pageType === 'proposal';
+
   return (
     <Box my={1} gap={2} display='flex' flexDirection='column'>
       {!shareChecked && !shareLink ? (
@@ -132,23 +137,27 @@ export default function ShareToWeb({
               </CopyToClipboard>
             }
           />
-          <Box display='flex' alignItems='center' justifyContent='space-between' mt={1}>
-            <InputLabel htmlFor='discovery-toggle' color='primary'>
-              Add to sidebar
-            </InputLabel>
-            <Switch
-              id='discovery-toggle'
-              data-test='toggle-allow-page-discovery'
-              checked={discoveryChecked}
-              disabled={disabled}
-              onChange={(_, checked) => {
-                handleDiscovery?.(checked);
-              }}
-            />
-          </Box>
-          <Typography width={{ xs: '100%', md: '80%' }} variant='body2'>
-            Anyone with access to the space will see this page in the sidebar
-          </Typography>
+          {!hideAllowDiscovery && (
+            <>
+              <Box display='flex' alignItems='center' justifyContent='space-between' mt={1}>
+                <InputLabel htmlFor='discovery-toggle' color='primary'>
+                  Add to sidebar
+                </InputLabel>
+                <Switch
+                  id='discovery-toggle'
+                  data-test='toggle-allow-page-discovery'
+                  checked={discoveryChecked}
+                  disabled={disabled}
+                  onChange={(_, checked) => {
+                    handleDiscovery?.(checked);
+                  }}
+                />
+              </Box>
+              <Typography width={{ xs: '100%', md: '80%' }} variant='body2'>
+                Anyone with access to the space will see this page in the sidebar
+              </Typography>
+            </>
+          )}
         </Box>
       )}
       {shareAlertMessage && (
