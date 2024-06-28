@@ -1,13 +1,12 @@
 import type { SessionOptions } from 'iron-session';
 
 // import the "optional" auth secret here so it doesnt throw an error at build time
-import { authSecret, baseUrl, cookieName, isProdEnv } from 'config/constants';
+import { authSecret, baseUrl, cookieName } from 'config/constants';
 
-export function getIronOptions(): SessionOptions {
+export function getIronOptions({ domain }: { domain?: string } = {}): SessionOptions {
   if (!authSecret) {
     throw new Error('AUTH_SECRET is not defined');
   }
-  const domain = isProdEnv ? 'charmverse.io' : undefined;
   const ironOptions: SessionOptions = {
     cookieName,
     password: authSecret,
