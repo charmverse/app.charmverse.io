@@ -1,14 +1,14 @@
+/* eslint-disable no-console */
 import { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import cors from '@koa/cors';
 import { getIronSession } from 'iron-session';
 import Koa from 'koa';
 
-import { authSecret, baseUrl, cookieName, isProdEnv } from 'config/constants';
+import { isProdEnv } from 'config/constants';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
 
-import { isDevEnv, isTestEnv } from './constants';
 import { logRoutes } from './logRoutes';
 import rootRouter from './routes';
 
