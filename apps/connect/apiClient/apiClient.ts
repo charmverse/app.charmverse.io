@@ -29,7 +29,7 @@ class ConnectApiClient extends HttpClient {
   }
 
   async getFarcasterUsersByUsername(username: string) {
-    return this.GET<FarcasterUser[]>('/api/farcaster/get-by-username', {
+    return GET<FarcasterUser[]>(`${connectApiHost}/api/farcaster/get-by-username`, {
       username
     });
   }
