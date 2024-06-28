@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
-import { ProjectFormEditor } from 'components/settings/projects/components/ProjectForm';
+import { ProjectFieldEditor } from 'components/common/form/fields/ProjectField/ProjectFieldEditor';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 
 export function ProjectFormEditorComponent() {
@@ -11,7 +11,7 @@ export function ProjectFormEditorComponent() {
 
   return (
     <GlobalContext>
-      <ProjectFormEditor fieldConfig={projectRequiredValues} onChange={setProjectRequiredValues} />
+      <ProjectFieldEditor fieldConfig={projectRequiredValues} onChange={setProjectRequiredValues} />
     </GlobalContext>
   );
 }

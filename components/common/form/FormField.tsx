@@ -22,7 +22,6 @@ import {
 import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { ProjectFormEditor } from 'components/settings/projects/components/ProjectForm';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
@@ -43,6 +42,7 @@ import {
   nonPrivateFieldTypes
 } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
+import { ProjectFieldEditor } from './fields/ProjectField/ProjectFieldEditor';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
 
@@ -205,7 +205,7 @@ function ExpandedFormField({
         </>
       )}
       {formField.type === 'project_profile' ? (
-        <ProjectFormEditor
+        <ProjectFieldEditor
           defaultRequired
           fieldConfig={
             (formField.fieldConfig ?? createDefaultProjectAndMembersFieldConfig()) as ProjectAndMembersFieldConfig
@@ -362,7 +362,7 @@ export function FormField(
           {!isOpen || readOnly ? (
             <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
               {formField.type === 'project_profile' ? (
-                <ProjectFormEditor
+                <ProjectFieldEditor
                   fieldConfig={
                     (formField.fieldConfig as ProjectAndMembersFieldConfig) ??
                     createDefaultProjectAndMembersFieldConfig()

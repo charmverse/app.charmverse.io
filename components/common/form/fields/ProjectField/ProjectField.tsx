@@ -1,19 +1,20 @@
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { debounce } from 'lodash';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { UseFormGetFieldState } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
-import { ProposalProjectFormAnswers as ProjectFormAnswers } from 'components/settings/projects/components/ProjectForm';
 import { useUser } from 'hooks/useUser';
 import type { ProjectFieldValue, FormFieldValue } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
+
+import { ProjectForm } from './ProjectForm';
 
 export function ProjectProfileInputField({
   onChange: _onChange,
@@ -152,7 +153,7 @@ export function ProjectProfileInputField({
       </Stack>
       {selectedProject && (
         <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
-          <ProjectFormAnswers
+          <ProjectForm
             fieldConfig={fieldConfig}
             isTeamLead={isTeamLead}
             disabled={disabled}

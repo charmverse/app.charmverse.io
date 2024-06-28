@@ -19,7 +19,7 @@ import { hoverIconsStyle } from '../Icons/hoverIconsStyle';
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import { FieldWrapper } from './fields/FieldWrapper';
-import { ProjectProfileInputField } from './fields/ProjectProfileInputField';
+import { ProjectProfileInputField } from './fields/ProjectField/ProjectField';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';

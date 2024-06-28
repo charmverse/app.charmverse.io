@@ -1,8 +1,8 @@
 import { projectMemberFieldProperties } from 'lib/projects/formField';
 import type { FieldConfig, ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 
-import { FieldAnswers } from './FormFields/FieldAnswers';
-import { FieldsEditor } from './FormFields/FieldsEditor';
+import { FieldAnswers } from './FieldAnswers';
+import { FieldsEditor } from './FieldsEditor';
 
 export function ProjectMemberFieldAnswers({
   fieldConfig,
