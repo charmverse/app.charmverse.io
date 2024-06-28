@@ -24,10 +24,10 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
         </Typography>
         {farcasterDetails && (
           <FarcasterCard
-            name={farcasterDetails.displayName}
-            avatar={farcasterDetails.pfpUrl}
-            bio={farcasterDetails.bio}
-            username={farcasterDetails.username}
+            name={farcasterDetails?.displayName}
+            avatar={farcasterDetails?.pfpUrl}
+            bio={farcasterDetails?.bio}
+            username={farcasterDetails?.username}
             fid={user.farcasterUser?.fid}
           />
         )}

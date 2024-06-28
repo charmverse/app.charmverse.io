@@ -82,7 +82,7 @@ export function SearchFarcasterUser({
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       )}
-      noOptionsText='No profiles found'
+      noOptionsText='Search by farcaster username'
     />
   );
 }

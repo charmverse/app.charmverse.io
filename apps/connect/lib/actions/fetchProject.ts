@@ -40,10 +40,10 @@ export async function fetchProject(projectId: string) {
         ...member.user,
         farcasterUser: {
           fid: member.user!.farcasterUser?.fid,
-          pfpUrl: farcasterUser.pfpUrl,
-          bio: farcasterUser.bio,
-          username: farcasterUser.username,
-          displayName: farcasterUser.displayName
+          pfpUrl: farcasterUser?.pfpUrl,
+          bio: farcasterUser?.bio,
+          username: farcasterUser?.username,
+          displayName: farcasterUser?.displayName
         }
       };
     })
