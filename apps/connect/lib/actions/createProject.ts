@@ -125,7 +125,7 @@ export const actionCreateProject = authActionClient
       )
     ).filter(isTruthy);
 
-    await prisma.project.create({
+    const createdProject = await prisma.project.create({
       data: {
         name: input.name,
         updatedBy: currentUserId,
@@ -163,5 +163,5 @@ export const actionCreateProject = authActionClient
       }
     });
 
-    return { success: true };
+    return { success: true, projectId: createdProject.id };
   });

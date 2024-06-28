@@ -5,8 +5,8 @@ import { PageWrapper } from '@connect/components/common/PageWrapper';
 import type { FormValues } from '@connect/lib/projects/form';
 import { schema } from '@connect/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -20,19 +20,28 @@ import { CreateProjectForm } from './components/CreateProjectForm';
 export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
 
+  const router = useRouter();
+
   const {
     control,
     formState: { isValid },
     handleSubmit
   } = useForm<FormValues>({
     defaultValues: {
-      name: '',
+      name: 'Example Project',
       projectMembers: [
         {
           farcasterId: user?.farcasterUser?.fid,
           name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName
         }
-      ]
+      ],
+      websites: ['https://www.charmverse.io'],
+      farcasterIds: ['https://warpcast.com/cassie/0xc329ea28'],
+      mirror: 'https://dev.mirror.xyz/_JH3B2prRmU23wmzFMncy9UOmYT7mHj5wdiQVUolT3o',
+      twitter: 'https://x.com/charmverse',
+      category: 'DeFi',
+      description: 'This is a project description.',
+      github: 'https://github.com/charmverse/app.charmverse.io'
     },
     resolver: yupResolver(schema),
     mode: 'onChange'
@@ -67,6 +76,9 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
           control={control}
           isValid={isValid}
           handleSubmit={handleSubmit}
+          onSuccess={() => {
+            router.push('/profile');
+          }}
         />
       </Box>
     </PageWrapper>
