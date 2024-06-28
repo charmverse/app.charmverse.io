@@ -41,13 +41,11 @@ export function ProjectForm({
   const { user } = useUser();
 
   const { id: projectId, projectMembers } = project;
-  const extraProjectMembers = projectMembers.slice(1) ?? [];
   const selectedProjectMembers = selectedMemberIds
-    .slice(1)
     .map((memberId) => projectMembers.find((member) => member.id === memberId))
     .filter(isTruthy);
-  const nonSelectedProjectMembers = extraProjectMembers.filter(
-    (projectMember) => projectMember.id && !selectedMemberIds.includes(projectMember.id)
+  const nonSelectedProjectMembers = projectMembers.filter(
+    (projectMember) => !projectMember.teamLead && projectMember.id && !selectedMemberIds.includes(projectMember.id)
   );
   const { onProjectUpdate, onProjectMemberUpdate, onProjectMemberAdd } = useProjectUpdates({
     projectId: project.id,
