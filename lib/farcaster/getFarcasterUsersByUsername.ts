@@ -32,11 +32,11 @@ type FarcasterUsersResponse = {
   };
 };
 
-const neynerUrl = `https://api.neynar.com/v2/farcaster/user/search`;
+const neynarBaseUrl = `https://api.neynar.com/v2`;
 
 export async function getFarcasterUsersByUsername(username: string) {
   const farcasterUsersResponse = await GET<FarcasterUsersResponse>(
-    neynerUrl,
+    `${neynarBaseUrl}/farcaster/user/search`,
     {
       q: username,
       limit: 5
