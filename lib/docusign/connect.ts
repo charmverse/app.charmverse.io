@@ -4,14 +4,14 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { GET, POST } from 'adapters/http';
+import { baseUrl } from 'config/constants';
 
 import type { RequiredDocusignCredentials } from './constants';
 import { getSpaceDocusignCredentials } from './getSpaceDocusignCredentials';
 import { docusignUserOAuthTokenHeader } from './headers';
 
-// Change this to match the base url in prod
-const webhookBaseUrl = 'https://1bd8-2001-861-3385-87c0-b5ea-9099-6827-716e.ngrok-free.app';
-// const webhookBaseUrl = baseUrl;
+// Change this to match the base url in prod - For local testing, use a base url like ngrok
+const webhookBaseUrl = baseUrl;
 
 async function getDocusignWebhook({
   docusignWebhookId,
