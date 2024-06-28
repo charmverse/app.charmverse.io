@@ -13,6 +13,7 @@ import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
+import { isTruthy } from 'lib/utils/types';
 
 export function useProjectForm(options: {
   fieldConfig: ProjectAndMembersFieldConfig;
@@ -48,6 +49,7 @@ export function useProjectForm(options: {
     criteriaMode: 'all',
     mode: 'onChange'
   });
+  const values = form.watch();
 
   // useEffect(() => {
   //   const projectWithMembers =
@@ -77,18 +79,19 @@ export function useProjectForm(options: {
 
   const applyProject = useCallback(
     (project: ProjectWithMembers, selectedMemberIds: string[]) => {
-      const teamLead = project.projectMembers.find((member) => member.teamLead);
-      const nonTeamLeadMembers = project.projectMembers
-        .filter(
-          (member) =>
-            // Make sure only the selected members are present in the form
-            !member.teamLead && selectedMemberIds.includes(member.id)
-        )
-        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      // make sure that projectMembers is the same order as selectedMemberIds
+      const projectMembers = selectedMemberIds
+        .map((memberId) => project.projectMembers.find((member) => member.id === memberId))
+        .filter(isTruthy);
+      project.projectMembers.filter(
+        (member) =>
+          // Make sure only the selected members are present in the form
+          !member.teamLead && selectedMemberIds.includes(member.id)
+      );
       form.reset(
         convertToProjectValues({
           ...project,
-          projectMembers: [teamLead!, ...nonTeamLeadMembers]
+          projectMembers
         })
       );
       // trigger form so that errors are populated correctly
@@ -99,7 +102,6 @@ export function useProjectForm(options: {
 
   const applyProjectMembers = useCallback(
     (projectMembers: ProjectMember[]) => {
-      console.log('set project members value');
       form.setValue('projectMembers', projectMembers);
     },
     [form]

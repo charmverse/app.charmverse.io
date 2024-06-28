@@ -76,7 +76,7 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
 
   // apply initial values to project form
   useEffect(() => {
-    if (proposal?.project && projectAnswer) {
+    if (proposal?.project && projectAnswer?.projectId === proposal.project.id) {
       applyProject(proposal.project, projectAnswer.selectedMemberIds);
     }
   }, [!!proposal, !!projectAnswer, applyProject]);

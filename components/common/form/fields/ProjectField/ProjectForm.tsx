@@ -13,6 +13,7 @@ import { defaultProjectMember } from 'lib/projects/constants';
 import { projectFieldProperties } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
+import { isTruthy } from 'lib/utils/types';
 
 import { useProjectUpdates } from './useProjectUpdates';
 
@@ -41,9 +42,10 @@ export function ProjectForm({
 
   const { id: projectId, projectMembers } = project;
   const extraProjectMembers = projectMembers.slice(1) ?? [];
-  const selectedProjectMembers = extraProjectMembers.filter(
-    (projectMember) => projectMember.id && selectedMemberIds.includes(projectMember.id)
-  );
+  const selectedProjectMembers = selectedMemberIds
+    .slice(1)
+    .map((memberId) => projectMembers.find((member) => member.id === memberId))
+    .filter(isTruthy);
   const nonSelectedProjectMembers = extraProjectMembers.filter(
     (projectMember) => projectMember.id && !selectedMemberIds.includes(projectMember.id)
   );
@@ -52,34 +54,41 @@ export function ProjectForm({
     isTeamLead
   });
 
-  async function onChangeTeamMembers(selectedMemberValue: string) {
+  async function addTeamMember(selectedMemberId: string) {
     // get updated project members in case they were updated in the form but not refreshed yet
     const updatedProject = await refreshProject();
     if (!updatedProject) {
       return;
     }
-    console.log('members', updatedProject.projectMembers);
-    const _selectedMemberIds = [...selectedMemberIds];
-    const _projectMembers = updatedProject.projectMembers.filter(({ id }) => selectedMemberIds.includes(id));
-    if (selectedMemberValue !== newTeamMember) {
-      _selectedMemberIds.push(selectedMemberValue);
-      const projectMember = updatedProject.projectMembers.find(({ id }) => id === selectedMemberValue);
+    const newMemberIds = [...selectedMemberIds];
+    const newProjectMembers = selectedMemberIds
+      .map((memberId) => updatedProject.projectMembers.find((member) => member.id === memberId))
+      .filter(isTruthy);
+    if (selectedMemberId !== newTeamMember) {
+      newMemberIds.push(selectedMemberId);
+      const projectMember = updatedProject.projectMembers.find(({ id }) => id === selectedMemberId);
       if (projectMember) {
-        _projectMembers.push(projectMember);
+        newProjectMembers.push(projectMember);
       } else {
-        log.error('Project member not found', { selectedMemberValue });
+        log.error('Project member not found', { selectedMemberId });
       }
     } else {
       const newProjectMember = await onProjectMemberAdd(defaultProjectMember());
       if (newProjectMember) {
-        _selectedMemberIds.push(newProjectMember.id);
-        _projectMembers.push(newProjectMember);
+        newMemberIds.push(newProjectMember.id);
+        newProjectMembers.push(newProjectMember);
       }
     }
     // update proposal answers form
-    onFormFieldChange({ projectId, selectedMemberIds: _selectedMemberIds });
+    onFormFieldChange({ projectId, selectedMemberIds: newMemberIds });
     // update project form
-    console.log('new members', _projectMembers);
+    applyProjectMembers(newProjectMembers);
+  }
+
+  function removeTeamMember(memberId: string) {
+    const newMemberIds = selectedMemberIds.filter((id) => id !== memberId);
+    const _projectMembers = projectMembers.filter(({ id }) => newMemberIds.includes(id));
+    onFormFieldChange({ projectId, selectedMemberIds: newMemberIds });
     applyProjectMembers(_projectMembers);
   }
 
@@ -133,16 +142,13 @@ export function ProjectForm({
         }}
       />
       {selectedProjectMembers.map((projectMember, index) => (
-        <Stack key={`project-member-${index.toString()}`}>
+        <Stack key={`project-member-${projectMember.id}`}>
           <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
             <Typography variant='h6'>Team member</Typography>
             <IconButton
               data-test='remove-project-member-button'
               disabled={disabled}
-              onClick={() => {
-                const _selectedMemberIds = selectedMemberIds.filter((id) => id !== projectMember.id);
-                onFormFieldChange({ projectId, selectedMemberIds: _selectedMemberIds });
-              }}
+              onClick={() => removeTeamMember(projectMember.id)}
             >
               <DeleteOutlineOutlinedIcon fontSize='small' color={disabled ? 'disabled' : 'error'} />
             </IconButton>
@@ -168,7 +174,7 @@ export function ProjectForm({
         disabled={disabled}
         value=''
         onChange={(event) => {
-          onChangeTeamMembers(event.target.value as string);
+          addTeamMember(event.target.value as string);
         }}
         renderValue={() => {
           return 'Select a team member';
