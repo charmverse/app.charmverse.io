@@ -68,9 +68,9 @@ export function AddProjectMembersForm({
           name={farcasterDetails.displayName}
           username={farcasterDetails.username}
           avatar={farcasterDetails.pfpUrl}
-          bio={farcasterDetails.bio}
+          avatarSize='large'
         />
-        <Stack gap={2}>
+        <Stack gap={1}>
           <SearchFarcasterUser
             selectedProfile={selectedFarcasterProfile}
             setSelectedProfile={(farcasterProfile) => {
@@ -98,15 +98,21 @@ export function AddProjectMembersForm({
             </Button>
           </Stack>
         </Stack>
-        <Stack gap={2} mb={2}>
+        <Stack gap={1} mb={2}>
           {selectedFarcasterProfiles.map((farcasterProfile) => (
             <FarcasterCard
+              avatarSize='large'
               fid={farcasterProfile.fid}
               key={farcasterProfile.fid}
               name={farcasterProfile.displayName}
               username={farcasterProfile.username}
               avatar={farcasterProfile.pfpUrl}
               bio=''
+              onDelete={() => {
+                setSelectedFarcasterProfiles(
+                  selectedFarcasterProfiles.filter((profile) => profile.fid !== farcasterProfile.fid)
+                );
+              }}
             />
           ))}
         </Stack>

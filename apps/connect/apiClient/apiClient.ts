@@ -4,6 +4,7 @@ import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 
 import { GET } from 'adapters/http';
 import { connectApiHost } from 'config/constants';
+import type { FarcasterUser } from 'lib/farcaster/getFarcasterUsersByUsername';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { LoggedInUser } from 'models/index';
 
@@ -24,6 +25,12 @@ class ConnectApiClient extends HttpClient {
       key: string;
     }>(`${connectApiHost}/api/image/upload`, {
       filename: encodeFilename(file.name)
+    });
+  }
+
+  async getFarcasterUsersByUsername(username: string) {
+    return this.GET<FarcasterUser[]>('/api/farcaster/get-by-username', {
+      username
     });
   }
 }
