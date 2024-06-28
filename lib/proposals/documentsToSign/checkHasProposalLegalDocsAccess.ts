@@ -57,7 +57,7 @@ export async function checkHasProposalLegalDocsAccess({
   });
 
   if (!hasDocusignAccess) {
-    throw new UnauthorisedActionError('You do not have permission to access legal documents for this proposal');
+    throw new UnauthorisedActionError('You do not have access to Docusign for this space');
   }
 
   const allPermissions = await permissionsApiClient.proposals.computeAllProposalEvaluationPermissions({
