@@ -8,7 +8,7 @@ import type { Control, UseFormGetFieldState } from 'react-hook-form';
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { FieldAnswerInput, FormFieldValue } from 'lib/forms/interfaces';
+import type { ProjectFieldValue, FormFieldValue, FieldAnswerInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -143,7 +143,7 @@ export function FormFieldAnswers({
                       disabled={disabled}
                       proposalId={proposalId}
                       formFieldId={formField.id}
-                      formFieldValue={field.value as { selectedMemberIds: string[] }}
+                      formFieldValue={field.value as ProjectFieldValue}
                       getFieldState={getFieldState}
                       fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
                       onChange={field.onChange}

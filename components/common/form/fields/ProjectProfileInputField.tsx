@@ -1,15 +1,15 @@
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { debounce } from 'lodash';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { UseFormGetFieldState } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
-import { ProposalProjectFormAnswers } from 'components/settings/projects/components/ProjectForm';
+import { ProposalProjectFormAnswers as ProjectFormAnswers } from 'components/settings/projects/components/ProjectForm';
 import { useUser } from 'hooks/useUser';
-import type { FormFieldValue } from 'lib/forms/interfaces';
+import type { ProjectFieldValue, FormFieldValue } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
@@ -28,7 +28,7 @@ export function ProjectProfileInputField({
   getFieldState
 }: {
   formFieldId: string;
-  formFieldValue?: { selectedMemberIds: string[] } | null;
+  formFieldValue?: ProjectFieldValue | null;
   proposalId?: string;
   inputEndAdornment?: React.ReactNode;
   disabled?: boolean;
@@ -43,11 +43,12 @@ export function ProjectProfileInputField({
     proposalId
   });
   const { user } = useUser();
-  const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(project ?? null);
   const { data: projectsWithMembers, mutate } = useGetProjects();
   const projectId = project?.id;
   const { reset } = useFormContext<ProjectAndMembersPayload>();
   const { trigger: createProject } = useCreateProject();
+
+  const selectedProject = projectsWithMembers?.find((_project) => _project.id === projectId);
 
   const isTeamLead = !!selectedProject?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
 
@@ -65,7 +66,7 @@ export function ProjectProfileInputField({
     }
   };
 
-  function onOptionClick(_selectedProject: ProjectWithMembers) {
+  function onSelectProject(_selectedProject: ProjectWithMembers) {
     if (proposalId) {
       updateProposal({
         projectId: _selectedProject.id
@@ -73,7 +74,6 @@ export function ProjectProfileInputField({
     }
     // update the projectId field of the form, it might be for a new structured proposal form
     onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
-    setSelectedProject(_selectedProject);
     reset(
       convertToProjectValues({
         ..._selectedProject,
@@ -82,18 +82,6 @@ export function ProjectProfileInputField({
       })
     );
   }
-
-  const onFormFieldChange = useCallback(
-    (newProjectMemberIds: string[]) => {
-      if (selectedProject) {
-        onChange({
-          projectId: selectedProject.id,
-          selectedMemberIds: newProjectMemberIds
-        });
-      }
-    },
-    [selectedProject?.id]
-  );
 
   return (
     <Stack gap={1} width='100%' mb={1}>
@@ -127,7 +115,7 @@ export function ProjectProfileInputField({
                 data-test={`project-option-${_project.id}`}
                 value={_project.id}
                 onClick={() => {
-                  onOptionClick(_project);
+                  onSelectProject(_project);
                 }}
               >
                 <Typography color={_project.name ? '' : 'secondary'}>{_project.name || 'Untitled Project'}</Typography>
@@ -140,7 +128,7 @@ export function ProjectProfileInputField({
             onClick={() => {
               createProject(createDefaultProjectAndMembersPayload(), {
                 onSuccess: async (createdProject) => {
-                  mutate(
+                  await mutate(
                     (_projects) => {
                       return [...(_projects ?? []), createdProject];
                     },
@@ -148,7 +136,7 @@ export function ProjectProfileInputField({
                       revalidate: false
                     }
                   );
-                  onOptionClick(createdProject);
+                  onSelectProject(createdProject);
                 }
               });
             }}
@@ -164,13 +152,14 @@ export function ProjectProfileInputField({
       </Stack>
       {selectedProject && (
         <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
-          <ProposalProjectFormAnswers
+          <ProjectFormAnswers
             fieldConfig={fieldConfig}
             isTeamLead={isTeamLead}
             disabled={disabled}
-            projectId={selectedProject.id}
             selectedProjectMemberIds={selectedMemberIds}
-            onFormFieldChange={onFormFieldChange}
+            onFormFieldChange={onChange}
+            projectId={selectedProject.id}
+            projectMembers={selectedProject.projectMembers}
           />
         </Box>
       )}

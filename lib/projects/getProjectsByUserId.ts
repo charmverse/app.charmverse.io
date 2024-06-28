@@ -13,6 +13,9 @@ export async function getProjectsByUserId({ userId }: { userId: string }): Promi
         }
       }
     },
+    orderBy: {
+      createdAt: 'desc'
+    },
     include: projectInclude
   });
 

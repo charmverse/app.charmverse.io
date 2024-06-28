@@ -4,19 +4,21 @@ import { Box, Divider, IconButton, MenuItem, Select, Stack, Typography } from '@
 import { useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
-import { useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useUser } from 'hooks/useUser';
+import type { ProjectFieldValue } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 
 import { useProjectUpdates } from '../hooks/useProjectUpdates';
 
 import { ProjectFieldAnswers, ProjectFieldsEditor } from './ProjectFields';
 import { ProjectMemberFieldAnswers, ProjectMemberFieldsEditor } from './ProjectMemberFields';
+
+const newTeamMember = 'ADD_TEAM_MEMBER';
 
 export function ProposalProjectFormAnswers({
   fieldConfig,
@@ -24,19 +26,19 @@ export function ProposalProjectFormAnswers({
   disabled,
   projectId,
   selectedProjectMemberIds,
-  onFormFieldChange
+  onFormFieldChange,
+  projectMembers
 }: {
   projectId: string;
   disabled?: boolean;
   fieldConfig?: ProjectAndMembersFieldConfig;
   isTeamLead: boolean;
   selectedProjectMemberIds: string[];
-  onFormFieldChange: (newProjectMemberIds: string[]) => void;
+  onFormFieldChange: (field: ProjectFieldValue) => void;
+  projectMembers: ProjectWithMembers['projectMembers'];
 }) {
-  const { data: projectsWithMembers } = useGetProjects();
   const { user } = useUser();
-  const projectWithMember = projectsWithMembers?.find((project) => project.id === projectId);
-  const extraProjectMembers = projectWithMember?.projectMembers.slice(1) ?? [];
+  const extraProjectMembers = projectMembers.slice(1) ?? [];
   const selectedProjectMembers = extraProjectMembers.filter(
     (projectMember) => projectMember.id && selectedProjectMemberIds.includes(projectMember.id)
   );
@@ -47,13 +49,15 @@ export function ProposalProjectFormAnswers({
     projectId
   });
 
-  async function onChange(selectedMemberValue: string) {
-    if (selectedMemberValue !== 'ADD_TEAM_MEMBER') {
-      onFormFieldChange([...selectedProjectMemberIds, selectedMemberValue]);
+  async function onChangeTeamMembers(selectedMemberValue: string) {
+    if (selectedMemberValue !== newTeamMember) {
+      const selectedMemberIds = [...selectedProjectMemberIds, selectedMemberValue];
+      onFormFieldChange({ projectId, selectedMemberIds });
     } else {
       const newProjectMember = await onProjectMemberAdd(createDefaultProjectAndMembersPayload().projectMembers[0]);
       if (newProjectMember) {
-        onFormFieldChange([...selectedProjectMemberIds, newProjectMember.id]);
+        const selectedMemberIds = [...selectedProjectMemberIds, newProjectMember.id];
+        onFormFieldChange({ projectId, selectedMemberIds });
       }
     }
   }
@@ -68,7 +72,7 @@ export function ProposalProjectFormAnswers({
     [onProjectUpdate, projectId]
   );
 
-  const teamLeadMemberId = projectWithMember?.projectMembers[0]?.id;
+  const teamLeadMemberId = projectMembers[0]?.id;
   const onProjectMemberUpdateMemo = useCallback(
     (updatedProjectMember: Record<string, any>) => {
       if (teamLeadMemberId) {
@@ -114,7 +118,8 @@ export function ProposalProjectFormAnswers({
               data-test='remove-project-member-button'
               disabled={disabled}
               onClick={() => {
-                onFormFieldChange(selectedProjectMemberIds.filter((id) => id !== projectMember.id));
+                const selectedMemberIds = selectedProjectMemberIds.filter((id) => id !== projectMember.id);
+                onFormFieldChange({ projectId, selectedMemberIds });
               }}
             >
               <DeleteOutlineOutlinedIcon fontSize='small' color={disabled ? 'disabled' : 'error'} />
@@ -141,7 +146,7 @@ export function ProposalProjectFormAnswers({
         disabled={disabled}
         value=''
         onChange={(event) => {
-          onChange(event.target.value as string);
+          onChangeTeamMembers(event.target.value as string);
         }}
         renderValue={() => {
           return 'Select a team member';
@@ -159,7 +164,7 @@ export function ProposalProjectFormAnswers({
           </MenuItem>
         ))}
         {nonSelectedProjectMembers.length && <Divider />}
-        <MenuItem data-test='project-member-option' value='ADD_TEAM_MEMBER' disabled={!isTeamLead || disabled}>
+        <MenuItem data-test='project-member-option' value={newTeamMember} disabled={!isTeamLead || disabled}>
           <Stack flexDirection='row' alignItems='center' gap={0.05}>
             <AddIcon fontSize='small' />
             <Typography>Add a new project member</Typography>

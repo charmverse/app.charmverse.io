@@ -11,35 +11,19 @@ export function CreateProjectForm({
   onCancel,
   onSave
 }: {
-  onSave?: (project: ProjectWithMembers) => void;
-  onCancel?: VoidFunction;
+  onSave: (project: ProjectWithMembers) => void;
+  onCancel: VoidFunction;
 }) {
   const { trigger: createProject, isMutating } = useCreateProject();
   const { formState, getValues, reset } = useFormContext<ProjectAndMembersPayload>();
 
   const isValid = formState.isValid;
-  const { mutate } = useGetProjects();
 
   async function saveProject() {
     const project = getValues();
-    try {
-      const createdProjectWithMembers = await createProject(project);
-      onSave?.(createdProjectWithMembers);
-      mutate(
-        (cachedData) => {
-          if (!cachedData) {
-            return cachedData;
-          }
-
-          return [...cachedData, createdProjectWithMembers];
-        },
-        {
-          revalidate: false
-        }
-      );
-    } catch (err) {
-      //
-    }
+    const createdProjectWithMembers = await createProject(project);
+    onSave(createdProjectWithMembers);
+    reset();
   }
 
   return (
@@ -64,7 +48,7 @@ export function CreateProjectForm({
             color='error'
             onClick={() => {
               reset();
-              onCancel?.();
+              onCancel();
             }}
           >
             Cancel
