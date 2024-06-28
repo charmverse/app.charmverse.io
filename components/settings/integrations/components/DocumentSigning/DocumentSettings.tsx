@@ -1,4 +1,4 @@
-import { Alert, Typography } from '@mui/material';
+import { Alert, Divider, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { useRouter } from 'next/router';
@@ -13,6 +13,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { IntegrationContainer } from '../IntegrationContainer';
 
 import { ConnectInfo } from './ConnectInfo';
+import { SelectAllowedRolesAndUsers } from './SelectAllowedRolesAndUsers';
 import { SelectDocusignAccount } from './SelectDocusignAccount';
 
 function ConnectedState({
@@ -49,6 +50,8 @@ function ConnectedState({
           onClick={handleAccountSelection}
         />
       )}
+      <Divider sx={{ height: '2px', my: 2 }} />
+      <SelectAllowedRolesAndUsers />
       <Button onClick={disconnectDocusign} color='error' variant='outlined' sx={{ width: 'fit-content', mt: 2 }}>
         Disconnect
       </Button>

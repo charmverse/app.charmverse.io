@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import {
   addEnvelopeToEvaluation,
   type EvaluationDocumentToSign
 } from 'lib/proposals/documentsToSign/addEnvelopeToEvaluation';
-import { checkUserHasEditLegalDocumentAccess } from 'lib/proposals/documentsToSign/checkUserHasEditLegalDocumentAccess';
+import { checkHasProposalLegalDocsAccess } from 'lib/proposals/documentsToSign/checkLegalDocsAccess';
 import { passDocumentEvaluationStepIfNecessaryOrReopenEvaluation } from 'lib/proposals/documentsToSign/passDocumentEvaluationStepIfNecessaryOrReopenEvaluation';
 import { removeEnvelopeFromEvaluation } from 'lib/proposals/documentsToSign/removeEnvelopeFromEvaluation';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -23,14 +23,10 @@ async function addProposalDocumentHandler(req: NextApiRequest, res: NextApiRespo
   const evaluationId = req.query.id as string;
   const envelopeId = req.body.envelopeId;
 
-  const hasAccess = await checkUserHasEditLegalDocumentAccess({
-    userId: req.session.user.id,
-    evaluationId: req.query.id as string
+  await checkHasProposalLegalDocsAccess({
+    evaluationId,
+    userId: req.session.user.id
   });
-
-  if (!hasAccess) {
-    throw new ActionNotPermittedError('You do not have permission to add document to sign to this proposal');
-  }
 
   await addEnvelopeToEvaluation({
     envelopeId,
@@ -49,14 +45,10 @@ async function removeProposalDocumentHandler(req: NextApiRequest, res: NextApiRe
   const evaluationId = req.query.id as string;
   const envelopeId = req.query.envelopeId as string;
 
-  const hasAccess = await checkUserHasEditLegalDocumentAccess({
-    userId: req.session.user.id,
-    evaluationId
+  await checkHasProposalLegalDocsAccess({
+    evaluationId,
+    userId: req.session.user.id
   });
-
-  if (!hasAccess) {
-    throw new ActionNotPermittedError('You do not have permission to remove documents from this proposal');
-  }
 
   await removeEnvelopeFromEvaluation({
     envelopeId,

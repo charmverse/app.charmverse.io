@@ -1,9 +1,12 @@
+import type { DocusignAllowedRoleOrUser } from '@charmverse/core/dist/cjs/prisma-client';
+
+import type { AllowedDocusignRolesAndUsersUpdate } from 'lib/docusign/allowedDocusignRolesAndUsers';
 import type { DocusignEnvelope, DocusignEnvelopeLite } from 'lib/docusign/api';
 import type { PublicDocuSignProfile } from 'lib/docusign/authentication';
 import type { UserDocusignAccountsInfo } from 'lib/docusign/getUserDocusignAccountsInfo';
 import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 
-import { useGET, type MaybeString } from './helpers';
+import { useGET, usePUT, type MaybeString } from './helpers';
 
 export function useGetDocusignProfile({ spaceId }: { spaceId: MaybeString }) {
   return useGET<PublicDocuSignProfile | null>(spaceId ? '/api/docusign/profile' : null, { spaceId });
@@ -19,6 +22,16 @@ export function useGetSearchSpaceDocusignEnvelopes(query: DocusignSearchRequest 
 
 export function useGetDocusignAccounts({ spaceId }: { spaceId: MaybeString }) {
   return useGET<UserDocusignAccountsInfo[]>(spaceId ? '/api/docusign/accounts' : null, { spaceId });
+}
+
+export function useGetAllowedDocusignUsersAndRoles({ spaceId }: { spaceId: MaybeString }) {
+  return useGET<DocusignAllowedRoleOrUser[]>(spaceId ? '/api/docusign/allowed-docusign-roles-users' : null, {
+    spaceId
+  });
+}
+
+export function usePutAllowedDocusignUsersAndRoles() {
+  return usePUT<AllowedDocusignRolesAndUsersUpdate>('/api/docusign/allowed-docusign-roles-users');
 }
 
 // export function useGetDocusignTemplates({ spaceId }: { spaceId: MaybeString }) {

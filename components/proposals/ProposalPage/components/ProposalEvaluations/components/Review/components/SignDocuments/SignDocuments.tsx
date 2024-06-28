@@ -1,9 +1,11 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import { Box, Card, Divider, FormLabel, Stack, Typography } from '@mui/material';
 
+import { useGetAllowedDocusignUsersAndRoles } from 'charmClient/hooks/docusign';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { useDocusign } from 'components/signing/hooks/useDocusign';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { DocumentWithSigners } from 'lib/proposals/documentsToSign/getProposalDocumentsToSign';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utils/dates';
@@ -59,6 +61,8 @@ export function SignDocuments({
     id: (reviewer.roleId ?? reviewer.userId) as string,
     group: reviewer.roleId ? 'role' : 'user'
   }));
+
+  const { space } = useCurrentSpace();
 
   const { showConfirmation } = useConfirmationModal();
 

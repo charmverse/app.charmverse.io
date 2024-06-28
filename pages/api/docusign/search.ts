@@ -4,8 +4,8 @@ import nc from 'next-connect';
 
 import type { DocusignEnvelopeLite, DocusignSearchParams } from 'lib/docusign/api';
 import { searchDocusignDocs } from 'lib/docusign/api';
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { checkUserHasEditLegalDocumentAccess } from 'lib/proposals/documentsToSign/checkUserHasEditLegalDocumentAccess';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { checkHasProposalLegalDocsAccess } from 'lib/proposals/documentsToSign/checkHasProposalLegalDocsAccess';
 import { withSessionRoute } from 'lib/session/withSession';
 
 export type DocusignSearchRequest = DocusignSearchParams & {
@@ -22,13 +22,10 @@ handler
 async function searchDocusign(req: NextApiRequest, res: NextApiResponse<DocusignEnvelopeLite[]>) {
   const proposalId = req.query.proposalId as string;
 
-  const hasDocumentAccess = await checkUserHasEditLegalDocumentAccess({
-    proposalId,
-    userId: req.session.user.id
+  await checkHasProposalLegalDocsAccess({
+    userId: req.session.user.id,
+    proposalId
   });
-  if (!hasDocumentAccess) {
-    throw new ActionNotPermittedError('You do not have permission to edit documents for this proposal');
-  }
 
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
