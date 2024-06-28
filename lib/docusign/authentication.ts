@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -6,13 +7,6 @@ import { docusignOauthBaseUri } from 'config/constants';
 
 import { getSpaceDocusignCredentials } from './getSpaceDocusignCredentials';
 import { docusignIntegrationAuthHeader, docusignUserOAuthTokenHeader } from './headers';
-
-type DocusignAccount = {
-  account_id: string;
-  is_default: boolean;
-  account_name: string;
-  base_uri: string;
-};
 
 type DocusignOauthResponse = {
   access_token: string;
@@ -91,7 +85,9 @@ export async function disconnectDocusignAccount({ spaceId }: { spaceId: string }
       {
         headers: docusignUserOAuthTokenHeader({ accessToken: credentials.accessToken })
       }
-    );
+    ).catch((err) => {
+      log.error('Failed to delete docusign webhook', { err, spaceId });
+    });
   }
 
   await prisma.docusignCredential.delete({

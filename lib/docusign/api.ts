@@ -96,8 +96,14 @@ export type DocusignEnvelope = {
   recipients: { signers: DocusignRecipient[] };
 };
 
-export function getDocusignEnvelopeCacheKey(envelopeId: string) {
+function getDocusignEnvelopeCacheKey(envelopeId: string) {
   return `docusign-envelope-${envelopeId}`;
+}
+
+export async function setEnvelopeInCache(envelope: DocusignEnvelope): Promise<void> {
+  await redisClient?.set(getDocusignEnvelopeCacheKey(envelope.envelopeId), JSON.stringify(envelope), {
+    EX: docusignPeriodBetweenRequestsInSeconds
+  });
 }
 
 export async function getEnvelope({
@@ -121,6 +127,8 @@ export async function getEnvelope({
       headers: docusignUserOAuthTokenHeader({ accessToken: credentials.accessToken })
     }
   );
+
+  await setEnvelopeInCache(envelopeFromDocusign);
 
   await redisClient?.set(`docusign-envelope-${envelopeId}`, JSON.stringify(envelopeFromDocusign), {
     EX: docusignPeriodBetweenRequestsInSeconds

@@ -3,7 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { getEnvelope } from 'lib/docusign/api';
+import type { DocusignEnvelope } from 'lib/docusign/api';
+import { getEnvelope, setEnvelopeInCache } from 'lib/docusign/api';
 import { onError, onNoMatch } from 'lib/middleware';
 import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
 import { passDocumentEvaluationStepIfNecessaryOrReopenEvaluation } from 'lib/proposals/documentsToSign/passDocumentEvaluationStepIfNecessaryOrReopenEvaluation';
@@ -90,7 +91,9 @@ export async function docusignEventHandler(req: NextApiRequestWithApiPageKey, re
   const envelopeSigners = envelope.recipients.signers;
 
   if (event.event === 'recipient-completed') {
-    const completedSigner = envelopeSigners.find((signer) => signer.recipientId === event.data.recipientId);
+    const completedSignerIndex = envelopeSigners.findIndex((signer) => signer.recipientId === event.data.recipientId);
+
+    const completedSigner = envelopeSigners[completedSignerIndex];
 
     if (completedSigner) {
       const signerInDb = await prisma.documentSigner.findFirst({
@@ -143,6 +146,25 @@ export async function docusignEventHandler(req: NextApiRequestWithApiPageKey, re
           }
         });
       }
+
+      const refreshedEnvelope: DocusignEnvelope = {
+        ...envelope,
+        recipients: {
+          ...envelope.recipients,
+          signers: envelopeSigners.map((signer, index) => {
+            if (index === completedSignerIndex) {
+              return {
+                ...signer,
+                signedDateTime: new Date().toISOString()
+              };
+            }
+
+            return signer;
+          })
+        }
+      };
+
+      await setEnvelopeInCache(refreshedEnvelope);
     }
   } else if (event.event === 'envelope-completed') {
     const usersToMarkAsComplete = await prisma.documentSigner.findMany({
@@ -190,6 +212,8 @@ export async function docusignEventHandler(req: NextApiRequestWithApiPageKey, re
         tx
       });
     });
+
+    await setEnvelopeInCache({ ...envelope, status: 'completed' });
   }
 
   return res.status(200).json({ success: true });

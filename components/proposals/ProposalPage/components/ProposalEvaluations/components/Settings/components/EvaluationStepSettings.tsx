@@ -1,12 +1,12 @@
 import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
-import { Box, Typography, FormLabel, TextField, Stack, Switch } from '@mui/material';
+import { Box, FormLabel, Stack, Switch, TextField, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import {
-  authorSystemRole,
   allMembersSystemRole,
+  authorSystemRole,
   tokenHoldersSystemRole
 } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
