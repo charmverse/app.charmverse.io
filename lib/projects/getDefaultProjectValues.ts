@@ -6,13 +6,12 @@ import { createDefaultProjectAndMembersPayload } from './constants';
 import type { ProjectAndMembersPayload } from './interfaces';
 
 export function getDefaultProjectValues({
-  membersRecord,
+  userMemberRecord,
   user
 }: {
   user: LoggedInUser | null;
-  membersRecord: Record<string, Member>;
+  userMemberRecord?: Member;
 }): ProjectAndMembersPayload {
-  const currentMember = user ? membersRecord[user.id] : null;
   const primaryWallet = user?.wallets.find((wallet) => wallet.id === user?.primaryWalletId) ?? user?.wallets[0];
   const userEmail =
     user?.email ?? ((user?.verifiedEmails.length ? user.verifiedEmails[0].email : undefined) as string | undefined);
@@ -25,10 +24,10 @@ export function getDefaultProjectValues({
       {
         ...defaultProjectAndMembersPayload.projectMembers[0],
         email: userEmail ?? '',
-        twitter: currentMember?.profile?.social?.twitterURL ?? '',
+        twitter: userMemberRecord?.profile?.social?.twitterURL ?? '',
         telegram: telegramUsername ?? '',
-        linkedin: currentMember?.profile?.social?.linkedinURL ?? '',
-        github: currentMember?.profile?.social?.githubURL ?? '',
+        linkedin: userMemberRecord?.profile?.social?.linkedinURL ?? '',
+        github: userMemberRecord?.profile?.social?.githubURL ?? '',
         walletAddress: primaryWallet?.ensname ?? primaryWallet?.address ?? ''
       }
     ]

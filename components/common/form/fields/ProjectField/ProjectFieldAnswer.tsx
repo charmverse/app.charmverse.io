@@ -7,16 +7,18 @@ import type { UseFormGetFieldState } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { ProjectFieldValue, FormFieldValue } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 
 import { ProjectForm } from './ProjectForm';
 
-export function ProjectProfileInputField({
+export function ProjectFieldAnswer({
   onChange: _onChange,
   onChangeDebounced: _onChangeDebounced,
   fieldConfig,
@@ -26,16 +28,20 @@ export function ProjectProfileInputField({
   proposalId,
   formFieldId,
   formFieldValue,
-  getFieldState
+  getFieldState,
+  applyProject,
+  applyProjectMembers
 }: {
   formFieldId: string;
   formFieldValue?: ProjectFieldValue | null;
-  proposalId?: string;
+  proposalId: string;
   inputEndAdornment?: React.ReactNode;
   disabled?: boolean;
   fieldConfig?: ProjectAndMembersFieldConfig;
   project?: ProjectWithMembers | null;
   onChange: (updatedValue: FormFieldValue) => void;
+  applyProject: (project: ProjectWithMembers, selectedMemberIds: string[]) => void;
+  applyProjectMembers: (projectMembers: ProjectWithMembers['projectMembers']) => void;
   getFieldState: UseFormGetFieldState<Record<string, FormFieldValue>>;
   onChangeDebounced: (updatedValue: { id: string; value: FormFieldValue }) => void;
 }) {
@@ -46,10 +52,10 @@ export function ProjectProfileInputField({
   const { user } = useUser();
   const { data: projectsWithMembers, mutate } = useGetProjects();
   const projectId = project?.id;
-  const { reset } = useFormContext<ProjectAndMembersPayload>();
+  const { membersRecord } = useMembers();
   const { trigger: createProject } = useCreateProject();
 
-  const selectedProject = projectsWithMembers?.find((_project) => _project.id === projectId);
+  const selectedProject = project; // projectsWithMembers?.find((_project) => _project.id === projectId);
 
   const isTeamLead = !!selectedProject?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
 
@@ -68,20 +74,39 @@ export function ProjectProfileInputField({
   };
 
   function onSelectProject(_selectedProject: ProjectWithMembers) {
-    if (proposalId) {
-      updateProposal({
-        projectId: _selectedProject.id
-      });
-    }
-    // update the projectId field of the form, it might be for a new structured proposal form
-    onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
-    reset(
-      convertToProjectValues({
-        ..._selectedProject,
-        // Just add the team lead to the project members since selectedMemberIds is empty
-        projectMembers: [_selectedProject.projectMembers[0]]
-      })
+    // update the proposal with the new project id
+    updateProposal({
+      projectId: _selectedProject.id
+    });
+    const _selectedMemberIds = _selectedProject.projectMembers.filter((m) => m.teamLead).map((m) => m.id);
+    // update the projectId field of the form
+    onChange({ projectId: _selectedProject.id, selectedMemberIds: _selectedMemberIds });
+    applyProject(_selectedProject, _selectedMemberIds);
+    // reset(
+    //   convertToProjectValues({
+    //     ...selectedProject,
+    //     // Just add the team lead to the project members since selectedMemberIds is empty
+    //     projectMembers: [_selectedProject.projectMembers[0]]
+    //   })
+    // );
+  }
+
+  async function addNewProject() {
+    const defaultProjectValues = getDefaultProjectValues({
+      user,
+      userMemberRecord: user ? membersRecord[user.id] : undefined
+    });
+    const createdProject = await createProject(defaultProjectValues);
+    // update the dropdown list of projects
+    await mutate(
+      (_projects) => {
+        return [...(_projects ?? []), createdProject];
+      },
+      {
+        revalidate: false
+      }
     );
+    onSelectProject(createdProject);
   }
 
   return (
@@ -101,12 +126,7 @@ export function ProjectProfileInputField({
             if (!selectedProject) {
               return <Typography color='secondary'>Select a project profile</Typography>;
             }
-            // Selected project might have stale name if it was changed, so find the correct project from the list
-            const selectedProjectName =
-              projectsWithMembers?.find((_project) => _project.id === selectedProject?.id)?.name ||
-              selectedProject?.name ||
-              'Untitled';
-            return selectedProjectName;
+            return selectedProject.name;
           }}
         >
           {projectsWithMembers?.map((_project) => {
@@ -124,24 +144,7 @@ export function ProjectProfileInputField({
             );
           })}
           <Divider />
-          <MenuItem
-            data-test='project-option-new'
-            onClick={() => {
-              createProject(createDefaultProjectAndMembersPayload(), {
-                onSuccess: async (createdProject) => {
-                  await mutate(
-                    (_projects) => {
-                      return [...(_projects ?? []), createdProject];
-                    },
-                    {
-                      revalidate: false
-                    }
-                  );
-                  onSelectProject(createdProject);
-                }
-              });
-            }}
-          >
+          <MenuItem data-test='project-option-new' onClick={addNewProject}>
             <Stack flexDirection='row' alignItems='center' gap={0.05}>
               <MuiAddIcon fontSize='small' />
               <Typography>Add a new project profile</Typography>
@@ -157,10 +160,10 @@ export function ProjectProfileInputField({
             fieldConfig={fieldConfig}
             isTeamLead={isTeamLead}
             disabled={disabled}
-            selectedProjectMemberIds={selectedMemberIds}
+            selectedMemberIds={selectedMemberIds}
             onFormFieldChange={onChange}
-            projectId={selectedProject.id}
-            projectMembers={selectedProject.projectMembers}
+            project={selectedProject}
+            applyProjectMembers={applyProjectMembers}
           />
         </Box>
       )}

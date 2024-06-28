@@ -82,7 +82,7 @@ export function FormFieldsInputs() {
   const props = useFormFields({ fields });
   return (
     <GlobalContext>
-      <CustomFormFieldAnswers {...props} enableComments={true} formFields={fields} />
+      <CustomFormFieldAnswers {...props} enableComments={true} applyProject={() => {}} formFields={fields} />
     </GlobalContext>
   );
 }
@@ -163,7 +163,7 @@ export function FormFieldsInputsDisplay() {
   const props = useFormFields({ fields });
   return (
     <GlobalContext>
-      <CustomFormFieldAnswers {...props} enableComments={true} disabled formFields={fields} />
+      <CustomFormFieldAnswers {...props} enableComments={true} applyProject={() => {}} disabled formFields={fields} />
     </GlobalContext>
   );
 }

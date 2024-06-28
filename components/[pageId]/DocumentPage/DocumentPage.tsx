@@ -113,10 +113,19 @@ function DocumentPageComponent({
     proposalId
   });
 
-  const { control, formFields, getFieldState, isLoadingAnswers, projectForm, onSave, refreshProposalFormAnswers } =
-    useProposalFormAnswers({
-      proposal
-    });
+  const {
+    control,
+    formFields,
+    getFieldState,
+    applyProject,
+    applyProjectMembers,
+    isLoadingAnswers,
+    projectForm,
+    onSave,
+    refreshProposalFormAnswers
+  } = useProposalFormAnswers({
+    proposal
+  });
 
   const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
     rewardId
@@ -517,6 +526,8 @@ function DocumentPageComponent({
                         key={proposal?.status === 'draft' ? 'draft' : 'published'}
                         project={proposal.project}
                         proposalId={proposal.id}
+                        applyProject={applyProject}
+                        applyProjectMembers={applyProjectMembers}
                       />
                     </LoadingComponent>
                   )

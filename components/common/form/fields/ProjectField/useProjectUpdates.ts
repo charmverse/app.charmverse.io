@@ -7,19 +7,17 @@ import { useAddProjectMember, useGetProjects, usePatchProject } from 'charmClien
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { AddProjectMemberPayload } from 'lib/projects/addProjectMember';
-import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
+import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 import type { UpdateProjectPayload } from 'lib/projects/updateProject';
 import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
-export function useProjectUpdates({ projectId }: { projectId: string }) {
-  const { mutate, data: projectsWithMembers } = useGetProjects();
+export function useProjectUpdates(project: ProjectWithMembers) {
+  const projectId = project.id;
   const { user } = useUser();
   const { trigger: updateProject } = usePatchProject(projectId);
-  const project = projectsWithMembers?.find((_project) => _project.id === projectId);
+  // const project = projectsWithMembers?.find((_project) => _project.id === projectId);
   const { trigger: addProjectMember } = useAddProjectMember(projectId);
   const isTeamLead = !!project?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
-
-  const { reset } = useFormContext<ProjectAndMembersPayload>();
 
   const { showMessage } = useSnackbar();
 
@@ -31,30 +29,6 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
         }
 
         try {
-          // Optimistically update the project in the cache
-          mutate(
-            (projects) => {
-              if (!projects) {
-                return projects;
-              }
-
-              return projects.map((_project) => {
-                if (_project.id === projectId) {
-                  return {
-                    ..._project,
-                    ...projectPayload,
-                    projectMembers: _project.projectMembers
-                  };
-                }
-
-                return _project;
-              });
-            },
-            {
-              revalidate: false
-            }
-          );
-
           const updatedProject = await updateProject(projectPayload);
           return updatedProject;
         } catch (_) {
@@ -70,48 +44,10 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
         if (!isTeamLead && projectMemberPayload.userId !== user?.id) {
           return null;
         }
-        try {
-          mutate(
-            (projects) => {
-              if (!projects) {
-                return projects;
-              }
-
-              return projects.map((_project) => {
-                if (_project.id === projectId) {
-                  const updatedProject = {
-                    ..._project,
-                    projectMembers: _project.projectMembers.map((_projectMember) => {
-                      if (_projectMember.id === projectMemberPayload.id) {
-                        return {
-                          ..._projectMember,
-                          ...projectMemberPayload
-                        };
-                      }
-
-                      return _projectMember;
-                    })
-                  };
-                  return updatedProject;
-                }
-
-                return _project;
-              });
-            },
-            {
-              revalidate: false
-            }
-          );
-
-          const updatedProjectMember = await charmClient.projects.updateProjectMember({
-            payload: projectMemberPayload,
-            projectId
-          });
-
-          return updatedProjectMember;
-        } catch (err) {
-          return null;
-        }
+        return charmClient.projects.updateProjectMember({
+          payload: projectMemberPayload,
+          projectId
+        });
       }, 150),
     [projectId, user?.id, isTeamLead]
   );
@@ -121,33 +57,7 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
       return null;
     }
     try {
-      const createdProjectMember = await addProjectMember(projectMemberPayload);
-      reset({
-        ...project,
-        projectMembers: [...project.projectMembers, createdProjectMember]
-      });
-      mutate(
-        (projects) => {
-          if (!projects) {
-            return projects;
-          }
-
-          return projects.map((_project) => {
-            if (_project.id === projectId) {
-              return {
-                ..._project,
-                projectMembers: [..._project.projectMembers, createdProjectMember]
-              };
-            }
-
-            return _project;
-          });
-        },
-        {
-          revalidate: false
-        }
-      );
-      return createdProjectMember;
+      return addProjectMember(projectMemberPayload);
     } catch (err) {
       showMessage('Failed to add project member', 'error');
       return null;

@@ -19,7 +19,7 @@ import { hoverIconsStyle } from '../Icons/hoverIconsStyle';
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import { FieldWrapper } from './fields/FieldWrapper';
-import { ProjectProfileInputField } from './fields/ProjectField/ProjectField';
+import { ProjectFieldAnswer } from './fields/ProjectField/ProjectFieldAnswer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
@@ -55,6 +55,7 @@ type FormFieldAnswersProps = {
   project?: ProjectWithMembers | null;
   proposalId?: string;
   milestoneProps?: ProposalRewardsTableProps;
+  applyProject: (project: ProjectWithMembers, selectedMemberIds: string[]) => void;
 };
 
 const StyledStack = styled(Stack)`
@@ -76,7 +77,8 @@ export function FormFieldAnswers({
   project,
   threads = {},
   proposalId,
-  milestoneProps
+  milestoneProps,
+  applyProject
 }: FormFieldAnswersProps) {
   const { user } = useUser();
   const { showMessage } = useSnackbar();
@@ -139,9 +141,10 @@ export function FormFieldAnswers({
               render={({ field, fieldState: { error } }) => {
                 return formField.type === 'project_profile' ? (
                   <FieldWrapper required label='Project'>
-                    <ProjectProfileInputField
+                    <ProjectFieldAnswer
                       disabled={disabled}
-                      proposalId={proposalId}
+                      applyProject={applyProject}
+                      proposalId={proposalId!}
                       formFieldId={formField.id}
                       formFieldValue={field.value as ProjectFieldValue}
                       getFieldState={getFieldState}

@@ -5,19 +5,11 @@ import { useCallback } from 'react';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import { FieldAnswers } from 'components/settings/projects/components/FieldAnswers';
-import { FieldsEditor } from 'components/settings/projects/components/FieldsEditor';
-import {
-  ProjectMemberFieldAnswers,
-  ProjectMemberFieldsEditor
-} from 'components/settings/projects/components/ProjectMemberFields';
+import { ProjectMemberFieldAnswers } from 'components/settings/projects/components/ProjectMemberFields';
 import { useUser } from 'hooks/useUser';
 import type { ProjectFieldValue } from 'lib/forms/interfaces';
-import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
-import {
-  projectMemberFieldProperties,
-  projectFieldProperties,
-  createDefaultProjectAndMembersFieldConfig
-} from 'lib/projects/formField';
+import { defaultProjectMember } from 'lib/projects/constants';
+import { projectFieldProperties } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
@@ -29,42 +21,47 @@ export function ProjectForm({
   fieldConfig,
   isTeamLead,
   disabled,
-  projectId,
-  selectedProjectMemberIds,
+  project,
+  selectedMemberIds,
   onFormFieldChange,
-  projectMembers
+  applyProjectMembers
 }: {
-  projectId: string;
+  project: ProjectWithMembers;
   disabled?: boolean;
   fieldConfig?: ProjectAndMembersFieldConfig;
   isTeamLead: boolean;
-  selectedProjectMemberIds: string[];
+  selectedMemberIds: string[];
   onFormFieldChange: (field: ProjectFieldValue) => void;
-  projectMembers: ProjectWithMembers['projectMembers'];
+  applyProjectMembers: (projectMembers: ProjectWithMembers['projectMembers']) => void;
 }) {
   const { user } = useUser();
+
+  const { id: projectId, projectMembers } = project;
   const extraProjectMembers = projectMembers.slice(1) ?? [];
   const selectedProjectMembers = extraProjectMembers.filter(
-    (projectMember) => projectMember.id && selectedProjectMemberIds.includes(projectMember.id)
+    (projectMember) => projectMember.id && selectedMemberIds.includes(projectMember.id)
   );
   const nonSelectedProjectMembers = extraProjectMembers.filter(
-    (projectMember) => projectMember.id && !selectedProjectMemberIds.includes(projectMember.id)
+    (projectMember) => projectMember.id && !selectedMemberIds.includes(projectMember.id)
   );
-  const { onProjectUpdate, onProjectMemberUpdate, onProjectMemberAdd } = useProjectUpdates({
-    projectId
-  });
+  const { onProjectUpdate, onProjectMemberUpdate, onProjectMemberAdd } = useProjectUpdates(project);
 
   async function onChangeTeamMembers(selectedMemberValue: string) {
+    const _selectedMemberIds = [...selectedMemberIds];
+    const _projectMembers = projectMembers.filter(({ id }) => selectedMemberIds.includes(id));
     if (selectedMemberValue !== newTeamMember) {
-      const selectedMemberIds = [...selectedProjectMemberIds, selectedMemberValue];
-      onFormFieldChange({ projectId, selectedMemberIds });
+      _selectedMemberIds.push(selectedMemberValue);
     } else {
-      const newProjectMember = await onProjectMemberAdd(createDefaultProjectAndMembersPayload().projectMembers[0]);
+      const newProjectMember = await onProjectMemberAdd(defaultProjectMember());
       if (newProjectMember) {
-        const selectedMemberIds = [...selectedProjectMemberIds, newProjectMember.id];
-        onFormFieldChange({ projectId, selectedMemberIds });
+        _selectedMemberIds.push(newProjectMember.id);
+        _projectMembers.push(newProjectMember);
       }
     }
+    // update proposal answers form
+    onFormFieldChange({ projectId, selectedMemberIds: _selectedMemberIds });
+    // update project form
+    applyProjectMembers(_projectMembers);
   }
 
   const onProjectUpdateMemo = useCallback(
@@ -124,8 +121,8 @@ export function ProjectForm({
               data-test='remove-project-member-button'
               disabled={disabled}
               onClick={() => {
-                const selectedMemberIds = selectedProjectMemberIds.filter((id) => id !== projectMember.id);
-                onFormFieldChange({ projectId, selectedMemberIds });
+                const _selectedMemberIds = selectedMemberIds.filter((id) => id !== projectMember.id);
+                onFormFieldChange({ projectId, selectedMemberIds: _selectedMemberIds });
               }}
             >
               <DeleteOutlineOutlinedIcon fontSize='small' color={disabled ? 'disabled' : 'error'} />
@@ -175,63 +172,6 @@ export function ProjectForm({
             <AddIcon fontSize='small' />
             <Typography>Add a new project member</Typography>
           </Stack>
-        </MenuItem>
-      </Select>
-    </Stack>
-  );
-}
-
-export function ProjectFormEditor({
-  onChange,
-  fieldConfig,
-  defaultRequired
-}: {
-  onChange?: (project: ProjectAndMembersFieldConfig) => void;
-  fieldConfig: ProjectAndMembersFieldConfig;
-  defaultRequired?: boolean;
-}) {
-  return (
-    <Stack gap={2}>
-      <Typography variant='h6'>Project Info</Typography>
-      <FieldsEditor
-        defaultRequired={defaultRequired}
-        fieldConfig={fieldConfig}
-        properties={projectFieldProperties}
-        onChange={
-          onChange === undefined
-            ? undefined
-            : (_fieldConfig) => {
-                onChange?.({
-                  ...fieldConfig,
-                  ..._fieldConfig
-                });
-              }
-        }
-      />
-      <Typography variant='h6' mt={2}>
-        Team Info
-      </Typography>
-      <FieldLabel>Team Lead</FieldLabel>
-      <FieldsEditor
-        defaultRequired={defaultRequired}
-        properties={projectMemberFieldProperties}
-        fieldConfig={fieldConfig?.projectMember}
-        onChange={
-          onChange === undefined
-            ? undefined
-            : (memberFieldConfig) => {
-                onChange?.({
-                  ...fieldConfig,
-                  projectMember: memberFieldConfig
-                });
-              }
-        }
-        isProjectMember
-      />
-      <FieldLabel>Team Members</FieldLabel>
-      <Select disabled value='SELECT_TEAM_MEMBER'>
-        <MenuItem value='SELECT_TEAM_MEMBER'>
-          <Typography>Select a team member</Typography>
         </MenuItem>
       </Select>
     </Stack>
