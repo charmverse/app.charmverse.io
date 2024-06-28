@@ -262,6 +262,7 @@ function getCardsFromPendingRewards(
         icon: null,
         type: 'bounty',
         path: '',
+        galleryImage: '',
         title: '',
         updatedAt: new Date(),
         updatedBy: '',
