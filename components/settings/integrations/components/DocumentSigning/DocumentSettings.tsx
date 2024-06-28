@@ -11,6 +11,7 @@ import { ConfirmationModal } from 'components/_app/components/ConfirmationModal'
 import { Button } from 'components/common/Button';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectField } from 'components/common/form/fields/SelectField';
+import Link from 'components/common/Link';
 import { useDocusign } from 'components/signing/hooks/useDocusign';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
@@ -19,6 +20,21 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { UserDocusignAccountsInfo } from 'lib/docusign/getUserDocusignAccountsInfo';
 
 import { IntegrationContainer } from '../IntegrationContainer';
+
+function ConnectInfo() {
+  return (
+    <Typography variant='body2'>
+      Running into Docusign Connect webhook errors? Follow{' '}
+      <Link
+        external
+        target='_blank'
+        href='https://support.docusign.com/s/articles/ERROR-This-Account-lacks-sufficient-permissions-Connect-not-enabled-for-account?language=en_US'
+      >
+        these steps
+      </Link>{' '}
+    </Typography>
+  );
+}
 
 function SelectDocusignAccount({
   currentAccountId,
@@ -51,7 +67,9 @@ function SelectDocusignAccount({
         }
         return (
           <Box key={account.docusignAccountId} display='flex' alignItems='center' justifyContent='space-between'>
-            <Typography variant='body2'>{account.docusignAccountName}</Typography>
+            <Typography variant='body2' fontWeight='bold'>
+              {account.docusignAccountName}
+            </Typography>
             <Button
               onClick={() => handleAccountSelection(account)}
               variant='outlined'
@@ -67,6 +85,8 @@ function SelectDocusignAccount({
           </Box>
         );
       })}
+
+      <ConnectInfo />
 
       <ConfirmationModal />
     </Stack>
@@ -122,8 +142,8 @@ export function DocumentSettings({ isAdmin }: { isAdmin: boolean }) {
         {docusignProfile ? (
           <Box>
             <Box display='flex' alignItems='center' justifyContent='space-between'>
-              <Typography variant='body2' display='flex'>
-                Connected Docusign Account: {docusignProfile.docusignAccountName}
+              <Typography variant='body2' display='flex' fontWeight='bold'>
+                {docusignProfile.docusignAccountName}
               </Typography>
               {availableDocusignAccounts?.length && isAdmin && (
                 <Button
@@ -149,13 +169,15 @@ export function DocumentSettings({ isAdmin }: { isAdmin: boolean }) {
             </Button>
           </Box>
         ) : (
-          <Box>
+          <Box display='flex' flexDirection='column' gap={2}>
             <Typography variant='body2'>
               Connect your Docusign account and allow users to sign documents inside CharmVerse.
             </Typography>
             <Alert severity='info' sx={{ width: 'fit-content' }}>
               The connected Docusign user should be an admin of your company Docusign account.
             </Alert>
+
+            <ConnectInfo />
 
             <Button onClick={connectDocusignAccount} color='primary' sx={{ width: 'fit-content' }}>
               Connect Docusign
