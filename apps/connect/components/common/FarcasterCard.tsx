@@ -10,7 +10,7 @@ export function FarcasterCard({
   avatar,
   bio,
   fid,
-  avatarSize,
+  avatarSize = 'xLarge',
   onDelete
 }: {
   name?: string;

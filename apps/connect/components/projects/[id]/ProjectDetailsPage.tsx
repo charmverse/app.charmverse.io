@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { fetchProject } from '@connect/lib/actions/fetchProject';
 import { Person } from '@mui/icons-material';
 import GitHubIcon from '@mui/icons-material/GitHub';

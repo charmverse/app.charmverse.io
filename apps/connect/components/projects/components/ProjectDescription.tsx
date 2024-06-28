@@ -18,6 +18,7 @@ export function ProjectDescription({ description }: { description: string }) {
           fontWeight: 'bold',
           cursor: 'pointer'
         }}
+        component='span'
         onClick={() => {
           setShowFullDescription(!showFullDescription);
         }}
