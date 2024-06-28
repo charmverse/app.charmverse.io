@@ -27,7 +27,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.x
 
       - name: set STAGE variable in environment for next steps
-        run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+        run: echo "STAGE=${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
       - name: checkout the files
         uses: actions/checkout@v4
@@ -38,10 +38,11 @@ jobs:
       - name: destroy the stack on AWS
         # we need to create a dummy zip file or else cdk throws an error it cannot find the asset
         run: |
-          touch deploy.zip
+          touch stg-webapp-${{ env.STAGE }}.zip
+          touch stg-connect-${{ env.STAGE }}.zip
           npm install aws-cdk-lib --no-audit --no-fund
-          npx cdk destroy \"stg-webapp-${STAGE}\" --force
-          npx cdk destroy \"stg-connect-${STAGE}\" --force
+          npx cdk destroy -c name=stg-webapp-${{ env.STAGE }} --force
+          npx cdk destroy -c name=stg-connect-${{ env.STAGE }} --force
 
       - name: delete the github deployments and the corresponding environment
         uses: strumwolf/delete-deployment-environment@v1.1.0

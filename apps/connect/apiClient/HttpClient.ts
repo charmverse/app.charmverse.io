@@ -1,10 +1,13 @@
 import { POST, GET, DELETE, PUT } from 'adapters/http';
 import { connectApiHost } from 'config/constants';
 
-export class BaseConnectApiClient {
+export class HttpClient {
   readonly baseUrl: string;
 
   constructor() {
+    if (!connectApiHost) {
+      throw new Error('NEXT_PUBLIC_CONNECT_API_HOST is not defined');
+    }
     this.baseUrl = connectApiHost;
   }
 

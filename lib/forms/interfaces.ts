@@ -15,7 +15,18 @@ export type ProjectFieldValue = {
   selectedMemberIds: string[];
 };
 
-export type FormFieldValue = string | string[] | LongTextValue | UploadedFileInfo | ProjectFieldValue;
+export type OpProjectFieldValue = {
+  projectTitle: string;
+  attestationId: string;
+};
+
+export type FormFieldValue =
+  | string
+  | string[]
+  | LongTextValue
+  | UploadedFileInfo
+  | ProjectFieldValue
+  | OpProjectFieldValue;
 
 export type FieldType = MemberPropertyType | FormFieldType;
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { darken, experimental_extendTheme as extendTheme } from '@mui/material/styles';
+import { darken, experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
 
 import {
   backgroundColor,
@@ -23,9 +23,6 @@ export const defaultFont =
 
 const extendedTheme = extendTheme({
   cssVarPrefix: 'charm',
-  typography: {
-    fontFamily: defaultFont
-  },
   colorSchemes: {
     light: {
       // palette for light mode
@@ -102,8 +99,7 @@ const extendedTheme = extendTheme({
           ...(ownerState?.variant === 'rounded' && {
             borderRadius: 10
           }),
-          fontWeight: 500,
-          color: 'background.default'
+          fontWeight: 500
         })
       }
     },
@@ -191,10 +187,12 @@ const extendedTheme = extendTheme({
       }
     },
     MuiCard: {
+      defaultProps: {
+        variant: 'outlined'
+      },
       styleOverrides: {
         root: ({ theme }) => ({
-          borderRadius: 6,
-          boxShadow: theme.shadows[2]
+          // boxShadow: theme.shadows[2]
         })
       }
     },
@@ -278,7 +276,8 @@ const extendedTheme = extendTheme({
           color: theme.vars.palette.primary.main,
           '&:hover': {
             color: theme.vars.palette.primary.dark
-          }
+          },
+          fontFamily: defaultFont
         })
       },
       defaultProps: {
@@ -288,4 +287,4 @@ const extendedTheme = extendTheme({
   }
 });
 
-export default extendedTheme;
+export default responsiveFontSizes(extendedTheme) as typeof extendedTheme;

@@ -1,18 +1,32 @@
 import { DataNotFoundError, SystemError, UnknownError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { getIronSession } from 'iron-session';
-import { cookies, headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
 
 const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
 
-export async function handleServerError(err: any) {
+type ErrorResponse = {
+  message: string;
+  errorType: string;
+  severity: string;
+  status: number;
+};
+
+export async function handleServerError(err: any): Promise<ErrorResponse> {
   // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
   // P2025 is thrown when a record is not found
   if (err.code === 'P2025') {
-    return new DataNotFoundError(`Data not found`);
+    const error = new DataNotFoundError('Data not found');
+
+    return {
+      message: error.message,
+      errorType: error.errorType,
+      severity: error.severity,
+      status: error.code
+    };
   }
 
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
@@ -46,5 +60,10 @@ export async function handleServerError(err: any) {
     });
   }
 
-  return { ...errorAsSystemError };
+  return {
+    message: err.message || 'Something went wrong',
+    severity: err.severity || 'error',
+    status: err.code || 500,
+    errorType: err.errorType || 'Unknown'
+  };
 }

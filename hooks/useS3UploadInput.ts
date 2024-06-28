@@ -50,7 +50,7 @@ export const useS3UploadInput = ({
         const { url } = await charmClient.resizeImage(formData);
         onFileUpload({ url: replaceS3Domain(url), fileName: file.name || '', size: file.size });
       } else {
-        const { url } = await uploadToS3(file, { onUploadPercentageProgress: setProgress });
+        const { url } = await uploadToS3(charmClient.uploadToS3, file, { onUploadPercentageProgress: setProgress });
         onFileUpload({ url: replaceS3Domain(url), fileName: file.name || '', size: file.size });
       }
     } catch (error) {

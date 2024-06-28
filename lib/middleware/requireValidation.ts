@@ -1,5 +1,6 @@
 import type { NextApiRequest } from 'next';
 import type { NextHandler } from 'next-connect';
+import type { Schema } from 'yup';
 
 import { validateTokenGateConditionsObject } from 'lib/tokenGates/validateTokenGateConditionsObject';
 
@@ -26,6 +27,15 @@ export function requireValidation(type: ValidationTypes) {
         });
       }
     }
+
+    next();
+  };
+}
+
+export function requireValidationSchema(schema: Schema) {
+  return async (req: NextApiRequest, res: NextApiRequest, next: NextHandler) => {
+    const body = req.body;
+    await schema.validate(body);
 
     next();
   };

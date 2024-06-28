@@ -18,7 +18,7 @@ function WarpcastLoginButton() {
 
   const onSuccessCallback = useCallback(async () => {
     popupState.close();
-    router.push('/welcome');
+    router.push('/profile');
   }, [popupState.close]);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
@@ -37,7 +37,7 @@ function WarpcastLoginButton() {
 
   return (
     <>
-      <Button size='small' onClick={signIn}>
+      <Button size='large' onClick={signIn} fullWidth>
         Connect with Farcaster
       </Button>
       <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />

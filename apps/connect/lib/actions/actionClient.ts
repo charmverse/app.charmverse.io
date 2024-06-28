@@ -13,6 +13,7 @@ import { handleServerError } from './onError';
 
 export const actionClient = createSafeActionClient({
   handleReturnedServerError: handleServerError,
+  defaultValidationErrorsShape: 'flattened',
   // @ts-ignore
   defineMetadataSchema: () => {
     return yup.object({
@@ -20,14 +21,6 @@ export const actionClient = createSafeActionClient({
     });
   }
 })
-  /**
-   * Middleware used for logging purposes.
-   */
-  .use(async ({ next }) => {
-    const result = await next({ ctx: null });
-    // log.info('LOGGING MIDDLEWARE FOR ACTION', metadata);
-    return result;
-  })
   /**
    * Middleware used for auth purposes.
    * Returns the context with the session object.

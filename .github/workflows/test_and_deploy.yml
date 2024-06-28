@@ -47,13 +47,15 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
+          NEXT_PUBLIC_CONNECT_API_HOST: https://connect-api.charmverse.io
           save_cache: true
+
       # source https://github.com/orgs/community/discussions/28474
       - name: Print head git commit message
         id: get_head_commit_message
         run: echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
 
-  test:
+  validate-code:
     name: Validate code
     runs-on: ubuntu-latest
     needs: build-app
@@ -68,6 +70,8 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
+        with:
+          NEXT_PUBLIC_CONNECT_API_HOST: https://connect-api.charmverse.io
 
       - run: npm run typecheck
       - run: npm run lint
@@ -137,6 +141,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
           mask-aws-account-id: 'no'
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -301,12 +306,55 @@ jobs:
         # with:
         #   args: ${{matrix.test_command}}
 
-  deploy:
-    name: Deploy to production
+  test-connect:
+    name: Test Connect App
+    runs-on: ubuntu-latest
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --hostname postgres
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore dependencies from cache
+        uses: ./.github/actions/install
+
+      - name: Setup test database
+        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+
+      - name: Validate Webapp
+        run: |
+          npm run lint -w apps/connect
+          npm run typecheck -w apps/connect
+
+      - name: Validate API
+        run: |
+          npm run lint -w apps/connect-api
+
+  deploy-docker:
+    name: Upload Docker image and assets
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test, test-matrix, e2e-test-matrix]
+    needs: build-app
     steps:
       - uses: actions/checkout@v4
         with:
@@ -317,12 +365,11 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
 
-      - name: Calculate Build ID and add to env file
+      - name: Calculate Build ID
         id: get_build_id
         run: |
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
-          echo "REACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/webapp.env
 
       - name: Build app
         uses: ./.github/actions/build
@@ -338,6 +385,51 @@ jobs:
           AWS_REGION: us-east-1
         with:
           ecr_registry: charmverse-web3-workspace
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Upload static assets to S3
+        run: |
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
+          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+
+      - name: Upload JS source maps to Datadog
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: |
+          npm install -g @datadog/datadog-ci
+          datadog-ci sourcemaps upload .next/static       \
+            --service=webapp                              \
+            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
+            --minified-path-prefix=https://cdn.charmverse.io/_next/static
+
+  deploy-main:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    needs: [validate-code, test-matrix, e2e-test-matrix, deploy-docker]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.x
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
+      - name: Calculate Build ID and add to env file
+        id: get_build_id
+        run: |
+          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          echo "REACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/webapp.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -364,43 +456,21 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
 
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_connect/00_env_vars.config
-
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_connect_api/00_env_vars.config
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Upload static assets to S3
-        run: |
-          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
-          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
-
       - name: Package webapp
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
-      - name: Update and Package background worker
+      - name: Package cron worker
         run: |
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
-      - name: Update and Package ceramic server
+      - name: Package ceramic server
         run: |
           rm -rf .ebextensions && mv .ebextensions_ceramic .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
 
-      - name: Update and Package websockets
+      - name: Package websockets
         id: pkg_websocket
         run: |
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
@@ -431,7 +501,7 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Deploy Websockets to Beanstalk
+      - name: Deploy websockets to Beanstalk
         if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
         uses: einaregilsson/beanstalk-deploy@v21
         with:
@@ -445,7 +515,7 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github
 
-      - name: Deploy Background to Beanstalk
+      - name: Deploy cron worker to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -458,17 +528,7 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Use datadog ci package to upload js maps
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-        run: |
-          npm install -g @datadog/datadog-ci
-          datadog-ci sourcemaps upload .next/static       \
-            --service=webapp                              \
-            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
-            --minified-path-prefix=https://cdn.charmverse.io/_next/static
-
-      - name: Deploy Ceramic to Beanstalk
+      - name: Deploy ceramic to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -481,26 +541,100 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Package and deploy Connect API to production
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_connect_api .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ prd-connect-api.zip
-          npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c name=prd-connect-api
+  deploy-connect:
+    name: Deploy Connect Webapp to production
+    runs-on: ubuntu-latest
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    needs: [test-connect, deploy-docker]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.x
 
-      - name: Package and deploy Connect App to production
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
+      - name: Set the docker compose env variables
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_connect/00_env_vars.config
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Package and deploy
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-connect.zip
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
-          npx cdk deploy -c name=prd-connect
+          npx cdk deploy --method=direct -c name=prd-connect
 
-  discord_alert:
-    name: Notify discord of failure
+  deploy-connect-api:
+    name: Deploy Connect API to production
+    runs-on: ubuntu-latest
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    needs: [test-connect, deploy-docker]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.x
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
+      - name: Set the docker compose env variables
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_connect_api/00_env_vars.config
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Package and deploy
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_connect_api .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ prd-connect-api.zip
+          npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
+          npx cdk deploy --method=direct -c name=prd-connect-api
+
+  discord-alert:
+    name: Notify Discord of failure
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
     # pass in all steps so we can check if any failed
-    needs: [build-app, test, test-matrix, e2e-test-matrix, deploy]
+    needs:
+      [
+        build-app,
+        validate-code,
+        test-matrix,
+        e2e-test-matrix,
+        deploy-docker,
+        deploy-main,
+        deploy-connect,
+        deploy-connect-api
+      ]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
