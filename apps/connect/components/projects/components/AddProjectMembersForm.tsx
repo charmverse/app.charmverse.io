@@ -2,13 +2,12 @@ import { log } from '@charmverse/core/log';
 import { actionCreateProject } from '@connect/lib/actions/createProject';
 import type { FormValues } from '@connect/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import AddIcon from '@mui/icons-material/AddOutlined';
 import { Button, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
-import { useFieldArray, useWatch } from 'react-hook-form';
+import { useFieldArray } from 'react-hook-form';
 
 import type { LoggedInUser } from 'models/User';
 
@@ -32,8 +31,6 @@ export function AddProjectMembersForm({
   handleSubmit: UseFormHandleSubmit<FormValues>;
 }) {
   const router = useRouter();
-
-  const formValues = useWatch({ control });
 
   const { append } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
@@ -72,31 +69,16 @@ export function AddProjectMembersForm({
         />
         <Stack gap={1}>
           <SearchFarcasterUser
-            selectedProfile={selectedFarcasterProfile}
             setSelectedProfile={(farcasterProfile) => {
               if (farcasterProfile) {
-                setSelectedFarcasterProfile(farcasterProfile);
+                append({
+                  farcasterId: farcasterProfile.fid!,
+                  name: farcasterProfile.displayName!
+                });
+                setSelectedFarcasterProfiles([...selectedFarcasterProfiles, farcasterProfile]);
               }
             }}
           />
-          <Stack flexDirection='row' justifyContent='center'>
-            <Button
-              disabled={!selectedFarcasterProfile}
-              onClick={() => {
-                if (selectedFarcasterProfile) {
-                  append({
-                    farcasterId: selectedFarcasterProfile.fid!,
-                    name: selectedFarcasterProfile.username!
-                  });
-                  setSelectedFarcasterProfiles([...selectedFarcasterProfiles, selectedFarcasterProfile]);
-                  setSelectedFarcasterProfile(null);
-                }
-              }}
-              startIcon={<AddIcon fontSize='small' />}
-            >
-              Add a team member
-            </Button>
-          </Stack>
         </Stack>
         <Stack gap={1} mb={2}>
           {selectedFarcasterProfiles.map((farcasterProfile) => (

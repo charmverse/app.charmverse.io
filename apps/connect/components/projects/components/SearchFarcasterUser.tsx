@@ -10,10 +10,8 @@ import { useEffect, useMemo, useState } from 'react';
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
 export function SearchFarcasterUser({
-  selectedProfile,
   setSelectedProfile
 }: {
-  selectedProfile: FarcasterProfile | null;
   setSelectedProfile: (profile: FarcasterProfile | null) => void;
 }) {
   const [farcasterProfiles, setFarcasterProfiles] = useState<FarcasterProfile[]>([]);
@@ -49,19 +47,12 @@ export function SearchFarcasterUser({
     }
   }, [searchTerm]);
 
-  useEffect(() => {
-    if (selectedProfile === null) {
-      setSearchTerm('');
-      setFarcasterProfiles([]);
-    }
-  }, [selectedProfile]);
-
   return (
     <Autocomplete<FarcasterProfile, false, true>
       disablePortal
       inputValue={searchTerm}
-      value={selectedProfile ?? undefined}
       onChange={(_, newValue) => {
+        setSearchTerm('');
         setSelectedProfile(newValue);
       }}
       getOptionLabel={(option) => `${option.username} ${option.fid}`}
