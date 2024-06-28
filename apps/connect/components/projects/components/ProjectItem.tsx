@@ -1,5 +1,5 @@
-import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
 import { Avatar } from '@connect/components/common/Avatar';
+import type { ProjectsWithMembers } from '@connect/lib/projects/getRecentProjectsWithMembers';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -9,11 +9,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 
-export function ProjectItem({
-  project
-}: {
-  project: Project & { projectMembers: (ProjectMember & { user: { avatar: string | null } | null })[] };
-}) {
+export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
   const projectMembers = project.projectMembers;
   const projectName = project.name || 'Untitled';
 
