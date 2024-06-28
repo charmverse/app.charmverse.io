@@ -36,7 +36,7 @@ export function useProjectForm(options: {
       defaultRequired: true,
       fieldConfig
     });
-  }, [fieldConfig]);
+  }, [!!fieldConfig]);
 
   const form = useForm({
     defaultValues: defaultProjectAndMembersPayload,
