@@ -13,7 +13,7 @@ export async function getRecentProjectsWithMembers({
   userId?: string;
   resultsNo?: number;
 } = {}) {
-  return prisma.project.findMany({
+  const projectWithMembers = await prisma.project.findMany({
     where: userId
       ? {
           deletedAt: null,
@@ -38,13 +38,15 @@ export async function getRecentProjectsWithMembers({
         include: {
           user: {
             select: {
-              avatar: true
+              farcasterUser: true
             }
           }
         }
       }
     }
   });
+
+  return projectWithMembers;
 }
 
 export type ProjectsWithMembers = Prisma.PromiseReturnType<typeof getRecentProjectsWithMembers>;

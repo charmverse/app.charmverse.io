@@ -1,5 +1,6 @@
 import { Avatar } from '@connect/components/common/Avatar';
 import type { ProjectsWithMembers } from '@connect/lib/projects/getRecentProjectsWithMembers';
+import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -40,7 +41,7 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
           sx={{ p: 0 }}
         >
           <Box>
-            <Typography>{projectName}</Typography>
+            <Typography variant='h6'>{projectName}</Typography>
             <Typography
               variant='body2'
               sx={{
@@ -59,7 +60,7 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
                 key={member.id}
                 size='small'
                 name={member.name || 'Untitled'}
-                avatar={member.user?.avatar || ''}
+                avatar={(member.user?.farcasterUser?.account as unknown as StatusAPIResponse)?.pfpUrl || ''}
               />
             ))}
           </AvatarGroup>

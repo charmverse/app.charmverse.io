@@ -6,6 +6,7 @@ import { inputBackground } from '@connect/theme/colors';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { Button, FormLabel, IconButton, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import Link from 'next/link';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { Controller, useController, useFieldArray } from 'react-hook-form';
@@ -83,9 +84,17 @@ function MultiTextValueFields({
   );
 }
 
-function AvatarField({ control }: { control: Control<FormValues> }) {
+function ImageField({
+  control,
+  name,
+  type
+}: {
+  type: 'avatar' | 'cover';
+  control: Control<FormValues>;
+  name: keyof FormValues;
+}) {
   const { field } = useController({
-    name: 'avatar',
+    name,
     control
   });
 
@@ -102,7 +111,9 @@ function AvatarField({ control }: { control: Control<FormValues> }) {
       render={() => (
         <div
           style={{
-            position: 'relative'
+            position: 'relative',
+            width: type === 'avatar' ? 125 : '100%',
+            height: 96
           }}
         >
           <input
@@ -121,67 +132,40 @@ function AvatarField({ control }: { control: Control<FormValues> }) {
               cursor: 'pointer'
             }}
           />
-          <Avatar
-            size='xLarge'
-            avatar={field.value}
-            sx={{
-              backgroundColor: !field.value ? inputBackground : undefined
-            }}
-          />
-        </div>
-      )}
-    />
-  );
-}
-
-function CoverImageField({ control }: { control: Control<FormValues> }) {
-  const { field } = useController({
-    name: 'cover',
-    control
-  });
-
-  const { inputRef, isUploading, onFileChange } = useS3UploadInput({
-    onFileUpload: ({ url }) => {
-      field.onChange(url);
-    }
-  });
-
-  return (
-    <Controller
-      name='cover'
-      control={control}
-      render={() => (
-        <div
-          style={{
-            width: '100%',
-            height: 96,
-            position: 'relative'
-          }}
-        >
-          <input
-            disabled={isUploading}
-            type='file'
-            accept={'image/*'}
-            ref={inputRef}
-            onChange={onFileChange}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              top: 0,
-              opacity: 0,
-              zIndex: 1,
-              cursor: 'pointer'
-            }}
-          />
-          <img
-            src={field.value}
-            style={{
-              width: '100%',
-              height: '100%',
-              background: inputBackground
-            }}
-          />
+          {isUploading ? (
+            <Stack
+              sx={{
+                backgroundColor: inputBackground,
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: type === 'avatar' ? '50%' : 0
+              }}
+            >
+              <CircularProgress color='secondary' size={50} />
+            </Stack>
+          ) : type === 'avatar' ? (
+            <Avatar
+              size='xLarge'
+              avatar={field.value as string}
+              sx={{
+                backgroundColor: !field.value ? inputBackground : undefined
+              }}
+            />
+          ) : (
+            <img
+              src={field.value as string}
+              style={{
+                width: '100%',
+                height: '100%',
+                background: inputBackground,
+                objectFit: 'cover',
+                objectPosition: 'center'
+              }}
+            />
+          )}
         </div>
       )}
     />
@@ -236,8 +220,8 @@ export function CreateProjectForm({
       <Stack>
         <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
         <Stack direction='row' gap={1}>
-          <AvatarField control={control} />
-          <CoverImageField control={control} />
+          <ImageField type='avatar' name='avatar' control={control} />
+          <ImageField name='cover' type='cover' control={control} />
         </Stack>
       </Stack>
       <Stack>
