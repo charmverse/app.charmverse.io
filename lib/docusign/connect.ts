@@ -1,4 +1,5 @@
 import { ExternalServiceError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { DocusignCredential, OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
@@ -13,6 +14,38 @@ import { docusignUserOAuthTokenHeader } from './headers';
 // Change this to match the base url in prod - For local testing, use a base url like ngrok
 const webhookBaseUrl = baseUrl;
 
+type DocusignWebhookConfiguration = {
+  connectId: string;
+  configurationType: string;
+  urlToPublishTo: string;
+  name: string;
+  allowEnvelopePublish: string;
+  deliveryMode: string;
+  enableLog: string;
+  includeDocuments: string;
+  includeCertificateOfCompletion: string;
+  requiresAcknowledgement: string;
+  signMessageWithX509Certificate: string;
+  useSoapInterface: string;
+  includeTimeZoneInformation: string;
+  includeOAuth: string;
+  includeHMAC: string;
+  integratorManaged: string;
+  includeEnvelopeVoidReason: string;
+  includeSenderAccountasCustomField: string;
+  events: string[];
+  soapNamespace: string;
+  allUsers: string;
+  allUsersExcept: string;
+  includeCertSoapHeader: string;
+  requireMutualTls: string;
+  includeDocumentFields: string;
+  eventData: {
+    version: string;
+    includeData: any[];
+  };
+};
+
 async function getDocusignWebhook({
   docusignWebhookId,
   docusignAccountId,
@@ -23,14 +56,16 @@ async function getDocusignWebhook({
   docusignAccountId: string;
   docusignAuthToken: string;
   docusignBaseUrl: string;
-}): Promise<any> {
-  return GET<{ configurations: any[] }>(
+}): Promise<{ configurations: DocusignWebhookConfiguration[] }> {
+  const docusignWebhook = await GET<{ configurations: DocusignWebhookConfiguration[] }>(
     `${docusignBaseUrl}/restapi/v2.1/accounts/${docusignAccountId}/connect/${docusignWebhookId}`,
     undefined,
     {
       headers: docusignUserOAuthTokenHeader({ accessToken: docusignAuthToken })
     }
   );
+
+  return docusignWebhook;
 }
 
 /**
@@ -40,10 +75,12 @@ async function getDocusignWebhook({
  * Full config of the webhook
  * https://developers.docusign.com/docs/esign-rest-api/reference/connect/connectconfigurations/create/
  */
-export async function createSpaceDocusignWebhook({
+async function createSpaceDocusignWebhook({
   spaceId,
   tx = prisma
-}: { spaceId: string } & OptionalPrismaTransaction): Promise<DocusignCredential> {
+}: { spaceId: string } & OptionalPrismaTransaction & {
+    credentials?: RequiredDocusignCredentials & Pick<DocusignCredential, 'docusignWebhookId' | 'id'>;
+  }): Promise<DocusignCredential> {
   let credentials = await getSpaceDocusignCredentials({ spaceId, tx });
 
   if (!credentials.webhookApiKey) {
@@ -109,6 +146,8 @@ export async function ensureSpaceWebhookExists({
       docusignAccountId: credentials.docusignAccountId,
       docusignAuthToken: credentials.accessToken,
       docusignBaseUrl: credentials.docusignApiBaseUrl
+    }).catch((err) => {
+      log.error('Error fetching Docusign webhook', { err, spaceId });
     });
 
     if (!webhook?.configurations.length) {
