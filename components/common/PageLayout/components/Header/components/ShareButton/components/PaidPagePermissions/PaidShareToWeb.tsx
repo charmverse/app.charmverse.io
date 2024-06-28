@@ -114,6 +114,7 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
         disabledTooltip={disabledToolip}
         isLoading={isDeletingPermissions || isCreatingPermission}
         shareAlertMessage={shareAlertMessage}
+        pageType={currentPage?.type}
       />
       {isShareChecked && publicPermission && currentPage?.type !== 'proposal' && (
         <PermissionInheritedFrom permission={publicPermission} />
