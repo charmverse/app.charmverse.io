@@ -76,10 +76,9 @@ export function ProjectFieldAnswer({
     updateProposal({
       projectId: _selectedProject.id
     });
-    const _selectedMemberIds = _selectedProject.projectMembers.filter((m) => m.teamLead).map((m) => m.id);
     // update the projectId field of the form
-    onChange({ projectId: _selectedProject.id, selectedMemberIds: _selectedMemberIds });
-    applyProject(_selectedProject, _selectedMemberIds);
+    onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
+    applyProject(_selectedProject, []);
     // reset(
     //   convertToProjectValues({
     //     ...selectedProject,
