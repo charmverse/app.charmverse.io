@@ -41,7 +41,7 @@ export function ProjectItem({ project }: { project: ProjectWithMembers }) {
           sx={{ p: 0 }}
         >
           <Box>
-            <Typography>{projectName}</Typography>
+            <Typography variant='h6'>{projectName}</Typography>
             <Typography
               variant='body2'
               sx={{
