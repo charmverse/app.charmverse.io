@@ -50,7 +50,10 @@ function SelectDocusignAccount({
   async function handleAccountSelection(account: UserDocusignAccountsInfo) {
     const message = `Are you sure you want to switch to ${account.docusignAccountName}?\r\nAny existing proposals with linked Docusign documents will not be updated.`;
 
-    const result = await showConfirmation(message);
+    const result = await showConfirmation({
+      title: 'Confirm Docusign account switch',
+      message
+    });
 
     if (result.confirmed) {
       onClick(account.docusignAccountId);

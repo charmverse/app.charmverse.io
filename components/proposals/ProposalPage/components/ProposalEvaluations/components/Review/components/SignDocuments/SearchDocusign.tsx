@@ -15,8 +15,8 @@ import {
 import Box from '@mui/material/Box';
 import { useState } from 'react';
 
+import { Button } from 'components/common/Button';
 import IconButton from 'components/common/DatabaseEditor/widgets/buttons/iconButton';
-import { Typography } from 'components/common/Typography';
 import { useDocusign } from 'components/signing/hooks/useDocusign';
 import type { DocusignEnvelope } from 'lib/docusign/api';
 
@@ -69,8 +69,9 @@ export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposal
   if (!showSearch) {
     return (
       <Box onClick={() => setShowSearch(true)} display='flex' alignItems='center'>
-        <IconButton icon={<DescriptionOutlinedIcon fontSize='small' />} />
-        <Typography>Add document</Typography>
+        <Button color='primary' fontSize='small' startIcon={<DescriptionOutlinedIcon fontSize='small' />}>
+          Add document
+        </Button>
       </Box>
     );
   }

@@ -3,6 +3,7 @@ import { Box, Card, Divider, FormLabel, Stack, Typography } from '@mui/material'
 
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { useDocusign } from 'components/signing/hooks/useDocusign';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import type { DocumentWithSigners } from 'lib/proposals/documentsToSign/getProposalDocumentsToSign';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utils/dates';
@@ -59,6 +60,8 @@ export function SignDocuments({
     group: reviewer.roleId ? 'role' : 'user'
   }));
 
+  const { showConfirmation } = useConfirmationModal();
+
   const { addDocumentToEvaluation, removeDocumentFromEvaluation } = useDocusign();
 
   async function handleAddDocument(envelopeId: string) {
@@ -66,8 +69,19 @@ export function SignDocuments({
     refreshProposal();
   }
 
-  async function handleRemoveDocument(envelopeId: string) {
-    await removeDocumentFromEvaluation({ envelopeId, evaluationId: evaluation.id });
+  async function handleRemoveDocument(doc: DocumentWithSigners) {
+    if (doc.signers.every((signer) => signer.completedAt)) {
+      const confirmation = await showConfirmation({
+        title: 'Remove document',
+        message: 'This document has been signed by all signers. Are you sure you want to remove it?'
+      });
+
+      if (!confirmation.confirmed) {
+        return;
+      }
+    }
+
+    await removeDocumentFromEvaluation({ envelopeId: doc.docusignEnvelopeId, evaluationId: evaluation.id });
     refreshProposal();
   }
 
@@ -95,7 +109,7 @@ export function SignDocuments({
                 <DocumentRow
                   key={doc.id}
                   documentWithSigners={doc}
-                  onRemoveDoc={isReviewer ? () => handleRemoveDocument(doc.docusignEnvelopeId) : undefined}
+                  onRemoveDoc={isReviewer ? () => handleRemoveDocument(doc) : undefined}
                 />
                 <Divider sx={{ my: 2 }} />
               </>
