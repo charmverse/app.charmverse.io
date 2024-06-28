@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { AttestationType, CredentialEventType } from '@charmverse/core/prisma-client';
+import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getChainById } from 'connectors/chains';
 import { Wallet, providers } from 'ethers';
@@ -7,7 +7,8 @@ import { Wallet, providers } from 'ethers';
 import { credentialsWalletPrivateKey } from 'config/constants';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
-import { attestationSchemaIds, encodeAttestation, type CredentialDataInput } from './schemas';
+import { attestationSchemaIds, encodeAttestation } from './schemas';
+import type { AttestationType, CredentialDataInput } from './schemas';
 
 export type OnChainAttestationInput<T extends AttestationType = AttestationType> = {
   chainId: EasSchemaChain;
@@ -15,9 +16,11 @@ export type OnChainAttestationInput<T extends AttestationType = AttestationType>
   type: T;
 };
 
-async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttestationInput): Promise<string> {
+export async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttestationInput): Promise<string> {
   const schemaId = attestationSchemaIds[type];
   const rpcUrl = getChainById(chainId)?.rpcUrls[0];
+
+  console.log('rpcUrl', rpcUrl);
 
   const provider = new providers.JsonRpcProvider(rpcUrl, chainId);
 
