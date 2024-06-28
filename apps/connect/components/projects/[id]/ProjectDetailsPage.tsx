@@ -6,14 +6,13 @@ import { Box, Divider, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
 
-import { Avatar } from '../common/Avatar';
-import { FarcasterCard } from '../common/FarcasterCard';
-import { PageWrapper } from '../common/PageWrapper';
+import { Avatar } from '../../common/Avatar';
+import { FarcasterCard } from '../../common/FarcasterCard';
+import { PageWrapper } from '../../common/PageWrapper';
+import { ProjectDescription } from '../components/ProjectDescription';
+import { ShareButton } from '../ProjectShareButton';
 
-import { ProjectDescription } from './components/ProjectDescription';
-import { ShareButton } from './ProjectShareButton';
-
-export async function ProjectDetails({ projectId }: { projectId: string }) {
+export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
   const project = await fetchProject(projectId);
 
   return (
