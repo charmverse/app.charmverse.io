@@ -74,6 +74,7 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
   // add a debounce delay so the state inside useFormFields has time to set the values or elsle empty fields will appear for a brief second
   const isLoadingAnswers = useDebouncedValue(!formFields, 1);
 
+  // apply initial values to project form
   useEffect(() => {
     if (proposal?.project && projectAnswer) {
       applyProject(proposal.project, projectAnswer.selectedMemberIds);

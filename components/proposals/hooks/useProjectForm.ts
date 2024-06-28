@@ -99,6 +99,7 @@ export function useProjectForm(options: {
 
   const applyProjectMembers = useCallback(
     (projectMembers: ProjectMember[]) => {
+      console.log('set project members value');
       form.setValue('projectMembers', projectMembers);
     },
     [form]

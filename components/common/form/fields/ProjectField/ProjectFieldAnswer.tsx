@@ -23,7 +23,7 @@ export function ProjectFieldAnswer({
   onChangeDebounced: _onChangeDebounced,
   fieldConfig,
   disabled,
-  project,
+  projectId,
   inputEndAdornment,
   proposalId,
   formFieldId,
@@ -38,7 +38,7 @@ export function ProjectFieldAnswer({
   inputEndAdornment?: React.ReactNode;
   disabled?: boolean;
   fieldConfig?: ProjectAndMembersFieldConfig;
-  project?: ProjectWithMembers | null;
+  projectId?: string | null;
   onChange: (updatedValue: FormFieldValue) => void;
   applyProject: (project: ProjectWithMembers, selectedMemberIds: string[]) => void;
   applyProjectMembers: (projectMembers: ProjectWithMembers['projectMembers']) => void;
@@ -50,13 +50,11 @@ export function ProjectFieldAnswer({
     proposalId
   });
   const { user } = useUser();
-  const { data: projectsWithMembers, mutate } = useGetProjects();
-  const projectId = project?.id;
+  const { data: projectsWithMembers, mutate: refreshProjects } = useGetProjects();
   const { membersRecord } = useMembers();
   const { trigger: createProject } = useCreateProject();
 
-  const selectedProject = project; // projectsWithMembers?.find((_project) => _project.id === projectId);
-
+  const selectedProject = projectsWithMembers?.find((_project) => _project.id === projectId);
   const isTeamLead = !!selectedProject?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
 
   const onChangeDebounced = useMemo(() => debounce(_onChangeDebounced, 300), [_onChangeDebounced]);
@@ -98,7 +96,7 @@ export function ProjectFieldAnswer({
     });
     const createdProject = await createProject(defaultProjectValues);
     // update the dropdown list of projects
-    await mutate(
+    await refreshProjects(
       (_projects) => {
         return [...(_projects ?? []), createdProject];
       },
@@ -135,8 +133,13 @@ export function ProjectFieldAnswer({
                 key={_project.id}
                 data-test={`project-option-${_project.id}`}
                 value={_project.id}
-                onClick={() => {
-                  onSelectProject(_project);
+                onClick={async () => {
+                  // retrieve the latest project data
+                  const updatedList = await refreshProjects();
+                  const _selectedProject = updatedList?.find((p) => p.id === _project.id);
+                  if (_selectedProject) {
+                    onSelectProject(_selectedProject);
+                  }
                 }}
               >
                 <Typography color={_project.name ? '' : 'secondary'}>{_project.name || 'Untitled Project'}</Typography>
@@ -163,6 +166,10 @@ export function ProjectFieldAnswer({
             selectedMemberIds={selectedMemberIds}
             onFormFieldChange={onChange}
             project={selectedProject}
+            refreshProject={async () => {
+              const updatedList = await refreshProjects();
+              return updatedList?.find((p) => p.id === selectedProject.id);
+            }}
             applyProjectMembers={applyProjectMembers}
           />
         </Box>

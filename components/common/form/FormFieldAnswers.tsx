@@ -52,10 +52,11 @@ type FormFieldAnswersProps = {
   pageId?: string;
   isDraft?: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
-  project?: ProjectWithMembers | null;
-  proposalId?: string;
+  projectId?: string | null;
+  proposalId: string;
   milestoneProps?: ProposalRewardsTableProps;
   applyProject: (project: ProjectWithMembers, selectedMemberIds: string[]) => void;
+  applyProjectMembers: (projectMembers: ProjectWithMembers['projectMembers']) => void;
 };
 
 const StyledStack = styled(Stack)`
@@ -74,11 +75,12 @@ export function FormFieldAnswers({
   getFieldState,
   control,
   pageId,
-  project,
+  projectId,
   threads = {},
   proposalId,
   milestoneProps,
-  applyProject
+  applyProject,
+  applyProjectMembers
 }: FormFieldAnswersProps) {
   const { user } = useUser();
   const { showMessage } = useSnackbar();
@@ -144,6 +146,7 @@ export function FormFieldAnswers({
                     <ProjectFieldAnswer
                       disabled={disabled}
                       applyProject={applyProject}
+                      applyProjectMembers={applyProjectMembers}
                       proposalId={proposalId!}
                       formFieldId={formField.id}
                       formFieldValue={field.value as ProjectFieldValue}
@@ -176,7 +179,7 @@ export function FormFieldAnswers({
                           </Box>
                         )
                       }
-                      project={project}
+                      projectId={projectId}
                     />
                   </FieldWrapper>
                 ) : (

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Divider, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
@@ -22,11 +23,13 @@ export function ProjectForm({
   isTeamLead,
   disabled,
   project,
+  refreshProject,
   selectedMemberIds,
   onFormFieldChange,
   applyProjectMembers
 }: {
   project: ProjectWithMembers;
+  refreshProject: () => Promise<ProjectWithMembers | undefined>;
   disabled?: boolean;
   fieldConfig?: ProjectAndMembersFieldConfig;
   isTeamLead: boolean;
@@ -44,13 +47,28 @@ export function ProjectForm({
   const nonSelectedProjectMembers = extraProjectMembers.filter(
     (projectMember) => projectMember.id && !selectedMemberIds.includes(projectMember.id)
   );
-  const { onProjectUpdate, onProjectMemberUpdate, onProjectMemberAdd } = useProjectUpdates(project);
+  const { onProjectUpdate, onProjectMemberUpdate, onProjectMemberAdd } = useProjectUpdates({
+    projectId: project.id,
+    isTeamLead
+  });
 
   async function onChangeTeamMembers(selectedMemberValue: string) {
+    // get updated project members in case they were updated in the form but not refreshed yet
+    const updatedProject = await refreshProject();
+    if (!updatedProject) {
+      return;
+    }
+    console.log('members', updatedProject.projectMembers);
     const _selectedMemberIds = [...selectedMemberIds];
-    const _projectMembers = projectMembers.filter(({ id }) => selectedMemberIds.includes(id));
+    const _projectMembers = updatedProject.projectMembers.filter(({ id }) => selectedMemberIds.includes(id));
     if (selectedMemberValue !== newTeamMember) {
       _selectedMemberIds.push(selectedMemberValue);
+      const projectMember = updatedProject.projectMembers.find(({ id }) => id === selectedMemberValue);
+      if (projectMember) {
+        _projectMembers.push(projectMember);
+      } else {
+        log.error('Project member not found', { selectedMemberValue });
+      }
     } else {
       const newProjectMember = await onProjectMemberAdd(defaultProjectMember());
       if (newProjectMember) {
@@ -61,6 +79,7 @@ export function ProjectForm({
     // update proposal answers form
     onFormFieldChange({ projectId, selectedMemberIds: _selectedMemberIds });
     // update project form
+    console.log('new members', _projectMembers);
     applyProjectMembers(_projectMembers);
   }
 
@@ -75,7 +94,7 @@ export function ProjectForm({
   );
 
   const teamLeadMemberId = projectMembers[0]?.id;
-  const onProjectMemberUpdateMemo = useCallback(
+  const onTeamLeadUpdate = useCallback(
     (updatedProjectMember: Record<string, any>) => {
       if (teamLeadMemberId) {
         onProjectMemberUpdate({
@@ -106,7 +125,7 @@ export function ProjectForm({
         disabled={!isTeamLead || disabled}
         defaultRequired
         fieldConfig={fieldConfig?.projectMember}
-        onChange={onProjectMemberUpdateMemo}
+        onChange={onTeamLeadUpdate}
       />
       <Divider
         sx={{
