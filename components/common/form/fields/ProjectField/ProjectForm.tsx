@@ -64,6 +64,9 @@ export function ProjectForm({
     const newProjectMembers = selectedMemberIds
       .map((memberId) => updatedProject.projectMembers.find((member) => member.id === memberId))
       .filter(isTruthy);
+    // always include team lead
+    const teamLead = updatedProject.projectMembers.find((member) => member.teamLead)!;
+    newProjectMembers.unshift(teamLead);
     if (selectedMemberId !== newTeamMember) {
       newMemberIds.push(selectedMemberId);
       const projectMember = updatedProject.projectMembers.find(({ id }) => id === selectedMemberId);
@@ -88,6 +91,9 @@ export function ProjectForm({
   function removeTeamMember(memberId: string) {
     const newMemberIds = selectedMemberIds.filter((id) => id !== memberId);
     const _projectMembers = projectMembers.filter(({ id }) => newMemberIds.includes(id));
+    // always include team lead
+    const teamLead = projectMembers.find((member) => member.teamLead)!;
+    _projectMembers.unshift(teamLead);
     onFormFieldChange({ projectId, selectedMemberIds: newMemberIds });
     applyProjectMembers(_projectMembers);
   }

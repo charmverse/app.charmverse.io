@@ -79,19 +79,17 @@ export function useProjectForm(options: {
 
   const applyProject = useCallback(
     (project: ProjectWithMembers, selectedMemberIds: string[]) => {
+      const teamLead = project.projectMembers.find((member) => member.teamLead)!;
       // make sure that projectMembers is the same order as selectedMemberIds
       const projectMembers = selectedMemberIds
         .map((memberId) => project.projectMembers.find((member) => member.id === memberId))
+        // sanity check - dont include team lead twice
+        .filter((member) => !member?.teamLead)
         .filter(isTruthy);
-      project.projectMembers.filter(
-        (member) =>
-          // Make sure only the selected members are present in the form
-          !member.teamLead && selectedMemberIds.includes(member.id)
-      );
       form.reset(
         convertToProjectValues({
           ...project,
-          projectMembers
+          projectMembers: [teamLead, ...projectMembers]
         })
       );
       // trigger form so that errors are populated correctly
