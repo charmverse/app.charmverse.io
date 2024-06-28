@@ -14,7 +14,7 @@ import { logRoutes } from './logRoutes';
 import rootRouter from './routes';
 
 console.log('REACT_APP_APP_ENV', process.env.REACT_APP_APP_ENV);
-console.log('root constants', constants);
+console.log('root constants', { idProd: constants.isProdEnv, isStaging: constants.isStagingEnv });
 console.log('connect app constants', { isProdEnv, isStagingEnv, isDevEnv, isTestEnv });
 
 export const app = new Koa();
