@@ -18,10 +18,12 @@ export function defineMetadataSchema() {
 }
 
 export const actionClient = createSafeActionClient({
-  handleReturnedServerError,
-  handleServerErrorLog,
   // @ts-ignore
   defineMetadataSchema,
+  // @ts-ignore
+  handleReturnedServerError,
+  // @ts-ignore
+  handleServerErrorLog,
   defaultValidationErrorsShape: 'flattened'
 })
   /**
