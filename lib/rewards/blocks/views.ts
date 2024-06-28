@@ -29,7 +29,7 @@ import {
 
 export const defaultRewardViews = [DEFAULT_TABLE_VIEW_BLOCK_ID, DEFAULT_BOARD_VIEW_BLOCK_ID];
 
-export const supportedRewardViewTypes: IViewType[] = ['calendar', 'board', 'table'];
+export const supportedRewardViewTypes: IViewType[] = ['calendar', 'board', 'table', 'gallery'];
 
 export function getDefaultView({ spaceId }: { spaceId?: string }) {
   // default to table view

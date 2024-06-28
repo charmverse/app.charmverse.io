@@ -90,7 +90,7 @@ function Gallery(props: Props): JSX.Element {
   return (
     <div className='Gallery'>
       {cards
-        .filter((c) => c.parentId === board.id)
+        // .filter((c) => c.parentId === board.id)
         .map((card) => {
           return (
             <GalleryCard

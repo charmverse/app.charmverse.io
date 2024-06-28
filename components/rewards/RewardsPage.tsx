@@ -14,6 +14,7 @@ import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import AddViewMenu from 'components/common/DatabaseEditor/components/addViewMenu';
 import { getVisibleAndHiddenGroups } from 'components/common/DatabaseEditor/components/centerPanel';
 import { CreateLinkedView } from 'components/common/DatabaseEditor/components/createLinkedView';
+import Gallery from 'components/common/DatabaseEditor/components/gallery/gallery';
 import Kanban from 'components/common/DatabaseEditor/components/kanban/kanban';
 import Table from 'components/common/DatabaseEditor/components/table/table';
 import { ViewFilterControl } from 'components/common/DatabaseEditor/components/ViewFilterControl';
@@ -421,6 +422,19 @@ export function RewardsPage({ title }: { title: string }) {
                     readOnlyTitle
                     disableDnd
                     hideLinkedBounty
+                  />
+                )}
+
+                {activeView.fields.viewType === 'gallery' && (
+                  <Gallery
+                    board={activeBoard}
+                    cards={cards}
+                    activeView={activeView}
+                    readOnly={!isAdmin}
+                    onCardClicked={(_e, card) => showRewardOrApplication(card.id, card?.parentId)}
+                    selectedCardIds={[]}
+                    addCard={() => {}}
+                    disableAddingCards={true}
                   />
                 )}
               </Box>
