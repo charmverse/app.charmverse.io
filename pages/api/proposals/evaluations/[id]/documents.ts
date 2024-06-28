@@ -6,7 +6,7 @@ import {
   addEnvelopeToEvaluation,
   type EvaluationDocumentToSign
 } from 'lib/proposals/documentsToSign/addEnvelopeToEvaluation';
-import { checkHasProposalLegalDocsAccess } from 'lib/proposals/documentsToSign/checkLegalDocsAccess';
+import { checkHasProposalLegalDocsAccess } from 'lib/proposals/documentsToSign/checkHasProposalLegalDocsAccess';
 import { passDocumentEvaluationStepIfNecessaryOrReopenEvaluation } from 'lib/proposals/documentsToSign/passDocumentEvaluationStepIfNecessaryOrReopenEvaluation';
 import { removeEnvelopeFromEvaluation } from 'lib/proposals/documentsToSign/removeEnvelopeFromEvaluation';
 import { withSessionRoute } from 'lib/session/withSession';
