@@ -18,7 +18,7 @@ import { useState } from 'react';
 import { Button } from 'components/common/Button';
 import IconButton from 'components/common/DatabaseEditor/widgets/buttons/iconButton';
 import { useDocusign } from 'components/signing/hooks/useDocusign';
-import type { DocusignEnvelope } from 'lib/docusign/api';
+import type { DocusignEnvelope, DocusignEnvelopeLite } from 'lib/docusign/api';
 
 function DocusignSearchResult({
   onClick,
@@ -49,7 +49,7 @@ function DocusignSearchResult({
 }
 
 type Props = {
-  onSelectEnvelope: (input: { envelope: DocusignEnvelope }) => void;
+  onSelectEnvelope: (input: { envelope: DocusignEnvelopeLite }) => void;
   selectedEnvelopeIds?: string[];
   proposalId: string;
 };
@@ -61,7 +61,7 @@ export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposal
 
   const [showSearch, setShowSearch] = useState(false);
 
-  function selectEnvelope({ envelope }: { envelope: DocusignEnvelope }) {
+  function selectEnvelope({ envelope }: { envelope: DocusignEnvelopeLite }) {
     onSelectEnvelope({ envelope });
     setShowSearch(false);
   }

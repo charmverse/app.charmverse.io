@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { DocusignEnvelope, DocusignSearchParams } from 'lib/docusign/api';
+import type { DocusignEnvelopeLite, DocusignSearchParams } from 'lib/docusign/api';
 import { searchDocusignDocs } from 'lib/docusign/api';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { checkUserHasEditLegalDocumentAccess } from 'lib/proposals/documentsToSign/checkUserHasEditLegalDocumentAccess';
@@ -19,7 +19,7 @@ handler
   .use(requireKeys([{ key: 'proposalId', valueType: 'uuid' }], 'query'))
   .get(searchDocusign);
 
-async function searchDocusign(req: NextApiRequest, res: NextApiResponse<DocusignEnvelope[]>) {
+async function searchDocusign(req: NextApiRequest, res: NextApiResponse<DocusignEnvelopeLite[]>) {
   const proposalId = req.query.proposalId as string;
 
   const hasDocumentAccess = await checkUserHasEditLegalDocumentAccess({

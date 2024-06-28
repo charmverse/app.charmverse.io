@@ -160,6 +160,32 @@ export type DocusignSearchParams = {
   title?: string;
 };
 
+export type DocusignEnvelopeLite = Pick<DocusignEnvelope, 'envelopeId' | 'emailSubject'> & {
+  recipients: {
+    signers: Pick<DocusignRecipient, 'name' | 'email' | 'status'>[];
+  };
+  sender: {
+    email: string;
+  };
+};
+
+function envelopeToLiteEnvelope(envelope: DocusignEnvelope): DocusignEnvelopeLite {
+  return {
+    envelopeId: envelope.envelopeId,
+    emailSubject: envelope.emailSubject,
+    recipients: {
+      signers: envelope.recipients.signers.map((signer) => ({
+        name: signer.name,
+        email: signer.email,
+        status: signer.status
+      }))
+    },
+    sender: {
+      email: envelope.sender.email
+    }
+  };
+}
+
 /**
  * https://developers.docusign.com/docs/esign-rest-api/reference/envelopes/envelopes/liststatuschanges/
  */
@@ -169,13 +195,13 @@ export async function searchDocusignDocs({
 }: {
   query: DocusignSearchParams;
   spaceId: string;
-}): Promise<DocusignEnvelope[]> {
+}): Promise<DocusignEnvelopeLite[]> {
   const searchResultsKey = `docusign-search-${JSON.stringify({ ...query, spaceId })}`;
 
   const cachedResults = await redisClient?.get(`docusign-search-${searchResultsKey}`);
 
   if (cachedResults) {
-    return JSON.parse(cachedResults);
+    return JSON.parse(cachedResults).map(envelopeToLiteEnvelope);
   }
 
   const spaceCreds = await getSpaceDocusignCredentials({ spaceId });
@@ -194,5 +220,5 @@ export async function searchDocusignDocs({
 
   await redisClient?.set(searchResultsKey, JSON.stringify(envelopes), { EX: 60 * 16 });
 
-  return envelopes;
+  return envelopes.map(envelopeToLiteEnvelope);
 }
