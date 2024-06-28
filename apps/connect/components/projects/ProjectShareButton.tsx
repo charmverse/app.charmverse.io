@@ -20,7 +20,7 @@ export function ShareButton() {
       variant='outlined'
       startIcon={clicked ? <CheckIcon fontSize='small' /> : <ShareIcon fontSize='small' />}
     >
-      Share
+      {clicked ? 'Copied!' : 'Share'}
     </Button>
   );
 }

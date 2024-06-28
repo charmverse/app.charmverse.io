@@ -9,13 +9,7 @@ export function ProjectDescription({ description }: { description: string }) {
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   return (
-    <Typography
-      variant='body1'
-      mt={2}
-      onClick={() => {
-        setShowFullDescription(!showFullDescription);
-      }}
-    >
+    <Typography variant='body1' mt={2}>
       {showFullDescription ? description : fancyTrim(description, 500)}
       <Typography
         variant='body2'
@@ -23,6 +17,9 @@ export function ProjectDescription({ description }: { description: string }) {
           mt: 1,
           fontWeight: 'bold',
           cursor: 'pointer'
+        }}
+        onClick={() => {
+          setShowFullDescription(!showFullDescription);
         }}
       >
         {showFullDescription ? 'Show less' : 'Show more'}
