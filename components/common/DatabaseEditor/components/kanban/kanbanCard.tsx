@@ -64,7 +64,6 @@ function RewardMetadata({ bountyId }: { bountyId: string }) {
 
 const KanbanCard = React.memo((props: Props) => {
   const { card, board, onDrop } = props;
-  console.log('card', card);
   const intl = useIntl();
   const [isDragging, isOver, cardRef] = useSortable(
     'card',

@@ -261,7 +261,6 @@ export function mapRewardToCard({
               mapApplicationToCard({
                 application,
                 pageTitle: rewardPage.title,
-                galleryImage: rewardPage.galleryImage,
                 reward,
                 spaceId,
                 spaceDomain,
@@ -279,7 +278,6 @@ export function mapRewardToCard({
 function mapApplicationToCard({
   application,
   pageTitle,
-  galleryImage,
   reward,
   spaceId,
   spaceDomain,
@@ -358,7 +356,6 @@ function mapApplicationToCard({
     id: application.id || '',
     spaceId,
     parentId: reward.id,
-    galleryImage: galleryImage || '',
     title: isSubmissionSource
       ? pageTitle || 'Untitled'
       : `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
