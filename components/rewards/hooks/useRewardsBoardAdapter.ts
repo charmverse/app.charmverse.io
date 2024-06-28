@@ -41,7 +41,7 @@ import { getAbsolutePath } from 'lib/utils/browser';
 import { isUUID } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 
-export type BoardReward = { id?: string; fields: RewardFields };
+export type BoardReward = { id?: string; fields: RewardFields; sourceProposalPage?: string };
 
 export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();

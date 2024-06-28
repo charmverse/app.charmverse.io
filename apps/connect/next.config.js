@@ -1,6 +1,13 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  // types are tested separately from the build
+  eslint: {
+    ignoreDuringBuilds: true
+  },
+  typescript: {
+    ignoreBuildErrors: true
+  },
   webpack(_config) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     // _config.resolve.alias.canvas = false;

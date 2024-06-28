@@ -9,17 +9,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 //   name: 'Greenpill Network'
 // }
 
-
 async function search() {
-  const result = await prisma.space.findFirstOrThrow({
+  const result = await prisma.project.deleteMany({
     where: {
-      
-    },
-    select: {
-      id: true,
-      paidTier: true,
+      createdBy: 'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835'
     }
   });
+  console.log(result);
 }
 
 search().then(() => console.log('Done'));
