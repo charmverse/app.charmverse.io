@@ -11,8 +11,8 @@ export async function middleware(request: NextRequest) {
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
   const user = session.user;
   const path = request.nextUrl.pathname;
-
-  if (!user && path !== '/' && !path.startsWith('/projects/')) {
+  // Make /p/ project pages public
+  if (!user && path !== '/' && !path.startsWith('/p/')) {
     return NextResponse.redirect(new URL('/', request.url));
   } else if (user && path === '/') {
     return NextResponse.redirect(new URL('/profile', request.url));
