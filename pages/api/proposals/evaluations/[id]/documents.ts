@@ -50,7 +50,7 @@ async function removeProposalDocumentHandler(req: NextApiRequest, res: NextApiRe
   });
 
   if (!hasAccess) {
-    throw new ActionNotPermittedError('You do not have permission to add document to sign to this proposal');
+    throw new ActionNotPermittedError('You do not have permission to remove documents from this proposal');
   }
 
   await removeEnvelopeFromEvaluation({
