@@ -5,6 +5,7 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { concealProposalSteps } from 'lib/proposals/concealProposalSteps';
+import { getProposalDocumentsToSign } from 'lib/proposals/documentsToSign/getProposalDocumentsToSign';
 import { getProposal } from 'lib/proposals/getProposal';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
@@ -33,6 +34,21 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   }
 
   const proposalWithConcealedSteps = await concealProposalSteps({ proposal, userId });
+
+  if (
+    (userId && proposalWithConcealedSteps.authors.some((a) => a.userId === userId)) ||
+    proposalWithConcealedSteps.evaluations.some((ev) => ev.isReviewer && ev.type === 'sign_documents')
+  ) {
+    const legalDocs = await getProposalDocumentsToSign({
+      proposalId
+    });
+
+    for (const evaluation of proposalWithConcealedSteps.evaluations) {
+      if (evaluation.type === 'sign_documents') {
+        evaluation.documentsToSign = legalDocs[evaluation.id] ?? [];
+      }
+    }
+  }
 
   return res.status(200).json(proposalWithConcealedSteps);
 }
