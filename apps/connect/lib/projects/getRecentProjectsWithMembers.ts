@@ -1,13 +1,5 @@
-import type { FarcasterUser, Project, ProjectMember } from '@charmverse/core/prisma-client';
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-export type ProjectWithMembers = Project & {
-  projectMembers: (ProjectMember & {
-    user: {
-      farcasterUser: FarcasterUser | null;
-    };
-  })[];
-};
 
 /**
  * Get recent projects with members
@@ -21,7 +13,7 @@ export async function getRecentProjectsWithMembers({
   userId?: string;
   resultsNo?: number;
 } = {}) {
-  const projectWithMembers = (await prisma.project.findMany({
+  const projectWithMembers = await prisma.project.findMany({
     where: userId
       ? {
           deletedAt: null,
@@ -32,7 +24,10 @@ export async function getRecentProjectsWithMembers({
           }
         }
       : {
-          deletedAt: null
+          deletedAt: null,
+          projectMembers: {
+            some: {}
+          }
         },
     orderBy: {
       createdAt: 'desc'
@@ -49,7 +44,9 @@ export async function getRecentProjectsWithMembers({
         }
       }
     }
-  })) as ProjectWithMembers[];
+  });
 
   return projectWithMembers;
 }
+
+export type ProjectsWithMembers = Prisma.PromiseReturnType<typeof getRecentProjectsWithMembers>;

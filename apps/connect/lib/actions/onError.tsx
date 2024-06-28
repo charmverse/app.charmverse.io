@@ -1,21 +1,24 @@
 import { DataNotFoundError, SystemError, UnknownError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import { getIronSession } from 'iron-session';
-import { headers, cookies } from 'next/headers';
+import type { IronSession } from 'iron-session';
+import { headers } from 'next/headers';
+import type { ServerErrorFunctionUtils } from 'next-safe-action/typeschema';
 
+import { isSystemError } from 'lib/middleware/isSystemError';
 import type { SessionData } from 'lib/session/config';
-import { getIronOptions } from 'lib/session/getIronOptions';
 
-const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
+import type { defineMetadataSchema } from './actionClient';
 
-type ErrorResponse = {
-  message: string;
-  errorType: string;
-  severity: string;
-  status: number;
-};
+type ErrorResponse = Omit<SystemError, 'error' | 'errorConstructor' | 'name'>;
 
-export async function handleServerError(err: any): Promise<ErrorResponse> {
+type MaybePromise<T> = Promise<T> | T;
+
+type MetadataSchema = ReturnType<typeof defineMetadataSchema>;
+
+export function handleReturnedServerError(
+  err: any,
+  _utils: ServerErrorFunctionUtils<MetadataSchema>
+): MaybePromise<ErrorResponse> {
   // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
   // P2025 is thrown when a record is not found
   if (err.code === 'P2025') {
@@ -25,45 +28,61 @@ export async function handleServerError(err: any): Promise<ErrorResponse> {
       message: error.message,
       errorType: error.errorType,
       severity: error.severity,
-      status: error.code
+      code: error.code
     };
   }
 
-  const session = await getIronSession<SessionData>(cookies(), getIronOptions());
-  const userId = session.user?.id;
+  const isValidSystemError = isSystemError(err);
+
+  const errorAsSystemError = isValidSystemError ? err : new UnknownError(err.stack ?? err.error ?? err);
+
+  const { stack, error, errorConstructor, ...withoutStack } = errorAsSystemError;
+
+  return withoutStack;
+}
+
+export function handleServerErrorLog(
+  err: any,
+  utils: ServerErrorFunctionUtils<MetadataSchema> & {
+    returnedError: ErrorResponse;
+  }
+): MaybePromise<void> {
+  const clientInput = utils?.clientInput;
+  const metadata = utils?.metadata;
+  const ctx = utils?.ctx;
+
+  // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
+  // P2025 is thrown when a record is not found
+  if (err.code === 'P2025') {
+    log.error(`Server Error: ${err.message || err.error?.message || err.error || err}`, { error: err });
+  }
+
+  const context = ctx as {
+    session: IronSession<SessionData>;
+    headers: ReturnType<typeof headers>;
+  };
+  const userId = context?.session?.user?.id;
 
   const headersList = headers();
   const fullUrl = headersList.get('referer') || '';
 
-  // We need to change strategy to validate the error since Prototypes are not always correct
-  const isValidSystemError =
-    validationProps.every((prop) => !!err[prop]) && typeof err.code === 'number' && err.code >= 400 && err.code <= 599;
+  const isValidSystemError = isSystemError(err);
 
   const errorAsSystemError = isValidSystemError ? err : new UnknownError(err.stack ?? err.error ?? err);
 
-  if (errorAsSystemError.code === 500) {
-    log.error(`Server Error: ${err.message || err.error?.message || err.error || err}`, {
-      // err.error?.message is for errors from @charmverse/core/http
-      error: err instanceof SystemError === false ? err.message || 'Something went wrong' : errorAsSystemError,
-      stack: err.error?.stack || err.stack,
-      userId,
-      projectId: '',
-      url: fullUrl,
-      body: undefined
-    });
-  } else {
-    log.warn(`Client Error: ${errorAsSystemError.message}`, {
-      url: fullUrl,
-      userId,
-      projectId: '', // @TODO Add projectId when it's ready
-      body: undefined
-    });
-  }
-
-  return {
-    message: err.message || 'Something went wrong',
-    severity: err.severity || 'error',
-    status: err.code || 500,
-    errorType: err.errorType || 'Unknown'
+  const loggedInfo = {
+    error: err instanceof SystemError === false ? err.message || 'Something went wrong' : errorAsSystemError,
+    stack: err.error?.stack || err.stack,
+    userId,
+    projectId: '',
+    url: fullUrl,
+    body: clientInput,
+    metadata
   };
+
+  if (errorAsSystemError.code === 500) {
+    log.error(`Server Error: ${err.message || err.error?.message || err.error || err}`, loggedInfo);
+  } else {
+    log.warn(`Client Error: ${errorAsSystemError.message}`, loggedInfo);
+  }
 }

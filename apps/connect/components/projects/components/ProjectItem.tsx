@@ -1,5 +1,5 @@
 import { Avatar } from '@connect/components/common/Avatar';
-import type { ProjectWithMembers } from '@connect/lib/projects/getRecentProjectsWithMembers';
+import type { ProjectsWithMembers } from '@connect/lib/projects/getRecentProjectsWithMembers';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
@@ -10,7 +10,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 
-export function ProjectItem({ project }: { project: ProjectWithMembers }) {
+export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
   const projectMembers = project.projectMembers;
   const projectName = project.name || 'Untitled';
 
