@@ -150,7 +150,7 @@ export function FarcasterUserProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const { data: farcasterProfile } = useSWR(
     (user && user.wallets.length !== 0) || farcasterUser
-      ? `farcaster/wallets=${user?.wallets[0].address}&fid=${farcasterUser?.fid}`
+      ? `farcaster/wallets=${user?.wallets[0]?.address}&fid=${farcasterUser?.fid}`
       : null,
     () =>
       getFarcasterProfile({
