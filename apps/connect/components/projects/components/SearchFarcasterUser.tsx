@@ -1,3 +1,4 @@
+import { connectApiClient } from '@connect/apiClient/apiClient';
 import { Avatar } from '@connect/components/common/Avatar';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { BoxProps } from '@mui/material';
@@ -6,38 +7,34 @@ import { Stack } from '@mui/system';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
 
-import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
 export function SearchFarcasterUser({
-  selectedProfile,
   setSelectedProfile
 }: {
-  selectedProfile: FarcasterProfile | null;
   setSelectedProfile: (profile: FarcasterProfile | null) => void;
 }) {
-  const [farcasterProfile, setFarcasterProfile] = useState<FarcasterProfile | null>(null);
+  const [farcasterProfiles, setFarcasterProfiles] = useState<FarcasterProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((_searchTerm: string) => {
-      getFarcasterProfile({
-        fid: _searchTerm,
-        username: _searchTerm
-      })
+      connectApiClient
+        .getFarcasterUsersByUsername(_searchTerm)
         .then((_farcasterProfiles) => {
-          if (_farcasterProfiles) {
-            setFarcasterProfile({
-              fid: _farcasterProfiles.body.id,
-              pfpUrl: _farcasterProfiles.body.avatarUrl,
-              bio: _farcasterProfiles.body.bio,
-              displayName: _farcasterProfiles.body.displayName,
-              username: _farcasterProfiles.body.username
-            });
+          if (_farcasterProfiles.length) {
+            setFarcasterProfiles(
+              _farcasterProfiles.map((profile) => ({
+                fid: profile.fid,
+                pfpUrl: profile.pfp_url,
+                bio: profile.profile.bio.text,
+                displayName: profile.display_name,
+                username: profile.username
+              }))
+            );
           }
         })
         .catch(() => {
-          setFarcasterProfile(null);
+          setFarcasterProfiles([]);
         });
     }, 500);
   }, []);
@@ -46,28 +43,21 @@ export function SearchFarcasterUser({
     if (searchTerm && searchTerm.length >= 3) {
       debouncedGetPublicSpaces(searchTerm);
     } else {
-      setFarcasterProfile(null);
+      setFarcasterProfiles([]);
     }
   }, [searchTerm]);
-
-  useEffect(() => {
-    if (selectedProfile === null) {
-      setSearchTerm('');
-      setFarcasterProfile(null);
-    }
-  }, [selectedProfile]);
 
   return (
     <Autocomplete<FarcasterProfile, false, true>
       disablePortal
       inputValue={searchTerm}
-      value={selectedProfile ?? undefined}
       onChange={(_, newValue) => {
+        setSearchTerm('');
         setSelectedProfile(newValue);
       }}
       getOptionLabel={(option) => `${option.username} ${option.fid}`}
       fullWidth
-      options={farcasterProfile ? [farcasterProfile] : []}
+      options={farcasterProfiles}
       clearOnBlur={false}
       disableClearable
       clearOnEscape={false}

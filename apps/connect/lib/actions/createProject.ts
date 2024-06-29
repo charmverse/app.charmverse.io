@@ -2,7 +2,6 @@
 
 import { prisma } from '@charmverse/core/prisma-client';
 import { authActionClient } from '@connect/lib/actions/actionClient';
-import { redirect } from 'next/navigation';
 import { v4 } from 'uuid';
 
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';

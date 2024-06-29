@@ -1,14 +1,16 @@
 import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
-import { Box, Typography, FormLabel, TextField, Stack, Switch } from '@mui/material';
+import { Box, FormLabel, Stack, Switch, TextField, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
+import { useGetAllowedDocusignUsersAndRoles } from 'charmClient/hooks/docusign';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import {
-  authorSystemRole,
   allMembersSystemRole,
+  authorSystemRole,
   tokenHoldersSystemRole
 } from 'components/settings/proposals/components/EvaluationPermissions';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
 import type { ConcealableEvaluationType, PopulatedEvaluation } from 'lib/proposals/interfaces';
@@ -49,6 +51,9 @@ export function EvaluationStepSettings({
   readOnly
 }: Props) {
   const isAdmin = useIsAdmin();
+
+  const { space } = useCurrentSpace();
+
   // reviewers are also readOnly when using a template with reviewers pre-selected
   const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
   const readOnlyAppealReviewers =
@@ -73,6 +78,25 @@ export function EvaluationStepSettings({
   const requiredReviews = evaluation.requiredReviews;
   const appealRequiredReviews = evaluation.appealRequiredReviews;
   const finalStep = evaluation.finalStep;
+
+  const { data: allowedDocusignUsersAndRoles } = useGetAllowedDocusignUsersAndRoles({
+    spaceId: evaluation.type === 'sign_documents' ? (space?.id as string) : null
+  });
+
+  const allowedUsersAndRoles = (allowedDocusignUsersAndRoles?.length ? allowedDocusignUsersAndRoles : null)?.map(
+    (allowedUserOrRole) => {
+      if (allowedUserOrRole.userId) {
+        return {
+          group: 'user',
+          id: allowedUserOrRole.userId as string
+        };
+      }
+      return {
+        group: 'role',
+        id: allowedUserOrRole.roleId as string
+      };
+    }
+  );
 
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
@@ -113,10 +137,15 @@ export function EvaluationStepSettings({
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
         <UserAndRoleSelect
           data-test={`proposal-${evaluation.type}-select`}
+          options={allowedUsersAndRoles}
           emptyPlaceholderContent='Select user or role'
           value={reviewerOptions as SelectOption[]}
           readOnly={readOnlyReviewers || isTokenVoting}
-          systemRoles={[authorSystemRole, isTokenVoting ? tokenHoldersSystemRole : allMembersSystemRole]}
+          systemRoles={
+            evaluation.type === 'sign_documents'
+              ? []
+              : [authorSystemRole, isTokenVoting ? tokenHoldersSystemRole : allMembersSystemRole]
+          }
           variant='outlined'
           onChange={handleOnChangeReviewers}
           required

@@ -24,7 +24,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 
 import { Button } from 'components/common/Button';
-import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -326,6 +325,8 @@ export function EvaluationDialog({
 
   const formValues = watch();
 
+  const hideEvaluationAdvancedSettings = evaluation?.type === 'sign_documents' || formValues.type === 'sign_documents';
+
   function updatePermissions({ permissions }: EvaluationTemplateFormItem) {
     setValue('permissions', permissions);
   }
@@ -402,7 +403,9 @@ export function EvaluationDialog({
             )}
           />
         </div>
-        {evaluation?.id && <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />}
+        {evaluation?.id && !hideEvaluationAdvancedSettings && (
+          <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />
+        )}
         {!evaluation?.id && (
           <>
             <div>
@@ -423,6 +426,15 @@ export function EvaluationDialog({
                       <Box display='flex' alignItems='center' width='100%'>
                         <ListItemIcon>{evaluationIcons.pass_fail()}</ListItemIcon>
                         <StyledListItemText primary='Pass/Decline' secondary='Thumbs up/Thumbs down, binary choice' />
+                      </Box>
+                    </MenuItem>
+                    <MenuItem value='sign_documents'>
+                      <Box display='flex' alignItems='center' width='100%'>
+                        <ListItemIcon>{evaluationIcons.sign_documents()}</ListItemIcon>
+                        <StyledListItemText
+                          primary='Sign Documents'
+                          secondary='Collect signatures from grant recipients'
+                        />
                       </Box>
                     </MenuItem>
                     <MenuItem value='rubric'>
@@ -452,7 +464,9 @@ export function EvaluationDialog({
                 />
               )}
             </Stack>
-            <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />
+            {!hideEvaluationAdvancedSettings && (
+              <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />
+            )}
           </>
         )}
       </Stack>

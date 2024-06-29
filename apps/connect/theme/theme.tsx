@@ -226,6 +226,13 @@ const extendedTheme = extendTheme({
         size: 'small'
       }
     },
+    MuiSkeleton: {
+      styleOverrides: {
+        root: {
+          transform: 'scale(1, 1)'
+        }
+      }
+    },
     MuiOutlinedInput: {
       defaultProps: {
         size: 'small'

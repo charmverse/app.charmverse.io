@@ -16,20 +16,22 @@ export function createDefaultProjectAndMembersPayload(): ProjectAndMembersPayloa
     communityUrl: '',
     otherUrl: '',
     walletAddress: '',
-    projectMembers: [
-      {
-        name: '',
-        walletAddress: '',
-        email: '',
-        twitter: '',
-        warpcast: '',
-        github: '',
-        linkedin: '',
-        telegram: '',
-        otherUrl: '',
-        previousProjects: ''
-      }
-    ]
+    projectMembers: [defaultProjectMember()]
+  };
+}
+
+export function defaultProjectMember(): ProjectAndMembersPayload['projectMembers'][0] {
+  return {
+    name: '',
+    walletAddress: '',
+    email: '',
+    twitter: '',
+    warpcast: '',
+    github: '',
+    linkedin: '',
+    telegram: '',
+    otherUrl: '',
+    previousProjects: ''
   };
 }
 

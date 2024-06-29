@@ -36,6 +36,7 @@ export default function FreeShareToWeb({ pageId }: Props) {
       shareChecked={isChecked}
       discoveryChecked={false}
       shareAlertMessage={shareAlertMessage}
+      pageType={currentPage?.type}
     />
   );
 }

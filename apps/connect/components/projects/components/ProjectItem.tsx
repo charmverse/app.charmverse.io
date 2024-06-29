@@ -1,5 +1,6 @@
-import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
 import { Avatar } from '@connect/components/common/Avatar';
+import type { ProjectsWithMembers } from '@connect/lib/projects/getRecentProjectsWithMembers';
+import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -9,11 +10,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 
-export function ProjectItem({
-  project
-}: {
-  project: Project & { projectMembers: (ProjectMember & { user: { avatar: string | null } | null })[] };
-}) {
+export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
   const projectMembers = project.projectMembers;
   const projectName = project.name || 'Untitled';
 
@@ -44,7 +41,7 @@ export function ProjectItem({
           sx={{ p: 0 }}
         >
           <Box>
-            <Typography>{projectName}</Typography>
+            <Typography variant='h6'>{projectName}</Typography>
             <Typography
               variant='body2'
               sx={{
@@ -63,7 +60,7 @@ export function ProjectItem({
                 key={member.id}
                 size='small'
                 name={member.name || 'Untitled'}
-                avatar={member.user?.avatar || ''}
+                avatar={(member.user?.farcasterUser?.account as unknown as StatusAPIResponse)?.pfpUrl || ''}
               />
             ))}
           </AvatarGroup>

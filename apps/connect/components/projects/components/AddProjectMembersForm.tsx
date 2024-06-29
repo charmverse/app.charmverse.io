@@ -1,20 +1,19 @@
 import { log } from '@charmverse/core/log';
-import { Avatar } from '@connect/components/common/Avatar';
-import { SearchFarcasterUser } from '@connect/components/projects/components/SearchFarcasterUser';
 import { actionCreateProject } from '@connect/lib/actions/createProject';
 import type { FormValues } from '@connect/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import AddIcon from '@mui/icons-material/AddOutlined';
-import { Button, Card, Divider, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
-import { useFieldArray, useWatch } from 'react-hook-form';
+import { useFieldArray } from 'react-hook-form';
 
 import type { LoggedInUser } from 'models/User';
 
 import { FarcasterCard } from '../../common/FarcasterCard';
+
+import { SearchFarcasterUser } from './SearchFarcasterUser';
 
 type FarcasterProfile = Pick<FarcasterBody, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
@@ -32,8 +31,6 @@ export function AddProjectMembersForm({
   handleSubmit: UseFormHandleSubmit<FormValues>;
 }) {
   const router = useRouter();
-
-  const formValues = useWatch({ control });
 
   const { append } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
@@ -64,59 +61,41 @@ export function AddProjectMembersForm({
       <Stack gap={1}>
         <Typography variant='h6'>Team</Typography>
         <FarcasterCard
-          name={formValues.name || 'Untitled'}
-          username=''
-          avatar={formValues.avatar || farcasterDetails.pfpUrl}
-          bio=''
+          fid={user.farcasterUser?.fid}
+          name={farcasterDetails.displayName}
+          username={farcasterDetails.username}
+          avatar={farcasterDetails.pfpUrl}
+          avatarSize='large'
         />
-        <Stack gap={2}>
+        <Stack gap={1}>
           <SearchFarcasterUser
-            selectedProfile={selectedFarcasterProfile}
             setSelectedProfile={(farcasterProfile) => {
               if (farcasterProfile) {
-                setSelectedFarcasterProfile(farcasterProfile);
+                append({
+                  farcasterId: farcasterProfile.fid!,
+                  name: farcasterProfile.displayName!
+                });
+                setSelectedFarcasterProfiles([...selectedFarcasterProfiles, farcasterProfile]);
               }
             }}
           />
-          <Stack flexDirection='row' justifyContent='center'>
-            <Button
-              disabled={!selectedFarcasterProfile}
-              onClick={() => {
-                if (selectedFarcasterProfile) {
-                  append({
-                    farcasterId: selectedFarcasterProfile.fid!,
-                    name: selectedFarcasterProfile.username!
-                  });
-                  setSelectedFarcasterProfiles([...selectedFarcasterProfiles, selectedFarcasterProfile]);
-                  setSelectedFarcasterProfile(null);
-                }
-              }}
-              startIcon={<AddIcon fontSize='small' />}
-            >
-              Add a team member
-            </Button>
-          </Stack>
         </Stack>
-        <Stack gap={2} mb={2}>
+        <Stack gap={1} mb={2}>
           {selectedFarcasterProfiles.map((farcasterProfile) => (
-            <Card
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1.5,
-                flexDirection: 'row',
-                p: 2
-              }}
+            <FarcasterCard
+              avatarSize='large'
+              fid={farcasterProfile.fid}
               key={farcasterProfile.fid}
-            >
-              <Avatar src={farcasterProfile.pfpUrl} size='large' />
-              <Stack gap={0}>
-                <Typography variant='h6'>{farcasterProfile.displayName}</Typography>
-                <Typography variant='subtitle1' color='secondary'>
-                  {farcasterProfile.username} #{farcasterProfile.fid}
-                </Typography>
-              </Stack>
-            </Card>
+              name={farcasterProfile.displayName}
+              username={farcasterProfile.username}
+              avatar={farcasterProfile.pfpUrl}
+              bio=''
+              onDelete={() => {
+                setSelectedFarcasterProfiles(
+                  selectedFarcasterProfiles.filter((profile) => profile.fid !== farcasterProfile.fid)
+                );
+              }}
+            />
           ))}
         </Stack>
         <Stack direction='row' justifyContent='space-between'>

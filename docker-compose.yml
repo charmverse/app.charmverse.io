@@ -119,6 +119,8 @@ services:
     extends:
       service: defaults
     command: ['sh', '-c', 'npm run connect-api:start:prod']
+    environment:
+      - REACT_APP_APP_ENV=staging
     ports:
       - '4000:3000'
     profiles:

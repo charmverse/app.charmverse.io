@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
@@ -43,10 +43,14 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
   const projectAnswer = answers?.find((answer) => answer.fieldId === projectField?.id)?.value as
     | { projectId: string; selectedMemberIds: string[] }
     | undefined;
-  const projectForm = useProjectForm({
-    initialProjectValues: proposal?.project,
-    projectId: proposal?.projectId,
-    selectedMemberIds: projectAnswer?.selectedMemberIds,
+  const {
+    form: projectForm,
+    applyProject,
+    applyProjectMembers
+  } = useProjectForm({
+    // initialProjectValues: proposal?.project,
+    // projectId: projectAnswer?.projectId,
+    // selectedMemberIds: projectAnswer?.selectedMemberIds,
     fieldConfig:
       (projectField?.fieldConfig as ProjectAndMembersFieldConfig) ?? createDefaultProjectAndMembersFieldConfig()
   });
@@ -70,6 +74,13 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
   // add a debounce delay so the state inside useFormFields has time to set the values or elsle empty fields will appear for a brief second
   const isLoadingAnswers = useDebouncedValue(!formFields, 1);
 
+  // apply initial values to project form
+  useEffect(() => {
+    if (proposal?.project && projectAnswer?.projectId === proposal.project.id) {
+      applyProject(proposal.project, projectAnswer.selectedMemberIds);
+    }
+  }, [!!proposal, !!projectAnswer, applyProject]);
+
   return {
     control,
     formFields,
@@ -77,6 +88,8 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
     onSave,
     getFieldState,
     isLoadingAnswers,
-    projectForm
+    projectForm,
+    applyProject,
+    applyProjectMembers
   };
 }

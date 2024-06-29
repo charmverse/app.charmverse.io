@@ -1,13 +1,11 @@
 import { log } from '@charmverse/core/log';
-import { Prisma } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { DataNotFoundError, SystemError } from 'lib/utils/errors';
 
 import { UnknownError } from './errors';
+import { isSystemError } from './isSystemError';
 import { removeApiKeyFromQuery } from './removeApiKeyFromQuery';
-
-const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
 
 export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
   // https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
@@ -17,8 +15,7 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
   }
 
   // We need to change strategy to validate the error since Prototypes are not always correct
-  const isValidSystemError =
-    validationProps.every((prop) => !!err[prop]) && typeof err.code === 'number' && err.code >= 400 && err.code <= 599;
+  const isValidSystemError = isSystemError(err);
 
   const errorAsSystemError = isValidSystemError ? err : new UnknownError(err.stack ?? err.error ?? err);
 

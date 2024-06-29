@@ -1,4 +1,4 @@
-import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
+import type { Project, ProjectMember } from '@charmverse/core/prisma';
 
 export type ProjectPayload = Pick<
   Project,
