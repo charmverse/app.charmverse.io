@@ -4,7 +4,7 @@ import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 
 import { GET } from 'adapters/http';
 import { connectApiHost } from 'config/constants';
-import type { FarcasterUser } from 'lib/farcaster/getFarcasterUsersByUsername';
+import type { FarcasterUser } from 'lib/farcaster/getFarcasterUsers';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { LoggedInUser } from 'models/index';
 
