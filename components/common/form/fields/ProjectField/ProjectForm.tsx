@@ -75,13 +75,12 @@ export function ProjectForm({
       }
     } else {
       const newProjectMember = await onProjectMemberAdd(defaultProjectMember());
-      // get updated project members
+      // get updated project members in case they were updated in the form but not refreshed yet
       await refreshProject();
       if (newProjectMember) {
         newMemberIds.push(newProjectMember.id);
         newProjectMembers.push(newProjectMember);
       }
-      console.log('added member', newProjectMember);
     }
     // update proposal answers form
     onFormFieldChange({ projectId, selectedMemberIds: newMemberIds });
