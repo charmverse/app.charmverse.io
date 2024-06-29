@@ -1,3 +1,5 @@
+import { log } from '@charmverse/core/log';
+
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 import { validateAnswers } from 'lib/forms/validateAnswers';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
@@ -73,7 +75,14 @@ export function getProposalErrors({
             project
           });
         } catch (error) {
-          errors.push((error as Error).message);
+          // hack for now only log errors on the backend when form is submitted
+          if (typeof window === 'undefined') {
+            log.error(`Project profile validation failed`, {
+              error,
+              projectId: project.id
+            });
+          }
+          errors.push(`Project profile validation failed`);
         }
       }
     }

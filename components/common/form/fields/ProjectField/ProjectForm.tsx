@@ -2,11 +2,12 @@ import { log } from '@charmverse/core/log';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Divider, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
-import { useCallback } from 'react';
+import type { KeyedMutator } from 'swr';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import { FieldAnswers } from 'components/settings/projects/components/FieldAnswers';
 import { ProjectMemberFieldAnswers } from 'components/settings/projects/components/ProjectMemberFields';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { ProjectFieldValue } from 'lib/forms/interfaces';
 import { defaultProjectMember } from 'lib/projects/constants';
@@ -24,13 +25,13 @@ export function ProjectForm({
   isTeamLead,
   disabled,
   project,
-  refreshProject,
+  refreshProjects,
   selectedMemberIds,
   onFormFieldChange,
   applyProjectMembers
 }: {
   project: ProjectWithMembers;
-  refreshProject: () => Promise<ProjectWithMembers | undefined>;
+  refreshProjects: KeyedMutator<ProjectWithMembers[]>;
   disabled?: boolean;
   fieldConfig?: ProjectAndMembersFieldConfig;
   isTeamLead: boolean;
@@ -40,7 +41,11 @@ export function ProjectForm({
 }) {
   const { user } = useUser();
 
+  const { showError } = useSnackbar();
+
   const { id: projectId, projectMembers } = project;
+
+  // Note: selectedMemberIds never includes team lead
   const selectedProjectMembers = selectedMemberIds
     .map((memberId) => projectMembers.find((member) => member.id === memberId))
     .filter(isTruthy);
@@ -49,37 +54,37 @@ export function ProjectForm({
   );
   const { onProjectUpdate, onProjectMemberUpdate, onProjectMemberAdd } = useProjectUpdates({
     projectId: project.id,
-    isTeamLead
+    isTeamLead,
+    refreshProjects
   });
 
   async function addTeamMember(selectedMemberId: string) {
-    // get updated project members in case they were updated in the form but not refreshed yet
-    const updatedProject = await refreshProject();
-    if (!updatedProject) {
-      return;
-    }
     const newMemberIds = [...selectedMemberIds];
     const newProjectMembers = selectedMemberIds
-      .map((memberId) => updatedProject.projectMembers.find((member) => member.id === memberId))
+      .map((memberId) => project.projectMembers.find((member) => member.id === memberId))
       .filter(isTruthy);
     // always include team lead
-    const teamLead = updatedProject.projectMembers.find((member) => member.teamLead)!;
+    const teamLead = project.projectMembers.find((member) => member.teamLead)!;
     newProjectMembers.unshift(teamLead);
     if (selectedMemberId !== newTeamMember) {
       newMemberIds.push(selectedMemberId);
-      const projectMember = updatedProject.projectMembers.find(({ id }) => id === selectedMemberId);
+      const projectMember = project.projectMembers.find(({ id }) => id === selectedMemberId);
       if (projectMember) {
         newProjectMembers.push(projectMember);
       } else {
         log.error('Project member not found', { selectedMemberId });
       }
     } else {
-      const newProjectMember = await onProjectMemberAdd(defaultProjectMember());
-      // get updated project members in case they were updated in the form but not refreshed yet
-      await refreshProject();
-      if (newProjectMember) {
-        newMemberIds.push(newProjectMember.id);
-        newProjectMembers.push(newProjectMember);
+      try {
+        const newProjectMember = await onProjectMemberAdd(defaultProjectMember());
+        if (newProjectMember) {
+          newMemberIds.push(newProjectMember.id);
+          newProjectMembers.push(newProjectMember);
+        }
+      } catch (error) {
+        log.warn('Failed to add project member', { error });
+        showError('Failed to add project member');
+        return;
       }
     }
     // update proposal answers form
@@ -90,36 +95,17 @@ export function ProjectForm({
 
   function removeTeamMember(memberId: string) {
     const newMemberIds = selectedMemberIds.filter((id) => id !== memberId);
-    const _projectMembers = projectMembers.filter(({ id }) => newMemberIds.includes(id));
+    const newProjectMembers = projectMembers.filter(({ id }) => newMemberIds.includes(id));
     // always include team lead
     const teamLead = projectMembers.find((member) => member.teamLead)!;
-    _projectMembers.unshift(teamLead);
+    newProjectMembers.unshift(teamLead);
+    // update proposal answers form
     onFormFieldChange({ projectId, selectedMemberIds: newMemberIds });
-    applyProjectMembers(_projectMembers);
+    // update project form
+    applyProjectMembers(newProjectMembers);
   }
 
-  const onProjectUpdateMemo = useCallback(
-    (updatedProjectValues: Record<string, any>) => {
-      onProjectUpdate({
-        ...updatedProjectValues,
-        id: projectId
-      });
-    },
-    [onProjectUpdate, projectId]
-  );
-
   const teamLeadMemberId = projectMembers[0]?.id;
-  const onTeamLeadUpdate = useCallback(
-    (updatedProjectMember: Record<string, any>) => {
-      if (teamLeadMemberId) {
-        onProjectMemberUpdate({
-          ...updatedProjectMember,
-          id: teamLeadMemberId
-        });
-      }
-    },
-    [onProjectMemberUpdate, teamLeadMemberId]
-  );
 
   return (
     <Stack gap={2} width='100%'>
@@ -128,7 +114,7 @@ export function ProjectForm({
         defaultRequired
         disabled={!isTeamLead || disabled}
         fieldConfig={fieldConfig}
-        onChange={onProjectUpdateMemo}
+        onChange={onProjectUpdate}
         properties={projectFieldProperties}
       />
       <Typography variant='h6' mt={2}>
@@ -140,13 +126,9 @@ export function ProjectForm({
         disabled={!isTeamLead || disabled}
         defaultRequired
         fieldConfig={fieldConfig?.projectMember}
-        onChange={onTeamLeadUpdate}
+        onChange={(updates) => onProjectMemberUpdate(teamLeadMemberId!, updates)}
       />
-      <Divider
-        sx={{
-          my: 1
-        }}
-      />
+      <Divider sx={{ my: 1 }} />
       {selectedProjectMembers.map((projectMember, index) => (
         <Stack key={`project-member-${projectMember.id}`}>
           <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
@@ -160,11 +142,8 @@ export function ProjectForm({
             </IconButton>
           </Stack>
           <ProjectMemberFieldAnswers
-            onChange={(updatedProjectMember) => {
-              onProjectMemberUpdate({
-                ...updatedProjectMember,
-                id: projectMember.id!
-              });
+            onChange={(updates) => {
+              onProjectMemberUpdate(projectMember.id, updates);
             }}
             projectMemberIndex={index + 1}
             disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}

@@ -165,10 +165,7 @@ export function ProjectFieldAnswer({
             selectedMemberIds={selectedMemberIds}
             onFormFieldChange={onChange}
             project={selectedProject}
-            refreshProject={async () => {
-              const updatedList = await refreshProjects();
-              return updatedList?.find((p) => p.id === selectedProject.id);
-            }}
+            refreshProjects={refreshProjects}
             applyProjectMembers={applyProjectMembers}
           />
         </Box>
