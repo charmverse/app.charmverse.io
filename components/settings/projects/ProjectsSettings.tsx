@@ -32,7 +32,7 @@ import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
 import { CreateProjectForm } from './components/CreateProjectForm';
-import { SettingsProjectFormAnswers } from './components/ProjectForm';
+import { ProjectFormAnswers } from './components/ProjectForm';
 
 function ProjectRow({
   projectWithMembers,
@@ -245,7 +245,7 @@ function ProjectRow({
         </AccordionSummary>
         <AccordionDetails>
           <FormProvider {...form}>
-            <SettingsProjectFormAnswers isTeamLead={isTeamLead} />
+            <ProjectFormAnswers isTeamLead={isTeamLead} />
           </FormProvider>
         </AccordionDetails>
       </Accordion>

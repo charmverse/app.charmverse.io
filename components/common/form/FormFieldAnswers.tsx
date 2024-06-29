@@ -8,7 +8,7 @@ import type { Control, UseFormGetFieldState } from 'react-hook-form';
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { FieldAnswerInput, FormFieldValue } from 'lib/forms/interfaces';
+import type { ProjectFieldValue, FormFieldValue, FieldAnswerInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -19,7 +19,7 @@ import { hoverIconsStyle } from '../Icons/hoverIconsStyle';
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import { FieldWrapper } from './fields/FieldWrapper';
-import { ProjectProfileInputField } from './fields/ProjectProfileInputField';
+import { ProjectFieldAnswer } from './fields/ProjectField/ProjectFieldAnswer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
@@ -52,9 +52,11 @@ type FormFieldAnswersProps = {
   pageId?: string;
   isDraft?: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
-  project?: ProjectWithMembers | null;
-  proposalId?: string;
+  projectId?: string | null;
+  proposalId: string;
   milestoneProps?: ProposalRewardsTableProps;
+  applyProject: (project: ProjectWithMembers, selectedMemberIds: string[]) => void;
+  applyProjectMembers: (projectMembers: ProjectWithMembers['projectMembers']) => void;
 };
 
 const StyledStack = styled(Stack)`
@@ -73,10 +75,12 @@ export function FormFieldAnswers({
   getFieldState,
   control,
   pageId,
-  project,
+  projectId,
   threads = {},
   proposalId,
-  milestoneProps
+  milestoneProps,
+  applyProject,
+  applyProjectMembers
 }: FormFieldAnswersProps) {
   const { user } = useUser();
   const { showMessage } = useSnackbar();
@@ -139,11 +143,13 @@ export function FormFieldAnswers({
               render={({ field, fieldState: { error } }) => {
                 return formField.type === 'project_profile' ? (
                   <FieldWrapper required label='Project'>
-                    <ProjectProfileInputField
+                    <ProjectFieldAnswer
                       disabled={disabled}
-                      proposalId={proposalId}
+                      applyProject={applyProject}
+                      applyProjectMembers={applyProjectMembers}
+                      proposalId={proposalId!}
                       formFieldId={formField.id}
-                      formFieldValue={field.value as { selectedMemberIds: string[] }}
+                      formFieldValue={field.value as ProjectFieldValue}
                       getFieldState={getFieldState}
                       fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
                       onChange={field.onChange}
@@ -173,7 +179,7 @@ export function FormFieldAnswers({
                           </Box>
                         )
                       }
-                      project={project}
+                      projectId={projectId}
                     />
                   </FieldWrapper>
                 ) : (

@@ -32,3 +32,20 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers): 
     })
   };
 }
+
+function convertProjectMemberToProjectMemberPayload(projectMember: ProjectAndMembersPayload['projectMembers'][0]) {
+  return {
+    warpcast: projectMember.warpcast,
+    email: projectMember.email,
+    github: projectMember.github,
+    linkedin: projectMember.linkedin,
+    name: projectMember.name,
+    otherUrl: projectMember.otherUrl,
+    previousProjects: projectMember.previousProjects,
+    telegram: projectMember.telegram,
+    twitter: projectMember.twitter,
+    walletAddress: projectMember.walletAddress,
+    id: projectMember.id,
+    userId: projectMember.userId
+  };
+}
