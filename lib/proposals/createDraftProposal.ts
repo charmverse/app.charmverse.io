@@ -132,7 +132,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
               private: false,
               required: true,
               id: uuid(),
-              fieldConfig: createDefaultProjectAndMembersFieldConfig()
+              fieldConfig: createDefaultProjectAndMembersFieldConfig({ allFieldsRequired: true })
             }
           ]
         : [],

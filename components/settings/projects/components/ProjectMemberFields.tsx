@@ -37,7 +37,6 @@ export function ProjectMemberFieldsEditor({
 }) {
   return (
     <FieldsEditor
-      defaultRequired={defaultRequired}
       properties={projectMemberFieldProperties}
       fieldConfig={fieldConfig}
       onChange={onChange}

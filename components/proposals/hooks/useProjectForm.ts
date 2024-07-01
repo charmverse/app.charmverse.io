@@ -13,7 +13,7 @@ import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
 export function useProjectForm(options: {
-  fieldConfig: ProjectAndMembersFieldConfig;
+  fieldConfig?: ProjectAndMembersFieldConfig;
   projectId?: string | null;
   selectedMemberIds?: string[];
   initialProjectValues?: ProjectWithMembers | null;

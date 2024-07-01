@@ -46,11 +46,11 @@ function addMatchersToSchema({
   }
 }
 
-export function createProjectYupSchema({ fieldConfig }: { fieldConfig: ProjectAndMembersFieldConfig }) {
+export function createProjectYupSchema({ fieldConfig }: { fieldConfig?: ProjectAndMembersFieldConfig }) {
   const yupProjectSchemaObject: Partial<Record<ProjectField, yup.StringSchema>> = {};
   const yupProjectMemberSchemaObject: Partial<Record<ProjectMemberField, yup.StringSchema>> = {};
   projectFieldProperties.forEach((projectFieldProperty) => {
-    const projectFieldConfig = fieldConfig[projectFieldProperty.field] ?? {
+    const projectFieldConfig = fieldConfig?.[projectFieldProperty.field] ?? {
       required: false,
       show: true
     };
@@ -73,7 +73,7 @@ export function createProjectYupSchema({ fieldConfig }: { fieldConfig: ProjectAn
   });
 
   projectMemberFieldProperties.forEach((projectMemberFieldProperty) => {
-    const projectMemberFieldConfig = fieldConfig.projectMember[projectMemberFieldProperty.field] ?? {
+    const projectMemberFieldConfig = fieldConfig?.projectMember[projectMemberFieldProperty.field] ?? {
       required: false,
       show: true
     };

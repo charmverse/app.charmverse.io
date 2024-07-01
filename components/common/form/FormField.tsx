@@ -206,10 +206,7 @@ function ExpandedFormField({
       )}
       {formField.type === 'project_profile' ? (
         <ProjectFieldEditor
-          defaultRequired
-          fieldConfig={
-            (formField.fieldConfig ?? createDefaultProjectAndMembersFieldConfig()) as ProjectAndMembersFieldConfig
-          }
+          fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
           onChange={(fieldConfig) => {
             updateFormField({
               id: formField.id,
@@ -362,13 +359,7 @@ export function FormField(
           {!isOpen || readOnly ? (
             <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
               {formField.type === 'project_profile' ? (
-                <ProjectFieldEditor
-                  fieldConfig={
-                    (formField.fieldConfig as ProjectAndMembersFieldConfig) ??
-                    createDefaultProjectAndMembersFieldConfig()
-                  }
-                  defaultRequired
-                />
+                <ProjectFieldEditor fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig} />
               ) : (
                 <FieldTypeRenderer
                   labelEndAdornment={

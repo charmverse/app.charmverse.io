@@ -10,8 +10,7 @@ import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import {
   projectMemberFieldProperties,
   createDefaultProjectAndMembersFieldConfig,
-  projectFieldProperties,
-  getFieldConfig
+  projectFieldProperties
 } from 'lib/projects/formField';
 import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 

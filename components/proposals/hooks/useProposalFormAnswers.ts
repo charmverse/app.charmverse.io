@@ -51,8 +51,7 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
     // initialProjectValues: proposal?.project,
     // projectId: projectAnswer?.projectId,
     // selectedMemberIds: projectAnswer?.selectedMemberIds,
-    fieldConfig:
-      (projectField?.fieldConfig as ProjectAndMembersFieldConfig) ?? createDefaultProjectAndMembersFieldConfig()
+    fieldConfig: projectField?.fieldConfig as ProjectAndMembersFieldConfig
   });
 
   const onSave = useCallback(

@@ -36,8 +36,6 @@ function FieldAnswer({
     return null;
   }
 
-  console.log('property', property.label, registeredField);
-
   return (
     <TextInputField
       key={property.label}
