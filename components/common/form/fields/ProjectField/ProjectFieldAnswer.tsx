@@ -156,20 +156,18 @@ export function ProjectFieldAnswer({
         {/** Required for support form field comments */}
         {inputEndAdornment}
       </Stack>
-      {selectedProject && (
-        <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
-          <ProjectForm
-            fieldConfig={fieldConfig}
-            isTeamLead={isTeamLead}
-            disabled={disabled}
-            selectedMemberIds={selectedMemberIds}
-            onFormFieldChange={onChange}
-            project={selectedProject}
-            refreshProjects={refreshProjects}
-            applyProjectMembers={applyProjectMembers}
-          />
-        </Box>
-      )}
+      <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
+        <ProjectForm
+          fieldConfig={fieldConfig}
+          isTeamLead={isTeamLead}
+          disabled={disabled}
+          selectedMemberIds={selectedMemberIds}
+          onFormFieldChange={onChange}
+          project={selectedProject}
+          refreshProjects={refreshProjects}
+          applyProjectMembers={applyProjectMembers}
+        />
+      </Box>
     </Stack>
   );
 }

@@ -14,7 +14,7 @@ export function useProjectUpdates({
   refreshProjects,
   isTeamLead
 }: {
-  projectId: string;
+  projectId?: string; // projectId is only required to make changes
   refreshProjects: KeyedMutator<ProjectWithMembers[]>;
   isTeamLead: boolean;
 }) {
@@ -73,7 +73,7 @@ export function useProjectUpdates({
   const onProjectUpdateMemo = useMemo(
     () =>
       debounce(async (projectPayload: Record<string, any>) => {
-        if (!isTeamLead) {
+        if (!isTeamLead || !projectId) {
           return null;
         }
 
@@ -99,7 +99,7 @@ export function useProjectUpdates({
           memberId: string,
           projectMemberPayload: Omit<UpdateProjectMemberPayload, 'id'> & { userId?: string }
         ) => {
-          if (!isTeamLead && projectMemberPayload.userId !== user?.id) {
+          if ((!isTeamLead && projectMemberPayload.userId !== user?.id) || !projectId) {
             return null;
           }
           const updatedTeamMember = await charmClient.projects.updateProjectMember({

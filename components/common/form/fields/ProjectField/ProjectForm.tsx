@@ -30,7 +30,7 @@ export function ProjectForm({
   onFormFieldChange,
   applyProjectMembers
 }: {
-  project: ProjectWithMembers;
+  project?: ProjectWithMembers; // only provided if you belong to the project
   refreshProjects: KeyedMutator<ProjectWithMembers[]>;
   disabled?: boolean;
   fieldConfig?: ProjectAndMembersFieldConfig;
@@ -43,7 +43,8 @@ export function ProjectForm({
 
   const { showError } = useSnackbar();
 
-  const { id: projectId, projectMembers } = project;
+  const projectId = project?.id;
+  const projectMembers = project?.projectMembers || [];
 
   // Note: selectedMemberIds never includes team lead
   const selectedProjectMembers = selectedMemberIds
@@ -53,12 +54,16 @@ export function ProjectForm({
     (projectMember) => !projectMember.teamLead && projectMember.id && !selectedMemberIds.includes(projectMember.id)
   );
   const { onProjectUpdate, onProjectMemberUpdate, onProjectMemberAdd } = useProjectUpdates({
-    projectId: project.id,
+    projectId,
     isTeamLead,
     refreshProjects
   });
 
   async function addTeamMember(selectedMemberId: string) {
+    if (!projectId) {
+      // project doesnt belong to user
+      return;
+    }
     const newMemberIds = [...selectedMemberIds];
     const newProjectMembers = selectedMemberIds
       .map((memberId) => project.projectMembers.find((member) => member.id === memberId))
@@ -94,6 +99,10 @@ export function ProjectForm({
   }
 
   function removeTeamMember(memberId: string) {
+    if (!projectId) {
+      // project doesnt belong to user
+      return;
+    }
     const newMemberIds = selectedMemberIds.filter((id) => id !== memberId);
     const newProjectMembers = projectMembers.filter(({ id }) => newMemberIds.includes(id));
     // always include team lead
