@@ -46,22 +46,16 @@ function addMatchersToSchema({
   }
 }
 
-export function createProjectYupSchema({
-  fieldConfig,
-  defaultRequired = false
-}: {
-  fieldConfig: ProjectAndMembersFieldConfig;
-  defaultRequired?: boolean;
-}) {
+export function createProjectYupSchema({ fieldConfig }: { fieldConfig: ProjectAndMembersFieldConfig }) {
   const yupProjectSchemaObject: Partial<Record<ProjectField, yup.StringSchema>> = {};
   const yupProjectMemberSchemaObject: Partial<Record<ProjectMemberField, yup.StringSchema>> = {};
   projectFieldProperties.forEach((projectFieldProperty) => {
     const projectFieldConfig = fieldConfig[projectFieldProperty.field] ?? {
-      required: defaultRequired,
+      required: false,
       show: true
     };
 
-    projectFieldConfig.required = projectFieldConfig.required ?? defaultRequired;
+    projectFieldConfig.required = projectFieldConfig.required ?? false;
 
     if (projectFieldConfig.show !== false) {
       if (projectFieldConfig.required) {
@@ -80,10 +74,10 @@ export function createProjectYupSchema({
 
   projectMemberFieldProperties.forEach((projectMemberFieldProperty) => {
     const projectMemberFieldConfig = fieldConfig.projectMember[projectMemberFieldProperty.field] ?? {
-      required: defaultRequired,
+      required: false,
       show: true
     };
-    projectMemberFieldConfig.required = projectMemberFieldConfig.required ?? defaultRequired;
+    projectMemberFieldConfig.required = projectMemberFieldConfig.required ?? false;
     if (projectMemberFieldConfig.show !== false) {
       if (projectMemberFieldConfig.required) {
         yupProjectMemberSchemaObject[projectMemberFieldProperty.field as ProjectMemberField] = yup.string().required();

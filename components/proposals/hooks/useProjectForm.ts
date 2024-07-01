@@ -36,7 +36,6 @@ export function useProjectForm(options: {
 
   useEffect(() => {
     yupSchema.current = createProjectYupSchema({
-      defaultRequired: true,
       fieldConfig
     });
   }, [!!fieldConfig]);

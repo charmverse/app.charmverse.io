@@ -127,7 +127,6 @@ export function ProjectForm({
     <Stack gap={2} width='100%'>
       <Typography variant='h6'>Project Info</Typography>
       <FieldAnswers
-        defaultRequired
         disabled={!isTeamLead || disabled}
         fieldConfig={fieldConfig}
         onChange={onProjectUpdate}
@@ -140,7 +139,6 @@ export function ProjectForm({
       <ProjectMemberFieldAnswers
         projectMemberIndex={0}
         disabled={!isTeamLead || disabled}
-        defaultRequired
         fieldConfig={fieldConfig?.projectMember}
         onChange={(updates) => onProjectMemberUpdate(teamLeadMemberId!, updates)}
       />

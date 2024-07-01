@@ -6,20 +6,17 @@ import { FieldsEditor } from './FieldsEditor';
 
 export function ProjectMemberFieldAnswers({
   fieldConfig,
-  defaultRequired,
   projectMemberIndex,
   disabled,
   onChange
 }: {
   projectMemberIndex: number;
   fieldConfig?: FieldConfig;
-  defaultRequired?: boolean;
   disabled?: boolean;
   onChange?: (projectMemberPayload: Record<string, any>) => any;
 }) {
   return (
     <FieldAnswers
-      defaultRequired={defaultRequired}
       disabled={disabled}
       name={`projectMembers[${projectMemberIndex}]`}
       fieldConfig={fieldConfig}

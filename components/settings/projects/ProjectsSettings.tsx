@@ -55,8 +55,7 @@ function ProjectRow({
     reValidateMode: 'onChange',
     resolver: yupResolver(
       createProjectYupSchema({
-        fieldConfig: createDefaultProjectAndMembersFieldConfig(),
-        defaultRequired: false
+        fieldConfig: createDefaultProjectAndMembersFieldConfig()
       })
     ),
     criteriaMode: 'all',
@@ -301,8 +300,7 @@ export function ProjectsSettings() {
     reValidateMode: 'onChange',
     resolver: yupResolver(
       createProjectYupSchema({
-        fieldConfig: createDefaultProjectAndMembersFieldConfig(),
-        defaultRequired: false
+        fieldConfig: createDefaultProjectAndMembersFieldConfig()
       })
     ),
     criteriaMode: 'all',
