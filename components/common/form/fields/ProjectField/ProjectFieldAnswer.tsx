@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import type { UseFormGetFieldState } from 'react-hook-form';
 
-import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
+import { useCreateProject, useGetProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
@@ -53,8 +53,11 @@ export function ProjectFieldAnswer({
   const { data: projectsWithMembers, mutate: refreshProjects } = useGetProjects();
   const { membersRecord } = useMembers();
   const { trigger: createProject } = useCreateProject();
+  const { data: selectedProjectFromDb } = useGetProject({
+    projectId
+  });
 
-  const selectedProject = projectsWithMembers?.find((_project) => _project.id === projectId);
+  const selectedProject = projectsWithMembers?.find((_project) => _project.id === projectId) ?? selectedProjectFromDb;
   const isTeamLead = !!selectedProject?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
 
   const onChangeDebounced = useMemo(() => debounce(_onChangeDebounced, 300), [_onChangeDebounced]);

@@ -3,13 +3,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { projectInclude } from 'lib/projects/constants';
 import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 import { updateProjectAndMembers } from 'lib/projects/updateProjectAndMembers';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(updateProjectController);
+handler.use(requireUser).put(updateProjectController).get(getProjectController);
 
 async function updateProjectController(req: NextApiRequest, res: NextApiResponse<ProjectWithMembers>) {
   const projectUpdatePayload = req.body as ProjectAndMembersPayload;
@@ -32,6 +33,19 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
     payload: projectUpdatePayload
   });
   return res.status(201).json(updatedProjectWithMembers);
+}
+
+async function getProjectController(req: NextApiRequest, res: NextApiResponse<ProjectWithMembers>) {
+  const projectId = req.query.id as string;
+
+  const project = await prisma.project.findUniqueOrThrow({
+    where: {
+      id: projectId
+    },
+    include: projectInclude
+  });
+
+  return res.status(201).json(project);
 }
 
 export default withSessionRoute(handler);
