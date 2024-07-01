@@ -108,54 +108,58 @@ export function ProjectFieldAnswer({
 
   return (
     <Stack gap={1} width='100%' mb={1}>
-      <Stack flexDirection='row' gap={1} alignItems='center'>
-        <Select
-          sx={{
-            width: '100%'
-          }}
-          key={projectId}
-          // only proposal author is able to change the project profile, not even team lead can change it
-          disabled={disabled}
-          displayEmpty
-          value={projectId ?? ''}
-          data-test='project-profile-select'
-          renderValue={() => {
-            if (!selectedProject) {
-              return <Typography color='secondary'>Select a project profile</Typography>;
-            }
-            return selectedProject.name;
-          }}
-        >
-          {projectsWithMembers?.map((_project) => {
-            return (
-              <MenuItem
-                key={_project.id}
-                data-test={`project-option-${_project.id}`}
-                value={_project.id}
-                onClick={async () => {
-                  // retrieve the latest project data
-                  const updatedList = await refreshProjects();
-                  const _selectedProject = updatedList?.find((p) => p.id === _project.id);
-                  if (_selectedProject) {
-                    onSelectProject(_selectedProject);
-                  }
-                }}
-              >
-                <Typography color={_project.name ? '' : 'secondary'}>{_project.name || 'Untitled Project'}</Typography>
-              </MenuItem>
-            );
-          })}
-          <Divider />
-          <MenuItem data-test='project-option-new' onClick={addNewProject}>
-            <Stack flexDirection='row' alignItems='center' gap={0.05}>
-              <MuiAddIcon fontSize='small' />
-              <Typography>Add a new project profile</Typography>
-            </Stack>
-          </MenuItem>
-        </Select>
-        {/** Required for support form field comments */}
-        {inputEndAdornment}
-      </Stack>
+      {!disabled && (
+        <Stack flexDirection='row' gap={1} alignItems='center'>
+          <Select
+            sx={{
+              width: '100%'
+            }}
+            key={projectId}
+            // only proposal author is able to change the project profile, not even team lead can change it
+            disabled={disabled}
+            displayEmpty
+            value={projectId ?? ''}
+            data-test='project-profile-select'
+            renderValue={() => {
+              if (!selectedProject) {
+                return <Typography color='secondary'>Select a project profile</Typography>;
+              }
+              return selectedProject.name;
+            }}
+          >
+            {projectsWithMembers?.map((_project) => {
+              return (
+                <MenuItem
+                  key={_project.id}
+                  data-test={`project-option-${_project.id}`}
+                  value={_project.id}
+                  onClick={async () => {
+                    // retrieve the latest project data
+                    const updatedList = await refreshProjects();
+                    const _selectedProject = updatedList?.find((p) => p.id === _project.id);
+                    if (_selectedProject) {
+                      onSelectProject(_selectedProject);
+                    }
+                  }}
+                >
+                  <Typography color={_project.name ? '' : 'secondary'}>
+                    {_project.name || 'Untitled Project'}
+                  </Typography>
+                </MenuItem>
+              );
+            })}
+            <Divider />
+            <MenuItem data-test='project-option-new' onClick={addNewProject}>
+              <Stack flexDirection='row' alignItems='center' gap={0.05}>
+                <MuiAddIcon fontSize='small' />
+                <Typography>Add a new project profile</Typography>
+              </Stack>
+            </MenuItem>
+          </Select>
+          {/** Required for support form field comments */}
+          {inputEndAdornment}
+        </Stack>
+      )}
       <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
         <ProjectForm
           fieldConfig={fieldConfig}
