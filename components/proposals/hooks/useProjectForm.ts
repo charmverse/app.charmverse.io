@@ -32,10 +32,9 @@ export function useProjectForm(options: {
   }, [!!fieldConfig]);
 
   const form = useForm({
-    // defaultValues: defaultProjectAndMembersPayload,
     defaultValues: createDefaultProjectAndMembersPayload(),
     reValidateMode: 'onChange',
-    resolver, // yupResolver(yupSchema.current),
+    resolver,
     criteriaMode: 'all',
     mode: 'onChange'
   });
