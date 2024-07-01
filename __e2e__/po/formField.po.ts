@@ -91,8 +91,8 @@ export class FormField extends DocumentPage {
     }
   }
 
-  async getProjectFieldLabel(fieldName: string) {
-    return this.page.locator(`data-test=project-${fieldName}-field-container >> data-test=field-label`).textContent();
+  getProjectFieldLabel(fieldName: string) {
+    return this.page.locator(`data-test=project-${fieldName}-field-container >> data-test=field-label`);
   }
 
   async getProjectOption(projectId: string) {

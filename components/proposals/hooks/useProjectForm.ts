@@ -1,17 +1,14 @@
-import type { Project, ProjectMember } from '@charmverse/core/prisma';
+import type { ProjectMember } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import type { Resolver } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { useGetProjects } from 'charmClient/hooks/projects';
-import { useMembers } from 'hooks/useMembers';
-import { useUser } from 'hooks/useUser';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
@@ -22,15 +19,8 @@ export function useProjectForm(options: {
   initialProjectValues?: ProjectWithMembers | null;
 }) {
   const { fieldConfig } = options;
-  // const { user } = useUser();
-  // const { membersRecord } = useMembers();
-  // const { data: projectsWithMembers } = useGetProjects();
-  // const selectedMemberIds = options.selectedMemberIds;
 
-  // const defaultProjectAndMembersPayload = useMemo(
-  //   () => getDefaultProjectValues({ user, userMemberRecord: user ? membersRecord[user.id] : undefined }),
-  //   [user, membersRecord]
-  // );
+  const resolver = useYupValidationResolver(createProjectYupSchema({ fieldConfig }));
 
   const yupSchema = useRef(yup.object());
 
@@ -41,40 +31,12 @@ export function useProjectForm(options: {
   }, [!!fieldConfig]);
 
   const form = useForm({
-    // defaultValues: defaultProjectAndMembersPayload,
     defaultValues: createDefaultProjectAndMembersPayload(),
     reValidateMode: 'onChange',
-    resolver: yupResolver(yupSchema.current),
+    resolver,
     criteriaMode: 'all',
     mode: 'onChange'
   });
-  const values = form.watch();
-
-  // useEffect(() => {
-  //   const projectWithMembers =
-  //     options.initialProjectValues ?? projectsWithMembers?.find((project) => project.id === options.projectId);
-
-  //   if (options.projectId && projectWithMembers) {
-  //     const teamLead = projectWithMembers.projectMembers.find((member) => member.teamLead);
-  //     const nonTeamLeadMembers = projectWithMembers.projectMembers
-  //       .filter(
-  //         (member) =>
-  //           // Make sure only the selected members are present in the form
-  //           !member.teamLead && selectedMemberIds?.includes(member.id)
-  //       )
-  //       .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-  //     form.reset(
-  //       convertToProjectValues({
-  //         ...projectWithMembers,
-  //         projectMembers: [teamLead!, ...nonTeamLeadMembers]
-  //       })
-  //     );
-  //     // trigger form so that errors are populated correctly
-  //     form.trigger();
-  //   } else {
-  //     // form.reset(defaultProjectAndMembersPayload);
-  //   }
-  // }, [!!projectsWithMembers, !!options.initialProjectValues, options.projectId, selectedMemberIds?.length]);
 
   const applyProject = useCallback(
     (project: ProjectWithMembers, selectedMemberIds: string[]) => {
@@ -105,4 +67,14 @@ export function useProjectForm(options: {
   );
 
   return { form, applyProject, applyProjectMembers };
+}
+
+// wrap yupResolver so that it always updates with the schema
+function useYupValidationResolver(validationSchema: any) {
+  const schema = useRef();
+  schema.current = validationSchema;
+
+  return useCallback<Resolver>(async (data, context, options) => {
+    return yupResolver(schema.current)(data, context, options);
+  }, []);
 }

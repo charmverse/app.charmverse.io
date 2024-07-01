@@ -33,6 +33,7 @@ describe('createReward', () => {
     const reviewers = [{ userId: user.id }, { roleId: reviewerRole.id }];
 
     const credentialTemplateId = uuid();
+    const imageUrl = 'https://s3.amazonaws.com/charm.public.jpeg';
 
     const rewardData: RewardCreationData = {
       spaceId: space.id,
@@ -46,14 +47,29 @@ describe('createReward', () => {
       customReward: 'Special Badge',
       fields: { fieldName: 'sampleField', type: 'text' },
       pageProps: {
-        title: 'reward page'
+        title: 'reward page',
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'image',
+              attrs: {
+                alt: null,
+                src: imageUrl,
+                size: 700,
+                track: [],
+                caption: null
+              }
+            }
+          ]
+        }
       },
       reviewers,
       allowedSubmitterRoles: [submitterRole.id],
       selectedCredentialTemplates: [credentialTemplateId]
     };
 
-    const { reward } = await createReward(rewardData);
+    const { reward, createdPageId } = await createReward(rewardData);
 
     expect(reward).toMatchObject<Partial<RewardWithUsers>>({
       chainId: 2,
@@ -69,6 +85,13 @@ describe('createReward', () => {
       assignedSubmitters: null,
       selectedCredentialTemplates: [credentialTemplateId]
     });
+
+    const page = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: createdPageId
+      }
+    });
+    expect(page.galleryImage).toBe(imageUrl);
   });
 
   it('should successfully create assigned reward based on assignedSubmitters', async () => {
