@@ -23,6 +23,7 @@ import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import type { ProposalPropertiesField } from './blocks/interfaces';
+import type { DocumentWithSigners } from './documentsToSign/getProposalDocumentsToSign';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from './rubric/interfaces';
 
 export type ProposalEvaluationStatus = 'in_progress' | 'passed' | 'declined' | 'unpublished' | 'archived';
@@ -71,6 +72,7 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   actionLabels?: WorkflowEvaluationJson['actionLabels'];
   notificationLabels?: WorkflowEvaluationJson['notificationLabels'];
   type: ConcealableEvaluationType;
+  documentsToSign?: DocumentWithSigners[];
 };
 
 export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {

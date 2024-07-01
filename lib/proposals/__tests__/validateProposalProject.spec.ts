@@ -46,7 +46,7 @@ describe('validateProposalProject', () => {
           }
         ]
       })
-    ).toThrow(InvalidInputError);
+    ).toThrow();
   });
 
   it('Should not throw error if proposal project information is valid', async () => {

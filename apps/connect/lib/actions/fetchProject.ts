@@ -35,15 +35,15 @@ export async function fetchProject(projectId: string) {
   return {
     ...project,
     projectMembers: project.projectMembers.map((member) => {
-      const farcasterUser = member.user!.farcasterUser?.account as unknown as StatusAPIResponse;
+      const farcasterUser = member.user?.farcasterUser?.account as unknown as StatusAPIResponse;
       return {
         ...member.user,
         farcasterUser: {
-          fid: member.user!.farcasterUser?.fid,
-          pfpUrl: farcasterUser.pfpUrl,
-          bio: farcasterUser.bio,
-          username: farcasterUser.username,
-          displayName: farcasterUser.displayName
+          fid: member.user?.farcasterUser?.fid,
+          pfpUrl: farcasterUser?.pfpUrl,
+          bio: farcasterUser?.bio,
+          username: farcasterUser?.username,
+          displayName: farcasterUser?.displayName
         }
       };
     })

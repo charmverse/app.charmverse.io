@@ -113,10 +113,19 @@ function DocumentPageComponent({
     proposalId
   });
 
-  const { control, formFields, getFieldState, isLoadingAnswers, projectForm, onSave, refreshProposalFormAnswers } =
-    useProposalFormAnswers({
-      proposal
-    });
+  const {
+    control,
+    formFields,
+    getFieldState,
+    applyProject,
+    applyProjectMembers,
+    isLoadingAnswers,
+    projectForm,
+    onSave,
+    refreshProposalFormAnswers
+  } = useProposalFormAnswers({
+    proposal
+  });
 
   const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
     rewardId
@@ -261,7 +270,6 @@ function DocumentPageComponent({
   }
 
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
-  const projectId = proposal?.projectId;
 
   return (
     <Box id='file-drop-container' display='flex' flexDirection='column' height='100%'>
@@ -515,8 +523,10 @@ function DocumentPageComponent({
                         threads={threads}
                         // This is required to reinstate the form field state after the proposal is published, necessary to show the correct project id
                         key={proposal?.status === 'draft' ? 'draft' : 'published'}
-                        project={proposal.project}
+                        projectId={proposal.projectId}
                         proposalId={proposal.id}
+                        applyProject={applyProject}
+                        applyProjectMembers={applyProjectMembers}
                       />
                     </LoadingComponent>
                   )

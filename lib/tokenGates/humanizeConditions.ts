@@ -25,7 +25,7 @@ export type HumanizeCondition = {
 export function humanizeConditionsData(conditions: TokenGate['conditions']): HumanizeCondition[] {
   const humanReadableConditions = conditions.accessControlConditions.map<HumanizeCondition>((acc) => {
     const chainDetails = getChainById(Number(acc.chain));
-    const tokenSymbol = chainDetails?.viem.nativeCurrency.symbol;
+    const tokenSymbol = chainDetails?.viem?.nativeCurrency.symbol || chainDetails?.nativeCurrency.symbol;
     const quantity = acc.quantity;
     const balance = Number(quantity) && Number(quantity) % 1 === 0 ? formatEther(BigInt(quantity)) : quantity;
     const image = acc.image;

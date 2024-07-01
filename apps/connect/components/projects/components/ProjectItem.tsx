@@ -18,7 +18,7 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
     <Card>
       <CardActionArea
         LinkComponent={Link}
-        href={`/projects/${project.id}`}
+        href={`/p/${project.id}`}
         hrefLang='en'
         sx={{ display: 'flex', gap: 2, p: 2, alignItems: 'normal', justifyContent: 'flex-start' }}
       >

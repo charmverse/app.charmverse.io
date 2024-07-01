@@ -12,20 +12,22 @@ export function ProjectDescription({ description }: { description: string }) {
   return (
     <Stack mt={2}>
       <Typography variant='body1'>{showFullDescription ? description : fancyTrim(description, 500)}</Typography>
-      <Typography
-        variant='body2'
-        sx={{
-          mt: 1,
-          fontWeight: 'bold',
-          cursor: 'pointer'
-        }}
-        component='span'
-        onClick={() => {
-          setShowFullDescription(!showFullDescription);
-        }}
-      >
-        {showFullDescription ? 'Show less' : 'Show more'}
-      </Typography>
+      {description.length > 500 && (
+        <Typography
+          variant='body2'
+          sx={{
+            mt: 1,
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+          component='span'
+          onClick={() => {
+            setShowFullDescription(!showFullDescription);
+          }}
+        >
+          {showFullDescription ? 'Show less' : 'Show more'}
+        </Typography>
+      )}
     </Stack>
   );
 }

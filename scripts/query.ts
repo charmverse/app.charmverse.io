@@ -1,3 +1,4 @@
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
 
 /**
@@ -17,5 +18,4 @@ async function search() {
   });
   console.log(result);
 }
-
 search().then(() => console.log('Done'));

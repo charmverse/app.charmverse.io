@@ -25,7 +25,7 @@ import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
 
 import type { MaybeString } from './helpers';
-import { useDELETE, useGET, useGETtrigger, usePOST, usePUT } from './helpers';
+import { useDELETE, useGET, useGETImmutable, useGETtrigger, usePOST, usePUT } from './helpers';
 
 // Getters
 
@@ -131,7 +131,7 @@ export function useUpdateProposalFormFields({ proposalId }: { proposalId: string
 }
 
 export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return useGET<FieldAnswerInput[]>(proposalId ? `/api/proposals/${proposalId}/form/answers` : null);
+  return useGETImmutable<FieldAnswerInput[]>(proposalId ? `/api/proposals/${proposalId}/form/answers` : null);
 }
 
 export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: MaybeString }) {

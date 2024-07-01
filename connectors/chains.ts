@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 // ref: https://wagmi.sh/core/chains
+import { defineChain } from 'viem';
 import type { Chain } from 'viem/chains';
 import {
   arbitrum,
@@ -19,6 +20,7 @@ import {
   polygon,
   polygonZkEvm,
   polygonMumbai,
+  polygonAmoy,
   sepolia,
   zkSync,
   zora,
@@ -65,6 +67,44 @@ const EVM_DEFAULT = {
     logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880'
   }
 };
+
+const kyoto = defineChain({
+  id: 1997,
+  name: 'Kyoto',
+  nativeCurrency: {
+    name: 'Kyoto',
+    decimals: 18,
+    address: '0x0000000000000000000000000000000000000000',
+    symbol: 'KYOTO'
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.kyotochain.io']
+    }
+  },
+  blockExplorers: {
+    default: { name: 'Explorer', url: 'https://kyotoscan.io' }
+  }
+});
+
+const kyotoTestnet = defineChain({
+  id: 1998,
+  name: 'Kyoto - Testnet',
+  nativeCurrency: {
+    name: 'Kyoto',
+    decimals: 18,
+    address: '0x0000000000000000000000000000000000000000',
+    symbol: 'KYOTO'
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.testnet.kyotoprotocol.io:8545']
+    }
+  },
+  blockExplorers: {
+    default: { name: 'Explorer', url: 'https://testnet.kyotoscan.io' }
+  }
+});
 
 /**
  * EIP-155 specifies developer and transaction shortnames for each network. You can find the list here
@@ -220,6 +260,24 @@ export const RPC: Record<string, IChainDetails> = {
     testnet: true,
     shortName: 'maticmum',
     unlockNetwork: true
+  },
+  AMOY: {
+    chainId: polygonAmoy.id,
+    viem: polygonAmoy,
+    chainName: 'Polygon - Amoy',
+    nativeCurrency: {
+      name: 'Polygon',
+      symbol: 'MATIC',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+    },
+    alchemyUrl: 'https://polygon-amoy.g.alchemy.com',
+    rpcUrls: polygonAmoy.rpcUrls.default.http,
+    blockExplorerUrls: ['https://amoy.polygonscan.com/'],
+    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
+    testnet: true,
+    shortName: 'maticamoy'
   },
   ARBITRUM: {
     ...EVM_DEFAULT,
@@ -388,6 +446,33 @@ export const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://explorer.ps.hmny.io'],
     iconUrl: '/images/cryptoLogos/harmony-one-logo.svg',
     shortName: 'hmy-ps-s0',
+    testnet: true
+  },
+  KYOTO: {
+    chainId: kyoto.id,
+    viem: kyoto,
+    chainName: kyoto.name,
+    nativeCurrency: {
+      ...kyoto.nativeCurrency,
+      logoURI: '/images/cryptoLogos/kyoto-logo.svg'
+    },
+    rpcUrls: kyoto.rpcUrls.default.http,
+    blockExplorerUrls: [kyoto.blockExplorers.default.url],
+    iconUrl: '/images/cryptoLogos/kyoto-logo.svg',
+    shortName: 'kyoto'
+  },
+  KYOTO_DEV: {
+    chainId: kyotoTestnet.id,
+    viem: kyotoTestnet,
+    chainName: kyotoTestnet.name,
+    nativeCurrency: {
+      ...kyotoTestnet.nativeCurrency,
+      logoURI: '/images/cryptoLogos/kyoto-logo.svg'
+    },
+    rpcUrls: kyotoTestnet.rpcUrls.default.http,
+    blockExplorerUrls: [kyotoTestnet.blockExplorers.default.url],
+    iconUrl: '/images/cryptoLogos/kyoto-logo.svg',
+    shortName: 'kyoto',
     testnet: true
   },
   TAIKO: {

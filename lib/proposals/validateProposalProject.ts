@@ -1,5 +1,4 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma';
 
 import type { FormFieldInput, FormFieldValue } from 'lib/forms/interfaces';
@@ -43,13 +42,5 @@ export function validateProposalProject({
     ];
   }
 
-  try {
-    projectSchema.validateSync(convertToProjectValues(project), { abortEarly: false });
-  } catch (error) {
-    log.error(`Project profile validation failed`, {
-      error,
-      projectId: project.id
-    });
-    throw new InvalidInputError(`Project profile validation failed`);
-  }
+  projectSchema.validateSync(convertToProjectValues(project), { abortEarly: false });
 }

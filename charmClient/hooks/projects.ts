@@ -1,6 +1,6 @@
 import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
 
-import { useGET, usePOST, usePUT } from 'charmClient/hooks/helpers';
+import { useGETImmutable, usePOST, usePUT } from 'charmClient/hooks/helpers';
 import type { AddProjectMemberPayload } from 'lib/projects/addProjectMember';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateProjectPayload } from 'lib/projects/updateProject';
@@ -10,7 +10,7 @@ export function useCreateProject() {
 }
 
 export function useGetProjects() {
-  return useGET<ProjectWithMembers[]>('/api/projects');
+  return useGETImmutable<ProjectWithMembers[]>('/api/projects');
 }
 
 export function useUpdateProject(projectId: string) {

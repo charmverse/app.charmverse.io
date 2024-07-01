@@ -30,7 +30,7 @@ function FieldAnswer({
   });
 
   const registeredField = register(name, {
-    setValueAs: (value) => value.trim()
+    setValueAs: (value) => value?.trim()
   });
 
   const isShown = getFieldConfig(fieldConfig?.[property.field]).show;

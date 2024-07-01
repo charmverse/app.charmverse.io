@@ -31,12 +31,11 @@ export function AddProjectMembersForm({
   handleSubmit: UseFormHandleSubmit<FormValues>;
   onSuccess: (projectId: string) => void;
 }) {
-  const { append } = useFieldArray({
+  const { append, remove } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
     control
   });
   const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] = useState<FarcasterProfile[]>([]);
-  const [selectedFarcasterProfile, setSelectedFarcasterProfile] = useState<FarcasterProfile | null>(null);
   // @ts-ignore
   const { execute, isExecuting } = useAction(actionCreateProject, {
     onSuccess: (data) => {
@@ -61,9 +60,9 @@ export function AddProjectMembersForm({
         <Typography variant='h6'>Team</Typography>
         <FarcasterCard
           fid={user.farcasterUser?.fid}
-          name={farcasterDetails.displayName}
-          username={farcasterDetails.username}
-          avatar={farcasterDetails.pfpUrl}
+          name={farcasterDetails?.displayName}
+          username={farcasterDetails?.username}
+          avatar={farcasterDetails?.pfpUrl}
           avatarSize='large'
         />
         <Stack gap={1}>
@@ -90,6 +89,7 @@ export function AddProjectMembersForm({
               avatar={farcasterProfile.pfpUrl}
               bio=''
               onDelete={() => {
+                remove(selectedFarcasterProfiles.findIndex((profile) => profile.fid === farcasterProfile.fid));
                 setSelectedFarcasterProfiles(
                   selectedFarcasterProfiles.filter((profile) => profile.fid !== farcasterProfile.fid)
                 );
@@ -104,7 +104,6 @@ export function AddProjectMembersForm({
             onClick={() => {
               onBack();
               setSelectedFarcasterProfiles([]);
-              setSelectedFarcasterProfile(null);
             }}
           >
             Back

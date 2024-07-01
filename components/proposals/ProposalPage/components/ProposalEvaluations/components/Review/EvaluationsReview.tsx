@@ -12,7 +12,9 @@ import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/Wor
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { useDocusign } from 'components/signing/hooks/useDocusign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
@@ -30,6 +32,7 @@ import { PrivateEvaluation } from './components/PrivateEvaluation';
 import { ProposalCredentials } from './components/ProposalCredentials/ProposalCredentials';
 import { RewardReviewStep } from './components/RewardReviewStep';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
+import { SignDocuments } from './components/SignDocuments/SignDocuments';
 import { VoteEvaluation } from './components/VoteEvaluation/VoteEvaluation';
 
 export type Props = {
@@ -82,6 +85,10 @@ export function EvaluationsReview({
   const [_expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const { mappedFeatures } = useSpaceFeatures();
   const { showMessage } = useSnackbar();
+
+  const isAdmin = useIsAdmin();
+  const { envelopes } = useDocusign();
+
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const [showEditCredentials, setShowEditCredentials] = useState(false);
   const { hasPendingOnchainCredentials, refreshIssuableCredentials } = useProposalCredentials({
@@ -275,6 +282,18 @@ export function EvaluationsReview({
                 isCurrent={isCurrent}
                 evaluation={evaluation}
                 refreshProposal={refreshProposal}
+              />
+            )}
+            {evaluation.type === 'sign_documents' && (
+              <SignDocuments
+                key={evaluation.id}
+                proposalId={proposal.id}
+                refreshProposal={refreshProposal}
+                isCurrent={isCurrent}
+                isReviewer={evaluation.isReviewer || isAdmin}
+                isAuthor={proposal.authors.some((a) => a.userId === user?.id)}
+                evaluation={evaluation}
+                documentsToSign={evaluation.documentsToSign}
               />
             )}
             {evaluation.type === 'private_evaluation' && (

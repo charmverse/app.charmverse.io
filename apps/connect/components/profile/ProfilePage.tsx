@@ -24,10 +24,10 @@ export async function ProfilePage({ user }: { user: LoggedInUser }) {
         <PageTitle>My Profile</PageTitle>
         <FarcasterCard
           fid={user.farcasterUser?.fid}
-          name={farcasterDetails.displayName}
-          username={farcasterDetails.username}
-          avatar={farcasterDetails.pfpUrl}
-          bio={farcasterDetails.bio}
+          name={farcasterDetails?.displayName}
+          username={farcasterDetails?.username}
+          avatar={farcasterDetails?.pfpUrl}
+          bio={farcasterDetails?.bio}
         />
         <Typography variant='h6'>Projects</Typography>
         <Suspense fallback={<ProjectItemSkeleton />}>

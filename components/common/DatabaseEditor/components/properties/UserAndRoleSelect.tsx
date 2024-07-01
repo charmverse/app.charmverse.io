@@ -175,6 +175,7 @@ type Props<T> = {
   showEmptyPlaceholder?: boolean;
   systemRoles?: SystemRoleOptionPopulated[];
   value: (T | string)[];
+  options?: { id: string; group: string }[];
   isRequiredValue?: (value: SelectOptionPopulated) => boolean;
   variant?: 'outlined' | 'standard';
   'data-test'?: string;
@@ -194,6 +195,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   showEmptyPlaceholder = true,
   emptyPlaceholderContent = 'Empty',
   systemRoles = [],
+  options,
   variant = 'standard',
   value: inputValue,
   isRequiredValue,
@@ -235,6 +237,22 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
     [];
 
   const filteredOptions = useMemo(() => {
+    if (options) {
+      return options
+        .map((option) => {
+          if (option.group === 'user') {
+            return (
+              mappedMembers.find((member) => member.id === option.id) ??
+              mappedRoles.find((role) => role.id === option.id)
+            );
+          } else if (option.group === 'role') {
+            return mappedRoles.find((role) => role.id === option.id);
+          }
+          return null;
+        })
+        .filter(isTruthy);
+    }
+
     let _filteredOptions: SelectOptionPopulated[] = [];
     if (isFreeSpace) {
       // In public space, don't include custom roles
@@ -250,7 +268,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
       }
     }
     return _filteredOptions;
-  }, [systemRoles, isFreeSpace, filteredMembers, roles, type]);
+  }, [systemRoles, isFreeSpace, filteredMembers, roles, type, options]);
 
   const allOptions = useMemo(() => {
     if (isFreeSpace) {

@@ -1,4 +1,4 @@
-import type { Prisma } from '@charmverse/core/prisma-client';
+import type { Prisma } from '@charmverse/core/prisma';
 
 import type { ProjectAndMembersPayload } from './interfaces';
 
@@ -16,20 +16,22 @@ export function createDefaultProjectAndMembersPayload(): ProjectAndMembersPayloa
     communityUrl: '',
     otherUrl: '',
     walletAddress: '',
-    projectMembers: [
-      {
-        name: '',
-        walletAddress: '',
-        email: '',
-        twitter: '',
-        warpcast: '',
-        github: '',
-        linkedin: '',
-        telegram: '',
-        otherUrl: '',
-        previousProjects: ''
-      }
-    ]
+    projectMembers: [defaultProjectMember()]
+  };
+}
+
+export function defaultProjectMember(): ProjectAndMembersPayload['projectMembers'][number] {
+  return {
+    name: '',
+    walletAddress: '',
+    email: '',
+    twitter: '',
+    warpcast: '',
+    github: '',
+    linkedin: '',
+    telegram: '',
+    otherUrl: '',
+    previousProjects: ''
   };
 }
 
