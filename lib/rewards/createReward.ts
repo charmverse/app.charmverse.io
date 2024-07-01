@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 
 import { NotFoundError } from 'lib/middleware';
 import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
+import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { InvalidInputError } from 'lib/utils/errors';
 
 import { getRewardOrThrow } from './getReward';
@@ -145,6 +146,7 @@ export async function createReward({
   let createdPageId: string | undefined;
 
   if (!linkedPageId) {
+    const galleryImage = pageProps?.content ? extractPreviewImage(pageProps.content as any) : null;
     const results = await prisma.bounty.create({
       data: {
         ...rewardCreateInput,
@@ -192,6 +194,7 @@ export async function createReward({
             type: pageProps?.type ?? 'bounty',
             content: pageProps?.content ?? undefined,
             contentText: pageProps?.contentText ?? '',
+            galleryImage,
             headerImage: pageProps?.headerImage,
             sourceTemplateId: pageProps?.sourceTemplateId,
             title: pageProps?.title ?? '',
