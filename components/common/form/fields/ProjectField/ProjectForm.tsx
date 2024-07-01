@@ -164,7 +164,6 @@ export function ProjectForm({
                   }}
                   projectMemberIndex={index + 1}
                   disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}
-                  defaultRequired
                   fieldConfig={fieldConfig?.projectMember}
                 />
               </Stack>
