@@ -35,11 +35,13 @@ export function validateProposalProject({
     const selectedMemberIds = projectFieldAnswer.selectedMemberIds;
     projectMembers = project.projectMembers.filter((member) => !member.teamLead);
     for (const memberId of selectedMemberIds) {
-      const member = projectMembers.find((m) => m.id === memberId);
+      const member = project.projectMembers.find((m) => m.id === memberId);
       if (!member) {
         throw new InvalidInputError(`Member with id ${memberId} does not exist in project`);
       }
-      projectMembers.push(member);
+      if (projectMembers.some((m) => m.id === memberId)) {
+        projectMembers.push(member);
+      }
     }
     project.projectMembers = projectMembers;
   }
