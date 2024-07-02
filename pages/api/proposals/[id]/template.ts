@@ -9,6 +9,7 @@ import type { ApplyTemplateRequest } from 'lib/proposals/applyProposalTemplate';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -27,6 +28,7 @@ async function applyTemplateEndpoint(req: NextApiRequest, res: NextApiResponse) 
     include: {
       page: {
         select: {
+          id: true,
           type: true
         }
       }
@@ -66,6 +68,14 @@ async function applyTemplateEndpoint(req: NextApiRequest, res: NextApiResponse) 
     templateId,
     actorId: userId
   });
+
+  relay.broadcast(
+    {
+      type: 'pages_meta_updated',
+      payload: [{ id: proposal.page!.id, sourceTemplateId: templateId, spaceId: proposal.spaceId }]
+    },
+    proposal.spaceId
+  );
 
   return res.status(200).end();
 }

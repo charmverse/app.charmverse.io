@@ -67,8 +67,8 @@ export function ForumPostActionList({
     }
   }
 
-  async function convertToProposal(pageId: string) {
-    navigateToSpacePath(`/proposals/new`, { sourcePostId: post?.id });
+  async function convertToProposal(sourcePostId: string) {
+    navigateToSpacePath(`/proposals/new`, { sourcePostId });
   }
 
   return (
