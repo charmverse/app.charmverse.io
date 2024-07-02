@@ -22,7 +22,7 @@ export type FarcasterSignerResponse = {
   token: string;
   deeplinkUrl: string;
 };
-// CharmVerse Dev account
+// @charmconnect
 const appFid = 750569;
 const deadline = Math.floor(Date.now() / 1000) + 86400 * 365 * 1; // 1 year
 
