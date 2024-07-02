@@ -1,4 +1,4 @@
-import { formatUnits, getAddress, parseEther } from 'viem';
+import { formatUnits, getAddress, parseEther, parseAbi } from 'viem';
 
 import { getPoapsFromAddress } from 'lib/blockchain/poaps';
 import { getPublicClient } from 'lib/blockchain/publicClient';
@@ -35,9 +35,9 @@ export async function validateTokenGateCondition(
     case condition.type === 'ERC20' && !!contractAddress && !!condition.quantity: {
       const minimumQuantity = BigInt(condition.quantity);
       const balance = await publicClient.readContract({
-        abi: ercAbi,
+        abi: parseAbi([`function getUser(address) view returns (uint256)`]),
         address: contractAddress,
-        functionName: 'balanceOf',
+        functionName: 'getUser',
         args: [userAddress]
       });
       const decimals = await publicClient.readContract({
@@ -96,6 +96,19 @@ export async function validateTokenGateCondition(
       });
 
       return userAddress === ownerAddress;
+    }
+    case condition.type === 'ContractMethod': {
+      const minimumQuantity = BigInt(condition.quantity || 1);
+      const result = await publicClient.readContract({
+        abi: parseAbi([`function ${condition.method}(address) view returns (uint256)`]),
+        address: contractAddress,
+        functionName: condition.method,
+        args: [walletAddress as `0x${string}`]
+      });
+      // we support structs, so long as the amount is first value in the struct. further support would require more user input
+      const balance = Array.isArray(result) ? result[0] : result;
+
+      return balance >= minimumQuantity;
     }
     // Owner of wallet address
     case condition.type === 'Wallet' && !!condition.tokenIds[0]: {

@@ -18,7 +18,7 @@ const schema = yup.object({
     .oneOf(tokenIds)
     .test('empty-check', 'Token selection is required', (option) => !!option),
   contract: yup.string().when('check', {
-    is: (val: TokenType) => val === 'customToken',
+    is: (val: TokenType) => val === 'customToken' || val === 'customContractMethod',
     then: () =>
       yup
         .string<`0x${string}`>()
@@ -42,6 +42,29 @@ const schema = yup.object({
 
           return true;
         }),
+    otherwise: () => yup.string()
+  }),
+  method: yup.string().when('check', {
+    is: (val: TokenType) => val === 'customContractMethod',
+    then: () => yup.string().required('Method is required'),
+    // .test('isContract', 'Invalid contract or chain', async (value, context) => {
+    //   const chain = context.parent.chain;
+    //   const check = context.parent.check;
+
+    //   if (chain && check === 'customToken') {
+    //     try {
+    //       await getToken(wagmiConfig, {
+    //         address: value,
+    //         chainId: Number(chain)
+    //       });
+    //       return true;
+    //     } catch (err) {
+    //       return false;
+    //     }
+    //   }
+
+    //   return true;
+    // }),
     otherwise: () => yup.string()
   }),
   quantity: yup

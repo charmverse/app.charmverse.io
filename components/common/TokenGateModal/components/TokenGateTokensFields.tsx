@@ -42,12 +42,24 @@ export function TokenGateTokenFields() {
           ))}
         </Select>
       </FieldWrapper>
-      {check === 'customToken' && (
+      {(check === 'customToken' || 'customContractMethod') && (
         <TextInputField
           label='Contract Address'
           error={errors.contract?.message}
           helperText={errors.contract?.message}
+          placeholder='0x0000000000000000000000000000000000000000'
           {...register('contract', {
+            deps: ['chain']
+          })}
+        />
+      )}
+      {check === 'customContractMethod' && (
+        <TextInputField
+          label='Contract Method'
+          error={errors.contract?.message}
+          helperText={errors.contract?.message}
+          placeholder='getBalance'
+          {...register('method', {
             deps: ['chain']
           })}
         />
