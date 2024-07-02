@@ -8,7 +8,6 @@ import { prismaToBlock } from 'lib/databases/block';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import { prettyPrint } from 'lib/utils/strings';
 import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalSourceDb } from 'testing/utils/proposals';
 import { addUserToSpace } from 'testing/utils/spaces';

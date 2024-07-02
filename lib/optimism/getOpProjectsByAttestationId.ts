@@ -1,6 +1,11 @@
-import { getOpProjects } from 'lib/optimism/getOpProjects';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
 
 export async function getOpProjectsByAttestationId({ attestationId }: { attestationId: string }) {
-  const opProjects = await getOpProjects();
-  return opProjects.find((project) => project.attestationUid === attestationId) ?? null;
+  return prisma.optimismProjectAttestation.findUnique({
+    where: {
+      attestationId
+    }
+  }) as Promise<OptimismProjectAttestationContent | null>;
 }

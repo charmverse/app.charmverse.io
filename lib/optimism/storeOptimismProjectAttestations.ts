@@ -141,14 +141,14 @@ export async function storeOptimismProjectAttestations() {
           attestationId: optimismProjectAttestation.id,
           name: optimismProjectMetadata.name,
           metadataAttestationId: optimismProjectMetadataAttestation.id,
-          metadata: optimismProjectMetadataAttestation.content,
+          metadata: optimismProjectMetadata,
           metadataUrl: optimismProjectMetadataAttestation.content.metadataUrl,
           farcasterIds,
           timeCreated: new Date(optimismProjectAttestation.timeCreated)
         },
         update: {
           name: optimismProjectMetadata.name,
-          metadata: optimismProjectMetadataAttestation.content,
+          metadata: optimismProjectMetadata,
           metadataUrl: optimismProjectMetadataAttestation.content.metadataUrl,
           farcasterIds
         }
