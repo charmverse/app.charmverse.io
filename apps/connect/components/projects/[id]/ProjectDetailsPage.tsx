@@ -1,10 +1,9 @@
 import 'server-only';
 
 import { fetchProject } from '@connect/lib/actions/fetchProject';
-import { Person } from '@mui/icons-material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
 
@@ -18,33 +17,7 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
   const project = await fetchProject(projectId);
 
   return (
-    <PageWrapper
-      sx={{
-        position: 'relative',
-        p: 0
-      }}
-    >
-      <Box
-        sx={{
-          top: 0,
-          p: 2,
-          width: '499px',
-          borderRight: {
-            xs: 'none',
-            md: '1px solid var(--charm-palette-divider)'
-          },
-          backgroundColor: 'white',
-          zIndex: 1,
-          position: 'fixed'
-        }}
-      >
-        <Stack sx={{ cursor: 'pointer', flexDirection: 'row', gap: 0.5, alignItems: 'center', width: 'fit-content' }}>
-          <Person fontSize='small' />
-          <Link href='/profile' passHref>
-            <Typography>Back to profile</Typography>
-          </Link>
-        </Stack>
-      </Box>
+    <PageWrapper backToProfileHeader>
       {!project ? (
         <Typography mt={5} p={2} variant='h6'>
           Project not found
@@ -60,7 +33,7 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
             width='100%'
             height='150px'
             style={{
-              marginTop: 8,
+              marginTop: 40,
               objectFit: 'cover',
               objectPosition: 'center'
             }}
@@ -72,7 +45,7 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
             size='xLarge'
             sx={{
               position: 'absolute',
-              top: '100px',
+              top: '130px',
               marginLeft: '24px'
             }}
             variant='rounded'
