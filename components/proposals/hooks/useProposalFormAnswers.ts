@@ -6,7 +6,6 @@ import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import { useProjectForm } from 'components/proposals/hooks/useProjectForm';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { FormFieldValue } from 'lib/forms/interfaces';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 

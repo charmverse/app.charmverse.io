@@ -11,7 +11,7 @@ export function ProjectMemberFieldAnswers({
   onChange
 }: {
   projectMemberIndex: number;
-  fieldConfig?: FieldConfig;
+  fieldConfig: FieldConfig;
   disabled?: boolean;
   onChange?: (projectMemberPayload: Record<string, any>) => any;
 }) {

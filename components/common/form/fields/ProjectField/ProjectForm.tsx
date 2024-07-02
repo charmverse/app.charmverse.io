@@ -139,7 +139,7 @@ export function ProjectForm({
       <ProjectMemberFieldAnswers
         projectMemberIndex={0}
         disabled={!isTeamLead || disabled}
-        fieldConfig={fieldConfig?.projectMember}
+        fieldConfig={fieldConfig.projectMember}
         onChange={(updates) => onProjectMemberUpdate(teamLeadMemberId!, updates)}
       />
       {showTeamMemberSection && (
@@ -164,7 +164,7 @@ export function ProjectForm({
                   }}
                   projectMemberIndex={index + 1}
                   disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}
-                  fieldConfig={fieldConfig?.projectMember}
+                  fieldConfig={fieldConfig.projectMember}
                 />
               </Stack>
               <Divider sx={{ my: 1 }} />
