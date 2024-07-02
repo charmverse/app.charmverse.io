@@ -9,7 +9,6 @@ import * as yup from 'yup';
 import { uploadFileToS3 } from 'lib/aws/uploadToS3Server';
 import { attestOnchain } from 'lib/credentials/attestOnchain';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-import { delay } from 'lib/utils/async';
 
 const schema = yup.object({
   projectId: yup.string().required()

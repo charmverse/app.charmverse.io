@@ -1,21 +1,23 @@
 'use client';
 
-import { LoadingComponent } from '@connect/components/common/LoadingComponent';
-import { useS3UploadInput } from '@connect/hooks/useS3UploadInput';
 import { actionPublishProjectToGitcoin } from '@connect/lib/actions/publishProjectToGitcoin';
-import { Button, Card, CardContent, Stack, Typography, Box } from '@mui/material';
+import { Alert, Button, Card, CardContent, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
+import { useState } from 'react';
 
 export function PublishProjectToGitcoin({ projectId }: { projectId: string }) {
   const router = useRouter();
+
+  const [error, setError] = useState<string | null>(null);
+
   // @ts-ignore
   const { execute, isExecuting } = useAction(actionPublishProjectToGitcoin, {
     onSuccess: (data) => {
-      router.push(`/projects/${projectId}`);
+      router.push(`/p/${projectId}`);
     },
-    onError(err) {
-      console.log(err);
+    onError(err: any) {
+      setError(err.message ?? 'Failed to publish project to Gitcoin');
     }
   });
 
@@ -27,9 +29,17 @@ export function PublishProjectToGitcoin({ projectId }: { projectId: string }) {
       <Card sx={{ py: 2 }}>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <Typography>Submit your project to Gitcoin</Typography>
-          <Button onClick={() => execute({ projectId })} disabled={isExecuting} sx={{ width: 'fit-content' }}>
+          <Button
+            onClick={() => {
+              setError(null);
+              execute({ projectId });
+            }}
+            disabled={isExecuting}
+            sx={{ width: 'fit-content' }}
+          >
             {isExecuting ? 'Publishing to Gitcoin' : 'Submit'}
           </Button>
+          {error && <Alert severity='error'>{error}</Alert>}
         </CardContent>
       </Card>
     </Stack>

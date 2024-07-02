@@ -103,7 +103,16 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
                 <Stack direction='row' gap={1} alignItems='center'>
                   <img src='/images/mirror-xyz.png' width={25} height={25} />
                   <Link href={project.mirror} passHref target='_blank'>
-                    <Typography variant='body1'>{project.mirror.replace(/https?:\/\/mirror.xyz\//, '')}</Typography>
+                    <Typography
+                      variant='body1'
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {project.mirror.replace(/https?:\/\/(?:\w+\.)?mirror\.xyz\//, '')}
+                    </Typography>
                   </Link>
                 </Stack>
               )}
@@ -126,7 +135,9 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
                     }}
                   />
                   <Link href={project.twitter} passHref target='_blank'>
-                    <Typography variant='body1'>{project.twitter.replace(/https?:\/\/twitter\.com\//, '')}</Typography>
+                    <Typography variant='body1'>
+                      {project.twitter.replace(/https?:\/\/(twitter|x)\.com\//, '')}
+                    </Typography>
                   </Link>
                 </Stack>
               )}

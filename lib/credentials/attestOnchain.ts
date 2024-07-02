@@ -20,9 +20,12 @@ export async function attestOnchain({ credentialInputs, type, chainId }: OnChain
   const schemaId = attestationSchemaIds[type];
   const rpcUrl = getChainById(chainId)?.rpcUrls[0];
 
-  console.log('rpcUrl', rpcUrl);
-
-  const provider = new providers.JsonRpcProvider(rpcUrl, chainId);
+  // This solution fixes ethers 5.7 not working with recent Next.js v14+ versions
+  // https://github.com/ethers-io/ethers.js/issues/4469#issuecomment-1932145334
+  const provider = new providers.JsonRpcProvider({
+    url: rpcUrl as string,
+    skipFetchSetup: true
+  });
 
   const wallet = new Wallet(credentialsWalletPrivateKey as string, provider);
 
