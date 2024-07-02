@@ -223,7 +223,7 @@ export function createDefaultProjectAndMembersFieldConfig({
       }
     }
   } as ProjectAndMembersFieldConfig;
-  // loop thro project fields
+  // loop thru project fields
   projectFieldProperties.forEach((field) => {
     config[field.field] = getFieldConfig({
       required: allFieldsRequired || field.alwaysRequired
@@ -232,7 +232,8 @@ export function createDefaultProjectAndMembersFieldConfig({
   // loop thru team member fields
   projectMemberFieldProperties.forEach((field) => {
     config.projectMember[field.field] = getFieldConfig({
-      private: field.allowPrivate
+      private: field.allowPrivate,
+      required: allFieldsRequired || field.alwaysRequired
     });
   });
 
