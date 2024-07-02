@@ -1,12 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 
+export type ProjectData = Awaited<ReturnType<typeof fetchProject>>;
+
 export async function fetchProject(projectId: string) {
   const project = await prisma.project.findUnique({
     where: {
       id: projectId
     },
     select: {
+      id: true,
       description: true,
       avatar: true,
       coverImage: true,
@@ -16,6 +19,7 @@ export async function fetchProject(projectId: string) {
       mirror: true,
       twitter: true,
       websites: true,
+      ogImage: true,
       projectMembers: {
         select: {
           user: {
