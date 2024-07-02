@@ -201,8 +201,10 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   }
 ];
 
-export function createDefaultProjectAndMembersFieldConfig(): ProjectAndMembersFieldConfig {
-  return {
+export function createDefaultProjectAndMembersFieldConfig({
+  allFieldsRequired
+}: { allFieldsRequired?: boolean } = {}): ProjectAndMembersFieldConfig {
+  const config = {
     name: {
       required: true
     },
@@ -221,6 +223,20 @@ export function createDefaultProjectAndMembersFieldConfig(): ProjectAndMembersFi
       }
     }
   } as ProjectAndMembersFieldConfig;
+  // loop thro project fields
+  projectFieldProperties.forEach((field) => {
+    config[field.field] = getFieldConfig({
+      required: allFieldsRequired || field.alwaysRequired
+    });
+  });
+  // loop thru team member fields
+  projectMemberFieldProperties.forEach((field) => {
+    config.projectMember[field.field] = getFieldConfig({
+      private: field.allowPrivate
+    });
+  });
+
+  return config;
 }
 
 export function getFieldConfig(field?: ProjectFieldConfig): ProjectFieldConfig {

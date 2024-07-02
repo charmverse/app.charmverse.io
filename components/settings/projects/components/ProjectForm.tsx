@@ -10,8 +10,7 @@ import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import {
   projectMemberFieldProperties,
   createDefaultProjectAndMembersFieldConfig,
-  projectFieldProperties,
-  getFieldConfig
+  projectFieldProperties
 } from 'lib/projects/formField';
 import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
@@ -33,12 +32,7 @@ export function ProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean }) {
   return (
     <Stack gap={2} width='100%'>
       <Typography variant='h6'>Project Info</Typography>
-      <FieldAnswers
-        properties={projectFieldProperties}
-        defaultRequired={false}
-        disabled={!isTeamLead}
-        fieldConfig={fieldConfig}
-      />
+      <FieldAnswers properties={projectFieldProperties} disabled={!isTeamLead} fieldConfig={fieldConfig} />
       <Typography variant='h6' mt={2}>
         Team Info
       </Typography>
@@ -46,7 +40,6 @@ export function ProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean }) {
       <ProjectMemberFieldAnswers
         projectMemberIndex={0}
         disabled={!isTeamLead}
-        defaultRequired={false}
         fieldConfig={fieldConfig?.projectMember}
       />
       {extraProjectMembers.length ? (
@@ -72,7 +65,6 @@ export function ProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean }) {
                 ) : null}
               </Stack>
               <FieldAnswers
-                defaultRequired={false}
                 disabled={!(isTeamLead || projectMember.userId === user?.id)}
                 name={`projectMembers[${index + 1}]`}
                 fieldConfig={fieldConfig?.projectMember}
@@ -81,7 +73,6 @@ export function ProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean }) {
               <ProjectMemberFieldAnswers
                 projectMemberIndex={index + 1}
                 disabled={!(isTeamLead || projectMember.userId === user?.id)}
-                defaultRequired={false}
                 fieldConfig={fieldConfig?.projectMember}
               />
             </Stack>

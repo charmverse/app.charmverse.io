@@ -30,8 +30,7 @@ export function validateProposalProject({
   }
 
   const projectSchema = createProjectYupSchema({
-    fieldConfig: projectField.fieldConfig as ProjectAndMembersFieldConfig,
-    defaultRequired: true
+    fieldConfig: projectField.fieldConfig as ProjectAndMembersFieldConfig
   });
 
   if (typeof projectFieldAnswer === 'object' && 'selectedMemberIds' in projectFieldAnswer) {

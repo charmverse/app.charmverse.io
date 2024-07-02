@@ -72,17 +72,6 @@ export async function getProposal({
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
 
-  const workflow = proposal.workflowId
-    ? await prisma.proposalWorkflow.findFirst({
-        where: {
-          id: proposal.workflowId
-        },
-        select: {
-          evaluations: true
-        }
-      })
-    : null;
-
   const currentPermissions =
     proposal.status === 'draft'
       ? permissionsByStep.draft
@@ -92,28 +81,38 @@ export async function getProposal({
     throw new Error('Could not find permissions for proposal');
   }
 
-  const credentials = await getProposalOrApplicationCredentials({ proposalId: id }).catch((error) => {
-    log.error('Error fetching proposal credentials', { error, proposalId: id });
-    return [];
-  });
-
   const evaluationIds = proposal.evaluations.map((e) => e.id);
 
-  const proposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
-    where: {
-      evaluationId: {
-        in: evaluationIds
+  const [workflow, credentials, proposalEvaluationReviews, proposalEvaluationAppealReviews] = await Promise.all([
+    proposal.workflowId
+      ? await prisma.proposalWorkflow.findFirst({
+          where: {
+            id: proposal.workflowId
+          },
+          select: {
+            evaluations: true
+          }
+        })
+      : Promise.resolve(null),
+    getProposalOrApplicationCredentials({ proposalId: id }).catch((error) => {
+      log.error('Error fetching proposal credentials', { error, proposalId: id });
+      return [];
+    }),
+    prisma.proposalEvaluationReview.findMany({
+      where: {
+        evaluationId: {
+          in: evaluationIds
+        }
       }
-    }
-  });
-
-  const proposalEvaluationAppealReviews = await prisma.proposalEvaluationAppealReview.findMany({
-    where: {
-      evaluationId: {
-        in: evaluationIds
+    }),
+    prisma.proposalEvaluationAppealReview.findMany({
+      where: {
+        evaluationId: {
+          in: evaluationIds
+        }
       }
-    }
-  });
+    })
+  ]);
 
   const isPublicPage =
     proposal.space.publicProposals ||

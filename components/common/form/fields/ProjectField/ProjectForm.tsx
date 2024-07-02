@@ -33,7 +33,7 @@ export function ProjectForm({
   project?: ProjectWithMembers; // only provided if you belong to the project
   refreshProjects: KeyedMutator<ProjectWithMembers[]>;
   disabled?: boolean;
-  fieldConfig?: ProjectAndMembersFieldConfig;
+  fieldConfig: ProjectAndMembersFieldConfig;
   isTeamLead: boolean;
   selectedMemberIds: string[];
   onFormFieldChange: (field: ProjectFieldValue) => void;
@@ -127,7 +127,6 @@ export function ProjectForm({
     <Stack gap={2} width='100%'>
       <Typography variant='h6'>Project Info</Typography>
       <FieldAnswers
-        defaultRequired
         disabled={!isTeamLead || disabled}
         fieldConfig={fieldConfig}
         onChange={onProjectUpdate}
@@ -140,8 +139,7 @@ export function ProjectForm({
       <ProjectMemberFieldAnswers
         projectMemberIndex={0}
         disabled={!isTeamLead || disabled}
-        defaultRequired
-        fieldConfig={fieldConfig?.projectMember}
+        fieldConfig={fieldConfig.projectMember}
         onChange={(updates) => onProjectMemberUpdate(teamLeadMemberId!, updates)}
       />
       {showTeamMemberSection && (
@@ -166,8 +164,7 @@ export function ProjectForm({
                   }}
                   projectMemberIndex={index + 1}
                   disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}
-                  defaultRequired
-                  fieldConfig={fieldConfig?.projectMember}
+                  fieldConfig={fieldConfig.projectMember}
                 />
               </Stack>
               <Divider sx={{ my: 1 }} />

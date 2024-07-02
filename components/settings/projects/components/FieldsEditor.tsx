@@ -7,13 +7,11 @@ export function FieldsEditor({
   onChange,
   fieldConfig,
   properties,
-  defaultRequired,
   isProjectMember
 }: {
   onChange?: (fieldConfig: FieldConfig) => void;
   fieldConfig: FieldConfig;
   properties: ProjectFieldProperty[];
-  defaultRequired?: boolean;
   isProjectMember?: boolean;
 }) {
   return (
@@ -36,7 +34,7 @@ export function FieldsEditor({
               multiline={property.multiline}
               rows={property.rows ?? 1}
               disabled
-              required={fieldConfig?.[property.field]?.required ?? defaultRequired}
+              required={fieldConfig?.[property.field]?.required}
             />
             {/** Required fields must always be required and shown */}
             {onChange && !property.alwaysRequired && (
@@ -69,7 +67,7 @@ export function FieldsEditor({
                     <Switch
                       size='small'
                       disabled={fieldConfig?.[property.field]?.show === false}
-                      checked={fieldConfig?.[property.field]?.required ?? defaultRequired}
+                      checked={fieldConfig?.[property.field]?.required}
                       onChange={(e) => {
                         onChange({
                           ...(fieldConfig ?? {}),

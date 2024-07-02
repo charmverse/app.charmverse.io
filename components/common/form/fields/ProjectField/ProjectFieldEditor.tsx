@@ -7,18 +7,15 @@ import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 
 export function ProjectFieldEditor({
   onChange,
-  fieldConfig,
-  defaultRequired
+  fieldConfig
 }: {
   onChange?: (project: ProjectAndMembersFieldConfig) => void;
   fieldConfig: ProjectAndMembersFieldConfig;
-  defaultRequired?: boolean;
 }) {
   return (
     <Stack gap={2}>
       <Typography variant='h6'>Project Info</Typography>
       <FieldsEditor
-        defaultRequired={defaultRequired}
         fieldConfig={fieldConfig}
         properties={projectFieldProperties}
         onChange={
@@ -37,7 +34,6 @@ export function ProjectFieldEditor({
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
       <FieldsEditor
-        defaultRequired={defaultRequired}
         properties={projectMemberFieldProperties}
         fieldConfig={fieldConfig?.projectMember}
         onChange={
