@@ -51,11 +51,12 @@ export function mapProjectToGitcoin({ project }: { project: ConnectProjectDetail
     name: project.name || '', // Direct mapping
     bio: project.description || '', // Assuming bio comes from description
     websiteUrl: project.websites?.[0] || '', // Taking the first website URL
-    payoutAddress: '', // Placeholder: needs specific logic or input
-    contributionDescription: project.description, // Placeholder: requires specific input
-    impactDescription: '', // Placeholder: requires specific input
-    impactCategory: [], // Assuming no direct mapping for categories
+    contributionDescription: project.description,
     contributionLinks: generateContributionLinks(project),
+    // -------------- Missing fields
+    impactCategory: [], // Assuming no direct mapping for categories
+    impactDescription: '', // Placeholder: requires specific input
+    payoutAddress: '', // Placeholder: needs specific logic or input
     impactMetrics: [], // Placeholder: requires specific input
     fundingSources: [] // Placeholder: requires specific input
   };
