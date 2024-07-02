@@ -3,7 +3,7 @@
 import { WrongStateError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { authActionClient } from '@connect/lib/actions/actionClient';
-import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
+import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import * as yup from 'yup';
 
 const schema = yup.object({
@@ -29,7 +29,7 @@ export const actionPublishProjectToGitcoin = authActionClient
       throw new WrongStateError('Project already published to Gitcoin');
     }
 
-    await storeProjectMetadataAndPublishOptimismAttestation({ projectId, userId: ctx.session.user.id });
+    await storeProjectMetadataAndPublishGitcoinAttestation({ projectId, userId: ctx.session.user.id });
 
     return { success: true };
   });

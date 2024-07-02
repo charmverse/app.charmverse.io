@@ -1,7 +1,6 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import type { OptimismProjectAttestation, OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { optimismSepolia } from 'viem/chains';
 
 import { attestOnchain } from 'lib/credentials/attestOnchain';
 import type {
@@ -65,21 +64,23 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     }
   });
 
+  const inputData = {
+    farcasterID: farcasterUser.fid,
+    category: project.category || '',
+    issuer: projectAttestationIssuerName,
+    metadataType: 1,
+    metadataUrl: staticFilePath,
+    name: project.name,
+    parentProjectRefUID: '',
+    projectRefUID: attestationUID
+  } as OptimismProjectSnapshotAttestationMetaData;
+
   const attestationMetadataUID = await attestOnchain({
-    type: 'optimismProject',
+    type: 'optimismProjectSnapshot',
     chainId,
     credentialInputs: {
       recipient: null,
-      data: {
-        farcasterID: farcasterUser.fid,
-        category: project.category || '',
-        issuer: projectAttestationIssuerName,
-        metadataType: 1,
-        metadataUrl: staticFilePath,
-        name: project.name,
-        parentProjectRefUID: '',
-        projectRefUID: attestationUID
-      } as OptimismProjectSnapshotAttestationMetaData
+      data: inputData
     }
   });
 
@@ -97,3 +98,14 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
 
   return attestationWithMetadata;
 }
+
+const inputData = {
+  farcasterID: 4339,
+  category: 'Defi',
+  issuer: projectAttestationIssuerName,
+  metadataType: 1,
+  metadataUrl: 'www.example.com',
+  name: 'Demo',
+  parentProjectRefUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
+  projectRefUID: '0x8222da54406a4d9eab91006c95cd4ec6279be90297d524e3dcc896d40fa8ca96'
+} as OptimismProjectSnapshotAttestationMetaData;

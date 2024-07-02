@@ -1,4 +1,4 @@
-import { optimism } from 'viem/chains';
+import { optimismSepolia } from 'viem/chains';
 
-export const projectAttestationChainId = optimism.id;
+export const projectAttestationChainId = optimismSepolia.id;
 export const projectAttestationIssuerName = 'CharmVerse';
