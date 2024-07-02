@@ -8,7 +8,10 @@ import {
   gitcoinProjectCredentialSchemaDefinition,
   gitcoinProjectCredentialSchemaId
 } from './gitcoinProjectSchema';
-import type { OptimismProjectAttestation, OptimismProjectSnapshotAttestation } from './optimismProjectSchemas';
+import type {
+  OptimismProjectAttestationData,
+  OptimismProjectSnapshotAttestationMetaData
+} from './optimismProjectSchemas';
 import {
   encodeOptimismProjectAttestation,
   encodeOptimismProjectSnapshotAttestation,
@@ -62,9 +65,9 @@ export type CredentialDataInput<T extends AttestationType = AttestationType> = T
   : T extends 'gitcoinProject'
   ? GitcoinProjectCredential
   : T extends 'optimismProject'
-  ? OptimismProjectAttestation
+  ? OptimismProjectAttestationData
   : T extends 'optimismProjectSnapshot'
-  ? OptimismProjectSnapshotAttestation
+  ? OptimismProjectSnapshotAttestationMetaData
   : never;
 
 export type CredentialData<T extends AttestationType = AttestationType> = {
@@ -82,9 +85,9 @@ export function encodeAttestation<T extends AttestationType = AttestationType>({
   } else if (type === 'gitcoinProject') {
     return encodeGitcoinProjectCredential(data as GitcoinProjectCredential);
   } else if (type === 'optimismProject') {
-    return encodeOptimismProjectAttestation(data as OptimismProjectAttestation);
+    return encodeOptimismProjectAttestation(data as OptimismProjectAttestationData);
   } else if (type === 'optimismProjectSnapshot') {
-    return encodeOptimismProjectSnapshotAttestation(data as OptimismProjectSnapshotAttestation);
+    return encodeOptimismProjectSnapshotAttestation(data as OptimismProjectSnapshotAttestationMetaData);
   }
   throw new Error(`Invalid Attestation Type: ${type}'`);
 }

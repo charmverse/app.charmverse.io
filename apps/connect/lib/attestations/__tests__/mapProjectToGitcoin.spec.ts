@@ -7,6 +7,7 @@ describe('mapProjectToGitcoin', () => {
     const input: ConnectProjectDetails = {
       id: '1',
       name: 'Project X',
+      category: 'DeFi',
       description: 'A sample project',
       avatar: 'avatar.png',
       coverImage: 'cover.jpg',

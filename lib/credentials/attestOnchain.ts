@@ -12,9 +12,11 @@ import type { AttestationType, CredentialDataInput } from './schemas';
 
 export type OnChainAttestationInput<T extends AttestationType = AttestationType> = {
   chainId: EasSchemaChain;
-  credentialInputs: { recipient: string; data: CredentialDataInput<T> };
+  credentialInputs: { recipient: string | null; data: CredentialDataInput<T> };
   type: T;
 };
+
+const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttestationInput): Promise<string> {
   const schemaId = attestationSchemaIds[type];
@@ -36,7 +38,10 @@ export async function attestOnchain({ credentialInputs, type, chainId }: OnChain
   const attestationUid = await eas
     .attest({
       schema: schemaId,
-      data: { recipient: credentialInputs.recipient, data: encodeAttestation({ type, data: credentialInputs.data }) }
+      data: {
+        recipient: credentialInputs.recipient ?? NULL_ADDRESS,
+        data: encodeAttestation({ type, data: credentialInputs.data })
+      }
     })
     .then((tx) => tx.wait());
 

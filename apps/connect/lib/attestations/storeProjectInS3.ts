@@ -18,7 +18,7 @@ export async function storeProjectInS3({
 }: {
   projectOrProjectId: ConnectProjectDetails | string;
   storageFormat: ProjectStorageFormat;
-}): Promise<{ staticFilePath: string }> {
+}): Promise<{ staticFilePath: string; mappedProject: any }> {
   if (!storageFormats.includes(storageFormat)) {
     throw new InvalidInputError('Invalid storage format');
   }
@@ -47,5 +47,5 @@ export async function storeProjectInS3({
     contentType: 'application/json'
   });
 
-  return { staticFilePath: `https://s3.amazonaws.com/${awsS3Bucket}/${filePath}` };
+  return { staticFilePath: `https://s3.amazonaws.com/${awsS3Bucket}/${filePath}`, mappedProject: formattedProject };
 }

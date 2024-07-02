@@ -16,6 +16,7 @@ export type ConnectProjectDetails = Pick<
   | 'description'
   | 'avatar'
   | 'coverImage'
+  | 'category'
   | 'name'
   | 'farcasterValues'
   | 'github'
@@ -39,6 +40,7 @@ export async function fetchProject(projectId: string): Promise<ConnectProjectDet
       avatar: true,
       coverImage: true,
       name: true,
+      category: true,
       farcasterValues: true,
       github: true,
       mirror: true,

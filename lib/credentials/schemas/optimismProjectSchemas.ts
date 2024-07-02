@@ -6,26 +6,26 @@ export const optimismProjectAttestationSchemaId = '0x7ae9f4adabd9214049df72f58ec
 
 export const optimismProjectAttestationSchemaDefinition = 'uint256 farcasterID,string issuer';
 
-export type OptimismProjectAttestation = {
+export type OptimismProjectAttestationData = {
   farcasterID: number;
   issuer: string;
 };
 
-export function encodeOptimismProjectAttestation({ farcasterID, issuer }: OptimismProjectAttestation) {
+export function encodeOptimismProjectAttestation({ farcasterID, issuer }: OptimismProjectAttestationData) {
   const encoder = new SchemaEncoder(optimismProjectAttestationSchemaDefinition);
   const encodedData = encoder.encodeData([
     { name: 'farcasterID', value: farcasterID, type: 'uint256' },
     { name: 'issuer', value: issuer, type: 'string' }
-  ] as TypedSchemaItem<OptimismProjectAttestation>[]);
+  ] as TypedSchemaItem<OptimismProjectAttestationData>[]);
 
   return encodedData;
 }
 
-export function decodeOptimismProjectAttestation(rawData: string): OptimismProjectAttestation {
+export function decodeOptimismProjectAttestation(rawData: string): OptimismProjectAttestationData {
   const decoder = new SchemaEncoder(optimismProjectAttestationSchemaDefinition);
   const parsed = decoder.decodeData(rawData);
   const values = parsed.reduce((acc, item) => {
-    const key = item.name as keyof OptimismProjectAttestation;
+    const key = item.name as keyof OptimismProjectAttestationData;
 
     if (key === 'farcasterID') {
       acc.farcasterID = parseInt(item.value.value as string);
@@ -33,9 +33,9 @@ export function decodeOptimismProjectAttestation(rawData: string): OptimismProje
       acc[key] = item.value.value as string;
     }
     return acc;
-  }, {} as OptimismProjectAttestation);
+  }, {} as OptimismProjectAttestationData);
 
-  return values as OptimismProjectAttestation;
+  return values as OptimismProjectAttestationData;
 }
 
 // Pt. 2 - Snapshot of state for an optimism attestation
@@ -46,7 +46,7 @@ export const optimismProjectSnapshotAttestationSchemaId =
 export const optimismProjectSnapshotAttestationSchemaDefinition =
   'bytes32 projectRefUID,uint256 farcasterID,string name,string category,bytes32 parentProjectRefUID,uint8 metadataType,string metadataUrl';
 
-export type OptimismProjectSnapshotAttestation = {
+export type OptimismProjectSnapshotAttestationMetaData = {
   projectRefUID: string;
   farcasterID: number;
   name: string;
@@ -64,7 +64,7 @@ export function encodeOptimismProjectSnapshotAttestation({
   name,
   parentProjectRefUID,
   projectRefUID
-}: OptimismProjectSnapshotAttestation) {
+}: OptimismProjectSnapshotAttestationMetaData) {
   const encoder = new SchemaEncoder(optimismProjectSnapshotAttestationSchemaDefinition);
   const encodedData = encoder.encodeData([
     { name: 'projectRefUID', value: projectRefUID, type: 'bytes32' },
@@ -74,16 +74,16 @@ export function encodeOptimismProjectSnapshotAttestation({
     { name: 'parentProjectRefUID', value: parentProjectRefUID, type: 'bytes32' },
     { name: 'metadataType', value: metadataType, type: 'uint8' },
     { name: 'metadataUrl', value: metadataUrl, type: 'string' }
-  ] as TypedSchemaItem<OptimismProjectSnapshotAttestation>[]);
+  ] as TypedSchemaItem<OptimismProjectSnapshotAttestationMetaData>[]);
 
   return encodedData;
 }
 
-export function decodeOptimismProjectSnapshotAttestation(rawData: string): OptimismProjectSnapshotAttestation {
+export function decodeOptimismProjectSnapshotAttestation(rawData: string): OptimismProjectSnapshotAttestationMetaData {
   const decoder = new SchemaEncoder(optimismProjectSnapshotAttestationSchemaDefinition);
   const parsed = decoder.decodeData(rawData);
   const values = parsed.reduce((acc, item) => {
-    const key = item.name as keyof OptimismProjectSnapshotAttestation;
+    const key = item.name as keyof OptimismProjectSnapshotAttestationMetaData;
 
     if (key === 'farcasterID' || key === 'metadataType') {
       acc[key] = parseInt(item.value.value as string);
@@ -91,7 +91,7 @@ export function decodeOptimismProjectSnapshotAttestation(rawData: string): Optim
       acc[key] = item.value.value as string;
     }
     return acc;
-  }, {} as OptimismProjectSnapshotAttestation);
+  }, {} as OptimismProjectSnapshotAttestationMetaData);
 
-  return values as OptimismProjectSnapshotAttestation;
+  return values as OptimismProjectSnapshotAttestationMetaData;
 }

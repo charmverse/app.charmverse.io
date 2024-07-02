@@ -1,7 +1,6 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import type { GitcoinProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { optimismSepolia } from 'viem/chains';
 
 import { attestOnchain } from 'lib/credentials/attestOnchain';
 import { gitcoinProjectCredentialSchemaId } from 'lib/credentials/schemas/gitcoinProjectSchema';
@@ -9,6 +8,7 @@ import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
 import { fetchProject } from '../actions/fetchProject';
 
+import { projectAttestationChainId } from './constants';
 import { storeProjectInS3 } from './storeProjectInS3';
 
 export async function storeProjectMetadataAndPublishGitcoinAttestation({
@@ -46,11 +46,9 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     storageFormat: 'gitcoin'
   });
 
-  const chainId = optimismSepolia.id;
-
   const attestationUID = await attestOnchain({
     type: 'gitcoinProject',
-    chainId,
+    chainId: projectAttestationChainId,
     credentialInputs: {
       recipient: fcProfile.connectedAddress ?? fcProfile.connectedAddresses[0] ?? fcProfile.body.address,
       data: {
@@ -67,7 +65,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     data: {
       project: { connect: { id: project.id } },
       attestationUID,
-      chainId,
+      chainId: projectAttestationChainId,
       schemaId: gitcoinProjectCredentialSchemaId
     }
   });
