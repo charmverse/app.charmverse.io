@@ -42,7 +42,7 @@ function FieldAnswer({
       label={property.label}
       multiline={property.multiline}
       rows={property.rows ?? 1}
-      required={false}
+      required={fieldConfig?.required}
       disabled={disabled}
       value={(field.value as string) ?? ''}
       error={fieldState.error?.message}
@@ -67,7 +67,7 @@ export function FieldAnswers({
 }: {
   disabled?: boolean;
   name?: string;
-  fieldConfig?: FieldConfig;
+  fieldConfig: FieldConfig;
   properties: ProjectFieldProperty[];
   onChange?: (onChange: Record<string, any>) => void;
 }) {
@@ -76,7 +76,7 @@ export function FieldAnswers({
       {properties.map((property) => (
         <FieldAnswer
           name={(name ? `${name}.${property.field}` : property.field) as Path<ProjectAndMembersPayload>}
-          fieldConfig={fieldConfig?.[property.field]}
+          fieldConfig={fieldConfig[property.field]}
           key={property.field as string}
           disabled={disabled}
           property={property}

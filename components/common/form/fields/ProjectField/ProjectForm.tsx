@@ -33,7 +33,7 @@ export function ProjectForm({
   project?: ProjectWithMembers; // only provided if you belong to the project
   refreshProjects: KeyedMutator<ProjectWithMembers[]>;
   disabled?: boolean;
-  fieldConfig?: ProjectAndMembersFieldConfig;
+  fieldConfig: ProjectAndMembersFieldConfig;
   isTeamLead: boolean;
   selectedMemberIds: string[];
   onFormFieldChange: (field: ProjectFieldValue) => void;
