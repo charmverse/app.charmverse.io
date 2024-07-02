@@ -21,8 +21,6 @@ export async function getProposal({
   id: string;
   permissionsByStep: PermissionsMap;
 }): Promise<ProposalWithUsersAndRubric> {
-  console.log('GET PROPOSAL');
-  console.log('GET PROPOSAL222');
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id
