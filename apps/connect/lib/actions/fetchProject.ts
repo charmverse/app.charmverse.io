@@ -1,12 +1,40 @@
+import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 
-export async function fetchProject(projectId: string) {
+type ProjectMember = {
+  fid: number;
+  pfpUrl: string;
+  bio: string;
+  username: string;
+  displayName: string;
+};
+
+export type ConnectProjectDetails = Pick<
+  Project,
+  | 'id'
+  | 'description'
+  | 'avatar'
+  | 'coverImage'
+  | 'name'
+  | 'farcasterValues'
+  | 'github'
+  | 'mirror'
+  | 'twitter'
+  | 'websites'
+> & {
+  projectMembers: {
+    farcasterUser: ProjectMember;
+  }[];
+};
+
+export async function fetchProject(projectId: string): Promise<ConnectProjectDetails | null> {
   const project = await prisma.project.findUnique({
     where: {
       id: projectId
     },
     select: {
+      id: true,
       description: true,
       avatar: true,
       coverImage: true,
@@ -44,7 +72,7 @@ export async function fetchProject(projectId: string) {
           bio: farcasterUser?.bio,
           username: farcasterUser?.username,
           displayName: farcasterUser?.displayName
-        }
+        } as ProjectMember
       };
     })
   };

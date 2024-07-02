@@ -6,6 +6,7 @@ import { authActionClient } from '@connect/lib/actions/actionClient';
 import { optimismSepolia } from 'viem/chains';
 import * as yup from 'yup';
 
+import { awsS3Bucket } from 'config/constants';
 import { uploadFileToS3 } from 'lib/aws/uploadToS3Server';
 import { attestOnchain } from 'lib/credentials/attestOnchain';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
@@ -112,7 +113,7 @@ export const actionPublishProjectToGitcoin = authActionClient
         recipient: fcProfile.connectedAddress ?? fcProfile.connectedAddresses[0] ?? fcProfile.body.address,
         data: {
           name: project.name,
-          metadataPtr: filePath,
+          metadataPtr: `https://s3.amazonaws.com/${awsS3Bucket}/${filePath}`,
           metadataType: 1,
           type: 'gitcoinProject',
           round: '1'
