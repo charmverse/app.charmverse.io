@@ -1,26 +1,20 @@
-'use client';
-
-import CheckIcon from '@mui/icons-material/Check';
 import ShareIcon from '@mui/icons-material/Share';
 import { Button } from '@mui/material';
-import { useState } from 'react';
+import Link from 'next/link';
 
-export function ShareButton() {
-  const [clicked, setClicked] = useState(false);
-
+export function ShareButton({ projectId }: { projectId: string }) {
   return (
     <Button
-      onClick={() => {
-        navigator.clipboard.writeText(window.location.href);
-        setClicked(true);
-        setTimeout(() => setClicked(false), 500);
-      }}
-      disabled={clicked}
+      LinkComponent={Link}
+      href={`https://warpcast.com/~/compose?text=Checkout%20my%20new%20Project!&embeds[]=https://connect.charmverse.io/p/${projectId}`}
+      target='_blank'
+      rel='noopener noreferrer'
+      disabled={!projectId}
       color='secondary'
       variant='outlined'
-      startIcon={clicked ? <CheckIcon fontSize='small' /> : <ShareIcon fontSize='small' />}
+      startIcon={<ShareIcon fontSize='small' />}
     >
-      {clicked ? 'Copied!' : 'Share'}
+      Share
     </Button>
   );
 }
