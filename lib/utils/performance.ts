@@ -8,10 +8,10 @@ export async function checkDuration<T>(
   const data = await callback(...options.args);
   performance.mark('end');
   const measure = performance.measure('measureFn', 'start', 'end');
-  const executionTime = measure.duration * 1000; // milliseconds
+  const executionTime = measure.duration / 1000; // seconds
 
   const logMessage = options.logMessage || 'Loaded function in ';
-  log.info(`${logMessage}${executionTime}ms`);
+  log.info(`${logMessage} ${executionTime}s`);
 
   return data;
 }
