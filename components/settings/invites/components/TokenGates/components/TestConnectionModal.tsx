@@ -11,14 +11,14 @@ import * as yup from 'yup';
 
 import { useTestTokenGate } from 'charmClient/hooks/tokenGates';
 import { Button } from 'components/common/Button';
-import { TextInputField } from 'components/common/form/fields/TextInputField';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { TokenGate, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { isValidChainAddress } from 'lib/tokens/validation';
+import { fancyTrim } from 'lib/utils/strings';
 
 type TestResult = {
   status?: 'loading' | 'error' | 'success' | 'token_gate_error';
+  error?: string;
 };
 type Props = Omit<ComponentProps<typeof Modal>, 'children'> & { tokenGateId?: string; onClose: VoidFunction };
 
@@ -64,13 +64,13 @@ export function TestConnectionModal({ tokenGateId, ...props }: Props) {
         // unexepcted error, maybe
         onError: (error) => {
           log.warn('Unexpected error when testing token gate', error);
-          setTestResult({ status: 'token_gate_error' });
+          setTestResult({ status: 'token_gate_error', error: error.error });
         },
         onSuccess: (result) => {
           if (result.success) {
             setTestResult({ status: 'success' });
           } else {
-            setTestResult({ status: 'error' });
+            setTestResult({ status: 'error', error: '' });
           }
         }
       }
@@ -87,7 +87,7 @@ export function TestConnectionModal({ tokenGateId, ...props }: Props) {
   return (
     <Modal size='fluid' {...props}>
       <Box width='550px' maxWidth='100%'>
-        <DialogTitle onClose={props.onClose}>Test token gate</DialogTitle>
+        <DialogTitle onClose={props.onClose}>Token gate test</DialogTitle>
         <Stack alignItems='flex-start' flexDirection='row'>
           <TextField
             fullWidth
@@ -96,13 +96,13 @@ export function TestConnectionModal({ tokenGateId, ...props }: Props) {
               <>
                 {testResult.status === 'loading' && (
                   <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }} variant='caption'>
-                    <CircularProgress size={10} />
+                    <CircularProgress size={20} />
                     Loading...
                   </Typography>
                 )}
                 {testResult.status === 'success' && (
                   <Typography
-                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}
                     variant='caption'
                     color='success.main'
                   >
@@ -111,9 +111,13 @@ export function TestConnectionModal({ tokenGateId, ...props }: Props) {
                   </Typography>
                 )}
                 {testResult.status === 'token_gate_error' && (
-                  <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }} variant='caption' color='error'>
+                  <Typography
+                    sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}
+                    variant='caption'
+                    color='error'
+                  >
                     <ErrorOutlineIcon color='error' fontSize='small' />
-                    Unknown error. Check token gate conditions
+                    Unknown error. {fancyTrim(testResult.error, 500)}
                   </Typography>
                 )}
                 {testResult.status === 'error' && (
