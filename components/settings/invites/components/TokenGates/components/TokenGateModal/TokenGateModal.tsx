@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box';
 
 import Modal from 'components/common/Modal';
-import Legend from 'components/settings/Legend';
 
 import { TokenGateContent } from './components/TokenGateContent';
 import { useTokenGateModal } from './hooks/useTokenGateModalContext';

@@ -10,7 +10,7 @@ import { validateTokenGateCondition } from './validateTokenGateCondition';
  * @param walletAddress string
  * @returns string | null
  */
-export async function validateTokenGate(tokenGate: TokenGate, walletAddress: string) {
+export async function validateTokenGate(tokenGate: TokenGate, walletAddress: string): Promise<string | null> {
   const tokenGatesValid = await Promise.all(
     tokenGate.conditions.accessControlConditions?.map(async (condition) =>
       validateTokenGateCondition(condition, walletAddress)
@@ -29,7 +29,10 @@ export async function validateTokenGate(tokenGate: TokenGate, walletAddress: str
   }
 }
 
-export async function validateTokenGateWithMultipleWallets(tokenGate: TokenGate, wallets: UserWallet[]) {
+export async function validateTokenGateWithMultipleWallets(
+  tokenGate: TokenGate,
+  wallets: UserWallet[]
+): Promise<string | null> {
   const values = await Promise.all(
     wallets.map(async (w) =>
       validateTokenGate(tokenGate, w.address).catch((error) => {

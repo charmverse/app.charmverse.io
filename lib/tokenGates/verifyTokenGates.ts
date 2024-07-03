@@ -9,7 +9,7 @@ import { validateTokenGateWithMultipleWallets } from './validateTokenGate';
 
 export type TokenGateResult = TokenGateWithRoles & { grantedRoles: string[]; verified: boolean };
 
-type Props = {
+export type Props = {
   userId: string;
   spaceId: string;
   tokenGateIds: string[];
