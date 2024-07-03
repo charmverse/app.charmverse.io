@@ -29,18 +29,25 @@ export function validateProposalProject({
     throw new InvalidInputError(`Project profile field not found`);
   }
 
-  const projectSchema = createProjectYupSchema({
-    fieldConfig: projectField.fieldConfig as ProjectAndMembersFieldConfig,
-    defaultRequired: true
-  });
+  let projectMembers = project.projectMembers;
 
   if (typeof projectFieldAnswer === 'object' && 'selectedMemberIds' in projectFieldAnswer) {
     const selectedMemberIds = projectFieldAnswer.selectedMemberIds;
-    project.projectMembers = [
-      project.projectMembers[0],
-      ...project.projectMembers.filter((member) => selectedMemberIds.includes(member.id))
-    ];
+    projectMembers = project.projectMembers.filter((member) => !member.teamLead);
+    for (const memberId of selectedMemberIds) {
+      const member = project.projectMembers.find((m) => m.id === memberId);
+      if (!member) {
+        throw new InvalidInputError(`Member with id ${memberId} does not exist in project`);
+      }
+      if (projectMembers.some((m) => m.id === memberId)) {
+        projectMembers.push(member);
+      }
+    }
+    project.projectMembers = projectMembers;
   }
 
-  projectSchema.validateSync(convertToProjectValues(project), { abortEarly: false });
+  const projectSchema = createProjectYupSchema({
+    fieldConfig: projectField.fieldConfig as ProjectAndMembersFieldConfig
+  });
+  projectSchema.validateSync(convertToProjectValues({ ...project, projectMembers }), { abortEarly: false });
 }
