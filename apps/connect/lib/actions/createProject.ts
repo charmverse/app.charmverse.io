@@ -5,7 +5,8 @@ import { authActionClient } from '@connect/lib/actions/actionClient';
 import { v4 } from 'uuid';
 
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-import { uid } from 'lib/utils/strings';
+import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
+import { stringToValidPath, uid } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 
 import type { FormValues } from '../projects/form';
@@ -125,9 +126,28 @@ export const actionCreateProject = authActionClient
       )
     ).filter(isTruthy);
 
+    let path = stringToValidPath({ input: input.name ?? '', wordSeparator: '-', autoReplaceEmpty: false });
+
+    const existingProjectWithPath = await prisma.project.findFirst({
+      where: {
+        path
+      },
+      select: {
+        id: true
+      }
+    });
+
+    if (existingProjectWithPath) {
+      path = generatePagePathFromPathAndTitle({
+        title: input.name,
+        existingPagePath: path
+      });
+    }
+
     await prisma.project.create({
       data: {
         name: input.name,
+        path,
         updatedBy: currentUserId,
         createdBy: currentUserId,
         description: input.description,
