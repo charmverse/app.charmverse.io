@@ -10,6 +10,7 @@ import { isTruthy } from 'lib/utils/types';
 
 import type { FormValues } from '../projects/form';
 import { schema } from '../projects/form';
+import { generateOgImage } from '../projects/generateOgImage';
 
 export type FarcasterAccount = {
   id: number;
@@ -125,7 +126,7 @@ export const actionCreateProject = authActionClient
       )
     ).filter(isTruthy);
 
-    await prisma.project.create({
+    const newProject = await prisma.project.create({
       data: {
         name: input.name,
         updatedBy: currentUserId,
@@ -162,6 +163,8 @@ export const actionCreateProject = authActionClient
         }
       }
     });
+
+    await generateOgImage(newProject.id, currentUserId);
 
     return { success: true };
   });
