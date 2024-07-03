@@ -19,7 +19,7 @@ export async function fetchProject(projectId: string) {
       mirror: true,
       twitter: true,
       websites: true,
-      ogImage: true,
+      farcasterFrameImage: true,
       projectMembers: {
         select: {
           user: {

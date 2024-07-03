@@ -8,12 +8,12 @@ export default async function ProjectPage({ params }: { params: { id: string } }
 
   return (
     <>
-      {project?.ogImage && (
+      {project?.farcasterFrameImage && (
         <>
           {/* Custom meta tags for farcaster */}
           <meta property='fc:frame' content='vNext' />
-          <meta property='og:image' content={project.ogImage} />
-          <meta name='fc:frame:image' content={`http://localhost:3000/api/og?id=${project.ogImage}`} />
+          <meta property='og:image' content={project.farcasterFrameImage} />
+          <meta name='fc:frame:image' content={project.farcasterFrameImage} />
           {/* Button 1 */}
           <meta name='fc:frame:button:1' content='Create a project' />
           <meta name='fc:frame:button:1:action' content='link' />

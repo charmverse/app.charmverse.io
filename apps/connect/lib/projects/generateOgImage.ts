@@ -9,15 +9,15 @@ import { saveOgImage } from './saveOgImage';
 export async function generateOgImage(projectId: string, userId: string) {
   const project = await prisma.project.findUnique({
     where: { id: projectId },
-    select: { id: true, ogImage: true }
+    select: { id: true, farcasterFrameImage: true }
   });
 
   if (!project) {
     throw new InvalidInputError(`Could not find project with id ${projectId}`);
   }
 
-  if (project.ogImage) {
-    return project.ogImage;
+  if (project.farcasterFrameImage) {
+    return project.farcasterFrameImage;
   }
 
   // Log duration of the image generation
@@ -25,7 +25,7 @@ export async function generateOgImage(projectId: string, userId: string) {
 
   await prisma.project.update({
     where: { id: projectId },
-    data: { ogImage: url }
+    data: { farcasterFrameImage: url }
   });
 
   log.info(`Generated OG Image for project ${projectId}`);
