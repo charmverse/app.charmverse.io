@@ -153,7 +153,7 @@ export const actionCreateProject = authActionClient
         description: input.description,
         category: input.category,
         websites: input.websites?.filter(isTruthy),
-        farcasterValues: input.farcasterIds?.filter(isTruthy),
+        farcasterValues: input.farcasterValues?.filter(isTruthy),
         twitter: input.twitter,
         github: input.github,
         mirror: input.mirror,

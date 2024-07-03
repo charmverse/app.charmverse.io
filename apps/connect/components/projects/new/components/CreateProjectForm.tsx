@@ -30,20 +30,21 @@ function MultiTextValueFields({
   return (
     <Stack>
       <FormLabel id={`project-${name.toLowerCase().replaceAll(' ', '')}`}>{label}</FormLabel>
-      <Controller
-        control={control}
-        name={`${name}.0` as FieldArrayPath<FormValues>}
-        render={({ field: _field, fieldState }) => (
-          <TextField
-            fullWidth
-            aria-labelledby={`project-${name}-0`}
-            placeholder={placeholder}
-            error={!!fieldState.error}
-            sx={{ mb: 1 }}
-            {..._field}
-          />
-        )}
-      />
+      <Stack direction='row' gap={1} alignItems='center' mb={1}>
+        <Controller
+          control={control}
+          name={`${name}.0` as FieldArrayPath<FormValues>}
+          render={({ field: _field, fieldState }) => (
+            <TextField
+              fullWidth
+              aria-labelledby={`project-${name}-0`}
+              placeholder={placeholder}
+              error={!!fieldState.error}
+              {..._field}
+            />
+          )}
+        />
+      </Stack>
       {fields.slice(1).map((field, index) => (
         <Stack key={field.id} gap={1} mb={1} direction='row'>
           <Controller
@@ -250,54 +251,72 @@ export function CreateProjectForm({
       <MultiTextValueFields control={control} name='websites' label='Websites' placeholder='https://acme-inc.com' />
       <MultiTextValueFields
         control={control}
-        name='farcasterIds'
+        name='farcasterValues'
         label='Farcaster'
-        placeholder='https://warpcast.xyz/acme-inc'
+        placeholder='https://warpcast.com/acme-inc'
       />
       <Stack>
         <FormLabel id='project-twitter'>X</FormLabel>
-        <Controller
-          control={control}
-          name='twitter'
-          render={({ field, fieldState }) => (
-            <TextField
-              placeholder='https://twitter.com/acme-inc'
-              aria-labelledby='project-twitter'
-              error={!!fieldState.error}
-              {...field}
-            />
-          )}
-        />
+        <Stack direction='row' gap={1} alignItems='center'>
+          <Typography color='secondary' width={250}>
+            https://x.com/
+          </Typography>
+          <Controller
+            control={control}
+            name='twitter'
+            render={({ field, fieldState }) => (
+              <TextField
+                fullWidth
+                placeholder='acme-inc'
+                aria-labelledby='project-twitter'
+                error={!!fieldState.error}
+                {...field}
+              />
+            )}
+          />
+        </Stack>
       </Stack>
       <Stack>
         <FormLabel id='project-github'>Github</FormLabel>
-        <Controller
-          control={control}
-          name='github'
-          render={({ field, fieldState }) => (
-            <TextField
-              placeholder='https://github.com/acme-inc'
-              aria-labelledby='project-github'
-              error={!!fieldState.error}
-              {...field}
-            />
-          )}
-        />
+        <Stack direction='row' gap={1} alignItems='center'>
+          <Typography color='secondary' width={250}>
+            https://github.com/
+          </Typography>
+          <Controller
+            control={control}
+            name='github'
+            render={({ field, fieldState }) => (
+              <TextField
+                fullWidth
+                placeholder='acme-inc'
+                aria-labelledby='project-github'
+                error={!!fieldState.error}
+                {...field}
+              />
+            )}
+          />
+        </Stack>
       </Stack>
       <Stack>
         <FormLabel id='project-mirror'>Mirror</FormLabel>
-        <Controller
-          control={control}
-          name='mirror'
-          render={({ field, fieldState }) => (
-            <TextField
-              placeholder='https://mirror.xyz/acme-inc'
-              aria-labelledby='project-mirror'
-              error={!!fieldState.error}
-              {...field}
-            />
-          )}
-        />
+        <Stack direction='row' gap={1} alignItems='center'>
+          <Typography color='secondary' width={250}>
+            https://mirror.xyz/
+          </Typography>
+          <Controller
+            control={control}
+            name='mirror'
+            render={({ field, fieldState }) => (
+              <TextField
+                fullWidth
+                placeholder='acme-inc'
+                aria-labelledby='project-mirror'
+                error={!!fieldState.error}
+                {...field}
+              />
+            )}
+          />
+        </Stack>
       </Stack>
       <Stack justifyContent='space-between' flexDirection='row'>
         <Link href='/profile' passHref>
