@@ -35,9 +35,9 @@ export async function validateTokenGateCondition(
     case condition.type === 'ERC20' && !!contractAddress && !!condition.quantity: {
       const minimumQuantity = BigInt(condition.quantity);
       const balance = await publicClient.readContract({
-        abi: parseAbi([`function getUser(address) view returns (uint256)`]),
+        abi: ercAbi,
         address: contractAddress,
-        functionName: 'getUser',
+        functionName: 'balanceOf',
         args: [userAddress]
       });
       const decimals = await publicClient.readContract({
