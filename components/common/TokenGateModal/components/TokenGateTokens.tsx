@@ -12,12 +12,12 @@ import { TokenGateTokenFields } from './TokenGateTokensFields';
  */
 export function TokenGateTokens() {
   const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
-  const methods = useTokensForm();
+  const form = useTokensForm();
   const {
     getValues,
     reset,
     formState: { isValid }
-  } = methods;
+  } = form;
 
   const onSubmit = async () => {
     const values = getValues();
@@ -32,7 +32,7 @@ export function TokenGateTokens() {
   };
 
   return (
-    <FormProvider {...methods}>
+    <FormProvider {...form}>
       <TokenGateTokenFields />
       <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
     </FormProvider>

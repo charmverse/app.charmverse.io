@@ -151,6 +151,18 @@ export function humanizeConditionsData(conditions: TokenGate['conditions']): Hum
           };
         }
       }
+      case 'ContractMethod': {
+        return {
+          image,
+          content: [
+            { ...tokenNameOrEtherscanUrl },
+            { type: 'text', content: `returns at least` },
+            { type: 'text', content: balance },
+            { type: 'text', content: `on` },
+            { type: 'text', content: chain }
+          ]
+        };
+      }
       case 'Wallet': {
         // Controls wallet with address ${shortWalletAddress}
         return {

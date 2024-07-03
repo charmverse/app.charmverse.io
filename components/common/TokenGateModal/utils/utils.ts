@@ -17,8 +17,9 @@ export const poapNameMatch = [
 ] as const;
 
 export const tokenCheck = [
-  { id: 'token', name: 'Check Balance' },
-  { id: 'customToken', name: 'Custom token' }
+  { id: 'token', name: 'Check balance' },
+  { id: 'customToken', name: 'Custom token' },
+  { id: 'customContractMethod', name: 'Custom contract method' }
 ] as const;
 
 export const nftCheck = [
