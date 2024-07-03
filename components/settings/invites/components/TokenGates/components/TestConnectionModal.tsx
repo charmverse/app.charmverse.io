@@ -64,7 +64,8 @@ export function TestConnectionModal({ tokenGateId, ...props }: Props) {
         // unexepcted error, maybe
         onError: (error) => {
           log.warn('Unexpected error when testing token gate', error);
-          setTestResult({ status: 'token_gate_error', error: error.error });
+          // error.error gives us the actual error, not "Something went wrong!"
+          setTestResult({ status: 'token_gate_error', error: (error as any).error });
         },
         onSuccess: (result) => {
           if (result.success) {
@@ -96,7 +97,7 @@ export function TestConnectionModal({ tokenGateId, ...props }: Props) {
               <>
                 {testResult.status === 'loading' && (
                   <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }} variant='caption'>
-                    <CircularProgress size={20} />
+                    <CircularProgress size={16} />
                     Loading...
                   </Typography>
                 )}
@@ -122,7 +123,7 @@ export function TestConnectionModal({ tokenGateId, ...props }: Props) {
                 )}
                 {testResult.status === 'error' && (
                   <Typography sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }} variant='caption' color='error'>
-                    <ErrorOutlineIcon color='error' />
+                    <ErrorOutlineIcon color='error' fontSize='small' />
                     The address does not meet the requirements
                   </Typography>
                 )}
