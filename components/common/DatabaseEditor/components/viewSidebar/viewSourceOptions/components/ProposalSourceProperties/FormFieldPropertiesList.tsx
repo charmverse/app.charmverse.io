@@ -61,16 +61,23 @@ export function FormFieldPropertiesList({
           } else {
             setSelectedProperties({
               ...selectedProperties,
-              templateProperties: selectedProperties.templateProperties.map((templateProperty) => {
-                if (templateProperty.templateId === templateId) {
-                  return {
-                    ...templateProperty,
-                    formFields:
-                      selectedFormFields.length === formFields.length ? [] : formFields.map((formField) => formField.id)
-                  };
-                }
-                return templateProperty;
-              })
+              templateProperties: selectedProperties.templateProperties
+                .map((templateProperty) => {
+                  if (templateProperty.templateId === templateId) {
+                    return {
+                      ...templateProperty,
+                      formFields:
+                        selectedFormFields.length === formFields.length
+                          ? []
+                          : formFields.map((formField) => formField.id)
+                    };
+                  }
+                  return templateProperty;
+                })
+                .filter(
+                  (_templateProperties) =>
+                    _templateProperties.formFields.length > 0 || _templateProperties.rubricEvaluations.length > 0
+                )
             });
           }
         }}
@@ -100,17 +107,22 @@ export function FormFieldPropertiesList({
                 }
                 setSelectedProperties({
                   ...selectedProperties,
-                  templateProperties: selectedProperties.templateProperties.map((templateProperty) => {
-                    if (templateProperty.templateId === templateId) {
-                      return {
-                        ...templateProperty,
-                        formFields: isChecked
-                          ? templateProperty.formFields.filter((id) => id !== formField.id)
-                          : [...templateProperty.formFields, formField.id]
-                      };
-                    }
-                    return templateProperty;
-                  })
+                  templateProperties: selectedProperties.templateProperties
+                    .map((templateProperty) => {
+                      if (templateProperty.templateId === templateId) {
+                        return {
+                          ...templateProperty,
+                          formFields: isChecked
+                            ? templateProperty.formFields.filter((id) => id !== formField.id)
+                            : [...templateProperty.formFields, formField.id]
+                        };
+                      }
+                      return templateProperty;
+                    })
+                    .filter(
+                      (_templateProperties) =>
+                        _templateProperties.formFields.length > 0 || _templateProperties.rubricEvaluations.length > 0
+                    )
                 });
               }}
             />

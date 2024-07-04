@@ -18,6 +18,15 @@ import { ProposalDefaultPropertiesList, ProposalDefaultPropertiesReadonlyList } 
 import { RubricEvaluationPropertiesList } from './RubricEvaluationPropertiesList';
 import { TemplatePropertiesReadonlyList } from './TemplatePropertiesReadonlyList';
 
+export type RubricEvaluationProperty =
+  | 'average'
+  | 'total'
+  | 'reviewers'
+  | 'criteriaTotal'
+  | 'reviewerScore'
+  | 'reviewerComment'
+  | 'criteriaAverage';
+
 export type SelectedProposalProperties = {
   projectMember: string[];
   project: string[];
@@ -26,13 +35,7 @@ export type SelectedProposalProperties = {
     templateId: string;
     rubricEvaluations: {
       title: string;
-      average?: boolean;
-      total?: boolean;
-      reviewers?: boolean;
-      criteriaTotal?: boolean;
-      reviewerScore?: boolean;
-      reviewerComment?: boolean;
-      criteriaAverage?: boolean;
+      properties: RubricEvaluationProperty[];
       templateId: string;
       evaluationId: string;
     }[];

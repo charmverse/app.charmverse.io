@@ -2,8 +2,18 @@ import { Stack, Typography } from '@mui/material';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
-import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
+import type { RubricEvaluationProperty, SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 import { SelectedPropertiesList } from './SelectedPropertiesList';
+
+const RubricPropertyLabel: Record<RubricEvaluationProperty, string> = {
+  average: 'Step Average',
+  total: 'Step Total',
+  reviewers: 'Step Reviewers',
+  criteriaTotal: 'Criteria Total',
+  criteriaAverage: 'Criteria Average',
+  reviewerScore: 'Individual Reviewer Scores',
+  reviewerComment: 'Individual Reviewer Comments'
+};
 
 export function TemplatePropertiesReadonlyList({
   selectedProperties
@@ -48,40 +58,16 @@ export function TemplatePropertiesReadonlyList({
                 />
               ) : null}
 
-              {templateProperty.rubricEvaluations.map((rubricEvaluation) => {
-                const items: string[] = [];
-                if (rubricEvaluation.average) {
-                  items.push('Step Average');
-                }
-                if (rubricEvaluation.total) {
-                  items.push('Step Total');
-                }
-                if (rubricEvaluation.reviewers) {
-                  items.push('Step Reviewers');
-                }
-                if (rubricEvaluation.criteriaTotal) {
-                  items.push('Criteria Total');
-                }
-                if (rubricEvaluation.criteriaAverage) {
-                  items.push('Criteria Average');
-                }
-                if (rubricEvaluation.reviewerScore) {
-                  items.push('Individual Reviewer Scores');
-                }
-                if (rubricEvaluation.reviewerComment) {
-                  items.push('Individual Reviewer Comments');
-                }
-                return (
-                  <Stack key={rubricEvaluation.templateId}>
-                    <SelectedPropertiesList
-                      items={items}
-                      title={rubricEvaluation.title}
-                      titleVariant='body2'
-                      hideDivider
-                    />
-                  </Stack>
-                );
-              })}
+              {templateProperty.rubricEvaluations.map((rubricEvaluation) => (
+                <Stack key={rubricEvaluation.templateId}>
+                  <SelectedPropertiesList
+                    items={rubricEvaluation.properties.map((property) => RubricPropertyLabel[property])}
+                    title={rubricEvaluation.title}
+                    titleVariant='body2'
+                    hideDivider
+                  />
+                </Stack>
+              ))}
             </Stack>
           );
         })}
