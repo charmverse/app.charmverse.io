@@ -16,8 +16,7 @@ import { getPagePath } from 'lib/pages/utils';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
 import randomName from 'lib/utils/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
-
-import { templatesContainer } from './page-invite';
+import { blueColor } from 'theme/colors';
 
 const handler = nc({
   onError,
@@ -184,7 +183,6 @@ const createProposalNotification = ({
     }
   };
 };
-
 const createBountyNotification = ({
   pageTitle,
   spaceName,
@@ -297,6 +295,23 @@ const templates = {
       spaceName: 'OrangeDAO',
       user
     });
+  },
+  'Guest added': () => {
+    return emails.getPageInviteEmail({
+      guestEmail: 'matt.blockchain',
+      invitingUserName: 'momakes.blockchain',
+      pageTitle: 'Acme Inc proposal',
+      pageId: '12344553',
+      emailBranding: {
+        artwork: '',
+        color: blueColor
+      }
+    });
+  },
+  'Email verification': () => {
+    return emails.getEmailVerification({
+      verificationUrl: 'https://apps.com'
+    });
   }
 };
 
@@ -310,5 +325,37 @@ handler.get(async (req, res) => {
 
   res.status(200).send(wrapped);
 });
+
+function templatesContainer(examples: { description: string; subject: string; html: string }[]) {
+  return `
+    <html>
+      <head><meta charset="UTF-8"></head>
+      <body style="font-size: 13px; font-family: arial,sans-serif">
+      <h1 style="background: white; padding: 40px 20px">
+        <div style="max-width: 1024px; margin: 0 auto">
+          Email Templates
+          <hr style="border-color: #eee" />
+        </div>
+      </h1>
+      ${examples
+        .map(
+          ({ description, subject, html }) => `
+        <div style="margin: 20px">
+          <div style="max-width: 1024px; margin: 0 auto">
+            <h2>
+              Template: ${description}
+            </h2>
+            <h3>
+              Email Subject: ${subject}
+            </h3>
+          </div>
+        </div>
+        <div style="margin-bottom: 20px">${html}</div>`
+        )
+        .join('<hr>')}
+      </body>
+    </html>
+  `;
+}
 
 export default handler;

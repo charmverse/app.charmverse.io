@@ -7,6 +7,7 @@ import nc from 'next-connect';
 
 import { spaceTemplateCookie } from 'components/common/CreateSpaceForm/constants';
 import { registerBeehiivSubscription } from 'lib/beehiiv/registerBeehiivSubscription';
+import { sendMagicLink } from 'lib/google/sendMagicLink';
 import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
 import { sendSignupEvent as sendLoopSignupEvent } from 'lib/loopsEmail/sendSignupEvent';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -54,6 +55,20 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
       }
     } catch (error) {
       log.error('Could not register user with Loop', { error, userId });
+    }
+  }
+  if (updatedUser.email) {
+    const verifiedEmail = await prisma.verifiedEmail.count({
+      where: {
+        email: updatedUser.email
+      }
+    });
+    if (verifiedEmail === 0) {
+      // see if user wants to verify their email address for logging in later
+      await sendMagicLink({
+        to: { email: updatedUser.email, userId: updatedUser.id, displayName: updatedUser.username }
+      });
+      log.info('Sent magic link to verify notification email', { userId: updatedUser.id });
     }
   }
   return res.status(200).end();

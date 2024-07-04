@@ -17,7 +17,7 @@ import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';
 
 const MAX_CHAR = 60;
 
-export function PendingNotification({
+export function NotificationTemplate({
   notification,
   user,
   spaceFeatures,

@@ -15,7 +15,7 @@ export type PageInviteEmailProps = {
   };
 };
 
-export function PageInviteEmail(props: PageInviteEmailProps) {
+export function PageInviteTemplate(props: PageInviteEmailProps) {
   const pageLink = `${baseUrl}/invite/page?id=${props.pageId}&email=${encodeURIComponent(props.guestEmail)}`;
 
   return (

@@ -8,10 +8,15 @@ import type { FeatureJson } from 'lib/features/constants';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 
-import { PendingNotification } from './templates/NotificationTemplate';
+import type { EmailVerificationProps } from './templates/EmailVerificationTemplate';
+import {
+  emailSubject as emailVerificationSubject,
+  EmailVerificationTemplate
+} from './templates/EmailVerificationTemplate';
+import { NotificationTemplate } from './templates/NotificationTemplate';
 import { OrangeDAOInviteTemplate } from './templates/OrangeDAOInviteTemplate';
-import type { PageInviteEmailProps } from './templates/PageInviteEmail';
-import { emailSubject, PageInviteEmail } from './templates/PageInviteEmail';
+import type { PageInviteEmailProps } from './templates/PageInviteTemplate';
+import { emailSubject, PageInviteTemplate } from './templates/PageInviteTemplate';
 
 export function getPendingNotificationEmail({
   notification,
@@ -27,7 +32,7 @@ export function getPendingNotificationEmail({
     color: string;
   };
 }) {
-  const html = render(PendingNotification({ emailBranding, notification, user, spaceFeatures }));
+  const html = render(NotificationTemplate({ emailBranding, notification, user, spaceFeatures }));
   const content = getNotificationMetadata({ notification, spaceFeatures }).content;
   const subject =
     typeof content === 'string' ? content : htmlToText(ReactDOMServer.renderToString(content as ReactElement));
@@ -66,8 +71,15 @@ export function getOrangeDaoSpaceInviteEmail({
 }
 
 export function getPageInviteEmail(props: PageInviteEmailProps) {
-  const html = render(PageInviteEmail(props));
+  const html = render(PageInviteTemplate(props));
   const subject = emailSubject(props);
+
+  return { html, subject };
+}
+
+export function getEmailVerification(props: EmailVerificationProps) {
+  const html = render(EmailVerificationTemplate(props));
+  const subject = emailVerificationSubject();
 
   return { html, subject };
 }

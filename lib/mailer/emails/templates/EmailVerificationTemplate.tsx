@@ -7,7 +7,7 @@ export type EmailVerificationProps = {
   verificationUrl: string;
 };
 
-export function EmailVerification({ verificationUrl }: EmailVerificationProps) {
+export function EmailVerificationTemplate({ verificationUrl }: EmailVerificationProps) {
   return (
     <EmailWrapper title='Verify your email address'>
       <Text variant='h2'>Verify your email address</Text>
@@ -18,7 +18,6 @@ export function EmailVerification({ verificationUrl }: EmailVerificationProps) {
         }}
       >
         <Button
-          variant='outlined'
           style={{
             width: 'fit-content'
           }}

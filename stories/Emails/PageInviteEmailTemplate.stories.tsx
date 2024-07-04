@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import { PageInviteEmail } from 'lib/mailer/emails/templates/PageInviteEmail';
+import { PageInviteEmail } from 'lib/mailer/emails/templates/PageInviteTemplate';
 
 export default {
   title: 'Emails/Page Invite',
