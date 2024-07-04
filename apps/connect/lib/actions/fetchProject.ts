@@ -13,6 +13,7 @@ type ProjectMember = {
 export type ConnectProjectDetails = Pick<
   Project,
   | 'id'
+  | 'createdBy'
   | 'description'
   | 'avatar'
   | 'coverImage'
@@ -36,6 +37,7 @@ export async function fetchProject(projectId: string): Promise<ConnectProjectDet
     },
     select: {
       id: true,
+      createdBy: true,
       description: true,
       avatar: true,
       coverImage: true,
