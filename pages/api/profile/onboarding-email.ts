@@ -67,8 +67,13 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
       // see if user wants to verify their email address for logging in later
       await sendMagicLink({
         to: { email: updatedUser.email, userId: updatedUser.id, displayName: updatedUser.username }
-      });
-      log.info('Sent magic link to verify notification email', { userId: updatedUser.id });
+      })
+        .catch((error) => {
+          log.warn('Error sending magic link to verify notification email', { error, userId: updatedUser.id });
+        })
+        .then(() => {
+          log.info('Sent magic link to verify notification email', { userId: updatedUser.id });
+        });
     }
   }
   return res.status(200).end();
