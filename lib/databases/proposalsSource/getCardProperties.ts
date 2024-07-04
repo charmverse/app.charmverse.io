@@ -40,6 +40,7 @@ export type ProposalData = {
     id: string;
     title: string;
     path: string;
+    sourceTemplateId: string | null;
   };
   proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates'> & {
     authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
@@ -119,7 +120,8 @@ const pageSelectObject = {
         }
       }
     }
-  }
+  },
+  sourceTemplateId: true
 } satisfies Prisma.PageSelect;
 
 export async function getCardPropertiesFromProposals({
@@ -254,7 +256,8 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
   properties = getCardPropertiesFromRubric({
     properties,
     evaluations: proposal.evaluations.filter((e) => e.type === 'rubric'),
-    templates: cardProperties
+    cardProperties,
+    templateId: page.sourceTemplateId
   });
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);

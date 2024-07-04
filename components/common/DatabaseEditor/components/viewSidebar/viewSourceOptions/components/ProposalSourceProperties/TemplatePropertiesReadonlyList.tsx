@@ -30,7 +30,9 @@ export function TemplatePropertiesReadonlyList({
 
   return (
     <Stack gap={1}>
-      <Typography fontWeight='bold'>Template Properties</Typography>
+      <Typography fontWeight='bold' variant='h6'>
+        Template Properties
+      </Typography>
       <Stack gap={2}>
         {selectedProperties.templateProperties.map((templateProperty) => {
           const proposalTemplate = proposalTemplates?.find(
@@ -42,9 +44,7 @@ export function TemplatePropertiesReadonlyList({
 
           return (
             <Stack key={templateProperty.templateId} gap={1}>
-              <Typography fontWeight='bold' variant='body2'>
-                {proposalTemplate.title}
-              </Typography>
+              <Typography fontWeight='bold'>{proposalTemplate.title}</Typography>
               {templateProperty.formFields.length ? (
                 <SelectedPropertiesList
                   items={

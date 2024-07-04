@@ -1,5 +1,6 @@
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
+import type { ProposalTemplateMeta } from 'lib/proposals/getProposalTemplates';
 import { isTruthy } from 'lib/utils/types';
 
 import type { Board } from '../board';
@@ -7,61 +8,90 @@ import { defaultProposalPropertyTypes } from '../proposalDbProperties';
 
 export function createSelectedPropertiesStateFromBoardProperties({
   cardProperties,
-  proposalCustomProperties
+  proposalCustomProperties,
+  proposalTemplates
 }: {
   proposalCustomProperties: Board['fields']['cardProperties'];
   cardProperties: Board['fields']['cardProperties'];
+  proposalTemplates: ProposalTemplateMeta[];
 }) {
-  const propertyIds = cardProperties.map((field) => field.id);
+  const cardPropertyIds = cardProperties.map((field) => field.id);
   const projectProperties = projectFieldProperties
-    .filter((property) => propertyIds.includes(property.columnPropertyId))
+    .filter((property) => cardPropertyIds.includes(property.columnPropertyId))
     .map((property) => property.field);
   const projectMemberProperties = projectMemberFieldProperties
-    .filter((property) => propertyIds.includes(property.columnPropertyId))
+    .filter((property) => cardPropertyIds.includes(property.columnPropertyId))
     .map((property) => property.field);
-  const formFieldIds = cardProperties.map((field) => field.formFieldId).filter(isTruthy);
-  const rubricEvaluationsPropertiesRecord: Record<string, SelectedProposalProperties['rubricEvaluations'][number]> = {};
   const customPropertyIds = proposalCustomProperties.map((field) => field.id);
   const defaultProposalProperties: string[] = [];
   const customProperties: string[] = [];
-  cardProperties.forEach((field) => {
+  const templateProperties: SelectedProposalProperties['templateProperties'] = [];
+
+  cardProperties.forEach((property) => {
     if (
-      field.type === 'proposalEvaluationAverage' ||
-      field.type === 'proposalEvaluationTotal' ||
-      field.type === 'proposalEvaluatedBy' ||
-      field.type === 'proposalRubricCriteriaTotal' ||
-      field.type === 'proposalRubricCriteriaReviewerComment' ||
-      field.type === 'proposalRubricCriteriaReviewerScore' ||
-      field.type === 'proposalRubricCriteriaAverage'
+      property.type === 'proposalEvaluationAverage' ||
+      property.type === 'proposalEvaluationTotal' ||
+      property.type === 'proposalEvaluatedBy' ||
+      property.type === 'proposalRubricCriteriaTotal' ||
+      property.type === 'proposalRubricCriteriaReviewerComment' ||
+      property.type === 'proposalRubricCriteriaReviewerScore' ||
+      property.type === 'proposalRubricCriteriaAverage'
     ) {
-      const fieldKey = field.evaluationTitle;
-      if (fieldKey) {
-        if (!rubricEvaluationsPropertiesRecord[fieldKey]) {
-          rubricEvaluationsPropertiesRecord[fieldKey] = {
-            title: fieldKey
+      const propertyKey = property.evaluationTitle;
+      const proposalTemplate = proposalTemplates.find((template) => template.pageId === property.templateId);
+      if (propertyKey && property.templateId && proposalTemplate) {
+        let templateProperty = templateProperties.find((template) => template.templateId === property.templateId);
+
+        if (!templateProperty) {
+          templateProperty = {
+            formFields: cardProperties
+              .filter((field) => field.formFieldId && field.templateId === property.templateId)
+              .map((field) => field.formFieldId)
+              .filter(isTruthy),
+            templateId: property.templateId,
+            rubricEvaluations: []
           };
+          templateProperties.push(templateProperty);
         }
 
-        if (field.type === 'proposalEvaluationAverage') {
-          rubricEvaluationsPropertiesRecord[fieldKey].average = true;
-        } else if (field.type === 'proposalEvaluationTotal') {
-          rubricEvaluationsPropertiesRecord[fieldKey].total = true;
-        } else if (field.type === 'proposalEvaluatedBy') {
-          rubricEvaluationsPropertiesRecord[fieldKey].reviewers = true;
-        } else if (field.type === 'proposalRubricCriteriaTotal') {
-          rubricEvaluationsPropertiesRecord[fieldKey].criteriaTotal = true;
-        } else if (field.type === 'proposalRubricCriteriaReviewerComment') {
-          rubricEvaluationsPropertiesRecord[fieldKey].reviewerComment = true;
-        } else if (field.type === 'proposalRubricCriteriaReviewerScore') {
-          rubricEvaluationsPropertiesRecord[fieldKey].reviewerScore = true;
-        } else if (field.type === 'proposalRubricCriteriaAverage') {
-          rubricEvaluationsPropertiesRecord[fieldKey].criteriaAverage = true;
+        let rubricEvaluationProperty = templateProperty.rubricEvaluations.find(
+          (evaluation) => evaluation.title === property.evaluationTitle
+        );
+        const proposalTemplateRubricEvaluation = proposalTemplate.evaluations?.find(
+          (evaluation) => evaluation.title === property.evaluationTitle
+        );
+
+        if (proposalTemplateRubricEvaluation) {
+          if (!rubricEvaluationProperty) {
+            rubricEvaluationProperty = {
+              title: property.evaluationTitle!,
+              evaluationId: proposalTemplateRubricEvaluation.id,
+              templateId: property.templateId,
+              properties: []
+            };
+          }
+
+          if (property.type === 'proposalEvaluationAverage') {
+            rubricEvaluationProperty.properties.push('average');
+          } else if (property.type === 'proposalEvaluationTotal') {
+            rubricEvaluationProperty.properties.push('total');
+          } else if (property.type === 'proposalEvaluatedBy') {
+            rubricEvaluationProperty.properties.push('reviewers');
+          } else if (property.type === 'proposalRubricCriteriaTotal') {
+            rubricEvaluationProperty.properties.push('criteriaTotal');
+          } else if (property.type === 'proposalRubricCriteriaReviewerComment') {
+            rubricEvaluationProperty.properties.push('reviewerComment');
+          } else if (property.type === 'proposalRubricCriteriaReviewerScore') {
+            rubricEvaluationProperty.properties.push('reviewerScore');
+          } else if (property.type === 'proposalRubricCriteriaAverage') {
+            rubricEvaluationProperty.properties.push('criteriaAverage');
+          }
         }
       }
-    } else if (customPropertyIds.includes(field.id)) {
-      customProperties.push(field.id);
-    } else if (defaultProposalPropertyTypes.includes(field.type)) {
-      defaultProposalProperties.push(field.type);
+    } else if (customPropertyIds.includes(property.id)) {
+      customProperties.push(property.id);
+    } else if (defaultProposalPropertyTypes.includes(property.type)) {
+      defaultProposalProperties.push(property.type);
     }
   });
 
@@ -70,7 +100,6 @@ export function createSelectedPropertiesStateFromBoardProperties({
     customProperties,
     project: projectProperties,
     projectMember: projectMemberProperties,
-    formFields: formFieldIds,
-    rubricEvaluations: Object.values(rubricEvaluationsPropertiesRecord)
+    templateProperties
   } as SelectedProposalProperties;
 }

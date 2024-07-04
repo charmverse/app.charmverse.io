@@ -44,11 +44,22 @@ export async function updateBoardProperties({
         proposal: {
           spaceId: boardBlock.spaceId,
           page: {
+            type: 'proposal_template',
             deletedAt: null
           }
         }
       },
       select: {
+        proposal: {
+          select: {
+            page: {
+              select: {
+                title: true,
+                id: true
+              }
+            }
+          }
+        },
         type: true,
         title: true,
         rubricCriteria: {

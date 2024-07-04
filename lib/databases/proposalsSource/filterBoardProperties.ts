@@ -13,7 +13,7 @@ export function filterBoardProperties({
   selectedProperties: SelectedProposalProperties;
   proposalCustomProperties: IPropertyTemplate[];
 }) {
-  const selectedFormFields = selectedProperties.formFields;
+  const selectedFormFieldIds = selectedProperties.templateProperties.map((p) => p.formFields).flat();
   const selectedProjectProperties = selectedProperties.project;
   const selectedProjectMemberProperties = selectedProperties.projectMember;
   const selectedCustomProperties = selectedProperties.customProperties;
@@ -26,7 +26,7 @@ export function filterBoardProperties({
     }
 
     if (p.formFieldId) {
-      return selectedFormFields.includes(p.formFieldId);
+      return selectedFormFieldIds.includes(p.formFieldId);
     }
 
     const matchedProjectFieldProperty = projectFieldProperties.find((field) => field.columnPropertyId === p.id);
@@ -62,36 +62,38 @@ export function filterBoardProperties({
       p.type === 'proposalRubricCriteriaReviewerScore' ||
       p.type === 'proposalRubricCriteriaAverage'
     ) {
-      const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
+      const rubricEvaluation = selectedProperties.templateProperties
+        .find((r) => r.templateId === p.templateId)
+        ?.rubricEvaluations.find((e) => e.title === p.evaluationTitle);
       if (!rubricEvaluation) {
         return false;
       }
       if (p.type === 'proposalEvaluationAverage') {
-        return !!rubricEvaluation.average;
+        return rubricEvaluation.properties.includes('average');
       }
 
       if (p.type === 'proposalEvaluationTotal') {
-        return !!rubricEvaluation.total;
+        return rubricEvaluation.properties.includes('total');
       }
 
       if (p.type === 'proposalEvaluatedBy') {
-        return !!rubricEvaluation.reviewers;
+        return rubricEvaluation.properties.includes('reviewers');
       }
 
       if (p.type === 'proposalRubricCriteriaTotal') {
-        return !!rubricEvaluation.criteriaTotal;
+        return rubricEvaluation.properties.includes('criteriaTotal');
       }
 
       if (p.type === 'proposalRubricCriteriaReviewerComment') {
-        return !!rubricEvaluation.reviewerComment;
+        return rubricEvaluation.properties.includes('reviewerComment');
       }
 
       if (p.type === 'proposalRubricCriteriaReviewerScore') {
-        return !!rubricEvaluation.reviewerScore;
+        return rubricEvaluation.properties.includes('reviewerScore');
       }
 
       if (p.type === 'proposalRubricCriteriaAverage') {
-        return !!rubricEvaluation.criteriaAverage;
+        return rubricEvaluation.properties.includes('criteriaAverage');
       }
     }
     // Custom proposal source board properties, so always show them
