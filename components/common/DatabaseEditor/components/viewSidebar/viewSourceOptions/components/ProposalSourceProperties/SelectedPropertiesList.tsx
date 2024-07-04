@@ -12,17 +12,19 @@ export function SelectedPropertiesList({
   title,
   children,
   hideDivider,
-  itemsSx
+  itemsSx,
+  titleVariant = 'body1'
 }: {
   title: string;
   children?: React.ReactNode;
   items: string[];
   hideDivider?: boolean;
   itemsSx?: SxProps;
+  titleVariant?: 'body1' | 'body2';
 }) {
   return (
     <Stack>
-      <StyledTitleTypography variant='body2'>{title}</StyledTitleTypography>
+      <StyledTitleTypography variant={titleVariant}>{title}</StyledTitleTypography>
       <Stack
         gap={0.5}
         mt={0.5}

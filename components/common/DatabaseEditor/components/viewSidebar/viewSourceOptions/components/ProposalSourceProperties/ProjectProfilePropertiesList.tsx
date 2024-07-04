@@ -132,6 +132,7 @@ export function ProjectProfilePropertiesReadonlyList({
           }}
           items={selectedProjectMemberFields.map((projectMemberFieldProperty) => projectMemberFieldProperty.label)}
           title='Project Member'
+          titleVariant='body2'
           hideDivider
         />
       )}
