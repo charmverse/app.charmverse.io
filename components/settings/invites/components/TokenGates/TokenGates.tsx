@@ -2,8 +2,8 @@ import type { Space } from '@charmverse/core/prisma';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 
 import { useGetTokenGates } from 'charmClient/hooks/tokenGates';
-import { TokenGateModalProvider } from 'components/common/TokenGateModal/hooks/useTokenGateModalContext';
-import TokenGateModal from 'components/common/TokenGateModal/TokenGateModal';
+import { TokenGateModalProvider } from 'components/settings/invites/components/TokenGates/components/TokenGateModal/hooks/useTokenGateModalContext';
+import TokenGateModal from 'components/settings/invites/components/TokenGates/components/TokenGateModal/TokenGateModal';
 
 import TokenGatesTable from './components/TokenGatesTable';
 

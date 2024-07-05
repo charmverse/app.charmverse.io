@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -8,16 +7,14 @@ import TableHead from '@mui/material/TableHead';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 
-import { useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
 import Loader from 'components/common/Loader';
 import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { TokenGate, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 
 import { CopyLink } from './CopyLink';
-import type { TestResult } from './TestConnectionModal';
 import { TestConnectionModal } from './TestConnectionModal';
 import { TokenGateTableRow } from './TokenGatesTableRow';
 
@@ -43,30 +40,8 @@ const padding = 32;
 export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refreshTokenGates }: Props) {
   const { account } = useWeb3Account();
   const isMobile = useSmallScreen();
-  const [testResult, setTestResult] = useState<TestResult>({});
   const { space } = useCurrentSpace();
-  const { trigger: verifyTokenGate } = useVerifyTokenGate();
-
-  async function testConnect(tokenGate: TokenGate) {
-    setTestResult({ status: 'loading' });
-
-    await verifyTokenGate(
-      {
-        commit: false,
-        spaceId: space?.id || '',
-        tokenGateIds: [tokenGate.id]
-      },
-      {
-        onError: (error) => {
-          log.warn('Error when verifying wallet', error);
-          setTestResult({ message: 'Your address does not meet the requirements', status: 'error' });
-        },
-        onSuccess: () => {
-          setTestResult({ status: 'success' });
-        }
-      }
-    );
-  }
+  const [tokenGateIdToTest, setTokenGateIdToTest] = useState<string | undefined>();
 
   return (
     <>
@@ -102,17 +77,16 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
                 account={account}
                 tokenGate={tokenGate}
                 refreshTokenGates={refreshTokenGates}
-                testConnect={testConnect}
+                testConnect={({ id }) => setTokenGateIdToTest(id)}
               />
             ))}
           </TableBody>
         </Table>
       </Box>
       <TestConnectionModal
-        status={testResult.status}
-        message={testResult.message}
-        open={!!testResult.status}
-        onClose={() => setTestResult({})}
+        open={!!tokenGateIdToTest}
+        tokenGateId={tokenGateIdToTest}
+        onClose={() => setTokenGateIdToTest(undefined)}
       />
     </>
   );

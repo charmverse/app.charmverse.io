@@ -3,8 +3,9 @@ import type { TokenGateToRole } from '@charmverse/core/prisma-client';
 import type { TokenGateVerificationRequest } from 'lib/tokenGates/applyTokenGates';
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
 import type { TokenGate, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import type { TokenGateTestRequest, TokenGateTestResponse } from 'pages/api/token-gates/test';
 
-import { useDELETE, useGET, usePOST, usePUT } from './helpers';
+import { useDELETE, useGET, useGETtrigger, usePOST, usePUT } from './helpers';
 
 export function useGetTokenGates(spaceId: string) {
   return useGET<TokenGateWithRoles[]>(spaceId ? '/api/token-gates' : null, { spaceId });
@@ -32,6 +33,10 @@ export function useEvaluateTokenGateEligibility() {
   return usePOST<Pick<TokenGateEvaluationAttempt, 'spaceIdOrDomain'>, TokenGateEvaluationResult>(
     '/api/token-gates/evaluate'
   );
+}
+
+export function useTestTokenGate() {
+  return useGETtrigger<TokenGateTestRequest, TokenGateTestResponse>('/api/token-gates/test');
 }
 
 export function useVerifyTokenGate() {
