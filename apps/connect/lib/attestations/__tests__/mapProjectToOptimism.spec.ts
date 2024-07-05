@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid';
+
 import type { ConnectProjectDetails } from '../../actions/fetchProject';
 import { mapProjectToOptimism } from '../mapProjectToOptimism'; // Adjust the import to the actual file location
 
@@ -6,11 +8,13 @@ describe('mapProjectToOptimism', () => {
     const input: ConnectProjectDetails = {
       id: '1',
       name: 'Project X',
+      createdBy: uuid(),
       category: 'DeFi',
       description: 'A sample project',
       avatar: 'avatar.png',
       coverImage: 'cover.jpg',
       farcasterValues: ['CharmVerse'],
+      farcasterFrameImage: null,
       github: 'https://github.com/projectx',
       twitter: 'https://twitter.com/projectx',
       mirror: 'https://mirror.xyz/projectx',

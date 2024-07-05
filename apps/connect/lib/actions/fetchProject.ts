@@ -19,6 +19,7 @@ export type ConnectProjectDetails = Pick<
   | 'coverImage'
   | 'category'
   | 'name'
+  | 'farcasterFrameImage'
   | 'farcasterValues'
   | 'github'
   | 'mirror'

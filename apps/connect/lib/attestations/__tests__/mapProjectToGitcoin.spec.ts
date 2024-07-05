@@ -1,17 +1,22 @@
 import type { ConnectProjectDetails } from '@connect/lib/actions/fetchProject';
+import { v4 as uuid } from 'uuid';
 
 import { mapProjectToGitcoin } from '../mapProjectToGitcoin';
 
 describe('mapProjectToGitcoin', () => {
+  const createdBy = uuid();
+
   it('should map the project details correctly', () => {
     const input: ConnectProjectDetails = {
       id: '1',
       name: 'Project X',
+      createdBy,
       category: 'DeFi',
       description: 'A sample project',
       avatar: 'avatar.png',
       coverImage: 'cover.jpg',
       farcasterValues: ['value1', 'value2'],
+      farcasterFrameImage: null,
       github: 'https://github.com/projectx',
       twitter: 'https://twitter.com/projectx',
       mirror: 'https://mirror.xyz/projectx',

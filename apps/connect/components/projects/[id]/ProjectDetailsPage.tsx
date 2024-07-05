@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { ProjectData } from '@connect/lib/actions/fetchProject';
+import type { ConnectProjectDetails } from '@connect/lib/actions/fetchProject';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
 import { Divider, Stack, Typography } from '@mui/material';
@@ -13,7 +13,7 @@ import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDescription } from '../components/ProjectDescription';
 import { ShareButton } from '../ProjectShareButton';
 
-export async function ProjectDetailsPage({ project }: { project?: ProjectData | null }) {
+export async function ProjectDetailsPage({ project }: { project?: ConnectProjectDetails | null }) {
   return (
     <PageWrapper backToProfileHeader>
       {!project ? (
