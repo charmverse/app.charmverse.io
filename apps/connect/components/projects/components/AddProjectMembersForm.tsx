@@ -47,9 +47,7 @@ export function AddProjectMembersForm({
     }
   });
 
-  const farcasterDetails = user.farcasterUser?.account as Required<
-    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>
-  >;
+  const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody>;
 
   return (
     <form

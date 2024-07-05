@@ -37,18 +37,28 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
           justifyContent='space-between'
           flexDirection='column'
           alignItems='start'
-          gap={1}
+          gap={0.5}
           sx={{ p: 0 }}
         >
           <Box>
-            <Typography variant='h6'>{projectName}</Typography>
             <Typography
-              variant='body2'
+              variant='h6'
+              overflow='hidden'
               sx={{
                 display: '-webkit-box',
                 WebkitBoxOrient: 'vertical',
-                WebkitLineClamp: '2',
-                overflow: 'hidden'
+                WebkitLineClamp: '1'
+              }}
+            >
+              {projectName}
+            </Typography>
+            <Typography
+              variant='body2'
+              overflow='hidden'
+              sx={{
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: '2'
               }}
             >
               {project.description}

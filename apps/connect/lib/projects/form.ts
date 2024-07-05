@@ -6,7 +6,7 @@ export const schema = yup.object({
   name: yup.string().required('Project name is required'),
   description: yup.string(),
   avatar: yup.string(),
-  cover: yup.string(),
+  coverImage: yup.string(),
   category: yup.string().oneOf(CATEGORIES),
   websites: yup.array(yup.string().url()),
   farcasterIds: yup.array(yup.string()),

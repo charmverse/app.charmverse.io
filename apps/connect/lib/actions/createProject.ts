@@ -8,7 +8,6 @@ import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import { uid } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 
-import type { FormValues } from '../projects/form';
 import { schema } from '../projects/form';
 import { generateOgImage } from '../projects/generateOgImage';
 
@@ -29,7 +28,7 @@ export const actionCreateProject = authActionClient
   .metadata({ actionName: 'create-project' })
   .schema(schema)
   .action(async ({ parsedInput, ctx }) => {
-    const input = parsedInput as FormValues;
+    const input = parsedInput;
     const currentUserId = ctx.session.user!.id;
     const farcasterAccounts = await prisma.farcasterUser.findMany({
       where: {
@@ -139,7 +138,7 @@ export const actionCreateProject = authActionClient
         github: input.github,
         mirror: input.mirror,
         avatar: input.avatar,
-        coverImage: input.cover,
+        coverImage: input.coverImage,
         source: 'connect',
         projectMembers: {
           createMany: {

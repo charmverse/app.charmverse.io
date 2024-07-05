@@ -1,7 +1,7 @@
 'use client';
 
-import { PageTitle } from '@connect/components/common/PageTitle';
 import { PageWrapper } from '@connect/components/common/PageWrapper';
+import type { ProjectData } from '@connect/lib/actions/fetchProject';
 import type { FormValues } from '@connect/lib/projects/form';
 import { schema } from '@connect/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -11,9 +11,12 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+import { isTruthy } from 'lib/utils/types';
 import type { LoggedInUser } from 'models/User';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
+import { ProjectDetails } from '../components/ProjectDetails';
+import { ProjectHeader } from '../components/ProjectHeader';
 
 import { CreateProjectForm } from './components/CreateProjectForm';
 
@@ -23,7 +26,8 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const {
     control,
     formState: { isValid },
-    handleSubmit
+    handleSubmit,
+    getValues
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
@@ -42,7 +46,6 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     return (
       <PageWrapper>
         <Box gap={2} display='flex' flexDirection='column'>
-          <PageTitle>Create a Project</PageTitle>
           <CreateProjectForm
             control={control}
             isValid={isValid}
@@ -55,10 +58,21 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     );
   }
 
+  const values = getValues();
+  const { farcasterIds, ...restProject } = values;
+  const project = {
+    ...restProject,
+    id: '',
+    farcasterValues: farcasterIds?.filter(isTruthy) || [],
+    farcasterFrameImage: '',
+    projectMembers: []
+  } as NonNullable<ProjectData>;
+
   return (
-    <PageWrapper>
+    <PageWrapper header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}>
       <Box gap={2} display='flex' flexDirection='column'>
-        <PageTitle>Add Team Members</PageTitle>
+        <ProjectDetails project={project} />
+        <Typography variant='h5'>Add team members</Typography>
         <AddProjectMembersForm
           user={user}
           onBack={() => {

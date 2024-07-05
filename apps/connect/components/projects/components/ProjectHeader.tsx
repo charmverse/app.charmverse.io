@@ -1,0 +1,50 @@
+import { Avatar } from '@connect/components/common/Avatar';
+import { Box } from '@mui/material';
+
+import { randomColor } from 'lib/utils/random';
+
+const height = '130px';
+
+export function ProjectHeader({
+  coverImage,
+  avatar,
+  name
+}: {
+  coverImage: string | null;
+  name: string;
+  avatar: string | null;
+}) {
+  return (
+    <Box mb={4}>
+      {coverImage ? (
+        <img
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
+          src={coverImage}
+          alt={name}
+          width='100%'
+          height={height}
+        />
+      ) : (
+        <Box
+          sx={{
+            background: `linear-gradient(to right,${randomColor()}, ${randomColor()} )`,
+            width: '100%',
+            height
+          }}
+        />
+      )}
+      <Avatar
+        avatar={avatar ?? undefined}
+        name={!avatar ? name : undefined}
+        alt={name}
+        size='xLarge'
+        sx={{
+          position: 'absolute',
+          top: '80px',
+          left: '24px'
+        }}
+        variant='rounded'
+      />
+    </Box>
+  );
+}

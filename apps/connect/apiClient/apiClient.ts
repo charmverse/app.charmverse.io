@@ -15,6 +15,10 @@ class ConnectApiClient extends HttpClient {
     return this.POST('/api/session/login-with-farcaster', req);
   }
 
+  async logOut(): Promise<void> {
+    return this.POST('/api/session/logout');
+  }
+
   async uploadImage(file: File) {
     // Using 'this.GET' causes issue during upload
     // can't read property 'GET' of undefined
