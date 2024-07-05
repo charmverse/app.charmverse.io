@@ -1,16 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
 import fetchMock from 'fetch-mock-jest';
-
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generateUser } from 'testing/utils/users';
 
 import { createConnectProject } from '../createConnectProject';
 
 const mockSandbox = fetchMock.sandbox();
 
 jest.mock('undici', () => {
-  return { fetch: (...args: any[]) => mockSandbox(...args) };
+  // @ts-ignore
+  return { fetch: (...args) => mockSandbox(...args) };
 });
 
 afterAll(async () => {
@@ -20,11 +18,11 @@ afterAll(async () => {
 
 describe('createConnectProject', () => {
   it('should create a project with project members', async () => {
-    const { user } = await generateUserAndSpace({
+    const { user } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
     });
 
-    const farcasterConnectedUser = await generateUser();
+    const farcasterConnectedUser = await testUtilsUser.generateUser();
 
     await prisma.farcasterUser.create({
       data: {
@@ -34,8 +32,8 @@ describe('createConnectProject', () => {
       }
     });
 
-    const nonFarcasterConnectedUserWallet = randomETHWalletAddress().toLowerCase();
-    const nonFarcasterConnectedUser = await generateUser();
+    const nonFarcasterConnectedUserWallet = testUtilsRandom.randomETHWalletAddress().toLowerCase();
+    const nonFarcasterConnectedUser = await testUtilsUser.generateUser();
 
     await prisma.userWallet.create({
       data: {
@@ -55,7 +53,7 @@ describe('createConnectProject', () => {
       ]
     });
 
-    const walletAddress = randomETHWalletAddress().toLowerCase();
+    const walletAddress = testUtilsRandom.randomETHWalletAddress();
 
     mockSandbox.get('https://api.neynar.com/v2/farcaster/user/bulk?fids[]=4', {
       users: [
