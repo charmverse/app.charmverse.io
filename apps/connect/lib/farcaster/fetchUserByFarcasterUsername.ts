@@ -11,7 +11,7 @@ export async function fetchUserByFarcasterUsername(username: string) {
     return null;
   }
 
-  const user = await prisma.user.findFirstOrThrow({
+  const user = await prisma.user.findFirst({
     where: {
       farcasterUser: {
         fid: farcasterUser.fid

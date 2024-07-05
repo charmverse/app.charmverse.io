@@ -17,6 +17,7 @@ export type ConnectProjectDetails = Pick<
   | 'description'
   | 'avatar'
   | 'coverImage'
+  | 'path'
   | 'category'
   | 'name'
   | 'farcasterFrameImage'
@@ -31,11 +32,19 @@ export type ConnectProjectDetails = Pick<
   }[];
 };
 
-export async function fetchProject(projectId: string): Promise<ConnectProjectDetails | null> {
-  const project = await prisma.project.findUnique({
-    where: {
-      id: projectId
-    },
+export async function fetchProject({
+  id,
+  path
+}: {
+  id?: string;
+  path?: string;
+}): Promise<ConnectProjectDetails | null> {
+  if (!id && !path) {
+    return null;
+  }
+
+  const project = await prisma.project.findFirst({
+    where: id ? { id } : { path },
     select: {
       id: true,
       createdBy: true,
@@ -46,6 +55,7 @@ export async function fetchProject(projectId: string): Promise<ConnectProjectDet
       category: true,
       farcasterValues: true,
       github: true,
+      path: true,
       mirror: true,
       twitter: true,
       websites: true,

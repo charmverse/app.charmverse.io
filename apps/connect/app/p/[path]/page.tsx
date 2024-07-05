@@ -3,8 +3,10 @@ import { fetchProject } from '@connect/lib/actions/fetchProject';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProjectPage({ params }: { params: { id: string } }) {
-  const project = await fetchProject(params.id);
+export default async function ProjectPage({ params }: { params: { path: string } }) {
+  const project = await fetchProject({
+    path: params.path
+  });
 
   return (
     <>
@@ -25,7 +27,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
           {/* Button 3 */}
           <meta name='fc:frame:button:3' content='View' />
           <meta name='fc:frame:button:3:action' content='link' />
-          <meta name='fc:frame:button:3:target' content={`https://connect.charmverse.io/p/${params.id}`} />
+          <meta name='fc:frame:button:3:target' content={`https://connect.charmverse.io/p/${params.path}`} />
         </>
       )}
       <ProjectDetailsPage project={project} />;

@@ -31,7 +31,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     }
   });
 
-  const project = await fetchProject(projectId);
+  const project = await fetchProject({ id: projectId });
 
   if (!project) {
     throw new DataNotFoundError('Project not found');

@@ -29,7 +29,7 @@ export function AddProjectMembersForm({
   control: Control<FormValues>;
   isValid: boolean;
   handleSubmit: UseFormHandleSubmit<FormValues>;
-  onSuccess: (projectId: string) => void;
+  onSuccess: ({ projectPath, projectId }: { projectPath: string; projectId: string }) => void;
 }) {
   const { append, remove } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
@@ -39,7 +39,7 @@ export function AddProjectMembersForm({
   // @ts-ignore
   const { execute, isExecuting } = useAction(actionCreateProject, {
     onSuccess: (data) => {
-      onSuccess(data.data?.projectId as string);
+      onSuccess({ projectId: data.data?.projectId as string, projectPath: data.data?.projectPath as string });
     },
     onError(err) {
       log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);

@@ -1,4 +1,4 @@
-
+/* eslint-disable import/no-extraneous-dependencies */
 import Router from 'koa-router';
 
 import router0 from './api/farcaster/get-by-username';
@@ -12,4 +12,3 @@ rootRouter.use(router1.routes(), router1.allowedMethods());
 rootRouter.use(router2.routes(), router2.allowedMethods());
 
 export default rootRouter;
-  

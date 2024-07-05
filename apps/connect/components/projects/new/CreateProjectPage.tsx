@@ -69,8 +69,8 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
           control={control}
           isValid={isValid}
           handleSubmit={handleSubmit}
-          onSuccess={(projectId) => {
-            router.push(`/projects/${projectId}/publish`);
+          onSuccess={({ projectPath }) => {
+            router.push(`/p/${projectPath}/publish`);
           }}
         />
       </Box>

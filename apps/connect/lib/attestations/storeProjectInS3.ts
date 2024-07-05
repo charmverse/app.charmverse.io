@@ -27,7 +27,8 @@ export async function storeProjectInS3({
     throw new InvalidInputError('Invalid storage format');
   }
 
-  const project = typeof projectOrProjectId === 'string' ? await fetchProject(projectOrProjectId) : projectOrProjectId;
+  const project =
+    typeof projectOrProjectId === 'string' ? await fetchProject({ id: projectOrProjectId }) : projectOrProjectId;
 
   if (!project) {
     throw new DataNotFoundError('Project not found');

@@ -21,6 +21,7 @@ describe('mapProjectToGitcoin', () => {
       twitter: 'https://twitter.com/projectx',
       mirror: 'https://mirror.xyz/projectx',
       websites: ['https://example.com'],
+      path: null,
       projectMembers: [
         {
           farcasterUser: {

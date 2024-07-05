@@ -23,7 +23,8 @@ export async function storeGitcoinProjectProfileInS3({
 }: {
   projectOrProjectId: ConnectProjectDetails | string;
 }): Promise<{ staticFilePath: string; profile: GitcoinUserProfile }> {
-  const project = typeof projectOrProjectId === 'string' ? await fetchProject(projectOrProjectId) : projectOrProjectId;
+  const project =
+    typeof projectOrProjectId === 'string' ? await fetchProject({ id: projectOrProjectId }) : projectOrProjectId;
 
   if (!project) {
     throw new DataNotFoundError('Project not found');
