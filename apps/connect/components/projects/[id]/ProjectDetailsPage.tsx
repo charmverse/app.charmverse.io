@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { ProjectData } from '@connect/lib/actions/fetchProject';
+import type { ConnectProjectDetails } from '@connect/lib/actions/fetchProject';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
 import { Divider, Stack, Typography } from '@mui/material';
@@ -34,7 +34,7 @@ function replaceUrl(link: string, domain: string) {
   };
 }
 
-export async function ProjectDetailsPage({ project }: { project?: ProjectData | null }) {
+export async function ProjectDetailsPage({ project }: { project?: ConnectProjectDetails | null }) {
   const farcasterLink = project?.farcasterValues[0] ? replaceUrl(project.farcasterValues[0], 'warpcast.com') : null;
   const githubLink = project?.github ? replaceUrl(project.github, 'github.com') : null;
   const mirrorLink = project?.mirror ? replaceUrl(project.mirror, 'mirror.xyz') : null;

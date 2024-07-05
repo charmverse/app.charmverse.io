@@ -1,23 +1,57 @@
+import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 
-export type ProjectData = Awaited<ReturnType<typeof fetchProject>>;
+type ProjectMember = {
+  fid: number;
+  pfpUrl: string;
+  bio: string;
+  username: string;
+  displayName: string;
+};
 
-export async function fetchProject({ id, path }: { id?: string; path?: string }) {
+export type ConnectProjectDetails = Pick<
+  Project,
+  | 'id'
+  | 'createdBy'
+  | 'description'
+  | 'avatar'
+  | 'coverImage'
+  | 'category'
+  | 'name'
+  | 'farcasterFrameImage'
+  | 'farcasterValues'
+  | 'github'
+  | 'mirror'
+  | 'twitter'
+  | 'websites'
+> & {
+  projectMembers: {
+    farcasterUser: ProjectMember;
+  }[];
+};
+
+export async function fetchProject({
+  id,
+  path
+}: {
+  id?: string;
+  path?: string;
+}): Promise<ConnectProjectDetails | null> {
   if (!id && !path) {
     return null;
   }
 
   const project = await prisma.project.findFirst({
-    where: {
-      OR: [{ id }, { path }]
-    },
+    where: id ? { id } : { path },
     select: {
       id: true,
+      createdBy: true,
       description: true,
       avatar: true,
       coverImage: true,
       name: true,
+      category: true,
       farcasterValues: true,
       github: true,
       mirror: true,
@@ -52,7 +86,7 @@ export async function fetchProject({ id, path }: { id?: string; path?: string })
           bio: farcasterUser?.bio,
           username: farcasterUser?.username,
           displayName: farcasterUser?.displayName
-        }
+        } as ProjectMember
       };
     })
   };

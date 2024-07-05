@@ -1,7 +1,9 @@
 'use server';
 
+import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect/lib/actions/actionClient';
 
+import { storeProjectMetadataAndPublishOptimismAttestation } from '../attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { createConnectProject } from '../projects/createConnectProject';
 import type { FormValues } from '../projects/form';
 import { schema } from '../projects/form';
@@ -18,7 +20,14 @@ export const actionCreateProject = authActionClient
       input
     });
 
+    await storeProjectMetadataAndPublishOptimismAttestation({
+      projectId: newProject.id,
+      userId: currentUserId
+    }).catch((err) => {
+      log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
+    });
+
     await generateOgImage(newProject.id, currentUserId);
 
-    return { success: true };
+    return { success: true, projectId: newProject.id };
   });
