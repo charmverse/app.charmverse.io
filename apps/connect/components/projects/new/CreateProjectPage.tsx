@@ -5,7 +5,6 @@ import { PageWrapper } from '@connect/components/common/PageWrapper';
 import type { FormValues } from '@connect/lib/projects/form';
 import { schema } from '@connect/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';

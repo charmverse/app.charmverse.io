@@ -3,10 +3,14 @@ import type { StatusAPIResponse } from '@farcaster/auth-kit';
 
 export type ProjectData = Awaited<ReturnType<typeof fetchProject>>;
 
-export async function fetchProject(projectId: string) {
-  const project = await prisma.project.findUnique({
+export async function fetchProject({ id, path }: { id?: string; path?: string }) {
+  if (!id && !path) {
+    return null;
+  }
+
+  const project = await prisma.project.findFirst({
     where: {
-      id: projectId
+      OR: [{ id }, { path }]
     },
     select: {
       id: true,

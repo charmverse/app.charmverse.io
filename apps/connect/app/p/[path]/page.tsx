@@ -3,8 +3,10 @@ import { fetchProject } from '@connect/lib/actions/fetchProject';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProjectPage({ params }: { params: { id: string } }) {
-  const project = await fetchProject(params.id);
+export default async function ProjectPage({ params }: { params: { path: string } }) {
+  const project = await fetchProject({
+    path: params.path
+  });
 
   return (
     <>

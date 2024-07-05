@@ -13,7 +13,9 @@ export async function saveOgImage(projectId: string, userId: string) {
     throw new DataNotFoundError('No id provided');
   }
 
-  const project = await fetchProject(projectId);
+  const project = await fetchProject({
+    id: projectId
+  });
 
   if (!project) {
     throw new DataNotFoundError(`Could not find project with id ${projectId}`);
