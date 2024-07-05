@@ -48,6 +48,7 @@ export async function fetchProject(projectId: string): Promise<ConnectProjectDet
       mirror: true,
       twitter: true,
       websites: true,
+      farcasterFrameImage: true,
       projectMembers: {
         select: {
           user: {

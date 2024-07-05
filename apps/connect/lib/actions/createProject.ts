@@ -12,6 +12,7 @@ import { isTruthy } from 'lib/utils/types';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '../attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import type { FormValues } from '../projects/form';
 import { schema } from '../projects/form';
+import { generateOgImage } from '../projects/generateOgImage';
 
 export type FarcasterAccount = {
   id: number;
@@ -127,7 +128,7 @@ export const actionCreateProject = authActionClient
       )
     ).filter(isTruthy);
 
-    const createdProject = await prisma.project.create({
+    const newProject = await prisma.project.create({
       data: {
         name: input.name,
         updatedBy: currentUserId,
@@ -166,11 +167,13 @@ export const actionCreateProject = authActionClient
     });
 
     await storeProjectMetadataAndPublishOptimismAttestation({
-      projectId: createdProject.id,
+      projectId: newProject.id,
       userId: currentUserId
     }).catch((err) => {
       log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
     });
 
-    return { success: true, projectId: createdProject.id };
+    await generateOgImage(newProject.id, currentUserId);
+
+    return { success: true, projectId: newProject.id };
   });

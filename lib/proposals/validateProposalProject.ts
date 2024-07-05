@@ -47,8 +47,7 @@ export function validateProposalProject({
   }
 
   const projectSchema = createProjectYupSchema({
-    fieldConfig: projectField.fieldConfig as ProjectAndMembersFieldConfig,
-    defaultRequired: true
+    fieldConfig: projectField.fieldConfig as ProjectAndMembersFieldConfig
   });
   projectSchema.validateSync(convertToProjectValues({ ...project, projectMembers }), { abortEarly: false });
 }

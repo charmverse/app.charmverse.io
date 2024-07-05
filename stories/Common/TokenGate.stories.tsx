@@ -6,8 +6,8 @@ import { http, HttpResponse } from 'msw';
 import { mockTokenGateResult, mockTokenGates } from 'stories/lib/mockTokenGataData';
 
 import { TokenGate as TokenGateComponent } from 'components/common/SpaceAccessGate/components/TokenGate/TokenGate';
-import { TokenGateModalProvider } from 'components/common/TokenGateModal/hooks/useTokenGateModalContext';
-import TokenGateModal from 'components/common/TokenGateModal/TokenGateModal';
+import { TokenGateModalProvider } from 'components/settings/invites/components/TokenGates/components/TokenGateModal/hooks/useTokenGateModalContext';
+import TokenGateModal from 'components/settings/invites/components/TokenGates/components/TokenGateModal/TokenGateModal';
 import type { TokenGate } from 'lib/tokenGates/interfaces';
 import { TokenGateContainer } from 'pages/join';
 
