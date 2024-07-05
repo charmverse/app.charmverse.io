@@ -34,6 +34,10 @@ type FarcasterUsersResponse = {
   };
 };
 
+type FarcasterUserBulkResponse = {
+  users: FarcasterUser[];
+};
+
 type FarcasterUsersByWalletsResponse = {
   [address: string]: FarcasterUser;
 };
@@ -64,7 +68,7 @@ export async function getFarcasterUsers({
     );
     return farcasterUsersResponse.result.users;
   } else if (fid) {
-    const farcasterUsersResponse = await GET<FarcasterUsersResponse>(
+    const farcasterUsersResponse = await GET<FarcasterUserBulkResponse>(
       `${neynarBaseUrl}/user/bulk`,
       {
         fids: [fid]
@@ -75,7 +79,7 @@ export async function getFarcasterUsers({
         }
       }
     );
-    return farcasterUsersResponse.result.users;
+    return farcasterUsersResponse.users;
   } else if (wallets) {
     const farcasterUsersResponse = await GET<FarcasterUsersByWalletsResponse>(
       `${neynarBaseUrl}/user/bulk-by-address`,

@@ -1,7 +1,8 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+import { getFarcasterUsers } from 'lib/farcaster/getFarcasterUsers';
 import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
 import { stringToValidPath, uid } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
@@ -40,7 +41,7 @@ export async function createConnectProject({ userId, input }: { input: FormValue
           };
         }
         try {
-          const farcasterProfile = await getFarcasterProfile({
+          const [farcasterProfile] = await getFarcasterUsers({
             fid: member.farcasterId
           });
           if (!farcasterProfile) {
@@ -52,7 +53,10 @@ export async function createConnectProject({ userId, input }: { input: FormValue
               wallets: {
                 some: {
                   address: {
-                    in: farcasterProfile.connectedAddresses.map((address) => address.toLowerCase())
+                    in: [
+                      farcasterProfile.custody_address,
+                      ...(farcasterProfile.verified_addresses ? farcasterProfile.verified_addresses.eth_addresses : [])
+                    ].map((address) => address.toLowerCase())
                   }
                 }
               }
@@ -66,10 +70,10 @@ export async function createConnectProject({ userId, input }: { input: FormValue
               farcasterId: member.farcasterId
             };
           }
-          const username = farcasterProfile.body.username;
-          const displayName = farcasterProfile.body.displayName;
-          const bio = farcasterProfile.body.bio;
-          const pfpUrl = farcasterProfile.body.avatarUrl;
+          const username = farcasterProfile.username;
+          const displayName = farcasterProfile.display_name;
+          const bio = farcasterProfile.profile.bio.text;
+          const pfpUrl = farcasterProfile.pfp_url;
           const fid = member.farcasterId;
 
           const newUser = await prisma.user.create({
@@ -78,7 +82,7 @@ export async function createConnectProject({ userId, input }: { input: FormValue
               username,
               identityType: 'Farcaster',
               claimed: false,
-              avatar: farcasterProfile.body.avatarUrl,
+              avatar: farcasterProfile.pfp_url,
               farcasterUser: {
                 create: {
                   account: { username, displayName, bio, pfpUrl },
@@ -100,6 +104,10 @@ export async function createConnectProject({ userId, input }: { input: FormValue
             farcasterId: member.farcasterId
           };
         } catch (err) {
+          log.error('Error creating user', {
+            fid: member.farcasterId,
+            err
+          });
           return null;
         }
       })

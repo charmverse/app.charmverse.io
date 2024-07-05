@@ -1,4 +1,4 @@
-import * as http from '@charmverse/core/http';
+import * as http from 'adapters/http';
 
 export type FarcasterProfile = {
   body: {
