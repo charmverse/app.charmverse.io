@@ -17,6 +17,7 @@ export type ConnectProjectDetails = Pick<
   | 'description'
   | 'avatar'
   | 'coverImage'
+  | 'path'
   | 'category'
   | 'name'
   | 'farcasterFrameImage'
@@ -54,6 +55,7 @@ export async function fetchProject({
       category: true,
       farcasterValues: true,
       github: true,
+      path: true,
       mirror: true,
       twitter: true,
       websites: true,

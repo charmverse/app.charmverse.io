@@ -29,5 +29,5 @@ export const actionCreateProject = authActionClient
 
     await generateOgImage(newProject.id, currentUserId);
 
-    return { success: true, projectId: newProject.id };
+    return { success: true, projectId: newProject.id, projectPath: newProject.path };
   });
