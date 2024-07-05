@@ -3,8 +3,8 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
-import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 export function NewProjectItem({ children, href }: { children: ReactNode; href: string }) {

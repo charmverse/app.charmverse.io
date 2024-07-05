@@ -1,6 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 
+export type ProjectData = Awaited<ReturnType<typeof fetchProject>>;
+
 export async function fetchProject({ id, path }: { id?: string; path?: string }) {
   if (!id && !path) {
     return null;
@@ -11,6 +13,7 @@ export async function fetchProject({ id, path }: { id?: string; path?: string })
       OR: [{ id }, { path }]
     },
     select: {
+      id: true,
       description: true,
       avatar: true,
       coverImage: true,
@@ -20,6 +23,7 @@ export async function fetchProject({ id, path }: { id?: string; path?: string })
       mirror: true,
       twitter: true,
       websites: true,
+      farcasterFrameImage: true,
       projectMembers: {
         select: {
           user: {

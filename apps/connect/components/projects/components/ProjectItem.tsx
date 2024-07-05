@@ -7,8 +7,8 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import Link from 'next/link';
 
 export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
   const projectMembers = project.projectMembers;

@@ -1,10 +1,9 @@
 import 'server-only';
 
-import { fetchProject } from '@connect/lib/actions/fetchProject';
-import { Person } from '@mui/icons-material';
+import type { ProjectData } from '@connect/lib/actions/fetchProject';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
 
@@ -35,42 +34,13 @@ function replaceUrl(link: string, domain: string) {
   };
 }
 
-export async function ProjectDetailsPage({ path }: { path: string }) {
-  const project = await fetchProject({ path });
-
+export async function ProjectDetailsPage({ project }: { project?: ProjectData | null }) {
   const farcasterLink = project?.farcasterValues[0] ? replaceUrl(project.farcasterValues[0], 'warpcast.com') : null;
   const githubLink = project?.github ? replaceUrl(project.github, 'github.com') : null;
   const mirrorLink = project?.mirror ? replaceUrl(project.mirror, 'mirror.xyz') : null;
   const twitterLink = project?.twitter ? replaceUrl(project.twitter, 'twitter.com') : null;
-
   return (
-    <PageWrapper
-      sx={{
-        position: 'relative',
-        p: 0
-      }}
-    >
-      <Box
-        sx={{
-          top: 0,
-          p: 2,
-          width: '499px',
-          borderRight: {
-            xs: 'none',
-            md: '1px solid var(--charm-palette-divider)'
-          },
-          backgroundColor: 'white',
-          zIndex: 1,
-          position: 'fixed'
-        }}
-      >
-        <Stack sx={{ cursor: 'pointer', flexDirection: 'row', gap: 0.5, alignItems: 'center', width: 'fit-content' }}>
-          <Person fontSize='small' />
-          <Link href='/profile' passHref>
-            <Typography>Back to profile</Typography>
-          </Link>
-        </Stack>
-      </Box>
+    <PageWrapper backToProfileHeader>
       {!project ? (
         <Typography mt={5} p={2} variant='h6'>
           Project not found
@@ -86,7 +56,7 @@ export async function ProjectDetailsPage({ path }: { path: string }) {
             width='100%'
             height='150px'
             style={{
-              marginTop: 8,
+              marginTop: 40,
               objectFit: 'cover',
               objectPosition: 'center'
             }}
@@ -98,7 +68,7 @@ export async function ProjectDetailsPage({ path }: { path: string }) {
             size='xLarge'
             sx={{
               position: 'absolute',
-              top: '100px',
+              top: '130px',
               marginLeft: '24px'
             }}
             variant='rounded'
@@ -106,7 +76,7 @@ export async function ProjectDetailsPage({ path }: { path: string }) {
           <Stack p={3} mt={4}>
             <Stack direction='row' mb={2} justifyContent='space-between' alignItems='center'>
               <Typography variant='h5'>{project.name}</Typography>
-              <ShareButton />
+              <ShareButton projectId={project.id} />
             </Stack>
             <Stack gap={1.5}>
               {farcasterLink && (
@@ -167,6 +137,7 @@ export async function ProjectDetailsPage({ path }: { path: string }) {
                   username={member.farcasterUser.username}
                   avatar={member.farcasterUser.pfpUrl}
                   bio={member.farcasterUser.bio}
+                  enableLink
                 />
               ))}
             </Stack>
