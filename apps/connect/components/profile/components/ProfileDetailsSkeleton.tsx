@@ -1,5 +1,6 @@
 import { PageWrapper } from '@connect/components/common/PageWrapper';
 import { ProjectItemSkeleton } from '@connect/components/projects/components/ProjectItemSkeleton';
+import { Box } from '@mui/material';
 import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
@@ -7,7 +8,7 @@ import Stack from '@mui/material/Stack';
 export function ProfileDetailsSkeleton() {
   return (
     <PageWrapper>
-      <Card sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Card sx={{ p: 2 }}>
           <Stack flexDirection='row' gap={3} alignItems='center'>
             <Skeleton variant='circular' width={100} height={100} animation='wave' />
@@ -22,7 +23,7 @@ export function ProfileDetailsSkeleton() {
         <ProjectItemSkeleton />
         <ProjectItemSkeleton />
         <ProjectItemSkeleton />
-      </Card>
+      </Box>
     </PageWrapper>
   );
 }

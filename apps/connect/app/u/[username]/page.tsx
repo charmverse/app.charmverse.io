@@ -1,5 +1,5 @@
 import { ProfileDetailsPage } from '@connect/components/profile/[username]/ProfileDetailsPage';
-import { fetchUserByFarcasterUsername } from '@connect/lib/actions/fetchUserByFarcasterUsername';
+import { fetchUserByFarcasterUsername } from '@connect/lib/farcaster/fetchUserByFarcasterUsername';
 
 export const dynamic = 'force-dynamic';
 

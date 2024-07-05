@@ -28,6 +28,7 @@ export async function ProfilePage({ user }: { user: LoggedInUser }) {
           username={farcasterDetails?.username}
           avatar={farcasterDetails?.pfpUrl}
           bio={farcasterDetails?.bio}
+          disableLink
         />
         <Typography variant='h6'>Projects</Typography>
         <Suspense fallback={<ProjectItemSkeleton />}>
