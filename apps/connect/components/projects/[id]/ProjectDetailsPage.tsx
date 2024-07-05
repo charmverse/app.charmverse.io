@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { ProjectData } from '@connect/lib/actions/fetchProject';
+import type { ConnectProjectDetails } from '@connect/lib/actions/fetchProject';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
 import { Divider, Stack, Typography } from '@mui/material';
@@ -13,7 +13,7 @@ import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDescription } from '../components/ProjectDescription';
 import { ShareButton } from '../ProjectShareButton';
 
-export async function ProjectDetailsPage({ project }: { project?: ProjectData | null }) {
+export async function ProjectDetailsPage({ project }: { project?: ConnectProjectDetails | null }) {
   return (
     <PageWrapper backToProfileHeader>
       {!project ? (
@@ -74,7 +74,16 @@ export async function ProjectDetailsPage({ project }: { project?: ProjectData | 
                 <Stack direction='row' gap={1} alignItems='center'>
                   <img src='/images/mirror-xyz.png' width={25} height={25} />
                   <Link href={project.mirror} passHref target='_blank'>
-                    <Typography variant='body1'>{project.mirror.replace(/https?:\/\/mirror.xyz\//, '')}</Typography>
+                    <Typography
+                      variant='body1'
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {project.mirror.replace(/https?:\/\/(?:\w+\.)?mirror\.xyz\//, '')}
+                    </Typography>
                   </Link>
                 </Stack>
               )}
@@ -97,7 +106,9 @@ export async function ProjectDetailsPage({ project }: { project?: ProjectData | 
                     }}
                   />
                   <Link href={project.twitter} passHref target='_blank'>
-                    <Typography variant='body1'>{project.twitter.replace(/https?:\/\/twitter\.com\//, '')}</Typography>
+                    <Typography variant='body1'>
+                      {project.twitter.replace(/https?:\/\/(twitter|x)\.com\//, '')}
+                    </Typography>
                   </Link>
                 </Stack>
               )}

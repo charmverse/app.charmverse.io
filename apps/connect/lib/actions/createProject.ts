@@ -1,5 +1,6 @@
 'use server';
 
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { authActionClient } from '@connect/lib/actions/actionClient';
 import { v4 } from 'uuid';
@@ -8,6 +9,7 @@ import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import { uid } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 
+import { storeProjectMetadataAndPublishOptimismAttestation } from '../attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import type { FormValues } from '../projects/form';
 import { schema } from '../projects/form';
 import { generateOgImage } from '../projects/generateOgImage';
@@ -164,7 +166,14 @@ export const actionCreateProject = authActionClient
       }
     });
 
+    await storeProjectMetadataAndPublishOptimismAttestation({
+      projectId: newProject.id,
+      userId: currentUserId
+    }).catch((err) => {
+      log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
+    });
+
     await generateOgImage(newProject.id, currentUserId);
 
-    return { success: true };
+    return { success: true, projectId: newProject.id };
   });

@@ -5,8 +5,8 @@ import { PageWrapper } from '@connect/components/common/PageWrapper';
 import type { FormValues } from '@connect/lib/projects/form';
 import { schema } from '@connect/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -19,6 +19,8 @@ import { CreateProjectForm } from './components/CreateProjectForm';
 
 export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
+
+  const router = useRouter();
 
   const {
     control,
@@ -67,6 +69,9 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
           control={control}
           isValid={isValid}
           handleSubmit={handleSubmit}
+          onSuccess={(projectId) => {
+            router.push(`/projects/${projectId}/publish`);
+          }}
         />
       </Box>
     </PageWrapper>
