@@ -28,20 +28,13 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     handleSubmit
   } = useForm<FormValues>({
     defaultValues: {
-      name: 'Example Project',
+      name: '',
       projectMembers: [
         {
           farcasterId: user?.farcasterUser?.fid,
           name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName
         }
-      ],
-      websites: ['https://www.charmverse.io'],
-      farcasterIds: ['https://warpcast.com/cassie/0xc329ea28'],
-      mirror: 'https://dev.mirror.xyz/_JH3B2prRmU23wmzFMncy9UOmYT7mHj5wdiQVUolT3o',
-      twitter: 'https://x.com/charmverse',
-      category: 'DeFi',
-      description: 'This is a project description.',
-      github: 'https://github.com/charmverse/app.charmverse.io'
+      ]
     },
     resolver: yupResolver(schema),
     mode: 'onChange'

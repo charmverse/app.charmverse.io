@@ -48,7 +48,7 @@ export async function storeGitcoinProjectProfileInS3({
 
   const profile: GitcoinUserProfile = {
     name: fcProfile.username,
-    profileImageUrl: project.avatar || fcProfile.pfpUrl || '',
+    profileImageUrl: fcProfile.pfpUrl || project.avatar || '',
     bannerImageUrl: project.coverImage || ''
   };
 
