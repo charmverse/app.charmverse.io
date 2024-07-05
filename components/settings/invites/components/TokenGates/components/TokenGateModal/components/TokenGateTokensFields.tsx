@@ -28,7 +28,7 @@ export function TokenGateTokenFields() {
           deps: ['contract']
         })}
       />
-      <FieldWrapper label='Which group should be able to access this asset'>
+      <FieldWrapper label='Type'>
         <Select<FormValues['check']>
           displayEmpty
           fullWidth
@@ -42,12 +42,24 @@ export function TokenGateTokenFields() {
           ))}
         </Select>
       </FieldWrapper>
-      {check === 'customToken' && (
+      {(check === 'customToken' || 'customContractMethod') && (
         <TextInputField
           label='Contract Address'
           error={errors.contract?.message}
           helperText={errors.contract?.message}
+          placeholder='0x0000000000000000000000000000000000000000'
           {...register('contract', {
+            deps: ['chain']
+          })}
+        />
+      )}
+      {check === 'customContractMethod' && (
+        <TextInputField
+          label='Contract Method'
+          error={errors.method?.message}
+          helperText={errors.method?.message}
+          placeholder='balanceOf'
+          {...register('method', {
             deps: ['chain']
           })}
         />

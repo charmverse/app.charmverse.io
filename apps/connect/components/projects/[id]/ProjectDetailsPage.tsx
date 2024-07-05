@@ -1,10 +1,9 @@
 import 'server-only';
 
-import { fetchProject } from '@connect/lib/actions/fetchProject';
-import { Person } from '@mui/icons-material';
+import type { ConnectProjectDetails } from '@connect/lib/actions/fetchProject';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
 
@@ -14,37 +13,34 @@ import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDescription } from '../components/ProjectDescription';
 import { ShareButton } from '../ProjectShareButton';
 
-export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
-  const project = await fetchProject(projectId);
+function replaceUrl(link: string, domain: string) {
+  let protocol = '';
+  let href = link;
+  let text = link;
 
+  try {
+    const url = new URL(link);
+    protocol = url.protocol;
+    href = url.href;
+    text = (url.pathname.startsWith('/') ? url.pathname.slice(1) : url.pathname) || url.hostname;
+  } catch (e) {
+    protocol = 'https://';
+    href = `${protocol}${domain}/${link}`;
+  }
+
+  return {
+    href,
+    text
+  };
+}
+
+export async function ProjectDetailsPage({ project }: { project?: ConnectProjectDetails | null }) {
+  const farcasterLink = project?.farcasterValues[0] ? replaceUrl(project.farcasterValues[0], 'warpcast.com') : null;
+  const githubLink = project?.github ? replaceUrl(project.github, 'github.com') : null;
+  const mirrorLink = project?.mirror ? replaceUrl(project.mirror, 'mirror.xyz') : null;
+  const twitterLink = project?.twitter ? replaceUrl(project.twitter, 'twitter.com') : null;
   return (
-    <PageWrapper
-      sx={{
-        position: 'relative',
-        p: 0
-      }}
-    >
-      <Box
-        sx={{
-          top: 0,
-          p: 2,
-          width: '499px',
-          borderRight: {
-            xs: 'none',
-            md: '1px solid var(--charm-palette-divider)'
-          },
-          backgroundColor: 'white',
-          zIndex: 1,
-          position: 'fixed'
-        }}
-      >
-        <Stack sx={{ cursor: 'pointer', flexDirection: 'row', gap: 0.5, alignItems: 'center', width: 'fit-content' }}>
-          <Person fontSize='small' />
-          <Link href='/profile' passHref>
-            <Typography>Back to profile</Typography>
-          </Link>
-        </Stack>
-      </Box>
+    <PageWrapper backToProfileHeader>
       {!project ? (
         <Typography mt={5} p={2} variant='h6'>
           Project not found
@@ -60,7 +56,7 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
             width='100%'
             height='150px'
             style={{
-              marginTop: 8,
+              marginTop: 40,
               objectFit: 'cover',
               objectPosition: 'center'
             }}
@@ -72,7 +68,7 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
             size='xLarge'
             sx={{
               position: 'absolute',
-              top: '100px',
+              top: '130px',
               marginLeft: '24px'
             }}
             variant='rounded'
@@ -80,14 +76,22 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
           <Stack p={3} mt={4}>
             <Stack direction='row' mb={2} justifyContent='space-between' alignItems='center'>
               <Typography variant='h5'>{project.name}</Typography>
-              <ShareButton />
+              <ShareButton projectId={project.id} />
             </Stack>
             <Stack gap={1.5}>
-              {project.github && (
+              {farcasterLink && (
+                <Stack direction='row' gap={1} alignItems='center'>
+                  <img src='/images/farcaster.png' width={25} height={25} />
+                  <Link href={farcasterLink.href} passHref target='_blank'>
+                    <Typography variant='body1'>{farcasterLink.text}</Typography>
+                  </Link>
+                </Stack>
+              )}
+              {githubLink && (
                 <Stack direction='row' gap={1} alignItems='center'>
                   <GitHubIcon />
-                  <Link href={project.github} passHref target='_blank'>
-                    <Typography variant='body1'>{project.github.replace(/https?:\/\/github\.com\/?/, '')}</Typography>
+                  <Link href={githubLink.href} passHref target='_blank'>
+                    <Typography variant='body1'>{githubLink.text}</Typography>
                   </Link>
                 </Stack>
               )}
@@ -99,25 +103,15 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
                   </Link>
                 </Stack>
               )}
-              {project.mirror && (
+              {mirrorLink && (
                 <Stack direction='row' gap={1} alignItems='center'>
                   <img src='/images/mirror-xyz.png' width={25} height={25} />
-                  <Link href={project.mirror} passHref target='_blank'>
-                    <Typography variant='body1'>{project.mirror.replace(/https?:\/\/mirror.xyz\//, '')}</Typography>
+                  <Link href={mirrorLink.href} passHref target='_blank'>
+                    <Typography variant='body1'>{mirrorLink.text}</Typography>
                   </Link>
                 </Stack>
               )}
-              {project.farcasterValues.length > 0 && (
-                <Stack direction='row' gap={1} alignItems='center'>
-                  <img src='/images/farcaster.png' width={25} height={25} />
-                  <Link href={project.farcasterValues[0]} passHref target='_blank'>
-                    <Typography variant='body1'>
-                      {project.farcasterValues[0].replace(/https?:\/\/warpcast\.com\//, '')}
-                    </Typography>
-                  </Link>
-                </Stack>
-              )}
-              {project.twitter && (
+              {twitterLink && (
                 <Stack direction='row' gap={1} alignItems='center'>
                   <FaXTwitter
                     style={{
@@ -125,8 +119,8 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
                       height: 24
                     }}
                   />
-                  <Link href={project.twitter} passHref target='_blank'>
-                    <Typography variant='body1'>{project.twitter.replace(/https?:\/\/twitter\.com\//, '')}</Typography>
+                  <Link href={twitterLink.href} passHref target='_blank'>
+                    <Typography variant='body1'>{twitterLink.text}</Typography>
                   </Link>
                 </Stack>
               )}
@@ -143,6 +137,7 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
                   username={member.farcasterUser.username}
                   avatar={member.farcasterUser.pfpUrl}
                   bio={member.farcasterUser.bio}
+                  enableLink
                 />
               ))}
             </Stack>
