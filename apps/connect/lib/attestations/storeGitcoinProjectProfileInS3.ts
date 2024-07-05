@@ -1,16 +1,16 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 
 import { awsS3Bucket } from 'config/constants';
 import { uploadFileToS3 } from 'lib/aws/uploadToS3Server';
+import { gitcoinProjectCredentialSchemaId } from 'lib/credentials/schemas/gitcoinProjectSchema';
+import { replaceS3Domain } from 'lib/utils/url';
 
 import type { ConnectProjectDetails } from '../actions/fetchProject';
 import { fetchProject } from '../actions/fetchProject';
 
-import { mapProjectToGitcoin } from './mapProjectToGitcoin';
-
-const storageFormats = ['gitcoin', 'optimism'] as const;
+import { getAttestationS3Path } from './getAttestationS3Path';
 
 type GitcoinUserProfile = {
   name: string;
@@ -40,7 +40,11 @@ export async function storeGitcoinProjectProfileInS3({
 
   const fcProfile = userProfile.account as Required<FarcasterBody>;
 
-  const filePath = `connect/projects/${project.id}/gitcoin/project-profile.json`;
+  const filePath = getAttestationS3Path({
+    schemaId: gitcoinProjectCredentialSchemaId,
+    charmverseId: project.id,
+    charmverseIdType: 'profile'
+  });
 
   const profile: GitcoinUserProfile = {
     name: fcProfile.username,
@@ -54,5 +58,5 @@ export async function storeGitcoinProjectProfileInS3({
     contentType: 'application/json'
   });
 
-  return { staticFilePath: `https://s3.amazonaws.com/${awsS3Bucket}/${filePath}`, profile };
+  return { staticFilePath: replaceS3Domain(`https://s3.amazonaws.com/${awsS3Bucket}/${filePath}`), profile };
 }

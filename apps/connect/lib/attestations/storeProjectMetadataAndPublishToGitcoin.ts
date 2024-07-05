@@ -53,36 +53,34 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     projectOrProjectId: project
   });
 
-  const [projectAttestationUID, profileAttestationUID] = await Promise.all([
-    attestOnchain({
-      type: 'gitcoinProject',
-      chainId: projectAttestationChainId,
-      credentialInputs: {
-        recipient: fcProfile.connectedAddress ?? fcProfile.connectedAddresses[0] ?? fcProfile.body.address,
-        data: {
-          name: project.name,
-          metadataPtr: staticFilePath,
-          metadataType: 0,
-          type: 'application',
-          round: currentGitcoinRound
-        }
+  const projectAttestationUID = await attestOnchain({
+    type: 'gitcoinProject',
+    chainId: projectAttestationChainId,
+    credentialInputs: {
+      recipient: fcProfile.connectedAddress ?? fcProfile.connectedAddresses[0] ?? fcProfile.body.address,
+      data: {
+        name: project.name,
+        metadataPtr: staticFilePath,
+        metadataType: 0,
+        type: 'application',
+        round: currentGitcoinRound
       }
-    }),
-    attestOnchain({
-      type: 'gitcoinProject',
-      chainId: projectAttestationChainId,
-      credentialInputs: {
-        recipient: fcProfile.connectedAddress ?? fcProfile.connectedAddresses[0] ?? fcProfile.body.address,
-        data: {
-          name: fcProfile.body.username,
-          metadataPtr: profileFilePath,
-          metadataType: 0,
-          type: 'profile',
-          round: currentGitcoinRound
-        }
+    }
+  });
+  const profileAttestationUID = await attestOnchain({
+    type: 'gitcoinProject',
+    chainId: projectAttestationChainId,
+    credentialInputs: {
+      recipient: fcProfile.connectedAddress ?? fcProfile.connectedAddresses[0] ?? fcProfile.body.address,
+      data: {
+        name: fcProfile.body.username,
+        metadataPtr: profileFilePath,
+        metadataType: 0,
+        type: 'profile',
+        round: currentGitcoinRound
       }
-    })
-  ]);
+    }
+  });
 
   const [storedProjectAttestation] = await Promise.all([
     prisma.gitcoinProjectAttestation.create({
