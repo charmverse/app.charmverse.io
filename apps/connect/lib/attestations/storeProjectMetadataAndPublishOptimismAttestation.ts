@@ -14,6 +14,9 @@ import { fetchProject } from '../actions/fetchProject';
 import { projectAttestationChainId, projectAttestationIssuerName } from './constants';
 import { storeProjectInS3 } from './storeProjectInS3';
 
+// Format for metadata.json:
+// attestations/{schemaId}/project-{charmverse_uid}/metadata.json
+
 export async function storeProjectMetadataAndPublishOptimismAttestation({
   userId,
   projectId,
@@ -98,14 +101,3 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
 
   return attestationWithMetadata;
 }
-
-const inputData = {
-  farcasterID: 4339,
-  category: 'Defi',
-  issuer: projectAttestationIssuerName,
-  metadataType: 1,
-  metadataUrl: 'www.example.com',
-  name: 'Demo',
-  parentProjectRefUID: '0x0000000000000000000000000000000000000000000000000000000000000000',
-  projectRefUID: '0x8222da54406a4d9eab91006c95cd4ec6279be90297d524e3dcc896d40fa8ca96'
-} as OptimismProjectSnapshotAttestationMetaData;
