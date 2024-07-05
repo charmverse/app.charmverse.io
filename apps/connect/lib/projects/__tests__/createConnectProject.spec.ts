@@ -44,23 +44,37 @@ describe('createConnectProject', () => {
       }
     });
 
-    mockSandbox.get('https://searchcaster.xyz/api/profiles?fid=3', [
-      {
-        connectedAddresses: [nonFarcasterConnectedUserWallet]
-      }
-    ]);
-
-    mockSandbox.get('https://searchcaster.xyz/api/profiles?fid=4', [
-      {
-        connectedAddresses: [randomETHWalletAddress().toLowerCase()],
-        body: {
-          username: 'user-4',
-          displayName: 'User 4',
-          bio: 'User 4 bio',
-          avatarUrl: 'https://example.com/pfp.jpg'
+    mockSandbox.get('https://api.neynar.com/v2/farcaster/user/bulk?fids[]=3', {
+      users: [
+        {
+          custody_address: nonFarcasterConnectedUserWallet,
+          verified_addresses: {
+            eth_addresses: [nonFarcasterConnectedUserWallet]
+          }
         }
-      }
-    ]);
+      ]
+    });
+
+    const walletAddress = randomETHWalletAddress().toLowerCase();
+
+    mockSandbox.get('https://api.neynar.com/v2/farcaster/user/bulk?fids[]=4', {
+      users: [
+        {
+          custody_address: walletAddress,
+          verified_addresses: {
+            eth_addresses: [walletAddress]
+          },
+          username: 'user-4',
+          display_name: 'User 4',
+          profile: {
+            bio: {
+              text: 'User 4 bio'
+            }
+          },
+          pfp_url: 'https://example.com/pfp.jpg'
+        }
+      ]
+    });
 
     const createdProject = await createConnectProject({
       input: {
@@ -103,6 +117,22 @@ describe('createConnectProject', () => {
         }
       }
     });
+
+    const farcasterUserFid3 = await prisma.farcasterUser.findFirst({
+      where: {
+        fid: 3,
+        userId: nonFarcasterConnectedUser.id
+      }
+    });
+
+    const farcasterUserFid4 = await prisma.farcasterUser.findFirst({
+      where: {
+        fid: 4
+      }
+    });
+
+    expect(farcasterUserFid3).toBeDefined();
+    expect(farcasterUserFid4).toBeDefined();
 
     expect(project).toMatchObject({
       name: 'Project',

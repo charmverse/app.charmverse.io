@@ -1,6 +1,5 @@
+import { GET } from '@charmverse/core/http';
 import { uniqBy } from 'lodash';
-
-import { GET } from 'adapters/http';
 
 export type FarcasterUser = {
   object: string;

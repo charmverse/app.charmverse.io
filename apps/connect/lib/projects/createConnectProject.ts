@@ -2,10 +2,11 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { getFarcasterUsers } from 'lib/farcaster/getFarcasterUsers';
 import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
 import { stringToValidPath, uid } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
+
+import { getFarcasterUsers } from '../farcaster/getFarcasterUsers';
 
 import type { FormValues } from './form';
 
