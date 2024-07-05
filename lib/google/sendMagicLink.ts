@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
 import { googleWebClientConfig } from 'config/constants';
@@ -11,16 +11,17 @@ type MagicLinkDispatch = {
   redirectUrl?: string;
 };
 
-const firebaseClientApp = initializeApp(googleWebClientConfig);
-
 export async function sendMagicLink({ to, redirectUrl }: MagicLinkDispatch) {
+  // make sure we only initialize the app once
+  const alreadyCreatedApps = getApps();
+  const firebaseClientApp =
+    alreadyCreatedApps.length === 0 ? initializeApp(googleWebClientConfig) : alreadyCreatedApps[0];
+
   const actionCodeSettings = {
     url: `${process.env.DOMAIN}/authenticate${redirectUrl ? `?redirectUrl=${encodeURIComponent(redirectUrl)}` : ''}`,
     handleCodeInApp: true
   };
-
   const verificationUrl = await getAuth(firebaseClientApp).generateEmailVerificationLink(to.email, actionCodeSettings);
-  // await sendSignInLinkToEmail(auth, email, actionCodeSettings);
 
   const template = getEmailVerification({
     verificationUrl

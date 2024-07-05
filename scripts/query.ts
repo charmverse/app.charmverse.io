@@ -14,6 +14,7 @@ const rateLimiter = RateLimit(10);
  * Use this script to perform database searches.
  */
 
+<<<<<<< Updated upstream
 async function query() {
   const result = await prisma.user.findFirst({
     where: {
@@ -22,6 +23,39 @@ async function query() {
   });
 
   console.log(result);
+=======
+// {
+//   id: 'dd047716-9512-447a-b9fd-79bfe8ccb280',
+//   name: 'Greenpill Network'
+// }
+
+async function search() {
+  const result = await prisma.space.findUnique({
+    where: {
+      domain: 'playgotchi'
+    },
+    include: {
+      spaceRoles: {
+        include: {
+          user: true
+        }
+      }
+    }
+  });
+  const users = await prisma.user.findMany({
+    where: {
+      id: {
+        in: result.spaceRoles.map((role) => role.userId)
+      }
+    },
+    include: {
+      wallets: true,
+      verifiedEmails: true,
+      GoogleCredential: true
+    }
+  });
+  console.log(users);
+>>>>>>> Stashed changes
 }
 
 query();
