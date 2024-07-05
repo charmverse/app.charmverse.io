@@ -192,11 +192,12 @@ test.describe.serial('Structured proposal template with project', () => {
       proposalPage.publishNewProposalButton.click()
     ]);
 
-    expect(await proposalFormFieldPage.getProjectFieldLabel('name')).toBe('Project Name*');
-    expect(await proposalFormFieldPage.getProjectFieldLabel('excerpt')).toBe('Describe your project in one sentence');
-    expect(await proposalFormFieldPage.getProjectFieldLabel('member-name')).toBe('Name*');
-    expect(await proposalFormFieldPage.getProjectFieldLabel('member-email')).toBe('Email*');
-    // expect(await proposalPage.page.locator('data-test=project-member-walletAddress-field-container').count()).toBe(0);
+    await expect(proposalFormFieldPage.getProjectFieldLabel('name')).toHaveText('Project Name*');
+    await expect(proposalFormFieldPage.getProjectFieldLabel('excerpt')).toHaveText(
+      'Describe your project in one sentence'
+    );
+    await expect(proposalFormFieldPage.getProjectFieldLabel('member-name')).toHaveText('Name*');
+    await expect(proposalFormFieldPage.getProjectFieldLabel('member-email')).toHaveText('Email*');
 
     const proposalTemplate = await prisma.proposal.findFirstOrThrow({
       where: {

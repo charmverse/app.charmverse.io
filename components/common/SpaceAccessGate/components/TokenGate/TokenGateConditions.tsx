@@ -88,7 +88,9 @@ function Condition({
           />
         </Box>
       )}
-      <Box width='100%'>{text}</Box>
+      <Box width='100%' display='flex' alignItems='center' gap={0.5}>
+        {text}
+      </Box>
       {onDelete && (
         <Box>
           <IconButton onClick={onDelete} disabled={isLoading} color='default'>

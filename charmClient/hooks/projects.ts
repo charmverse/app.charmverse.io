@@ -17,10 +17,10 @@ export function useUpdateProject(projectId: string) {
   return usePUT<ProjectAndMembersPayload, ProjectWithMembers>(`/api/projects/${projectId}`);
 }
 
-export function usePatchProject(projectId: string) {
+export function usePatchProject(projectId?: string) {
   return usePUT<UpdateProjectPayload, Project>(`/api/projects/${projectId}/patch`);
 }
 
-export function useAddProjectMember(projectId: string) {
+export function useAddProjectMember(projectId?: string) {
   return usePOST<AddProjectMemberPayload, ProjectMember>(`/api/projects/${projectId}/members`);
 }

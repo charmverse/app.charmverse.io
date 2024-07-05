@@ -6,7 +6,6 @@ import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import { useProjectForm } from 'components/proposals/hooks/useProjectForm';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { FormFieldValue } from 'lib/forms/interfaces';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
@@ -51,8 +50,7 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
     // initialProjectValues: proposal?.project,
     // projectId: projectAnswer?.projectId,
     // selectedMemberIds: projectAnswer?.selectedMemberIds,
-    fieldConfig:
-      (projectField?.fieldConfig as ProjectAndMembersFieldConfig) ?? createDefaultProjectAndMembersFieldConfig()
+    fieldConfig: projectField?.fieldConfig as ProjectAndMembersFieldConfig
   });
 
   const onSave = useCallback(

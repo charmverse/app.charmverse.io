@@ -82,7 +82,7 @@ function FieldWrapperComponent({
         </Box>
       )}
       <ReadonlyCharmContent content={description} />
-      <Stack gap={1} alignItems={inputEndAdornmentAlignItems} flexDirection='row'>
+      <Stack alignItems={inputEndAdornmentAlignItems} flexDirection='row'>
         <div style={{ flexGrow: 1, overflowX: 'hidden' }}>{children}</div>
         {inputEndAdornment}
       </Stack>

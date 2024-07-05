@@ -6,7 +6,8 @@ import { forwardRef } from 'react';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 
-type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number; maxRows?: number };
+type Props = ControlFieldProps &
+  FieldProps & { multiline?: boolean; inputEndAdornmentAlignItems?: string; rows?: number; maxRows?: number };
 
 export const TextInputField = forwardRef<HTMLDivElement, Props>(
   (
@@ -14,6 +15,7 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
       label,
       labelEndAdornment,
       inputEndAdornment,
+      inputEndAdornmentAlignItems,
       iconLabel,
       inline,
       error,
@@ -36,7 +38,7 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
       : undefined;
     return (
       <FieldWrapper
-        inputEndAdornmentAlignItems={multiline ? 'flex-start' : 'center'}
+        inputEndAdornmentAlignItems={inputEndAdornmentAlignItems || multiline ? 'flex-start' : 'center'}
         labelEndAdornment={labelEndAdornment}
         inputEndAdornment={inputEndAdornment}
         description={description}

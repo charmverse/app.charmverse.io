@@ -30,10 +30,10 @@ export function ProjectForm({
   onFormFieldChange,
   applyProjectMembers
 }: {
-  project: ProjectWithMembers;
+  project?: ProjectWithMembers; // only provided if you belong to the project
   refreshProjects: KeyedMutator<ProjectWithMembers[]>;
   disabled?: boolean;
-  fieldConfig?: ProjectAndMembersFieldConfig;
+  fieldConfig: ProjectAndMembersFieldConfig;
   isTeamLead: boolean;
   selectedMemberIds: string[];
   onFormFieldChange: (field: ProjectFieldValue) => void;
@@ -43,22 +43,31 @@ export function ProjectForm({
 
   const { showError } = useSnackbar();
 
-  const { id: projectId, projectMembers } = project;
+  const projectId = project?.id;
+  const projectMembers = project?.projectMembers || [];
 
   // Note: selectedMemberIds never includes team lead
-  const selectedProjectMembers = selectedMemberIds
-    .map((memberId) => projectMembers.find((member) => member.id === memberId))
-    .filter(isTruthy);
+  const selectedProjectMembers = selectedMemberIds.map((memberId) => {
+    const member = projectMembers.find((m) => m.id === memberId);
+    return {
+      id: memberId,
+      userId: member?.userId
+    };
+  });
   const nonSelectedProjectMembers = projectMembers.filter(
-    (projectMember) => !projectMember.teamLead && projectMember.id && !selectedMemberIds.includes(projectMember.id)
+    (projectMember) => !projectMember.teamLead && !selectedMemberIds.includes(projectMember.id)
   );
   const { onProjectUpdate, onProjectMemberUpdate, onProjectMemberAdd } = useProjectUpdates({
-    projectId: project.id,
+    projectId,
     isTeamLead,
     refreshProjects
   });
 
   async function addTeamMember(selectedMemberId: string) {
+    if (!projectId) {
+      // project doesnt belong to user
+      return;
+    }
     const newMemberIds = [...selectedMemberIds];
     const newProjectMembers = selectedMemberIds
       .map((memberId) => project.projectMembers.find((member) => member.id === memberId))
@@ -94,6 +103,10 @@ export function ProjectForm({
   }
 
   function removeTeamMember(memberId: string) {
+    if (!projectId) {
+      // project doesnt belong to user
+      return;
+    }
     const newMemberIds = selectedMemberIds.filter((id) => id !== memberId);
     const newProjectMembers = projectMembers.filter(({ id }) => newMemberIds.includes(id));
     // always include team lead
@@ -107,11 +120,13 @@ export function ProjectForm({
 
   const teamLeadMemberId = projectMembers[0]?.id;
 
+  // for non-authors, hide the team members section if it is empty
+  const showTeamMemberSection = !disabled || selectedProjectMembers.length > 0;
+
   return (
     <Stack gap={2} width='100%'>
       <Typography variant='h6'>Project Info</Typography>
       <FieldAnswers
-        defaultRequired
         disabled={!isTeamLead || disabled}
         fieldConfig={fieldConfig}
         onChange={onProjectUpdate}
@@ -124,66 +139,72 @@ export function ProjectForm({
       <ProjectMemberFieldAnswers
         projectMemberIndex={0}
         disabled={!isTeamLead || disabled}
-        defaultRequired
-        fieldConfig={fieldConfig?.projectMember}
+        fieldConfig={fieldConfig.projectMember}
         onChange={(updates) => onProjectMemberUpdate(teamLeadMemberId!, updates)}
       />
-      <Divider sx={{ my: 1 }} />
-      {selectedProjectMembers.map((projectMember, index) => (
-        <Stack key={`project-member-${projectMember.id}`}>
-          <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
-            <Typography variant='h6'>Team member</Typography>
-            <IconButton
-              data-test='remove-project-member-button'
+      {showTeamMemberSection && (
+        <>
+          <Divider sx={{ my: 1 }} />
+          {selectedProjectMembers.map((projectMember, index) => (
+            <>
+              <Stack key={`project-member-${projectMember.id}`}>
+                <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
+                  <FieldLabel>Team Member</FieldLabel>
+                  <IconButton
+                    data-test='remove-project-member-button'
+                    disabled={disabled}
+                    onClick={() => removeTeamMember(projectMember.id)}
+                  >
+                    <DeleteOutlineOutlinedIcon fontSize='small' color={disabled ? 'disabled' : 'error'} />
+                  </IconButton>
+                </Stack>
+                <ProjectMemberFieldAnswers
+                  onChange={(updates) => {
+                    onProjectMemberUpdate(projectMember.id, updates);
+                  }}
+                  projectMemberIndex={index + 1}
+                  disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}
+                  fieldConfig={fieldConfig.projectMember}
+                />
+              </Stack>
+              <Divider sx={{ my: 1 }} />
+            </>
+          ))}
+          {!disabled && (
+            <Select
+              displayEmpty
+              data-test='project-team-members-select'
               disabled={disabled}
-              onClick={() => removeTeamMember(projectMember.id)}
+              value=''
+              onChange={(event) => {
+                addTeamMember(event.target.value as string);
+              }}
+              renderValue={() => {
+                return 'Add a team member';
+              }}
             >
-              <DeleteOutlineOutlinedIcon fontSize='small' color={disabled ? 'disabled' : 'error'} />
-            </IconButton>
-          </Stack>
-          <ProjectMemberFieldAnswers
-            onChange={(updates) => {
-              onProjectMemberUpdate(projectMember.id, updates);
-            }}
-            projectMemberIndex={index + 1}
-            disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}
-            defaultRequired
-            fieldConfig={fieldConfig?.projectMember}
-          />
-        </Stack>
-      ))}
-      <FieldLabel>Team Members</FieldLabel>
-      <Select
-        displayEmpty
-        data-test='project-team-members-select'
-        disabled={disabled}
-        value=''
-        onChange={(event) => {
-          addTeamMember(event.target.value as string);
-        }}
-        renderValue={() => {
-          return 'Select a team member';
-        }}
-      >
-        {nonSelectedProjectMembers.map((projectMember) => (
-          <MenuItem
-            key={`project-member-${projectMember.id}`}
-            value={projectMember.id}
-            data-test='project-member-option'
-          >
-            <Typography color={projectMember.name ? '' : 'secondary'}>
-              {projectMember.name || 'Untitled Project Member'}
-            </Typography>
-          </MenuItem>
-        ))}
-        {nonSelectedProjectMembers.length && <Divider />}
-        <MenuItem data-test='project-member-option' value={newTeamMember} disabled={!isTeamLead || disabled}>
-          <Stack flexDirection='row' alignItems='center' gap={0.05}>
-            <AddIcon fontSize='small' />
-            <Typography>Add a new project member</Typography>
-          </Stack>
-        </MenuItem>
-      </Select>
+              {nonSelectedProjectMembers.map((projectMember) => (
+                <MenuItem
+                  key={`project-member-${projectMember.id}`}
+                  value={projectMember.id}
+                  data-test='project-member-option'
+                >
+                  <Typography color={projectMember.name ? '' : 'secondary'}>
+                    {projectMember.name || 'Untitled Project Member'}
+                  </Typography>
+                </MenuItem>
+              ))}
+              {nonSelectedProjectMembers.length && <Divider />}
+              <MenuItem data-test='project-member-option' value={newTeamMember} disabled={!isTeamLead || disabled}>
+                <Stack flexDirection='row' alignItems='center' gap={0.05}>
+                  <AddIcon fontSize='small' />
+                  <Typography>Add a new project member</Typography>
+                </Stack>
+              </MenuItem>
+            </Select>
+          )}
+        </>
+      )}
     </Stack>
   );
 }

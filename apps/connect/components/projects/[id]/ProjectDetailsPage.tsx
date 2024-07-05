@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { fetchProject } from '@connect/lib/actions/fetchProject';
+import type { ProjectData } from '@connect/lib/actions/fetchProject';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
 import { Divider, Stack, Typography } from '@mui/material';
@@ -13,9 +13,7 @@ import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDescription } from '../components/ProjectDescription';
 import { ShareButton } from '../ProjectShareButton';
 
-export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
-  const project = await fetchProject(projectId);
-
+export async function ProjectDetailsPage({ project }: { project?: ProjectData | null }) {
   return (
     <PageWrapper backToProfileHeader>
       {!project ? (
@@ -53,7 +51,7 @@ export async function ProjectDetailsPage({ projectId }: { projectId: string }) {
           <Stack p={3} mt={4}>
             <Stack direction='row' mb={2} justifyContent='space-between' alignItems='center'>
               <Typography variant='h5'>{project.name}</Typography>
-              <ShareButton />
+              <ShareButton projectId={project.id} />
             </Stack>
             <Stack gap={1.5}>
               {project.github && (

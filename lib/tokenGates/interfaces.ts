@@ -9,6 +9,7 @@ export type AccessType =
   | 'ERC20'
   | 'ERC721'
   | 'ERC1155'
+  | 'ContractMethod'
   | 'Wallet'
   | 'MolochDAOv2.1'
   | 'Builder'
@@ -39,7 +40,7 @@ export type AccessControlCondition = {
   /** Contract address of the asset. */
   contractAddress: string;
   /** Method for querying the contract. */
-  method: Method;
+  method: Method | string; // string for custom contract methods
   /** Value of any type of token gate. */
   tokenIds: string[];
   /** The quantity of an asset. e.g. 2 ETH */
