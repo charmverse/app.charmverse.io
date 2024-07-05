@@ -91,10 +91,7 @@
     "connect-api:start:prod": "npm run start:prod --w=apps/connect-api"
   },
   "lint-staged": {
-    "apps/connect-api/**/*.{ts,tsx}": [
-      "npm run lint -w=connect-api"
-    ],
-    "(!apps)/**/*.{ts,tsx}": [
+    "*.{ts,tsx}": [
       "eslint --fix"
     ]
   },
@@ -302,7 +299,7 @@
     "scroll-into-view-if-needed": "^2.2.29",
     "serverless": "^3.38.0",
     "serverless-lift": "^1.28.1",
-    "sharp": "^0.33.3",
+    "sharp": "^0.33.4",
     "siwe": "^2.1.4",
     "socket.io": "^4.7.0",
     "socket.io-client": "^4.6.1",

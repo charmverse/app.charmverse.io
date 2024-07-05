@@ -21,7 +21,7 @@ type Props = {
   tokenGate: TokenGateWithRoles;
   spaceId?: string;
   refreshTokenGates: () => Promise<void>;
-  testConnect: (tokenGate: TokenGateWithRoles) => Promise<void>;
+  testConnect: (tokenGate: TokenGateWithRoles) => void;
 };
 
 export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testConnect, refreshTokenGates }: Props) {

@@ -37,7 +37,7 @@ export function ProjectFieldAnswer({
   proposalId: string;
   inputEndAdornment?: React.ReactNode;
   disabled?: boolean;
-  fieldConfig?: ProjectAndMembersFieldConfig;
+  fieldConfig: ProjectAndMembersFieldConfig;
   projectId?: string | null;
   onChange: (updatedValue: FormFieldValue) => void;
   applyProject: (project: ProjectWithMembers, selectedMemberIds: string[]) => void;
