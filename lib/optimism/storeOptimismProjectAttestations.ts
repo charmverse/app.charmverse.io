@@ -116,15 +116,13 @@ export async function storeOptimismProjectAttestations() {
       );
       const farcasterIds = Array.from(
         new Set([
-          // Convert hex version of big number to string integer
-          parseInt(optimismProjectMetadataAttestation.content.farcasterID.hex, 16).toString(),
           ...(optimismProjectMetadata
             ? optimismProjectMetadata.team
                 .map((teamMember) => {
                   if (teamMember.startsWith('0x')) {
-                    return parseInt(teamMember, 16).toString();
+                    return parseInt(teamMember, 16);
                   } else if (parseInt(teamMember)) {
-                    return parseInt(teamMember).toString();
+                    return parseInt(teamMember);
                   }
                   return null;
                 })
@@ -135,16 +133,17 @@ export async function storeOptimismProjectAttestations() {
 
       await prisma.optimismProjectAttestation.upsert({
         where: {
-          attestationId: optimismProjectAttestation.id
+          projectRefUID: optimismProjectAttestation.id
         },
         create: {
-          attestationId: optimismProjectAttestation.id,
+          projectRefUID: optimismProjectAttestation.id,
           name: optimismProjectMetadata.name,
-          metadataAttestationId: optimismProjectMetadataAttestation.id,
+          metadataAttestationUID: optimismProjectMetadataAttestation.id,
           metadata: optimismProjectMetadata,
           metadataUrl: optimismProjectMetadataAttestation.content.metadataUrl,
           farcasterIds,
-          timeCreated: new Date(optimismProjectAttestation.timeCreated)
+          timeCreated: new Date(optimismProjectAttestation.timeCreated),
+          chainId: optimism.id
         },
         update: {
           name: optimismProjectMetadata.name,

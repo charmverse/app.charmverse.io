@@ -79,8 +79,8 @@ cron.schedule('0 */6 * * *', refreshDocusignOAuthTask);
 // Sync op reviews every 15 minutes - remove by July 2024
 cron.schedule('*/15 * * * *', syncOptimismReviewsTask);
 
-// Store optimism project attestations every day at midnight
-cron.schedule('0 0 * * *', storeOptimismProjectAttestations);
+// Store optimism project attestations once an hour
+cron.schedule('0 * * * *', storeOptimismProjectAttestations);
 
 const port = process.env.PORT || 4000;
 
