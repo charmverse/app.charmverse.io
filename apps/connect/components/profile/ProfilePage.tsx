@@ -33,7 +33,7 @@ export async function ProfilePage({ user }: { user: LoggedInUser }) {
         <Suspense fallback={<ProjectItemSkeleton />}>
           <ProjectsList userId={user.id} />
         </Suspense>
-        <NewProjectItem href='/p/new'>Create a project</NewProjectItem>
+        <NewProjectItem href='/projects/new'>Create a project</NewProjectItem>
       </Box>
     </PageWrapper>
   );
