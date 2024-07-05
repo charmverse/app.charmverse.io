@@ -27,7 +27,7 @@ export default async function ProjectPage({ params }: { params: { path: string }
           {/* Button 3 */}
           <meta name='fc:frame:button:3' content='View' />
           <meta name='fc:frame:button:3:action' content='link' />
-          <meta name='fc:frame:button:3:target' content={`https://connect.charmverse.io/p/${params.id}`} />
+          <meta name='fc:frame:button:3:target' content={`https://connect.charmverse.io/p/${params.path}`} />
         </>
       )}
       <ProjectDetailsPage project={project} />;
