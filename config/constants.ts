@@ -33,6 +33,13 @@ export const googleWebClientConfig = {
   appId: env('GOOGLE_APP_ID')
 };
 
+export const googleFirebaseAdminConfig = {
+  // replace `\` and `n` character pairs w/ single `\n` character
+  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  projectId: googleWebClientConfig.projectId,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL
+};
+
 export const charmverseDiscordInvite = 'https://discord.gg/ACYCzBGC2M';
 export const userManualUrl = 'https://tiny.charmverse.io/user-manual';
 // Google config with sensitive scopes (to eventually replace the primary config)
