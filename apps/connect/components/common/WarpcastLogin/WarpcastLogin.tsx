@@ -2,6 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { connectApiClient } from '@connect/apiClient/apiClient';
+import { actionRevalidatePath } from '@connect/lib/actions/revalidatePath';
 import { AuthKitProvider, SignInButton } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import Box from '@mui/material/Box';
@@ -19,6 +20,7 @@ function WarpcastLoginButton() {
     await connectApiClient.loginViaFarcaster(res).catch((error) => {
       log.error('There was an error on the server while logging in with Warpcast', { error });
     });
+    await actionRevalidatePath();
     router.push('/profile');
   }, []);
 

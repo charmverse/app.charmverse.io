@@ -2,6 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { connectApiClient } from '@connect/apiClient/apiClient';
+import { actionRevalidatePath } from '@connect/lib/actions/revalidatePath';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
 import Image from 'next/image';
@@ -32,7 +33,8 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
     await connectApiClient.logOut().catch((error) => {
       log.error('There was an error while trying to signout', { error });
     });
-    router.refresh();
+    await actionRevalidatePath();
+    router.push('/');
   };
 
   return (
