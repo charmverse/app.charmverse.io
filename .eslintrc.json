@@ -29,7 +29,11 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "react", "react-hooks"],
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "react-hooks"
+  ],
   "rules": {
     "react/jsx-key": "error",
     "react/forbid-prop-types": 0,
@@ -66,7 +70,10 @@
     "arrow-body-style": "off",
     "arrow-parens": "off",
     "class-methods-use-this": "off",
-    "comma-dangle": ["error", "never"],
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
     "consistent-return": "off",
     "import/prefer-default-export": "off",
     "import/extensions": "off",
@@ -76,7 +83,11 @@
       "error",
       {
         "devDependencies": true,
-        "packageDir": ["./", "./apps/connect-api", "./apps/connect"]
+        "packageDir": [
+          "./",
+          "./apps/connect-api",
+          "./apps/connect"
+        ]
       }
     ],
     "import/order": [
@@ -87,12 +98,23 @@
           "caseInsensitive": true
         },
         "newlines-between": "always",
-        "groups": ["builtin", "external", "internal", "object", "parent", "sibling", "index"]
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "object",
+          "parent",
+          "sibling",
+          "index"
+        ]
       }
     ],
     "jsx-a11y/anchor-is-valid": "off",
     "jsx-a11y/no-static-element-interactions": "off",
-    "jsx-quotes": ["error", "prefer-single"],
+    "jsx-quotes": [
+      "error",
+      "prefer-single"
+    ],
     "max-classes-per-file": "off",
     "max-len": [
       "error",
@@ -144,7 +166,10 @@
     "react/jsx-filename-extension": [
       1,
       {
-        "extensions": [".tsx", ".jsx"]
+        "extensions": [
+          ".tsx",
+          ".jsx"
+        ]
       }
     ],
     "react/jsx-no-bind": "off",

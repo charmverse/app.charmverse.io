@@ -9,7 +9,10 @@
       "error",
       {
         "devDependencies": true,
-        "packageDir": ["./", "../../"]
+        "packageDir": [
+          "./",
+          "../../"
+        ]
       }
     ]
   },
