@@ -12,7 +12,7 @@ import { Suspense } from 'react';
 export function HomePage() {
   return (
     <PageWrapper>
-      <Box display='flex' gap={2} flexDirection='column'>
+      <Box data-test='connect-home-page' display='flex' gap={2} flexDirection='column'>
         <PageTitle>Onchain Summer</PageTitle>
         <Typography align='center' my={2}>
           Create your profile, add projects and compete for 540K OP in total prizes on Gitcoin.
