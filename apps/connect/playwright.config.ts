@@ -102,7 +102,7 @@ const config: PlaywrightTestConfig = {
   webServer: {
     // add DEBUG=pw:webserver environment variable to see server output
     command: 'dotenv -e .env.test.local -- npm run start -w=apps/connect',
-    port: 3335,
+    port: 3337,
     reuseExistingServer: true // !!process.env.CI
   }
 };
