@@ -90,11 +90,12 @@ const GET_EXTERNAL_CREDENTIALS = gql`
       attester
       recipient
       schemaId
+      timeCreated
     }
   }
 `;
 
-function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | EasSchemaChain>({
+export function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | EasSchemaChain, Data = any>({
   chainId,
   wallets,
   schemas,
@@ -102,10 +103,10 @@ function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | Ea
 }: {
   schemas: Record<Chain, { schemaId: string; issuers?: string[] }[]>;
   chainId: Chain;
-  wallets: string[];
+  wallets?: string[];
   type?: 'onchain' | 'charmverse';
-}): Promise<EASAttestationFromApi[]> {
-  const recipient = wallets.map((w) => getAddress(w));
+}): Promise<EASAttestationFromApi<Data>[]> {
+  const recipient = wallets?.map((w) => getAddress(w));
 
   const query = {
     OR: schemas[chainId].map((_schema) => ({
@@ -113,7 +114,7 @@ function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | Ea
         equals: _schema.schemaId
       },
       attester: _schema.issuers ? { in: _schema.issuers } : undefined,
-      recipient: { in: recipient }
+      recipient: recipient ? { in: recipient } : undefined
     }))
   };
 

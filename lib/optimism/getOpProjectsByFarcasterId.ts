@@ -1,6 +1,13 @@
-import { getOpProjects } from 'lib/optimism/getOpProjects';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
 
 export async function getOpProjectsByFarcasterId({ farcasterId }: { farcasterId: number }) {
-  return getOpProjects();
-  // return opProjects.filter((project) => project.team.find((member) => member.farcasterId !== farcasterId.toString()));
+  return prisma.optimismProjectAttestation.findMany({
+    where: {
+      farcasterIds: {
+        has: farcasterId
+      }
+    }
+  }) as Promise<OptimismProjectAttestationContent[]>;
 }

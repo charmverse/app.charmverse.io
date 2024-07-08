@@ -1,10 +1,11 @@
+import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { OPProjectData } from 'lib/optimism/getOpProjects';
 import { getOpProjectsByFarcasterId } from 'lib/optimism/getOpProjectsByFarcasterId';
+import type { OptimismProjectMetadata } from 'lib/optimism/storeOptimismProjectAttestations';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utils/errors';
 
@@ -12,7 +13,11 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getProjectsController);
 
-async function getProjectsController(req: NextApiRequest, res: NextApiResponse<OPProjectData[]>) {
+export type OptimismProjectAttestationContent = Omit<OptimismProjectAttestation, 'metadata'> & {
+  metadata: OptimismProjectMetadata;
+};
+
+async function getProjectsController(req: NextApiRequest, res: NextApiResponse<OptimismProjectAttestationContent[]>) {
   const userId = req.session.user.id;
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -31,8 +36,8 @@ async function getProjectsController(req: NextApiRequest, res: NextApiResponse<O
 
   const fid = user.farcasterUser.fid;
 
-  const opProjects = await getOpProjectsByFarcasterId({ farcasterId: fid });
-  return res.status(200).json(opProjects);
+  const opProjectAttestations = await getOpProjectsByFarcasterId({ farcasterId: fid });
+  return res.status(200).json(opProjectAttestations);
 }
 
 export default withSessionRoute(handler);
