@@ -8,9 +8,6 @@ import type { Ref, ReactNode } from 'react';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { isAnkrChain } from 'lib/blockchain/provider/ankr/config';
-import { isZkSyncChain } from 'lib/blockchain/provider/zksync/config';
-import { isZoraChain } from 'lib/blockchain/provider/zora/config';
 
 function SelectField(
   props: SelectProps<string> & { helperMessage?: ReactNode; chains?: IChainDetails[] },
