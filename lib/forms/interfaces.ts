@@ -17,7 +17,7 @@ export type ProjectFieldValue = {
 
 export type OpProjectFieldValue = {
   projectTitle: string;
-  attestationId: string;
+  projectRefUID: string;
 };
 
 export type FormFieldValue =
