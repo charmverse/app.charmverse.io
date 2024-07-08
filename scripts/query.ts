@@ -1,23 +1,16 @@
-import { gql } from '@apollo/client';
-import { ApolloClientWithRedisCache } from 'lib/credentials/apolloClientWithRedisCache';
-import {  decodeOptimismProjectSnapshotAttestation, optimismProjectSnapshotAttestationSchemaId } from 'lib/credentials/schemas/optimismProjectSchemas';
-import { prettyPrint } from 'lib/utils/strings';
-
-import {RateLimit} from 'async-sema';
-import { GET } from 'adapters/http';
-import { writeToSameFolder } from 'lib/utils/file';
-import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
-
-const rateLimiter = RateLimit(10);
+import { prisma } from '@charmverse/core/prisma-client';
 
 /**
  * Use this script to perform database searches.
  */
 
 async function query() {
-  const result = await prisma.user.findFirst({
+  const result = await prisma.page.update({
     where: {
-      username: 'example'
+      id: '09ad994d-dc30-470f-8067-452a33b796f5'
+    },
+    data: {
+      convertedProposalId: null
     }
   });
 
