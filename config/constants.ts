@@ -39,6 +39,7 @@ export const googleFirebaseAdminConfig = {
   projectId: googleWebClientConfig.projectId,
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL
 };
+export const magicLinkEmailCookie = 'magic-link';
 
 export const charmverseDiscordInvite = 'https://discord.gg/ACYCzBGC2M';
 export const userManualUrl = 'https://tiny.charmverse.io/user-manual';

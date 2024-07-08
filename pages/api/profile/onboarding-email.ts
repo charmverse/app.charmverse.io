@@ -6,6 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { spaceTemplateCookie } from 'components/common/CreateSpaceForm/constants';
+import { magicLinkEmailCookie } from 'config/constants';
 import { registerBeehiivSubscription } from 'lib/beehiiv/registerBeehiivSubscription';
 import { sendMagicLink } from 'lib/google/sendMagicLink';
 import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
@@ -31,10 +32,12 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
 
   const updatedUser = await updateUserProfile(userId, payload);
 
+  const cookies = new Cookies(req, res);
+
   if (updatedUser.email && updatedUser.emailNewsletter && payload.spaceId) {
     try {
       // retrieve space template used via cookie
-      const spaceTemplate = new Cookies(req, res).get(spaceTemplateCookie);
+      const spaceTemplate = cookies.get(spaceTemplateCookie);
 
       const space = await prisma.space.findUniqueOrThrow({
         where: {
@@ -73,6 +76,11 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
         })
         .then(() => {
           log.info('Sent magic link to verify notification email', { userId: updatedUser.id });
+          cookies.set(magicLinkEmailCookie, updatedUser.email, {
+            httpOnly: false,
+            sameSite: 'strict',
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) // 7 days
+          });
         });
     }
   }

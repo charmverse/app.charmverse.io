@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { FirebaseApp } from 'firebase/app';
 import { initializeApp } from 'firebase/app';
 import {
@@ -11,21 +12,27 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { googleWebClientConfig } from 'config/constants';
+import { googleWebClientConfig, magicLinkEmailCookie } from 'config/constants';
 import { useUser } from 'hooks/useUser';
-import { getAppUrl } from 'lib/utils/browser';
+import { getCookie, getAppUrl } from 'lib/utils/browser';
 import { InvalidInputError } from 'lib/utils/errors';
 
 import { useLocalStorage } from './useLocalStorage';
 
 export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
+  const router = useRouter();
+  // this cookie is set by the server when signing in thru onboarding
+  const magicLinkEmailFromServer = getCookie(magicLinkEmailCookie);
+
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));
   // Google client setup start
   const [provider] = useState(new GoogleAuthProvider());
   const { setUser } = useUser();
-  const [emailForSignIn, setEmailForSignIn] = useLocalStorage('emailForSignIn', '');
-  const router = useRouter();
-
+  const [emailForSignInFromClient, setEmailForSignIn] = useLocalStorage(
+    'emailForSignIn',
+    magicLinkEmailFromServer || ''
+  );
+  const emailForSignIn = emailForSignInFromClient || magicLinkEmailFromServer;
   useEffect(() => {
     provider.addScope('email');
     provider.addScope('openid');
@@ -105,7 +112,7 @@ export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
       }
     } else {
       setEmailForSignIn('');
-      throw new InvalidInputError(`Sign-in link is invalid`);
+      log.warn('Sign-in link is invalid', { href: window.location.href });
     }
   }
 
