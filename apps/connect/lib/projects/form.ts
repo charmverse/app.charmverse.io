@@ -9,10 +9,10 @@ export const schema = yup.object({
   cover: yup.string(),
   category: yup.string().oneOf(CATEGORIES),
   websites: yup.array(yup.string().url()),
-  farcasterIds: yup.array(yup.string()),
-  github: yup.string().url(),
-  twitter: yup.string().url(),
-  mirror: yup.string().url(),
+  farcasterValues: yup.array(yup.string()),
+  github: yup.string(),
+  twitter: yup.string(),
+  mirror: yup.string(),
   projectMembers: yup
     .array(
       yup.object({

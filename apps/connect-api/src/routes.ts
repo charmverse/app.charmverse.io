@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import Router from 'koa-router';
 
 import router0 from './api/farcaster/get-by-username';

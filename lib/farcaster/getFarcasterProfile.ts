@@ -30,6 +30,7 @@ export async function getFarcasterProfile({
 }) {
   const numericFid = typeof fid === 'string' ? Number.parseInt(fid, 10) : fid;
   let _farcasterProfile: FarcasterProfile | null = null;
+
   for (const wallet of wallets) {
     [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
       `${profileApiUrl}?connected_address=${wallet}`,
@@ -60,6 +61,10 @@ export async function getFarcasterProfile({
         credentials: 'omit'
       }
     );
+
+    if (_farcasterProfile) {
+      return _farcasterProfile;
+    }
   }
 
   if (username && !_farcasterProfile) {

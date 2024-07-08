@@ -1,8 +1,25 @@
-// 1. Loan Officer Schema used by Financial Institution for verifying a loan officer
-import type { AttestationType } from '@charmverse/core/prisma';
+import type { AttestationType as PrismaAttestationType } from '@charmverse/core/prisma';
 
 import type { ExternalCredential } from './external';
 import { encodeExternalCredential, externalCredentialSchemaDefinition, externalCredentialSchemaId } from './external';
+import type { GitcoinProjectCredential } from './gitcoinProjectSchema';
+import {
+  encodeGitcoinProjectCredential,
+  gitcoinProjectCredentialSchemaDefinition,
+  gitcoinProjectCredentialSchemaId
+} from './gitcoinProjectSchema';
+import type {
+  OptimismProjectAttestationData,
+  OptimismProjectSnapshotAttestationMetaData
+} from './optimismProjectSchemas';
+import {
+  encodeOptimismProjectAttestation,
+  encodeOptimismProjectSnapshotAttestation,
+  optimismProjectAttestationSchemaDefinition,
+  optimismProjectAttestationSchemaId,
+  optimismProjectSnapshotAttestationSchemaDefinition,
+  optimismProjectSnapshotAttestationSchemaId
+} from './optimismProjectSchemas';
 import type { ProposalCredential } from './proposal';
 import { encodeProposalCredential, proposalCredentialSchemaId, proposalCredentialSchemaDefinition } from './proposal';
 import type { RewardCredential } from './reward';
@@ -11,19 +28,30 @@ import { encodeRewardCredential, rewardCredentialSchemaId, rewardCredentialSchem
 export const allSchemaDefinitions = [
   proposalCredentialSchemaDefinition,
   rewardCredentialSchemaDefinition,
-  externalCredentialSchemaDefinition
+  externalCredentialSchemaDefinition,
+  gitcoinProjectCredentialSchemaDefinition,
+  optimismProjectAttestationSchemaDefinition,
+  optimismProjectSnapshotAttestationSchemaDefinition
 ];
+
+export type AttestationType = PrismaAttestationType | 'gitcoinProject' | 'optimismProject' | 'optimismProjectSnapshot';
 
 export const credentialLabels: Record<AttestationType, string> = {
   proposal: 'Proposal',
   reward: 'Reward',
-  external: 'External'
+  external: 'External',
+  gitcoinProject: 'Gitcoin Project',
+  optimismProject: 'Optimism Project',
+  optimismProjectSnapshot: 'Optimism Project Snapshot'
 };
 
 export const attestationSchemaIds: Record<AttestationType, string> = {
   proposal: proposalCredentialSchemaId,
   reward: rewardCredentialSchemaId,
-  external: externalCredentialSchemaId
+  external: externalCredentialSchemaId,
+  gitcoinProject: gitcoinProjectCredentialSchemaId,
+  optimismProject: optimismProjectAttestationSchemaId,
+  optimismProjectSnapshot: optimismProjectSnapshotAttestationSchemaId
 };
 
 export const charmverseCredentialSchemas = [attestationSchemaIds.proposal, attestationSchemaIds.reward];
@@ -34,6 +62,12 @@ export type CredentialDataInput<T extends AttestationType = AttestationType> = T
   ? RewardCredential
   : T extends 'external'
   ? ExternalCredential
+  : T extends 'gitcoinProject'
+  ? GitcoinProjectCredential
+  : T extends 'optimismProject'
+  ? OptimismProjectAttestationData
+  : T extends 'optimismProjectSnapshot'
+  ? OptimismProjectSnapshotAttestationMetaData
   : never;
 
 export type CredentialData<T extends AttestationType = AttestationType> = {
@@ -48,6 +82,12 @@ export function encodeAttestation<T extends AttestationType = AttestationType>({
     return encodeRewardCredential(data as RewardCredential);
   } else if (type === 'external') {
     return encodeExternalCredential(data as ExternalCredential);
+  } else if (type === 'gitcoinProject') {
+    return encodeGitcoinProjectCredential(data as GitcoinProjectCredential);
+  } else if (type === 'optimismProject') {
+    return encodeOptimismProjectAttestation(data as OptimismProjectAttestationData);
+  } else if (type === 'optimismProjectSnapshot') {
+    return encodeOptimismProjectSnapshotAttestation(data as OptimismProjectSnapshotAttestationMetaData);
   }
   throw new Error(`Invalid Attestation Type: ${type}'`);
 }

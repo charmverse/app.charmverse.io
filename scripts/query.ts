@@ -1,21 +1,27 @@
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { prisma } from '@charmverse/core/prisma-client';
+import { gql } from '@apollo/client';
+import { ApolloClientWithRedisCache } from 'lib/credentials/apolloClientWithRedisCache';
+import {  decodeOptimismProjectSnapshotAttestation, optimismProjectSnapshotAttestationSchemaId } from 'lib/credentials/schemas/optimismProjectSchemas';
+import { prettyPrint } from 'lib/utils/strings';
+
+import {RateLimit} from 'async-sema';
+import { GET } from 'adapters/http';
+import { writeToSameFolder } from 'lib/utils/file';
+import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
+
+const rateLimiter = RateLimit(10);
 
 /**
  * Use this script to perform database searches.
  */
 
-// {
-//   id: 'dd047716-9512-447a-b9fd-79bfe8ccb280',
-//   name: 'Greenpill Network'
-// }
-
-async function search() {
-  const result = await prisma.project.deleteMany({
+async function query() {
+  const result = await prisma.user.findFirst({
     where: {
-      createdBy: 'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835'
+      username: 'example'
     }
   });
+
   console.log(result);
 }
-search().then(() => console.log('Done'));
+
+query();

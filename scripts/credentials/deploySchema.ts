@@ -12,7 +12,7 @@ import type { Chain } from 'viem/chains';
 import { createPublicClient, PublicClient } from 'viem';
 
 type PrivateKeyString = `0x${string}`;
-const privateKey = process.env.PRIVATE_KEY as PrivateKeyString;
+const privateKey = `0x${process.env.CREDENTIAL_WALLET_KEY as string}` as PrivateKeyString;
 
 if (!privateKey) {
   throw new Error('PRIVATE_KEY env variable is required');
@@ -48,6 +48,8 @@ async function deploy(chain: Chain, schema: string, resolverAddress: string = NU
   });
   return transaction;
 }
+
+deploy(optimismSepolia, 'bytes32 projectRefUID,uint256 farcasterID,string name,string category,bytes32 parentProjectRefUID,uint8 metadataType,string metadataUrl').then().catch(console.error);
 
 async function attest({
   chain,
@@ -183,4 +185,4 @@ async function doStuff() {
   console.log('Event Attestation:', eventAttestation);
 }
 
-doStuff().then().catch(console.error);
+// doStuff().then().catch(console.error);
