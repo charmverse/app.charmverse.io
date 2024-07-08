@@ -87,7 +87,7 @@ export class ProposalPage extends DocumentPage {
     return this.page.locator(`data-test=select-option-${optionId}`);
   }
 
-  waitForNewProposalPage() {
+  async waitForNewProposalPage() {
     return expect(this.documentTitleInput).toBeVisible();
   }
 

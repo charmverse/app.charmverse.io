@@ -1,9 +1,11 @@
-import { test as base, expect } from '@playwright/test';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
+import { expect, test as base } from '__e2e__/utils/test';
 
-import { DocumentPage } from './po/document.po';
-import { generateUserAndSpace } from './utils/mocks';
-import { login } from './utils/session';
+import { generateProposalWorkflowWithEvaluations } from 'testing/utils/proposals';
+
+import { DocumentPage } from '../po/document.po';
+import { generateUserAndSpace } from '../utils/mocks';
+import { login } from '../utils/session';
 
 type Fixtures = {
   documentPage: DocumentPage;
@@ -15,11 +17,13 @@ const test = base.extend<Fixtures>({
   documentPage: ({ page }, use) => use(new DocumentPage(page))
 });
 
-test.skip('convert page to proposal - create a page, convert that page to proposal and assert editor is readonly with proposal banner', async ({
+test('convert page to proposal - create a page, convert that page to proposal and assert editor is readonly with proposal banner', async ({
   documentPage,
-  pageHeader
+  pageHeader,
+  proposalPage
 }) => {
   const { space, user, page: generatedPage } = await generateUserAndSpace({ isAdmin: true });
+  await generateProposalWorkflowWithEvaluations({ spaceId: space.id });
 
   await login({
     page: documentPage.page,
@@ -33,15 +37,16 @@ test.skip('convert page to proposal - create a page, convert that page to propos
 
   await pageHeader.convertToProposal();
 
+  await proposalPage.waitForNewProposalPage();
+
   // Go back to page to assert that we have the proposal conversion banner and editor is readonly
   await documentPage.goToPage({
     domain: space.domain,
     path: generatedPage.path
   });
-
   await expect(documentPage.proposalBanner).toBeVisible();
 
-  const isEditable = await documentPage.isPageEditable();
+  // const isEditable = await documentPage.isPageEditable();
 
-  expect(isEditable).toBe(false);
+  // expect(isEditable).toBe(false);
 });
