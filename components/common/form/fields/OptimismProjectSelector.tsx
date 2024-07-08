@@ -1,5 +1,5 @@
 import LaunchIcon from '@mui/icons-material/Launch';
-import { ListItemText, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Divider, ListItemText, MenuItem, Select, Stack, Typography } from '@mui/material';
 
 import { useGetOpProject, useGetOpProjects } from 'charmClient/hooks/optimism';
 import { Avatar } from 'components/common/Avatar';
@@ -9,6 +9,7 @@ import { WarpcastLogin } from 'components/login/components/WarpcastLogin';
 import { useUser } from 'hooks/useUser';
 import type { OpProjectFieldValue } from 'lib/forms/interfaces';
 import { isValidUrl } from 'lib/utils/isValidUrl';
+import { fancyTrim } from 'lib/utils/strings';
 import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
 
 import type { ControlFieldProps, FieldProps } from '../interfaces';
@@ -126,8 +127,9 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
                 <Stack key={contract.address} gap={1} mt={index !== 0 ? 2 : 0}>
                   <OptimismProjectFields label='Address' value={contract.address} />
                   <OptimismProjectFields label='Chain id' value={contract.chainId} />
-                  <OptimismProjectFields label='Deployer' value={contract.deployerAddress} />
-                  <OptimismProjectFields label='Transaction id' value={contract.deploymentTxHash} />
+                  <OptimismProjectFields label='Deployer address' value={contract.deployerAddress} />
+                  <OptimismProjectFields label='Transaction hash' value={contract.deploymentTxHash} />
+                  <Divider sx={{ mt: 2 }} />
                 </Stack>
               ))}
             </Stack>
@@ -240,7 +242,7 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
                     textWrap: 'wrap',
                     textOverflow: 'ellipsis'
                   }}
-                  secondary={project.metadata.description}
+                  secondary={fancyTrim(project.metadata.description, 150)}
                 />
               </MenuItem>
             ))}
