@@ -19,12 +19,7 @@ function SelectField(
   const { helperMessage, chains: chainsProp, ...restProps } = props;
 
   const { space } = useCurrentSpace();
-  const chainList =
-    chainsProp ||
-    getChainList({ enableTestnets: !!space?.enableTestnets }).filter(
-      (chain) =>
-        !!chain.alchemyUrl || isAnkrChain(chain.chainId) || isZkSyncChain(chain.chainId) || isZoraChain(chain.chainId)
-    );
+  const chainList = chainsProp || getChainList({ enableTestnets: !!space?.enableTestnets });
 
   return (
     <FieldWrapper label='Blockchain'>
