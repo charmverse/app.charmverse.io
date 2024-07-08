@@ -37,11 +37,9 @@ export function createSelectedPropertiesStateFromBoardProperties({
       property.type === 'proposalRubricCriteriaReviewerScore' ||
       property.type === 'proposalRubricCriteriaAverage'
     ) {
-      const propertyKey = property.evaluationTitle;
       const proposalTemplate = proposalTemplates.find((template) => template.pageId === property.templateId);
-      if (propertyKey && property.templateId && proposalTemplate) {
+      if (property.evaluationTitle && property.templateId && proposalTemplate) {
         let templateProperty = templateProperties.find((template) => template.templateId === property.templateId);
-
         if (!templateProperty) {
           templateProperty = {
             formFields: cardProperties
@@ -69,6 +67,8 @@ export function createSelectedPropertiesStateFromBoardProperties({
               templateId: property.templateId,
               properties: []
             };
+
+            templateProperty.rubricEvaluations.push(rubricEvaluationProperty);
           }
 
           if (property.type === 'proposalEvaluationAverage') {
