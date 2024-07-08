@@ -2,6 +2,7 @@ scripts/
 dist/
 
 apps/connect-api/dist/
+apps/connect-api/src/routes.ts
 apps/connect/.next/
 
 background/ceramicServer/generated/
