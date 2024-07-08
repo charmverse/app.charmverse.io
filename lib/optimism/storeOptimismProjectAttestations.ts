@@ -154,10 +154,8 @@ export async function storeOptimismProjectAttestations() {
       });
 
       log.info(`Stored metadata for project ${optimismProjectMetadata.name}`);
-    } catch (_) {
-      log.error(`Failed to store metadata for project ${optimismProjectAttestation.id}`, _);
+    } catch (err) {
+      log.error(`Failed to store metadata for project ${optimismProjectAttestation.id}`, err);
     }
   }
 }
-
-storeOptimismProjectAttestations();
