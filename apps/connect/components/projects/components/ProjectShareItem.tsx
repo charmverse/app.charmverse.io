@@ -1,6 +1,6 @@
-import type { ProjectData } from '@connect/lib/actions/fetchProject';
+import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
 
-export function ProjectShareItem({ project }: { project: NonNullable<ProjectData> }) {
+export function ProjectShareItem({ project }: { project: NonNullable<ConnectProjectDetails> }) {
   const projectMembers = project.projectMembers;
   const projectName = project.name || 'Untitled';
   const defaultFont =

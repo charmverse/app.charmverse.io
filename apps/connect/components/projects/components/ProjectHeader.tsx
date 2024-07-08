@@ -1,7 +1,5 @@
 import { Avatar } from '@connect/components/common/Avatar';
-import { Box } from '@mui/material';
-
-import { randomColor } from 'lib/utils/random';
+import Box from '@mui/material/Box';
 
 const height = '130px';
 
@@ -10,9 +8,9 @@ export function ProjectHeader({
   avatar,
   name
 }: {
-  coverImage: string | null;
+  coverImage?: string | null;
   name: string;
-  avatar: string | null;
+  avatar?: string | null;
 }) {
   return (
     <Box mb={4}>
@@ -27,7 +25,7 @@ export function ProjectHeader({
       ) : (
         <Box
           sx={{
-            background: `linear-gradient(to right,${randomColor()}, ${randomColor()} )`,
+            background: 'grey.300',
             width: '100%',
             height
           }}

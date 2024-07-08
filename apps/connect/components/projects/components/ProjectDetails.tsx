@@ -1,14 +1,28 @@
-import type { ProjectData } from '@connect/lib/actions/fetchProject';
+import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
 import { Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
 
+import { replaceUrl } from 'lib/utils/url';
+
 import { ProjectDescription } from '../components/ProjectDescription';
 import { ShareButton } from '../ProjectShareButton';
 
-export function ProjectDetails({ project }: { project: NonNullable<ProjectData> }) {
+export type ProjectDetailsProps = {
+  project: Pick<
+    ConnectProjectDetails,
+    'farcasterValues' | 'github' | 'mirror' | 'twitter' | 'name' | 'websites' | 'description' | 'id'
+  >;
+};
+
+export function ProjectDetails({ project }: ProjectDetailsProps) {
+  const farcasterLink = project?.farcasterValues[0] ? replaceUrl(project.farcasterValues[0], 'warpcast.com') : null;
+  const githubLink = project?.github ? replaceUrl(project.github, 'github.com') : null;
+  const mirrorLink = project?.mirror ? replaceUrl(project.mirror, 'mirror.xyz') : null;
+  const twitterLink = project?.twitter ? replaceUrl(project.twitter, 'twitter.com') : null;
+
   return (
     <Stack>
       <Stack direction='row' mb={2} justifyContent='space-between' alignItems='center' flexWrap='wrap' gap={0.5}>
@@ -24,17 +38,15 @@ export function ProjectDetails({ project }: { project: NonNullable<ProjectData> 
             </Link>
           </Stack>
         )}
-        {project.farcasterValues.length > 0 && (
+        {farcasterLink && (
           <Stack direction='row' gap={1} alignItems='center'>
             <img src='/images/farcaster.png' width={25} height={25} />
-            <Link href={project.farcasterValues[0]} passHref target='_blank'>
-              <Typography variant='body1'>
-                {project.farcasterValues[0].replace(/https?:\/\/warpcast\.com\//, '')}
-              </Typography>
+            <Link href={farcasterLink.href} passHref target='_blank'>
+              <Typography variant='body1'>{farcasterLink.text}</Typography>
             </Link>
           </Stack>
         )}
-        {project.twitter && (
+        {twitterLink && (
           <Stack direction='row' gap={1} alignItems='center'>
             <FaXTwitter
               style={{
@@ -42,24 +54,24 @@ export function ProjectDetails({ project }: { project: NonNullable<ProjectData> 
                 height: 24
               }}
             />
-            <Link href={project.twitter} passHref target='_blank'>
-              <Typography variant='body1'>{project.twitter.replace(/https?:\/\/twitter\.com\//, '')}</Typography>
+            <Link href={twitterLink.href} passHref target='_blank'>
+              <Typography variant='body1'>{twitterLink.text}</Typography>
             </Link>
           </Stack>
         )}
-        {project.github && (
+        {githubLink && (
           <Stack direction='row' gap={1} alignItems='center'>
             <GitHubIcon />
-            <Link href={project.github} passHref target='_blank'>
-              <Typography variant='body1'>{project.github.replace(/https?:\/\/github\.com\/?/, '')}</Typography>
+            <Link href={githubLink.href} passHref target='_blank'>
+              <Typography variant='body1'>{githubLink.text}</Typography>
             </Link>
           </Stack>
         )}
-        {project.mirror && (
+        {mirrorLink && (
           <Stack direction='row' gap={1} alignItems='center'>
             <img src='/images/mirror-xyz.png' width={25} height={25} />
-            <Link href={project.mirror} passHref target='_blank'>
-              <Typography variant='body1'>{project.mirror.replace(/https?:\/\/mirror.xyz\//, '')}</Typography>
+            <Link href={mirrorLink.href} passHref target='_blank'>
+              <Typography variant='body1'>{mirrorLink.text}</Typography>
             </Link>
           </Stack>
         )}

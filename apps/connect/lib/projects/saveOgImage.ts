@@ -6,14 +6,16 @@ import sharp from 'sharp';
 
 import { getUserS3FilePath, uploadFileToS3 } from 'lib/aws/uploadToS3Server';
 
-import { fetchProject } from '../actions/fetchProject';
+import { fetchProject } from './fetchProject';
 
 export async function saveOgImage(projectId: string, userId: string) {
   if (!projectId) {
     throw new DataNotFoundError('No id provided');
   }
 
-  const project = await fetchProject(projectId);
+  const project = await fetchProject({
+    id: projectId
+  });
 
   if (!project) {
     throw new DataNotFoundError(`Could not find project with id ${projectId}`);

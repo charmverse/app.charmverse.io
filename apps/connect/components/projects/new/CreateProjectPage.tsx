@@ -1,20 +1,20 @@
 'use client';
 
 import { PageWrapper } from '@connect/components/common/PageWrapper';
-import type { ProjectData } from '@connect/lib/actions/fetchProject';
 import type { FormValues } from '@connect/lib/projects/form';
 import { schema } from '@connect/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-import { isTruthy } from 'lib/utils/types';
 import type { LoggedInUser } from 'models/User';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
+import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectHeader } from '../components/ProjectHeader';
 
@@ -22,6 +22,8 @@ import { CreateProjectForm } from './components/CreateProjectForm';
 
 export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
+
+  const router = useRouter();
 
   const {
     control,
@@ -58,20 +60,22 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     );
   }
 
-  const values = getValues();
-  const { farcasterIds, ...restProject } = values;
-  const project = {
-    ...restProject,
+  const project = getValues();
+  const projectDetails = {
     id: '',
-    farcasterValues: farcasterIds?.filter(isTruthy) || [],
-    farcasterFrameImage: '',
-    projectMembers: []
-  } as NonNullable<ProjectData>;
+    name: project.name,
+    description: project.description,
+    farcasterValues: project.farcasterValues,
+    github: project.github,
+    mirror: project.mirror,
+    twitter: project.twitter,
+    websites: project.websites
+  } as ProjectDetailsProps['project'];
 
   return (
     <PageWrapper header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}>
       <Box gap={2} display='flex' flexDirection='column'>
-        <ProjectDetails project={project} />
+        <ProjectDetails project={projectDetails} />
         <Typography variant='h5'>Add team members</Typography>
         <AddProjectMembersForm
           user={user}
@@ -81,6 +85,9 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
           control={control}
           isValid={isValid}
           handleSubmit={handleSubmit}
+          onSuccess={({ projectPath }) => {
+            router.push(`/p/${projectPath}/publish`);
+          }}
         />
       </Box>
     </PageWrapper>

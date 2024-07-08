@@ -25,7 +25,6 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
             bio={farcasterDetails.bio}
             username={farcasterDetails.username}
             fid={user.farcasterUser?.fid}
-            disableLink
           />
         )}
         <br />

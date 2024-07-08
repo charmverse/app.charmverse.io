@@ -3,7 +3,6 @@ import { actionCreateProject } from '@connect/lib/actions/createProject';
 import type { FormValues } from '@connect/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Button, Stack, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
@@ -22,16 +21,16 @@ export function AddProjectMembersForm({
   isValid,
   handleSubmit,
   onBack,
-  user
+  user,
+  onSuccess
 }: {
   user: LoggedInUser;
   onBack: VoidFunction;
   control: Control<FormValues>;
   isValid: boolean;
   handleSubmit: UseFormHandleSubmit<FormValues>;
+  onSuccess: ({ projectPath, projectId }: { projectPath: string; projectId: string }) => void;
 }) {
-  const router = useRouter();
-
   const { append, remove } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
     control
@@ -39,8 +38,8 @@ export function AddProjectMembersForm({
   const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] = useState<FarcasterProfile[]>([]);
   // @ts-ignore
   const { execute, isExecuting } = useAction(actionCreateProject, {
-    onSuccess() {
-      router.push('/profile');
+    onSuccess: (data) => {
+      onSuccess({ projectId: data.data?.projectId as string, projectPath: data.data?.projectPath as string });
     },
     onError(err) {
       log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);

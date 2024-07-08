@@ -81,7 +81,7 @@ async function attestOffchain({
 
 export type CharmVerseCredentialInput = {
   chainId: EasSchemaChain;
-  credential: CredentialData;
+  credential: CredentialData<AttestationType>;
   recipient: string;
 };
 
@@ -89,7 +89,7 @@ export type SignedAttestation = {
   sig: SignedOffchainAttestation;
   signer: string;
   verificationUrl: string;
-  credentialData: CredentialData;
+  credentialData: CredentialData<AttestationType>;
   recipient: string;
   timestamp: number;
 };

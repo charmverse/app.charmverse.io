@@ -1,14 +1,14 @@
 import 'server-only';
 
 import { FarcasterCard } from '@connect/components/common/FarcasterCard';
-import type { ProjectData } from '@connect/lib/actions/fetchProject';
+import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
 import { Divider, Stack, Typography } from '@mui/material';
 
 import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectHeader } from '../components/ProjectHeader';
 
-export async function ProjectDetailsPage({ project }: { project?: ProjectData | null }) {
+export async function ProjectDetailsPage({ project }: { project?: ConnectProjectDetails | null }) {
   if (!project) {
     return (
       <PageWrapper>
@@ -33,6 +33,7 @@ export async function ProjectDetailsPage({ project }: { project?: ProjectData | 
             username={member.farcasterUser.username}
             avatar={member.farcasterUser.pfpUrl}
             bio={member.farcasterUser.bio}
+            enableLink
           />
         ))}
       </Stack>

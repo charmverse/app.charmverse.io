@@ -24,20 +24,21 @@ export function MultiTextValueFields({
   return (
     <Stack>
       <FormLabel id={`project-${name.toLowerCase().replaceAll(' ', '')}`}>{label}</FormLabel>
-      <Controller
-        control={control}
-        name={`${name}.0` as FieldArrayPath<FormValues>}
-        render={({ field: _field, fieldState }) => (
-          <TextField
-            fullWidth
-            aria-labelledby={`project-${name}-0`}
-            placeholder={placeholder}
-            error={!!fieldState.error}
-            sx={{ mb: 1 }}
-            {..._field}
-          />
-        )}
-      />
+      <Stack direction='row' gap={1} alignItems='center' mb={1}>
+        <Controller
+          control={control}
+          name={`${name}.0` as FieldArrayPath<FormValues>}
+          render={({ field: _field, fieldState }) => (
+            <TextField
+              fullWidth
+              aria-labelledby={`project-${name}-0`}
+              placeholder={placeholder}
+              error={!!fieldState.error}
+              {..._field}
+            />
+          )}
+        />
+      </Stack>
       {fields.slice(1).map((field, index) => (
         <Stack key={field.id} gap={1} mb={1} direction='row'>
           <Controller

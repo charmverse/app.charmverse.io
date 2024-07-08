@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { AttestationType, CredentialEventType } from '@charmverse/core/prisma-client';
+import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getChainById } from 'connectors/chains';
 import { Wallet, providers } from 'ethers';
@@ -7,19 +7,27 @@ import { Wallet, providers } from 'ethers';
 import { credentialsWalletPrivateKey } from 'config/constants';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
-import { attestationSchemaIds, encodeAttestation, type CredentialDataInput } from './schemas';
+import { attestationSchemaIds, encodeAttestation } from './schemas';
+import type { AttestationType, CredentialDataInput } from './schemas';
 
 export type OnChainAttestationInput<T extends AttestationType = AttestationType> = {
   chainId: EasSchemaChain;
-  credentialInputs: { recipient: string; data: CredentialDataInput<T> };
+  credentialInputs: { recipient: string | null; data: CredentialDataInput<T> };
   type: T;
 };
 
-async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttestationInput): Promise<string> {
+const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+export async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttestationInput): Promise<string> {
   const schemaId = attestationSchemaIds[type];
   const rpcUrl = getChainById(chainId)?.rpcUrls[0];
 
-  const provider = new providers.JsonRpcProvider(rpcUrl, chainId);
+  // This solution fixes ethers 5.7 not working with recent Next.js v14+ versions
+  // https://github.com/ethers-io/ethers.js/issues/4469#issuecomment-1932145334
+  const provider = new providers.JsonRpcProvider({
+    url: rpcUrl as string,
+    skipFetchSetup: true
+  });
 
   const wallet = new Wallet(credentialsWalletPrivateKey as string, provider);
 
@@ -30,7 +38,10 @@ async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttesta
   const attestationUid = await eas
     .attest({
       schema: schemaId,
-      data: { recipient: credentialInputs.recipient, data: encodeAttestation({ type, data: credentialInputs.data }) }
+      data: {
+        recipient: credentialInputs.recipient ?? NULL_ADDRESS,
+        data: encodeAttestation({ type, data: credentialInputs.data })
+      }
     })
     .then((tx) => tx.wait());
 
