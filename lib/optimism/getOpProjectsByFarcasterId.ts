@@ -6,7 +6,7 @@ export async function getOpProjectsByFarcasterId({ farcasterId }: { farcasterId:
   return prisma.optimismProjectAttestation.findMany({
     where: {
       farcasterIds: {
-        has: farcasterId.toString()
+        has: farcasterId
       }
     }
   }) as Promise<OptimismProjectAttestationContent[]>;

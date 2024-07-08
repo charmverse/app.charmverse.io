@@ -76,7 +76,7 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
       osoSlug,
       grantsAndFunding
     },
-    attestationId
+    projectRefUID
   } = project;
 
   return (
@@ -104,7 +104,7 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
             'Overview',
             <Stack gap={1.5} key='overview'>
               <OptimismProjectFields label='Project description' value={description} />
-              <OptimismProjectFields label='Project attestation id' value={attestationId} />
+              <OptimismProjectFields label='Project attestation id' value={projectRefUID} />
               <OptimismProjectFields label='Categories' value={category} />
               <OptimismProjectFields label='Open Source Observer' value={osoSlug} />
               <OptimismProjectFields label='Repositories' value={github} />
@@ -184,7 +184,7 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
 
   const { data: projects = [] } = useGetOpProjects(hasFarcasterAccount);
 
-  const selectedProject = projects.find((project) => project.attestationId === value?.attestationId);
+  const selectedProject = projects.find((project) => project.projectRefUID === value?.projectRefUID);
 
   if (disabled) {
     return <OptimismProjectSelectorReadOnly value={value} {...props} />;
@@ -198,18 +198,18 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
         <>
           <Select<string>
             displayEmpty
-            value={selectedProject?.attestationId ?? ''}
+            value={selectedProject?.projectRefUID ?? ''}
             disabled={disabled}
             onChange={(e) => {
               const projectId = e.target.value;
               const newProject =
                 projectId !== 'add-new-project'
-                  ? projects.find((project) => project.attestationId === projectId)
+                  ? projects.find((project) => project.projectRefUID === projectId)
                   : null;
               if (newProject) {
                 props.onChange?.({
                   projectTitle: newProject.name,
-                  attestationId: newProject.attestationId
+                  projectRefUID: newProject.projectRefUID
                 });
               }
             }}
@@ -223,8 +223,8 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
           >
             {projects.map((project) => (
               <MenuItem
-                key={project.attestationId}
-                value={project.attestationId}
+                key={project.projectRefUID}
+                value={project.projectRefUID}
                 sx={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -261,12 +261,12 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
 }
 
 function OptimismProjectSelectorReadOnly({ value, ...props }: Props) {
-  const { data: project } = useGetOpProject(value?.attestationId);
+  const { data: project } = useGetOpProject(value?.projectRefUID);
   return (
     <FieldWrapper {...props}>
       <Select<string>
         displayEmpty
-        value={project?.attestationId ?? ''}
+        value={project?.projectRefUID ?? ''}
         disabled
         fullWidth
         renderValue={() =>
@@ -274,7 +274,7 @@ function OptimismProjectSelectorReadOnly({ value, ...props }: Props) {
         }
       >
         {project && (
-          <MenuItem key={project.attestationId} value={project.attestationId}>
+          <MenuItem key={project.projectRefUID} value={project.projectRefUID}>
             <Typography>{project.name}</Typography>
           </MenuItem>
         )}

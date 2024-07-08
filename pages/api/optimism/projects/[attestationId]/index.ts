@@ -15,7 +15,7 @@ async function getProjectByAttestationIdController(
   res: NextApiResponse<OptimismProjectAttestationContent | null>
 ) {
   const attestationId = req.query.attestationId as string;
-  const opProjectAttestation = await getOpProjectsByAttestationId({ attestationId });
+  const opProjectAttestation = await getOpProjectsByAttestationId({ projectRefUID: attestationId });
   return res.status(200).json(opProjectAttestation);
 }
 
