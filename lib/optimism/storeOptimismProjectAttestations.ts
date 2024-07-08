@@ -108,6 +108,8 @@ export async function storeOptimismProjectAttestations() {
       return acc;
     }, {} as Record<string, EASAttestationFromApi<OptimismProjectAttestation>>);
 
+  let totalUpdatedProjects = 0;
+
   for (const optimismProjectAttestation of Object.values(optimismProjectAttestationRecord)) {
     const optimismProjectMetadataAttestation = optimismProjectMetadataAttestationRecord[optimismProjectAttestation.id];
     try {
@@ -152,10 +154,11 @@ export async function storeOptimismProjectAttestations() {
           farcasterIds
         }
       });
-
-      log.info(`Stored metadata for project ${optimismProjectMetadata.name}`);
+      totalUpdatedProjects += 1;
     } catch (err) {
       log.error(`Failed to store metadata for project ${optimismProjectAttestation.id}`, err);
     }
   }
+
+  return totalUpdatedProjects;
 }
