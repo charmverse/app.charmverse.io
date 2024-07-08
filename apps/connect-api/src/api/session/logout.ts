@@ -4,6 +4,7 @@ import { PathBasedRouter } from '@connect-api/lib/pathBasedRouter';
 const router = new PathBasedRouter();
 
 router.POST(async (ctx: RouterContext<void, void>) => {
+  // dsa dsa
   ctx.request.session.destroy();
 });
 
