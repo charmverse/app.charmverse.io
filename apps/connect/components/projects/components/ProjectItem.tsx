@@ -1,7 +1,6 @@
 import { Avatar } from '@connect/components/common/Avatar';
 import type { ProjectsWithMembers } from '@connect/lib/projects/getRecentProjectsWithMembers';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
-import ImageIcon from '@mui/icons-material/Image';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -31,19 +30,7 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
             sx={{ maxWidth: '100px', minWidth: '100px', height: '100px', borderRadius: 3 }}
           />
         ) : (
-          <Box
-            borderRadius={2}
-            width='100px'
-            height='100px'
-            display='flex'
-            alignItems='center'
-            justifyContent='center'
-            bgcolor='grey.200'
-            flexDirection='column'
-            overflow='hidden'
-          >
-            <ImageIcon color='secondary' />
-          </Box>
+          <Avatar avatar={undefined} name={projectName} alt={projectName} size='xLarge' variant='rounded' />
         )}
         <CardContent
           component={Box}
