@@ -23,13 +23,7 @@ export function ProjectHeader({
           height={height}
         />
       ) : (
-        <Box
-          sx={{
-            background: 'grey.300',
-            width: '100%',
-            height
-          }}
-        />
+        <Box bgcolor='grey.300' width='100%' height={height} />
       )}
       <Avatar
         avatar={avatar ?? undefined}

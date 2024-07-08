@@ -1,6 +1,7 @@
 import { Avatar } from '@connect/components/common/Avatar';
 import type { ProjectsWithMembers } from '@connect/lib/projects/getRecentProjectsWithMembers';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
+import ImageIcon from '@mui/icons-material/Image';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -22,15 +23,28 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
         hrefLang='en'
         sx={{ display: 'flex', gap: 2, p: 2, alignItems: 'normal', justifyContent: 'flex-start' }}
       >
-        <CardMedia
-          component='img'
-          alt={projectName}
-          src={
-            project.avatar ||
-            'https://cdn.charmverse.io/user-content/f50534c5-22e7-47ee-96cb-54f4ce1a0e3e/9b2b00af-9644-43aa-add1-cde22f0253c3/breaking_wave.jpg'
-          }
-          sx={{ maxWidth: '100px', minWidth: '100px', height: '100px', borderRadius: 3 }}
-        />
+        {project.avatar ? (
+          <CardMedia
+            component='img'
+            alt={projectName}
+            src={project.avatar}
+            sx={{ maxWidth: '100px', minWidth: '100px', height: '100px', borderRadius: 3 }}
+          />
+        ) : (
+          <Box
+            borderRadius={2}
+            width='100px'
+            height='100px'
+            display='flex'
+            alignItems='center'
+            justifyContent='center'
+            bgcolor='grey.200'
+            flexDirection='column'
+            overflow='hidden'
+          >
+            <ImageIcon color='secondary' />
+          </Box>
+        )}
         <CardContent
           component={Box}
           display='flex'
