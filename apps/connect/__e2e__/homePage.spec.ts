@@ -55,25 +55,20 @@ test.describe('Home page', () => {
 
     await expect(userEmail).toBeEditable();
 
-    await userEmail.focus();
-
     const email = `test-${randomIntFromInterval(1, 1000000)}@gmail.com`;
 
-    await page.keyboard.type(email);
-
+    await userEmail.fill(email);
     await expect(userEmail).toHaveValue(email);
 
     const notifyAboutGrants = page.locator('data-test=onboarding-notify-grants');
 
-    await notifyAboutGrants.setChecked(true);
+    await notifyAboutGrants.focus();
+    await expect(await notifyAboutGrants.isChecked()).toBe(true);
 
     const acceptTerms = page.locator('data-test=onboarding-accept-terms');
-
-    await acceptTerms.setChecked(true);
+    await acceptTerms.click();
 
     const finishOnboarding = page.locator('data-test=finish-onboarding');
-
-    await page.pause();
 
     await Promise.all([page.waitForResponse('**/welcome'), finishOnboarding.click()]);
 
