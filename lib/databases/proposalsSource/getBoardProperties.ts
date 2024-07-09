@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-
 import type { PageType, ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 

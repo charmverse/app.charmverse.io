@@ -1,6 +1,5 @@
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
-import { prettyPrint } from 'lib/utils/strings';
 
 import type { IPropertyTemplate } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';
