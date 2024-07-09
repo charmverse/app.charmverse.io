@@ -101,9 +101,7 @@ test('Open the app and go to home page', async ({ page }) => {
 
   const publishButton = page.locator('data-test=project-form-publish');
 
-  await publishButton.click();
-
-  await page.waitForURL('**/p/*/publish');
+  await Promise.all([page.waitForURL('**/p/*/publish'), publishButton.click()]);
 
   const gitcoinSkipAttestation = page.locator('data-test=project-skip-gitcoin-attestation');
 
