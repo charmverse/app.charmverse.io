@@ -75,6 +75,21 @@ export const getServerSideProps = withSessionSsr(async (context) => {
         notFound: true
       };
     }
+    if (sourcePageId) {
+      const sourcePagePermissions = await permissionsApiClient.pages.computePagePermissions({
+        resourceId: sourcePageId,
+        userId: sessionUserId
+      });
+      if (!sourcePagePermissions.edit_content) {
+        log.warn('User does not have permission to create proposal from page', {
+          userId: sessionUserId,
+          pageId: sourcePageId
+        });
+        return {
+          notFound: true
+        };
+      }
+    }
     const proposal = await createDraftProposal(newDraftParams);
     return {
       redirect: {
