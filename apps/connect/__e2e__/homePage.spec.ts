@@ -3,7 +3,6 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { expect, test } from 'e2e/testWithFixtures';
 
 import { randomIntFromInterval } from 'lib/utils/random';
-import { sleep } from 'lib/utils/sleep';
 
 import { loginBrowserUser } from './utils/loginBrowserUser';
 
@@ -36,9 +35,12 @@ test.describe('Home page', () => {
 
     const connectButton = page.locator('data-test=connect-with-farcaster');
 
-    const farcasterModal = page.locator('data-test=farcaster-login-modal');
+    // We are using the modal from Farcaster SDK, so we target by expected text
+    const farcasterModal = page.getByText("Scan with your phone's camera to continue.");
 
     await connectButton.click();
+
+    await page.pause();
 
     await expect(farcasterModal).toBeVisible();
   });
@@ -71,9 +73,7 @@ test.describe('Home page', () => {
 
     const finishOnboarding = page.locator('data-test=finish-onboarding');
 
-    await finishOnboarding.click();
-
-    await page.waitForResponse('**/welcome');
+    await Promise.all([page.waitForResponse('**/welcome'), finishOnboarding.click()]);
 
     const user = await prisma.user.findFirstOrThrow({
       where: {

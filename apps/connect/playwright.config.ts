@@ -101,7 +101,7 @@ const config: PlaywrightTestConfig = {
   /* Run your local dev server before starting the tests */
   webServer: {
     // add DEBUG=pw:webserver environment variable to see server output
-    command: 'dotenv -e .env.test.local -- npm run start -w=apps/connect',
+    command: 'dotenv -e ../../.env.test.local -- npm run start -w=apps/connect',
     port: 3337,
     reuseExistingServer: true // !!process.env.CI
   }
