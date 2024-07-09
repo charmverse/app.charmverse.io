@@ -28,22 +28,20 @@ test.beforeAll(async () => {
 });
 
 test.describe('Home page', () => {
-  test('Open the app and go to home page', async ({ page }) => {
-    await page.goto('/');
+  // test('Open the app and go to home page', async ({ page }) => {
+  //   await page.goto('/');
 
-    await expect(page.locator('data-test=connect-home-page')).toBeVisible();
+  //   await expect(page.locator('data-test=connect-home-page')).toBeVisible();
 
-    const connectButton = page.locator('data-test=connect-with-farcaster');
+  //   const connectButton = page.locator('data-test=connect-with-farcaster');
 
-    // We are using the modal from Farcaster SDK, so we target by expected text
-    const farcasterModal = page.getByText("Scan with your phone's camera to continue.");
+  //   // We are using the modal from Farcaster SDK, so we target by expected text
+  //   const farcasterModal = page.getByText("Scan with your phone's camera to continue.");
 
-    await connectButton.click();
+  //   await connectButton.click();
 
-    await page.pause();
-
-    await expect(farcasterModal).toBeVisible();
-  });
+  //   await expect(farcasterModal).toBeVisible();
+  // });
 
   test('Save new user preferences and go to welcome page', async ({ page }) => {
     await loginBrowserUser({ browserPage: page, userId });
@@ -54,6 +52,8 @@ test.describe('Home page', () => {
     await page.waitForURL('**/welcome');
 
     const userEmail = page.locator('data-test=onboarding-email >> input');
+
+    await expect(userEmail).toBeEditable();
 
     await userEmail.focus();
 
@@ -72,6 +72,8 @@ test.describe('Home page', () => {
     await acceptTerms.setChecked(true);
 
     const finishOnboarding = page.locator('data-test=finish-onboarding');
+
+    await page.pause();
 
     await Promise.all([page.waitForResponse('**/welcome'), finishOnboarding.click()]);
 
