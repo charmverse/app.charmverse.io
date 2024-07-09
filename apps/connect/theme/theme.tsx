@@ -92,6 +92,13 @@ const extendedTheme = extendTheme({
         disableRestoreFocus: true
       }
     },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          color: 'text.primary'
+        }
+      }
+    },
     MuiAppBar: {},
     MuiAvatar: {
       styleOverrides: {

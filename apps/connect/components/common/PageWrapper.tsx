@@ -10,8 +10,9 @@ export function PageWrapper({ children, header = null, ...restProps }: BoxProps 
       bgcolor='background.default'
       border={{ xs: 'none', md: '1px solid var(--charm-palette-divider)' }}
       maxWidth='500px'
-      minHeight='calc(100vh - 96px)'
+      height='100%'
       mx='auto'
+      mb={1}
       {...restProps}
     >
       {header}

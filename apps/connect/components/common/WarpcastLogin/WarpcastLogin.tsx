@@ -38,6 +38,7 @@ function WarpcastLoginButton() {
           button: {
             width: '100%',
             maxWidth: 400,
+            minWidth: 400,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
