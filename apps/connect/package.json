@@ -10,7 +10,7 @@
     "lint": "npx next lint",
     "debug:e2e": "npx dotenv -e ../../.env.test.local -- npx playwright test --headed --timeout=0 --config ./playwright.config.ts",
     "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e ../../.env.test.local -- npx playwright test --config ./playwright.config.ts",
-    "typecheck": "../../node_modules/typescript/bin/tsc --project tsconfig.json --noEmit"
+    "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",

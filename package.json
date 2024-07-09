@@ -77,7 +77,7 @@
     "upgrade:storybook": "npx storybook@latest upgrade",
     "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes",
     "connect": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect-app\" \"npm run connect-api\"",
-    "connect:start:test": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"PORT=3337 dotenv -e .env.test.local -- npm run start --workspace=apps/connect\" \"dotenv -e .env.test.local -- npm run start --w=apps/connect-api\"",
+    "connect:start:test": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"PORT=3337 dotenv -e .env.test.local -- npm run start --workspace=apps/connect\" \"dotenv -e .env.test.local -- npm run start --w=apps/connect-api\"",
     "connect:remote": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect-app:remote\" \"npm run connect-api:remote\"",
     "connect:build": "concurrently --names \"build-connect,build-connect-api\" -c \"green,yellow\" \"npm run connect-app:build\" \"npm run connect-api:build\"",
     "connect:start:prod": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect-app:start:prod\" \"npm run connect-api:start:prod\"",
