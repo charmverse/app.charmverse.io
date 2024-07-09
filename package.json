@@ -92,7 +92,7 @@
     "connect-api:start:prod": "npm run start:prod --w=apps/connect-api",
     "connect:debug:e2e": "npm run debug:e2e -w=apps/connect",
     "connect:test:e2e:ci": "npm run test:e2e:ci -w=apps/connect",
-    "connect:start:test:ci": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"DISABLE_PUBLISHED_CREDENTIALS=\"true\" npm run connect-app:start:prod\" \"npm run connect-api:start:prod\" npm run connect:start:prod"
+    "connect:start:test:ci": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 npm run connect-app:start:prod\" \"npm run connect-api:start:prod\" npm run connect:start:prod"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

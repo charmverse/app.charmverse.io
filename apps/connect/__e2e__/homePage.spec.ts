@@ -52,25 +52,28 @@ test.describe('Home page', () => {
     await page.waitForURL('**/welcome');
 
     const userEmail = page.locator('data-test=onboarding-email >> input');
+    const notifyAboutGrants = page.locator('data-test=onboarding-notify-grants');
+    const acceptTerms = page.locator('data-test=onboarding-accept-terms');
 
     await expect(userEmail).toBeEditable();
+    await expect(notifyAboutGrants).toBeVisible();
+    await expect(acceptTerms).toBeVisible();
 
     const email = `test-${randomIntFromInterval(1, 1000000)}@gmail.com`;
 
     await userEmail.fill(email);
     await expect(userEmail).toHaveValue(email);
 
-    const notifyAboutGrants = page.locator('data-test=onboarding-notify-grants');
-
     await notifyAboutGrants.focus();
     await expect(await notifyAboutGrants.isChecked()).toBe(true);
 
-    const acceptTerms = page.locator('data-test=onboarding-accept-terms');
     await acceptTerms.click();
 
     const finishOnboarding = page.locator('data-test=finish-onboarding');
 
-    await Promise.all([page.waitForResponse('**/welcome'), finishOnboarding.click()]);
+    await finishOnboarding.click();
+
+    await page.waitForURL('**/profile');
 
     const user = await prisma.user.findFirstOrThrow({
       where: {
@@ -83,7 +86,5 @@ test.describe('Home page', () => {
     });
 
     await expect(user.emailNewsletter).toBe(true);
-
-    await page.waitForURL('**/profile');
   });
 });
