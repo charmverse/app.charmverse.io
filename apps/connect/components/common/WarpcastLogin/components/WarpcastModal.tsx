@@ -6,7 +6,12 @@ import type { DialogProps } from '@mui/material/Dialog';
 
 export function FarcasterLoginModal({ url, ...props }: Omit<DialogProps, 'children'> & { url?: string }) {
   return (
-    <Dialog open={props.open && !!url} onClose={props.onClose} title='Sign in with Warpcast'>
+    <Dialog
+      data-test='farcaster-login-modal'
+      open={props.open && !!url}
+      onClose={props.onClose}
+      title='Sign in with Warpcast'
+    >
       <DialogTitle>Sign in with Warpcast</DialogTitle>
       <DialogContent sx={{ gap: 2, display: 'flex', flexDirection: 'column' }}>
         <DialogContentText variant='body1'>Scan with your phone's camera to continue.</DialogContentText>
