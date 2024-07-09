@@ -1,7 +1,7 @@
 import { PageTitle } from '@connect/components/common/PageTitle';
 import { PageWrapper } from '@connect/components/common/PageWrapper';
 import { PublishProjectToGitcoin } from '@connect/components/projects/[id]/PublishProjectToGitcoin';
-import { Box } from '@mui/system';
+import { Box } from '@mui/material';
 
 export default function PublishProjectPage({ params }: { params: { id: string } }) {
   return (

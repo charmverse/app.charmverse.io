@@ -15,7 +15,7 @@ export function ShareButton({ projectId }: { projectId: string }) {
   return (
     <Button
       LinkComponent={Link}
-      href={`https://warpcast.com/~/compose?text=Checkout%20my%20new%20Project!&embeds[]=${url}`}
+      href={encodeURI(`https://warpcast.com/~/compose?text=Checkout my new Project!&embeds[]=${url}`)}
       target='_blank'
       rel='noopener noreferrer'
       disabled={!projectId}

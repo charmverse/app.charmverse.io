@@ -1,4 +1,4 @@
-import type { ConnectProjectDetails } from '../actions/fetchProject';
+import type { ConnectProjectDetails } from '../projects/fetchProject';
 
 type Contract = {
   address: string;

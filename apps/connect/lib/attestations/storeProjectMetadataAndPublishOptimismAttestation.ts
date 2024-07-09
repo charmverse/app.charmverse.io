@@ -9,7 +9,7 @@ import type {
 } from 'lib/credentials/schemas/optimismProjectSchemas';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
-import { fetchProject } from '../actions/fetchProject';
+import { fetchProject } from '../projects/fetchProject';
 
 import { projectAttestationChainId, projectAttestationIssuerName } from './constants';
 import { storeProjectInS3 } from './storeProjectInS3';

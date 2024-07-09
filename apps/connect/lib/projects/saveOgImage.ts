@@ -6,7 +6,7 @@ import sharp from 'sharp';
 
 import { getUserS3FilePath, uploadFileToS3 } from 'lib/aws/uploadToS3Server';
 
-import { fetchProject } from '../actions/fetchProject';
+import { fetchProject } from './fetchProject';
 
 export async function saveOgImage(projectId: string, userId: string) {
   if (!projectId) {

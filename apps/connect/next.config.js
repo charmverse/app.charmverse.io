@@ -8,6 +8,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true
   },
+  images: {
+    unoptimized: true
+  },
   webpack(_config) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     // _config.resolve.alias.canvas = false;

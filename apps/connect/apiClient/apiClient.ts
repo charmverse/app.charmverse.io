@@ -1,18 +1,22 @@
 'use client';
 
+import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 
 import { GET } from 'adapters/http';
 import { connectApiHost } from 'config/constants';
 import type { FarcasterUser } from 'lib/farcaster/getFarcasterUsers';
 import { encodeFilename } from 'lib/utils/encodeFilename';
-import type { LoggedInUser } from 'models/index';
 
 import { HttpClient } from './HttpClient';
 
 class ConnectApiClient extends HttpClient {
   async loginViaFarcaster(req: FarcasterBody): Promise<LoggedInUser> {
     return this.POST('/api/session/login-with-farcaster', req);
+  }
+
+  async logout(): Promise<void> {
+    return this.POST('/api/session/logout');
   }
 
   async uploadImage(file: File) {

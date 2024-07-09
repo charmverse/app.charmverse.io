@@ -1,4 +1,4 @@
-import type { ConnectProjectDetails } from '@connect/lib/actions/fetchProject';
+import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
 
 export function ProjectShareItem({ project }: { project: NonNullable<ConnectProjectDetails> }) {
   const projectMembers = project.projectMembers;
@@ -70,7 +70,17 @@ export function ProjectShareItem({ project }: { project: NonNullable<ConnectProj
           }}
         />
       )}
-      <img style={avatarStyle} src={project.avatar || ''} alt={project.name} width='100px' height='100px' />
+      {project.avatar ? (
+        <img style={avatarStyle} src={project.avatar || ''} alt={project.name} width='100px' height='100px' />
+      ) : (
+        <div
+          style={{
+            background: 'grey',
+            width: '100px',
+            height: '100px'
+          }}
+        />
+      )}
       <div style={memberStackStyle}>
         <h1 style={{ fontWeight: 400, fontSize: '1.5rem', margin: 0, padding: 0 }}>{projectName}</h1>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
