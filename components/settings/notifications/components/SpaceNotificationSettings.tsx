@@ -68,7 +68,7 @@ export function getDefaultNotificationValues(toggles: NotificationToggles): Noti
     rewards: toggles.rewards ?? true,
     proposals: toggles.proposals ?? true,
     polls: toggles.polls ?? true,
-    forum: toggles.polls ?? true
+    forum: toggles.forum ?? true
   };
   Object.entries(notificationTypes).forEach(([, settings]) => {
     settings.types.forEach((typeColumn) => {
@@ -228,6 +228,18 @@ export function NotificationTogglesInput({ isAdmin }: { isAdmin: boolean }) {
             enabled={formValues.notificationToggles?.polls}
             title={notificationTypes.polls.title}
             types={notificationTypes.polls.types}
+          />
+        }
+        disabled={!isAdmin}
+      />
+      <ToggleInput
+        name='notificationToggles.forum'
+        label={
+          <NotificationRuleComponent
+            disabled={!isAdmin}
+            enabled={formValues.notificationToggles?.forum}
+            title={notificationTypes.forum.title}
+            types={notificationTypes.forum.types}
           />
         }
         disabled={!isAdmin}
