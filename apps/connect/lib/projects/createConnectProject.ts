@@ -146,7 +146,7 @@ export async function createConnectProject({ userId, input }: { input: FormValue
       github: input.github,
       mirror: input.mirror,
       avatar: input.avatar,
-      coverImage: input.cover,
+      coverImage: input.coverImage,
       source: 'connect',
       projectMembers: {
         createMany: {

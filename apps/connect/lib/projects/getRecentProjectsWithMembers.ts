@@ -7,7 +7,7 @@ import { prisma } from '@charmverse/core/prisma-client';
  * @returns Project & Project Members for each project
  */
 export async function getRecentProjectsWithMembers({
-  resultsNo = 10,
+  resultsNo,
   userId
 }: {
   userId?: string;

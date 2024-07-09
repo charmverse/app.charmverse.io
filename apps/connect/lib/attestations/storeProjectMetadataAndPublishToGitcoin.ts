@@ -6,7 +6,7 @@ import { attestOnchain } from 'lib/credentials/attestOnchain';
 import { gitcoinProjectCredentialSchemaId } from 'lib/credentials/schemas/gitcoinProjectSchema';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
-import { fetchProject } from '../actions/fetchProject';
+import { fetchProject } from '../projects/fetchProject';
 
 import { projectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';

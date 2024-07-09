@@ -1,4 +1,4 @@
-import type { ConnectProjectDetails } from '@connect/lib/actions/fetchProject';
+import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
 import { v4 as uuid } from 'uuid';
 
 import { mapProjectToGitcoin } from '../mapProjectToGitcoin';

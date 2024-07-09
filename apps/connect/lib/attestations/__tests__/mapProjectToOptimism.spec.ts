@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import type { ConnectProjectDetails } from '../../actions/fetchProject';
+import type { ConnectProjectDetails } from '../../projects/fetchProject';
 import { mapProjectToOptimism } from '../mapProjectToOptimism'; // Adjust the import to the actual file location
 
 describe('mapProjectToOptimism', () => {
