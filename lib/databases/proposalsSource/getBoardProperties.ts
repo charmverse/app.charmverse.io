@@ -22,7 +22,7 @@ type PartialPropertyTemplate = Omit<IPropertyTemplate, 'options'>;
 // define properties that will apply to all source fields
 const defaultOptions = { readOnly: true, readOnlyValues: true, options: [] };
 
-type EvaluationStep = {
+export type EvaluationStep = {
   proposal: {
     page?: {
       id?: string | null;
@@ -107,7 +107,8 @@ export function getBoardProperties({
   return filterBoardProperties({
     boardProperties,
     proposalCustomProperties,
-    selectedProperties
+    selectedProperties,
+    evaluationSteps
   });
 }
 

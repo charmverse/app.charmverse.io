@@ -4,14 +4,18 @@ import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projec
 import type { IPropertyTemplate } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';
 
+import type { EvaluationStep } from './getBoardProperties';
+
 export function filterBoardProperties({
   boardProperties,
   selectedProperties,
+  evaluationSteps,
   proposalCustomProperties
 }: {
   boardProperties: IPropertyTemplate[];
   selectedProperties: SelectedProposalProperties;
   proposalCustomProperties: IPropertyTemplate[];
+  evaluationSteps: EvaluationStep[];
 }) {
   const selectedFormFieldIds = selectedProperties.templateProperties.map((p) => p.formFields).flat();
   const selectedProjectProperties = selectedProperties.project;
@@ -62,10 +66,11 @@ export function filterBoardProperties({
       p.type === 'proposalRubricCriteriaReviewerScore' ||
       p.type === 'proposalRubricCriteriaAverage'
     ) {
-      const rubricEvaluation = selectedProperties.templateProperties
-        .find((r) => r.templateId === p.templateId)
-        ?.rubricEvaluations.find((e) => e.title === p.evaluationTitle);
-      if (!rubricEvaluation) {
+      const templateProperty = selectedProperties.templateProperties.find((t) => t.templateId === p.templateId);
+      const evaluationStep = evaluationSteps?.find((e) => e.proposal?.page?.id === p.templateId);
+      const rubricEvaluation = templateProperty?.rubricEvaluations.find((e) => e.title === p.evaluationTitle);
+
+      if (!rubricEvaluation || !templateProperty || !evaluationStep) {
         return false;
       }
       if (p.type === 'proposalEvaluationAverage') {
@@ -78,6 +83,12 @@ export function filterBoardProperties({
 
       if (p.type === 'proposalEvaluatedBy') {
         return rubricEvaluation.properties.includes('reviewers');
+      }
+
+      const isRubricEvaluationCriteriaPresent = evaluationStep.rubricCriteria.find((c) => c.title === p.criteriaTitle);
+
+      if (!isRubricEvaluationCriteriaPresent) {
+        return false;
       }
 
       if (p.type === 'proposalRubricCriteriaTotal') {
