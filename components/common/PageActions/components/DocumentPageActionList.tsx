@@ -136,7 +136,7 @@ export function DocumentPageActionList({
   const { space } = useCurrentSpace();
   const basePageBounty = rewards?.find((r) => r.id === pageId);
 
-  const canCreateProposal = spacePermissions?.createProposals;
+  const canCreateProposal = spacePermissions?.createProposals && pagePermissions?.edit_content;
 
   const isLockablePageType = lockablePageTypes.includes(page.type);
 
