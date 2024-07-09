@@ -68,9 +68,10 @@ export function filterBoardProperties({
       p.type === 'proposalRubricCriteriaReviewerComment'
     ) {
       const templateProperty = selectedProperties.templateProperties.find((t) => t.templateId === p.templateId);
-      const evaluationStep = evaluationSteps?.find((e) => e.proposal?.page?.id === p.templateId);
+      const evaluationStep = evaluationSteps?.find(
+        (e) => e.proposal?.page?.id === p.templateId && e.title === p.evaluationTitle
+      );
       const rubricEvaluation = templateProperty?.rubricEvaluations.find((e) => e.title === p.evaluationTitle);
-
       if (!rubricEvaluation || !templateProperty || !evaluationStep) {
         return false;
       }

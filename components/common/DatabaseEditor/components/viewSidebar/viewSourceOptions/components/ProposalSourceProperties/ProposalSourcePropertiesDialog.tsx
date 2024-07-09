@@ -36,8 +36,6 @@ export type SelectedProposalProperties = {
     rubricEvaluations: {
       title: string;
       properties: RubricEvaluationProperty[];
-      templateId: string;
-      evaluationId: string;
     }[];
     formFields: string[];
   }[];
