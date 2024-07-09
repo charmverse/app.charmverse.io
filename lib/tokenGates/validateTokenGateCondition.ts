@@ -195,7 +195,7 @@ export async function validateTokenGateConditionWithDelegates(
     const eligibleDelegations = delegations.filter((delegation) => {
       if (delegation.type === 'ALL') {
         return true;
-      } else if (delegation.contract !== NULL_ADDRESS) {
+      } else if (delegation.contract === condition.contractAddress) {
         if (delegation.tokenId === 0 || condition.tokenIds.includes(delegation.tokenId.toString())) {
           return true;
         }
