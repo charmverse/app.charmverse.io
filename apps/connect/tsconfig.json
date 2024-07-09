@@ -25,7 +25,6 @@
     ],
     "paths": {
       "@connect/*": ["./*"],
-      "e2e/*": ["../../__e2e__/*"],
       "adapters/*": ["../../adapters/*"],
       "lib/*": ["../../lib/*"],
       "config/*": ["../../config/*"],

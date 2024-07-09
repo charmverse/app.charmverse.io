@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { expect, test } from 'e2e/testWithFixtures';
+import { expect, test } from 'playwright/test';
 
 import { randomIntFromInterval } from 'lib/utils/random';
 

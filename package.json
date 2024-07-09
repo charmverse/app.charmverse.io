@@ -92,7 +92,7 @@
     "connect-api:start:prod": "npm run start:prod --w=apps/connect-api",
     "connect:debug:e2e": "npm run debug:e2e -w=apps/connect",
     "connect:test:e2e:ci": "npm run test:e2e:ci -w=apps/connect",
-    "connect:start:test:ci": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 dotenv -e .env.test.local -- npm run connect:start:prod"
+    "connect:start:test:ci": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 npm run connect:start:prod"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
