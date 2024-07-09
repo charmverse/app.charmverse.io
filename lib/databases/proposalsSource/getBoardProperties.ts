@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { PageType, ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
@@ -25,8 +25,10 @@ const defaultOptions = { readOnly: true, readOnlyValues: true, options: [] };
 export type EvaluationStep = {
   proposal: {
     page?: {
+      type: PageType;
       id?: string | null;
       title: string;
+      sourceTemplateId?: string | null;
     } | null;
   };
   title: string;
@@ -57,6 +59,11 @@ export function getBoardProperties({
   currentCardProperties?: IPropertyTemplate[];
   formFields?: (FormFieldInput & { pageId?: string })[];
 }) {
+  const proposalTemplateEvaluations = evaluationSteps.filter(
+    (step) => step.proposal.page?.type === 'proposal_template'
+  );
+  const proposalEvaluations = evaluationSteps.filter((step) => step.proposal.page?.type === 'proposal');
+
   const evaluationStepTitles: Set<string> = new Set();
   for (const evaluationStep of evaluationSteps) {
     evaluationStepTitles.add(evaluationStep.title);
@@ -87,12 +94,12 @@ export function getBoardProperties({
   });
 
   // properties per each evaluation step
-  applyProposalEvaluationProperties(boardProperties, evaluationSteps);
+  applyProposalEvaluationProperties(boardProperties, proposalTemplateEvaluations);
 
   // properties for each unique questions on rubric evaluation step
-  applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps);
+  applyRubricEvaluationQuestionProperties(boardProperties, proposalTemplateEvaluations);
 
-  applyRubricEvaluationReviewerProperties(boardProperties, evaluationSteps);
+  applyRubricEvaluationReviewerProperties(boardProperties, proposalEvaluations, proposalTemplateEvaluations);
 
   // properties related to form proposals
   applyFormFieldProperties(boardProperties, formFields);
@@ -108,16 +115,23 @@ export function getBoardProperties({
     boardProperties,
     proposalCustomProperties,
     selectedProperties,
-    evaluationSteps
+    evaluationSteps: proposalTemplateEvaluations
   });
 }
 
 function applyRubricEvaluationReviewerProperties(
   boardProperties: IPropertyTemplate[],
-  evaluationSteps: EvaluationStep[]
+  evaluationSteps: EvaluationStep[],
+  templateEvaluationSteps: EvaluationStep[]
 ) {
   evaluationSteps.forEach((evaluationStep) => {
-    const page = evaluationStep.proposal.page;
+    const templateEvaluationStep = templateEvaluationSteps.find(
+      (step) => step.proposal.page?.id === evaluationStep.proposal.page?.sourceTemplateId
+    );
+    const templatePage = templateEvaluationStep?.proposal.page;
+    if (!templatePage) {
+      return;
+    }
     if (evaluationStep.type === 'rubric') {
       evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
         rubricCriteria.answers.forEach((answer) => {
@@ -127,21 +141,21 @@ function applyRubricEvaluationReviewerProperties(
               p.evaluationTitle === evaluationStep.title &&
               p.criteriaTitle === rubricCriteria.title &&
               p.reviewerId === answer.user.id &&
-              p.templateId === page?.id
+              p.templateId === templatePage.id
           );
           if (existingCriteriaReviewerScorePropIndex === -1) {
             boardProperties.push({
               id: uuid(),
               type: 'proposalRubricCriteriaReviewerScore',
-              name: `${page ? `${page.title} - ` : ''}${evaluationStep.title} - ${rubricCriteria.title} - ${
-                answer.user.username
-              } - Score`,
+              name: `${templatePage ? `${templatePage.title} - ` : ''}${evaluationStep.title} - ${
+                rubricCriteria.title
+              } - ${answer.user.username} - Score`,
               evaluationTitle: evaluationStep.title,
               criteriaTitle: rubricCriteria.title,
               reviewerId: answer.user.id,
               private: false,
               options: [],
-              templateId: evaluationStep.proposal.page?.id ?? undefined
+              templateId: templatePage.id ?? undefined
             });
           }
 
@@ -151,21 +165,21 @@ function applyRubricEvaluationReviewerProperties(
               p.evaluationTitle === evaluationStep.title &&
               p.criteriaTitle === rubricCriteria.title &&
               p.reviewerId === answer.user.id &&
-              p.templateId === evaluationStep.proposal.page?.id
+              p.templateId === templatePage.id
           );
           if (existingCriteriaReviewerCommentPropIndex === -1) {
             boardProperties.push({
               id: uuid(),
               type: 'proposalRubricCriteriaReviewerComment',
-              name: `${page ? `${page.title} - ` : ''}${evaluationStep.title} - ${rubricCriteria.title} - ${
-                answer.user.username
-              } - Comment`,
+              name: `${templatePage ? `${templatePage.title} - ` : ''}${evaluationStep.title} - ${
+                rubricCriteria.title
+              } - ${answer.user.username} - Comment`,
               evaluationTitle: evaluationStep.title,
               criteriaTitle: rubricCriteria.title,
               reviewerId: answer.user.id,
               private: false,
               options: [],
-              templateId: evaluationStep.proposal.page?.id ?? undefined
+              templateId: templatePage.id ?? undefined
             });
           }
         });

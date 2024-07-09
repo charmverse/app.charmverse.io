@@ -35,7 +35,11 @@ export function getCardPropertiesFromRubric({
     const filteredRubricAnswers = allRubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
     filteredRubricAnswers.forEach((rubricCriteriaAnswer) => {
       cardProperties.forEach((p) => {
-        if (p.criteriaTitle === criteria.title && p.reviewerId === rubricCriteriaAnswer.userId) {
+        if (
+          p.criteriaTitle === criteria.title &&
+          p.reviewerId === rubricCriteriaAnswer.userId &&
+          p.templateId === templateId
+        ) {
           if (p.type === 'proposalRubricCriteriaReviewerComment') {
             properties[p.id] = rubricCriteriaAnswer.comment ?? '';
           } else if (p.type === 'proposalRubricCriteriaReviewerScore') {

@@ -1,5 +1,6 @@
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
+import { prettyPrint } from 'lib/utils/strings';
 
 import type { IPropertyTemplate } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';
@@ -62,9 +63,9 @@ export function filterBoardProperties({
       p.type === 'proposalEvaluationTotal' ||
       p.type === 'proposalEvaluatedBy' ||
       p.type === 'proposalRubricCriteriaTotal' ||
-      p.type === 'proposalRubricCriteriaReviewerComment' ||
+      p.type === 'proposalRubricCriteriaAverage' ||
       p.type === 'proposalRubricCriteriaReviewerScore' ||
-      p.type === 'proposalRubricCriteriaAverage'
+      p.type === 'proposalRubricCriteriaReviewerComment'
     ) {
       const templateProperty = selectedProperties.templateProperties.find((t) => t.templateId === p.templateId);
       const evaluationStep = evaluationSteps?.find((e) => e.proposal?.page?.id === p.templateId);
@@ -95,16 +96,16 @@ export function filterBoardProperties({
         return rubricEvaluation.properties.includes('criteriaTotal');
       }
 
-      if (p.type === 'proposalRubricCriteriaReviewerComment') {
-        return rubricEvaluation.properties.includes('reviewerComment');
+      if (p.type === 'proposalRubricCriteriaAverage') {
+        return rubricEvaluation.properties.includes('criteriaAverage');
       }
 
       if (p.type === 'proposalRubricCriteriaReviewerScore') {
         return rubricEvaluation.properties.includes('reviewerScore');
       }
 
-      if (p.type === 'proposalRubricCriteriaAverage') {
-        return rubricEvaluation.properties.includes('criteriaAverage');
+      if (p.type === 'proposalRubricCriteriaReviewerComment') {
+        return rubricEvaluation.properties.includes('reviewerComment');
       }
     }
     // Custom proposal source board properties, so always show them

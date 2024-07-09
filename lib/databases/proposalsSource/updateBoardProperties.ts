@@ -44,7 +44,11 @@ export async function updateBoardProperties({
         proposal: {
           spaceId: boardBlock.spaceId,
           page: {
-            type: 'proposal_template',
+            // Need only proposal templates for rubric evaluation & criteria properties
+            // Need only proposals for rubric evaluation criteria score properties
+            type: {
+              in: ['proposal_template', 'proposal']
+            },
             deletedAt: null
           }
         }
@@ -54,6 +58,8 @@ export async function updateBoardProperties({
           select: {
             page: {
               select: {
+                sourceTemplateId: true,
+                type: true,
                 title: true,
                 id: true
               }
