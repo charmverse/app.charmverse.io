@@ -58,6 +58,9 @@ export function getBoardProperties({
   formFields?: (FormFieldInput & { pageId?: string })[];
 }) {
   const evaluationStepTitles: Set<string> = new Set();
+  for (const evaluationStep of evaluationSteps) {
+    evaluationStepTitles.add(evaluationStep.title);
+  }
 
   const boardProperties = [...currentCardProperties];
 
