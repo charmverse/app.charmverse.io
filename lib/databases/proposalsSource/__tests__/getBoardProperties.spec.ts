@@ -73,7 +73,8 @@ describe('getBoardProperties', () => {
             }
           ],
           title: 'Rubric Evaluation 1',
-          type: 'rubric'
+          type: 'rubric',
+          proposal: {}
         },
         {
           rubricCriteria: [
@@ -95,12 +96,14 @@ describe('getBoardProperties', () => {
             }
           ],
           title: 'Rubric Evaluation 2',
-          type: 'rubric'
+          type: 'rubric',
+          proposal: {}
         },
         {
           rubricCriteria: [],
           title: 'Feedback',
-          type: 'feedback'
+          type: 'feedback',
+          proposal: {}
         }
       ]
     });
@@ -253,7 +256,8 @@ describe('getBoardProperties', () => {
         {
           title: 'Rubric Evaluation',
           type: 'rubric',
-          rubricCriteria: []
+          rubricCriteria: [],
+          proposal: {}
         }
       ]
     });
@@ -268,7 +272,8 @@ describe('getBoardProperties', () => {
         {
           title: 'Rubric Evaluation',
           type: 'rubric',
-          rubricCriteria: []
+          rubricCriteria: [],
+          proposal: {}
         }
       ]
     });
@@ -281,7 +286,8 @@ describe('getBoardProperties', () => {
         {
           title: 'Rubric Evaluation',
           type: 'rubric',
-          rubricCriteria: []
+          rubricCriteria: [],
+          proposal: {}
         }
       ]
     });

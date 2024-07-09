@@ -50,7 +50,6 @@ export function RubricEvaluationPropertiesList({
             rubricEvaluations: [
               {
                 evaluationId,
-                templateId,
                 title: rubricEvaluation?.title || '',
                 properties: updatedProperties
               }

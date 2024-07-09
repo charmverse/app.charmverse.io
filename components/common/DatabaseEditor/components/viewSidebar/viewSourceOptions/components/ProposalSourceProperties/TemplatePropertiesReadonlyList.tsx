@@ -59,7 +59,7 @@ export function TemplatePropertiesReadonlyList({
               ) : null}
 
               {templateProperty.rubricEvaluations.map((rubricEvaluation) => (
-                <Stack key={rubricEvaluation.templateId}>
+                <Stack key={rubricEvaluation.evaluationId}>
                   <SelectedPropertiesList
                     items={rubricEvaluation.properties.map((property) => RubricPropertyLabel[property])}
                     title={rubricEvaluation.title}

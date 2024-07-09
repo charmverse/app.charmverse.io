@@ -275,11 +275,13 @@ describe('filterBoardProperties', () => {
             rubricEvaluations: [
               {
                 properties: ['average'],
-                title: 'Rubric 1'
+                title: 'Rubric 1',
+                evaluationId: v4()
               },
               {
                 properties: ['average', 'total'],
-                title: 'Rubric 2'
+                title: 'Rubric 2',
+                evaluationId: v4()
               }
             ]
           },
@@ -289,7 +291,8 @@ describe('filterBoardProperties', () => {
             rubricEvaluations: [
               {
                 properties: ['total'],
-                title: 'Rubric 1'
+                title: 'Rubric 1',
+                evaluationId: v4()
               }
             ]
           }
@@ -504,11 +507,13 @@ describe('filterBoardProperties', () => {
             rubricEvaluations: [
               {
                 properties: ['reviewerComment', 'reviewerScore'],
-                title: 'Rubric 1'
+                title: 'Rubric 1',
+                evaluationId: v4()
               },
               {
                 properties: ['reviewerComment'],
-                title: 'Rubric 2'
+                title: 'Rubric 2',
+                evaluationId: v4()
               }
             ]
           },
@@ -518,7 +523,8 @@ describe('filterBoardProperties', () => {
             rubricEvaluations: [
               {
                 properties: ['reviewerScore'],
-                title: 'Rubric 1'
+                title: 'Rubric 1',
+                evaluationId: v4()
               }
             ]
           }
@@ -862,11 +868,13 @@ describe('filterBoardProperties', () => {
             rubricEvaluations: [
               {
                 properties: ['criteriaAverage', 'criteriaTotal'],
-                title: 'Rubric 1'
+                title: 'Rubric 1',
+                evaluationId: v4()
               },
               {
                 properties: ['criteriaAverage'],
-                title: 'Rubric 2'
+                title: 'Rubric 2',
+                evaluationId: v4()
               }
             ]
           },
@@ -876,7 +884,8 @@ describe('filterBoardProperties', () => {
             rubricEvaluations: [
               {
                 properties: ['criteriaTotal'],
-                title: 'Rubric 1'
+                title: 'Rubric 1',
+                evaluationId: v4()
               }
             ]
           }

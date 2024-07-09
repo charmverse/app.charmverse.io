@@ -64,7 +64,6 @@ export function createSelectedPropertiesStateFromBoardProperties({
             rubricEvaluationProperty = {
               title: property.evaluationTitle!,
               evaluationId: proposalTemplateRubricEvaluation.id,
-              templateId: property.templateId,
               properties: []
             };
 
