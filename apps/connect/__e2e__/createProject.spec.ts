@@ -3,11 +3,10 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { expect, test } from 'e2e/testWithFixtures';
 
 import { randomIntFromInterval } from 'lib/utils/random';
-import { sleep } from 'lib/utils/sleep';
 
 import { loginBrowserUser } from './utils/loginBrowserUser';
 
-test('Open the app and go to home page', async ({ page }) => {
+test('Create a project and view details', async ({ page }) => {
   const projectData = {
     projectFormName: 'Acme Inc',
     projectFormDescription: 'A description of your project',
@@ -152,8 +151,6 @@ test('Open the app and go to home page', async ({ page }) => {
   }
 
   // Check project description
-
-  await page.pause();
 
   const projectDescription = await page.locator('data-test=project-details-description');
   await expect(projectDescription).toHaveText(projectData.projectFormDescription);

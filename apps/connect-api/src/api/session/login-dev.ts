@@ -12,6 +12,9 @@ const router = new PathBasedRouter();
 
 const isTestEnv = process.env.REACT_APP_APP_ENV === 'test';
 
+const demoAvatar =
+  'https://wrpcd.net/cdn-cgi/image/anim=false,fit=contain,f=auto,w=168/https%3A%2F%2Fapp.charmverse.io%2Ffavicon.png';
+
 router.GET(async (ctx: RouterContext<FarcasterBody, LoggedInUser>) => {
   if (!isTestEnv) {
     throw new InvalidInputError('This endpoint is only available in test environment');
@@ -24,6 +27,16 @@ router.GET(async (ctx: RouterContext<FarcasterBody, LoggedInUser>) => {
 
     const randomInt = randomIntFromInterval(1, 1000000);
 
+    await prisma.user.update({
+      where: {
+        id: newUserId
+      },
+      data: {
+        username: `demo-${randomInt}`,
+        avatar: demoAvatar
+      }
+    });
+
     await prisma.farcasterUser.create({
       data: {
         fid: randomInt,
@@ -32,7 +45,7 @@ router.GET(async (ctx: RouterContext<FarcasterBody, LoggedInUser>) => {
           username: `example-user-${randomInt}`,
           displayName: `display-${randomInt}`,
           bio: 'dev user',
-          pfpUrl: 'https://example.com/pfp.png'
+          pfpUrl: demoAvatar
         }
       }
     });
