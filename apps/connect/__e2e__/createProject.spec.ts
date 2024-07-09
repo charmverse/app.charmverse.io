@@ -126,29 +126,21 @@ test('Create a project and view details', async ({ page }) => {
 
   // Check project Farcaster
   const projectFarcaster = await page.locator('data-test=project-details-farcaster');
-  if ((await projectFarcaster.count()) > 0) {
-    await expect(projectFarcaster).toHaveText(
-      projectData.projectFormFarcasterValues[0].replace(/https?:\/\/warpcast.com\//, '')
-    );
-  }
+  await expect(projectFarcaster).toHaveText(
+    projectData.projectFormFarcasterValues[0].replace(/https?:\/\/warpcast.com\//, '')
+  );
 
   // Check project Twitter
   const projectTwitter = await page.locator('data-test=project-details-twitter');
-  if ((await projectTwitter.count()) > 0) {
-    await expect(projectTwitter).toHaveText(projectData.projectFormTwitter.replace(/https?:\/\/www.twitter.com\//, ''));
-  }
+  await expect(projectTwitter).toHaveText(projectData.projectFormTwitter.replace(/https?:\/\/www.twitter.com\//, ''));
 
   // Check project GitHub
   const projectGithub = await page.locator('data-test=project-details-github');
-  if ((await projectGithub.count()) > 0) {
-    await expect(projectGithub).toHaveText(projectData.projectFormGithub.replace(/https?:\/\/www.github.com\//, ''));
-  }
+  await expect(projectGithub).toHaveText(projectData.projectFormGithub.replace(/https?:\/\/www.github.com\//, ''));
 
   // Check project Mirror
   const projectMirror = await page.locator('data-test=project-details-mirror');
-  if ((await projectMirror.count()) > 0) {
-    await expect(projectMirror).toHaveText(projectData.projectFormMirror.replace(/https?:\/\/www.mirror.xyz\//, ''));
-  }
+  await expect(projectMirror).toHaveText(projectData.projectFormMirror.replace(/https?:\/\/www.mirror.xyz\//, ''));
 
   // Check project description
 
