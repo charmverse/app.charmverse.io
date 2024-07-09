@@ -43,6 +43,9 @@ function PageLayout({ children }: PageLayoutProps) {
 
   const { accessChecked, publicPage } = useSharedPage();
 
+  const sidebarProps = useNavigationSidebar({
+    enabled: enableSidebar
+  });
   const {
     open,
     enableResize,
@@ -50,12 +53,10 @@ function PageLayout({ children }: PageLayoutProps) {
     sidebarWidth,
     handleDrawerOpen,
     handleDrawerClose: closeLeftSidebar
-  } = useNavigationSidebar({
-    enabled: enableSidebar
-  });
+  } = sidebarProps;
   // do not show navigation sidebar when the workflow sidebar is open
-  const leftSidebarOpen =
-    open && rightSidebarOpen !== 'proposal_evaluation' && rightSidebarOpen !== 'reward_evaluation';
+  const workflowSidebarOpen = rightSidebarOpen === 'proposal_evaluation' || rightSidebarOpen === 'reward_evaluation';
+  const leftSidebarOpen = open && !workflowSidebarOpen;
 
   // open left sidebar and close right sidebar if it is open
   function openLeftSidebar() {
@@ -78,6 +79,11 @@ function PageLayout({ children }: PageLayoutProps) {
         basePageId={publicPage?.page?.id}
         basePageType={publicPage?.page?.type}
         enableSidebar={enableSidebar}
+        sidebarProps={{
+          ...sidebarProps,
+          handleDrawerOpen: openLeftSidebar,
+          open: leftSidebarOpen
+        }}
       >
         {children || null}
       </SharedPageLayout>

@@ -22,7 +22,7 @@ import { HeaderSpacer, StyledToolbar, ToggleSidebarIcon } from './components/Hea
 import { LayoutProviders } from './components/LayoutProviders';
 import { LoggedOutButtons } from './components/LoggedOutButtons';
 import PageContainer from './components/PageContainer';
-import { useNavigationSidebar } from './components/Sidebar/hooks/useNavigationSidebar';
+import type { useNavigationSidebar } from './components/Sidebar/hooks/useNavigationSidebar';
 import { NavigationSidebarDrawer } from './components/Sidebar/NavigationSidebarDrawer';
 
 const LayoutContainer = styled.div`
@@ -35,6 +35,7 @@ type Props = {
   basePageId?: string;
   basePageType?: PageType;
   enableSidebar: boolean;
+  sidebarProps: ReturnType<typeof useNavigationSidebar>;
 };
 
 // We could update this component in future to support other invite types
@@ -63,14 +64,19 @@ function JoinSpaceWithPublicProposals() {
   );
 }
 
-export function SharedPageLayout({ children, basePageId, basePageType, enableSidebar }: Props) {
+export function SharedPageLayout({ children, basePageId, basePageType, enableSidebar, sidebarProps }: Props) {
   const isMobile = useSmallScreen();
   const { publicPageType } = useSharedPage();
   const { user } = useUser();
 
-  const { open, enableResize, isResizing, sidebarWidth, handleDrawerOpen, handleDrawerClose } = useNavigationSidebar({
-    enabled: enableSidebar
-  });
+  const {
+    open: leftSidebarOpen,
+    enableResize,
+    isResizing,
+    sidebarWidth,
+    handleDrawerOpen,
+    handleDrawerClose
+  } = sidebarProps;
 
   return (
     <LayoutProviders>
@@ -78,11 +84,11 @@ export function SharedPageLayout({ children, basePageId, basePageType, enableSid
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer data-test='public-page-layout' className='app-content'>
-        {open !== null && (
+        {leftSidebarOpen !== null && (
           <>
-            <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
+            <AppBar open={leftSidebarOpen} sidebarWidth={sidebarWidth} position='fixed'>
               <StyledToolbar variant='dense'>
-                <ToggleSidebarIcon open={open} openSidebar={handleDrawerOpen} />
+                <ToggleSidebarIcon open={leftSidebarOpen} openSidebar={handleDrawerOpen} />
                 <Box
                   sx={{
                     display: 'flex',
@@ -126,11 +132,12 @@ export function SharedPageLayout({ children, basePageId, basePageType, enableSid
             </AppBar>
             <NavigationSidebarDrawer
               enabled={enableSidebar}
+              {...sidebarProps}
               enableResizing={!!user}
               enableSpaceFeatures={false}
               enableResize={enableResize}
               isResizing={isResizing}
-              open={open}
+              open={leftSidebarOpen}
               width={sidebarWidth}
               closeSidebar={handleDrawerClose}
             />
