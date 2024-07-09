@@ -13,7 +13,7 @@ export function NewProjectItem({ children, href }: { children: ReactNode; href: 
       <CardActionArea
         LinkComponent={Link}
         href={href}
-        data-test='new-project'
+        data-test='create-new-project'
         hrefLang='en'
         sx={{ display: 'flex', gap: 2, p: 2, alignItems: 'normal', justifyContent: 'flex-start' }}
       >

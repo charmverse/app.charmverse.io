@@ -28,6 +28,7 @@ export function CreateProjectForm({
           name='name'
           render={({ field, fieldState }) => (
             <TextField
+              data-test='project-form-name'
               autoFocus
               placeholder='Acme Inc.'
               aria-labelledby='project-name'
@@ -44,6 +45,7 @@ export function CreateProjectForm({
           name='description'
           render={({ field }) => (
             <TextField
+              data-test='project-form-description'
               multiline
               rows={3}
               aria-labelledby='project-description'
@@ -70,6 +72,7 @@ export function CreateProjectForm({
               displayEmpty
               fullWidth
               aria-labelledby='project-category'
+              data-test='project-form-category'
               renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
               error={!!fieldState.error}
               {...field}
@@ -83,11 +86,18 @@ export function CreateProjectForm({
           )}
         />
       </Stack>
-      <MultiTextValueFields control={control} name='websites' label='Websites' placeholder='https://acme-inc.com' />
+      <MultiTextValueFields
+        control={control}
+        name='websites'
+        label='Websites'
+        dataTest='project-form-websites'
+        placeholder='https://acme-inc.com'
+      />
       <MultiTextValueFields
         control={control}
         name='farcasterValues'
         label='Farcaster'
+        dataTest='project-form-farcaster-values'
         placeholder='https://warpcast.com/acme-inc'
       />
       <Stack>
@@ -103,6 +113,7 @@ export function CreateProjectForm({
               <TextField
                 fullWidth
                 placeholder='acme-inc'
+                data-test='project-form-twitter'
                 aria-labelledby='project-twitter'
                 error={!!fieldState.error}
                 {...field}
@@ -125,6 +136,7 @@ export function CreateProjectForm({
                 fullWidth
                 placeholder='acme-inc'
                 aria-labelledby='project-github'
+                data-test='project-form-github'
                 error={!!fieldState.error}
                 {...field}
               />
@@ -146,6 +158,7 @@ export function CreateProjectForm({
                 fullWidth
                 placeholder='acme-inc'
                 aria-labelledby='project-mirror'
+                data-test='project-form-mirror'
                 error={!!fieldState.error}
                 {...field}
               />
@@ -159,7 +172,7 @@ export function CreateProjectForm({
             Cancel
           </Button>
         </Link>
-        <Button size='large' disabled={!isValid} onClick={onNext}>
+        <Button data-test='project-form-confirm-values' size='large' disabled={!isValid} onClick={onNext}>
           Next
         </Button>
       </Stack>

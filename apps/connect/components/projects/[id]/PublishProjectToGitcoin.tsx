@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 
-export function PublishProjectToGitcoin({ projectId }: { projectId: string }) {
+export function PublishProjectToGitcoin({ projectPath }: { projectPath: string }) {
   const router = useRouter();
 
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +14,7 @@ export function PublishProjectToGitcoin({ projectId }: { projectId: string }) {
   // @ts-ignore
   const { execute, isExecuting } = useAction(actionPublishProjectToGitcoin, {
     onSuccess: (data) => {
-      router.push(`/p/${projectId}`);
+      router.push(`/p/${projectPath}`);
     },
     onError(err: any) {
       setError(err.message ?? 'Failed to publish project to Gitcoin');
@@ -32,14 +32,27 @@ export function PublishProjectToGitcoin({ projectId }: { projectId: string }) {
           <Button
             onClick={() => {
               setError(null);
-              execute({ projectId });
+              execute({ projectPath });
             }}
             disabled={isExecuting}
-            sx={{ width: 'fit-content' }}
+            sx={{ width: 'fit-content', minWidth: '120px' }}
           >
-            {isExecuting ? 'Publishing to Gitcoin' : 'Submit'}
+            {isExecuting ? 'Publishing' : 'Submit'}
           </Button>
           {error && <Alert severity='error'>{error}</Alert>}
+
+          <Typography variant='caption'>OR </Typography>
+
+          <Button
+            href={`/p/${projectPath}`}
+            variant='outlined'
+            color='secondary'
+            disabled={isExecuting}
+            data-test='project-skip-gitcoin-attestation'
+            sx={{ width: 'fit-content', minWidth: '120px' }}
+          >
+            View project
+          </Button>
         </CardContent>
       </Card>
     </Stack>
