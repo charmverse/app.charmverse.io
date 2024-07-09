@@ -1,2 +1,20 @@
-import { DelegateV1, DelegateV2 } from '@delegatexyz/sdk';
+import { DelegateV2 } from '@delegatexyz/sdk';
+import { getChainById } from 'connectors/chains';
 import { http } from 'viem';
+
+function getClient(rpcUrl: string) {
+  return new DelegateV2(http(rpcUrl));
+}
+
+function getClientByChain(chainId: number) {
+  const config = getChainById(chainId);
+  if (!config) {
+    throw new Error(`Chain with id ${chainId} not found`);
+  }
+  return getClient(config.rpcUrls[0]);
+}
+
+export function getIncomingDelegations(chainId: number, address: `0x${string}`) {
+  const client = getClientByChain(chainId);
+  return client.getIncomingDelegations(address);
+}
