@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+
 import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
@@ -8,6 +10,7 @@ import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { prettyPrint } from 'lib/utils/strings';
 
 import { filterBoardProperties } from './filterBoardProperties';
 
@@ -52,7 +55,7 @@ export function getBoardProperties({
   proposalCustomProperties?: IPropertyTemplate[];
   evaluationSteps?: EvaluationStep[];
   currentCardProperties?: IPropertyTemplate[];
-  formFields?: FormFieldInput[];
+  formFields?: (FormFieldInput & { pageId?: string })[];
 }) {
   const evaluationStepTitles: Set<string> = new Set();
 
@@ -203,7 +206,10 @@ function applyRubricEvaluationQuestionProperties(
   }
 }
 
-function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFields: FormFieldInput[]) {
+function applyFormFieldProperties(
+  boardProperties: IPropertyTemplate[],
+  formFields: (FormFieldInput & { pageId?: string })[]
+) {
   formFields.forEach((formField) => {
     let boardPropertyType: IPropertyTemplate['type'] | null = null;
     let boardPropertyOptions: IPropertyTemplate['options'] = [];
@@ -249,7 +255,8 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
         formFieldId: formField.id,
         readOnly: true,
         readOnlyValues: true,
-        private: formField.private
+        private: formField.private,
+        templateId: formField.pageId
       };
 
       applyFormFieldToProperties(boardProperties, fieldProperty);

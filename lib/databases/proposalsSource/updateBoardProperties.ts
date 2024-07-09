@@ -88,7 +88,7 @@ export async function updateBoardProperties({
         proposal: {
           some: {
             page: {
-              type: 'proposal',
+              type: 'proposal_template',
               deletedAt: null
             },
             spaceId: boardBlock.spaceId
@@ -105,6 +105,7 @@ export async function updateBoardProperties({
           select: {
             page: {
               select: {
+                id: true,
                 createdAt: true
               }
             }
@@ -127,7 +128,13 @@ export async function updateBoardProperties({
 
   const formFields: FormFieldInput[] = forms
     .sort((a, b) => (a.proposal[0]?.page?.createdAt.getTime() ?? 0) - (b.proposal[0]?.page?.createdAt.getTime() ?? 0))
-    .flatMap((p) => p.formFields.map((field) => ({ ...field, options: field.options as FormFieldInput['options'] })));
+    .flatMap((p) =>
+      p.formFields.map((field) => ({
+        ...field,
+        pageId: p.proposal[0].page?.id,
+        options: field.options as FormFieldInput['options']
+      }))
+    );
 
   const proposalCustomProperties = (proposalBoardBlock?.fields.cardProperties ?? []) as IPropertyTemplate[];
   const boardProperties = getBoardProperties({
