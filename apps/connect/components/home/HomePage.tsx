@@ -10,13 +10,21 @@ export function HomePage() {
       display='flex'
       flexDirection='column'
       alignItems='center'
-      gap={4}
       maxWidth='100vw'
       border='0'
       textAlign='center'
+      sx={{
+        '& > .MuiBox-root': {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: { xs: 6, md: 4 },
+          my: { xs: 6, md: 4 },
+          alignItems: 'center'
+        }
+      }}
     >
       <Image
-        src='/images/homepage-banner.png'
+        src='/images/sunny-awards.png'
         width={500}
         height={200}
         sizes='100vw'
@@ -27,10 +35,10 @@ export function HomePage() {
         }}
         alt='Charmverse Connect homepage'
       />
-      <Typography align='center' variant='h4' my={2}>
+      <Typography align='center' variant='h4'>
         Celebrate Onchain Summer with the Sunny Awards
       </Typography>
-      <Typography align='center' my={2}>
+      <Typography align='center'>
         Create your project and submit it to the Sunny Awards to compete for 540K OP in total prizes.
       </Typography>
       <WarpcastLogin />
@@ -40,7 +48,6 @@ export function HomePage() {
         target='_blank'
         rel='noopener'
         color='inherit'
-        mt={1}
         display='block'
       >
         Don't have a Farcaster account?

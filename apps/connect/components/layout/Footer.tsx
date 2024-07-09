@@ -4,6 +4,9 @@ import Image from 'next/image';
 export function Footer() {
   return (
     <Box
+      position='absolute'
+      bottom={0}
+      width='100%'
       component='footer'
       display='flex'
       gap={0.5}

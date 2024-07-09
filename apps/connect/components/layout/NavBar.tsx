@@ -44,7 +44,7 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
       <Container maxWidth={false}>
         <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
           <Link href='/'>
-            <Image src='/images/connect-logo.png' width={200} height={40} alt='Connect logo' />
+            <Image src='/images/connect-logo.png' width={15} height={40} alt='Connect logo' />
           </Link>
           {user && (
             <Box display='flex' gap={1} alignItems='center'>
