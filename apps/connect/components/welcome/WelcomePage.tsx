@@ -1,16 +1,15 @@
 import { PageWrapper } from '@connect/components/common/PageWrapper';
+import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-
-import type { LoggedInUser } from 'models/User';
 
 import { FarcasterCard } from '../common/FarcasterCard';
 
 import { ExtraDetails } from './ExtraDetails';
 
 export function WelcomePage({ user }: { user: LoggedInUser }) {
-  const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody>;
+  const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
     <PageWrapper>

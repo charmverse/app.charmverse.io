@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: 'Onchain network for connecting web3 developers, projects, organizations'
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children
 }: Readonly<{
   children: ReactNode;

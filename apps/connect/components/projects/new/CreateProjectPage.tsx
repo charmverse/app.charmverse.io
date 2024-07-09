@@ -1,6 +1,7 @@
 'use client';
 
 import { PageWrapper } from '@connect/components/common/PageWrapper';
+import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { FormValues } from '@connect/lib/projects/form';
 import { schema } from '@connect/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -11,7 +12,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-import type { LoggedInUser } from 'models/User';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';

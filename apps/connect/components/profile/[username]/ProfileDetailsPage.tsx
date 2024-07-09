@@ -2,12 +2,11 @@ import { FarcasterCard } from '@connect/components/common/FarcasterCard';
 import { PageWrapper } from '@connect/components/common/PageWrapper';
 import { ProjectItemSkeleton } from '@connect/components/projects/components/ProjectItemSkeleton';
 import { ProjectsList } from '@connect/components/projects/components/ProjectsList';
+import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { Suspense } from 'react';
-
-import type { LoggedInUser } from 'models/User';
 
 export async function ProfileDetailsPage({ user }: { user: Pick<LoggedInUser, 'farcasterUser' | 'id'> | null }) {
   if (!user?.farcasterUser) {
@@ -18,7 +17,7 @@ export async function ProfileDetailsPage({ user }: { user: Pick<LoggedInUser, 'f
     );
   }
 
-  const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody>;
+  const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
     <PageWrapper>

@@ -3,6 +3,7 @@
 import { log } from '@charmverse/core/log';
 import { connectApiClient } from '@connect/apiClient/apiClient';
 import { actionRevalidatePath } from '@connect/lib/actions/revalidatePath';
+import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
 import Image from 'next/image';
@@ -10,8 +11,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-
-import type { LoggedInUser } from 'models/User';
 
 import { Avatar } from '../common/Avatar';
 
@@ -30,7 +29,7 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
   };
 
   const handleLogout = async () => {
-    await connectApiClient.logOut().catch((error) => {
+    await connectApiClient.logout().catch((error) => {
       log.error('There was an error while trying to signout', { error });
     });
     await actionRevalidatePath();

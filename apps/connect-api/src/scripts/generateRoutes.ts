@@ -34,8 +34,7 @@ async function generateRoutesFile() {
     .map((_, index) => `rootRouter.use(router${index}.routes(), router${index}.allowedMethods());`)
     .join('\n');
 
-  const content = `
-/* eslint-disable import/no-extraneous-dependencies */
+  const content = `/* eslint-disable import/no-extraneous-dependencies */
 import Router from 'koa-router';
 
 ${imports}

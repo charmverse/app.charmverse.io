@@ -1,8 +1,7 @@
 import { Box, Link, Typography } from '@mui/material';
-import type { BoxProps } from '@mui/material/Box';
 import Image from 'next/image';
 
-export function Footer(props: BoxProps) {
+export function Footer() {
   return (
     <Box
       component='footer'
@@ -13,7 +12,6 @@ export function Footer(props: BoxProps) {
       bgcolor='grey.200'
       mx='auto'
       p={1}
-      {...props}
     >
       <Typography component='span'>Powered by</Typography>
       <Link href='https://app.charmverse.io' target='_blank' rel='noopener'>
