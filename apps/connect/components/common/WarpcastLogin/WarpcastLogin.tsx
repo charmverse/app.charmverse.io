@@ -30,16 +30,13 @@ function WarpcastLoginButton() {
 
   return (
     <Box
-      display='flex'
-      alignItems='center'
+      width='100%'
       data-test='connect-with-farcaster'
       sx={{
         '.fc-authkit-signin-button': {
-          width: '100%',
           button: {
             width: '100%',
             maxWidth: 400,
-            minWidth: 400,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
