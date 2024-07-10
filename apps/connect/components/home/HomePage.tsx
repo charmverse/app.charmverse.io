@@ -18,9 +18,11 @@ export function HomePage() {
         '& > .MuiBox-root': {
           display: 'flex',
           flexDirection: 'column',
-          gap: { xs: 6, md: 4 },
-          my: { xs: 6, md: 4 },
-          alignItems: 'center'
+          gap: { xs: 0, md: 6 },
+          my: { xs: 0, md: 4 },
+          justifyContent: { xs: 'space-evenly', md: 'normal' },
+          alignItems: 'center',
+          height: '100%'
         }
       }}
     >

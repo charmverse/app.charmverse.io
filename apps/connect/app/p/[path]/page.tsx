@@ -13,17 +13,17 @@ export default async function ProjectPage({ params }: { params: { path: string }
       {project?.farcasterFrameImage && (
         <>
           {/* Custom meta tags for farcaster */}
-          <meta property='fc:frame' content='vNext' />
-          <meta property='og:image' content={project.farcasterFrameImage} />
+          <meta name='fc:frame' content='vNext' />
+          <meta name='og:image' content={project.farcasterFrameImage} />
           <meta name='fc:frame:image' content={project.farcasterFrameImage} />
           {/* Button 1 */}
-          <meta name='fc:frame:button:2' content='Sunny Awards' />
-          <meta name='fc:frame:button:2:action' content='link' />
-          <meta name='fc:frame:button:2:target' content='https://connect.charmverse.io' />
+          <meta name='fc:frame:button:1' content='Sunny Awards' />
+          <meta name='fc:frame:button:1:action' content='link' />
+          <meta name='fc:frame:button:1:target' content='https://connect.charmverse.io' />
           {/* Button 2 */}
-          <meta name='fc:frame:button:3' content='View' />
-          <meta name='fc:frame:button:3:action' content='link' />
-          <meta name='fc:frame:button:3:target' content={`https://connect.charmverse.io/p/${params.path}`} />
+          <meta name='fc:frame:button:2' content='View' />
+          <meta name='fc:frame:button:2:action' content='link' />
+          <meta name='fc:frame:button:2:target' content={`https://connect.charmverse.io/p/${params.path}`} />
         </>
       )}
       <ProjectDetailsPage project={project} />
