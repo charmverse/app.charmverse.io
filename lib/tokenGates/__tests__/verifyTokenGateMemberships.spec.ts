@@ -18,8 +18,8 @@ async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: stri
   });
 }
 
-jest.mock('lib/tokenGates/validateTokenGateCondition', () => ({
-  validateTokenGateCondition: jest.fn().mockResolvedValue(true)
+jest.mock('lib/tokenGates/validateTokenGateConditionWithDelegates', () => ({
+  validateTokenGateConditionWithDelegates: jest.fn().mockResolvedValue(true)
 }));
 
 describe('verifyTokenGateMemberships', () => {
