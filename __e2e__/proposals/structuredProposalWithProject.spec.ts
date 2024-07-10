@@ -6,7 +6,7 @@ import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUser, loginBrowserUser } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
 
-import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersPayload, defaultProjectMember } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
@@ -54,16 +54,15 @@ test.beforeAll(async () => {
       ...defaultProjectAndMembersPayload,
       name: 'Test Project',
       projectMembers: [
-        {
-          ...defaultProjectAndMembersPayload.projectMembers[0],
+        defaultProjectMember({
+          teamLead: true,
           email: `test@${v4()}.com`,
           name: 'Test Member'
-        },
-        {
-          ...defaultProjectAndMembersPayload.projectMembers[0],
+        }),
+        defaultProjectMember({
           email: `test@${v4()}.com`,
           name: 'Test Member 2'
-        }
+        })
       ]
     },
     userId: spaceAdmin.id

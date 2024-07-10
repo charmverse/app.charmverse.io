@@ -33,7 +33,13 @@ export function validateProposalProject({
 
   if (typeof projectFieldAnswer === 'object' && 'selectedMemberIds' in projectFieldAnswer) {
     const selectedMemberIds = projectFieldAnswer.selectedMemberIds;
-    projectMembers = project.projectMembers.filter((member) => !member.teamLead);
+    // get team lead
+    const teamLead = project.projectMembers.find((member) => member.teamLead);
+    if (!teamLead) {
+      throw new InvalidInputError(`Team lead not found in project`);
+    }
+    // team lead is always included
+    projectMembers = [teamLead];
     for (const memberId of selectedMemberIds) {
       const member = project.projectMembers.find((m) => m.id === memberId);
       if (!member) {

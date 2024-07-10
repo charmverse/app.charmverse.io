@@ -27,25 +27,10 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers): 
         twitter: projectMember.twitter,
         walletAddress: projectMember.walletAddress,
         id: projectMember.id,
+        // note that teamLead is not set by the user but it is required for validating the form
+        teamLead: projectMember.teamLead,
         userId: projectMember.userId
       };
     })
-  };
-}
-
-function convertProjectMemberToProjectMemberPayload(projectMember: ProjectAndMembersPayload['projectMembers'][0]) {
-  return {
-    warpcast: projectMember.warpcast,
-    email: projectMember.email,
-    github: projectMember.github,
-    linkedin: projectMember.linkedin,
-    name: projectMember.name,
-    otherUrl: projectMember.otherUrl,
-    previousProjects: projectMember.previousProjects,
-    telegram: projectMember.telegram,
-    twitter: projectMember.twitter,
-    walletAddress: projectMember.walletAddress,
-    id: projectMember.id,
-    userId: projectMember.userId
   };
 }

@@ -82,6 +82,10 @@ export function getProposalErrors({
               projectId: project.id
             });
           }
+          log.warn(`Project profile validation failed`, {
+            error,
+            projectId: project.id
+          });
           errors.push(`Project profile validation failed`);
         }
       }

@@ -16,22 +16,36 @@ export function createDefaultProjectAndMembersPayload(): ProjectAndMembersPayloa
     communityUrl: '',
     otherUrl: '',
     walletAddress: '',
-    projectMembers: [defaultProjectMember()]
+    projectMembers: [defaultProjectMember({ teamLead: true })]
   };
 }
 
-export function defaultProjectMember(): ProjectAndMembersPayload['projectMembers'][number] {
+export function defaultProjectMember({
+  walletAddress = '',
+  email = '',
+  name = '',
+  teamLead = false,
+  userId
+}: {
+  email?: string;
+  name?: string;
+  walletAddress?: string;
+  teamLead?: boolean;
+  userId?: string;
+} = {}): ProjectAndMembersPayload['projectMembers'][number] {
   return {
-    name: '',
-    walletAddress: '',
-    email: '',
+    name,
+    teamLead,
+    walletAddress,
+    email,
     twitter: '',
     warpcast: '',
     github: '',
     linkedin: '',
     telegram: '',
     otherUrl: '',
-    previousProjects: ''
+    previousProjects: '',
+    userId
   };
 }
 
