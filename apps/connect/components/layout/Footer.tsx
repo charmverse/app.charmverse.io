@@ -3,21 +3,11 @@ import Image from 'next/image';
 
 export function Footer() {
   return (
-    <Box
-      position='absolute'
-      bottom={0}
-      width='100%'
-      component='footer'
-      display='flex'
-      gap={0.5}
-      alignItems='center'
-      justifyContent='center'
-      bgcolor='grey.200'
-      mx='auto'
-      p={1}
-    >
-      <Typography component='span'>Powered by</Typography>
-      <Link href='https://app.charmverse.io' target='_blank' rel='noopener'>
+    <Box width='100%' component='footer' textAlign='center' bgcolor='grey.200' mx='auto' p={1}>
+      <Typography component='span' mr={0.5}>
+        Powered by
+      </Typography>
+      <Link href='https://charmverse.io' target='_blank' rel='noopener'>
         <Image
           src='/images/charmverse-logo-black.webp'
           width={100}

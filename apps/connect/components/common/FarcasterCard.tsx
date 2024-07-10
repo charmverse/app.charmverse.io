@@ -9,14 +9,12 @@ function FarcasterCardContent({
   name,
   bio,
   username,
-  fid,
   avatarSize = 'xLarge',
   onDelete
 }: {
   name?: string;
   bio?: string;
   username?: string;
-  fid?: number;
   avatar?: string;
   avatarSize?: AvatarSize;
   onDelete?: VoidFunction;
@@ -50,7 +48,7 @@ function FarcasterCardContent({
           )}
         </Stack>
         <Typography variant='subtitle1' color='secondary'>
-          @{username || 'N/A'} #{fid || 'N/A'}
+          @{username || 'N/A'}
         </Typography>
         <Typography>{bio}</Typography>
       </Box>

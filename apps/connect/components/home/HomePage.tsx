@@ -11,7 +11,8 @@ export function HomePage() {
       flexDirection='column'
       alignItems='center'
       maxWidth='100vw'
-      border='0'
+      border='none'
+      borderRadius='0'
       textAlign='center'
       sx={{
         '& > .MuiBox-root': {

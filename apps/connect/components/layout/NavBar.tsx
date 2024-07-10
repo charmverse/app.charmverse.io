@@ -39,10 +39,10 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
   return (
     <AppBar
       position='static'
-      sx={{ backgroundColor: path === '/' ? 'background.default' : 'transparent', boxShadow: 'none' }}
+      sx={{ backgroundColor: path === '/' ? 'background.default' : 'transparent', boxShadow: 'none', pt: 1 }}
     >
       <Container maxWidth={false}>
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }} variant='dense'>
           <Link href='/'>
             <Image src='/images/connect-logo.png' width={15} height={40} alt='Connect logo' />
           </Link>
