@@ -1,5 +1,6 @@
 import { ProjectDetailsPage } from '@connect/components/projects/[id]/ProjectDetailsPage';
 import { fetchProject } from '@connect/lib/projects/fetchProject';
+import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,9 +9,13 @@ export default async function ProjectPage({ params }: { params: { path: string }
     path: params.path
   });
 
+  if (!project) {
+    return notFound();
+  }
+
   return (
     <>
-      {project?.farcasterFrameImage && (
+      {project.farcasterFrameImage && (
         <>
           {/* Custom meta tags for farcaster */}
           <meta name='fc:frame' content='vNext' />
