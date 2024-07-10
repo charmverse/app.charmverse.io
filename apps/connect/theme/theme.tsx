@@ -94,9 +94,10 @@ const extendedTheme = extendTheme({
     },
     MuiFormLabel: {
       styleOverrides: {
-        root: {
-          color: 'text.primary'
-        }
+        root: ({ theme }) => ({
+          color: theme.vars.palette.text.primary,
+          marginBottom: 5
+        })
       }
     },
     MuiAppBar: {},
