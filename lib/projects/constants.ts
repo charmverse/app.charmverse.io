@@ -16,13 +16,16 @@ export function createDefaultProjectAndMembersPayload(): ProjectAndMembersPayloa
     communityUrl: '',
     otherUrl: '',
     walletAddress: '',
-    projectMembers: [defaultProjectMember()]
+    projectMembers: [defaultProjectMember({ teamLead: true })]
   };
 }
 
-export function defaultProjectMember(): ProjectAndMembersPayload['projectMembers'][number] {
+export function defaultProjectMember({
+  teamLead = false
+}: { teamLead?: boolean } = {}): ProjectAndMembersPayload['projectMembers'][number] {
   return {
     name: '',
+    teamLead,
     walletAddress: '',
     email: '',
     twitter: '',
