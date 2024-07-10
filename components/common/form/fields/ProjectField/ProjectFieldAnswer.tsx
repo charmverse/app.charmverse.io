@@ -157,18 +157,20 @@ export function ProjectFieldAnswer({
           {inputEndAdornment}
         </Stack>
       )}
-      <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
-        <ProjectForm
-          fieldConfig={fieldConfig}
-          isTeamLead={isTeamLead}
-          disabled={disabled}
-          selectedMemberIds={selectedMemberIds}
-          onFormFieldChange={onChange}
-          project={selectedProject}
-          refreshProjects={refreshProjects}
-          applyProjectMembers={applyProjectMembers}
-        />
-      </Box>
+      {selectedProject && (
+        <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
+          <ProjectForm
+            fieldConfig={fieldConfig}
+            isTeamLead={isTeamLead}
+            disabled={disabled}
+            selectedMemberIds={selectedMemberIds}
+            onFormFieldChange={onChange}
+            project={selectedProject}
+            refreshProjects={refreshProjects}
+            applyProjectMembers={applyProjectMembers}
+          />
+        </Box>
+      )}
     </Stack>
   );
 }
