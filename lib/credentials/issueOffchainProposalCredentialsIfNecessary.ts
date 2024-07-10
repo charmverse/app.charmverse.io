@@ -9,10 +9,8 @@ import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
-import { credentialEventLabels } from './constants';
+import { credentialEventLabels, disableCredentialAutopublish } from './constants';
 import type { CredentialDataInput } from './schemas';
-
-const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
 export async function issueOffchainProposalCredentialsIfNecessary({
   proposalId,
@@ -21,7 +19,7 @@ export async function issueOffchainProposalCredentialsIfNecessary({
   proposalId: string;
   event: Extract<CredentialEventType, 'proposal_approved'>;
 }): Promise<void> {
-  if (disablePublishedCredentials) {
+  if (disableCredentialAutopublish) {
     log.warn('Published credentials are disabled');
     return;
   }

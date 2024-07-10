@@ -35,7 +35,7 @@ export function HomePage() {
         }}
         alt='Charmverse Connect homepage'
       />
-      <Typography align='center' variant='h4'>
+      <Typography data-test='connect-home-page' align='center' variant='h4'>
         Celebrate Onchain Summer with the Sunny Awards
       </Typography>
       <Typography align='center'>

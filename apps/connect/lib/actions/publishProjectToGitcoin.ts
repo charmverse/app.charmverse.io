@@ -7,7 +7,7 @@ import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect/lib/a
 import * as yup from 'yup';
 
 const schema = yup.object({
-  projectId: yup.string().required()
+  projectPath: yup.string().required()
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -15,10 +15,12 @@ export type FormValues = yup.InferType<typeof schema>;
 export const actionPublishProjectToGitcoin = authActionClient
   .metadata({ actionName: 'publishProjectToGitcoin' })
   .schema(schema)
-  .action(async ({ ctx, parsedInput: { projectId } }) => {
+  .action(async ({ ctx, parsedInput: { projectPath } }) => {
     const existingAttestation = await prisma.gitcoinProjectAttestation.findFirst({
       where: {
-        projectId
+        project: {
+          path: projectPath
+        }
       },
       select: {
         id: true
@@ -29,7 +31,10 @@ export const actionPublishProjectToGitcoin = authActionClient
       throw new WrongStateError('Project already published to Gitcoin');
     }
 
-    await storeProjectMetadataAndPublishGitcoinAttestation({ projectId, userId: ctx.session.user.id });
+    await storeProjectMetadataAndPublishGitcoinAttestation({
+      projectIdOrPath: projectPath,
+      userId: ctx.session.user.id
+    });
 
     return { success: true };
   });
