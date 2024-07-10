@@ -122,7 +122,6 @@ export function ProjectForm({
 
   // for non-authors, hide the team members section if it is empty
   const showTeamMemberSection = !disabled || selectedProjectMembers.length > 0;
-
   return (
     <Stack gap={2} width='100%'>
       <Typography variant='h6'>Project Info</Typography>
