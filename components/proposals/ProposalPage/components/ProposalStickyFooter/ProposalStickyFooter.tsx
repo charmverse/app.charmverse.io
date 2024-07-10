@@ -40,7 +40,6 @@ export function ProposalStickyFooter({
       showMessage((error as Error).message, 'error');
     }
   }
-
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const milestoneFormInput = proposal.form?.formFields?.find((field) => field.type === 'milestone');
   const formFields =
