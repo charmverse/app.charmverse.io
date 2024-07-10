@@ -17,7 +17,7 @@ export async function createOffchainCredentialsForProjects() {
     log.info(`Running ${approvedApplications.length} approved applications from questbook, on chain ${chainId}`);
 
     for (const application of approvedApplications) {
-      const recepient = getAddress(application.recipient);
+      const recepient = getAddress(application.recipient) as `0x{string}`;
       const owners = await getProjectOwners([recepient], chainId);
       const updatedAt = Number(application.date || 0) * 1000;
       const credentialDate = updatedAt ? new Date(updatedAt).toISOString() : new Date().toISOString();

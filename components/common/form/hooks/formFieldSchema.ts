@@ -98,7 +98,7 @@ export function getYupValidationSchema(fields: FormFieldInput[]) {
               return false;
             }
 
-            return value ? isAddress(value) || value.endsWith('.eth') || isValidName(value) : true;
+            return value ? value.endsWith('.eth') || isValidName(value) || isAddress(value) : true;
           });
           break;
         }

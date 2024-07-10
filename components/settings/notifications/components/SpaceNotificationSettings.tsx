@@ -13,7 +13,7 @@ import type { FormValues } from '../NotificationSettings';
 
 type NotificationType = { label: string; type?: NotificationToggleOption };
 
-type ConfigurableGroups = Extract<NotificationGroup, 'rewards' | 'proposals' | 'polls'>;
+type ConfigurableGroups = Extract<NotificationGroup, 'rewards' | 'proposals' | 'polls' | 'forum'>;
 
 const notificationTypes: Record<ConfigurableGroups, { title: string; types: NotificationType[][] }> = {
   rewards: {
@@ -55,6 +55,10 @@ const notificationTypes: Record<ConfigurableGroups, { title: string; types: Noti
   polls: {
     title: 'Polls',
     types: [[{ label: 'Poll created (All members)' }]]
+  },
+  forum: {
+    title: 'Forum',
+    types: [[{ label: 'Post created (All members)' }]]
   }
 };
 
@@ -63,7 +67,8 @@ export function getDefaultNotificationValues(toggles: NotificationToggles): Noti
   const defaultValues: NotificationToggles = {
     rewards: toggles.rewards ?? true,
     proposals: toggles.proposals ?? true,
-    polls: toggles.polls ?? true
+    polls: toggles.polls ?? true,
+    forum: toggles.forum ?? true
   };
   Object.entries(notificationTypes).forEach(([, settings]) => {
     settings.types.forEach((typeColumn) => {
@@ -223,6 +228,18 @@ export function NotificationTogglesInput({ isAdmin }: { isAdmin: boolean }) {
             enabled={formValues.notificationToggles?.polls}
             title={notificationTypes.polls.title}
             types={notificationTypes.polls.types}
+          />
+        }
+        disabled={!isAdmin}
+      />
+      <ToggleInput
+        name='notificationToggles.forum'
+        label={
+          <NotificationRuleComponent
+            disabled={!isAdmin}
+            enabled={formValues.notificationToggles?.forum}
+            title={notificationTypes.forum.title}
+            types={notificationTypes.forum.types}
           />
         }
         disabled={!isAdmin}

@@ -105,7 +105,7 @@ export function AddProjectMembersForm({
           >
             Back
           </Button>
-          <Button disabled={!isValid || isExecuting} type='submit'>
+          <Button data-test='project-form-publish' disabled={!isValid || isExecuting} type='submit'>
             Publish
           </Button>
         </Stack>

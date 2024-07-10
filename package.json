@@ -77,6 +77,7 @@
     "upgrade:storybook": "npx storybook@latest upgrade",
     "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes",
     "connect": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect-app\" \"npm run connect-api\"",
+    "connect:start:test": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"PORT=3337 dotenv -e .env.test.local -- npm run start --workspace=apps/connect\" \"dotenv -e .env.test.local -- npm run start --w=apps/connect-api\"",
     "connect:remote": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect-app:remote\" \"npm run connect-api:remote\"",
     "connect:build": "concurrently --names \"build-connect,build-connect-api\" -c \"green,yellow\" \"npm run connect-app:build\" \"npm run connect-api:build\"",
     "connect:start:prod": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect-app:start:prod\" \"npm run connect-api:start:prod\"",
@@ -88,7 +89,10 @@
     "connect-api:remote": "dotenv -e .env.production -- npm run start --workspace=apps/connect-api",
     "connect-api:test": "dotenv -e .env.test.local -- npm run test --w=apps/connect-api",
     "connect-api:build": "dotenv -e .env.local -- npm run build --w=apps/connect-api",
-    "connect-api:start:prod": "npm run start:prod --w=apps/connect-api"
+    "connect-api:start:prod": "npm run start:prod --w=apps/connect-api",
+    "connect:debug:e2e": "npm run debug:e2e -w=apps/connect",
+    "connect:test:e2e:ci": "npm run test:e2e:ci -w=apps/connect",
+    "connect:start:test:ci": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"DISABLE_PUBLISHED_CREDENTIALS=true PORT=3337 npm run connect-app:start:prod\" \"npm run connect-api:start:prod\""
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -315,7 +319,7 @@
     "unique-names-generator": "^4.7.1",
     "usehooks-ts": "^2.14.0",
     "uuid": "^8.3.2",
-    "viem": "^2.8.13",
+    "viem": "^2.17.3",
     "wagmi": "^2.5.11",
     "yup": "^1.4.0",
     "zksync-web3": "^0.16.0"
@@ -435,8 +439,8 @@
     "react-dom": "^18.2.0",
     "typescript": "^5.4.2",
     "esbuild": "^0.19.5",
-    "viem": "^2.8.13",
-    "next": "14.1.1"
+    "next": "14.1.1",
+    "viem": "^2.17.3"
   },
   "msw": {
     "workerDirectory": "public"

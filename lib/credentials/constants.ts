@@ -10,6 +10,8 @@ export const proposalCreatedVerb = 'Published';
 export const proposalApprovedVerb = 'Approved';
 export const rewardSubmissionApprovedVerb = 'Approved';
 
+export const disableCredentialAutopublish = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
+
 export const credentialEventLabels: Partial<Record<CredentialEventType, LabelFn>> = {
   proposal_created: (map) => `${proposalCreatedVerb} ${map('Proposal')}`,
   proposal_approved: (map) => `${map('Proposal')} ${proposalApprovedVerb}`,

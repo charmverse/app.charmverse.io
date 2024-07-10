@@ -9,12 +9,14 @@ export function MultiTextValueFields({
   control,
   label,
   name,
-  placeholder
+  placeholder,
+  dataTest
 }: {
   control: Control<FormValues>;
   name: keyof FormValues;
   label: string;
   placeholder: string;
+  dataTest?: string;
 }) {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -31,6 +33,7 @@ export function MultiTextValueFields({
           render={({ field: _field, fieldState }) => (
             <TextField
               fullWidth
+              data-test={dataTest}
               aria-labelledby={`project-${name}-0`}
               placeholder={placeholder}
               error={!!fieldState.error}

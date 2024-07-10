@@ -3,6 +3,8 @@
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect/lib/actions/actionClient';
 
+import { disableCredentialAutopublish } from 'lib/credentials/constants';
+
 import { storeProjectMetadataAndPublishOptimismAttestation } from '../attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { createConnectProject } from '../projects/createConnectProject';
 import { schema } from '../projects/form';
@@ -19,12 +21,14 @@ export const actionCreateProject = authActionClient
       input
     });
 
-    await storeProjectMetadataAndPublishOptimismAttestation({
-      projectId: newProject.id,
-      userId: currentUserId
-    }).catch((err) => {
-      log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
-    });
+    if (!disableCredentialAutopublish) {
+      await storeProjectMetadataAndPublishOptimismAttestation({
+        projectId: newProject.id,
+        userId: currentUserId
+      }).catch((err) => {
+        log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
+      });
+    }
 
     await generateOgImage(newProject.id, currentUserId);
 
