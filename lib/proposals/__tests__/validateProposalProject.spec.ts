@@ -1,7 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { v4 } from 'uuid';
 
-import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { createDefaultProject, defaultProjectMember } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import { getProjectProfileFieldConfigDefaultHidden, getProjectProfileFieldConfig } from 'testing/mocks/form';
 import { generateUserAndSpace } from 'testing/setupDatabase';
@@ -11,13 +10,12 @@ import { validateProposalProject } from '../validateProposalProject';
 describe('validateProposalProject', () => {
   it('Should throw error if proposal project information is not valid', async () => {
     const { user } = await generateUserAndSpace();
-    const projectValues = createDefaultProjectAndMembersPayload();
 
     const createdProject = await createProject({
       userId: user.id,
       project: {
-        ...projectValues,
-        projectMembers: [projectValues.projectMembers[0], projectValues.projectMembers[0]]
+        ...createDefaultProject(),
+        projectMembers: [defaultProjectMember({ teamLead: true }), defaultProjectMember()]
       }
     });
     const projectFieldId = v4();
@@ -51,19 +49,18 @@ describe('validateProposalProject', () => {
 
   it('Should not throw error if proposal project information is valid', async () => {
     const { user } = await generateUserAndSpace();
-    const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
     const projectFieldId = v4();
 
     const createdProject = await createProject({
       userId: user.id,
       project: {
-        ...defaultProjectAndMembersPayload,
+        ...createDefaultProject(),
         name: 'Test Project',
         projectMembers: [
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
+            teamLead: true,
             name: 'Test User'
-          }
+          })
         ]
       }
     });

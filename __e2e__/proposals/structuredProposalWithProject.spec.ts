@@ -6,7 +6,7 @@ import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUser, loginBrowserUser } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
 
-import { createDefaultProjectAndMembersPayload, defaultProjectMember } from 'lib/projects/constants';
+import { createDefaultProject, defaultProjectMember } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
@@ -48,10 +48,9 @@ test.beforeAll(async () => {
     }
   ];
 
-  const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
   project = await createProject({
     project: {
-      ...defaultProjectAndMembersPayload,
+      ...createDefaultProject(),
       name: 'Test Project',
       projectMembers: [
         defaultProjectMember({
