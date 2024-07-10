@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import { randomETHWallet } from 'lib/utils/blockchain';
 
-import { createDefaultProjectAndMembersPayload, defaultProjectMember } from '../constants';
+import { createDefaultProject, defaultProjectMember } from '../constants';
 import { createProject } from '../createProject';
 
 describe('createProject', () => {
@@ -13,10 +13,7 @@ describe('createProject', () => {
     const { user } = await testUtilsUser.generateUserAndSpace();
     await expect(
       createProject({
-        project: {
-          ...createDefaultProjectAndMembersPayload(),
-          projectMembers: []
-        },
+        project: createDefaultProject(),
         userId: user.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
@@ -33,8 +30,6 @@ describe('createProject', () => {
     const nonConnectedWalletAddress = randomETHWallet().address.toLowerCase();
     const nonConnectedVerifiedEmail = `${v4()}@gmail.com`;
     const nonConnectedGoogleAccountEmail = `${v4()}@gmail.com`;
-
-    const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
 
     await prisma.user.update({
       where: {
@@ -83,7 +78,7 @@ describe('createProject', () => {
 
     const createdProjectWithMembers = await createProject({
       project: {
-        ...defaultProjectAndMembersPayload,
+        ...createDefaultProject(),
         blog: 'https://blog.com',
         projectMembers: [
           // Project lead

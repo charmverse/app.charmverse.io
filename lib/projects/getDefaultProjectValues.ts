@@ -2,7 +2,7 @@ import type { Member } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
-import { createDefaultProjectAndMembersPayload } from './constants';
+import { createDefaultProject, defaultProjectMember } from './constants';
 import type { ProjectAndMembersPayload } from './interfaces';
 
 export function getDefaultProjectValues({
@@ -16,20 +16,19 @@ export function getDefaultProjectValues({
   const userEmail =
     user?.email ?? ((user?.verifiedEmails.length ? user.verifiedEmails[0].email : undefined) as string | undefined);
   const telegramUsername = (user?.telegramUser?.account as unknown as Partial<TelegramAccount>)?.username;
-  const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
 
   return {
-    ...defaultProjectAndMembersPayload,
+    ...createDefaultProject(),
     projectMembers: [
-      {
-        ...defaultProjectAndMembersPayload.projectMembers[0],
+      defaultProjectMember({
         email: userEmail ?? '',
-        twitter: userMemberRecord?.profile?.social?.twitterURL ?? '',
-        telegram: telegramUsername ?? '',
-        linkedin: userMemberRecord?.profile?.social?.linkedinURL ?? '',
         github: userMemberRecord?.profile?.social?.githubURL ?? '',
+        linkedin: userMemberRecord?.profile?.social?.linkedinURL ?? '',
+        teamLead: true,
+        telegram: telegramUsername ?? '',
+        twitter: userMemberRecord?.profile?.social?.twitterURL ?? '',
         walletAddress: primaryWallet?.ensname ?? primaryWallet?.address ?? ''
-      }
+      })
     ]
   };
 }

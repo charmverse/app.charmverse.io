@@ -16,19 +16,22 @@ export async function createProject(payload: {
     throw new InvalidInputError('At least one member is required');
   }
 
+  const teamLeads = payload.project.projectMembers.filter((member) => member.teamLead);
+  if (teamLeads.length !== 1) {
+    throw new InvalidInputError('Exactly one team lead is required');
+  }
+
   const project = payload.project;
   const projectId = v4();
 
   const projectMembersCreatePayload = await Promise.all(
     project.projectMembers.map(async (member) => {
-      const charmVerseUserIdWithProjectMember = member.teamLead
-        ? payload.userId
-        : await findCharmVerseUserIdWithProjectMember(member);
+      const connectedUserId = member.teamLead ? payload.userId : await findCharmVerseUserIdWithProjectMember(member);
       if (!member.teamLead) {
         trackUserAction('add_project_member', {
           userId: payload.userId,
           projectId,
-          connectedUserId: charmVerseUserIdWithProjectMember,
+          connectedUserId,
           email: member.email,
           walletAddress: member.walletAddress
         });
@@ -36,7 +39,7 @@ export async function createProject(payload: {
 
       return {
         ...member,
-        userId: charmVerseUserIdWithProjectMember,
+        userId: connectedUserId,
         updatedBy: payload.userId
       };
     })

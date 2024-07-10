@@ -4,6 +4,13 @@ import type { ProjectAndMembersPayload } from './interfaces';
 
 export function createDefaultProjectAndMembersPayload(): ProjectAndMembersPayload {
   return {
+    ...createDefaultProject(),
+    projectMembers: [defaultProjectMember({ teamLead: true })]
+  };
+}
+
+export function createDefaultProject(): ProjectAndMembersPayload {
+  return {
     name: '',
     deletedAt: null,
     excerpt: '',
@@ -16,33 +23,38 @@ export function createDefaultProjectAndMembersPayload(): ProjectAndMembersPayloa
     communityUrl: '',
     otherUrl: '',
     walletAddress: '',
-    projectMembers: [defaultProjectMember({ teamLead: true })]
+    projectMembers: []
   };
 }
+
+type ProjectMemberPayload = ProjectAndMembersPayload['projectMembers'][number];
 
 export function defaultProjectMember({
   walletAddress = '',
   email = '',
+  github = '',
+  linkedin = '',
   name = '',
+  telegram = '',
+  twitter = '',
   teamLead = false,
   userId
-}: {
-  email?: string;
-  name?: string;
-  walletAddress?: string;
-  teamLead?: boolean;
-  userId?: string;
-} = {}): ProjectAndMembersPayload['projectMembers'][number] {
+}: Partial<
+  Pick<
+    ProjectMemberPayload,
+    'email' | 'github' | 'linkedin' | 'name' | 'teamLead' | 'telegram' | 'twitter' | 'userId' | 'walletAddress'
+  >
+> = {}): ProjectMemberPayload {
   return {
     name,
     teamLead,
     walletAddress,
     email,
-    twitter: '',
+    twitter,
     warpcast: '',
-    github: '',
-    linkedin: '',
-    telegram: '',
+    github,
+    linkedin,
+    telegram,
     otherUrl: '',
     previousProjects: '',
     userId

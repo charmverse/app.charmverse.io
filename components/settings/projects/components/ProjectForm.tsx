@@ -6,7 +6,7 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useUser } from 'hooks/useUser';
-import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { defaultProjectMember } from 'lib/projects/constants';
 import {
   projectMemberFieldProperties,
   createDefaultProjectAndMembersFieldConfig,
@@ -96,10 +96,7 @@ export function ProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean }) {
           startIcon={<AddIcon fontSize='small' />}
           data-test='add-project-member-button'
           onClick={() => {
-            const projectMembers = [
-              ...projectValues.projectMembers,
-              createDefaultProjectAndMembersPayload().projectMembers[0]
-            ];
+            const projectMembers = [...projectValues.projectMembers, defaultProjectMember()];
 
             setValue('projectMembers', projectMembers, {
               shouldValidate: true,
