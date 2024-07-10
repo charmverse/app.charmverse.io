@@ -157,7 +157,7 @@ export function ProjectFieldAnswer({
           {inputEndAdornment}
         </Stack>
       )}
-      {selectedProject && (
+      {formFieldValue?.projectId && (
         <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
           <ProjectForm
             fieldConfig={fieldConfig}
