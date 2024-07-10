@@ -3,7 +3,6 @@ import type { Space, User } from '@charmverse/core/prisma';
 import { assignRole } from 'lib/roles';
 import { updateTokenGateRoles } from 'lib/tokenGates/updateTokenGateRoles';
 import { randomETHWallet } from 'lib/utils/blockchain';
-import type { LoggedInUser } from 'models';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateTokenGate } from 'testing/utils/tokenGates';
 

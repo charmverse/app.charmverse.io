@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma-client';
 
 import type { TokenGate } from './interfaces';
-import { validateTokenGateConditionWithDelegates } from './validateTokenGateCondition';
+import { validateTokenGateConditionWithDelegates } from './validateTokenGateConditionWithDelegates';
 /**
  * Used for validating token gates. Returns token gate id or null if not valid
  * @param tokenGate TokenGate

@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { walletAddress } from 'stories/lib/mockTokenGataData';
 
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
-import { validateTokenGateConditionWithDelegates } from 'lib/tokenGates/validateTokenGateCondition';
+import { validateTokenGateCondition } from 'lib/tokenGates/validateTokenGateCondition';
 import { verifyTokenGateMembership } from 'lib/tokenGates/verifyTokenGateMembership';
 import type { UserToVerifyMembership } from 'lib/tokenGates/verifyTokenGateMemberships';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
@@ -15,7 +15,7 @@ jest.mock('../../blockchain/publicClient');
 const mockGetPublicClient = jest.mocked(getPublicClient);
 
 jest.mock('lib/tokenGates/validateTokenGateCondition');
-const mockValidateTokenGateCondition = jest.mocked(validateTokenGateConditionWithDelegates);
+const mockValidateTokenGateCondition = jest.mocked(validateTokenGateCondition);
 
 describe('verifyTokenGateMembership', () => {
   let user: User;
