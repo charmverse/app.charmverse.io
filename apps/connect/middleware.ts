@@ -6,7 +6,6 @@ import { NextResponse } from 'next/server';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
 
-// @TODO Update projects to be public
 export async function middleware(request: NextRequest) {
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
   const user = session.user;
@@ -28,8 +27,9 @@ export const config = {
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
+     * - images (image files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)'
+    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|manifest.webmanifest).*)'
   ]
 };

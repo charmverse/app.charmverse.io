@@ -10,7 +10,7 @@ export function ProjectDescription({ description }: { description: string }) {
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   return (
-    <Stack mt={2}>
+    <Stack mt={2} data-test='project-details-description'>
       <Typography variant='body1'>{showFullDescription ? description : fancyTrim(description, 500)}</Typography>
       {description.length > 500 && (
         <Typography

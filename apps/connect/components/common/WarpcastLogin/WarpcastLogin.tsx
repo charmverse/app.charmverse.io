@@ -1,47 +1,56 @@
 'use client';
 
-import { useFarcasterConnection } from '@connect/hooks/useFarcasterConnection';
-import { AuthKitProvider, type AuthClientError } from '@farcaster/auth-kit';
-import Button from '@mui/material/Button';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { log } from '@charmverse/core/log';
+import { connectApiClient } from '@connect/apiClient/apiClient';
+import { actionRevalidatePath } from '@connect/lib/actions/revalidatePath';
+import { AuthKitProvider, SignInButton } from '@farcaster/auth-kit';
+import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
+import Box from '@mui/material/Box';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
-import { warpcastConfig } from 'lib/farcaster/config';
+import '@farcaster/auth-kit/styles.css';
 
-import { FarcasterLoginModal } from './components/WarpcastModal';
+import { warpcastConfig } from 'lib/farcaster/config';
 
 function WarpcastLoginButton() {
   const router = useRouter();
 
-  const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
-
-  const onSuccessCallback = useCallback(async () => {
-    popupState.close();
+  const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
+    await connectApiClient.loginViaFarcaster(res).catch((error) => {
+      log.error('There was an error on the server while logging in with Warpcast', { error });
+    });
+    await actionRevalidatePath();
     router.push('/profile');
-  }, [popupState.close]);
-
-  const onErrorCallback = useCallback((err?: AuthClientError) => {
-    popupState.close();
   }, []);
 
-  const onClick = useCallback(() => {
-    popupState.open();
+  const onErrorCallback = useCallback((error?: AuthClientError) => {
+    log.error('There was an error while logging in with Warpcast', { error });
   }, []);
-
-  const { signIn, url } = useFarcasterConnection({
-    onSuccess: onSuccessCallback,
-    onError: onErrorCallback,
-    onClick
-  });
 
   return (
-    <>
-      <Button size='large' onClick={signIn} fullWidth>
-        Connect with Farcaster
-      </Button>
-      <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />
-    </>
+    <Box
+      display='flex'
+      alignItems='center'
+      data-test='connect-with-farcaster'
+      sx={{
+        '.fc-authkit-signin-button': {
+          width: '100%',
+          button: {
+            width: '100%',
+            maxWidth: 400,
+            minWidth: 400,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 1,
+            mx: 'auto'
+          }
+        }
+      }}
+    >
+      <SignInButton onSuccess={onSuccessCallback} onError={onErrorCallback} hideSignOut />
+    </Box>
   );
 }
 

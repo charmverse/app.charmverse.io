@@ -1,177 +1,12 @@
-import { Avatar } from '@connect/components/common/Avatar';
-import { useS3UploadInput } from '@connect/hooks/useS3UploadInput';
 import type { FormValues } from '@connect/lib/projects/form';
 import { CATEGORIES } from '@connect/lib/projects/form';
-import { inputBackground } from '@connect/theme/colors';
-import AddIcon from '@mui/icons-material/AddOutlined';
-import DeleteIcon from '@mui/icons-material/DeleteOutline';
-import { Button, FormLabel, IconButton, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
-import CircularProgress from '@mui/material/CircularProgress';
+import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
-import type { Control, FieldArrayPath } from 'react-hook-form';
-import { Controller, useController, useFieldArray } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 
-function MultiTextValueFields({
-  control,
-  label,
-  name,
-  placeholder
-}: {
-  control: Control<FormValues>;
-  name: keyof FormValues;
-  label: string;
-  placeholder: string;
-}) {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: name as FieldArrayPath<FormValues>
-  });
-
-  return (
-    <Stack>
-      <FormLabel id={`project-${name.toLowerCase().replaceAll(' ', '')}`}>{label}</FormLabel>
-      <Stack direction='row' gap={1} alignItems='center' mb={1}>
-        <Controller
-          control={control}
-          name={`${name}.0` as FieldArrayPath<FormValues>}
-          render={({ field: _field, fieldState }) => (
-            <TextField
-              fullWidth
-              aria-labelledby={`project-${name}-0`}
-              placeholder={placeholder}
-              error={!!fieldState.error}
-              {..._field}
-            />
-          )}
-        />
-      </Stack>
-      {fields.slice(1).map((field, index) => (
-        <Stack key={field.id} gap={1} mb={1} direction='row'>
-          <Controller
-            control={control}
-            name={`${name}.${index + 1}` as FieldArrayPath<FormValues>}
-            render={({ field: _field, fieldState }) => (
-              <Stack width='100%' gap={1} alignItems='center' flexDirection='row'>
-                <TextField
-                  fullWidth
-                  aria-labelledby={`project-${name}-${index + 1}`}
-                  placeholder={placeholder}
-                  error={!!fieldState.error}
-                  {..._field}
-                />
-                <IconButton size='small'>
-                  <DeleteIcon fontSize='small' color='error' onClick={() => remove(index + 1)} />
-                </IconButton>
-              </Stack>
-            )}
-          />
-        </Stack>
-      ))}
-      <Button
-        sx={{
-          width: 'fit-content'
-        }}
-        startIcon={<AddIcon fontSize='small' />}
-        size='small'
-        variant='outlined'
-        color='secondary'
-        onClick={() => {
-          append('' as any);
-        }}
-      >
-        Add
-      </Button>
-    </Stack>
-  );
-}
-
-function ImageField({
-  control,
-  name,
-  type
-}: {
-  type: 'avatar' | 'cover';
-  control: Control<FormValues>;
-  name: keyof FormValues;
-}) {
-  const { field } = useController({
-    name,
-    control
-  });
-
-  const { inputRef, isUploading, onFileChange } = useS3UploadInput({
-    onFileUpload: ({ url }) => {
-      field.onChange(url);
-    }
-  });
-
-  return (
-    <Controller
-      name='avatar'
-      control={control}
-      render={() => (
-        <div
-          style={{
-            position: 'relative',
-            width: type === 'avatar' ? 125 : '100%',
-            height: 96
-          }}
-        >
-          <input
-            disabled={isUploading}
-            type='file'
-            accept={'image/*'}
-            ref={inputRef}
-            onChange={onFileChange}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              top: 0,
-              opacity: 0,
-              zIndex: 1,
-              cursor: 'pointer'
-            }}
-          />
-          {isUploading ? (
-            <Stack
-              sx={{
-                backgroundColor: inputBackground,
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: type === 'avatar' ? '50%' : 0
-              }}
-            >
-              <CircularProgress color='secondary' size={50} />
-            </Stack>
-          ) : type === 'avatar' ? (
-            <Avatar
-              size='xLarge'
-              avatar={field.value as string}
-              sx={{
-                backgroundColor: !field.value ? inputBackground : undefined
-              }}
-            />
-          ) : (
-            <img
-              src={field.value as string}
-              style={{
-                width: '100%',
-                height: '100%',
-                background: inputBackground,
-                objectFit: 'cover',
-                objectPosition: 'center'
-              }}
-            />
-          )}
-        </div>
-      )}
-    />
-  );
-}
+import { ImageField } from './ImageField';
+import { MultiTextValueFields } from './MultiTextValueFields';
 
 export function CreateProjectForm({
   control,
@@ -193,6 +28,7 @@ export function CreateProjectForm({
           name='name'
           render={({ field, fieldState }) => (
             <TextField
+              data-test='project-form-name'
               autoFocus
               placeholder='Acme Inc.'
               aria-labelledby='project-name'
@@ -209,6 +45,7 @@ export function CreateProjectForm({
           name='description'
           render={({ field }) => (
             <TextField
+              data-test='project-form-description'
               multiline
               rows={3}
               aria-labelledby='project-description'
@@ -222,7 +59,7 @@ export function CreateProjectForm({
         <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
         <Stack direction='row' gap={1}>
           <ImageField type='avatar' name='avatar' control={control} />
-          <ImageField name='cover' type='cover' control={control} />
+          <ImageField type='cover' name='coverImage' control={control} />
         </Stack>
       </Stack>
       <Stack>
@@ -235,6 +72,7 @@ export function CreateProjectForm({
               displayEmpty
               fullWidth
               aria-labelledby='project-category'
+              data-test='project-form-category'
               renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
               error={!!fieldState.error}
               {...field}
@@ -248,11 +86,18 @@ export function CreateProjectForm({
           )}
         />
       </Stack>
-      <MultiTextValueFields control={control} name='websites' label='Websites' placeholder='https://acme-inc.com' />
+      <MultiTextValueFields
+        control={control}
+        name='websites'
+        label='Websites'
+        dataTest='project-form-websites'
+        placeholder='https://acme-inc.com'
+      />
       <MultiTextValueFields
         control={control}
         name='farcasterValues'
         label='Farcaster'
+        dataTest='project-form-farcaster-values'
         placeholder='https://warpcast.com/acme-inc'
       />
       <Stack>
@@ -268,6 +113,7 @@ export function CreateProjectForm({
               <TextField
                 fullWidth
                 placeholder='acme-inc'
+                data-test='project-form-twitter'
                 aria-labelledby='project-twitter'
                 error={!!fieldState.error}
                 {...field}
@@ -290,6 +136,7 @@ export function CreateProjectForm({
                 fullWidth
                 placeholder='acme-inc'
                 aria-labelledby='project-github'
+                data-test='project-form-github'
                 error={!!fieldState.error}
                 {...field}
               />
@@ -311,6 +158,7 @@ export function CreateProjectForm({
                 fullWidth
                 placeholder='acme-inc'
                 aria-labelledby='project-mirror'
+                data-test='project-form-mirror'
                 error={!!fieldState.error}
                 {...field}
               />
@@ -324,7 +172,7 @@ export function CreateProjectForm({
             Cancel
           </Button>
         </Link>
-        <Button size='large' disabled={!isValid} onClick={onNext}>
+        <Button data-test='project-form-confirm-values' size='large' disabled={!isValid} onClick={onNext}>
           Next
         </Button>
       </Stack>

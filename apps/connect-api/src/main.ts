@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 
 import { app } from './server';
 
-const port = process.env.PORT || 4000;
+const port = process.env.CONNECT_API_PORT || process.env.PORT || 4000;
 const host = '0.0.0.0';
 
 const server = app.listen(typeof port === 'string' ? parseInt(port) : port, host, () => {

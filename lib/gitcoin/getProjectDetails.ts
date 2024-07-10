@@ -45,12 +45,12 @@ export async function getProjectDetails({
 }): Promise<GitcoinProjectDetails | null> {
   const publicClient = getPublicClient(chainId);
 
-  const onchainOwners = await publicClient.readContract({
+  const onchainOwners = (await publicClient.readContract({
     address: getAddress(PROJECT_REGISTRY_ADDRESSES[chainId]),
     abi: ProjectRegistryAbi,
     functionName: 'getProjectOwners',
     args: [BigInt(projectId)]
-  });
+  })) as `0x${string}`[];
 
   const metadataDetails: ProjectOnchainDetails = await publicClient.readContract({
     address: getAddress(PROJECT_REGISTRY_ADDRESSES[chainId]),

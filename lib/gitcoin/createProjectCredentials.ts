@@ -18,7 +18,7 @@ export async function createOffchainCredentialsForProjects() {
 
     for (const application of approvedApplications) {
       const metadata = application.metadata;
-      const recepient = getAddress(metadata.recipient);
+      const recepient = getAddress(metadata.recipient) as `0x${string}`;
       const owners = await getProjectOwners([recepient], chainId);
       const approvedStatusSnapshot = application.statusSnapshots?.find((s) => String(s.status) === '1');
       const approvedSnapshotDate = new Date((Number(approvedStatusSnapshot?.timestamp) || 0) * 1000).toISOString();

@@ -25,7 +25,9 @@ export async function createNotificationsFromEvent(
       ? createRewardNotifications(webhookData).then((ids) => ids.map((id) => ({ id, type: 'rewards' as const })))
       : [],
     createDocumentNotifications(webhookData).then((ids) => ids.map((id) => ({ id, type: 'documents' as const }))),
-    createForumNotifications(webhookData).then((ids) => ids.map((id) => ({ id, type: 'forum' as const }))),
+    isNotificationEnabled({ group: 'forum', rules: notificationToggles })
+      ? createForumNotifications(webhookData).then((ids) => ids.map((id) => ({ id, type: 'forum' as const })))
+      : [],
     createCardNotifications(webhookData).then((ids) => ids.map((id) => ({ id, type: 'card' as const })))
   ]).then((results) => {
     return results.flat().filter(isTruthy);

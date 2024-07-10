@@ -42,7 +42,7 @@ export function TokenGateTokenFields() {
           ))}
         </Select>
       </FieldWrapper>
-      {(check === 'customToken' || 'customContractMethod') && (
+      {(check === 'customToken' || check === 'customContractMethod') && (
         <TextInputField
           label='Contract Address'
           error={errors.contract?.message}

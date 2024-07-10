@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { actionCreateProject } from '@connect/lib/actions/createProject';
+import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { FormValues } from '@connect/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Button, Stack, Typography } from '@mui/material';
@@ -7,8 +8,6 @@ import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
-
-import type { LoggedInUser } from 'models/User';
 
 import { FarcasterCard } from '../../common/FarcasterCard';
 
@@ -46,9 +45,7 @@ export function AddProjectMembersForm({
     }
   });
 
-  const farcasterDetails = user.farcasterUser?.account as Required<
-    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>
-  >;
+  const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
     <form
@@ -108,7 +105,7 @@ export function AddProjectMembersForm({
           >
             Back
           </Button>
-          <Button disabled={!isValid || isExecuting} type='submit'>
+          <Button data-test='project-form-publish' disabled={!isValid || isExecuting} type='submit'>
             Publish
           </Button>
         </Stack>

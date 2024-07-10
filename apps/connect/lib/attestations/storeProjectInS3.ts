@@ -6,8 +6,8 @@ import { gitcoinProjectCredentialSchemaId } from 'lib/credentials/schemas/gitcoi
 import { optimismProjectSnapshotAttestationSchemaId } from 'lib/credentials/schemas/optimismProjectSchemas';
 import { replaceS3Domain } from 'lib/utils/url';
 
-import type { ConnectProjectDetails } from '../actions/fetchProject';
-import { fetchProject } from '../actions/fetchProject';
+import type { ConnectProjectDetails } from '../projects/fetchProject';
+import { fetchProject } from '../projects/fetchProject';
 
 import { getAttestationS3Path } from './getAttestationS3Path';
 import { mapProjectToGitcoin } from './mapProjectToGitcoin';

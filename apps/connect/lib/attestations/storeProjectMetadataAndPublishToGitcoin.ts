@@ -1,12 +1,13 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import type { GitcoinProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { attestOnchain } from 'lib/credentials/attestOnchain';
 import { gitcoinProjectCredentialSchemaId } from 'lib/credentials/schemas/gitcoinProjectSchema';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
-import { fetchProject } from '../actions/fetchProject';
+import { fetchProject } from '../projects/fetchProject';
 
 import { projectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
@@ -16,10 +17,10 @@ const currentGitcoinRound = 'clxokl3hl000013trh6d4lhyo';
 
 export async function storeProjectMetadataAndPublishGitcoinAttestation({
   userId,
-  projectId
+  projectIdOrPath
 }: {
   userId: string;
-  projectId: string;
+  projectIdOrPath: string;
 }): Promise<GitcoinProjectAttestation> {
   const farcasterUser = await prisma.farcasterUser.findUniqueOrThrow({
     where: {
@@ -31,7 +32,9 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     }
   });
 
-  const project = await fetchProject({ id: projectId });
+  const project = await fetchProject(
+    stringUtils.isUUID(projectIdOrPath) ? { id: projectIdOrPath } : { path: projectIdOrPath }
+  );
 
   if (!project) {
     throw new DataNotFoundError('Project not found');

@@ -2,9 +2,7 @@
 
 import { prisma } from '@charmverse/core/prisma-client';
 import { authActionClient } from '@connect/lib/actions/actionClient';
-
-import { sessionUserRelations } from 'lib/session/config';
-import type { LoggedInUser } from 'models/User';
+import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 
 export const getCurrentUser = authActionClient
   .metadata({ actionName: 'getCurrentUser' })
@@ -15,7 +13,9 @@ export const getCurrentUser = authActionClient
       where: {
         id: userId
       },
-      include: sessionUserRelations
+      include: {
+        farcasterUser: true
+      }
     });
 
     return user;

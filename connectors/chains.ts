@@ -24,8 +24,8 @@ import {
   sepolia,
   zkSync,
   zora,
-  taikoJolnir,
-  taikoTestnetSepolia,
+  taikoHekla,
+  taiko,
   zkSyncTestnet
 } from 'viem/chains';
 
@@ -477,21 +477,21 @@ export const RPC: Record<string, IChainDetails> = {
   },
   TAIKO: {
     ...EVM_DEFAULT,
-    chainId: taikoJolnir.id,
-    viem: taikoJolnir,
-    chainName: 'Taiko Jolnir',
-    rpcUrls: taikoJolnir.rpcUrls.default.http,
-    blockExplorerUrls: [taikoJolnir.blockExplorers.default.url],
+    chainId: taiko.id,
+    viem: taiko,
+    chainName: 'Taiko',
+    rpcUrls: taiko.rpcUrls.default.http,
+    blockExplorerUrls: [taiko.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/taiko-logo.svg',
     shortName: 'tko-jolnir'
   },
   TAIKO_DEV: {
     ...EVM_DEFAULT,
-    chainId: taikoTestnetSepolia.id,
-    viem: taikoTestnetSepolia,
-    chainName: 'Taiko Sepolia - Testnet',
-    rpcUrls: taikoTestnetSepolia.rpcUrls.default.http,
-    blockExplorerUrls: [taikoTestnetSepolia.blockExplorers.default.url],
+    chainId: taikoHekla.id,
+    viem: taikoHekla,
+    chainName: 'Taiko Hekla - Testnet',
+    rpcUrls: taikoHekla.rpcUrls.default.http,
+    blockExplorerUrls: [taikoHekla.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/taiko-logo.svg',
     shortName: 'taiko-sepolia',
     testnet: true
