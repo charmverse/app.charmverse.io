@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import { randomETHWallet } from 'lib/utils/blockchain';
 
-import { createDefaultProjectAndMembersPayload } from '../constants';
+import { createDefaultProjectAndMembersPayload, defaultProjectMember } from '../constants';
 import { createProject } from '../createProject';
 
 describe('createProject', () => {
@@ -87,40 +87,34 @@ describe('createProject', () => {
         blog: 'https://blog.com',
         projectMembers: [
           // Project lead
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
+            teamLead: true,
             walletAddress: projectTeamLeadWalletAddress
-          },
+          }),
           // Wallet address connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             walletAddress: walletAddressUserAddress
-          },
+          }),
           // Wallet address not connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             walletAddress: nonConnectedWalletAddress
-          },
+          }),
           // Google account connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: googleAccountUserEmail
-          },
+          }),
           // Google account not connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: nonConnectedGoogleAccountEmail
-          },
+          }),
           // Verified email connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: verifiedEmailUserEmail
-          },
+          }),
           // Verified email not connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: nonConnectedVerifiedEmail
-          }
+          })
         ]
       },
       userId: projectTeamLead.id

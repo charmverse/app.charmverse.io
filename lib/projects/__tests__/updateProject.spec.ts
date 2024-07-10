@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 
 import { randomETHWallet } from 'lib/utils/blockchain';
 
-import { createDefaultProjectAndMembersPayload } from '../constants';
+import { createDefaultProjectAndMembersPayload, defaultProjectMember } from '../constants';
 import { createProject } from '../createProject';
 import { updateProjectAndMembers } from '../updateProjectAndMembers';
 
@@ -94,43 +94,39 @@ describe('updateProjectAndMembers', () => {
         ...defaultProjectAndMembersPayload,
         name: 'Test project',
         projectMembers: [
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
+            teamLead: true,
             name: 'Team Lead',
             email: projectTeamLeadEmail,
             userId: projectTeamLead.id,
             walletAddress: projectTeamLeadAddress
-          },
+          }),
           // Update user with wallet address
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: '',
             name: 'Wallet address user',
             walletAddress: walletAddressUserAddress,
             userId: walletAddressUser.id
-          },
+          }),
           // Remove project user without any user connected
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: '',
             name: 'Random Project user',
             walletAddress: ''
-          },
+          }),
           // Remove project user with user connected
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: verifiedEmailUserEmail,
             name: 'Verified Email Project user',
             walletAddress: '',
             userId: verifiedEmailUser.id
-          },
+          }),
           // Connect user id with a project member without any wallet address or email
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: '',
             name: 'Random Project user 2',
             walletAddress: ''
-          }
+          })
         ]
       }
     });
