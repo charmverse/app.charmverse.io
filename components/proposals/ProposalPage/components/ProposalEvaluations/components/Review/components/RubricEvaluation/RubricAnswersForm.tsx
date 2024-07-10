@@ -13,6 +13,7 @@ import {
 import { Button } from 'components/common/Button';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
+import type { RubricAnswerData } from 'lib/proposals/rubric/upsertRubricAnswers';
 import { getNumberFromString } from 'lib/utils/numbers';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
@@ -156,10 +157,8 @@ export function RubricAnswersForm({
 
   const answerValues = watch('answers');
 
-  const answersError = answerValues.some(
-    (value) => typeof (value.response as any)?.score !== 'number' && !!value.comment
-  )
-    ? 'Comments cannot be entered without a score'
+  const answersError = answerValues.some((value) => typeof (value.response as any)?.score !== 'number')
+    ? 'Every question of the evaluation must be answered'
     : undefined;
 
   async function submitAnswers(values: FormInput) {
@@ -170,11 +169,8 @@ export function RubricAnswersForm({
     if (!confirmed) {
       return;
     }
-    // answers are optional - filter out ones with no score
-    const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
     await upsertRubricCriteriaAnswer({
-      // @ts-ignore -  TODO: make answer types match
-      answers: filteredAnswers,
+      answers: values.answers as unknown as RubricAnswerData[],
       evaluationId
     });
     // if draft is showing, delete it now that we updated the answers

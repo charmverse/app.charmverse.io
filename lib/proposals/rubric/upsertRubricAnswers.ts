@@ -8,7 +8,7 @@ import { setPageUpdatedAt } from '../setPageUpdatedAt';
 import { getAnswersTable } from './getAnswersTable';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from './interfaces';
 
-type RubricAnswerData<T extends ProposalRubricCriteriaType = ProposalRubricCriteriaType> = Pick<
+export type RubricAnswerData<T extends ProposalRubricCriteriaType = ProposalRubricCriteriaType> = Pick<
   ProposalRubricCriteriaAnswerWithTypedResponse<T>,
   'rubricCriteriaId' | 'response'
 > & { comment?: string };
@@ -26,6 +26,8 @@ export async function upsertRubricAnswers({ answers, userId, proposalId, evaluat
     throw new InvalidInputError(`Valid proposalId is required`);
   } else if (!stringUtils.isUUID(userId)) {
     throw new InvalidInputError(`Valid userId is required`);
+  } else if (answers.find((a) => typeof (a.response as any).score !== 'number')) {
+    throw new InvalidInputError(`Enter a valid score for all the questions`);
   }
 
   const criteria = (await prisma.proposalRubricCriteria.findMany({
