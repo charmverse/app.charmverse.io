@@ -13,7 +13,7 @@ import { Controller, useController } from 'react-hook-form';
 
 const height = 96;
 
-export function ImageField({
+export function ProjectImageField({
   control,
   name,
   type

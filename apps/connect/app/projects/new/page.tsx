@@ -3,7 +3,7 @@ import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
 import { redirect } from 'next/navigation';
 
 export default async function CreateProject() {
-  const user = await getCurrentUser();
+  const user = await getCurrentUser({});
 
   if (!user?.data) {
     redirect('/');

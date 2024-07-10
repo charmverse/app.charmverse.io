@@ -1,8 +1,6 @@
 import { ProjectDetailsPage } from '@connect/components/projects/[id]/ProjectDetailsPage';
 import { fetchProject } from '@connect/lib/projects/fetchProject';
 
-export const dynamic = 'force-dynamic';
-
 export default async function ProjectPage({ params }: { params: { path: string } }) {
   const project = await fetchProject({
     path: params.path
