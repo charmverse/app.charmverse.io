@@ -33,7 +33,11 @@ export function getProposalProjectFormAnswers({
   projectWithMembers.projectMembers.forEach((projectMember) => {
     privateProjectMemberFields.forEach((key) => {
       if (key in projectMember) {
-        projectMember[key] = '';
+        if (key === 'teamLead') {
+          projectMember[key] = false;
+        } else {
+          projectMember[key] = '';
+        }
       }
     });
   });

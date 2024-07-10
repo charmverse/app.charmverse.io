@@ -15,6 +15,7 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
   });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId: proposal?.id });
 
+  // only calculate this once on load, since answers will become stale and override the formFIelds
   const formFields = useMemo(
     () =>
       answers &&
@@ -24,12 +25,12 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
         );
         return {
           ...formField,
-          formFieldAnswer: proposalFormFieldAnswer,
+          // formFieldAnswer: proposalFormFieldAnswer,
           value: proposalFormFieldAnswer?.value as FormFieldValue,
           options: (formField.options ?? []) as SelectOptionType[]
         };
       }),
-    [proposal?.form?.formFields, answers]
+    [!!proposal?.form?.formFields, !!answers]
   );
 
   // get Answers form

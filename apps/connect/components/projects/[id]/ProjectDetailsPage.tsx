@@ -9,22 +9,12 @@ import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectHeader } from '../components/ProjectHeader';
 
-export async function ProjectDetailsPage({ project }: { project?: ConnectProjectDetails | null }) {
-  const currentUser = await getCurrentUser({});
-  if (!project || !currentUser?.data) {
-    return (
-      <PageWrapper>
-        <Typography mt={5} p={2} variant='h6'>
-          Project not found
-        </Typography>
-      </PageWrapper>
-    );
-  }
+export async function ProjectDetailsPage({ project }: { project: ConnectProjectDetails }) {
+  const currentUser = await getCurrentUser();
 
   const isCurrentUserTeamLead = project.projectMembers.some(
-    (member) => member.teamLead && member.userId === currentUser.data?.id
+    (member) => member.teamLead && member.userId === currentUser?.data?.id
   );
-
   return (
     <PageWrapper header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}>
       <ProjectDetails showEditButton={isCurrentUserTeamLead} project={project} />
