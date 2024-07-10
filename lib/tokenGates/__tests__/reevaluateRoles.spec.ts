@@ -6,7 +6,7 @@ import { randomETHWallet } from 'lib/utils/blockchain';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateTokenGate } from 'testing/utils/tokenGates';
 
-jest.mock('lib/tokenGates/validateTokenGateCondition', () => ({
+jest.mock('lib/tokenGates/validateTokenGateConditionWithDelegates', () => ({
   validateTokenGateConditionWithDelegates: jest.fn().mockResolvedValue(true)
 }));
 
