@@ -1,22 +1,25 @@
-import type { Space } from '@charmverse/core/prisma';
-import { walletAddress } from 'stories/lib/mockTokenGataData';
+import type { Space, User } from '@charmverse/core/prisma';
 
 import { assignRole } from 'lib/roles';
 import { updateTokenGateRoles } from 'lib/tokenGates/updateTokenGateRoles';
+import { randomETHWallet } from 'lib/utils/blockchain';
 import type { LoggedInUser } from 'models';
-import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateTokenGate } from 'testing/utils/tokenGates';
 
 jest.mock('lib/tokenGates/validateTokenGateCondition', () => ({
-  validateTokenGateCondition: jest.fn().mockResolvedValue(true)
+  validateTokenGateConditionWithDelegates: jest.fn().mockResolvedValue(true)
 }));
 
 describe('reevaluateRoles', () => {
-  let user: LoggedInUser;
+  let user: User;
   let space: Space;
 
   beforeEach(async () => {
-    const { user: u, space: s } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const { user: u, space: s } = await generateUserAndSpace({
+      isAdmin: true,
+      walletAddress: randomETHWallet().address
+    });
     user = u;
     space = s;
   });

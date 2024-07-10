@@ -11,11 +11,10 @@ import { validateTokenGateConditionWithDelegates } from './validateTokenGateCond
  */
 export async function validateTokenGate(tokenGate: TokenGate, walletAddress: string): Promise<string | null> {
   const tokenGatesValid = await Promise.all(
-    tokenGate.conditions.accessControlConditions?.map(async (condition) =>
+    (tokenGate.conditions.accessControlConditions || []).map((condition) =>
       validateTokenGateConditionWithDelegates(condition, walletAddress)
-    ) || []
+    )
   );
-
   const allConditionsAreValid = tokenGate.conditions.operator === 'AND' && tokenGatesValid.every((v) => v);
 
   const someConditionsAreValid =

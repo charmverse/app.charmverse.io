@@ -4,7 +4,6 @@ import { formatUnits, getAddress, parseEther, parseAbi } from 'viem';
 import { getIncomingDelegations } from 'lib/blockchain/delegateXYZ/client';
 import { getPoapsFromAddress } from 'lib/blockchain/poaps';
 import { getPublicClient } from 'lib/blockchain/publicClient';
-import { NULL_ADDRESS } from 'lib/credentials/constants';
 import { getGitcoinPassportScore } from 'lib/credentials/getGitcoinCredentialsByWallets';
 import { getUserMemberships } from 'lib/guild-xyz/getUserMemberships';
 
