@@ -23,7 +23,7 @@ function addMatchersToSchema({
         }
 
         if (value) {
-          return isAddress(value) || value.endsWith('.eth');
+          return value.endsWith('.eth') || isAddress(value);
         }
 
         return true;
