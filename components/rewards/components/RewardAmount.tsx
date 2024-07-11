@@ -93,17 +93,6 @@ export function RewardAmount({
                 {truncatedAmount} {tokenInfo.isContract && tokenInfo.tokenSymbol}
               </Typography>
             )}
-            {tokenInfo.isContract && tokenInfo.tokenSymbol && (
-              <Typography
-                component='span'
-                variant='body2'
-                data-test='reward-amount'
-                textTransform='uppercase'
-                {...typographyProps}
-              >
-                {tokenInfo.isContract && tokenInfo.tokenSymbol}
-              </Typography>
-            )}
             {!truncatedAmount && noAmountText && <EmptyPlaceholder>{noAmountText}</EmptyPlaceholder>}
           </>
         )}
