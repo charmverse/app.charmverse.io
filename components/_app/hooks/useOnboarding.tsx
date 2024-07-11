@@ -1,7 +1,7 @@
 import charmClient from 'charmClient';
 import { useMembers } from 'hooks/useMembers';
 import { useSpaces } from 'hooks/useSpaces';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 export type OnboardingStep = 'email_step' | 'profile_step';
 

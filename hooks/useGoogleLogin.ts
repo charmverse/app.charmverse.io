@@ -5,7 +5,7 @@ import { log } from '@charmverse/core/log';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { googleOAuthClientIdSensitive as googleOAuthClientId } from 'config/constants';
+import { googleOAuthClientIdSensitive as googleOAuthClientId } from '@root/config/constants';
 import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';

@@ -12,7 +12,7 @@ import { verifyOtpToken } from 'lib/profile/otp/verifyOtpToken';
 import { verifyRecoveryCode } from 'lib/profile/otp/verifyRecoveryCode';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getUserProfile } from 'lib/users/getUser';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

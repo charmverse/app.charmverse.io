@@ -21,7 +21,7 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utils/blockchain';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 import { useUpdateProfileAvatar } from '../hooks/useUpdateProfileAvatar';
 import { useUserDetails } from '../hooks/useUserDetails';

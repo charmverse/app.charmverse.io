@@ -1,6 +1,6 @@
-import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors/chains';
+import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@root/connectors/chains';
 
-import fetch from 'adapters/http/fetch';
+import fetch from '@root/adapters/http/fetch';
 
 const CoinMarketCapCryptoMapping: Record<CryptoCurrency | string, number> = {
   AVAX: 5805,

@@ -2,7 +2,7 @@
 
 import { useS3UploadInput } from '@connect/hooks/useS3UploadInput';
 import type { FormValues } from '@connect/lib/projects/form';
-import { inputBackground } from '@connect/theme/colors';
+import { inputBackground } from 'theme/colors';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';

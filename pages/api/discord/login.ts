@@ -2,13 +2,13 @@ import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { isTestEnv } from 'config/constants';
+import { isTestEnv } from '@root/config/constants';
 import { loginByDiscord } from 'lib/discord/loginByDiscord';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { InvalidStateError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -6,7 +6,7 @@ import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
 import { ethers } from 'ethers';
 
-import { GET } from 'adapters/http';
+import { GET } from '@root/adapters/http';
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { isMantleChain } from 'lib/gnosis/mantleClient';
 import { paginatedCall } from 'lib/utils/async';

@@ -7,7 +7,7 @@ import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { isProdEnv } from 'config/constants';
+import { isProdEnv } from '@root/config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 

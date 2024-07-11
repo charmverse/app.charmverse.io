@@ -6,7 +6,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { AlertColor, ButtonProps } from '@mui/material';
 import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
 import ERC20ABI from 'abis/ERC20.json';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 import { ethers } from 'ethers';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';

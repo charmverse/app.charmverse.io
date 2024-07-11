@@ -6,7 +6,7 @@ import type {
 } from '@charmverse/core/permissions';
 import { PermissionsApiClient } from '@charmverse/core/permissions';
 
-import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
+import { permissionsApiAuthKey, permissionsApiUrl } from '@root/config/constants';
 
 // Injected method for expanding args
 function withUseProposalPermissionsArgs<T>(args: T): T {

@@ -2,7 +2,8 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-kit';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
+import type { LoggedInUser } from '@root/models';
 import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
@@ -15,7 +16,6 @@ import { getUserProfile } from 'lib/users/getUser';
 import { postUserCreate } from 'lib/users/postUserCreate';
 import { DisabledAccountError, InvalidInputError } from 'lib/utils/errors';
 import { uid } from 'lib/utils/strings';
-import type { LoggedInUser } from 'models';
 
 const appClient = createAppClient({
   ethereum: viemConnector({

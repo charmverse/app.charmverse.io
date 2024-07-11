@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 export class GlobalPage {
   // eslint-disable-next-line no-useless-constructor

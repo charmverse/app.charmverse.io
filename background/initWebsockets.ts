@@ -2,7 +2,7 @@
 import './websockets/datadog';
 import { log } from '@charmverse/core/log';
 
-import { appEnv } from 'config/constants';
+import { appEnv } from '@root/config/constants';
 
 import { httpServer, socketServer } from './websockets/app';
 import { cleanup as originCacheCleanup } from './websockets/verifyCustomOrigin';

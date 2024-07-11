@@ -1,6 +1,6 @@
 import type { Role } from '@charmverse/core/prisma';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import type { CreateRoleInput } from 'pages/api/roles/index';
 

@@ -5,7 +5,7 @@ import type { Transaction } from 'prosemirror-state';
 import { Plugin, PluginKey } from 'prosemirror-state';
 import type { EditorProps, EditorView, Decoration } from 'prosemirror-view';
 
-import { isDevEnv } from 'config/constants';
+import { isDevEnv } from '@root/config/constants';
 
 import { createElement } from './createElement';
 

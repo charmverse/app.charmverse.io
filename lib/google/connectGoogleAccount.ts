@@ -6,7 +6,7 @@ import { getUserProfile } from 'lib/users/getUser';
 import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
 import { InvalidInputError, MissingDataError, UnauthorisedActionError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
 

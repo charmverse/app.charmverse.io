@@ -17,7 +17,7 @@ import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/data
 import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { PageIcon } from 'components/common/PageIcon';
-import { webhookEndpoint } from 'config/constants';
+import { webhookEndpoint } from '@root/config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, DataSourceType } from 'lib/databases/board';
 import { createBoardView, type BoardView } from 'lib/databases/boardView';

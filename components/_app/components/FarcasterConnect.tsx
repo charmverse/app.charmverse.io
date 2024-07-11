@@ -6,7 +6,7 @@ import { useWarpcastLogin } from 'components/login/hooks/useWarpcastLogin';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import { warpcastConfig } from 'lib/farcaster/config';
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-import type { LoggedInUser } from 'models/User';
+import type { LoggedInUser } from '@root/models/User';
 
 import { ConnectedAccount } from './ConnectedAccount';
 

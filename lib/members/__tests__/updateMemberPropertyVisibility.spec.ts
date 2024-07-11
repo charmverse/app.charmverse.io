@@ -2,7 +2,7 @@ import type { MemberProperty, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { UndesirableOperationError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateMemberProperty } from 'testing/utils/members';
 import { addUserToSpace, generateSpaceForUser } from 'testing/utils/spaces';

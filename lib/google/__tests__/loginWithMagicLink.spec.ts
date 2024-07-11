@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { DecodedIdToken } from '../firebaseApp';

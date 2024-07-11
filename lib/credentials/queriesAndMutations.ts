@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
 
-import { credentialsWalletPrivateKey, graphQlServerEndpoint, isDevEnv, isStagingEnv } from 'config/constants';
+import { credentialsWalletPrivateKey, graphQlServerEndpoint, isDevEnv, isStagingEnv } from '@root/config/constants';
 
 import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';

@@ -1,6 +1,6 @@
 import env from '@beam-australia/react-env';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 
 type IframelyResponse = {
   html?: string;

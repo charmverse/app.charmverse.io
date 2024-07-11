@@ -3,7 +3,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { sealData, unsealData } from 'iron-session';
 import { v4 as uuid } from 'uuid';
 
-import { authSecret } from 'config/constants';
+import { authSecret } from '@root/config/constants';
 
 import { encodeDocusignState, decodeDocusignState } from '../encodeAndDecodeDocusignState';
 

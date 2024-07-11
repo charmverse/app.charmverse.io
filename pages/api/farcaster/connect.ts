@@ -7,7 +7,7 @@ import { connectFarcaster } from 'lib/farcaster/connectFarcaster';
 import { disconnectFarcaster } from 'lib/farcaster/disconnectFarcaster';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

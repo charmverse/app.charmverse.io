@@ -9,9 +9,9 @@ import type {
   User,
   UserDetails
 } from '@charmverse/core/prisma';
-import type { FiatCurrency, IPairQuote } from 'connectors/chains';
+import type { FiatCurrency, IPairQuote } from '@root/connectors/chains';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
@@ -27,7 +27,7 @@ import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 

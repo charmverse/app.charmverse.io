@@ -22,7 +22,7 @@ import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { webhookEndpoint } from 'config/constants';
+import { webhookEndpoint } from '@root/config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';

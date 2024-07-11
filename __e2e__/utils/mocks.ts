@@ -4,11 +4,11 @@ import { Wallet } from '@ethersproject/wallet';
 import type { Page as BrowserPage } from '@playwright/test';
 import { v4 as uuid } from 'uuid';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import { createPage, createUserWithWallet } from 'testing/setupDatabase';
 
 export async function loginBrowserUser({

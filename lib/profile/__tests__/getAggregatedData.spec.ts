@@ -4,7 +4,7 @@ import fetchMock from 'fetch-mock-jest';
 
 import { getAggregatedData } from 'lib/profile';
 import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 const mockSandbox = fetchMock.sandbox();

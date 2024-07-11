@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { deleteUserS3Assets } from 'lib/aws/deleteUserS3Assets';
+import { deleteUserS3Assets } from '@root/libaws/deleteUserS3Assets';
 
 export async function blacklistUser(userId: string) {
   const user = await prisma.user.findUniqueOrThrow({

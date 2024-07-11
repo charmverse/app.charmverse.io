@@ -2,7 +2,7 @@ import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { isTestEnv } from 'config/constants';
+import { isTestEnv } from '@root/config/constants';
 import { requireKeys, requireSuperApiKey } from 'lib/middleware';
 import { defaultHandler } from 'lib/public-api/handler';
 import type { UserProfile } from 'lib/public-api/interfaces';

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { FormFieldValue, LongTextValue, ProjectFieldValue } from 'lib/forms/interfaces';

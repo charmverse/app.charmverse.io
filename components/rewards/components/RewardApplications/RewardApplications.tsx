@@ -11,7 +11,7 @@ import { useUser } from 'hooks/useUser';
 import { submissionStatuses } from 'lib/rewards/constants';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { formatDate, formatDateTime } from 'lib/utils/dates';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
 

@@ -5,8 +5,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { GET } from 'adapters/http';
-import { redisClient } from 'adapters/redis/redisClient';
+import { GET } from '@root/adapters/http';
+import { redisClient } from '@root/adapters/redis/redisClient';
 
 import type { RequiredDocusignCredentials } from './constants';
 import { docusignPeriodBetweenRequestsInSeconds } from './constants';

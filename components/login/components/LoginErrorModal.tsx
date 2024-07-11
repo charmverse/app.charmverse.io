@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
-import { charmverseDiscordInvite } from 'config/constants';
+import { charmverseDiscordInvite } from '@root/config/constants';
 
 type Props = {
   onClose: () => void;

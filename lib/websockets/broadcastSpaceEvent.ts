@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 
-import { redisClient } from 'adapters/redis/redisClient';
+import { redisClient } from '@root/adapters/redis/redisClient';
 
 import { config } from './config';
 import type { ServerMessage } from './interfaces';

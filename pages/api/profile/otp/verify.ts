@@ -9,7 +9,7 @@ import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { verifyOtpToken } from 'lib/profile/otp/verifyOtpToken';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getUserProfile } from 'lib/users/getUser';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

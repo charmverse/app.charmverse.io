@@ -7,7 +7,7 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { DisconnectWalletRequest } from 'lib/users/disconnectWallet';
 import { disconnectWallet } from 'lib/users/disconnectWallet';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

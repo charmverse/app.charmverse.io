@@ -1,15 +1,14 @@
 import { STSClient, GetFederationTokenCommand } from '@aws-sdk/client-sts';
+import { PathBasedRouter } from '@connect-api/lib/pathBasedRouter';
+import { awsS3Bucket } from '@root/config/constants';
+import { getS3ClientConfig } from '@root/lib/aws/getS3ClientConfig';
+import { getUserS3FilePath } from '@root/lib/aws/uploadToS3Server';
+import type { SessionData } from '@root/lib/session/config';
+import { getIronOptions } from '@root/lib/session/getIronOptions';
 import Cookies from 'cookies';
 import { getIronSession } from 'iron-session';
 import type Router from 'koa-router';
 import { v4 as uuid } from 'uuid';
-
-import { PathBasedRouter } from '@connect-api/lib/pathBasedRouter';
-import { awsS3Bucket } from 'config/constants';
-import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
-import { getUserS3FilePath } from 'lib/aws/uploadToS3Server';
-import type { SessionData } from 'lib/session/config';
-import { getIronOptions } from 'lib/session/getIronOptions';
 
 const router = new PathBasedRouter();
 

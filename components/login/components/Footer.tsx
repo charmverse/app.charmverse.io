@@ -9,7 +9,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 import { FaXTwitter } from 'react-icons/fa6';
 
-import { charmverseDiscordInvite } from 'config/constants';
+import { charmverseDiscordInvite } from '@root/config/constants';
 import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
 import DiscordIcon from 'public/images/logos/discord_logo.svg';
 

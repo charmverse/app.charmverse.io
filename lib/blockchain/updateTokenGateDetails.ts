@@ -1,4 +1,4 @@
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 
 import { getGuildDetails } from 'lib/guild-xyz/getGuild';
 import { getHypersubDetails } from 'lib/tokenGates/hypersub/getHypersubDetails';

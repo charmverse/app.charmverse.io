@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 import { optimism } from 'viem/chains';
 
 import type { EasSchemaChain } from '../connectors';

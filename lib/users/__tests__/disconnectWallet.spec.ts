@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { sessionUserRelations } from 'lib/session/config';
+import { sessionUserRelations } from '@root/lib/session/config';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { disconnectWallet } from '../disconnectWallet';

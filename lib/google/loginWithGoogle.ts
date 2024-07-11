@@ -10,7 +10,7 @@ import { getUserProfile } from 'lib/users/getUser';
 import { postUserCreate } from 'lib/users/postUserCreate';
 import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from 'lib/utils/errors';
 import { uid } from 'lib/utils/strings';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
 

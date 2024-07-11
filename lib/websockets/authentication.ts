@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getIronSession, unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
-import { authSecret } from 'config/constants';
+import { authSecret } from '@root/config/constants';
 import { ActionNotPermittedError } from 'lib/middleware';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';

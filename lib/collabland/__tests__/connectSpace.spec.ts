@@ -12,7 +12,7 @@ import { addUserToSpace } from 'testing/utils/spaces';
 
 const collablandApiUrl = 'https://fakedomain.com';
 
-jest.mock('config/constants', () => ({
+jest.mock('@root/config/constants', () => ({
   authSecret: 'testsecret1234567890'
 }));
 

@@ -4,8 +4,8 @@ import type { DocusignCredential, OptionalPrismaTransaction } from '@charmverse/
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import { GET, POST } from 'adapters/http';
-import { baseUrl } from 'config/constants';
+import { GET, POST } from '@root/adapters/http';
+import { baseUrl } from '@root/config/constants';
 
 import type { RequiredDocusignCredentials } from './constants';
 import { getSpaceDocusignCredentials } from './getSpaceDocusignCredentials';

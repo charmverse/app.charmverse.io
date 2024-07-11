@@ -7,7 +7,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';
 
-import { awsS3Bucket } from 'config/constants';
+import { awsS3Bucket } from '@root/config/constants';
 import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
 import { getUserS3FilePath } from 'lib/aws/uploadToS3Server';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';

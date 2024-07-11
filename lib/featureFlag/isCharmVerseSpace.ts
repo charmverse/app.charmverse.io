@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma-client';
 
-import { isDevEnv } from 'config/constants';
+import { isDevEnv } from '@root/config/constants';
 
 export const defaultDomains = ['charmverse'];
 

@@ -5,7 +5,7 @@ import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { ProfileWidgets } from 'components/members/components/MemberProfile/components/ProfileWidgets/ProfileWidgets';
 import type { Member } from 'lib/members/interfaces';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import type { PublicUser } from 'pages/api/public/profile/[userId]';
 
 import { UserCredentialsList } from './UserCredentials/UserCredentialsList';

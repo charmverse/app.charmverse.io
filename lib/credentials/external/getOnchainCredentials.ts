@@ -7,7 +7,7 @@ import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
 import { getAddress } from 'viem';
 import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
-import { isDevEnv, isStagingEnv } from 'config/constants';
+import { isDevEnv, isStagingEnv } from '@root/config/constants';
 
 import { ApolloClientWithRedisCache } from '../apolloClientWithRedisCache';
 import type { EasSchemaChain } from '../connectors';

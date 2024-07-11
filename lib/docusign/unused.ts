@@ -5,9 +5,9 @@
 // import { log } from '@charmverse/core/log';
 // import { prisma } from '@charmverse/core/prisma-client';
 
-// import { GET, POST } from 'adapters/http';
-// import { redisClient } from 'adapters/redis/redisClient';
-// import { baseUrl } from 'config/constants';
+// import { GET, POST } from '@root/adapters/http';
+// import { redisClient } from '@root/adapters/redis/redisClient';
+// import { baseUrl } from '@root/config/constants';
 // import { InvalidStateError } from 'lib/middleware';
 // import { prettyPrint } from 'lib/utils/strings';
 

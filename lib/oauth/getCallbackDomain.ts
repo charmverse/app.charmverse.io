@@ -1,4 +1,4 @@
-import { appSubdomain, baseUrl, isDevEnv, isProdEnv, isStagingEnv } from 'config/constants';
+import { appSubdomain, baseUrl, isDevEnv, isProdEnv, isStagingEnv } from '@root/config/constants';
 import { getAppApexDomain } from 'lib/utils/domains/getAppApexDomain';
 import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';

@@ -5,7 +5,7 @@ import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/clien
 import { log } from '@charmverse/core/log';
 import type { RedisClientType } from 'redis';
 
-import { redisClient } from 'adapters/redis/redisClient';
+import { redisClient } from '@root/adapters/redis/redisClient';
 
 /**
  *

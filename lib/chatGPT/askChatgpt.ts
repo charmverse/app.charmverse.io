@@ -1,6 +1,6 @@
 import { SystemError } from '@charmverse/core/errors';
 
-import { POST } from 'adapters/http';
+import { POST } from '@root/adapters/http';
 
 import type { ChatGPTModel } from './constants';
 import { CHAT_GPT_BASE_URL, OPENAI_API_KEY, chatGPTModels } from './constants';

@@ -12,7 +12,7 @@ import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DisabledAccountError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

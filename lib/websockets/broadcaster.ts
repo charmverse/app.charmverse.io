@@ -5,9 +5,9 @@ import { createAdapter as createRedisAdapter } from '@socket.io/redis-adapter';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
-import { getClient as getPostgresClient } from 'adapters/postgres/postgresClient';
-import { redisClient } from 'adapters/redis/redisClient';
-import { isDevEnv, isTestEnv } from 'config/constants';
+import { getClient as getPostgresClient } from '@root/adapters/postgres/postgresClient';
+import { redisClient } from '@root/adapters/redis/redisClient';
+import { isDevEnv, isTestEnv } from '@root/config/constants';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
 import { authOnConnect } from './authentication';

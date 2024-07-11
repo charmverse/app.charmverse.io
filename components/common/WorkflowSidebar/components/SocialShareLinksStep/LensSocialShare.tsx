@@ -8,7 +8,7 @@ import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
-import { isProdEnv } from 'config/constants';
+import { isProdEnv } from '@root/config/constants';
 import { useCreateLensPublication } from 'hooks/useCreateLensPublication';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';

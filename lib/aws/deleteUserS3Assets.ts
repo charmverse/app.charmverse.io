@@ -3,7 +3,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { awsS3Bucket } from 'config/constants';
+import { awsS3Bucket } from '@root/config/constants';
 
 import { getS3ClientConfig } from './getS3ClientConfig';
 import { listS3BucketContents } from './listS3Assets';

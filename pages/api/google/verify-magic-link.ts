@@ -9,7 +9,7 @@ import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { postUserCreate } from 'lib/users/postUserCreate';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

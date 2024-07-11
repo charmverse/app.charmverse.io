@@ -1,8 +1,8 @@
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 
-import { GET } from 'adapters/http';
-import { redisClient } from 'adapters/redis/redisClient';
-import { docusignOauthBaseUri } from 'config/constants';
+import { GET } from '@root/adapters/http';
+import { redisClient } from '@root/adapters/redis/redisClient';
+import { docusignOauthBaseUri } from '@root/config/constants';
 
 import { docusignPeriodBetweenRequestsInSeconds } from './constants';
 import { docusignUserOAuthTokenHeader } from './headers';

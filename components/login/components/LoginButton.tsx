@@ -23,7 +23,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { SystemError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models/User';
+import type { LoggedInUser } from '@root/models/User';
 
 import { DiscordLoginHandler } from './DiscordLoginHandler';
 import { EmailAddressForm } from './EmailAddressForm';

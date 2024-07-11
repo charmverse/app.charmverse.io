@@ -6,7 +6,7 @@ import { firebaseApp } from 'lib/google/firebaseApp';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { sessionUserRelations } from 'lib/session/config';
 import { getUserProfile } from 'lib/users/getUser';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 import type { LoginWithGoogleRequest } from './loginWithGoogle';
 

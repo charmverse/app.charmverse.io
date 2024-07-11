@@ -4,7 +4,7 @@ import { OAuth2Client } from 'google-auth-library';
 import {
   googleOAuthClientIdSensitive as googleOAuthClientId,
   googleOAuthClientSecretSensitive as googleOAuthClientSecret
-} from 'config/constants';
+} from '@root/config/constants';
 
 export type GoogleLoginOauthParams = {
   redirectUri?: string;

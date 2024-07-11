@@ -4,10 +4,9 @@
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { awsS3Bucket } from '@root/config/constants';
+import { getS3ClientConfig } from '@root/lib/aws/getS3ClientConfig';
 import { v4 as uuid } from 'uuid';
-
-import { awsS3Bucket } from 'config/constants';
-import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
 
 const client = new S3Client(getS3ClientConfig());
 

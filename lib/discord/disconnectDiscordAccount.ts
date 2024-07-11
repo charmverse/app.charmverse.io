@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { sessionUserRelations } from 'lib/session/config';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
 import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 export type DisconnectDiscordRequest = {
   userId: string;

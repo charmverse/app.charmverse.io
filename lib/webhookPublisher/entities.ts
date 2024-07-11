@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import type {
   ApplicationEntity,

@@ -1,12 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-
 import type { RouterContext } from '@connect-api/koa';
 import { PathBasedRouter } from '@connect-api/lib/pathBasedRouter';
-import { InvalidInputError } from 'lib/utils/errors';
-import { randomIntFromInterval } from 'lib/utils/random';
-import type { LoggedInUser } from 'models';
+import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
+import { InvalidInputError } from '@root/lib/utils/errors';
+import { randomIntFromInterval } from '@root/lib/utils/random';
+import type { LoggedInUser } from '@root/models';
 
 const router = new PathBasedRouter();
 

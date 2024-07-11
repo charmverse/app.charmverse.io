@@ -24,7 +24,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { FormFieldValue } from 'lib/forms/interfaces';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 import type { OnboardingStep } from '../hooks/useOnboarding';
 import { useOnboarding } from '../hooks/useOnboarding';

@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { SchemaRegistry } from '@ethereum-attestation-service/eas-sdk';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 import type { Chain } from 'viem';
 import { createPublicClient, http } from 'viem';
 import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';

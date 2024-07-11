@@ -4,7 +4,7 @@ import { log } from '@charmverse/core/log';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { googleOAuthClientIdSensitive as googleOAuthClientId } from 'config/constants';
+import { googleOAuthClientIdSensitive as googleOAuthClientId } from '@root/config/constants';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { formScopes } from 'lib/google/forms/config';
 import { validateFormScopes } from 'lib/google/forms/validateFormScopes';

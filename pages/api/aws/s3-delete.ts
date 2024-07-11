@@ -4,7 +4,7 @@ import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { awsS3Bucket } from 'config/constants';
+import { awsS3Bucket } from '@root/config/constants';
 import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

@@ -1,7 +1,7 @@
 import firebase from 'firebase-admin';
 import { v4 } from 'uuid';
 
-import { googleWebClientConfig } from 'config/constants';
+import { googleWebClientConfig } from '@root/config/constants';
 
 class FirebaseApp {
   app: firebase.app.App;

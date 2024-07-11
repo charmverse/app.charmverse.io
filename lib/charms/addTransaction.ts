@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { CharmActionTrigger } from 'lib/charms/constants';
+import type { CharmActionTrigger } from '@root/lib/charms/constants';
 
 export type TransactionMetadata = {
   // actorId - could be different from userId if the action was triggered by someone else (i.e. CV team)

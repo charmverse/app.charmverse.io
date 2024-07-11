@@ -3,7 +3,7 @@ import { createServer } from 'http';
 import { log } from '@charmverse/core/log';
 import { Server } from 'socket.io';
 
-import { isDevEnv, isTestEnv } from 'config/constants';
+import { isDevEnv, isTestEnv } from '@root/config/constants';
 import { config } from 'lib/websockets/config';
 import { relay } from 'lib/websockets/relay';
 

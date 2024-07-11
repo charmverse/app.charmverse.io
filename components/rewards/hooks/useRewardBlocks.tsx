@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import { v4 } from 'uuid';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import { useDeleteRewardBlocks, useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';

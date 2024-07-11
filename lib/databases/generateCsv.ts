@@ -6,7 +6,7 @@ import type { Formatters, PropertyContext } from 'components/common/DatabaseEdit
 import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import { Utils } from 'components/common/DatabaseEditor/utils';
 import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 import { CardFilter } from 'lib/databases/cardFilter';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';

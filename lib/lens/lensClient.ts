@@ -1,6 +1,6 @@
 import { LensClient, production, development } from '@lens-protocol/client';
 
-import { isProdEnv } from 'config/constants';
+import { isProdEnv } from '@root/config/constants';
 
 const isServer = typeof window === 'undefined';
 

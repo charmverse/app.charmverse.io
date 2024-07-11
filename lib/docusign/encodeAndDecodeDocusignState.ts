@@ -6,7 +6,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { sealData, unsealData } from 'iron-session';
 
-import { authSecret } from 'config/constants';
+import { authSecret } from '@root/config/constants';
 
 type DocusignOAuthState = {
   userId: string;

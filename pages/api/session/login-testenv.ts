@@ -2,7 +2,7 @@ import type { IdentityType } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { isTestEnv } from 'config/constants';
+import { isTestEnv } from '@root/config/constants';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

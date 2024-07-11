@@ -6,7 +6,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { RateLimit } from 'async-sema';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 
 import { getPublicClient } from 'lib/blockchain/publicClient';
 import { lowerCaseEqual } from 'lib/utils/strings';

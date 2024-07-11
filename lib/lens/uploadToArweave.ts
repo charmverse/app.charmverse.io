@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 
-import { POST } from 'adapters/http';
-import { isProdEnv } from 'config/constants';
+import { POST } from '@root/adapters/http';
+import { isProdEnv } from '@root/config/constants';
 
 export const uploadToArweave = async (data: any): Promise<string | null> => {
   const response = await POST<{ id: string }>(

@@ -2,9 +2,9 @@ import { log } from '@charmverse/core/log';
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { sessionUserRelations } from 'lib/session/config';
-import { MissingDataError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { MissingDataError } from '@root/lib/utils/errors';
+import type { LoggedInUser } from '@root/models';
 
 import { getUserProfile } from './getUser';
 import { updateUsedIdentity } from './updateUsedIdentity';

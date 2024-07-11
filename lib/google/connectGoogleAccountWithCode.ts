@@ -1,9 +1,9 @@
-import { googleOAuthClientIdSensitive } from 'config/constants';
+import { googleOAuthClientIdSensitive } from '@root/config/constants';
 import { getClient } from 'lib/google/authorization/authClient';
 import { connectGoogleAccount } from 'lib/google/connectGoogleAccount';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import { InvalidInputError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 export type ConnectAccountRequest = {
   code: string;

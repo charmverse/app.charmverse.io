@@ -7,7 +7,7 @@ import { sessionUserRelations } from 'lib/session/config';
 import type { UserAvatar } from 'lib/users/interfaces';
 import { InvalidInputError } from 'lib/utils/errors';
 import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 export async function updateProfileAvatar({
   avatar,

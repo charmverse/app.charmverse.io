@@ -14,7 +14,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
 import { BlockCounts } from 'components/settings/subscription/BlockCounts';
-import { userManualUrl } from 'config/constants';
+import { userManualUrl } from '@root/config/constants';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';

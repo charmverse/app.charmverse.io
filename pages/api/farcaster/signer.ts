@@ -3,8 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { mnemonicToAccount } from 'viem/accounts';
 
-import * as http from 'adapters/http';
-import { isProdEnv } from 'config/constants';
+import * as http from '@root/adapters/http';
+import { isProdEnv } from '@root/config/constants';
 import { createHexKeyPair } from 'lib/farcaster/createHexKeyPair';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

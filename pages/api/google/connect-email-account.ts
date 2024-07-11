@@ -12,7 +12,7 @@ import { countConnectableIdentities } from 'lib/users/countConnectableIdentities
 import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

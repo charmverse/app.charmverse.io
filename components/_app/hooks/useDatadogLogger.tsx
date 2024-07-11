@@ -3,7 +3,7 @@ import { datadogLogs } from '@datadog/browser-logs';
 import { datadogRum } from '@datadog/browser-rum';
 import { useEffect } from 'react';
 
-import { isProdEnv, isStagingEnv } from 'config/constants';
+import { isProdEnv, isStagingEnv } from '@root/config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 

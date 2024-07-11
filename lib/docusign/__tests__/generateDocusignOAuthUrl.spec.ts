@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { v4 as uuid } from 'uuid';
 
-import { baseUrl, docusignClientId, docusignOauthBaseUri } from 'config/constants';
+import { baseUrl, docusignClientId, docusignOauthBaseUri } from '@root/config/constants';
 
 import { encodeDocusignState } from '../encodeAndDecodeDocusignState';
 import { docusignScopes, generateDocusignOAuthUrl } from '../generateDocusignOAuthUrl';

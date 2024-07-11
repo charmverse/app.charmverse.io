@@ -17,7 +17,7 @@ import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
-import { isProdEnv } from 'config/constants';
+import { isProdEnv } from '@root/config/constants';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';

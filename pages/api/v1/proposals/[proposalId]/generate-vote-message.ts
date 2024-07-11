@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { isTestEnv } from 'config/constants';
+import { isTestEnv } from '@root/config/constants';
 import { requireKeys } from 'lib/middleware';
 import type { SnapshotProposalVoteMessage, SnapshotProposalVoteType } from 'lib/public-api';
 import { generateSnapshotVoteMessage } from 'lib/public-api/generateSnapshotVoteMessage';

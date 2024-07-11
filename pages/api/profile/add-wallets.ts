@@ -12,7 +12,7 @@ import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { withSessionRoute } from 'lib/session/withSession';
 import { shortenHex } from 'lib/utils/blockchain';
 import { InvalidInputError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

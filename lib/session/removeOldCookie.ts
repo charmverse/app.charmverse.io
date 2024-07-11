@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { cookieName } from 'config/constants';
+import { cookieName } from '@root/config/constants';
 import { getAppApexDomain } from 'lib/utils/domains/getAppApexDomain';
 import { isLocalhostAlias } from 'lib/utils/domains/isLocalhostAlias';
 

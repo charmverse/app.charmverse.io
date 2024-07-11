@@ -6,7 +6,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getUserProfile } from 'lib/users/getUser';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 const handler = nc({
   onError,

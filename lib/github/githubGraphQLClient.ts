@@ -1,4 +1,4 @@
-import { githubAccessToken } from 'config/constants';
+import { githubAccessToken } from '@root/config/constants';
 import { ApolloClientWithRedisCache } from 'lib/credentials/apolloClientWithRedisCache';
 
 import { GITHUB_GRAPHQL_BASE_URL } from './constants';

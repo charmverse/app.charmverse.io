@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography, { type TypographyProps } from '@mui/material/Typography';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 import millify from 'millify';
 
 import { EmptyPlaceholder } from 'components/common/DatabaseEditor/components/properties/EmptyPlaceholder';

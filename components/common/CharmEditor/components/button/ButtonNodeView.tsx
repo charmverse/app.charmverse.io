@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiNftLine } from 'react-icons/ri';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 

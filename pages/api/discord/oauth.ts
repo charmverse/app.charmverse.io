@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { isTestEnv } from 'config/constants';
+import { isTestEnv } from '@root/config/constants';
 import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import { getDiscordRedirectUrl } from 'lib/discord/getDiscordRedirectUrl';
 import { onError, onNoMatch } from 'lib/middleware';

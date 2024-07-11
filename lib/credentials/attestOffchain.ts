@@ -7,11 +7,11 @@ import type {
   SignedOffchainAttestation
 } from '@ethereum-attestation-service/eas-sdk';
 import { Offchain, createOffchainURL } from '@ethereum-attestation-service/eas-sdk';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 import { Wallet, providers } from 'ethers';
 import { v4 as uuid } from 'uuid';
 
-import { credentialsWalletPrivateKey } from 'config/constants';
+import { credentialsWalletPrivateKey } from '@root/config/constants';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { isValidChainAddress } from 'lib/tokens/validation';
 

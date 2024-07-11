@@ -1,12 +1,12 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
+import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
+import type { LoggedInUser } from '@root/models';
 
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { sessionUserRelations } from 'lib/session/config';
 import { getUserProfile } from 'lib/users/getUser';
 import { DisabledAccountError, ExternalServiceError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
 
 export async function connectFarcaster({
   fid,

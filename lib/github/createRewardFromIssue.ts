@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { createReward } from 'lib/rewards/createReward';
