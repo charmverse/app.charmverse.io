@@ -3,10 +3,9 @@ import type { AssignedPostCategoryPermission, TargetPermissionGroup } from '@cha
 import type { PostCategory, Role, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
-
-import { mapPostCategoryPermissionToAssignee } from 'lib/permissions/forum/mapPostCategoryPermissionToAssignee';
-import type { AssignedSpacePermission } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
-import { mapSpacePermissionToAssignee } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
+import { mapPostCategoryPermissionToAssignee } from '@root/lib/permissions/forum/mapPostCategoryPermissionToAssignee';
+import type { AssignedSpacePermission } from '@root/lib/permissions/spaces/mapSpacePermissionToAssignee';
+import { mapSpacePermissionToAssignee } from '@root/lib/permissions/spaces/mapSpacePermissionToAssignee';
 
 import { exportSpaceData, type SpaceDataExport } from '../exportSpaceData';
 import type { ImportedPermissions } from '../importSpacePermissions';

@@ -1,6 +1,5 @@
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
-
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import { generateMarkdown } from '../generateMarkdown';
 

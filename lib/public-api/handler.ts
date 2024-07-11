@@ -1,14 +1,13 @@
 import { log } from '@charmverse/core/log';
+import { count } from '@root/lib/metrics';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { ActionNotPermittedError, onError, onNoMatch } from '@root/lib/middleware';
+import { requireApiKey } from '@root/lib/middleware/requireApiKey';
+import type { NextApiRequestWithApiPageKey } from '@root/lib/middleware/requireApiPageKey';
+import { requireApiPageKey } from '@root/lib/middleware/requireApiPageKey';
+import { requireSuperApiKey } from '@root/lib/middleware/requireSuperApiKey';
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { count } from 'lib/metrics';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
-import { requireApiKey } from 'lib/middleware/requireApiKey';
-import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
-import { requireApiPageKey } from 'lib/middleware/requireApiPageKey';
-import { requireSuperApiKey } from 'lib/middleware/requireSuperApiKey';
 
 export function defaultHandler() {
   return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch }).use(logApiRequest);

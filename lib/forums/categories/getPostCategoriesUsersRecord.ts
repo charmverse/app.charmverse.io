@@ -1,8 +1,7 @@
 import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getPermissionsClient } from 'lib/permissions/api';
-import { getUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
+import { getPermissionsClient } from '@root/lib/permissions/api';
+import { getUserSpaceNotifications } from '@root/lib/userNotifications/spaceNotifications';
 
 import { getPostCategories } from './getPostCategories';
 

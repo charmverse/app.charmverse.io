@@ -2,10 +2,9 @@ import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { CredentialEventType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getFeatureTitle } from '@root/lib/features/getFeatureTitle';
+import { getSubmissionPagePermalink } from '@root/lib/pages/getPagePermalink';
 import { optimism } from 'viem/chains';
-
-import { getFeatureTitle } from 'lib/features/getFeatureTitle';
-import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
 import { credentialEventLabels, disableCredentialAutopublish } from './constants';

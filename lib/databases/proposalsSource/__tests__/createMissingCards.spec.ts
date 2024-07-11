@@ -2,9 +2,9 @@ import { Prisma } from '@charmverse/core/prisma';
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { setPageUpdatedAt } from '@root/lib/proposals/setPageUpdatedAt';
 import { v4 } from 'uuid';
 
-import { setPageUpdatedAt } from 'lib/proposals/setPageUpdatedAt';
 import { generateBoard, generateProposal } from 'testing/setupDatabase';
 
 import { createMissingCards } from '../createMissingCards';

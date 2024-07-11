@@ -1,7 +1,6 @@
 import type { ProposalBlock, ProposalReviewer } from '@charmverse/core/prisma';
-
-import type { BoardFields } from 'lib/databases/board';
-import type { BoardViewFields } from 'lib/databases/boardView';
+import type { BoardFields } from '@root/lib/databases/board';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
 
 export type ProposalPropertyOption = { id: string; color: string; value: string };
 

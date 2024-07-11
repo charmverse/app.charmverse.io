@@ -1,7 +1,7 @@
 // playwright-dev-page.ts
 import type { Page } from '@playwright/test';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import { GlobalPage } from './global.po';
 // capture actions on the pages in signup flow

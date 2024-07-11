@@ -1,7 +1,6 @@
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from '@root/lib/proposals/blocks/constants';
 import arrayEquals from 'lodash/isEqual';
 import { v4 } from 'uuid';
-
-import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
 import type { PropertyType } from './board';
 

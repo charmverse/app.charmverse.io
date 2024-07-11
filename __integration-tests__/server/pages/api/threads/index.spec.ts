@@ -4,7 +4,7 @@ import { testUtilsPages } from '@charmverse/core/test';
 import request from 'supertest';
 
 import type { ThreadCreatePayload, ThreadWithComments } from 'lib/threads';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

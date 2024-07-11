@@ -1,5 +1,5 @@
 import type SafeServiceClient from '@safe-global/safe-service-client';
-import type { IChainDetails } from 'connectors/chains';
+import type { IChainDetails } from '@root/connectors/chains';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 

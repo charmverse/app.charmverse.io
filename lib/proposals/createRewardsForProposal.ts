@@ -1,21 +1,20 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { InvalidStateError } from '@root/lib/middleware';
+import { getPageMetaList } from '@root/lib/pages/server/getPageMetaList';
+import type { ProposalFields } from '@root/lib/proposals/interfaces';
+import type { RewardFields } from '@root/lib/rewards/blocks/interfaces';
+import { createReward } from '@root/lib/rewards/createReward';
+import { assignedWorkflow } from '@root/lib/rewards/getRewardWorkflows';
+import type { RewardReviewer } from '@root/lib/rewards/interfaces';
+import { InvalidInputError } from '@root/lib/utils/errors';
+import { isTruthy } from '@root/lib/utils/types';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishProposalEventBase } from '@root/lib/webhookPublisher/publishEvent';
+import { relay } from '@root/lib/websockets/relay';
 import { uniqBy } from 'lodash';
-
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { InvalidStateError } from 'lib/middleware';
-import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
-import type { ProposalFields } from 'lib/proposals/interfaces';
-import type { RewardFields } from 'lib/rewards/blocks/interfaces';
-import { createReward } from 'lib/rewards/createReward';
-import { assignedWorkflow } from 'lib/rewards/getRewardWorkflows';
-import type { RewardReviewer } from 'lib/rewards/interfaces';
-import { InvalidInputError } from 'lib/utils/errors';
-import { isTruthy } from 'lib/utils/types';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
-import { relay } from 'lib/websockets/relay';
 
 export async function createRewardsForProposal({ proposalId, userId }: { userId: string; proposalId: string }) {
   if (!proposalId) {

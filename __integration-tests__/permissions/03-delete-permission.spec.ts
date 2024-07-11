@@ -4,7 +4,7 @@ import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

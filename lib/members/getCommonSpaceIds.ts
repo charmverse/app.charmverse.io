@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { CommonSpacesInput } from 'lib/members/interfaces';
+import type { CommonSpacesInput } from '@root/lib/members/interfaces';
 
 export async function getCommonSpaceIds({ memberId, requestingUserId, spaceId }: CommonSpacesInput): Promise<string[]> {
   if (!requestingUserId) {

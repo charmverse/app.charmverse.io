@@ -1,4 +1,4 @@
-import type { BoardPropertyValue, PageProperty } from 'lib/public-api/interfaces';
+import type { BoardPropertyValue, PageProperty } from '@root/lib/public-api/interfaces';
 
 export type ValueToValidate = {
   value: BoardPropertyValue;

@@ -1,12 +1,11 @@
 import { createHmac } from 'crypto';
 
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { WebhookMessageProcessResult } from 'lib/collabland/webhook/interfaces';
-import { createPageComment } from 'lib/pages/comments/createPageComment';
-import { createDocumentWithText } from 'lib/prosemirror/constants';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
+import type { WebhookMessageProcessResult } from '@root/lib/collabland/webhook/interfaces';
+import { createPageComment } from '@root/lib/pages/comments/createPageComment';
+import { createDocumentWithText } from '@root/lib/prosemirror/constants';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from '@root/lib/webhookPublisher/publishEvent';
 
 import { SIGNING_KEY } from '../mailgunClient';
 

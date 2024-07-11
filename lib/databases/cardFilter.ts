@@ -1,9 +1,7 @@
 import { log } from '@charmverse/core/log';
-
-import { Utils } from 'components/common/DatabaseEditor/utils';
-import type { IPropertyTemplate } from 'lib/databases/board';
-import type { Card, CardPropertyValue, CardWithRelations } from 'lib/databases/card';
-import { propertyConfigs } from 'lib/databases/filterClause';
+import type { IPropertyTemplate } from '@root/lib/databases/board';
+import type { Card, CardPropertyValue, CardWithRelations } from '@root/lib/databases/card';
+import { propertyConfigs } from '@root/lib/databases/filterClause';
 import type {
   NumberDataTypeConditions,
   FilterClause,
@@ -12,11 +10,13 @@ import type {
   MultiSelectDataTypeConditions,
   SelectDataTypeConditions,
   DateDataTypeConditions
-} from 'lib/databases/filterClause';
-import type { FilterGroup } from 'lib/databases/filterGroup';
-import { isAFilterGroupInstance } from 'lib/databases/filterGroup';
-import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
-import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposals/interfaces';
+} from '@root/lib/databases/filterClause';
+import type { FilterGroup } from '@root/lib/databases/filterGroup';
+import { isAFilterGroupInstance } from '@root/lib/databases/filterGroup';
+import { getProposalEvaluationStatus } from '@root/lib/proposals/getProposalEvaluationStatus';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from '@root/lib/proposals/interfaces';
+
+import { Utils } from 'components/common/DatabaseEditor/utils';
 
 import { Constants } from './constants';
 

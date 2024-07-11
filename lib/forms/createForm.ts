@@ -1,8 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
 import { v4 } from 'uuid';
-
-import type { FormFieldInput } from 'lib/forms/interfaces';
 
 export async function createForm(fields: FormFieldInput[]) {
   if (!fields || fields.length === 0) {

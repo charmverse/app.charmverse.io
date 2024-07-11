@@ -1,9 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
-import type { ReactNode } from 'react';
-
-import { type FeatureJson } from 'lib/features/constants';
-import { getFeatureTitle } from 'lib/features/getFeatureTitle';
+import { type FeatureJson } from '@root/lib/features/constants';
+import { getFeatureTitle } from '@root/lib/features/getFeatureTitle';
 import type {
   ApplicationCommentNotificationType,
   BountyNotification,
@@ -15,8 +13,9 @@ import type {
   NotificationActor,
   PostNotification,
   ProposalNotification
-} from 'lib/notifications/interfaces';
-import { getActionButtonLabels } from 'lib/proposals/getActionButtonLabels';
+} from '@root/lib/notifications/interfaces';
+import { getActionButtonLabels } from '@root/lib/proposals/getActionButtonLabels';
+import type { ReactNode } from 'react';
 
 import { getNotificationUrl } from './getNotificationUrl';
 

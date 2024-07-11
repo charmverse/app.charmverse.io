@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidStateError } from '@root/lib/middleware';
+import { InvalidInputError } from '@root/lib/utils/errors';
 import { generatePage } from '__e2e__/utils/pages';
 
-import { InvalidStateError } from 'lib/middleware';
-import { InvalidInputError } from 'lib/utils/errors';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { removeMember } from '../removeMember';

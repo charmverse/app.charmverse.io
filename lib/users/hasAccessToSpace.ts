@@ -1,8 +1,7 @@
 import type { SpaceRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { SystemError } from 'lib/utils/errors';
-import { InvalidInputError } from 'lib/utils/errors';
+import type { SystemError } from '@root/lib/utils/errors';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
 import { AdministratorOnlyError, UserIsGuestError, UserIsNotSpaceMemberError } from './errors';
 

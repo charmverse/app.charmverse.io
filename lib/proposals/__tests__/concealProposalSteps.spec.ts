@@ -1,9 +1,8 @@
 import type { ProposalWorkflow, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { work } from '@root/lib/rewards/work';
 import { v4 as uuid } from 'uuid';
-
-import { work } from 'lib/rewards/work';
 
 import type { MinimalProposal } from '../concealProposalSteps';
 import { concealProposalSteps } from '../concealProposalSteps';

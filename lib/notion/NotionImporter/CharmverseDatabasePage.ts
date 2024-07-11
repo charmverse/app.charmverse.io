@@ -1,10 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { DatabaseObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { blockToPrisma } from '@root/lib/databases/block';
+import { createBoard } from '@root/lib/databases/board';
+import { createBoardView } from '@root/lib/databases/boardView';
 import { v4 } from 'uuid';
-
-import { blockToPrisma } from 'lib/databases/block';
-import { createBoard } from 'lib/databases/board';
-import { createBoardView } from 'lib/databases/boardView';
 
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';

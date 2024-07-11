@@ -1,6 +1,5 @@
 import type { User, UserVote, Vote, VoteOptions } from '@charmverse/core/prisma';
-
-import type { NotificationActor } from 'lib/notifications/interfaces';
+import type { NotificationActor } from '@root/lib/notifications/interfaces';
 
 export const DEFAULT_THRESHOLD = 50;
 

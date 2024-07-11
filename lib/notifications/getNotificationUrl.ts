@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-
 import type {
   BountyNotification,
   CardNotification,
@@ -8,7 +7,7 @@ import type {
   PostNotification,
   ProposalNotification,
   VoteNotification
-} from 'lib/notifications/interfaces';
+} from '@root/lib/notifications/interfaces';
 
 function getUrlSearchParamsFromNotificationType(
   notification: Pick<

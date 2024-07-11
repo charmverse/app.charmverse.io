@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { InvalidInputError } from 'lib/utils/errors';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
 import type { AssignablePermissionGroups } from '../interfaces';
 

@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
+import { isTestEnv } from '@root/config/constants';
 import { getAddress } from 'viem';
 import { normalize } from 'viem/ens';
-
-import { isTestEnv } from 'config/constants';
 
 import { getPublicClient } from './publicClient';
 

@@ -1,8 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma, ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 
 import { getProjectById } from './getProjectById';
 import {

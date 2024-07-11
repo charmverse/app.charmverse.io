@@ -1,11 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { FormField, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import { isUUID } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
-import type { FormFieldInput } from 'lib/forms/interfaces';
-import { isUUID } from 'lib/utils/strings';
 
 export async function upsertProposalFormFields({
   proposalId,

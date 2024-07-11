@@ -1,6 +1,5 @@
-import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors/chains';
-
-import fetch from 'adapters/http/fetch';
+import fetch from '@root/adapters/http/fetch';
+import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@root/connectors/chains';
 
 export function getPriceFromCryptoCompare(base: CryptoCurrency | string, quote: FiatCurrency) {
   return fetch<any>(`https://min-api.cryptocompare.com/data/price?fsym=${base}&tsyms=${quote}`).then((data) => {

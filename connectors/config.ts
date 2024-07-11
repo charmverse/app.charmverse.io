@@ -1,13 +1,14 @@
 import env from '@beam-australia/react-env';
+import { isTestEnv } from '@root/config/constants';
 import { coinbaseWallet, walletConnect, injected, mock } from '@wagmi/connectors';
-import { getChainList } from 'connectors/chains';
 import type { Address, Chain, Transport } from 'viem';
 import { custom, http } from 'viem';
 import { mainnet } from 'viem/chains';
 import { createConfig } from 'wagmi';
 
+import { getChainList } from './chains';
+
 import 'viem/window';
-import { isTestEnv } from 'config/constants';
 
 const allChains = getChainList({ enableTestnets: true });
 

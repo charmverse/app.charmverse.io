@@ -3,8 +3,8 @@
 import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 
-import { GET } from 'adapters/http';
-import { connectApiHost } from 'config/constants';
+import { GET } from '@root/adapters/http';
+import { connectApiHost } from '@root/config/constants';
 import type { FarcasterUser } from 'lib/farcaster/getFarcasterUsers';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 

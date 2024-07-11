@@ -1,8 +1,5 @@
 {
   "extends": "../../.eslintrc.json",
-  "parserOptions": {
-    "project": ["./tsconfig.json", "apps/connect-api/tsconfig.json", "../../tsconfig.json"]
-  },
   "rules": {
     "@next/next/no-html-link-for-pages": "off",
     "import/no-extraneous-dependencies": [
@@ -15,12 +12,5 @@
         ]
       }
     ]
-  },
-  "settings": {
-    "import/resolver": {
-      "typescript": {
-        "project": "apps/connect-api/tsconfig.json"
-      }
-    }
   }
 }

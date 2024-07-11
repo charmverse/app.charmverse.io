@@ -6,12 +6,11 @@ import type {
 } from '@charmverse/core/pages';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page, Space } from '@charmverse/core/prisma';
-
-import type { Board } from 'lib/databases/board';
-import type { BoardView } from 'lib/databases/boardView';
-import type { Card } from 'lib/databases/card';
-import type { PagePermissionMeta } from 'lib/permissions/interfaces';
-import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
+import type { Board } from '@root/lib/databases/board';
+import type { BoardView } from '@root/lib/databases/boardView';
+import type { Card } from '@root/lib/databases/card';
+import type { PagePermissionMeta } from '@root/lib/permissions/interfaces';
+import type { RewardWithUsersAndPageMeta } from '@root/lib/rewards/interfaces';
 
 export type PageWithPermissionsMeta = Page & {
   permissions: PagePermissionMeta[];

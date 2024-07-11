@@ -4,7 +4,7 @@ import { login } from '__e2e__/utils/session';
 import { generateAndMockTokenGateRequests } from '__e2e__/utils/tokenGates';
 import { mockWeb3 } from '__e2e__/utils/web3';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import { generateUserAndSpace } from '../../utils/mocks';
 

@@ -1,6 +1,7 @@
-import { createMemberPropertyPermission } from 'lib/members/createMemberPropertyPermission';
-import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
-import { assignRole } from 'lib/roles';
+import { createMemberPropertyPermission } from '@root/lib/members/createMemberPropertyPermission';
+import { getAccessibleMemberPropertiesBySpace } from '@root/lib/members/getAccessibleMemberPropertiesBySpace';
+import { assignRole } from '@root/lib/roles';
+
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateMemberProperty } from 'testing/utils/members';
 

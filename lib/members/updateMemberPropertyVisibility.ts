@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { NotFoundError } from 'lib/middleware';
-import { UndesirableOperationError } from 'lib/utils/errors';
+import { NotFoundError } from '@root/lib/middleware';
+import { UndesirableOperationError } from '@root/lib/utils/errors';
 
 import { MEMBER_PROPERTY_CONFIG } from './constants';
 import type { UpdateMemberPropertyVisibilityPayload } from './interfaces';

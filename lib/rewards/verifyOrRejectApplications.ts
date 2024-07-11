@@ -1,8 +1,7 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
-import { getReward } from 'lib/rewards/getReward';
+import { countRemainingSubmissionSlots } from '@root/lib/rewards/countRemainingSubmissionSlots';
+import { getReward } from '@root/lib/rewards/getReward';
 
 export async function verifyOrRejectApplications(rewardId: string) {
   const reward = await getReward({ rewardId });

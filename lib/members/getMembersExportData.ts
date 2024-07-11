@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { DiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
+import { getAllMemberPropertiesBySpace } from '@root/lib/members/getAccessibleMemberPropertiesBySpace';
+import { getSpaceMembers } from '@root/lib/members/getSpaceMembers';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { getAllMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
-import { getSpaceMembers } from 'lib/members/getSpaceMembers';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 export async function getMembersExportData(spaceId: string) {

@@ -1,17 +1,17 @@
-import { v4 as uuid } from 'uuid';
-
-import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
-import type { UIBlockWithDetails as FBBlock } from 'lib/databases/block';
-import type { IViewType } from 'lib/databases/boardView';
-import { createBoardView } from 'lib/databases/boardView';
-import { Constants } from 'lib/databases/constants';
+import type { UIBlockWithDetails as FBBlock } from '@root/lib/databases/block';
+import type { IViewType } from '@root/lib/databases/boardView';
+import { createBoardView } from '@root/lib/databases/boardView';
+import { Constants } from '@root/lib/databases/constants';
 import {
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_BOARD_VIEW_BLOCK_ID,
   DEFAULT_CALENDAR_VIEW_BLOCK_ID,
   DEFAULT_TABLE_VIEW_BLOCK_ID
-} from 'lib/databases/customBlocks/constants';
-import type { RewardType } from 'lib/rewards/interfaces';
+} from '@root/lib/databases/customBlocks/constants';
+import type { RewardType } from '@root/lib/rewards/interfaces';
+import { v4 as uuid } from 'uuid';
+
+import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
 
 import {
   REWARDS_APPLICANTS_BLOCK_ID,

@@ -2,8 +2,7 @@ import { createHmac } from 'crypto';
 
 import { prisma } from '@charmverse/core/prisma-client';
 import type { InstallationDeletedEvent, IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
-
-import type { WebhookMessageProcessResult } from 'lib/collabland/webhook/interfaces';
+import type { WebhookMessageProcessResult } from '@root/lib/collabland/webhook/interfaces';
 
 import { createRewardFromIssue } from '../createRewardFromIssue';
 

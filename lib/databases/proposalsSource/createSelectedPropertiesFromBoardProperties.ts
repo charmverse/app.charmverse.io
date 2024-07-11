@@ -1,6 +1,7 @@
+import { projectFieldProperties, projectMemberFieldProperties } from '@root/lib/projects/formField';
+import { isTruthy } from '@root/lib/utils/types';
+
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
-import { isTruthy } from 'lib/utils/types';
 
 import type { Board } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';

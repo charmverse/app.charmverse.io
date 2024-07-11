@@ -1,7 +1,6 @@
+import { googleWebClientConfig } from '@root/config/constants';
 import { initializeApp } from 'firebase/app';
 import { getAuth, sendSignInLinkToEmail } from 'firebase/auth';
-
-import { googleWebClientConfig } from 'config/constants';
 
 type MagicLinkDispatch = {
   email: string;

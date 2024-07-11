@@ -1,4 +1,4 @@
-import { docusignClientId, docusignClientSecret } from 'config/constants';
+import { docusignClientId, docusignClientSecret } from '@root/config/constants';
 
 export function docusignIntegrationAuthHeader() {
   return {

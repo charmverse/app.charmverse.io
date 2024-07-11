@@ -1,4 +1,4 @@
-import { isProdEnv } from 'config/constants';
+import { isProdEnv } from '@root/config/constants';
 
 export const INSTALLATION_ID_COOKIE = 'github-installation-id';
 

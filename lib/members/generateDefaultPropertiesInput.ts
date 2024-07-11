@@ -1,6 +1,9 @@
 import type { MemberPropertyType, Prisma } from '@charmverse/core/prisma-client';
-
-import { DEFAULT_MEMBER_PROPERTIES, HIDDEN_MEMBER_PROPERTIES, MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
+import {
+  DEFAULT_MEMBER_PROPERTIES,
+  HIDDEN_MEMBER_PROPERTIES,
+  MEMBER_PROPERTY_CONFIG
+} from '@root/lib/members/constants';
 
 export function generateDefaultPropertiesInput({
   userId,

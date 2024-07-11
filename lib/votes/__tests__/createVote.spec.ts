@@ -1,8 +1,8 @@
 import { VoteStatus } from '@charmverse/core/prisma';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { DuplicateDataError } from '@root/lib/utils/errors';
 import { v4 as uuid } from 'uuid';
 
-import { DuplicateDataError } from 'lib/utils/errors';
 import { createPage } from 'testing/setupDatabase';
 
 import { createVote as createVoteService } from '../createVote';

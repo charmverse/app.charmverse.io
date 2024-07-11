@@ -1,7 +1,6 @@
+import type { ThreadWithComments } from '@root/lib/threads/interfaces';
 import type { MarkType, Node, Schema } from 'prosemirror-model';
 import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
-
-import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 export function findTotalInlineComments(
   schema: Schema,

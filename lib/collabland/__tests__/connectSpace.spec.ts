@@ -1,11 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { connectSpace } from '@root/lib/collabland/connectSpace';
+import { encryptData } from '@root/lib/utils/dataEncryption';
 import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 
-import { connectSpace } from 'lib/collabland/connectSpace';
-import { encryptData } from 'lib/utils/dataEncryption';
 import { createDiscordUser } from 'testing/utils/discord';
 import { createRole } from 'testing/utils/roles';
 import { addUserToSpace } from 'testing/utils/spaces';

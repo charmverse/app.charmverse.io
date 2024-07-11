@@ -1,6 +1,6 @@
+import { PageCommentNotFoundError } from '@root/lib/pages/comments/errors';
 import { v4 } from 'uuid';
 
-import { PageCommentNotFoundError } from 'lib/pages/comments/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePageWithComment } from 'testing/utils/pages';
 

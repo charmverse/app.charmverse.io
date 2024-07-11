@@ -1,6 +1,6 @@
 import { expect, test } from '__e2e__/testWithFixtures';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 import { generateSpaceForUser } from 'testing/utils/spaces';
 
 import { generateUserAndSpace } from './utils/mocks';

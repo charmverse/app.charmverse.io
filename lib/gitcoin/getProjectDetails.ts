@@ -1,8 +1,7 @@
+import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { getSafeOwners } from '@root/lib/gnosis/safe/getSafeOwners';
+import { fetchFileByHash, getIpfsFileUrl } from '@root/lib/ipfs/fetchFileByHash';
 import { getAddress } from 'viem';
-
-import { getPublicClient } from 'lib/blockchain/publicClient';
-import { getSafeOwners } from 'lib/gnosis/safe/getSafeOwners';
-import { fetchFileByHash, getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
 
 import { ProjectRegistryAbi } from './abi/ProjectRegistry';
 import { PROJECT_REGISTRY_ADDRESSES } from './constants';

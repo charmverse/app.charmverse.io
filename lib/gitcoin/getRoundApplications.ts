@@ -1,4 +1,4 @@
-import { fetchFileByHash } from 'lib/ipfs/fetchFileByHash';
+import { fetchFileByHash } from '@root/lib/ipfs/fetchFileByHash';
 
 import type { ProjectMetadata } from './getProjectDetails';
 import { createGraphqlClient } from './graphql/client';

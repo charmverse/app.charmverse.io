@@ -1,5 +1,5 @@
-import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
-import type { OauthFlowType } from 'lib/oauth/interfaces';
+import { getCallbackDomain } from '@root/lib/oauth/getCallbackDomain';
+import type { OauthFlowType } from '@root/lib/oauth/interfaces';
 
 const callbackPaths: Record<OauthFlowType, string> = {
   popup: '/authenticate/discord'

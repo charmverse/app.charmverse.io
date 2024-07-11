@@ -1,11 +1,11 @@
 import type { Application, IssuedCredential } from '@charmverse/core/prisma-client';
 import { ApplicationStatus, prisma } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsUser } from '@charmverse/core/test';
+import { typedKeys } from '@root/lib/utils/objects';
+import { pseudoRandomHexString } from '@root/lib/utils/random';
 import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
-import { typedKeys } from 'lib/utils/objects';
-import { pseudoRandomHexString } from 'lib/utils/random';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateBounty, generateBountyApplication, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 

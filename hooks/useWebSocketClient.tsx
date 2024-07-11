@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import { websocketsHost } from 'config/constants';
+import { websocketsHost } from '@root/config/constants';
 import type { ClientMessage, ServerMessage, WebSocketMessage, WebSocketPayload } from 'lib/websockets/interfaces';
 import { PubSub } from 'lib/websockets/pubSub';
 

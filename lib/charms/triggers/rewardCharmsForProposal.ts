@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { addCharms } from 'lib/charms/addCharms';
-import { CharmActionTrigger, charmActionRewards } from 'lib/charms/constants';
+import { addCharms } from '@root/lib/charms/addCharms';
+import { CharmActionTrigger, charmActionRewards } from '@root/lib/charms/constants';
 
 /**
  * Reward user for creating first proposal (only once)

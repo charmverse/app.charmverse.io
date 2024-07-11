@@ -18,11 +18,10 @@ import type {
   VoteOptions
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isBoardPageType } from '@root/lib/pages/isBoardPageType';
+import type { PageContent, TextContent } from '@root/lib/prosemirror/interfaces';
+import { DataNotFoundError } from '@root/lib/utils/errors';
 import { validate } from 'uuid';
-
-import { isBoardPageType } from 'lib/pages/isBoardPageType';
-import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
-import { DataNotFoundError } from 'lib/utils/errors';
 
 export type RelatedPageData = {
   blocks: {

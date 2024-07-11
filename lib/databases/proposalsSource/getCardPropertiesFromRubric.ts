@@ -1,7 +1,7 @@
-import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
-import type { AnswerData } from 'lib/proposals/rubric/aggregateResults';
-import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import type { ProposalPropertyValue } from '@root/lib/proposals/blocks/interfaces';
+import type { AnswerData } from '@root/lib/proposals/rubric/aggregateResults';
+import { aggregateResults } from '@root/lib/proposals/rubric/aggregateResults';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from '@root/lib/proposals/rubric/interfaces';
 
 import type { IPropertyTemplate } from '../board';
 

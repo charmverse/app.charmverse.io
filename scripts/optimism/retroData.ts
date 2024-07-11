@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { readFile } from 'fs/promises';
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 
 import { parse } from 'csv-parse/sync';
 import { readFileSync } from 'fs';

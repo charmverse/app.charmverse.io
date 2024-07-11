@@ -1,4 +1,4 @@
-import { isProdEnv } from 'config/constants';
+import { isProdEnv } from '@root/config/constants';
 
 // Stripe Constants
 

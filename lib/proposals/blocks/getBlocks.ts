@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { ProposalBlockWithTypedFields } from 'lib/proposals/blocks/interfaces';
+import type { ProposalBlockWithTypedFields } from '@root/lib/proposals/blocks/interfaces';
 
 export async function getBlocks({
   spaceId,

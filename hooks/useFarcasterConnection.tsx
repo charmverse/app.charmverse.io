@@ -4,7 +4,7 @@ import { useCallback, useEffect } from 'react';
 
 import { useFarcasterConnect, useFarcasterLogin } from 'charmClient/hooks/farcaster';
 import type { LoginType } from 'lib/farcaster/interfaces';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 import { useUser } from './useUser';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';

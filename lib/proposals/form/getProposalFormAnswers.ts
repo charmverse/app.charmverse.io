@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
-import { getProposalFormFields } from 'lib/proposals/form/getProposalFormFields';
+import type { FieldAnswerInput, FormFieldInput } from '@root/lib/forms/interfaces';
+import { getProposalFormFields } from '@root/lib/proposals/form/getProposalFormFields';
 
 export async function getProposalFormAnswers({
   proposalId,

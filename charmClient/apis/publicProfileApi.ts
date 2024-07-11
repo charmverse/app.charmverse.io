@@ -1,6 +1,6 @@
 import type { ProfileFragment } from '@lens-protocol/client';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import type { EnsProfile } from 'lib/profile/getEnsProfile';
 import type { SummonUserProfile } from 'lib/summon/interfaces';
 

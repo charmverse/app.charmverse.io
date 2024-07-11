@@ -1,4 +1,4 @@
-import { isProdEnv } from 'config/constants';
+import { isProdEnv } from '@root/config/constants';
 
 export const COLLAB_API_KEY = process.env.COLLAB_API_KEY as string | undefined;
 export const COLLABLAND_API_URL =

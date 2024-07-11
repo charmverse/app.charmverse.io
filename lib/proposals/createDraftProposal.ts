@@ -1,12 +1,11 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
+import { createDefaultProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
+import type { ProposalFields } from '@root/lib/proposals/interfaces';
+import type { RubricCriteriaTyped } from '@root/lib/proposals/rubric/interfaces';
 import { v4 as uuid } from 'uuid';
-
-import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import type { ProposalFields } from 'lib/proposals/interfaces';
-import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
 
 import type { ProposalEvaluationInput } from './createProposal';
 import { createProposal } from './createProposal';

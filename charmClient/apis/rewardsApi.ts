@@ -1,7 +1,7 @@
 import type { Resource, UserPermissionFlags } from '@charmverse/core/permissions';
 import type { Application, ApplicationComment, BountyOperation, Space } from '@charmverse/core/prisma';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { ApplicationReview } from 'lib/rewards/reviewApplication';

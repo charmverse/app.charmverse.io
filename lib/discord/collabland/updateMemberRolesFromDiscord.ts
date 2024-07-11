@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { createAndAssignCollablandRoles } from 'lib/collabland/assignRolesCollabland';
-import { getDiscordUserState } from 'lib/collabland/collablandClient';
+import { createAndAssignCollablandRoles } from '@root/lib/collabland/assignRolesCollabland';
+import { getDiscordUserState } from '@root/lib/collabland/collablandClient';
 
 export async function updateMemberRolesFromDiscord({
   spaceId,

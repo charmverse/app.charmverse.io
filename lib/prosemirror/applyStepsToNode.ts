@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
+import type { ProsemirrorJSONStep } from '@root/lib/websockets/documentEvents/interfaces';
 import type { Node } from 'prosemirror-model';
 import { Step } from 'prosemirror-transform';
 
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
-import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
 
 export function applyStepsToNode(steps: ProsemirrorJSONStep[], node: Node): Node {
   return steps.reduce<Node>((n, stepJson, index) => {

@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { BlockTypes } from 'lib/databases/block';
-import type { RewardBlockWithTypedFields } from 'lib/rewards/blocks/interfaces';
+import type { BlockTypes } from '@root/lib/databases/block';
+import type { RewardBlockWithTypedFields } from '@root/lib/rewards/blocks/interfaces';
 
 export async function getBlocks({
   spaceId,

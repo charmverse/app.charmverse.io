@@ -1,10 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { SpaceRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@root/lib/utils/errors';
+import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
-import { InvalidInputError } from 'lib/utils/errors';
-import { uid } from 'lib/utils/strings';
 import { generateUserAndSpace, generateSpaceUser } from 'testing/setupDatabase';
 
 import { AdministratorOnlyError, UserIsGuestError, UserIsNotSpaceMemberError } from '../errors';

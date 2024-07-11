@@ -1,9 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { CredentialEventType, IssuedCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishBountyEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishBountyEvent, publishProposalEventBase } from '@root/lib/webhookPublisher/publishEvent';
 
 type NonNullableValues<T> = {
   [P in keyof T]: NonNullable<T[P]>;

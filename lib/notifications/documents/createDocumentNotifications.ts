@@ -1,15 +1,14 @@
 /* eslint-disable no-continue */
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getPermissionsClient } from 'lib/permissions/api';
-import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ThreadAccessGroup } from 'lib/threads';
-import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { getPermissionsClient } from '@root/lib/permissions/api';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
+import type { UserMentionMetadata } from '@root/lib/prosemirror/extractMentions';
+import { extractMentions } from '@root/lib/prosemirror/extractMentions';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import type { ThreadAccessGroup } from '@root/lib/threads';
+import type { WebhookEvent } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
 import { saveDocumentNotification } from '../saveNotification';
 
