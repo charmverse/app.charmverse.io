@@ -1,6 +1,8 @@
 'use client';
 
+import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect/components/common/PageWrapper';
+import { actionCreateProject } from '@connect/lib/actions/createProject';
 import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { FormValues } from '@connect/lib/projects/form';
 import { schema } from '@connect/lib/projects/form';
@@ -8,6 +10,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useRouter } from 'next/navigation';
+import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -16,14 +19,23 @@ import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
+import { ProjectForm } from '../components/ProjectForm';
 import { ProjectHeader } from '../components/ProjectHeader';
-
-import { CreateProjectForm } from './components/CreateProjectForm';
 
 export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
 
   const router = useRouter();
+
+  // @ts-ignore
+  const { execute, isExecuting } = useAction(actionCreateProject, {
+    onSuccess: (data) => {
+      router.push(`/p/${data.data?.projectPath as string}/publish`);
+    },
+    onError(err) {
+      log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
+    }
+  });
 
   const {
     control,
@@ -48,7 +60,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     return (
       <PageWrapper>
         <Box gap={2} display='flex' flexDirection='column'>
-          <CreateProjectForm
+          <ProjectForm
             control={control}
             isValid={isValid}
             onNext={() => {
@@ -87,9 +99,8 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
           control={control}
           isValid={isValid}
           handleSubmit={handleSubmit}
-          onSuccess={({ projectPath }) => {
-            router.push(`/p/${projectPath}/publish`);
-          }}
+          execute={execute}
+          isExecuting={isExecuting}
         />
       </Box>
     </PageWrapper>

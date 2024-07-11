@@ -94,7 +94,8 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
       name: project.name,
       chainId,
       timeCreated: new Date(),
-      metadata: mappedProject
+      metadata: mappedProject,
+      projectId: project.id
     }
   });
 
