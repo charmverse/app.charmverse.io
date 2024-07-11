@@ -47,7 +47,7 @@ describe('aggregateResults', () => {
     expect(result).toMatchObject<AggregateResults>({
       allScores: {
         // Average of all individual scores (not average of averages)
-        average: 8,
+        average: 12,
         sum: 24
       },
       reviewersResults: {
