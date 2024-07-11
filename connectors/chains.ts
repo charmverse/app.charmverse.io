@@ -119,7 +119,7 @@ export const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: [mainnet.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
     iconUrl: '/images/cryptoLogos/ethereum-icon-purple.svg',
-    rpcUrls: mainnet.rpcUrls.default.http,
+    rpcUrls: ['https://rpc.ankr.com/eth'], // this one returns errors in prod: mainnet.rpcUrls.default.http,
     shortName: 'eth',
     unlockNetwork: true,
     hypersubNetwork: true
