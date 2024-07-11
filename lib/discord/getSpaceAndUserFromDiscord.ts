@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getSpacesFromDiscord } from 'lib/discord/getSpaceFromDiscord';
+import { getSpacesFromDiscord } from '@root/lib/discord/getSpaceFromDiscord';
 
 export async function getSpacesAndUserFromDiscord({
   discordServerId,

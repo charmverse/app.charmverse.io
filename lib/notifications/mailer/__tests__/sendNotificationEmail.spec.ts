@@ -1,9 +1,9 @@
 import { testUtilsPages } from '@charmverse/core/test';
+import { saveDocumentNotification } from '@root/lib/notifications/saveNotification';
+import { builders } from '@root/lib/prosemirror/builders';
+import { updateUserProfile } from '@root/lib/users/updateUserProfile';
 import { v4 } from 'uuid';
 
-import { saveDocumentNotification } from 'lib/notifications/saveNotification';
-import { builders } from 'lib/prosemirror/builders';
-import { updateUserProfile } from 'lib/users/updateUserProfile';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 afterEach(() => {

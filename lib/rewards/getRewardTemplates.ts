@@ -1,8 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { rewardWithUsersInclude } from 'lib/rewards/getReward';
-import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
+import { rewardWithUsersInclude } from '@root/lib/rewards/getReward';
+import { mapDbRewardToReward } from '@root/lib/rewards/mapDbRewardToReward';
 
 import type { RewardTemplate } from './getRewardTemplate';
 

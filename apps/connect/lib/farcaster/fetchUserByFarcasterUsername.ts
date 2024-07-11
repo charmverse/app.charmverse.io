@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getFarcasterUsers } from 'lib/farcaster/getFarcasterUsers';
+import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 
 export async function fetchUserByFarcasterUsername(username: string) {
   const [farcasterUser] = await getFarcasterUsers({

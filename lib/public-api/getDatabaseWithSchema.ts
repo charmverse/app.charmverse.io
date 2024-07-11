@@ -1,8 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
+import { generatePageQuery } from '@root/lib/pages/server/generatePageQuery';
 
 import { DatabasePageNotFoundError, SpaceNotFoundError } from './errors';
 import type { DatabasePage } from './interfaces';

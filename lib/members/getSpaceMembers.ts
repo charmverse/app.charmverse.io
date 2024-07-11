@@ -1,18 +1,18 @@
 import type { MemberProperty } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+import type { DiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
+import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import {
   getAccessibleMemberPropertiesBySpace,
   getAllMemberPropertiesBySpace
-} from 'lib/members/getAccessibleMemberPropertiesBySpace';
-import { getMemberSearchValue } from 'lib/members/getMemberSearchValue';
-import { getSpaceMemberSearchParams } from 'lib/members/getSpaceMemberSearchParams';
-import type { Member } from 'lib/members/interfaces';
-import { getPropertiesWithValues } from 'lib/members/utils';
-import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { replaceS3Domain } from 'lib/utils/url';
+} from '@root/lib/members/getAccessibleMemberPropertiesBySpace';
+import { getMemberSearchValue } from '@root/lib/members/getMemberSearchValue';
+import { getSpaceMemberSearchParams } from '@root/lib/members/getSpaceMemberSearchParams';
+import type { Member } from '@root/lib/members/interfaces';
+import { getPropertiesWithValues } from '@root/lib/members/utils';
+import { hasNftAvatar } from '@root/lib/users/hasNftAvatar';
+import { replaceS3Domain } from '@root/lib/utils/url';
+
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import type { UserIdentities } from './getMemberUsername';

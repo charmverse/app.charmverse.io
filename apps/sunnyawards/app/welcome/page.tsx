@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Welcome() {
-  const user = await getCurrentUserAction({});
+  const user = await getCurrentUserAction();
 
   if (!user?.data) {
     return null;

@@ -1,8 +1,7 @@
 import crypto from 'node:crypto';
 
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { WebhookNameSpaces } from 'lib/webhookPublisher/interfaces';
+import { WebhookNameSpaces } from '@root/lib/webhookPublisher/interfaces';
 
 export function createSigningSecret() {
   return crypto.randomBytes(160 / 8).toString('hex');

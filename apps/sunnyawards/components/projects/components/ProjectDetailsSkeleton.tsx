@@ -1,10 +1,11 @@
-import { PageWrapper } from 'components/common/PageWrapper';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
+
+import { PageWrapper } from 'components/common/PageWrapper';
 
 export function ProjectDetailsSkeleton() {
   return (

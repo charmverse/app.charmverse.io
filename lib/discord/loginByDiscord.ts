@@ -1,19 +1,18 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { isTestEnv } from '@root/config/constants';
+import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
+import { getDiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
+import { getDiscordCallbackUrl } from '@root/lib/discord/getDiscordCallbackUrl';
+import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { logSignupViaDiscord } from '@root/lib/metrics/postToDiscord';
+import type { OauthFlowType } from '@root/lib/oauth/interfaces';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { postUserCreate } from '@root/lib/users/postUserCreate';
+import { DisabledAccountError } from '@root/lib/utils/errors';
+import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
-
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { getDiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
-import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
-import type { OauthFlowType } from 'lib/oauth/interfaces';
-import { sessionUserRelations } from 'lib/session/config';
-import { postUserCreate } from 'lib/users/postUserCreate';
-import { DisabledAccountError } from 'lib/utils/errors';
-import { uid } from 'lib/utils/strings';
 
 type LoginWithDiscord = {
   code: string;

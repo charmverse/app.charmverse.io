@@ -1,9 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
+import { generatePageQuery } from '@root/lib/pages/server/generatePageQuery';
+import { getMarkdownText } from '@root/lib/prosemirror/getMarkdownText';
 
 import { PageNotFoundError } from './errors';
 import { getDatabaseWithSchema } from './getDatabaseWithSchema';

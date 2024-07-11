@@ -1,19 +1,19 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
-import { ProjectShareItem } from 'components/projects/components/ProjectShareItem';
+import { getUserS3FilePath, uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
 import { ImageResponse } from 'next/og';
 import React from 'react';
 import sharp from 'sharp';
 
-import { getUserS3FilePath, uploadFileToS3 } from 'lib/aws/uploadToS3Server';
+import { ProjectShareItem } from 'components/projects/components/ProjectShareItem';
 
-import { fetchProject } from './getProject';
+import { getProject } from './getProject';
 
 export async function saveOgImage(projectId: string, userId: string) {
   if (!projectId) {
     throw new DataNotFoundError('No id provided');
   }
 
-  const project = await fetchProject({
+  const project = await getProject({
     id: projectId
   });
 

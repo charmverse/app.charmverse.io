@@ -1,9 +1,9 @@
 import type { Page, Post, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InsecureOperationError, UndesirableOperationError } from '@root/lib/utils/errors';
+import { typedKeys } from '@root/lib/utils/objects';
 import { v4 } from 'uuid';
 
-import { InsecureOperationError, UndesirableOperationError } from 'lib/utils/errors';
-import { typedKeys } from 'lib/utils/objects';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 

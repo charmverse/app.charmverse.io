@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { updateUsedIdentity } from '@root/lib/users/updateUsedIdentity';
+import { InvalidInputError, MissingDataError } from '@root/lib/utils/errors';
 import type { LoggedInUser } from '@root/models';
-
-import { sessionUserRelations } from 'lib/session/config';
-import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
-import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
 
 export type EmailAccountDisconnect = {
   email: string;

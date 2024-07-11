@@ -1,8 +1,7 @@
+import type { SignatureVerificationPayloadWithAddress } from '@root/lib/blockchain/signAndVerify';
+import { isValidWalletSignature, verifyEIP1271Signature } from '@root/lib/blockchain/signAndVerify';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
-
-import type { SignatureVerificationPayloadWithAddress } from 'lib/blockchain/signAndVerify';
-import { isValidWalletSignature, verifyEIP1271Signature } from 'lib/blockchain/signAndVerify';
 
 import { MissingDataError } from '../utils/errors';
 

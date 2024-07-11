@@ -1,11 +1,12 @@
-import { connectApiClient } from '@connect/apiClient/apiClient';
-import { Avatar } from 'components/common/Avatar';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { BoxProps } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
+import { apiClient } from 'apiClient/apiClient';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
+
+import { Avatar } from 'components/common/Avatar';
 
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
@@ -18,7 +19,7 @@ export function SearchFarcasterUser({
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((_searchTerm: string) => {
-      connectApiClient
+      apiClient
         .getFarcasterUsersByUsername(_searchTerm)
         .then((_farcasterProfiles) => {
           if (_farcasterProfiles.length) {

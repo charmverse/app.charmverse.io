@@ -1,11 +1,10 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation, privateEvaluationSteps } from '@charmverse/core/proposals';
-
-import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getProposalAction } from 'lib/proposals/getProposalAction';
-import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
+import { getProposalAction } from '@root/lib/proposals/getProposalAction';
+import type { WebhookEvent } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
 import type { NotificationToggles } from '../notificationToggles';
 import { saveProposalNotification } from '../saveNotification';

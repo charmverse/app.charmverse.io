@@ -15,12 +15,12 @@ import type {
   ProposalEvaluationAppealReview
 } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import type { EASAttestationFromApi } from '@root/lib/credentials/external/getOnchainCredentials';
+import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
+import type { UpdateableRewardFields } from '@root/lib/rewards/updateRewardSettings';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
-import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
-import type { ProjectWithMembers } from 'lib/projects/interfaces';
-import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import type { ProposalPropertiesField } from './blocks/interfaces';
 import type { DocumentWithSigners } from './documentsToSign/getProposalDocumentsToSign';

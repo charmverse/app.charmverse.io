@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Profile() {
-  const user = await getCurrentUserAction({});
+  const user = await getCurrentUserAction();
 
   if (!user?.data) {
     redirect('/');

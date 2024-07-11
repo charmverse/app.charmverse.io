@@ -32,7 +32,7 @@ export type ConnectProjectDetails = Pick<
   }[];
 };
 
-export async function getProject(query: { path: string }): Promise<ConnectProjectDetails | null> {
+export async function getProject(query: { path: string } | { id: string }): Promise<ConnectProjectDetails | null> {
   const project = await prisma.project.findFirst({
     where: query,
     select: {

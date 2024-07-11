@@ -1,13 +1,12 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import type { OptimismProjectAttestation, OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { attestOnchain } from 'lib/credentials/attestOnchain';
+import { attestOnchain } from '@root/lib/credentials/attestOnchain';
 import type {
   OptimismProjectAttestationData,
   OptimismProjectSnapshotAttestationMetaData
-} from 'lib/credentials/schemas/optimismProjectSchemas';
-import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+} from '@root/lib/credentials/schemas/optimismProjectSchemas';
+import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
 import { fetchProject } from '../projects/fetchProject';
 

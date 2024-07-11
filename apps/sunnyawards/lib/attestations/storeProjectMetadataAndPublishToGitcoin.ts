@@ -2,12 +2,11 @@ import { DataNotFoundError } from '@charmverse/core/errors';
 import type { GitcoinProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
+import { attestOnchain } from '@root/lib/credentials/attestOnchain';
+import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
+import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
-import { attestOnchain } from 'lib/credentials/attestOnchain';
-import { gitcoinProjectCredentialSchemaId } from 'lib/credentials/schemas/gitcoinProjectSchema';
-import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-
-import { fetchProject } from '../projects/getProject';
+import { getProject } from '../projects/getProject';
 
 import { projectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
@@ -32,7 +31,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     }
   });
 
-  const project = await fetchProject(
+  const project = await getProject(
     stringUtils.isUUID(projectIdOrPath) ? { id: projectIdOrPath } : { path: projectIdOrPath }
   );
 

@@ -1,9 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { TypographyProps } from '@mui/material/Typography';
 import { getChainById } from '@root/connectors/chains';
+import { shortWalletAddress } from '@root/lib/utils/blockchain';
 import { formatEther } from 'viem';
-
-import { shortWalletAddress } from 'lib/utils/blockchain';
 
 import type { Operator, TokenGate } from './interfaces';
 

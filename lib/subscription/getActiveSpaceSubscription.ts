@@ -1,8 +1,7 @@
 import type { StripeSubscription } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DeprecatedFreeTrial } from '@root/lib/subscription/constants';
 import type Stripe from 'stripe';
-
-import { DeprecatedFreeTrial } from 'lib/subscription/constants';
 
 import type { SubscriptionFieldsFromStripe } from './mapStripeFields';
 import { mapStripeFields } from './mapStripeFields';

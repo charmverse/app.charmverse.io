@@ -1,7 +1,6 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { ProposalNotification } from 'lib/notifications/interfaces';
+import type { ProposalNotification } from '@root/lib/notifications/interfaces';
 
 import type { QueryCondition } from '../utils';
 import { notificationMetadataSelectStatement, queryCondition } from '../utils';

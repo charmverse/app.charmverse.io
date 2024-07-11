@@ -1,4 +1,4 @@
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 
 export function extractPollIds(content: PageContent | null) {
   if (!content) {

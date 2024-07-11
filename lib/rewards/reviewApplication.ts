@@ -1,9 +1,8 @@
 import type { Application, ApplicationStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { issueOffchainRewardCredentialsIfNecessary } from 'lib/credentials/issueOffchainRewardCredentialsIfNecessary';
-import { verifyOrRejectApplications } from 'lib/rewards/verifyOrRejectApplications';
-import { WrongStateError } from 'lib/utils/errors';
+import { issueOffchainRewardCredentialsIfNecessary } from '@root/lib/credentials/issueOffchainRewardCredentialsIfNecessary';
+import { verifyOrRejectApplications } from '@root/lib/rewards/verifyOrRejectApplications';
+import { WrongStateError } from '@root/lib/utils/errors';
 
 import { rollupRewardStatus } from './rollupRewardStatus';
 

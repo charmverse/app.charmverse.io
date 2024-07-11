@@ -1,8 +1,7 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
-import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { issueOffchainProposalCredentialsIfNecessary } from '@root/lib/credentials/issueOffchainProposalCredentialsIfNecessary';
+import { publishProposalEvent } from '@root/lib/webhookPublisher/publishEvent';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import { setPageUpdatedAt } from './setPageUpdatedAt';

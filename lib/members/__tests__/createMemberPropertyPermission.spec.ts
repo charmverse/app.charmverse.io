@@ -1,5 +1,6 @@
-import { createMemberPropertyPermission } from 'lib/members/createMemberPropertyPermission';
-import { InvalidInputError } from 'lib/utils/errors';
+import { createMemberPropertyPermission } from '@root/lib/members/createMemberPropertyPermission';
+import { InvalidInputError } from '@root/lib/utils/errors';
+
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateMemberProperty } from 'testing/utils/members';
 

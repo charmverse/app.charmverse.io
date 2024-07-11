@@ -1,6 +1,6 @@
+import type { Member } from '@root/lib/members/interfaces';
 import type { LoggedInUser } from '@root/models';
 
-import type { Member } from 'lib/members/interfaces';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { createDefaultProject, defaultProjectMember } from './constants';

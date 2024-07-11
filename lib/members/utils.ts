@@ -1,6 +1,5 @@
 import type { MemberProperty, MemberPropertyValue, Space } from '@charmverse/core/prisma';
-
-import type { MemberPropertyValuesBySpace, PropertyValueWithDetails } from 'lib/members/interfaces';
+import type { MemberPropertyValuesBySpace, PropertyValueWithDetails } from '@root/lib/members/interfaces';
 
 type MemberPropertyWithSpace = MemberProperty & {
   space: Space;

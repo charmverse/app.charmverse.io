@@ -1,10 +1,9 @@
 import { log } from '@charmverse/core/log';
-import { connectApiClient } from '@connect/apiClient/apiClient';
+import { uploadToS3 } from '@root/lib/aws/uploadToS3Browser';
+import { DEFAULT_MAX_FILE_SIZE_MB } from '@root/lib/file/constants';
+import { replaceS3Domain } from '@root/lib/utils/url';
+import { apiClient } from 'apiClient/apiClient';
 import { useState } from 'react';
-
-import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { DEFAULT_MAX_FILE_SIZE_MB } from 'lib/file/constants';
-import { replaceS3Domain } from 'lib/utils/url';
 
 import { useFilePicker } from './useFilePicker';
 
@@ -39,7 +38,7 @@ export const useS3UploadInput = ({
     setFileName(file.name || '');
 
     try {
-      const { url } = await uploadToS3(connectApiClient.uploadImage, file, { onUploadPercentageProgress: setProgress });
+      const { url } = await uploadToS3(apiClient.uploadImage, file, { onUploadPercentageProgress: setProgress });
       onFileUpload({ url: replaceS3Domain(url), fileName: file.name || '', size: file.size });
     } catch (error) {
       log.error('Error uploading image to s3', { error });

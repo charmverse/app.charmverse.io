@@ -1,10 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { signAndPublishCharmverseCredential } from '@root/lib/credentials/attestOffchain';
+import type { ExternalProjectMetadata } from '@root/lib/credentials/schemas/external';
 import { optimism } from 'viem/chains';
 import { getAddress } from 'viem/utils';
-
-import { signAndPublishCharmverseCredential } from 'lib/credentials/attestOffchain';
-import type { ExternalProjectMetadata } from 'lib/credentials/schemas/external';
 
 import { GITCOIN_SUPPORTED_CHAINS } from './constants';
 import { getProjectOwners } from './getProjectDetails';

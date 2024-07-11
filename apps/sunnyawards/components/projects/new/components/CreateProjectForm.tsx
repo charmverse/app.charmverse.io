@@ -1,9 +1,10 @@
-import type { FormValues } from 'lib/projects/form';
-import { CATEGORIES } from 'lib/projects/form';
 import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
+
+import { CATEGORIES } from 'lib/projects/form';
+import type { FormValues } from 'lib/projects/form';
 
 import { ImageField } from './ImageField';
 import { MultiTextValueFields } from './MultiTextValueFields';

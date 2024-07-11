@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { DataNotFoundError } from 'lib/utils/errors';
-import { isTruthy } from 'lib/utils/types';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { DataNotFoundError } from '@root/lib/utils/errors';
+import { isTruthy } from '@root/lib/utils/types';
 
 import type { TokenGateWithRoles } from './interfaces';
 import { validateTokenGateWithMultipleWallets } from './validateTokenGate';

@@ -1,14 +1,13 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-
 import { awsS3Bucket } from '@root/config/constants';
-import { uploadFileToS3 } from 'lib/aws/uploadToS3Server';
-import { gitcoinProjectCredentialSchemaId } from 'lib/credentials/schemas/gitcoinProjectSchema';
-import { replaceS3Domain } from 'lib/utils/url';
+import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
+import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
+import { replaceS3Domain } from '@root/lib/utils/url';
 
 import type { ConnectProjectDetails } from '../projects/getProject';
-import { fetchProject } from '../projects/getProject';
+import { getProject } from '../projects/getProject';
 
 import { getAttestationS3Path } from './getAttestationS3Path';
 
@@ -24,7 +23,7 @@ export async function storeGitcoinProjectProfileInS3({
   projectOrProjectId: ConnectProjectDetails | string;
 }): Promise<{ staticFilePath: string; profile: GitcoinUserProfile }> {
   const project =
-    typeof projectOrProjectId === 'string' ? await fetchProject({ id: projectOrProjectId }) : projectOrProjectId;
+    typeof projectOrProjectId === 'string' ? await getProject({ id: projectOrProjectId }) : projectOrProjectId;
 
   if (!project) {
     throw new DataNotFoundError('Project not found');

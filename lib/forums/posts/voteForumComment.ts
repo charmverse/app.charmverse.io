@@ -1,9 +1,8 @@
 import type { PostCommentUpDownVote } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPostCommentVoteEvent } from 'lib/webhookPublisher/publishEvent';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishPostCommentVoteEvent } from '@root/lib/webhookPublisher/publishEvent';
 
 type CommentVote = {
   commentId: string;

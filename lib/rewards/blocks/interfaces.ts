@@ -1,9 +1,8 @@
 import type { RewardBlock } from '@charmverse/core/prisma';
-
-import type { BlockWithDetails } from 'lib/databases/block';
-import type { Board, IPropertyTemplate, BoardFields } from 'lib/databases/board';
-import type { BoardViewFields } from 'lib/databases/boardView';
-import type { CardPropertyValue } from 'lib/databases/card';
+import type { BlockWithDetails } from '@root/lib/databases/block';
+import type { Board, IPropertyTemplate, BoardFields } from '@root/lib/databases/board';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
+import type { CardPropertyValue } from '@root/lib/databases/card';
 
 import type { ApplicationMeta, RewardReviewer } from '../interfaces';
 

@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { findOrCreateCollablandRoles } from 'lib/collabland/findOrCreateCollablandRoles';
-import { getSpacesAndUserFromDiscord } from 'lib/discord/getSpaceAndUserFromDiscord';
+import { findOrCreateCollablandRoles } from '@root/lib/collabland/findOrCreateCollablandRoles';
+import { getSpacesAndUserFromDiscord } from '@root/lib/discord/getSpaceAndUserFromDiscord';
 
 export async function assignRolesCollabland({
   discordUserId,

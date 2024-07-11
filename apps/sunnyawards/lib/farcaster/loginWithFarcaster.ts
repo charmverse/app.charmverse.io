@@ -110,7 +110,7 @@ export async function loginWithFarcaster({
   });
 
   if (userWithWallet) {
-    const updatedUser = await prisma.user.update({
+    await prisma.user.update({
       where: {
         id: userWithWallet.id
       },
@@ -139,13 +139,10 @@ export async function loginWithFarcaster({
             fid
           }
         }
-      },
-      include: sessionUserRelations
+      }
     });
 
     trackUserAction('sign_in', { userId: userWithWallet.id, identityType: 'Farcaster' });
-
-    return updatedUser;
   }
 
   const userId = uuid();

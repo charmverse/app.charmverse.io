@@ -1,8 +1,9 @@
-import type { AvatarSize } from 'components/common/Avatar';
-import { Avatar } from 'components/common/Avatar';
 import { DeleteOutline } from '@mui/icons-material';
 import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
+
+import { Avatar } from 'components/common/Avatar';
+import type { AvatarSize } from 'components/common/Avatar';
 
 function FarcasterCardContent({
   avatar,

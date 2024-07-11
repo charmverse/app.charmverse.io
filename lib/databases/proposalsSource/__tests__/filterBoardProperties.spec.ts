@@ -1,11 +1,10 @@
-import { v4 } from 'uuid';
-
 import {
   PROJECT_MEMBER_EMAILS_ID,
   PROJECT_MEMBER_NAMES_ID,
   PROJECT_NAME_ID,
   PROJECT_TWITTER_ID
-} from 'lib/projects/formField';
+} from '@root/lib/projects/formField';
+import { v4 } from 'uuid';
 
 import { filterBoardProperties } from '../filterBoardProperties';
 

@@ -1,9 +1,8 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getPostCategoriesUsersRecord } from 'lib/forums/categories/getPostCategoriesUsersRecord';
-import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { getPostCategoriesUsersRecord } from '@root/lib/forums/categories/getPostCategoriesUsersRecord';
+import type { WebhookEvent } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
 import { savePostNotification } from '../saveNotification';
 

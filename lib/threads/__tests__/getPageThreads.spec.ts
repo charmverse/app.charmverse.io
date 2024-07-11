@@ -1,6 +1,6 @@
 import { testUtilsUser } from '@charmverse/core/test';
+import { assignRole } from '@root/lib/roles';
 
-import { assignRole } from 'lib/roles';
 import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
 import { createRole } from 'testing/utils/roles';
 

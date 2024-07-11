@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
-
-import { InvalidStateError } from 'lib/middleware';
+import { InvalidStateError } from '@root/lib/middleware';
 
 import type { GithubGraphQLQuery, GithubUserName } from './getMergedPullRequests';
 import type { PullRequestMeta } from './getPullRequestMeta';

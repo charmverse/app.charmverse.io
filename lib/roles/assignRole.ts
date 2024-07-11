@@ -1,9 +1,8 @@
 import type { SpaceRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { InvalidStateError } from 'lib/middleware';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from 'lib/utils/errors';
+import { InvalidStateError } from '@root/lib/middleware';
+import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
+import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from '@root/lib/utils/errors';
 
 import type { RoleAssignment } from './interfaces';
 import { listRoleMembers } from './listRoleMembers';

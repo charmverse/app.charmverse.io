@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { VoteNotification } from 'lib/notifications/interfaces';
+import type { VoteNotification } from '@root/lib/notifications/interfaces';
 
 import { aggregateVoteResult } from '../../votes/aggregateVoteResult';
 import { calculateVoteStatus } from '../../votes/calculateVoteStatus';

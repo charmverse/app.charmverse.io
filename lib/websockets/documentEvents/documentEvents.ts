@@ -1,22 +1,21 @@
 import { getLogger } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { STATIC_PAGES } from '@root/lib/features/constants';
+import { trashPages } from '@root/lib/pages/trashPages';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
+import { applyStepsToNode } from '@root/lib/prosemirror/applyStepsToNode';
+import { emptyDocument } from '@root/lib/prosemirror/constants';
+import { convertAndSavePage } from '@root/lib/prosemirror/conversions/convertOldListNodes';
+import { extractMentions } from '@root/lib/prosemirror/extractMentions';
+import { extractPreviewImage } from '@root/lib/prosemirror/extractPreviewImage';
+import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import { isUUID } from '@root/lib/utils/strings';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from '@root/lib/webhookPublisher/publishEvent';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
-
-import { STATIC_PAGES } from 'lib/features/constants';
-import { trashPages } from 'lib/pages/trashPages';
-import { permissionsApiClient } from 'lib/permissions/api/client';
-import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isUUID } from 'lib/utils/strings';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { AuthenticatedSocketData } from '../authentication';
 import type { AbstractWebsocketBroadcaster } from '../interfaces';

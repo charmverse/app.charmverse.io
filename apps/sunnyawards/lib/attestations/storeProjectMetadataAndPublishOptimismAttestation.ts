@@ -1,15 +1,14 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import type { OptimismProjectAttestation, OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { attestOnchain } from 'lib/credentials/attestOnchain';
+import { attestOnchain } from '@root/lib/credentials/attestOnchain';
 import type {
   OptimismProjectAttestationData,
   OptimismProjectSnapshotAttestationMetaData
-} from 'lib/credentials/schemas/optimismProjectSchemas';
-import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+} from '@root/lib/credentials/schemas/optimismProjectSchemas';
+import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
-import { fetchProject } from '../projects/getProject';
+import { getProject } from '../projects/getProject';
 
 import { projectAttestationChainId, projectAttestationIssuerName } from './constants';
 import { storeProjectInS3 } from './storeProjectInS3';
@@ -35,7 +34,7 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     }
   });
 
-  const project = await fetchProject({ id: projectId });
+  const project = await getProject({ id: projectId });
 
   if (!project) {
     throw new DataNotFoundError('Project not found');

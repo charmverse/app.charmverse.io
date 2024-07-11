@@ -1,13 +1,12 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
-
 import { awsS3Bucket } from '@root/config/constants';
-import { uploadFileToS3 } from 'lib/aws/uploadToS3Server';
-import { gitcoinProjectCredentialSchemaId } from 'lib/credentials/schemas/gitcoinProjectSchema';
-import { optimismProjectSnapshotAttestationSchemaId } from 'lib/credentials/schemas/optimismProjectSchemas';
-import { replaceS3Domain } from 'lib/utils/url';
+import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
+import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
+import { optimismProjectSnapshotAttestationSchemaId } from '@root/lib/credentials/schemas/optimismProjectSchemas';
+import { replaceS3Domain } from '@root/lib/utils/url';
 
 import type { ConnectProjectDetails } from '../projects/getProject';
-import { fetchProject } from '../projects/getProject';
+import { getProject } from '../projects/getProject';
 
 import { getAttestationS3Path } from './getAttestationS3Path';
 import { mapProjectToGitcoin } from './mapProjectToGitcoin';
@@ -28,7 +27,7 @@ export async function storeProjectInS3({
   }
 
   const project =
-    typeof projectOrProjectId === 'string' ? await fetchProject({ id: projectOrProjectId }) : projectOrProjectId;
+    typeof projectOrProjectId === 'string' ? await getProject({ id: projectOrProjectId }) : projectOrProjectId;
 
   if (!project) {
     throw new DataNotFoundError('Project not found');

@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getSummonProfile } from 'lib/profile/getSummonProfile';
+import { getSummonProfile } from '@root/lib/profile/getSummonProfile';
 
 import { getSummonRoleLabel } from './getSummonRoleLabel';
 

@@ -1,7 +1,6 @@
 import type { PostCategory } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getSpace } from 'lib/spaces/getSpace';
+import { getSpace } from '@root/lib/spaces/getSpace';
 
 import { getImportData } from './getImportData';
 import type { ImportParams } from './interfaces';

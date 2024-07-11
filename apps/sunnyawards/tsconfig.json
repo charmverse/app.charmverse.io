@@ -26,6 +26,7 @@
     "paths": {
       "apiClient/*": ["./apiClient/*"],
       "components/*": ["./components/*"],
+      "hooks/*": ["./hooks/*"],
       "lib/*": ["./lib/*"],
       "public/*": ["./public/*"],
       "theme/*": ["./theme/*"],

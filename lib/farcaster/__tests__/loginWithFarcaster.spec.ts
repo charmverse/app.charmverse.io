@@ -1,8 +1,8 @@
 import { DisabledAccountError, ExternalServiceError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { verifySignInMessage } from '@farcaster/auth-kit';
+import { InvalidStateError } from '@root/lib/middleware';
 
-import { InvalidStateError } from 'lib/middleware';
 import { generateFarcasterUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { LoginWithFarcasterParams } from '../loginWithFarcaster';

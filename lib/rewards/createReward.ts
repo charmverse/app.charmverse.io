@@ -1,11 +1,10 @@
 import type { Page, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { NotFoundError } from '@root/lib/middleware';
+import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
+import { extractPreviewImage } from '@root/lib/prosemirror/extractPreviewImage';
+import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
-
-import { NotFoundError } from 'lib/middleware';
-import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
-import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
-import { InvalidInputError } from 'lib/utils/errors';
 
 import { getRewardOrThrow } from './getReward';
 import { getRewardErrors } from './getRewardErrors';

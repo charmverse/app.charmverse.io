@@ -17,9 +17,10 @@ import '@farcaster/auth-kit/styles.css';
 function WarpcastLoginButton() {
   const router = useRouter();
 
+  // @ts-ignore
   const { execute: loginUser } = useAction(loginWithFarcasterAction, {
     onSuccess: async () => {
-      await actionRevalidatePath({});
+      await actionRevalidatePath();
       router.push('/profile');
     },
     onError(err) {

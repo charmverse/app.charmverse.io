@@ -1,9 +1,9 @@
 import { GET } from '@root/adapters/http';
 import { getChainById } from '@root/connectors/chains';
+import { paginatedCall } from '@root/lib/utils/async';
+import { isTruthy } from '@root/lib/utils/types';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
-import { paginatedCall } from 'lib/utils/async';
-import { isTruthy } from 'lib/utils/types';
 
 import type { NFTData } from '../../getNFTs';
 

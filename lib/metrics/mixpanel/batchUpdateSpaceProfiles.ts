@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
-
-import type { MixPanelSpaceProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import type { MixPanelSpaceProfile } from '@root/lib/metrics/mixpanel/updateTrackGroupProfile';
 
 import { groupBatchUpdate } from './groupBatchUpdate';
 import { GroupKeys } from './mixpanel';

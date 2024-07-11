@@ -1,6 +1,7 @@
+import { notFound } from 'next/navigation';
+
 import { ProfileDetailsPage } from 'components/profile/[username]/ProfileDetailsPage';
 import { fetchUserByFarcasterUsername } from 'lib/farcaster/fetchUserByFarcasterUsername';
-import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 

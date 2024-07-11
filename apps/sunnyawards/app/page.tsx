@@ -7,7 +7,7 @@ import { getCurrentUserAction } from 'lib/profile/getCurrentUserAction';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const user = await getCurrentUserAction({});
+  const user = await getCurrentUserAction();
 
   if (user?.data) {
     redirect('/profile');

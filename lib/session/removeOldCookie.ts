@@ -1,8 +1,7 @@
 import { cookieName } from '@root/config/constants';
+import { getAppApexDomain } from '@root/lib/utils/domains/getAppApexDomain';
+import { isLocalhostAlias } from '@root/lib/utils/domains/isLocalhostAlias';
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-import { getAppApexDomain } from 'lib/utils/domains/getAppApexDomain';
-import { isLocalhostAlias } from 'lib/utils/domains/isLocalhostAlias';
 
 export async function removeOldCookieFromResponse(req: NextApiRequest, res: NextApiResponse, keepSession?: boolean) {
   if (isLocalhostAlias(req.headers.host)) {

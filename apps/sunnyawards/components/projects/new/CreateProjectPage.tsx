@@ -1,17 +1,17 @@
 'use client';
 
-import { PageWrapper } from 'components/common/PageWrapper';
-import type { LoggedInUser } from 'lib/profile/getCurrentUserAction';
-import type { FormValues } from 'lib/projects/form';
-import { schema } from 'lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+import { PageWrapper } from 'components/common/PageWrapper';
+import type { LoggedInUser } from 'lib/profile/getCurrentUserAction';
+import { schema } from 'lib/projects/form';
+import type { FormValues } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';

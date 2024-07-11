@@ -1,10 +1,10 @@
 import type { Space, User, Vote } from '@charmverse/core/prisma';
 import { testUtilsProposals } from '@charmverse/core/test';
+import { castProposalVote } from '@root/lib/public-api/castProposalVote';
+import { UserIsNotSpaceMemberError } from '@root/lib/users/errors';
+import { DataNotFoundError, UndesirableOperationError } from '@root/lib/utils/errors';
 import { v4 as uuid } from 'uuid';
 
-import { castProposalVote } from 'lib/public-api/castProposalVote';
-import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { DataNotFoundError, UndesirableOperationError } from 'lib/utils/errors';
 import { createVote, generateUserAndSpace } from 'testing/setupDatabase';
 
 let user: User;

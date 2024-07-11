@@ -1,10 +1,10 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
+import { loginWithFarcaster } from '@root/lib/farcaster/loginWithFarcaster';
 import * as yup from 'yup';
 
 import { actionClient } from 'lib/actions/actionClient';
-import { loginWithFarcaster } from 'lib/farcaster/loginWithFarcaster';
 
 const schema = yup.object({
   projectPath: yup.string().required()

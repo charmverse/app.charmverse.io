@@ -1,10 +1,10 @@
+import type { UIBlockWithDetails } from '@root/lib/databases/block';
+import { createBlock } from '@root/lib/databases/block';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import { replaceS3Domain } from '@root/lib/utils/url';
 import { v4 } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-import type { UIBlockWithDetails } from 'lib/databases/block';
-import { createBlock } from 'lib/databases/block';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { replaceS3Domain } from 'lib/utils/url';
 
 import type { Card } from './card';
 import { Constants } from './constants';

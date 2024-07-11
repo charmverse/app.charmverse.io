@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { ThreadWithComments } from 'lib/threads/interfaces';
+import type { ThreadWithComments } from '@root/lib/threads/interfaces';
 
 import { threadIncludeClause } from './utils';
 

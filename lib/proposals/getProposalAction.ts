@@ -1,8 +1,7 @@
 import type { Proposal, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-
-import type { ProposalNotificationType } from 'lib/notifications/interfaces';
-import type { Reward } from 'lib/rewards/interfaces';
+import type { ProposalNotificationType } from '@root/lib/notifications/interfaces';
+import type { Reward } from '@root/lib/rewards/interfaces';
 
 export type ProposalWithEvaluation = Pick<Proposal, 'status'> & {
   evaluations: (Pick<ProposalEvaluation, 'index' | 'result' | 'type' | 'id'> & {

@@ -8,8 +8,8 @@
 // import { GET, POST } from '@root/adapters/http';
 // import { redisClient } from '@root/adapters/redis/redisClient';
 // import { baseUrl } from '@root/config/constants';
-// import { InvalidStateError } from 'lib/middleware';
-// import { prettyPrint } from 'lib/utils/strings';
+// import { InvalidStateError } from '@root/lib/middleware';
+// import { prettyPrint } from '@root/lib/utils/strings';
 
 // import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
 // import type { RequiredDocusignCredentials } from './constants';

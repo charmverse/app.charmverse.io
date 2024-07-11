@@ -9,11 +9,10 @@ import type {
 import { Offchain, createOffchainURL } from '@ethereum-attestation-service/eas-sdk';
 import { credentialsWalletPrivateKey } from '@root/config/constants';
 import { getChainById } from '@root/connectors/chains';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { isValidChainAddress } from '@root/lib/tokens/validation';
 import { Wallet, providers } from 'ethers';
 import { v4 as uuid } from 'uuid';
-
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { isValidChainAddress } from 'lib/tokens/validation';
 
 import type { EasSchemaChain } from './connectors';
 import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';

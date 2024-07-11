@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { READONLY_MEMBER_PROPERTIES } from 'lib/members/constants';
-import type { PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
-import { updateMemberPropertyValue } from 'lib/members/updateMemberPropertyValue';
-import { mapPropertyValueWithDetails } from 'lib/members/utils';
+import { READONLY_MEMBER_PROPERTIES } from '@root/lib/members/constants';
+import type { PropertyValueWithDetails, UpdateMemberPropertyValuePayload } from '@root/lib/members/interfaces';
+import { updateMemberPropertyValue } from '@root/lib/members/updateMemberPropertyValue';
+import { mapPropertyValueWithDetails } from '@root/lib/members/utils';
 
 type UpdatePropertyInput = {
   data: UpdateMemberPropertyValuePayload[];

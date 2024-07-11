@@ -1,8 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createForumPost } from '@root/lib/forums/posts/createForumPost';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
-import { createForumPost } from 'lib/forums/posts/createForumPost';
-import { InvalidInputError } from 'lib/utils/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 

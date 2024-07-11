@@ -10,10 +10,9 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import type { BoardFields } from '@root/lib/databases/board';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
 import { v4 as uuid } from 'uuid';
-
-import type { BoardFields } from 'lib/databases/board';
-import type { BoardViewFields } from 'lib/databases/boardView';
 
 import type { SpaceDataExport } from '../exportSpaceData';
 import type { SpaceSettingsExport } from '../exportSpaceSettings';

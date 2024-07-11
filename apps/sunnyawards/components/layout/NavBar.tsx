@@ -22,9 +22,10 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
   const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
+  // @ts-ignore
   const { execute: logoutUser } = useAction(logoutAction, {
     onSuccess: async () => {
-      await actionRevalidatePath({});
+      await actionRevalidatePath();
       router.push('/');
     },
     onError(err) {

@@ -1,7 +1,8 @@
 import 'server-only';
 
-import { getRecentProjectsWithMembers } from 'lib/projects/getRecentProjectsWithMembers';
 import { Typography } from '@mui/material';
+
+import { getRecentProjectsWithMembers } from 'lib/projects/getRecentProjectsWithMembers';
 
 import { ProjectItem } from './ProjectItem';
 

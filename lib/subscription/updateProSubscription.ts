@@ -1,6 +1,5 @@
+import { InvalidStateError } from '@root/lib/middleware';
 import type Stripe from 'stripe';
-
-import { InvalidStateError } from 'lib/middleware';
 
 import type { SubscriptionStatusType } from './constants';
 import { getActiveSpaceSubscription, type SpaceSubscriptionWithStripeData } from './getActiveSpaceSubscription';

@@ -1,8 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { getSpaceMemberMetadata } from '@root/lib/members/getSpaceMemberMetadata';
+import { assignRole } from '@root/lib/roles';
 import type { LoggedInUser } from '@root/models';
 
-import { getSpaceMemberMetadata } from 'lib/members/getSpaceMemberMetadata';
-import { assignRole } from 'lib/roles';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace, generateSpaceForUser } from 'testing/utils/spaces';
 

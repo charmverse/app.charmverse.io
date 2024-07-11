@@ -3,19 +3,18 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-kit';
 import { getChainById } from '@root/connectors/chains';
+import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
+import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { InvalidStateError } from '@root/lib/middleware';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { getUserProfile } from '@root/lib/users/getUser';
+import { postUserCreate } from '@root/lib/users/postUserCreate';
+import { DisabledAccountError, InvalidInputError } from '@root/lib/utils/errors';
+import { uid } from '@root/lib/utils/strings';
 import type { LoggedInUser } from '@root/models';
 import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
-
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { InvalidStateError } from 'lib/middleware';
-import { sessionUserRelations } from 'lib/session/config';
-import { getUserProfile } from 'lib/users/getUser';
-import { postUserCreate } from 'lib/users/postUserCreate';
-import { DisabledAccountError, InvalidInputError } from 'lib/utils/errors';
-import { uid } from 'lib/utils/strings';
 
 const appClient = createAppClient({
   ethereum: viemConnector({
