@@ -52,6 +52,12 @@ runs:
       run: |
         npm run connect-api:build
 
+    - name: Build Sunny Awards
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      run: |
+        npm run sunnyawards:build
+
     # building cache key takes almost a minute, so we only run this if we are saving the cache
     - name: Cache build
       if: inputs.save_cache
