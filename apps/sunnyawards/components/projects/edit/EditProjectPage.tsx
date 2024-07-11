@@ -12,9 +12,9 @@ import { useForm } from 'react-hook-form';
 import { PageWrapper } from 'components/common/PageWrapper';
 import type { LoggedInUser } from 'lib/profile/getCurrentUserAction';
 import { editProjectAction } from 'lib/projects/editProjectAction';
-import type { ConnectProjectDetails } from 'lib/projects/fetchProject';
 import { schema } from 'lib/projects/form';
 import type { FormValues, ProjectCategory } from 'lib/projects/form';
+import type { ConnectProjectDetails } from 'lib/projects/getProject';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';

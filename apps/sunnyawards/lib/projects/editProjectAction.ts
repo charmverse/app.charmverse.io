@@ -13,7 +13,7 @@ import { generateOgImage } from '../projects/generateOgImage';
 
 import { editConnectProject } from './editConnectProject';
 
-export const actionEditProject = authActionClient
+export const editProjectAction = authActionClient
   .metadata({ actionName: 'create-project' })
   .schema(schema)
   .action(async ({ parsedInput, ctx }) => {
