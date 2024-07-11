@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
   const user = session.user;
   const path = request.nextUrl.pathname;
   // Make /p/ project pages public
-  if (!user && path !== '/' && !path.startsWith('/p/') && !path.startsWith('/u/')) {
+  if (!user && path !== '/' && !path.startsWith('/p/') && !path.startsWith('/u/') && !path.startsWith('/grants')) {
     return NextResponse.redirect(new URL('/', request.url));
   } else if (user && path === '/') {
     return NextResponse.redirect(new URL('/profile', request.url));
