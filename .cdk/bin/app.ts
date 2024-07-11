@@ -23,6 +23,10 @@ if (stackNameParam.startsWith('prd')) {
 else if (stackNameParam.startsWith('stg-connect')) {
   new ConnectStagingStack(app, stackNameParam, deployProps);
 }
+// Sunny awards staging
+else if (stackNameParam.startsWith('stg-sunnyawards')) {
+  new ConnectStagingStack(app, stackNameParam, deployProps);
+}
 // Webapp staging
 else if (stackNameParam.startsWith('stg-webapp')) {
   new WebappStagingStack(app, stackNameParam, deployProps);

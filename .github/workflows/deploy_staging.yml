@@ -33,6 +33,7 @@ jobs:
 
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy')}}; then stack='stg-webapp'; fi
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect')}}; then stack='stg-connect'; fi
+          if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')}}; then stack='stg-sunnyawards'; fi
           echo "STACK=$stack" >> $GITHUB_ENV
           echo "STAGE_NAME=$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
