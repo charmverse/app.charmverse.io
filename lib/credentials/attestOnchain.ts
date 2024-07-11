@@ -18,7 +18,11 @@ export type OnChainAttestationInput<T extends AttestationType = AttestationType>
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-export async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttestationInput): Promise<string> {
+export async function attestOnchain<T extends AttestationType = AttestationType>({
+  credentialInputs,
+  type,
+  chainId
+}: OnChainAttestationInput<T>): Promise<string> {
   const schemaId = attestationSchemaIds[type];
   const rpcUrl = getChainById(chainId)?.rpcUrls[0];
 

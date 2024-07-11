@@ -1,5 +1,9 @@
 import type { AttestationType as PrismaAttestationType } from '@charmverse/core/prisma';
 
+import type { CharmQualifyingEvent } from './charmQualifyingEvent';
+import { charmQualifyingEventSchemaId, encodeCharmQualifyingEvent } from './charmQualifyingEvent';
+import type { CharmUserIdentifier } from './charmUserIdentifier';
+import { charmUserIdentifierSchemaId, encodeCharmUserIdentifier } from './charmUserIdentifier';
 import type { ExternalCredential } from './external';
 import { encodeExternalCredential, externalCredentialSchemaDefinition, externalCredentialSchemaId } from './external';
 import type { GitcoinProjectCredential } from './gitcoinProjectSchema';
@@ -34,7 +38,13 @@ export const allSchemaDefinitions = [
   optimismProjectSnapshotAttestationSchemaDefinition
 ];
 
-export type AttestationType = PrismaAttestationType | 'gitcoinProject' | 'optimismProject' | 'optimismProjectSnapshot';
+export type AttestationType =
+  | PrismaAttestationType
+  | 'gitcoinProject'
+  | 'optimismProject'
+  | 'optimismProjectSnapshot'
+  | 'charmUserIdentifier'
+  | 'charmQualifyingEvent';
 
 export const credentialLabels: Record<AttestationType, string> = {
   proposal: 'Proposal',
@@ -42,7 +52,9 @@ export const credentialLabels: Record<AttestationType, string> = {
   external: 'External',
   gitcoinProject: 'Gitcoin Project',
   optimismProject: 'Optimism Project',
-  optimismProjectSnapshot: 'Optimism Project Snapshot'
+  optimismProjectSnapshot: 'Optimism Project Snapshot',
+  charmUserIdentifier: 'CharmVerse User',
+  charmQualifyingEvent: 'CharmVerse Qualifier'
 };
 
 export const attestationSchemaIds: Record<AttestationType, string> = {
@@ -51,7 +63,9 @@ export const attestationSchemaIds: Record<AttestationType, string> = {
   external: externalCredentialSchemaId,
   gitcoinProject: gitcoinProjectCredentialSchemaId,
   optimismProject: optimismProjectAttestationSchemaId,
-  optimismProjectSnapshot: optimismProjectSnapshotAttestationSchemaId
+  optimismProjectSnapshot: optimismProjectSnapshotAttestationSchemaId,
+  charmQualifyingEvent: charmQualifyingEventSchemaId,
+  charmUserIdentifier: charmUserIdentifierSchemaId
 };
 
 export const charmverseCredentialSchemas = [attestationSchemaIds.proposal, attestationSchemaIds.reward];
@@ -68,6 +82,10 @@ export type CredentialDataInput<T extends AttestationType = AttestationType> = T
   ? OptimismProjectAttestationData
   : T extends 'optimismProjectSnapshot'
   ? OptimismProjectSnapshotAttestationMetaData
+  : T extends 'charmQualifyingEvent'
+  ? CharmQualifyingEvent
+  : T extends 'charmUserIdentifier'
+  ? CharmUserIdentifier
   : never;
 
 export type CredentialData<T extends AttestationType = AttestationType> = {
@@ -88,6 +106,10 @@ export function encodeAttestation<T extends AttestationType = AttestationType>({
     return encodeOptimismProjectAttestation(data as OptimismProjectAttestationData);
   } else if (type === 'optimismProjectSnapshot') {
     return encodeOptimismProjectSnapshotAttestation(data as OptimismProjectSnapshotAttestationMetaData);
+  } else if (type === 'charmQualifyingEvent') {
+    return encodeCharmQualifyingEvent(data as CharmQualifyingEvent);
+  } else if (type === 'charmUserIdentifier') {
+    return encodeCharmUserIdentifier(data as CharmUserIdentifier);
   }
   throw new Error(`Invalid Attestation Type: ${type}'`);
 }
