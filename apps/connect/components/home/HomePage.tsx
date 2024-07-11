@@ -11,15 +11,18 @@ export function HomePage() {
       flexDirection='column'
       alignItems='center'
       maxWidth='100vw'
-      border='0'
+      border='none'
+      borderRadius='0'
       textAlign='center'
       sx={{
         '& > .MuiBox-root': {
           display: 'flex',
           flexDirection: 'column',
-          gap: { xs: 6, md: 4 },
-          my: { xs: 6, md: 4 },
-          alignItems: 'center'
+          gap: { xs: 0, md: 6 },
+          my: { xs: 0, md: 4 },
+          justifyContent: { xs: 'space-evenly', md: 'normal' },
+          alignItems: 'center',
+          height: '100%'
         }
       }}
     >

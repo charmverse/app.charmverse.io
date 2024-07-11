@@ -8,17 +8,7 @@ import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectHeader } from '../components/ProjectHeader';
 
-export async function ProjectDetailsPage({ project }: { project?: ConnectProjectDetails | null }) {
-  if (!project) {
-    return (
-      <PageWrapper>
-        <Typography mt={5} p={2} variant='h6'>
-          Project not found
-        </Typography>
-      </PageWrapper>
-    );
-  }
-
+export async function ProjectDetailsPage({ project }: { project: ConnectProjectDetails }) {
   return (
     <PageWrapper header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}>
       <ProjectDetails project={project} />

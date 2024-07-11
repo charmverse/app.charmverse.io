@@ -121,6 +121,7 @@
     "@composedb/devtools-node": "^0.7.1",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
+    "@delegatexyz/sdk": "^0.5.2",
     "@emotion/babel-preset-css-prop": "^11.11.0",
     "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.4",

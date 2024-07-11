@@ -8,16 +8,8 @@ import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { Suspense } from 'react';
 
-export async function ProfileDetailsPage({ user }: { user: Pick<LoggedInUser, 'farcasterUser' | 'id'> | null }) {
-  if (!user?.farcasterUser) {
-    return (
-      <PageWrapper>
-        <Typography variant='h6'>User not found</Typography>
-      </PageWrapper>
-    );
-  }
-
-  const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
+export async function ProfileDetailsPage({ user }: { user: Pick<LoggedInUser, 'farcasterUser' | 'id'> }) {
+  const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
     <PageWrapper>

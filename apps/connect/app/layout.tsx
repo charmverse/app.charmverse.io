@@ -25,9 +25,8 @@ export default function RootLayout({
     <html lang='en'>
       <Box
         component='body'
-        position='relative'
         display='grid'
-        gridTemplateColumns='auto 1fr auto'
+        gridTemplateRows='auto 1fr auto'
         minHeight='100vh'
         bgcolor={{ xs: 'background.default', md: 'grey.200' }}
       >

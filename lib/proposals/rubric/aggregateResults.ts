@@ -87,7 +87,7 @@ export function aggregateResults({
 
   const allScores = Object.values(criteriaScores).flat();
   const allScoresSum = allScores.length ? sum(allScores) : null;
-  const allScoresAverage = allScores.length ? roundNumber(mean(allScores)) : null;
+  const allScoresAverage = allScores.length ? roundNumber(sum(allScores) / reviewers.length) : null;
 
   const mappedReviewerResults = reviewersResults.reduce((acc, reviewer) => {
     acc[reviewer.id] = reviewer;

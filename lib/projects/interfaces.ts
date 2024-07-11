@@ -24,6 +24,7 @@ export type ProjectMemberPayload = Pick<
   | 'name'
   | 'otherUrl'
   | 'previousProjects'
+  | 'teamLead'
   | 'telegram'
   | 'twitter'
   | 'walletAddress'

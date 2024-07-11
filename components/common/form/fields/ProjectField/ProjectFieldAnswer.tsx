@@ -2,7 +2,6 @@ import MuiAddIcon from '@mui/icons-material/Add';
 import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 import { useMemo } from 'react';
-import { useFormContext } from 'react-hook-form';
 import type { UseFormGetFieldState } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
@@ -10,11 +9,9 @@ import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { ProjectFieldValue, FormFieldValue } from 'lib/forms/interfaces';
-import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
-import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
-import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
 import { ProjectForm } from './ProjectForm';
 
@@ -160,18 +157,20 @@ export function ProjectFieldAnswer({
           {inputEndAdornment}
         </Stack>
       )}
-      <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
-        <ProjectForm
-          fieldConfig={fieldConfig}
-          isTeamLead={isTeamLead}
-          disabled={disabled}
-          selectedMemberIds={selectedMemberIds}
-          onFormFieldChange={onChange}
-          project={selectedProject}
-          refreshProjects={refreshProjects}
-          applyProjectMembers={applyProjectMembers}
-        />
-      </Box>
+      {formFieldValue?.projectId && (
+        <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
+          <ProjectForm
+            fieldConfig={fieldConfig}
+            isTeamLead={isTeamLead}
+            disabled={disabled}
+            selectedMemberIds={selectedMemberIds}
+            onFormFieldChange={onChange}
+            project={selectedProject}
+            refreshProjects={refreshProjects}
+            applyProjectMembers={applyProjectMembers}
+          />
+        </Box>
+      )}
     </Stack>
   );
 }

@@ -16,7 +16,7 @@ export async function ProfilePage({ user }: { user: LoggedInUser }) {
 
   return (
     <PageWrapper>
-      <Box gap={2} display='flex' flexDirection='column'>
+      <Box gap={3} display='flex' flexDirection='column' mt={{ md: 2 }}>
         <FarcasterCard
           fid={user.farcasterUser?.fid}
           name={farcasterDetails?.displayName}

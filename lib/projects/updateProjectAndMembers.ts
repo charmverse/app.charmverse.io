@@ -1,9 +1,9 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma, ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
-import { projectInclude } from './constants';
 import { getProjectById } from './getProjectById';
 import {
   findCharmVerseUserIdWithProjectMember,
@@ -42,6 +42,11 @@ export async function updateProjectAndMembers({
     }),
     {}
   );
+
+  const teamLeads = payload.projectMembers.filter((member) => member.teamLead);
+  if (teamLeads.length !== 1) {
+    throw new InvalidInputError('Exactly one team lead is required');
+  }
 
   const payloadProjectMemberIds = payload.projectMembers.map((projectMember) => projectMember.id);
   const deletedProjectMembersIds = Object.keys(existingProjectMembersRecord).filter(
