@@ -1,3 +1,4 @@
+import { ExpandableDescription } from '@connect/components/common/ExpandableDescription';
 import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -7,7 +8,6 @@ import { FaXTwitter } from 'react-icons/fa6';
 
 import { replaceUrl } from 'lib/utils/url';
 
-import { ProjectDescription } from '../components/ProjectDescription';
 import { ShareButton } from '../ProjectShareButton';
 
 export type ProjectDetailsProps = {
@@ -88,7 +88,7 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
           </Stack>
         )}
       </Stack>
-      {project.description && <ProjectDescription description={project.description} />}
+      {project.description && <ExpandableDescription description={project.description} />}
     </Stack>
   );
 }

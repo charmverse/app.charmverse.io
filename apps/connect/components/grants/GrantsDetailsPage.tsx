@@ -12,6 +12,7 @@ export type Grant = {
   logo?: string;
   launchDate?: string;
   createdAt: string;
+  applyLink?: string;
   path: string;
 };
 

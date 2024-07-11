@@ -18,7 +18,7 @@ export function GrantItem({ grant }: { grant: Grant }) {
     <Card>
       <CardActionArea
         LinkComponent={Link}
-        href={`/p/${grant.path}`}
+        href={`/g/${grant.path}`}
         hrefLang='en'
         sx={{ display: 'flex', gap: 2, p: 2, alignItems: 'normal', justifyContent: 'flex-start' }}
       >

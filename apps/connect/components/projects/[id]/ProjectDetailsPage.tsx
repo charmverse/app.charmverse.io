@@ -4,13 +4,15 @@ import { FarcasterCard } from '@connect/components/common/FarcasterCard';
 import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
 import { Divider, Stack, Typography } from '@mui/material';
 
+import { PageCoverHeader } from '../../common/PageCoverHeader';
 import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';
-import { ProjectHeader } from '../components/ProjectHeader';
 
 export async function ProjectDetailsPage({ project }: { project: ConnectProjectDetails }) {
   return (
-    <PageWrapper header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}>
+    <PageWrapper
+      header={<PageCoverHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}
+    >
       <ProjectDetails project={project} />
       <Divider sx={{ my: 2 }} />
       <Typography variant='h6'>Members</Typography>

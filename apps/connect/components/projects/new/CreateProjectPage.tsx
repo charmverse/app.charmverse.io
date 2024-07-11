@@ -14,9 +14,9 @@ import { useForm } from 'react-hook-form';
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
+import { ProjectHeader } from '../components/PageCoverHeader';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
-import { ProjectHeader } from '../components/ProjectHeader';
 
 import { CreateProjectForm } from './components/CreateProjectForm';
 

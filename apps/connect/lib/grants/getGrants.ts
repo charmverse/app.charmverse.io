@@ -56,8 +56,11 @@ export async function getGrants(
   const launchDateProperty = boardProperties.find(
     (property) => property.type === 'date' && property.name === 'Grants Launch Date'
   );
+  const applyLinkProperty = boardProperties.find(
+    (property) => property.type === 'url' && property.name === 'Grants Apply Link'
+  );
 
-  if (!descriptionProperty || !bannerProperty || !logoProperty || !launchDateProperty) {
+  if (!applyLinkProperty || !descriptionProperty || !bannerProperty || !logoProperty || !launchDateProperty) {
     throw new UndesirableOperationError();
   }
 
@@ -72,7 +75,8 @@ export async function getGrants(
         logo: cardProperties[logoProperty.id] as string,
         launchDate: cardProperties[launchDateProperty.id] as string,
         createdAt: card.createdAt.toISOString(),
-        path: card.page?.path ?? ''
+        path: card.page?.path ?? '',
+        applyLink: cardProperties[applyLinkProperty.id] as string
       };
     })
     .sort((g1, g2) => {

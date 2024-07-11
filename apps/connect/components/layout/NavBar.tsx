@@ -75,6 +75,9 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
                 <MenuItem>
                   <Link href='/profile'>@{farcasterDetails?.username}</Link>
                 </MenuItem>
+                <MenuItem>
+                  <Link href='/grants/new'>Grants</Link>
+                </MenuItem>
                 <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
               </Menu>
             </Box>
