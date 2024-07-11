@@ -27,6 +27,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
 
   const router = useRouter();
 
+  // @ts-ignore
   const { execute, isExecuting } = useAction(actionCreateProject, {
     onSuccess: (data) => {
       router.push(`/p/${data.data?.projectPath as string}/publish`);

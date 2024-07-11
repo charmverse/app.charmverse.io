@@ -28,7 +28,9 @@ describe('mapProjectToOptimism', () => {
             bio: "Alice's bio",
             username: 'alice',
             displayName: 'Alice'
-          }
+          },
+          teamLead: true,
+          userId: uuid()
         },
         {
           farcasterUser: {
@@ -37,7 +39,9 @@ describe('mapProjectToOptimism', () => {
             bio: "Bob's bio",
             username: 'bob',
             displayName: 'Bob'
-          }
+          },
+          teamLead: false,
+          userId: uuid()
         }
       ]
     };

@@ -10,10 +10,12 @@ export default async function EditProject({
     path: string;
   };
 }) {
-  const project = await fetchProject({
-    path: params.path
-  });
-  const user = await getCurrentUser({});
+  const [project, user] = await Promise.all([
+    fetchProject({
+      path: params.path
+    }),
+    getCurrentUser()
+  ]);
 
   if (!user?.data) {
     redirect('/');

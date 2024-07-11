@@ -4,6 +4,7 @@ import { authActionClient } from '@connect/lib/actions/actionClient';
 import { revalidatePath } from 'next/cache';
 
 import { editConnectProject } from '../projects/editConnectProject';
+import type { FormValues } from '../projects/form';
 import { schema } from '../projects/form';
 import { generateOgImage } from '../projects/generateOgImage';
 
@@ -15,7 +16,9 @@ export const actionEditProject = authActionClient
     const currentUserId = ctx.session.user!.id;
     const editedProject = await editConnectProject({
       userId: currentUserId,
-      input
+      input: input as FormValues & {
+        projectId: string;
+      }
     });
 
     await generateOgImage(editedProject.id, currentUserId);

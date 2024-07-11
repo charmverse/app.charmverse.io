@@ -26,6 +26,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
 
   const router = useRouter();
 
+  // @ts-ignore
   const { execute, isExecuting } = useAction(actionEditProject, {
     onSuccess: () => {
       router.push(`/p/${project.path}`);
