@@ -65,13 +65,11 @@ async function updateProposalSourceDatabaseBoardProperties() {
           .map((property) => property.field),
         templateProperties: []
       }
+
       const formFields = await prisma.formField.findMany({
         where: {
           id: {
             in: formFieldProperties.map(property => property.formFieldId as string)
-          },
-          form: {
-            spaceId: proposalSourceBoard.spaceId,
           }
         },
         select: {
@@ -198,7 +196,9 @@ async function updateProposalSourceDatabaseBoardProperties() {
                 const rubricEvaluationProperty = ProposalPropertyRubricPropertyRecord[property.type];
                 const propertyRubricEvaluation = proposalTemplateProperty.rubricEvaluations.find(evaluation => evaluation.evaluationId === rubricEvaluation.id);
                 if (propertyRubricEvaluation) {
-                  propertyRubricEvaluation.properties.push(rubricEvaluationProperty);
+                  if (!propertyRubricEvaluation.properties.includes(rubricEvaluationProperty)) {
+                    propertyRubricEvaluation.properties.push(rubricEvaluationProperty);
+                  }
                 } else {
                   proposalTemplateProperty.rubricEvaluations.push({
                     evaluationId: rubricEvaluation.id,
