@@ -1,5 +1,6 @@
 'use client';
 
+import { PageCoverHeader } from '@connect/components/common/PageCoverHeader';
 import { PageWrapper } from '@connect/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { FormValues } from '@connect/lib/projects/form';
@@ -14,7 +15,6 @@ import { useForm } from 'react-hook-form';
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
-import { ProjectHeader } from '../components/PageCoverHeader';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
 
@@ -73,7 +73,9 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   } as ProjectDetailsProps['project'];
 
   return (
-    <PageWrapper header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}>
+    <PageWrapper
+      header={<PageCoverHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}
+    >
       <Box gap={2} display='flex' flexDirection='column'>
         <ProjectDetails project={projectDetails} />
         <Typography variant='h5' data-test='project-form-add-team'>
