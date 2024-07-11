@@ -6,7 +6,7 @@ import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { createOrGetUserFromWallet } from '../createUser';
 
-jest.mock('@root/lib/blockchain/getENSName', () => {
+jest.mock('lib/blockchain/getENSName', () => {
   return {
     getENSName: (address: string) => {
       if (address.match('include')) {
@@ -28,7 +28,7 @@ jest.mock('@root/lib/blockchain/getENSName', () => {
   };
 });
 
-jest.mock('@root/lib/blockchain/getNFTs', () => {
+jest.mock('lib/blockchain/getNFTs', () => {
   return {
     getNFTs: (input: { wallets: any[] }) => {
       return [];
@@ -36,7 +36,7 @@ jest.mock('@root/lib/blockchain/getNFTs', () => {
   };
 });
 
-jest.mock('@root/lib/metrics/mixpanel/trackUserAction', () => ({
+jest.mock('lib/metrics/mixpanel/trackUserAction', () => ({
   trackUserAction: jest.fn()
 }));
 

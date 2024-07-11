@@ -15,9 +15,17 @@ const app = new cdk.App();
 // Command example: cdk deploy --context name=stg-connect
 const stackNameParam: string = app.node.getContext('name');
 
-// Connect production
-if (stackNameParam.startsWith('prd')) {
-  new ProductionStack(app, stackNameParam, deployProps);
+// Sunny awawrds production
+if (stackNameParam === 'prd-sunnyawards') {
+  new ProductionStack(app, stackNameParam, deployProps, {
+    sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/4618b240-08da-4d91-98c1-ac12362be229'
+  });
+}
+// Connect webapp and api production
+else if (stackNameParam.startsWith('prd')) {
+  new ProductionStack(app, stackNameParam, deployProps, {
+    sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b960ff5c-ed3e-4e65-b2c4-ecc64e696902'
+  });
 }
 // Connect staging
 else if (stackNameParam.startsWith('stg-connect')) {
