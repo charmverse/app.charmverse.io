@@ -14,7 +14,7 @@ import { inputBackground } from 'theme/colors';
 
 const height = 96;
 
-export function ImageField({
+export function ProjectImageField({
   control,
   name,
   type

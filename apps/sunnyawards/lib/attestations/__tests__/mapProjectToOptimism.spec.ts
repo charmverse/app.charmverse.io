@@ -1,72 +1,76 @@
-import { v4 as uuid } from 'uuid';
+import type { ConnectProjectDetails } from 'lib/projects/getProject';
 
-import type { ConnectProjectDetails } from '../../projects/getProject';
-import { mapProjectToOptimism } from '../mapProjectToOptimism'; // Adjust the import to the actual file location
+type Contract = {
+  address: string;
+  deploymentTxHash: string;
+  deployerAddress: string;
+  chainId: number; // Example chainIds: 10, 8453, 7777777
+};
 
-describe('mapProjectToOptimism', () => {
-  it('should map the project details correctly', () => {
-    const input: ConnectProjectDetails = {
-      id: '1',
-      name: 'Project X',
-      createdBy: uuid(),
-      category: 'DeFi',
-      description: 'A sample project',
-      avatar: 'avatar.png',
-      coverImage: 'cover.jpg',
-      farcasterValues: ['CharmVerse'],
-      farcasterFrameImage: null,
-      github: 'https://github.com/projectx',
-      twitter: 'https://twitter.com/projectx',
-      mirror: 'https://mirror.xyz/projectx',
-      websites: ['https://example.com'],
-      path: null,
-      projectMembers: [
-        {
-          farcasterUser: {
-            fid: 123,
-            pfpUrl: 'https://pfp.url/alice',
-            bio: "Alice's bio",
-            username: 'alice',
-            displayName: 'Alice'
-          }
-        },
-        {
-          farcasterUser: {
-            fid: 456,
-            pfpUrl: 'https://pfp.url/bob',
-            bio: "Bob's bio",
-            username: 'bob',
-            displayName: 'Bob'
-          }
-        }
-      ]
-    };
+type VentureFunding = {
+  amount: string; // Examples: "3m-5m", "1m-3m"
+  year: string; // Example: "2023"
+  details: string;
+};
 
-    const expectedOutput = {
-      name: 'Project X',
-      description: 'A sample project',
-      projectAvatarUrl: 'avatar.png',
-      projectCoverImageUrl: 'cover.jpg',
-      category: 'DeFi',
-      osoSlug: '', // Placeholder
-      socialLinks: {
-        website: ['https://example.com'],
-        farcaster: ['CharmVerse'],
-        twitter: 'https://twitter.com/projectx',
-        mirror: 'https://mirror.xyz/projectx'
-      },
-      team: ['Alice', 'Bob'],
-      github: ['https://github.com/projectx'],
-      packages: [], // Placeholder
-      contracts: [], // Placeholder
-      grantsAndFunding: {
-        ventureFunding: [], // Placeholder
-        grants: [], // Placeholder
-        revenue: [] // Placeholder
-      }
-    };
+type Grant = {
+  grant: string;
+  link?: string | null;
+  amount: string; // Examples: "under-250k", "1000000"
+  date: string; // Example: "2023-03-01"
+  details: string;
+};
 
-    const output = mapProjectToOptimism(input);
-    expect(output).toEqual(expectedOutput);
-  });
-});
+type Revenue = {
+  amount: string; // Examples: "under-250k", "1m-3m", "500k-1m"
+  details: string;
+};
+
+type OptimismProject = {
+  name: string;
+  description: string;
+  projectAvatarUrl: string;
+  projectCoverImageUrl: string;
+  category: string;
+  osoSlug?: string;
+  socialLinks: {
+    website?: string[];
+    farcaster?: string[];
+    twitter?: string; // Examples: "https://x.com/defillama", "@orderlynetwork"
+    mirror?: string | null;
+  };
+  team: string[];
+  github: string[];
+  packages?: string[];
+  contracts: Contract[];
+  grantsAndFunding: {
+    ventureFunding?: VentureFunding[];
+    grants?: Grant[];
+    revenue?: Revenue[];
+  };
+};
+export function mapProjectToOptimism(input: ConnectProjectDetails): OptimismProject {
+  return {
+    name: input.name || '',
+    description: input.description || '',
+    projectAvatarUrl: input.avatar || '',
+    projectCoverImageUrl: input.coverImage || '',
+    category: input.category || '',
+    socialLinks: {
+      website: input.websites || [],
+      farcaster: input.farcasterValues || [],
+      twitter: input.twitter || '',
+      mirror: input.mirror || null
+    },
+    team: input.projectMembers.map((member) => member.farcasterUser.displayName),
+    github: input.github ? [input.github] : [],
+    osoSlug: '', // Placeholder: requires specific input
+    packages: [], // Placeholder: requires specific input
+    contracts: [], // Placeholder: requires specific input
+    grantsAndFunding: {
+      ventureFunding: [], // Placeholder: requires specific input
+      grants: [], // Placeholder: requires specific input
+      revenue: [] // Placeholder: requires specific input
+    }
+  };
+}

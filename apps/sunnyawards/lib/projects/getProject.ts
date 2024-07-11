@@ -1,8 +1,8 @@
 import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { StatusAPIResponse } from '@farcaster/auth-client';
+import type { StatusAPIResponse } from '@farcaster/auth-kit';
 
-type ProjectMember = {
+type FarcasterUser = {
   fid: number;
   pfpUrl: string;
   bio: string;
@@ -28,7 +28,9 @@ export type ConnectProjectDetails = Pick<
   | 'websites'
 > & {
   projectMembers: {
-    farcasterUser: ProjectMember;
+    userId: string | null;
+    teamLead: boolean;
+    farcasterUser: FarcasterUser;
   }[];
 };
 
@@ -51,7 +53,18 @@ export async function getProject(query: { path: string } | { id: string }): Prom
       websites: true,
       farcasterFrameImage: true,
       projectMembers: {
+        orderBy: [
+          {
+            // team lead first
+            teamLead: 'desc'
+          },
+          {
+            createdAt: 'asc'
+          }
+        ],
         select: {
+          teamLead: true,
+          userId: true,
           user: {
             select: {
               farcasterUser: true
@@ -72,13 +85,15 @@ export async function getProject(query: { path: string } | { id: string }): Prom
       const farcasterUser = member.user?.farcasterUser?.account as unknown as StatusAPIResponse;
       return {
         ...member.user,
+        userId: member.userId,
+        teamLead: member.teamLead,
         farcasterUser: {
           fid: member.user?.farcasterUser?.fid,
           pfpUrl: farcasterUser?.pfpUrl,
           bio: farcasterUser?.bio,
           username: farcasterUser?.username,
           displayName: farcasterUser?.displayName
-        } as ProjectMember
+        } as FarcasterUser
       };
     })
   };

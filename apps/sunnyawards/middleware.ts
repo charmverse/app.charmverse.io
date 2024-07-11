@@ -1,3 +1,4 @@
+import { isTruthy } from '@root/lib/utils/types';
 import { getIronSession } from 'iron-session';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
@@ -10,8 +11,13 @@ export async function middleware(request: NextRequest) {
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
   const user = session.user;
   const path = request.nextUrl.pathname;
-  // Make /p/ project pages public
-  if (!user && path !== '/' && !path.startsWith('/p/') && !path.startsWith('/u/')) {
+  // Make /p/ project pages public, /u/ user pages public
+  const projectPathChunks = path.split('/').filter(isTruthy);
+  const isEditProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'edit';
+  const isNewProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'new';
+  const isProjectPath = projectPathChunks[0] === 'p' && !isEditProjectPath && !isNewProjectPath;
+
+  if (!user && path !== '/' && !isProjectPath && !path.startsWith('/u/')) {
     return NextResponse.redirect(new URL('/', request.url));
   } else if (user && path === '/') {
     return NextResponse.redirect(new URL('/profile', request.url));

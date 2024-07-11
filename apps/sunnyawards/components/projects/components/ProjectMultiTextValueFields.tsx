@@ -6,7 +6,7 @@ import { Controller, useFieldArray } from 'react-hook-form';
 
 import type { FormValues } from 'lib/projects/form';
 
-export function MultiTextValueFields({
+export function ProjectMultiTextValueFields({
   control,
   label,
   name,

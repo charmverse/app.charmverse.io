@@ -1,24 +1,26 @@
+import EditIcon from '@mui/icons-material/Edit';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
-import { Stack, Typography } from '@mui/material';
+import { IconButton, Stack, Typography } from '@mui/material';
 import { replaceUrl } from '@root/lib/utils/url';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import type { ConnectProjectDetails } from 'lib/projects/getProject';
 
-import { ShareButton } from '../ProjectShareButton';
+import { ProjectDescription } from '../components/ProjectDescription';
 
-import { ProjectDescription } from './ProjectDescription';
+import { ShareButton } from './ProjectShareButton';
 
 export type ProjectDetailsProps = {
   project: Pick<
     ConnectProjectDetails,
-    'farcasterValues' | 'github' | 'mirror' | 'twitter' | 'name' | 'websites' | 'description' | 'id'
+    'farcasterValues' | 'github' | 'mirror' | 'twitter' | 'name' | 'websites' | 'description' | 'id' | 'path'
   >;
+  showEditButton?: boolean;
 };
 
-export function ProjectDetails({ project }: ProjectDetailsProps) {
+export function ProjectDetails({ project, showEditButton = false }: ProjectDetailsProps) {
   const farcasterLink = project?.farcasterValues[0] ? replaceUrl(project.farcasterValues[0], 'warpcast.com') : null;
   const githubLink = project?.github ? replaceUrl(project.github, 'github.com') : null;
   const mirrorLink = project?.mirror ? replaceUrl(project.mirror, 'mirror.xyz') : null;
@@ -26,11 +28,20 @@ export function ProjectDetails({ project }: ProjectDetailsProps) {
 
   return (
     <Stack data-test='project-details'>
-      <Stack direction='row' mb={2} justifyContent='space-between' alignItems='center' flexWrap='wrap' gap={0.5}>
+      <Stack direction='row' mb={2} justifyContent='space-between' alignItems='center' flexWrap='wrap' gap={1}>
         <Typography variant='h5' data-test='project-name'>
           {project.name}
         </Typography>
-        <ShareButton projectId={project.id} data-test='share-button' />
+        <Stack direction='row' gap={1} alignItems='center'>
+          {showEditButton && project.path && (
+            <Link href={`/p/${project.path}/edit`}>
+              <IconButton size='small' color='secondary'>
+                <EditIcon fontSize='small' />
+              </IconButton>
+            </Link>
+          )}
+          <ShareButton projectId={project.id} data-test='share-button' />
+        </Stack>
       </Stack>
       <Stack gap={1.5}>
         {project.websites[0] && (

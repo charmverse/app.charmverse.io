@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid, v4 } from 'uuid';
 
 import type { ConnectProjectDetails } from 'lib/projects/getProject';
 
@@ -31,7 +31,9 @@ describe('mapProjectToGitcoin', () => {
             bio: "Alice's bio",
             username: 'alice',
             displayName: 'Alice'
-          }
+          },
+          teamLead: true,
+          userId: createdBy
         },
         {
           farcasterUser: {
@@ -40,7 +42,9 @@ describe('mapProjectToGitcoin', () => {
             bio: "Bob's bio",
             username: 'bob',
             displayName: 'Bob'
-          }
+          },
+          teamLead: false,
+          userId: v4()
         }
       ]
     };

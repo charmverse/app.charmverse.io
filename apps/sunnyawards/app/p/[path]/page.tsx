@@ -3,8 +3,6 @@ import { notFound } from 'next/navigation';
 import { ProjectDetailsPage } from 'components/projects/[id]/ProjectDetailsPage';
 import { getProject } from 'lib/projects/getProject';
 
-export const dynamic = 'force-dynamic';
-
 export default async function ProjectPage({ params }: { params: { path: string } }) {
   const project = await getProject({
     path: params.path
