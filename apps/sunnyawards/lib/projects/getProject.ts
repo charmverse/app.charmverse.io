@@ -1,6 +1,6 @@
 import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { StatusAPIResponse } from '@farcaster/auth-kit';
+import type { StatusAPIResponse } from '@farcaster/auth-client';
 
 type ProjectMember = {
   fid: number;

@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-kit';
+import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
+import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-client';
 import { getChainById } from '@root/connectors/chains';
 import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
 import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';

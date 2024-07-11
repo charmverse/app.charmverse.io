@@ -80,7 +80,7 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
                 <MenuItem>
                   <Link href='/profile'>@{farcasterDetails?.username}</Link>
                 </MenuItem>
-                <MenuItem onClick={logoutUser}>Sign Out</MenuItem>
+                <MenuItem onClick={() => logoutUser()}>Sign Out</MenuItem>
               </Menu>
             </Box>
           )}

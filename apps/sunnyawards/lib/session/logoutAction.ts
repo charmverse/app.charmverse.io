@@ -11,14 +11,11 @@ const schema = yup.object({
 
 export type FormValues = yup.InferType<typeof schema>;
 
-export const logoutAction = authActionClient
-  .metadata({ actionName: 'login' })
-  .schema(yup.object({})) // accept all body input
-  .action(async ({ ctx, parsedInput }) => {
-    const userId = ctx.session.user?.id;
-    ctx.session.destroy();
+export const logoutAction = authActionClient.metadata({ actionName: 'login' }).action(async ({ ctx, parsedInput }) => {
+  const userId = ctx.session.user?.id;
+  ctx.session.destroy();
 
-    log.info('User logged out with Farcaster', { userId, method: 'farcaster' });
+  log.info('User logged out with Farcaster', { userId, method: 'farcaster' });
 
-    return { success: true };
-  });
+  return { success: true };
+});

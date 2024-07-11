@@ -46,12 +46,10 @@ export const authActionClient = actionClient.use(async ({ next, ctx }) => {
     throw new UnauthorisedActionError('You are not logged in. Please try to login');
   }
 
-  const user = await prisma.user.findUniqueOrThrow({
+  await prisma.user.findUniqueOrThrow({
     where: { id: userId },
     select: { id: true }
   });
 
-  const session: IronSession<Required<Pick<SessionData, 'user'>>> = { ...ctx.session, user };
-
-  return next({ ctx: { ...ctx, session } });
+  return next({ ctx });
 });
