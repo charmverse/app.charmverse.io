@@ -3,10 +3,7 @@ import type { OptimismProjectAttestation, OptionalPrismaTransaction } from '@cha
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { attestOnchain } from 'lib/credentials/attestOnchain';
-import type {
-  OptimismProjectAttestationData,
-  OptimismProjectSnapshotAttestationMetaData
-} from 'lib/credentials/schemas/optimismProjectSchemas';
+import type { OptimismProjectSnapshotAttestationMetaData } from 'lib/credentials/schemas/optimismProjectSchemas';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
 import { fetchProject } from '../projects/fetchProject';
@@ -17,7 +14,7 @@ import { storeProjectInS3 } from './storeProjectInS3';
 // Format for metadata.json:
 // attestations/{schemaId}/project-{charmverse_uid}/metadata.json
 
-export async function storeProjectMetadataAndPublishOptimismAttestation({
+export async function storeUpdatedProjectMetadataAttestation({
   userId,
   projectId,
   tx = prisma
@@ -55,15 +52,12 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
 
   const chainId = projectAttestationChainId;
 
-  const attestationUID = await attestOnchain({
-    type: 'optimismProject',
-    chainId,
-    credentialInputs: {
-      recipient: null,
-      data: {
-        farcasterID: farcasterUser.fid,
-        issuer: projectAttestationIssuerName
-      } as OptimismProjectAttestationData
+  const existingOptimismAttestation = await prisma.optimismProjectAttestation.findFirstOrThrow({
+    where: {
+      projectId: project.id
+    },
+    select: {
+      projectRefUID: true
     }
   });
 
@@ -75,7 +69,7 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     metadataUrl: staticFilePath,
     name: project.name,
     parentProjectRefUID: '',
-    projectRefUID: attestationUID
+    projectRefUID: existingOptimismAttestation.projectRefUID
   } as OptimismProjectSnapshotAttestationMetaData;
 
   const attestationMetadataUID = await attestOnchain({
@@ -87,16 +81,16 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     }
   });
 
-  const attestationWithMetadata = await prisma.optimismProjectAttestation.create({
+  const attestationWithMetadata = await prisma.optimismProjectAttestation.update({
+    where: {
+      projectRefUID: existingOptimismAttestation.projectRefUID
+    },
     data: {
-      projectRefUID: attestationUID,
       metadataAttestationUID: attestationMetadataUID,
       metadataUrl: staticFilePath,
       name: project.name,
-      chainId,
       timeCreated: new Date(),
-      metadata: mappedProject,
-      projectId: project.id
+      metadata: mappedProject
     }
   });
 
