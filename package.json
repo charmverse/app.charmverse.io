@@ -100,7 +100,9 @@
     "sunnyawards:start:test": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 dotenv -e .env.test.local -- npm run start --workspace=apps/connect"
   },
   "lint-staged": {
-    "*.{ts,tsx}": []
+    "*.{ts,tsx}": [
+      "eslint --fix"
+    ]
   },
   "dependencies": {
     "@ankr.com/ankr.js": "^0.5.0",
