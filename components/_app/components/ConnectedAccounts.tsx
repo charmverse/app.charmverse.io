@@ -1,4 +1,5 @@
 import { Stack, Typography } from '@mui/material';
+import type { LoggedInUser } from '@root/models';
 import dynamic from 'next/dynamic';
 
 import { useAddUserWallets } from 'charmClient/hooks/profile';
@@ -14,7 +15,6 @@ import { useAccount } from 'hooks/wagmi';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { shortenHex } from 'lib/utils/blockchain';
-import type { LoggedInUser } from '@root/models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useRequiredMemberProperties } from '../../members/hooks/useRequiredMemberProperties';

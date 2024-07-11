@@ -4,7 +4,6 @@
 
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { GET } from '@root/adapters/http';
 import { redisClient } from '@root/adapters/redis/redisClient';
 

@@ -1,11 +1,11 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { charmverseDiscordInvite } from '@root/config/constants';
 import { useForm } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import Link from 'components/common/Link';
-import { charmverseDiscordInvite } from '@root/config/constants';
 
 type Props = {
   changeType?: () => void;

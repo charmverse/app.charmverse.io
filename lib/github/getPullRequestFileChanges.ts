@@ -1,5 +1,4 @@
 import type { PullRequestSummary } from '@charmverse/core/prisma-client';
-
 import { GET } from '@root/adapters/http';
 import { githubAccessToken } from '@root/config/constants';
 

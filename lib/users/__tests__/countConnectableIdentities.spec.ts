@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 } from 'uuid';
-
 import { sessionUserRelations } from '@root/lib/session/config';
 import { uid } from '@root/lib/utils/strings';
+import { v4 } from 'uuid';
+
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { countConnectableIdentities } from '../countConnectableIdentities';

@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { DELETE, POST } from '@root/adapters/http';
 import { docusignOauthBaseUri } from '@root/config/constants';
 

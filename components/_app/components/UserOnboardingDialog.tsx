@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
 import { Alert } from '@mui/material';
+import type { LoggedInUser } from '@root/models';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
@@ -24,7 +25,6 @@ import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { FormFieldValue } from 'lib/forms/interfaces';
-import type { LoggedInUser } from '@root/models';
 
 import type { OnboardingStep } from '../hooks/useOnboarding';
 import { useOnboarding } from '../hooks/useOnboarding';

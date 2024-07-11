@@ -1,5 +1,5 @@
-import type ISafeApiKit from '@safe-global/api-kit';
 import { getChainById } from '@root/connectors/chains';
+import type ISafeApiKit from '@safe-global/api-kit';
 /**
  * Api client for readonly Gnosis Safe operations
  */

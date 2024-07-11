@@ -1,6 +1,5 @@
 import type { CharmWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { generateCharmWallet } from '@root/lib/charms/generateCharmWallet';
 
 export async function getUserOrSpaceWallet({

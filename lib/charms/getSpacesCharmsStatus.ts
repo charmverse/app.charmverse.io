@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { getSpaceBlockCount } from '@root/lib/spaces/getSpaceBlockCount';
 import { blocksPerCharm, defaultFreeBlockQuota } from '@root/lib/subscription/constants';
 

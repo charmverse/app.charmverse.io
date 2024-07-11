@@ -1,11 +1,11 @@
 import type { AuthClientError } from '@farcaster/auth-kit';
+import type { LoggedInUser } from '@root/models';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback } from 'react';
 
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { LoginType } from 'lib/farcaster/interfaces';
-import type { LoggedInUser } from '@root/models';
 
 export function useWarpcastLogin({ type }: { type: LoginType }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });

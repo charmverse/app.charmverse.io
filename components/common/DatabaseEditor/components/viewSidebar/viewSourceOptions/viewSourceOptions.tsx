@@ -3,6 +3,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Grid, Tooltip, Typography } from '@mui/material';
+import { webhookEndpoint } from '@root/config/constants';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 import { BsFiletypeCsv } from 'react-icons/bs';
@@ -17,7 +18,6 @@ import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/data
 import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { PageIcon } from 'components/common/PageIcon';
-import { webhookEndpoint } from '@root/config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, DataSourceType } from 'lib/databases/board';
 import { createBoardView, type BoardView } from 'lib/databases/boardView';

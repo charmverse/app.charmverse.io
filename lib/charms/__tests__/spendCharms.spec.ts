@@ -1,11 +1,11 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import type { CharmWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { getTransaction } from '@root/lib/charms/getTransaction';
 import { getUserOrSpaceWallet } from '@root/lib/charms/getUserOrSpaceWallet';
 import { spendCharms } from '@root/lib/charms/spendCharms';
 import { transferCharms } from '@root/lib/charms/transferCharms';
+
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('spendCharms', () => {

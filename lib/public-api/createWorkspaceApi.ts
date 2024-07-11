@@ -1,7 +1,7 @@
 import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { baseUrl } from '@root/config/constants';
+
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/collabland/upsertSpaceRolesFromDiscord';
 import { upsertUserRolesFromDiscord } from 'lib/discord/collabland/upsertUserRolesFromDiscord';
 import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';

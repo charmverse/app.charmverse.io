@@ -5,6 +5,7 @@ import type { SxProps, Theme } from '@mui/material';
 import { Box, Stack, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
+import type { LoggedInUser } from '@root/models';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
@@ -21,7 +22,6 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 import { shortWalletAddress } from 'lib/utils/blockchain';
-import type { LoggedInUser } from '@root/models';
 
 import { useUpdateProfileAvatar } from '../hooks/useUpdateProfileAvatar';
 import { useUserDetails } from '../hooks/useUserDetails';

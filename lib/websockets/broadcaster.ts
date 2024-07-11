@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getClient as getPostgresClient } from '@root/adapters/postgres/postgresClient';
+import { redisClient } from '@root/adapters/redis/redisClient';
+import { isDevEnv, isTestEnv } from '@root/config/constants';
 import { createAdapter as createPostgresAdapter } from '@socket.io/postgres-adapter';
 import { createAdapter as createRedisAdapter } from '@socket.io/redis-adapter';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
-import { getClient as getPostgresClient } from '@root/adapters/postgres/postgresClient';
-import { redisClient } from '@root/adapters/redis/redisClient';
-import { isDevEnv, isTestEnv } from '@root/config/constants';
 import { SpaceMembershipRequiredError } from 'lib/permissions/errors';
 
 import { authOnConnect } from './authentication';

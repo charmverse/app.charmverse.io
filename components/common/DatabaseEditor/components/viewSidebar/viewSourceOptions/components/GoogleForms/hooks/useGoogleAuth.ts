@@ -1,10 +1,10 @@
 /// <reference types="google.accounts" />
 
 import { log } from '@charmverse/core/log';
+import { googleOAuthClientIdSensitive as googleOAuthClientId } from '@root/config/constants';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { googleOAuthClientIdSensitive as googleOAuthClientId } from '@root/config/constants';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { formScopes } from 'lib/google/forms/config';
 import { validateFormScopes } from 'lib/google/forms/validateFormScopes';

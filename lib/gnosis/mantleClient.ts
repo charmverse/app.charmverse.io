@@ -1,8 +1,7 @@
+import * as http from '@root/adapters/http';
 import type { SafeTransactionData } from '@safe-global/safe-core-sdk-types';
 import { getAddress } from 'viem';
 import { mantle, mantleTestnet } from 'viem/chains';
-
-import * as http from '@root/adapters/http';
 
 type MantleMultisigSafe = {
   address: {

@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import { shortWalletAddress } from '@root/lib/utils/blockchain';
+
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { createOrGetUserFromWallet } from '../createUser';

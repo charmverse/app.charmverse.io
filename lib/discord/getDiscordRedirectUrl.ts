@@ -1,4 +1,5 @@
 import { appSubdomain, isProdEnv, isStagingEnv } from '@root/config/constants';
+
 import { getAppApexDomain } from 'lib/utils/domains/getAppApexDomain';
 
 export function getDiscordRedirectUrl(host: string | undefined, redirectTo: string) {

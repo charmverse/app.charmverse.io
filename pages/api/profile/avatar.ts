@@ -1,3 +1,4 @@
+import type { LoggedInUser } from '@root/models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -5,7 +6,6 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { updateProfileAvatar } from 'lib/profile/updateProfileAvatar';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { UserAvatar } from 'lib/users/interfaces';
-import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { LoggedInUser } from '@root/models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -12,7 +13,6 @@ import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { withSessionRoute } from 'lib/session/withSession';
 import { shortenHex } from 'lib/utils/blockchain';
 import { InvalidInputError } from 'lib/utils/errors';
-import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

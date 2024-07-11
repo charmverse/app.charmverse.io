@@ -1,6 +1,6 @@
+import { GET } from '@root/adapters/http';
 import { getChainById } from '@root/connectors/chains';
 
-import { GET } from '@root/adapters/http';
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { paginatedCall } from 'lib/utils/async';
 import { isTruthy } from 'lib/utils/types';

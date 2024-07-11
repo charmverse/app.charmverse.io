@@ -1,10 +1,10 @@
 import { SIGNED_KEY_REQUEST_TYPE, SIGNED_KEY_REQUEST_VALIDATOR_EIP_712_DOMAIN } from '@farcaster/core';
+import * as http from '@root/adapters/http';
+import { isProdEnv } from '@root/config/constants';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { mnemonicToAccount } from 'viem/accounts';
 
-import * as http from '@root/adapters/http';
-import { isProdEnv } from '@root/config/constants';
 import { createHexKeyPair } from 'lib/farcaster/createHexKeyPair';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

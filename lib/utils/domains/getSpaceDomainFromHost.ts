@@ -1,4 +1,5 @@
 import { isStagingEnv } from '@root/config/constants';
+
 import { getValidDefaultHost } from 'lib/utils/domains/getValidDefaultHost';
 import { isLocalhostAlias } from 'lib/utils/domains/isLocalhostAlias';
 

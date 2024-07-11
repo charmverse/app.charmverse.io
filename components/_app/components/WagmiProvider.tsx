@@ -1,10 +1,9 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { isDevEnv, isTestEnv } from '@root/config/constants';
 import { getWagmiConfig, wagmiConfig } from '@root/connectors/config';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import type { Config } from 'wagmi';
 import { WagmiProvider as OriginalWagmiProvider } from 'wagmi';
-
-import { isDevEnv, isTestEnv } from '@root/config/constants';
 
 export function WagmiProvider({ children }: { children: React.ReactNode }) {
   const [config, setConfig] = useState<Config | undefined>(() => (isTestEnv && !isDevEnv ? undefined : wagmiConfig));

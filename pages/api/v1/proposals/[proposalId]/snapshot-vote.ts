@@ -1,11 +1,11 @@
 import { DataNotFoundError, UndesirableOperationError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import * as http from '@root/adapters/http';
+import { isTestEnv } from '@root/config/constants';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getAddress } from 'viem';
 
-import * as http from '@root/adapters/http';
-import { isTestEnv } from '@root/config/constants';
 import { requireKeys } from 'lib/middleware';
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';

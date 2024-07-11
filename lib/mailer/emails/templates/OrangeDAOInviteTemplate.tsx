@@ -3,8 +3,8 @@ import { Column } from '@react-email/column';
 import { Hr } from '@react-email/hr';
 import { Row } from '@react-email/row';
 import { Section } from '@react-email/section';
-
 import { baseUrl } from '@root/config/constants';
+
 import { getFormattedDateTime } from 'lib/utils/dates';
 
 import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';

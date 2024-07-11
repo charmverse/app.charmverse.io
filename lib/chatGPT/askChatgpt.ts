@@ -1,5 +1,4 @@
 import { SystemError } from '@charmverse/core/errors';
-
 import { POST } from '@root/adapters/http';
 
 import type { ChatGPTModel } from './constants';

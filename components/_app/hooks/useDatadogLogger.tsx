@@ -1,9 +1,9 @@
 import env from '@beam-australia/react-env';
 import { datadogLogs } from '@datadog/browser-logs';
 import { datadogRum } from '@datadog/browser-rum';
+import { isProdEnv, isStagingEnv } from '@root/config/constants';
 import { useEffect } from 'react';
 
-import { isProdEnv, isStagingEnv } from '@root/config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 

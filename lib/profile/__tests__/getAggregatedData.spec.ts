@@ -1,10 +1,10 @@
 import type { Space, SpaceRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { LoggedInUser } from '@root/models';
 import fetchMock from 'fetch-mock-jest';
 
 import { getAggregatedData } from 'lib/profile';
 import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import type { LoggedInUser } from '@root/models';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 const mockSandbox = fetchMock.sandbox();

@@ -1,5 +1,6 @@
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, List, ListItem, Stack, TextField, Typography } from '@mui/material';
+import { isProdEnv } from '@root/config/constants';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -7,7 +8,6 @@ import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { isProdEnv } from '@root/config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 

@@ -1,11 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { GET } from '@root/adapters/http';
+import { getChainById } from '@root/connectors/chains';
 import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
-import { getChainById } from '@root/connectors/chains';
 import { zkSync, zkSyncTestnet } from 'viem/chains';
 import { Provider } from 'zksync-web3';
 
-import { GET } from '@root/adapters/http';
 import type { NFTData } from 'lib/blockchain/getNFTs';
 import { getPublicClient } from 'lib/blockchain/publicClient';
 import { lowerCaseEqual } from 'lib/utils/strings';

@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { baseUrl } from '@root/config/constants';
 
 import type {

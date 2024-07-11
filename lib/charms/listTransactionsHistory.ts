@@ -1,6 +1,5 @@
 import type { CharmTransaction } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
 import type { TransactionMetadata } from '@root/lib/charms/addTransaction';
 import { TRANSACTIONS_PAGE_SIZE } from '@root/lib/charms/constants';
 import { getUserOrSpaceWallet } from '@root/lib/charms/getUserOrSpaceWallet';

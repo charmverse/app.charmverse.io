@@ -2,11 +2,11 @@ import type { Nft } from '@ankr.com/ankr.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 import type { Blockchain as AnkrBlockchain } from '@ankr.com/ankr.js/dist/types';
 import { log } from '@charmverse/core/log';
+import { GET } from '@root/adapters/http';
 import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
 import { ethers } from 'ethers';
 
-import { GET } from '@root/adapters/http';
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { isMantleChain } from 'lib/gnosis/mantleClient';
 import { paginatedCall } from 'lib/utils/async';

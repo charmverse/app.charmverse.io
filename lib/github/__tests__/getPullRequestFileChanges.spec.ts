@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { GET } from '@root/adapters/http';
 import { githubAccessToken } from '@root/config/constants';
+
 import { randomIntFromInterval } from 'lib/utils/random';
 
 import { GITHUB_API_BASE_URL } from '../constants';

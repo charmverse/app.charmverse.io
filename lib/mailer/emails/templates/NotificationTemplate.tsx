@@ -4,8 +4,8 @@ import { Hr } from '@react-email/hr';
 import { Img } from '@react-email/img';
 import { Row } from '@react-email/row';
 import { Section } from '@react-email/section';
-
 import { baseUrl } from '@root/config/constants';
+
 import type { FeatureJson } from 'lib/features/constants';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';

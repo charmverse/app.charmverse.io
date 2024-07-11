@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { LoggedInUser } from '@root/models';
 import { v4 } from 'uuid';
 
-import type { LoggedInUser } from '@root/models';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { NotionImporter } from '../NotionImporter/NotionImporter';

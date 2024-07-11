@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-
 import { POST } from '@root/adapters/http';
 import { isProdEnv } from '@root/config/constants';
 

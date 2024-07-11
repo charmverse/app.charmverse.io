@@ -1,9 +1,8 @@
 import { Column } from '@react-email/column';
 import { Container } from '@react-email/container';
 import { Img } from '@react-email/img';
-import type { ReactNode } from 'react';
-
 import { baseUrl } from '@root/config/constants';
+import type { ReactNode } from 'react';
 
 import Link from './Link';
 import Text from './Text';

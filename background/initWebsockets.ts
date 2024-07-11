@@ -1,7 +1,6 @@
 // init app instrumentation
 import './websockets/datadog';
 import { log } from '@charmverse/core/log';
-
 import { appEnv } from '@root/config/constants';
 
 import { httpServer, socketServer } from './websockets/app';

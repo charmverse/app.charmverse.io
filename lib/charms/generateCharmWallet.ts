@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { isUniqueConstraintError } from '@root/lib/utils/errors/prisma';
 
 type Params = { userId: string } | { spaceId: string };

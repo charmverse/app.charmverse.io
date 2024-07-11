@@ -1,6 +1,5 @@
-import { v4 as uuid } from 'uuid';
-
 import { baseUrl } from '@root/config/constants';
+import { v4 as uuid } from 'uuid';
 
 import { mux } from './muxClient';
 

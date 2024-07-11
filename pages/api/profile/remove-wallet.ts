@@ -1,4 +1,5 @@
 import type { UserWallet } from '@charmverse/core/prisma';
+import type { LoggedInUser } from '@root/models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,7 +8,6 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { DisconnectWalletRequest } from 'lib/users/disconnectWallet';
 import { disconnectWallet } from 'lib/users/disconnectWallet';
-import type { LoggedInUser } from '@root/models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,7 +1,7 @@
+import { DELETE, GET, POST, PUT } from '@root/adapters/http';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-import { DELETE, GET, POST, PUT } from '@root/adapters/http';
 import {
   useGetDocusignAccounts,
   useGetDocusignProfile,

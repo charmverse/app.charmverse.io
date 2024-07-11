@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { addCharms } from '@root/lib/charms/addCharms';
 import { CharmActionTrigger, charmActionRewards } from '@root/lib/charms/constants';
 

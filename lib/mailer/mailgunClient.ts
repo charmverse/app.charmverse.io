@@ -1,7 +1,6 @@
+import { isProdEnv } from '@root/config/constants';
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
-
-import { isProdEnv } from '@root/config/constants';
 
 export const API_KEY = process.env.MAILGUN_API_KEY as string | undefined;
 export const SIGNING_KEY = process.env.MAILGUN_SIGNING_KEY as string;

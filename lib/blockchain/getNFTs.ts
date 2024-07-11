@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
-import orderBy from 'lodash/orderBy';
-
 import { isTestEnv } from '@root/config/constants';
+import orderBy from 'lodash/orderBy';
 
 // Alchemy APIs
 import {

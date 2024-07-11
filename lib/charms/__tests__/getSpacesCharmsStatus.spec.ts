@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { addCharms } from '@root/lib/charms/addCharms';
 import { getSpacesCharmsStatus } from '@root/lib/charms/getSpacesCharmsStatus';
+
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('getSpacesCharmsStatus', () => {

@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { GET } from '@root/adapters/http';
 import { optimism } from 'viem/chains';
 
-import { GET } from '@root/adapters/http';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import { getTrackedOnChainCredentials } from 'lib/credentials/external/getOnchainCredentials';
 import { isTruthy } from 'lib/utils/types';

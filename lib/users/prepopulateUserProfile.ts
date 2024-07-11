@@ -1,11 +1,10 @@
 import { log } from '@charmverse/core/log';
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { uniqBy } from 'lodash';
-
 import { getENSDetails } from '@root/lib/blockchain';
 import { getUserNFTs } from '@root/lib/profile/getUserNFTs';
 import { updateProfileAvatar } from '@root/lib/profile/updateProfileAvatar';
+import { uniqBy } from 'lodash';
 
 const acceptedImageFormats = ['.jpg', '.jpeg', '.png', '.webp'];
 

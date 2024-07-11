@@ -5,7 +5,6 @@ import type {
   PermissionCompute
 } from '@charmverse/core/permissions';
 import { PermissionsApiClient } from '@charmverse/core/permissions';
-
 import { permissionsApiAuthKey, permissionsApiUrl } from '@root/config/constants';
 
 // Injected method for expanding args

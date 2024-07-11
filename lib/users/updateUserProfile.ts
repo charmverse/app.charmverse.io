@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { sessionUserRelations } from '@root/lib/session/config';
 import { MissingDataError } from '@root/lib/utils/errors';
 import type { LoggedInUser } from '@root/models';

@@ -2,10 +2,10 @@ import { IncomingMessage, ServerResponse } from 'http';
 
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { authSecret } from '@root/config/constants';
 import { getIronSession, unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
-import { authSecret } from '@root/config/constants';
 import { ActionNotPermittedError } from 'lib/middleware';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';

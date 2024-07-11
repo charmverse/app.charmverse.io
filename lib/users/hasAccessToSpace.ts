@@ -1,6 +1,5 @@
 import type { SpaceRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
 import type { SystemError } from '@root/lib/utils/errors';
 import { InvalidInputError } from '@root/lib/utils/errors';
 

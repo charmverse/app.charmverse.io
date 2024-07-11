@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
 import { generateCharmWallet } from '@root/lib/charms/generateCharmWallet';
+
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('generateCharmWallet', () => {

@@ -1,8 +1,8 @@
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { typedKeys } from '@root/lib/utils/objects';
 import { v4 } from 'uuid';
 
-import { typedKeys } from '@root/lib/utils/objects';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { updateUserProfile } from '../updateUserProfile';
