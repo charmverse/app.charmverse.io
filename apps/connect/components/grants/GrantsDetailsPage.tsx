@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { PageWrapper } from '@connect/components/common/PageWrapper';
 import type { Grant } from '@connect/lib/grants/getGrants';
 import { Button, Stack } from '@mui/material';
@@ -9,12 +11,12 @@ export function GrantsDetailsPage({ grants, currentTab }: { grants: Grant[]; cur
   return (
     <PageWrapper>
       <Stack direction='row' gap={1} justifyContent='center'>
-        <Link href='/grants/upcoming'>
+        <Link href='/grants?sort=upcoming'>
           <Button size='small' variant={currentTab === 'upcoming' ? 'contained' : 'outlined'}>
             Upcoming
           </Button>
         </Link>
-        <Link href='/grants/new'>
+        <Link href='/grants?sort=new'>
           <Button size='small' variant={currentTab === 'new' ? 'contained' : 'outlined'}>
             New
           </Button>

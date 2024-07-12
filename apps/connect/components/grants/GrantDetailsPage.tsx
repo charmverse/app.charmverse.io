@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { Grant } from '@connect/lib/grants/getGrants';
 import { Button, Chip, Link, Stack, Typography } from '@mui/material';
 
