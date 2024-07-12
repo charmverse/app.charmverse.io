@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { PageCoverHeader } from '@connect/components/common/PageCoverHeader';
 import { PageWrapper } from '@connect/components/common/PageWrapper';
 import { actionEditProject } from '@connect/lib/actions/editProject';
 import type { LoggedInUser } from '@connect/lib/profile/interfaces';
@@ -19,7 +20,6 @@ import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectForm } from '../components/ProjectForm';
-import { ProjectHeader } from '../components/ProjectHeader';
 
 export function EditProjectPage({ user, project }: { user: LoggedInUser; project: ConnectProjectDetails }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
@@ -98,7 +98,11 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
   return (
     <PageWrapper
       header={
-        <ProjectHeader name={projectValues.name} avatar={projectValues.avatar} coverImage={projectValues.coverImage} />
+        <PageCoverHeader
+          name={projectValues.name}
+          avatar={projectValues.avatar}
+          coverImage={projectValues.coverImage}
+        />
       }
     >
       <Box gap={2} display='flex' flexDirection='column'>
