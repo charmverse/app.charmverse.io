@@ -5,6 +5,7 @@ import webpush from 'web-push';
 
 initWebPush();
 
+// This API is used only for testing purposes. @TODO Delete this API after the cron job implementation .
 export async function GET(_: NextRequest) {
   try {
     const subscriptions = await prisma.serviceWorkerSubscriptions.findMany({
@@ -24,7 +25,7 @@ export async function GET(_: NextRequest) {
     return NextResponse.json({
       message: `${subscriptions.length} messages sent!`
     });
-  } catch (err) {
+  } catch (err: any) {
     return NextResponse.json({
       status: 500,
       message: err?.message
