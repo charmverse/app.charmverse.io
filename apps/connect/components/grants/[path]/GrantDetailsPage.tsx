@@ -3,9 +3,9 @@ import 'server-only';
 import type { Grant } from '@connect/lib/grants/getGrants';
 import { Button, Chip, Link, Stack, Typography } from '@mui/material';
 
-import { ExpandableDescription } from '../common/ExpandableDescription';
-import { PageCoverHeader } from '../common/PageCoverHeader';
-import { PageWrapper } from '../common/PageWrapper';
+import { ExpandableDescription } from '../../common/ExpandableDescription';
+import { PageCoverHeader } from '../../common/PageCoverHeader';
+import { PageWrapper } from '../../common/PageWrapper';
 
 export function GrantDetailsPage({ grant }: { grant: Grant }) {
   return (

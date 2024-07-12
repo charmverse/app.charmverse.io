@@ -1,4 +1,4 @@
-import { GrantsDetailsPage } from '@connect/components/grants/GrantsDetailsPage';
+import { GrantsListPage } from '@connect/components/grants/GrantsListPage';
 import { getGrants } from '@connect/lib/grants/getGrants';
 
 export default async function GrantsPage({
@@ -13,5 +13,5 @@ export default async function GrantsPage({
     sort
   });
 
-  return <GrantsDetailsPage grants={grants} currentTab={sort} />;
+  return <GrantsListPage grants={grants} currentTab={sort} />;
 }
