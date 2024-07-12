@@ -35,6 +35,7 @@ export const iconForPropertyType = (propertyType: PropertyType | 'title', props?
     case 'multiSelect':
       return <FormatListBulletedIcon fontSize='small' {...props} />;
     case 'proposalEvaluationAverage':
+    case 'proposalEvaluationReviewerAverage':
     case 'proposalEvaluationTotal':
     case 'proposalRubricCriteriaTotal':
     case 'proposalRubricCriteriaAverage':

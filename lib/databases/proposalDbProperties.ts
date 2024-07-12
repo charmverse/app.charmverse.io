@@ -80,6 +80,12 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalEvaluationAverage'
   }),
+  proposalEvaluationReviewerAverage: () => ({
+    id: uuid(),
+    name: 'Proposal Evaluation Reviewer Average',
+    options: [],
+    type: 'proposalEvaluationReviewerAverage'
+  }),
   proposalEvaluationTotal: () => ({
     id: uuid(),
     name: 'Proposal Evaluation Total',

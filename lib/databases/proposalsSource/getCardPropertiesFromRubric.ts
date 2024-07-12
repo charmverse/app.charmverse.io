@@ -93,6 +93,10 @@ export function getCardPropertiesFromRubric({
       (p) => p.type === 'proposalEvaluationAverage' && p.evaluationTitle === evaluation.title
     );
 
+    const proposalEvaluationReviewerAverageProp = templates.find(
+      (p) => p.type === 'proposalEvaluationReviewerAverage' && p.evaluationTitle === evaluation.title
+    );
+
     if (proposalEvaluatedByProp) {
       properties[proposalEvaluatedByProp.id] = uniqueReviewers;
     }
@@ -103,6 +107,12 @@ export function getCardPropertiesFromRubric({
 
     if (proposalEvaluationAverageProp) {
       properties[proposalEvaluationAverageProp.id] = allScores.average ?? '';
+    }
+
+    if (proposalEvaluationReviewerAverageProp) {
+      const totalReviewers = Object.keys(reviewersResults).length;
+      properties[proposalEvaluationReviewerAverageProp.id] =
+        totalReviewers === 0 ? 0 : (allScores.sum ?? 0) / totalReviewers ?? '';
     }
   }
 

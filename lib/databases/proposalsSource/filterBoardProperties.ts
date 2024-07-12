@@ -56,6 +56,7 @@ export function filterBoardProperties({
 
     if (
       p.type === 'proposalEvaluationAverage' ||
+      p.type === 'proposalEvaluationReviewerAverage' ||
       p.type === 'proposalEvaluationTotal' ||
       p.type === 'proposalEvaluatedBy' ||
       p.type === 'proposalRubricCriteriaTotal' ||
@@ -69,6 +70,10 @@ export function filterBoardProperties({
       }
       if (p.type === 'proposalEvaluationAverage') {
         return !!rubricEvaluation.average;
+      }
+
+      if (p.type === 'proposalEvaluationReviewerAverage') {
+        return !!rubricEvaluation.reviewerAverage;
       }
 
       if (p.type === 'proposalEvaluationTotal') {

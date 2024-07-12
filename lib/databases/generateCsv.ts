@@ -252,6 +252,7 @@ function getCSVColumns({
     } else if (
       propertyTemplate.type === 'number' ||
       propertyTemplate.type === 'proposalEvaluationAverage' ||
+      propertyTemplate.type === 'proposalEvaluationReviewerAverage' ||
       propertyTemplate.type === 'proposalEvaluationTotal' ||
       propertyTemplate.type === 'proposalRubricCriteriaTotal' ||
       propertyTemplate.type === 'proposalRubricCriteriaAverage'

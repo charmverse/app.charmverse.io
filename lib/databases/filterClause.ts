@@ -152,6 +152,10 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     datatype: 'number',
     conditions: NumberDataTypeConditions
   },
+  proposalEvaluationReviewerAverage: {
+    datatype: 'number',
+    conditions: NumberDataTypeConditions
+  },
   proposalEvaluationTotal: {
     datatype: 'number',
     conditions: NumberDataTypeConditions
