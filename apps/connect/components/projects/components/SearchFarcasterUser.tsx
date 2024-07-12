@@ -10,8 +10,10 @@ import { useEffect, useMemo, useState } from 'react';
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
 export function SearchFarcasterUser({
-  setSelectedProfile
+  setSelectedProfile,
+  filteredFarcasterIds = []
 }: {
+  filteredFarcasterIds?: number[];
   setSelectedProfile: (profile: FarcasterProfile | null) => void;
 }) {
   const [farcasterProfiles, setFarcasterProfiles] = useState<FarcasterProfile[]>([]);
@@ -23,13 +25,15 @@ export function SearchFarcasterUser({
         .then((_farcasterProfiles) => {
           if (_farcasterProfiles.length) {
             setFarcasterProfiles(
-              _farcasterProfiles.map((profile) => ({
-                fid: profile.fid,
-                pfpUrl: profile.pfp_url,
-                bio: profile.profile.bio.text,
-                displayName: profile.display_name,
-                username: profile.username
-              }))
+              _farcasterProfiles
+                .filter((profile) => !filteredFarcasterIds?.includes(profile.fid))
+                .map((profile) => ({
+                  fid: profile.fid,
+                  pfpUrl: profile.pfp_url,
+                  bio: profile.profile.bio.text,
+                  displayName: profile.display_name,
+                  username: profile.username
+                }))
             );
           }
         })
