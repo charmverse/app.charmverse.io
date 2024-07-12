@@ -305,6 +305,13 @@ function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[],
       name: `${rubricStepTitle} (Step average)`,
       evaluationTitle: rubricStepTitle
     });
+
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluationReviewerAverage',
+      name: `${rubricStepTitle} (Step reviewer average)`,
+      evaluationTitle: rubricStepTitle
+    });
   }
 }
 

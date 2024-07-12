@@ -197,6 +197,7 @@ export function sortCards(
           template.type === 'date' ||
           template.type === 'tokenAmount' ||
           template.type === 'proposalEvaluationAverage' ||
+          template.type === 'proposalEvaluationReviewerAverage' ||
           template.type === 'proposalEvaluationTotal' ||
           template.type === 'proposalRubricCriteriaTotal' ||
           template.type === 'proposalRubricCriteriaAverage'

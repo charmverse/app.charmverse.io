@@ -28,6 +28,7 @@ export function createSelectedPropertiesStateFromBoardProperties({
   cardProperties.forEach((field) => {
     if (
       field.type === 'proposalEvaluationAverage' ||
+      field.type === 'proposalEvaluationReviewerAverage' ||
       field.type === 'proposalEvaluationTotal' ||
       field.type === 'proposalEvaluatedBy' ||
       field.type === 'proposalRubricCriteriaTotal' ||
@@ -57,6 +58,8 @@ export function createSelectedPropertiesStateFromBoardProperties({
           rubricEvaluationsPropertiesRecord[fieldKey].reviewerScore = true;
         } else if (field.type === 'proposalRubricCriteriaAverage') {
           rubricEvaluationsPropertiesRecord[fieldKey].criteriaAverage = true;
+        } else if (field.type === 'proposalEvaluationReviewerAverage') {
+          rubricEvaluationsPropertiesRecord[fieldKey].reviewerAverage = true;
         }
       }
     } else if (customPropertyIds.includes(field.id)) {

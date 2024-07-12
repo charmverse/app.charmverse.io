@@ -4,8 +4,6 @@ import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { replaceS3Domain } from '@root/lib/utils/url';
 import { v4 } from 'uuid';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-
 import type { Card } from './card';
 import { Constants } from './constants';
 
@@ -17,6 +15,7 @@ export const proposalPropertyTypesList = [
   'proposalRubricCriteriaAverage',
   'proposalRubricCriteriaTotal',
   'proposalEvaluationAverage',
+  'proposalEvaluationReviewerAverage',
   'proposalAuthor',
   'proposalReviewer',
   'proposalEvaluationType',
