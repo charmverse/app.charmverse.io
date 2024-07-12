@@ -48,7 +48,6 @@ export function ProjectImageField({
           }}
         >
           <input
-            title={`Add ${type}`}
             disabled={isUploading}
             type='file'
             accept={'image/*'}
