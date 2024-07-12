@@ -42,7 +42,7 @@ export async function GET(request: Request) {
     filename = `${randomName}.${extension}`;
   }
 
-  const key = getUserS3FilePath({ userId, url: filename });
+  const key = getUserS3FilePath({ userId, url: decodeURIComponent(filename) });
 
   const policy = {
     Statement: [
