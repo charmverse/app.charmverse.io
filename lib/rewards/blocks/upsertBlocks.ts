@@ -1,15 +1,14 @@
 import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { filterInternalProperties } from 'lib/databases/utilities';
+import { filterInternalProperties } from '@root/lib/databases/utilities';
 import type {
   RewardBlockUpdateInput,
   RewardBlockWithTypedFields,
   RewardPropertyValues
-} from 'lib/rewards/blocks/interfaces';
-import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
-import { updateRewardSettings } from 'lib/rewards/updateRewardSettings';
+} from '@root/lib/rewards/blocks/interfaces';
+import { upsertBlock } from '@root/lib/rewards/blocks/upsertBlock';
+import { updateRewardSettings } from '@root/lib/rewards/updateRewardSettings';
 
 export async function upsertBlocks({
   blocksData,

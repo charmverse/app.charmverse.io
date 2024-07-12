@@ -1,5 +1,6 @@
 import type { RouterContext } from '@connect-api/koa';
 import { PathBasedRouter } from '@connect-api/lib/pathBasedRouter';
+
 import type { FarcasterUser } from 'lib/farcaster/getFarcasterUsers';
 import { getFarcasterUsers } from 'lib/farcaster/getFarcasterUsers';
 

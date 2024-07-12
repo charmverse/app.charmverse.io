@@ -1,8 +1,7 @@
 import { arrayUtils } from '@charmverse/core/utilities';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from '@root/lib/proposals/rubric/interfaces';
+import { isNumber, roundNumber } from '@root/lib/utils/numbers';
 import { mean, sum } from 'lodash';
-
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
-import { isNumber, roundNumber } from 'lib/utils/numbers';
 
 /**
  * null if no answers available
@@ -87,7 +86,7 @@ export function aggregateResults({
 
   const allScores = Object.values(criteriaScores).flat();
   const allScoresSum = allScores.length ? sum(allScores) : null;
-  const allScoresAverage = allScores.length ? roundNumber(sum(allScores) / reviewers.length) : null;
+  const allScoresAverage = allScores.length ? roundNumber(mean(allScores)) : null;
 
   const mappedReviewerResults = reviewersResults.reduce((acc, reviewer) => {
     acc[reviewer.id] = reviewer;

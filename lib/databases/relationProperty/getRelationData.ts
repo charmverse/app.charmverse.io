@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { InvalidStateError, NotFoundError } from 'lib/middleware';
+import { InvalidStateError, NotFoundError } from '@root/lib/middleware';
 
 import type { BoardFields, IPropertyTemplate } from '../board';
 

@@ -1,11 +1,10 @@
 import { GET, POST } from '@charmverse/core/http';
 import { getLogger } from '@charmverse/core/log';
+import { isProdEnv } from '@root/config/constants';
+import { COLLABLAND_API_URL, COLLAB_API_KEY } from '@root/lib/collabland/config';
+import type { CollablandUserResult } from '@root/lib/collabland/interfaces';
+import type { ExternalRole } from '@root/lib/roles';
 import { RateLimit } from 'async-sema';
-
-import { isProdEnv } from 'config/constants';
-import { COLLABLAND_API_URL, COLLAB_API_KEY } from 'lib/collabland/config';
-import type { CollablandUserResult } from 'lib/collabland/interfaces';
-import type { ExternalRole } from 'lib/roles';
 
 const log = getLogger('collabland-client');
 

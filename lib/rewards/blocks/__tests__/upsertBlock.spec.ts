@@ -1,10 +1,10 @@
+import type { PropertyType } from '@root/lib/databases/board';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
+import { getBlocks } from '@root/lib/rewards/blocks/getBlocks';
+import type { RewardBlockInput, RewardBlockUpdateInput } from '@root/lib/rewards/blocks/interfaces';
+import { upsertBlock } from '@root/lib/rewards/blocks/upsertBlock';
 import { v4 } from 'uuid';
 
-import type { PropertyType } from 'lib/databases/board';
-import type { BoardViewFields } from 'lib/databases/boardView';
-import { getBlocks } from 'lib/rewards/blocks/getBlocks';
-import type { RewardBlockInput, RewardBlockUpdateInput } from 'lib/rewards/blocks/interfaces';
-import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('reward blocks - updateBlock', () => {

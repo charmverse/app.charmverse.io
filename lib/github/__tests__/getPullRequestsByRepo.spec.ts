@@ -1,4 +1,4 @@
-import { githubGrapghQLClient } from 'lib/github/githubGraphQLClient';
+import { githubGrapghQLClient } from '@root/lib/github/githubGraphQLClient';
 
 import type { PullRequestMeta } from '../getPullRequestMeta';
 import type { PullRequestsByRepo } from '../getPullRequestsByRepo';

@@ -1,4 +1,4 @@
-import type { PageContent, BlockNode } from 'lib/prosemirror/interfaces';
+import type { PageContent, BlockNode } from '@root/lib/prosemirror/interfaces';
 
 function extractImageURL(item: BlockNode) {
   if (item.type === 'paragraph') {

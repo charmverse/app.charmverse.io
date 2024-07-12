@@ -1,10 +1,9 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { ProjectShareItem } from '@connect/components/projects/components/ProjectShareItem';
+import { getUserS3FilePath, uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
 import { ImageResponse } from 'next/og';
 import React from 'react';
 import sharp from 'sharp';
-
-import { getUserS3FilePath, uploadFileToS3 } from 'lib/aws/uploadToS3Server';
 
 import { fetchProject } from './fetchProject';
 

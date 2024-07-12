@@ -1,10 +1,10 @@
 import type { IssuedCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { pseudoRandomHexString } from '@root/lib/utils/random';
 import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
-import { pseudoRandomHexString } from 'lib/utils/random';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { issueOffchainProposalCredentialsIfNecessary } from '../issueOffchainProposalCredentialsIfNecessary';

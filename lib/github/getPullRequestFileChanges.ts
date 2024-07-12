@@ -1,7 +1,6 @@
 import type { PullRequestSummary } from '@charmverse/core/prisma-client';
-
-import { GET } from 'adapters/http';
-import { githubAccessToken } from 'config/constants';
+import { GET } from '@root/adapters/http';
+import { githubAccessToken } from '@root/config/constants';
 
 import { GITHUB_API_BASE_URL } from './constants';
 

@@ -1,9 +1,8 @@
 import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
+import { credentialsWalletPrivateKey, graphQlServerEndpoint, isDevEnv, isStagingEnv } from '@root/config/constants';
 import { Wallet } from 'ethers';
-
-import { credentialsWalletPrivateKey, graphQlServerEndpoint, isDevEnv, isStagingEnv } from 'config/constants';
 
 import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';

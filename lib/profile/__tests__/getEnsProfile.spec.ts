@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { getENSDetails } from '@root/lib/blockchain';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 
-import { getENSDetails } from 'lib/blockchain';
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { getEnsProfile } from '../getEnsProfile';

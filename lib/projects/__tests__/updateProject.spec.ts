@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { randomETHWallet } from '@root/lib/utils/blockchain';
 import { v4 } from 'uuid';
-
-import { randomETHWallet } from 'lib/utils/blockchain';
 
 import { createDefaultProject, defaultProjectMember } from '../constants';
 import { createProject } from '../createProject';

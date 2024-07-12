@@ -1,8 +1,7 @@
 import { WrongStateError } from '@charmverse/core/errors';
 import type { Application } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { issueOffchainRewardCredentialsIfNecessary } from 'lib/credentials/issueOffchainRewardCredentialsIfNecessary';
+import { issueOffchainRewardCredentialsIfNecessary } from '@root/lib/credentials/issueOffchainRewardCredentialsIfNecessary';
 
 export async function markSubmissionAsPaid(submissionId: string): Promise<Application> {
   const submission = await prisma.application.findUniqueOrThrow({

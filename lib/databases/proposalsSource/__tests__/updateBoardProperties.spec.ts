@@ -2,11 +2,11 @@ import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma-cli
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { objectUtils } from '@charmverse/core/utilities';
+import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
+import { InvalidStateError } from '@root/lib/middleware';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
-import { InvalidStateError } from 'lib/middleware';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 

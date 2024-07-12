@@ -1,7 +1,7 @@
 // playwright-dev-page.ts
 import type { Locator, Page } from '@playwright/test';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 // capture actions on the pages in signup flow
 export class ForumPostPage {
   readonly page: Page;

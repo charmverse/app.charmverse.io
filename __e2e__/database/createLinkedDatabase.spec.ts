@@ -6,7 +6,7 @@ import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagesSidebarPage } from '__e2e__/po/pagesSidebar.po';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import type { CardFields } from 'lib/databases/card';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';

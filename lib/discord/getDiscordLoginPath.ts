@@ -1,4 +1,4 @@
-import type { AuthType, OauthFlowType } from 'lib/oauth/interfaces';
+import type { AuthType, OauthFlowType } from '@root/lib/oauth/interfaces';
 
 export function getDiscordLoginPath({
   type,

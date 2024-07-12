@@ -2,10 +2,9 @@ import fs from 'node:fs/promises';
 
 import type { Block, Page, Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { extractPreviewImage } from '@root/lib/prosemirror/extractPreviewImage';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { v4 } from 'uuid';
-
-import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 interface AWSAssetUrl {
   oldPageId: string;

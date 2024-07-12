@@ -131,6 +131,15 @@ export function RubricEvaluationPropertiesList({
                 label='Step Average'
               />
               <PropertySelector
+                isChecked={!!_rubricEvaluation?.reviewerAverage}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
+                    reviewerAverage: !_rubricEvaluation?.reviewerAverage
+                  });
+                }}
+                label='Step Reviewer Average'
+              />
+              <PropertySelector
                 isChecked={!!_rubricEvaluation?.total}
                 onClick={() => {
                   updateRubricEvaluationProperties(rubricEvaluationTitle, { total: !_rubricEvaluation?.total });
@@ -225,6 +234,10 @@ export function RubricEvaluationPropertiesReadonlyList({
           }
           if (rubricEvaluation.reviewerComment) {
             items.push('Individual Reviewer Comments');
+          }
+
+          if (rubricEvaluation.reviewerAverage) {
+            items.push('Reviewer Average');
           }
 
           if (items.length === 0) {

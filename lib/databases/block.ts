@@ -1,9 +1,8 @@
 import type { Page, PageType, Block as PrismaBlock } from '@charmverse/core/prisma';
+import type { OptionalFalseyFields } from '@root/lib/utils/objects';
+import { replaceS3Domain } from '@root/lib/utils/url';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
-
-import type { OptionalFalseyFields } from 'lib/utils/objects';
-import { replaceS3Domain } from 'lib/utils/url';
 
 // export const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
 export const blockTypes = ['board', 'view', 'card', 'unknown'] as const;

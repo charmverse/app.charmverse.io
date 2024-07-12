@@ -4,7 +4,7 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { login } from '__e2e__/utils/session';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 import { generateUserAndSpaceKyc } from 'testing/utils/kyc';
 
 test.describe.serial('Review reward applications', () => {

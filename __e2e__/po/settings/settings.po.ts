@@ -2,7 +2,7 @@
 import type { Locator, Page } from '@playwright/test';
 
 import type { AccountSettingsSection, SpaceSettingsSection } from 'components/settings/config';
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import { GlobalPage } from '../global.po';
 

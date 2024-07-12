@@ -2,7 +2,7 @@ import { test as base, expect } from '@playwright/test';
 import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
 import { v4 } from 'uuid';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import { generateSpaceRole, generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';

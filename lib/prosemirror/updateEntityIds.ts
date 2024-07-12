@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
+import type { PageContent, TextContent, TextMark } from '@root/lib/prosemirror/interfaces';
 import { v4 as uuid } from 'uuid';
-
-import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
 
 type UpdateRefs = {
   oldNewRecordIdHashMap: Record<string, string>;

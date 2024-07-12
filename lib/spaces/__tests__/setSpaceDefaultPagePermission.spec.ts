@@ -1,8 +1,8 @@
 import type { Space } from '@charmverse/core/prisma';
+import { SpaceNotFoundError } from '@root/lib/public-api';
+import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
-import { SpaceNotFoundError } from 'lib/public-api';
-import { InvalidInputError } from 'lib/utils/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

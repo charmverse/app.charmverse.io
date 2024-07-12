@@ -2,12 +2,11 @@
 import type { Page, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { getPagePath } from '@root/lib/pages';
+import { builders as _ } from '@root/lib/prosemirror/builders';
+import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { v4 } from 'uuid';
-
-import { getPagePath } from 'lib/pages';
-import { builders as _ } from 'lib/prosemirror/builders';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { WebsocketBroadcaster } from '../broadcaster';
 import type { DocumentRoom } from '../documentEvents/docRooms';

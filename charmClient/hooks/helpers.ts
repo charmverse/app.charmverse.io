@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 
 export type MaybeString = string | null | undefined;
 

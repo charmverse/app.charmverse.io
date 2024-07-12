@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import type { MixpanelEventMap, MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
 
 export class TrackApi {

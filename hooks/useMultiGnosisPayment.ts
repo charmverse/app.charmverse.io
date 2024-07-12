@@ -1,7 +1,7 @@
 import { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 

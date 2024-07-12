@@ -1,7 +1,6 @@
 import { type PermissionsClient } from '@charmverse/core/permissions';
-
-import { PublicForumPermissionsClient } from 'lib/permissions/forum/client';
-import { PublicProposalsPermissionsClient } from 'lib/permissions/proposals/client';
+import { PublicForumPermissionsClient } from '@root/lib/permissions/forum/client';
+import { PublicProposalsPermissionsClient } from '@root/lib/permissions/proposals/client';
 
 export class PublicPermissionsClient implements PermissionsClient {
   forum = new PublicForumPermissionsClient();

@@ -1,4 +1,4 @@
-import { baseUrl, docusignClientId, docusignOauthBaseUri } from 'config/constants';
+import { baseUrl, docusignClientId, docusignOauthBaseUri } from '@root/config/constants';
 
 import { encodeDocusignState } from './encodeAndDecodeDocusignState';
 

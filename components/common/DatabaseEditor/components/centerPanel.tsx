@@ -7,6 +7,7 @@ import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Link, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+import { webhookEndpoint } from '@root/config/constants';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -22,7 +23,6 @@ import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { webhookEndpoint } from 'config/constants';
 import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';

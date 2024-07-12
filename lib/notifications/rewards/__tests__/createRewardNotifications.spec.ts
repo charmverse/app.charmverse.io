@@ -1,10 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { reviewApplication } from '@root/lib/rewards/reviewApplication';
+import { work } from '@root/lib/rewards/work';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
+import {
+  getApplicationEntity,
+  getRewardEntity,
+  getSpaceEntity,
+  getUserEntity
+} from '@root/lib/webhookPublisher/entities';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
-import { reviewApplication } from 'lib/rewards/reviewApplication';
-import { work } from 'lib/rewards/work';
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import { getApplicationEntity, getRewardEntity, getSpaceEntity, getUserEntity } from 'lib/webhookPublisher/entities';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { createUserWithWallet, generateUserAndSpace, generateBounty } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';

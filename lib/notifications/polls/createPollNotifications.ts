@@ -1,9 +1,8 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/client';
-import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { getPermissionsClient, permissionsApiClient } from '@root/lib/permissions/api/client';
+import type { WebhookEvent } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
 import { savePollNotification } from '../saveNotification';
 

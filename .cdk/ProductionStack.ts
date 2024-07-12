@@ -3,8 +3,12 @@ import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import { Construct } from 'constructs';
 
+export type Options = {
+  sslCert: string;
+};
+
 export class ProductionStack extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps) {
+  constructor(scope: Construct, id: string, props: StackProps, options: Options) {
     super(scope, id, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
@@ -42,6 +46,8 @@ export class ProductionStack extends Stack {
       },
       Version: 1
     };
+
+    const sslCert = 'arn:aws:acm:us-east-1:310849459438:certificate/4618b240-08da-4d91-98c1-ac12362be229';
 
     // list of all options: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
     const optionSettingProperties: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] = [
@@ -88,7 +94,7 @@ export class ProductionStack extends Stack {
       {
         namespace: 'aws:elbv2:listener:443',
         optionName: 'SSLCertificateArns',
-        value: 'arn:aws:acm:us-east-1:310849459438:certificate/b960ff5c-ed3e-4e65-b2c4-ecc64e696902'
+        value: options.sslCert
       },
       {
         namespace: 'aws:elbv2:listener:443',

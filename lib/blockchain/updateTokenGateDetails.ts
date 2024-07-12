@@ -1,10 +1,9 @@
-import { getChainById } from 'connectors/chains';
-
-import { getGuildDetails } from 'lib/guild-xyz/getGuild';
-import { getHypersubDetails } from 'lib/tokenGates/hypersub/getHypersubDetails';
-import type { AccessControlCondition, TokenGate } from 'lib/tokenGates/interfaces';
-import { getLockMetadata } from 'lib/tokenGates/unlock/getLockMetadata';
-import { getTokenMetadata } from 'lib/tokens/getTokenMetadata';
+import { getChainById } from '@root/connectors/chains';
+import { getGuildDetails } from '@root/lib/guild-xyz/getGuild';
+import { getHypersubDetails } from '@root/lib/tokenGates/hypersub/getHypersubDetails';
+import type { AccessControlCondition, TokenGate } from '@root/lib/tokenGates/interfaces';
+import { getLockMetadata } from '@root/lib/tokenGates/unlock/getLockMetadata';
+import { getTokenMetadata } from '@root/lib/tokens/getTokenMetadata';
 
 import { getNFT } from './getNFTs';
 import { getPoapByEventId } from './poaps';

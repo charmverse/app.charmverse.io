@@ -1,12 +1,11 @@
 import { log } from '@charmverse/core/log';
 import type { MemberPropertyType, Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
-import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
-import { getSpaceDomainFromName } from 'lib/spaces/utils';
-import { updateCustomerStripeInfo } from 'lib/subscription/updateCustomerStripeInfo';
-import { DataNotFoundError, DuplicateDataError, InvalidInputError } from 'lib/utils/errors';
+import { updateTrackGroupProfile } from '@root/lib/metrics/mixpanel/updateTrackGroupProfile';
+import { getSpaceByDomain } from '@root/lib/spaces/getSpaceByDomain';
+import { getSpaceDomainFromName } from '@root/lib/spaces/utils';
+import { updateCustomerStripeInfo } from '@root/lib/subscription/updateCustomerStripeInfo';
+import { DataNotFoundError, DuplicateDataError, InvalidInputError } from '@root/lib/utils/errors';
 
 import { updateSnapshotDomain } from './updateSnapshotDomain';
 import { updateSpaceCustomDomain } from './updateSpaceCustomDomain';

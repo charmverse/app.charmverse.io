@@ -1,9 +1,8 @@
 import type { Page, Bounty } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { rewardWithUsersInclude } from 'lib/rewards/getReward';
-import type { RewardReviewer } from 'lib/rewards/interfaces';
-import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
+import { rewardWithUsersInclude } from '@root/lib/rewards/getReward';
+import type { RewardReviewer } from '@root/lib/rewards/interfaces';
+import { mapDbRewardToReward } from '@root/lib/rewards/mapDbRewardToReward';
 
 export type RewardTemplate = Bounty & {
   assignedSubmitters: string[] | null;

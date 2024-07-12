@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { FarcasterCard } from '@connect/components/common/FarcasterCard';
+import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
 import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
 import { Divider, Stack, Typography } from '@mui/material';
 
@@ -9,11 +10,16 @@ import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';
 
 export async function ProjectDetailsPage({ project }: { project: ConnectProjectDetails }) {
+  const currentUser = await getCurrentUser();
+
+  const isCurrentUserTeamLead = project.projectMembers.some(
+    (member) => member.teamLead && member.userId === currentUser?.data?.id
+  );
   return (
     <PageWrapper
       header={<PageCoverHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}
     >
-      <ProjectDetails project={project} />
+      <ProjectDetails showEditButton={isCurrentUserTeamLead} project={project} />
       <Divider sx={{ my: 2 }} />
       <Typography variant='h6'>Members</Typography>
       <Stack gap={1}>

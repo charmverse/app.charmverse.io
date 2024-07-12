@@ -1,16 +1,15 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { prismaToUIBlock } from '@root/lib/databases/block';
+import { createPage } from '@root/lib/pages/server/createPage';
+import { getPagePath } from '@root/lib/pages/utils';
+import { emptyDocument } from '@root/lib/prosemirror/constants';
+import { getMarkdownText } from '@root/lib/prosemirror/getMarkdownText';
+import { parseMarkdown } from '@root/lib/prosemirror/markdown/parseMarkdown';
+import { InvalidInputError } from '@root/lib/utils/errors';
+import { relay } from '@root/lib/websockets/relay';
 import { v4 as uuid } from 'uuid';
-
-import { prismaToUIBlock } from 'lib/databases/block';
-import { createPage } from 'lib/pages/server/createPage';
-import { getPagePath } from 'lib/pages/utils';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
-import { InvalidInputError } from 'lib/utils/errors';
-import { relay } from 'lib/websockets/relay';
 
 import { getDatabaseWithSchema } from './getDatabaseWithSchema';
 import { handleMappedPropertyEdgeCases } from './handleMappedPropertyEdgeCases';

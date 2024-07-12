@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
-
-import { getIncomingDelegations } from 'lib/blockchain/delegateXYZ/client';
+import { getIncomingDelegations } from '@root/lib/blockchain/delegateXYZ/client';
 
 import type { AccessControlCondition } from './interfaces';
 import { validateTokenGateCondition } from './validateTokenGateCondition';

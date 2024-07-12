@@ -1,6 +1,5 @@
 import type { FormFieldType } from '@charmverse/core/prisma-client';
-
-import type { FieldAnswerInput } from 'lib/forms/interfaces';
+import type { FieldAnswerInput } from '@root/lib/forms/interfaces';
 
 export function validateAnswers(
   answers: FieldAnswerInput[],

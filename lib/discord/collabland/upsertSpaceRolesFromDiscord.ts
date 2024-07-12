@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
-
-import { getGuildRoles } from 'lib/collabland/collablandClient';
-import { findOrCreateRoles } from 'lib/roles/createRoles';
+import { getGuildRoles } from '@root/lib/collabland/collablandClient';
+import { findOrCreateRoles } from '@root/lib/roles/createRoles';
 
 type Props = {
   spaceId: string;

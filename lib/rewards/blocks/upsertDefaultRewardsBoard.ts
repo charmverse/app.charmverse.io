@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/databases/customBlocks/constants';
+import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
+import { DEFAULT_BOARD_BLOCK_ID } from '@root/lib/databases/customBlocks/constants';
 
 import { APPLICANT_STATUS_BLOCK_ID } from './constants';
 import { upsertBlock } from './upsertBlock';

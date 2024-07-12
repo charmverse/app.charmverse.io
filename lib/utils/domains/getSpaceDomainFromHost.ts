@@ -1,6 +1,6 @@
-import { isStagingEnv } from 'config/constants';
-import { getValidDefaultHost } from 'lib/utils/domains/getValidDefaultHost';
-import { isLocalhostAlias } from 'lib/utils/domains/isLocalhostAlias';
+import { isStagingEnv } from '@root/config/constants';
+import { getValidDefaultHost } from '@root/lib/utils/domains/getValidDefaultHost';
+import { isLocalhostAlias } from '@root/lib/utils/domains/isLocalhostAlias';
 
 export function getSpaceDomainFromHost(host?: string | null) {
   if (process.env.DISABLE_SUBDOMAINS === 'true') {

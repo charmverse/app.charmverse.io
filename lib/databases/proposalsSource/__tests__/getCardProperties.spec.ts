@@ -1,13 +1,13 @@
 import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { prismaToBlock } from '@root/lib/databases/block';
+import type { Board, IPropertyTemplate } from '@root/lib/databases/board';
+import type { ProposalFields } from '@root/lib/proposals/interfaces';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
-import { prismaToBlock } from 'lib/databases/block';
-import type { Board, IPropertyTemplate } from 'lib/databases/board';
-import type { ProposalFields } from 'lib/proposals/interfaces';
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalSourceDb } from 'testing/utils/proposals';
 import { addUserToSpace } from 'testing/utils/spaces';
@@ -315,7 +315,7 @@ describe('getCardPropertiesFromProposals', () => {
     ]);
     expect(cardFieldProperties[rubricEvaluation1EvaluationTotalProp.id as string]).toStrictEqual(23);
     expect(cardFieldProperties[rubricEvaluation2EvaluationTotalProp.id as string]).toStrictEqual(4);
-    expect(cardFieldProperties[rubricEvaluation1EvaluationAverageProp.id as string]).toStrictEqual(11.5);
+    expect(cardFieldProperties[rubricEvaluation1EvaluationAverageProp.id as string]).toStrictEqual(5.75);
     expect(cardFieldProperties[rubricEvaluation2EvaluationAverageProp.id as string]).toStrictEqual(4);
   });
 

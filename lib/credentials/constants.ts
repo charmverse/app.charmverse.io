@@ -1,6 +1,5 @@
 import type { CredentialEventType } from '@charmverse/core/prisma-client';
-
-import type { FeatureTitleVariation } from 'lib/features/getFeatureTitle';
+import type { FeatureTitleVariation } from '@root/lib/features/getFeatureTitle';
 
 // Labels require a mapper to rename features based on the space's settings
 type LabelFn = (getFeatureTitle: (featureWord: FeatureTitleVariation) => string) => string;

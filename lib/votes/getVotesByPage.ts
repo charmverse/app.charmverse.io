@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getTokenSupplyAmount } from 'lib/blockchain/getTokenSupplyAmount';
-import { isTruthy } from 'lib/utils/types';
+import { getTokenSupplyAmount } from '@root/lib/blockchain/getTokenSupplyAmount';
+import { isTruthy } from '@root/lib/utils/types';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';

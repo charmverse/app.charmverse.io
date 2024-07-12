@@ -1,9 +1,8 @@
 /* eslint-disable camelcase */
 
 import { log } from '@charmverse/core/log';
+import { coerceToMilliseconds } from '@root/lib/utils/dates';
 import type Stripe from 'stripe';
-
-import { coerceToMilliseconds } from 'lib/utils/dates';
 
 import { DeprecatedFreeTrial } from './constants';
 import type { SubscriptionPeriod, SubscriptionStatusType } from './constants';

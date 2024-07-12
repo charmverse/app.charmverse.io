@@ -1,6 +1,6 @@
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import { Page, Space, prisma } from '@charmverse/core/prisma-client';
-import { isTestEnv } from 'config/constants';
+import { isTestEnv } from '@root/config/constants';
 import { writeToSameFolder } from 'lib/utils/file';
 
 async function seedDuplicatePages(): Promise<Space> {

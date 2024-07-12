@@ -1,8 +1,8 @@
 import type { Block, BlockCount } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsBounties, testUtilsForum, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { emptyDocument } from '@root/lib/prosemirror/constants';
 
-import { emptyDocument } from 'lib/prosemirror/constants';
 import { generateSchema } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 

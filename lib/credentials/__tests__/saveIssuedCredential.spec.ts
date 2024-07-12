@@ -9,10 +9,10 @@ import type {
   User
 } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { pseudoRandomHexString } from '@root/lib/utils/random';
 import { v4 as uuid } from 'uuid';
 import { mainnet } from 'viem/chains';
 
-import { pseudoRandomHexString } from 'lib/utils/random';
 import { generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
 import type { IdenticalCredentialProps } from '../saveIssuedCredential';

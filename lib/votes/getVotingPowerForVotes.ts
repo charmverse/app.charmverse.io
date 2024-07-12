@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getTokenAmountOnBlockNumber } from 'lib/snapshot/getTokenAmountOnBlockNumber';
+import { getTokenAmountOnBlockNumber } from '@root/lib/snapshot/getTokenAmountOnBlockNumber';
 
 import type { ExtendedVote } from './interfaces';
 
