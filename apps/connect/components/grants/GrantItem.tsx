@@ -1,4 +1,6 @@
 import { Avatar } from '@connect/components/common/Avatar';
+import type { Grant } from '@connect/lib/grants/getGrants';
+import { Chip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
@@ -8,8 +10,6 @@ import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 
 import { fancyTrim } from 'lib/utils/strings';
-
-import type { Grant } from './GrantsDetailsPage';
 
 export function GrantItem({ grant }: { grant: Grant }) {
   const grantName = grant.name || 'Untitled';
@@ -38,7 +38,7 @@ export function GrantItem({ grant }: { grant: Grant }) {
           justifyContent='space-between'
           flexDirection='column'
           alignItems='start'
-          gap={0.5}
+          gap={1}
           sx={{ p: 0 }}
         >
           <Box>
@@ -65,6 +65,12 @@ export function GrantItem({ grant }: { grant: Grant }) {
               {fancyTrim(grant.description, 150)}
             </Typography>
           </Box>
+          <Chip
+            label={grant.open ? 'Open' : 'Closed'}
+            variant='outlined'
+            color={grant.open ? 'success' : 'error'}
+            size='small'
+          />
         </CardContent>
       </CardActionArea>
     </Card>

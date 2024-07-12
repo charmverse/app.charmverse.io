@@ -1,4 +1,4 @@
-import type { Grant } from '@connect/components/grants/GrantsDetailsPage';
+import type { Grant } from '@connect/lib/grants/getGrants';
 
 import { getGrants } from './getGrants';
 

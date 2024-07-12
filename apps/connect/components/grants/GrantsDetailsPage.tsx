@@ -1,20 +1,9 @@
 import { PageWrapper } from '@connect/components/common/PageWrapper';
+import type { Grant } from '@connect/lib/grants/getGrants';
 import { Button, Stack } from '@mui/material';
 import Link from 'next/link';
 
 import { GrantItem } from './GrantItem';
-
-export type Grant = {
-  id: string;
-  description: string;
-  name: string;
-  banner?: string;
-  logo?: string;
-  launchDate?: string;
-  createdAt: string;
-  applyLink?: string;
-  path: string;
-};
 
 export function GrantsDetailsPage({ grants, currentTab }: { grants: Grant[]; currentTab: 'new' | 'upcoming' }) {
   return (
