@@ -48,7 +48,6 @@ export function ProjectImageField({
           }}
         >
           <input
-            title={`Add ${type}`}
             disabled={isUploading}
             type='file'
             accept={'image/*'}
@@ -80,8 +79,8 @@ export function ProjectImageField({
               <CircularProgress color='secondary' size={40} />
             ) : field.value ? (
               <Image
+                alt=''
                 src={field.value as string}
-                alt={`Add ${type}`}
                 width={500}
                 height={height}
                 sizes='100vw'
