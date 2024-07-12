@@ -20,6 +20,9 @@ serverless/*.node
 /apps/connect/.next/
 /apps/connect/dist/
 /apps/connect/node_modules/
+# Serwist
+/apps/connect/public/sw*
+/apps/connect/public/swe-worker*
 
 # connect api
 /apps/connect-api/dist/
@@ -75,5 +78,3 @@ storybook-static
 build-storybook.log
 # Storybook dev server cache folder
 .cache
-
-
