@@ -79,7 +79,7 @@ jobs:
           sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
 
           # substituting the connect api domain name
-          sed -i 's/NEXT_PUBLIC_CONNECT_API_HOST=.*/NEXT_PUBLIC_CONNECT_API_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:4000/g' .ebstalk.apps.env/connect.env
+          sed -i 's/REACT_APP_CONNECT_API_HOST=.*/REACT_APP_CONNECT_API_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:4000/g' .ebstalk.apps.env/connect.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
