@@ -2,7 +2,7 @@ import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 
 import type { TypedSchemaItem } from './interfaces';
 
-export const charmUserIdentifierSchemaId = '0x123456789abcdef123456789abcdef123456789abcdef123456789abcdef1234';
+export const charmUserIdentifierSchemaId = '0x235844d6857140c2a38dd10c6e7ee1b34e7810fc185264234351cc8942bd63bf';
 
 export const charmUserIdentifierSchemaDefinition = 'string uid';
 

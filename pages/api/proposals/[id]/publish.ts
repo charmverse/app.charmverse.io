@@ -3,7 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { optimismSepolia } from 'viem/chains';
 
+import { issueProposalPublishedQualifyingEvent } from 'lib/credentials/reputation/issueProposalPublishedQualifyingEvent';
 import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -72,7 +74,12 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
           }
         }
       },
-      spaceId: true
+      spaceId: true,
+      space: {
+        select: {
+          domain: true
+        }
+      }
     }
   });
 
@@ -160,6 +167,16 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     status: 'published',
     spaceId: proposalPage?.spaceId || ''
   });
+
+  const issueCred = proposalPage.space.domain === 'cvt-demo-credentials';
+
+  if (issueCred) {
+    await issueProposalPublishedQualifyingEvent({
+      chainId: optimismSepolia.id,
+      proposalId: proposalPage.proposal.id,
+      userId
+    });
+  }
 
   return res.status(200).json({ ok: true });
 }
