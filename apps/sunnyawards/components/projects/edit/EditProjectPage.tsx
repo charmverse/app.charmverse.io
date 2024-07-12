@@ -55,7 +55,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       twitter: project.twitter ?? undefined,
       websites: project.websites,
       projectMembers:
-        project.projectMembers.slice(1).map(
+        project.projectMembers.map(
           (member) =>
             ({
               farcasterId: member.farcasterUser.fid,
@@ -118,7 +118,8 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           execute={(input) => {
             execute({
               ...input,
-              projectId: project.id
+              projectId: project.id,
+              projectMembers: input.projectMembers.slice(1)
             });
           }}
           isExecuting={isExecuting}

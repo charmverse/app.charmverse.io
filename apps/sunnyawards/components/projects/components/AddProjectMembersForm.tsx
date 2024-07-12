@@ -1,5 +1,6 @@
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Button, Stack, Typography } from '@mui/material';
+import { isTruthy } from '@root/lib/utils/types';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
@@ -58,6 +59,7 @@ export function AddProjectMembersForm({
         />
         <Stack gap={1}>
           <SearchFarcasterUser
+            filteredFarcasterIds={selectedFarcasterProfiles.map((profile) => profile.fid).filter(isTruthy)}
             setSelectedProfile={(farcasterProfile) => {
               if (farcasterProfile) {
                 append({
