@@ -6,7 +6,7 @@ export class HttpClient {
 
   constructor() {
     if (!connectApiHost) {
-      throw new Error('NEXT_PUBLIC_CONNECT_API_HOST is not defined');
+      throw new Error('CONNECT_API_HOST is not defined');
     }
     this.baseUrl = connectApiHost;
   }
