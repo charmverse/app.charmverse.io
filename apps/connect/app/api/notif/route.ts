@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { initWebPush } from '@connect/lib/pwa/initWebPush';
 import { NextResponse, type NextRequest } from 'next/server';
 import webpush from 'web-push';
+
+import { initWebPush } from 'lib/pwa/initWebPush';
 
 initWebPush();
 

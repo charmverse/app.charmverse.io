@@ -30,7 +30,11 @@ export function NotificationRequest() {
           userVisibleOnly: true
         };
 
-        const subscription = await swRegistration?.pushManager.subscribe(options);
+        if (!swRegistration) {
+          return;
+        }
+
+        const subscription = await swRegistration.pushManager.subscribe(options);
 
         if (!subscription) {
           return;
