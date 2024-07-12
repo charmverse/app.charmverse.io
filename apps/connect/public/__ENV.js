@@ -1,0 +1,1 @@
+window.__ENV = {"REACT_APP_CONNECT_API_HOST":"http://localhost:4000"};

@@ -3,8 +3,8 @@ import { Footer } from '@connect/components/layout/Footer';
 import { Header } from '@connect/components/layout/Header';
 import Box from '@mui/material/Box';
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import type { ReactNode } from 'react';
-
 import '@connect/theme/cssVariables.scss';
 
 export const metadata: Metadata = {
@@ -23,6 +23,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
+      {/* load env vars for the frontend */}
+      <Script src='/__ENV.js' />
       <Box
         component='body'
         display='grid'

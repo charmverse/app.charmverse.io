@@ -10,7 +10,7 @@ import { encodeFilename } from 'lib/utils/encodeFilename';
 
 import { HttpClient } from './HttpClient';
 
-class ConnectApiClient extends HttpClient {
+export class ConnectApiClient extends HttpClient {
   async loginViaFarcaster(req: FarcasterBody): Promise<LoggedInUser> {
     return this.POST('/api/session/login-with-farcaster', req);
   }
@@ -38,5 +38,3 @@ class ConnectApiClient extends HttpClient {
     });
   }
 }
-
-export const connectApiClient = new ConnectApiClient();

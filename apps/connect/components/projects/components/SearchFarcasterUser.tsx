@@ -1,4 +1,4 @@
-import { connectApiClient } from '@connect/apiClient/apiClient';
+import { ConnectApiClient } from '@connect/apiClient/apiClient';
 import { Avatar } from '@connect/components/common/Avatar';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { BoxProps } from '@mui/material';
@@ -20,6 +20,7 @@ export function SearchFarcasterUser({
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((_searchTerm: string) => {
+      const connectApiClient = new ConnectApiClient();
       connectApiClient
         .getFarcasterUsersByUsername(_searchTerm)
         .then((_farcasterProfiles) => {
