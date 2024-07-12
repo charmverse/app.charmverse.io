@@ -1,7 +1,6 @@
 'use client';
 
 import { GET } from '@root/adapters/http';
-import { connectApiHost } from '@root/config/constants';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { encodeFilename } from '@root/lib/utils/encodeFilename';
 
@@ -12,7 +11,7 @@ export const apiClient = {
       region: string;
       bucket: string;
       key: string;
-    }>(`${connectApiHost}/api/aws/upload-token`, {
+    }>('/api/aws/upload-token', {
       filename: encodeFilename(file.name)
     });
   },

@@ -9,7 +9,7 @@ type Config = {
 };
 
 export async function uploadToS3(
-  fileUploader: (file: File) => Promise<{
+  getUploadToken: (file: File) => Promise<{
     token: any;
     bucket: string;
     key: string;
@@ -18,7 +18,7 @@ export async function uploadToS3(
   file: File,
   config?: Config
 ) {
-  const data = await fileUploader(file);
+  const data = await getUploadToken(file); // retrieve a token to upload to s3
   const trackProgress = !!config?.onUploadPercentageProgress;
 
   const { S3Client } = await import('@aws-sdk/client-s3');
