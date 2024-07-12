@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 
 export async function GET(request: Request) {
@@ -6,9 +7,14 @@ export async function GET(request: Request) {
   if (typeof username !== 'string') {
     return new Response('username is required', { status: 400 });
   }
-  const result = await getFarcasterUsers({
-    username
-  });
+  try {
+    const result = await getFarcasterUsers({
+      username
+    });
 
-  return Response.json(result);
+    return Response.json(result);
+  } catch (error) {
+    log.error('Error requesting user from farcaster', { error, username });
+    return new Response(`Unknown error: ${(error as Error).message}`, { status: 500 });
+  }
 }
