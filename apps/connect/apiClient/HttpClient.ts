@@ -1,12 +1,13 @@
+import env from '@beam-australia/react-env';
 import { POST, GET, DELETE, PUT } from '@root/adapters/http';
-import { connectApiHost } from '@root/config/constants';
 
 export class HttpClient {
   readonly baseUrl: string;
 
   constructor() {
+    const connectApiHost = env('CONNECT_API_HOST');
     if (!connectApiHost) {
-      throw new Error('NEXT_PUBLIC_CONNECT_API_HOST is not defined');
+      throw new Error('REACT_APP_CONNECT_API_HOST is not defined');
     }
     this.baseUrl = connectApiHost;
   }
@@ -18,6 +19,8 @@ export class HttpClient {
 
   async POST<T>(...args: Parameters<typeof POST>): Promise<T> {
     args[0] = this.baseUrl + args[0];
+    // eslint-disable-next-line no-console
+    console.log('POST', this.baseUrl, args);
     return POST(...args);
   }
 

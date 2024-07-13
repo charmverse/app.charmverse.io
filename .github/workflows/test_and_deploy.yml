@@ -47,7 +47,6 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          NEXT_PUBLIC_CONNECT_API_HOST: https://connect-api.charmverse.io
           save_cache: true
 
       # source https://github.com/orgs/community/discussions/28474
@@ -70,8 +69,6 @@ jobs:
 
       - name: Restore app from cache
         uses: ./.github/actions/build
-        with:
-          NEXT_PUBLIC_CONNECT_API_HOST: https://connect-api.charmverse.io
 
       - run: npm run typecheck
       - run: npm run lint

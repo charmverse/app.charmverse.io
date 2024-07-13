@@ -1,6 +1,6 @@
 'use client';
 
-import { connectApiClient } from '@connect/apiClient/apiClient';
+import { ConnectApiClient } from '@connect/apiClient/apiClient';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import { useSignIn } from '@farcaster/auth-kit';
 import { useCallback, useEffect } from 'react';
@@ -16,6 +16,7 @@ export function useFarcasterConnection({
 }) {
   const onWarpcastSuccessCallback = useCallback(
     async (res: StatusAPIResponse) => {
+      const connectApiClient = new ConnectApiClient();
       await connectApiClient.loginViaFarcaster(res);
       onSuccess?.();
     },

@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { connectApiClient } from '@connect/apiClient/apiClient';
+import { ConnectApiClient } from '@connect/apiClient/apiClient';
 import { useState } from 'react';
 
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
@@ -39,6 +39,7 @@ export const useS3UploadInput = ({
     setFileName(file.name || '');
 
     try {
+      const connectApiClient = new ConnectApiClient();
       const { url } = await uploadToS3(connectApiClient.uploadImage, file, { onUploadPercentageProgress: setProgress });
       onFileUpload({ url: replaceS3Domain(url), fileName: file.name || '', size: file.size });
     } catch (error) {

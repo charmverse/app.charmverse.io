@@ -69,4 +69,4 @@ export const docusignOauthBaseUri = process.env.DOCUSIGN_OAUTH_BASE_URI as strin
 export const githubAccessToken = process.env.GITHUB_ACCESS_TOKEN as string;
 
 // API Client
-export const connectApiHost = process.env.NEXT_PUBLIC_CONNECT_API_HOST as string;
+export const connectApiHost = env('CONNECT_API_HOST');
