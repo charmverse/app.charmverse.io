@@ -19,6 +19,8 @@ export class HttpClient {
 
   async POST<T>(...args: Parameters<typeof POST>): Promise<T> {
     args[0] = this.baseUrl + args[0];
+    // eslint-disable-next-line no-console
+    console.log('POST', this.baseUrl, args);
     return POST(...args);
   }
 
