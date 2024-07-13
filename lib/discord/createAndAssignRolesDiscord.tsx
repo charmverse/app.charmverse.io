@@ -1,5 +1,5 @@
-import type { ExternalRole } from 'lib/roles';
-import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
+import type { ExternalRole } from '@root/lib/roles';
+import { createAndAssignRoles } from '@root/lib/roles/createAndAssignRoles';
 
 import { getSpacesAndUserFromDiscord } from './getSpaceAndUserFromDiscord';
 

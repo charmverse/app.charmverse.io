@@ -3,10 +3,9 @@ import { log } from '@charmverse/core/log';
 import type { CredentialEventType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { getFeatureTitle } from '@root/lib/features/getFeatureTitle';
+import { getPagePermalink } from '@root/lib/pages/getPagePermalink';
 import { optimism } from 'viem/chains';
-
-import { getFeatureTitle } from 'lib/features/getFeatureTitle';
-import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
 import { credentialEventLabels, disableCredentialAutopublish } from './constants';

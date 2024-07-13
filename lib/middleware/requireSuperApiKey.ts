@@ -2,10 +2,9 @@ import crypto from 'node:crypto';
 
 import type { SuperApiToken } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidApiKeyError } from '@root/lib/middleware/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
-
-import { InvalidApiKeyError } from 'lib/middleware/errors';
 
 declare module 'http' {
   interface IncomingMessage {

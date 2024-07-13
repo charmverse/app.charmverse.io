@@ -1,9 +1,8 @@
+import { randomBoardColor } from '@root/lib/databases/constants';
+import type { PageProperty } from '@root/lib/public-api';
+import { isTruthy } from '@root/lib/utils/types';
 import uniqBy from 'lodash/uniqBy';
 import { v4 as uuid } from 'uuid';
-
-import { randomBoardColor } from 'lib/databases/constants';
-import type { PageProperty } from 'lib/public-api';
-import { isTruthy } from 'lib/utils/types';
 
 import type { BodyFormResponse } from './interfaces';
 

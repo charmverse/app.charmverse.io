@@ -1,9 +1,8 @@
+import type { UIBlockWithDetails } from '@root/lib/databases/block';
+import { createBlock } from '@root/lib/databases/block';
+import type { FilterGroup } from '@root/lib/databases/filterGroup';
+import { createFilterGroup } from '@root/lib/databases/filterGroup';
 import { upperFirst } from 'lodash';
-
-import type { UIBlockWithDetails } from 'lib/databases/block';
-import { createBlock } from 'lib/databases/block';
-import type { FilterGroup } from 'lib/databases/filterGroup';
-import { createFilterGroup } from 'lib/databases/filterGroup';
 
 import type { DataSourceType, GoogleFormSourceData } from './board';
 

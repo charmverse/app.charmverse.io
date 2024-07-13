@@ -1,8 +1,7 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
+import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
 
 type Props = {
   spaceId: string;

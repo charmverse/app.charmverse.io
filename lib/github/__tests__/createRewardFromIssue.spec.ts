@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { createReward } from '@root/lib/rewards/createReward';
 import { v4 } from 'uuid';
 
-import { createReward } from 'lib/rewards/createReward';
 import { createPage } from 'testing/pages';
 
 import { createRewardFromIssue } from '../createRewardFromIssue';

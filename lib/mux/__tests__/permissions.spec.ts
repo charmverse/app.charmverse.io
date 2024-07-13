@@ -1,4 +1,5 @@
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
+
 import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
 

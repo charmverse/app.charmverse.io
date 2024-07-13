@@ -1,7 +1,6 @@
 import type { PostComment } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 
 export async function deletePostComment({
   commentId,

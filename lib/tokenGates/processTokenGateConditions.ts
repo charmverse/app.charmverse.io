@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 import flatten from 'lodash/flatten';
 
 import type { TokenGate } from './interfaces';

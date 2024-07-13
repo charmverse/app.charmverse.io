@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { TokenGateResult } from 'lib/tokenGates/verifyTokenGates';
+import type { TokenGateResult } from '@root/lib/tokenGates/verifyTokenGates';
 
 type UpdateUserTokenGatesProps = { tokenGates: TokenGateResult[]; spaceId: string; userId: string };
 

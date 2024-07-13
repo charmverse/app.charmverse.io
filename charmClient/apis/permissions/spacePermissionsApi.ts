@@ -1,6 +1,6 @@
 import type { PagePermissionLevel, Space } from '@charmverse/core/prisma';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta/interfaces';
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 import type { SpacePermissions } from 'lib/permissions/spaces/listPermissions';

@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import { useCreateFarcasterSigner } from 'charmClient/hooks/farcaster';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';

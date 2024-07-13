@@ -1,4 +1,4 @@
-import { stringToValidPath, uid } from 'lib/utils/strings';
+import { stringToValidPath, uid } from '@root/lib/utils/strings';
 
 const maxTitleCharacters = 50;
 

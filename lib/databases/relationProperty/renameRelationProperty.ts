@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { NotFoundError } from 'lib/middleware';
+import { NotFoundError } from '@root/lib/middleware';
 
 import { getRelationData } from './getRelationData';
 import type { SyncRelationPropertyPayload } from './syncRelationProperty';

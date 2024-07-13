@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { RedisClientType } from 'redis';
 import { createClient } from 'redis';
 
-import { isDevEnv } from 'config/constants';
+import { isDevEnv } from '@root/config/constants';
 
 let redisClientInstance: RedisClientType | null = null;
 

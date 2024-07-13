@@ -1,4 +1,4 @@
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import type { AssetRequest, AssetResponse } from 'pages/api/mux/asset/[id]';
 import type { CreateUploadResponse } from 'pages/api/mux/upload';
 import type { UploadRequest, UploadResponse } from 'pages/api/mux/upload/[id]';

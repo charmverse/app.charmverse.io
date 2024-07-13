@@ -1,9 +1,8 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { TransactionResult } from 'lib/charms/addTransaction';
-import { addTransaction } from 'lib/charms/addTransaction';
-import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
+import type { TransactionResult } from '@root/lib/charms/addTransaction';
+import { addTransaction } from '@root/lib/charms/addTransaction';
+import { getUserOrSpaceWallet } from '@root/lib/charms/getUserOrSpaceWallet';
 
 /**
  * Spend space's charms by admin

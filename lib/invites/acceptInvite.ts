@@ -1,9 +1,8 @@
 import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { logInviteAccepted } from 'lib/metrics/postToDiscord';
-import { joinSpace } from 'lib/spaces/joinSpace';
+import { logInviteAccepted } from '@root/lib/metrics/postToDiscord';
+import { joinSpace } from '@root/lib/spaces/joinSpace';
 
 import { validateInviteLink } from './validateInviteLink';
 

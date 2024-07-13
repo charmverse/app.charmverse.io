@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
-
-import { getPage } from 'lib/pages/server';
+import { getPage } from '@root/lib/pages/server';
 
 import { mixpanel, GroupKeys } from './mixpanel';
 

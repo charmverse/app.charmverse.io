@@ -1,5 +1,5 @@
-import { recoveryCodeSecretKey } from 'config/constants';
-import { decryptData, encryptData } from 'lib/utils/dataEncryption';
+import { recoveryCodeSecretKey } from '@root/config/constants';
+import { decryptData, encryptData } from '@root/lib/utils/dataEncryption';
 
 export function encryptRecoveryCode(text: string) {
   return encryptData(text, recoveryCodeSecretKey);

@@ -1,4 +1,4 @@
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import type { Notification } from 'lib/notifications/interfaces';
 import type { MarkNotifications } from 'lib/notifications/markNotifications';
 import type { GetNotificationsStateResponse, UpdateNotificationsState } from 'pages/api/notifications/state';

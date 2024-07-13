@@ -1,10 +1,10 @@
 import type { ProfileItem } from '@charmverse/core/prisma';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import type { DisconnectGoogleAccountRequest } from 'lib/google/disconnectGoogleAccount';
 import type { EmailAccountDisconnect } from 'lib/google/disconnectVerifiedEmail';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import type { CreateCredentialRequest, CredentialRequest, CredentialItem } from 'pages/api/google/credentials';
 import type { GoogleFormItem, GetFormsRequest } from 'pages/api/google/forms';
 import type { RefreshFormsRequest } from 'pages/api/google/forms/sync-responses';

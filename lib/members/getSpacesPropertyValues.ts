@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { DiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
+import { getAccessibleMemberPropertiesBySpace } from '@root/lib/members/getAccessibleMemberPropertiesBySpace';
+import { getCommonSpaceIds } from '@root/lib/members/getCommonSpaceIds';
+import { getSpaceMemberMetadata } from '@root/lib/members/getSpaceMemberMetadata';
+import type { CommonSpacesInput, MemberPropertyValuesBySpace } from '@root/lib/members/interfaces';
+import { getPropertiesWithValues, groupPropertyValuesBySpace } from '@root/lib/members/utils';
 
-import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { getAccessibleMemberPropertiesBySpace } from 'lib/members/getAccessibleMemberPropertiesBySpace';
-import { getCommonSpaceIds } from 'lib/members/getCommonSpaceIds';
-import { getSpaceMemberMetadata } from 'lib/members/getSpaceMemberMetadata';
-import type { CommonSpacesInput, MemberPropertyValuesBySpace } from 'lib/members/interfaces';
-import { getPropertiesWithValues, groupPropertyValuesBySpace } from 'lib/members/utils';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 export async function getSpacesPropertyValues({

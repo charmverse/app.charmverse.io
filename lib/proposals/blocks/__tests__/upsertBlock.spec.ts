@@ -1,9 +1,9 @@
+import type { PropertyType } from '@root/lib/databases/board';
+import { getBlocks } from '@root/lib/proposals/blocks/getBlocks';
+import type { ProposalBlockInput, ProposalBlockUpdateInput } from '@root/lib/proposals/blocks/interfaces';
+import { upsertBlock } from '@root/lib/proposals/blocks/upsertBlock';
 import { v4 } from 'uuid';
 
-import type { PropertyType } from 'lib/databases/board';
-import { getBlocks } from 'lib/proposals/blocks/getBlocks';
-import type { ProposalBlockInput, ProposalBlockUpdateInput } from 'lib/proposals/blocks/interfaces';
-import { upsertBlock } from 'lib/proposals/blocks/upsertBlock';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('proposal blocks - upsertBlock', () => {

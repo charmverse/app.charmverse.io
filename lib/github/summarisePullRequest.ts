@@ -4,10 +4,9 @@ import path from 'node:path';
 import { log } from '@charmverse/core/log';
 import type { PullRequestSummary } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { askChatGPT } from 'lib/chatGPT/askChatgpt';
-import type { ChatGPTModel } from 'lib/chatGPT/constants';
-import { writeToSameFolder } from 'lib/utils/file';
+import { askChatGPT } from '@root/lib/chatGPT/askChatgpt';
+import type { ChatGPTModel } from '@root/lib/chatGPT/constants';
+import { writeToSameFolder } from '@root/lib/utils/file';
 
 import { GITHUB_API_BASE_URL } from './constants';
 import type { PullRequestToQuery } from './getPullRequestFileChanges';
@@ -34,7 +33,7 @@ export type PullRequestSummaryWithFilePatches = Omit<PullRequestSummary, 'patche
 
 export function baseSummarisePRPrompt({ files }: { files: string }) {
   return `Please review this pull request
-  
+
   Start from the back end, and explain it through to the client-side experience.
 
   Use this template. Do not refer to specific files, just focus on functionality and technical improvements.
@@ -47,7 +46,7 @@ export function baseSummarisePRPrompt({ files }: { files: string }) {
   - New or updated user interactions
 
   ${promptAndFileSeparator}
-  
+
   ${files}
 
   ${promptAndFileSeparator}

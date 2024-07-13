@@ -1,9 +1,8 @@
+import type { ApiEventMap } from '@root/lib/metrics/mixpanel/interfaces/ApiEvent';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import type { InjectedPageApiKey, NextApiRequestWithApiPageKey } from '@root/lib/middleware/requireApiPageKey';
 import type { NextApiRequest } from 'next';
 import { v4 as uuid } from 'uuid';
-
-import type { ApiEventMap } from 'lib/metrics/mixpanel/interfaces/ApiEvent';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import type { InjectedPageApiKey, NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
 
 import { logApiRequest } from '../handler';
 

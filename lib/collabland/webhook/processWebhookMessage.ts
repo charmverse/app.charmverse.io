@@ -1,18 +1,18 @@
-import { assignRolesCollabland } from 'lib/collabland/assignRolesCollabland';
-import { disconnectSpace } from 'lib/collabland/disconnectSpace';
+import { assignRolesCollabland } from '@root/lib/collabland/assignRolesCollabland';
+import { disconnectSpace } from '@root/lib/collabland/disconnectSpace';
 import type {
   MemberUpdateWebhookMessageData,
   MessageType,
   UninstallWebhookMessageData,
   WebhookMessage,
   WebhookMessageProcessResult
-} from 'lib/collabland/webhook/interfaces';
-import { getSpacesFromDiscord } from 'lib/discord/getSpaceFromDiscord';
-import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
-import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
-import { getRequestApiKey } from 'lib/middleware/getRequestApiKey';
-import { verifyApiKeyForSpace } from 'lib/middleware/verifyApiKeyForSpace';
-import { isTruthy } from 'lib/utils/types';
+} from '@root/lib/collabland/webhook/interfaces';
+import { getSpacesFromDiscord } from '@root/lib/discord/getSpaceFromDiscord';
+import { removeSpaceMemberDiscord } from '@root/lib/discord/removeSpaceMemberDiscord';
+import { unassignRolesDiscord } from '@root/lib/discord/unassignRolesDiscord';
+import { getRequestApiKey } from '@root/lib/middleware/getRequestApiKey';
+import { verifyApiKeyForSpace } from '@root/lib/middleware/verifyApiKeyForSpace';
+import { isTruthy } from '@root/lib/utils/types';
 
 const messageHandlers: Record<MessageType, (message: WebhookMessage<any>) => Promise<WebhookMessageProcessResult>> = {
   guildMemberUpdate: async (message: WebhookMessage<MemberUpdateWebhookMessageData>) => {

@@ -8,8 +8,7 @@ import type {
   UserTokenGate
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { verifyTokenGateMembership } from 'lib/tokenGates/verifyTokenGateMembership';
+import { verifyTokenGateMembership } from '@root/lib/tokenGates/verifyTokenGateMembership';
 
 export type UserToVerifyMembership = SpaceRole & {
   user: User & {

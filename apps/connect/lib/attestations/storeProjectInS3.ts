@@ -1,10 +1,9 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
-
-import { awsS3Bucket } from 'config/constants';
-import { uploadFileToS3 } from 'lib/aws/uploadToS3Server';
-import { gitcoinProjectCredentialSchemaId } from 'lib/credentials/schemas/gitcoinProjectSchema';
-import { optimismProjectSnapshotAttestationSchemaId } from 'lib/credentials/schemas/optimismProjectSchemas';
-import { replaceS3Domain } from 'lib/utils/url';
+import { awsS3Bucket } from '@root/config/constants';
+import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
+import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
+import { optimismProjectSnapshotAttestationSchemaId } from '@root/lib/credentials/schemas/optimismProjectSchemas';
+import { replaceS3Domain } from '@root/lib/utils/url';
 
 import type { ConnectProjectDetails } from '../projects/fetchProject';
 import { fetchProject } from '../projects/fetchProject';

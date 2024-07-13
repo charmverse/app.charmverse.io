@@ -1,7 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import type { Member } from '@root/lib/members/interfaces';
 import type { EditorView } from 'prosemirror-view';
-
-import type { Member } from 'lib/members/interfaces';
 
 export function extractTextFromSelection(
   view: EditorView,

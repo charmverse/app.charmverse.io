@@ -2,14 +2,13 @@
 
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, PageType, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
+import type { UIBlockWithDetails } from '@root/lib/databases/block';
+import type { FailedImportsError } from '@root/lib/notion/interfaces';
+import type { ProposalWithUsersLite } from '@root/lib/proposals/getProposals';
+import type { RewardBlockWithTypedFields } from '@root/lib/rewards/blocks/interfaces';
+import type { ExtendedVote, VoteTask } from '@root/lib/votes/interfaces';
 import type { Node } from 'prosemirror-model';
 import type { Server, Socket } from 'socket.io';
-
-import type { UIBlockWithDetails } from 'lib/databases/block';
-import type { FailedImportsError } from 'lib/notion/interfaces';
-import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
-import type { RewardBlockWithTypedFields } from 'lib/rewards/blocks/interfaces';
-import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
 export type Resource<T = object> = { id: string } & T;
 export type ResourceWithSpaceId = Resource<{ spaceId: string }>;

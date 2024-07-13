@@ -1,7 +1,6 @@
+import { isTestEnv } from '@root/config/constants';
 import { ZDK, ZDKNetwork, ZDKChain } from '@zoralabs/zdk';
 import { RateLimit } from 'async-sema';
-
-import { isTestEnv } from 'config/constants';
 
 // Ref: https://docs.zora.co/docs/zora-api/zdk
 // NFT example: https://docs.zora.co/docs/guides/zdk-intro-guide

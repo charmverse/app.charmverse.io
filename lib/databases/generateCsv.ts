@@ -1,19 +1,19 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@root/config/constants';
+import { CardFilter } from '@root/lib/databases/cardFilter';
+import type { FilterGroup } from '@root/lib/databases/filterGroup';
+import { getRelatedBlocks } from '@root/lib/databases/getRelatedBlocks';
+import { getBlocks as getBlocksForProposalSource } from '@root/lib/databases/proposalsSource/getBlocks';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
+import { formatDate, formatDateTime } from '@root/lib/utils/dates';
+import { isTruthy } from '@root/lib/utils/types';
 import { sortBy } from 'lodash';
 
-import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
 import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
+import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
 import { Utils } from 'components/common/DatabaseEditor/utils';
 import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
-import { baseUrl } from 'config/constants';
-import { CardFilter } from 'lib/databases/cardFilter';
-import type { FilterGroup } from 'lib/databases/filterGroup';
-import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
-import { getBlocks as getBlocksForProposalSource } from 'lib/databases/proposalsSource/getBlocks';
-import { permissionsApiClient } from 'lib/permissions/api/client';
-import { formatDate, formatDateTime } from 'lib/utils/dates';
-import { isTruthy } from 'lib/utils/types';
 
 import type { Board, IPropertyTemplate, PropertyType } from './board';
 import type { BoardView } from './boardView';
@@ -252,6 +252,7 @@ function getCSVColumns({
     } else if (
       propertyTemplate.type === 'number' ||
       propertyTemplate.type === 'proposalEvaluationAverage' ||
+      propertyTemplate.type === 'proposalEvaluationReviewerAverage' ||
       propertyTemplate.type === 'proposalEvaluationTotal' ||
       propertyTemplate.type === 'proposalRubricCriteriaTotal' ||
       propertyTemplate.type === 'proposalRubricCriteriaAverage'

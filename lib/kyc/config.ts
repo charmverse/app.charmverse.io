@@ -1,4 +1,4 @@
-import { isProdEnv } from 'config/constants';
+import { isProdEnv } from '@root/config/constants';
 
 // Synaps
 export const synapsUrl = 'https://api.synaps.io/v4' as const;

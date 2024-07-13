@@ -1,4 +1,4 @@
-import { InvalidStateError } from 'lib/middleware';
+import { InvalidStateError } from '@root/lib/middleware';
 
 import type { SubscriptionPeriod } from './constants';
 import { stripeClient } from './stripe';

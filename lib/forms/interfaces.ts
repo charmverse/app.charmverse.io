@@ -1,8 +1,8 @@
 import type { FormFieldType, MemberPropertyType, FormField } from '@charmverse/core/prisma';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 // used by charm editor
 export type LongTextValue = {

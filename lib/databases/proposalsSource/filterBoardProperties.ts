@@ -1,5 +1,6 @@
+import { projectFieldProperties, projectMemberFieldProperties } from '@root/lib/projects/formField';
+
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 
 import type { IPropertyTemplate } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';
@@ -55,6 +56,7 @@ export function filterBoardProperties({
 
     if (
       p.type === 'proposalEvaluationAverage' ||
+      p.type === 'proposalEvaluationReviewerAverage' ||
       p.type === 'proposalEvaluationTotal' ||
       p.type === 'proposalEvaluatedBy' ||
       p.type === 'proposalRubricCriteriaTotal' ||
@@ -68,6 +70,10 @@ export function filterBoardProperties({
       }
       if (p.type === 'proposalEvaluationAverage') {
         return !!rubricEvaluation.average;
+      }
+
+      if (p.type === 'proposalEvaluationReviewerAverage') {
+        return !!rubricEvaluation.reviewerAverage;
       }
 
       if (p.type === 'proposalEvaluationTotal') {

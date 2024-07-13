@@ -1,9 +1,8 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getRewardReviewerIds } from 'lib/rewards/getRewardReviewerIds';
-import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { getRewardReviewerIds } from '@root/lib/rewards/getRewardReviewerIds';
+import type { WebhookEvent } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
 import { saveRewardNotification } from '../saveNotification';
 

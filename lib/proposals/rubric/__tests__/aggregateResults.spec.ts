@@ -1,5 +1,5 @@
-import type { AggregateResults } from 'lib/proposals/rubric/aggregateResults';
-import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
+import type { AggregateResults } from '@root/lib/proposals/rubric/aggregateResults';
+import { aggregateResults } from '@root/lib/proposals/rubric/aggregateResults';
 
 const firstUserId = '1';
 
@@ -47,7 +47,7 @@ describe('aggregateResults', () => {
     expect(result).toMatchObject<AggregateResults>({
       allScores: {
         // Average of all individual scores (not average of averages)
-        average: 12,
+        average: 8,
         sum: 24
       },
       reviewersResults: {

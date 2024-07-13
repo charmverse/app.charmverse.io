@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
+import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { RateLimit } from 'async-sema';
 import { getAddress } from 'viem';
-
-import { getPublicClient } from 'lib/blockchain/publicClient';
 
 import { ProjectRegistryAbi } from './abi/ProjectRegistry';
 import { PROJECT_REGISTRY_ADDRESSES } from './constants';

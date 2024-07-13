@@ -1,5 +1,5 @@
-import { POST, GET, DELETE, PUT } from 'adapters/http';
-import { connectApiHost } from 'config/constants';
+import { POST, GET, DELETE, PUT } from '@root/adapters/http';
+import { connectApiHost } from '@root/config/constants';
 
 export class HttpClient {
   readonly baseUrl: string;

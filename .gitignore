@@ -21,6 +21,11 @@ serverless/*.node
 /apps/connect/dist/
 /apps/connect/node_modules/
 
+# sunnyawards
+/apps/sunnyawards/.next/
+/apps/sunnyawards/dist/
+/apps/sunnyawards/node_modules/
+
 # connect api
 /apps/connect-api/dist/
 /apps/connect/node_modules/

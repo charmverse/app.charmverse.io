@@ -1,10 +1,9 @@
 import { log } from '@charmverse/core/log';
 import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getChainById } from 'connectors/chains';
+import { credentialsWalletPrivateKey } from '@root/config/constants';
+import { getChainById } from '@root/connectors/chains';
 import { Wallet, providers } from 'ethers';
-
-import { credentialsWalletPrivateKey } from 'config/constants';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
 import { attestationSchemaIds, encodeAttestation } from './schemas';

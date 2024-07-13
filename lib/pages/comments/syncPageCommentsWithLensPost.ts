@@ -1,7 +1,6 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
-
-import { fetchLensPageComments } from 'lib/lens/fetchLensPostComments';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
+import { fetchLensPageComments } from '@root/lib/lens/fetchLensPostComments';
+import { parseMarkdown } from '@root/lib/prosemirror/markdown/parseMarkdown';
 
 import { listPageComments } from './listPageComments';
 

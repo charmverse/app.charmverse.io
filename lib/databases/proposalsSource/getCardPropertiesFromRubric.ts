@@ -1,7 +1,7 @@
-import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
-import type { AnswerData } from 'lib/proposals/rubric/aggregateResults';
-import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import type { ProposalPropertyValue } from '@root/lib/proposals/blocks/interfaces';
+import type { AnswerData } from '@root/lib/proposals/rubric/aggregateResults';
+import { aggregateResults } from '@root/lib/proposals/rubric/aggregateResults';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from '@root/lib/proposals/rubric/interfaces';
 
 import type { IPropertyTemplate } from '../board';
 
@@ -93,6 +93,10 @@ export function getCardPropertiesFromRubric({
       (p) => p.type === 'proposalEvaluationAverage' && p.evaluationTitle === evaluation.title
     );
 
+    const proposalEvaluationReviewerAverageProp = templates.find(
+      (p) => p.type === 'proposalEvaluationReviewerAverage' && p.evaluationTitle === evaluation.title
+    );
+
     if (proposalEvaluatedByProp) {
       properties[proposalEvaluatedByProp.id] = uniqueReviewers;
     }
@@ -103,6 +107,12 @@ export function getCardPropertiesFromRubric({
 
     if (proposalEvaluationAverageProp) {
       properties[proposalEvaluationAverageProp.id] = allScores.average ?? '';
+    }
+
+    if (proposalEvaluationReviewerAverageProp) {
+      const totalReviewers = Object.keys(reviewersResults).length;
+      properties[proposalEvaluationReviewerAverageProp.id] =
+        totalReviewers === 0 ? 0 : (allScores.sum ?? 0) / totalReviewers ?? '';
     }
   }
 

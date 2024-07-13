@@ -1,13 +1,13 @@
 import styled from '@emotion/styled';
 import { LoginOutlined, FlagOutlined } from '@mui/icons-material';
 import { Box, Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
+import { baseUrl } from '@root/config/constants';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import { Button } from 'components/common/Button';
 import { ContextMenu } from 'components/common/ContextMenu';
 import Link from 'components/common/Link';
-import { baseUrl } from 'config/constants';
 import darkLogoImage from 'public/images/charmverse_logo_icon.png';
 
 const LogoImage = styled(Image)`

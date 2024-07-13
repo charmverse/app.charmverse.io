@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';

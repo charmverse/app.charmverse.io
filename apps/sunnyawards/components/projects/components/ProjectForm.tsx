@@ -1,14 +1,15 @@
-import type { FormValues } from '@connect/lib/projects/form';
-import { CATEGORIES } from '@connect/lib/projects/form';
 import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
-import { ImageField } from './ImageField';
-import { MultiTextValueFields } from './MultiTextValueFields';
+import { CATEGORIES } from 'lib/projects/form';
+import type { FormValues } from 'lib/projects/form';
 
-export function CreateProjectForm({
+import { ProjectImageField } from './ProjectImageField';
+import { ProjectMultiTextValueFields } from './ProjectMultiTextValueFields';
+
+export function ProjectForm({
   control,
   isValid,
   onNext
@@ -58,8 +59,8 @@ export function CreateProjectForm({
       <Stack>
         <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
         <Stack direction='row' gap={1}>
-          <ImageField type='avatar' name='avatar' control={control} />
-          <ImageField type='cover' name='coverImage' control={control} />
+          <ProjectImageField type='avatar' name='avatar' control={control} />
+          <ProjectImageField type='cover' name='coverImage' control={control} />
         </Stack>
       </Stack>
       <Stack>
@@ -86,14 +87,14 @@ export function CreateProjectForm({
           )}
         />
       </Stack>
-      <MultiTextValueFields
+      <ProjectMultiTextValueFields
         control={control}
         name='websites'
         label='Websites'
         dataTest='project-form-websites'
         placeholder='https://acme-inc.com'
       />
-      <MultiTextValueFields
+      <ProjectMultiTextValueFields
         control={control}
         name='farcasterValues'
         label='Farcaster'

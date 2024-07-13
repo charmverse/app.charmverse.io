@@ -1,8 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-
-import type { PropertyType } from 'lib/databases/board';
-import { InvalidStateError } from 'lib/middleware';
-import type { BoardPropertyValue, PageProperty } from 'lib/public-api/interfaces';
+import type { PropertyType } from '@root/lib/databases/board';
+import { InvalidStateError } from '@root/lib/middleware';
+import type { BoardPropertyValue, PageProperty } from '@root/lib/public-api/interfaces';
 
 import { InvalidCustomPropertyKeyError } from '../errors';
 import { getDatabaseWithSchema } from '../getDatabaseWithSchema';

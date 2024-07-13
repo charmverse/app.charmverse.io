@@ -1,8 +1,8 @@
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import { extractPollIds } from 'lib/prosemirror/extractPollIds';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPostEvent, publishDocumentEvent, publishVoteEvent } from 'lib/webhookPublisher/publishEvent';
+import { extractMentions } from '@root/lib/prosemirror/extractMentions';
+import { extractPollIds } from '@root/lib/prosemirror/extractPollIds';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishPostEvent, publishDocumentEvent, publishVoteEvent } from '@root/lib/webhookPublisher/publishEvent';
 
 export async function publishForumPostEvents(post: {
   id: string;

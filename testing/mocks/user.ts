@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
 import { deterministicRandomName } from 'lib/utils/randomName';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
   const id = user?.id ?? uuid();

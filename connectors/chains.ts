@@ -1,5 +1,7 @@
 import { log } from '@charmverse/core/log';
 // ref: https://wagmi.sh/core/chains
+import { isDevEnv } from '@root/config/constants';
+import { uniqueValues } from '@root/lib/utils/array';
 import { defineChain } from 'viem';
 import type { Chain } from 'viem/chains';
 import {
@@ -28,9 +30,6 @@ import {
   taiko,
   zkSyncTestnet
 } from 'viem/chains';
-
-import { isDevEnv } from 'config/constants';
-import { uniqueValues } from 'lib/utils/array';
 
 export interface IChainDetails {
   chainId: number;
@@ -120,7 +119,7 @@ export const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: [mainnet.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
     iconUrl: '/images/cryptoLogos/ethereum-icon-purple.svg',
-    rpcUrls: mainnet.rpcUrls.default.http,
+    rpcUrls: ['https://rpc.ankr.com/eth'], // this one returns errors in prod: mainnet.rpcUrls.default.http,
     shortName: 'eth',
     unlockNetwork: true,
     hypersubNetwork: true

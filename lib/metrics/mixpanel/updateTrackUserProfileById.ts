@@ -1,4 +1,4 @@
-import { getUserProfile } from 'lib/users/getUser';
+import { getUserProfile } from '@root/lib/users/getUser';
 
 import { updateTrackUserProfile } from './updateTrackUserProfile';
 

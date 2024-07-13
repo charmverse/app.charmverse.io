@@ -3,16 +3,15 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { Space } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
+import { isBoardPageType } from '@root/lib/pages/isBoardPageType';
+import { createPage } from '@root/lib/pages/server/createPage';
+import { generatePagePathFromPathAndTitle, getPagePath } from '@root/lib/pages/utils';
+import { updateEntityIds } from '@root/lib/prosemirror/updateEntityIds';
+import type { Reward } from '@root/lib/rewards/interfaces';
+import { getSpace } from '@root/lib/spaces/getSpace';
+import { typedKeys } from '@root/lib/utils/objects';
 import { v4 as uuid } from 'uuid';
-
-import type { BoardViewFields } from 'lib/databases/boardView';
-import { isBoardPageType } from 'lib/pages/isBoardPageType';
-import { createPage } from 'lib/pages/server/createPage';
-import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
-import { updateEntityIds } from 'lib/prosemirror/updateEntityIds';
-import type { Reward } from 'lib/rewards/interfaces';
-import { getSpace } from 'lib/spaces/getSpace';
-import { typedKeys } from 'lib/utils/objects';
 
 import type { ExportedPage } from './exportWorkspacePages';
 import { getImportData } from './getImportData';

@@ -1,8 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { assignRole } from '@root/lib/roles';
+import { updateTokenGateRoles } from '@root/lib/tokenGates/updateTokenGateRoles';
+import { randomETHWallet } from '@root/lib/utils/blockchain';
 
-import { assignRole } from 'lib/roles';
-import { updateTokenGateRoles } from 'lib/tokenGates/updateTokenGateRoles';
-import { randomETHWallet } from 'lib/utils/blockchain';
 import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateTokenGate } from 'testing/utils/tokenGates';
 

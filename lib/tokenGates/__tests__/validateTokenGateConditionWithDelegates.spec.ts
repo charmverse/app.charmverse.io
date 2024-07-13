@@ -1,10 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { AccessControlCondition } from '@root/lib/tokenGates/interfaces';
+import { validateTokenGateConditionWithDelegates } from '@root/lib/tokenGates/validateTokenGateConditionWithDelegates';
+import { verifyTokenGateMemberships } from '@root/lib/tokenGates/verifyTokenGateMemberships';
 import { walletAddress } from 'stories/lib/mockTokenGataData';
 
-import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
-import { validateTokenGateConditionWithDelegates } from 'lib/tokenGates/validateTokenGateConditionWithDelegates';
-import { verifyTokenGateMemberships } from 'lib/tokenGates/verifyTokenGateMemberships';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { clearTokenGateData, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';

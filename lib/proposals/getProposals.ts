@@ -10,14 +10,13 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { sortBy } from 'lodash';
-
 import type {
   IssuableProposalCredentialAuthor,
   IssuableProposalCredentialSpace,
   ProposalWithJoinedData
-} from 'lib/credentials/findIssuableProposalCredentials';
-import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
+} from '@root/lib/credentials/findIssuableProposalCredentials';
+import { generateCredentialInputsForProposal } from '@root/lib/credentials/findIssuableProposalCredentials';
+import { sortBy } from 'lodash';
 
 import type { ProposalStep } from './getCurrentStep';
 import { getCurrentStep } from './getCurrentStep';

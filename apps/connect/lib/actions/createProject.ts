@@ -2,8 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect/lib/actions/actionClient';
-
-import { disableCredentialAutopublish } from 'lib/credentials/constants';
+import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
 
 import { storeProjectMetadataAndPublishOptimismAttestation } from '../attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { createConnectProject } from '../projects/createConnectProject';

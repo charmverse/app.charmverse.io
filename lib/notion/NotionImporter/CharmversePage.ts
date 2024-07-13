@@ -1,10 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { blockToPrisma } from '@root/lib/databases/block';
+import { createCard } from '@root/lib/databases/card';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { v4 } from 'uuid';
-
-import { blockToPrisma } from 'lib/databases/block';
-import { createCard } from 'lib/databases/card';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';

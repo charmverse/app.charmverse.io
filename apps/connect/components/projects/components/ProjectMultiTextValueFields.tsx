@@ -5,7 +5,7 @@ import { Button, FormLabel, IconButton, Stack, TextField } from '@mui/material';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { Controller, useFieldArray } from 'react-hook-form';
 
-export function MultiTextValueFields({
+export function ProjectMultiTextValueFields({
   control,
   label,
   name,

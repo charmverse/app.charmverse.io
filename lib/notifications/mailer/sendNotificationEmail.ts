@@ -1,18 +1,18 @@
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { FeatureJson } from '@root/lib/features/constants';
+import * as mailer from '@root/lib/mailer';
+import * as emails from '@root/lib/mailer/emails';
+import { getMemberUsernameBySpaceRole } from '@root/lib/members/getMemberUsername';
+import { getCardNotifications } from '@root/lib/notifications/cards/getCardNotifications';
+import { getDocumentNotifications } from '@root/lib/notifications/documents/getDocumentNotifications';
+import { getPostNotifications } from '@root/lib/notifications/forum/getForumNotifications';
+import type { Notification, NotificationGroup } from '@root/lib/notifications/interfaces';
+import { getPollNotifications } from '@root/lib/notifications/polls/getPollNotifications';
+import { getProposalNotifications } from '@root/lib/notifications/proposals/getProposalNotifications';
+import { getBountyNotifications } from '@root/lib/notifications/rewards/getRewardNotifications';
 import type { MessagesSendResult } from 'mailgun.js';
 
-import type { FeatureJson } from 'lib/features/constants';
-import * as mailer from 'lib/mailer';
-import * as emails from 'lib/mailer/emails';
-import { getMemberUsernameBySpaceRole } from 'lib/members/getMemberUsername';
-import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
-import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
-import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
-import type { Notification, NotificationGroup } from 'lib/notifications/interfaces';
-import { getPollNotifications } from 'lib/notifications/polls/getPollNotifications';
-import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
-import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotifications';
 import { blueColor } from 'theme/colors';
 
 const notificationSelectFields = {

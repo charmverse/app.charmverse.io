@@ -1,8 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError, InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
-import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateCommentWithThreadAndPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

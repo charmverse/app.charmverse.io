@@ -1,9 +1,9 @@
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { InvalidInputError } from 'lib/utils/errors';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateUser } from 'testing/utils/users';
 

@@ -1,9 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-
-import { createVote as createVoteService } from 'lib/votes/createVote';
-import type { VoteDTO } from 'lib/votes/interfaces';
+import { createVote as createVoteService } from '@root/lib/votes/createVote';
+import type { VoteDTO } from '@root/lib/votes/interfaces';
 
 import type { VoteSettings } from './interfaces';
 

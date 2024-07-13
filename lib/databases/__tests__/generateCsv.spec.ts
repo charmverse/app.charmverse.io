@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
+import { createMissingCards } from '@root/lib/databases/proposalsSource/createMissingCards';
 import { v4 } from 'uuid';
 
-import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { generateBoard } from 'testing/setupDatabase';
 import { generateProposalSourceDb } from 'testing/utils/proposals';
 

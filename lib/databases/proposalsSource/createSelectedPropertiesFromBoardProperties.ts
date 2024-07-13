@@ -1,6 +1,7 @@
+import { projectFieldProperties, projectMemberFieldProperties } from '@root/lib/projects/formField';
+import { isTruthy } from '@root/lib/utils/types';
+
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
-import { isTruthy } from 'lib/utils/types';
 
 import type { Board } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';
@@ -27,6 +28,7 @@ export function createSelectedPropertiesStateFromBoardProperties({
   cardProperties.forEach((field) => {
     if (
       field.type === 'proposalEvaluationAverage' ||
+      field.type === 'proposalEvaluationReviewerAverage' ||
       field.type === 'proposalEvaluationTotal' ||
       field.type === 'proposalEvaluatedBy' ||
       field.type === 'proposalRubricCriteriaTotal' ||
@@ -56,6 +58,8 @@ export function createSelectedPropertiesStateFromBoardProperties({
           rubricEvaluationsPropertiesRecord[fieldKey].reviewerScore = true;
         } else if (field.type === 'proposalRubricCriteriaAverage') {
           rubricEvaluationsPropertiesRecord[fieldKey].criteriaAverage = true;
+        } else if (field.type === 'proposalEvaluationReviewerAverage') {
+          rubricEvaluationsPropertiesRecord[fieldKey].reviewerAverage = true;
         }
       }
     } else if (customPropertyIds.includes(field.id)) {
