@@ -1,9 +1,9 @@
 'use client';
 
+import env from '@beam-australia/react-env';
 import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { GET } from '@root/adapters/http';
-import { connectApiHost } from '@root/config/constants';
 
 import type { FarcasterUser } from 'lib/farcaster/getFarcasterUsers';
 import { encodeFilename } from 'lib/utils/encodeFilename';
@@ -27,7 +27,7 @@ export class ConnectApiClient extends HttpClient {
       region: string;
       bucket: string;
       key: string;
-    }>(`${connectApiHost}/api/image/upload`, {
+    }>(`${env('CONNECT_API_HOST')}/api/image/upload`, {
       filename: encodeFilename(file.name)
     });
   }
