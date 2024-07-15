@@ -232,7 +232,7 @@ function PropertyValueElement(props: Props) {
       />
     );
   } else if (propertyTemplate.type === 'proposalReviewer') {
-    const reviewerOptions: SelectOption[] = (propertyValue as unknown as ProposalReviewerProperty).map((reviewer) => ({
+    const reviewerOptions: SelectOption[] = (propertyValue as unknown as ProposalReviewerProperty)?.map((reviewer) => ({
       group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
       id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
     }));
