@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import { useEffect } from 'react';
 
+import charmClient from 'charmClient';
 import { trackPageView } from 'charmClient/hooks/track';
 import { DatabasePage } from 'components/[pageId]/DatabasePage';
 import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
@@ -49,6 +50,13 @@ export function SharedPage({ publicPage }: Props) {
       spaceDomain,
       spaceCustomDomain
     });
+
+    if (space?.domain === 'op-grants') {
+      charmClient.track.trackActionOp('page_view', {
+        type: rootPage.type,
+        path: rootPage.path
+      });
+    }
 
     setPageTitle(rootPage.title);
     setCurrentPageId(rootPage.id);

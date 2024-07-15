@@ -11,7 +11,7 @@ export type EventInput<T = MixpanelEvent> = T & {
 
 export type OpEventInput<T = MixpanelOpEvent> = T & {
   event: MixpanelOpEventName;
-};
+} & Partial<MixpanelTrackBase>;
 
 /*
  * This function is used to record events in the database.

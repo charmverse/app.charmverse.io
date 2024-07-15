@@ -3,6 +3,7 @@ import type { Page } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
 import { useCallback, useEffect } from 'react';
 
+import charmClient from 'charmClient';
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -39,6 +40,12 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
         spaceDomain: currentSpace.domain,
         spaceCustomDomain: currentSpace.customDomain
       });
+      if (currentSpace?.domain === 'op-grants') {
+        charmClient.track.trackActionOp('page_view', {
+          type: page.type,
+          path: page.path
+        });
+      }
       setCurrentPageId(page.id);
     }
     return () => {

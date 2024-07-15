@@ -118,6 +118,12 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
         spaceDomain: space.domain,
         spaceCustomDomain: space.customDomain
       });
+      if (space.domain === 'op-grants') {
+        charmClient.track.trackActionOp('page_view', {
+          type: 'post',
+          path: post.path
+        });
+      }
       setFormInputs(post);
     }
   }, [post?.id, !!space]);

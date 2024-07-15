@@ -1,3 +1,5 @@
+import type { PageType } from '@charmverse/core/prisma-client';
+import type { ViewOpPageEvent } from '@root/lib/metrics/mixpanel/opEvents';
 import { useEffect } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -20,6 +22,10 @@ export function trackPageView(page: Omit<PageEventMap['page_view'], 'userId'>) {
   });
 }
 
+export function trackOpPageView(page: ViewOpPageEvent) {
+  track.trackActionOp('page_view', page);
+}
+
 export function useTrackPageView(page: Omit<PageEventMap['page_view'], 'spaceId' | 'userId'>) {
   const { space: currentSpace } = useCurrentSpace();
   useEffect(() => {
@@ -32,4 +38,13 @@ export function useTrackPageView(page: Omit<PageEventMap['page_view'], 'spaceId'
       });
     }
   }, [currentSpace?.id]);
+}
+
+export function useTrackOpPageView(page: ViewOpPageEvent) {
+  const { space: currentSpace } = useCurrentSpace();
+  useEffect(() => {
+    if (currentSpace?.domain !== 'op-grants') {
+      track.trackActionOp('page_view', page);
+    }
+  }, [currentSpace?.id, page]);
 }
