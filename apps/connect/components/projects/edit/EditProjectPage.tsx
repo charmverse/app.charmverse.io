@@ -4,9 +4,9 @@ import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect/components/common/PageWrapper';
 import { actionEditProject } from '@connect/lib/actions/editProject';
 import type { LoggedInUser } from '@connect/lib/profile/interfaces';
-import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
 import type { FormValues, ProjectCategory } from '@connect/lib/projects/form';
 import { schema } from '@connect/lib/projects/form';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -126,7 +126,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           initialFarcasterProfiles={project.projectMembers.slice(1).map((member) => ({
             bio: member.farcasterUser.bio,
             displayName: member.farcasterUser.displayName,
-            fid: member.farcasterUser.fid,
+            fid: parseInt(member.farcasterUser.fid.toString()),
             pfpUrl: member.farcasterUser.pfpUrl,
             username: member.farcasterUser.username
           }))}

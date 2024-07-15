@@ -1,7 +1,6 @@
 import { v4 as uuid, v4 } from 'uuid';
 
-import type { ConnectProjectDetails } from 'lib/projects/getProject';
-
+import type { ConnectProjectDetails } from '../../projects/fetchProject';
 import { mapProjectToGitcoin } from '../mapProjectToGitcoin';
 
 describe('mapProjectToGitcoin', () => {

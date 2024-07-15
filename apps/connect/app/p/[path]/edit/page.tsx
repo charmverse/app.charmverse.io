@@ -1,6 +1,6 @@
 import { EditProjectPage } from '@connect/components/projects/edit/EditProjectPage';
 import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
-import { fetchProject } from '@connect/lib/projects/fetchProject';
+import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
 import { notFound, redirect } from 'next/navigation';
 
 export default async function EditProject({

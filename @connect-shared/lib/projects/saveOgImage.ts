@@ -4,16 +4,16 @@ import { ImageResponse } from 'next/og';
 import React from 'react';
 import sharp from 'sharp';
 
-import { ProjectShareItem } from 'components/projects/components/ProjectShareItem';
+import { ProjectShareItem } from '../../components/ProjectShareItem';
 
-import { getProject } from './getProject';
+import { fetchProject } from './fetchProject';
 
 export async function saveOgImage(projectId: string, userId: string) {
   if (!projectId) {
     throw new DataNotFoundError('No id provided');
   }
 
-  const project = await getProject({
+  const project = await fetchProject({
     id: projectId
   });
 

@@ -5,7 +5,7 @@ import { attestOnchain } from '@root/lib/credentials/attestOnchain';
 import type { OptimismProjectSnapshotAttestationMetaData } from '@root/lib/credentials/schemas/optimismProjectSchemas';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
-import { getProject } from '../projects/getProject';
+import { fetchProject } from '../projects/fetchProject';
 
 import { projectAttestationChainId, projectAttestationIssuerName } from './constants';
 import { storeProjectInS3 } from './storeProjectInS3';
@@ -31,7 +31,7 @@ export async function storeUpdatedProjectMetadataAttestation({
     }
   });
 
-  const project = await getProject({ id: projectId });
+  const project = await fetchProject({ id: projectId });
 
   if (!project) {
     throw new DataNotFoundError('Project not found');

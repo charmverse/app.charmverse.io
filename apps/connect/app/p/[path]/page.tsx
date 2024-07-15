@@ -1,5 +1,5 @@
 import { ProjectDetailsPage } from '@connect/components/projects/[id]/ProjectDetailsPage';
-import { fetchProject } from '@connect/lib/projects/fetchProject';
+import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
 import { notFound } from 'next/navigation';
 
 export default async function ProjectPage({ params }: { params: { path: string } }) {
