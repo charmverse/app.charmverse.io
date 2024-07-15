@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
+import { trackOpUserAction } from 'lib/metrics/mixpanel/trackOpUserAction';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -42,6 +43,11 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       title: true,
       hasContent: true,
       type: true,
+      space: {
+        select: {
+          domain: true
+        }
+      },
       proposal: {
         include: {
           authors: true,
@@ -160,6 +166,15 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     status: 'published',
     spaceId: proposalPage?.spaceId || ''
   });
+
+  const spaceDomain = proposalPage.space.domain;
+
+  if (spaceDomain === 'op-grants' && proposalPage.type === 'proposal') {
+    trackOpUserAction('successful_proposal_creation', {
+      proposalId,
+      userId
+    });
+  }
 
   return res.status(200).json({ ok: true });
 }

@@ -4,7 +4,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfileById } from '@root/lib/metrics/mixpanel/updateTrackUserProfileById';
 import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from '@root/lib/webhookPublisher/publishEvent';
 
