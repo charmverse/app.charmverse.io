@@ -1,8 +1,7 @@
 import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
-
-import type { FarcasterProfileInfo, FarcasterUserWithProfile } from 'lib/farcaster/loginWithFarcaster';
+import type { FarcasterProfileInfo } from '@root/lib/farcaster/loginWithFarcaster';
 
 export type ConnectProjectDetails = Pick<
   Project,
