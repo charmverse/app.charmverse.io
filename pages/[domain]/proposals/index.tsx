@@ -1,4 +1,4 @@
-import { useTrackOpPageView, useTrackPageView } from 'charmClient/hooks/track';
+import { useTrackPageView } from 'charmClient/hooks/track';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { ProposalsBoardProvider } from 'components/proposals/hooks/useProposalsBoard';
@@ -9,7 +9,6 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 export default function ProposalsPageComponent() {
   useTrackPageView({ type: 'proposals_list' });
-  useTrackOpPageView({ type: 'proposals_list' });
   const { mappedFeatures } = useSpaceFeatures();
   const proposalTitle = mappedFeatures.proposals.title;
 

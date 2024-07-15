@@ -54,7 +54,8 @@ export function SharedPage({ publicPage }: Props) {
     if (space?.domain === 'op-grants') {
       charmClient.track.trackActionOp('page_view', {
         type: rootPage.type,
-        path: rootPage.path
+        path: rootPage.path,
+        url: window.location.href
       });
     }
 

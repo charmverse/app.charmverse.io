@@ -25,7 +25,7 @@ function WrapperPostPage({ post }: { post: PostWithVotes }) {
   const [, setPageTitle] = usePageTitle();
 
   useTrackPageView({ postId: post.id, type: 'post' });
-  useTrackOpPageView({ path: post.path, type: 'post' });
+  useTrackOpPageView({ path: post.path, type: 'post', url: window.location.href });
 
   return (
     <PostPage

@@ -36,7 +36,7 @@ export function ProposalStickyFooter({
 
   async function onClick() {
     try {
-      if (space?.domain === 'op-grants') {
+      if (space?.domain === 'op-grants' && proposal.page?.type === 'proposal') {
         charmClient.track.trackActionOp('click_proposal_submit_button', {
           proposalId: proposal.id
         });

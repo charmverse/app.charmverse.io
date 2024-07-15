@@ -121,7 +121,8 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
       if (space.domain === 'op-grants') {
         charmClient.track.trackActionOp('page_view', {
           type: 'post',
-          path: post.path
+          path: post.path,
+          url: window.location.href
         });
       }
       setFormInputs(post);

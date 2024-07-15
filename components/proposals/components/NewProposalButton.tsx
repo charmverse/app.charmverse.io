@@ -81,6 +81,11 @@ export function NewProposalButton() {
   }
 
   function createFromTemplate(template: TemplateItem) {
+    if (space?.domain === 'op-grants') {
+      charmClient.track.trackActionOp('click_proposal_creation_button', {
+        spaceId: space.id
+      });
+    }
     navigateToSpacePath(`/proposals/new`, { template: template.id });
   }
 

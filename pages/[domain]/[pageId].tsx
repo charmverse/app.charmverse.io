@@ -2,7 +2,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSidePropsContext } from 'next';
 import { useEffect } from 'react';
 
-import charmClient from 'charmClient';
 import { EditorPage } from 'components/[pageId]/EditorPage/EditorPage';
 import { SharedPage } from 'components/[pageId]/SharedPage/SharedPage';
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -167,20 +166,13 @@ export default function PageView() {
   }, []);
 
   useEffect(() => {
-    // new indicates that the draft proposal has been created and added to only trigger event once
-    if (router.query.new && space?.domain === 'op-grants') {
-      charmClient.track.trackActionOp('successful_application_form_open', {});
-      updateURLQuery({
-        new: undefined
-      });
-    }
     // reload is used by new proposal endpoint. see pages/[domain]/proposals/new.tsx
     if (router.query.reload) {
       setTimeout(() => {
         window.location.search = '';
       }, 0);
     }
-  }, [router.query.reload, router.query.new, space?.domain, router.pathname, clearURLQuery]);
+  }, [router.query.reload, clearURLQuery]);
 
   if (!isSpaceMember && publicPage) {
     if (subscriptionEnded) {

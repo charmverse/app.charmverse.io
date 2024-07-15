@@ -1,7 +1,6 @@
 import type { IdentityType, PageType } from '@charmverse/core/prisma-client';
 
 import type { BaseEventWithoutGroup } from './interfaces/BaseEvent';
-import type { StaticPageType } from './interfaces/PageEvent';
 
 interface ClickProposalCreationButtonEvent extends BaseEventWithoutGroup {}
 
@@ -33,7 +32,8 @@ interface ClickSigninEvent extends BaseEventWithoutGroup {
 
 export interface ViewOpPageEvent extends BaseEventWithoutGroup {
   path?: string;
-  type: PageType | 'post' | StaticPageType;
+  url?: string;
+  type: PageType | 'post';
 }
 
 export type MixpanelOpEventMap = {

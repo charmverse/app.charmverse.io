@@ -78,7 +78,8 @@ function PageDialogBase(props: Props) {
       if (space.domain === 'op-grants') {
         charmClient.track.trackActionOp('page_view', {
           type: page.type,
-          path: page.path
+          path: page.path,
+          url: window.location.href
         });
       }
     }

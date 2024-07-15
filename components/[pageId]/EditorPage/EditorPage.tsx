@@ -41,9 +41,13 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
         spaceCustomDomain: currentSpace.customDomain
       });
       if (currentSpace?.domain === 'op-grants') {
+        if (page.type === 'proposal') {
+          charmClient.track.trackActionOp('successful_application_form_open', {});
+        }
         charmClient.track.trackActionOp('page_view', {
           type: page.type,
-          path: page.path
+          path: page.path,
+          url: window.location.href
         });
       }
       setCurrentPageId(page.id);

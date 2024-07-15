@@ -1,4 +1,3 @@
-import type { PageType } from '@charmverse/core/prisma-client';
 import type { ViewOpPageEvent } from '@root/lib/metrics/mixpanel/opEvents';
 import { useEffect } from 'react';
 
@@ -20,10 +19,6 @@ export function trackPageView(page: Omit<PageEventMap['page_view'], 'userId'>) {
       pathname
     }
   });
-}
-
-export function trackOpPageView(page: ViewOpPageEvent) {
-  track.trackActionOp('page_view', page);
 }
 
 export function useTrackPageView(page: Omit<PageEventMap['page_view'], 'spaceId' | 'userId'>) {
