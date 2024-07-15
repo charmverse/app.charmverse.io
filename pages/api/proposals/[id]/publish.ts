@@ -169,7 +169,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
 
   const spaceDomain = proposalPage.space.domain;
 
-  if (spaceDomain !== 'op-grants') {
+  if (spaceDomain === 'op-grants') {
     trackUserActionOp('publish_proposal', {
       proposalId,
       userId

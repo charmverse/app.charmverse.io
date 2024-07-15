@@ -168,7 +168,7 @@ export default function PageView() {
 
   // reload is used by new proposal endpoint. see pages/[domain]/proposals/new.tsx
   useEffect(() => {
-    if (router.query.new && space?.domain !== 'op-grants') {
+    if (router.query.new && space?.domain === 'op-grants') {
       charmClient.track.trackActionOp('open_application_form', {});
       updateURLQuery({
         new: undefined

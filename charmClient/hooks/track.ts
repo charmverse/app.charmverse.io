@@ -43,7 +43,7 @@ export function useTrackPageView(page: Omit<PageEventMap['page_view'], 'spaceId'
 export function useTrackOpPageView(page: Omit<ViewOpPageEvent, 'userId'>) {
   const { space: currentSpace } = useCurrentSpace();
   useEffect(() => {
-    if (currentSpace?.domain !== 'op-grants') {
+    if (currentSpace?.domain === 'op-grants') {
       track.trackActionOp('page_view', page);
     }
   }, [currentSpace?.id, page]);

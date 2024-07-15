@@ -97,8 +97,7 @@ export function NewProposalButton() {
               disabled={!canCreateProposal}
               onClick={() => {
                 if (space) {
-                  // TODO: Remove !==
-                  if (space.domain !== 'op-grants') {
+                  if (space.domain === 'op-grants') {
                     charmClient.track.trackActionOp('create_proposal_button_click', {
                       spaceId: space.id
                     });
