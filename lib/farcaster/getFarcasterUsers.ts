@@ -70,7 +70,7 @@ export async function getFarcasterUsers({
     const farcasterUsersResponse = await GET<FarcasterUserBulkResponse>(
       `${neynarBaseUrl}/user/bulk`,
       {
-        fids: [fid]
+        fids: fid
       },
       {
         headers: {

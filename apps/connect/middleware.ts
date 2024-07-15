@@ -11,6 +11,7 @@ export async function middleware(request: NextRequest) {
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
   const user = session.user;
   const path = request.nextUrl.pathname;
+
   // Make /p/ project pages public, /u/ user pages public
   const projectPathChunks = path.split('/').filter(isTruthy);
   const isEditProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'edit';
@@ -36,6 +37,6 @@ export const config = {
      * - images (image files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|manifest.webmanifest).*)'
+    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest).*)'
   ]
 };

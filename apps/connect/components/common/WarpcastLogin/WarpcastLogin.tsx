@@ -1,7 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { connectApiClient } from '@connect/apiClient/apiClient';
+import { ConnectApiClient } from '@connect/apiClient/apiClient';
 import { actionRevalidatePath } from '@connect/lib/actions/revalidatePath';
 import { AuthKitProvider, SignInButton } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
@@ -17,6 +17,7 @@ function WarpcastLoginButton() {
   const router = useRouter();
 
   const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
+    const connectApiClient = new ConnectApiClient();
     await connectApiClient.loginViaFarcaster(res).catch((error) => {
       log.error('There was an error on the server while logging in with Warpcast', { error });
     });

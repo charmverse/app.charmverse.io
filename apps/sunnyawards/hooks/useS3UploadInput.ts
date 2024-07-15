@@ -38,7 +38,7 @@ export const useS3UploadInput = ({
     setFileName(file.name || '');
 
     try {
-      const { url } = await uploadToS3(apiClient.uploadImage, file, { onUploadPercentageProgress: setProgress });
+      const { url } = await uploadToS3(apiClient.getUploadToken, file, { onUploadPercentageProgress: setProgress });
       onFileUpload({ url: replaceS3Domain(url), fileName: file.name || '', size: file.size });
     } catch (error) {
       log.error('Error uploading image to s3', { error });

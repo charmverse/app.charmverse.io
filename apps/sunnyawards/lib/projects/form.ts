@@ -9,7 +9,7 @@ export const schema = yup.object({
   description: yup.string(),
   avatar: yup.string(),
   coverImage: yup.string(),
-  category: yup.string().oneOf(CATEGORIES),
+  category: yup.string().oneOf(CATEGORIES).nullable().optional(),
   websites: yup.array(yup.string().url()),
   farcasterValues: yup.array(yup.string()),
   github: yup.string(),

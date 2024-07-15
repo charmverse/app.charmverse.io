@@ -6,6 +6,8 @@ import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
 
+import { isTruthy } from 'lib/utils/types';
+
 import { FarcasterCard } from '../../common/FarcasterCard';
 
 import { SearchFarcasterUser } from './SearchFarcasterUser';
@@ -57,6 +59,7 @@ export function AddProjectMembersForm({
         />
         <Stack gap={1}>
           <SearchFarcasterUser
+            filteredFarcasterIds={selectedFarcasterProfiles.map((profile) => profile.fid).filter(isTruthy)}
             setSelectedProfile={(farcasterProfile) => {
               if (farcasterProfile) {
                 append({

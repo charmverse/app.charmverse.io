@@ -16,6 +16,8 @@ import type { LoggedInUser } from '@root/models';
 import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
+import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
+
 const appClient = createAppClient({
   ethereum: viemConnector({
     rpcUrl: getChainById(optimism.id)!.rpcUrls[0]
@@ -92,6 +94,11 @@ export async function loginWithFarcaster({
 
     trackUserAction('sign_in', { userId: farcasterUser.user.id, identityType: 'Farcaster' });
 
+    await trackOpSpaceClickSigninEvent({
+      userId: farcasterUser.user.id,
+      identityType: 'Farcaster'
+    });
+
     return getUserProfile('id', farcasterUser.userId);
   }
   const userWithWallet = await prisma.user.findFirst({
@@ -144,6 +151,11 @@ export async function loginWithFarcaster({
     });
 
     trackUserAction('sign_in', { userId: userWithWallet.id, identityType: 'Farcaster' });
+
+    await trackOpSpaceClickSigninEvent({
+      userId: userWithWallet.id,
+      identityType: 'Farcaster'
+    });
 
     return updatedUser;
   }
