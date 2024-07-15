@@ -20,7 +20,7 @@ export async function task() {
       });
       webpush.sendNotification(s.subscription as any, payload);
     });
-    count('cron.sunny-push-notifications.removed-member-roles', subscriptions.length);
+    count('cron.sunnyawards-push-notifications.subscriptions', subscriptions.length);
   } catch (error: any) {
     log.error(`Error while sending push notifications to the Sunny Awards`, { error });
   }
