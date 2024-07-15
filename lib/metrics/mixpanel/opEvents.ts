@@ -16,11 +16,19 @@ interface SuccessfulProposalCreationEvent extends BaseEventWithoutGroup {
 }
 
 interface ClickSignupEvent extends BaseEventWithoutGroup {
-  identityType: IdentityType | null;
+  signinMethod: IdentityType | null;
 }
 
 interface SuccessfulSignupEvent extends BaseEventWithoutGroup {
-  identityType: IdentityType | null;
+  signinMethod: IdentityType | null;
+}
+
+interface SuccessfulSigninEvent extends BaseEventWithoutGroup {
+  signinMethod: IdentityType | null;
+}
+
+interface ClickSigninEvent extends BaseEventWithoutGroup {
+  signinMethod: IdentityType | null;
 }
 
 export interface ViewOpPageEvent extends BaseEventWithoutGroup {
@@ -36,6 +44,8 @@ export type MixpanelOpEventMap = {
   page_view: ViewOpPageEvent;
   click_signup: ClickSignupEvent;
   successful_signup: SuccessfulSignupEvent;
+  successful_signin: SuccessfulSigninEvent;
+  click_signin: ClickSigninEvent;
 };
 
 export type MixpanelOpEvent = MixpanelOpEventMap[keyof MixpanelOpEventMap];

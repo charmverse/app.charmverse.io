@@ -1,10 +1,8 @@
-import { log } from '@charmverse/core/log';
 import { trackUserActionOp } from '@root/lib/metrics/mixpanel/trackUserActionOp';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';
 
-import { recordDatabaseEvent } from 'lib/metrics/recordDatabaseEvent';
 import type { OpEventInput } from 'lib/metrics/recordDatabaseEvent';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -40,16 +38,6 @@ async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success:
   }
 
   trackUserActionOp(eventName, { ...eventPayload, userId });
-
-  try {
-    await recordDatabaseEvent({
-      event: req.body,
-      distinctUserId: req.session.user?.id || req.session.anonymousUserId,
-      userId: req.session.user?.id
-    });
-  } catch (error) {
-    log.error('Error recording database event', { ...request, error, referer: req.headers.referer });
-  }
 
   res.status(200).end();
 }

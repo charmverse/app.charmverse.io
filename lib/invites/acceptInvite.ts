@@ -90,7 +90,7 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
     });
     trackUserActionOp('successful_signup', {
       userId,
-      identityType: user.identityType
+      signinMethod: user.identityType
     });
   }
 }

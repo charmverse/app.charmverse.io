@@ -29,7 +29,7 @@ export default function InvitationPage({ invite, space }: Props) {
     try {
       if (space.domain === 'op-grants' && user) {
         charmClient.track.trackActionOp('click_signup', {
-          identityType: user.identityType
+          signinMethod: user.identityType
         });
       }
       await charmClient.acceptInvite({ id: invite.id });
