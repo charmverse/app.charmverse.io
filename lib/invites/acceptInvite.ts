@@ -4,7 +4,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { logInviteAccepted } from '@root/lib/metrics/postToDiscord';
 import { joinSpace } from '@root/lib/spaces/joinSpace';
 
-import { trackUserActionOp } from '../metrics/mixpanel/trackUserActionOp';
+import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
 import { updateTrackOpUserProfile } from '../metrics/mixpanel/updateTrackOpUserProfile';
 import { getUserProfile } from '../users/getUser';
 
@@ -83,7 +83,7 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
 
   if (invite.space.domain === 'op-grants') {
     const user = await getUserProfile('id', userId);
-    trackUserActionOp('successful_signup', {
+    trackOpUserAction('successful_signup', {
       userId,
       signinMethod: user.identityType
     });

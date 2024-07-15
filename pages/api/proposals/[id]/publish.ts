@@ -1,11 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { trackUserActionOp } from '@root/lib/metrics/mixpanel/trackUserActionOp';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
+import { trackOpUserAction } from 'lib/metrics/mixpanel/trackOpUserAction';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -170,7 +170,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
   const spaceDomain = proposalPage.space.domain;
 
   if (spaceDomain === 'op-grants') {
-    trackUserActionOp('successful_proposal_creation', {
+    trackOpUserAction('successful_proposal_creation', {
       proposalId,
       userId
     });

@@ -5,8 +5,8 @@ import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/
 import { getChainById } from '@root/connectors/chains';
 import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
 import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
+import { trackOpUserAction } from '@root/lib/metrics/mixpanel/trackOpUserAction';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
-import { trackUserActionOp } from '@root/lib/metrics/mixpanel/trackUserActionOp';
 import { InvalidStateError } from '@root/lib/middleware/errors';
 import { sessionUserRelations } from '@root/lib/session/config';
 import { getUserProfile } from '@root/lib/users/getUser';

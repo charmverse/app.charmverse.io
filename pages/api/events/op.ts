@@ -1,8 +1,8 @@
-import { trackUserActionOp } from '@root/lib/metrics/mixpanel/trackUserActionOp';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';
 
+import { trackOpUserAction } from 'lib/metrics/mixpanel/trackOpUserAction';
 import type { OpEventInput } from 'lib/metrics/recordDatabaseEvent';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -37,7 +37,7 @@ async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success:
     throw new InvalidInputError('Invalid track data');
   }
 
-  trackUserActionOp(eventName, { ...eventPayload, userId });
+  trackOpUserAction(eventName, { ...eventPayload, userId });
 
   res.status(200).end();
 }

@@ -1,7 +1,7 @@
 import type { IdentityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { trackUserActionOp } from './trackUserActionOp';
+import { trackOpUserAction } from './trackOpUserAction';
 
 export async function trackOpSpaceSuccessfulSigninEvent({
   userId,
@@ -32,7 +32,7 @@ export async function trackOpSpaceSuccessfulSigninEvent({
     }));
 
   if (isOpGrantsSpaceMember) {
-    trackUserActionOp('successful_signin', {
+    trackOpUserAction('successful_signin', {
       userId,
       signinMethod: identityType
     });
@@ -68,7 +68,7 @@ export async function trackOpSpaceClickSigninEvent({
     }));
 
   if (isOpGrantsSpaceMember) {
-    trackUserActionOp('click_signin', {
+    trackOpUserAction('click_signin', {
       userId,
       signinMethod: identityType
     });

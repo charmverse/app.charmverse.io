@@ -5,7 +5,7 @@ import { mixpanelOp } from './mixpanel';
 import type { MixpanelOpEventMap, MixpanelOpEventName } from './opEvents';
 import { eventNameToHumanFormat, paramsToHumanFormat, validateMixPanelEvent } from './utils';
 
-export function trackUserActionOp<T extends MixpanelOpEventName>(eventName: T, params: MixpanelOpEventMap[T]) {
+export function trackOpUserAction<T extends MixpanelOpEventName>(eventName: T, params: MixpanelOpEventMap[T]) {
   const { userId, ...restParams } = params;
   // map userId prop to distinct_id required by mixpanel to recognize the user
   const mixpanelTrackParams: MixpanelTrackBase = {
