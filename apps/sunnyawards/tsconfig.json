@@ -24,6 +24,7 @@
       }
     ],
     "paths": {
+      "@connect-shared/*": ["../../@connect-shared/*"],
       "apiClient/*": ["./apiClient/*"],
       "components/*": ["./components/*"],
       "hooks/*": ["./hooks/*"],

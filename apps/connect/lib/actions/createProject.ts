@@ -2,9 +2,9 @@
 
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect/lib/actions/actionClient';
+import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
 
-import { storeProjectMetadataAndPublishOptimismAttestation } from '../attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { createConnectProject } from '../projects/createConnectProject';
 import { schema } from '../projects/form';
 import { generateOgImage } from '../projects/generateOgImage';
