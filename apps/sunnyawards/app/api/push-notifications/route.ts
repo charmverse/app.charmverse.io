@@ -7,6 +7,8 @@ import webpush from 'web-push';
 
 import { initWebPush } from 'lib/pwa/initWebPush';
 
+export const dynamic = 'force-dynamic';
+
 initWebPush();
 
 export async function GET(_: Request) {
