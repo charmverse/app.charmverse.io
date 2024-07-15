@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import type { Control } from 'react-hook-form';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 
+import charmClient from 'charmClient';
 import { usePublishProposal } from 'charmClient/hooks/proposals';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { Button } from 'components/common/Button';
@@ -35,6 +36,11 @@ export function ProposalStickyFooter({
 
   async function onClick() {
     try {
+      if (space?.domain !== 'op-grants') {
+        charmClient.track.trackActionOp('submit_proposal_button_click', {
+          proposalId: proposal.id
+        });
+      }
       await publishProposal();
     } catch (error) {
       showMessage((error as Error).message, 'error');

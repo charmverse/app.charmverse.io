@@ -1,6 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import { trackUserActionOp } from '@root/lib/metrics/mixpanel/trackUserActionOP';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -42,6 +43,11 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       title: true,
       hasContent: true,
       type: true,
+      space: {
+        select: {
+          domain: true
+        }
+      },
       proposal: {
         include: {
           authors: true,
@@ -160,6 +166,14 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     status: 'published',
     spaceId: proposalPage?.spaceId || ''
   });
+
+  const spaceDomain = proposalPage.space.domain;
+
+  if (spaceDomain !== 'op-grants') {
+    trackUserActionOp('publish_proposal', {
+      proposalId
+    });
+  }
 
   return res.status(200).json({ ok: true });
 }
