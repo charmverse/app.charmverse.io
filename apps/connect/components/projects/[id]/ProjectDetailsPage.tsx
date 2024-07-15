@@ -23,7 +23,7 @@ export async function ProjectDetailsPage({ project }: { project: ConnectProjectD
       <Stack gap={1}>
         {project.projectMembers.map((member) => (
           <FarcasterCard
-            fid={member.farcasterUser.fid}
+            fid={parseInt(member.farcasterUser.fid.toString())}
             key={member.farcasterUser.fid}
             name={member.farcasterUser.displayName}
             username={member.farcasterUser.username}
