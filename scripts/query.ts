@@ -1,20 +1,37 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { prettyPrint } from 'lib/utils/strings';
 
 /**
  * Use this script to perform database searches.
  */
 
 async function query() {
-  const result = await prisma.page.update({
-    where: {
-      id: '09ad994d-dc30-470f-8067-452a33b796f5'
-    },
-    data: {
-      convertedProposalId: null
-    }
-  });
+  // const result = await prisma.page.findMany({
+  //   where: {
+  //      title: 'Optimism Protocol Registry'
+  //   },
+  //   select: {
+  //     id: true,
+  //     type: true,
+  //     path: true
+  //   }
+  // });
 
-  console.log(result);
+  const result = await prisma.user.findFirst({
+    where: {
+      verifiedEmails: {
+        some: {
+          email: 'atandadave@gmail.com'
+        }
+      }
+    },
+    select: {
+      id: true,
+      username: true,
+    }
+  })
+
+  prettyPrint(result);
 }
 
 query();

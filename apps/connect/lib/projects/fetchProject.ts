@@ -2,13 +2,7 @@ import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 
-type FarcasterUser = {
-  fid: number;
-  pfpUrl: string;
-  bio: string;
-  username: string;
-  displayName: string;
-};
+import type { FarcasterProfileInfo, FarcasterUserWithProfile } from 'lib/farcaster/loginWithFarcaster';
 
 export type ConnectProjectDetails = Pick<
   Project,
@@ -30,7 +24,7 @@ export type ConnectProjectDetails = Pick<
   projectMembers: {
     userId: string | null;
     teamLead: boolean;
-    farcasterUser: FarcasterUser;
+    farcasterUser: FarcasterProfileInfo;
   }[];
 };
 
@@ -103,7 +97,7 @@ export async function fetchProject({
           bio: farcasterUser?.bio,
           username: farcasterUser?.username,
           displayName: farcasterUser?.displayName
-        } as FarcasterUser
+        } as FarcasterProfileInfo
       };
     })
   };
