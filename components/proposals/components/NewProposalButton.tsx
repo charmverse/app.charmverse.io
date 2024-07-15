@@ -97,10 +97,12 @@ export function NewProposalButton() {
               disabled={!canCreateProposal}
               onClick={() => {
                 if (space) {
-                  charmClient.track.trackActionOp('create_proposal_button_click', {
-                    spaceId: space.id
-                  });
-
+                  // TODO: Remove !==
+                  if (space.domain !== 'op-grants') {
+                    charmClient.track.trackActionOp('create_proposal_button_click', {
+                      spaceId: space.id
+                    });
+                  }
                   router.push(getAbsolutePath('/proposals/new', space.domain));
                 }
               }}

@@ -96,7 +96,8 @@ export const getServerSideProps = withSessionSsr(async (context) => {
         destination: getPagePath({
           hostName: context.req.headers.host,
           path: proposal.page.path,
-          spaceDomain: space.domain
+          spaceDomain: space.domain,
+          query: { new: '1' }
         }),
         permanent: false
       }
@@ -149,7 +150,7 @@ export const getServerSideProps = withSessionSsr(async (context) => {
           hostName: context.req.headers.host,
           path: proposal.page.path,
           spaceDomain: space.domain,
-          query: { reload: '1' }
+          query: { reload: '1', new: '1' }
         }),
         permanent: false
       }

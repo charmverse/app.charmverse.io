@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 
 import type { MixpanelTrackBase } from './interfaces';
-import { mixpanelOP } from './mixpanel';
+import { mixpanelOp } from './mixpanel';
 import type { MixpanelOpEventMap, MixpanelOpEventName } from './opEvents';
 import { eventNameToHumanFormat, paramsToHumanFormat, validateMixPanelEvent } from './utils';
 
@@ -22,7 +22,7 @@ export function trackUserActionOp<T extends MixpanelOpEventName>(eventName: T, p
   }
 
   try {
-    mixpanelOP?.track(humanReadableEventName, mixpanelTrackParams);
+    mixpanelOp?.track(humanReadableEventName, mixpanelTrackParams);
   } catch (e) {
     log.warn(`Failed to update mixpanel op event ${eventName}`);
   }

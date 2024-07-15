@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
-import { trackUserActionOP } from '@root/lib/metrics/mixpanel/trackUserActionOP';
+import { trackUserActionOp } from '@root/lib/metrics/mixpanel/trackUserActionOP';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';
 
-import { recordDatabaseEvent, type EventInput } from 'lib/metrics/recordDatabaseEvent';
+import { recordDatabaseEvent } from 'lib/metrics/recordDatabaseEvent';
+import type { OpEventInput } from 'lib/metrics/recordDatabaseEvent';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utils/errors';
@@ -14,7 +15,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.post(trackHandler);
 
 async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success: 'ok' } | { error: string }>) {
-  const request = req.body as EventInput;
+  const request = req.body as OpEventInput;
 
   const { event: eventName, ...eventPayload } = request;
 
@@ -30,15 +31,12 @@ async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success:
   const userId = req.session.user?.id ?? req.session.anonymousUserId;
   // Make sure to use userId from session
   eventPayload.userId = userId;
-  if (eventPayload.userId === req.session.anonymousUserId) {
-    eventPayload.isAnonymous = true;
-  }
 
   if (!userId) {
     throw new InvalidInputError('Invalid track data');
   }
 
-  trackUserActionOP(eventName, { ...eventPayload, userId });
+  trackUserActionOp(eventName, { ...eventPayload, userId });
 
   try {
     await recordDatabaseEvent({

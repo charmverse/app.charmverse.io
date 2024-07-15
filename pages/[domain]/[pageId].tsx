@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSidePropsContext } from 'next';
 import { useEffect } from 'react';
 
+import charmClient from 'charmClient';
 import { EditorPage } from 'components/[pageId]/EditorPage/EditorPage';
 import { SharedPage } from 'components/[pageId]/SharedPage/SharedPage';
 import ErrorPage from 'components/common/errors/ErrorPage';
@@ -124,7 +125,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 export default function PageView() {
   const { publicPage } = useSharedPage();
   const basePageId = usePageIdFromPath();
-  const { router, clearURLQuery } = useCharmRouter();
+  const { router, clearURLQuery, updateURLQuery } = useCharmRouter();
   const { isSpaceMember } = useIsSpaceMember();
   const { user } = useUser();
   const { space } = useCurrentSpace();
@@ -167,12 +168,19 @@ export default function PageView() {
 
   // reload is used by new proposal endpoint. see pages/[domain]/proposals/new.tsx
   useEffect(() => {
+    if (router.query.new && space?.domain !== 'op-grants') {
+      charmClient.track.trackActionOp('open_application_form', {});
+      updateURLQuery({
+        new: undefined
+      });
+    }
+
     if (router.query.reload) {
       setTimeout(() => {
         window.location.search = '';
       }, 0);
     }
-  }, [router.query.reload, clearURLQuery]);
+  }, [router.query.reload, router.query.new, space?.domain, router.pathname, clearURLQuery]);
 
   if (!isSpaceMember && publicPage) {
     if (subscriptionEnded) {
