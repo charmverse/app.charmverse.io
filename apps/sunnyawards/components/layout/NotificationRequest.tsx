@@ -1,8 +1,11 @@
 'use client';
 
+import env from '@beam-australia/react-env';
 import { useEffect, useState } from 'react';
 
 import { actionSaveSubscription } from 'lib/actions/saveSubscription';
+
+import { VAPID_PUBLIC_KEY } from './constants';
 
 export function NotificationRequest() {
   const [permission, setPermission] = useState(
@@ -26,7 +29,7 @@ export function NotificationRequest() {
         const swRegistration = await navigator.serviceWorker.getRegistration();
 
         const options: PushSubscriptionOptionsInit = {
-          applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || process.env.REACT_APP_VAPID_PUBLIC_KEY,
+          applicationServerKey: VAPID_PUBLIC_KEY,
           userVisibleOnly: true
         };
 
