@@ -32,7 +32,7 @@
       "@root/config/*": ["../../config/*"],
       "@root/connectors/*": ["../../connectors/*"],
       "@root/lib/*": ["../../lib/*"],
-      "@root/models/*": ["../../models/*"],
+      "@root/models": ["../../models/index.ts"],
       "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
       "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
       "@charmverse/core/shared": ["../../node_modules/@charmverse/core/dist/cjs/shared"],
