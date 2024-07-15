@@ -1,4 +1,5 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
@@ -43,16 +44,20 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     throw new DataNotFoundError('Farcaster profile not found');
   }
 
-  const mappedProject = mapProjectToOptimism(project);
-
   const { attestationId: projectRefUID } = await createProjectViaAgora({
-    farcasterId: farcasterUser.fid
+    farcasterId: farcasterUser.fid,
+    projectName: project.name
   });
+
+  log.info('Project created via Agora', { projectRefUID });
+
   const { attestationId: attestationMetadataUID } = await storeProjectMetadataViaAgora({
     farcasterId: farcasterUser.fid,
     projectRefUID,
     projectId
   });
+
+  log.info('Project metadata created via Agora', { projectRefUID });
 
   return { projectRefUID, attestationMetadataUID };
 }

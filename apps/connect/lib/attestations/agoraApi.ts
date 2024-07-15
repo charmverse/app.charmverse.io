@@ -9,14 +9,17 @@ import { mapProjectToOptimism } from './mapProjectToOptimism';
 const AGORA_API_KEY = process.env.AGORA_API_KEY as string;
 
 export function createProjectViaAgora({
-  farcasterId
+  farcasterId,
+  projectName
 }: {
   farcasterId: string | number;
+  projectName: string;
 }): Promise<{ attestationId: string }> {
   return POST(
     'https://retrofunding.optimism.io/api/v1/projects',
     {
-      farcasterId
+      farcasterId: farcasterId.toString(),
+      name: projectName
     },
     {
       headers: {
@@ -58,7 +61,7 @@ export async function storeProjectMetadataViaAgora({
   return POST(
     `https://retrofunding.optimism.io/api/v1/projects/${projectRefUID}/metadata_snapshot`,
     {
-      farcasterId,
+      farcasterId: farcasterId.toString(),
       metadata: mapProjectToOptimism({
         ...project,
         projectMembers: project.projectMembers
