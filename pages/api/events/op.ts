@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { trackUserActionOp } from '@root/lib/metrics/mixpanel/trackUserActionOP';
+import { trackUserActionOp } from '@root/lib/metrics/mixpanel/trackUserActionOp';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';

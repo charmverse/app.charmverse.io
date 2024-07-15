@@ -166,15 +166,15 @@ export default function PageView() {
     };
   }, []);
 
-  // reload is used by new proposal endpoint. see pages/[domain]/proposals/new.tsx
   useEffect(() => {
+    // new indicates that the draft proposal has been created and added to only trigger event once
     if (router.query.new && space?.domain === 'op-grants') {
-      charmClient.track.trackActionOp('open_application_form', {});
+      charmClient.track.trackActionOp('successful_application_form_open', {});
       updateURLQuery({
         new: undefined
       });
     }
-
+    // reload is used by new proposal endpoint. see pages/[domain]/proposals/new.tsx
     if (router.query.reload) {
       setTimeout(() => {
         window.location.search = '';

@@ -4,6 +4,8 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { logInviteAccepted } from '@root/lib/metrics/postToDiscord';
 import { joinSpace } from '@root/lib/spaces/joinSpace';
 
+import { trackUserActionOp } from '../metrics/mixpanel/trackUserActionOp';
+
 import { validateInviteLink } from './validateInviteLink';
 
 export type InviteLinkAcceptance = {
@@ -76,4 +78,19 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
       }
     })
   ]);
+
+  if (invite.space.domain === 'op-grants') {
+    const user = await prisma.user.findUniqueOrThrow({
+      where: {
+        id: userId
+      },
+      select: {
+        identityType: true
+      }
+    });
+    trackUserActionOp('successful_signup', {
+      userId,
+      identityType: user.identityType
+    });
+  }
 }

@@ -1,18 +1,26 @@
-import type { PageType } from '@charmverse/core/prisma-client';
+import type { IdentityType, PageType } from '@charmverse/core/prisma-client';
 
 import type { BaseEventWithoutGroup } from './interfaces/BaseEvent';
 import type { StaticPageType } from './interfaces/PageEvent';
 
-interface ProposalCreateButtonClickEvent extends BaseEventWithoutGroup {}
+interface ClickProposalCreationButtonEvent extends BaseEventWithoutGroup {}
 
-interface ApplicationOpenFormEvent extends BaseEventWithoutGroup {}
+interface SuccessfulApplicationFormOpenEvent extends BaseEventWithoutGroup {}
 
-interface ProposalSubmitButtonClickEvent extends BaseEventWithoutGroup {
+interface ClickProposalSubmitButtonEvent extends BaseEventWithoutGroup {
   proposalId: string;
 }
 
-interface PublishProposalEvent extends BaseEventWithoutGroup {
+interface SuccessfulProposalCreationEvent extends BaseEventWithoutGroup {
   proposalId: string;
+}
+
+interface ClickSignupEvent extends BaseEventWithoutGroup {
+  identityType: IdentityType | null;
+}
+
+interface SuccessfulSignupEvent extends BaseEventWithoutGroup {
+  identityType: IdentityType | null;
 }
 
 export interface ViewOpPageEvent extends BaseEventWithoutGroup {
@@ -21,11 +29,13 @@ export interface ViewOpPageEvent extends BaseEventWithoutGroup {
 }
 
 export type MixpanelOpEventMap = {
-  create_proposal_button_click: ProposalCreateButtonClickEvent;
-  open_application_form: ApplicationOpenFormEvent;
-  submit_proposal_button_click: ProposalSubmitButtonClickEvent;
-  publish_proposal: PublishProposalEvent;
+  click_proposal_creation_button: ClickProposalCreationButtonEvent;
+  successful_application_form_open: SuccessfulApplicationFormOpenEvent;
+  click_proposal_submit_button: ClickProposalSubmitButtonEvent;
+  successful_proposal_creation: SuccessfulProposalCreationEvent;
   page_view: ViewOpPageEvent;
+  click_signup: ClickSignupEvent;
+  successful_signup: SuccessfulSignupEvent;
 };
 
 export type MixpanelOpEvent = MixpanelOpEventMap[keyof MixpanelOpEventMap];
