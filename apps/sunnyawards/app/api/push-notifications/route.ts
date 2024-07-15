@@ -9,9 +9,8 @@ import { initWebPush } from 'lib/pwa/initWebPush';
 
 export const dynamic = 'force-dynamic';
 
-initWebPush();
-
 export async function GET(_: Request) {
+  initWebPush();
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
   const userId = session.user?.id || undefined;
 
