@@ -120,7 +120,7 @@
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
     "@ceramicnetwork/http-client": "^5.6.0",
-    "@charmverse/core": "^0.70.3",
+    "@charmverse/core": "0.70.4-rc-feat-sw-subscri.3",
     "@column-resizer/core": "^1.0.2",
     "@composedb/devtools": "^0.7.1",
     "@composedb/devtools-node": "^0.7.1",
@@ -327,6 +327,7 @@
     "uuid": "^8.3.2",
     "viem": "^2.17.3",
     "wagmi": "^2.5.11",
+    "web-push": "^3.6.7",
     "yup": "^1.4.0",
     "zksync-web3": "^0.16.0"
   },

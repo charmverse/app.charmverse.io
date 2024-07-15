@@ -17,6 +17,7 @@ import { task as processSynapsWebhookMessages } from './tasks/processSynapsWebho
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
 import { refreshDocusignOAuthTask } from './tasks/refreshDocusignOAuthTask';
 import { sendDraftProposalNotificationTask } from './tasks/sendDraftProposalNotificationTask';
+import { task as sendPushNotificationsToSunyAppTask } from './tasks/sendPushNotificationsToSunyAppTask';
 import { task as storeOptimismProjectAttestations } from './tasks/storeOptimismProjectAttestations';
 import { syncOptimismReviewsTask } from './tasks/syncOptimismReviews';
 import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
@@ -81,6 +82,9 @@ cron.schedule('*/15 * * * *', syncOptimismReviewsTask);
 
 // Store optimism project attestations once an hour
 cron.schedule('0 * * * *', storeOptimismProjectAttestations);
+
+// Send push notifications to the Sunny Awards app every day at 10am
+// cron.schedule('0 10 * * *', sendPushNotificationsToSunyAppTask);
 
 const port = process.env.PORT || 4000;
 

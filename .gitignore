@@ -25,6 +25,8 @@ serverless/*.node
 /apps/sunnyawards/.next/
 /apps/sunnyawards/dist/
 /apps/sunnyawards/node_modules/
+/apps/sunnyawards/public/sw*
+/apps/sunnyawards/public/swe-worker*
 
 # connect api
 /apps/connect-api/dist/

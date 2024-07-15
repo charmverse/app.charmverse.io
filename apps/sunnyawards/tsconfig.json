@@ -2,10 +2,10 @@
   "compilerOptions": {
     "outDir": "../../dist/apps/connect",
     "rootDir": "../../",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": [
+      // This allows Serwist to type `window.serwist`.
+      "@serwist/next/typings"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -52,5 +52,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["../../node_modules", ".next/"]
+  "exclude": ["../../node_modules", ".next/", "public/sw.js"]
 }
