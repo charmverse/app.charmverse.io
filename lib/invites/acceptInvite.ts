@@ -5,6 +5,8 @@ import { logInviteAccepted } from '@root/lib/metrics/postToDiscord';
 import { joinSpace } from '@root/lib/spaces/joinSpace';
 
 import { trackUserActionOp } from '../metrics/mixpanel/trackUserActionOp';
+import { updateTrackOpUserProfile } from '../metrics/mixpanel/updateTrackOpUserProfile';
+import { getUserProfile } from '../users/getUser';
 
 import { validateInviteLink } from './validateInviteLink';
 
@@ -80,17 +82,11 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
   ]);
 
   if (invite.space.domain === 'op-grants') {
-    const user = await prisma.user.findUniqueOrThrow({
-      where: {
-        id: userId
-      },
-      select: {
-        identityType: true
-      }
-    });
+    const user = await getUserProfile('id', userId);
     trackUserActionOp('successful_signup', {
       userId,
       signinMethod: user.identityType
     });
+    await updateTrackOpUserProfile(user);
   }
 }
