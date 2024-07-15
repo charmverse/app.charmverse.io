@@ -171,7 +171,8 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
 
   if (spaceDomain !== 'op-grants') {
     trackUserActionOp('publish_proposal', {
-      proposalId
+      proposalId,
+      userId
     });
   }
 

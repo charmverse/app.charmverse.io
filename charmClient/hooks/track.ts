@@ -40,7 +40,7 @@ export function useTrackPageView(page: Omit<PageEventMap['page_view'], 'spaceId'
   }, [currentSpace?.id]);
 }
 
-export function useTrackOpPageView(page: ViewOpPageEvent) {
+export function useTrackOpPageView(page: Omit<ViewOpPageEvent, 'userId'>) {
   const { space: currentSpace } = useCurrentSpace();
   useEffect(() => {
     if (currentSpace?.domain !== 'op-grants') {
