@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { POST } from '@root/adapters/http';
-
-import type { FarcasterUserWithProfile } from 'lib/farcaster/loginWithFarcaster';
-import { isTruthy } from 'lib/utils/types';
+import type { FarcasterUserWithProfile } from '@root/lib/farcaster/loginWithFarcaster';
+import { isTruthy } from '@root/lib/utils/types';
 
 import { mapProjectToOptimism } from './mapProjectToOptimism';
 

@@ -19,11 +19,7 @@ async function query() {
 
   const result = await prisma.user.findFirst({
     where: {
-      verifiedEmails: {
-        some: {
-          email: 'atandadave@gmail.com'
-        }
-      }
+      username: 'xandradozet.eth'
     },
     select: {
       id: true,

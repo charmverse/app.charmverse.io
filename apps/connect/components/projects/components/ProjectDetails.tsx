@@ -1,4 +1,4 @@
-import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import EditIcon from '@mui/icons-material/Edit';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
