@@ -1,7 +1,6 @@
 import type { UrlObject } from 'url';
 
 import { log } from '@charmverse/core/log';
-import { space } from '@lens-protocol/metadata/*';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';

@@ -1,3 +1,4 @@
+import { trackOpSpaceSuccessfulSigninEvent } from '@root/lib/metrics/mixpanel/trackOpSpaceSigninEvent';
 import type { LoggedInUser } from '@root/models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -32,6 +33,10 @@ async function connectAccountWithGoogleCodeHandler(
       req.session.otpUser = { id: loggedInUser.id, method: 'Google' };
       await req.session.save();
 
+      await trackOpSpaceSuccessfulSigninEvent({
+        userId: loggedInUser.id,
+        identityType: 'Google'
+      });
       return res.status(200).json({ otpRequired: true });
     }
   } else if (type === 'connect') {

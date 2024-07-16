@@ -18,6 +18,7 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
   const path = usePathname();
   const router = useRouter();
   const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
+
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const handleOpenUserMenu = (event: MouseEvent<HTMLElement>) => {

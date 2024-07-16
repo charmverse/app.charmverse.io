@@ -1,5 +1,4 @@
 import type { Page } from '@playwright/test';
-
 import { baseUrl } from '@root/config/constants';
 
 export function login({ page, userId }: { userId: string; page: Page }) {

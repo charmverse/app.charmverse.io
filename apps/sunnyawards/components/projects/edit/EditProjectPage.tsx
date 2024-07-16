@@ -1,9 +1,11 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import type { FarcasterProfileInfo } from '@root/lib/farcaster/loginWithFarcaster';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -14,7 +16,6 @@ import type { LoggedInUser } from 'lib/profile/getCurrentUserAction';
 import { editProjectAction } from 'lib/projects/editProjectAction';
 import { schema } from 'lib/projects/form';
 import type { FormValues, ProjectCategory } from 'lib/projects/form';
-import type { ConnectProjectDetails } from 'lib/projects/getProject';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
@@ -124,13 +125,16 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           }}
           isExecuting={isExecuting}
           // Skip the first member which is the team lead
-          initialFarcasterProfiles={project.projectMembers.slice(1).map((member) => ({
-            bio: member.farcasterUser.bio,
-            displayName: member.farcasterUser.displayName,
-            fid: member.farcasterUser.fid,
-            pfpUrl: member.farcasterUser.pfpUrl,
-            username: member.farcasterUser.username
-          }))}
+          initialFarcasterProfiles={project.projectMembers.slice(1).map(
+            (member) =>
+              ({
+                bio: member.farcasterUser.bio,
+                displayName: member.farcasterUser.displayName,
+                fid: member.farcasterUser.fid,
+                pfpUrl: member.farcasterUser.pfpUrl,
+                username: member.farcasterUser.username
+              } as any)
+          )}
         />
       </Box>
     </PageWrapper>

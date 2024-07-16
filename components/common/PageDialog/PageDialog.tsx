@@ -7,6 +7,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef } from 'react';
 
+import charmClient from 'charmClient/charmClient';
 import { trackPageView } from 'charmClient/hooks/track';
 import { DocumentPage } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
@@ -74,6 +75,13 @@ function PageDialogBase(props: Props) {
         spaceDomain: domain,
         spaceCustomDomain: space.customDomain
       });
+      if (space.domain === 'op-grants') {
+        charmClient.track.trackActionOp('page_view', {
+          type: page.type,
+          path: page.path,
+          url: window.location.href
+        });
+      }
     }
   }, [page?.id, space?.customDomain]);
 

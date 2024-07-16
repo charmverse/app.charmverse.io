@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTestEnv } from '@root/config/constants';
 import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
 import { getDiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
 import { getDiscordCallbackUrl } from '@root/lib/discord/getDiscordCallbackUrl';
@@ -13,6 +12,8 @@ import { postUserCreate } from '@root/lib/users/postUserCreate';
 import { DisabledAccountError } from '@root/lib/utils/errors';
 import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
+
+import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
 
 type LoginWithDiscord = {
   code: string;
@@ -51,6 +52,11 @@ export async function loginByDiscord({
     if (discordUser.user.deletedAt) {
       throw new DisabledAccountError();
     }
+
+    await trackOpSpaceClickSigninEvent({
+      userId: discordUser.user.id,
+      identityType: 'Discord'
+    });
 
     trackUserAction('sign_in', { userId: discordUser.user.id, identityType: 'Discord' });
     return discordUser.user;

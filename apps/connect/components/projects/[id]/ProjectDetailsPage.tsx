@@ -2,7 +2,7 @@ import 'server-only';
 
 import { FarcasterCard } from '@connect/components/common/FarcasterCard';
 import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
-import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import { Divider, Stack, Typography } from '@mui/material';
 
 import { PageWrapper } from '../../common/PageWrapper';
@@ -23,7 +23,7 @@ export async function ProjectDetailsPage({ project }: { project: ConnectProjectD
       <Stack gap={1}>
         {project.projectMembers.map((member) => (
           <FarcasterCard
-            fid={member.farcasterUser.fid}
+            fid={parseInt(member.farcasterUser.fid.toString())}
             key={member.farcasterUser.fid}
             name={member.farcasterUser.displayName}
             username={member.farcasterUser.username}

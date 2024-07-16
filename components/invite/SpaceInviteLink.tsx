@@ -27,6 +27,11 @@ export default function InvitationPage({ invite, space }: Props) {
   const [isBannedFromSpace, setIsBannedFromSpace] = useState(false);
   async function joinSpace() {
     try {
+      if (space.domain === 'op-grants' && user) {
+        charmClient.track.trackActionOp('click_signup', {
+          signinMethod: user.identityType
+        });
+      }
       await charmClient.acceptInvite({ id: invite.id });
 
       let redirectUrl = getSpaceUrl(space);

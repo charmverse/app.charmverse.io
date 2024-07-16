@@ -3,8 +3,14 @@ import type { MixpanelEvent, MixpanelEventName, MixpanelTrackBase } from '@root/
 import type { PageEventMap } from '@root/lib/metrics/mixpanel/interfaces/PageEvent';
 import type { UserEventMap } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
 
+import type { MixpanelOpEvent, MixpanelOpEventName } from './mixpanel/opEvents';
+
 export type EventInput<T = MixpanelEvent> = T & {
   event: MixpanelEventName;
+} & Partial<MixpanelTrackBase>;
+
+export type OpEventInput<T = MixpanelOpEvent> = T & {
+  event: MixpanelOpEventName;
 } & Partial<MixpanelTrackBase>;
 
 /*

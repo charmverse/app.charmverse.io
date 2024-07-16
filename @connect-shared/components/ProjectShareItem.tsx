@@ -1,4 +1,4 @@
-import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 
 export function ProjectShareItem({ project }: { project: NonNullable<ConnectProjectDetails> }) {
   const projectMembers = project.projectMembers;

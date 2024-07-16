@@ -1,15 +1,14 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
+import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
+import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
 
 import { authActionClient } from 'lib/actions/actionClient';
 
-import { storeProjectMetadataAndPublishOptimismAttestation } from '../attestations/storeProjectMetadataAndPublishOptimismAttestation';
-
 import { createConnectProject } from './createConnectProject';
 import { schema } from './form';
-import { generateOgImage } from './generateOgImage';
 
 export const createProjectAction = authActionClient
   .metadata({ actionName: 'create-project' })

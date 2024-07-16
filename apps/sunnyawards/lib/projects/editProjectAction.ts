@@ -1,15 +1,15 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
+import { storeUpdatedProjectMetadataAttestation } from '@connect-shared/lib/attestations/storeUpdatedProjectMetadataAttestation';
+import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { revalidatePath } from 'next/cache';
 
 import { authActionClient } from 'lib/actions/actionClient';
 
-import { storeUpdatedProjectMetadataAttestation } from '../attestations/storeUpdatedProjectMetadataAttestation';
 import type { FormValues } from '../projects/form';
 import { schema } from '../projects/form';
-import { generateOgImage } from '../projects/generateOgImage';
 
 import { editConnectProject } from './editConnectProject';
 
