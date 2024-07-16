@@ -205,3 +205,7 @@ describe('loadAndGenerateCsv()', () => {
     expect(firstRow).toContain('first guy,second guy');
   });
 });
+
+describe('generateTableArray()', () => {
+  it('should return a table array with correct properties and filters applied', async () => {});
+});
