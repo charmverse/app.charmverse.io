@@ -18,6 +18,8 @@ import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from '@
 
 import { Utils } from 'components/common/DatabaseEditor/utils';
 
+import { prettyPrint } from '../utils/strings';
+
 import { Constants } from './constants';
 
 class CardFilter {
@@ -32,7 +34,14 @@ class CardFilter {
       : [...templates, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
 
     return cards
-      .map((card) => {
+      .map((card, index) => {
+        if (index < 3) {
+          prettyPrint({
+            index,
+            card
+          });
+        }
+
         const cardMeetsFilter = this.isFilterGroupMet(filterGroup, cardProperties, card);
 
         // Return the card along with all subPages that meet the filter
