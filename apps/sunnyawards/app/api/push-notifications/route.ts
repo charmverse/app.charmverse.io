@@ -9,7 +9,11 @@ import { initWebPush } from 'lib/pwa/initWebPush';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(_: Request) {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const title = searchParams.get('title');
+  const body = searchParams.get('body');
+
   initWebPush();
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
   const userId = session.user?.id || undefined;
@@ -23,8 +27,8 @@ export async function GET(_: Request) {
 
     subscriptions.forEach((s) => {
       const payload = JSON.stringify({
-        title: 'WebPush Notification!',
-        body: 'Hello World'
+        title: title || 'WebPush Notification!',
+        body: body || 'Hello World'
       });
       webpush.sendNotification(s.subscription as any, payload);
     });
