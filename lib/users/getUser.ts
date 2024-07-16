@@ -1,9 +1,8 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { sessionUserRelations } from 'lib/session/config';
-import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { InvalidInputError, MissingDataError } from '@root/lib/utils/errors';
+import type { LoggedInUser } from '@root/models';
 
 export async function getUserProfile(
   key: 'id' | 'addresses',

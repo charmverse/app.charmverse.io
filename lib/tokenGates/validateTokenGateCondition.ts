@@ -1,9 +1,8 @@
+import { getPoapsFromAddress } from '@root/lib/blockchain/poaps';
+import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { getGitcoinPassportScore } from '@root/lib/credentials/getGitcoinCredentialsByWallets';
+import { getUserMemberships } from '@root/lib/guild-xyz/getUserMemberships';
 import { formatUnits, getAddress, parseEther, parseAbi } from 'viem';
-
-import { getPoapsFromAddress } from 'lib/blockchain/poaps';
-import { getPublicClient } from 'lib/blockchain/publicClient';
-import { getGitcoinPassportScore } from 'lib/credentials/getGitcoinCredentialsByWallets';
-import { getUserMemberships } from 'lib/guild-xyz/getUserMemberships';
 
 import { erc1155Abi, ercAbi, hatsProtocolAbi, molochDaoAbi } from './abis/abis';
 import { subscriptionTokenV1ABI } from './hypersub/abi';

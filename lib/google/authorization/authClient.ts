@@ -1,10 +1,9 @@
 import { log } from '@charmverse/core/log';
-import { OAuth2Client } from 'google-auth-library';
-
 import {
   googleOAuthClientIdSensitive as googleOAuthClientId,
   googleOAuthClientSecretSensitive as googleOAuthClientSecret
-} from 'config/constants';
+} from '@root/config/constants';
+import { OAuth2Client } from 'google-auth-library';
 
 export type GoogleLoginOauthParams = {
   redirectUri?: string;

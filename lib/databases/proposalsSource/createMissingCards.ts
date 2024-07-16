@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { applyPageToBlock } from 'lib/databases/block';
-import { createCardPage } from 'lib/pages/createCardPage';
+import { applyPageToBlock } from '@root/lib/databases/block';
+import { createCardPage } from '@root/lib/pages/createCardPage';
 
 import type { BlockWithDetails } from '../block';
 

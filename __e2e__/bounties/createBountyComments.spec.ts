@@ -7,7 +7,7 @@
 // import { createUserAndSpace } from '__e2e__/utils/mocks';
 // import { login } from '__e2e__/utils/session';
 
-// import { baseUrl } from 'config/constants';
+// import { baseUrl } from '@root/config/constants';
 // import { createApplication } from 'lib/applications/actions';
 // import { createBounty } from 'lib/bounties';
 // import { generateSpaceUser } from 'testing/setupDatabase';

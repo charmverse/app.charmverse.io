@@ -1,11 +1,10 @@
 import type { ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { getENSName } from 'lib/blockchain';
-import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
-import { shortWalletAddress } from 'lib/utils/blockchain';
-import { uid } from 'lib/utils/strings';
+import { getENSName } from '@root/lib/blockchain';
+import { isProfilePathAvailable } from '@root/lib/profile/isProfilePathAvailable';
+import { shortWalletAddress } from '@root/lib/utils/blockchain';
+import { uid } from '@root/lib/utils/strings';
 
 import type { ProjectAndMembersPayload } from './interfaces';
 

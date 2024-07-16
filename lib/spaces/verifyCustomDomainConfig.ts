@@ -2,11 +2,10 @@ import dns from 'dns/promises';
 
 import { getLogger } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCertificateDetails, requestCertificateForDomain } from '@root/lib/aws/ACM';
+import { addCertificateToListener, hasCertificateAdded } from '@root/lib/aws/ELB';
+import type { CustomDomainVerification } from '@root/lib/spaces/interfaces';
 import { request, Agent } from 'undici';
-
-import { getCertificateDetails, requestCertificateForDomain } from 'lib/aws/ACM';
-import { addCertificateToListener, hasCertificateAdded } from 'lib/aws/ELB';
-import type { CustomDomainVerification } from 'lib/spaces/interfaces';
 
 const log = getLogger('ELB');
 

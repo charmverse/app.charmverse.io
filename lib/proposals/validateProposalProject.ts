@@ -1,11 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma } from '@charmverse/core/prisma';
-
-import type { FormFieldInput, FormFieldValue } from 'lib/forms/interfaces';
-import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
-import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
-import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import type { ProjectWithMembers } from 'lib/projects/interfaces';
+import type { FormFieldInput, FormFieldValue } from '@root/lib/forms/interfaces';
+import { convertToProjectValues } from '@root/lib/projects/convertToProjectValues';
+import { createProjectYupSchema } from '@root/lib/projects/createProjectYupSchema';
+import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
+import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
 
 export function validateProposalProject({
   formFields,
@@ -33,7 +32,13 @@ export function validateProposalProject({
 
   if (typeof projectFieldAnswer === 'object' && 'selectedMemberIds' in projectFieldAnswer) {
     const selectedMemberIds = projectFieldAnswer.selectedMemberIds;
-    projectMembers = project.projectMembers.filter((member) => !member.teamLead);
+    // get team lead
+    const teamLead = project.projectMembers.find((member) => member.teamLead);
+    if (!teamLead) {
+      throw new InvalidInputError(`Team lead not found in project`);
+    }
+    // team lead is always included
+    projectMembers = [teamLead];
     for (const memberId of selectedMemberIds) {
       const member = project.projectMembers.find((m) => m.id === memberId);
       if (!member) {

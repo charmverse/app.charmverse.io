@@ -1,7 +1,6 @@
 import type { Post, PostUpDownVote } from '@charmverse/core/prisma';
-
-import { extractSummary } from 'lib/prosemirror/extractSummary';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import { extractSummary } from '@root/lib/prosemirror/extractSummary';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 
 import type { ForumPostVotes } from './interfaces';
 

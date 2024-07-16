@@ -1,4 +1,4 @@
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 
 export type FarcasterProfile = {
   body: {

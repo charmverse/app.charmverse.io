@@ -171,6 +171,18 @@ export function RubricEvaluationPropertiesList({
                 label='Step Average'
               />
               <PropertySelector
+                isChecked={rubricEvaluationProperties.includes('reviewerAverage')}
+                onClick={() => {
+                  updateRubricEvaluationProperties(
+                    rubricEvaluation.id,
+                    rubricEvaluationProperties.includes('reviewerAverage')
+                      ? rubricEvaluationProperties.filter((property) => property !== 'reviewerAverage')
+                      : [...rubricEvaluationProperties, 'reviewerAverage']
+                  );
+                }}
+                label='Step Reviewer Average'
+              />
+              <PropertySelector
                 isChecked={rubricEvaluationProperties.includes('total')}
                 onClick={() => {
                   updateRubricEvaluationProperties(

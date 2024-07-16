@@ -3,8 +3,7 @@ import type { SpaceResourcesRequest } from '@charmverse/core/permissions';
 import type { FormField, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
 
 export type ProposalTemplateMeta = {
   pageId: string;

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { deleteArchivalBlockCounts } from '@root/lib/spaces/deleteArchivalBlockCounts';
 
-import { deleteArchivalBlockCounts } from 'lib/spaces/deleteArchivalBlockCounts';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('deleteArchivalBlockCounts', () => {

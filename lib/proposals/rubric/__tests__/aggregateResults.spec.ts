@@ -1,5 +1,5 @@
-import type { AggregateResults } from 'lib/proposals/rubric/aggregateResults';
-import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
+import type { AggregateResults } from '@root/lib/proposals/rubric/aggregateResults';
+import { aggregateResults } from '@root/lib/proposals/rubric/aggregateResults';
 
 const firstUserId = '1';
 

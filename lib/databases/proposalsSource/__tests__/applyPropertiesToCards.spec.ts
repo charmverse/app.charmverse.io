@@ -1,9 +1,9 @@
 import type { FormField, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { prismaToBlock } from '@root/lib/databases/block';
+import type { Board, IPropertyTemplate } from '@root/lib/databases/board';
 
-import { prismaToBlock } from 'lib/databases/block';
-import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import { generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalSourceDb } from 'testing/utils/proposals';
 

@@ -1,5 +1,6 @@
+import { projectFieldProperties, projectMemberFieldProperties } from '@root/lib/projects/formField';
+
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 import type { ProposalTemplateMeta } from 'lib/proposals/getProposalTemplates';
 
 import type { Board } from '../board';
@@ -43,6 +44,7 @@ export function createSelectedPropertiesStateFromBoardProperties({
       property.type === 'proposalEvaluatedBy' ||
       property.type === 'proposalEvaluationTotal' ||
       property.type === 'proposalEvaluationAverage' ||
+      property.type === 'proposalEvaluationReviewerAverage' ||
       property.type === 'proposalRubricCriteriaTotal' ||
       property.type === 'proposalRubricCriteriaAverage' ||
       property.type === 'proposalRubricCriteriaReviewerScore' ||
@@ -81,6 +83,8 @@ export function createSelectedPropertiesStateFromBoardProperties({
             rubricEvaluationProperty.properties.push('reviewerScore');
           } else if (property.type === 'proposalRubricCriteriaReviewerComment') {
             rubricEvaluationProperty.properties.push('reviewerComment');
+          } else if (property.type === 'proposalEvaluationReviewerAverage') {
+            rubricEvaluationProperty.properties.push('reviewerAverage');
           }
         }
       }

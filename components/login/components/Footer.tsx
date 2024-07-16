@@ -7,9 +7,9 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
+import { charmverseDiscordInvite } from '@root/config/constants';
 import { FaXTwitter } from 'react-icons/fa6';
 
-import { charmverseDiscordInvite } from 'config/constants';
 import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
 import DiscordIcon from 'public/images/logos/discord_logo.svg';
 

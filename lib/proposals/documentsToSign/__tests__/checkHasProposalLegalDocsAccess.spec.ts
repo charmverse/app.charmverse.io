@@ -1,12 +1,11 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser, testUtilsMembers, testUtilsProposals } from '@charmverse/core/test';
+import { updateAllowedDocusignRolesAndUsers } from '@root/lib/docusign/allowedDocusignRolesAndUsers';
+import { canAccessDocusign } from '@root/lib/docusign/canAccessDocusign';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import { use } from 'react';
 import { v4 as uuid } from 'uuid';
-
-import { updateAllowedDocusignRolesAndUsers } from 'lib/docusign/allowedDocusignRolesAndUsers';
-import { canAccessDocusign } from 'lib/docusign/canAccessDocusign';
-import { permissionsApiClient } from 'lib/permissions/api/client';
 
 import { checkHasProposalLegalDocsAccess } from '../checkHasProposalLegalDocsAccess';
 

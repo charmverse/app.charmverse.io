@@ -1,4 +1,4 @@
-import type { ProfileProposalEvent, ProfileVoteEvent, CommunityDetails } from 'lib/profile/interfaces';
+import type { ProfileProposalEvent, ProfileVoteEvent, CommunityDetails } from '@root/lib/profile/interfaces';
 
 import type { UserCommunity } from './interfaces';
 

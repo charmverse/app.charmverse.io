@@ -1,8 +1,7 @@
+import { validateTokenGateConditionsObject } from '@root/lib/tokenGates/validateTokenGateConditionsObject';
 import type { NextApiRequest } from 'next';
 import type { NextHandler } from 'next-connect';
 import type { Schema } from 'yup';
-
-import { validateTokenGateConditionsObject } from 'lib/tokenGates/validateTokenGateConditionsObject';
 
 import { UnknownError } from './errors';
 

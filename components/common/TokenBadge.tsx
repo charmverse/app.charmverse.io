@@ -1,5 +1,5 @@
 import { Box, Stack } from '@mui/material';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';

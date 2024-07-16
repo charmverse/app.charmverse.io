@@ -1,4 +1,4 @@
-import { sortArrayByObjectProperty } from 'lib/utils/array';
+import { sortArrayByObjectProperty } from '@root/lib/utils/array';
 
 import type { FeatureJson, MappedFeature, FeatureMap } from './constants';
 import { STATIC_PAGES } from './constants';

@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { googleWebClientConfig } from 'config/constants';
+import { googleWebClientConfig } from '@root/config/constants';
 import { useUser } from 'hooks/useUser';
 import { getAppUrl } from 'lib/utils/browser';
 import { InvalidInputError } from 'lib/utils/errors';

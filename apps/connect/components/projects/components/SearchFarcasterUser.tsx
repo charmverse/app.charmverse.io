@@ -1,4 +1,4 @@
-import { connectApiClient } from '@connect/apiClient/apiClient';
+import { ConnectApiClient } from '@connect/apiClient/apiClient';
 import { Avatar } from '@connect/components/common/Avatar';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { BoxProps } from '@mui/material';
@@ -10,26 +10,31 @@ import { useEffect, useMemo, useState } from 'react';
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
 export function SearchFarcasterUser({
-  setSelectedProfile
+  setSelectedProfile,
+  filteredFarcasterIds = []
 }: {
+  filteredFarcasterIds?: number[];
   setSelectedProfile: (profile: FarcasterProfile | null) => void;
 }) {
   const [farcasterProfiles, setFarcasterProfiles] = useState<FarcasterProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((_searchTerm: string) => {
+      const connectApiClient = new ConnectApiClient();
       connectApiClient
         .getFarcasterUsersByUsername(_searchTerm)
         .then((_farcasterProfiles) => {
           if (_farcasterProfiles.length) {
             setFarcasterProfiles(
-              _farcasterProfiles.map((profile) => ({
-                fid: profile.fid,
-                pfpUrl: profile.pfp_url,
-                bio: profile.profile.bio.text,
-                displayName: profile.display_name,
-                username: profile.username
-              }))
+              _farcasterProfiles
+                .filter((profile) => !filteredFarcasterIds?.includes(profile.fid))
+                .map((profile) => ({
+                  fid: profile.fid,
+                  pfpUrl: profile.pfp_url,
+                  bio: profile.profile.bio.text,
+                  displayName: profile.display_name,
+                  username: profile.username
+                }))
             );
           }
         })

@@ -1,11 +1,11 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateDefaultPropertiesInput } from '@root/lib/members/generateDefaultPropertiesInput';
+import { DuplicateDataError, InvalidInputError } from '@root/lib/utils/errors';
+import { typedKeys } from '@root/lib/utils/objects';
+import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
-import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
-import { DuplicateDataError, InvalidInputError } from 'lib/utils/errors';
-import { typedKeys } from 'lib/utils/objects';
-import { uid } from 'lib/utils/strings';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { UpdateableSpaceFields } from '../updateSpace';

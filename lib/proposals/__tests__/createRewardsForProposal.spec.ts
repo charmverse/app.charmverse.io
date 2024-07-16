@@ -1,9 +1,9 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { createRewardsForProposal } from '@root/lib/proposals/createRewardsForProposal';
 import { v4 as uuid } from 'uuid';
 
-import { createRewardsForProposal } from 'lib/proposals/createRewardsForProposal';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { createProposal } from '../createProposal';

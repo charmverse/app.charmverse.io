@@ -25,7 +25,8 @@ export type RubricEvaluationProperty =
   | 'criteriaTotal'
   | 'reviewerScore'
   | 'reviewerComment'
-  | 'criteriaAverage';
+  | 'criteriaAverage'
+  | 'reviewerAverage';
 
 export type SelectedProposalProperties = {
   projectMember: string[];

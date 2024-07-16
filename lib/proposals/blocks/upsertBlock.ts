@@ -1,8 +1,7 @@
 import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getUpsertBlockInput } from 'lib/databases/customBlocks/getUpsertBlockInput';
-import type { ProposalBlockInput, ProposalBlockUpdateInput } from 'lib/proposals/blocks/interfaces';
+import { getUpsertBlockInput } from '@root/lib/databases/customBlocks/getUpsertBlockInput';
+import type { ProposalBlockInput, ProposalBlockUpdateInput } from '@root/lib/proposals/blocks/interfaces';
 
 export function upsertBlock({
   data,

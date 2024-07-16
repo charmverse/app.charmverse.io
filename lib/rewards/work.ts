@@ -1,11 +1,10 @@
 import type { Application, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { InvalidStateError } from 'lib/middleware';
-import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utils/errors';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
+import { InvalidStateError } from '@root/lib/middleware';
+import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from '@root/lib/utils/errors';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from '@root/lib/webhookPublisher/publishEvent';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
 import { getRewardOrThrow } from './getReward';

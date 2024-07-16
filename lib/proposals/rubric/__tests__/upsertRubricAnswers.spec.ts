@@ -1,9 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { getAnswersTable } from '@root/lib/proposals/rubric/getAnswersTable';
 import { v4 as uuid } from 'uuid';
-
-import { getAnswersTable } from 'lib/proposals/rubric/getAnswersTable';
 
 import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from '../interfaces';
 import { upsertRubricAnswers } from '../upsertRubricAnswers';

@@ -2,13 +2,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { SchemaRegistry } from '@ethereum-attestation-service/eas-sdk';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
+import { typedKeys } from '@root/lib/utils/objects';
 import type { Chain } from 'viem';
 import { createPublicClient, http } from 'viem';
 import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
 import { clientToProvider } from 'hooks/useWeb3Signer';
-import { typedKeys } from 'lib/utils/objects';
 
 import type { EasSchemaChain } from '../connectors';
 import { easConnectors, getOnChainSchemaUrl } from '../connectors';

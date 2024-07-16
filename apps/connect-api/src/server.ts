@@ -2,10 +2,10 @@
 import { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import cors from '@koa/cors';
+import { isProdEnv } from '@root/config/constants';
 import { getIronSession } from 'iron-session';
 import Koa from 'koa';
 
-import { isProdEnv } from 'config/constants';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
 

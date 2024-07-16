@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
+import type { UpdateMemberPropertyValuePayload } from '@root/lib/members/interfaces';
 
 type UpdatePropertyInput = {
   data: UpdateMemberPropertyValuePayload;

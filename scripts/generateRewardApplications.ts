@@ -1,5 +1,5 @@
 import { ApplicationStatus, prisma } from '@charmverse/core/prisma-client';
-import { isStagingEnv, isTestEnv } from 'config/constants';
+import { isStagingEnv, isTestEnv } from '@root/config/constants';
 import { testUtilsUser } from '@charmverse/core/test';
 import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 import { stringUtils } from '@charmverse/core/utilities';

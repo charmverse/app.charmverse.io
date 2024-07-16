@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import * as summonProfile from '@root/lib/profile/getSummonProfile';
+import { TENANT_URLS } from '@root/lib/summon/constants';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import { v4 } from 'uuid';
 
-import * as summonProfile from 'lib/profile/getSummonProfile';
-import { TENANT_URLS } from 'lib/summon/constants';
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 

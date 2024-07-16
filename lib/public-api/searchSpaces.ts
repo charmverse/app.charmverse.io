@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { SpaceApiResponse } from 'lib/public-api/interfaces';
+import type { SpaceApiResponse } from '@root/lib/public-api/interfaces';
 
 import { mapSpace } from './createWorkspaceApi';
 

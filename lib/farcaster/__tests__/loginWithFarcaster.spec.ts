@@ -1,14 +1,14 @@
-import { DisabledAccountError, ExternalServiceError, InvalidInputError } from '@charmverse/core/errors';
+import { DisabledAccountError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { verifySignInMessage } from '@farcaster/auth-kit';
+import { verifySignInMessage } from '@farcaster/auth-client';
+import { InvalidStateError } from '@root/lib/middleware';
 
-import { InvalidStateError } from 'lib/middleware';
 import { generateFarcasterUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { LoginWithFarcasterParams } from '../loginWithFarcaster';
 import { loginWithFarcaster } from '../loginWithFarcaster';
 
-jest.mock('@farcaster/auth-kit', () => ({
+jest.mock('@farcaster/auth-client', () => ({
   verifySignInMessage: jest.fn().mockResolvedValue({ success: true }),
   viemConnector: jest.fn().mockReturnValue({ rpcUrls: ['http://localhost:8545'] }),
   createAppClient: jest.fn().mockReturnValue({})

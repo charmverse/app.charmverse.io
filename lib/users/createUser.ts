@@ -1,18 +1,17 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getENSName } from '@root/lib/blockchain/getENSName';
+import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
+import { logSignupViaWallet } from '@root/lib/metrics/postToDiscord';
+import { isProfilePathAvailable } from '@root/lib/profile/isProfilePathAvailable';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { shortWalletAddress } from '@root/lib/utils/blockchain';
+import { uid } from '@root/lib/utils/strings';
+import type { LoggedInUser } from '@root/models';
 import { v4 } from 'uuid';
 
-import { getENSName } from 'lib/blockchain/getENSName';
-import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
-import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
-import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
-import { sessionUserRelations } from 'lib/session/config';
-import { postUserCreate } from 'lib/users/postUserCreate';
-import { shortWalletAddress } from 'lib/utils/blockchain';
-import { uid } from 'lib/utils/strings';
-import type { LoggedInUser } from 'models';
-
 import { getUserProfile } from './getUser';
+import { postUserCreate } from './postUserCreate';
 import { prepopulateUserProfile } from './prepopulateUserProfile';
 
 type UserProps = { address: string; email?: string; id?: string; avatar?: string; skipTracking?: boolean };

@@ -1,10 +1,10 @@
 import { useTheme } from '@emotion/react';
+import { charmverseDiscordInvite, isProdEnv } from '@root/config/constants';
 import type { GetStaticProps, InferGetStaticPropsType } from 'next';
 import dynamic from 'next/dynamic';
 import { createSwaggerSpec } from 'next-swagger-doc';
 import { useEffect } from 'react';
 
-import { charmverseDiscordInvite, isProdEnv } from 'config/constants';
 import { useColorMode } from 'context/darkMode';
 
 import 'swagger-ui-react/swagger-ui.css';

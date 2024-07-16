@@ -1,7 +1,7 @@
 import type { StatusAPIResponse as FarcasterPayload } from '@farcaster/auth-kit';
 import type { Frame } from 'frames.js';
 
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import type { FrameActionRequest, FrameActionResponse } from 'pages/api/farcaster/frame-action';
 import type { FarcasterSignerResponse } from 'pages/api/farcaster/signer';
 

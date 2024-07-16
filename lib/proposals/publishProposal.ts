@@ -1,9 +1,8 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getCurrentStep } from 'lib/proposals/getCurrentStep';
-import type { ProposalFields } from 'lib/proposals/interfaces';
-import { relay } from 'lib/websockets/relay';
+import { getCurrentStep } from '@root/lib/proposals/getCurrentStep';
+import type { ProposalFields } from '@root/lib/proposals/interfaces';
+import { relay } from '@root/lib/websockets/relay';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import { getVoteEvaluationStepsWithBlockNumber } from './getVoteEvaluationStepsWithBlockNumber';

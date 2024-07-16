@@ -2,7 +2,7 @@ import type { MemberProperty, Space } from '@charmverse/core/prisma';
 import request from 'supertest';
 
 import type { PropertyValue } from 'lib/members/interfaces';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateMemberProperty, generateMemberPropertyValue } from 'testing/utils/members';

@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
+import type { DiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
 
 import { findUserByIdentity, getUserSummonProfile } from './api';
 import { TENANT_URLS } from './constants';

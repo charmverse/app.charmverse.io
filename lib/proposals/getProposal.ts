@@ -2,10 +2,9 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-
-import { getProposalOrApplicationCredentials } from 'lib/credentials/getProposalOrApplicationCredentials';
-import type { permissionsApiClient } from 'lib/permissions/api/client';
-import { projectInclude } from 'lib/projects/constants';
+import { getProposalOrApplicationCredentials } from '@root/lib/credentials/getProposalOrApplicationCredentials';
+import type { permissionsApiClient } from '@root/lib/permissions/api/client';
+import { projectInclude } from '@root/lib/projects/constants';
 
 import type { ProposalWithUsersAndRubric } from './interfaces';
 import { mapDbProposalToProposal } from './mapDbProposalToProposal';

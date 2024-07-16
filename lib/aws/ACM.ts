@@ -1,9 +1,8 @@
 import type { ACMClientConfig } from '@aws-sdk/client-acm';
 import { ACM } from '@aws-sdk/client-acm';
 import { getLogger } from '@charmverse/core/log';
-
-import type { DomainCertificateDetails } from 'lib/aws/interfaces';
-import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';
+import type { DomainCertificateDetails } from '@root/lib/aws/interfaces';
+import { isValidDomainName } from '@root/lib/utils/domains/isValidDomainName';
 
 import { AWS_REGION } from './config';
 

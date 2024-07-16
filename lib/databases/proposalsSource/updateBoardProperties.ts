@@ -1,11 +1,11 @@
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { IPropertyTemplate, BoardFields } from '@root/lib/databases/board';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import { InvalidStateError } from '@root/lib/middleware/errors';
+import { DEFAULT_BOARD_BLOCK_ID } from '@root/lib/proposals/blocks/constants';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
-import type { FormFieldInput } from 'lib/forms/interfaces';
-import { InvalidStateError } from 'lib/middleware/errors';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
 import { getBoardProperties } from './getBoardProperties';
 

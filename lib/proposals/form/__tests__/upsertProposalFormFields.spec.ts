@@ -2,11 +2,10 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { FormField, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { createForm } from '@root/lib/forms/createForm';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import { upsertProposalFormFields } from '@root/lib/proposals/form/upsertProposalFormFields';
 import { v4 } from 'uuid';
-
-import { createForm } from 'lib/forms/createForm';
-import type { FormFieldInput } from 'lib/forms/interfaces';
-import { upsertProposalFormFields } from 'lib/proposals/form/upsertProposalFormFields';
 
 const numberFieldInput: FormFieldInput = {
   id: v4(),

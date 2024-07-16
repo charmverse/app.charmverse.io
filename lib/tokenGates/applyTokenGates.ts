@@ -1,19 +1,18 @@
 import type { Role, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 } from 'uuid';
-
-import { applyDiscordGate } from 'lib/discord/collabland/applyDiscordGate';
-import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
-import { updateUserTokenGates } from 'lib/tokenGates/updateUserTokenGates';
+import { applyDiscordGate } from '@root/lib/discord/collabland/applyDiscordGate';
+import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfileById } from '@root/lib/metrics/mixpanel/updateTrackUserProfileById';
+import { updateUserTokenGates } from '@root/lib/tokenGates/updateUserTokenGates';
 import {
   DataNotFoundError,
   InsecureOperationError,
   InvalidInputError,
   UnauthorisedActionError
-} from 'lib/utils/errors';
-import { isTruthy } from 'lib/utils/types';
+} from '@root/lib/utils/errors';
+import { isTruthy } from '@root/lib/utils/types';
+import { v4 } from 'uuid';
 
 import type { TokenGateJoinType } from './interfaces';
 import { verifyTokenGates } from './verifyTokenGates';

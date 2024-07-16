@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getPage } from 'lib/pages/server';
-import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
+import { getPage } from '@root/lib/pages/server';
+import { getMarkdownText } from '@root/lib/prosemirror/getMarkdownText';
 
 import { PageNotFoundError } from './errors';
 import type { UserProfile } from './interfaces';

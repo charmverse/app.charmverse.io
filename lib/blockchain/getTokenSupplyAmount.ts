@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
+import { getTokenMetadata } from '@root/lib/tokens/getTokenMetadata';
 import { ethers } from 'ethers';
-
-import { getTokenMetadata } from 'lib/tokens/getTokenMetadata';
 
 export async function getTokenSupplyAmount({
   chainId,

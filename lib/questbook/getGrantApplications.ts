@@ -1,7 +1,6 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
+import { isTruthy } from '@root/lib/utils/types';
 import { getAddress } from 'viem';
-
-import { isTruthy } from 'lib/utils/types';
 
 import { createGraphqlClient } from './graphql/client';
 import type { ChainId } from './graphql/endpoints';

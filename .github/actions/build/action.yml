@@ -7,9 +7,6 @@ inputs:
   REACT_APP_APP_ENV:
     description: '...'
     required: false
-  NEXT_PUBLIC_CONNECT_API_HOST:
-    description: '...'
-    required: false
 
 runs:
   using: 'composite'
@@ -41,8 +38,6 @@ runs:
     - name: Build Connect App
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
-      env:
-        NEXT_PUBLIC_CONNECT_API_HOST: ${{ inputs.NEXT_PUBLIC_CONNECT_API_HOST }}
       run: |
         npm run connect:build
 
@@ -51,6 +46,12 @@ runs:
       if: steps.restore_build.outputs.cache-hit != 'true'
       run: |
         npm run connect-api:build
+
+    - name: Build Sunny Awards
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      run: |
+        npm run sunnyawards:build
 
     # building cache key takes almost a minute, so we only run this if we are saving the cache
     - name: Cache build

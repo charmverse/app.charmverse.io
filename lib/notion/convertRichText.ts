@@ -1,6 +1,5 @@
 import type { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
-
-import type { TextContent, MentionNode } from 'lib/prosemirror/interfaces';
+import type { TextContent, MentionNode } from '@root/lib/prosemirror/interfaces';
 
 export function convertRichText(richTexts: RichTextItemResponse[]) {
   const contents: (TextContent | MentionNode)[] = [];

@@ -12,11 +12,10 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
+import type { BoardFields } from '@root/lib/databases/board';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
+import { getSpace } from '@root/lib/spaces/getSpace';
 import { v4 as uuid } from 'uuid';
-
-import type { BoardFields } from 'lib/databases/board';
-import type { BoardViewFields } from 'lib/databases/boardView';
-import { getSpace } from 'lib/spaces/getSpace';
 
 import { getImportData } from './getImportData';
 import type { ImportParams } from './interfaces';

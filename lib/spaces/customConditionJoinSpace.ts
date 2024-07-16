@@ -1,7 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-
-import { joinSpace } from 'lib/spaces/joinSpace';
+import { joinSpace } from '@root/lib/spaces/joinSpace';
 
 export type CustomJoinParams = {
   proposalTemplate?: string;

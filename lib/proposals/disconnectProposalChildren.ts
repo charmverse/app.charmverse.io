@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { PageNotFoundError } from 'lib/pages/server';
-import { permissionsApiClient } from 'lib/permissions/api/client';
+import { PageNotFoundError } from '@root/lib/pages/server';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
 
 /**
  * Used for when a proposal has nested pages (mainly because it was a pre february 2023 proposal), or because it was a page converted to proposal

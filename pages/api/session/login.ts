@@ -1,5 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import {
+  trackOpSpaceClickSigninEvent,
+  trackOpSpaceSuccessfulSigninEvent
+} from '@root/lib/metrics/mixpanel/trackOpSpaceSigninEvent';
+import type { LoggedInUser } from '@root/models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -12,7 +17,6 @@ import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DisabledAccountError } from 'lib/utils/errors';
-import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -42,6 +46,11 @@ async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { 
     throw new DisabledAccountError();
   }
 
+  await trackOpSpaceClickSigninEvent({
+    userId: user.id,
+    identityType: 'Wallet'
+  });
+
   await updateGuildRolesForUser(
     user.wallets.map((w) => w.address),
     user.spaceRoles
@@ -60,6 +69,11 @@ async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { 
   await req.session.save();
 
   trackUserAction('sign_in', { userId: user.id, identityType: 'Wallet' });
+
+  await trackOpSpaceSuccessfulSigninEvent({
+    userId: user.id,
+    identityType: 'Wallet'
+  });
 
   log.info(`User ${user.id} logged in with Wallet`, { userId: user.id, method: 'wallet' });
 

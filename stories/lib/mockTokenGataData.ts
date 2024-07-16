@@ -1,5 +1,6 @@
-import type { TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
-import type { AccessControlCondition, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import type { TokenGateEvaluationResult } from '@root/lib/tokenGates/evaluateEligibility';
+import type { AccessControlCondition, TokenGateWithRoles } from '@root/lib/tokenGates/interfaces';
+
 import { createMockTokenGate } from 'testing/mocks/tokenGate';
 
 import { spaces as _spaces, spaceRoles } from '../lib/mockData';

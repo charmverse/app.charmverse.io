@@ -1,13 +1,12 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { getNFT, verifyNFTOwner } from 'lib/blockchain/getNFTs';
-import { sessionUserRelations } from 'lib/session/config';
-import type { UserAvatar } from 'lib/users/interfaces';
-import { InvalidInputError } from 'lib/utils/errors';
-import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
-import type { LoggedInUser } from 'models';
+import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
+import { getNFT, verifyNFTOwner } from '@root/lib/blockchain/getNFTs';
+import { sessionUserRelations } from '@root/lib/session/config';
+import type { UserAvatar } from '@root/lib/users/interfaces';
+import { InvalidInputError } from '@root/lib/utils/errors';
+import { getFilenameWithExtension } from '@root/lib/utils/getFilenameWithExtension';
+import type { LoggedInUser } from '@root/models';
 
 export async function updateProfileAvatar({
   avatar,

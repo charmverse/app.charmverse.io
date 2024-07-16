@@ -1,8 +1,7 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { canAccessDocusign } from 'lib/docusign/canAccessDocusign';
-import { permissionsApiClient } from 'lib/permissions/api/client';
+import { canAccessDocusign } from '@root/lib/docusign/canAccessDocusign';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
 
 export async function checkHasProposalLegalDocsAccess({
   userId,

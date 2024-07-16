@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import type { UserMentionMetadata } from '@root/lib/prosemirror/extractMentions';
+import type { CardPropertyEntity } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
 import {
   getApplicationCommentEntity,

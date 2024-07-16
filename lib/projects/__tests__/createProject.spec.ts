@@ -1,11 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { randomETHWallet } from '@root/lib/utils/blockchain';
 import { v4 } from 'uuid';
 
-import { randomETHWallet } from 'lib/utils/blockchain';
-
-import { createDefaultProjectAndMembersPayload } from '../constants';
+import { createDefaultProject, defaultProjectMember } from '../constants';
 import { createProject } from '../createProject';
 
 describe('createProject', () => {
@@ -13,10 +12,7 @@ describe('createProject', () => {
     const { user } = await testUtilsUser.generateUserAndSpace();
     await expect(
       createProject({
-        project: {
-          ...createDefaultProjectAndMembersPayload(),
-          projectMembers: []
-        },
+        project: createDefaultProject(),
         userId: user.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
@@ -33,8 +29,6 @@ describe('createProject', () => {
     const nonConnectedWalletAddress = randomETHWallet().address.toLowerCase();
     const nonConnectedVerifiedEmail = `${v4()}@gmail.com`;
     const nonConnectedGoogleAccountEmail = `${v4()}@gmail.com`;
-
-    const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
 
     await prisma.user.update({
       where: {
@@ -83,44 +77,38 @@ describe('createProject', () => {
 
     const createdProjectWithMembers = await createProject({
       project: {
-        ...defaultProjectAndMembersPayload,
+        ...createDefaultProject(),
         blog: 'https://blog.com',
         projectMembers: [
           // Project lead
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
+            teamLead: true,
             walletAddress: projectTeamLeadWalletAddress
-          },
+          }),
           // Wallet address connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             walletAddress: walletAddressUserAddress
-          },
+          }),
           // Wallet address not connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             walletAddress: nonConnectedWalletAddress
-          },
+          }),
           // Google account connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: googleAccountUserEmail
-          },
+          }),
           // Google account not connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: nonConnectedGoogleAccountEmail
-          },
+          }),
           // Verified email connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: verifiedEmailUserEmail
-          },
+          }),
           // Verified email not connected with user
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: nonConnectedVerifiedEmail
-          }
+          })
         ]
       },
       userId: projectTeamLead.id

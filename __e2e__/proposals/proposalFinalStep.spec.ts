@@ -5,7 +5,7 @@ import { getCurrentEvaluation, type WorkflowEvaluationJson } from '@charmverse/c
 import { expect, test } from '__e2e__/utils/test';
 import { v4 as uuid } from 'uuid';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 import { createProposal } from 'lib/proposals/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
 

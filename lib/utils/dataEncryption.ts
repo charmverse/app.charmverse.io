@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import { authSecret } from 'config/constants';
+import { authSecret } from '@root/config/constants';
 
 const method = 'aes-256-cbc';
 

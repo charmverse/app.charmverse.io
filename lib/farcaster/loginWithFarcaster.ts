@@ -1,27 +1,41 @@
 import { log } from '@charmverse/core/log';
+import type { FarcasterUser } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-kit';
-import { getChainById } from 'connectors/chains';
+import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
+import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-client';
+import { getChainById } from '@root/connectors/chains';
+import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
+import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { InvalidStateError } from '@root/lib/middleware';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { getUserProfile } from '@root/lib/users/getUser';
+import { postUserCreate } from '@root/lib/users/postUserCreate';
+import { DisabledAccountError, InvalidInputError } from '@root/lib/utils/errors';
+import { uid } from '@root/lib/utils/strings';
+import type { LoggedInUser } from '@root/models';
 import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { InvalidStateError } from 'lib/middleware';
-import { sessionUserRelations } from 'lib/session/config';
-import { getUserProfile } from 'lib/users/getUser';
-import { postUserCreate } from 'lib/users/postUserCreate';
-import { DisabledAccountError, InvalidInputError } from 'lib/utils/errors';
-import { uid } from 'lib/utils/strings';
-import type { LoggedInUser } from 'models';
+import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
 
 const appClient = createAppClient({
   ethereum: viemConnector({
     rpcUrl: getChainById(optimism.id)!.rpcUrls[0]
   })
 });
+
+export type FarcasterProfileInfo = {
+  fid: string | number;
+  username: string;
+  displayName: string;
+  bio: string;
+  pfpUrl: string;
+};
+
+export type FarcasterUserWithProfile = Omit<FarcasterUser, 'account'> & {
+  account: FarcasterProfileInfo;
+};
 
 export type LoginWithFarcasterParams = FarcasterBody &
   Required<Pick<FarcasterBody, 'nonce' | 'message' | 'signature'>> & {
@@ -93,6 +107,11 @@ export async function loginWithFarcaster({
 
     trackUserAction('sign_in', { userId: farcasterUser.user.id, identityType: 'Farcaster' });
 
+    await trackOpSpaceClickSigninEvent({
+      userId: farcasterUser.user.id,
+      identityType: 'Farcaster'
+    });
+
     return getUserProfile('id', farcasterUser.userId);
   }
   const userWithWallet = await prisma.user.findFirst({
@@ -136,7 +155,7 @@ export async function loginWithFarcaster({
         },
         farcasterUser: {
           create: {
-            account: { username, displayName, bio, pfpUrl },
+            account: { username, displayName, bio, pfpUrl, fid },
             fid
           }
         }
@@ -145,6 +164,11 @@ export async function loginWithFarcaster({
     });
 
     trackUserAction('sign_in', { userId: userWithWallet.id, identityType: 'Farcaster' });
+
+    await trackOpSpaceClickSigninEvent({
+      userId: userWithWallet.id,
+      identityType: 'Farcaster'
+    });
 
     return updatedUser;
   }

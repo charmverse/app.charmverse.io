@@ -1,7 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { connectApiClient } from '@connect/apiClient/apiClient';
+import { ConnectApiClient } from '@connect/apiClient/apiClient';
 import { actionRevalidatePath } from '@connect/lib/actions/revalidatePath';
 import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
@@ -18,6 +18,7 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
   const path = usePathname();
   const router = useRouter();
   const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
+
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const handleOpenUserMenu = (event: MouseEvent<HTMLElement>) => {
@@ -29,6 +30,7 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
   };
 
   const handleLogout = async () => {
+    const connectApiClient = new ConnectApiClient();
     await connectApiClient.logout().catch((error) => {
       log.error('There was an error while trying to signout', { error });
     });

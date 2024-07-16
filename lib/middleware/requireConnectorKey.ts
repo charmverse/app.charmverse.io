@@ -1,7 +1,6 @@
+import { ActionNotPermittedError } from '@root/lib/middleware/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
-
-import { ActionNotPermittedError } from 'lib/middleware/errors';
 
 const key = process.env.CONNECTOR_KEY;
 /**

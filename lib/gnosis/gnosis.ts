@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
+import { getChainById, getChainList } from '@root/connectors/chains';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import { RateLimit } from 'async-sema';
-import { getChainById, getChainList } from 'connectors/chains';
 import uniqBy from 'lodash/uniqBy';
 import { getAddress } from 'viem';
 import { mantle, mantleTestnet } from 'viem/chains';

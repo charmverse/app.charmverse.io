@@ -1,5 +1,5 @@
-import type { ProjectField, ProjectAndMembersFieldConfig, ProjectMemberField } from 'lib/projects/formField';
-import type { ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectField, ProjectAndMembersFieldConfig, ProjectMemberField } from '@root/lib/projects/formField';
+import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
 
 export function getProposalProjectFormAnswers({
   canViewPrivateFields,
@@ -33,7 +33,11 @@ export function getProposalProjectFormAnswers({
   projectWithMembers.projectMembers.forEach((projectMember) => {
     privateProjectMemberFields.forEach((key) => {
       if (key in projectMember) {
-        projectMember[key] = '';
+        if (key === 'teamLead') {
+          projectMember[key] = false;
+        } else {
+          projectMember[key] = '';
+        }
       }
     });
   });
