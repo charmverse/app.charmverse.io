@@ -2,7 +2,11 @@ import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getEasInstance } from '@root/lib/credentials/connectors';
+import { getAttestation } from '@root/lib/credentials/getAttestation';
+import { decodeOptimismProjectSnapshotAttestation } from '@root/lib/credentials/schemas/optimismProjectSchemas';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
+import { optimism } from 'viem/chains';
 
 import { fetchProject } from '../projects/fetchProject';
 
@@ -57,7 +61,32 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     projectId
   });
 
-  log.info('Project metadata created via Agora', { projectRefUID });
+  log.info('Project metadata created via Agora', { attestationMetadataUID });
+
+  const { metadataUrl, name } = await getAttestation({
+    attestationUID: attestationMetadataUID,
+    chainId: optimism.id
+  }).then((data) => decodeOptimismProjectSnapshotAttestation(data.data));
+
+  await prisma.optimismProjectAttestation.create({
+    data: {
+      metadata: mapProjectToOptimism(project),
+      farcasterIds: project.projectMembers
+        .map((member) => parseInt(member.farcasterUser.fid.toString()))
+        .filter(Boolean),
+      projectRefUID,
+      chainId: optimism.id,
+      metadataAttestationUID: attestationMetadataUID,
+      metadataUrl,
+      name,
+      project: {
+        connect: {
+          id: projectId
+        }
+      },
+      timeCreated: new Date()
+    }
+  });
 
   return { projectRefUID, attestationMetadataUID };
 }
