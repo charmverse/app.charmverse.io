@@ -12,7 +12,8 @@ const RubricPropertyLabel: Record<RubricEvaluationProperty, string> = {
   criteriaTotal: 'Criteria Total',
   criteriaAverage: 'Criteria Average',
   reviewerScore: 'Individual Reviewer Scores',
-  reviewerComment: 'Individual Reviewer Comments'
+  reviewerComment: 'Individual Reviewer Comments',
+  reviewerAverage: 'Reviewer Average'
 };
 
 export function TemplatePropertiesReadonlyList({

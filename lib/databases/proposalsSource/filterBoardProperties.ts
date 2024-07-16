@@ -81,7 +81,7 @@ export function filterBoardProperties({
       }
 
       if (p.type === 'proposalEvaluationReviewerAverage') {
-        return !!rubricEvaluation.reviewerAverage;
+        return rubricEvaluation.properties.includes('reviewerAverage');
       }
 
       if (p.type === 'proposalEvaluationTotal') {

@@ -96,8 +96,11 @@ export function getCardPropertiesFromRubric({
         p.type === 'proposalEvaluationAverage' && p.evaluationTitle === evaluation.title && p.templateId === templateId
     );
 
-    const proposalEvaluationReviewerAverageProp = templates.find(
-      (p) => p.type === 'proposalEvaluationReviewerAverage' && p.evaluationTitle === evaluation.title
+    const proposalEvaluationReviewerAverageProp = cardProperties.find(
+      (p) =>
+        p.type === 'proposalEvaluationReviewerAverage' &&
+        p.evaluationTitle === evaluation.title &&
+        p.templateId === templateId
     );
 
     if (proposalEvaluatedByProp) {
