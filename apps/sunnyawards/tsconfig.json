@@ -3,10 +3,6 @@
     "outDir": "../../dist/apps/connect",
     "rootDir": "../../",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "types": [
-      // This allows Serwist to type `window.serwist`.
-      "@serwist/next/typings"
-    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
