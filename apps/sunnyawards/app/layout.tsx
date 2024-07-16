@@ -59,6 +59,7 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
+  const vapidPublicKey = process.env.VAPID_PUBLIC_KEY;
 
   return (
     <html lang='en' dir='ltr'>
@@ -71,7 +72,7 @@ export default async function RootLayout({
       >
         <AppProviders>
           <Header />
-          {session?.user?.id && <NotificationRequest />}
+          {session?.user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
           <Box component='main'>{children}</Box>
           <Footer />
         </AppProviders>

@@ -1,13 +1,10 @@
 'use client';
 
-import env from '@beam-australia/react-env';
 import { useEffect, useState } from 'react';
 
 import { actionSaveSubscription } from 'lib/actions/saveSubscription';
 
-import { VAPID_PUBLIC_KEY } from './constants';
-
-export function NotificationRequest() {
+export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: string }) {
   const [permission, setPermission] = useState(
     typeof window !== 'undefined' ? window?.Notification?.permission : false
   );
@@ -29,11 +26,11 @@ export function NotificationRequest() {
         const swRegistration = await navigator.serviceWorker.getRegistration();
 
         const options: PushSubscriptionOptionsInit = {
-          applicationServerKey: VAPID_PUBLIC_KEY,
+          applicationServerKey: vapidPublicKey,
           userVisibleOnly: true
         };
 
-        if (!swRegistration) {
+        if (!swRegistration || !vapidPublicKey) {
           return;
         }
 
@@ -52,7 +49,7 @@ export function NotificationRequest() {
     if (permission === 'default') {
       requestPermission();
     }
-  }, [permission]);
+  }, [permission, vapidPublicKey]);
 
   return null;
 }
