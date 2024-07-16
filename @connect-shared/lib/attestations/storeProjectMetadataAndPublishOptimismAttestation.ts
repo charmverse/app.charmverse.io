@@ -63,7 +63,7 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
 
   log.info('Project metadata created via Agora', { attestationMetadataUID });
 
-  const { metadataUrl, name } = await getAttestation({
+  const attestationData = await getAttestation({
     attestationUID: attestationMetadataUID,
     chainId: optimism.id
   }).then((data) => decodeOptimismProjectSnapshotAttestation(data.data));
@@ -77,8 +77,8 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
       projectRefUID,
       chainId: optimism.id,
       metadataAttestationUID: attestationMetadataUID,
-      metadataUrl,
-      name,
+      metadataUrl: attestationData.metadataUrl,
+      name: attestationData.name,
       project: {
         connect: {
           id: projectId

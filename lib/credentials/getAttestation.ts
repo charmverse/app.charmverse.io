@@ -5,6 +5,7 @@ import { optimism } from 'viem/chains';
 import { getEthersProvider } from '../blockchain/getEthersProvider';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
+import { decodeOptimismProjectSnapshotAttestation } from './schemas/optimismProjectSchemas';
 
 export async function getAttestation({ attestationUID, chainId }: { chainId: EasSchemaChain; attestationUID: string }) {
   const eas = getEasInstance(chainId);
