@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { getRecentProjectsWithMembers } from '@connect/lib/projects/getRecentProjectsWithMembers';
+import { getRecentProjectsWithMembers } from '@connect-shared/lib/projects/getRecentProjectsWithMembers';
 import { Typography } from '@mui/material';
 
 import { ProjectItem } from './ProjectItem';

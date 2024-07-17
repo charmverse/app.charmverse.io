@@ -41,8 +41,8 @@ function FarcasterCard({
           <Stack direction='row' justifyContent='space-between'>
             <Typography variant='h6'>{name}</Typography>
             {onDelete && (
-              <IconButton size='small'>
-                <DeleteOutline color='error' onClick={onDelete} fontSize='small' />
+              <IconButton size='small' onClick={onDelete}>
+                <DeleteOutline color='error' fontSize='small' />
               </IconButton>
             )}
           </Stack>
@@ -129,8 +129,6 @@ export function OptimismProjectForm({
   } = useForm<OptimismProjectFormValues>({
     defaultValues: {
       name: '',
-      websites: [],
-      farcasterValues: [],
       projectMembers: [
         {
           farcasterId: user?.farcasterUser?.fid,
@@ -252,7 +250,15 @@ export function OptimismProjectForm({
       <Stack direction='row' justifyContent='space-between'>
         <Button
           disabled={!isValid || isMutating}
-          onClick={() => createOptimismProject(getValues()).then(onCreateProject)}
+          onClick={() => {
+            const values = getValues();
+            createOptimismProject({
+              ...values,
+              // For some reason websites and farcasterValues both are [null] need to find out why
+              farcasterValues: values.farcasterValues?.filter((value) => value) ?? [],
+              websites: values.websites?.filter((value) => value) ?? []
+            }).then(onCreateProject);
+          }}
         >
           Create
         </Button>
