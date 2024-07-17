@@ -129,7 +129,5 @@ rl.question('Enter the path to your file: ', async (file) => {
           }
           console.log('Text copied to clipboard');
         });
-
-        // await fs.writeFile('tokenisedFiles.txt', fullPrompt);
     });
 });

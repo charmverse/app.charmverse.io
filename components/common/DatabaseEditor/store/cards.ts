@@ -341,17 +341,7 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
       }
       let result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       if (filter) {
-        console.log('Filtered results:', result.length);
-
-        const matchingCard = result.find((c) => c.fields.properties.__step === 'Rewards');
-
-        const splicedCards = result.slice(0, 2);
-
-        if (matchingCard) {
-          splicedCards.push(matchingCard);
-        }
-
-        result = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, splicedCards);
+        result = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
       }
       if (searchText) {
         result = searchFilterCards(result, board, searchText);
@@ -375,7 +365,7 @@ export const makeSelectCardsFromBoard = () =>
 export const makeSelectBoardTemplates = () =>
   createSelector(
     getTemplates,
-    (state, boardId) => boardId,
+    (state: RootState, boardId: string) => boardId,
     (templates, boardId) => {
       if (!templates) {
         return [];

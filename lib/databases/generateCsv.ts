@@ -15,8 +15,6 @@ import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import { Utils } from 'components/common/DatabaseEditor/utils';
 import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 
-import { prettyPrint } from '../utils/strings';
-
 import type { Board, IPropertyTemplate, PropertyType } from './board';
 import type { BoardView } from './boardView';
 import type { Card } from './card';
@@ -184,13 +182,6 @@ export function generateTableArray(
       : allCardProperties.filter((template: IPropertyTemplate) => visiblePropertyIds.includes(template.id));
 
   const filterGroup = viewToExport.fields.filter || { filters: [] };
-
-  prettyPrint({
-    filterGroup,
-    cards: cards.slice(0, 3),
-    board,
-    viewToExport
-  });
 
   const filteredCards = CardFilter.applyFilterGroup(filterGroup, allCardProperties, cards) || [];
 
