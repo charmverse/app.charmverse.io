@@ -10,16 +10,17 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+
 import type {
   IssuableProposalCredentialAuthor,
   IssuableProposalCredentialSpace,
   ProposalWithJoinedData
-} from '@root/lib/credentials/findIssuableProposalCredentials';
-import { generateCredentialInputsForProposal } from '@root/lib/credentials/findIssuableProposalCredentials';
-import { PROPOSAL_REVIEWERS_BLOCK_ID } from '@root/lib/proposals/blocks/constants';
-import type { ProposalPropertyValue } from '@root/lib/proposals/blocks/interfaces';
-import { getCurrentStep } from '@root/lib/proposals/getCurrentStep';
-import type { ProposalFields } from '@root/lib/proposals/interfaces';
+} from 'lib/credentials/findIssuableProposalCredentials';
+import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
+import { getCurrentStep } from 'lib/proposals/getCurrentStep';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 
 import type { BlockWithDetails } from '../block';
 import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../board';
@@ -39,6 +40,7 @@ export type ProposalData = {
     id: string;
     title: string;
     path: string;
+    sourceTemplateId: string | null;
   };
   proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates'> & {
     authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
@@ -118,7 +120,8 @@ const pageSelectObject = {
         }
       }
     }
-  }
+  },
+  sourceTemplateId: true
 } satisfies Prisma.PageSelect;
 
 export async function getCardPropertiesFromProposals({
@@ -253,7 +256,8 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
   properties = getCardPropertiesFromRubric({
     properties,
     evaluations: proposal.evaluations.filter((e) => e.type === 'rubric'),
-    templates: cardProperties
+    cardProperties,
+    templateId: page.sourceTemplateId
   });
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);

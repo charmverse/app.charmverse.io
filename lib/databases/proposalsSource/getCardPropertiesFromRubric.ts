@@ -9,12 +9,14 @@ import type { ProposalData } from './getCardProperties';
 
 export function getCardPropertiesFromRubric({
   properties,
-  templates,
-  evaluations
+  cardProperties,
+  evaluations,
+  templateId
 }: {
+  templateId: string | null;
   evaluations: ProposalData['proposal']['evaluations'];
   properties: Record<string, ProposalPropertyValue>;
-  templates: IPropertyTemplate[];
+  cardProperties: IPropertyTemplate[];
 }): Record<string, ProposalPropertyValue> {
   const rubricCriteriaScore: Record<
     string,
@@ -32,12 +34,16 @@ export function getCardPropertiesFromRubric({
   allRubricCriterias.forEach((criteria) => {
     const filteredRubricAnswers = allRubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
     filteredRubricAnswers.forEach((rubricCriteriaAnswer) => {
-      templates.forEach((template) => {
-        if (template.criteriaTitle === criteria.title && template.reviewerId === rubricCriteriaAnswer.userId) {
-          if (template.type === 'proposalRubricCriteriaReviewerComment') {
-            properties[template.id] = rubricCriteriaAnswer.comment ?? '';
-          } else if (template.type === 'proposalRubricCriteriaReviewerScore') {
-            properties[template.id] = rubricCriteriaAnswer.response.score ?? '';
+      cardProperties.forEach((p) => {
+        if (
+          p.criteriaTitle === criteria.title &&
+          p.reviewerId === rubricCriteriaAnswer.userId &&
+          p.templateId === templateId
+        ) {
+          if (p.type === 'proposalRubricCriteriaReviewerComment') {
+            properties[p.id] = rubricCriteriaAnswer.comment ?? '';
+          } else if (p.type === 'proposalRubricCriteriaReviewerScore') {
+            properties[p.id] = rubricCriteriaAnswer.response.score ?? '';
           }
         }
       });
@@ -57,19 +63,14 @@ export function getCardPropertiesFromRubric({
     }
   });
 
-  templates.forEach((template) => {
-    if (template.criteriaTitle && rubricCriteriaScore[template.criteriaTitle]) {
-      if (template.type === 'proposalRubricCriteriaTotal') {
-        properties[template.id] =
-          ((properties[template.id] as number) ?? 0) + rubricCriteriaScore[template.criteriaTitle].total;
-      } else if (template.type === 'proposalRubricCriteriaAverage') {
-        properties[template.id] =
-          ((properties[template.id] as number) ?? 0) +
-          Number(
-            (
-              rubricCriteriaScore[template.criteriaTitle].total / rubricCriteriaScore[template.criteriaTitle].count
-            ).toFixed(2)
-          );
+  cardProperties.forEach((p) => {
+    if (p.criteriaTitle && rubricCriteriaScore[p.criteriaTitle] && p.templateId === templateId) {
+      if (p.type === 'proposalRubricCriteriaTotal') {
+        properties[p.id] = ((properties[p.id] as number) ?? 0) + rubricCriteriaScore[p.criteriaTitle].total;
+      } else if (p.type === 'proposalRubricCriteriaAverage') {
+        properties[p.id] =
+          ((properties[p.id] as number) ?? 0) +
+          Number((rubricCriteriaScore[p.criteriaTitle].total / rubricCriteriaScore[p.criteriaTitle].count).toFixed(2));
       }
     }
   });
@@ -83,18 +84,23 @@ export function getCardPropertiesFromRubric({
 
     const uniqueReviewers = Object.keys(reviewersResults);
 
-    const proposalEvaluatedByProp = templates.find(
-      (p) => p.type === 'proposalEvaluatedBy' && p.evaluationTitle === evaluation.title
+    const proposalEvaluatedByProp = cardProperties.find(
+      (p) => p.type === 'proposalEvaluatedBy' && p.evaluationTitle === evaluation.title && p.templateId === templateId
     );
-    const proposalEvaluationTotalProp = templates.find(
-      (p) => p.type === 'proposalEvaluationTotal' && p.evaluationTitle === evaluation.title
+    const proposalEvaluationTotalProp = cardProperties.find(
+      (p) =>
+        p.type === 'proposalEvaluationTotal' && p.evaluationTitle === evaluation.title && p.templateId === templateId
     );
-    const proposalEvaluationAverageProp = templates.find(
-      (p) => p.type === 'proposalEvaluationAverage' && p.evaluationTitle === evaluation.title
+    const proposalEvaluationAverageProp = cardProperties.find(
+      (p) =>
+        p.type === 'proposalEvaluationAverage' && p.evaluationTitle === evaluation.title && p.templateId === templateId
     );
 
-    const proposalEvaluationReviewerAverageProp = templates.find(
-      (p) => p.type === 'proposalEvaluationReviewerAverage' && p.evaluationTitle === evaluation.title
+    const proposalEvaluationReviewerAverageProp = cardProperties.find(
+      (p) =>
+        p.type === 'proposalEvaluationReviewerAverage' &&
+        p.evaluationTitle === evaluation.title &&
+        p.templateId === templateId
     );
 
     if (proposalEvaluatedByProp) {

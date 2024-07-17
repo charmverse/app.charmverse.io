@@ -1,191 +1,256 @@
-import { Divider, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
 import { PropertySelector } from './PropertiesListSelector';
-import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
-import { SelectedPropertiesList } from './SelectedPropertiesList';
+import type { RubricEvaluationProperty, SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 
 export function RubricEvaluationPropertiesList({
   selectedProperties,
-  setSelectedProperties
+  setSelectedProperties,
+  templateId
 }: {
+  templateId: string;
   selectedProperties: SelectedProposalProperties;
   setSelectedProperties: (selectedProperties: SelectedProposalProperties) => void;
 }) {
   const { proposalTemplates } = useProposalTemplates({
     detailed: true
   });
-  const rubricEvaluationTitles = useMemo(() => {
-    const _rubricEvaluationTitles: Set<string> = new Set(
-      selectedProperties.rubricEvaluations.map((evaluation) => evaluation.title)
-    );
-    proposalTemplates?.forEach((template) => {
-      template.evaluations?.forEach((evaluation) => {
-        if (evaluation.type === 'rubric') {
-          _rubricEvaluationTitles.add(evaluation.title);
-        }
-      });
-    });
-    return Array.from(_rubricEvaluationTitles);
-  }, [proposalTemplates, selectedProperties.rubricEvaluations]);
 
-  if (rubricEvaluationTitles.length === 0) {
+  const { rubricEvaluations, proposalTemplateProperties } = useMemo(() => {
+    const proposalTemplate = proposalTemplates?.find((template) => template.pageId === templateId);
+    return {
+      rubricEvaluations: proposalTemplate?.evaluations?.filter((evaluation) => evaluation.type === 'rubric') || [],
+      proposalTemplateProperties: selectedProperties.templateProperties.find(
+        (templateProperty) => templateProperty.templateId === templateId
+      )
+    };
+  }, [proposalTemplates, templateId, selectedProperties]);
+
+  if (rubricEvaluations.length === 0) {
     return <Typography>No rubric evaluations available</Typography>;
   }
 
-  function updateRubricEvaluationProperties(evaluationTitle: string, updatedProperties: { [key: string]: boolean }) {
-    const existingEvaluation = selectedProperties.rubricEvaluations.find(
-      (evaluation) => evaluation.title === evaluationTitle
+  function updateRubricEvaluationProperties(evaluationId: string, updatedProperties: RubricEvaluationProperty[]) {
+    const rubricEvaluationProperty = proposalTemplateProperties?.rubricEvaluations.find(
+      (evaluation) => evaluation.evaluationId === evaluationId
     );
+    const rubricEvaluation = rubricEvaluations.find((evaluation) => evaluation.id === evaluationId);
 
-    if (!existingEvaluation) {
+    if (!proposalTemplateProperties) {
       setSelectedProperties({
         ...selectedProperties,
-        rubricEvaluations: [
-          ...selectedProperties.rubricEvaluations,
+        templateProperties: [
+          ...selectedProperties.templateProperties,
           {
-            title: evaluationTitle,
-            ...updatedProperties
+            templateId,
+            formFields: [],
+            rubricEvaluations: [
+              {
+                evaluationId,
+                title: rubricEvaluation?.title || '',
+                properties: updatedProperties
+              }
+            ]
           }
         ]
       });
-    } else {
-      const updatedSelectedProperties = {
+    } else if (!rubricEvaluationProperty) {
+      setSelectedProperties({
         ...selectedProperties,
-        rubricEvaluations: selectedProperties.rubricEvaluations
-          .map((rubricEvaluation) => {
-            if (rubricEvaluation.title === evaluationTitle) {
-              return {
-                ...rubricEvaluation,
-                ...updatedProperties
-              };
+        templateProperties: selectedProperties.templateProperties.map((templateProperty) => {
+          if (templateProperty.templateId === templateId) {
+            return {
+              ...templateProperty,
+              rubricEvaluations: [
+                ...templateProperty.rubricEvaluations,
+                {
+                  evaluationId,
+                  templateId,
+                  title: rubricEvaluation?.title || '',
+                  properties: updatedProperties
+                }
+              ]
+            };
+          }
+
+          return templateProperty;
+        })
+      });
+    } else {
+      setSelectedProperties({
+        ...selectedProperties,
+        templateProperties: selectedProperties.templateProperties
+          .map((templateProperty) => {
+            if (templateProperty.templateId !== templateId) {
+              return templateProperty;
             }
-            return rubricEvaluation;
+
+            return {
+              ...templateProperty,
+              rubricEvaluations: templateProperty.rubricEvaluations
+                .map((evaluation) =>
+                  evaluation.evaluationId === evaluationId
+                    ? { ...evaluation, properties: updatedProperties }
+                    : evaluation
+                )
+                .filter((evaluation) => evaluation.properties.length > 0)
+            };
           })
-          .filter((evaluation) => {
-            const isAllPropertiesFalsy =
-              !evaluation.average &&
-              !evaluation.total &&
-              !evaluation.reviewers &&
-              !evaluation.criteriaTotal &&
-              !evaluation.reviewerScore &&
-              !evaluation.reviewerComment &&
-              !evaluation.criteriaAverage;
-            return !isAllPropertiesFalsy;
-          })
-      };
-      setSelectedProperties(updatedSelectedProperties);
+          .filter(
+            (_templateProperties) =>
+              _templateProperties.formFields.length > 0 || _templateProperties.rubricEvaluations.length > 0
+          )
+      });
     }
   }
 
   return (
     <Stack gap={1}>
-      {rubricEvaluationTitles.map((rubricEvaluationTitle) => {
-        const _rubricEvaluation = selectedProperties?.rubricEvaluations.find(
-          (evaluation) => evaluation.title === rubricEvaluationTitle
+      {rubricEvaluations.map((rubricEvaluation) => {
+        const rubricEvaluationProperty = proposalTemplateProperties?.rubricEvaluations.find(
+          (evaluation) => evaluation.evaluationId === rubricEvaluation.id
         );
-        const isAllPropertiesSelected =
-          _rubricEvaluation?.average &&
-          _rubricEvaluation?.total &&
-          _rubricEvaluation?.reviewers &&
-          _rubricEvaluation?.criteriaTotal &&
-          _rubricEvaluation?.reviewerScore &&
-          _rubricEvaluation?.reviewerComment &&
-          _rubricEvaluation?.criteriaAverage;
+
+        const rubricEvaluationProperties = rubricEvaluationProperty?.properties ?? [];
+        const isAllPropertiesSelected = rubricEvaluationProperties.length === 7;
 
         return (
-          <Stack key={rubricEvaluationTitle}>
+          <Stack key={rubricEvaluation.id}>
             <PropertySelector
               isChecked={!!isAllPropertiesSelected}
               onClick={() => {
                 if (isAllPropertiesSelected) {
                   setSelectedProperties({
                     ...selectedProperties,
-                    rubricEvaluations: selectedProperties.rubricEvaluations.filter(
-                      (evaluation) => evaluation.title !== rubricEvaluationTitle
-                    )
+                    templateProperties: selectedProperties.templateProperties
+                      .map((templateProperty) => {
+                        if (templateProperty.templateId === templateId) {
+                          return {
+                            ...templateProperty,
+                            rubricEvaluations: templateProperty.rubricEvaluations
+                              .filter((evaluation) => evaluation.evaluationId !== rubricEvaluation.id)
+                              .filter((evaluation) => evaluation.properties.length > 0)
+                          };
+                        }
+                        return templateProperty;
+                      })
+                      .filter(
+                        (_templateProperties) =>
+                          _templateProperties.formFields.length > 0 || _templateProperties.rubricEvaluations.length > 0
+                      )
                   });
                 } else {
-                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
-                    average: true,
-                    total: true,
-                    reviewers: true,
-                    criteriaTotal: true,
-                    reviewerScore: true,
-                    reviewerComment: true,
-                    criteriaAverage: true
-                  });
+                  updateRubricEvaluationProperties(rubricEvaluation.id, [
+                    'average',
+                    'total',
+                    'reviewers',
+                    'criteriaTotal',
+                    'reviewerScore',
+                    'reviewerComment',
+                    'criteriaAverage'
+                  ]);
                 }
               }}
-              label={rubricEvaluationTitle}
+              label={rubricEvaluation.title}
               bold
             />
             <Stack ml={2}>
               <PropertySelector
-                isChecked={!!_rubricEvaluation?.average}
+                isChecked={rubricEvaluationProperties.includes('average')}
                 onClick={() => {
-                  updateRubricEvaluationProperties(rubricEvaluationTitle, { average: !_rubricEvaluation?.average });
+                  updateRubricEvaluationProperties(
+                    rubricEvaluation.id,
+                    rubricEvaluationProperties.includes('average')
+                      ? rubricEvaluationProperties.filter((property) => property !== 'average')
+                      : [...rubricEvaluationProperties, 'average']
+                  );
                 }}
                 label='Step Average'
               />
               <PropertySelector
-                isChecked={!!_rubricEvaluation?.reviewerAverage}
+                isChecked={rubricEvaluationProperties.includes('reviewerAverage')}
                 onClick={() => {
-                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
-                    reviewerAverage: !_rubricEvaluation?.reviewerAverage
-                  });
+                  updateRubricEvaluationProperties(
+                    rubricEvaluation.id,
+                    rubricEvaluationProperties.includes('reviewerAverage')
+                      ? rubricEvaluationProperties.filter((property) => property !== 'reviewerAverage')
+                      : [...rubricEvaluationProperties, 'reviewerAverage']
+                  );
                 }}
                 label='Step Reviewer Average'
               />
               <PropertySelector
-                isChecked={!!_rubricEvaluation?.total}
+                isChecked={rubricEvaluationProperties.includes('total')}
                 onClick={() => {
-                  updateRubricEvaluationProperties(rubricEvaluationTitle, { total: !_rubricEvaluation?.total });
+                  updateRubricEvaluationProperties(
+                    rubricEvaluation.id,
+                    rubricEvaluationProperties.includes('total')
+                      ? rubricEvaluationProperties.filter((property) => property !== 'total')
+                      : [...rubricEvaluationProperties, 'total']
+                  );
                 }}
                 label='Step Total'
               />
               <PropertySelector
-                isChecked={!!_rubricEvaluation?.reviewers}
+                isChecked={rubricEvaluationProperties.includes('reviewers')}
                 onClick={() => {
-                  updateRubricEvaluationProperties(rubricEvaluationTitle, { reviewers: !_rubricEvaluation?.reviewers });
+                  updateRubricEvaluationProperties(
+                    rubricEvaluation.id,
+                    rubricEvaluationProperties.includes('reviewers')
+                      ? rubricEvaluationProperties.filter((property) => property !== 'reviewers')
+                      : [...rubricEvaluationProperties, 'reviewers']
+                  );
                 }}
                 label='Step Reviewers'
               />
               <PropertySelector
-                isChecked={!!_rubricEvaluation?.criteriaTotal}
+                isChecked={rubricEvaluationProperties.includes('criteriaTotal')}
                 onClick={() => {
-                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
-                    criteriaTotal: !_rubricEvaluation?.criteriaTotal
-                  });
+                  updateRubricEvaluationProperties(
+                    rubricEvaluation.id,
+                    rubricEvaluationProperties.includes('criteriaTotal')
+                      ? rubricEvaluationProperties.filter((property) => property !== 'criteriaTotal')
+                      : [...rubricEvaluationProperties, 'criteriaTotal']
+                  );
                 }}
                 label='Criteria Total (for each criteria)'
               />
               <PropertySelector
-                isChecked={!!_rubricEvaluation?.criteriaAverage}
+                isChecked={rubricEvaluationProperties.includes('criteriaAverage')}
                 onClick={() => {
-                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
-                    criteriaAverage: !_rubricEvaluation?.criteriaAverage
-                  });
+                  updateRubricEvaluationProperties(
+                    rubricEvaluation.id,
+                    rubricEvaluationProperties.includes('criteriaAverage')
+                      ? rubricEvaluationProperties.filter((property) => property !== 'criteriaAverage')
+                      : [...rubricEvaluationProperties, 'criteriaAverage']
+                  );
                 }}
                 label='Criteria Average (for each criteria)'
               />
               <PropertySelector
-                isChecked={!!_rubricEvaluation?.reviewerScore}
+                isChecked={rubricEvaluationProperties.includes('reviewerScore')}
                 onClick={() => {
-                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
-                    reviewerScore: !_rubricEvaluation?.reviewerScore
-                  });
+                  updateRubricEvaluationProperties(
+                    rubricEvaluation.id,
+                    rubricEvaluationProperties.includes('reviewerScore')
+                      ? rubricEvaluationProperties.filter((property) => property !== 'reviewerScore')
+                      : [...rubricEvaluationProperties, 'reviewerScore']
+                  );
                 }}
                 label='Individual Reviewer Scores'
               />
               <PropertySelector
-                isChecked={!!_rubricEvaluation?.reviewerComment}
+                isChecked={rubricEvaluationProperties.includes('reviewerComment')}
                 onClick={() => {
-                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
-                    reviewerComment: !_rubricEvaluation?.reviewerComment
-                  });
+                  updateRubricEvaluationProperties(
+                    rubricEvaluation.id,
+                    rubricEvaluationProperties.includes('reviewerComment')
+                      ? rubricEvaluationProperties.filter((property) => property !== 'reviewerComment')
+                      : [...rubricEvaluationProperties, 'reviewerComment']
+                  );
                 }}
                 label='Individual Reviewer Comments'
               />
@@ -193,71 +258,6 @@ export function RubricEvaluationPropertiesList({
           </Stack>
         );
       })}
-    </Stack>
-  );
-}
-
-export function RubricEvaluationPropertiesReadonlyList({
-  selectedProperties
-}: {
-  selectedProperties: SelectedProposalProperties;
-}) {
-  if (selectedProperties.rubricEvaluations.length === 0) {
-    return null;
-  }
-
-  return (
-    <Stack gap={1}>
-      <Typography fontWeight='bold' variant='body2'>
-        Proposal Rubric Evaluations
-      </Typography>
-      <Stack gap={2}>
-        {selectedProperties.rubricEvaluations.map((rubricEvaluation) => {
-          const items: string[] = [];
-          if (rubricEvaluation.average) {
-            items.push('Step Average');
-          }
-          if (rubricEvaluation.total) {
-            items.push('Step Total');
-          }
-          if (rubricEvaluation.reviewers) {
-            items.push('Step Reviewers');
-          }
-          if (rubricEvaluation.criteriaTotal) {
-            items.push('Criteria Total');
-          }
-          if (rubricEvaluation.criteriaAverage) {
-            items.push('Criteria Average');
-          }
-          if (rubricEvaluation.reviewerScore) {
-            items.push('Individual Reviewer Scores');
-          }
-          if (rubricEvaluation.reviewerComment) {
-            items.push('Individual Reviewer Comments');
-          }
-
-          if (rubricEvaluation.reviewerAverage) {
-            items.push('Reviewer Average');
-          }
-
-          if (items.length === 0) {
-            return null;
-          }
-          return (
-            <SelectedPropertiesList
-              key={rubricEvaluation.title}
-              items={items}
-              title={rubricEvaluation.title}
-              hideDivider
-            />
-          );
-        })}
-      </Stack>
-      <Divider
-        sx={{
-          my: 2
-        }}
-      />
     </Stack>
   );
 }
