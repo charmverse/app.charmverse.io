@@ -95,6 +95,7 @@ describe('createOptimismProject', () => {
           }
         ]
       },
+      source: 'connect',
       userId: user.id
     });
 
