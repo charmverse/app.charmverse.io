@@ -7,13 +7,13 @@ import { getFarcasterUsers } from '../farcaster/getFarcasterUsers';
 import { isTruthy } from '../utils/types';
 
 export async function getOpProjectsByFarcasterId({ farcasterId }: { farcasterId: number }) {
-  const optimismProjectAttestations = (await prisma.optimismProjectAttestation.findMany({
+  const optimismProjectAttestations = await prisma.optimismProjectAttestation.findMany({
     where: {
       farcasterIds: {
         has: farcasterId
       }
     }
-  })) as OptimismProjectAttestationContent[];
+  });
 
   const farcasterUsers = await getFarcasterUsers({
     fids: optimismProjectAttestations.flatMap((attestation) => attestation.farcasterIds)
@@ -45,5 +45,5 @@ export async function getOpProjectsByFarcasterId({ farcasterId }: { farcasterId:
         })
         .filter(isTruthy)
     };
-  });
+  }) as OptimismProjectAttestationContent[];
 }
