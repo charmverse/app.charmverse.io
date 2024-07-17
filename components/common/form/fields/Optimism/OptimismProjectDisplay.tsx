@@ -1,5 +1,6 @@
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Divider, Stack, Typography } from '@mui/material';
+import { replaceUrl } from '@root/lib/utils/url';
 import { useState } from 'react';
 
 import { useEditOptimismProject, useGetOpProjects } from 'charmClient/hooks/optimism';
@@ -213,10 +214,16 @@ export function OptimismProjectDisplay({
           [
             'Social',
             <Stack gap={1.5} key='social'>
-              <OptimismProjectFields label='Farcaster' value={socialLinks.farcaster} />
-              <OptimismProjectFields label='Twitter' value={socialLinks.twitter} />
+              <OptimismProjectFields
+                label='Farcaster'
+                value={socialLinks.farcaster.map((farcasterValue) => replaceUrl(farcasterValue, 'warpcast.com').href)}
+              />
+              <OptimismProjectFields label='Twitter' value={replaceUrl(socialLinks.twitter, 'twitter.com').href} />
               <OptimismProjectFields label='Website' value={socialLinks.website} />
-              <OptimismProjectFields label='Mirror' value={socialLinks.mirror} />
+              <OptimismProjectFields
+                label='Mirror'
+                value={socialLinks.mirror ? replaceUrl(socialLinks.mirror, 'mirror.xyz').href : null}
+              />
             </Stack>
           ],
           [
