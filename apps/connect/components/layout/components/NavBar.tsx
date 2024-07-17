@@ -61,6 +61,9 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
               <Menu
                 sx={{ mt: 5 }}
                 id='menu-appbar'
+                slotProps={{
+                  paper: { sx: { '.MuiList-root': { pb: 0 }, maxWidth: '250px' } }
+                }}
                 anchorEl={anchorElUser}
                 anchorOrigin={{
                   vertical: 'top',
@@ -78,8 +81,8 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
                 <MenuItem>
                   <Link href='/profile'>@{farcasterDetails?.username}</Link>
                 </MenuItem>
-                <InstallAppMenuItem>Install web app</InstallAppMenuItem>
                 <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
+                <InstallAppMenuItem>Install</InstallAppMenuItem>
               </Menu>
             </Box>
           )}

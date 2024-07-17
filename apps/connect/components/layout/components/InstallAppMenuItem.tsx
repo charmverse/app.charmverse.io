@@ -1,4 +1,4 @@
-import { MenuItem } from '@mui/material';
+import { Box, Button, MenuItem, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import { useAddToHomescreenPrompt } from 'hooks/useAddToHomeScreenPrompt';
@@ -10,5 +10,12 @@ export function InstallAppMenuItem({ children }: { children: ReactNode }) {
     return null;
   }
 
-  return <MenuItem onClick={promptToInstall}>{children}</MenuItem>;
+  return (
+    <Box bgcolor='blue' p={2}>
+      <Typography color='white' variant='body2' mb={1}>
+        Enjoy the full experience with our free webapp
+      </Typography>
+      <Button onClick={promptToInstall}>{children}</Button>
+    </Box>
+  );
 }
