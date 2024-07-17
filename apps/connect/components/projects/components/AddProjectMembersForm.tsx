@@ -1,12 +1,12 @@
-import type { LoggedInUser } from '@connect/lib/profile/interfaces';
-import type { FormValues } from '@connect/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Button, Stack, Typography } from '@mui/material';
+import { isTruthy } from '@root/lib/utils/types';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
 
-import { isTruthy } from 'lib/utils/types';
+import type { LoggedInUser } from 'lib/profile/interfaces';
+import type { FormValues } from 'lib/projects/form';
 
 import { FarcasterCard } from '../../common/FarcasterCard';
 

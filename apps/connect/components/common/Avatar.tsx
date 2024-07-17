@@ -1,9 +1,8 @@
 import type { AvatarProps, SxProps, Theme } from '@mui/material';
 import MuiAvatar from '@mui/material/Avatar';
+import { stringToColor } from '@root/lib/utils/strings';
+import { replaceS3Domain } from '@root/lib/utils/url';
 import React from 'react';
-
-import { stringToColor } from 'lib/utils/strings';
-import { replaceS3Domain } from 'lib/utils/url';
 
 export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge' | '3xLarge';
 export type AvatarVariant = AvatarProps['variant'];

@@ -1,12 +1,12 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
-import { authActionClient } from '@connect/lib/actions/actionClient';
 import { storeUpdatedProjectMetadataAttestation } from '@connect-shared/lib/attestations/storeUpdatedProjectMetadataAttestation';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
+import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { revalidatePath } from 'next/cache';
 
-import { disableCredentialAutopublish } from 'lib/credentials/constants';
+import { authActionClient } from 'lib/actions/actionClient';
 
 import { editConnectProject } from '../projects/editConnectProject';
 import type { FormValues } from '../projects/form';

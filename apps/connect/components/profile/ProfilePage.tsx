@@ -1,11 +1,12 @@
-import { FarcasterCard } from '@connect/components/common/FarcasterCard';
-import { PageWrapper } from '@connect/components/common/PageWrapper';
-import { ProjectsList } from '@connect/components/projects/components/ProjectsList';
-import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { Suspense } from 'react';
+
+import { FarcasterCard } from 'components/common/FarcasterCard';
+import { PageWrapper } from 'components/common/PageWrapper';
+import { ProjectsList } from 'components/projects/components/ProjectsList';
+import type { LoggedInUser } from 'lib/profile/interfaces';
 
 import { ProjectItemSkeleton } from '../projects/components/ProjectItemSkeleton';
 

@@ -1,8 +1,9 @@
-import { PageWrapper } from '@connect/components/common/PageWrapper';
-import { WarpcastLogin } from '@connect/components/common/WarpcastLogin/WarpcastLogin';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
+
+import { PageWrapper } from 'components/common/PageWrapper';
+import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 
 export function HomePage() {
   return (

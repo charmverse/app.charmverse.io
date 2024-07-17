@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { initWebPush } from 'apps/sunnyawards/lib/pwa/initWebPush';
+import { initWebPush } from 'apps/connect/lib/pwa/initWebPush';
 import webpush from 'web-push';
 
 import { count } from 'lib/metrics';

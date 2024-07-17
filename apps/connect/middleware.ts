@@ -1,11 +1,11 @@
+import { getIronOptions } from '@root/lib/session/getIronOptions';
+import { isTruthy } from '@root/lib/utils/types';
 import { getIronSession } from 'iron-session';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import type { SessionData } from 'lib/session/config';
-import { getIronOptions } from 'lib/session/getIronOptions';
-import { isTruthy } from 'lib/utils/types';
 
 export async function middleware(request: NextRequest) {
   const session = await getIronSession<SessionData>(cookies(), getIronOptions());
@@ -37,6 +37,6 @@ export const config = {
      * - images (image files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest).*)'
+    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest|sw.js).*)'
   ]
 };

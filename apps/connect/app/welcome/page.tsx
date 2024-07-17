@@ -1,7 +1,8 @@
-import { WelcomePage } from '@connect/components/welcome/WelcomePage';
-import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+import { WelcomePage } from 'components/welcome/WelcomePage';
+import { getCurrentUser } from 'lib/actions/getCurrentUser';
 
 export const metadata: Metadata = {
   other: {

@@ -1,8 +1,9 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
-import { authActionClient } from '@connect/lib/actions/actionClient';
-import type { LoggedInUser } from '@connect/lib/profile/interfaces';
+
+import { authActionClient } from 'lib/actions/actionClient';
+import type { LoggedInUser } from 'lib/profile/interfaces';
 
 export const getCurrentUser = authActionClient
   .metadata({ actionName: 'getCurrentUser' })

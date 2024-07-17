@@ -1,16 +1,16 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { ConnectApiClient } from '@connect/apiClient/apiClient';
-import { actionRevalidatePath } from '@connect/lib/actions/revalidatePath';
 import { AuthKitProvider, SignInButton } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import Box from '@mui/material/Box';
+import { ConnectApiClient } from 'apiClient/apiClient';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 import '@farcaster/auth-kit/styles.css';
 
+import { actionRevalidatePath } from 'lib/actions/revalidatePath';
 import { warpcastConfig } from 'lib/farcaster/config';
 
 function WarpcastLoginButton() {

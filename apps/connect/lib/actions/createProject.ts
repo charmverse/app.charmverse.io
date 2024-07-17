@@ -1,10 +1,11 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
-import { authActionClient } from '@connect/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
+
+import { authActionClient } from 'lib/actions/actionClient';
 
 import { createConnectProject } from '../projects/createConnectProject';
 import { schema } from '../projects/form';
@@ -31,5 +32,5 @@ export const actionCreateProject = authActionClient
 
     await generateOgImage(newProject.id, currentUserId);
 
-    return { success: true, projectId: newProject.id, projectPath: newProject.path };
+    return { projectId: newProject.id, projectPath: newProject.path };
   });

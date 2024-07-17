@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
+import { getCurrentUser } from 'lib/actions/getCurrentUser';
 
-import { NavBar } from './NavBar';
+import { NavBar } from './components/NavBar';
 
 export async function Header() {
   const user = await getCurrentUser();

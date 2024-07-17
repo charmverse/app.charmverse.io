@@ -1,8 +1,8 @@
 'use client';
 
-import { ConnectApiClient } from '@connect/apiClient/apiClient';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import { useSignIn } from '@farcaster/auth-kit';
+import { ConnectApiClient } from 'apiClient/apiClient';
 import { useCallback, useEffect } from 'react';
 
 export function useFarcasterConnection({

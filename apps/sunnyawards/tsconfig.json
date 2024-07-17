@@ -2,7 +2,11 @@
   "compilerOptions": {
     "outDir": "../../dist/apps/connect",
     "rootDir": "../../",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -49,5 +53,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["../../node_modules", ".next/", "public/sw.js"]
+  "exclude": ["../../node_modules", ".next/"]
 }

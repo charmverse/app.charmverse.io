@@ -1,11 +1,6 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { PageWrapper } from '@connect/components/common/PageWrapper';
-import { actionEditProject } from '@connect/lib/actions/editProject';
-import type { LoggedInUser } from '@connect/lib/profile/interfaces';
-import type { FormValues, ProjectCategory } from '@connect/lib/projects/form';
-import { schema } from '@connect/lib/projects/form';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
@@ -14,6 +9,12 @@ import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+import { PageWrapper } from 'components/common/PageWrapper';
+import { actionEditProject } from 'lib/actions/editProject';
+import type { LoggedInUser } from 'lib/profile/interfaces';
+import { schema } from 'lib/projects/form';
+import type { FormValues, ProjectCategory } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
