@@ -31,7 +31,7 @@ function OptimismProjectFields({
   label: string;
   value: number | string | string[] | null | undefined;
 }) {
-  if (!value) {
+  if (Array.isArray(value) ? value.length === 0 : !value) {
     return null;
   }
 
@@ -45,23 +45,54 @@ function OptimismProjectFields({
           {value.map((v) =>
             isValidUrl(v) || v.startsWith('http') ? (
               <Link external key={v} href={v} target='_blank'>
-                {v}
+                <Typography
+                  sx={{
+                    overflowWrap: 'break-word'
+                  }}
+                >
+                  {v}
+                </Typography>
               </Link>
             ) : (
-              <Typography key={v}>{v}</Typography>
+              <Typography
+                key={v}
+                sx={{
+                  overflowWrap: 'break-word'
+                }}
+              >
+                {v}
+              </Typography>
             )
           )}
         </Stack>
       ) : typeof value === 'string' ? (
         isValidUrl(value) || value.startsWith('http') ? (
           <Link external href={value} target='_blank'>
-            {value}
+            <Typography
+              sx={{
+                overflowWrap: 'break-word'
+              }}
+            >
+              {value}
+            </Typography>
           </Link>
         ) : (
-          <Typography>{value}</Typography>
+          <Typography
+            sx={{
+              overflowWrap: 'break-word'
+            }}
+          >
+            {value}
+          </Typography>
         )
       ) : (
-        <Typography>{value}</Typography>
+        <Typography
+          sx={{
+            overflowWrap: 'break-word'
+          }}
+        >
+          {value}
+        </Typography>
       )}
     </Stack>
   );
@@ -80,6 +111,7 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
       osoSlug,
       grantsAndFunding
     },
+    metadataAttestationUID,
     projectRefUID
   } = project;
 
@@ -108,7 +140,14 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
             'Overview',
             <Stack gap={1.5} key='overview'>
               <OptimismProjectFields label='Project description' value={description} />
-              <OptimismProjectFields label='Project attestation id' value={projectRefUID} />
+              <OptimismProjectFields
+                label='Project attestation'
+                value={`https://optimism.easscan.org/attestation/view/${projectRefUID}`}
+              />
+              <OptimismProjectFields
+                label='Project metadata attestation'
+                value={`https://optimism.easscan.org/attestation/view/${metadataAttestationUID}`}
+              />
               <OptimismProjectFields label='Categories' value={category} />
               <OptimismProjectFields label='Open Source Observer' value={osoSlug} />
               <OptimismProjectFields label='Repositories' value={github} />
