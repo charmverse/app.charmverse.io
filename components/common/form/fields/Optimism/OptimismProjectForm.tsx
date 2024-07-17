@@ -33,12 +33,14 @@ export function FarcasterCard({
   avatar,
   name,
   onDelete,
-  username
+  username,
+  disabled
 }: {
   avatar?: string;
   name?: string;
   username?: string;
   onDelete?: VoidFunction;
+  disabled?: boolean;
 }) {
   return (
     <Card>
@@ -48,7 +50,7 @@ export function FarcasterCard({
           <Stack direction='row' justifyContent='space-between'>
             <Typography variant='h6'>{name}</Typography>
             {onDelete && (
-              <IconButton size='small' onClick={onDelete}>
+              <IconButton size='small' onClick={onDelete} disabled={disabled}>
                 <DeleteOutline color='error' fontSize='small' />
               </IconButton>
             )}
@@ -123,6 +125,7 @@ function OptimismProjectMembersForm({
             avatar={farcasterProfile.avatar}
             name={farcasterProfile.name}
             username={farcasterProfile.username}
+            disabled={disabled}
             onDelete={() => {
               remove(selectedFarcasterProfiles.findIndex((profile) => profile.fid === farcasterProfile.fid));
               setSelectedFarcasterProfiles(
