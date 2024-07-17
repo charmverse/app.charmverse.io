@@ -13,8 +13,10 @@ type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'disp
 
 export function SearchFarcasterUser({
   setSelectedProfile,
+  disabled,
   filteredFarcasterIds = []
 }: {
+  disabled?: boolean;
   filteredFarcasterIds?: number[];
   setSelectedProfile: (profile: FarcasterProfile | null) => void;
 }) {
@@ -63,6 +65,7 @@ export function SearchFarcasterUser({
         setSearchTerm('');
         setSelectedProfile(newValue);
       }}
+      disabled={disabled}
       getOptionLabel={(option) => `${option.username} ${option.fid}`}
       fullWidth
       options={farcasterProfiles}

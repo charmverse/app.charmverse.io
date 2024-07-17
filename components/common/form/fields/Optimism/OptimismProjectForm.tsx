@@ -1,15 +1,18 @@
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { DeleteOutline } from '@mui/icons-material';
-import { Card, IconButton, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import ImageIcon from '@mui/icons-material/Image';
+import { Box, Card, CircularProgress, IconButton, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
+import Image from 'next/image';
 import { useState } from 'react';
 import type { Control, FieldArrayPath } from 'react-hook-form';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useController, useFieldArray, useForm } from 'react-hook-form';
 
 import { useCreateOptimismProject } from 'charmClient/hooks/optimism';
 import { Avatar } from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
+import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import { useUser } from 'hooks/useUser';
 
 import { SearchFarcasterUser } from '../../SearchFarcasterUser';
@@ -55,7 +58,13 @@ function FarcasterCard({
   );
 }
 
-function OptimismProjectMembersForm({ control }: { control: Control<OptimismProjectFormValues> }) {
+function OptimismProjectMembersForm({
+  disabled,
+  control
+}: {
+  disabled: boolean;
+  control: Control<OptimismProjectFormValues>;
+}) {
   const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] = useState<FarcasterProfile[]>([]);
   const { user } = useUser();
   const userFarcasterAccount = user?.farcasterUser?.account as unknown as StatusAPIResponse;
@@ -77,6 +86,7 @@ function OptimismProjectMembersForm({ control }: { control: Control<OptimismProj
       />
       <Stack gap={1}>
         <SearchFarcasterUser
+          disabled={disabled}
           filteredFarcasterIds={[
             userFarcasterAccount.fid!,
             ...selectedFarcasterProfiles.map((profile) => profile.fid).filter(isTruthy)
@@ -109,6 +119,100 @@ function OptimismProjectMembersForm({ control }: { control: Control<OptimismProj
         ))}
       </Stack>
     </>
+  );
+}
+
+function OptimismProjectImageField({
+  control,
+  name,
+  type,
+  disabled
+}: {
+  disabled?: boolean;
+  control: Control<OptimismProjectFormValues>;
+  name: keyof OptimismProjectFormValues;
+  type: 'avatar' | 'cover';
+}) {
+  const { field } = useController({
+    name,
+    control
+  });
+
+  const { inputRef, isUploading, onFileChange } = useS3UploadInput({
+    onFileUpload: ({ url }) => {
+      field.onChange(url);
+    }
+  });
+
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={() => (
+        <Box
+          sx={{
+            position: 'relative',
+            width: type === 'avatar' ? 125 : '100%',
+            height: 96,
+            borderRadius: 2
+          }}
+        >
+          <input
+            title={`Add ${type}`}
+            disabled={isUploading || disabled}
+            type='file'
+            accept={'image/*'}
+            ref={inputRef}
+            onChange={onFileChange}
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+              opacity: 0,
+              zIndex: 1,
+              cursor: 'pointer'
+            }}
+          />
+
+          <Box
+            borderRadius={2}
+            height='100%'
+            display='flex'
+            alignItems='center'
+            justifyContent='center'
+            bgcolor={(theme) => theme.palette.background.light}
+            flexDirection='column'
+            overflow='hidden'
+            gap={0}
+          >
+            {isUploading ? (
+              <CircularProgress color='secondary' size={40} />
+            ) : field.value ? (
+              <Image
+                src={field.value as string}
+                alt={`Add ${type}`}
+                width={500}
+                height={96}
+                sizes='100vw'
+                style={{
+                  width: '100%',
+                  height: 96,
+                  objectFit: 'cover'
+                }}
+              />
+            ) : (
+              <>
+                <ImageIcon color='secondary' />
+                <Typography color='secondary' variant='caption'>
+                  Add {type === 'avatar' ? 'avatar' : 'cover'}
+                </Typography>
+              </>
+            )}
+          </Box>
+        </Box>
+      )}
+    />
   );
 }
 
@@ -145,7 +249,14 @@ export function OptimismProjectForm({
         control={control}
         name='name'
         render={({ field, fieldState }) => (
-          <TextInputField label='Name' placeholder='Acme Inc.' required {...field} error={fieldState.error?.message} />
+          <TextInputField
+            disabled={isMutating}
+            label='Name'
+            placeholder='Acme Inc.'
+            required
+            {...field}
+            error={fieldState.error?.message}
+          />
         )}
       />
 
@@ -154,13 +265,23 @@ export function OptimismProjectForm({
         name='description'
         render={({ field, fieldState }) => (
           <TextInputField
+            disabled={isMutating}
             label='Description'
+            rows={5}
+            multiline
             placeholder='A description of your project'
             {...field}
             error={fieldState.error?.message}
           />
         )}
       />
+
+      <FieldWrapper label='Project avatar and cover image'>
+        <Stack direction='row' gap={1}>
+          <OptimismProjectImageField disabled={isMutating} type='avatar' name='avatar' control={control} />
+          <OptimismProjectImageField disabled={isMutating} type='cover' name='coverImage' control={control} />
+        </Stack>
+      </FieldWrapper>
 
       <Controller
         control={control}
@@ -170,6 +291,7 @@ export function OptimismProjectForm({
             <Select
               displayEmpty
               fullWidth
+              disabled={isMutating}
               renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
               error={!!fieldState.error}
               {...field}
@@ -187,6 +309,7 @@ export function OptimismProjectForm({
       <ProjectMultiTextValueFields
         control={control}
         name='websites'
+        disabled={isMutating}
         label='Websites'
         placeholder='https://acme-inc.com'
       />
@@ -194,6 +317,7 @@ export function OptimismProjectForm({
       <ProjectMultiTextValueFields
         control={control}
         name='farcasterValues'
+        disabled={isMutating}
         label='Farcaster'
         placeholder='https://warpcast.com/acme-inc'
       />
@@ -207,7 +331,7 @@ export function OptimismProjectForm({
             control={control}
             name='twitter'
             render={({ field, fieldState }) => (
-              <TextField fullWidth placeholder='acme-inc' error={!!fieldState.error} {...field} />
+              <TextField disabled={isMutating} fullWidth placeholder='acme-inc' error={!!fieldState.error} {...field} />
             )}
           />
         </Stack>
@@ -222,7 +346,7 @@ export function OptimismProjectForm({
             control={control}
             name='github'
             render={({ field, fieldState }) => (
-              <TextField fullWidth placeholder='acme-inc' error={!!fieldState.error} {...field} />
+              <TextField disabled={isMutating} fullWidth placeholder='acme-inc' error={!!fieldState.error} {...field} />
             )}
           />
         </Stack>
@@ -237,7 +361,7 @@ export function OptimismProjectForm({
             control={control}
             name='mirror'
             render={({ field, fieldState }) => (
-              <TextField fullWidth placeholder='acme-inc' error={!!fieldState.error} {...field} />
+              <TextField disabled={isMutating} fullWidth placeholder='acme-inc' error={!!fieldState.error} {...field} />
             )}
           />
         </Stack>
@@ -245,7 +369,7 @@ export function OptimismProjectForm({
 
       <Typography variant='h6'>Team members</Typography>
 
-      <OptimismProjectMembersForm control={control} />
+      <OptimismProjectMembersForm disabled={isMutating} control={control} />
 
       <Stack direction='row' justifyContent='space-between'>
         <Button

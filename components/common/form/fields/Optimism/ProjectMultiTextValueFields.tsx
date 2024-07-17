@@ -12,8 +12,10 @@ export function ProjectMultiTextValueFields({
   control,
   label,
   name,
-  placeholder
+  placeholder,
+  disabled
 }: {
+  disabled?: boolean;
   control: Control<OptimismProjectFormValues>;
   name: keyof OptimismProjectFormValues;
   label: string;
@@ -32,7 +34,13 @@ export function ProjectMultiTextValueFields({
             control={control}
             name={`${name}.0` as FieldArrayPath<OptimismProjectFormValues>}
             render={({ field: _field, fieldState }) => (
-              <TextField fullWidth placeholder={placeholder} error={!!fieldState.error} {..._field} />
+              <TextField
+                disabled={disabled}
+                fullWidth
+                placeholder={placeholder}
+                error={!!fieldState.error}
+                {..._field}
+              />
             )}
           />
         </Stack>
@@ -43,9 +51,15 @@ export function ProjectMultiTextValueFields({
               name={`${name}.${index + 1}` as FieldArrayPath<OptimismProjectFormValues>}
               render={({ field: _field, fieldState }) => (
                 <Stack width='100%' gap={1} alignItems='center' flexDirection='row'>
-                  <TextField fullWidth placeholder={placeholder} error={!!fieldState.error} {..._field} />
-                  <IconButton size='small'>
-                    <DeleteIcon fontSize='small' color='error' onClick={() => remove(index + 1)} />
+                  <TextField
+                    disabled={disabled}
+                    fullWidth
+                    placeholder={placeholder}
+                    error={!!fieldState.error}
+                    {..._field}
+                  />
+                  <IconButton disabled={disabled} size='small' onClick={() => remove(index + 1)}>
+                    <DeleteIcon fontSize='small' color='error' />
                   </IconButton>
                 </Stack>
               )}
@@ -59,6 +73,7 @@ export function ProjectMultiTextValueFields({
         }}
         startIcon={<AddIcon fontSize='small' />}
         size='small'
+        disabled={disabled}
         variant='outlined'
         color='secondary'
         onClick={() => {

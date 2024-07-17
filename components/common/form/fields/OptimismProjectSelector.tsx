@@ -294,8 +294,7 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
               <Typography>Create new OP project</Typography>
             </MenuItem>
           </Select>
-          {selectedProject && <OptimismProjectDisplay project={selectedProject} />}
-          {creatingOpProject && (
+          {creatingOpProject ? (
             <OptimismProjectForm
               onCreateProject={(projectInfo) => {
                 mutate().then(() => {
@@ -308,7 +307,9 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
               }}
               onCancel={() => setCreatingOpProject(false)}
             />
-          )}
+          ) : selectedProject ? (
+            <OptimismProjectDisplay project={selectedProject} />
+          ) : null}
         </>
       )}
     </FieldWrapper>
