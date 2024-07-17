@@ -1,7 +1,10 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { POST } from '@root/adapters/http';
-import type { FarcasterUserWithProfile } from '@root/lib/farcaster/loginWithFarcaster';
+import { getAttestation } from '@root/lib/credentials/getAttestation';
+import { decodeOptimismProjectSnapshotAttestation } from '@root/lib/credentials/schemas/optimismProjectSchemas';
 import { isTruthy } from '@root/lib/utils/types';
+import { optimism } from 'viem/chains';
 
 import { mapProjectToOptimism } from './mapProjectToOptimism';
 
@@ -37,45 +40,41 @@ export async function storeProjectMetadataViaAgora({
   farcasterId: string | number;
   projectId: string;
   projectRefUID: string;
-}): Promise<{ attestationId: string }> {
+}) {
   const project = await prisma.project.findUniqueOrThrow({
     where: {
       id: projectId
     },
     include: {
-      projectMembers: true
-    }
-  });
-
-  const fids = project.projectMembers.map((pm) => pm.farcasterId).filter(isTruthy);
-
-  const farcasterUsers = await prisma.farcasterUser.findMany({
-    where: {
-      fid: {
-        in: fids
+      projectMembers: {
+        select: {
+          teamLead: true,
+          farcasterId: true,
+          userId: true,
+          user: {
+            select: {
+              farcasterUser: true
+            }
+          }
+        }
       }
     }
   });
 
-  return POST(
+  const projectMetadata = mapProjectToOptimism({
+    ...project,
+    projectMembers: project.projectMembers.map((pm) => {
+      return {
+        farcasterId: pm.farcasterId as number
+      };
+    })
+  });
+
+  const { attestationId: attestationMetadataUID } = await POST<{ attestationId: string }>(
     `https://retrofunding.optimism.io/api/v1/projects/${projectRefUID}/metadata_snapshot`,
     {
       farcasterId: farcasterId.toString(),
-      metadata: mapProjectToOptimism({
-        ...project,
-        projectMembers: project.projectMembers
-          .map((pm) => {
-            const farcasterUser = farcasterUsers.find((fu) => fu.fid === pm.farcasterId) as FarcasterUserWithProfile;
-
-            return {
-              ...pm,
-              farcasterUser: {
-                ...farcasterUser.account
-              }
-            };
-          })
-          .filter((pm) => !!pm.farcasterUser)
-      })
+      metadata: projectMetadata
     },
     {
       headers: {
@@ -84,4 +83,43 @@ export async function storeProjectMetadataViaAgora({
       }
     }
   );
+
+  log.info('Project metadata created via Agora', { attestationMetadataUID });
+
+  const attestationData = await getAttestation({
+    attestationUID: attestationMetadataUID,
+    chainId: optimism.id
+  }).then((data) => decodeOptimismProjectSnapshotAttestation(data.data));
+
+  await prisma.optimismProjectAttestation.upsert({
+    where: {
+      projectRefUID
+    },
+    create: {
+      metadata: projectMetadata,
+      farcasterIds: project.projectMembers.map((member) => member.farcasterId).filter(isTruthy),
+      projectRefUID,
+      chainId: optimism.id,
+      metadataAttestationUID: attestationMetadataUID,
+      metadataUrl: attestationData.metadataUrl,
+      name: attestationData.name,
+      project: {
+        connect: {
+          id: projectId
+        }
+      },
+      timeCreated: new Date()
+    },
+    update: {
+      metadata: projectMetadata,
+      farcasterIds: project.projectMembers.map((member) => member.farcasterId).filter(isTruthy),
+      name: attestationData.name,
+      metadataAttestationUID: attestationMetadataUID,
+      metadataUrl: attestationData.metadataUrl
+    }
+  });
+
+  return {
+    attestationMetadataUID
+  };
 }

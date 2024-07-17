@@ -1,3 +1,5 @@
+import type { Project } from '@charmverse/core/prisma-client';
+
 import type { ConnectProjectDetails } from '../projects/fetchProject';
 
 type Contract = {
@@ -49,7 +51,26 @@ type OptimismProject = {
     revenue?: Revenue[];
   };
 };
-export function mapProjectToOptimism(input: ConnectProjectDetails): OptimismProject {
+
+export type ProjectDetails = Pick<
+  Project,
+  | 'description'
+  | 'avatar'
+  | 'coverImage'
+  | 'category'
+  | 'name'
+  | 'farcasterValues'
+  | 'github'
+  | 'mirror'
+  | 'twitter'
+  | 'websites'
+> & {
+  projectMembers: {
+    farcasterId: number;
+  }[];
+};
+
+export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
   return {
     name: input.name || '',
     description: input.description || '',
@@ -62,7 +83,7 @@ export function mapProjectToOptimism(input: ConnectProjectDetails): OptimismProj
       twitter: input.twitter || '',
       mirror: input.mirror || null
     },
-    team: input.projectMembers.map((member) => member.farcasterUser.displayName),
+    team: input.projectMembers.map((member) => member.farcasterId.toString()),
     github: input.github ? [input.github] : [],
     osoSlug: '', // Placeholder: requires specific input
     packages: [], // Placeholder: requires specific input
