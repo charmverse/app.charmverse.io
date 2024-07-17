@@ -124,14 +124,16 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
           style={{ width: '100%', height: '150px', objectFit: 'cover' }}
         />
       )}
-      <Stack gap={1} direction='row' alignItems='center' p={1.5} pb={0}>
-        <Avatar
-          avatar={isValidUrl(projectAvatarUrl) ? projectAvatarUrl : undefined}
-          name={project.name}
-          size='medium'
-          variant='rounded'
-        />
-        <Typography variant='h6'>{project.name}</Typography>
+      <Stack direction='row' alignItems='center' p={1.5} pb={0} justifyContent='space-between'>
+        <Stack gap={1} direction='row' alignItems='center'>
+          <Avatar
+            avatar={isValidUrl(projectAvatarUrl) ? projectAvatarUrl : undefined}
+            name={project.name}
+            size='medium'
+            variant='rounded'
+          />
+          <Typography variant='h6'>{project.name}</Typography>
+        </Stack>
       </Stack>
 
       <MultiTabs

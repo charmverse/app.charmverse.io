@@ -91,9 +91,7 @@
         "../../node_modules/@charmverse/core/dist/cjs/pages-utilities"
       ],
       "@charmverse/core/proposals": [
-        "../../node_modules/@charmverse/core/dist/cjs/proposals",
-        ,
-        "../../@connect-shared/lib/projects/editOptimismProject.ts""../../@connect-shared/lib/projects/getRecentProjectsWithMembers.ts"
+        "../../node_modules/@charmverse/core/dist/cjs/proposals"
       ],
       "@charmverse/core/bounties": [
         "../../node_modules/@charmverse/core/dist/cjs/bounties"
