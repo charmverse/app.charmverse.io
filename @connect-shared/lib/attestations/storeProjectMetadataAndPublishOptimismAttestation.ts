@@ -56,5 +56,7 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     projectId
   });
 
+  log.info('Project metadata created via Agora', { attestationMetadataUID });
+
   return { projectRefUID, attestationMetadataUID };
 }

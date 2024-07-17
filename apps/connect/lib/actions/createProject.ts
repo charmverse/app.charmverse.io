@@ -3,11 +3,11 @@
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
+import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
 
-import { createConnectProject } from '../projects/createConnectProject';
-import { schema } from '../projects/form';
+import { schema } from '../../../../@connect-shared/lib/projects/form';
 
 export const actionCreateProject = authActionClient
   .metadata({ actionName: 'create-project' })
@@ -15,9 +15,10 @@ export const actionCreateProject = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     const input = parsedInput;
     const currentUserId = ctx.session.user!.id;
-    const newProject = await createConnectProject({
+    const newProject = await createOptimismProject({
       userId: currentUserId,
-      input
+      input,
+      source: 'connect'
     });
 
     if (!disableCredentialAutopublish) {

@@ -1,5 +1,5 @@
-import LaunchIcon from '@mui/icons-material/Launch';
 import { Divider, ListItemText, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { useState } from 'react';
 
 import { useGetOpProject, useGetOpProjects } from 'charmClient/hooks/optimism';
 import { Avatar } from 'components/common/Avatar';
@@ -15,11 +15,14 @@ import type { OptimismProjectAttestationContent } from 'pages/api/optimism/proje
 import type { ControlFieldProps, FieldProps } from '../interfaces';
 
 import { FieldWrapper } from './FieldWrapper';
+import { FarcasterCard, OptimismProjectForm } from './Optimism/OptimismProjectForm';
 
 type Props = Omit<ControlFieldProps, 'value'> &
   FieldProps & {
     value?: OpProjectFieldValue;
   };
+
+export const CATEGORIES = ['CeFi', 'Cross Chain', 'DeFi', 'Governance', 'NFT', 'Social', 'Utility'] as const;
 
 function OptimismProjectFields({
   value,
@@ -28,7 +31,7 @@ function OptimismProjectFields({
   label: string;
   value: number | string | string[] | null | undefined;
 }) {
-  if (!value) {
+  if (Array.isArray(value) ? value.length === 0 : !value) {
     return null;
   }
 
@@ -42,23 +45,54 @@ function OptimismProjectFields({
           {value.map((v) =>
             isValidUrl(v) || v.startsWith('http') ? (
               <Link external key={v} href={v} target='_blank'>
-                {v}
+                <Typography
+                  sx={{
+                    overflowWrap: 'break-word'
+                  }}
+                >
+                  {v}
+                </Typography>
               </Link>
             ) : (
-              <Typography key={v}>{v}</Typography>
+              <Typography
+                key={v}
+                sx={{
+                  overflowWrap: 'break-word'
+                }}
+              >
+                {v}
+              </Typography>
             )
           )}
         </Stack>
       ) : typeof value === 'string' ? (
         isValidUrl(value) || value.startsWith('http') ? (
           <Link external href={value} target='_blank'>
-            {value}
+            <Typography
+              sx={{
+                overflowWrap: 'break-word'
+              }}
+            >
+              {value}
+            </Typography>
           </Link>
         ) : (
-          <Typography>{value}</Typography>
+          <Typography
+            sx={{
+              overflowWrap: 'break-word'
+            }}
+          >
+            {value}
+          </Typography>
         )
       ) : (
-        <Typography>{value}</Typography>
+        <Typography
+          sx={{
+            overflowWrap: 'break-word'
+          }}
+        >
+          {value}
+        </Typography>
       )}
     </Stack>
   );
@@ -77,6 +111,7 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
       osoSlug,
       grantsAndFunding
     },
+    metadataAttestationUID,
     projectRefUID
   } = project;
 
@@ -89,14 +124,16 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
           style={{ width: '100%', height: '150px', objectFit: 'cover' }}
         />
       )}
-      <Stack gap={1} direction='row' alignItems='center' p={1.5} pb={0}>
-        <Avatar
-          avatar={isValidUrl(projectAvatarUrl) ? projectAvatarUrl : undefined}
-          name={project.name}
-          size='medium'
-          variant='rounded'
-        />
-        <Typography variant='h6'>{project.name}</Typography>
+      <Stack direction='row' alignItems='center' p={1.5} pb={0} justifyContent='space-between'>
+        <Stack gap={1} direction='row' alignItems='center'>
+          <Avatar
+            avatar={isValidUrl(projectAvatarUrl) ? projectAvatarUrl : undefined}
+            name={project.name}
+            size='medium'
+            variant='rounded'
+          />
+          <Typography variant='h6'>{project.name}</Typography>
+        </Stack>
       </Stack>
 
       <MultiTabs
@@ -105,10 +142,25 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
             'Overview',
             <Stack gap={1.5} key='overview'>
               <OptimismProjectFields label='Project description' value={description} />
-              <OptimismProjectFields label='Project attestation id' value={projectRefUID} />
+              <OptimismProjectFields
+                label='Project attestation'
+                value={`https://optimism.easscan.org/attestation/view/${projectRefUID}`}
+              />
+              <OptimismProjectFields
+                label='Project metadata attestation'
+                value={`https://optimism.easscan.org/attestation/view/${metadataAttestationUID}`}
+              />
               <OptimismProjectFields label='Categories' value={category} />
               <OptimismProjectFields label='Open Source Observer' value={osoSlug} />
               <OptimismProjectFields label='Repositories' value={github} />
+            </Stack>
+          ],
+          [
+            'Team',
+            <Stack gap={1.5} key='team'>
+              {project.teamMembers.map((member) => (
+                <FarcasterCard key={member.fid} avatar={member.avatar} name={member.name} username={member.username} />
+              ))}
             </Stack>
           ],
           [
@@ -183,8 +235,8 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
 export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
   const { user } = useUser();
   const hasFarcasterAccount = !!user?.farcasterUser?.fid;
-
-  const { data: projects = [] } = useGetOpProjects(hasFarcasterAccount);
+  const [creatingOpProject, setCreatingOpProject] = useState(false);
+  const { mutate, data: projects = [] } = useGetOpProjects(hasFarcasterAccount);
 
   const selectedProject = projects.find((project) => project.projectRefUID === value?.projectRefUID);
 
@@ -213,6 +265,8 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
                   projectTitle: newProject.name,
                   projectRefUID: newProject.projectRefUID
                 });
+              } else if (projectId === 'add-new-project') {
+                setCreatingOpProject(true);
               }
             }}
             fullWidth
@@ -246,16 +300,26 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
                 />
               </MenuItem>
             ))}
-            <Link target='_blank' href='https://retrofunding.optimism.io' external>
-              <MenuItem value='add-new-project'>
-                <Stack direction='row' gap={1} alignItems='center'>
-                  <Typography color='primary'>Create new OP project</Typography>
-                  <LaunchIcon fontSize='small' />
-                </Stack>
-              </MenuItem>
-            </Link>
+            <MenuItem value='add-new-project'>
+              <Typography>Create new OP project</Typography>
+            </MenuItem>
           </Select>
-          {selectedProject && <OptimismProjectDisplay project={selectedProject} />}
+          {creatingOpProject ? (
+            <OptimismProjectForm
+              onCreateProject={(projectInfo) => {
+                mutate().then(() => {
+                  props.onChange?.({
+                    projectTitle: projectInfo.title,
+                    projectRefUID: projectInfo.projectRefUID
+                  });
+                  setCreatingOpProject(false);
+                });
+              }}
+              onCancel={() => setCreatingOpProject(false)}
+            />
+          ) : selectedProject ? (
+            <OptimismProjectDisplay project={selectedProject} />
+          ) : null}
         </>
       )}
     </FieldWrapper>

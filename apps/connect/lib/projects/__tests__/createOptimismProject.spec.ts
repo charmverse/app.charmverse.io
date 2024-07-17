@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
+import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import fetchMock from 'fetch-mock-jest';
-
-import { createConnectProject } from '../createConnectProject';
 
 const mockSandbox = fetchMock.sandbox();
 
@@ -16,7 +15,7 @@ afterAll(async () => {
   await prisma.farcasterUser.deleteMany();
 });
 
-describe('createConnectProject', () => {
+describe('createOptimismProject', () => {
   it('should create a project with project members', async () => {
     const { user } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
@@ -74,7 +73,7 @@ describe('createConnectProject', () => {
       ]
     });
 
-    const createdProject = await createConnectProject({
+    const createdProject = await createOptimismProject({
       input: {
         name: 'Project',
         projectMembers: [
@@ -96,6 +95,7 @@ describe('createConnectProject', () => {
           }
         ]
       },
+      source: 'connect',
       userId: user.id
     });
 

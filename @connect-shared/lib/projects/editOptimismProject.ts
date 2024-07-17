@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 
 import type { FormValues } from './form';
 
-export async function editConnectProject({
+export async function editOptimismProject({
   userId,
   input
 }: {
@@ -78,7 +78,7 @@ export async function editConnectProject({
         }
         try {
           const [farcasterProfile] = await getFarcasterUsers({
-            fid: member.farcasterId
+            fids: [member.farcasterId]
           });
 
           if (!farcasterProfile) {

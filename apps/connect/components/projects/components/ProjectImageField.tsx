@@ -1,7 +1,7 @@
 'use client';
 
 import { useS3UploadInput } from '@connect/hooks/useS3UploadInput';
-import type { FormValues } from '@connect/lib/projects/form';
+import type { FormValues } from '@connect-shared/lib/projects/form';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
