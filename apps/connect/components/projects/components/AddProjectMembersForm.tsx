@@ -1,5 +1,5 @@
 import type { LoggedInUser } from '@connect/lib/profile/interfaces';
-import type { FormValues } from '@connect/lib/projects/form';
+import type { FormValues } from '@connect-shared/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Button, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
