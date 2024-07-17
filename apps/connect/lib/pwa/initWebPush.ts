@@ -5,9 +5,5 @@ export function initWebPush() {
   if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
     throw new InvalidInputError('VAPID keys are not set');
   }
-  webPush.setVapidDetails(
-    'https://register.thesunnyawards.fun',
-    process.env.VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY
-  );
+  webPush.setVapidDetails('https://connect.charmverse.io', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
 }

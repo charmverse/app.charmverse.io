@@ -8,7 +8,7 @@ import { count } from 'lib/metrics';
 initWebPush();
 
 export async function task() {
-  log.debug('Running Push Notification cron job for Sunny Awards app');
+  log.debug('Running Push Notification cron job for Connect app');
 
   try {
     const subscriptions = await prisma.pushNotificationSubscription.findMany({});
@@ -20,8 +20,8 @@ export async function task() {
       });
       webpush.sendNotification(s.subscription as any, payload);
     });
-    count('cron.sunnyawards-push-notifications.subscriptions', subscriptions.length);
+    count('cron.connect-push-notifications.subscriptions', subscriptions.length);
   } catch (error: any) {
-    log.error(`Error while sending push notifications to the Sunny Awards`, { error });
+    log.error(`Error while sending push notifications to the Connect app`, { error });
   }
 }
