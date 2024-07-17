@@ -7,7 +7,7 @@ import { createOptimismProject } from '@connect-shared/lib/projects/createOptimi
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
 
-import { schema } from '../projects/form';
+import { schema } from '../../../../@connect-shared/lib/projects/form';
 
 export const actionCreateProject = authActionClient
   .metadata({ actionName: 'create-project' })
@@ -17,7 +17,8 @@ export const actionCreateProject = authActionClient
     const currentUserId = ctx.session.user!.id;
     const newProject = await createOptimismProject({
       userId: currentUserId,
-      input
+      input,
+      source: 'connect'
     });
 
     if (!disableCredentialAutopublish) {

@@ -9,8 +9,8 @@ import { revalidatePath } from 'next/cache';
 
 import { disableCredentialAutopublish } from 'lib/credentials/constants';
 
-import type { FormValues } from '../projects/form';
-import { schema } from '../projects/form';
+import type { FormValues } from '../../../../@connect-shared/lib/projects/form';
+import { schema } from '../../../../@connect-shared/lib/projects/form';
 
 export const actionEditProject = authActionClient
   .metadata({ actionName: 'create-project' })

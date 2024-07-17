@@ -1,5 +1,5 @@
 import { Avatar } from '@connect/components/common/Avatar';
-import type { ProjectsWithMembers } from '@connect/lib/projects/getRecentProjectsWithMembers';
+import type { ProjectsWithMembers } from '@connect-shared/lib/projects/getRecentProjectsWithMembers';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';

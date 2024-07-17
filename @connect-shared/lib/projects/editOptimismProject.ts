@@ -5,7 +5,7 @@ import { uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
 import { v4 } from 'uuid';
 
-import type { FormValues } from '../../../apps/sunnyawards/lib/projects/form';
+import type { FormValues } from './form';
 
 export async function editOptimismProject({
   userId,

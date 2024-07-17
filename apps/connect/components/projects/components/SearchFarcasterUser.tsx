@@ -8,7 +8,6 @@ import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
 
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
-const connectApiClient = new ConnectApiClient();
 
 export function SearchFarcasterUser({
   setSelectedProfile,
@@ -21,7 +20,7 @@ export function SearchFarcasterUser({
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((_searchTerm: string) => {
-      connectApiClient
+      new ConnectApiClient()
         .getFarcasterUsersByUsername(_searchTerm)
         .then((_farcasterProfiles) => {
           if (_farcasterProfiles.length) {
