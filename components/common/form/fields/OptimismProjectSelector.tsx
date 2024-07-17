@@ -1,5 +1,5 @@
-import LaunchIcon from '@mui/icons-material/Launch';
 import { Divider, ListItemText, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { useState } from 'react';
 
 import { useGetOpProject, useGetOpProjects } from 'charmClient/hooks/optimism';
 import { Avatar } from 'components/common/Avatar';
@@ -15,11 +15,14 @@ import type { OptimismProjectAttestationContent } from 'pages/api/optimism/proje
 import type { ControlFieldProps, FieldProps } from '../interfaces';
 
 import { FieldWrapper } from './FieldWrapper';
+import { OptimismProjectForm } from './Optimism/OptimismProjectForm';
 
 type Props = Omit<ControlFieldProps, 'value'> &
   FieldProps & {
     value?: OpProjectFieldValue;
   };
+
+export const CATEGORIES = ['CeFi', 'Cross Chain', 'DeFi', 'Governance', 'NFT', 'Social', 'Utility'] as const;
 
 function OptimismProjectFields({
   value,
@@ -183,8 +186,8 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
 export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
   const { user } = useUser();
   const hasFarcasterAccount = !!user?.farcasterUser?.fid;
-
-  const { data: projects = [] } = useGetOpProjects(hasFarcasterAccount);
+  const [creatingOpProject, setCreatingOpProject] = useState(false);
+  const { mutate, data: projects = [] } = useGetOpProjects(hasFarcasterAccount);
 
   const selectedProject = projects.find((project) => project.projectRefUID === value?.projectRefUID);
 
@@ -213,6 +216,8 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
                   projectTitle: newProject.name,
                   projectRefUID: newProject.projectRefUID
                 });
+              } else if (projectId === 'add-new-project') {
+                setCreatingOpProject(true);
               }
             }}
             fullWidth
@@ -246,16 +251,25 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
                 />
               </MenuItem>
             ))}
-            <Link target='_blank' href='https://retrofunding.optimism.io' external>
-              <MenuItem value='add-new-project'>
-                <Stack direction='row' gap={1} alignItems='center'>
-                  <Typography color='primary'>Create new OP project</Typography>
-                  <LaunchIcon fontSize='small' />
-                </Stack>
-              </MenuItem>
-            </Link>
+            <MenuItem value='add-new-project'>
+              <Typography>Create new OP project</Typography>
+            </MenuItem>
           </Select>
           {selectedProject && <OptimismProjectDisplay project={selectedProject} />}
+          {creatingOpProject && (
+            <OptimismProjectForm
+              onCreateProject={(projectInfo) => {
+                mutate().then(() => {
+                  props.onChange?.({
+                    projectTitle: projectInfo.title,
+                    projectRefUID: projectInfo.projectRefUID
+                  });
+                  setCreatingOpProject(false);
+                });
+              }}
+              onCancel={() => setCreatingOpProject(false)}
+            />
+          )}
         </>
       )}
     </FieldWrapper>

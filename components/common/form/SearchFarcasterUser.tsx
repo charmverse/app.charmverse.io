@@ -1,5 +1,3 @@
-import { ConnectApiClient } from '@connect/apiClient/apiClient';
-import { Avatar } from '@connect/components/common/Avatar';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { BoxProps } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
@@ -7,8 +5,11 @@ import { Stack } from '@mui/system';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
 
+import charmClient from 'charmClient';
+
+import { Avatar } from '../Avatar';
+
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
-const connectApiClient = new ConnectApiClient();
 
 export function SearchFarcasterUser({
   setSelectedProfile,
@@ -21,8 +22,10 @@ export function SearchFarcasterUser({
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((_searchTerm: string) => {
-      connectApiClient
-        .getFarcasterUsersByUsername(_searchTerm)
+      charmClient
+        .searchFarcasterUser({
+          username: _searchTerm
+        })
         .then((_farcasterProfiles) => {
           if (_farcasterProfiles.length) {
             setFarcasterProfiles(
@@ -69,7 +72,7 @@ export function SearchFarcasterUser({
       renderOption={(props, profile) => {
         return (
           <Box {...(props as BoxProps)} display='flex' alignItems='center' gap={1} flexDirection='row'>
-            <Avatar src={profile.pfpUrl} size='medium' />
+            <Avatar avatar={profile.pfpUrl} name={profile.username} size='medium' />
             <Stack>
               <Typography variant='body1'>{profile.displayName}</Typography>
               <Typography variant='subtitle2' color='secondary'>

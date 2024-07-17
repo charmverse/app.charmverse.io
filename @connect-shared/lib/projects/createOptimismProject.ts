@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { ProjectSource } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
@@ -6,9 +7,17 @@ import { stringToValidPath, uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
 import { v4 } from 'uuid';
 
-import type { FormValues } from './form';
+import type { FormValues } from '../../../apps/connect/lib/projects/form';
 
-export async function createConnectProject({ userId, input }: { input: FormValues; userId: string }) {
+export async function createOptimismProject({
+  source = 'connect',
+  userId,
+  input
+}: {
+  source?: ProjectSource;
+  input: FormValues;
+  userId: string;
+}) {
   const farcasterAccounts = await prisma.farcasterUser.findMany({
     where: {
       fid: {
@@ -146,7 +155,7 @@ export async function createConnectProject({ userId, input }: { input: FormValue
       mirror: input.mirror,
       avatar: input.avatar,
       coverImage: input.coverImage,
-      source: 'connect',
+      source,
       projectMembers: {
         createMany: {
           data: [
