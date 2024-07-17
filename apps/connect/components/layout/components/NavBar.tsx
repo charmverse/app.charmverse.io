@@ -11,6 +11,7 @@ import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
 import { Avatar } from 'components/common/Avatar';
+import { InstallAppMenuItem } from 'components/layout/components/InstallAppMenuItem';
 import { actionRevalidatePath } from 'lib/actions/revalidatePath';
 import type { LoggedInUser } from 'lib/profile/interfaces';
 
@@ -77,6 +78,7 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
                 <MenuItem>
                   <Link href='/profile'>@{farcasterDetails?.username}</Link>
                 </MenuItem>
+                <InstallAppMenuItem>Install web app</InstallAppMenuItem>
                 <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
               </Menu>
             </Box>
