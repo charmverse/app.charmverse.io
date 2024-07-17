@@ -22,7 +22,12 @@ import type { OptimismProjectFormValues } from './optimismProjectFormValues';
 import { OPTIMISM_PROJECT_CATEGORIES, optimismProjectSchema } from './optimismProjectFormValues';
 import { ProjectMultiTextValueFields } from './ProjectMultiTextValueFields';
 
-export type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
+export type FarcasterProfile = {
+  username: string;
+  name: string;
+  avatar: string;
+  fid: number;
+};
 
 export function FarcasterCard({
   avatar,
@@ -59,12 +64,15 @@ export function FarcasterCard({
 
 function OptimismProjectMembersForm({
   disabled,
-  control
+  control,
+  initialFarcasterProfiles = []
 }: {
+  initialFarcasterProfiles?: FarcasterProfile[];
   disabled: boolean;
   control: Control<OptimismProjectFormValues>;
 }) {
-  const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] = useState<FarcasterProfile[]>([]);
+  const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] =
+    useState<FarcasterProfile[]>(initialFarcasterProfiles);
   const { user } = useUser();
   const userFarcasterAccount = user?.farcasterUser?.account as unknown as StatusAPIResponse;
   const { append, remove } = useFieldArray({
@@ -95,7 +103,15 @@ function OptimismProjectMembersForm({
               append({
                 farcasterId: farcasterProfile.fid!
               });
-              setSelectedFarcasterProfiles([...selectedFarcasterProfiles, farcasterProfile]);
+              setSelectedFarcasterProfiles([
+                ...selectedFarcasterProfiles,
+                {
+                  avatar: farcasterProfile.pfpUrl as string,
+                  name: farcasterProfile.displayName as string,
+                  username: farcasterProfile.username as string,
+                  fid: farcasterProfile.fid!
+                }
+              ]);
             }
           }}
         />
@@ -104,8 +120,8 @@ function OptimismProjectMembersForm({
         {selectedFarcasterProfiles.map((farcasterProfile) => (
           <FarcasterCard
             key={farcasterProfile.fid}
-            avatar={farcasterProfile.pfpUrl}
-            name={farcasterProfile.displayName}
+            avatar={farcasterProfile.avatar}
+            name={farcasterProfile.name}
             username={farcasterProfile.username}
             onDelete={() => {
               remove(selectedFarcasterProfiles.findIndex((profile) => profile.fid === farcasterProfile.fid));
@@ -219,8 +235,10 @@ export function OptimismProjectForm({
   onCancel,
   isMutating,
   optimismValues,
-  submitButtonText = 'Create'
+  submitButtonText = 'Create',
+  initialFarcasterProfiles
 }: {
+  initialFarcasterProfiles?: FarcasterProfile[];
   optimismValues?: OptimismProjectFormValues;
   isMutating: boolean;
   onSubmit: (projectValues: OptimismProjectFormValues) => void;
@@ -371,7 +389,11 @@ export function OptimismProjectForm({
 
       <Typography variant='h6'>Team members</Typography>
 
-      <OptimismProjectMembersForm disabled={isMutating} control={control} />
+      <OptimismProjectMembersForm
+        initialFarcasterProfiles={initialFarcasterProfiles}
+        disabled={isMutating}
+        control={control}
+      />
 
       <Stack direction='row' justifyContent='space-between'>
         <Button
@@ -382,7 +404,7 @@ export function OptimismProjectForm({
         >
           {submitButtonText}
         </Button>
-        <Button color='secondary' variant='outlined' onClick={onCancel}>
+        <Button color='secondary' variant='outlined' onClick={onCancel} disabled={isMutating}>
           Cancel
         </Button>
       </Stack>

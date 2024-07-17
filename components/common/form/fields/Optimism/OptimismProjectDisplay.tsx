@@ -110,6 +110,7 @@ export function OptimismProjectDisplay({
       grantsAndFunding,
       team
     },
+    teamMembers,
     metadataAttestationUID,
     projectRefUID
   } = project;
@@ -142,6 +143,7 @@ export function OptimismProjectDisplay({
           websites: socialLinks.website,
           projectMembers: team.map((farcasterId) => ({ farcasterId: parseInt(farcasterId) }))
         }}
+        initialFarcasterProfiles={teamMembers.slice(1)}
         submitButtonText='Edit'
         onSubmit={onSubmit}
         isMutating={isMutating}
