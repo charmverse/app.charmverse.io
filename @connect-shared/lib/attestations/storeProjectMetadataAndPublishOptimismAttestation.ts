@@ -7,7 +7,6 @@ import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { fetchProject } from '../projects/fetchProject';
 
 import { createProjectViaAgora, storeProjectMetadataViaAgora } from './agoraApi';
-import { mapProjectToOptimism } from './mapProjectToOptimism';
 
 // Format for metadata.json:
 // attestations/{schemaId}/project-{charmverse_uid}/metadata.json
@@ -51,13 +50,11 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
 
   log.info('Project created via Agora', { projectRefUID });
 
-  const { attestationId: attestationMetadataUID } = await storeProjectMetadataViaAgora({
+  const { attestationMetadataUID } = await storeProjectMetadataViaAgora({
     farcasterId: farcasterUser.fid,
     projectRefUID,
     projectId
   });
-
-  log.info('Project metadata created via Agora', { projectRefUID });
 
   return { projectRefUID, attestationMetadataUID };
 }
