@@ -30,13 +30,19 @@ jobs:
         run: |
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
-
+      
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy')}}; then stack='stg-webapp'; fi
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect')}}; then stack='stg-connect'; fi
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')}}; then stack='stg-sunnyawards'; fi
+      
           echo "STACK=$stack" >> $GITHUB_ENV
-          echo "STAGE_NAME=$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
-
+          stage_name="$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
+      
+          # Sanitize STAGE_NAME as per StagingStack.ts
+          sanitized_stage=$(echo "$stage_name" | sed 's/[^a-zA-Z0-9-]//g' | cut -c1-40 | sed 's/^-/0/' | sed 's/-$/$0/')
+      
+          echo "STAGE_NAME=$sanitized_stage" >> $GITHUB_ENV
+      
       - name: Install dependencies
         uses: ./.github/actions/install
 
