@@ -18,6 +18,12 @@ handler.use(requireUser).get(getProjectsController).post(createProjectController
 
 export type OptimismProjectAttestationContent = Omit<OptimismProjectAttestation, 'metadata'> & {
   metadata: OptimismProjectMetadata;
+  teamMembers: {
+    username: string;
+    name: string;
+    avatar: string;
+    fid: number;
+  }[];
 };
 
 async function getProjectsController(req: NextApiRequest, res: NextApiResponse<OptimismProjectAttestationContent[]>) {

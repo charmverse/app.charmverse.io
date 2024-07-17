@@ -78,7 +78,7 @@ export async function editOptimismProject({
         }
         try {
           const [farcasterProfile] = await getFarcasterUsers({
-            fid: member.farcasterId
+            fids: [member.farcasterId]
           });
 
           if (!farcasterProfile) {

@@ -15,7 +15,7 @@ import type { OptimismProjectAttestationContent } from 'pages/api/optimism/proje
 import type { ControlFieldProps, FieldProps } from '../interfaces';
 
 import { FieldWrapper } from './FieldWrapper';
-import { OptimismProjectForm } from './Optimism/OptimismProjectForm';
+import { FarcasterCard, OptimismProjectForm } from './Optimism/OptimismProjectForm';
 
 type Props = Omit<ControlFieldProps, 'value'> &
   FieldProps & {
@@ -153,6 +153,14 @@ function OptimismProjectDisplay({ project }: { project: OptimismProjectAttestati
               <OptimismProjectFields label='Categories' value={category} />
               <OptimismProjectFields label='Open Source Observer' value={osoSlug} />
               <OptimismProjectFields label='Repositories' value={github} />
+            </Stack>
+          ],
+          [
+            'Team',
+            <Stack gap={1.5} key='team'>
+              {project.teamMembers.map((member) => (
+                <FarcasterCard key={member.fid} avatar={member.avatar} name={member.name} username={member.username} />
+              ))}
             </Stack>
           ],
           [

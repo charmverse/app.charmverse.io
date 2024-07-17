@@ -50,7 +50,7 @@ export async function createOptimismProject({
         }
         try {
           const [farcasterProfile] = await getFarcasterUsers({
-            fid: member.farcasterId
+            fids: [member.farcasterId]
           });
           if (!farcasterProfile) {
             return null;

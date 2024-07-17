@@ -25,7 +25,7 @@ import { ProjectMultiTextValueFields } from './ProjectMultiTextValueFields';
 
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
-function FarcasterCard({
+export function FarcasterCard({
   avatar,
   name,
   onDelete,
