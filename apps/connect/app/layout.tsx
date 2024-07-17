@@ -9,7 +9,7 @@ import { AppProviders } from 'components/layout/AppProviders';
 import { NotificationRequest } from 'components/layout/components/NotificationRequest';
 import { Footer } from 'components/layout/Footer';
 import { Header } from 'components/layout/Header';
-import '@connect/theme/cssVariables.scss';
+import 'theme/cssVariables.scss';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/config';
 import { appDescription, appName, appTitle, appTitleTemplate } from 'lib/utils/appDetails';
