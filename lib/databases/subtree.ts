@@ -64,22 +64,66 @@ export async function getSubtree({ pageId, userId }: { pageId: string; userId: s
 
     return result;
   } else {
+    // INCOMPLETE CODE
+    const proposalBoardBlocks = blocks.filter(
+      (b) => b.type === 'board' && (b.fields as BoardFields).sourceType === 'proposals'
+    );
+
+    // Keep track of all proposal blocks for later filtering
+    const proposalBlocksMap: Record<string, BlockWithDetails> = proposalBoardBlocks.reduce((acc, board) => {
+      acc[board.id] = board;
+      return acc;
+    }, {} as Record<string, BlockWithDetails>);
+
+    // Prepare blocks for processing
+    const blocksGroupedByBoard = proposalBoardBlocks.reduce((acc, board) => {
+      acc[board.id] = {
+        board,
+        cards: []
+      };
+      return acc;
+    }, {} as Record<string, { board: BlockWithDetails; cards: BlockWithDetails[] }>);
+
+    if (proposalBoardBlocks.length) {
+      blocks.forEach((_block) => {
+        const parentId = _block.parentId;
+        if (parentId && _block.type === 'card' && blocksGroupedByBoard[parentId]) {
+          blocksGroupedByBoard[parentId].cards.push(_block);
+          proposalBlocksMap[_block.id] = _block;
+        }
+      });
+    }
+
+    const refreshedBlocks: BlockWithDetails[] = [];
+
+    for (const proposalBoard of proposalBoardBlocks) {
+      const refreshedWithProposalProps = await getBlocksAndRefresh(
+        proposalBoard,
+        blocksGroupedByBoard[proposalBoard.id].cards
+      );
+
+      refreshedBlocks.push(proposalBoard, ...refreshedWithProposalProps);
+    }
+
     const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
       pageIds: blocks.map((b) => b.pageId).filter(isTruthy),
       userId
     });
 
     // Remember to allow normal blocks that do not have a page, like views, to be shown
-    let filtered = blocks.filter((b) => typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read);
+    let filtered = blocks.filter(
+      (b) => !proposalBlocksMap[b.id] && (typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read)
+    );
+
+    const cardsWithProposalProps = [...filtered, ...refreshedBlocks];
 
     // Only edit
     if (page.isLocked && block?.type === 'board' && !computed.edit_lock && block) {
       const views = filtered.filter((b) => b.type === 'view');
-      const cards = filtered.filter((b) => b.type === 'card');
       const filteredCards = filterLockedDatabaseCards({
         board: block as any as Board,
         views: views as any as BoardView[],
-        cards: cards as any as Card[]
+        cards: cardsWithProposalProps as any as Card[]
       });
 
       filtered = [block, ...(views as any as BlockWithDetails[]), ...(filteredCards as any as BlockWithDetails[])];

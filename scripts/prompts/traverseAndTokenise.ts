@@ -24,9 +24,9 @@ ${fileContent}
 
 }
 
-const basePrompt = `Please only return the content from the first file in the following list.
+const basePrompt = `Please only return the content which you have changed.
 
-This is where we want to make changes. The rest of the files provide you context on the dependancy tree and types.
+The first file is the entrypoint to our code, and the rest are its dependenecies.
 
 `;
 
