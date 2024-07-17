@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "testgen": "python scripts/testgen/make_tests.py",
+    "getcontext": "npx tsx scripts/prompts/traverseAndTokenise.ts",
     "ceramic:local": "CERAMIC_ENABLE_EXPERIMENTAL_COMPOSE_DB='true' npx ceramic daemon",
     "ceramic:graphql": "npx dotenv -e .env.local --  tsx background/ceramicServer/ceramic-client.ts",
     "ceramic:graphql:stg": "npx dotenv -e .env.staging --  tsx background/ceramicServer/ceramic-client.ts",
