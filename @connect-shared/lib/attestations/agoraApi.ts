@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { POST } from '@root/adapters/http';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
 import { decodeOptimismProjectSnapshotAttestation } from '@root/lib/credentials/schemas/optimismProjectSchemas';
-import { isTruthy } from '@root/lib/utils/types';
 import { optimism } from 'viem/chains';
 
 import { mapProjectToOptimism } from './mapProjectToOptimism';
@@ -70,6 +70,28 @@ export async function storeProjectMetadataViaAgora({
     })
   });
 
+  return createProjectMetadataAttestation({
+    farcasterId,
+    farcasterIds: project.projectMembers.map((pm) => pm.farcasterId as number),
+    projectMetadata,
+    projectRefUID,
+    projectId
+  });
+}
+
+export async function createProjectMetadataAttestation({
+  projectRefUID,
+  farcasterId,
+  projectMetadata,
+  farcasterIds,
+  projectId
+}: {
+  projectId?: string | null;
+  farcasterId: number | string;
+  projectRefUID: string;
+  projectMetadata: Prisma.InputJsonValue;
+  farcasterIds: number[];
+}) {
   const { attestationId: attestationMetadataUID } = await POST<{ attestationId: string }>(
     `https://retrofunding.optimism.io/api/v1/projects/${projectRefUID}/metadata_snapshot`,
     {
@@ -97,22 +119,24 @@ export async function storeProjectMetadataViaAgora({
     },
     create: {
       metadata: projectMetadata,
-      farcasterIds: project.projectMembers.map((member) => member.farcasterId).filter(isTruthy),
+      farcasterIds,
       projectRefUID,
       chainId: optimism.id,
       metadataAttestationUID: attestationMetadataUID,
       metadataUrl: attestationData.metadataUrl,
       name: attestationData.name,
-      project: {
-        connect: {
-          id: projectId
-        }
-      },
+      project: projectId
+        ? {
+            connect: {
+              id: projectId
+            }
+          }
+        : undefined,
       timeCreated: new Date()
     },
     update: {
       metadata: projectMetadata,
-      farcasterIds: project.projectMembers.map((member) => member.farcasterId).filter(isTruthy),
+      farcasterIds,
       name: attestationData.name,
       metadataAttestationUID: attestationMetadataUID,
       metadataUrl: attestationData.metadataUrl

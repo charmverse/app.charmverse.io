@@ -9,7 +9,6 @@ import { useState } from 'react';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { Controller, useController, useFieldArray, useForm } from 'react-hook-form';
 
-import { useCreateOptimismProject } from 'charmClient/hooks/optimism';
 import { Avatar } from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
@@ -23,7 +22,7 @@ import type { OptimismProjectFormValues } from './optimismProjectFormValues';
 import { OPTIMISM_PROJECT_CATEGORIES, optimismProjectSchema } from './optimismProjectFormValues';
 import { ProjectMultiTextValueFields } from './ProjectMultiTextValueFields';
 
-type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
+export type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
 export function FarcasterCard({
   avatar,
@@ -94,8 +93,7 @@ function OptimismProjectMembersForm({
           setSelectedProfile={(farcasterProfile) => {
             if (farcasterProfile) {
               append({
-                farcasterId: farcasterProfile.fid!,
-                name: farcasterProfile.displayName!
+                farcasterId: farcasterProfile.fid!
               });
               setSelectedFarcasterProfiles([...selectedFarcasterProfiles, farcasterProfile]);
             }
@@ -171,7 +169,7 @@ function OptimismProjectImageField({
               top: 0,
               opacity: 0,
               zIndex: 1,
-              cursor: 'pointer'
+              cursor: disabled ? 'inherit' : 'pointer'
             }}
           />
 
@@ -217,13 +215,18 @@ function OptimismProjectImageField({
 }
 
 export function OptimismProjectForm({
-  onCreateProject,
-  onCancel
+  onSubmit,
+  onCancel,
+  isMutating,
+  optimismValues,
+  submitButtonText = 'Create'
 }: {
-  onCreateProject: (projectInfo: { title: string; projectRefUID: string }) => void;
+  optimismValues?: OptimismProjectFormValues;
+  isMutating: boolean;
+  onSubmit: (projectValues: OptimismProjectFormValues) => void;
   onCancel: VoidFunction;
+  submitButtonText?: string;
 }) {
-  const { trigger: createOptimismProject, isMutating } = useCreateOptimismProject();
   const { user } = useUser();
 
   const {
@@ -231,12 +234,11 @@ export function OptimismProjectForm({
     formState: { isValid },
     getValues
   } = useForm<OptimismProjectFormValues>({
-    defaultValues: {
+    defaultValues: optimismValues ?? {
       name: '',
       projectMembers: [
         {
-          farcasterId: user?.farcasterUser?.fid,
-          name: (user?.farcasterUser?.account as unknown as StatusAPIResponse)?.displayName
+          farcasterId: user?.farcasterUser?.fid
         }
       ]
     },
@@ -375,16 +377,10 @@ export function OptimismProjectForm({
         <Button
           disabled={!isValid || isMutating}
           onClick={() => {
-            const values = getValues();
-            createOptimismProject({
-              ...values,
-              // For some reason websites and farcasterValues both are [null] need to find out why
-              farcasterValues: values.farcasterValues?.filter((value) => value) ?? [],
-              websites: values.websites?.filter((value) => value) ?? []
-            }).then(onCreateProject);
+            onSubmit(getValues());
           }}
         >
-          Create
+          {submitButtonText}
         </Button>
         <Button color='secondary' variant='outlined' onClick={onCancel}>
           Cancel

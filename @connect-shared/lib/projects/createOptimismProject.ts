@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { ProjectSource } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { StatusAPIResponse } from '@farcaster/auth-client';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath, uid } from '@root/lib/utils/strings';
@@ -21,30 +22,45 @@ export async function createOptimismProject({
   const farcasterAccounts = await prisma.farcasterUser.findMany({
     where: {
       fid: {
-        in: input.projectMembers.slice(1).map(({ farcasterId }) => farcasterId)
+        in: input.projectMembers.map(({ farcasterId }) => farcasterId)
       }
     },
     select: {
       userId: true,
-      fid: true
+      fid: true,
+      account: true
     }
   });
 
-  const farcasterAccountsUserIdRecord: Record<number, string> = farcasterAccounts.reduce<Record<number, string>>(
-    (acc, { userId: _userId, fid }) => {
-      acc[fid] = _userId;
-      return acc;
-    },
-    {}
-  );
+  const farcasterAccountsRecord: Record<
+    number,
+    {
+      userId: string;
+      account: StatusAPIResponse;
+    }
+  > = farcasterAccounts.reduce<
+    Record<
+      number,
+      {
+        userId: string;
+        account: StatusAPIResponse;
+      }
+    >
+  >((acc, { fid, userId: _userId, account }) => {
+    acc[fid] = {
+      userId: _userId,
+      account: account as unknown as StatusAPIResponse
+    };
+    return acc;
+  }, {});
 
   const projectMembers = (
     await Promise.all(
       input.projectMembers.slice(1).map(async (member) => {
-        if (farcasterAccountsUserIdRecord[member.farcasterId]) {
+        if (farcasterAccountsRecord[member.farcasterId]) {
           return {
-            userId: farcasterAccountsUserIdRecord[member.farcasterId],
-            name: member.name,
+            userId: farcasterAccountsRecord[member.farcasterId].userId,
+            name: farcasterAccountsRecord[member.farcasterId].account.displayName as string,
             farcasterId: member.farcasterId
           };
         }
@@ -68,13 +84,16 @@ export async function createOptimismProject({
                   }
                 }
               }
+            },
+            select: {
+              id: true
             }
           });
 
           if (farcasterWalletUser) {
             return {
               userId: farcasterWalletUser.id,
-              name: member.name,
+              name: farcasterProfile.display_name,
               farcasterId: member.farcasterId
             };
           }
@@ -108,7 +127,7 @@ export async function createOptimismProject({
 
           return {
             userId: newUser.id,
-            name: member.name,
+            name: displayName,
             farcasterId: member.farcasterId
           };
         } catch (err) {
@@ -163,7 +182,7 @@ export async function createOptimismProject({
               teamLead: true,
               updatedBy: userId,
               userId,
-              name: input.projectMembers[0].name,
+              name: farcasterAccountsRecord[input.projectMembers[0].farcasterId].account.displayName as string,
               farcasterId: input.projectMembers[0].farcasterId
             },
             ...projectMembers.map((member) => ({
