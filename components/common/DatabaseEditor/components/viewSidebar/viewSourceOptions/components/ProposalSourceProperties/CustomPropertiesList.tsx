@@ -85,7 +85,7 @@ export function CustomPropertiesReadonlyList({
 
   return (
     <Stack>
-      <Typography fontWeight='bold' variant='body2'>
+      <Typography fontWeight='bold' variant='h6'>
         Custom Properties
       </Typography>
       <Stack gap={0.5} mt={0.5}>
