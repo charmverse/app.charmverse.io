@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { isDevEnv, isStagingEnv } from '@root/config/constants';
 import webpush from 'web-push';
 
 import { initWebPush } from 'lib/pwa/initWebPush';
@@ -8,11 +7,6 @@ import { getSession } from 'lib/session/getSession';
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
-  if (!isDevEnv || !isStagingEnv) {
-    return new Response('Route can be used only in development!', {
-      status: 500
-    });
-  }
   const { searchParams } = new URL(req.url);
   const title = searchParams.get('title');
   const body = searchParams.get('body');
