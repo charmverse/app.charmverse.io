@@ -1,14 +1,11 @@
-import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
+import { isTruthy } from '@root/lib/utils/types';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import type { SessionData } from 'lib/session/config';
-import { getIronOptions } from 'lib/session/getIronOptions';
-import { isTruthy } from 'lib/utils/types';
+import { getSession } from 'lib/session/getSession';
 
 export async function middleware(request: NextRequest) {
-  const session = await getIronSession<SessionData>(cookies(), getIronOptions());
+  const session = await getSession();
   const user = session.user;
   const path = request.nextUrl.pathname;
 
@@ -37,6 +34,6 @@ export const config = {
      * - images (image files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest).*)'
+    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest|sw.js).*)'
   ]
 };

@@ -1,7 +1,8 @@
 'use server';
 
-import { actionClient } from '@connect/lib/actions/actionClient';
 import { revalidatePath } from 'next/cache';
+
+import { actionClient } from 'lib/actions/actionClient';
 
 /**
  * Revalidates the main layout data.

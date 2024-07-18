@@ -1,18 +1,19 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { ConnectApiClient } from '@connect/apiClient/apiClient';
-import { actionRevalidatePath } from '@connect/lib/actions/revalidatePath';
-import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
+import { ConnectApiClient } from 'apiClient/apiClient';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
-import { Avatar } from '../common/Avatar';
+import { Avatar } from 'components/common/Avatar';
+import { InstallAppMenuItem } from 'components/layout/components/InstallAppMenuItem';
+import { actionRevalidatePath } from 'lib/actions/revalidatePath';
+import type { LoggedInUser } from 'lib/profile/interfaces';
 
 export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
   const path = usePathname();
@@ -60,6 +61,9 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
               <Menu
                 sx={{ mt: 5 }}
                 id='menu-appbar'
+                slotProps={{
+                  paper: { sx: { '.MuiList-root': { pb: 0 }, maxWidth: '250px' } }
+                }}
                 anchorEl={anchorElUser}
                 anchorOrigin={{
                   vertical: 'top',
@@ -78,6 +82,7 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
                   <Link href='/profile'>@{farcasterDetails?.username}</Link>
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
+                <InstallAppMenuItem>Install</InstallAppMenuItem>
               </Menu>
             </Box>
           )}

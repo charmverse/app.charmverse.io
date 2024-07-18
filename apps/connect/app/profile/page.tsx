@@ -1,7 +1,8 @@
-import { ProfilePage } from '@connect/components/profile/ProfilePage';
-import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+import { ProfilePage } from 'components/profile/ProfilePage';
+import { getCurrentUser } from 'lib/actions/getCurrentUser';
 
 export const dynamic = 'force-dynamic';
 

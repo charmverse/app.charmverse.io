@@ -1,20 +1,20 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { PageWrapper } from '@connect/components/common/PageWrapper';
-import { actionCreateProject } from '@connect/lib/actions/createProject';
-import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { FormValues } from '@connect-shared/lib/projects/form';
 import { schema } from '@connect-shared/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+import { PageWrapper } from 'components/common/PageWrapper';
+import { actionCreateProject } from 'lib/actions/createProject';
+import type { LoggedInUser } from 'lib/profile/interfaces';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';

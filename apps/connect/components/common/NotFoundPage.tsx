@@ -1,6 +1,7 @@
-import Bolt from '@connect/public/images/lightning_bolt.svg';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+
+import Bolt from 'public/images/lightning_bolt.svg';
 
 export function NotFoundPage({ content = 'The page you are looking for does not exist!' }: { content?: string }) {
   return (

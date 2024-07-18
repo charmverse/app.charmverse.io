@@ -2,9 +2,10 @@
 
 import { WrongStateError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { authActionClient } from '@connect/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import * as yup from 'yup';
+
+import { authActionClient } from 'lib/actions/actionClient';
 
 const schema = yup.object({
   projectPath: yup.string().required()

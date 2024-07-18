@@ -20,6 +20,8 @@ serverless/*.node
 /apps/connect/.next/
 /apps/connect/dist/
 /apps/connect/node_modules/
+/apps/connect/public/sw*
+/apps/connect/public/swe-worker*
 
 # sunnyawards
 /apps/sunnyawards/.next/

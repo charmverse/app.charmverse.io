@@ -1,9 +1,10 @@
 import 'server-only';
 
-import { FarcasterCard } from '@connect/components/common/FarcasterCard';
-import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import { Divider, Stack, Typography } from '@mui/material';
+
+import { FarcasterCard } from 'components/common/FarcasterCard';
+import { getCurrentUser } from 'lib/actions/getCurrentUser';
 
 import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';

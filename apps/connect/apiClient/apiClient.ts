@@ -1,12 +1,12 @@
 'use client';
 
 import env from '@beam-australia/react-env';
-import type { LoggedInUser } from '@connect/lib/profile/interfaces';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { GET } from '@root/adapters/http';
+import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
+import { encodeFilename } from '@root/lib/utils/encodeFilename';
 
-import type { FarcasterUser } from 'lib/farcaster/getFarcasterUsers';
-import { encodeFilename } from 'lib/utils/encodeFilename';
+import type { LoggedInUser } from 'lib/profile/interfaces';
 
 import { HttpClient } from './HttpClient';
 
