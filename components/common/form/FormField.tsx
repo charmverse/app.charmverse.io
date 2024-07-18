@@ -22,7 +22,7 @@ import {
 import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -90,6 +90,7 @@ function ExpandedFormField({
   formFieldTypeFrequencyCount
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
+  const { space } = useCurrentSpace();
   const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
   // Auto focus on title text field when expanded
   useEffect(() => {
@@ -101,10 +102,18 @@ function ExpandedFormField({
   const formFieldType = formField.type;
   const filteredFormFieldTypes = useMemo(() => {
     if (!formFieldTypeFrequencyCount) {
-      return formFieldTypes;
+      return formFieldTypes.filter((_formFieldType) => {
+        if (_formFieldType === 'optimism_project_profile' && space?.domain !== 'op-grants') {
+          return false;
+        }
+        return true;
+      });
     }
 
     return formFieldTypes.filter((_formFieldType) => {
+      if (_formFieldType === 'optimism_project_profile' && space?.domain !== 'op-grants') {
+        return false;
+      }
       const nonDuplicateFieldType = nonDuplicateFieldTypes.includes(_formFieldType);
       if (nonDuplicateFieldType) {
         return !formFieldTypeFrequencyCount[_formFieldType] || _formFieldType === formFieldType;
@@ -112,7 +121,7 @@ function ExpandedFormField({
 
       return true;
     });
-  }, [formFieldTypeFrequencyCount, formFieldType]);
+  }, [formFieldTypeFrequencyCount, formFieldType, !!space?.domain]);
 
   return (
     <>

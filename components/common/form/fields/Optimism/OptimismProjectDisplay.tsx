@@ -8,6 +8,7 @@ import { Avatar } from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import MultiTabs from 'components/common/MultiTabs';
+import { useUser } from 'hooks/useUser';
 import { isValidUrl } from 'lib/utils/isValidUrl';
 import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
 
@@ -95,6 +96,7 @@ export function OptimismProjectDisplay({
   readOnly?: boolean;
   project: OptimismProjectAttestationContent;
 }) {
+  const { user } = useUser();
   const { mutate } = useGetOpProjects();
   const [isEditing, setIsEditing] = useState(false);
   const { trigger: editOptimismProject, isMutating } = useEditOptimismProject(project.projectRefUID);
@@ -111,10 +113,13 @@ export function OptimismProjectDisplay({
       grantsAndFunding,
       team
     },
+    farcasterIds,
     teamMembers,
     metadataAttestationUID,
     projectRefUID
   } = project;
+
+  const canEdit = farcasterIds.find((farcasterId) => farcasterId === user?.farcasterUser?.fid);
 
   function onSubmit(values: OptimismProjectFormValues) {
     editOptimismProject({
@@ -144,8 +149,9 @@ export function OptimismProjectDisplay({
           websites: socialLinks.website,
           projectMembers: team.map((farcasterId) => ({ farcasterId: parseInt(farcasterId) }))
         }}
+        // skip the team lead
         initialFarcasterProfiles={teamMembers.slice(1)}
-        submitButtonText='Edit'
+        submitButtonText='Update'
         onSubmit={onSubmit}
         isMutating={isMutating}
         onCancel={() => setIsEditing(false)}
@@ -178,6 +184,7 @@ export function OptimismProjectDisplay({
             startIcon={<EditOutlinedIcon fontSize='small' />}
             variant='outlined'
             color='secondary'
+            disabledTooltip={!canEdit ? 'You do not have permission to edit this project' : undefined}
           >
             Edit
           </Button>

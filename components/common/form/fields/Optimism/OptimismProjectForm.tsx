@@ -87,7 +87,7 @@ function OptimismProjectMembersForm({
   }
 
   return (
-    <>
+    <Stack gap={1}>
       <FarcasterCard
         avatar={userFarcasterAccount.pfpUrl}
         name={userFarcasterAccount.displayName}
@@ -118,24 +118,23 @@ function OptimismProjectMembersForm({
           }}
         />
       </Stack>
-      <Stack gap={1} mb={2}>
-        {selectedFarcasterProfiles.map((farcasterProfile) => (
-          <FarcasterCard
-            key={farcasterProfile.fid}
-            avatar={farcasterProfile.avatar}
-            name={farcasterProfile.name}
-            username={farcasterProfile.username}
-            disabled={disabled}
-            onDelete={() => {
-              remove(selectedFarcasterProfiles.findIndex((profile) => profile.fid === farcasterProfile.fid));
-              setSelectedFarcasterProfiles(
-                selectedFarcasterProfiles.filter((profile) => profile.fid !== farcasterProfile.fid)
-              );
-            }}
-          />
-        ))}
-      </Stack>
-    </>
+      {selectedFarcasterProfiles.map((farcasterProfile) => (
+        <FarcasterCard
+          key={farcasterProfile.fid}
+          avatar={farcasterProfile.avatar}
+          name={farcasterProfile.name}
+          username={farcasterProfile.username}
+          disabled={disabled}
+          onDelete={() => {
+            // + 1 since the first member is the team lead
+            remove(selectedFarcasterProfiles.findIndex((profile) => profile.fid === farcasterProfile.fid) + 1);
+            setSelectedFarcasterProfiles(
+              selectedFarcasterProfiles.filter((profile) => profile.fid !== farcasterProfile.fid)
+            );
+          }}
+        />
+      ))}
+    </Stack>
   );
 }
 
@@ -399,6 +398,9 @@ export function OptimismProjectForm({
       />
 
       <Stack direction='row' justifyContent='space-between'>
+        <Button color='secondary' variant='outlined' onClick={onCancel} disabled={isMutating}>
+          Cancel
+        </Button>
         <Button
           disabled={!isValid || isMutating}
           onClick={() => {
@@ -406,9 +408,6 @@ export function OptimismProjectForm({
           }}
         >
           {submitButtonText}
-        </Button>
-        <Button color='secondary' variant='outlined' onClick={onCancel} disabled={isMutating}>
-          Cancel
         </Button>
       </Stack>
     </Stack>

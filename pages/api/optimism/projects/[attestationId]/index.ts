@@ -3,12 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { createProjectMetadataAttestation } from '@connect-shared/lib/attestations/agoraApi';
 import { editOptimismProject } from '@connect-shared/lib/projects/editOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
-import { GET } from '@root/adapters/http';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
-import {
-  decodeOptimismProjectAttestation,
-  decodeOptimismProjectSnapshotAttestation
-} from '@root/lib/credentials/schemas/optimismProjectSchemas';
+import { decodeOptimismProjectAttestation } from '@root/lib/credentials/schemas/optimismProjectSchemas';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import type { OptimismProjectMetadata } from '@root/lib/optimism/storeOptimismProjectAttestations';
 import { withSessionRoute } from '@root/lib/session/withSession';
 import { UnauthorisedActionError } from '@root/lib/utils/errors';
@@ -37,6 +34,7 @@ async function getProjectByAttestationIdController(
 
 async function updateProjectController(req: NextApiRequest, res: NextApiResponse) {
   const attestationId = req.query.attestationId as string;
+  const userId = req.session.user.id;
   const optimismProjectValues = req.body as OptimismProjectFormValues;
 
   const optimismProjectAttestation = await prisma.optimismProjectAttestation.findUniqueOrThrow({
@@ -44,13 +42,14 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
       projectRefUID: attestationId
     },
     select: {
+      metadata: true,
       projectId: true,
       metadataAttestationUID: true
     }
   });
   const farcasterUser = await prisma.farcasterUser.findUniqueOrThrow({
     where: {
-      userId: req.session.user.id
+      userId
     },
     select: {
       fid: true
@@ -68,21 +67,16 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
 
   if (optimismProjectAttestation.projectId) {
     await editOptimismProject({
-      userId: req.session.user.id,
+      userId,
       input: {
         projectId: optimismProjectAttestation.projectId,
         ...optimismProjectValues
       }
     });
-    await generateOgImage(optimismProjectAttestation.projectId, req.session.user.id);
+    await generateOgImage(optimismProjectAttestation.projectId, userId);
   }
 
-  const projectMetadataAttestationData = await getAttestation({
-    attestationUID: optimismProjectAttestation.metadataAttestationUID,
-    chainId: optimism.id
-  }).then((data) => decodeOptimismProjectSnapshotAttestation(data.data));
-
-  const optimismProjectMetadata = await GET<OptimismProjectMetadata>(projectMetadataAttestationData.metadataUrl);
+  const optimismProjectMetadata = optimismProjectAttestation.metadata as OptimismProjectMetadata;
 
   const newProjectMetadata = {
     ...optimismProjectMetadata,
@@ -107,6 +101,11 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
     projectMetadata: newProjectMetadata,
     projectRefUID: attestationId,
     projectId: optimismProjectAttestation.projectId
+  });
+
+  trackUserAction('update_optimism_project', {
+    projectRefUID: attestationId,
+    userId
   });
 
   return res.status(200).end();

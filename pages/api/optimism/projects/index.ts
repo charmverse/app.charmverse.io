@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -84,6 +85,12 @@ async function createProjectController(
   });
 
   await generateOgImage(newProject.id, userId);
+
+  trackUserAction('create_optimism_project', {
+    projectRefUID,
+    farcasterId: user.farcasterUser.fid,
+    userId
+  });
 
   return res.status(200).json({
     title: newProject.name,
