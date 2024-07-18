@@ -1,64 +1,36 @@
 import { log } from '@charmverse/core/log';
+import type { ProjectSource } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
-import { uid } from '@root/lib/utils/strings';
+import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
+import { stringToValidPath, uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
 import { v4 } from 'uuid';
 
 import type { FormValues } from './form';
 
-export async function editConnectProject({
+export async function createOptimismProject({
+  source,
   userId,
   input
 }: {
-  input: FormValues & {
-    projectId: string;
-  };
+  source: ProjectSource;
+  input: FormValues;
   userId: string;
 }) {
-  const [currentProjectMembers, inputProjectMembers] = await Promise.all([
-    prisma.projectMember.findMany({
-      where: {
-        projectId: input.projectId,
-        teamLead: false
-      },
-      select: {
-        id: true,
-        user: {
-          select: {
-            farcasterUser: {
-              select: {
-                fid: true
-              }
-            }
-          }
-        }
+  const farcasterAccounts = await prisma.farcasterUser.findMany({
+    where: {
+      fid: {
+        in: input.projectMembers.slice(1).map(({ farcasterId }) => farcasterId)
       }
-    }),
-    prisma.farcasterUser.findMany({
-      where: {
-        fid: {
-          in: input.projectMembers.map(({ farcasterId }) => farcasterId)
-        }
-      },
-      select: {
-        userId: true,
-        fid: true
-      }
-    })
-  ]);
+    },
+    select: {
+      userId: true,
+      fid: true
+    }
+  });
 
-  const deletedProjectMembers = currentProjectMembers.filter(
-    (projectMember) =>
-      !input.projectMembers.some((member) => member.farcasterId === projectMember.user?.farcasterUser?.fid)
-  );
-
-  const newProjectMembers = input.projectMembers.filter(
-    (member) =>
-      !currentProjectMembers.some((projectMember) => member.farcasterId === projectMember.user?.farcasterUser?.fid)
-  );
-
-  const farcasterAccountsUserIdRecord: Record<number, string> = inputProjectMembers.reduce<Record<number, string>>(
+  const farcasterAccountsUserIdRecord: Record<number, string> = farcasterAccounts.reduce<Record<number, string>>(
     (acc, { userId: _userId, fid }) => {
       acc[fid] = _userId;
       return acc;
@@ -68,7 +40,7 @@ export async function editConnectProject({
 
   const projectMembers = (
     await Promise.all(
-      newProjectMembers.map(async (member) => {
+      input.projectMembers.slice(1).map(async (member) => {
         if (farcasterAccountsUserIdRecord[member.farcasterId]) {
           return {
             userId: farcasterAccountsUserIdRecord[member.farcasterId],
@@ -78,9 +50,8 @@ export async function editConnectProject({
         }
         try {
           const [farcasterProfile] = await getFarcasterUsers({
-            fid: member.farcasterId
+            fids: [member.farcasterId]
           });
-
           if (!farcasterProfile) {
             return null;
           }
@@ -151,42 +122,62 @@ export async function editConnectProject({
     )
   ).filter(isTruthy);
 
-  const [editedProject] = await prisma.$transaction([
-    prisma.project.update({
-      where: {
-        id: input.projectId
-      },
-      data: {
-        name: input.name,
-        updatedBy: userId,
-        description: input.description,
-        category: input.category,
-        websites: input.websites?.filter(isTruthy),
-        farcasterValues: input.farcasterValues?.filter(isTruthy),
-        twitter: input.twitter,
-        github: input.github,
-        mirror: input.mirror,
-        avatar: input.avatar,
-        coverImage: input.coverImage
-      }
-    }),
-    prisma.projectMember.createMany({
-      data: projectMembers.map((member) => ({
-        teamLead: false,
-        updatedBy: userId,
-        name: member.name,
-        userId: member.userId,
-        projectId: input.projectId
-      }))
-    }),
-    prisma.projectMember.deleteMany({
-      where: {
-        id: {
-          in: deletedProjectMembers.map((member) => member.id)
+  let path = stringToValidPath({ input: input.name ?? '', wordSeparator: '-', autoReplaceEmpty: false });
+
+  const existingProjectWithPath = await prisma.project.findFirst({
+    where: {
+      path
+    },
+    select: {
+      id: true
+    }
+  });
+
+  if (existingProjectWithPath) {
+    path = generatePagePathFromPathAndTitle({
+      title: input.name,
+      existingPagePath: path
+    });
+  }
+
+  const project = await prisma.project.create({
+    data: {
+      name: input.name,
+      path,
+      updatedBy: userId,
+      createdBy: userId,
+      description: input.description,
+      category: input.category,
+      websites: input.websites?.filter(isTruthy),
+      farcasterValues: input.farcasterValues?.filter(isTruthy),
+      twitter: input.twitter,
+      github: input.github,
+      mirror: input.mirror,
+      avatar: input.avatar,
+      coverImage: input.coverImage,
+      source,
+      projectMembers: {
+        createMany: {
+          data: [
+            {
+              teamLead: true,
+              updatedBy: userId,
+              userId,
+              name: input.projectMembers[0].name,
+              farcasterId: input.projectMembers[0].farcasterId
+            },
+            ...projectMembers.map((member) => ({
+              teamLead: false,
+              updatedBy: userId,
+              userId: member.userId,
+              name: member.name,
+              farcasterId: member.farcasterId
+            }))
+          ]
         }
       }
-    })
-  ]);
+    }
+  });
 
-  return editedProject;
+  return project;
 }

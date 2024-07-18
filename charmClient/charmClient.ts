@@ -11,6 +11,7 @@ import type {
 } from '@charmverse/core/prisma';
 import * as http from '@root/adapters/http';
 import type { FiatCurrency, IPairQuote } from '@root/connectors/chains';
+import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import type { LoggedInUser } from '@root/models';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
@@ -367,6 +368,10 @@ class CharmClient {
 
   resolveEnsName(ens: string) {
     return http.GET<string | null>('/api/resolve-ens', { ens });
+  }
+
+  searchFarcasterUser({ username }: { username: string }) {
+    return http.GET<FarcasterUser[]>(`/api/farcaster/search-by-username`, { username });
   }
 }
 

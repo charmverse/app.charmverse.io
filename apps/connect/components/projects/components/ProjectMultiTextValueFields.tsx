@@ -1,10 +1,9 @@
+import type { FormValues } from '@connect-shared/lib/projects/form';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { Button, FormLabel, IconButton, Stack, TextField } from '@mui/material';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { Controller, useFieldArray } from 'react-hook-form';
-
-import type { FormValues } from 'lib/projects/form';
 
 export function ProjectMultiTextValueFields({
   control,

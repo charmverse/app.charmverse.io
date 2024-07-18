@@ -1,3 +1,4 @@
+import type { FormValues } from '@connect-shared/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Button, Stack, Typography } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
@@ -6,7 +7,6 @@ import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-fo
 import { useFieldArray } from 'react-hook-form';
 
 import type { LoggedInUser } from 'lib/profile/interfaces';
-import type { FormValues } from 'lib/projects/form';
 
 import { FarcasterCard } from '../../common/FarcasterCard';
 

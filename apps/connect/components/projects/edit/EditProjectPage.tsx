@@ -2,6 +2,8 @@
 
 import { log } from '@charmverse/core/log';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
+import type { FormValues, ProjectCategory } from '@connect-shared/lib/projects/form';
+import { schema } from '@connect-shared/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -13,8 +15,6 @@ import { useForm } from 'react-hook-form';
 import { PageWrapper } from 'components/common/PageWrapper';
 import { actionEditProject } from 'lib/actions/editProject';
 import type { LoggedInUser } from 'lib/profile/interfaces';
-import { schema } from 'lib/projects/form';
-import type { FormValues, ProjectCategory } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';

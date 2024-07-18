@@ -55,7 +55,9 @@
     ".next/types/**/*.ts",
     "../../@connect-shared/lib/projects/fetchProject.ts",
     "../../@connect-shared/lib/projects/saveOgImage.ts",
-    "../../@connect-shared/ProjectShareItem.tsx"
+    "../../@connect-shared/ProjectShareItem.tsx",
+    "../../@connect-shared/lib/projects/createOptimismProject.ts",
+    "../../@connect-shared/lib/projects/form.ts"
   ],
   "exclude": ["../../node_modules", ".next/", "public/sw.js"]
 }
