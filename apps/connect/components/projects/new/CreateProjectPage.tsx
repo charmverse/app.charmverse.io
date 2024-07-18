@@ -14,8 +14,6 @@ import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
@@ -47,8 +45,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
       name: '',
       projectMembers: [
         {
-          farcasterId: user?.farcasterUser?.fid,
-          name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName
+          farcasterId: user?.farcasterUser?.fid
         }
       ]
     },
