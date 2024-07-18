@@ -11,6 +11,7 @@ import { useRef } from 'react';
 
 import charmClient from 'charmClient/charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
+import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 import { EditIcon } from 'components/common/Icons/EditIcon';
@@ -56,8 +57,11 @@ export function NewProposalButton() {
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
   const { trigger: trashPages } = useTrashPages();
   const canCreateProposal = spacePermissions?.createProposals;
-  const router = useRouter();
+
   const { space } = useCurrentSpace();
+  const { data: workflows } = useGetProposalWorkflows(space?.id);
+
+  const hasWorkflows = !!workflows?.length;
 
   const proposalTemplatePages: TemplateItem[] = (proposalTemplates || []).map((proposal) => ({
     id: proposal.pageId,
@@ -95,11 +99,19 @@ export function NewProposalButton() {
 
   return (
     <>
-      <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
+      <Tooltip
+        title={
+          !canCreateProposal
+            ? 'You do not have the permission to create a proposal.'
+            : !hasWorkflows
+            ? 'Add a workflow from the space settings to start using proposals'
+            : ''
+        }
+      >
         <Box>
           <ButtonGroup variant='contained' ref={buttonRef}>
             <Button
-              disabled={!canCreateProposal}
+              disabled={!canCreateProposal || !hasWorkflows}
               onClick={() => {
                 if (space?.domain === 'op-grants') {
                   charmClient.track.trackActionOp('click_proposal_creation_button', {
@@ -115,7 +127,7 @@ export function NewProposalButton() {
             <Button
               data-test='proposal-template-select'
               size='small'
-              disabled={!canCreateProposal}
+              disabled={!canCreateProposal || !hasWorkflows}
               onClick={popupState.open}
             >
               <KeyboardArrowDown />
