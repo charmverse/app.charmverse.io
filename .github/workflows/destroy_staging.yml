@@ -27,7 +27,13 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.x
 
       - name: set STAGE variable in environment for next steps
-        run: echo "STAGE=${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+        run: |
+          stage_name="$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
+
+          # Sanitize STAGE_NAME as per StagingStack.ts
+          sanitized_stage=$(echo "$stage_name" | sed 's/[^a-zA-Z0-9-]//g' | cut -c1-40 | sed 's/^-/0/' | sed 's/-$/$0/')
+
+          echo "STAGE_NAME=$sanitized_stage" >> $GITHUB_ENV
 
       - name: checkout the files
         uses: actions/checkout@v4
