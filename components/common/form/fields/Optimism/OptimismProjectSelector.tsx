@@ -76,7 +76,9 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
             }}
             fullWidth
             renderValue={(selectedValue) => {
-              if (selectedValue === '') {
+              if (selectedValue === 'add-new-project') {
+                return <Typography color='textSecondary'>New project</Typography>;
+              } else if (selectedValue === '') {
                 return <Typography color='textSecondary'>Select a project</Typography>;
               }
               return selectedProject?.name ?? '';
