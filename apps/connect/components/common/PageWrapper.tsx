@@ -12,7 +12,6 @@ export function PageWrapper({ children, header = null, ...restProps }: BoxProps 
       maxWidth='700px'
       height='100%'
       mx='auto'
-      mb={1}
       {...restProps}
     >
       {header}
