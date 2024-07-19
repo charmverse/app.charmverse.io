@@ -52,7 +52,8 @@ export function HomePage() {
         href='https://warpcast.com/~/signup'
         target='_blank'
         rel='noopener'
-        color='inherit'
+        color='text.primary'
+        fontWeight={500}
         display='block'
       >
         Don't have a Farcaster account?
