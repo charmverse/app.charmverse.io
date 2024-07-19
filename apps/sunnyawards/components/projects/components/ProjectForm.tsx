@@ -31,7 +31,7 @@ export function ProjectForm({
             <TextField
               data-test='project-form-name'
               autoFocus
-              placeholder='Acme Inc.'
+              placeholder='Charmverse'
               aria-labelledby='project-name'
               error={!!fieldState.error}
               {...field}
@@ -92,14 +92,14 @@ export function ProjectForm({
         name='websites'
         label='Websites'
         dataTest='project-form-websites'
-        placeholder='https://acme-inc.com'
+        placeholder='https://charmverse.io'
       />
       <ProjectMultiTextValueFields
         control={control}
         name='farcasterValues'
         label='Farcaster'
         dataTest='project-form-farcaster-values'
-        placeholder='https://warpcast.com/acme-inc'
+        placeholder='https://warpcast.com/charmverse'
       />
       <Stack>
         <FormLabel id='project-twitter'>X</FormLabel>
@@ -113,7 +113,7 @@ export function ProjectForm({
             render={({ field, fieldState }) => (
               <TextField
                 fullWidth
-                placeholder='acme-inc'
+                placeholder='charmverse'
                 data-test='project-form-twitter'
                 aria-labelledby='project-twitter'
                 error={!!fieldState.error}
@@ -135,7 +135,7 @@ export function ProjectForm({
             render={({ field, fieldState }) => (
               <TextField
                 fullWidth
-                placeholder='acme-inc'
+                placeholder='charmverse'
                 aria-labelledby='project-github'
                 data-test='project-form-github'
                 error={!!fieldState.error}
@@ -157,7 +157,7 @@ export function ProjectForm({
             render={({ field, fieldState }) => (
               <TextField
                 fullWidth
-                placeholder='acme-inc'
+                placeholder='charmverse'
                 aria-labelledby='project-mirror'
                 data-test='project-form-mirror'
                 error={!!fieldState.error}
