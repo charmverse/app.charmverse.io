@@ -19,9 +19,9 @@ import type { ContextMenuProps } from './EvaluationContextMenu';
 import { EvaluationContextMenu } from './EvaluationContextMenu';
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 
-type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit' | 'move'>;
+type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit' | 'move' | 'move_forward'>;
 
-export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move'];
+export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move', 'move_forward'];
 
 // const evaluateVerbs = {
 //   [ProposalEvaluationType.feedback]: 'Move Forward',
@@ -96,7 +96,8 @@ const permissionOperationPlaceholders = {
   [ProposalOperation.view]: 'Only admins can view the proposal',
   [ProposalOperation.comment]: 'No one can comment',
   [ProposalOperation.edit]: 'Only admins can edit the proposal',
-  [ProposalOperation.move]: 'Only admins can change the current step'
+  [ProposalOperation.move]: 'Only admins can change the current step',
+  [ProposalOperation.move_forward]: 'Reviewers can mark this step complete'
 };
 
 export function EvaluationPermissionsRow({
@@ -193,7 +194,13 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
 
       {proposalOperations.map((operation) => (
         <Box key={operation} className='octo-propertyrow'>
-          <PropertyLabel readOnly>{operation === 'move' ? 'Move Backward' : capitalize(operation)}</PropertyLabel>
+          <PropertyLabel readOnly>
+            {operation === 'move'
+              ? 'Move Backward'
+              : operation === 'move_forward'
+              ? 'Complete step'
+              : capitalize(operation)}
+          </PropertyLabel>
           {isFirstEvaluation && operation === 'move' ? (
             <Tooltip title='Only authors can move back to Draft'>
               <span>
@@ -232,17 +239,6 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
         <PropertyLabel readOnly>
           {evaluation.type === 'sign_documents' ? 'Prepare Documents' : 'Evaluate'}
         </PropertyLabel>
-        <UserAndRoleSelect
-          readOnly
-          wrapColumn
-          value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
-          systemRoles={evaluation.type === 'vote' ? [currentVoterSystemRole] : [currentReviewerSystemRole]}
-          onChange={() => {}}
-        />
-      </Box>
-
-      <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
-        <PropertyLabel readOnly>Move forward</PropertyLabel>
         <UserAndRoleSelect
           readOnly
           wrapColumn
