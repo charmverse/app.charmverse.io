@@ -61,6 +61,8 @@ export function NewProposalButton() {
   const { space } = useCurrentSpace();
   const { data: workflows } = useGetProposalWorkflows(space?.id);
 
+  const templatesRequired = !!space?.requireProposalTemplate;
+
   const hasWorkflows = !!workflows?.length;
 
   const proposalTemplatePages: TemplateItem[] = (proposalTemplates || []).map((proposal) => ({
@@ -118,8 +120,12 @@ export function NewProposalButton() {
                     spaceId: space.id
                   });
                 }
+                if (templatesRequired) {
+                  popupState.open();
+                }
               }}
-              href='/proposals/new'
+              // We don't want to navigate to the new proposal page if the space enforces creating templates from a proposal
+              href={templatesRequired ? undefined : '/proposals/new'}
               data-test='new-proposal-button'
             >
               Create
@@ -128,7 +134,14 @@ export function NewProposalButton() {
               data-test='proposal-template-select'
               size='small'
               disabled={!canCreateProposal || !hasWorkflows}
-              onClick={popupState.open}
+              onClick={() => {
+                if (space?.domain === 'op-grants') {
+                  charmClient.track.trackActionOp('click_proposal_creation_button', {
+                    spaceId: space.id
+                  });
+                }
+                popupState.open();
+              }}
             >
               <KeyboardArrowDown />
             </Button>
