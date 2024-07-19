@@ -48,7 +48,6 @@ import { PageEditorContainer } from './components/PageEditorContainer';
 import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { PageTitleInput } from './components/PageTitleInput';
-import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalNotesBanner } from './components/ProposalNotesBanner';
 import { ProposalProperties } from './components/ProposalProperties';
