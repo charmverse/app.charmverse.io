@@ -24,16 +24,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <Box
-        component='body'
-        display='grid'
-        gridTemplateRows='auto 1fr auto'
-        minHeight='100vh'
-        bgcolor={{ xs: 'background.default', md: 'grey.200' }}
-      >
+      <Box component='body' display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
         <AppProviders>
           <Header />
-          <Box component='main'>{children}</Box>
+          <Box component='main' bgcolor='mainBackground.main' pb={2}>
+            {children}
+          </Box>
           <Footer />
         </AppProviders>
       </Box>
