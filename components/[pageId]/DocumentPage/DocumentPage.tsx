@@ -290,16 +290,10 @@ function DocumentPageComponent({
           {/** we need a reference for width to handle inline dbs */}
           <Box ref={containerWidthRef} width='100%' />
           {/* show either deleted banner or archived, but not both */}
-          {page.deletedAt ? (
+          {page.deletedAt && (
             <AlertContainer>
               <PageDeleteBanner pageType={page.type} pageId={page.id} />
             </AlertContainer>
-          ) : (
-            !!proposal?.archived && (
-              <AlertContainer>
-                <ProposalArchivedBanner proposalId={proposal.id} disabled={!proposal.permissions.delete} />
-              </AlertContainer>
-            )
           )}
           {connectionError && (
             <AlertContainer>
