@@ -230,8 +230,19 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
       {/* show evaluation action which is uneditable */}
       <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
         <PropertyLabel readOnly>
-          {evaluation.type === 'sign_documents' ? 'Prepare Documents' : 'Move Forward'}
+          {evaluation.type === 'sign_documents' ? 'Prepare Documents' : 'Evaluate'}
         </PropertyLabel>
+        <UserAndRoleSelect
+          readOnly
+          wrapColumn
+          value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
+          systemRoles={evaluation.type === 'vote' ? [currentVoterSystemRole] : [currentReviewerSystemRole]}
+          onChange={() => {}}
+        />
+      </Box>
+
+      <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
+        <PropertyLabel readOnly>Move forward</PropertyLabel>
         <UserAndRoleSelect
           readOnly
           wrapColumn
