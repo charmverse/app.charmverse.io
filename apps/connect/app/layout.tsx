@@ -1,7 +1,5 @@
 import Box from '@mui/material/Box';
-import { getIronSession } from 'iron-session';
 import type { Metadata, Viewport } from 'next';
-import { cookies } from 'next/headers';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
@@ -10,8 +8,7 @@ import { NotificationRequest } from 'components/layout/components/NotificationRe
 import { Footer } from 'components/layout/Footer';
 import { Header } from 'components/layout/Header';
 import 'theme/cssVariables.scss';
-import type { SessionData } from 'lib/session/config';
-import { getIronOptions } from 'lib/session/config';
+import { getSession } from 'lib/session/getSession';
 import { appDescription, appName, appTitle, appTitleTemplate } from 'lib/utils/appDetails';
 
 export const metadata: Metadata = {
@@ -58,24 +55,20 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const session = await getIronSession<SessionData>(cookies(), getIronOptions());
+  const session = await getSession();
   const vapidPublicKey = process.env.VAPID_PUBLIC_KEY;
 
   return (
     <html lang='en' dir='ltr'>
       {/* load env vars for the frontend */}
       <Script src='/__ENV.js' />
-      <Box
-        component='body'
-        display='grid'
-        gridTemplateRows='auto 1fr auto'
-        minHeight='100vh'
-        bgcolor={{ xs: 'background.default', md: 'grey.200' }}
-      >
+      <Box component='body' display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
         <AppProviders>
           <Header />
           {session?.user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
-          <Box component='main'>{children}</Box>
+          <Box component='main' bgcolor='mainBackground.main' pb={2}>
+            {children}
+          </Box>
           <Footer />
         </AppProviders>
       </Box>
