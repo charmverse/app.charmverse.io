@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import { isSystemError } from '@root/lib/middleware/isSystemError';
 import type { IronSession } from 'iron-session';
 import { headers } from 'next/headers';
-import type { ServerErrorFunctionUtils } from 'next-safe-action/typeschema';
+import type { ServerErrorFunctionUtils } from 'next-safe-action';
 
 import type { SessionData } from 'lib/session/config';
 

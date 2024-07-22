@@ -6,12 +6,6 @@ import * as yup from 'yup';
 
 import { actionClient } from 'lib/actions/actionClient';
 
-const schema = yup.object({
-  projectPath: yup.string().required()
-});
-
-export type FormValues = yup.InferType<typeof schema>;
-
 export const loginWithFarcasterAction = actionClient
   .metadata({ actionName: 'login' })
   .schema(yup.object({})) // accept all body input
