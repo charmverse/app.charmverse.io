@@ -4,7 +4,7 @@ import { isSystemError } from '@root/lib/middleware/isSystemError';
 import type { SessionData } from '@root/lib/session/config';
 import type { IronSession } from 'iron-session';
 import { headers } from 'next/headers';
-import type { ServerErrorFunctionUtils } from 'next-safe-action/typeschema';
+import type { ServerErrorFunctionUtils } from 'next-safe-action';
 
 import type { defineMetadataSchema } from './actionClient';
 

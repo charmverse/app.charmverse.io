@@ -5,7 +5,6 @@ import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchPr
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import type { FarcasterProfileInfo } from '@root/lib/farcaster/loginWithFarcaster';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -28,7 +27,6 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
 
   const router = useRouter();
 
-  // @ts-ignore
   const { execute, isExecuting } = useAction(editProjectAction, {
     onSuccess: () => {
       router.push(`/p/${project.path}`);
@@ -119,7 +117,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           execute={(input) => {
             execute({
               ...input,
-              projectId: project.id,
+              id: project.id,
               projectMembers: input.projectMembers.slice(1)
             });
           }}

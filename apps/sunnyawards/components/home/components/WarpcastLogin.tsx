@@ -19,7 +19,7 @@ import '@farcaster/auth-kit/styles.css';
 function WarpcastLoginButton() {
   const router = useRouter();
   const { isAuthenticated } = useProfile();
-  // @ts-ignore
+
   const { execute: loginUser, hasErrored } = useAction(loginWithFarcasterAction, {
     onSuccess: async () => {
       actionRevalidatePath();

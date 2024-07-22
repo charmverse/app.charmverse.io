@@ -1,10 +1,11 @@
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import { Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
 
+import { LoadingComponent } from 'components/common/LoadingComponent';
 import type { LoggedInUser } from 'lib/profile/getCurrentUserAction';
 import type { FormValues } from 'lib/projects/form';
 
@@ -101,9 +102,19 @@ export function AddProjectMembersForm({
           >
             Back
           </Button>
-          <Button data-test='project-form-publish' disabled={!isValid || isExecuting} type='submit'>
-            Publish
-          </Button>
+          <Box>
+            {isExecuting && (
+              <>
+                <Typography variant='caption' color='textSecondary'>
+                  Submitting your project onchain
+                </Typography>
+                <LoadingComponent isLoading={isExecuting} />
+              </>
+            )}
+            <Button data-test='project-form-publish' disabled={!isValid || isExecuting} type='submit'>
+              Publish
+            </Button>
+          </Box>
         </Stack>
       </Stack>
     </form>

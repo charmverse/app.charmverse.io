@@ -38,7 +38,7 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
     await connectApiClient.logout().catch((error) => {
       log.error('There was an error while trying to signout', { error });
     });
-    await actionRevalidatePath();
+    actionRevalidatePath();
     router.push('/');
   };
 
