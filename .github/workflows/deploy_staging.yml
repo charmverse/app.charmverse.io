@@ -34,8 +34,13 @@ jobs:
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy')}}; then stack='stg-webapp'; fi
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect')}}; then stack='stg-connect'; fi
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')}}; then stack='stg-sunnyawards'; fi
-          echo "STACK=$stack" >> $GITHUB_ENV
-          echo "STAGE_NAME=$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+          full_stage_name=$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
+
+          # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
+          stage_name=`echo "$full_stack_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
+
+          # export the stage name so that it can be used in other steps
+          echo "STAGE_NAME=$stage_name" >> $GITHUB_ENV
 
       - name: Install dependencies
         uses: ./.github/actions/install

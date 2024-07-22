@@ -8,14 +8,12 @@ export type Options = {
 };
 
 export class ProductionStack extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps, options: Options) {
-    super(scope, id, props);
+  constructor(scope: Construct, appName: string, props: StackProps, options: Options) {
+    super(scope, appName, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
-      path: `${__dirname}/../${id}.zip`
+      path: `${__dirname}/../${appName}.zip`
     });
-    // Create a ElasticBeanStalk app. - must be 40 characters or less
-    const appName = sanitizeAppName(id);
 
     const ebApp = new elasticbeanstalk.CfnApplication(this, 'Application', {
       applicationName: appName
@@ -165,13 +163,4 @@ export class ProductionStack extends Stack {
       versionLabel: appVersionProps.ref
     });
   }
-}
-
-// Member must contain only letters, digits, and the dash character and may not start or end with a dash
-function sanitizeAppName(name: string) {
-  return name
-    .replace(/[^a-zA-Z0-9-]/g, '')
-    .slice(0, 40)
-    .replace(/^-/, '0')
-    .replace(/-$/, '0');
 }
