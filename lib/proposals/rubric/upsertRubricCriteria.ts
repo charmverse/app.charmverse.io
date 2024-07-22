@@ -9,7 +9,7 @@ import { setPageUpdatedAt } from '../setPageUpdatedAt';
 import type { RubricCriteriaTypedFields, RubricCriteriaTyped } from './interfaces';
 
 export type RubricDataInput = Pick<ProposalRubricCriteria, 'title'> &
-  Partial<Pick<ProposalRubricCriteria, 'description' | 'id'>> &
+  Partial<Pick<ProposalRubricCriteria, 'description' | 'id' | 'index'>> &
   RubricCriteriaTypedFields;
 
 export type RubricCriteriaUpsert = {
@@ -81,7 +81,7 @@ export async function upsertRubricCriteria({
           },
           create: {
             id: rubricCriteriaId,
-            index,
+            index: rubric.index || index,
             title: rubric.title,
             description: rubric.description,
             type: rubric.type,
