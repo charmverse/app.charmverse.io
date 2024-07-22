@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { IronSession } from 'iron-session';
 import { headers } from 'next/headers';
 import { createSafeActionClient } from 'next-safe-action';
+import { yupAdapter } from 'next-safe-action/adapters/yup';
 import * as yup from 'yup';
 
 import type { SessionData } from 'lib/session/config';
@@ -17,6 +18,7 @@ export function defineMetadataSchema() {
 }
 
 export const actionClient = createSafeActionClient({
+  validationAdapter: yupAdapter(),
   defineMetadataSchema,
   handleReturnedServerError,
   handleServerErrorLog,
