@@ -2,6 +2,7 @@ import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { headers } from 'next/headers';
 import { createSafeActionClient } from 'next-safe-action';
+import { yupAdapter } from 'next-safe-action/adapters/yup';
 import * as yup from 'yup';
 
 import { getSession } from 'lib/session/getSession';
@@ -15,6 +16,7 @@ export function defineMetadataSchema() {
 }
 
 export const actionClient = createSafeActionClient({
+  validationAdapter: yupAdapter(),
   defineMetadataSchema,
   handleReturnedServerError,
   handleServerErrorLog,

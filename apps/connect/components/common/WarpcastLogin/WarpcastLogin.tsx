@@ -18,10 +18,11 @@ import { warpcastConfig } from 'lib/farcaster/config';
 function WarpcastLoginButton() {
   const router = useRouter();
   const { isAuthenticated } = useProfile();
-  const connectApiClient = new ConnectApiClient();
-  const { trigger, error } = useSWRMutation('login', (_, { arg }: { arg: StatusAPIResponse }) =>
-    connectApiClient.loginViaFarcaster(arg)
-  );
+
+  const { trigger, error } = useSWRMutation('login', (_, { arg }: { arg: StatusAPIResponse }) => {
+    const connectApiClient = new ConnectApiClient();
+    return connectApiClient.loginViaFarcaster(arg);
+  });
 
   const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
     trigger(res, {
