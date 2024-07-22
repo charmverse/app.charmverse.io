@@ -92,7 +92,7 @@ export async function upsertRubricCriteria({
           update: {
             title: rubric.title,
             description: rubric.description,
-            index,
+            index: rubric.index || index,
             type: rubric.type,
             parameters: rubric.parameters
           }
