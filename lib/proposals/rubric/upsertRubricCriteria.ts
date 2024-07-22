@@ -81,7 +81,7 @@ export async function upsertRubricCriteria({
           },
           create: {
             id: rubricCriteriaId,
-            index: rubric.index ?? index,
+            index: typeof rubric.index === 'number' && rubric.index !== -1 ? rubric.index : index,
             title: rubric.title,
             description: rubric.description,
             type: rubric.type,
