@@ -1,13 +1,10 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { IronSession } from 'iron-session';
-import { getIronSession } from 'iron-session';
-import { cookies, headers } from 'next/headers';
-import { createSafeActionClient } from 'next-safe-action/typeschema';
+import { headers } from 'next/headers';
+import { createSafeActionClient } from 'next-safe-action';
 import * as yup from 'yup';
 
-import type { SessionData } from 'lib/session/config';
-import { getIronOptions } from 'lib/session/config';
+import { getSession } from 'lib/session/getSession';
 
 import { handleReturnedServerError, handleServerErrorLog } from './onError';
 
@@ -18,11 +15,8 @@ export function defineMetadataSchema() {
 }
 
 export const actionClient = createSafeActionClient({
-  // @ts-ignore
   defineMetadataSchema,
-  // @ts-ignore
   handleReturnedServerError,
-  // @ts-ignore
   handleServerErrorLog,
   defaultValidationErrorsShape: 'flattened'
 })
@@ -31,7 +25,7 @@ export const actionClient = createSafeActionClient({
    * Returns the context with the session object.
    */
   .use(async ({ next }) => {
-    const session = await getIronSession<SessionData>(cookies(), getIronOptions());
+    const session = await getSession();
     const headerList = headers();
 
     return next({

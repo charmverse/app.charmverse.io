@@ -2,11 +2,9 @@ import { STSClient, GetFederationTokenCommand } from '@aws-sdk/client-sts';
 import { awsS3Bucket } from '@root/config/constants';
 import { getS3ClientConfig } from '@root/lib/aws/getS3ClientConfig';
 import { getUserS3FilePath } from '@root/lib/aws/uploadToS3Server';
-import type { SessionData } from '@root/lib/session/config';
-import { getIronOptions } from '@root/lib/session/getIronOptions';
-import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
 import { v4 as uuid } from 'uuid';
+
+import { getSession } from 'lib/session/getSession';
 
 const missingKeys: string[] = [];
 if (!process.env.S3_UPLOAD_REGION) {
@@ -21,7 +19,7 @@ const validCharacters = /^[\000-\177]*$/;
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   let filename = searchParams.get('filename');
-  const session = await getIronSession<SessionData>(cookies(), getIronOptions());
+  const session = await getSession();
   const userId = session.user?.id;
 
   if (!userId) {

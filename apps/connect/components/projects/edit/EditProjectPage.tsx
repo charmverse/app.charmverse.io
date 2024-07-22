@@ -27,7 +27,6 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
 
   const router = useRouter();
 
-  // @ts-ignore
   const { execute, isExecuting } = useAction(actionEditProject, {
     onSuccess: () => {
       router.push(`/p/${project.path}`);
@@ -118,7 +117,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           execute={(input) => {
             execute({
               ...input,
-              projectId: project.id,
+              id: project.id,
               projectMembers: input.projectMembers.slice(1)
             });
           }}

@@ -1,5 +1,6 @@
 'use client';
 
+import { grey } from '@mui/material/colors';
 import { darken, experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
 
 import {
@@ -51,7 +52,9 @@ const extendedTheme = extendTheme({
         },
         inputBackground: {
           main: inputBackground
-        }
+        },
+        footerBackground: { main: grey[200] },
+        mainBackground: { main: grey[200] }
       }
     },
     dark: {
@@ -82,7 +85,9 @@ const extendedTheme = extendTheme({
         },
         inputBackground: {
           main: inputBackgroundDarkMode
-        }
+        },
+        footerBackground: { main: grey[700] },
+        mainBackground: { main: backgroundColorDarkMode }
       }
     }
   },

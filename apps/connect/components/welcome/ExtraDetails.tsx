@@ -24,7 +24,7 @@ const defaultValues = { email: '', terms: false, notify: true } as const;
 
 export function ExtraDetails() {
   const router = useRouter();
-  // @ts-ignore
+
   const { execute, result, isExecuting, hasErrored } = useAction(actionOnboarding, {
     onSuccess() {
       router.push('/profile');

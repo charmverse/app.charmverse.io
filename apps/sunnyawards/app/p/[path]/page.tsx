@@ -17,7 +17,7 @@ export default async function ProjectPage({ params }: { params: { path: string }
       {project.farcasterFrameImage && (
         <>
           {/* Custom meta tags for farcaster */}
-          <meta name='fc:frame' content='Next' />
+          <meta name='fc:frame' content='vNext' />
           <meta name='og:image' content={project.farcasterFrameImage} />
           <meta name='fc:frame:image' content={project.farcasterFrameImage} />
           {/* Button 1 */}

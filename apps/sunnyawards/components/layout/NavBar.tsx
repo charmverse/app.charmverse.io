@@ -10,6 +10,7 @@ import { useAction } from 'next-safe-action/hooks';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
+import { useDarkTheme } from 'hooks/useDarktheme';
 import { actionRevalidatePath } from 'lib/actions/revalidatePath';
 import type { LoggedInUser } from 'lib/profile/getCurrentUserAction';
 import { logoutAction } from 'lib/session/logoutAction';
@@ -19,10 +20,10 @@ import { Avatar } from '../common/Avatar';
 export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
   const path = usePathname();
   const router = useRouter();
+  useDarkTheme();
   const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
-  // @ts-ignore
   const { execute: logoutUser } = useAction(logoutAction, {
     onSuccess: async () => {
       await actionRevalidatePath();
@@ -44,7 +45,11 @@ export function NavBar({ user }: { user: LoggedInUser | null | undefined }) {
   return (
     <AppBar
       position='static'
-      sx={{ backgroundColor: path === '/' ? 'background.default' : 'transparent', boxShadow: 'none', pt: 1 }}
+      sx={{
+        backgroundColor: path === '/' ? 'background.default' : { xs: 'background.default', md: 'mainBackground.main' },
+        boxShadow: 'none',
+        pt: 1
+      }}
     >
       <Container maxWidth={false}>
         <Toolbar disableGutters sx={{ justifyContent: 'space-between' }} variant='dense'>
