@@ -2,6 +2,7 @@ import { ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
+import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
 import { capitalize } from 'lodash';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
@@ -19,9 +20,9 @@ import type { ContextMenuProps } from './EvaluationContextMenu';
 import { EvaluationContextMenu } from './EvaluationContextMenu';
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 
-type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit' | 'move' | 'move_forward'>;
+type SupportedOperation = Extract<ProposalOperation, 'view' | 'comment' | 'edit' | 'move'>;
 
-export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move', 'move_forward'];
+export const proposalOperations: SupportedOperation[] = ['view', 'comment', 'edit', 'move'];
 
 // const evaluateVerbs = {
 //   [ProposalEvaluationType.feedback]: 'Move Forward',
@@ -68,6 +69,17 @@ export const currentReviewerSystemRole = {
   label: 'Reviewers (Current Step)'
 } as const;
 
+export const approverSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Approvers selected for this evaluation'>
+      <PersonIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: 'approver',
+  label: 'Approvers (Current Step)'
+} as const;
+
 // a copy of current reviewer, with a different label for vote
 const currentVoterSystemRole = {
   ...currentReviewerSystemRole,
@@ -97,7 +109,7 @@ const permissionOperationPlaceholders = {
   [ProposalOperation.comment]: 'No one can comment',
   [ProposalOperation.edit]: 'Only admins can edit the proposal',
   [ProposalOperation.move]: 'Only admins can change the current step',
-  [ProposalOperation.move_forward]: 'Reviewers can mark this step complete'
+  [ProposalOperation.complete_evaluation]: 'Approvers can mark this step complete'
 };
 
 export function EvaluationPermissionsRow({
@@ -194,13 +206,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
 
       {proposalOperations.map((operation) => (
         <Box key={operation} className='octo-propertyrow'>
-          <PropertyLabel readOnly>
-            {operation === 'move'
-              ? 'Move Backward'
-              : operation === 'move_forward'
-              ? 'Complete step'
-              : capitalize(operation)}
-          </PropertyLabel>
+          <PropertyLabel readOnly>{operation === 'move' ? 'Move Backward' : capitalize(operation)}</PropertyLabel>
           {isFirstEvaluation && operation === 'move' ? (
             <Tooltip title='Only authors can move back to Draft'>
               <span>
@@ -247,6 +253,20 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
           onChange={() => {}}
         />
       </Box>
+
+      {/* show evaluation action which is uneditable */}
+      {approvableEvaluationTypes.includes(evaluation.type as any) && (
+        <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
+          <PropertyLabel readOnly>Complete Step</PropertyLabel>
+          <UserAndRoleSelect
+            readOnly
+            wrapColumn
+            value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
+            systemRoles={[approverSystemRole]}
+            onChange={() => {}}
+          />
+        </Box>
+      )}
     </>
   );
 }
