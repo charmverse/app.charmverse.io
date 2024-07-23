@@ -2,7 +2,6 @@ import { AppProviders } from '@connect-shared/components/layout/AppProviders';
 import { Footer } from '@connect-shared/components/layout/Footer';
 import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import Box from '@mui/material/Box';
-import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
@@ -25,8 +24,6 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const user = await getCurrentUserAction();
-
-  useDatadogLogger({ service: 'sunnyawards-browser' });
 
   return (
     <html lang='en'>

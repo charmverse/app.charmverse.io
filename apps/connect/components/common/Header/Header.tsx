@@ -6,6 +6,7 @@ import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePath
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
+import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 import { ConnectApiClient } from 'apiClient/apiClient';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -21,6 +22,8 @@ export function Header({ user }: { user: LoggedInUser | null }) {
   const path = usePathname();
   const router = useRouter();
   useDarkTheme();
+
+  useDatadogLogger({ service: 'connect-browser', userId: user?.id });
 
   const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
 

@@ -8,6 +8,7 @@ import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAct
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
+import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -18,6 +19,8 @@ import { useState } from 'react';
 export function Header({ user }: { user: LoggedInUser | null }) {
   const path = usePathname();
   const router = useRouter();
+
+  useDatadogLogger({ service: 'sunnyawards-browser', userId: user?.id });
   useDarkTheme();
   const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);

@@ -4,7 +4,6 @@ import { Footer } from '@connect-shared/components/layout/Footer';
 import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import Box from '@mui/material/Box';
-import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
@@ -61,8 +60,6 @@ export default async function RootLayout({
   const user = await getCurrentUserAction();
   const session = await getSession();
   const vapidPublicKey = process.env.VAPID_PUBLIC_KEY;
-
-  useDatadogLogger({ service: 'connect-browser' });
 
   return (
     <html lang='en' dir='ltr'>
