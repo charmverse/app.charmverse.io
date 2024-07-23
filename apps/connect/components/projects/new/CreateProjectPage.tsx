@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { FormValues } from '@connect-shared/lib/projects/form';
 import { schema } from '@connect-shared/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -13,8 +14,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { PageWrapper } from 'components/common/PageWrapper';
-import { actionCreateProject } from 'lib/actions/createProject';
-import type { LoggedInUser } from 'lib/profile/interfaces';
+import { actionCreateProject } from 'lib/projects/createProjectAction';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';

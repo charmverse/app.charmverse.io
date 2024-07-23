@@ -1,17 +1,17 @@
 import 'server-only';
 
+import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import { Divider, Stack, Typography } from '@mui/material';
 
 import { FarcasterCard } from 'components/common/FarcasterCard';
-import { getCurrentUser } from 'lib/actions/getCurrentUser';
 
 import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectHeader } from '../components/ProjectHeader';
 
 export async function ProjectDetailsPage({ project }: { project: ConnectProjectDetails }) {
-  const currentUser = await getCurrentUser();
+  const currentUser = await getCurrentUserAction();
 
   const isCurrentUserTeamLead = project.projectMembers.some(
     (member) => member.teamLead && member.userId === currentUser?.data?.id

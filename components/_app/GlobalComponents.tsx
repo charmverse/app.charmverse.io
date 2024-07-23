@@ -7,9 +7,11 @@ import { VerifyLoginOtpModal } from 'components/login/components/VerifyLoginOtpM
 import { MemberProfileDialogGlobal } from 'components/members/components/MemberProfileDialogGlobal';
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useDatadogLogger } from 'hooks/useDatadogLogger';
 import { useMarkNotificationFromUrl } from 'hooks/useMarkNotificationFromUrl';
 import { getPagesListCacheKey } from 'hooks/usePages';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useUser } from 'hooks/useUser';
 import { useVerifyLoginOtp } from 'hooks/useVerifyLoginOtp';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
@@ -17,16 +19,16 @@ import type { WebSocketPayload } from 'lib/websockets/interfaces';
 import { ConfirmationModal } from './components/ConfirmationModal';
 import { Snackbar } from './components/Snackbar';
 import { UserOnboardingDialogGlobal } from './components/UserOnboardingDialog';
-import useDatadogLogger from './hooks/useDatadogLogger';
 
 export function GlobalComponents() {
   const router = useRouter();
   const { space: currentSpace } = useCurrentSpace();
+  const { user } = useUser();
   const { subscribe } = useWebSocketClient();
   const { openSettings, isOpen: isSettingsDialogOpen } = useSettingsDialog();
   const { isOpen: isVerifyOtpOpen, close: closeVerifyOtp } = useVerifyLoginOtp();
   // Register logs to Datadog
-  useDatadogLogger();
+  useDatadogLogger({ spaceId: currentSpace?.id, userId: user?.id, service: 'webapp-browser' });
 
   useAppLoadedEvent();
 

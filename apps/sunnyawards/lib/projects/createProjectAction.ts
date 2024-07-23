@@ -1,12 +1,11 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
+import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
-
-import { authActionClient } from 'lib/actions/actionClient';
 
 import { schema } from './form';
 

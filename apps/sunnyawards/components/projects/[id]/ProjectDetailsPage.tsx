@@ -1,10 +1,10 @@
 import 'server-only';
 
+import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import { Divider, Stack, Typography } from '@mui/material';
 
 import { FarcasterCard } from 'components/common/FarcasterCard';
-import { getCurrentUserAction } from 'lib/profile/getCurrentUserAction';
 
 import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';

@@ -1,8 +1,8 @@
+import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
 import { notFound, redirect } from 'next/navigation';
 
 import { EditProjectPage } from 'components/projects/edit/EditProjectPage';
-import { getCurrentUserAction } from 'lib/profile/getCurrentUserAction';
 
 export default async function EditProject({
   params
