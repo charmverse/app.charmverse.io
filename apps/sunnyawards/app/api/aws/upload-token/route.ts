@@ -1,10 +1,9 @@
 import { STSClient, GetFederationTokenCommand } from '@aws-sdk/client-sts';
+import { getSession } from '@connect-shared/lib/session/getSession';
 import { awsS3Bucket } from '@root/config/constants';
 import { getS3ClientConfig } from '@root/lib/aws/getS3ClientConfig';
 import { getUserS3FilePath } from '@root/lib/aws/uploadToS3Server';
 import { v4 as uuid } from 'uuid';
-
-import { getSession } from 'lib/session/getSession';
 
 const missingKeys: string[] = [];
 if (!process.env.S3_UPLOAD_REGION) {

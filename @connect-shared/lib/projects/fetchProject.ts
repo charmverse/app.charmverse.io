@@ -96,7 +96,7 @@ export async function fetchProject({
           bio: farcasterUser?.bio,
           username: farcasterUser?.username,
           displayName: farcasterUser?.displayName
-        } as FarcasterProfileInfo
+        }
       };
     })
   };

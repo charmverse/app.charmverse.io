@@ -1,8 +1,7 @@
+import { getSession } from '@connect-shared/lib/session/getSession';
 import { isTruthy } from '@root/lib/utils/types';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-
-import { getSession } from 'lib/session/getSession';
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();

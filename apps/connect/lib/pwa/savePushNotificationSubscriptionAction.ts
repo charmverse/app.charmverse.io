@@ -1,8 +1,7 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { authActionClient } from 'lib/actions/actionClient';
+import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 
 import { saveSubscriptionSchema } from './subscriptionSchema';
 

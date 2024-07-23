@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import type { FormValues, ProjectCategory } from '@connect-shared/lib/projects/form';
 import { schema } from '@connect-shared/lib/projects/form';
@@ -13,8 +14,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { PageWrapper } from 'components/common/PageWrapper';
-import { actionEditProject } from 'lib/actions/editProject';
-import type { LoggedInUser } from 'lib/profile/interfaces';
+import { actionEditProject } from 'lib/projects/editProjectAction';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
@@ -126,7 +126,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           initialFarcasterProfiles={project.projectMembers.slice(1).map((member) => ({
             bio: member.farcasterUser.bio,
             displayName: member.farcasterUser.displayName,
-            fid: parseInt(member.farcasterUser.fid.toString()),
+            fid: member.farcasterUser.fid,
             pfpUrl: member.farcasterUser.pfpUrl,
             username: member.farcasterUser.username
           }))}

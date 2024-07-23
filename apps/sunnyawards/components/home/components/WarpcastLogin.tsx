@@ -1,6 +1,8 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
+import { loginWithFarcasterAction } from '@connect-shared/lib/session/loginAction';
 import { AuthKitProvider, SignInButton, useProfile } from '@farcaster/auth-kit';
 import type { AuthClientError } from '@farcaster/auth-kit';
 import { Typography } from '@mui/material';
@@ -9,10 +11,6 @@ import { warpcastConfig } from '@root/lib/farcaster/config';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
-import useSWRMutation from 'swr/mutation';
-
-import { actionRevalidatePath } from 'lib/actions/revalidatePath';
-import { loginWithFarcasterAction } from 'lib/session/loginAction';
 
 import '@farcaster/auth-kit/styles.css';
 
@@ -22,7 +20,7 @@ function WarpcastLoginButton() {
 
   const { execute: loginUser, hasErrored } = useAction(loginWithFarcasterAction, {
     onSuccess: async () => {
-      actionRevalidatePath();
+      revalidatePathAction();
       router.push('/profile');
     },
     onError(err) {

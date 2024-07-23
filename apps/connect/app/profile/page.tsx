@@ -1,8 +1,8 @@
+import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { ProfilePage } from 'components/profile/ProfilePage';
-import { getCurrentUser } from 'lib/actions/getCurrentUser';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Profile() {
-  const user = await getCurrentUser();
+  const user = await getCurrentUserAction();
 
   if (!user?.data) {
     redirect('/');

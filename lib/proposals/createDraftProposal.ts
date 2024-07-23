@@ -1,6 +1,7 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { createDefaultProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
 import type { ProposalFields } from '@root/lib/proposals/interfaces';
@@ -18,7 +19,7 @@ export type ProposalContentType = 'structured' | 'free_form';
 export type CreateDraftProposalInput = {
   createdBy: string;
   spaceId: string;
-  contentType: ProposalContentType;
+  contentType?: ProposalContentType;
   pageType?: Extract<PageType, 'proposal_template' | 'proposal'>;
   title?: string;
   templateId?: string;
@@ -39,6 +40,11 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
             proposal: {
               include: {
                 authors: true,
+                form: {
+                  include: {
+                    formFields: true
+                  }
+                },
                 evaluations: {
                   include: {
                     reviewers: true,
@@ -116,26 +122,37 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
     pendingRewards: []
   };
 
+  let formFields: FormFieldInput[] = [];
+  if (input.pageType === 'proposal_template' && template?.proposal?.form) {
+    formFields = template.proposal.form.formFields.map(
+      ({ id, ...item }) =>
+        ({
+          ...item,
+          description: item.description ?? '',
+          fieldConfig: {}
+        } as any as FormFieldInput)
+    );
+  } else if (input.contentType === 'structured') {
+    formFields = [
+      {
+        type: 'project_profile',
+        name: '',
+        description: null,
+        index: 0,
+        options: [],
+        private: false,
+        required: true,
+        id: uuid(),
+        fieldConfig: createDefaultProjectAndMembersFieldConfig({ allFieldsRequired: true })
+      }
+    ];
+  }
+
   return createProposal({
     authors,
     evaluations,
     fields,
-    formFields:
-      input.contentType === 'structured'
-        ? [
-            {
-              type: 'project_profile',
-              name: '',
-              description: null,
-              index: 0,
-              options: [],
-              private: false,
-              required: true,
-              id: uuid(),
-              fieldConfig: createDefaultProjectAndMembersFieldConfig({ allFieldsRequired: true })
-            }
-          ]
-        : [],
+    formFields,
     formId: template?.proposal?.formId || undefined,
     workflowId: workflow.id,
     isDraft: true,

@@ -5,7 +5,8 @@
     "defaults"
   ],
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "@connect-shared"
   ],
   "scripts": {
     "testgen": "python scripts/testgen/make_tests.py",

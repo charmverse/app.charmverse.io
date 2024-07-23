@@ -71,10 +71,6 @@ export function useGetOrCreateProposalNotesId() {
 
 // Mutative requests
 
-export function useCreateProposal() {
-  return usePOST<Omit<CreateProposalInput, 'userId'>, { id: string }>('/api/proposals');
-}
-
 export function useUpdateProposal({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Omit<UpdateProposalRequest, 'proposalId'>>(`/api/proposals/${proposalId}`);
 }

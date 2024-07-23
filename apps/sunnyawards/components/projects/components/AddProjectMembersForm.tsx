@@ -1,3 +1,4 @@
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
@@ -6,7 +7,6 @@ import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-fo
 import { useFieldArray } from 'react-hook-form';
 
 import { LoadingComponent } from 'components/common/LoadingComponent';
-import type { LoggedInUser } from 'lib/profile/getCurrentUserAction';
 import type { FormValues } from 'lib/projects/form';
 
 import { FarcasterCard } from '../../common/FarcasterCard';
