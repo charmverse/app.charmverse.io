@@ -1,4 +1,4 @@
-import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
+import { getSession } from '@connect-shared/lib/session/getSession';
 import { redirect } from 'next/navigation';
 
 import { HomePage } from 'components/home/HomePage';
@@ -7,9 +7,9 @@ import { HomePage } from 'components/home/HomePage';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const user = await getCurrentUserAction();
+  const session = await getSession();
 
-  if (user?.data) {
+  if (session?.user?.id) {
     redirect('/profile');
   }
 
