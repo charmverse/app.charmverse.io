@@ -1,5 +1,4 @@
 import { AppProviders } from '@connect-shared/components/layout/AppProviders';
-import { NotificationRequest } from '@connect-shared/components/layout/components/NotificationRequest';
 import { Footer } from '@connect-shared/components/layout/Footer';
 import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { getSession } from '@connect-shared/lib/session/getSession';
@@ -9,6 +8,7 @@ import Script from 'next/script';
 import type { ReactNode } from 'react';
 
 import { Header } from 'components/common/Header/Header';
+import { NotificationRequest } from 'components/common/NotificationRequest';
 import { appDescription, appName, appTitle, appTitleTemplate } from 'lib/utils/appDetails';
 import theme from 'theme/theme';
 
