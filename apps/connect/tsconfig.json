@@ -31,6 +31,7 @@
       "@root/config/*": ["../../config/*"],
       "@root/connectors/*": ["../../connectors/*"],
       "@root/lib/*": ["../../lib/*"],
+      "@root/hooks/*": ["../../hooks/*"],
       "@root/models": ["../../models"],
       "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
       "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
@@ -51,13 +52,6 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "../../@connect-shared/lib/projects/fetchProject.ts",
-    "../../@connect-shared/lib/projects/saveOgImage.ts",
-    "../../@connect-shared/ProjectShareItem.tsx",
-    "../../@connect-shared/lib/projects/createOptimismProject.ts",
-    "../../@connect-shared/lib/projects/form.ts"
-  ],
+    "**/*.tsx" ],
   "exclude": ["../../node_modules", ".next/", "public/sw.js"]
 }

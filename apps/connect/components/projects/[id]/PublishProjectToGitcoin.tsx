@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 
-import { actionPublishProjectToGitcoin } from 'lib/actions/publishProjectToGitcoin';
+import { actionPublishProjectToGitcoin } from 'lib/projects/publishProjectToGitcoinAction';
 
 export function PublishProjectToGitcoin({ projectPath }: { projectPath: string }) {
   const router = useRouter();

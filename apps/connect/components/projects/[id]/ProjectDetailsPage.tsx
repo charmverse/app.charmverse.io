@@ -1,10 +1,10 @@
 import 'server-only';
 
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
+import { getSession } from '@connect-shared/lib/session/getSession';
 import { Divider, Stack, Typography } from '@mui/material';
 
 import { FarcasterCard } from 'components/common/FarcasterCard';
-import { getSession } from 'lib/session/getSession';
 
 import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';

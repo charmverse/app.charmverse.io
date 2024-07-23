@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { getSession } from '@connect-shared/lib/session/getSession';
 import webpush from 'web-push';
 
 import { initWebPush } from 'lib/pwa/initWebPush';
-import { getSession } from 'lib/session/getSession';
 
 export const dynamic = 'force-dynamic';
 

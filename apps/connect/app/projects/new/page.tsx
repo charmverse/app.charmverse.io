@@ -1,10 +1,10 @@
+import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { redirect } from 'next/navigation';
 
 import { CreateProjectPage } from 'components/projects/new/CreateProjectPage';
-import { getCurrentUser } from 'lib/actions/getCurrentUser';
 
 export default async function CreateProject() {
-  const user = await getCurrentUser();
+  const user = await getCurrentUserAction();
 
   if (!user?.data) {
     redirect('/');
