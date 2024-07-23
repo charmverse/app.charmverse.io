@@ -126,7 +126,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           initialFarcasterProfiles={project.projectMembers.slice(1).map((member) => ({
             bio: member.farcasterUser.bio,
             displayName: member.farcasterUser.displayName,
-            fid: parseInt(member.farcasterUser.fid.toString()),
+            fid: member.farcasterUser.fid,
             pfpUrl: member.farcasterUser.pfpUrl,
             username: member.farcasterUser.username
           }))}
