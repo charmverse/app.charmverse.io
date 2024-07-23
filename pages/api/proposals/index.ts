@@ -57,7 +57,7 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
           proposal: {
             include: {
               evaluations: {
-                include: { reviewers: true },
+                include: { reviewers: true, evaluationApprovers: true, appealReviewers: true },
                 orderBy: {
                   index: 'asc'
                 }
@@ -81,13 +81,33 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
       if (matchingEvaluation.reviewers.length !== evaluation.reviewers.length) {
         return false;
       }
-      return evaluation.reviewers.every((reviewer) =>
-        matchingEvaluation.reviewers.some(
-          (evaluationReviewer) =>
-            evaluationReviewer.userId === reviewer.userId ||
-            evaluationReviewer.systemRole === reviewer.systemRole ||
-            evaluationReviewer.roleId === reviewer.roleId
-        )
+      if (matchingEvaluation.appealReviewers?.length !== evaluation.appealReviewers?.length) {
+        return false;
+      }
+      if (matchingEvaluation.evaluationApprovers?.length !== evaluation.evaluationApprovers?.length) {
+        return false;
+      }
+      return evaluation.reviewers.every(
+        (reviewer) =>
+          matchingEvaluation.reviewers.some(
+            (evaluationReviewer) =>
+              evaluationReviewer.userId === reviewer.userId ||
+              evaluationReviewer.systemRole === reviewer.systemRole ||
+              evaluationReviewer.roleId === reviewer.roleId
+          ) &&
+          evaluation.evaluationApprovers?.every((approver) =>
+            matchingEvaluation.evaluationApprovers?.some(
+              (evaluationApprover) =>
+                evaluationApprover.userId === approver.userId || evaluationApprover.roleId === approver.roleId
+            )
+          ) &&
+          evaluation.appealReviewers?.every((appealReviewer) =>
+            matchingEvaluation.appealReviewers?.some(
+              (evaluationAppealReviewer) =>
+                evaluationAppealReviewer.userId === appealReviewer.userId ||
+                evaluationAppealReviewer.roleId === appealReviewer.roleId
+            )
+          )
       );
     });
     if (!isValidEvaluationSteps) {

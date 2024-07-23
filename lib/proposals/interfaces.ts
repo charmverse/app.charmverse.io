@@ -12,7 +12,8 @@ import type {
   Vote,
   ProposalEvaluationReview,
   ProposalAppealReviewer,
-  ProposalEvaluationAppealReview
+  ProposalEvaluationAppealReview,
+  ProposalEvaluationApprover
 } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import type { EASAttestationFromApi } from '@root/lib/credentials/external/getOnchainCredentials';
@@ -60,6 +61,7 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   permissions: ProposalEvaluationPermission[];
   reviewers: ProposalReviewer[];
   appealReviewers?: ProposalAppealReviewer[] | null;
+  evaluationApprovers?: ProposalEvaluationApprover[] | null;
   voteSettings: VoteSettings | null;
   isReviewer?: boolean; // added by the webapp api
   isAppealReviewer?: boolean; // added by the webapp api

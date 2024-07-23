@@ -1,7 +1,12 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
-import type { Prisma, ProposalAppealReviewer, ProposalEvaluation } from '@charmverse/core/prisma-client';
+import type {
+  Prisma,
+  ProposalAppealReviewer,
+  ProposalEvaluation,
+  ProposalEvaluationApprover
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
@@ -34,6 +39,7 @@ type PageProps = Partial<
 export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 'title' | 'type'> & {
   finalStep?: boolean | null;
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
+  evaluationApprovers?: Partial<Pick<ProposalEvaluationApprover, 'userId' | 'roleId'>>[] | null;
   rubricCriteria: RubricDataInput[];
   voteSettings?: VoteSettings | null;
   requiredReviews?: WorkflowEvaluationJson['requiredReviews'];
@@ -92,6 +98,7 @@ export async function createProposal({
 
   const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = [];
   const appealReviewersInput: Prisma.ProposalAppealReviewerCreateManyInput[] = [];
+  const approversInput: Prisma.ProposalEvaluationApproverCreateManyInput[] = [];
 
   const project = projectId ? await getProjectById(projectId) : null;
 
@@ -125,7 +132,7 @@ export async function createProposal({
   }
 
   // retrieve permissions and apply evaluation ids to reviewers
-  evaluations.forEach(({ id: evaluationId, reviewers: evalReviewers, appealReviewers }, index) => {
+  evaluations.forEach(({ id: evaluationId, reviewers: evalReviewers, appealReviewers, evaluationApprovers }, index) => {
     const permissions = workflow.evaluations[index]?.permissions;
     if (!permissions) {
       throw new Error(
@@ -152,6 +159,16 @@ export async function createProposal({
         ...appealReviewers.map((reviewer) => ({
           roleId: reviewer.roleId,
           userId: reviewer.userId,
+          proposalId,
+          evaluationId: evaluationIds[index]
+        }))
+      );
+    }
+    if (evaluationApprovers) {
+      approversInput.push(
+        ...evaluationApprovers.map((approver) => ({
+          roleId: approver.roleId,
+          userId: approver.userId,
           proposalId,
           evaluationId: evaluationIds[index]
         }))
