@@ -228,28 +228,6 @@ export function RubricResults({
           <Typography color='secondary'>N/A</Typography>
         )}
       </Box>
-      {evaluation && (
-        <>
-          <Divider sx={{ my: 1 }} />
-          <Box mx={2}>
-            <Typography variant='subtitle1' sx={{ mb: 1 }}>
-              Decision
-            </Typography>
-
-            <PassFailEvaluationContainer
-              isCurrent={isCurrent}
-              hideReviewer
-              authors={authors}
-              archived={archived}
-              key='results'
-              evaluation={evaluation}
-              proposalId={proposalId}
-              confirmationMessage='Please verify that all reviewers have submitted a response. This will submit the final review for this step.'
-              refreshProposal={refreshProposal}
-            />
-          </Box>
-        </>
-      )}
     </>
   );
 }

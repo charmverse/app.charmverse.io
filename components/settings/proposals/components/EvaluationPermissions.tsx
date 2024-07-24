@@ -261,7 +261,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
           <UserAndRoleSelect
             readOnly
             wrapColumn
-            value={[{ group: 'system_role', id: ProposalSystemRole.current_reviewer }]}
+            value={[{ group: 'system_role', id: 'approver' }]}
             systemRoles={[approverSystemRole]}
             onChange={() => {}}
           />

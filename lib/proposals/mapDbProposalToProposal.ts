@@ -101,7 +101,8 @@ export function mapDbProposalToProposal({
       appealReviews,
       declineReasonOptions: workflowEvaluation?.declineReasons ?? [],
       isReviewer: !!stepPermissions?.evaluate,
-      isAppealReviewer: !!stepPermissions?.evaluate_appeal
+      isAppealReviewer: !!stepPermissions?.evaluate_appeal,
+      isApprover: !!stepPermissions?.complete_evaluation
     } as PopulatedEvaluation;
   });
   const pageFields = page?.type === 'proposal_template' ? page : { sourceTemplateId: page?.sourceTemplateId };

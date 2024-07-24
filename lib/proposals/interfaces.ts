@@ -65,6 +65,7 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   voteSettings: VoteSettings | null;
   isReviewer?: boolean; // added by the webapp api
   isAppealReviewer?: boolean; // added by the webapp api
+  isApprover?: boolean; // added by webapp api
   requiredReviews: number;
   appealable?: boolean | null;
   appealRequiredReviews?: number | null;
