@@ -58,15 +58,13 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <Box gap={2} display='flex' flexDirection='column'>
-          <ProjectForm
-            control={control}
-            isValid={isValid}
-            onNext={() => {
-              setShowTeamMemberForm(true);
-            }}
-          />
-        </Box>
+        <ProjectForm
+          control={control}
+          isValid={isValid}
+          onNext={() => {
+            setShowTeamMemberForm(true);
+          }}
+        />
       </PageWrapper>
     );
   }
