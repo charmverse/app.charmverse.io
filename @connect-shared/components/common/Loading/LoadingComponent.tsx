@@ -1,3 +1,4 @@
+import type { BoxProps } from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import React from 'react';
@@ -27,8 +28,9 @@ export function LoadingComponent({
   minHeight,
   size = 40,
   className,
-  'data-test': dataTest
-}: LoadingProps): JSX.Element {
+  'data-test': dataTest,
+  ...restProps
+}: LoadingProps & BoxProps): JSX.Element {
   if (!isLoading) {
     return (
       component || (
@@ -40,8 +42,8 @@ export function LoadingComponent({
   }
 
   return (
-    <LoadingCard height={height} minHeight={minHeight} className={className}>
-      <CircularProgress sx={{ height: size, width: size, color: '#ccc' }} />
+    <LoadingCard height={height} minHeight={minHeight} className={className} gap={1} {...restProps}>
+      <CircularProgress sx={{ color: '#ccc' }} size={size} />
       {label ? (
         <Typography variant='caption' style={{ color: '#aaa', paddingLeft: 8 }}>
           {label}
