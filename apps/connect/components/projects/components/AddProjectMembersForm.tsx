@@ -1,3 +1,4 @@
+import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { FormValues } from '@connect-shared/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
@@ -100,9 +101,20 @@ export function AddProjectMembersForm({
           >
             Back
           </Button>
-          <Button data-test='project-form-publish' disabled={!isValid || isExecuting} type='submit'>
-            Publish
-          </Button>
+          <Stack direction='row' gap={1}>
+            {isExecuting && (
+              <LoadingComponent
+                height={20}
+                size={20}
+                minHeight={20}
+                label='Submitting your project onchain'
+                flexDirection='row-reverse'
+              />
+            )}
+            <Button data-test='project-form-publish' disabled={!isValid || isExecuting} type='submit'>
+              Publish
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
     </form>
