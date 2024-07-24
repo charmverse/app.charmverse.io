@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Box, Button, Snackbar } from '@mui/material';
+import { Alert, Box, Button, Snackbar, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -82,7 +82,9 @@ export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: strin
     >
       <Alert severity='info' icon={<div />}>
         <Box display='flex' flexDirection='column' gap={1}>
-          For the full Charm Connect experience we require you to allow notifications on this device
+          <Typography variant='body2'>
+            For the full Charm Connect experience we require you to allow notifications on this device
+          </Typography>
           <Box display='flex' gap={1}>
             <Button onClick={requestPermission}>Allow</Button>
             <Button onClick={handleDeny} variant='outlined'>
