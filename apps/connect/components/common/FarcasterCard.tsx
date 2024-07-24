@@ -67,7 +67,7 @@ export function FarcasterCard(props: {
   onDelete?: VoidFunction;
   enableLink?: boolean;
 }) {
-  if (!props.enableLink) {
+  if (!props.enableLink || !props.username) {
     return (
       <Card sx={{ border: 'none' }}>
         <FarcasterCardContent {...props} />
