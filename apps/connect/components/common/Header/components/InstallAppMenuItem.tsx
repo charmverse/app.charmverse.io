@@ -1,4 +1,4 @@
-import { Box, Button, MenuItem, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import { useAddToHomescreenPrompt } from 'hooks/useAddToHomeScreenPrompt';

@@ -1,55 +1,96 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Alert, Box, Button, Snackbar } from '@mui/material';
+import { useCallback, useEffect, useState } from 'react';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { savePushNotificationSubscriptionAction } from 'lib/pwa/savePushNotificationSubscriptionAction';
 
 export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: string }) {
-  const [permission, setPermission] = useState(
-    typeof window !== 'undefined' ? window?.Notification?.permission : false
+  const [permission, setPermission] = useLocalStorage<NotificationPermission>(
+    'notificationPermission',
+    typeof window !== 'undefined' ? window?.Notification?.permission : 'default'
   );
 
-  useEffect(() => {
-    const requestPermission = async () => {
-      const notificationPermission = await Notification.requestPermission();
+  const [snackbarState, setSnackbarState] = useState<boolean>(false);
 
-      setPermission(notificationPermission);
+  const handleDeny = () => {
+    setPermission('denied');
+    setSnackbarState(false);
+  };
 
-      if (notificationPermission === 'granted') {
-        const notificationsSupported =
-          'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+  const handleClose = () => {
+    setSnackbarState(false);
+  };
 
-        if (!notificationsSupported || Notification.permission !== 'granted') {
-          return;
-        }
+  const notificationsSupported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
 
-        const swRegistration = await navigator.serviceWorker.getRegistration();
+  const requestPermission = useCallback(async () => {
+    const notificationPermission = await Notification.requestPermission();
+    setPermission(notificationPermission);
 
-        const options: PushSubscriptionOptionsInit = {
-          applicationServerKey: vapidPublicKey,
-          userVisibleOnly: true
-        };
-
-        if (!swRegistration || !vapidPublicKey) {
-          return;
-        }
-
-        const subscription = await swRegistration.pushManager.subscribe(options);
-
-        if (!subscription) {
-          return;
-        }
-
-        const json = JSON.parse(JSON.stringify(subscription));
-
-        await savePushNotificationSubscriptionAction({ subscription: json });
+    if (notificationPermission === 'granted') {
+      if (!notificationsSupported || Notification.permission !== 'granted') {
+        return;
       }
-    };
 
-    if (permission === 'default') {
-      requestPermission();
+      const swRegistration = await navigator.serviceWorker.getRegistration();
+
+      const options: PushSubscriptionOptionsInit = {
+        applicationServerKey: vapidPublicKey,
+        userVisibleOnly: true
+      };
+
+      if (!swRegistration || !vapidPublicKey) {
+        return;
+      }
+
+      const subscription = await swRegistration.pushManager.subscribe(options);
+
+      if (!subscription) {
+        return;
+      }
+
+      const json = JSON.parse(JSON.stringify(subscription));
+
+      await savePushNotificationSubscriptionAction({ subscription: json });
     }
-  }, [permission, vapidPublicKey]);
+  }, [vapidPublicKey, notificationsSupported, setPermission]);
 
-  return null;
+  // Update permission state if the user changes it manually
+  useEffect(() => {
+    if (permission !== 'denied' && permission !== Notification.permission) {
+      setPermission(Notification.permission);
+    }
+  }, [permission, setPermission]);
+
+  // Alert the user to allow notifications
+  useEffect(() => {
+    if (permission === 'default') {
+      setSnackbarState(true);
+    } else {
+      setSnackbarState(false);
+    }
+  }, [permission, requestPermission]);
+
+  return (
+    <Snackbar
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      open={snackbarState}
+      onClose={handleClose}
+      key='notification'
+    >
+      <Alert severity='info' icon={<div />}>
+        <Box display='flex' flexDirection='column' gap={1}>
+          For the full Charm Connect experience we require you to allow notifications on this device
+          <Box display='flex' gap={1}>
+            <Button onClick={requestPermission}>Allow</Button>
+            <Button onClick={handleDeny} variant='outlined'>
+              Deny
+            </Button>
+          </Box>
+        </Box>
+      </Alert>
+    </Snackbar>
+  );
 }
