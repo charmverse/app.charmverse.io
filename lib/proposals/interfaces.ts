@@ -66,6 +66,8 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   isReviewer?: boolean; // added by the webapp api
   isAppealReviewer?: boolean; // added by the webapp api
   isApprover?: boolean; // added by webapp api
+
+  totalReviews: number; // Number of reviews, or unique userIds in rubric answers
   requiredReviews: number;
   appealable?: boolean | null;
   appealRequiredReviews?: number | null;

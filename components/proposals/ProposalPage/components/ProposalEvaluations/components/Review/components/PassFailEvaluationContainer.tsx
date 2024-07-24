@@ -51,6 +51,7 @@ type Props = {
     | 'isAppealReviewer'
     | 'appealReviews'
     | 'appealReason'
+    | 'totalReviews'
   >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
@@ -186,7 +187,7 @@ export function PassFailEvaluationContainer({
       id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
     })),
     isSubmittingReview: isSubmittingEvaluationReview,
-    evaluationReviews: evaluation.reviews,
+    totalReviews: evaluation.totalReviews,
     requiredReviews: evaluation.requiredReviews,
     evaluationResult: evaluation.appealedAt ? 'fail' : evaluation.result,
     declineReasonOptions: evaluation.declineReasonOptions,

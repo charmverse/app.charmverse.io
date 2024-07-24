@@ -47,6 +47,7 @@ export type PassFailEvaluationProps = {
     result: ProposalEvaluationResult;
     completedAt: Date;
   }[];
+  totalReviews: number;
   requiredReviews: number;
   evaluationResult?: PopulatedEvaluation['result'];
   declineReasonOptions: string[];
@@ -81,6 +82,7 @@ export function PassFailEvaluation({
   onResetEvaluationReview,
   declineReasonOptions,
   completedAt,
+  totalReviews,
   actionLabels: _actionLabels,
   confirmationMessage,
   isAppealProcess,
@@ -92,7 +94,7 @@ export function PassFailEvaluation({
   const [evaluationReviewId, setEvaluationReviewId] = useState<string | null>(null);
   const [declineMessage, setDeclineMessage] = useState('');
 
-  const reviewsThresholdMet = evaluationReviews.length > requiredReviews;
+  const reviewsThresholdMet = totalReviews >= requiredReviews;
 
   const declineReasonModalPopupState = usePopupState({ variant: 'dialog' });
   const disabledTooltip = !isCurrent

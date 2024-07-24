@@ -44,6 +44,7 @@ export async function getProposalTemplate({ pageId }: { pageId: string }): Promi
           },
           rubricAnswers: true,
           draftRubricAnswers: true,
+          reviews: true,
           vote: true
         }
       },

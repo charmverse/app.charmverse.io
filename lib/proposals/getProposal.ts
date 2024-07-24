@@ -39,6 +39,7 @@ export async function getProposal({
               index: 'asc'
             }
           },
+          reviews: true,
           rubricAnswers: true,
           draftRubricAnswers: true,
           vote: true
