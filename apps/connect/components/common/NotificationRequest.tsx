@@ -82,9 +82,7 @@ export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: strin
     >
       <Alert severity='info' icon={<div />}>
         <Box display='flex' flexDirection='column' gap={1}>
-          <Typography variant='body2'>
-            For the full Charm Connect experience we require you to allow notifications on this device
-          </Typography>
+          <Typography variant='body2'>Get notified of Grants and Funding Opportunities</Typography>
           <Box display='flex' gap={1}>
             <Button onClick={requestPermission}>Allow</Button>
             <Button onClick={handleDeny} variant='outlined'>
