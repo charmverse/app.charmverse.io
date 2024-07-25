@@ -57,8 +57,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const user = await getCurrentUserAction();
   const session = await getSession();
+  const user = session?.user?.id ? await getCurrentUserAction() : null;
   const vapidPublicKey = process.env.VAPID_PUBLIC_KEY;
 
   return (
