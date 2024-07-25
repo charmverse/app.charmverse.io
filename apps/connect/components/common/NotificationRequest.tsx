@@ -23,9 +23,8 @@ export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: strin
     setSnackbarState(false);
   };
 
-  const notificationsSupported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
-
   const requestPermission = useCallback(async () => {
+    const notificationsSupported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
     const notificationPermission = await Notification.requestPermission();
     setPermission(notificationPermission);
 
@@ -55,7 +54,7 @@ export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: strin
 
       await savePushNotificationSubscriptionAction({ subscription: json });
     }
-  }, [vapidPublicKey, notificationsSupported, setPermission]);
+  }, [vapidPublicKey, setPermission]);
 
   // Update permission state if the user changes it manually
   useEffect(() => {
