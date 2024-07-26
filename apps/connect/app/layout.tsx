@@ -64,7 +64,7 @@ export default async function RootLayout({
   return (
     <html lang='en' dir='ltr'>
       <body>
-        {/* load env vars for the frontend */}
+        {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script src='/__ENV.js' />
         <Box component='body' display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
           <AppProviders theme={theme}>
