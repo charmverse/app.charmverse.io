@@ -67,12 +67,12 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
   const properties = [
     getDefaultStepProperty({ evaluationStepTitles }),
     getDefaultStatusProperty(),
-    getPublishedATProperty(),
     {
       ...defaultOptions,
       ...proposalDbProperties.proposalAuthor({ name: 'Author' })
     },
     { ...defaultOptions, ...proposalDbProperties.proposalReviewer() },
+    getPublishedAtProperty(),
     { ...defaultOptions, ...proposalDbProperties.proposalCreatedAt() },
     {
       ...defaultOptions,
@@ -109,7 +109,7 @@ export function getDefaultStepProperty({ evaluationStepTitles }: { evaluationSte
   };
 }
 
-export function getPublishedATProperty() {
+export function getPublishedAtProperty() {
   return {
     ...defaultOptions,
     ...proposalDbProperties.proposalPublishedAt({
