@@ -20,7 +20,11 @@ export async function createOptimismProject({
     Partial<
       Pick<
         Project,
-        'primaryContractAddress' | 'primaryContractChainId' | 'primaryContractDeployTxHash' | 'primaryContractDeployer'
+        | 'primaryContractAddress'
+        | 'primaryContractChainId'
+        | 'primaryContractDeployTxHash'
+        | 'primaryContractDeployer'
+        | 'mintingWalletAddress'
       >
     >;
   userId: string;
@@ -166,6 +170,7 @@ export async function createOptimismProject({
       primaryContractChainId: input.primaryContractChainId,
       primaryContractDeployTxHash: input.primaryContractDeployTxHash,
       primaryContractDeployer: input.primaryContractDeployer,
+      mintingWalletAddress: input.mintingWalletAddress,
       source,
       projectMembers: {
         createMany: {
