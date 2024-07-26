@@ -104,7 +104,12 @@ function ExpandedFormField({
   const formFieldType = formField.type;
   const filteredFormFieldTypes = useMemo(() => {
     if (!formFieldTypeFrequencyCount) {
-      return formFieldTypes;
+      return formFieldTypes.filter((_formFieldType) => {
+        if (_formFieldType === 'optimism_project_profile' && space?.domain !== 'op-grants') {
+          return false;
+        }
+        return true;
+      });
     }
 
     return formFieldTypes.filter((_formFieldType) => {

@@ -7,7 +7,7 @@ import { isTruthy } from '@root/lib/utils/types';
 import { optimism } from 'viem/chains';
 
 type OptimismProjectAttestation = {
-  farcasterID: number;
+  farcasterID: { hex: string };
   issuer: string;
 };
 
@@ -109,7 +109,9 @@ export async function storeOptimismProjectAttestations() {
 
   let totalUpdatedProjects = 0;
 
-  for (const optimismProjectAttestation of Object.values(optimismProjectAttestationRecord)) {
+  for (const optimismProjectAttestation of Object.values(optimismProjectAttestationRecord).filter(
+    (attestation) => parseInt(attestation.content.farcasterID.hex, 16) === 290639
+  )) {
     const optimismProjectMetadataAttestation = optimismProjectMetadataAttestationRecord[optimismProjectAttestation.id];
     try {
       const optimismProjectMetadata = await GET<OptimismProjectMetadata>(
@@ -161,3 +163,5 @@ export async function storeOptimismProjectAttestations() {
 
   return totalUpdatedProjects;
 }
+
+storeOptimismProjectAttestations();
