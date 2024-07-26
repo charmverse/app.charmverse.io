@@ -19,7 +19,6 @@ export const schema = yup.object({
   projectMembers: yup
     .array(
       yup.object({
-        name: yup.string().required(),
         farcasterId: yup.number().required()
       })
     )

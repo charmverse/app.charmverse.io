@@ -1,4 +1,6 @@
-import { getNFTUrl, extractAttrsFromUrl } from '../utils';
+import { getNFTUrl } from '@root/lib/blockchain/utils';
+
+import { extractAttrsFromUrl } from '../utils';
 
 describe('NFT Utils', () => {
   const extractionCases = [

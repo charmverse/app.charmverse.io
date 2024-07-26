@@ -1,8 +1,7 @@
+import { getNFTUrl } from '@root/lib/blockchain/utils';
 import type { TokenResponseItem } from '@zoralabs/zdk';
 import { ZDKChain, ZDKNetwork } from '@zoralabs/zdk';
 import { zoraTestnet } from 'viem/chains';
-
-import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 
 import type { NFTData } from '../../getNFTs';
 

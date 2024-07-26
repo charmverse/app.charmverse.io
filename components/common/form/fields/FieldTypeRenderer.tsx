@@ -22,7 +22,7 @@ import { FieldWrapper } from './FieldWrapper';
 import { FileField } from './FileField';
 import { ImageField } from './ImageField';
 import { LabelField } from './LabelField';
-import { OptimismProjectSelector } from './OptimismProjectSelector';
+import { OptimismProjectSelector } from './Optimism/OptimismProjectSelector';
 import { PersonInputField } from './PersonInputField';
 
 type TextInputConfig = {

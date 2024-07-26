@@ -1,7 +1,7 @@
 import type { OptimismProjectFormValues } from 'components/common/form/fields/Optimism/optimismProjectFormValues';
 import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
 
-import { useGET, usePOST } from './helpers';
+import { useGET, usePOST, usePUT } from './helpers';
 
 export function useGetOpProjects(enabled: boolean = true) {
   return useGET<OptimismProjectAttestationContent[]>(enabled ? '/api/optimism/projects' : undefined);
@@ -21,4 +21,8 @@ export function useCreateOptimismProject() {
       projectRefUID: string;
     }
   >('/api/optimism/projects');
+}
+
+export function useEditOptimismProject(attestationId: string) {
+  return usePUT<OptimismProjectFormValues>(`/api/optimism/projects/${attestationId}`);
 }
