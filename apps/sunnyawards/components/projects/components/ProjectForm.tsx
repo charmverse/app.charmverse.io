@@ -24,26 +24,7 @@ export function ProjectForm({
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
 
-  const { fieldState: primaryContractAdressFieldState } = useController({
-    name: 'primaryContractAddress',
-    control
-  });
-
-  const { fieldState: primaryContractDeployerState } = useController({
-    name: 'primaryContractDeployer',
-    control
-  });
-
-  const { fieldState: primaryContractDeployTxFieldState } = useController({
-    name: 'primaryContractDeployTxHash',
-    control
-  });
-
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
-
-  const primaryContractAddressError = primaryContractAdressFieldState.error?.message;
-  const primaryContractDeployerError = primaryContractDeployerState.error?.message;
-  const primaryContractDeployTxError = primaryContractDeployTxFieldState.error?.message;
 
   return (
     <>
@@ -127,15 +108,15 @@ export function ProjectForm({
               <Controller
                 control={control}
                 name='primaryContractAddress'
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <TextField
                     data-test='project-contract'
                     rows={3}
                     aria-labelledby='project-contract'
                     placeholder='Contract address'
                     {...field}
-                    error={!!primaryContractAddressError}
-                    helperText={primaryContractAddressError}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
                   />
                 )}
               />
@@ -145,15 +126,15 @@ export function ProjectForm({
               <Controller
                 control={control}
                 name='primaryContractDeployer'
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <TextField
                     data-test='project-deployer'
                     rows={3}
                     aria-labelledby='project-deployer'
                     placeholder='Address used to deploy the contract'
                     {...field}
-                    error={!!primaryContractDeployerError}
-                    helperText={primaryContractDeployerError}
+                    error={!!fieldState.error?.message}
+                    helperText={fieldState.error?.message}
                   />
                 )}
               />
@@ -163,15 +144,15 @@ export function ProjectForm({
               <Controller
                 control={control}
                 name='primaryContractDeployTxHash'
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <TextField
                     data-test='project-deploy-tx-hash'
                     rows={3}
                     aria-labelledby='project-deploy-tx-hash'
                     placeholder='Has of the transaction used to deploy the contract'
                     {...field}
-                    error={!!primaryContractDeployTxError}
-                    helperText={primaryContractDeployTxError}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
                   />
                 )}
               />

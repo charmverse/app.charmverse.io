@@ -24,7 +24,7 @@ export const schema = yup.object({
   github: yup.string(),
   twitter: yup.string(),
   mirror: yup.string(),
-  sunnyAwardsProjectType: yup.string().oneOf(SUNNY_AWARD_CATEGORIES).optional(),
+  sunnyAwardsProjectType: yup.string().oneOf(SUNNY_AWARD_CATEGORIES).required(),
   primaryContractChainId: yup.string().test('isChainId', 'Invalid chain ID', async (value, context) => {
     if ((context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType) === 'app') {
       return !!value && !Number.isNaN(parseInt(value));
