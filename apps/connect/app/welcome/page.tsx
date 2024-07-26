@@ -1,7 +1,8 @@
-import { WelcomePage } from '@connect/components/welcome/WelcomePage';
-import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
+import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+import { WelcomePage } from 'components/welcome/WelcomePage';
 
 export const metadata: Metadata = {
   other: {
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Welcome() {
-  const user = await getCurrentUser();
+  const user = await getCurrentUserAction();
 
   if (!user?.data) {
     return null;

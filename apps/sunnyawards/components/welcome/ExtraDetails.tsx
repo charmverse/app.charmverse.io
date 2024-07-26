@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { onboardingAction } from '@connect-shared/lib/profile/onboardingAction';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
@@ -18,13 +19,12 @@ import { Controller, useForm } from 'react-hook-form';
 
 import type { FormValues } from 'lib/profile/form';
 import { schema } from 'lib/profile/form';
-import { onboardingAction } from 'lib/profile/onboardingAction';
 
 const defaultValues = { email: '', terms: false, notify: true } as const;
 
 export function ExtraDetails() {
   const router = useRouter();
-  // @ts-ignore
+
   const { execute, result, isExecuting, hasErrored } = useAction(onboardingAction, {
     onSuccess() {
       router.push('/profile');

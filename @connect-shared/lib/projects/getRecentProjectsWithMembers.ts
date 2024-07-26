@@ -1,5 +1,6 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { replaceS3Domain } from '@root/lib/utils/url';
 
 /**
  * Get recent projects with members
@@ -46,7 +47,11 @@ export async function getRecentProjectsWithMembers({
     }
   });
 
-  return projectWithMembers;
+  return projectWithMembers.map((project) => ({
+    ...project,
+    avatar: replaceS3Domain(project.avatar),
+    coverImage: replaceS3Domain(project.coverImage)
+  }));
 }
 
 export type ProjectsWithMembers = Prisma.PromiseReturnType<typeof getRecentProjectsWithMembers>;

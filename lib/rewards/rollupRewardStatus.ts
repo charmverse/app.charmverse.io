@@ -13,6 +13,12 @@ export async function rollupRewardStatus({ rewardId }: { rewardId: string }): Pr
       id: rewardId
     },
     select: {
+      space: {
+        select: {
+          domain: true
+        }
+      },
+      createdBy: true,
       status: true,
       maxSubmissions: true,
       applications: {

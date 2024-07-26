@@ -54,6 +54,7 @@
       "@root/connectors/*": [
         "../../connectors/*"
       ],
+      "@root/hooks/*": ["../../hooks/*"],
       "@root/lib/*": [
         "../../lib/*"
       ],
@@ -107,10 +108,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "../../@connect-shared/lib/farcaster/fetchUserByFarcasterUsername.ts"
-  ],
+    "**/*.tsx"],
   "exclude": [
     "../../node_modules",
     ".next/"

@@ -5,6 +5,7 @@ export const CATEGORIES = ['CeFi', 'Cross Chain', 'DeFi', 'Governance', 'NFT', '
 export type ProjectCategory = (typeof CATEGORIES)[number];
 
 export const schema = yup.object({
+  id: yup.string(),
   name: yup.string().required('Project name is required'),
   description: yup.string(),
   avatar: yup.string(),

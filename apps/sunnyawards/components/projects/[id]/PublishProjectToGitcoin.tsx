@@ -12,7 +12,6 @@ export function PublishProjectToGitcoin({ projectPath }: { projectPath: string }
 
   const [error, setError] = useState<string | null>(null);
 
-  // @ts-ignore
   const { execute, isExecuting } = useAction(publishProjectToGitcoinAction, {
     onSuccess: (data) => {
       router.push(`/p/${projectPath}`);

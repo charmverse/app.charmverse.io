@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
@@ -73,6 +73,11 @@ export function TemplatePropertiesReadonlyList({
           );
         })}
       </Stack>
+      <Divider
+        sx={{
+          my: 2
+        }}
+      />
     </Stack>
   );
 }

@@ -33,7 +33,27 @@ interface ClickSigninEvent extends BaseEventWithoutGroup {
 export interface ViewOpPageEvent extends BaseEventWithoutGroup {
   path?: string;
   url?: string;
-  type: PageType | 'post';
+  type: PageType | 'post' | 'proposals_list' | 'bounties_list';
+}
+
+interface ProposalPassedEvent extends BaseEventWithoutGroup {
+  proposalId: string;
+}
+
+interface ProposalFailedEvent extends BaseEventWithoutGroup {
+  proposalId: string;
+}
+
+interface RewardCompletedEvent extends BaseEventWithoutGroup {
+  rewardId: string;
+}
+
+interface RewardPaidEvent extends BaseEventWithoutGroup {
+  rewardId: string;
+}
+
+interface RewardOpenedEvent extends BaseEventWithoutGroup {
+  rewardId: string;
 }
 
 export type MixpanelOpEventMap = {
@@ -46,6 +66,11 @@ export type MixpanelOpEventMap = {
   successful_signup: SuccessfulSignupEvent;
   successful_signin: SuccessfulSigninEvent;
   click_signin: ClickSigninEvent;
+  proposal_passed: ProposalPassedEvent;
+  proposal_failed: ProposalFailedEvent;
+  reward_completed: RewardCompletedEvent;
+  reward_paid: RewardPaidEvent;
+  reward_opened: RewardOpenedEvent;
 };
 
 export type MixpanelOpEvent = MixpanelOpEventMap[keyof MixpanelOpEventMap];

@@ -1,15 +1,15 @@
+import { getSession } from '@connect-shared/lib/session/getSession';
 import { redirect } from 'next/navigation';
 
 import { HomePage } from 'components/home/HomePage';
-import { getCurrentUserAction } from 'lib/profile/getCurrentUserAction';
 
 // tell Next that this route loads dynamic data
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const user = await getCurrentUserAction();
+  const session = await getSession();
 
-  if (user?.data) {
+  if (session?.user?.id) {
     redirect('/profile');
   }
 

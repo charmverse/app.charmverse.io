@@ -1,19 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 
 export async function fetchUserByFarcasterUsername(username: string) {
-  const [farcasterUser] = await getFarcasterUsers({
-    username
-  });
-
-  if (!farcasterUser) {
-    return null;
-  }
-
   const user = await prisma.user.findFirst({
     where: {
       farcasterUser: {
-        fid: farcasterUser.fid
+        account: {
+          path: ['username'],
+          equals: username
+        }
       }
     },
     select: {

@@ -1,11 +1,12 @@
-import { ConnectApiClient } from '@connect/apiClient/apiClient';
-import { Avatar } from '@connect/components/common/Avatar';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { BoxProps } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
+import { ConnectApiClient } from 'apiClient/apiClient';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
+
+import { Avatar } from 'components/common/Avatar';
 
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
