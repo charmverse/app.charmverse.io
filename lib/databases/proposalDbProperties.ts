@@ -4,6 +4,7 @@ import type { Constants } from '@root/lib/databases/constants';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
+  PROPOSAL_PUBLISHED_AT_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID
@@ -111,7 +112,7 @@ export const proposalDbProperties: {
     type: 'proposalAuthor'
   }),
   proposalPublishedAt: ({ name } = {}) => ({
-    id: uuid(),
+    id: PROPOSAL_PUBLISHED_AT_ID,
     name: name || 'Publish Date',
     options: [],
     type: 'proposalPublishedAt'
