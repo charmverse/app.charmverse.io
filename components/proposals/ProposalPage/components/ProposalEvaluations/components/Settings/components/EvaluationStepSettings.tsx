@@ -1,11 +1,12 @@
 import type { ProposalEvaluation, ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
 import { Box, FormLabel, Stack, Switch, TextField, Typography } from '@mui/material';
 import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useGetAllowedDocusignUsersAndRoles } from 'charmClient/hooks/docusign';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import {
   allMembersSystemRole,
   authorSystemRole,
@@ -56,6 +57,8 @@ export function EvaluationStepSettings({
   const isAdmin = useIsAdmin();
 
   const { space } = useCurrentSpace();
+
+  const [editingApprovers, setEditingApprovers] = useState(false);
 
   // reviewers are also readOnly when using a template with reviewers pre-selected
   const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
@@ -186,20 +189,18 @@ export function EvaluationStepSettings({
                 Approvers
               </Typography>
             </FormLabel>
-            <Typography variant='caption'>Who can move this proposal to the next step</Typography>
+            <Typography variant='caption'>
+              Who can move this proposal to the next step. Defaults to current reviewer if no user or role is selected
+            </Typography>
           </Box>
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
             <UserAndRoleSelect
               data-test={`proposal-${evaluation.type}-approver-select`}
               options={allowedUsersAndRoles}
               emptyPlaceholderContent='Select user or role'
-              value={
-                !approverOptions?.length
-                  ? [{ group: 'system_role', id: 'current_reviewer' }]
-                  : (approverOptions as SelectOption[])
-              }
+              value={approverOptions ?? []}
               readOnly={readOnlyReviewers}
-              systemRoles={[currentReviewerSystemRole]}
+              systemRoles={[]}
               variant='outlined'
               onChange={handleOnChangeApprovers}
             />

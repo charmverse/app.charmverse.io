@@ -119,8 +119,7 @@ export function PassFailEvaluation({
   const actionLabels = getActionButtonLabels({
     actionLabels: _actionLabels
   });
-  const canReview =
-    isReviewer && evaluationReviews.length < requiredReviews && !evaluationResult && !currentUserEvaluationReview;
+  const canReview = isReviewer && totalReviews < requiredReviews && !evaluationResult && !currentUserEvaluationReview;
 
   const canPassFail = (!actionCompletesStep && canReview) || (actionCompletesStep && isApprover);
 
@@ -275,19 +274,19 @@ export function PassFailEvaluation({
             </Box>
           </Box>
         )}
-        {!canPassFail && isCurrent && evaluationResult === null && evaluationReviews.length === 0 && (
+        {!canPassFail && isCurrent && evaluationResult === null && totalReviews === 0 && (
           <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' py={2} px={2}>
             <Typography variant='body2'>{isAppealProcess ? 'Appeal' : 'Review'} process ongoing</Typography>
           </Stack>
         )}
         {evaluationResult === 'pass' && (
-          <ResultCopyStack addPaddingTop={evaluationReviews.length === 0}>
+          <ResultCopyStack addPaddingTop={totalReviews === 0}>
             <ApprovedIcon color='success' />
             <Typography variant='body2'>Approved {completedDate}</Typography>
           </ResultCopyStack>
         )}
         {evaluationResult === 'fail' && (
-          <ResultCopyStack addPaddingTop={evaluationReviews.length === 0}>
+          <ResultCopyStack addPaddingTop={totalReviews === 0}>
             <RejectedIcon color='error' />
             <Typography variant='body2'>Declined {completedDate}</Typography>
           </ResultCopyStack>

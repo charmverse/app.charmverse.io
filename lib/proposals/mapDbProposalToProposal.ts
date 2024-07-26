@@ -1,3 +1,4 @@
+import { arrayUtils } from '@charmverse/core/dist/cjs/utilities';
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
   FormField,
@@ -93,7 +94,11 @@ export function mapDbProposalToProposal({
     let rubricAnswers = evaluation.rubricAnswers;
     let draftRubricAnswers = evaluation.draftRubricAnswers;
     let reviews = evaluation.reviews;
-    const totalReviews = evaluation.type === 'rubric' ? evaluation.rubricAnswers.length : evaluation.reviews.length;
+    const totalReviews =
+      evaluation.type === 'rubric'
+        ? // 1 answer per user per rubric, we care about unique respondents
+          arrayUtils.uniqueValues(evaluation.rubricAnswers.map((a) => a.userId)).length
+        : evaluation.reviews.length;
 
     if (!stepPermissions?.evaluate) {
       draftRubricAnswers = [];
