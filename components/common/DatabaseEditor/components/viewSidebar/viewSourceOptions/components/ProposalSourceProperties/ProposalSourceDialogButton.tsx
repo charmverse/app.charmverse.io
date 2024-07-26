@@ -7,6 +7,7 @@ import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board } from 'lib/databases/board';
@@ -16,6 +17,9 @@ import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialo
 import { ProposalSourcePropertiesDialog } from './ProposalSourcePropertiesDialog';
 
 export function ProposalSourceDialogButton({ board }: { board: Board }) {
+  const { proposalTemplates } = useProposalTemplates({
+    detailed: true
+  });
   const { trigger: createProposalSource, isMutating: isLoadingProposalSource } = useSWRMutation(
     `/api/pages/${board.id}/proposal-source`,
     (_url, { arg }: Readonly<{ arg: { pageId: string; selectedProperties: SelectedProposalProperties } }>) =>
@@ -31,9 +35,10 @@ export function ProposalSourceDialogButton({ board }: { board: Board }) {
   const proposalSourceSelectedProperties = useMemo(() => {
     return createSelectedPropertiesStateFromBoardProperties({
       cardProperties: board.fields.cardProperties,
-      proposalCustomProperties: boardCustomProperties.fields.cardProperties
+      proposalCustomProperties: boardCustomProperties.fields.cardProperties,
+      proposalTemplates: proposalTemplates ?? []
     });
-  }, [board.fields.cardProperties, boardCustomProperties.fields.cardProperties]);
+  }, [proposalTemplates, board.fields.cardProperties, boardCustomProperties.fields.cardProperties]);
 
   return (
     <>

@@ -1,7 +1,8 @@
-import { EditProjectPage } from '@connect/components/projects/edit/EditProjectPage';
-import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
-import { fetchProject } from '@connect/lib/projects/fetchProject';
+import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
+import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
 import { notFound, redirect } from 'next/navigation';
+
+import { EditProjectPage } from 'components/projects/edit/EditProjectPage';
 
 export default async function EditProject({
   params
@@ -14,7 +15,7 @@ export default async function EditProject({
     fetchProject({
       path: params.path
     }),
-    getCurrentUser()
+    getCurrentUserAction()
   ]);
 
   if (!user?.data) {

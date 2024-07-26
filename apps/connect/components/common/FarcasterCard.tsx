@@ -1,8 +1,9 @@
-import type { AvatarSize } from '@connect/components/common/Avatar';
-import { Avatar } from '@connect/components/common/Avatar';
 import { DeleteOutline } from '@mui/icons-material';
 import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
+
+import { Avatar } from 'components/common/Avatar';
+import type { AvatarSize } from 'components/common/Avatar';
 
 function FarcasterCardContent({
   avatar,
@@ -66,7 +67,7 @@ export function FarcasterCard(props: {
   onDelete?: VoidFunction;
   enableLink?: boolean;
 }) {
-  if (!props.enableLink) {
+  if (!props.enableLink || !props.username) {
     return (
       <Card sx={{ border: 'none' }}>
         <FarcasterCardContent {...props} />

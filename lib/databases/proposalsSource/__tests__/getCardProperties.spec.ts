@@ -1,3 +1,4 @@
+import type { ProposalEvaluationTestInput } from '@charmverse/core/dist/cjs/lib/testing/proposals';
 import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
@@ -83,67 +84,87 @@ describe('getCardPropertiesFromProposals', () => {
       spaceId: generated.space.id
     });
 
+    const evaluationInputs: ProposalEvaluationTestInput[] = [
+      {
+        rubricCriteria: [
+          {
+            description: 'Rubric criteria 1',
+            parameters: {
+              min: 0,
+              max: 5
+            },
+            title: 'Rubric criteria 1'
+          },
+          {
+            description: 'Rubric criteria 2',
+            parameters: {
+              min: 0,
+              max: 10
+            },
+            title: 'Rubric criteria 2'
+          }
+        ],
+        evaluationType: 'rubric',
+        title: 'Rubric evaluation 1',
+        reviewers: [
+          {
+            group: 'user',
+            id: proposalReviewer.id
+          },
+          {
+            group: 'user',
+            id: admin.id
+          }
+        ],
+        permissions: []
+      },
+      {
+        rubricCriteria: [
+          {
+            description: 'Rubric criteria 1',
+            parameters: {
+              min: 0,
+              max: 10
+            },
+            title: 'Rubric criteria 1'
+          }
+        ],
+        evaluationType: 'rubric',
+        title: 'Rubric evaluation 2',
+        reviewers: [
+          {
+            group: 'user',
+            id: admin.id
+          }
+        ],
+        permissions: []
+      }
+    ];
+
+    const proposalTemplate = await testUtilsProposals.generateProposal({
+      authors: [admin.id],
+      evaluationInputs,
+      proposalStatus: 'published',
+      pageType: 'proposal_template',
+      spaceId: generated.space.id,
+      userId: admin.id
+    });
+
     const generatedProposal = await testUtilsProposals.generateProposal({
       authors: [admin.id],
-      evaluationInputs: [
-        {
-          rubricCriteria: [
-            {
-              description: 'Rubric criteria 1',
-              parameters: {
-                min: 0,
-                max: 5
-              },
-              title: 'Rubric criteria 1'
-            },
-            {
-              description: 'Rubric criteria 2',
-              parameters: {
-                min: 0,
-                max: 10
-              },
-              title: 'Rubric criteria 2'
-            }
-          ],
-          evaluationType: 'rubric',
-          title: 'Rubric evaluation 1',
-          reviewers: [
-            {
-              group: 'user',
-              id: proposalReviewer.id
-            },
-            {
-              group: 'user',
-              id: admin.id
-            }
-          ],
-          permissions: []
-        },
-        {
-          rubricCriteria: [
-            {
-              description: 'Rubric criteria 1',
-              parameters: {
-                min: 0,
-                max: 10
-              },
-              title: 'Rubric criteria 1'
-            }
-          ],
-          evaluationType: 'rubric',
-          title: 'Rubric evaluation 2',
-          reviewers: [
-            {
-              group: 'user',
-              id: admin.id
-            }
-          ],
-          permissions: []
-        }
-      ],
+      evaluationInputs,
       proposalStatus: 'published',
       spaceId: generated.space.id,
       userId: admin.id
+    });
+
+    await prisma.page.update({
+      where: {
+        id: generatedProposal.page.id
+      },
+      data: {
+        sourceTemplateId: proposalTemplate.page.id
+      }
     });
 
     const proposalRubricCriterias = await prisma.proposalRubricCriteria.findMany({
@@ -257,22 +278,22 @@ describe('getCardPropertiesFromProposals', () => {
     ) as IPropertyTemplate;
     const proposalEvaluationStepProp = cardProperties.find((prop) => prop.type === 'proposalStep') as IPropertyTemplate;
     const rubricEvaluation1EvaluatedByProp = cardProperties.find(
-      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === `Rubric evaluation 1 (Step reviewers)`
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.evaluationTitle === 'Rubric evaluation 1'
     ) as IPropertyTemplate;
     const rubricEvaluation2EvaluatedByProp = cardProperties.find(
-      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === `Rubric evaluation 2 (Step reviewers)`
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.evaluationTitle === 'Rubric evaluation 2'
     ) as IPropertyTemplate;
     const rubricEvaluation1EvaluationTotalProp = cardProperties.find(
-      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === `Rubric evaluation 1 (Step total)`
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.evaluationTitle === `Rubric evaluation 1`
     ) as IPropertyTemplate;
     const rubricEvaluation2EvaluationTotalProp = cardProperties.find(
-      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === `Rubric evaluation 2 (Step total)`
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.evaluationTitle === `Rubric evaluation 2`
     ) as IPropertyTemplate;
     const rubricEvaluation1EvaluationAverageProp = cardProperties.find(
-      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === `Rubric evaluation 1 (Step average)`
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.evaluationTitle === `Rubric evaluation 1`
     ) as IPropertyTemplate;
     const rubricEvaluation2EvaluationAverageProp = cardProperties.find(
-      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === `Rubric evaluation 2 (Step average)`
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.evaluationTitle === `Rubric evaluation 2`
     ) as IPropertyTemplate;
 
     expect(proposalUrlProp).toBeDefined();
@@ -303,7 +324,7 @@ describe('getCardPropertiesFromProposals', () => {
 
     const cardFieldProperties = card.fields.properties;
 
-    expect(cardFieldProperties[proposalUrlProp.id as string]).toStrictEqual(generatedProposal.page.path);
+    expect(cardFieldProperties[proposalUrlProp.id as string]).toStrictEqual(generatedProposal.page!.path);
     expect(cardFieldProperties[proposalStatusProp.id as string]).toStrictEqual('pass');
     expect(cardFieldProperties[proposalEvaluationTypeProp.id as string]).toStrictEqual('rubric');
     expect(cardFieldProperties[proposalEvaluationStepProp.id as string]).toStrictEqual('Rubric evaluation 2');
@@ -326,47 +347,67 @@ describe('getCardPropertiesFromProposals', () => {
       spaceId: generated.space.id
     });
 
+    const evaluationInputs: ProposalEvaluationTestInput[] = [
+      {
+        evaluationType: 'feedback',
+        title: 'Feedback',
+        reviewers: [],
+        permissions: []
+      },
+      {
+        rubricCriteria: [
+          {
+            title: 'Rubric criteria 1'
+          },
+          {
+            title: 'Rubric criteria 2'
+          }
+        ],
+        evaluationType: 'rubric',
+        title: 'Rubric evaluation 1',
+        reviewers: [],
+        permissions: []
+      },
+      {
+        rubricCriteria: [
+          {
+            title: 'Rubric criteria 1'
+          },
+          {
+            title: 'Rubric criteria 2.1'
+          }
+        ],
+        evaluationType: 'rubric',
+        title: 'Rubric evaluation 2',
+        reviewers: [],
+        permissions: []
+      }
+    ];
+
+    const proposalTemplate = await testUtilsProposals.generateProposal({
+      authors: [admin.id],
+      evaluationInputs,
+      proposalStatus: 'published',
+      pageType: 'proposal_template',
+      spaceId: generated.space.id,
+      userId: admin.id
+    });
+
     const generatedProposal = await testUtilsProposals.generateProposal({
       authors: [admin.id],
-      evaluationInputs: [
-        {
-          evaluationType: 'feedback',
-          title: 'Feedback',
-          reviewers: [],
-          permissions: []
-        },
-        {
-          rubricCriteria: [
-            {
-              title: 'Rubric criteria 1'
-            },
-            {
-              title: 'Rubric criteria 2'
-            }
-          ],
-          evaluationType: 'rubric',
-          title: 'Rubric evaluation 1',
-          reviewers: [],
-          permissions: []
-        },
-        {
-          rubricCriteria: [
-            {
-              title: 'Rubric criteria 1'
-            },
-            {
-              title: 'Rubric criteria 2.1'
-            }
-          ],
-          evaluationType: 'rubric',
-          title: 'Rubric evaluation 2',
-          reviewers: [],
-          permissions: []
-        }
-      ],
+      evaluationInputs,
       proposalStatus: 'published',
       spaceId: generated.space.id,
       userId: admin.id
+    });
+
+    await prisma.page.update({
+      where: {
+        id: generatedProposal.page.id
+      },
+      data: {
+        sourceTemplateId: proposalTemplate.page.id
+      }
     });
 
     const proposalRubricCriterias = await prisma.proposalRubricCriteria.findMany({
@@ -761,6 +802,20 @@ describe('getCardPropertiesFromProposals', () => {
       userId: spaceMember.id
     });
 
+    const proposalTemplate = await testUtilsProposals.generateProposal({
+      authors: [proposalAuthor.id],
+      proposalStatus: 'published',
+      pageType: 'proposal_template',
+      reviewers: [
+        {
+          group: 'user',
+          id: proposalAuthor.id
+        }
+      ],
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
     const proposal = await testUtilsProposals.generateProposal({
       authors: [proposalAuthor.id],
       proposalStatus: 'published',
@@ -772,6 +827,15 @@ describe('getCardPropertiesFromProposals', () => {
       ],
       spaceId: testSpace.id,
       userId: proposalAuthor.id
+    });
+
+    await prisma.page.update({
+      where: {
+        id: proposal.page.id
+      },
+      data: {
+        sourceTemplateId: proposalTemplate.page.id
+      }
     });
 
     const form = await prisma.form.create({
@@ -793,12 +857,25 @@ describe('getCardPropertiesFromProposals', () => {
         },
         proposal: {
           connect: {
-            id: proposal.id
+            id: proposalTemplate.id
           }
         }
       },
       include: {
         formFields: true
+      }
+    });
+
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        form: {
+          connect: {
+            id: form.id
+          }
+        }
       }
     });
 

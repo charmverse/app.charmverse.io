@@ -1,10 +1,9 @@
 import { log } from '@charmverse/core/log';
-import { ConnectApiClient } from '@connect/apiClient/apiClient';
+import { uploadToS3 } from '@root/lib/aws/uploadToS3Browser';
+import { DEFAULT_MAX_FILE_SIZE_MB } from '@root/lib/file/constants';
+import { replaceS3Domain } from '@root/lib/utils/url';
+import { ConnectApiClient } from 'apiClient/apiClient';
 import { useState } from 'react';
-
-import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
-import { DEFAULT_MAX_FILE_SIZE_MB } from 'lib/file/constants';
-import { replaceS3Domain } from 'lib/utils/url';
 
 import { useFilePicker } from './useFilePicker';
 

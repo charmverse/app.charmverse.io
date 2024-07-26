@@ -1,14 +1,10 @@
+import { getSession } from '@connect-shared/lib/session/getSession';
 import { isTruthy } from '@root/lib/utils/types';
-import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import type { SessionData } from 'lib/session/config';
-import { getIronOptions } from 'lib/session/config';
-
 export async function middleware(request: NextRequest) {
-  const session = await getIronSession<SessionData>(cookies(), getIronOptions());
+  const session = await getSession();
   const user = session.user;
   const path = request.nextUrl.pathname;
   // Make /p/ project pages public, /u/ user pages public

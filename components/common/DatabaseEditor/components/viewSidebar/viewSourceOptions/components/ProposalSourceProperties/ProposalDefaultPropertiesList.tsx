@@ -76,6 +76,7 @@ export function ProposalDefaultPropertiesReadonlyList({
   return (
     <SelectedPropertiesList
       title='Proposal Defaults'
+      titleVariant='h6'
       items={selectedDefaultProperties.map((property) => property.name)}
     />
   );

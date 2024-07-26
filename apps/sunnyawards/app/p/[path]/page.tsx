@@ -1,10 +1,10 @@
+import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
 import { notFound } from 'next/navigation';
 
 import { ProjectDetailsPage } from 'components/projects/[id]/ProjectDetailsPage';
-import { getProject } from 'lib/projects/getProject';
 
 export default async function ProjectPage({ params }: { params: { path: string } }) {
-  const project = await getProject({
+  const project = await fetchProject({
     path: params.path
   });
 
@@ -17,7 +17,7 @@ export default async function ProjectPage({ params }: { params: { path: string }
       {project.farcasterFrameImage && (
         <>
           {/* Custom meta tags for farcaster */}
-          <meta name='fc:frame' content='Next' />
+          <meta name='fc:frame' content='vNext' />
           <meta name='og:image' content={project.farcasterFrameImage} />
           <meta name='fc:frame:image' content={project.farcasterFrameImage} />
           {/* Button 1 */}

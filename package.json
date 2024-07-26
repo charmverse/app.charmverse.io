@@ -5,7 +5,8 @@
     "defaults"
   ],
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "@connect-shared"
   ],
   "scripts": {
     "testgen": "python scripts/testgen/make_tests.py",
@@ -120,7 +121,7 @@
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
     "@ceramicnetwork/http-client": "^5.6.0",
-    "@charmverse/core": "^0.70.3",
+    "@charmverse/core": "^0.72.1",
     "@column-resizer/core": "^1.0.2",
     "@composedb/devtools": "^0.7.1",
     "@composedb/devtools-node": "^0.7.1",
@@ -159,10 +160,10 @@
     "@lens-protocol/react-web": "^2.0.0-alpha.27",
     "@lens-protocol/wagmi": "^4.0.0-alpha.4",
     "@metamask/onboarding": "^1.0.1",
-    "@mui/icons-material": "^5.15.7",
+    "@mui/icons-material": "^5.16.4",
     "@mui/lab": "^5.0.0-alpha.118",
-    "@mui/material": "^5.15.20",
-    "@mui/system": "5.15",
+    "@mui/material": "^5.16.4",
+    "@mui/system": "5.16.4",
     "@mui/x-date-pickers": "^6.19.5",
     "@mux/mux-node": "^8.0.0",
     "@mux/mux-video-react": "^0.7.15",
@@ -327,6 +328,7 @@
     "uuid": "^8.3.2",
     "viem": "^2.17.3",
     "wagmi": "^2.5.11",
+    "web-push": "^3.6.7",
     "yup": "^1.4.0",
     "zksync-web3": "^0.16.0"
   },
@@ -420,6 +422,7 @@
     "node-mocks-http": "^1.14.1",
     "ora": "^8.0.1",
     "patch-package": "^8.0.0",
+    "pino-pretty": "^11.2.2",
     "playwright": "^1.42.1",
     "prettier": "^2.8.0",
     "react-copy-to-clipboard": "^5.1.0",

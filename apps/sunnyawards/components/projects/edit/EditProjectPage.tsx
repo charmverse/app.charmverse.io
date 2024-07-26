@@ -1,6 +1,8 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -10,11 +12,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { PageWrapper } from 'components/common/PageWrapper';
-import type { LoggedInUser } from 'lib/profile/getCurrentUserAction';
 import { editProjectAction } from 'lib/projects/editProjectAction';
 import { schema } from 'lib/projects/form';
 import type { FormValues, ProjectCategory } from 'lib/projects/form';
-import type { ConnectProjectDetails } from 'lib/projects/getProject';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
@@ -27,7 +27,6 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
 
   const router = useRouter();
 
-  // @ts-ignore
   const { execute, isExecuting } = useAction(editProjectAction, {
     onSuccess: () => {
       router.push(`/p/${project.path}`);
@@ -70,15 +69,13 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <Box gap={2} display='flex' flexDirection='column'>
-          <ProjectForm
-            control={control}
-            isValid={isValid}
-            onNext={() => {
-              setShowTeamMemberForm(true);
-            }}
-          />
-        </Box>
+        <ProjectForm
+          control={control}
+          isValid={isValid}
+          onNext={() => {
+            setShowTeamMemberForm(true);
+          }}
+        />
       </PageWrapper>
     );
   }
@@ -118,19 +115,22 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           execute={(input) => {
             execute({
               ...input,
-              projectId: project.id,
+              id: project.id,
               projectMembers: input.projectMembers.slice(1)
             });
           }}
           isExecuting={isExecuting}
           // Skip the first member which is the team lead
-          initialFarcasterProfiles={project.projectMembers.slice(1).map((member) => ({
-            bio: member.farcasterUser.bio,
-            displayName: member.farcasterUser.displayName,
-            fid: member.farcasterUser.fid,
-            pfpUrl: member.farcasterUser.pfpUrl,
-            username: member.farcasterUser.username
-          }))}
+          initialFarcasterProfiles={project.projectMembers.slice(1).map(
+            (member) =>
+              ({
+                bio: member.farcasterUser.bio,
+                displayName: member.farcasterUser.displayName,
+                fid: member.farcasterUser.fid,
+                pfpUrl: member.farcasterUser.pfpUrl,
+                username: member.farcasterUser.username
+              } as any)
+          )}
         />
       </Box>
     </PageWrapper>

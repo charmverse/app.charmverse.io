@@ -6,6 +6,8 @@ import { extractPreviewImage } from '@root/lib/prosemirror/extractPreviewImage';
 import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
+import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
+
 import { getRewardOrThrow } from './getReward';
 import { getRewardErrors } from './getRewardErrors';
 import { getRewardType } from './getRewardType';
@@ -69,7 +71,8 @@ export async function createReward({
     },
     select: {
       id: true,
-      publicBountyBoard: true
+      publicBountyBoard: true,
+      domain: true
     }
   });
 
@@ -223,6 +226,13 @@ export async function createReward({
         }
       })
     ]);
+  }
+
+  if (space?.domain === 'op-grants') {
+    trackOpUserAction('reward_opened', {
+      userId,
+      rewardId
+    });
   }
 
   const reward = await getRewardOrThrow({ rewardId });

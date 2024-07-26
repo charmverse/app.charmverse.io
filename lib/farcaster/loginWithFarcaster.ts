@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { FarcasterUser } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
 import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-client';
@@ -23,6 +24,14 @@ const appClient = createAppClient({
     rpcUrl: getChainById(optimism.id)!.rpcUrls[0]
   })
 });
+
+export type FarcasterProfileInfo = {
+  fid: number | undefined;
+  username?: string;
+  displayName?: string;
+  bio?: string;
+  pfpUrl?: string;
+};
 
 export type LoginWithFarcasterParams = FarcasterBody &
   Required<Pick<FarcasterBody, 'nonce' | 'message' | 'signature'>> & {
@@ -142,7 +151,7 @@ export async function loginWithFarcaster({
         },
         farcasterUser: {
           create: {
-            account: { username, displayName, bio, pfpUrl },
+            account: { username, displayName, bio, pfpUrl, fid },
             fid
           }
         }

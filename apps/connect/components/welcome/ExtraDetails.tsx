@@ -1,9 +1,9 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { schema } from '@connect/lib/profile/form';
-import type { FormValues } from '@connect/lib/profile/form';
-import { actionOnboarding } from '@connect/lib/profile/onboardingAction';
+import type { FormValues } from '@connect-shared/lib/profile/form';
+import { schema } from '@connect-shared/lib/profile/form';
+import { onboardingAction } from '@connect-shared/lib/profile/onboardingAction';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
@@ -23,8 +23,8 @@ const defaultValues = { email: '', terms: false, notify: true } as const;
 
 export function ExtraDetails() {
   const router = useRouter();
-  // @ts-ignore
-  const { execute, result, isExecuting, hasErrored } = useAction(actionOnboarding, {
+
+  const { execute, result, isExecuting, hasErrored } = useAction(onboardingAction, {
     onSuccess() {
       router.push('/profile');
     },

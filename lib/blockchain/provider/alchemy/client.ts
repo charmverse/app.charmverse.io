@@ -3,9 +3,8 @@ import { getChainById } from '@root/connectors/chains';
 import { paginatedCall } from '@root/lib/utils/async';
 import { isTruthy } from '@root/lib/utils/types';
 
-import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
-
 import type { NFTData } from '../../getNFTs';
+import { getNFTUrl } from '../../getNFTUrl';
 
 import type { SupportedChainId } from './config';
 

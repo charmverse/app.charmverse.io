@@ -1,4 +1,4 @@
-import type { FormValues } from '@connect/lib/projects/form';
+import type { FormValues } from '@connect-shared/lib/projects/form';
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { Button, FormLabel, IconButton, Stack, TextField } from '@mui/material';

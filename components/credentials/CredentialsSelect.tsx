@@ -136,7 +136,7 @@ export function CredentialSelect({
             );
           }
 
-          return <CredentialComponent key={option.id} {...option} {...props} />;
+          return <CredentialComponent {...option} {...props} key={option.id} />;
         }}
         renderTags={(value: any[], getTagProps) => {
           return value.map((val, index) => {

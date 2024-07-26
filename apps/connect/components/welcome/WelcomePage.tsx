@@ -1,8 +1,9 @@
-import { PageWrapper } from '@connect/components/common/PageWrapper';
-import type { LoggedInUser } from '@connect/lib/profile/interfaces';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+
+import { PageWrapper } from 'components/common/PageWrapper';
 
 import { FarcasterCard } from '../common/FarcasterCard';
 

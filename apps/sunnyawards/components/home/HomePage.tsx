@@ -30,7 +30,7 @@ export function HomePage() {
     >
       <Image
         src='/images/sunny-awards.png'
-        width={500}
+        width={400}
         height={200}
         sizes='100vw'
         style={{
@@ -52,7 +52,8 @@ export function HomePage() {
         href='https://warpcast.com/~/signup'
         target='_blank'
         rel='noopener'
-        color='inherit'
+        color='text.primary'
+        fontWeight={500}
         display='block'
       >
         Don't have a Farcaster account?

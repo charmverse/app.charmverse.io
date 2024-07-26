@@ -1,13 +1,13 @@
-import { ExpandableDescription } from '@connect/components/common/ExpandableDescription';
-import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import EditIcon from '@mui/icons-material/Edit';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
 import { IconButton, Stack, Typography } from '@mui/material';
+import { replaceUrl } from '@root/lib/utils/url';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
 
-import { replaceUrl } from 'lib/utils/url';
+import { ExpandableDescription } from 'components/common/ExpandableDescription';
 
 import { ShareButton } from './ProjectShareButton';
 
