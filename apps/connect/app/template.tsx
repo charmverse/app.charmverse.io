@@ -6,27 +6,34 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
-const variants = {
+const mobileVariants = {
   hidden: { opacity: 0, x: 200, y: 0 },
   enter: { opacity: 1, x: 0, y: 0 },
-  exit: { opacity: 0, x: 0, y: 0 }
+  exit: { opacity: 0, x: 200, y: 0 }
+};
+
+const desktopVariants = {
+  hidden: { opacity: 0 },
+  enter: { opacity: 1 },
+  exit: { opacity: 0 }
 };
 
 export default function Template({ children }: { children: ReactNode }) {
   const key = usePathname();
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.down('sm'));
+  const matchesMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  if (matches) {
+  if (matchesMobile) {
     return (
       <AnimatePresence mode='wait'>
         <motion.div
+          style={{ height: '100%' }}
           key={key}
           initial='hidden'
           animate='enter'
           exit='exit'
-          variants={variants}
-          transition={{ type: 'linear', duration: 0.2 }}
+          variants={mobileVariants}
+          transition={{ type: 'easeInOut', duration: 0.2 }}
           className='overflow-hidden'
         >
           {children}
@@ -35,5 +42,19 @@ export default function Template({ children }: { children: ReactNode }) {
     );
   }
 
-  return children;
+  return (
+    <AnimatePresence mode='wait'>
+      <motion.div
+        key={key}
+        initial='hidden'
+        animate='enter'
+        exit='exit'
+        variants={desktopVariants}
+        transition={{ type: 'easeInOut', duration: 0.2 }}
+        className='overflow-hidden'
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
 }
