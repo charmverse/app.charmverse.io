@@ -28,7 +28,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
 
   const { execute, isExecuting } = useAction(createProjectAction, {
     onSuccess: (data) => {
-      router.push(`/p/${data.data?.projectPath as string}/publish`);
+      router.push(`/p/${data.data?.projectPath as string}/share`);
     },
     onError(err) {
       log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);

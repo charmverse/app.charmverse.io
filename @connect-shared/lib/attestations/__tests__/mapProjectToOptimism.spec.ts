@@ -1,5 +1,5 @@
 import type { ProjectDetails } from '../mapProjectToOptimism';
-import { mapProjectToOptimism } from '../mapProjectToOptimism'; // Adjust the import to the actual file location
+import { mapProjectToOptimism } from '../mapProjectToOptimism';
 
 describe('mapProjectToOptimism', () => {
   it('should map the project details correctly', () => {
@@ -14,6 +14,11 @@ describe('mapProjectToOptimism', () => {
       twitter: 'https://twitter.com/projectx',
       mirror: 'https://mirror.xyz/projectx',
       websites: ['https://example.com'],
+      mintingWalletAddress: null,
+      primaryContractAddress: null,
+      primaryContractChainId: null,
+      primaryContractDeployTxHash: null,
+      primaryContractDeployer: null,
       projectMembers: [
         {
           farcasterId: 123
