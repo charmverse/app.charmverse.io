@@ -25,6 +25,7 @@ export async function createOptimismProject({
         | 'primaryContractDeployTxHash'
         | 'primaryContractDeployer'
         | 'mintingWalletAddress'
+        | 'sunnyAwardsProjectType'
       >
     >;
   userId: string;
@@ -171,6 +172,7 @@ export async function createOptimismProject({
       primaryContractDeployTxHash: input.primaryContractDeployTxHash,
       primaryContractDeployer: input.primaryContractDeployer,
       mintingWalletAddress: input.mintingWalletAddress,
+      sunnyAwardsProjectType: input.sunnyAwardsProjectType,
       source,
       projectMembers: {
         createMany: {
