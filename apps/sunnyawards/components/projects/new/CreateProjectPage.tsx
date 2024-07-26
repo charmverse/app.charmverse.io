@@ -5,6 +5,7 @@ import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAct
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -12,8 +13,8 @@ import { useForm } from 'react-hook-form';
 
 import { PageWrapper } from 'components/common/PageWrapper';
 import { createProjectAction } from 'lib/projects/createProjectAction';
-import { schema } from 'lib/projects/form';
 import type { FormValues } from 'lib/projects/form';
+import { schema } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
@@ -37,33 +38,23 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
 
   const {
     control,
-    formState: { isValid, errors, dirtyFields },
+    formState: { isValid },
     handleSubmit,
-    getValues,
-    watch
+    getValues
   } = useForm<FormValues>({
     defaultValues: {
-      name: 'Demo name',
-      description: 'Demo description',
+      name: '',
       sunnyAwardsProjectType: 'other',
       projectMembers: [
         {
+          name: (user?.farcasterUser?.account as FarcasterProfile['body']).displayName,
           farcasterId: user?.farcasterUser?.fid
         }
-      ],
-      // Stubs
-      primaryContractAddress: '0x5fd84259d66Cd46123540766Be93DFE6D43130D7',
-      primaryContractChainId: '11155420',
-      primaryContractDeployer: '0x97eFFE60F93386969EdC31Dbd09677da23fE901A',
-      primaryContractDeployTxHash: '0xfefc5286cd0832e466d56c4a25e39d30f3f8bca1279f2334c59fa56cf64a4843'
+      ]
     },
     resolver: yupResolver(schema),
     mode: 'onChange'
   });
-
-  const values = watch();
-
-  console.log('PARENT', { isValid, errors, values, dirtyFields });
 
   if (!showTeamMemberForm) {
     return (

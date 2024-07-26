@@ -26,8 +26,6 @@ export function ProjectForm({
 
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
 
-  console.log('control', control._formValues, 'errors', control._formState.errors);
-
   return (
     <>
       <Stack gap={2}>
