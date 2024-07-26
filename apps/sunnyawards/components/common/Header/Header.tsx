@@ -12,6 +12,7 @@ import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import Script from 'next/script';
 import { useAction } from 'next-safe-action/hooks';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
@@ -19,7 +20,6 @@ import { useState } from 'react';
 export function Header({ user }: { user: LoggedInUser | null }) {
   const path = usePathname();
   const router = useRouter();
-
   useDatadogLogger({ service: 'sunnyawards-browser', userId: user?.id });
   useDarkTheme();
   const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
