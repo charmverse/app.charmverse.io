@@ -1,4 +1,3 @@
-import { arrayUtils } from '@charmverse/core/dist/cjs/utilities';
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
   FormField,
@@ -17,6 +16,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { arrayUtils } from '@charmverse/core/utilities';
 import type { EASAttestationFromApi } from '@root/lib/credentials/external/getOnchainCredentials';
 import type { FormFieldInput } from '@root/lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
