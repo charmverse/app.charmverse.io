@@ -422,6 +422,7 @@
     "node-mocks-http": "^1.14.1",
     "ora": "^8.0.1",
     "patch-package": "^8.0.0",
+    "pino-pretty": "^11.2.2",
     "playwright": "^1.42.1",
     "prettier": "^2.8.0",
     "react-copy-to-clipboard": "^5.1.0",

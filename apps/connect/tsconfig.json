@@ -27,6 +27,7 @@
       "lib/*": ["./lib/*"],
       "public/*": ["./public/*"],
       "theme/*": ["./theme/*"],
+      "@root/abis/*": ["../../abis/*"],
       "@root/adapters/*": ["../../adapters/*"],
       "@root/config/*": ["../../config/*"],
       "@root/connectors/*": ["../../connectors/*"],

@@ -45,6 +45,9 @@
       "theme/*": [
         "./theme/*"
       ],
+      "@root/abis/*": [
+        "../../abis/*"
+      ],
       "@root/adapters/*": [
         "../../adapters/*"
       ],
@@ -54,7 +57,9 @@
       "@root/connectors/*": [
         "../../connectors/*"
       ],
-      "@root/hooks/*": ["../../hooks/*"],
+      "@root/hooks/*": [
+        "../../hooks/*"
+      ],
       "@root/lib/*": [
         "../../lib/*"
       ],
@@ -108,7 +113,9 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"],
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
   "exclude": [
     "../../node_modules",
     ".next/"

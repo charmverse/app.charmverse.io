@@ -2,14 +2,13 @@ import type { Nft } from '@ankr.com/ankr.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 import type { Blockchain as AnkrBlockchain } from '@ankr.com/ankr.js/dist/types';
 import { log } from '@charmverse/core/log';
+import ERC721_ABI from '@root/abis/ERC721.json';
 import { GET } from '@root/adapters/http';
+import { getNFTUrl } from '@root/lib/blockchain/utils';
 import { isMantleChain } from '@root/lib/gnosis/mantleClient';
 import { paginatedCall } from '@root/lib/utils/async';
-import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
 import { ethers } from 'ethers';
-
-import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 
 import type { NFTData } from '../../getNFTs';
 

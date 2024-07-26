@@ -1,8 +1,6 @@
 import type { Project } from '@charmverse/core/prisma-client';
 
-import type { ConnectProjectDetails } from '../projects/fetchProject';
-
-type Contract = {
+export type Contract = {
   address: string;
   deploymentTxHash: string;
   deployerAddress: string;
@@ -64,6 +62,11 @@ export type ProjectDetails = Pick<
   | 'mirror'
   | 'twitter'
   | 'websites'
+  | 'primaryContractAddress'
+  | 'primaryContractChainId'
+  | 'primaryContractDeployTxHash'
+  | 'primaryContractDeployer'
+  | 'mintingWalletAddress'
 > & {
   projectMembers: {
     farcasterId: number;
@@ -71,6 +74,21 @@ export type ProjectDetails = Pick<
 };
 
 export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
+  const contracts: Contract[] =
+    input.primaryContractAddress &&
+    input.primaryContractChainId &&
+    input.primaryContractDeployTxHash &&
+    input.primaryContractDeployer
+      ? [
+          {
+            address: input.primaryContractAddress,
+            deploymentTxHash: input.primaryContractDeployTxHash,
+            deployerAddress: input.primaryContractDeployer,
+            chainId: Number(input.primaryContractChainId)
+          }
+        ]
+      : [];
+
   return {
     name: input.name || '',
     description: input.description || '',
@@ -87,7 +105,7 @@ export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
     github: input.github ? [input.github] : [],
     osoSlug: '', // Placeholder: requires specific input
     packages: [], // Placeholder: requires specific input
-    contracts: [], // Placeholder: requires specific input
+    contracts,
     grantsAndFunding: {
       ventureFunding: [], // Placeholder: requires specific input
       grants: [], // Placeholder: requires specific input
