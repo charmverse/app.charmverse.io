@@ -29,6 +29,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
   const { execute: logoutUser } = useAction(logoutAction, {
     onSuccess: async () => {
       await revalidatePathAction();
+      log.info('User logged out');
       router.push('/');
     },
     onError(err) {

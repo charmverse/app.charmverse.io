@@ -43,6 +43,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
     await connectApiClient.logout().catch((error) => {
       log.error('There was an error while trying to signout', { error });
     });
+    log.info('User logged out');
     revalidatePathAction();
     router.push('/');
   };
