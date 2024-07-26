@@ -1,5 +1,3 @@
-import { Avatar } from '@connect/components/common/Avatar';
-import type { Grant } from '@connect/lib/grants/getGrants';
 import { Chip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -7,9 +5,11 @@ import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
+import { fancyTrim } from '@root/lib/utils/strings';
 import Link from 'next/link';
 
-import { fancyTrim } from 'lib/utils/strings';
+import { Avatar } from 'components/common/Avatar';
+import type { Grant } from 'lib/grants/getGrants';
 
 export function GrantItem({ grant }: { grant: Grant }) {
   const grantName = grant.name || 'Untitled';

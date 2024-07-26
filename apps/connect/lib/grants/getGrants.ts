@@ -1,8 +1,7 @@
 import { UndesirableOperationError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { BoardFields } from 'lib/databases/board';
-import type { CardFields } from 'lib/databases/card';
+import { type BoardFields } from '@root/lib/databases/board';
+import { type CardFields } from '@root/lib/databases/card';
 
 const grantsDatabaseBoardId = '8cfb5664-b51b-41bd-afbd-44e284fa756d';
 

@@ -7,7 +7,7 @@ import { replaceUrl } from '@root/lib/utils/url';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
 
-import { ExpandableDescription } from 'components/common/ExpandableDescription';
+import { ProjectDescription } from 'components/common/ProjectDescription';
 
 import { ShareButton } from './ProjectShareButton';
 
@@ -99,7 +99,7 @@ export function ProjectDetails({ project, showEditButton = false }: ProjectDetai
           </Stack>
         )}
       </Stack>
-      {project.description && <ExpandableDescription description={project.description} />}
+      {project.description && <ProjectDescription description={project.description} />}
     </Stack>
   );
 }

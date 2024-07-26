@@ -1,6 +1,7 @@
-import { GrantDetailsPage } from '@connect/components/grants/[path]/GrantDetailsPage';
-import { getGrant } from '@connect/lib/grants/getGrant';
 import { notFound } from 'next/navigation';
+
+import { GrantDetailsPage } from 'components/grants/[path]/GrantDetailsPage';
+import { getGrant } from 'lib/grants/getGrant';
 
 export default async function GrantPage({
   params

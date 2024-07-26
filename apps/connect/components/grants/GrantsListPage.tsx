@@ -1,9 +1,10 @@
 import 'server-only';
 
-import { PageWrapper } from '@connect/components/common/PageWrapper';
-import type { Grant } from '@connect/lib/grants/getGrants';
 import { Button, Stack } from '@mui/material';
 import Link from 'next/link';
+
+import { PageWrapper } from 'components/common/PageWrapper';
+import type { Grant } from 'lib/grants/getGrants';
 
 import { GrantItem } from './components/GrantItem';
 

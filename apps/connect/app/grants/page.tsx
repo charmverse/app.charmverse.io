@@ -1,5 +1,5 @@
-import { GrantsListPage } from '@connect/components/grants/GrantsListPage';
-import { getGrants } from '@connect/lib/grants/getGrants';
+import { GrantsListPage } from 'components/grants/GrantsListPage';
+import { getGrants } from 'lib/grants/getGrants';
 
 export default async function GrantsPage({
   searchParams

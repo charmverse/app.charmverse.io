@@ -1,11 +1,12 @@
 import 'server-only';
 
-import type { Grant } from '@connect/lib/grants/getGrants';
 import { Button, Chip, Link, Stack, Typography } from '@mui/material';
 
-import { ExpandableDescription } from '../../common/ExpandableDescription';
+import type { Grant } from 'lib/grants/getGrants';
+
 import { PageCoverHeader } from '../../common/PageCoverHeader';
 import { PageWrapper } from '../../common/PageWrapper';
+import { ProjectDescription } from '../../common/ProjectDescription';
 
 export function GrantDetailsPage({ grant }: { grant: Grant }) {
   return (
@@ -23,7 +24,7 @@ export function GrantDetailsPage({ grant }: { grant: Grant }) {
             size='small'
           />
         </Stack>
-        {grant.description && <ExpandableDescription description={grant.description} />}
+        {grant.description && <ProjectDescription description={grant.description} />}
         {grant.applyLink && (
           <Stack direction='row' justifyContent='center' my={2}>
             <Link href={grant.applyLink} target='_blank'>

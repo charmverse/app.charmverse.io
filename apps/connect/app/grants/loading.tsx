@@ -1,4 +1,4 @@
-import { GrantsListPageSkeleton } from '@connect/components/grants/components/GrantsListPageSkeleton';
+import { GrantsListPageSkeleton } from 'components/grants/components/GrantsListPageSkeleton';
 
 export default function Loading() {
   return <GrantsListPageSkeleton />;
