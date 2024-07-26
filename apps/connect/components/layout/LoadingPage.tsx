@@ -1,7 +1,7 @@
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import Box from '@mui/material/Box';
 
-export default function Loading() {
+export function LoadingPage() {
   return (
     <Box
       height='100vh'
