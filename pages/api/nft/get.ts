@@ -1,8 +1,8 @@
+import { getNFT } from '@root/lib/blockchain/getNFTs';
+import type { NFTData, NFTRequest } from '@root/lib/blockchain/getNFTs';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { getNFT } from 'lib/blockchain/getNFTs';
-import type { NFTData, NFTRequest } from 'lib/blockchain/getNFTs';
 import { onError, onNoMatch } from 'lib/middleware';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
