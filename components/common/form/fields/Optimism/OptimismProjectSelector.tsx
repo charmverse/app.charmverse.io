@@ -61,22 +61,26 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
             disabled={disabled}
             onChange={(e) => {
               const projectId = e.target.value;
-              const newProject =
-                projectId !== 'add-new-project'
-                  ? projects.find((project) => project.projectRefUID === projectId)
-                  : null;
-              if (newProject) {
-                props.onChange?.({
-                  projectTitle: newProject.name,
-                  projectRefUID: newProject.projectRefUID
-                });
-              } else if (projectId === 'add-new-project') {
+              if (projectId === 'add-new-project') {
                 setCreatingOpProject(true);
+              } else if (projectId === 'remove-project') {
+                props.onChange?.({
+                  projectTitle: '',
+                  projectRefUID: ''
+                });
+              } else {
+                const newProject = projects.find((project) => project.projectRefUID === projectId);
+                if (newProject) {
+                  props.onChange?.({
+                    projectTitle: newProject.name,
+                    projectRefUID: newProject.projectRefUID
+                  });
+                }
               }
             }}
             fullWidth
             renderValue={(selectedValue) => {
-              if (selectedValue === 'add-new-project') {
+              if (creatingOpProject || selectedValue === 'add-new-project') {
                 return <Typography color='textSecondary'>New project</Typography>;
               } else if (selectedValue === '') {
                 return <Typography color='textSecondary'>Select a project</Typography>;
@@ -107,8 +111,11 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
                 />
               </MenuItem>
             ))}
-            <MenuItem value='add-new-project'>
+            <MenuItem value='add-new-project' sx={{ mb: 1 }}>
               <Typography>Create new OP project</Typography>
+            </MenuItem>
+            <MenuItem value='remove-project' sx={{ mb: 1 }}>
+              <Typography>Remove OP project</Typography>
             </MenuItem>
           </Select>
           {creatingOpProject ? (
