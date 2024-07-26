@@ -16,7 +16,7 @@ export const createProjectAction = authActionClient
   .schema(schema)
   .action(async ({ parsedInput, ctx }) => {
     const input = parsedInput;
-    prettyPrint({ input });
+
     const currentUserId = ctx.session.user!.id;
     const newProject = await createOptimismProject({
       userId: currentUserId,
