@@ -110,6 +110,12 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalAuthor'
   }),
+  proposalPublishedAt: ({ name } = {}) => ({
+    id: uuid(),
+    name: name || 'Publish Date',
+    options: [],
+    type: 'proposalPublishedAt'
+  }),
   proposalRubricCriteriaReviewerComment: () => ({
     id: uuid(),
     name: 'Proposal Rubric Criteria Reviewer Comment',
@@ -186,7 +192,8 @@ export const defaultProposalProperties = [
   proposalDbProperties.proposalStep(),
   proposalDbProperties.proposalUrl(),
   proposalDbProperties.proposalAuthor(),
-  proposalDbProperties.proposalReviewer()
+  proposalDbProperties.proposalReviewer(),
+  proposalDbProperties.proposalPublishedAt()
 ];
 
 export const defaultProposalPropertyTypes = defaultProposalProperties.map((p) => p.type);

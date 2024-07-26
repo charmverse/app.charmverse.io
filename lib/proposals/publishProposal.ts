@@ -14,7 +14,8 @@ export async function publishProposal({ proposalId, userId }: { proposalId: stri
       id: proposalId
     },
     data: {
-      status: 'published'
+      status: 'published',
+      publishedAt: new Date()
     },
     include: {
       page: {

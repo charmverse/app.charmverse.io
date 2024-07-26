@@ -25,6 +25,7 @@ export const iconForPropertyType = (propertyType: PropertyType | 'title', props?
     case 'createdBy':
       return <PersonIcon fontSize='small' {...props} />;
     case 'createdTime':
+    case 'proposalPublishedAt':
       return <AccessTimeIcon fontSize='small' {...props} />;
     case 'date':
       return <EventNoteIcon fontSize='small' {...props} />;

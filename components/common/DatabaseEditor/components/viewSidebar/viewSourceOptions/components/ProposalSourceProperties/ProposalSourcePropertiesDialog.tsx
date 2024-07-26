@@ -21,6 +21,7 @@ import { TemplatePropertiesReadonlyList } from './TemplatePropertiesReadonlyList
 export type RubricEvaluationProperty =
   | 'average'
   | 'total'
+  | 'publishedAt'
   | 'reviewers'
   | 'criteriaTotal'
   | 'reviewerScore'
