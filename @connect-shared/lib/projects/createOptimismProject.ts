@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
-import type { ProjectSource } from '@charmverse/core/prisma-client';
+import type { OptionalPrismaTransaction, Project, ProjectSource } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { StatusAPIResponse } from '@farcaster/auth-client';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath, uid } from '@root/lib/utils/strings';
@@ -12,39 +13,66 @@ import type { FormValues } from './form';
 export async function createOptimismProject({
   source,
   userId,
-  input
+  input,
+  tx = prisma
 }: {
   source: ProjectSource;
-  input: FormValues;
+  input: FormValues &
+    Partial<
+      Pick<
+        Project,
+        | 'primaryContractAddress'
+        | 'primaryContractChainId'
+        | 'primaryContractDeployTxHash'
+        | 'primaryContractDeployer'
+        | 'mintingWalletAddress'
+        | 'sunnyAwardsProjectType'
+      >
+    >;
   userId: string;
-}) {
-  const farcasterAccounts = await prisma.farcasterUser.findMany({
+} & OptionalPrismaTransaction) {
+  const farcasterAccounts = await tx.farcasterUser.findMany({
     where: {
       fid: {
-        in: input.projectMembers.slice(1).map(({ farcasterId }) => farcasterId)
+        in: input.projectMembers.map(({ farcasterId }) => farcasterId)
       }
     },
     select: {
       userId: true,
-      fid: true
+      fid: true,
+      account: true
     }
   });
 
-  const farcasterAccountsUserIdRecord: Record<number, string> = farcasterAccounts.reduce<Record<number, string>>(
-    (acc, { userId: _userId, fid }) => {
-      acc[fid] = _userId;
-      return acc;
-    },
-    {}
-  );
+  const farcasterAccountsRecord: Record<
+    number,
+    {
+      userId: string;
+      account: StatusAPIResponse;
+    }
+  > = farcasterAccounts.reduce<
+    Record<
+      number,
+      {
+        userId: string;
+        account: StatusAPIResponse;
+      }
+    >
+  >((acc, { fid, userId: _userId, account }) => {
+    acc[fid] = {
+      userId: _userId,
+      account: account as unknown as StatusAPIResponse
+    };
+    return acc;
+  }, {});
 
   const projectMembers = (
     await Promise.all(
       input.projectMembers.slice(1).map(async (member) => {
-        if (farcasterAccountsUserIdRecord[member.farcasterId]) {
+        if (farcasterAccountsRecord[member.farcasterId]) {
           return {
-            userId: farcasterAccountsUserIdRecord[member.farcasterId],
-            name: member.name,
+            userId: farcasterAccountsRecord[member.farcasterId].userId,
+            name: farcasterAccountsRecord[member.farcasterId].account.displayName as string,
             farcasterId: member.farcasterId
           };
         }
@@ -56,7 +84,7 @@ export async function createOptimismProject({
             return null;
           }
 
-          const farcasterWalletUser = await prisma.user.findFirst({
+          const farcasterWalletUser = await tx.user.findFirst({
             where: {
               wallets: {
                 some: {
@@ -68,13 +96,16 @@ export async function createOptimismProject({
                   }
                 }
               }
+            },
+            select: {
+              id: true
             }
           });
 
           if (farcasterWalletUser) {
             return {
               userId: farcasterWalletUser.id,
-              name: member.name,
+              name: farcasterProfile.display_name,
               farcasterId: member.farcasterId
             };
           }
@@ -84,7 +115,7 @@ export async function createOptimismProject({
           const pfpUrl = farcasterProfile.pfp_url;
           const fid = member.farcasterId;
 
-          const newUser = await prisma.user.create({
+          const newUser = await tx.user.create({
             data: {
               id: v4(),
               username,
@@ -108,7 +139,7 @@ export async function createOptimismProject({
 
           return {
             userId: newUser.id,
-            name: member.name,
+            name: displayName,
             farcasterId: member.farcasterId
           };
         } catch (err) {
@@ -124,7 +155,7 @@ export async function createOptimismProject({
 
   let path = stringToValidPath({ input: input.name ?? '', wordSeparator: '-', autoReplaceEmpty: false });
 
-  const existingProjectWithPath = await prisma.project.findFirst({
+  const existingProjectWithPath = await tx.project.findFirst({
     where: {
       path
     },
@@ -140,7 +171,7 @@ export async function createOptimismProject({
     });
   }
 
-  const project = await prisma.project.create({
+  const project = await tx.project.create({
     data: {
       name: input.name,
       path,
@@ -155,6 +186,12 @@ export async function createOptimismProject({
       mirror: input.mirror,
       avatar: input.avatar,
       coverImage: input.coverImage,
+      primaryContractAddress: input.primaryContractAddress,
+      primaryContractChainId: input.primaryContractChainId,
+      primaryContractDeployTxHash: input.primaryContractDeployTxHash,
+      primaryContractDeployer: input.primaryContractDeployer,
+      mintingWalletAddress: input.mintingWalletAddress,
+      sunnyAwardsProjectType: input.sunnyAwardsProjectType,
       source,
       projectMembers: {
         createMany: {
@@ -163,7 +200,7 @@ export async function createOptimismProject({
               teamLead: true,
               updatedBy: userId,
               userId,
-              name: input.projectMembers[0].name,
+              name: farcasterAccountsRecord[input.projectMembers[0].farcasterId].account.displayName as string,
               farcasterId: input.projectMembers[0].farcasterId
             },
             ...projectMembers.map((member) => ({

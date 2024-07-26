@@ -26,7 +26,6 @@ export const optimismProjectSchema = yup.object({
   projectMembers: yup
     .array(
       yup.object({
-        name: yup.string().required(),
         farcasterId: yup.number().required()
       })
     )

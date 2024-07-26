@@ -5,7 +5,6 @@ import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAct
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -29,7 +28,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
 
   const { execute, isExecuting } = useAction(createProjectAction, {
     onSuccess: (data) => {
-      router.push(`/p/${data.data?.projectPath as string}/publish`);
+      router.push(`/p/${data.data?.projectPath as string}/share`);
     },
     onError(err) {
       log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
@@ -46,8 +45,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
       name: '',
       projectMembers: [
         {
-          farcasterId: user?.farcasterUser?.fid,
-          name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName
+          farcasterId: user?.farcasterUser?.fid
         }
       ]
     },
@@ -58,15 +56,13 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <Box gap={2} display='flex' flexDirection='column'>
-          <ProjectForm
-            control={control}
-            isValid={isValid}
-            onNext={() => {
-              setShowTeamMemberForm(true);
-            }}
-          />
-        </Box>
+        <ProjectForm
+          control={control}
+          isValid={isValid}
+          onNext={() => {
+            setShowTeamMemberForm(true);
+          }}
+        />
       </PageWrapper>
     );
   }

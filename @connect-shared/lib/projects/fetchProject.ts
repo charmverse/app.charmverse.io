@@ -2,6 +2,7 @@ import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { FarcasterProfileInfo } from '@root/lib/farcaster/loginWithFarcaster';
+import { replaceS3Domain } from '@root/lib/utils/url';
 
 export type ConnectProjectDetails = Pick<
   Project,
@@ -84,6 +85,8 @@ export async function fetchProject({
 
   return {
     ...project,
+    avatar: replaceS3Domain(project.avatar),
+    coverImage: replaceS3Domain(project.coverImage),
     projectMembers: project.projectMembers.map((member) => {
       const farcasterUser = member.user?.farcasterUser?.account as unknown as StatusAPIResponse;
       return {

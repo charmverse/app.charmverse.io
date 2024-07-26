@@ -1,12 +1,12 @@
+import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
 
-import { LoadingComponent } from 'components/common/LoadingComponent';
 import type { FormValues } from 'lib/projects/form';
 
 import { FarcasterCard } from '../../common/FarcasterCard';
@@ -102,19 +102,20 @@ export function AddProjectMembersForm({
           >
             Back
           </Button>
-          <Box>
+          <Stack direction='row' gap={1}>
             {isExecuting && (
-              <>
-                <Typography variant='caption' color='textSecondary'>
-                  Submitting your project onchain
-                </Typography>
-                <LoadingComponent isLoading={isExecuting} />
-              </>
+              <LoadingComponent
+                height={20}
+                size={20}
+                minHeight={20}
+                label='Submitting your project onchain'
+                flexDirection='row-reverse'
+              />
             )}
             <Button data-test='project-form-publish' disabled={!isValid || isExecuting} type='submit'>
               Publish
             </Button>
-          </Box>
+          </Stack>
         </Stack>
       </Stack>
     </form>
