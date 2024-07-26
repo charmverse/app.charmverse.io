@@ -1,11 +1,15 @@
+'use client';
+
 import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { capitalize } from '@root/lib/utils/strings';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
-import { Controller } from 'react-hook-form';
+import { Controller, useController } from 'react-hook-form';
 
-import { CATEGORIES } from 'lib/projects/form';
 import type { FormValues } from 'lib/projects/form';
+import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
 
+import { ProjectBlockchainSelect } from './BlockchainSelect';
 import { ProjectImageField } from './ProjectImageField';
 import { ProjectMultiTextValueFields } from './ProjectMultiTextValueFields';
 
@@ -18,6 +22,10 @@ export function ProjectForm({
   isValid: boolean;
   onNext: VoidFunction;
 }) {
+  const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
+
+  const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
+
   return (
     <>
       <Stack gap={2}>
@@ -57,6 +65,130 @@ export function ProjectForm({
             )}
           />
         </Stack>
+        <Stack>
+          <FormLabel id='project-sunnyaward-type' required>
+            Sunny Awards Project Type
+          </FormLabel>
+          <Controller
+            control={control}
+            name='sunnyAwardsProjectType'
+            render={({ field, fieldState }) => (
+              <Select
+                displayEmpty
+                fullWidth
+                aria-labelledby='project-sunny-category'
+                data-test='project-sunny-category'
+                renderValue={(value) =>
+                  value ? capitalize(value) : <Typography color='secondary'>Select a category</Typography>
+                }
+                error={!!fieldState.error}
+                {...field}
+              >
+                {SUNNY_AWARD_CATEGORIES.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {capitalize(category)}
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
+          />
+        </Stack>
+        {sunnyAwardsProjectType === 'app' && (
+          <Stack gap={2}>
+            <Stack>
+              <FormLabel id='project-chain' required>
+                Project Chain ID
+              </FormLabel>
+              <Controller
+                control={control}
+                name='primaryContractChainId'
+                render={({ field }) => (
+                  <ProjectBlockchainSelect {...field} value={field.value} onChange={field.onChange} />
+                )}
+              />
+            </Stack>
+            <Stack>
+              <FormLabel id='project-contract' required>
+                Project Contract Address
+              </FormLabel>
+              <Controller
+                control={control}
+                name='primaryContractAddress'
+                render={({ field, fieldState }) => (
+                  <TextField
+                    data-test='project-contract'
+                    rows={3}
+                    aria-labelledby='project-contract'
+                    placeholder='Contract address'
+                    {...field}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+            </Stack>
+            <Stack>
+              <FormLabel id='project-deployer' required>
+                Project Deployer Address
+              </FormLabel>
+              <Controller
+                control={control}
+                name='primaryContractDeployer'
+                render={({ field, fieldState }) => (
+                  <TextField
+                    data-test='project-deployer'
+                    rows={3}
+                    aria-labelledby='project-deployer'
+                    placeholder='Address used to deploy the contract'
+                    {...field}
+                    error={!!fieldState.error?.message}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+            </Stack>
+            <Stack>
+              <FormLabel id='project-deploy-tx-hash' required>
+                Project Deployment Transaction Hash
+              </FormLabel>
+              <Controller
+                control={control}
+                name='primaryContractDeployTxHash'
+                render={({ field, fieldState }) => (
+                  <TextField
+                    data-test='project-deploy-tx-hash'
+                    rows={3}
+                    aria-labelledby='project-deploy-tx-hash'
+                    placeholder='Has of the transaction used to deploy the contract'
+                    {...field}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+            </Stack>
+          </Stack>
+        )}
+        {sunnyAwardsProjectType === 'creator' && (
+          <Stack>
+            <FormLabel id='project-minting-wallet' required>
+              Creator minting wallet address
+            </FormLabel>
+            <Controller
+              control={control}
+              name='mintingWalletAddress'
+              render={({ field }) => (
+                <TextField
+                  data-test='project-minting-wallet'
+                  rows={3}
+                  aria-labelledby='project-minting-wallet'
+                  placeholder='Wallet used to mint the project'
+                  {...field}
+                />
+              )}
+            />
+          </Stack>
+        )}
         <Stack>
           <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
           <Stack direction='row' gap={1}>

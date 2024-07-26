@@ -36,6 +36,9 @@
       "@connect-api/*": [
         "./apps/connect-api/src/*"
       ],
+      "@root/abis/*": [
+        "./abis/*"
+      ],
       "@root/adapters/*": [
         "./adapters/*"
       ],

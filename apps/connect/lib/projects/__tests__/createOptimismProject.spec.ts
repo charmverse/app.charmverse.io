@@ -78,20 +78,16 @@ describe('createOptimismProject', () => {
         name: 'Project',
         projectMembers: [
           {
-            farcasterId: 1,
-            name: 'User 1'
+            farcasterId: 1
           },
           {
-            farcasterId: 2,
-            name: 'User 2'
+            farcasterId: 2
           },
           {
-            farcasterId: 3,
-            name: 'User 3'
+            farcasterId: 3
           },
           {
-            farcasterId: 4,
-            name: 'User 4'
+            farcasterId: 4
           }
         ]
       },

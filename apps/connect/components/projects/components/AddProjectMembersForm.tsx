@@ -63,8 +63,7 @@ export function AddProjectMembersForm({
             setSelectedProfile={(farcasterProfile) => {
               if (farcasterProfile) {
                 append({
-                  farcasterId: farcasterProfile.fid!,
-                  name: farcasterProfile.displayName!
+                  farcasterId: farcasterProfile.fid!
                 });
                 setSelectedFarcasterProfiles([...selectedFarcasterProfiles, farcasterProfile]);
               }

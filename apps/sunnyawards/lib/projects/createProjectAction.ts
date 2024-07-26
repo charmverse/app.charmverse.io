@@ -3,9 +3,11 @@
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
+import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
+import { prettyPrint } from '@root/lib/utils/strings';
 
 import { schema } from './form';
 
@@ -14,10 +16,14 @@ export const createProjectAction = authActionClient
   .schema(schema)
   .action(async ({ parsedInput, ctx }) => {
     const input = parsedInput;
+    prettyPrint({ input });
     const currentUserId = ctx.session.user!.id;
     const newProject = await createOptimismProject({
       userId: currentUserId,
-      input,
+      input: {
+        ...input,
+        primaryContractChainId: input.primaryContractChainId ? parseInt(input.primaryContractChainId) : undefined
+      },
       source: 'connect'
     });
 
@@ -27,6 +33,11 @@ export const createProjectAction = authActionClient
         userId: currentUserId
       }).catch((err) => {
         log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
+      });
+
+      await storeProjectMetadataAndPublishGitcoinAttestation({
+        projectIdOrPath: newProject.id,
+        userId: currentUserId
       });
     }
 

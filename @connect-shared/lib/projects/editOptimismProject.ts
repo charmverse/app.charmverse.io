@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
@@ -43,7 +44,8 @@ export async function editOptimismProject({
       },
       select: {
         userId: true,
-        fid: true
+        fid: true,
+        account: true
       }
     })
   ]);
@@ -58,21 +60,35 @@ export async function editOptimismProject({
       !currentProjectMembers.some((projectMember) => member.farcasterId === projectMember.user?.farcasterUser?.fid)
   );
 
-  const farcasterAccountsUserIdRecord: Record<number, string> = inputProjectMembers.reduce<Record<number, string>>(
-    (acc, { userId: _userId, fid }) => {
-      acc[fid] = _userId;
-      return acc;
-    },
-    {}
-  );
+  const farcasterAccountsRecord: Record<
+    number,
+    {
+      userId: string;
+      account: StatusAPIResponse;
+    }
+  > = inputProjectMembers.reduce<
+    Record<
+      number,
+      {
+        userId: string;
+        account: StatusAPIResponse;
+      }
+    >
+  >((acc, { fid, userId: _userId, account }) => {
+    acc[fid] = {
+      userId: _userId,
+      account: account as unknown as StatusAPIResponse
+    };
+    return acc;
+  }, {});
 
   const projectMembers = (
     await Promise.all(
       newProjectMembers.map(async (member) => {
-        if (farcasterAccountsUserIdRecord[member.farcasterId]) {
+        if (farcasterAccountsRecord[member.farcasterId]) {
           return {
-            userId: farcasterAccountsUserIdRecord[member.farcasterId],
-            name: member.name,
+            userId: farcasterAccountsRecord[member.farcasterId].userId,
+            name: farcasterAccountsRecord[member.farcasterId].account.displayName as string,
             farcasterId: member.farcasterId
           };
         }
@@ -103,7 +119,7 @@ export async function editOptimismProject({
           if (farcasterWalletUser) {
             return {
               userId: farcasterWalletUser.id,
-              name: member.name,
+              name: farcasterProfile.display_name,
               farcasterId: member.farcasterId
             };
           }
@@ -137,7 +153,7 @@ export async function editOptimismProject({
 
           return {
             userId: newUser.id,
-            name: member.name,
+            name: displayName,
             farcasterId: member.farcasterId
           };
         } catch (err) {

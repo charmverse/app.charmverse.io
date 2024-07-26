@@ -13,8 +13,8 @@ import { useForm } from 'react-hook-form';
 
 import { PageWrapper } from 'components/common/PageWrapper';
 import { createProjectAction } from 'lib/projects/createProjectAction';
-import { schema } from 'lib/projects/form';
 import type { FormValues } from 'lib/projects/form';
+import { schema } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
@@ -29,7 +29,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
 
   const { execute, isExecuting } = useAction(createProjectAction, {
     onSuccess: (data) => {
-      router.push(`/p/${data.data?.projectPath as string}/publish`);
+      router.push(`/p/${data.data?.projectPath as string}/share`);
     },
     onError(err) {
       log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
@@ -44,10 +44,11 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
+      sunnyAwardsProjectType: 'other',
       projectMembers: [
         {
-          farcasterId: user?.farcasterUser?.fid,
-          name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName
+          name: (user?.farcasterUser?.account as FarcasterProfile['body']).displayName,
+          farcasterId: user?.farcasterUser?.fid
         }
       ]
     },

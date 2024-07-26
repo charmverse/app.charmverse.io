@@ -9,7 +9,6 @@ import { useState } from 'react';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { Controller, useController, useFieldArray, useForm } from 'react-hook-form';
 
-import { useCreateOptimismProject } from 'charmClient/hooks/optimism';
 import { Avatar } from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
@@ -23,18 +22,25 @@ import type { OptimismProjectFormValues } from './optimismProjectFormValues';
 import { OPTIMISM_PROJECT_CATEGORIES, optimismProjectSchema } from './optimismProjectFormValues';
 import { ProjectMultiTextValueFields } from './ProjectMultiTextValueFields';
 
-type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
+export type FarcasterProfile = {
+  username: string;
+  name: string;
+  avatar: string;
+  fid: number;
+};
 
 export function FarcasterCard({
   avatar,
   name,
   onDelete,
-  username
+  username,
+  disabled
 }: {
   avatar?: string;
   name?: string;
   username?: string;
   onDelete?: VoidFunction;
+  disabled?: boolean;
 }) {
   return (
     <Card>
@@ -44,7 +50,7 @@ export function FarcasterCard({
           <Stack direction='row' justifyContent='space-between'>
             <Typography variant='h6'>{name}</Typography>
             {onDelete && (
-              <IconButton size='small' onClick={onDelete}>
+              <IconButton size='small' onClick={onDelete} disabled={disabled}>
                 <DeleteOutline color='error' fontSize='small' />
               </IconButton>
             )}
@@ -60,12 +66,15 @@ export function FarcasterCard({
 
 function OptimismProjectMembersForm({
   disabled,
-  control
+  control,
+  initialFarcasterProfiles = []
 }: {
+  initialFarcasterProfiles?: FarcasterProfile[];
   disabled: boolean;
   control: Control<OptimismProjectFormValues>;
 }) {
-  const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] = useState<FarcasterProfile[]>([]);
+  const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] =
+    useState<FarcasterProfile[]>(initialFarcasterProfiles);
   const { user } = useUser();
   const userFarcasterAccount = user?.farcasterUser?.account as unknown as StatusAPIResponse;
   const { append, remove } = useFieldArray({
@@ -78,7 +87,7 @@ function OptimismProjectMembersForm({
   }
 
   return (
-    <>
+    <Stack gap={1}>
       <FarcasterCard
         avatar={userFarcasterAccount.pfpUrl}
         name={userFarcasterAccount.displayName}
@@ -94,31 +103,38 @@ function OptimismProjectMembersForm({
           setSelectedProfile={(farcasterProfile) => {
             if (farcasterProfile) {
               append({
-                farcasterId: farcasterProfile.fid!,
-                name: farcasterProfile.displayName!
+                farcasterId: farcasterProfile.fid!
               });
-              setSelectedFarcasterProfiles([...selectedFarcasterProfiles, farcasterProfile]);
+              setSelectedFarcasterProfiles([
+                ...selectedFarcasterProfiles,
+                {
+                  avatar: farcasterProfile.pfpUrl as string,
+                  name: farcasterProfile.displayName as string,
+                  username: farcasterProfile.username as string,
+                  fid: farcasterProfile.fid!
+                }
+              ]);
             }
           }}
         />
       </Stack>
-      <Stack gap={1} mb={2}>
-        {selectedFarcasterProfiles.map((farcasterProfile) => (
-          <FarcasterCard
-            key={farcasterProfile.fid}
-            avatar={farcasterProfile.pfpUrl}
-            name={farcasterProfile.displayName}
-            username={farcasterProfile.username}
-            onDelete={() => {
-              remove(selectedFarcasterProfiles.findIndex((profile) => profile.fid === farcasterProfile.fid));
-              setSelectedFarcasterProfiles(
-                selectedFarcasterProfiles.filter((profile) => profile.fid !== farcasterProfile.fid)
-              );
-            }}
-          />
-        ))}
-      </Stack>
-    </>
+      {selectedFarcasterProfiles.map((farcasterProfile) => (
+        <FarcasterCard
+          key={farcasterProfile.fid}
+          avatar={farcasterProfile.avatar}
+          name={farcasterProfile.name}
+          username={farcasterProfile.username}
+          disabled={disabled}
+          onDelete={() => {
+            // + 1 since the first member is the team lead
+            remove(selectedFarcasterProfiles.findIndex((profile) => profile.fid === farcasterProfile.fid) + 1);
+            setSelectedFarcasterProfiles(
+              selectedFarcasterProfiles.filter((profile) => profile.fid !== farcasterProfile.fid)
+            );
+          }}
+        />
+      ))}
+    </Stack>
   );
 }
 
@@ -171,7 +187,7 @@ function OptimismProjectImageField({
               top: 0,
               opacity: 0,
               zIndex: 1,
-              cursor: 'pointer'
+              cursor: disabled ? 'inherit' : 'pointer'
             }}
           />
 
@@ -217,13 +233,20 @@ function OptimismProjectImageField({
 }
 
 export function OptimismProjectForm({
-  onCreateProject,
-  onCancel
+  onSubmit,
+  onCancel,
+  isMutating,
+  optimismValues,
+  submitButtonText = 'Create',
+  initialFarcasterProfiles
 }: {
-  onCreateProject: (projectInfo: { title: string; projectRefUID: string }) => void;
+  initialFarcasterProfiles?: FarcasterProfile[];
+  optimismValues?: OptimismProjectFormValues;
+  isMutating: boolean;
+  onSubmit: (projectValues: OptimismProjectFormValues) => void;
   onCancel: VoidFunction;
+  submitButtonText?: string;
 }) {
-  const { trigger: createOptimismProject, isMutating } = useCreateOptimismProject();
   const { user } = useUser();
 
   const {
@@ -231,12 +254,11 @@ export function OptimismProjectForm({
     formState: { isValid },
     getValues
   } = useForm<OptimismProjectFormValues>({
-    defaultValues: {
+    defaultValues: optimismValues ?? {
       name: '',
       projectMembers: [
         {
-          farcasterId: user?.farcasterUser?.fid,
-          name: (user?.farcasterUser?.account as unknown as StatusAPIResponse)?.displayName
+          farcasterId: user?.farcasterUser?.fid
         }
       ]
     },
@@ -369,25 +391,23 @@ export function OptimismProjectForm({
 
       <Typography variant='h6'>Team members</Typography>
 
-      <OptimismProjectMembersForm disabled={isMutating} control={control} />
+      <OptimismProjectMembersForm
+        initialFarcasterProfiles={initialFarcasterProfiles}
+        disabled={isMutating}
+        control={control}
+      />
 
       <Stack direction='row' justifyContent='space-between'>
+        <Button color='secondary' variant='outlined' onClick={onCancel} disabled={isMutating}>
+          Cancel
+        </Button>
         <Button
           disabled={!isValid || isMutating}
           onClick={() => {
-            const values = getValues();
-            createOptimismProject({
-              ...values,
-              // For some reason websites and farcasterValues both are [null] need to find out why
-              farcasterValues: values.farcasterValues?.filter((value) => value) ?? [],
-              websites: values.websites?.filter((value) => value) ?? []
-            }).then(onCreateProject);
+            onSubmit(getValues());
           }}
         >
-          Create
-        </Button>
-        <Button color='secondary' variant='outlined' onClick={onCancel}>
-          Cancel
+          {submitButtonText}
         </Button>
       </Stack>
     </Stack>
