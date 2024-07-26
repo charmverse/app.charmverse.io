@@ -1,8 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { v4 as uuid } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { recordDatabaseEvent, type EventInput } from 'lib/metrics/recordDatabaseEvent';
 
 import { actionClient } from '../actions/actionClient';
 
@@ -23,7 +21,7 @@ export const trackEventAction = actionClient
       await ctx.session.save();
     }
 
-    const event = { userId, ...eventPayload } as EventInput;
+    const event = { userId, ...eventPayload };
 
     // Make sure to use userId from session
     event.userId = sessionUserId;
@@ -33,15 +31,15 @@ export const trackEventAction = actionClient
 
     trackUserAction(eventName, event);
 
-    try {
-      await recordDatabaseEvent({
-        event,
-        distinctUserId: event.userId,
-        userId: sessionUserId
-      });
-    } catch (error) {
-      log.error('Error recording database event', { ...parsedInput, error });
-    }
+    // try {
+    //   await recordDatabaseEvent({
+    //     event,
+    //     distinctUserId: event.userId,
+    //     userId: sessionUserId
+    //   });
+    // } catch (error) {
+    //   log.error('Error recording database event', { ...parsedInput, error });
+    // }
 
     return { success: true };
   });

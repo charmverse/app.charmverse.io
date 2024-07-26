@@ -2,7 +2,11 @@ import type { MixpanelEvent, MixpanelEventName, MixpanelTrackBase } from '@root/
 import * as yup from 'yup';
 
 export const schema = yup.object({
-  event: yup.string<MixpanelEventName>().required()
+  event: yup.string<MixpanelEventName>().required(),
+  path: yup.string().required(),
+  url: yup.string().required(),
+  isAnonymous: yup.boolean(),
+  meta: yup.object()
 });
 
 export type Payload = yup.InferType<typeof schema>;
