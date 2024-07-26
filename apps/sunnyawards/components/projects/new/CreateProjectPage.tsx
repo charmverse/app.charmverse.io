@@ -37,21 +37,33 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
 
   const {
     control,
-    formState: { isValid },
+    formState: { isValid, errors, dirtyFields },
     handleSubmit,
-    getValues
+    getValues,
+    watch
   } = useForm<FormValues>({
     defaultValues: {
-      name: '',
+      name: 'Demo name',
+      description: 'Demo description',
+      sunnyAwardsProjectType: 'other',
       projectMembers: [
         {
           farcasterId: user?.farcasterUser?.fid
         }
-      ]
+      ],
+      // Stubs
+      primaryContractAddress: '0x5fd84259d66Cd46123540766Be93DFE6D43130D7',
+      primaryContractChainId: '11155420',
+      primaryContractDeployer: '0x97eFFE60F93386969EdC31Dbd09677da23fE901A',
+      primaryContractDeployTxHash: '0xfefc5286cd0832e466d56c4a25e39d30f3f8bca1279f2334c59fa56cf64a4843'
     },
     resolver: yupResolver(schema),
     mode: 'onChange'
   });
+
+  const values = watch();
+
+  console.log('PARENT', { isValid, errors, values, dirtyFields });
 
   if (!showTeamMemberForm) {
     return (

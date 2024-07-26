@@ -26,6 +26,8 @@ export function ProjectForm({
 
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
 
+  console.log('control', control._formValues, 'errors', control._formState.errors);
+
   return (
     <>
       <Stack gap={2}>
@@ -66,7 +68,9 @@ export function ProjectForm({
           />
         </Stack>
         <Stack>
-          <FormLabel id='project-sunnyaward-type'>Sunny Awards Project Type</FormLabel>
+          <FormLabel id='project-sunnyaward-type' required>
+            Sunny Awards Project Type
+          </FormLabel>
           <Controller
             control={control}
             name='sunnyAwardsProjectType'
@@ -74,8 +78,8 @@ export function ProjectForm({
               <Select
                 displayEmpty
                 fullWidth
-                aria-labelledby='project-category'
-                data-test='project-form-category'
+                aria-labelledby='project-sunny-category'
+                data-test='project-sunny-category'
                 renderValue={(value) =>
                   value ? capitalize(value) : <Typography color='secondary'>Select a category</Typography>
                 }
@@ -94,7 +98,9 @@ export function ProjectForm({
         {sunnyAwardsProjectType === 'app' && (
           <Stack gap={2}>
             <Stack>
-              <FormLabel id='project-chain'>Project Chain ID</FormLabel>
+              <FormLabel id='project-chain' required>
+                Project Chain ID
+              </FormLabel>
               <Controller
                 control={control}
                 name='primaryContractChainId'
@@ -104,7 +110,9 @@ export function ProjectForm({
               />
             </Stack>
             <Stack>
-              <FormLabel id='project-contract'>Project Contract Address</FormLabel>
+              <FormLabel id='project-contract' required>
+                Project Contract Address
+              </FormLabel>
               <Controller
                 control={control}
                 name='primaryContractAddress'
@@ -122,7 +130,9 @@ export function ProjectForm({
               />
             </Stack>
             <Stack>
-              <FormLabel id='project-deployer'>Project Deployer Address</FormLabel>
+              <FormLabel id='project-deployer' required>
+                Project Deployer Address
+              </FormLabel>
               <Controller
                 control={control}
                 name='primaryContractDeployer'
@@ -140,7 +150,9 @@ export function ProjectForm({
               />
             </Stack>
             <Stack>
-              <FormLabel id='project-contract'>Project Deployment Transaction Hash</FormLabel>
+              <FormLabel id='project-deploy-tx-hash' required>
+                Project Deployment Transaction Hash
+              </FormLabel>
               <Controller
                 control={control}
                 name='primaryContractDeployTxHash'
@@ -161,7 +173,9 @@ export function ProjectForm({
         )}
         {sunnyAwardsProjectType === 'creator' && (
           <Stack>
-            <FormLabel id='project-minting-wallet'>Creator minting wallet address</FormLabel>
+            <FormLabel id='project-minting-wallet' required>
+              Creator minting wallet address
+            </FormLabel>
             <Controller
               control={control}
               name='mintingWalletAddress'
