@@ -33,7 +33,7 @@ interface ClickSigninEvent extends BaseEventWithoutGroup {
 export interface ViewOpPageEvent extends BaseEventWithoutGroup {
   path?: string;
   url?: string;
-  type: PageType | 'post';
+  type: PageType | 'post' | 'proposals_list' | 'bounties_list';
 }
 
 interface ProposalPassedEvent extends BaseEventWithoutGroup {

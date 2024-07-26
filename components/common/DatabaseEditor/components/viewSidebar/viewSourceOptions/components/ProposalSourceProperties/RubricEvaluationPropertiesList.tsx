@@ -115,7 +115,16 @@ export function RubricEvaluationPropertiesList({
         );
 
         const rubricEvaluationProperties = rubricEvaluationProperty?.properties ?? [];
-        const isAllPropertiesSelected = rubricEvaluationProperties.length === 7;
+        const isAllPropertiesSelected = [
+          'average',
+          'total',
+          'reviewers',
+          'criteriaTotal',
+          'reviewerScore',
+          'reviewerComment',
+          'criteriaAverage',
+          'reviewerAverage'
+        ].every((property) => rubricEvaluationProperties.includes(property as RubricEvaluationProperty));
 
         return (
           <Stack key={rubricEvaluation.id}>
@@ -150,7 +159,8 @@ export function RubricEvaluationPropertiesList({
                     'criteriaTotal',
                     'reviewerScore',
                     'reviewerComment',
-                    'criteriaAverage'
+                    'criteriaAverage',
+                    'reviewerAverage'
                   ]);
                 }
               }}

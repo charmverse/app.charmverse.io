@@ -29,7 +29,7 @@ export function HomePage() {
     >
       <Image
         src='/images/sunny-awards.png'
-        width={500}
+        width={400}
         height={200}
         sizes='100vw'
         style={{
