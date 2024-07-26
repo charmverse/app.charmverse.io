@@ -7,7 +7,6 @@ import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-share
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
-import { prettyPrint } from '@root/lib/utils/strings';
 
 import { schema } from './form';
 
