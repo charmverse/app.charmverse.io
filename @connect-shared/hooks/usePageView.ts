@@ -1,7 +1,6 @@
+import { getBrowserPath } from '@root/lib/utils/browser';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';
-
-import { getBrowserPath } from 'lib/utils/browser';
 
 import { trackEventAction } from '../lib/mixpanel/trackEventAction';
 

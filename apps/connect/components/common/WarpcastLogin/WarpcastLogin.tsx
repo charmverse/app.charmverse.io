@@ -26,8 +26,9 @@ function WarpcastLoginButton() {
 
   const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
     trigger(res, {
-      onSuccess: () => {
+      onSuccess: (user) => {
         revalidatePathAction();
+        log.info('User logged in', { userId: user.id });
         router.push('/profile');
       },
       onError: (err) => {

@@ -1,6 +1,7 @@
-import { v4 as uuid } from 'uuid';
+'use server';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { v4 as uuid } from 'uuid';
 
 import { actionClient } from '../actions/actionClient';
 
