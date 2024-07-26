@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('node:path');
+
 const nextConfig = {
   // types are tested separately from the build
   eslint: {
@@ -12,8 +15,11 @@ const nextConfig = {
     unoptimized: true
   },
   webpack(_config) {
+    const imgDir = path.join(__dirname, '..', '..', 'public');
+    console.log('Img dir', imgDir);
     // Fix for: "Module not found: Can't resolve 'canvas'"
     // _config.resolve.alias.canvas = false;
+    _config.resolve.alias['@images'] = imgDir;
 
     _config.module.rules.push({
       test: /\.svg$/,

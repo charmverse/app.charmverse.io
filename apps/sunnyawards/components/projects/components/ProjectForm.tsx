@@ -1,14 +1,15 @@
-import type { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
-import { ProjectBlockchainSelect } from '@connect-shared/components/form/BlockchainSelect';
+'use client';
+
 import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
-import { Controller } from 'react-hook-form';
+import { Controller, useController } from 'react-hook-form';
 
-import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
 import type { FormValues } from 'lib/projects/form';
+import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
 
+import { ProjectBlockchainSelect } from './BlockchainSelect';
 import { ProjectImageField } from './ProjectImageField';
 import { ProjectMultiTextValueFields } from './ProjectMultiTextValueFields';
 
@@ -21,10 +22,28 @@ export function ProjectForm({
   isValid: boolean;
   onNext: VoidFunction;
 }) {
-  const sunnyAwardsProjectType = control._formValues.sunnyAwardsProjectType as SunnyAwardsProjectType | undefined;
+  const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
 
-  const form = 3;
-  // Tests
+  const { fieldState: primaryContractAdressFieldState } = useController({
+    name: 'primaryContractAddress',
+    control
+  });
+
+  const { fieldState: primaryContractDeployerState } = useController({
+    name: 'primaryContractDeployer',
+    control
+  });
+
+  const { fieldState: primaryContractDeployTxFieldState } = useController({
+    name: 'primaryContractDeployTxHash',
+    control
+  });
+
+  const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
+
+  const primaryContractAddressError = primaryContractAdressFieldState.error?.message;
+  const primaryContractDeployerError = primaryContractDeployerState.error?.message;
+  const primaryContractDeployTxError = primaryContractDeployTxFieldState.error?.message;
 
   return (
     <>
@@ -92,37 +111,84 @@ export function ProjectForm({
           />
         </Stack>
         {sunnyAwardsProjectType === 'app' && (
-          <Stack>
-            <FormLabel id='project-chain'>Project Chain ID</FormLabel>
-            <ProjectBlockchainSelect />
-
-            <FormLabel id='project-contract'>Project Contract Address</FormLabel>
-            <Controller
-              control={control}
-              name='primaryContractAddress'
-              render={({ field }) => (
-                <TextField
-                  data-test='project-contract'
-                  rows={3}
-                  aria-labelledby='project-contract'
-                  placeholder='A description of your project'
-                  {...field}
-                />
-              )}
-            />
+          <Stack gap={2}>
+            <Stack>
+              <FormLabel id='project-chain'>Project Chain ID</FormLabel>
+              <Controller
+                control={control}
+                name='primaryContractChainId'
+                render={({ field }) => (
+                  <ProjectBlockchainSelect {...field} value={field.value} onChange={field.onChange} />
+                )}
+              />
+            </Stack>
+            <Stack>
+              <FormLabel id='project-contract'>Project Contract Address</FormLabel>
+              <Controller
+                control={control}
+                name='primaryContractAddress'
+                render={({ field }) => (
+                  <TextField
+                    data-test='project-contract'
+                    rows={3}
+                    aria-labelledby='project-contract'
+                    placeholder='Contract address'
+                    {...field}
+                    error={!!primaryContractAddressError}
+                    helperText={primaryContractAddressError}
+                  />
+                )}
+              />
+            </Stack>
+            <Stack>
+              <FormLabel id='project-deployer'>Project Deployer Address</FormLabel>
+              <Controller
+                control={control}
+                name='primaryContractDeployer'
+                render={({ field }) => (
+                  <TextField
+                    data-test='project-deployer'
+                    rows={3}
+                    aria-labelledby='project-deployer'
+                    placeholder='Address used to deploy the contract'
+                    {...field}
+                    error={!!primaryContractDeployerError}
+                    helperText={primaryContractDeployerError}
+                  />
+                )}
+              />
+            </Stack>
+            <Stack>
+              <FormLabel id='project-contract'>Project Deployment Transaction Hash</FormLabel>
+              <Controller
+                control={control}
+                name='primaryContractDeployTxHash'
+                render={({ field }) => (
+                  <TextField
+                    data-test='project-deploy-tx-hash'
+                    rows={3}
+                    aria-labelledby='project-deploy-tx-hash'
+                    placeholder='Has of the transaction used to deploy the contract'
+                    {...field}
+                    error={!!primaryContractDeployTxError}
+                    helperText={primaryContractDeployTxError}
+                  />
+                )}
+              />
+            </Stack>
           </Stack>
         )}
         {sunnyAwardsProjectType === 'creator' && (
           <Stack>
-            <FormLabel id='project-description'>Creator minting wallet address</FormLabel>
+            <FormLabel id='project-minting-wallet'>Creator minting wallet address</FormLabel>
             <Controller
               control={control}
-              name='description'
+              name='mintingWalletAddress'
               render={({ field }) => (
                 <TextField
-                  data-test='project-form-description'
+                  data-test='project-minting-wallet'
                   rows={3}
-                  aria-labelledby='project-description'
+                  aria-labelledby='project-minting-wallet'
                   placeholder='Wallet used to mint the project'
                   {...field}
                 />

@@ -45,6 +45,9 @@
       "theme/*": [
         "./theme/*"
       ],
+      "@root/abis/*": [
+        "../../abis/*"
+      ],
       "@root/adapters/*": [
         "../../adapters/*"
       ],

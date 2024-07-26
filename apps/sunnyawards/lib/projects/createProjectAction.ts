@@ -17,7 +17,10 @@ export const createProjectAction = authActionClient
     const currentUserId = ctx.session.user!.id;
     const newProject = await createOptimismProject({
       userId: currentUserId,
-      input,
+      input: {
+        ...input,
+        primaryContractChainId: input.primaryContractChainId ? parseInt(input.primaryContractChainId) : undefined
+      },
       source: 'connect'
     });
 
