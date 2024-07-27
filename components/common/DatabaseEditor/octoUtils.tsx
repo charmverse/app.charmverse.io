@@ -79,6 +79,10 @@ class OctoUtils {
         displayValue = PROPOSAL_STEP_LABELS[propertyValue as ProposalEvaluationStep];
         break;
       }
+      case 'proposalPublishedAt': {
+        displayValue = propertyValue ? formatDateTime(new Date(propertyValue as string)) : 'N/A';
+        break;
+      }
       case 'person':
       case 'proposalEvaluatedBy':
       case 'proposalAuthor':

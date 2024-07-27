@@ -687,6 +687,16 @@ function PropertyValueElement(props: Props) {
         centerContent={displayType !== 'table'}
       />
     );
+  } else if (propertyTemplate.type === 'proposalPublishedAt') {
+    propertyValueElement = propertyValue ? (
+      <CreatedAt
+        createdAt={new Date(propertyValue as string).getTime()}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        centerContent={displayType !== 'table'}
+      />
+    ) : (
+      ''
+    );
   } else if (propertyTemplate.type === 'updatedTime') {
     propertyValueElement = (
       <LastModifiedAt

@@ -4,6 +4,7 @@ import type { Constants } from '@root/lib/databases/constants';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
+  PROPOSAL_PUBLISHED_AT_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID
@@ -110,6 +111,12 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalAuthor'
   }),
+  proposalPublishedAt: ({ name } = {}) => ({
+    id: PROPOSAL_PUBLISHED_AT_ID,
+    name: name || 'Publish Date',
+    options: [],
+    type: 'proposalPublishedAt'
+  }),
   proposalRubricCriteriaReviewerComment: () => ({
     id: uuid(),
     name: 'Proposal Rubric Criteria Reviewer Comment',
@@ -186,7 +193,8 @@ export const defaultProposalProperties = [
   proposalDbProperties.proposalStep(),
   proposalDbProperties.proposalUrl(),
   proposalDbProperties.proposalAuthor(),
-  proposalDbProperties.proposalReviewer()
+  proposalDbProperties.proposalReviewer(),
+  proposalDbProperties.proposalPublishedAt()
 ];
 
 export const defaultProposalPropertyTypes = defaultProposalProperties.map((p) => p.type);

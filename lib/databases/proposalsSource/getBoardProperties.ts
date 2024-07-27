@@ -12,7 +12,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { filterBoardProperties } from './filterBoardProperties';
 
 // Note: maybe we should instead hav ea whitelist of form field answers that we support?
-export const excludedFieldTypes = ['project_profile', 'label'];
+export const excludedFieldTypes = ['project_profile', 'label', 'optimism_project_profile'];
 
 type PartialPropertyTemplate = Omit<IPropertyTemplate, 'options'>;
 
@@ -72,6 +72,7 @@ export function getBoardProperties({
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalReviewerNotes());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalAuthor());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalStatus());
+  applyToPropertiesByType(boardProperties, proposalDbProperties.proposalPublishedAt());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalUrl());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
   applyToPropertiesByType(boardProperties, {

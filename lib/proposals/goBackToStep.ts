@@ -129,6 +129,7 @@ export async function goBackToStep({
         id: proposalId
       },
       data: {
+        publishedAt: null,
         status: 'draft'
       }
     });
