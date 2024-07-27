@@ -13,10 +13,10 @@ export function usePageView() {
   useEffect(() => {
     execute({
       event: 'page_view',
-      current_page_title: document.title,
-      current_domain: window.location.hostname,
-      current_url_path: window.location.pathname,
-      current_url_search: window.location.search
+      currentPageTitle: document.title,
+      currentDomain: window.location.hostname,
+      currentUrlPath: window.location.pathname,
+      currentUrlSearch: window.location.search
     });
   }, [pathname, execute]);
 }
