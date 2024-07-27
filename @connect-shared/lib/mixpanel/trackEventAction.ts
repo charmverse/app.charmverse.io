@@ -5,11 +5,11 @@ import { v4 as uuid } from 'uuid';
 
 import { actionClient } from '../actions/actionClient';
 
-import { schema } from './trackEventActionSchema';
+import { pageViewSchema } from './trackEventActionSchema';
 
 export const trackEventAction = actionClient
   .metadata({ actionName: 'mixpanel_event' })
-  .schema(schema)
+  .schema(pageViewSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { event: eventName, ...eventPayload } = parsedInput;
 
