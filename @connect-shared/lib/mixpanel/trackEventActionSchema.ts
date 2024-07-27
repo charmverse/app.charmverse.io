@@ -4,10 +4,10 @@ import * as yup from 'yup';
 export const pageViewSchema = yup.object().shape({
   event: yup.string<MixpanelEventName>().required(),
   isAnonymous: yup.boolean(),
-  current_page_title: yup.string(),
-  current_domain: yup.string(),
-  current_url_path: yup.string(),
-  current_url_search: yup.string()
+  currentPageTitle: yup.string(),
+  currentDomain: yup.string(),
+  currentUrlPath: yup.string(),
+  currentUrlSearch: yup.string()
 });
 
 export type Payload = yup.InferType<typeof pageViewSchema>;
