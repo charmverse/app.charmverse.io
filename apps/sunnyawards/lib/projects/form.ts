@@ -83,14 +83,13 @@ export const schema = yup.object({
   primaryContractDeployer: yup
     .string<Address>()
     .test('isAddress', 'Must be a valid address', async (value, context) => {
-      const chain = context.parent.primaryContractChainId;
       const sunnyAwardsProjectType = context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType;
 
       if (sunnyAwardsProjectType === 'app') {
         if (!value) {
           return false;
         }
-        return isAddress(value);
+        return !!isAddress(value);
       }
 
       return true;
@@ -99,7 +98,7 @@ export const schema = yup.object({
     .string()
     .test('mintingWalletAddress', 'Artwork minting wallet address is required', async (value, context) => {
       if ((context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType) === 'creator') {
-        return !!value && isAddress(value);
+        return !!value && !!isAddress(value);
       }
 
       return true;

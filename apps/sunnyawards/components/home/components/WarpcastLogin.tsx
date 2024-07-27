@@ -19,8 +19,9 @@ function WarpcastLoginButton() {
   const { isAuthenticated } = useProfile();
 
   const { execute: loginUser, hasErrored } = useAction(loginWithFarcasterAction, {
-    onSuccess: async () => {
+    onSuccess: async ({ data }) => {
       revalidatePathAction();
+      log.info('User logged in', { userId: data?.userId });
       router.push('/profile');
     },
     onError(err) {
