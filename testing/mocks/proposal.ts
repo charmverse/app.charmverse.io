@@ -54,6 +54,7 @@ export function createMockProposal(input: ProposalInput = {}): OptionalNullable<
       title: 'Rubric',
       result: null,
       rubricAnswers: [],
+      totalReviews: 0,
       draftRubricAnswers: [],
       rubricCriteria: [],
       reviewers: [],

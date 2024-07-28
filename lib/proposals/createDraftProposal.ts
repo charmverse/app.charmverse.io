@@ -49,6 +49,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
                   include: {
                     reviewers: true,
                     appealReviewers: true,
+                    evaluationApprovers: true,
                     rubricCriteria: true
                   }
                 },

@@ -33,11 +33,14 @@ export async function getProposal({
           permissions: true,
           reviewers: true,
           appealReviewers: true,
+          appealReviews: true,
+          evaluationApprovers: true,
           rubricCriteria: {
             orderBy: {
               index: 'asc'
             }
           },
+          reviews: true,
           rubricAnswers: true,
           draftRubricAnswers: true,
           vote: true

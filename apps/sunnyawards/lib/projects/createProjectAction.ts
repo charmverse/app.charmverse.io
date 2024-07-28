@@ -7,7 +7,6 @@ import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-share
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
-import { prettyPrint } from '@root/lib/utils/strings';
 
 import { schema } from './form';
 
@@ -16,7 +15,7 @@ export const createProjectAction = authActionClient
   .schema(schema)
   .action(async ({ parsedInput, ctx }) => {
     const input = parsedInput;
-    prettyPrint({ input });
+
     const currentUserId = ctx.session.user!.id;
     const newProject = await createOptimismProject({
       userId: currentUserId,

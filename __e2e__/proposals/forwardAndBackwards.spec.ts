@@ -75,8 +75,10 @@ test.describe('Go through full proposal flow', async () => {
     // Move beyond feedback step
     await proposalPage.passFeedbackEvaluation.click();
 
+    // await page.pause();
+
     // Move beyond pass_fail step
-    await proposalPage.passEvaluationButton.click();
+    await proposalPage.passEvaluationButton.first().click();
 
     // Move beyond rubric step
     await proposalPage.rubricCriteriaScore.fill('10');

@@ -5,7 +5,7 @@ on:
     types: [labeled, opened, synchronize]
 
 env:
-  SELECTED_PERMISSION_API_TAG: latest
+  SELECTED_PERMISSION_API_TAG: permissions-proposal-progess
 
 concurrency:
   group: staging-${{ github.ref }}
