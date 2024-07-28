@@ -188,6 +188,7 @@ export function PassFailEvaluationContainer({
     })),
     isSubmittingReview: isSubmittingEvaluationReview,
     totalReviews: evaluation.totalReviews,
+    evaluationReviews: evaluation.reviews,
     requiredReviews: evaluation.requiredReviews,
     evaluationResult: evaluation.appealedAt ? 'fail' : evaluation.result,
     declineReasonOptions: evaluation.declineReasonOptions,
