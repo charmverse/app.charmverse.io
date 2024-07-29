@@ -12,7 +12,8 @@ type SupportedColor =
   | 'turquoise'
   | 'purple'
   | 'pink'
-  | 'red';
+  | 'red'
+  | 'default';
 
 export type UploadedFileInfo = { url: string; fileName: string; size?: number };
 

@@ -48,7 +48,7 @@ export type ProposalPendingReward = {
   page: {
     content: PageContent | null;
     contentText: string;
-    title: string;
+    title?: string;
     type?: PageType;
     templateId?: string;
   };

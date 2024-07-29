@@ -281,7 +281,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const updateContent: Partial<UpdateProposalRequest> = {
       fields: {
         properties: {},
-        pendingRewards: [{ draftId: uuid(), page: { content: { type: 'doc' }, contentText: '' }, reward: {} }]
+        pendingRewards: [{ draftId: uuid(), page: { content: { type: 'doc' as const }, contentText: '' }, reward: {} }]
       }
     };
 
