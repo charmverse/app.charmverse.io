@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 
 import { CreateProjectPage } from 'components/projects/new/CreateProjectPage';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Create a Project'
 };

@@ -24,8 +24,6 @@ function FarcasterCardContent({
       sx={{
         display: 'flex',
         gap: 2,
-        p: 0,
-        pb: '0 !important',
         alignItems: 'center',
         flexDirection: 'row'
       }}
@@ -68,14 +66,14 @@ export function FarcasterCard(props: {
 }) {
   if (!props.enableLink || !props.username) {
     return (
-      <Card sx={{ border: 'none' }}>
+      <Card>
         <FarcasterCardContent {...props} />
       </Card>
     );
   }
 
   return (
-    <Card sx={{ border: 'none' }}>
+    <Card>
       <CardActionArea LinkComponent={Link} href={`/u/${props.username}`} hrefLang='en'>
         <FarcasterCardContent {...props} />
       </CardActionArea>
