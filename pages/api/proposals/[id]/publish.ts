@@ -80,8 +80,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
           }
         }
       },
-      spaceId: true,
-      
+      spaceId: true
     }
   });
 
