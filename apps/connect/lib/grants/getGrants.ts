@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { IPropertyTemplate, BoardFields } from '@root/lib/databases/board';
 import { type CardFields } from '@root/lib/databases/card';
 
-const grantsDatabaseBoardId = process.env.GRANTS_TRACKER_BOARD_ID; // 4155ac5b-325a-4d9a-89ff-72ef1235aa85 from production
+const grantsDatabaseBoardId = process.env.GRANTS_TRACKER_BOARD_ID;
 
 type DateValue = {
   from: number;
