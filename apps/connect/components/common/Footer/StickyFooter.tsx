@@ -20,15 +20,15 @@ export function StickyFooter() {
             href='/profile'
             value='profile'
             icon={<ProfileIcon />}
-            sx={{ gap: '4px' }}
+            sx={{ gap: '2px' }}
           />
-          <BottomNavigationAction label='Feed' href='feed' value='feed' icon={<FeedIcon />} sx={{ gap: '4px' }} />
+          <BottomNavigationAction label='Feed' href='feed' value='feed' icon={<FeedIcon />} sx={{ gap: '2px' }} />
           <BottomNavigationAction
             label='Grants'
             href='grants'
             value='grants'
             icon={<GrantIcon />}
-            sx={{ gap: '4px' }}
+            sx={{ gap: '2px' }}
           />
         </BottomNavigation>
       </Paper>
