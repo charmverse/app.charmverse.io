@@ -1,10 +1,10 @@
-import { from } from '@apollo/client';
-import { UndesirableOperationError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { type BoardFields } from '@root/lib/databases/board';
+import { isStagingEnv } from '@root/config/constants';
+import type { IPropertyTemplate, BoardFields } from '@root/lib/databases/board';
 import { type CardFields } from '@root/lib/databases/card';
 
-const grantsDatabaseBoardId = '4155ac5b-325a-4d9a-89ff-72ef1235aa85';
+const grantsDatabaseBoardId = isStagingEnv ? '' : '4155ac5b-325a-4d9a-89ff-72ef1235aa85';
 
 type DateValue = {
   from: number;
@@ -13,17 +13,16 @@ type DateValue = {
 
 export type Grant = {
   id: string;
-  description: string;
+  description?: string;
   name: string;
   banner?: string;
   logo?: string;
-  launchDate: DateValue | null;
+  launchDate?: DateValue;
   createdAt: string;
   applyLink?: string;
-  path: string;
   status?: string;
-  announcement: string;
-  publishDate: DateValue;
+  announcement?: string;
+  publishDate?: DateValue;
 };
 
 function getParsedDateValue(dateStr: string | undefined): DateValue | null {
@@ -95,23 +94,33 @@ export async function getGrants(
     {} as Record<string, string>
   );
 
-  if (
-    !statusProperty ||
-    !applyLinkProperty ||
-    !descriptionProperty ||
-    !bannerProperty ||
-    !logoProperty ||
-    !launchDateProperty ||
-    !announcementProperty ||
-    !publishDateProperty
-  ) {
-    throw new UndesirableOperationError();
+  const propertiesRecord: Record<string, IPropertyTemplate | undefined> = {
+    Status: statusProperty,
+    'Apply link': applyLinkProperty,
+    Description: descriptionProperty,
+    Banner: bannerProperty,
+    Logo: logoProperty,
+    'Launch date': launchDateProperty,
+    Announcement: announcementProperty,
+    'Publish date': publishDateProperty
+  };
+
+  const nonExistentProperties = Object.entries(propertiesRecord).filter(([_, property]) => !property);
+
+  if (nonExistentProperties.length) {
+    log.warn(
+      `The following properties are missing from the grants tracker database: ${nonExistentProperties
+        .map(([name]) => name)
+        .join(', ')}`
+    );
   }
 
   return grantsCards
     .filter((card) => {
       const cardProperties = (card.fields as CardFields).properties;
-      const publishDatePropertyValue = cardProperties[publishDateProperty.id] as string | undefined;
+      const publishDatePropertyValue = publishDateProperty
+        ? (cardProperties[publishDateProperty.id] as string | undefined)
+        : undefined;
       const publishDate = getParsedDateValue(publishDatePropertyValue);
       return publishDate && publishDate.from <= new Date().getTime();
     })
@@ -120,21 +129,24 @@ export async function getGrants(
       return {
         id: card.id,
         name: card.page?.title ?? 'Untitled',
-        description: cardProperties[descriptionProperty.id] as string,
-        banner: cardProperties[bannerProperty.id] as string,
-        logo: cardProperties[logoProperty.id] as string,
-        launchDate: getParsedDateValue(cardProperties[launchDateProperty.id] as string),
+        description: descriptionProperty ? (cardProperties[descriptionProperty.id] as string) : undefined,
+        banner: bannerProperty ? (cardProperties[bannerProperty.id] as string) : undefined,
+        logo: logoProperty ? (cardProperties[logoProperty.id] as string) : undefined,
+        launchDate: launchDateProperty
+          ? getParsedDateValue(cardProperties[launchDateProperty.id] as string)
+          : undefined,
         createdAt: card.createdAt.toISOString(),
-        path: card.page?.path ?? '',
-        applyLink: cardProperties[applyLinkProperty.id] as string,
-        status: statusRecord[cardProperties[statusProperty.id] as string],
-        announcement: cardProperties[announcementProperty.id] as string,
-        publishDate: getParsedDateValue(cardProperties[publishDateProperty.id] as string)
+        applyLink: applyLinkProperty ? (cardProperties[applyLinkProperty.id] as string) : undefined,
+        status: statusProperty ? statusRecord[cardProperties[statusProperty.id] as string] : undefined,
+        announcement: announcementProperty ? (cardProperties[announcementProperty.id] as string) : undefined,
+        publishDate: publishDateProperty
+          ? getParsedDateValue(cardProperties[publishDateProperty.id] as string)
+          : undefined
       } as Grant;
     })
     .sort((g1, g2) => {
       if (sort === 'new') {
-        return g2.publishDate.from - g1.publishDate.from;
+        return (g2.publishDate?.from ?? 0) - (g1.publishDate?.from ?? 0);
       } else {
         if (!g1.launchDate || !g2.launchDate) {
           return 0;
