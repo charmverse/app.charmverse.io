@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
+
 import { GrantsListPage } from 'components/grants/GrantsListPage';
 import { getGrants } from 'lib/grants/getGrants';
+
+export const metadata: Metadata = {
+  title: 'Grants'
+};
 
 export default async function GrantsPage({
   searchParams

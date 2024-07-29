@@ -1,10 +1,10 @@
+import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { Box } from '@mui/material';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
 import { PageTitle } from 'components/common/PageTitle';
-import { PageWrapper } from 'components/common/PageWrapper';
 import { PublishProjectToGitcoin } from 'components/projects/[id]/PublishProjectToGitcoin';
 import { ShareButton } from 'components/projects/components/ProjectShareButton';
 import { ShareProjectToWarpcastButton } from 'components/projects/components/ShareProjectToWarpcastButton';

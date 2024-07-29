@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isStagingEnv } from '@root/config/constants';
+import { isProdEnv } from '@root/config/constants';
 import type { IPropertyTemplate, BoardFields } from '@root/lib/databases/board';
 import { type CardFields } from '@root/lib/databases/card';
 
-const grantsDatabaseBoardId = isStagingEnv ? '' : '4155ac5b-325a-4d9a-89ff-72ef1235aa85';
+const grantsDatabaseBoardId = isProdEnv ? '4155ac5b-325a-4d9a-89ff-72ef1235aa85' : '';
 
 type DateValue = {
   from: number;
@@ -39,8 +39,12 @@ export async function getGrants(
     sort: 'new'
   }
 ): Promise<Grant[]> {
+  if (!grantsDatabaseBoardId) {
+    log.warn('Returning 0 grants because an id was not provided for the grants tracker database');
+    return [];
+  }
   const [grantsDatabase, grantsCards] = await Promise.all([
-    prisma.block.findUniqueOrThrow({
+    prisma.block.findUnique({
       where: {
         id: grantsDatabaseBoardId
       },
@@ -66,6 +70,11 @@ export async function getGrants(
       }
     })
   ]);
+
+  if (!grantsDatabase) {
+    log.warn('Returning 0 grants because we could not find the grants tracker database', { grantsDatabaseBoardId });
+    return [];
+  }
 
   const boardProperties = (grantsDatabase.fields as unknown as BoardFields).cardProperties;
   const descriptionProperty = boardProperties.find(

@@ -1,8 +1,8 @@
+import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 
-import { PageWrapper } from 'components/common/PageWrapper';
 import 'server-only';
 
 export function GrantsListPageSkeleton() {
