@@ -38,7 +38,7 @@ async function exportForumPosters(outputPath: string) {
     return {
       'Forum Poster': author,
       // 'Forum Poster Email': users.find((user) => user?.username === author)?.email,
-      // 'Forum Poster Wallet': users.find((user) => user?.username === author)?.wallets[0]?.address,
+      'Forum Poster Wallet': users.find((user) => user?.username === author)?.wallets[0]?.address,
       'Post Count': count
     };
   });
@@ -46,7 +46,7 @@ async function exportForumPosters(outputPath: string) {
   const csvString = stringify(csvData, {
     delimiter: '\t',
     header: true,
-    columns: ['Forum Poster', 'Post Count']
+    columns: ['Forum Poster', 'Forum Poster Wallet', 'Post Count']
   });
 
   writeFileSync(outputPath, csvString);
@@ -63,7 +63,11 @@ async function exportProposalVoters(outputPath: string) {
     include: {
       userVotes: {
         include: {
-          user: true
+          user: {
+            include: {
+              wallets: true
+            }
+          }
         }
       }
     }
@@ -87,7 +91,7 @@ async function exportProposalVoters(outputPath: string) {
     return {
       'Proposal Voter': author,
       // 'Forum Poster Email': users.find((user) => user?.username === author)?.email,
-      // 'Forum Poster Wallet': users.find((user) => user?.username === author)?.wallets[0]?.address,
+      'Forum Poster Wallet': users.find((user) => user?.username === author)?.wallets[0]?.address,
       'Vote Count': count
     };
   });
@@ -95,11 +99,11 @@ async function exportProposalVoters(outputPath: string) {
   const csvString = stringify(csvData, {
     delimiter: '\t',
     header: true,
-    columns: ['Proposal Voter', 'Vote Count']
+    columns: ['Proposal Voter', 'Proposal Voter Wallet', 'Vote Count']
   });
 
   writeFileSync(outputPath, csvString);
 }
 
-// exportForumPosters(forumPostersCSV).catch(console.error);
+exportForumPosters(forumPostersCSV).catch(console.error);
 exportProposalVoters(proposalVotersCSV).catch(console.error);
