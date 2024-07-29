@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { arbitrum, avalanche, base, bsc, mainnet, fantom, mantle, optimism, polygon, zora } from 'viem/chains';
 
-import type { SupportedChainId } from 'lib/blockchain/getNFTs';
-
 import type { NodeAttrs } from '../../components/common/CharmEditor/components/nft/nft.specs';
+
+import type { SupportedChainId } from './getNFTs';
 
 const openseaChainsByPath: Record<string, SupportedChainId | undefined> = {
   ethereum: 1,

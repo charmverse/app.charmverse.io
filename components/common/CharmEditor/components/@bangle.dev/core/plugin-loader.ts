@@ -9,8 +9,7 @@ import type { Schema } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
 import type { EditorProps } from 'prosemirror-view';
 
-import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
-
+import type { SpecRegistry } from '../../@bangle.dev/core/specRegistry';
 import { dropCursor } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
 import * as editorStateCounter from './editor-state-counter';

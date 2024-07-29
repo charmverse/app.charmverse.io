@@ -1,5 +1,6 @@
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
+
 import charmClient from 'charmClient';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
 
 export function useMutateMemberPropertyValues(onUpdate: VoidFunction) {

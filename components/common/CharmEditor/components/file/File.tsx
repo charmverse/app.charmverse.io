@@ -3,7 +3,7 @@ import { Box, Typography } from '@mui/material';
 
 import Link from 'components/common/Link';
 import MultiTabs from 'components/common/MultiTabs';
-import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
+import type { UploadedFileInfo } from 'lib/forms/interfaces';
 import { replaceS3Domain } from 'lib/utils/url';
 
 import { BlockNodeContainer } from '../common/BlockNodeContainer';

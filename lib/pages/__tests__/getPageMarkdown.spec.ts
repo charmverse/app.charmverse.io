@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals } from '@charmverse/core/test';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { getPageMarkdown } from '@root/lib/pages/getPageMarkdown';
 import { _, jsonDoc } from '@root/lib/prosemirror/builders';
 
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { getProjectProfileFieldConfigDefaultHidden } from 'testing/mocks/form';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 

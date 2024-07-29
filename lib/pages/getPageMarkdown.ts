@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getChainById } from '@root/connectors/chains';
-import type { FormFieldValue, LongTextValue, ProjectFieldValue } from '@root/lib/forms/interfaces';
+import type { FormFieldValue, LongTextValue, ProjectFieldValue, SelectOptionType } from '@root/lib/forms/interfaces';
 import type {
   ProjectField,
   ProjectMemberField,
@@ -12,8 +12,6 @@ import type { ProposalFields } from '@root/lib/proposals/interfaces';
 import { _ } from '@root/lib/prosemirror/builders';
 import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
 import { generateMarkdown } from '@root/lib/prosemirror/markdown/generateMarkdown';
-
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 
 export async function getPageMarkdown({
   pageId,

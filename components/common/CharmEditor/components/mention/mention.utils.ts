@@ -1,8 +1,7 @@
 import type { Command, PluginKey } from 'prosemirror-state';
 import { v4 } from 'uuid';
 
-import type { SuggestPluginState } from 'lib/prosemirror/interfaces';
-
+import type { SuggestPluginState } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 import { replaceSuggestMarkWith } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { UserDataPluginKey } from '../charm/charm.plugins';
 

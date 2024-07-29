@@ -1,6 +1,6 @@
 import { Box, FormLabel, Typography } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
