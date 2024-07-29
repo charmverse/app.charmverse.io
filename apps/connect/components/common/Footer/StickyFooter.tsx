@@ -19,7 +19,7 @@ export function StickyFooter() {
             label='Profile'
             href='/profile'
             value='profile'
-            icon={<ProfileIcon fontSize='small' />}
+            icon={<ProfileIcon />}
             sx={{ gap: '4px' }}
           />
           <BottomNavigationAction label='Feed' href='feed' value='feed' icon={<FeedIcon />} sx={{ gap: '4px' }} />
