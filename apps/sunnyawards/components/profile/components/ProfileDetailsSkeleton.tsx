@@ -1,9 +1,9 @@
+import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { Box } from '@mui/material';
 import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 
-import { PageWrapper } from 'components/common/PageWrapper';
 import { ProjectItemSkeleton } from 'components/projects/components/ProjectItemSkeleton';
 
 export function ProfileDetailsSkeleton() {
