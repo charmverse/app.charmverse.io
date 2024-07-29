@@ -1,8 +1,9 @@
-import { PageWrapper } from '@connect/components/common/PageWrapper';
-import { WarpcastLogin } from '@connect/components/common/WarpcastLogin/WarpcastLogin';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
+
+import { PageWrapper } from 'components/common/PageWrapper';
+import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 
 export function HomePage() {
   return (
@@ -28,7 +29,7 @@ export function HomePage() {
     >
       <Image
         src='/images/sunny-awards.png'
-        width={500}
+        width={400}
         height={200}
         sizes='100vw'
         style={{
@@ -50,7 +51,8 @@ export function HomePage() {
         href='https://warpcast.com/~/signup'
         target='_blank'
         rel='noopener'
-        color='inherit'
+        color='text.primary'
+        fontWeight={500}
         display='block'
       >
         Don't have a Farcaster account?

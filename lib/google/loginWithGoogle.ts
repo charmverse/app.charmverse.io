@@ -11,6 +11,8 @@ import { DisabledAccountError, InsecureOperationError, InvalidInputError, System
 import { uid } from '@root/lib/utils/strings';
 import type { LoggedInUser } from '@root/models';
 
+import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
+
 import { verifyGoogleToken } from './verifyGoogleToken';
 
 export type LoginWithGoogleRequest = {
@@ -123,6 +125,11 @@ export async function loginWithGoogle({
     }
 
     trackUserAction('sign_in', { userId: (user as LoggedInUser).id, identityType: 'Google' });
+
+    await trackOpSpaceClickSigninEvent({
+      userId: (user as LoggedInUser).id,
+      identityType: 'Google'
+    });
 
     const updatedUser = await getUserProfile('id', (user as LoggedInUser).id);
 

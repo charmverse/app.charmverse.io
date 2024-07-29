@@ -1,35 +1,40 @@
-import { connectApiClient } from '@connect/apiClient/apiClient';
-import { Avatar } from '@connect/components/common/Avatar';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { BoxProps } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
+import { ConnectApiClient } from 'apiClient/apiClient';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
+
+import { Avatar } from 'components/common/Avatar';
 
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
 export function SearchFarcasterUser({
-  setSelectedProfile
+  setSelectedProfile,
+  filteredFarcasterIds = []
 }: {
+  filteredFarcasterIds?: number[];
   setSelectedProfile: (profile: FarcasterProfile | null) => void;
 }) {
   const [farcasterProfiles, setFarcasterProfiles] = useState<FarcasterProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((_searchTerm: string) => {
-      connectApiClient
+      new ConnectApiClient()
         .getFarcasterUsersByUsername(_searchTerm)
         .then((_farcasterProfiles) => {
           if (_farcasterProfiles.length) {
             setFarcasterProfiles(
-              _farcasterProfiles.map((profile) => ({
-                fid: profile.fid,
-                pfpUrl: profile.pfp_url,
-                bio: profile.profile.bio.text,
-                displayName: profile.display_name,
-                username: profile.username
-              }))
+              _farcasterProfiles
+                .filter((profile) => !filteredFarcasterIds?.includes(profile.fid))
+                .map((profile) => ({
+                  fid: profile.fid,
+                  pfpUrl: profile.pfp_url,
+                  bio: profile.profile.bio.text,
+                  displayName: profile.display_name,
+                  username: profile.username
+                }))
             );
           }
         })

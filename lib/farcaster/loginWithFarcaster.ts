@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { FarcasterUser } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
 import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-client';
@@ -16,11 +17,21 @@ import type { LoggedInUser } from '@root/models';
 import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
+import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
+
 const appClient = createAppClient({
   ethereum: viemConnector({
     rpcUrl: getChainById(optimism.id)!.rpcUrls[0]
   })
 });
+
+export type FarcasterProfileInfo = {
+  fid: number | undefined;
+  username?: string;
+  displayName?: string;
+  bio?: string;
+  pfpUrl?: string;
+};
 
 export type LoginWithFarcasterParams = FarcasterBody &
   Required<Pick<FarcasterBody, 'nonce' | 'message' | 'signature'>> & {
@@ -92,6 +103,11 @@ export async function loginWithFarcaster({
 
     trackUserAction('sign_in', { userId: farcasterUser.user.id, identityType: 'Farcaster' });
 
+    await trackOpSpaceClickSigninEvent({
+      userId: farcasterUser.user.id,
+      identityType: 'Farcaster'
+    });
+
     return getUserProfile('id', farcasterUser.userId);
   }
   const userWithWallet = await prisma.user.findFirst({
@@ -135,7 +151,7 @@ export async function loginWithFarcaster({
         },
         farcasterUser: {
           create: {
-            account: { username, displayName, bio, pfpUrl },
+            account: { username, displayName, bio, pfpUrl, fid },
             fid
           }
         }
@@ -144,6 +160,11 @@ export async function loginWithFarcaster({
     });
 
     trackUserAction('sign_in', { userId: userWithWallet.id, identityType: 'Farcaster' });
+
+    await trackOpSpaceClickSigninEvent({
+      userId: userWithWallet.id,
+      identityType: 'Farcaster'
+    });
 
     return updatedUser;
   }

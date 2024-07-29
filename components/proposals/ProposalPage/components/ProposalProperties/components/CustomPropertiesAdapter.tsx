@@ -38,6 +38,7 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
       requiredReviews: 1,
       finalStep: null
     },
+    publishedAt: proposalFromDb?.publishedAt ?? null,
     reviewers: [],
     evaluations: [],
     id: '',

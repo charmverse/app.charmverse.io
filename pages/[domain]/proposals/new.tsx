@@ -32,7 +32,8 @@ export const getServerSideProps = withSessionSsr(async (context) => {
     select: {
       id: true,
       domain: true,
-      publicProposalTemplates: true
+      publicProposalTemplates: true,
+      requireProposalTemplate: true
     }
   });
 
@@ -62,10 +63,16 @@ export const getServerSideProps = withSessionSsr(async (context) => {
 
   // User is a member, early exit
   if (isMember) {
+    if (space.requireProposalTemplate && !template && pageType !== 'proposal_template') {
+      log.warn('User is a member but space requires a template to create proposals', { spaceId: space.id });
+
+      return { notFound: true };
+    }
     const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
       resourceId: space.id,
       userId: sessionUserId
     });
+
     if (!computedPermissions.createProposals) {
       log.warn('User is a member but does not have permission to create proposals', {
         userId: sessionUserId,
@@ -101,6 +108,12 @@ export const getServerSideProps = withSessionSsr(async (context) => {
         permanent: false
       }
     };
+  }
+
+  if (space.requireProposalTemplate && !template) {
+    log.warn('Space requires a template to create proposals', { spaceId: space.id });
+
+    return { notFound: true };
   }
 
   // User is not a member, but space has not enabled public templates. Join via normal route

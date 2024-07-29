@@ -5,7 +5,7 @@ on:
     types: [labeled, opened, synchronize]
 
 env:
-  SELECTED_PERMISSION_API_TAG: latest
+  SELECTED_PERMISSION_API_TAG: permissions-proposal-progess
 
 concurrency:
   group: staging-${{ github.ref }}
@@ -34,8 +34,13 @@ jobs:
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy')}}; then stack='stg-webapp'; fi
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect')}}; then stack='stg-connect'; fi
           if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')}}; then stack='stg-sunnyawards'; fi
-          echo "STACK=$stack" >> $GITHUB_ENV
-          echo "STAGE_NAME=$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+          full_stage_name="$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
+
+          # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
+          stage_name=`echo "$full_stage_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
+
+          # export the stage name so that it can be used in other steps
+          echo "STAGE_NAME=$stage_name" >> $GITHUB_ENV
 
       - name: Install dependencies
         uses: ./.github/actions/install
@@ -44,7 +49,6 @@ jobs:
         uses: ./.github/actions/build
         with:
           REACT_APP_APP_ENV: 'staging'
-          NEXT_PUBLIC_CONNECT_API_HOST: https://${{ env.STAGE_NAME }}.charmverse.co:4000
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -79,7 +83,7 @@ jobs:
           sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
 
           # substituting the connect api domain name
-          sed -i 's/NEXT_PUBLIC_CONNECT_API_HOST=.*/NEXT_PUBLIC_CONNECT_API_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:4000/g' .ebstalk.apps.env/connect.env
+          sed -i 's/REACT_APP_CONNECT_API_HOST=.*/REACT_APP_CONNECT_API_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:4000/g' .ebstalk.apps.env/connect.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master

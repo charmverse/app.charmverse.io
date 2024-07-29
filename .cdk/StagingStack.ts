@@ -9,14 +9,12 @@ const domain = 'charmverse.co';
 type CustomOptions = { options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] };
 
 export class StagingStack extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps, { options = [] }: CustomOptions) {
-    super(scope, id, props);
+  constructor(scope: Construct, appName: string, props: StackProps, { options = [] }: CustomOptions) {
+    super(scope, appName, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
-      path: `${__dirname}/../${id}.zip`
+      path: `${__dirname}/../${appName}.zip`
     });
-    // Create a ElasticBeanStalk app. - must be 40 characters or less
-    const appName = sanitizeAppName(id);
 
     const deploymentDomain = `${appName}.${domain}`;
 
@@ -197,13 +195,4 @@ export class StagingStack extends Stack {
       value: 'https://' + deploymentDomain + '/'
     });
   }
-}
-
-// Member must contain only letters, digits, and the dash character and may not start or end with a dash
-function sanitizeAppName(name: string) {
-  return name
-    .replace(/[^a-zA-Z0-9-]/g, '')
-    .slice(0, 40)
-    .replace(/^-/, '0')
-    .replace(/-$/, '0');
 }

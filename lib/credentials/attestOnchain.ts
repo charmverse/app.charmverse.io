@@ -5,6 +5,8 @@ import { credentialsWalletPrivateKey } from '@root/config/constants';
 import { getChainById } from '@root/connectors/chains';
 import { Wallet, providers } from 'ethers';
 
+import { getEthersProvider } from '../blockchain/getEthersProvider';
+
 import { getEasInstance, type EasSchemaChain } from './connectors';
 import { attestationSchemaIds, encodeAttestation } from './schemas';
 import type { AttestationType, CredentialDataInput } from './schemas';
@@ -23,14 +25,9 @@ export async function attestOnchain<T extends AttestationType = AttestationType>
   chainId
 }: OnChainAttestationInput<T>): Promise<string> {
   const schemaId = attestationSchemaIds[type];
-  const rpcUrl = getChainById(chainId)?.rpcUrls[0];
+  const rpcUrl = getChainById(chainId)?.rpcUrls[0] as string;
 
-  // This solution fixes ethers 5.7 not working with recent Next.js v14+ versions
-  // https://github.com/ethers-io/ethers.js/issues/4469#issuecomment-1932145334
-  const provider = new providers.JsonRpcProvider({
-    url: rpcUrl as string,
-    skipFetchSetup: true
-  });
+  const provider = getEthersProvider({ rpcUrl });
 
   const wallet = new Wallet(credentialsWalletPrivateKey as string, provider);
 

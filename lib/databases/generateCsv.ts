@@ -10,8 +10,8 @@ import { formatDate, formatDateTime } from '@root/lib/utils/dates';
 import { isTruthy } from '@root/lib/utils/types';
 import { sortBy } from 'lodash';
 
-import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
+import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import { Utils } from 'components/common/DatabaseEditor/utils';
 import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 
@@ -173,13 +173,16 @@ function generateTableArray(
 ): { rows: string[][]; rowIds: string[] } {
   const rows: string[][] = [];
   const visiblePropertyIds: string[] = viewToExport.fields.visiblePropertyIds;
+
+  const allCardProperties = board.fields.cardProperties as IPropertyTemplate[];
+
   const cardProperties =
     !visiblePropertyIds || visiblePropertyIds.length === 0
-      ? (board.fields.cardProperties as IPropertyTemplate[])
-      : board.fields.cardProperties.filter((template: IPropertyTemplate) => visiblePropertyIds.includes(template.id));
+      ? allCardProperties
+      : allCardProperties.filter((template: IPropertyTemplate) => visiblePropertyIds.includes(template.id));
 
   const filterGroup = viewToExport.fields.filter || { filters: [] };
-  const filteredCards = CardFilter.applyFilterGroup(filterGroup, cardProperties, cards) || [];
+  const filteredCards = CardFilter.applyFilterGroup(filterGroup, allCardProperties, cards) || [];
 
   if (
     viewToExport.fields.viewType === 'calendar' &&

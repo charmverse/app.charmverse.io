@@ -7,8 +7,15 @@ const apiKey = typeof process.env.MIXPANEL_API_KEY === 'string' ? process.env.MI
 if (apiKey) {
   mixpanelInstance = Mixpanel.init(apiKey);
 }
-
 export const mixpanel = mixpanelInstance;
+
+let mixpanelInstanceOp: Mixpanel.Mixpanel | null = null;
+const apiKeyOp = typeof process.env.OP_MIXPANEL_API_KEY === 'string' ? process.env.OP_MIXPANEL_API_KEY : null;
+
+if (apiKeyOp) {
+  mixpanelInstanceOp = Mixpanel.init(apiKeyOp);
+}
+export const mixpanelOp = mixpanelInstanceOp;
 
 export function getApiKey() {
   if (!apiKey) {

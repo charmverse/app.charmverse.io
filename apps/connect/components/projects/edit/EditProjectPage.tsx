@@ -1,12 +1,10 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { PageWrapper } from '@connect/components/common/PageWrapper';
-import { actionEditProject } from '@connect/lib/actions/editProject';
-import type { LoggedInUser } from '@connect/lib/profile/interfaces';
-import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
-import type { FormValues, ProjectCategory } from '@connect/lib/projects/form';
-import { schema } from '@connect/lib/projects/form';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
+import type { FormValues, ProjectCategory } from '@connect-shared/lib/projects/form';
+import { schema } from '@connect-shared/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -14,6 +12,9 @@ import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+import { PageWrapper } from 'components/common/PageWrapper';
+import { actionEditProject } from 'lib/projects/editProjectAction';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
@@ -26,7 +27,6 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
 
   const router = useRouter();
 
-  // @ts-ignore
   const { execute, isExecuting } = useAction(actionEditProject, {
     onSuccess: () => {
       router.push(`/p/${project.path}`);
@@ -54,7 +54,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       twitter: project.twitter ?? undefined,
       websites: project.websites,
       projectMembers:
-        project.projectMembers.slice(1).map(
+        project.projectMembers.map(
           (member) =>
             ({
               farcasterId: member.farcasterUser.fid,
@@ -69,15 +69,13 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <Box gap={2} display='flex' flexDirection='column'>
-          <ProjectForm
-            control={control}
-            isValid={isValid}
-            onNext={() => {
-              setShowTeamMemberForm(true);
-            }}
-          />
-        </Box>
+        <ProjectForm
+          control={control}
+          isValid={isValid}
+          onNext={() => {
+            setShowTeamMemberForm(true);
+          }}
+        />
       </PageWrapper>
     );
   }
@@ -117,7 +115,8 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           execute={(input) => {
             execute({
               ...input,
-              projectId: project.id
+              id: project.id,
+              projectMembers: input.projectMembers.slice(1)
             });
           }}
           isExecuting={isExecuting}

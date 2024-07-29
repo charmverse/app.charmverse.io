@@ -1,20 +1,22 @@
 import 'server-only';
 
-import { FarcasterCard } from '@connect/components/common/FarcasterCard';
-import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
-import type { ConnectProjectDetails } from '@connect/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
+import { getSession } from '@connect-shared/lib/session/getSession';
 import { Divider, Stack, Typography } from '@mui/material';
+
+import { FarcasterCard } from 'components/common/FarcasterCard';
 
 import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectHeader } from '../components/ProjectHeader';
 
 export async function ProjectDetailsPage({ project }: { project: ConnectProjectDetails }) {
-  const currentUser = await getCurrentUser();
+  const session = await getSession();
 
   const isCurrentUserTeamLead = project.projectMembers.some(
-    (member) => member.teamLead && member.userId === currentUser?.data?.id
+    (member) => member.teamLead && member.userId === session.user.id
   );
+
   return (
     <PageWrapper header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}>
       <ProjectDetails showEditButton={isCurrentUserTeamLead} project={project} />

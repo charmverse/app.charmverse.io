@@ -2,10 +2,38 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
 
+import { getFarcasterUsers } from '../farcaster/getFarcasterUsers';
+
 export async function getOpProjectsByAttestationId({ projectRefUID }: { projectRefUID: string }) {
-  return prisma.optimismProjectAttestation.findUnique({
+  const optimismProjectAttestation = await prisma.optimismProjectAttestation.findUnique({
     where: {
       projectRefUID
     }
-  }) as Promise<OptimismProjectAttestationContent | null>;
+  });
+
+  if (!optimismProjectAttestation) {
+    return null;
+  }
+
+  const farcasterUsers = await getFarcasterUsers({
+    fids: optimismProjectAttestation.farcasterIds
+  });
+
+  return {
+    ...optimismProjectAttestation,
+    teamMembers: optimismProjectAttestation.farcasterIds
+      .map((fid) => {
+        const user = farcasterUsers.find((u) => u.fid === fid);
+        if (!user) {
+          return null;
+        }
+        return {
+          username: user.username,
+          name: user.display_name,
+          avatar: user.pfp_url,
+          fid: user.fid
+        };
+      })
+      .filter(Boolean)
+  } as OptimismProjectAttestationContent;
 }

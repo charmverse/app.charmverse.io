@@ -7,9 +7,6 @@ inputs:
   REACT_APP_APP_ENV:
     description: '...'
     required: false
-  NEXT_PUBLIC_CONNECT_API_HOST:
-    description: '...'
-    required: false
 
 runs:
   using: 'composite'
@@ -31,7 +28,8 @@ runs:
           background/ceramicServer/generated
           apps/connect/.next
           apps/connect-api/dist
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!dont_cache') }}
+          apps/sunnyawards/.next
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!apps/sunnyawards/.next', '!dont_cache') }}
 
     - name: Build
       shell: bash
@@ -41,8 +39,6 @@ runs:
     - name: Build Connect App
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
-      env:
-        NEXT_PUBLIC_CONNECT_API_HOST: ${{ inputs.NEXT_PUBLIC_CONNECT_API_HOST }}
       run: |
         npm run connect:build
 
@@ -70,4 +66,5 @@ runs:
           background/ceramicServer/generated
           apps/connect/.next
           apps/connect-api/dist
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!dont_cache') }}
+          apps/sunnyawards/.next
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!apps/sunnyawards/.next', '!dont_cache') }}

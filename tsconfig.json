@@ -5,7 +5,9 @@
       "module": "commonjs",
       "jsxImportSource": ""
     },
-    "require": ["tsconfig-paths/register"],
+    "require": [
+      "tsconfig-paths/register"
+    ],
     "transpileOnly": true
   },
   "compilerOptions": {
@@ -13,7 +15,11 @@
     "baseUrl": ".",
     "strict": true,
     "target": "es2019",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -27,40 +33,113 @@
     "incremental": true,
     "isolatedModules": true,
     "paths": {
-      "@connect-api/*": ["./apps/connect-api/src/*"],
-      "@root/adapters/*": ["./adapters/*"],
-      "@root/connectors/*": ["./connectors/*"],
-      "@root/config/*": ["./config/*"],
-      "@root/lib/*": ["./lib/*"],
-      "@root/models": ["./models"],
-      "config/*": ["./config/*"],
-      "scripts/*": ["./scripts/*"],
-      "lib/*": ["./lib/*"],
-      "components/*": ["./components/*"],
-      "hooks/*": ["./hooks/*"],
-      "abis/*": ["./abis/*"],
-      "pages/*": ["./pages/*"],
-      "shared/*": ["./shared/*"],
-      "public/*": ["./public/*"],
-      "theme/*": ["./theme/*"],
-      "testing/*": ["./testing/*"],
-      "__e2e__/*": ["./__e2e__/*"],
-      "@charmverse/core/prisma": ["node_modules/@charmverse/core/dist/cjs/prisma"],
-      "@charmverse/core/prisma-client": ["node_modules/@charmverse/core/dist/cjs/prisma-client"],
-      "@charmverse/core/shared": ["node_modules/@charmverse/core/dist/cjs/shared"],
-      "@charmverse/core/log": ["node_modules/@charmverse/core/dist/cjs/lib/log"],
-      "@charmverse/core/http": ["node_modules/@charmverse/core/dist/cjs/http"],
-      "@charmverse/core/test": ["node_modules/@charmverse/core/dist/cjs/test"],
-      "@charmverse/core/permissions": ["node_modules/@charmverse/core/dist/cjs/permissions"],
-      "@charmverse/core/permissions/flags": ["node_modules/@charmverse/core/dist/cjs/permissions-flags"],
-      "@charmverse/core/pages": ["node_modules/@charmverse/core/dist/cjs/pages"],
-      "@charmverse/core/pages/utilities": ["node_modules/@charmverse/core/dist/cjs/pages-utilities"],
-      "@charmverse/core/proposals": ["node_modules/@charmverse/core/dist/cjs/proposals"],
-      "@charmverse/core/bounties": ["node_modules/@charmverse/core/dist/cjs/bounties"],
-      "@charmverse/core/utilities": ["node_modules/@charmverse/core/dist/cjs/utilities"],
-      "@charmverse/core/errors": ["node_modules/@charmverse/core/dist/cjs/errors"]
+      "@connect-api/*": [
+        "./apps/connect-api/src/*"
+      ],
+      "@root/abis/*": [
+        "./abis/*"
+      ],
+      "@root/adapters/*": [
+        "./adapters/*"
+      ],
+      "@root/connectors/*": [
+        "./connectors/*"
+      ],
+      "@root/config/*": [
+        "./config/*"
+      ],
+      "@root/lib/*": [
+        "./lib/*"
+      ],
+      "@root/models": [
+        "./models"
+      ],
+      "config/*": [
+        "./config/*"
+      ],
+      "scripts/*": [
+        "./scripts/*"
+      ],
+      "lib/*": [
+        "./lib/*"
+      ],
+      "components/*": [
+        "./components/*"
+      ],
+      "hooks/*": [
+        "./hooks/*"
+      ],
+      "abis/*": [
+        "./abis/*"
+      ],
+      "pages/*": [
+        "./pages/*"
+      ],
+      "shared/*": [
+        "./shared/*"
+      ],
+      "public/*": [
+        "./public/*"
+      ],
+      "theme/*": [
+        "./theme/*"
+      ],
+      "testing/*": [
+        "./testing/*"
+      ],
+      "__e2e__/*": [
+        "./__e2e__/*"
+      ],
+      "@charmverse/core/prisma": [
+        "node_modules/@charmverse/core/dist/cjs/prisma"
+      ],
+      "@charmverse/core/prisma-client": [
+        "node_modules/@charmverse/core/dist/cjs/prisma-client"
+      ],
+      "@charmverse/core/shared": [
+        "node_modules/@charmverse/core/dist/cjs/shared"
+      ],
+      "@charmverse/core/log": [
+        "node_modules/@charmverse/core/dist/cjs/lib/log"
+      ],
+      "@charmverse/core/http": [
+        "node_modules/@charmverse/core/dist/cjs/http"
+      ],
+      "@charmverse/core/test": [
+        "node_modules/@charmverse/core/dist/cjs/test"
+      ],
+      "@charmverse/core/permissions": [
+        "node_modules/@charmverse/core/dist/cjs/permissions"
+      ],
+      "@charmverse/core/permissions/flags": [
+        "node_modules/@charmverse/core/dist/cjs/permissions-flags"
+      ],
+      "@charmverse/core/pages": [
+        "node_modules/@charmverse/core/dist/cjs/pages"
+      ],
+      "@charmverse/core/pages/utilities": [
+        "node_modules/@charmverse/core/dist/cjs/pages-utilities"
+      ],
+      "@charmverse/core/proposals": [
+        "node_modules/@charmverse/core/dist/cjs/proposals"
+      ],
+      "@charmverse/core/bounties": [
+        "node_modules/@charmverse/core/dist/cjs/bounties"
+      ],
+      "@charmverse/core/utilities": [
+        "node_modules/@charmverse/core/dist/cjs/utilities"
+      ],
+      "@charmverse/core/errors": [
+        "node_modules/@charmverse/core/dist/cjs/errors"
+      ]
     }
   },
-  "exclude": ["node_modules", "apps"],
-  "include": ["**/*.ts", "**/*.tsx"]
+  "exclude": [
+    "node_modules",
+    "apps"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }

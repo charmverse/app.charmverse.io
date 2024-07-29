@@ -10,16 +10,17 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+
 import type {
   IssuableProposalCredentialAuthor,
   IssuableProposalCredentialSpace,
   ProposalWithJoinedData
-} from '@root/lib/credentials/findIssuableProposalCredentials';
-import { generateCredentialInputsForProposal } from '@root/lib/credentials/findIssuableProposalCredentials';
-import { PROPOSAL_REVIEWERS_BLOCK_ID } from '@root/lib/proposals/blocks/constants';
-import type { ProposalPropertyValue } from '@root/lib/proposals/blocks/interfaces';
-import { getCurrentStep } from '@root/lib/proposals/getCurrentStep';
-import type { ProposalFields } from '@root/lib/proposals/interfaces';
+} from 'lib/credentials/findIssuableProposalCredentials';
+import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
+import { getCurrentStep } from 'lib/proposals/getCurrentStep';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 
 import type { BlockWithDetails } from '../block';
 import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../board';
@@ -39,8 +40,9 @@ export type ProposalData = {
     id: string;
     title: string;
     path: string;
+    sourceTemplateId: string | null;
   };
-  proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates'> & {
+  proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates' | 'publishedAt'> & {
     authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
     evaluations: (Pick<
       ProposalEvaluation,
@@ -66,6 +68,7 @@ const pageSelectObject = {
   proposal: {
     select: {
       id: true,
+      publishedAt: true,
       authors: {
         select: {
           userId: true,
@@ -118,7 +121,8 @@ const pageSelectObject = {
         }
       }
     }
-  }
+  },
+  sourceTemplateId: true
 } satisfies Prisma.PageSelect;
 
 export async function getCardPropertiesFromProposals({
@@ -250,10 +254,15 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     properties[proposalProps.proposalAuthor.id] = proposal.authors.map((author) => author.userId);
   }
 
+  if (proposalProps.proposalPublishedAt) {
+    properties[proposalProps.proposalPublishedAt.id] = proposal.publishedAt?.toISOString() ?? '';
+  }
+
   properties = getCardPropertiesFromRubric({
     properties,
     evaluations: proposal.evaluations.filter((e) => e.type === 'rubric'),
-    templates: cardProperties
+    cardProperties,
+    templateId: page.sourceTemplateId
   });
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
@@ -289,6 +298,7 @@ export function getCardPropertyTemplates({ cardProperties }: { cardProperties: I
     proposalStatus: cardProperties.find((prop) => prop.type === 'proposalStatus'),
     proposalStep: cardProperties.find((prop) => prop.type === 'proposalStep'),
     proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl'),
-    proposalReviewer: cardProperties.find((prop) => prop.type === 'proposalReviewer')
+    proposalReviewer: cardProperties.find((prop) => prop.type === 'proposalReviewer'),
+    proposalPublishedAt: cardProperties.find((prop) => prop.type === 'proposalPublishedAt')
   };
 }

@@ -566,10 +566,9 @@ describe('GET /api/blocks/[id]/subtree - proposal databases', () => {
       selectedProperties: {
         defaults: ['proposalStep', 'proposalEvaluationType'],
         customProperties: [],
-        formFields: [],
         project: [],
         projectMember: [],
-        rubricEvaluations: []
+        templateProperties: []
       }
     });
     const visibleProposal = await testUtilsProposals.generateProposal({

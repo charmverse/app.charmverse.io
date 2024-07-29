@@ -1,17 +1,17 @@
 'use client';
 
-import { actionPublishProjectToGitcoin } from '@connect/lib/actions/publishProjectToGitcoin';
 import { Alert, Button, Card, CardContent, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
+
+import { actionPublishProjectToGitcoin } from 'lib/projects/publishProjectToGitcoinAction';
 
 export function PublishProjectToGitcoin({ projectPath }: { projectPath: string }) {
   const router = useRouter();
 
   const [error, setError] = useState<string | null>(null);
 
-  // @ts-ignore
   const { execute, isExecuting } = useAction(actionPublishProjectToGitcoin, {
     onSuccess: (data) => {
       router.push(`/p/${projectPath}`);

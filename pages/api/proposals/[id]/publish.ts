@@ -7,6 +7,7 @@ import { optimismSepolia } from 'viem/chains';
 
 import { issueProposalPublishedQualifyingEvent } from 'lib/credentials/reputation/issueProposalPublishedQualifyingEvent';
 import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
+import { trackOpUserAction } from 'lib/metrics/mixpanel/trackOpUserAction';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -44,6 +45,11 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       title: true,
       hasContent: true,
       type: true,
+      space: {
+        select: {
+          domain: true
+        }
+      },
       proposal: {
         include: {
           authors: true,
@@ -75,11 +81,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
         }
       },
       spaceId: true,
-      space: {
-        select: {
-          domain: true
-        }
-      }
+      
     }
   });
 
@@ -174,6 +176,15 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     await issueProposalPublishedQualifyingEvent({
       chainId: optimismSepolia.id,
       proposalId: proposalPage.proposal.id,
+      userId
+    });
+  }
+
+  const spaceDomain = proposalPage.space.domain;
+
+  if (spaceDomain === 'op-grants' && proposalPage.type === 'proposal') {
+    trackOpUserAction('successful_proposal_creation', {
+      proposalId,
       userId
     });
   }

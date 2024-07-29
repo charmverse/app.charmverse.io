@@ -1,16 +1,13 @@
-import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
+import { getSession } from '@connect-shared/lib/session/getSession';
+import { isTruthy } from '@root/lib/utils/types';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import type { SessionData } from 'lib/session/config';
-import { getIronOptions } from 'lib/session/getIronOptions';
-import { isTruthy } from 'lib/utils/types';
-
 export async function middleware(request: NextRequest) {
-  const session = await getIronSession<SessionData>(cookies(), getIronOptions());
+  const session = await getSession();
   const user = session.user;
   const path = request.nextUrl.pathname;
+
   // Make /p/ project pages public, /u/ user pages public
   const projectPathChunks = path.split('/').filter(isTruthy);
   const isEditProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'edit';
@@ -36,6 +33,6 @@ export const config = {
      * - images (image files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|manifest.webmanifest).*)'
+    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest|sw.js).*)'
   ]
 };

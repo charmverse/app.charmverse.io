@@ -85,7 +85,7 @@ services:
       [
         'sh',
         '-c',
-        'npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/connect --keepAliveTimeout 70000'
+        'npx react-env --path .env --dest ./apps/connect/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/connect --keepAliveTimeout 70000'
       ]
     profiles:
       - prd-connect
@@ -99,7 +99,7 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/connect --keepAliveTimeout 70000'
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/connect/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/connect --keepAliveTimeout 70000'
       ]
     environment:
       - REACT_APP_APP_ENV=staging
@@ -135,7 +135,7 @@ services:
       [
         'sh',
         '-c',
-        'npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/sunnyawards --keepAliveTimeout 70000'
+        'npx react-env --path .env --dest ./apps/sunnyawards/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/sunnyawards --keepAliveTimeout 70000'
       ]
     profiles:
       - prd-sunnyawards
@@ -149,7 +149,7 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/sunnyawards --keepAliveTimeout 70000'
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/sunnyawards/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/sunnyawards --keepAliveTimeout 70000'
       ]
     environment:
       - REACT_APP_APP_ENV=staging

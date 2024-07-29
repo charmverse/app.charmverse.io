@@ -1,4 +1,4 @@
-import { Alert, SvgIcon } from '@mui/material';
+import { Alert, Box, SvgIcon, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { RiChatCheckLine } from 'react-icons/ri';
 
@@ -8,6 +8,8 @@ import MultiTabs from 'components/common/MultiTabs';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposals/interfaces';
+
+import { PassFailEvaluationContainer } from '../PassFailEvaluationContainer';
 
 import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricResults } from './RubricResults';
@@ -98,6 +100,24 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
           </MultiTabs>
         </>
       )}
+      <Box mx={2}>
+        <Typography variant='subtitle1' sx={{ mb: 1 }}>
+          Decision
+        </Typography>
+
+        <PassFailEvaluationContainer
+          isCurrent={!!isCurrent}
+          hideReviewer
+          authors={proposal?.authors?.map((a) => a.userId) ?? []}
+          archived={!!proposal?.archived}
+          actionCompletesStep
+          key='results'
+          evaluation={evaluation}
+          proposalId={proposal?.id}
+          confirmationMessage='Please verify that all reviewers have submitted a response. This will submit the final review for this step.'
+          refreshProposal={refreshProposal}
+        />
+      </Box>
       {evaluationTabs.length === 0 && !proposal && <LoadingComponent isLoading={true} />}
       {evaluationTabs.length === 0 && proposal && (
         <NoCommentsMessage

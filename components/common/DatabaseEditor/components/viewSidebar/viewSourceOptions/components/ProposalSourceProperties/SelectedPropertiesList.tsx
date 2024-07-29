@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import type { SxProps } from '@mui/material';
+import type { SxProps, TypographyProps } from '@mui/material';
 import { Divider, Stack, Typography } from '@mui/material';
 
 const StyledTitleTypography = styled(Typography)`
@@ -12,17 +12,19 @@ export function SelectedPropertiesList({
   title,
   children,
   hideDivider,
-  itemsSx
+  itemsSx,
+  titleVariant = 'body1'
 }: {
   title: string;
   children?: React.ReactNode;
   items: string[];
   hideDivider?: boolean;
   itemsSx?: SxProps;
+  titleVariant?: TypographyProps['variant'];
 }) {
   return (
     <Stack>
-      <StyledTitleTypography variant='body2'>{title}</StyledTitleTypography>
+      <StyledTitleTypography variant={titleVariant}>{title}</StyledTitleTypography>
       <Stack
         gap={0.5}
         mt={0.5}

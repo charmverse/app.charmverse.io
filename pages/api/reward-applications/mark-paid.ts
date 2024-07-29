@@ -1,5 +1,6 @@
 import type { Application } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackOpUserAction } from '@root/lib/metrics/mixpanel/trackOpUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -29,7 +30,17 @@ async function markSubmissionAsPaidController(req: NextApiRequest, res: NextApiR
       id: applicationId as string
     },
     select: {
-      bounty: true
+      bounty: {
+        select: {
+          id: true,
+          space: {
+            select: {
+              domain: true
+            }
+          },
+          spaceId: true
+        }
+      }
     }
   });
 
@@ -52,6 +63,13 @@ async function markSubmissionAsPaidController(req: NextApiRequest, res: NextApiR
     userId,
     applicationId
   });
+
+  if (submission.bounty.space.domain === 'op-grants') {
+    trackOpUserAction('reward_paid', {
+      userId,
+      rewardId: updatedSubmission.bountyId
+    });
+  }
 
   return res.status(200).json(updatedSubmission);
 }
