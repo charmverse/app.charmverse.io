@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
-import { conditionalPlural } from '@root/lib/utils/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -94,8 +93,6 @@ export function PassFailEvaluation({
   const [evaluationReviewId, setEvaluationReviewId] = useState<string | null>(null);
   const [declineMessage, setDeclineMessage] = useState('');
 
-  const reviewsThresholdMet = totalReviews >= requiredReviews;
-
   const declineReasonModalPopupState = usePopupState({ variant: 'dialog' });
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
@@ -103,11 +100,6 @@ export function PassFailEvaluation({
     ? 'You are not a reviewer'
     : actionCompletesStep && !isApprover
     ? 'You are not an approver'
-    : actionCompletesStep && isApprover && !reviewsThresholdMet
-    ? `${requiredReviews} ${conditionalPlural({
-        word: 'review',
-        count: requiredReviews
-      })} required to complete this step`
     : isSubmittingReview
     ? 'Submitting review'
     : archived
