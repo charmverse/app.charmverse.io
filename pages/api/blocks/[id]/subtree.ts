@@ -1,4 +1,4 @@
-import { getSubtree } from '@root/lib/databases/subtree';
+import { getSubtree } from '@root/lib/databases/getSubtree';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
