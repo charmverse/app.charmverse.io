@@ -22,6 +22,7 @@ import {
 import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
@@ -97,14 +98,24 @@ function ExpandedFormField({
       titleTextFieldRef.current.querySelector('input')?.focus();
     }
   }, [titleTextFieldRef]);
+  const isCharmverseSpace = useIsCharmverseSpace();
+  const { space } = useCurrentSpace();
 
   const formFieldType = formField.type;
   const filteredFormFieldTypes = useMemo(() => {
     if (!formFieldTypeFrequencyCount) {
-      return formFieldTypes;
+      return formFieldTypes.filter((_formFieldType) => {
+        if (_formFieldType === 'optimism_project_profile' && space?.domain !== 'op-grants') {
+          return false;
+        }
+        return true;
+      });
     }
 
     return formFieldTypes.filter((_formFieldType) => {
+      if (_formFieldType === 'optimism_project_profile' && space?.domain !== 'op-grants' && !isCharmverseSpace) {
+        return false;
+      }
       const nonDuplicateFieldType = nonDuplicateFieldTypes.includes(_formFieldType);
       if (nonDuplicateFieldType) {
         return !formFieldTypeFrequencyCount[_formFieldType] || _formFieldType === formFieldType;
@@ -112,7 +123,7 @@ function ExpandedFormField({
 
       return true;
     });
-  }, [formFieldTypeFrequencyCount, formFieldType]);
+  }, [formFieldTypeFrequencyCount, isCharmverseSpace, formFieldType, !!space?.domain]);
 
   return (
     <>

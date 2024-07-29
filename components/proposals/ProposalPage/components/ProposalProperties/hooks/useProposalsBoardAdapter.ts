@@ -21,7 +21,8 @@ import {
   PROPOSAL_STEP_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
-  PROPOSAL_EVALUATION_TYPE_ID
+  PROPOSAL_EVALUATION_TYPE_ID,
+  PROPOSAL_PUBLISHED_AT_ID
 } from 'lib/proposals/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
@@ -166,6 +167,7 @@ export function mapProposalToCard({
     ...proposalFields.properties,
     // [Constants.titleColumnId]: proposal.title,
     // add default field values on the fly
+    [PROPOSAL_PUBLISHED_AT_ID]: proposal.publishedAt ? new Date(proposal.publishedAt).getTime() : '',
     [PROPOSAL_STATUS_BLOCK_ID]: proposal.archived ? 'archived' : proposal.currentStep?.result ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
     [PROPOSAL_STEP_BLOCK_ID]: proposal.currentStep?.title ?? 'Draft',

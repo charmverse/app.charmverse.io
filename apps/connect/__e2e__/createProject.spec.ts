@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { randomIntFromInterval } from '@root/lib/utils/random';
 import { expect, test } from 'playwright/test';
-
-import { randomIntFromInterval } from 'lib/utils/random';
 
 import { loginBrowserUser } from './utils/loginBrowserUser';
 

@@ -1,9 +1,15 @@
-import { CreateProjectPage } from '@connect/components/projects/new/CreateProjectPage';
-import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
+import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import { CreateProjectPage } from 'components/projects/new/CreateProjectPage';
+
+export const metadata: Metadata = {
+  title: 'Create a Project'
+};
+
 export default async function CreateProject() {
-  const user = await getCurrentUser();
+  const user = await getCurrentUserAction();
 
   if (!user?.data) {
     redirect('/');

@@ -42,6 +42,7 @@ export async function updateBoardProperties({
     prisma.proposalEvaluation.findMany({
       where: {
         proposal: {
+          archived: false,
           spaceId: boardBlock.spaceId,
           page: {
             // Need only proposal templates for rubric evaluation & criteria properties
@@ -97,6 +98,7 @@ export async function updateBoardProperties({
               type: 'proposal_template',
               deletedAt: null
             },
+            archived: false,
             spaceId: boardBlock.spaceId
           }
         }

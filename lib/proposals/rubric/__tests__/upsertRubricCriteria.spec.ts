@@ -46,7 +46,7 @@ describe('upsertRubricCriteria', () => {
     const newRubrics = await upsertRubricCriteria({
       proposalId: proposal.id,
       evaluationId: proposal.evaluations[0].id,
-      rubricCriteria: [...rubrics, { type: 'range', title: 'Second score', parameters: { max: 7, min: 1 } }],
+      rubricCriteria: [...rubrics, { type: 'range', index: 4, title: 'Second score', parameters: { max: 7, min: 1 } }],
       actorId: user.id
     });
 
@@ -54,7 +54,7 @@ describe('upsertRubricCriteria', () => {
       rubrics[0],
       expect.objectContaining({
         id: expect.any(String),
-        index: 1,
+        index: 4,
         description: null,
         parameters: {
           max: 7,

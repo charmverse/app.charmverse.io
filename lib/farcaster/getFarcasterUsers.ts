@@ -46,10 +46,10 @@ const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
 export async function getFarcasterUsers({
   wallets,
   username,
-  fid
+  fids
 }: {
   username?: string;
-  fid?: number;
+  fids?: number[];
   wallets?: string[];
 }) {
   if (username) {
@@ -66,11 +66,11 @@ export async function getFarcasterUsers({
       }
     );
     return farcasterUsersResponse.result.users;
-  } else if (fid) {
+  } else if (fids && fids.length) {
     const farcasterUsersResponse = await GET<FarcasterUserBulkResponse>(
       `${neynarBaseUrl}/user/bulk`,
       {
-        fids: fid
+        fids: fids.join(',')
       },
       {
         headers: {

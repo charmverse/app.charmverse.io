@@ -1,6 +1,6 @@
-import type { ConnectProjectDetails } from '../projects/fetchProject';
+import type { Project } from '@charmverse/core/prisma-client';
 
-type Contract = {
+export type Contract = {
   address: string;
   deploymentTxHash: string;
   deployerAddress: string;
@@ -49,7 +49,46 @@ type OptimismProject = {
     revenue?: Revenue[];
   };
 };
-export function mapProjectToOptimism(input: ConnectProjectDetails): OptimismProject {
+
+export type ProjectDetails = Pick<
+  Project,
+  | 'description'
+  | 'avatar'
+  | 'coverImage'
+  | 'category'
+  | 'name'
+  | 'farcasterValues'
+  | 'github'
+  | 'mirror'
+  | 'twitter'
+  | 'websites'
+  | 'primaryContractAddress'
+  | 'primaryContractChainId'
+  | 'primaryContractDeployTxHash'
+  | 'primaryContractDeployer'
+  | 'mintingWalletAddress'
+> & {
+  projectMembers: {
+    farcasterId: number;
+  }[];
+};
+
+export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
+  const contracts: Contract[] =
+    input.primaryContractAddress &&
+    input.primaryContractChainId &&
+    input.primaryContractDeployTxHash &&
+    input.primaryContractDeployer
+      ? [
+          {
+            address: input.primaryContractAddress,
+            deploymentTxHash: input.primaryContractDeployTxHash,
+            deployerAddress: input.primaryContractDeployer,
+            chainId: Number(input.primaryContractChainId)
+          }
+        ]
+      : [];
+
   return {
     name: input.name || '',
     description: input.description || '',
@@ -62,11 +101,11 @@ export function mapProjectToOptimism(input: ConnectProjectDetails): OptimismProj
       twitter: input.twitter || '',
       mirror: input.mirror || null
     },
-    team: input.projectMembers.map((member) => member.farcasterUser.displayName),
+    team: input.projectMembers.map((member) => member.farcasterId.toString()),
     github: input.github ? [input.github] : [],
     osoSlug: '', // Placeholder: requires specific input
     packages: [], // Placeholder: requires specific input
-    contracts: [], // Placeholder: requires specific input
+    contracts,
     grantsAndFunding: {
       ventureFunding: [], // Placeholder: requires specific input
       grants: [], // Placeholder: requires specific input

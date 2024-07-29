@@ -26,15 +26,11 @@ const appClient = createAppClient({
 });
 
 export type FarcasterProfileInfo = {
-  fid: string | number;
-  username: string;
-  displayName: string;
-  bio: string;
-  pfpUrl: string;
-};
-
-export type FarcasterUserWithProfile = Omit<FarcasterUser, 'account'> & {
-  account: FarcasterProfileInfo;
+  fid: number | undefined;
+  username?: string;
+  displayName?: string;
+  bio?: string;
+  pfpUrl?: string;
 };
 
 export type LoginWithFarcasterParams = FarcasterBody &

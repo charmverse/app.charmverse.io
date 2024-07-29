@@ -1,11 +1,9 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { PageWrapper } from '@connect/components/common/PageWrapper';
-import { actionCreateProject } from '@connect/lib/actions/createProject';
-import type { LoggedInUser } from '@connect/lib/profile/interfaces';
-import type { FormValues } from '@connect/lib/projects/form';
-import { schema } from '@connect/lib/projects/form';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { FormValues } from '@connect-shared/lib/projects/form';
+import { schema } from '@connect-shared/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -14,7 +12,8 @@ import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+import { PageWrapper } from 'components/common/PageWrapper';
+import { actionCreateProject } from 'lib/projects/createProjectAction';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
@@ -27,7 +26,6 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
 
   const router = useRouter();
 
-  // @ts-ignore
   const { execute, isExecuting } = useAction(actionCreateProject, {
     onSuccess: (data) => {
       router.push(`/p/${data.data?.projectPath as string}/publish`);
@@ -47,8 +45,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
       name: '',
       projectMembers: [
         {
-          farcasterId: user?.farcasterUser?.fid,
-          name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName
+          farcasterId: user?.farcasterUser?.fid
         }
       ]
     },
@@ -59,15 +56,13 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <Box gap={2} display='flex' flexDirection='column'>
-          <ProjectForm
-            control={control}
-            isValid={isValid}
-            onNext={() => {
-              setShowTeamMemberForm(true);
-            }}
-          />
-        </Box>
+        <ProjectForm
+          control={control}
+          isValid={isValid}
+          onNext={() => {
+            setShowTeamMemberForm(true);
+          }}
+        />
       </PageWrapper>
     );
   }

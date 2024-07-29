@@ -1,7 +1,13 @@
-import { EditProjectPage } from '@connect/components/projects/edit/EditProjectPage';
-import { getCurrentUser } from '@connect/lib/actions/getCurrentUser';
+import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
+import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
+
+import { EditProjectPage } from 'components/projects/edit/EditProjectPage';
+
+export const metadata: Metadata = {
+  title: 'Edit Project'
+};
 
 export default async function EditProject({
   params
@@ -14,7 +20,7 @@ export default async function EditProject({
     fetchProject({
       path: params.path
     }),
-    getCurrentUser()
+    getCurrentUserAction()
   ]);
 
   if (!user?.data) {

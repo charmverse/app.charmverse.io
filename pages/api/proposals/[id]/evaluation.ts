@@ -78,6 +78,7 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     evaluationId,
     voteSettings: req.body.voteSettings,
     reviewers,
+    evaluationApprovers: req.body.evaluationApprovers,
     actorId: userId,
     requiredReviews,
     spaceId: proposal.spaceId,

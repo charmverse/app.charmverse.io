@@ -1,7 +1,6 @@
 'use client';
 
-import { useS3UploadInput } from '@connect/hooks/useS3UploadInput';
-import type { FormValues } from '@connect/lib/projects/form';
+import type { FormValues } from '@connect-shared/lib/projects/form';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -10,6 +9,7 @@ import Image from 'next/image';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
+import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import { inputBackground } from 'theme/colors';
 
 const height = 96;

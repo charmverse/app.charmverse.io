@@ -15,7 +15,6 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import ShortTextIcon from '@mui/icons-material/ShortText';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
-import { SvgIcon } from '@mui/material';
 import type { ReactNode } from 'react';
 
 export const formFieldTypes = [

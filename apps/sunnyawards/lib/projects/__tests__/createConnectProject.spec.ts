@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
+import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import fetchMock from 'fetch-mock-jest';
-
-import { createConnectProject } from '../createConnectProject';
 
 const mockSandbox = fetchMock.sandbox();
 
@@ -74,28 +73,25 @@ describe('createConnectProject', () => {
       ]
     });
 
-    const createdProject = await createConnectProject({
+    const createdProject = await createOptimismProject({
       input: {
         name: 'Project',
         projectMembers: [
           {
-            farcasterId: 1,
-            name: 'User 1'
+            farcasterId: 1
           },
           {
-            farcasterId: 2,
-            name: 'User 2'
+            farcasterId: 2
           },
           {
-            farcasterId: 3,
-            name: 'User 3'
+            farcasterId: 3
           },
           {
-            farcasterId: 4,
-            name: 'User 4'
+            farcasterId: 4
           }
         ]
       },
+      source: 'connect',
       userId: user.id
     });
 

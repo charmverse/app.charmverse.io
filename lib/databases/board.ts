@@ -20,6 +20,7 @@ export const proposalPropertyTypesList = [
   'proposalReviewer',
   'proposalEvaluationType',
   'proposalCreatedAt',
+  'proposalPublishedAt',
   'proposalStep',
   'proposalReviewerNotes',
   'proposalRubricCriteriaReviewerScore',

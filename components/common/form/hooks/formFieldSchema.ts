@@ -20,6 +20,12 @@ export function getYupValidationSchema(fields: FormFieldInput[]) {
     (fields || []).reduce((acc, property) => {
       const isRequired = property.required;
       switch (property.type) {
+        case 'optimism_project_profile': {
+          acc[property.id] = yup.object().test('is-required', 'Required', (value) => {
+            return isRequired ? 'projectRefUID' in value && !!value.projectRefUID : true;
+          });
+          break;
+        }
         case 'text':
         case 'short_text':
         case 'text_multiline': {
@@ -158,6 +164,9 @@ function getInitialFormFieldValue(prop: { type: FieldType; value?: FormFieldValu
       return prop.value || { content: emptyDocument, contentText: '' };
     case 'project_profile': {
       return prop.value || { projectId: '', selectedMemberIds: [] };
+    }
+    case 'optimism_project_profile': {
+      return prop.value || { projectRefUID: '', projectTitle: '' };
     }
     default:
       return prop.value || '';

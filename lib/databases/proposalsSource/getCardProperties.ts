@@ -42,7 +42,7 @@ export type ProposalData = {
     path: string;
     sourceTemplateId: string | null;
   };
-  proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates'> & {
+  proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates' | 'publishedAt'> & {
     authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
     evaluations: (Pick<
       ProposalEvaluation,
@@ -68,6 +68,7 @@ const pageSelectObject = {
   proposal: {
     select: {
       id: true,
+      publishedAt: true,
       authors: {
         select: {
           userId: true,
@@ -253,6 +254,10 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     properties[proposalProps.proposalAuthor.id] = proposal.authors.map((author) => author.userId);
   }
 
+  if (proposalProps.proposalPublishedAt) {
+    properties[proposalProps.proposalPublishedAt.id] = proposal.publishedAt?.toISOString() ?? '';
+  }
+
   properties = getCardPropertiesFromRubric({
     properties,
     evaluations: proposal.evaluations.filter((e) => e.type === 'rubric'),
@@ -293,6 +298,7 @@ export function getCardPropertyTemplates({ cardProperties }: { cardProperties: I
     proposalStatus: cardProperties.find((prop) => prop.type === 'proposalStatus'),
     proposalStep: cardProperties.find((prop) => prop.type === 'proposalStep'),
     proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl'),
-    proposalReviewer: cardProperties.find((prop) => prop.type === 'proposalReviewer')
+    proposalReviewer: cardProperties.find((prop) => prop.type === 'proposalReviewer'),
+    proposalPublishedAt: cardProperties.find((prop) => prop.type === 'proposalPublishedAt')
   };
 }

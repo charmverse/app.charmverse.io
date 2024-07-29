@@ -2,9 +2,8 @@
 
 import { Typography } from '@mui/material';
 import { Stack } from '@mui/system';
+import { fancyTrim } from '@root/lib/utils/strings';
 import { useState } from 'react';
-
-import { fancyTrim } from 'lib/utils/strings';
 
 export function ProjectDescription({ description }: { description: string }) {
   const [showFullDescription, setShowFullDescription] = useState(false);
