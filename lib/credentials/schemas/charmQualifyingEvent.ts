@@ -4,7 +4,7 @@ import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import type { TypedSchemaItem } from './interfaces';
 
 // This schema ID is bound to change as we move through resolver contract versions
-export const charmQualifyingEventSchemaId = '0x056dbcd02b356c8efb77eb15b30695916604130921f5fbfe4dd75707db642822';
+export const charmQualifyingEventSchemaId = '0xffebe1dbfc8c97cd866b63e442d6c725b78bc4c2de0683d332d5de5e6c11bd19';
 
 export const charmQualifyingEventSchemaDefinition =
   'string name,string category,string projectRefUID,string metadataSnapshotRefUID,string userRefUID';

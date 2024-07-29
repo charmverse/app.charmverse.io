@@ -94,12 +94,12 @@ async function deploySchemasOnNewChain({ chainId }: { chainId: EasSchemaChain })
 
 // deploySchema({
 //   chainId: optimismSepolia.id,
-//   schema: charmUserIdentifierSchemaDefinition,
-//   resolver: '0xda8793f28080ac2473032dc50497b93de0c1c67b'
+//   schema: charmUserIdentifierSchemaDefinition
+//   // resolver: '0xda8793f28080ac2473032dc50497b93de0c1c67b'
 // }).then(console.log);
 
 // deploySchema({
 //   chainId: optimismSepolia.id,
 //   schema: charmQualifyingEventSchemaDefinition,
-//   resolver: '0xda8793f28080ac2473032dc50497b93de0c1c67b'
+//   resolver: '0x2AEc1DedD9A63173d673BCaa60564a4bae38bc38'
 // }).then(console.log);
