@@ -16,7 +16,7 @@ export const createProjectAction = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     const input = parsedInput;
 
-    const currentUserId = ctx.session.user!.id;
+    const currentUserId = ctx.session.user.id;
     const newProject = await createOptimismProject({
       userId: currentUserId,
       input: {
@@ -37,6 +37,8 @@ export const createProjectAction = authActionClient
       await storeProjectMetadataAndPublishGitcoinAttestation({
         projectIdOrPath: newProject.id,
         userId: currentUserId
+      }).catch((err) => {
+        log.error('Failed to store project metadata and publish gitcoin attestation', { err, userId: currentUserId });
       });
     }
 
