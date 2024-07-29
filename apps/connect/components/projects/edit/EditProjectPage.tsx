@@ -13,6 +13,7 @@ import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { PageCoverHeader } from 'components/common/PageCoverHeader';
 import { PageWrapper } from 'components/common/PageWrapper';
 import { actionEditProject } from 'lib/projects/editProjectAction';
 
@@ -20,7 +21,6 @@ import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectForm } from '../components/ProjectForm';
-import { ProjectHeader } from '../components/ProjectHeader';
 
 export function EditProjectPage({ user, project }: { user: LoggedInUser; project: ConnectProjectDetails }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
@@ -96,7 +96,11 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
   return (
     <PageWrapper
       header={
-        <ProjectHeader name={projectValues.name} avatar={projectValues.avatar} coverImage={projectValues.coverImage} />
+        <PageCoverHeader
+          name={projectValues.name}
+          avatar={projectValues.avatar}
+          coverImage={projectValues.coverImage}
+        />
       }
     >
       <Box gap={2} display='flex' flexDirection='column'>

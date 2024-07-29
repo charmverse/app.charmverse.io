@@ -5,10 +5,10 @@ import { getSession } from '@connect-shared/lib/session/getSession';
 import { Divider, Stack, Typography } from '@mui/material';
 
 import { FarcasterCard } from 'components/common/FarcasterCard';
+import { PageCoverHeader } from 'components/common/PageCoverHeader';
 
 import { PageWrapper } from '../../common/PageWrapper';
 import { ProjectDetails } from '../components/ProjectDetails';
-import { ProjectHeader } from '../components/ProjectHeader';
 
 export async function ProjectDetailsPage({ project }: { project: ConnectProjectDetails }) {
   const session = await getSession();
@@ -18,7 +18,9 @@ export async function ProjectDetailsPage({ project }: { project: ConnectProjectD
   );
 
   return (
-    <PageWrapper header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}>
+    <PageWrapper
+      header={<PageCoverHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}
+    >
       <ProjectDetails showEditButton={isCurrentUserTeamLead} project={project} />
       <Divider sx={{ my: 2 }} />
       <Typography variant='h6'>Members</Typography>

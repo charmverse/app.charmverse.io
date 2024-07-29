@@ -54,6 +54,12 @@ export interface PluginState {
   markName: string;
 }
 
+export interface SuggestPluginState {
+  tooltipContentDOM: HTMLElement;
+  markName: string;
+  suggestTooltipKey: PluginKey<PluginState>;
+}
+
 function pluginsFactory({
   key = new PluginKey('suggest_tooltip'),
   markName,

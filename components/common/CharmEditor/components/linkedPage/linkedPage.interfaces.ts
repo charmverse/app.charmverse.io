@@ -1,3 +1,3 @@
-import type { SuggestPluginState } from 'lib/prosemirror/interfaces';
+import type { SuggestPluginState } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 
 export interface LinkedPagePluginState extends SuggestPluginState {}

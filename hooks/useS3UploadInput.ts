@@ -7,9 +7,9 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import type { ResizeType } from 'lib/file/constants';
 import { DEFAULT_MAX_FILE_SIZE_MB, FORM_DATA_FILE_PART_NAME, FORM_DATA_IMAGE_RESIZE_TYPE } from 'lib/file/constants';
+import type { UploadedFileInfo } from 'lib/forms/interfaces';
 import { replaceS3Domain } from 'lib/utils/url';
 
-export type UploadedFileInfo = { url: string; fileName: string; size?: number };
 export type UploadedFileCallback = (info: UploadedFileInfo) => void;
 
 export const useS3UploadInput = ({

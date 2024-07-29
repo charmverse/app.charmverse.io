@@ -19,6 +19,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
@@ -43,7 +44,6 @@ import {
 } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import { ProjectFieldEditor } from './fields/ProjectField/ProjectFieldEditor';
-import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
 
 export const FormFieldContainer = styled(Stack, {

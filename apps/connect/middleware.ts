@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
   const isNewProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'new';
   const isProjectPath = projectPathChunks[0] === 'p' && !isEditProjectPath && !isNewProjectPath;
 
-  if (!user && path !== '/' && !isProjectPath && !path.startsWith('/u/')) {
+  if (!user && path !== '/' && !isProjectPath && !path.startsWith('/u/') && !path.startsWith('/grants')) {
     return NextResponse.redirect(new URL('/', request.url));
   } else if (user && path === '/') {
     return NextResponse.redirect(new URL('/profile', request.url));

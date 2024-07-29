@@ -1,6 +1,6 @@
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import type { ReactNode } from 'react';
 
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { FormFieldValue } from 'lib/forms/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 

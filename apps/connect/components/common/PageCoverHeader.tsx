@@ -4,7 +4,7 @@ import { Avatar } from 'components/common/Avatar';
 
 const height = '130px';
 
-export function ProjectHeader({
+export function PageCoverHeader({
   coverImage,
   avatar,
   name

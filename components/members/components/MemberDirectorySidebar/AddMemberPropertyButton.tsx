@@ -1,10 +1,10 @@
 import type { MemberPropertyType } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import { Button, Menu, MenuItem, Stack, TextField } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useMemo, useState } from 'react';
 
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectOptionsList } from 'components/common/form/fields/Select/SelectOptionsList';
 import { isSelectType } from 'components/common/form/fields/utils';
 import Modal from 'components/common/Modal';

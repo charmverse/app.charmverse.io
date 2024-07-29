@@ -1,3 +1,4 @@
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { capitalize } from 'lodash';
 import { useState } from 'react';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
@@ -6,7 +7,6 @@ import { members } from 'stories/lib/mockData';
 import { v4 } from 'uuid';
 
 import { formFieldTypes } from 'components/common/form/constants';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldAnswers as CustomFormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
