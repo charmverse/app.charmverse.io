@@ -1,5 +1,4 @@
 import { AppProviders } from '@connect-shared/components/layout/AppProviders';
-import { Footer } from '@connect-shared/components/layout/Footer';
 import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import Box from '@mui/material/Box';
@@ -75,7 +74,6 @@ export default async function RootLayout({
             <Box component='main' bgcolor='mainBackground.main' pb={2}>
               {children}
             </Box>
-            <Footer />
             <StickyFooter />
           </AppProviders>
         </Box>
