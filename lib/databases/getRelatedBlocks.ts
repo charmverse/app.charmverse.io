@@ -99,5 +99,5 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
     // remove orphan and deleted blocks
     .filter((block) => !block.deletedAt && (!!block.pageId || block.type === 'view' || block.type === 'board'));
 
-  return { blocks: [...validBlocks] as any, source };
+  return { blocks: validBlocks, source };
 }

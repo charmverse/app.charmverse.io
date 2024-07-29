@@ -1,238 +1,96 @@
 import { v4 as uuid } from 'uuid';
 
-const propertyIdStep = '__step';
+const inProgressProposalCard = {
+  id: 'ee188725-f74b-44c6-b67a-cb8e8aa89937',
+  deletedAt: 0,
+  createdAt: 1722253407862,
+  createdBy: '572edd48-f255-4fd9-9dd5-ce97dc4595d9',
+  updatedAt: 1722253548412,
+  updatedBy: '572edd48-f255-4fd9-9dd5-ce97dc4595d9',
+  spaceId: '0398c52a-829b-454f-b899-d9bb79b09229',
+  parentId: 'de8eb9f9-d327-4738-ad07-7fca153f25d7',
+  rootId: 'de8eb9f9-d327-4738-ad07-7fca153f25d7',
+  schema: 1,
+  type: 'card',
+  title: 'Getting Started',
+  fields: {
+    icon: '',
+    isTemplate: false,
+    properties: {
+      '680e0e93-5ba5-4c24-b3aa-61e579aafa93': 'getting-started-8198984395372089',
+      __status: 'in_progress',
+      'b3387401-6b08-4a46-a255-86d6964bdf27': 'feedback',
+      __step: 'Feedback',
+      __authors: ['572edd48-f255-4fd9-9dd5-ce97dc4595d9'],
+      __publishedAt: '',
+      __reviewers: [
+        {
+          userId: null,
+          roleId: null,
+          systemRole: 'author'
+        }
+      ]
+    },
+    headerImage: null,
+    contentOrder: []
+  }
+};
 
-const filterId1 = uuid();
-const filterId2 = uuid();
-const cardId1 = uuid();
-const cardId2 = uuid();
-const cardId3 = uuid();
-const cardCreatedBy = uuid();
-const spaceId = uuid();
-const parentId = uuid();
-const rootId = uuid();
-const reviewerRoleId = uuid();
-const boardId = uuid();
-const boardCreatedBy = uuid();
-const viewToExportId = uuid();
-const viewToExportCreatedBy = uuid();
-
-export const inputs = {
-  filterGroup: {
-    operation: 'or',
-    filters: [
-      {
-        propertyId: propertyIdStep,
-        condition: 'is',
-        values: ['Rewards'],
-        filterId: filterId1
-      },
-      {
-        propertyId: propertyIdStep,
-        condition: 'is',
-        values: ['Credentials'],
-        filterId: filterId2
-      }
-    ]
+const completedProposalCard = {
+  id: 'd7469a94-a04c-433a-920c-e60f10381dc7',
+  deletedAt: 0,
+  createdAt: 1722253469222,
+  createdBy: '572edd48-f255-4fd9-9dd5-ce97dc4595d9',
+  updatedAt: 1722253548412,
+  updatedBy: '572edd48-f255-4fd9-9dd5-ce97dc4595d9',
+  spaceId: '0398c52a-829b-454f-b899-d9bb79b09229',
+  parentId: 'de8eb9f9-d327-4738-ad07-7fca153f25d7',
+  rootId: 'de8eb9f9-d327-4738-ad07-7fca153f25d7',
+  schema: 1,
+  type: 'card',
+  title: 'Proposal 0',
+  fields: {
+    icon: '',
+    isTemplate: false,
+    properties: {
+      '680e0e93-5ba5-4c24-b3aa-61e579aafa93': 'path-c202bb90-4720-486f-9841-f8ce98a38a56',
+      __status: 'pass',
+      'b3387401-6b08-4a46-a255-86d6964bdf27': 'rubric',
+      __step: 'rubric',
+      __authors: ['572edd48-f255-4fd9-9dd5-ce97dc4595d9'],
+      __publishedAt: '',
+      __reviewers: [
+        {
+          userId: '572edd48-f255-4fd9-9dd5-ce97dc4595d9',
+          roleId: null,
+          systemRole: null
+        }
+      ]
+    },
+    headerImage: null,
+    contentOrder: []
   },
-  cards: [
-    {
-      id: cardId1,
-      deletedAt: 0,
-      createdAt: 1718546526199,
-      createdBy: cardCreatedBy,
-      updatedAt: 1720722241206,
-      updatedBy: cardCreatedBy,
-      spaceId,
-      parentId,
-      rootId,
-      schema: 1,
-      type: 'card',
-      title: 'EcoProject Alpha Application',
-      fields: {
-        icon: '',
-        isTemplate: false,
-        properties: {
-          [uuid()]: 'ecoproject-alpha-application-9824426817281955',
-          __status: 'in_progress',
-          [uuid()]: 'rubric',
-          __step: 'Rubric evaluation',
-          __reviewers: [
-            {
-              userId: null,
-              roleId: reviewerRoleId,
-              systemRole: null
-            }
-          ],
-          __project_name: 'EcoProject Alpha',
-          __project_excerpt: 'Developing sustainable solutions for local communities',
-          __project_description:
-            'EcoProject Alpha focuses on creating sustainable agricultural practices in rural areas, integrating modern technology to enhance productivity and environmental stewardship.',
-          __project_twitter: 'https://x.com/EcoProjectAlpha',
-          __project_website: 'ecoprojectalpha.com',
-          __project_github: 'https://github.com/ecoprojectalpha',
-          __project_blog: '',
-          __project_demoUrl: 'https://demo.ecoprojectalpha.com',
-          __project_communityUrl: 'https://t.me/EcoProjectAlpha',
-          __project_otherUrl: '',
-          __project_walletAddress: '',
-          __projectMembers_name: ['John Doe'],
-          __projectMembers_walletAddress: [],
-          __projectMembers_email: ['johndoe@example.com'],
-          __projectMembers_twitter: ['https://x.com/johndoe'],
-          __projectMembers_warpcast: [],
-          __projectMembers_github: [],
-          __projectMembers_linkedin: [],
-          __projectMembers_telegram: ['@johndoe'],
-          __projectMembers_otherUrl: [],
-          __projectMembers_previousProjects: ['Green Initiative']
-        },
-        headerImage: null,
-        contentOrder: []
-      },
-      pageId: cardId1,
-      syncWithPageId: uuid(),
-      hasContent: false,
-      pageType: 'card',
-      isLocked: false
-    },
-    {
-      id: cardId2,
-      deletedAt: 0,
-      createdAt: 1718627585005,
-      createdBy: cardCreatedBy,
-      updatedAt: 1720722241207,
-      updatedBy: cardCreatedBy,
-      spaceId,
-      parentId,
-      rootId,
-      schema: 1,
-      type: 'card',
-      title: 'Demo',
-      fields: {
-        icon: '',
-        isTemplate: false,
-        properties: {
-          [uuid()]: 'demo-9428199094523',
-          __status: 'in_progress',
-          [uuid()]: 'rubric',
-          __step: 'Rubric evaluation',
-          __reviewers: [
-            {
-              userId: null,
-              roleId: reviewerRoleId,
-              systemRole: null
-            }
-          ],
-          __project_name: 'Demo project',
-          __project_excerpt: 'We run a p2p investing marketplace',
-          __project_description: 'Our tech allows users to invest in projects they care about.',
-          __project_twitter: 'https://x.com/com',
-          __project_website: 'www.example.com',
-          __project_github: '',
-          __project_blog: '',
-          __project_demoUrl: 'https://play.google.com/store/apps/details?id=com.company.demo&pcampaignid=web_share',
-          __project_communityUrl: '',
-          __project_otherUrl: '',
-          __project_walletAddress: '',
-          __projectMembers_name: ['Demo S'],
-          __projectMembers_walletAddress: [],
-          __projectMembers_email: ['demo@example.com'],
-          __projectMembers_twitter: ['@example'],
-          __projectMembers_warpcast: [],
-          __projectMembers_github: [],
-          __projectMembers_linkedin: [],
-          __projectMembers_telegram: [],
-          __projectMembers_otherUrl: [],
-          __projectMembers_previousProjects: []
-        },
-        headerImage: null,
-        contentOrder: []
-      },
-      pageId: cardId2,
-      syncWithPageId: uuid(),
-      hasContent: false,
-      pageType: 'card',
-      isLocked: false
-    },
-    {
-      id: cardId3,
-      deletedAt: 0,
-      createdAt: 1718655135781,
-      createdBy: cardCreatedBy,
-      updatedAt: 1720722241207,
-      updatedBy: cardCreatedBy,
-      spaceId,
-      parentId,
-      rootId,
-      schema: 1,
-      type: 'card',
-      title: 'Green Horizon Initiative',
-      fields: {
-        icon: '',
-        isTemplate: false,
-        properties: {
-          [uuid()]: 'green-horizon-initiative-8594324990979427',
-          __status: 'in_progress',
-          [uuid()]: 'rubric',
-          __step: 'Initial Evaluation',
-          __reviewers: [
-            {
-              userId: null,
-              roleId: reviewerRoleId,
-              systemRole: null
-            }
-          ],
-          __project_name: 'Green Horizon: Training farmers & communities on sustainable practices',
-          __project_excerpt:
-            'Green Horizon Initiative focuses on environment and social development, emphasizing sustainable agriculture and climate resilience.',
-          __project_description:
-            'Green Horizon Initiative is a community-led project in rural areas, training farmers on sustainable agricultural methods, promoting agroforestry, and enhancing climate resilience through education and practical support.',
-          __project_twitter: 'https://www.x.com/@greenhorizon',
-          __project_website: 'https://www.greenhorizon.org',
-          __project_github: 'GreenHorizon',
-          __project_blog: 'https://greenhorizon.org/blog',
-          __project_demoUrl: 'https://www.greenhorizon.org/demo',
-          __project_communityUrl: 'https://www.instagram.com/greenhorizon',
-          __project_otherUrl: 'https://www.youtube.com/GreenHorizon',
-          __project_walletAddress: '',
-          __projectMembers_name: ['Alice Johnson', 'Bob Smith'],
-          __projectMembers_walletAddress: [],
-          __projectMembers_email: ['alice@greenhorizon.org', 'bob@greenhorizon.org'],
-          __projectMembers_twitter: ['https://www.x.com/@alice_johnson', 'https://www.x.com/@bob_smith'],
-          __projectMembers_warpcast: ['https://warpcast.com/~/invite-page/233344?id=abc123'],
-          __projectMembers_github: ['https://www.github.com/GreenHorizon'],
-          __projectMembers_linkedin: [
-            'https://www.linkedin.com/in/alice-johnson',
-            'https://www.linkedin.com/in/bob-smith'
-          ],
-          __projectMembers_telegram: ['@alicejohnson', '@bobsmith'],
-          __projectMembers_otherUrl: [],
-          __projectMembers_previousProjects: ['https://explorer.gitcoin.co/#/round/29/12/04']
-        },
-        headerImage: null,
-        contentOrder: []
-      },
-      pageId: cardId3,
-      syncWithPageId: uuid(),
-      hasContent: false,
-      pageType: 'card',
-      isLocked: false
-    }
-  ],
+  pageId: 'd7469a94-a04c-433a-920c-e60f10381dc7',
+  syncWithPageId: 'f2bd9412-69b0-4c12-8c27-f25584bd603d',
+  hasContent: false,
+  pageType: 'card',
+  isLocked: false
+};
+
+export const generateTableArrayInput = {
   board: {
-    id: boardId,
+    id: 'de8eb9f9-d327-4738-ad07-7fca153f25d7',
     deletedAt: 0,
-    createdAt: 1720722226427,
-    createdBy: boardCreatedBy,
-    updatedAt: 1721066146021,
-    updatedBy: boardCreatedBy,
-    spaceId,
+    createdAt: 1722253526097,
+    createdBy: '572edd48-f255-4fd9-9dd5-ce97dc4595d9',
+    updatedAt: 1722253557385,
+    updatedBy: '572edd48-f255-4fd9-9dd5-ce97dc4595d9',
+    spaceId: '0398c52a-829b-454f-b899-d9bb79b09229',
     parentId: '',
-    rootId,
+    rootId: 'de8eb9f9-d327-4738-ad07-7fca153f25d7',
     schema: 1,
     type: 'board',
-    title: 'Winning Projects',
+    title: 'Proposals db',
     fields: {
       icon: '',
       viewIds: [],
@@ -241,6 +99,22 @@ export const inputs = {
       description: '',
       headerImage: null,
       cardProperties: [
+        {
+          id: 'fad43664-955a-4be1-a69d-3982c0348858',
+          name: 'Reviewer Notes',
+          type: 'proposalReviewerNotes',
+          options: [],
+          readOnly: true,
+          readOnlyValues: true
+        },
+        {
+          id: '__authors',
+          name: 'Proposal Authors',
+          type: 'proposalAuthor',
+          options: [],
+          readOnly: true,
+          readOnlyValues: true
+        },
         {
           id: '__status',
           name: 'Proposal Status',
@@ -276,7 +150,15 @@ export const inputs = {
           readOnlyValues: true
         },
         {
-          id: uuid(),
+          id: '__publishedAt',
+          name: 'Publish Date',
+          type: 'proposalPublishedAt',
+          options: [],
+          readOnly: true,
+          readOnlyValues: true
+        },
+        {
+          id: '680e0e93-5ba5-4c24-b3aa-61e579aafa93',
           name: 'Proposal Url',
           type: 'proposalUrl',
           options: [],
@@ -284,9 +166,17 @@ export const inputs = {
           readOnlyValues: true
         },
         {
-          id: uuid(),
+          id: 'b3387401-6b08-4a46-a255-86d6964bdf27',
           name: 'Proposal Type',
           type: 'proposalEvaluationType',
+          options: [],
+          readOnly: true,
+          readOnlyValues: true
+        },
+        {
+          id: '__reviewers',
+          name: 'Proposal Reviewers',
+          type: 'proposalReviewer',
           options: [],
           readOnly: true,
           readOnlyValues: true
@@ -302,24 +192,24 @@ export const inputs = {
               value: 'Draft'
             },
             {
-              id: 'Intake Filter',
+              id: 'rubric',
               color: 'propColorGray',
-              value: 'Intake Filter'
+              value: 'rubric'
             },
             {
-              id: 'Initial Evaluation',
+              id: 'Feedback',
               color: 'propColorGray',
-              value: 'Initial Evaluation'
+              value: 'Feedback'
             },
             {
-              id: 'Rubric evaluation',
+              id: 'Review',
               color: 'propColorGray',
-              value: 'Rubric evaluation'
+              value: 'Review'
             },
             {
-              id: 'Final Review',
+              id: 'Community vote',
               color: 'propColorGray',
-              value: 'Final Review'
+              value: 'Community vote'
             },
             {
               id: 'Rewards',
@@ -334,62 +224,38 @@ export const inputs = {
           ],
           readOnly: true,
           readOnlyValues: true
-        },
-        {
-          id: '__projectMembers_email',
-          name: 'Project Member Emails',
-          type: 'multiSelect',
-          options: [],
-          readOnly: true,
-          dynamicOptions: true,
-          readOnlyValues: true
-        },
-        {
-          id: uuid(),
-          name: 'Reviewer Notes',
-          type: 'proposalReviewerNotes',
-          options: [],
-          readOnly: true,
-          readOnlyValues: true
         }
       ],
       showDescription: false,
       columnCalculations: []
     },
-    pageId: boardId,
-    icon: '🏆',
+    pageId: 'de8eb9f9-d327-4738-ad07-7fca153f25d7',
     hasContent: false,
     pageType: 'board',
     isLocked: false
   },
-  viewToExport: {
-    id: viewToExportId,
+  view: {
+    id: '0bc2fdaf-91ed-42be-b536-0f16814deedd',
     deletedAt: 0,
-    createdAt: 1720722240401,
-    createdBy: viewToExportCreatedBy,
-    updatedAt: 1721066205000,
-    updatedBy: viewToExportCreatedBy,
-    spaceId,
-    parentId: boardId,
-    rootId,
+    createdAt: 1722253544664,
+    createdBy: '572edd48-f255-4fd9-9dd5-ce97dc4595d9',
+    updatedAt: 1722253651495,
+    updatedBy: '572edd48-f255-4fd9-9dd5-ce97dc4595d9',
+    spaceId: '0398c52a-829b-454f-b899-d9bb79b09229',
+    parentId: 'de8eb9f9-d327-4738-ad07-7fca153f25d7',
+    rootId: 'de8eb9f9-d327-4738-ad07-7fca153f25d7',
     schema: 1,
     type: 'view',
     title: '',
     fields: {
       filter: {
-        operation: 'or',
+        operation: 'and',
         filters: [
           {
-            propertyId: propertyIdStep,
+            propertyId: '__step',
             condition: 'is',
-            values: ['Rewards'],
-            filterId: filterId1
-          },
-          {
-            propertyId: propertyIdStep,
-            condition: 'is',
-            values: ['Credentials'],
-            filterId: filterId2
+            values: ['Feedback'],
+            filterId: '8657a459-024f-4988-97f7-da94c41c1d2f'
           }
         ]
       },
@@ -399,10 +265,7 @@ export const inputs = {
       sourceType: 'proposals',
       sortOptions: [],
       columnWidths: {
-        __step: 211,
-        __title: 280,
-        __projectMembers_email: 268,
-        [uuid()]: 485
+        __title: 280
       },
       hiddenOptionIds: [],
       columnWrappedIds: [],
@@ -410,7 +273,33 @@ export const inputs = {
       defaultTemplateId: '',
       columnCalculations: {},
       kanbanCalculations: {},
-      visiblePropertyIds: ['__title', uuid(), '__reviewers']
+      visiblePropertyIds: [
+        '__title',
+        'fad43664-955a-4be1-a69d-3982c0348858',
+        '__authors',
+        '__status',
+        '__publishedAt',
+        '680e0e93-5ba5-4c24-b3aa-61e579aafa93',
+        '__reviewers'
+      ]
+    }
+  },
+  cards: [inProgressProposalCard, completedProposalCard],
+  formatters: {},
+  context: {
+    users: {
+      '572edd48-f255-4fd9-9dd5-ce97dc4595d9': {
+        username: 'test'
+      }
+    },
+    spaceDomain: 'demo-space-domain'
+  },
+  cardMap: {
+    [inProgressProposalCard.id]: {
+      title: [inProgressProposalCard.title]
+    },
+    [completedProposalCard.id]: {
+      title: [completedProposalCard.title]
     }
   }
 };
