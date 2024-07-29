@@ -2,7 +2,6 @@ import type { ProjectsWithMembers } from '@connect-shared/lib/projects/getRecent
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
@@ -10,13 +9,14 @@ import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 
 import { Avatar } from 'components/common/Avatar';
+import { CardMotion } from 'components/common/Motions/CardMotion';
 
 export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
   const projectMembers = project.projectMembers;
   const projectName = project.name || 'Untitled';
 
   return (
-    <Card>
+    <CardMotion>
       <CardActionArea
         LinkComponent={Link}
         href={`/p/${project.path}`}
@@ -78,6 +78,6 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
           </AvatarGroup>
         </CardContent>
       </CardActionArea>
-    </Card>
+    </CardMotion>
   );
 }

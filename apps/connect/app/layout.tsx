@@ -50,7 +50,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#fff'
+  themeColor: '#fff',
+  userScalable: false
 };
 export default async function RootLayout({
   children
