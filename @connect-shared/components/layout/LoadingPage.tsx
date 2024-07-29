@@ -1,5 +1,6 @@
-import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import Box from '@mui/material/Box';
+
+import { LoadingComponent } from '../common/Loading/LoadingComponent';
 
 export function LoadingPage() {
   return (

@@ -14,8 +14,6 @@ import theme from 'theme/theme';
 
 import 'theme/cssVariables.scss';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   applicationName: appName,
   title: {
