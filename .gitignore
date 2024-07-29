@@ -45,6 +45,8 @@ playwright-report
 .DS_Store
 *.env*
 !.env.*.example
+# the following two lines are required to include .env files for deployment
+!.ebstalk.apps.env/
 !.ebstalk.apps.env/*.env
 *.tsbuildinfo
 
