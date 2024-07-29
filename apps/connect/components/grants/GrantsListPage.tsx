@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { PageWrapper } from 'components/common/PageWrapper';
 import type { Grant } from 'lib/grants/getGrants';
 
-import { GrantItem } from './components/GrantItem';
+import { GrantItem } from './components/GrantCard';
 
 export function GrantsListPage({ grants, currentTab }: { grants: Grant[]; currentTab: 'new' | 'upcoming' }) {
   return (

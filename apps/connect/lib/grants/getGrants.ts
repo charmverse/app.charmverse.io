@@ -1,9 +1,15 @@
+import { from } from '@apollo/client';
 import { UndesirableOperationError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { type BoardFields } from '@root/lib/databases/board';
 import { type CardFields } from '@root/lib/databases/card';
 
-const grantsDatabaseBoardId = '8cfb5664-b51b-41bd-afbd-44e284fa756d';
+const grantsDatabaseBoardId = '4155ac5b-325a-4d9a-89ff-72ef1235aa85';
+
+type DateValue = {
+  from: number;
+  to?: number;
+};
 
 export type Grant = {
   id: string;
@@ -11,12 +17,19 @@ export type Grant = {
   name: string;
   banner?: string;
   logo?: string;
-  launchDate?: { from: number; to: number };
+  launchDate: DateValue | null;
   createdAt: string;
   applyLink?: string;
   path: string;
-  open?: boolean;
+  status?: string;
+  announcement: string;
+  publishDate: DateValue;
 };
+
+function getParsedDateValue(dateStr: string | undefined): DateValue | null {
+  const date = dateStr ? new Date(JSON.parse(dateStr).from) : null;
+  return date ? { from: date.getTime(), to: date.getTime() } : null;
+}
 
 export async function getGrants(
   {
@@ -67,14 +80,20 @@ export async function getGrants(
   const applyLinkProperty = boardProperties.find(
     (property) => property.type === 'url' && property.name === 'Apply link'
   );
+  const announcementProperty = boardProperties.find(
+    (property) => property.type === 'text' && property.name === 'Announcement'
+  );
   const statusProperty = boardProperties.find((property) => property.type === 'select' && property.name === 'Status');
-  const statusRecord = (statusProperty?.options ?? []).reduce((record, option) => {
-    const isOpen = option.value === 'Open for applications';
-    return {
+  const publishDateProperty = boardProperties.find(
+    (property) => property.type === 'date' && property.name === 'Publish date'
+  );
+  const statusRecord = (statusProperty?.options ?? []).reduce(
+    (record, option) => ({
       ...record,
-      [option.id]: isOpen
-    };
-  }, {} as Record<string, boolean>);
+      [option.id]: option.value
+    }),
+    {} as Record<string, string>
+  );
 
   if (
     !statusProperty ||
@@ -82,12 +101,20 @@ export async function getGrants(
     !descriptionProperty ||
     !bannerProperty ||
     !logoProperty ||
-    !launchDateProperty
+    !launchDateProperty ||
+    !announcementProperty ||
+    !publishDateProperty
   ) {
     throw new UndesirableOperationError();
   }
 
   return grantsCards
+    .filter((card) => {
+      const cardProperties = (card.fields as CardFields).properties;
+      const publishDatePropertyValue = cardProperties[publishDateProperty.id] as string | undefined;
+      const publishDate = getParsedDateValue(publishDatePropertyValue);
+      return publishDate && publishDate.from <= new Date().getTime();
+    })
     .map((card) => {
       const cardProperties = (card.fields as CardFields).properties;
       return {
@@ -96,16 +123,18 @@ export async function getGrants(
         description: cardProperties[descriptionProperty.id] as string,
         banner: cardProperties[bannerProperty.id] as string,
         logo: cardProperties[logoProperty.id] as string,
-        launchDate: cardProperties[launchDateProperty.id] as unknown as { from: number; to: number },
+        launchDate: getParsedDateValue(cardProperties[launchDateProperty.id] as string),
         createdAt: card.createdAt.toISOString(),
         path: card.page?.path ?? '',
         applyLink: cardProperties[applyLinkProperty.id] as string,
-        open: statusRecord[cardProperties[statusProperty.id] as string]
+        status: statusRecord[cardProperties[statusProperty.id] as string],
+        announcement: cardProperties[announcementProperty.id] as string,
+        publishDate: getParsedDateValue(cardProperties[publishDateProperty.id] as string)
       } as Grant;
     })
     .sort((g1, g2) => {
       if (sort === 'new') {
-        return g2.createdAt.localeCompare(g1.createdAt);
+        return g2.publishDate.from - g1.publishDate.from;
       } else {
         if (!g1.launchDate || !g2.launchDate) {
           return 0;
