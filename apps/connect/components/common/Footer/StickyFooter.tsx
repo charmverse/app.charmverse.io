@@ -22,10 +22,10 @@ export function StickyFooter() {
             icon={<ProfileIcon />}
             sx={{ gap: '2px' }}
           />
-          <BottomNavigationAction label='Feed' href='feed' value='feed' icon={<FeedIcon />} sx={{ gap: '2px' }} />
+          <BottomNavigationAction label='Feed' href='/feed' value='feed' icon={<FeedIcon />} sx={{ gap: '2px' }} />
           <BottomNavigationAction
             label='Grants'
-            href='grants'
+            href='/grants'
             value='grants'
             icon={<GrantIcon />}
             sx={{ gap: '2px' }}
