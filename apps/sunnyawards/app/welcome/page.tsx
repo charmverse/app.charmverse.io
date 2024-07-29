@@ -7,7 +7,8 @@ import { WelcomePage } from 'components/welcome/WelcomePage';
 export const metadata: Metadata = {
   other: {
     robots: 'noindex'
-  }
+  },
+  title: 'Welcome'
 };
 
 export default async function Welcome() {

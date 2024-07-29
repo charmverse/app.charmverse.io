@@ -22,7 +22,7 @@ export function useDatadogLogger({ service, userId, spaceId }: { service: string
         version: env('BUILD_ID')
       });
     }
-  }, []);
+  }, [service]);
 
   // Load DD_RUM_LOGS
   useEffect(() => {
@@ -46,7 +46,7 @@ export function useDatadogLogger({ service, userId, spaceId }: { service: string
     }
 
     return () => datadogRum.stopSessionReplayRecording();
-  }, []);
+  }, [service]);
 
   // Load the user id for DD_LOGS & DD_RUM_LOGS
   useEffect(() => {

@@ -2,6 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { useDarkTheme } from '@connect-shared/hooks/useDarkTheme';
+import { usePageView } from '@connect-shared/hooks/usePageView';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
@@ -22,7 +23,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
   const path = usePathname();
   const router = useRouter();
   useDarkTheme();
-
+  usePageView();
   useDatadogLogger({ service: 'connect-browser', userId: user?.id });
 
   const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
@@ -42,6 +43,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
     await connectApiClient.logout().catch((error) => {
       log.error('There was an error while trying to signout', { error });
     });
+    log.info('User logged out');
     revalidatePathAction();
     router.push('/');
   };

@@ -2,8 +2,8 @@ import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { conditionalPlural } from '@root/lib/utils/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -20,10 +20,12 @@ import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
 export type PassFailEvaluationProps = {
   isAppealProcess?: boolean;
+  actionCompletesStep?: boolean;
   confirmationMessage?: string;
   hideReviewer?: boolean;
   isCurrent: boolean;
   isReviewer?: boolean;
+  isApprover?: boolean;
   archived?: boolean;
   onSubmitEvaluationReview: (params: {
     declineReason: string | null;
@@ -45,6 +47,7 @@ export type PassFailEvaluationProps = {
     result: ProposalEvaluationResult;
     completedAt: Date;
   }[];
+  totalReviews: number;
   requiredReviews: number;
   evaluationResult?: PopulatedEvaluation['result'];
   declineReasonOptions: string[];
@@ -66,6 +69,7 @@ const ResultCopyStack = styled(Stack)<{ addPaddingTop?: boolean }>`
 export function PassFailEvaluation({
   isCurrent,
   isReviewer,
+  isApprover,
   archived,
   onSubmitEvaluationReview,
   hideReviewer,
@@ -78,20 +82,32 @@ export function PassFailEvaluation({
   onResetEvaluationReview,
   declineReasonOptions,
   completedAt,
+  totalReviews,
   actionLabels: _actionLabels,
   confirmationMessage,
-  isAppealProcess
+  isAppealProcess,
+  actionCompletesStep
 }: PassFailEvaluationProps) {
   const { user } = useUser();
   const currentUserEvaluationReview = evaluationReviews?.find((review) => review.reviewerId === user?.id);
   const [declineReason, setDeclineReason] = useState<string | null>(null);
   const [evaluationReviewId, setEvaluationReviewId] = useState<string | null>(null);
   const [declineMessage, setDeclineMessage] = useState('');
+
+  const reviewsThresholdMet = totalReviews >= requiredReviews;
+
   const declineReasonModalPopupState = usePopupState({ variant: 'dialog' });
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
-    : !isReviewer
+    : !actionCompletesStep && !isReviewer
     ? 'You are not a reviewer'
+    : actionCompletesStep && !isApprover
+    ? 'You are not an approver'
+    : actionCompletesStep && isApprover && !reviewsThresholdMet
+    ? `${requiredReviews} ${conditionalPlural({
+        word: 'review',
+        count: requiredReviews
+      })} required to complete this step`
     : isSubmittingReview
     ? 'Submitting review'
     : archived
@@ -103,10 +119,11 @@ export function PassFailEvaluation({
   const actionLabels = getActionButtonLabels({
     actionLabels: _actionLabels
   });
-  const canReview =
-    isReviewer && evaluationReviews.length < requiredReviews && !evaluationResult && !currentUserEvaluationReview;
-  const { showConfirmation } = useConfirmationModal();
+  const canReview = isReviewer && totalReviews < requiredReviews && !evaluationResult && !currentUserEvaluationReview;
 
+  const canPassFail = (!actionCompletesStep && canReview) || (actionCompletesStep && isApprover);
+
+  const { showConfirmation } = useConfirmationModal();
   const _onSubmitEvaluationReview = async (result: NonNullable<PopulatedEvaluation['result']>) => {
     if (confirmationMessage) {
       const { confirmed } = await showConfirmation({
@@ -222,7 +239,7 @@ export function PassFailEvaluation({
           </Stack>
         )}
 
-        {canReview && (
+        {canPassFail && (
           <Box display='flex' justifyContent='space-between' alignItems='center' p={2}>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
@@ -257,19 +274,19 @@ export function PassFailEvaluation({
             </Box>
           </Box>
         )}
-        {!canReview && isCurrent && evaluationResult === null && evaluationReviews.length === 0 && (
+        {!canPassFail && isCurrent && evaluationResult === null && totalReviews === 0 && (
           <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' py={2} px={2}>
             <Typography variant='body2'>{isAppealProcess ? 'Appeal' : 'Review'} process ongoing</Typography>
           </Stack>
         )}
         {evaluationResult === 'pass' && (
-          <ResultCopyStack addPaddingTop={evaluationReviews.length === 0}>
+          <ResultCopyStack addPaddingTop={totalReviews === 0}>
             <ApprovedIcon color='success' />
             <Typography variant='body2'>Approved {completedDate}</Typography>
           </ResultCopyStack>
         )}
         {evaluationResult === 'fail' && (
-          <ResultCopyStack addPaddingTop={evaluationReviews.length === 0}>
+          <ResultCopyStack addPaddingTop={totalReviews === 0}>
             <RejectedIcon color='error' />
             <Typography variant='body2'>Declined {completedDate}</Typography>
           </ResultCopyStack>

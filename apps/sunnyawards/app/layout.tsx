@@ -4,6 +4,7 @@ import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUser
 import { getSession } from '@connect-shared/lib/session/getSession';
 import Box from '@mui/material/Box';
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import type { ReactNode } from 'react';
 
 import { Header } from 'components/common/Header/Header';
@@ -30,15 +31,19 @@ export default async function RootLayout({
 
   return (
     <html lang='en'>
-      <Box component='body' display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
-        <AppProviders theme={theme}>
-          <Header user={user?.data || null} />
-          <Box component='main' bgcolor='mainBackground.main' pb={2}>
-            {children}
-          </Box>
-          <Footer />
-        </AppProviders>
-      </Box>
+      <body>
+        {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
+        <Script src='/__ENV.js' strategy='beforeInteractive' />
+        <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
+          <AppProviders theme={theme}>
+            <Header user={user?.data || null} />
+            <Box component='main' bgcolor='mainBackground.main' pb={2}>
+              {children}
+            </Box>
+            <Footer />
+          </AppProviders>
+        </Box>
+      </body>
     </html>
   );
 }

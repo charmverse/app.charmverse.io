@@ -1,7 +1,12 @@
 import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { ProjectDetailsPage } from 'components/projects/[id]/ProjectDetailsPage';
+
+export const metadata: Metadata = {
+  title: 'Project'
+};
 
 export default async function ProjectPage({ params }: { params: { path: string } }) {
   const project = await fetchProject({

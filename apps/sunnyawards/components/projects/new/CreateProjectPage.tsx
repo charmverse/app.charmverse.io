@@ -5,6 +5,7 @@ import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAct
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -12,8 +13,8 @@ import { useForm } from 'react-hook-form';
 
 import { PageWrapper } from 'components/common/PageWrapper';
 import { createProjectAction } from 'lib/projects/createProjectAction';
-import { schema } from 'lib/projects/form';
 import type { FormValues } from 'lib/projects/form';
+import { schema } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
@@ -43,8 +44,10 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
+      sunnyAwardsProjectType: 'other',
       projectMembers: [
         {
+          name: (user?.farcasterUser?.account as FarcasterProfile['body']).displayName,
           farcasterId: user?.farcasterUser?.fid
         }
       ]
