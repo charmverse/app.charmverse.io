@@ -17,5 +17,5 @@ export const loginWithFarcasterAction = actionClient
     ctx.session.user = { id: loggedInUser.id };
     await ctx.session.save();
 
-    return { success: true };
+    return { success: true, userId: loggedInUser.id };
   });

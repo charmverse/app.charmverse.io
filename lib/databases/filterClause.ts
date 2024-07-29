@@ -148,6 +148,10 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     datatype: 'multi_select',
     conditions: MultiSelectDataTypeConditions
   },
+  proposalPublishedAt: {
+    datatype: 'date',
+    conditions: DateDataTypeConditions
+  },
   proposalEvaluationAverage: {
     datatype: 'number',
     conditions: NumberDataTypeConditions

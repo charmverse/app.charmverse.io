@@ -72,6 +72,7 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
       ...proposalDbProperties.proposalAuthor({ name: 'Author' })
     },
     { ...defaultOptions, ...proposalDbProperties.proposalReviewer() },
+    getPublishedAtProperty(),
     { ...defaultOptions, ...proposalDbProperties.proposalCreatedAt() },
     {
       ...defaultOptions,
@@ -104,6 +105,15 @@ export function getDefaultStepProperty({ evaluationStepTitles }: { evaluationSte
     ...proposalDbProperties.proposalStep({
       name: 'Step',
       options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials']
+    })
+  };
+}
+
+export function getPublishedAtProperty() {
+  return {
+    ...defaultOptions,
+    ...proposalDbProperties.proposalPublishedAt({
+      name: 'Publish date'
     })
   };
 }

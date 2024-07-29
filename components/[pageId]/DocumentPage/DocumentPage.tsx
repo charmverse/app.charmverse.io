@@ -395,6 +395,7 @@ function DocumentPageComponent({
                   proposal={proposal}
                   proposalInput={proposal}
                   templateId={proposal?.page?.sourceTemplateId}
+                  expanded
                   onChangeEvaluation={onChangeEvaluation}
                   onChangeTemplate={onChangeTemplate}
                   refreshProposal={refreshProposal}

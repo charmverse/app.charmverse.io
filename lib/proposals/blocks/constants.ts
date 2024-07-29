@@ -1,6 +1,7 @@
 export const DEFAULT_BOARD_BLOCK_ID = '__defaultBoard';
 export const DEFAULT_VIEW_BLOCK_ID = '__defaultView';
 export const PROPOSAL_STATUS_BLOCK_ID = '__status';
+export const PROPOSAL_PUBLISHED_AT_ID = '__publishedAt';
 export const PROPOSAL_STEP_BLOCK_ID = '__step';
 export const AUTHORS_BLOCK_ID = '__authors';
 export const PROPOSAL_REVIEWERS_BLOCK_ID = '__reviewers';
