@@ -1,5 +1,4 @@
 import type { Page as BrowserPage } from '@playwright/test';
-
 import { connectApiHost } from '@root/config/constants';
 
 export async function loginBrowserUser({

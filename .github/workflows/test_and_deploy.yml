@@ -213,8 +213,8 @@ jobs:
             test_command: 'npm run test:e2e:ci -- --shard=2/3'
           - test_name: 'Browser e2e test #3'
             test_command: 'npm run test:e2e:ci -- --shard=3/3'
-          # - test_name: 'Connect App E2E'
-          #   test_command: 'npm run connect:test:e2e:ci'
+          - test_name: 'Connect App E2E'
+            test_command: 'npm run connect:test:e2e:ci'
 
     steps:
       - uses: actions/checkout@v4
