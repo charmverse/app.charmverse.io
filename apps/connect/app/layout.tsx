@@ -16,6 +16,10 @@ import 'theme/cssVariables.scss';
 
 export const metadata: Metadata = {
   applicationName: appName,
+  icons: {
+    icon: ['/images/favicon.png'],
+    apple: ['/images/favicon.png']
+  },
   title: {
     default: `${appName} - ${appTitle}`,
     template: appTitleTemplate
