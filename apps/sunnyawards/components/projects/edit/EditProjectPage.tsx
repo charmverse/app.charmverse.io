@@ -43,6 +43,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     getValues
   } = useForm<FormValues>({
     defaultValues: {
+      id: project.id,
       name: project.name,
       avatar: project.avatar ?? undefined,
       category: project.category as ProjectCategory,
