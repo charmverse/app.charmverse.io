@@ -4,15 +4,12 @@ import FlipCameraAndroidOutlinedIcon from '@mui/icons-material/FlipCameraAndroid
 import { Card, CardActionArea, Link, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { relativeTime } from '@root/lib/utils/dates';
-import { prettyPrint } from '@root/lib/utils/strings';
 
 import { Avatar } from 'components/common/Avatar';
 import type { Recast } from 'lib/feed/getFarcasterUserRecasts';
 
-export function RecastCard({ recast }: { recast: Recast }) {
-  const mentionedProfiles = recast.mentioned_profiles.map((profile) => profile.username);
-
-  const recastTextChunks = mentionedProfiles.reduce<
+function createRecastChunks({ text, ids }: { text: string; ids: string[] }) {
+  return ids.reduce<
     {
       text: string;
       type: 'text' | 'mention';
@@ -23,18 +20,18 @@ export function RecastCard({ recast }: { recast: Recast }) {
         .map((chunk) =>
           chunk.text
             .split(`@${username}`)
-            .map((text, index, _chunks) => {
+            .map((chunkText, index, _chunks) => {
               if (_chunks.length - 1 === index) {
                 return [
                   {
-                    text,
+                    text: chunkText,
                     type: 'text' as const
                   }
                 ];
               }
               return [
                 {
-                  text,
+                  text: chunkText,
                   type: 'text' as const
                 },
                 {
@@ -49,13 +46,18 @@ export function RecastCard({ recast }: { recast: Recast }) {
     },
     [
       {
-        text: recast.text,
-        type: 'text'
+        text,
+        type: 'text' as const
       }
     ]
   );
+}
 
-  prettyPrint({ recastTextChunks });
+export function RecastCard({ recast }: { recast: Recast }) {
+  const mentionedProfiles = recast.mentioned_profiles.map((profile) => profile.username);
+  const recastParagraphsChunks = recast.text
+    .split('\n')
+    .map((text) => createRecastChunks({ text, ids: mentionedProfiles }));
 
   return (
     <Card>
@@ -81,29 +83,34 @@ export function RecastCard({ recast }: { recast: Recast }) {
             </Typography>
             <Typography>{relativeTime(recast.timestamp)}</Typography>
           </Stack>
-          <Typography component='p'>
-            {recastTextChunks.map((chunk, index) => {
-              if (chunk.type === 'text') {
-                return (
-                  <Typography component='span' key={`${index.toString()}`} variant='body1'>
-                    {chunk.text}
-                  </Typography>
-                );
-              }
-              return (
-                <Link
-                  component='a'
-                  key={`${index.toString()}`}
-                  href={`https://warpcast.com/${chunk.text}`}
-                  target='_blank'
-                >
-                  <Typography variant='body1' component='span' color='primary'>
-                    @{chunk.text}
-                  </Typography>
-                </Link>
-              );
-            })}
-          </Typography>
+          <Stack gap={1}>
+            {recastParagraphsChunks.map((recastParagraphChunks, paragraphIndex) => (
+              <Typography key={`${paragraphIndex.toString()}`} component='p'>
+                {recastParagraphChunks.map((chunk, index) => {
+                  if (chunk.type === 'text') {
+                    return (
+                      <Typography component='span' key={`${index.toString()}`} variant='body1'>
+                        {chunk.text}
+                      </Typography>
+                    );
+                  }
+                  return (
+                    <Link
+                      component='a'
+                      key={`${index.toString()}`}
+                      href={`https://warpcast.com/${chunk.text}`}
+                      target='_blank'
+                    >
+                      <Typography variant='body1' component='span' color='primary'>
+                        @{chunk.text}
+                      </Typography>
+                    </Link>
+                  );
+                })}
+              </Typography>
+            ))}
+          </Stack>
+
           <Stack direction='row' gap={1} alignItems='center'>
             <Stack direction='row' gap={0.5} alignItems='center'>
               <ChatBubbleOutlineOutlinedIcon fontSize='small' />
