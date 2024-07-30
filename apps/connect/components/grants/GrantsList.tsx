@@ -8,7 +8,7 @@ import type { Grant } from 'lib/grants/getGrants';
 
 import { GrantItem } from './components/GrantCard';
 
-export function GrantsListPage({ grants, currentTab }: { grants: Grant[]; currentTab: 'new' | 'upcoming' }) {
+export function GrantsList({ grants, currentTab }: { grants: Grant[]; currentTab: 'new' | 'upcoming' }) {
   return (
     <PageWrapper>
       <Stack direction='row' gap={1} justifyContent='center'>
