@@ -1,5 +1,6 @@
 import { GET } from '@root/adapters/http';
 import { getFarcasterUsers, type FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
+import { uniqBy } from 'lodash';
 
 const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
 
@@ -100,9 +101,12 @@ export async function getFarcasterUserRecasts(): Promise<Recast[]> {
     }
   );
 
-  return userRecasts.casts.map((recast) => ({
-    ...recast,
-    object: 'recast',
-    parent_author: charmverseProfile
-  }));
+  return uniqBy(
+    userRecasts.casts.map((recast) => ({
+      ...recast,
+      object: 'recast',
+      parent_author: charmverseProfile
+    })),
+    'hash'
+  );
 }

@@ -140,7 +140,7 @@ export function RecastCard({ recast }: { recast: Recast }) {
           {recast.channel && (
             <Link target='_blank' href={`https://warpcast.com/channel/${recast.channel.id}`}>
               <Typography variant='subtitle1' color='secondary'>
-                /{recast.channel.name}
+                /{recast.channel.id}
               </Typography>
             </Link>
           )}
