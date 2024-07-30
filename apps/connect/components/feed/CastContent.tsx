@@ -27,7 +27,14 @@ export function CastContent({ cast }: { cast: Cast }) {
           {castParagraphChunks.map((chunk, index) => {
             if (chunk.type === 'text') {
               return (
-                <Typography component='span' key={`${index.toString()}`} variant='body1'>
+                <Typography
+                  component='span'
+                  key={`${index.toString()}`}
+                  variant='body1'
+                  sx={{
+                    wordBreak: 'break-word'
+                  }}
+                >
                   {chunk.text}
                 </Typography>
               );
@@ -35,7 +42,14 @@ export function CastContent({ cast }: { cast: Cast }) {
             if (chunk.type === 'mention') {
               return (
                 <Link key={`${index.toString()}`} href={`https://warpcast.com/${chunk.text.slice(1)}`} target='_blank'>
-                  <Typography variant='body1' component='span' color='primary'>
+                  <Typography
+                    variant='body1'
+                    component='span'
+                    color='primary'
+                    sx={{
+                      wordBreak: 'break-word'
+                    }}
+                  >
                     {chunk.text}
                   </Typography>
                 </Link>
@@ -44,7 +58,15 @@ export function CastContent({ cast }: { cast: Cast }) {
 
             return (
               <Link key={`${index.toString()}`} href={chunk.text} target='_blank'>
-                <Typography variant='body1' component='p' color='primary'>
+                <Typography
+                  variant='body1'
+                  component='span'
+                  color='primary'
+                  sx={{
+                    wordBreak: 'break-word',
+                    display: 'block'
+                  }}
+                >
                   {chunk.text}
                 </Typography>
               </Link>
