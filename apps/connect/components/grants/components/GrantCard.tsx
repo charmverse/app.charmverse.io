@@ -1,5 +1,6 @@
 'use client';
 
+import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import { Button, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -17,7 +18,7 @@ export function GrantItem({ grant }: { grant: Grant }) {
   const [showDetails, setShowDetails] = useState(false);
 
   return (
-    <Card>
+    <CardMotion>
       <CardActionArea
         sx={{ p: 2 }}
         onClick={() => {
@@ -87,6 +88,6 @@ export function GrantItem({ grant }: { grant: Grant }) {
           )}
         </Stack>
       </CardActionArea>
-    </Card>
+    </CardMotion>
   );
 }
