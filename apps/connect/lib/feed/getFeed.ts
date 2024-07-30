@@ -1,9 +1,9 @@
-import type { Recast } from './getFarcasterUserRecasts';
-import { getFarcasterUserRecasts } from './getFarcasterUserRecasts';
+import type { Cast } from './getFarcasterUserReactions';
+import { getFarcasterUserReactions } from './getFarcasterUserReactions';
 
-export type FeedItem = Recast;
+export type FeedItem = { type: 'recast' | 'like' | 'cast'; cast: Cast };
 
 export async function getFeed(): Promise<FeedItem[]> {
-  const recasts = await getFarcasterUserRecasts();
-  return [...recasts];
+  const recasts = await getFarcasterUserReactions();
+  return [...recasts.map((recast): FeedItem => ({ type: recast.reaction_type, cast: recast.cast }))];
 }
