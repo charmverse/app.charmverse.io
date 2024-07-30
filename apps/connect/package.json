@@ -7,6 +7,7 @@
     "start:test": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 dotenv -e ../../.env.test.local npx next dev",
     "build": "npx next build",
     "start:prod": "npx next start",
+    "start:test:ci": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 npx react-env --path ../../.env.test.local --dest ./public -- npx next start",
     "lint": "npx next lint",
     "debug:e2e": "npx dotenv -e ../../.env.test.local -- npx playwright test --headed --timeout=0 --config ./playwright.config.ts",
     "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e ../../.env.test.local -- npx playwright test --config ./playwright.config.ts",

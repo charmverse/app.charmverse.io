@@ -1,16 +1,16 @@
 import { log } from '@charmverse/core/log';
 import type { IPropertyTemplate } from '@root/lib/databases/board';
 import type { Card, CardPropertyValue, CardWithRelations } from '@root/lib/databases/card';
-import { propertyConfigs } from '@root/lib/databases/filterClause';
 import type {
-  NumberDataTypeConditions,
-  FilterClause,
-  TextDataTypeConditions,
   BooleanDataTypeConditions,
+  DateDataTypeConditions,
+  FilterClause,
   MultiSelectDataTypeConditions,
+  NumberDataTypeConditions,
   SelectDataTypeConditions,
-  DateDataTypeConditions
+  TextDataTypeConditions
 } from '@root/lib/databases/filterClause';
+import { propertyConfigs } from '@root/lib/databases/filterClause';
 import type { FilterGroup } from '@root/lib/databases/filterGroup';
 import { isAFilterGroupInstance } from '@root/lib/databases/filterGroup';
 import { getProposalEvaluationStatus } from '@root/lib/proposals/getProposalEvaluationStatus';
@@ -93,7 +93,7 @@ class CardFilter {
 
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
-    let value = card.fields.properties[filter.propertyId] as CardPropertyValue | undefined;
+    let value = card.fields.properties?.[filter.propertyId] as CardPropertyValue | undefined;
     if (filter.propertyId === Constants.titleColumnId) {
       value = card.title?.toLowerCase() ?? '';
     } else if (!value) {

@@ -18,7 +18,7 @@ concurrency:
   group: ci-${{ github.event_name }}-${{ github.ref }}
 
 env:
-  SELECTED_PERMISSION_API_TAG: permissions-proposal-progess
+  SELECTED_PERMISSION_API_TAG: latest
 
 
 jobs:
@@ -213,8 +213,8 @@ jobs:
             test_command: 'npm run test:e2e:ci -- --shard=2/3'
           - test_name: 'Browser e2e test #3'
             test_command: 'npm run test:e2e:ci -- --shard=3/3'
-          # - test_name: 'Connect App E2E'
-          #   test_command: 'npm run connect:test:e2e:ci'
+          - test_name: 'Connect App E2E'
+            test_command: 'npm run connect:test:e2e:ci'
 
     steps:
       - uses: actions/checkout@v4
@@ -271,6 +271,7 @@ jobs:
       - name: Start services
         run: |
           npm run start:test:ci &
+          npm run connect:start:test:ci &> connect.log &
 
           sleep_loop_ct=0
           until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
@@ -290,7 +291,9 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         # we have to run docker command ourselves to set network=host so that playwright can access the server
         run: |
-          docker run --name mcrmicrosoftcomplaywrightv1343jammy_68c205 \
+          tail -f connect.log &
+
+          docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
                       --workdir /github/workspace --rm  \
                       -e "REACT_APP_APP_ENV" -e CI=true \
                       -v "/var/run/docker.sock":"/var/run/docker.sock" \
