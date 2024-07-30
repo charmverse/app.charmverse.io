@@ -1,11 +1,7 @@
 import { GET } from '@root/adapters/http';
-import { getFarcasterUsers, type FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
+import { type FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import type { IframelyResponse } from '@root/lib/iframely/getIframely';
-import { getIframely } from '@root/lib/iframely/getIframely';
-import { isTruthy } from '@root/lib/utils/types';
 import { uniqBy } from 'lodash';
-
-import { getEmbeddedCasts } from './getEmbeddedCasts';
 
 const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
 
@@ -51,6 +47,7 @@ export type Cast = {
           content_type: string;
           content_length: string;
         };
+        frame?: IframelyResponse;
       }
     | {
         cast_id: {
@@ -114,41 +111,10 @@ export async function getFarcasterUserReactions({ fid }: { fid: number }): Promi
 
   const userReactions = userReactionsResponse.reactions;
 
-  // const embeddedFramesRecord = (
-  //   await Promise.all(
-  //     userReactions
-  //       .map((reaction) => reaction.cast.embeds.map((embed) => ('url' in embed ? embed.url : null)).filter(isTruthy))
-  //       .flat()
-  //       .map((url) => getIframely({ url, darkMode: 'dark' }))
-  //   )
-  // ).reduce((acc, frame) => {
-  //   acc[frame.url] = frame;
-  //   return acc;
-  // }, {} as Record<string, IframelyResponse>);
-
-  const embeddedCasts = await getEmbeddedCasts({
-    casts: userReactions.map((reaction) => reaction.cast)
-  });
-
   return uniqBy(
     userReactions.map((reaction) => ({
       ...reaction,
-      cast_key: `${reaction.object}-${reaction.cast.hash}`,
-      cast: {
-        ...reaction.cast,
-        embeds: reaction.cast.embeds.map((embed) => {
-          if ('cast_id' in embed) {
-            return {
-              cast_id: {
-                ...embed.cast_id,
-                cast: embeddedCasts.find((cast) => cast.hash === embed.cast_id.hash)!
-              }
-            };
-          }
-
-          return embed;
-        })
-      }
+      cast_key: `${reaction.object}-${reaction.cast.hash}`
     })),
     'cast_key'
   );

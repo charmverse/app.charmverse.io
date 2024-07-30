@@ -1,3 +1,8 @@
+import type { IframelyResponse } from '@root/lib/iframely/getIframely';
+import { getIframely } from '@root/lib/iframely/getIframely';
+import { isTruthy } from '@root/lib/utils/types';
+
+import { getEmbeddedCasts } from './getEmbeddedCasts';
 import { getFarcasterUserCasts } from './getFarcasterUserCasts';
 import type { Cast } from './getFarcasterUserReactions';
 import { getFarcasterUserReactions } from './getFarcasterUserReactions';
@@ -11,8 +16,48 @@ export async function getFeed(): Promise<FeedItem[]> {
   const userCasts = await getFarcasterUserCasts({
     fid: 1501
   });
-  return [
+
+  const feedItems = [
     ...userReactions.map((reaction): FeedItem => ({ type: reaction.reaction_type, cast: reaction.cast })),
     ...userCasts.map((cast): FeedItem => ({ type: 'cast', cast }))
   ].sort((a, b) => new Date(b.cast.timestamp).getTime() - new Date(a.cast.timestamp).getTime());
+
+  const embeddedCasts = await getEmbeddedCasts({
+    casts: feedItems.map((item) => item.cast)
+  });
+
+  const embeddedFramesRecord = (
+    await Promise.all(
+      feedItems
+        .map((feedItem) => feedItem.cast.embeds.map((embed) => ('url' in embed ? embed.url : null)).filter(isTruthy))
+        .flat()
+        .map((url) => getIframely({ url, darkMode: 'dark' }))
+    )
+  ).reduce((acc, frame) => {
+    acc[frame.url] = frame;
+    return acc;
+  }, {} as Record<string, IframelyResponse>);
+
+  return feedItems.map((feedItem) => ({
+    ...feedItem,
+    cast: {
+      ...feedItem.cast,
+      embeds: feedItem.cast.embeds.map((embed) => {
+        if ('cast_id' in embed) {
+          return {
+            cast_id: {
+              ...embed.cast_id,
+              cast: embeddedCasts.find((cast) => cast.hash === embed.cast_id.hash)!
+            }
+          };
+        } else if (embed.url in embeddedFramesRecord) {
+          return {
+            ...embed,
+            frame: embeddedFramesRecord[embed.url]
+          };
+        }
+        return embed;
+      })
+    }
+  }));
 }
