@@ -23,7 +23,7 @@ export async function trashPages({
     modifiedChildPageIds.push(...(await trashOrDeletePage(pageId, userId, trash ? 'trash' : 'restore')));
     trackUserAction(trash ? 'archive_page' : 'restore_page', { userId, spaceId, pageId });
     log.info(`User ${trash ? 'trashed' : 'restored'} a page`, {
-      pageIds: modifiedChildPageIds,
+      pageId,
       spaceId,
       userId
     });
