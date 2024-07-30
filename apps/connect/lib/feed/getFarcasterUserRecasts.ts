@@ -1,5 +1,6 @@
 import { GET } from '@root/adapters/http';
 import { getFarcasterUsers, type FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
+import { isTruthy } from '@root/lib/utils/types';
 import { uniqBy } from 'lodash';
 
 const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
@@ -56,6 +57,7 @@ export type Recast = {
         cast_id: {
           fid: number;
           hash: string;
+          cast: Recast;
         };
       }
   )[];
@@ -101,12 +103,40 @@ export async function getFarcasterUserRecasts(): Promise<Recast[]> {
     }
   );
 
-  return uniqBy(
+  const uniqueRecasts = uniqBy(
     userRecasts.casts.map((recast) => ({
       ...recast,
       object: 'recast',
       parent_author: charmverseProfile
     })),
     'hash'
-  );
+  ) as Recast[];
+
+  const recastRecord: Record<string, Recast> = {};
+  uniqueRecasts.forEach((recast) => {
+    recastRecord[recast.hash] = recast;
+  });
+
+  const embeddedCasts = uniqueRecasts
+    .map((uniqueRecast) =>
+      uniqueRecast.embeds.map((embed) => ('cast_id' in embed ? embed.cast_id.hash : null)).filter(isTruthy)
+    )
+    .flat();
+
+  return uniqueRecasts
+    .filter((uniqueRecast) => !embeddedCasts.includes(uniqueRecast.hash))
+    .map((recast) => ({
+      ...recast,
+      embeds: recast.embeds.map((embed) => {
+        if ('cast_id' in embed) {
+          return {
+            cast_id: {
+              ...embed.cast_id,
+              cast: recastRecord[embed.cast_id.hash]
+            }
+          };
+        }
+        return embed;
+      })
+    }));
 }
