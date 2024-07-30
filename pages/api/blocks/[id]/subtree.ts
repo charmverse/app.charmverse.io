@@ -23,7 +23,7 @@ export const config = {
 async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWithDetails[] | { error: string }>) {
   const subtree = await getSubtree({
     pageId: req.query.id as string,
-    userId: req.session.user.id
+    userId: req.session.user?.id
   });
 
   return res.status(200).json(subtree);
