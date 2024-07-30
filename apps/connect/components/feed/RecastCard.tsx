@@ -12,14 +12,14 @@ function createRecastChunks({ text, ids }: { text: string; ids: string[] }) {
   return ids.reduce<
     {
       text: string;
-      type: 'text' | 'mention';
+      type: 'text' | 'mention' | 'link';
     }[]
   >(
-    (chunks, username) => {
+    (chunks, id) => {
       return chunks
         .map((chunk) =>
           chunk.text
-            .split(`@${username}`)
+            .split(id)
             .map((chunkText, index, _chunks) => {
               if (_chunks.length - 1 === index) {
                 return [
@@ -35,8 +35,8 @@ function createRecastChunks({ text, ids }: { text: string; ids: string[] }) {
                   type: 'text' as const
                 },
                 {
-                  text: username,
-                  type: 'mention' as const
+                  text: id,
+                  type: id.startsWith('@') ? ('mention' as const) : ('link' as const)
                 }
               ];
             })
@@ -54,10 +54,13 @@ function createRecastChunks({ text, ids }: { text: string; ids: string[] }) {
 }
 
 export function RecastCard({ recast }: { recast: Recast }) {
-  const mentionedProfiles = recast.mentioned_profiles.map((profile) => profile.username);
-  const recastParagraphsChunks = recast.text
-    .split('\n')
-    .map((text) => createRecastChunks({ text, ids: mentionedProfiles }));
+  const mentionedProfiles = recast.mentioned_profiles.map((profile) => `@${profile.username}`);
+  const recastParagraphsChunks = recast.text.split('\n').map((text) =>
+    createRecastChunks({
+      text,
+      ids: [...mentionedProfiles, ...recast.embeds.filter((embed) => 'url' in embed).map((embed) => embed.url)]
+    })
+  );
 
   return (
     <Card>
@@ -94,15 +97,24 @@ export function RecastCard({ recast }: { recast: Recast }) {
                       </Typography>
                     );
                   }
+                  if (chunk.type === 'mention') {
+                    return (
+                      <Link
+                        key={`${index.toString()}`}
+                        href={`https://warpcast.com/${chunk.text.slice(1)}`}
+                        target='_blank'
+                      >
+                        <Typography variant='body1' component='span' color='primary'>
+                          {chunk.text}
+                        </Typography>
+                      </Link>
+                    );
+                  }
+
                   return (
-                    <Link
-                      component='a'
-                      key={`${index.toString()}`}
-                      href={`https://warpcast.com/${chunk.text}`}
-                      target='_blank'
-                    >
-                      <Typography variant='body1' component='span' color='primary'>
-                        @{chunk.text}
+                    <Link key={`${index.toString()}`} href={chunk.text} target='_blank'>
+                      <Typography variant='body1' component='p' color='primary'>
+                        {chunk.text}
                       </Typography>
                     </Link>
                   );
