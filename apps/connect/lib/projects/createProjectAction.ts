@@ -27,6 +27,8 @@ export const actionCreateProject = authActionClient
       }).catch((err) => {
         log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
       });
+    } else {
+      log.info('Skip credential publishing');
     }
 
     await generateOgImage(newProject.id, currentUserId);
