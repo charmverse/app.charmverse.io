@@ -2,7 +2,6 @@
 
 import { Button, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
@@ -10,6 +9,7 @@ import { useState } from 'react';
 import { FaChevronUp } from 'react-icons/fa6';
 
 import { Avatar } from 'components/common/Avatar';
+import { CardMotion } from 'components/common/Motions/CardMotion';
 import type { Grant } from 'lib/grants/getGrants';
 
 export function GrantItem({ grant }: { grant: Grant }) {
@@ -17,7 +17,7 @@ export function GrantItem({ grant }: { grant: Grant }) {
   const [showDetails, setShowDetails] = useState(false);
 
   return (
-    <Card>
+    <CardMotion>
       <CardActionArea
         sx={{ p: 2 }}
         onClick={() => {
@@ -87,6 +87,6 @@ export function GrantItem({ grant }: { grant: Grant }) {
           )}
         </Stack>
       </CardActionArea>
-    </Card>
+    </CardMotion>
   );
 }
