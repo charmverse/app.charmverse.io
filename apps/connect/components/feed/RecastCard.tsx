@@ -4,7 +4,6 @@ import FlipCameraAndroidOutlinedIcon from '@mui/icons-material/FlipCameraAndroid
 import { Card, CardActionArea, Link, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { relativeTime } from '@root/lib/utils/dates';
-import { prettyPrint } from '@root/lib/utils/strings';
 
 import { Avatar } from 'components/common/Avatar';
 import type { Recast } from 'lib/feed/getFarcasterUserRecasts';
@@ -65,6 +64,8 @@ function CastContent({ cast }: { cast: Recast }) {
     })
   );
 
+  const embeddedCasts = cast.embeds.filter((embed) => 'cast_id' in embed).map((embed) => embed.cast_id.cast);
+
   return (
     <Stack gap={1}>
       {recastParagraphsChunks.map((recastParagraphChunks, paragraphIndex) => (
@@ -98,15 +99,13 @@ function CastContent({ cast }: { cast: Recast }) {
         </Typography>
       ))}
 
-      {cast.embeds.length ? (
+      {embeddedCasts.length ? (
         <Stack gap={1} my={1}>
-          {cast.embeds.map((embed) =>
-            'cast_id' in embed ? (
-              <Card key={embed.cast_id.cast.hash} sx={{ p: 2 }}>
-                <CastCard cast={embed.cast_id.cast} />
-              </Card>
-            ) : null
-          )}
+          {embeddedCasts.map((embeddedCast) => (
+            <Card key={embeddedCast.hash} sx={{ p: 2 }}>
+              <CastCard cast={embeddedCast} />
+            </Card>
+          ))}
         </Stack>
       ) : null}
     </Stack>
