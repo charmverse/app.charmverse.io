@@ -6,6 +6,7 @@ import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shar
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { schema } from '@connect-shared/lib/projects/form';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
+import { isTestEnv } from '@root/config/constants';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
 
 export const actionCreateProject = authActionClient
@@ -31,7 +32,9 @@ export const actionCreateProject = authActionClient
       log.info('Skip credential publishing');
     }
 
-    await generateOgImage(newProject.id, currentUserId);
+    if (!isTestEnv) {
+      await generateOgImage(newProject.id, currentUserId);
+    }
 
     return { projectId: newProject.id, projectPath: newProject.path };
   });
