@@ -1,4 +1,4 @@
-import { Typography, Card, Link, CardActionArea } from '@mui/material';
+import { Typography, Card, Link, CardActionArea, Avatar } from '@mui/material';
 import { Stack } from '@mui/system';
 import { isTruthy } from '@root/lib/utils/types';
 
@@ -107,14 +107,62 @@ export function CastContent({ cast, nested = false }: { nested?: boolean; cast: 
             <Stack gap={1} my={1} key={embeddedFrame.url}>
               <Card sx={{ p: 2 }}>
                 <CardActionArea href={embeddedFrame.meta.canonical} target='_blank' component={Link} color='inherit'>
-                  <Stack gap={2} direction='row' alignItems='center'>
-                    {embeddedFrame.links.icon?.[0] ? (
-                      <img src={embeddedFrame.links.icon[0].href} style={{ width: '100px', height: '100px' }} />
-                    ) : null}
+                  <Stack
+                    gap={{
+                      xs: 1,
+                      md: 2
+                    }}
+                    direction={{
+                      xs: 'column',
+                      md: 'row'
+                    }}
+                    alignItems={{
+                      xs: 'flex-start',
+                      md: 'center'
+                    }}
+                  >
+                    <Stack direction='row' gap={1} alignItems='center' justifyContent='flex-start'>
+                      {embeddedFrame.links.icon?.[0] ? (
+                        <Avatar
+                          src={embeddedFrame.links.icon[0].href}
+                          sx={{
+                            width: {
+                              xs: 35,
+                              md: 100
+                            },
+                            height: {
+                              xs: 35,
+                              md: 100
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <Typography
+                        variant='h6'
+                        sx={{
+                          display: {
+                            xs: 'block',
+                            md: 'none'
+                          }
+                        }}
+                      >
+                        {embeddedFrame.meta.title}
+                      </Typography>
+                    </Stack>
                     <Stack gap={1}>
-                      <Typography variant='h6'>{embeddedFrame.meta.title}</Typography>
-                      <Typography variant='body2'>{embeddedFrame.meta.description}</Typography>
-                      <Typography variant='body2' color='secondary'>
+                      <Typography
+                        variant='h6'
+                        sx={{
+                          display: {
+                            xs: 'none',
+                            md: 'block'
+                          }
+                        }}
+                      >
+                        {embeddedFrame.meta.title}
+                      </Typography>
+                      <Typography variant='body1'>{embeddedFrame.meta.description}</Typography>
+                      <Typography variant='subtitle2' color='secondary'>
                         {embeddedFrame.meta.canonical}
                       </Typography>
                     </Stack>
