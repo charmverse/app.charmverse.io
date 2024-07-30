@@ -8,11 +8,11 @@ export type PointerSurfaceProps = {
   children?: any;
   className?: string | null;
   disabled?: boolean | null;
-  id?: string | null;
+  id?: string;
   onClick?: ((val: any, e: SyntheticEvent) => void) | null;
   onMouseEnter?: ((val: any, e: SyntheticEvent) => void) | null;
-  style?: object | null;
-  title?: string | null;
+  style?: object;
+  title?: string;
   value?: any;
 };
 
@@ -21,7 +21,7 @@ class PointerSurface extends React.PureComponent<PointerSurfaceProps> {
 
   _mul = false;
 
-  _pressedTarget = null;
+  _pressedTarget: Element | null = null;
 
   _unmounted = false;
 
@@ -54,6 +54,7 @@ class PointerSurface extends React.PureComponent<PointerSurfaceProps> {
     this._pressedTarget = null;
     this._clicked = false;
 
+    // @ts-ignore
     if (e.which === 3 || e.button == 2) {
       // right click.
       return;
@@ -98,27 +99,26 @@ class PointerSurface extends React.PureComponent<PointerSurfaceProps> {
     const { className, disabled, active, id, style, title, children } = this.props;
     const { pressed } = this.state;
 
-    const buttonClassName = cx(className, {
-      active,
-      disabled,
-      pressed
-    });
+    let buttonClassName = className || '';
+    if (active) buttonClassName += ' active';
+    if (disabled) buttonClassName += ' disabled';
+    if (pressed) buttonClassName += ' pressed';
 
     return (
       <span
-        aria-disabled={disabled}
+        //aria-disabled={disabled}
         aria-pressed={pressed}
         className={buttonClassName}
-        disabled={disabled}
+        // disabled={disabled}
         id={id}
         onKeyPress={disabled ? preventEventDefault : this._onMouseUp}
         onMouseDown={disabled ? preventEventDefault : this._onMouseDown}
         onMouseEnter={disabled ? preventEventDefault : this._onMouseEnter}
-        onMouseLeave={disabled ? null : this._onMouseLeave}
+        onMouseLeave={disabled ? undefined : this._onMouseLeave}
         onMouseUp={disabled ? preventEventDefault : this._onMouseUp}
         role='button'
         style={style}
-        tabIndex={disabled ? null : 0}
+        tabIndex={disabled ? undefined : 0}
         title={title}
       >
         {children}

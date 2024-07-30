@@ -4,13 +4,12 @@ import type { Schema } from 'prosemirror-model';
 import { Fragment } from 'prosemirror-model';
 import type { Transaction } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
-import type { Transform } from 'prosemirror-transform';
 
 import { PARAGRAPH, TABLE, TABLE_CELL, TABLE_ROW } from './NodeNames';
 
 const ZERO_WIDTH_SPACE_CHAR = '\u200b';
 
-export default function insertTable(tr: Transaction, schema: Schema, rows: number, cols: number): Transform {
+export default function insertTable(tr: Transaction, schema: Schema, rows: number, cols: number): Transaction {
   if (!tr.selection || !tr.doc) {
     return tr;
   }

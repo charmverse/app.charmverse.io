@@ -1,11 +1,11 @@
 // import cx from 'classnames';
-import type { EditorState } from 'prosemirror-state';
-import type { Transform } from 'prosemirror-transform';
+import type { EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import React from 'react';
 
-import CommandMenu from './CommandMenu';
+import CommandMenu, { CommandMenuProps } from './CommandMenu';
 import createPopUp from './createPopUp';
+import { PopUpHandle } from './createPopUp';
 import CustomButton from './CustomButton';
 import uuid from './uuid';
 
@@ -15,14 +15,14 @@ class CommandMenuButton extends React.PureComponent<{
   className?: string | null;
   commandGroups: any[]; // Array<{ [string]: UICommand }>;
   disabled?: boolean | null;
-  dispatch: (tr: Transform) => void;
+  dispatch: (tr: Transaction) => void;
   editorState: EditorState;
-  editorView: EditorView | null;
+  editorView?: EditorView;
   icon?: string | React.ReactNode | null;
   label?: string | React.ReactNode | null;
-  title?: string | null;
+  title?: string;
 }> {
-  _menu = null;
+  _menu: PopUpHandle | null = null;
 
   _id = uuid();
 
@@ -86,13 +86,14 @@ class CommandMenuButton extends React.PureComponent<{
 
   _showMenu = (): void => {
     const menu = this._menu;
-    const menuProps = {
+    const menuProps: CommandMenuProps = {
       ...this.props,
       onCommand: this._onCommand
     };
     if (menu) {
       menu.update(menuProps);
     } else {
+      // @ts-ignore
       this._menu = createPopUp(CommandMenu, menuProps, {
         anchor: document.getElementById(this._id),
         onClose: this._onClose

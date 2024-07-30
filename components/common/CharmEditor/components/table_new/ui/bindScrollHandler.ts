@@ -1,4 +1,4 @@
-type ScrollHandle = {
+export type ScrollHandle = {
   dispose: () => void;
 };
 

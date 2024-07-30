@@ -1,4 +1,4 @@
-import type { EditorState, Selection } from 'prosemirror-state';
+import type { EditorState, Selection, Transaction } from 'prosemirror-state';
 import { Transform } from 'prosemirror-transform';
 import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent } from 'react';
@@ -21,6 +21,7 @@ function dryRunEditorStateProxyGetter(state: EditorState, propKey: keyof EditorS
 }
 
 function dryRunEditorStateProxySetter(state: EditorState, propKey: keyof EditorState, propValue: string): boolean {
+  // @ts-ignore
   state[propKey] = propValue;
   // Indicate success
   return true;
@@ -41,11 +42,11 @@ class UICommand {
     return false;
   };
 
-  isEnabled = (state: EditorState, view: EditorView | null): boolean => {
+  isEnabled = (state: EditorState, view?: EditorView): boolean => {
     return this.dryRun(state, view);
   };
 
-  dryRun = (state: EditorState, view: EditorView | null): boolean => {
+  dryRun = (state: EditorState, view?: EditorView): boolean => {
     const { Proxy } = window;
 
     const dryRunState = Proxy
@@ -55,14 +56,14 @@ class UICommand {
         })
       : state;
 
-    return this.execute(dryRunState, null, view);
+    return this.execute(dryRunState, undefined, view);
   };
 
   execute = (
     state: EditorState,
-    dispatch: ((tr: Transform) => void) | null,
-    view: EditorView | null,
-    event?: SyntheticEvent | null
+    dispatch?: (tr: Transaction) => void,
+    view?: EditorView,
+    event?: SyntheticEvent
   ): boolean => {
     this.waitForUserInput(state, dispatch, view, event)
       .then((inputs) => {
@@ -76,18 +77,18 @@ class UICommand {
 
   waitForUserInput = (
     state: EditorState,
-    dispatch: ((tr: Transform) => void) | null,
-    view: EditorView | null,
-    event?: SyntheticEvent | null
+    dispatch?: (tr: Transaction) => void,
+    view?: EditorView,
+    event?: SyntheticEvent
   ): Promise<any> => {
     return Promise.resolve(undefined);
   };
 
   executeWithUserInput = (
     state: EditorState,
-    dispatch: ((tr: Transform) => void) | null,
-    view: EditorView | null,
-    inputs: any
+    dispatch?: (tr: Transaction) => void,
+    view?: EditorView,
+    inputs?: any
   ): boolean => {
     return false;
   };

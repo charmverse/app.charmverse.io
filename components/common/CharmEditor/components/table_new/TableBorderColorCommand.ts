@@ -1,18 +1,17 @@
-import type { EditorState } from 'prosemirror-state';
+import type { EditorState, Transaction } from 'prosemirror-state';
 import { setCellAttr } from 'prosemirror-tables';
-import type { Transform } from 'prosemirror-transform';
 import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent } from 'react';
 
 import ColorEditor from './ui/ColorEditor';
-import createPopUp from './ui/createPopUp';
+import createPopUp, { PopUpHandle } from './ui/createPopUp';
 import { atAnchorRight } from './ui/PopUpPosition';
 import UICommand from './ui/UICommand';
 
 const setCellBorderBlack = setCellAttr('borderColor', '#000000');
 
 class TableBorderColorCommand extends UICommand {
-  _popUp = null;
+  _popUp: PopUpHandle | null = null;
 
   shouldRespondToUIEvent = (e: SyntheticEvent | MouseEvent): boolean => {
     return e.type === UICommand.EventType.MOUSEENTER;
@@ -24,7 +23,7 @@ class TableBorderColorCommand extends UICommand {
 
   waitForUserInput = (
     state: EditorState,
-    dispatch?: ((tr: Transform) => void) | null,
+    dispatch?: ((tr: Transaction) => void) | null,
     view?: EditorView | null,
     event?: SyntheticEvent | null
   ): Promise<any> => {
@@ -38,6 +37,7 @@ class TableBorderColorCommand extends UICommand {
 
     const anchor = event ? event.currentTarget : null;
     return new Promise((resolve) => {
+      // @ts-ignore
       this._popUp = createPopUp(ColorEditor, null, {
         anchor,
         position: atAnchorRight,
@@ -53,7 +53,7 @@ class TableBorderColorCommand extends UICommand {
 
   executeWithUserInput = (
     state: EditorState,
-    dispatch?: (tr: Transform) => void,
+    dispatch?: (tr: Transaction) => void,
     view?: EditorView,
     color?: string
   ): boolean => {

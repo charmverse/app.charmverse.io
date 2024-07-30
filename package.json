@@ -355,7 +355,7 @@
     "@types/autosuggest-highlight": "^3.2.0",
     "@types/aws-lambda": "^8.10.109",
     "@types/bcrypt": "^5.0.2",
-    "@types/color": "^3.0.3",
+    "@types/color": "^3.0.6",
     "@types/cookies": "^0.7.8",
     "@types/cryptr": "^4.0.1",
     "@types/diff": "^5.0.2",

@@ -11,7 +11,7 @@ import PopUp from './PopUp';
 import uuid from './uuid';
 
 export type PopUpHandle = {
-  close: (val: any) => void;
+  close: (val?: any) => void;
   update: (props: object) => void;
 };
 
@@ -40,7 +40,7 @@ function showModalMask(): void {
 
   const selector = '.czi-pop-up-element[data-pop-up-modal]';
   const zIndex = Array.from(document.querySelectorAll(selector)).reduce(
-    (zz, el) => Math.max(zz, Number(el.style.zIndex)),
+    (zz, el) => Math.max(zz, Number((el as HTMLElement).style.zIndex)),
     0
   );
 
@@ -54,7 +54,7 @@ function hideModalMask(): void {
   }
 }
 
-function getRootElement(id: string, forceCreation: boolean, popUpParams: PopUpParams | null): HTMLElement | null {
+function getRootElement(id: string, forceCreation: boolean, popUpParams?: PopUpParams | null): HTMLElement | null {
   const root: any = (popUpParams && popUpParams.container) || document.body || document.documentElement;
   let element = document.getElementById(id);
   if (!element && forceCreation) {
@@ -91,7 +91,7 @@ function getRootElement(id: string, forceCreation: boolean, popUpParams: PopUpPa
 function renderPopUp(
   rootId: string,
   close: VoidFunction,
-  View: VoidFunction,
+  View: React.ComponentType<ViewProps>,
   viewProps: ViewProps,
   popUpParams: PopUpParams
 ): void {
@@ -121,13 +121,13 @@ function unrenderPopUp(rootId: string): void {
 }
 
 export default function createPopUp(
-  View: VoidFunction,
+  View: React.ComponentType<ViewProps>,
   viewProps?: ViewProps | null,
   popUpParams?: PopUpParams | null
 ): PopUpHandle {
   const rootId = uuid();
 
-  let handle = null;
+  let handle: PopUpHandle | null = null;
   let currentViewProps = viewProps;
 
   viewProps = viewProps || {};
@@ -141,7 +141,7 @@ export default function createPopUp(
     modalsCount++;
   }
 
-  const closePopUp = (value) => {
+  const closePopUp = (value?: any) => {
     if (!handle) {
       return;
     }

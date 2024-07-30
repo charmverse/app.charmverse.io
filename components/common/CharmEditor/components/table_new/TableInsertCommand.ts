@@ -1,18 +1,17 @@
-import type { EditorState } from 'prosemirror-state';
+import type { EditorState, Transaction } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
-import type { Transform } from 'prosemirror-transform';
 import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent } from 'react';
 
 import insertTable from './insertTable';
-import createPopUp from './ui/createPopUp';
+import createPopUp, { PopUpHandle } from './ui/createPopUp';
 import { atAnchorRight } from './ui/PopUpPosition';
 import TableGridSizeEditor from './ui/TableGridSizeEditor';
 import type { TableGridSizeEditorValue } from './ui/TableGridSizeEditor';
 import UICommand from './ui/UICommand';
 
 class TableInsertCommand extends UICommand {
-  _popUp = null;
+  _popUp: PopUpHandle | null = null;
 
   shouldRespondToUIEvent = (e: SyntheticEvent | MouseEvent): boolean => {
     return e.type === UICommand.EventType.MOUSEENTER;
@@ -29,7 +28,7 @@ class TableInsertCommand extends UICommand {
 
   waitForUserInput = (
     state: EditorState,
-    dispatch?: ((tr: Transform) => void) | null,
+    dispatch?: ((tr: Transaction) => void) | null,
     view?: EditorView | null,
     event?: SyntheticEvent | null
   ): Promise<any> => {
@@ -43,6 +42,7 @@ class TableInsertCommand extends UICommand {
 
     const anchor = event ? event.currentTarget : null;
     return new Promise((resolve) => {
+      // @ts-ignore
       this._popUp = createPopUp(TableGridSizeEditor, null, {
         anchor,
         position: atAnchorRight,
@@ -58,7 +58,7 @@ class TableInsertCommand extends UICommand {
 
   executeWithUserInput = (
     state: EditorState,
-    dispatch?: (tr: Transform) => void,
+    dispatch?: (tr: Transaction) => void,
     view?: EditorView,
     inputs?: TableGridSizeEditorValue
   ): boolean => {

@@ -3,7 +3,6 @@
 import type { Schema, Node, ResolvedPos } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import { CellSelection, mergeCells } from 'prosemirror-tables';
-import type { Transform } from 'prosemirror-transform';
 import type { EditorView } from 'prosemirror-view';
 
 import { PARAGRAPH, TABLE_CELL, TEXT } from './NodeNames';
@@ -61,7 +60,7 @@ function purgeConsecutiveBlankParagraphNodes(tr: Transaction, schema: Schema): T
 }
 
 class TableMergeCellsCommand extends UICommand {
-  execute = (state: EditorState, dispatch: ((tr: Transform) => void) | null, view: EditorView | null): boolean => {
+  execute = (state: EditorState, dispatch?: ((tr: Transaction) => void) | null, view?: EditorView | null): boolean => {
     const { tr, schema, selection } = state;
     let endTr = tr;
     if (selection instanceof CellSelection) {

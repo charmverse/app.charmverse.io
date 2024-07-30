@@ -1,25 +1,26 @@
-import type { EditorState } from 'prosemirror-state';
-import type { Transform } from 'prosemirror-transform';
+import type { EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
-import type { SyntheticEvent } from 'react';
+import type { SyntheticEvent, ReactNode } from 'react';
 import React from 'react';
 
 import CustomMenu from './CustomMenu';
 import CustomMenuItem from './CustomMenuItem';
 import type UICommand from './UICommand';
 
-class CommandMenu extends React.PureComponent<{
+export type CommandMenuProps = {
   commandGroups: any[]; // { [string]: UICommand }[];
-  dispatch: (tr: Transform) => void;
+  dispatch: (tr: Transaction) => void;
   editorState: EditorState;
-  editorView: EditorView | null;
+  editorView?: EditorView;
   onCommand: VoidFunction | null;
-}> {
+};
+
+class CommandMenu extends React.PureComponent<CommandMenuProps> {
   _activeCommand: UICommand | null = null;
 
   render() {
     const { commandGroups, editorState, editorView } = this.props;
-    const children = [];
+    const children: ReactNode[] = [];
     const jj = commandGroups.length - 1;
 
     commandGroups.forEach((group, ii) => {

@@ -8,7 +8,7 @@ import { atAnchorBottomLeft, atViewportCenter } from './PopUpPosition';
 import type { Rect } from './rects';
 import uuid from './uuid';
 
-type PositionHandler = (anchorRect: Rect | null, bodyRect: Rect | null) => Rect;
+type PositionHandler = (anchorRect?: Rect, bodyRect?: Rect) => Rect;
 
 export type ViewProps = object;
 
@@ -22,7 +22,7 @@ export type PopUpParams = {
 };
 
 export type PopUpProps = {
-  View: VoidFunction;
+  View: React.ComponentType<ViewProps>;
   close: VoidFunction;
   popUpParams: PopUpParams;
   viewProps: any;
@@ -34,13 +34,13 @@ export type PopUpHandle = {
 };
 
 class PopUp extends React.PureComponent<PopUpProps> {
-  _bridge = null;
+  _bridge: { getDetails: () => PopUpDetails } | null = null;
 
   _id = uuid();
 
   componentDidMount(): void {
     this._bridge = { getDetails: this._getDetails };
-    PopUpManager.register(this._bridge);
+    this._bridge && PopUpManager.register(this._bridge);
   }
 
   componentWillUnmount(): void {

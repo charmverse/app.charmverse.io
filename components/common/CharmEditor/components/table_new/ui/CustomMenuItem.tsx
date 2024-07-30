@@ -13,6 +13,7 @@ class CustomMenuItemSeparator extends React.PureComponent<any, any, any> {
 
 class CustomMenuItem extends React.PureComponent<{
   label: string;
+  active?: boolean;
   disabled?: boolean | null;
   onClick: ((value: any, e: React.SyntheticEvent) => void) | null;
   onMouseEnter: ((value: any, e: React.SyntheticEvent) => void) | null;

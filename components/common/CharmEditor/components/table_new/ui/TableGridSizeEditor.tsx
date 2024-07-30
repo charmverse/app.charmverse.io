@@ -163,6 +163,7 @@ class TableGridSizeEditor extends React.PureComponent<{
         <div
           className='czi-table-grid-size-editor-body'
           onMouseDown={this._onMouseDown}
+          /* @ts-ignore */
           onMouseEnter={this._onMouseEnter}
           style={bodyStyle}
         >

@@ -1,14 +1,14 @@
 // @flow
 
-import type { EditorState } from 'prosemirror-state';
+import type { Node } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 /* eslint-disable-next-line */
 import React from 'react';
 
 import findActionableCell from './findActionableCell';
-import bindScrollHandler from './ui/bindScrollHandler';
-import createPopUp from './ui/createPopUp';
+import bindScrollHandler, { ScrollHandle } from './ui/bindScrollHandler';
+import createPopUp, { PopUpHandle } from './ui/createPopUp';
 import isElementFullyVisible from './ui/isElementFullyVisible';
 import { atAnchorTopRight } from './ui/PopUpPosition';
 import TableCellMenu from './ui/TableCellMenu';
@@ -16,21 +16,23 @@ import TableCellMenu from './ui/TableCellMenu';
 import './ui/czi-pop-up.css';
 
 class TableCellTooltipView {
-  _cellElement: null;
+  _cellElement: HTMLElement | null = null;
 
-  _popUp = null;
+  _popUp: PopUpHandle | null = null;
 
-  _scrollHandle = null;
+  _scrollHandle: ScrollHandle | null = null;
 
   constructor(editorView: EditorView) {
-    this.update(editorView, null);
+    this.update(editorView);
   }
 
-  update(view: EditorView, lastState: EditorState): void {
-    const { state, readOnly } = view;
+  update(view: EditorView): void {
+    // const { state, readOnly } = view;
+    const { state } = view;
     const result = findActionableCell(state);
 
-    if (!result || readOnly) {
+    // if (!result || readOnly) {
+    if (!result) {
       this.destroy();
       return;
     }
@@ -42,7 +44,7 @@ class TableCellTooltipView {
       return;
     }
 
-    let cellEl = domFound.node;
+    let cellEl: HTMLElement | null = domFound.node as HTMLElement;
     const popUp = this._popUp;
     const viewPops = {
       editorState: state,
@@ -64,6 +66,7 @@ class TableCellTooltipView {
       // Creates a new popup.
       popUp && popUp.close();
       this._cellElement = cellEl;
+      // @ts-ignore
       this._popUp = createPopUp(TableCellMenu, viewPops, {
         anchor: cellEl,
         autoDismiss: false,

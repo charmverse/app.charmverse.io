@@ -1,18 +1,17 @@
-import type { EditorState } from 'prosemirror-state';
+import type { EditorState, Transaction } from 'prosemirror-state';
 import { setCellAttr } from 'prosemirror-tables';
-import type { Transform } from 'prosemirror-transform';
 import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent } from 'react';
 
 import ColorEditor from './ui/ColorEditor';
-import createPopUp from './ui/createPopUp';
+import createPopUp, { PopUpHandle } from './ui/createPopUp';
 import { atAnchorRight } from './ui/PopUpPosition';
 import UICommand from './ui/UICommand';
 
 const setCellBackgroundBlack = setCellAttr('background', '#000000');
 
 class TableBackgroundColorCommand extends UICommand {
-  _popUp = null;
+  _popUp: PopUpHandle | null = null;
 
   shouldRespondToUIEvent = (e: SyntheticEvent | MouseEvent): boolean => {
     return e.type === UICommand.EventType.MOUSEENTER;
@@ -24,9 +23,9 @@ class TableBackgroundColorCommand extends UICommand {
 
   waitForUserInput = (
     state: EditorState,
-    dispatch?: ((tr: Transform) => void) | null,
-    view?: EditorView | null,
-    event?: SyntheticEvent | null
+    dispatch?: (tr: Transaction) => void,
+    view?: EditorView,
+    event?: SyntheticEvent
   ): Promise<any> => {
     if (this._popUp) {
       return Promise.resolve(undefined);
@@ -38,6 +37,7 @@ class TableBackgroundColorCommand extends UICommand {
 
     const anchor = event ? event.currentTarget : null;
     return new Promise((resolve) => {
+      // @ts-ignore
       this._popUp = createPopUp(ColorEditor, null, {
         anchor,
         position: atAnchorRight,
@@ -53,8 +53,8 @@ class TableBackgroundColorCommand extends UICommand {
 
   executeWithUserInput = (
     state: EditorState,
-    dispatch: ((tr: Transform) => void) | null,
-    view: EditorView | null,
+    dispatch?: (tr: Transaction) => void,
+    view?: EditorView,
     hex?: string
   ): boolean => {
     if (dispatch && hex !== undefined) {

@@ -3,7 +3,7 @@ import Color from 'color';
 const RGBA_PATTERN = /^rgba/i;
 const RGBA_TRANSPARENT = 'rgba(0,0,0,0)';
 
-const ColorMaping = {
+const ColorMaping: Record<string, string> = {
   transparent: RGBA_TRANSPARENT,
   inherit: ''
 };
@@ -26,6 +26,7 @@ export function toCSSColor(source: string): string {
 
   if (source && RGBA_PATTERN.test(source)) {
     const color = Color(source);
+    // @ts-ignore @types/color is outdated
     if (color.valpha === 0) {
       ColorMaping[source] = RGBA_TRANSPARENT;
       return RGBA_TRANSPARENT;
