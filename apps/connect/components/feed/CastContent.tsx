@@ -1,5 +1,6 @@
 import { Typography, Card, Link } from '@mui/material';
 import { Stack } from '@mui/system';
+import { isTruthy } from '@root/lib/utils/types';
 
 import { createCastParagraphChunks } from 'lib/feed/createCastParagraphChunks';
 import type { Cast } from 'lib/feed/getFarcasterUserReactions';
@@ -9,7 +10,10 @@ import { CastAuthorDetails } from './CastAuthorDetails';
 export function CastContent({ cast }: { cast: Cast }) {
   const castParagraphsChunks = createCastParagraphChunks(cast);
 
-  const embeddedCasts = cast.embeds.filter((embed) => 'cast_id' in embed).map((embed) => embed.cast_id.cast);
+  const embeddedCasts = cast.embeds
+    .filter((embed) => 'cast_id' in embed)
+    .map((embed) => embed.cast_id.cast)
+    .filter(isTruthy);
 
   return (
     <Stack gap={0.5}>

@@ -5,6 +5,8 @@ import { getIframely } from '@root/lib/iframely/getIframely';
 import { isTruthy } from '@root/lib/utils/types';
 import { uniqBy } from 'lodash';
 
+import { getEmbeddedCasts } from './getEmbeddedCasts';
+
 const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
 
 type UserProfile = {
@@ -51,7 +53,7 @@ export type Cast = {
         cast_id: {
           fid: number;
           hash: string;
-          cast: Cast;
+          cast: Cast | undefined;
         };
       }
   )[];
@@ -86,24 +88,18 @@ type Reaction = {
   object: 'likes' | 'recasts';
 };
 
-type ReactionsResponse = {
+type UserReactionsResponse = {
   reactions: Reaction[];
   next: {
     cursor: string | null;
   };
 };
 
-type CastsResponse = {
-  result: {
-    casts: Cast[];
-  };
-};
-
-export async function getFarcasterUserReactions(): Promise<Reaction[]> {
-  const userReactionsResponse = await GET<ReactionsResponse>(
+export async function getFarcasterUserReactions({ fid }: { fid: number }): Promise<Reaction[]> {
+  const userReactionsResponse = await GET<UserReactionsResponse>(
     `${neynarBaseUrl}/reactions/user`,
     {
-      fid: 1501,
+      fid,
       type: 'all'
     },
     {
@@ -127,46 +123,33 @@ export async function getFarcasterUserReactions(): Promise<Reaction[]> {
   //   return acc;
   // }, {} as Record<string, IframelyResponse>);
 
-  const embeddedCastHashes = Array.from(
-    new Set(
-      userReactions
-        .map((reaction) =>
-          reaction.cast.embeds.filter((embed) => 'cast_id' in embed).map((embed) => embed.cast_id.hash)
-        )
-        .flat()
-    )
-  );
-  const embeddedCasts = await GET<CastsResponse>(
-    `${neynarBaseUrl}/casts`,
-    {
-      casts: embeddedCastHashes.join(',')
-    },
-    {
-      headers: {
-        Api_key: process.env.NEYNAR_API_KEY
-      }
-    }
-  );
+  const embeddedCasts = await getEmbeddedCasts({
+    casts: userReactions.map((reaction) => reaction.cast)
+  });
 
-  return userReactions.map((reaction) => ({
-    ...reaction,
-    cast: {
-      ...reaction.cast,
-      embeds: reaction.cast.embeds.map((embed) => {
-        if ('cast_id' in embed) {
-          return {
-            cast_id: {
-              ...embed.cast_id,
-              cast: embeddedCasts.result.casts.find((cast) => cast.hash === embed.cast_id.hash)!
-            }
-          };
-        } else if ('url' in embed) {
-          return {
-            url: embed.url
-          };
-        }
-        return embed;
-      })
-    }
-  }));
+  return uniqBy(
+    userReactions.map((reaction) => ({
+      ...reaction,
+      cast_key: `${reaction.object}-${reaction.cast.hash}`,
+      cast: {
+        ...reaction.cast,
+        embeds: reaction.cast.embeds.map((embed) => {
+          if ('cast_id' in embed) {
+            return {
+              cast_id: {
+                ...embed.cast_id,
+                cast: embeddedCasts.find((cast) => cast.hash === embed.cast_id.hash)!
+              }
+            };
+          } else if ('url' in embed) {
+            return {
+              url: embed.url
+            };
+          }
+          return embed;
+        })
+      }
+    })),
+    'cast_key'
+  );
 }
