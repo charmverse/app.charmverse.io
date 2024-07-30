@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { loginWithFarcasterAction } from '@connect-shared/lib/session/loginAction';
 import { AuthKitProvider, SignInButton, useProfile } from '@farcaster/auth-kit';
@@ -34,7 +35,7 @@ function WarpcastLoginButton() {
   }, []);
 
   if (isAuthenticated) {
-    return null;
+    return <LoadingComponent size={30} label='Logging you in...' />;
   }
 
   return (

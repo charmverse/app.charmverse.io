@@ -2,11 +2,7 @@
   "compilerOptions": {
     "outDir": "../../dist/apps/connect",
     "rootDir": "../../",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext", "webworker"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -54,15 +50,6 @@
       "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "../../node_modules",
-    ".next/",
-    "public/sw.js"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["../../node_modules", ".next/", "public/sw.js", "sw.js"]
 }
