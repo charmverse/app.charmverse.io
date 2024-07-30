@@ -29,14 +29,14 @@ async function connectAccountWithGoogleCodeHandler(
       signupAnalytics
     });
 
+    await trackOpSpaceSuccessfulSigninEvent({
+      userId: loggedInUser.id,
+      identityType: 'Google'
+    });
+
     if (loggedInUser.otp?.activatedAt) {
       req.session.otpUser = { id: loggedInUser.id, method: 'Google' };
       await req.session.save();
-
-      await trackOpSpaceSuccessfulSigninEvent({
-        userId: loggedInUser.id,
-        identityType: 'Google'
-      });
       return res.status(200).json({ otpRequired: true });
     }
   } else if (type === 'connect') {
