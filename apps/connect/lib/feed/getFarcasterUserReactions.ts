@@ -47,7 +47,10 @@ export type Cast = {
   embeds: (
     | {
         url: string;
-        metadata?: IframelyResponse;
+        metadata?: {
+          content_type: string;
+          content_length: string;
+        };
       }
     | {
         cast_id: {
@@ -141,11 +144,8 @@ export async function getFarcasterUserReactions({ fid }: { fid: number }): Promi
                 cast: embeddedCasts.find((cast) => cast.hash === embed.cast_id.hash)!
               }
             };
-          } else if ('url' in embed) {
-            return {
-              url: embed.url
-            };
           }
+
           return embed;
         })
       }

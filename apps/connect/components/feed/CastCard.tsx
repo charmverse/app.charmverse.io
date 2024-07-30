@@ -1,6 +1,8 @@
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import { Card, CardActionArea, Link, Typography } from '@mui/material';
+import { Link, Typography } from '@mui/material';
+import Card from '@mui/material/Card';
+import CardActionArea from '@mui/material/CardActionArea';
 import { Stack } from '@mui/system';
 import { BsArrowRepeat } from 'react-icons/bs';
 

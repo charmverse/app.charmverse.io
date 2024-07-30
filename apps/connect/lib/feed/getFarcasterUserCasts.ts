@@ -43,10 +43,6 @@ export async function getFarcasterUserCasts({ fid }: { fid: number }) {
               cast: embeddedCasts.find((embeddedCast) => embeddedCast.hash === embed.cast_id.hash)!
             }
           };
-        } else if ('url' in embed) {
-          return {
-            url: embed.url
-          };
         }
 
         return embed;

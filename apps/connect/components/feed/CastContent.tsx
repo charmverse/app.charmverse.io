@@ -15,6 +15,11 @@ export function CastContent({ cast }: { cast: Cast }) {
     .map((embed) => embed.cast_id.cast)
     .filter(isTruthy);
 
+  const embeddedImageUrls = cast.embeds
+    .filter((embed) => 'url' in embed)
+    .map((embed) => (embed.metadata?.content_type?.startsWith('image') ? embed.url : null))
+    .filter(isTruthy);
+
   return (
     <Stack gap={0.5}>
       {castParagraphsChunks.map((castParagraphChunks, paragraphIndex) => (
@@ -57,6 +62,14 @@ export function CastContent({ cast }: { cast: Cast }) {
                 <CastContent cast={embeddedCast} />
               </Stack>
             </Card>
+          ))}
+        </Stack>
+      ) : null}
+
+      {embeddedImageUrls.length ? (
+        <Stack gap={1} my={1}>
+          {embeddedImageUrls.map((embeddedImageUrl) => (
+            <img key={embeddedImageUrl} src={embeddedImageUrl} alt='Embedded' style={{ width: '100%' }} />
           ))}
         </Stack>
       ) : null}

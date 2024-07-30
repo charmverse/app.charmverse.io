@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { Button, Stack } from '@mui/material';
 import Link from 'next/link';
