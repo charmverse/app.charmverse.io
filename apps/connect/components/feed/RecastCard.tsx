@@ -4,6 +4,7 @@ import FlipCameraAndroidOutlinedIcon from '@mui/icons-material/FlipCameraAndroid
 import { Card, CardActionArea, Link, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import { relativeTime } from '@root/lib/utils/dates';
+import { prettyPrint } from '@root/lib/utils/strings';
 
 import { Avatar } from 'components/common/Avatar';
 import type { Recast } from 'lib/feed/getFarcasterUserRecasts';
@@ -25,14 +26,14 @@ function createRecastChunks({ text, ids }: { text: string; ids: string[] }) {
                 return [
                   {
                     text: chunkText,
-                    type: 'text' as const
+                    type: chunk.type
                   }
                 ];
               }
               return [
                 {
                   text: chunkText,
-                  type: 'text' as const
+                  type: chunk.type
                 },
                 {
                   text: id,
@@ -54,11 +55,13 @@ function createRecastChunks({ text, ids }: { text: string; ids: string[] }) {
 }
 
 function CastContent({ cast }: { cast: Recast }) {
-  const mentionedProfiles = cast.mentioned_profiles.map((profile) => `@${profile.username}`);
   const recastParagraphsChunks = cast.text.split('\n').map((text) =>
     createRecastChunks({
       text,
-      ids: [...mentionedProfiles, ...cast.embeds.filter((embed) => 'url' in embed).map((embed) => embed.url)]
+      ids: [
+        ...cast.mentioned_profiles.map((profile) => `@${profile.username}`),
+        ...cast.embeds.filter((embed) => 'url' in embed).map((embed) => embed.url)
+      ]
     })
   );
 
