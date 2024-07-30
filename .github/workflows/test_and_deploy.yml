@@ -270,7 +270,7 @@ jobs:
 
       - name: Start services
         run: |
-          npm run start:test:ci &
+          npm run start:test:ci & npm run connect:start:test:ci &
 
           sleep_loop_ct=0
           until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
