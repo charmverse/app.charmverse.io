@@ -3,8 +3,7 @@ import { Plugin, PluginKey } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import { useContext, useEffect, useState } from 'react';
 
-import type { BangleEditorStateProps } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor-state';
-
+import type { BangleEditorStateProps } from '../core/bangle-editor-state';
 import { BangleEditorState } from '../core/bangle-editor-state';
 
 import { EditorViewContext } from './ReactEditor';

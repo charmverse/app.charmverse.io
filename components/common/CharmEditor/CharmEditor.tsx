@@ -46,7 +46,8 @@ import InlineCommandPalette from './components/inlinePalette/components/InlineCo
 import { LinksPopup } from './components/link/LinksPopup';
 import { LinkedPage } from './components/linkedPage/components/LinkedPage';
 import { LinkedPagesPopup } from './components/linkedPage/components/LinkedPagesPopup';
-import { Mention, MentionsPopup } from './components/mention/components';
+import { Mention } from './components/mention/components/Mention';
+import { MentionsPopup } from './components/mention/components/MentionsPopup';
 import { NestedPage } from './components/nestedPage/components/NestedPage';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
