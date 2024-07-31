@@ -213,8 +213,6 @@ jobs:
             test_command: 'npm run test:e2e:ci -- --shard=2/3'
           - test_name: 'Browser e2e test #3'
             test_command: 'npm run test:e2e:ci -- --shard=3/3'
-          - test_name: 'Connect App E2E'
-            test_command: 'npm run connect:test:e2e:ci'
 
     steps:
       - uses: actions/checkout@v4
@@ -462,7 +460,7 @@ jobs:
             sleep 1
           done
 
-      - name: Run Connect E2E tests
+      - name: Run Sunny Awards E2E tests
         env:
           REACT_APP_APP_ENV: 'test'
         # we have to run docker command ourselves to set network=host so that playwright can access the server
