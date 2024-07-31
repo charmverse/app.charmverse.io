@@ -104,72 +104,76 @@ export function CastContent({ cast, nested = false }: { nested?: boolean; cast: 
 
       {embeddedFrames.length && !nested
         ? embeddedFrames.map((embeddedFrame) => (
-            <Stack gap={1} my={1} key={embeddedFrame.url}>
-              <Card sx={{ p: 2 }}>
-                <CardActionArea href={embeddedFrame.meta.canonical} target='_blank' component={Link} color='inherit'>
-                  <Stack
-                    gap={{
-                      xs: 1,
-                      md: 2
-                    }}
-                    direction={{
-                      xs: 'column',
-                      md: 'row'
-                    }}
-                    alignItems={{
-                      xs: 'flex-start',
-                      md: 'center'
-                    }}
-                  >
-                    <Stack direction='row' gap={1} alignItems='center' justifyContent='flex-start'>
-                      {embeddedFrame.links.icon?.[0] ? (
-                        <Avatar
-                          src={embeddedFrame.links.icon[0].href}
-                          sx={{
-                            width: {
-                              xs: 35,
-                              md: 100
-                            },
-                            height: {
-                              xs: 35,
-                              md: 100
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <Typography
-                        variant='h6'
+            <Card sx={{ my: 1 }} key={embeddedFrame.url}>
+              <CardActionArea
+                sx={{ p: 2 }}
+                href={embeddedFrame.meta.canonical}
+                target='_blank'
+                component={Link}
+                color='inherit'
+              >
+                <Stack
+                  gap={{
+                    xs: 1,
+                    md: 2
+                  }}
+                  direction={{
+                    xs: 'column',
+                    md: 'row'
+                  }}
+                  alignItems={{
+                    xs: 'flex-start',
+                    md: 'center'
+                  }}
+                >
+                  <Stack direction='row' gap={1} alignItems='center' justifyContent='flex-start'>
+                    {embeddedFrame.links.icon?.[0] ? (
+                      <Avatar
+                        src={embeddedFrame.links.icon[0].href}
                         sx={{
-                          display: {
-                            xs: 'block',
-                            md: 'none'
+                          width: {
+                            xs: 35,
+                            md: 100
+                          },
+                          height: {
+                            xs: 35,
+                            md: 100
                           }
                         }}
-                      >
-                        {embeddedFrame.meta.title}
-                      </Typography>
-                    </Stack>
-                    <Stack gap={1}>
-                      <Typography
-                        variant='h6'
-                        sx={{
-                          display: {
-                            xs: 'none',
-                            md: 'block'
-                          }
-                        }}
-                      >
-                        {embeddedFrame.meta.title}
-                      </Typography>
-                      <Typography variant='body1'>{embeddedFrame.meta.description}</Typography>
-                      <Typography variant='subtitle2' color='secondary'>
-                        {embeddedFrame.meta.canonical}
-                      </Typography>
-                    </Stack>
+                      />
+                    ) : null}
+                    <Typography
+                      variant='h6'
+                      sx={{
+                        display: {
+                          xs: 'block',
+                          md: 'none'
+                        }
+                      }}
+                    >
+                      {embeddedFrame.meta.title}
+                    </Typography>
                   </Stack>
-                </CardActionArea>
-              </Card>
-            </Stack>
+                  <Stack gap={1}>
+                    <Typography
+                      variant='h6'
+                      sx={{
+                        display: {
+                          xs: 'none',
+                          md: 'block'
+                        }
+                      }}
+                    >
+                      {embeddedFrame.meta.title}
+                    </Typography>
+                    <Typography variant='body1'>{embeddedFrame.meta.description}</Typography>
+                    <Typography variant='subtitle2' color='secondary'>
+                      {embeddedFrame.meta.canonical}
+                    </Typography>
+                  </Stack>
+                </Stack>
+              </CardActionArea>
+            </Card>
           ))
         : null}
     </Stack>

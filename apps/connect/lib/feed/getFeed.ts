@@ -1,13 +1,14 @@
 import type { IframelyResponse } from '@root/lib/iframely/getIframely';
 import { getIframely } from '@root/lib/iframely/getIframely';
 import { isTruthy } from '@root/lib/utils/types';
+import { uniqBy } from 'lodash';
 
 import { getEmbeddedCasts } from './getEmbeddedCasts';
 import { getFarcasterUserCasts } from './getFarcasterUserCasts';
 import type { Cast } from './getFarcasterUserReactions';
 import { getFarcasterUserReactions } from './getFarcasterUserReactions';
 
-export type FeedItem = { type: 'recast' | 'like' | 'cast'; cast: Cast };
+export type FeedItem = { type: 'recast' | 'like' | 'cast'; cast: Cast; hash: string };
 
 export async function getFeed(): Promise<FeedItem[]> {
   const userReactions = await getFarcasterUserReactions({
@@ -17,10 +18,15 @@ export async function getFeed(): Promise<FeedItem[]> {
     fid: 1501
   });
 
-  const feedItems = [
-    ...userReactions.map((reaction): FeedItem => ({ type: reaction.reaction_type, cast: reaction.cast })),
-    ...userCasts.map((cast): FeedItem => ({ type: 'cast', cast }))
-  ].sort((a, b) => new Date(b.cast.timestamp).getTime() - new Date(a.cast.timestamp).getTime());
+  const feedItems = uniqBy(
+    [
+      ...userReactions.map(
+        (reaction): FeedItem => ({ type: reaction.reaction_type, cast: reaction.cast, hash: reaction.cast.hash })
+      ),
+      ...userCasts.map((cast): FeedItem => ({ type: 'cast', cast, hash: cast.hash }))
+    ],
+    'hash'
+  ).sort((a, b) => new Date(b.cast.timestamp).getTime() - new Date(a.cast.timestamp).getTime());
 
   const embeddedCasts = await getEmbeddedCasts({
     casts: feedItems.map((item) => item.cast)

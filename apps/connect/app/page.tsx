@@ -10,7 +10,7 @@ export default async function Home() {
   const session = await getSession();
 
   if (session?.user?.id) {
-    redirect('/profile');
+    redirect('/feed');
   }
 
   return <HomePage />;

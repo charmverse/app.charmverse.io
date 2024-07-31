@@ -1,7 +1,6 @@
 import { GET } from '@root/adapters/http';
 import { type FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import type { IframelyResponse } from '@root/lib/iframely/getIframely';
-import { uniqBy } from 'lodash';
 
 const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
 
@@ -109,13 +108,5 @@ export async function getFarcasterUserReactions({ fid }: { fid: number }): Promi
     }
   );
 
-  const userReactions = userReactionsResponse.reactions;
-
-  return uniqBy(
-    userReactions.map((reaction) => ({
-      ...reaction,
-      cast_key: `${reaction.object}-${reaction.cast.hash}`
-    })),
-    'cast_key'
-  );
+  return userReactionsResponse.reactions;
 }

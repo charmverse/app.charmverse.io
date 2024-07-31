@@ -4,7 +4,7 @@ import { Stack } from '@mui/system';
 
 import type { FeedItem } from 'lib/feed/getFeed';
 
-import { CastCard } from './CastCard';
+import { CastCard } from './components/CastCard';
 
 export function FeedList({ feed }: { feed: FeedItem[] }) {
   return (
