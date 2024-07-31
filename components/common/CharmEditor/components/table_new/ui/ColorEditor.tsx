@@ -4,8 +4,6 @@ import React from 'react';
 import clamp from './clamp';
 import CustomButton from './CustomButton';
 
-import './czi-color-editor.css';
-
 function generateGreyColors(count: number): Color[] {
   let cc = 255;
   const interval = cc / count;

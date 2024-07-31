@@ -1,6 +1,3 @@
-// @flow
-
-import './czi-custom-menu-item.css';
 import React from 'react';
 
 import CustomButton from './CustomButton';

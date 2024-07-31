@@ -1,5 +1,3 @@
-// @flow
-
 import type { Schema } from 'prosemirror-model';
 import { Fragment } from 'prosemirror-model';
 import type { Transaction } from 'prosemirror-state';

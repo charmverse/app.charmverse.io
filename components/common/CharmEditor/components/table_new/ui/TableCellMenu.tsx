@@ -1,4 +1,3 @@
-// @flow
 import { Edit as EditIcon } from '@mui/icons-material';
 import type { EditorState } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
@@ -6,8 +5,6 @@ import React from 'react';
 
 import CommandMenuButton from './CommandMenuButton';
 import { TABLE_COMMANDS_GROUP } from './EditorToolbarConfig';
-
-import './czi-table-cell-menu.css';
 
 type Props = {
   editorState: EditorState;
@@ -26,7 +23,7 @@ class TableCellMenu extends React.PureComponent<Props> {
         dispatch={editorView.dispatch}
         editorState={editorState}
         editorView={editorView}
-        icon={<EditIcon />}
+        icon={<EditIcon fontSize='small' sx={{ pointerEvents: 'none' }} />}
         title='Edit'
       />
     );

@@ -68,11 +68,12 @@ class PointerSurface extends React.PureComponent<PointerSurfaceProps> {
       document.addEventListener('mouseup', this._onMouseUpCapture, true);
       this._mul = true;
     }
+    console.log('complte on mousedown');
   };
 
   _onMouseUp = (e: SyntheticEvent): void => {
     e.preventDefault();
-
+    console.log('onMouseUp', this);
     if (this._clicked || e.type === 'keypress') {
       const { onClick, value, disabled } = this.props;
       !disabled && onClick && onClick(value, e);
@@ -88,11 +89,13 @@ class PointerSurface extends React.PureComponent<PointerSurfaceProps> {
       document.removeEventListener('mouseup', this._onMouseUpCapture, true);
     }
     const target = e.target;
+    console.log('_onMouseUpCapture 1', this._clicked, e.target, this._pressedTarget);
     this._clicked =
       this._pressedTarget instanceof HTMLElement &&
       target instanceof HTMLElement &&
       (target === this._pressedTarget || target.contains(this._pressedTarget) || this._pressedTarget.contains(target));
     this.setState({ pressed: false });
+    console.log('_onMouseUpCapture 2', this._clicked);
   };
 
   render() {

@@ -1,5 +1,3 @@
-// @flow
-
 import clamp from './clamp';
 import type { PositionHandler } from './PopUpPosition';
 import { fromHTMlElement, fromXY, isIntersected } from './rects';

@@ -1,6 +1,3 @@
-// @flow
-
-import type { Node } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 /* eslint-disable-next-line */
@@ -12,8 +9,6 @@ import createPopUp, { PopUpHandle } from './ui/createPopUp';
 import isElementFullyVisible from './ui/isElementFullyVisible';
 import { atAnchorTopRight } from './ui/PopUpPosition';
 import TableCellMenu from './ui/TableCellMenu';
-
-import './ui/czi-pop-up.css';
 
 class TableCellTooltipView {
   _cellElement: HTMLElement | null = null;

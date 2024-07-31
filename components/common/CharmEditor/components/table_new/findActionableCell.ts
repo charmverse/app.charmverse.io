@@ -1,5 +1,3 @@
-// @flow
-
 import type { Node } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';

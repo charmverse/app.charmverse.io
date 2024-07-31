@@ -1,4 +1,3 @@
-import './czi-custom-button.css';
 // import cx from 'classnames';
 import React from 'react';
 

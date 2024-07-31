@@ -9,8 +9,6 @@ import { PopUpHandle } from './createPopUp';
 import CustomButton from './CustomButton';
 import uuid from './uuid';
 
-import './czi-custom-menu-button.css';
-
 class CommandMenuButton extends React.PureComponent<{
   className?: string | null;
   commandGroups: any[]; // Array<{ [string]: UICommand }>;
@@ -48,14 +46,14 @@ class CommandMenuButton extends React.PureComponent<{
       });
 
     const { expanded } = this.state;
-    // const buttonClassName = cx(className, {
-    //   'czi-custom-menu-button': true,
-    //   expanded
-    // });
+    let buttonClassName = (className ? className + ' ' : '') + 'czi-custom-menu-button';
+    if (expanded) {
+      buttonClassName += ' expanded';
+    }
 
     return (
       <CustomButton
-        className='czi-custom-menu-button' // {buttonClassName}
+        className={buttonClassName}
         disabled={!enabled}
         icon={icon}
         id={this._id}
@@ -72,6 +70,7 @@ class CommandMenuButton extends React.PureComponent<{
 
   _onClick = (): void => {
     const expanded = !this.state.expanded;
+
     this.setState({
       expanded
     });

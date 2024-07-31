@@ -1,8 +1,7 @@
-// @flow
-
 import type { Node } from 'prosemirror-model';
 import { tableNodes } from 'prosemirror-tables';
 
+import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import toCSSColor from './ui/toCSSColor';
 
 const NO_VISIBLE_BORDER_WIDTH = new Set(['0pt', '0px']);
@@ -77,4 +76,11 @@ const TableNodeSpec = {
 };
 Object.assign(TableNodesSpecs, { table: TableNodeSpec });
 
-export default TableNodesSpecs;
+export const spec = Object.entries(TableNodesSpecs).map(
+  ([name, schema]) =>
+    ({
+      name,
+      type: 'node',
+      schema
+    } as BaseRawNodeSpec)
+);

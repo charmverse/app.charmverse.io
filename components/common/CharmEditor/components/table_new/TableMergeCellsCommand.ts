@@ -1,5 +1,3 @@
-// @flow
-
 import type { Schema, Node, ResolvedPos } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import { CellSelection, mergeCells } from 'prosemirror-tables';

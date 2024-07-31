@@ -7,8 +7,6 @@ import clamp from './clamp';
 import htmlElementToRect from './htmlElementToRect';
 import { fromHTMlElement, fromXY, isIntersected } from './rects';
 
-import './czi-table-grid-size-editor.css';
-
 export type TableGridSizeEditorValue = {
   cols: number;
   rows: number;

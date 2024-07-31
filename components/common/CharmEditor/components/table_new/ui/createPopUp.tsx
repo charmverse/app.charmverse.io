@@ -1,15 +1,10 @@
-// @flow
-
-import './czi-vars.css';
-import './czi-pop-up.css';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 import type { PopUpParams, ViewProps } from './PopUp';
 import PopUp from './PopUp';
 import uuid from './uuid';
-
+import { createRoot } from 'react-dom/client';
 export type PopUpHandle = {
   close: (val?: any) => void;
   update: (props: object) => void;
@@ -97,8 +92,12 @@ function renderPopUp(
 ): void {
   const rootNode = getRootElement(rootId, true, popUpParams);
   if (rootNode) {
+    // @ts-ignore - save a reference for later
+    rootNode._reactContainer ||= createRoot(rootNode);
+    // @ts-ignore
+    const reactRoot = rootNode._reactContainer;
     const component = <PopUp View={View} close={close} popUpParams={popUpParams} viewProps={viewProps} />;
-    ReactDOM.render(component, rootNode);
+    reactRoot.render(component);
   }
 
   if (modalsCount > 0) {
@@ -111,8 +110,13 @@ function renderPopUp(
 function unrenderPopUp(rootId: string): void {
   const rootNode = getRootElement(rootId, false);
   if (rootNode) {
-    ReactDOM.unmountComponentAtNode(rootNode);
-    rootNode.parentElement && rootNode.parentElement.removeChild(rootNode);
+    setTimeout(() => {
+      // @ts-ignore
+      rootNode._reactContainer?.unmount();
+      // @ts-ignore
+      rootNode._reactContainer = null;
+      rootNode.parentElement && rootNode.parentElement.removeChild(rootNode);
+    });
   }
 
   if (modalsCount === 0) {

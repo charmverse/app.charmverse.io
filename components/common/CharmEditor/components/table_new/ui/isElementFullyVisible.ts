@@ -1,5 +1,3 @@
-// @flow
-
 import { fromHTMlElement } from './rects';
 
 export default function isElementFullyVisible(el: HTMLElement): boolean {
