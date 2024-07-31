@@ -1,7 +1,7 @@
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { useCallback, useMemo, useEffect } from 'react';
 
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import { useProjectForm } from 'components/proposals/hooks/useProjectForm';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';

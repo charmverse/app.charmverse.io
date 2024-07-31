@@ -1,6 +1,7 @@
 import type { FormFieldType } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import debounce from 'lodash/debounce';
 import { useRef, useEffect, useState, useMemo } from 'react';
 import { v4 } from 'uuid';
@@ -11,7 +12,6 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 
 import { Button } from '../Button';
 
-import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
 
 export function FormFieldsEditor({

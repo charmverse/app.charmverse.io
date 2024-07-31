@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import { Stack } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { isEmptyValue } from 'components/common/form/fields/utils';

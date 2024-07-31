@@ -1,5 +1,6 @@
 import { Avatar } from '@connect-shared/components/common/Avatar';
 import type { AvatarSize } from '@connect-shared/components/common/Avatar';
+import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import { DeleteOutline } from '@mui/icons-material';
 import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
@@ -24,8 +25,6 @@ function FarcasterCardContent({
       sx={{
         display: 'flex',
         gap: 2,
-        p: 0,
-        pb: '0 !important',
         alignItems: 'center',
         flexDirection: 'row'
       }}
@@ -68,17 +67,17 @@ export function FarcasterCard(props: {
 }) {
   if (!props.enableLink || !props.username) {
     return (
-      <Card sx={{ border: 'none' }}>
+      <Card>
         <FarcasterCardContent {...props} />
       </Card>
     );
   }
 
   return (
-    <Card sx={{ border: 'none' }}>
+    <CardMotion>
       <CardActionArea LinkComponent={Link} href={`/u/${props.username}`} hrefLang='en'>
         <FarcasterCardContent {...props} />
       </CardActionArea>
-    </Card>
+    </CardMotion>
   );
 }

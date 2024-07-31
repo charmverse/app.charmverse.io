@@ -13,9 +13,9 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 
 import Avatar from 'components/common/Avatar';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';

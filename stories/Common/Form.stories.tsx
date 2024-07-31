@@ -9,9 +9,8 @@ import { TextInputField } from 'components/common/form/fields/TextInputField';
 import { SocialInputs } from 'components/settings/profile/components/SocialInputs';
 import { TimezoneAutocomplete } from 'components/settings/profile/components/TimezoneAutocomplete';
 import UserDescription from 'components/settings/profile/components/UserDescription';
+import type { SelectOptionType } from 'lib/forms/interfaces';
 import type { Social } from 'lib/members/interfaces';
-
-import type { SelectOptionType } from '../../components/common/form/fields/Select/interfaces';
 
 export default {
   title: 'common/Form',

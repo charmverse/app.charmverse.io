@@ -3,13 +3,13 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, MenuItem, Stack, TextField, Tooltip } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectOptionsList } from 'components/common/form/fields/Select/SelectOptionsList';
 import { isSelectType } from 'components/common/form/fields/utils';
 import Modal from 'components/common/Modal';

@@ -1,9 +1,9 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import type { FormValues } from '@connect-shared/lib/projects/form';
-import { schema } from '@connect-shared/lib/projects/form';
+import { schema, type FormValues } from '@connect-shared/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -12,14 +12,13 @@ import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { PageWrapper } from 'components/common/PageWrapper';
+import { PageCoverHeader } from 'components/common/PageCoverHeader';
 import { actionCreateProject } from 'lib/projects/createProjectAction';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectForm } from '../components/ProjectForm';
-import { ProjectHeader } from '../components/ProjectHeader';
 
 export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
@@ -80,7 +79,9 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   } as ProjectDetailsProps['project'];
 
   return (
-    <PageWrapper header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}>
+    <PageWrapper
+      header={<PageCoverHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}
+    >
       <Box gap={2} display='flex' flexDirection='column'>
         <ProjectDetails project={projectDetails} />
         <Typography variant='h5' data-test='project-form-add-team'>

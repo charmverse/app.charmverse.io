@@ -7,8 +7,7 @@ import {
   backgroundColor,
   backgroundColorDarkMode,
   backgroundLightColorDarkMode,
-  blueColor,
-  darkBlueColor,
+  brandColor,
   inputBackground,
   inputBackgroundDarkMode,
   inputBorder,
@@ -42,7 +41,7 @@ const extendedTheme = extendTheme({
           primary: primaryTextColor
         },
         primary: {
-          main: blueColor
+          main: brandColor
         },
         secondary: {
           main: secondaryTextColor
@@ -74,8 +73,8 @@ const extendedTheme = extendTheme({
           primary: primaryTextColorDarkMode
         },
         primary: {
-          main: darkBlueColor,
-          dark: darken(darkBlueColor, 0.2)
+          main: brandColor,
+          dark: darken(brandColor, 0.2)
         },
         secondary: {
           main: secondaryTextColorDarkMode

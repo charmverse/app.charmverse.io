@@ -1,8 +1,7 @@
+import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
-
-import { PageWrapper } from 'components/common/PageWrapper';
 
 import { WarpcastLogin } from './components/WarpcastLogin';
 

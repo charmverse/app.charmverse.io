@@ -1,6 +1,7 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { useCallback, useMemo } from 'react';
 import { Controller } from 'react-hook-form';
 import type { Control, UseFormGetFieldState } from 'react-hook-form';
@@ -20,7 +21,6 @@ import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import { FieldWrapper } from './fields/FieldWrapper';
 import { ProjectFieldAnswer } from './fields/ProjectField/ProjectFieldAnswer';
-import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
 
