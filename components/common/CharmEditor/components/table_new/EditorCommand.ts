@@ -31,8 +31,10 @@ const {
 // editable tables, even though those don't work in ProseMirror. The only way
 // to turn these off is globally, which you might want to do with the
 // following code:
-document.execCommand('enableObjectResizing', false, 'false');
-document.execCommand('enableInlineTableEditing', false, 'false');
+if (typeof document !== 'undefined') {
+  document.execCommand('enableObjectResizing', false, 'false');
+  document.execCommand('enableInlineTableEditing', false, 'false');
+}
 
 export const TABLE_ADD_COLUMN_AFTER = createCommand(addColumnAfter);
 export const TABLE_ADD_COLUMN_BEFORE = createCommand(addColumnBefore);
