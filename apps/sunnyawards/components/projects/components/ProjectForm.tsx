@@ -177,13 +177,15 @@ export function ProjectForm({
             <Controller
               control={control}
               name='mintingWalletAddress'
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <TextField
                   data-test='project-minting-wallet'
                   rows={3}
                   aria-labelledby='project-minting-wallet'
                   placeholder='Wallet used to mint the project'
                   {...field}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
                 />
               )}
             />

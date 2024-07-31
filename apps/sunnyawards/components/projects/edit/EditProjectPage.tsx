@@ -43,6 +43,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     getValues
   } = useForm<FormValues>({
     defaultValues: {
+      id: project.id,
       name: project.name,
       avatar: project.avatar ?? undefined,
       category: project.category as ProjectCategory,
@@ -53,6 +54,12 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       mirror: project.mirror ?? undefined,
       twitter: project.twitter ?? undefined,
       websites: project.websites,
+      sunnyAwardsProjectType: project.sunnyAwardsProjectType ?? undefined,
+      primaryContractChainId: project.primaryContractChainId?.toString() ?? undefined,
+      primaryContractAddress: (project.primaryContractAddress as `0x${string}`) ?? undefined,
+      primaryContractDeployTxHash: (project.primaryContractDeployTxHash as `0x${string}`) ?? undefined,
+      primaryContractDeployer: (project.primaryContractDeployer as `0x${string}`) ?? undefined,
+      mintingWalletAddress: (project.mintingWalletAddress as `0x${string}`) ?? undefined,
       projectMembers:
         project.projectMembers.map(
           (member) =>

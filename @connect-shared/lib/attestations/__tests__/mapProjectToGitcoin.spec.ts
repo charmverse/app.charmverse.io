@@ -1,6 +1,6 @@
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
 import { v4 as uuid, v4 } from 'uuid';
 
-import type { ConnectProjectDetails } from '../../projects/fetchProject';
 import { mapProjectToGitcoin } from '../mapProjectToGitcoin';
 
 describe('mapProjectToGitcoin', () => {
@@ -22,6 +22,12 @@ describe('mapProjectToGitcoin', () => {
       mirror: 'https://mirror.xyz/projectx',
       websites: ['https://example.com'],
       path: null,
+      mintingWalletAddress: null,
+      primaryContractAddress: null,
+      primaryContractChainId: null,
+      primaryContractDeployer: null,
+      primaryContractDeployTxHash: null,
+      sunnyAwardsProjectType: null,
       projectMembers: [
         {
           farcasterUser: {
