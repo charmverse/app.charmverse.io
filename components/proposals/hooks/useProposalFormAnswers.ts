@@ -25,7 +25,7 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
         );
         return {
           ...formField,
-          // formFieldAnswer: proposalFormFieldAnswer,
+          formFieldAnswerId: proposalFormFieldAnswer?.id,
           value: proposalFormFieldAnswer?.value as FormFieldValue,
           options: (formField.options ?? []) as SelectOptionType[]
         };
