@@ -46,7 +46,7 @@ export type Cast = {
           content_type: string;
           content_length: string;
         };
-        frame?: IframelyResponse;
+        embed?: IframelyResponse;
       }
     | {
         cast_id: {
@@ -56,6 +56,22 @@ export type Cast = {
         };
       }
   )[];
+  frames?: {
+    version: string;
+    title: string;
+    image: string;
+    image_aspect_ratio: string;
+    buttons: {
+      index: number;
+      title: string;
+      action_type: string;
+      target?: string;
+    }[];
+    input: Record<string, unknown>;
+    state: Record<string, unknown>;
+    post_url: string;
+    frames_url: string;
+  }[];
   reactions: {
     likes_count: number;
     recasts_count: number;

@@ -5,7 +5,10 @@ import { isTruthy } from '@root/lib/utils/types';
 import { createCastParagraphChunks } from 'lib/feed/createCastParagraphChunks';
 import type { Cast } from 'lib/feed/getFarcasterUserReactions';
 
-import { CastAuthorDetails } from './CastAuthorDetails';
+import { CastAuthorDetails } from '../CastAuthorDetails';
+
+import { CastEmbedContent } from './CastEmbedContent';
+import { CastFrameContent } from './CastFrameContent';
 
 export function CastContent({ cast, nested = false }: { nested?: boolean; cast: Cast }) {
   const castParagraphsChunks = createCastParagraphChunks(cast);
@@ -20,9 +23,9 @@ export function CastContent({ cast, nested = false }: { nested?: boolean; cast: 
     .map((embed) => (embed.metadata?.content_type?.startsWith('image') ? embed.url : null))
     .filter(isTruthy);
 
-  const embeddedFrames = cast.embeds
+  const embeds = cast.embeds
     .map((embed) =>
-      'frame' in embed ? (embed.frame && !embed.metadata?.content_type?.startsWith('image') ? embed.frame : null) : null
+      'embed' in embed ? (embed.embed && !embed.metadata?.content_type?.startsWith('image') ? embed.embed : null) : null
     )
     .filter(isTruthy);
 
@@ -102,80 +105,8 @@ export function CastContent({ cast, nested = false }: { nested?: boolean; cast: 
         </Stack>
       ) : null}
 
-      {embeddedFrames.length && !nested
-        ? embeddedFrames.map((embeddedFrame) => (
-            <Card sx={{ my: 1 }} key={embeddedFrame.url}>
-              <CardActionArea
-                sx={{ p: 2 }}
-                href={embeddedFrame.meta.canonical}
-                target='_blank'
-                component={Link}
-                color='inherit'
-              >
-                <Stack
-                  gap={{
-                    xs: 1,
-                    md: 2
-                  }}
-                  direction={{
-                    xs: 'column',
-                    md: 'row'
-                  }}
-                  alignItems={{
-                    xs: 'flex-start',
-                    md: 'center'
-                  }}
-                >
-                  <Stack direction='row' gap={1} alignItems='center' justifyContent='flex-start'>
-                    {embeddedFrame.links.icon?.[0] ? (
-                      <Avatar
-                        src={embeddedFrame.links.icon[0].href}
-                        sx={{
-                          width: {
-                            xs: 35,
-                            md: 100
-                          },
-                          height: {
-                            xs: 35,
-                            md: 100
-                          }
-                        }}
-                      />
-                    ) : null}
-                    <Typography
-                      variant='h6'
-                      sx={{
-                        display: {
-                          xs: 'block',
-                          md: 'none'
-                        }
-                      }}
-                    >
-                      {embeddedFrame.meta.title}
-                    </Typography>
-                  </Stack>
-                  <Stack gap={1}>
-                    <Typography
-                      variant='h6'
-                      sx={{
-                        display: {
-                          xs: 'none',
-                          md: 'block'
-                        }
-                      }}
-                    >
-                      {embeddedFrame.meta.title}
-                    </Typography>
-                    <Typography variant='body1'>{embeddedFrame.meta.description}</Typography>
-                    <Typography variant='subtitle2' color='secondary'>
-                      {embeddedFrame.meta.canonical}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </CardActionArea>
-            </Card>
-          ))
-        : null}
+      {embeds.length && !nested ? <CastEmbedContent embeds={embeds} /> : null}
+      {cast.frames?.length && !nested ? <CastFrameContent frames={cast.frames} /> : null}
     </Stack>
   );
 }
