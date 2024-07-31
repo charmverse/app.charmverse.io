@@ -10,12 +10,14 @@ import { getFarcasterUserReactions } from './getFarcasterUserReactions';
 
 export type FeedItem = { type: 'recast' | 'like' | 'cast'; cast: Cast; hash: string };
 
+const charmverseFarcasterId = 1501;
+
 export async function getFeed(): Promise<FeedItem[]> {
   const userReactions = await getFarcasterUserReactions({
-    fid: 1501
+    fid: charmverseFarcasterId
   });
   const userCasts = await getFarcasterUserCasts({
-    fid: 1501
+    fid: charmverseFarcasterId
   });
 
   const feedItems = uniqBy(

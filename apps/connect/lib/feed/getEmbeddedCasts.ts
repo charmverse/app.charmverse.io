@@ -1,4 +1,5 @@
 import { GET } from '@root/adapters/http';
+import { isTruthy } from '@root/lib/utils/types';
 
 import type { Cast } from './getFarcasterUserReactions';
 
@@ -13,7 +14,11 @@ const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
 export async function getEmbeddedCasts({ casts }: { casts: Cast[] }) {
   const embeddedCastHashes = Array.from(
     new Set(
-      casts.map((cast) => cast.embeds.filter((embed) => 'cast_id' in embed).map((embed) => embed.cast_id.hash)).flat()
+      casts
+        .map((cast) =>
+          cast.embeds.map((embed) => ('cast_id' in embed ? embed.cast_id.hash : undefined)).filter(isTruthy)
+        )
+        .flat()
     )
   );
 

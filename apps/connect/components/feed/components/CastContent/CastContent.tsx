@@ -1,6 +1,6 @@
-import { Typography, Card, Link, CardActionArea, Avatar } from '@mui/material';
+import { Card, Link, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
-import { isTruthy } from '@root/lib/utils/types';
+import type { IframelyResponse } from '@root/lib/iframely/getIframely';
 
 import { createCastParagraphChunks } from 'lib/feed/createCastParagraphChunks';
 import type { Cast } from 'lib/feed/getFarcasterUserReactions';
@@ -13,21 +13,27 @@ import { CastFrameContent } from './CastFrameContent';
 export function CastContent({ cast, nested = false }: { nested?: boolean; cast: Cast }) {
   const castParagraphsChunks = createCastParagraphChunks(cast);
 
-  const embeddedCasts = cast.embeds
-    .filter((embed) => 'cast_id' in embed)
-    .map((embed) => embed.cast_id.cast)
-    .filter(isTruthy);
+  const embeddedCasts: Cast[] = [];
+  const embeddedImageUrls: string[] = [];
+  const embeds: IframelyResponse[] = [];
 
-  const embeddedImageUrls = cast.embeds
-    .filter((embed) => 'url' in embed)
-    .map((embed) => (embed.metadata?.content_type?.startsWith('image') ? embed.url : null))
-    .filter(isTruthy);
+  cast.embeds.forEach((embed) => {
+    if ('cast_id' in embed && embed.cast_id.cast) {
+      embeddedCasts.push(embed.cast_id.cast);
+    }
+  });
 
-  const embeds = cast.embeds
-    .map((embed) =>
-      'embed' in embed ? (embed.embed && !embed.metadata?.content_type?.startsWith('image') ? embed.embed : null) : null
-    )
-    .filter(isTruthy);
+  cast.embeds.forEach((embed) => {
+    if ('url' in embed && embed.metadata?.content_type?.startsWith('image')) {
+      embeddedImageUrls.push(embed.url);
+    }
+  });
+
+  cast.embeds.forEach((embed) => {
+    if ('embed' in embed && embed.embed && embed.metadata?.content_type?.startsWith('image')) {
+      embeds.push(embed.embed);
+    }
+  });
 
   return (
     <Stack gap={0.5}>

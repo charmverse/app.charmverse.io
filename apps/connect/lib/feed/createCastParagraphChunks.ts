@@ -1,3 +1,5 @@
+import { isTruthy } from '@root/lib/utils/types';
+
 import type { Cast } from './getFarcasterUserReactions';
 
 export function createCastParagraphChunks(cast: Cast) {
@@ -10,11 +12,15 @@ export function createCastParagraphChunks(cast: Cast) {
           type: 'mention' as const
         })),
         ...cast.embeds
-          .filter((embed) => 'url' in embed)
-          .map((embed) => ({
-            id: embed.url,
-            type: 'link' as const
-          }))
+          .map((embed) =>
+            'url' in embed
+              ? {
+                  id: embed.url,
+                  type: 'link' as const
+                }
+              : null
+          )
+          .filter(isTruthy)
       ]
     })
   );
