@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 
 import { CreateProjectPage } from 'components/projects/new/CreateProjectPage';
 
+export const dynamic = 'force-dynamic';
+
 export default async function CreateProject() {
   const user = await getCurrentUserAction();
 
