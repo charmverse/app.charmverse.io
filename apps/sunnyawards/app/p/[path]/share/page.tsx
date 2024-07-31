@@ -43,7 +43,7 @@ export default function PublishProjectPage({ params }: { params: { path: string 
         }}
         alt='Charmverse Connect homepage'
       />
-      <Typography data-test='connect-home-page' align='center' variant='h4'>
+      <Typography align='center' variant='h4'>
         Congratulations your project has just entered the Sunny Awards
       </Typography>
       <Typography align='center'>Share the good news on Warpcast!</Typography>

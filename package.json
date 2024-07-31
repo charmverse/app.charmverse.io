@@ -84,7 +84,7 @@
     "connect:build": "concurrently --names \"build-connect,build-connect-api\" -c \"green,yellow\" \"npm run connect-app:build\" \"npm run connect-api:build\"",
     "connect:start:prod": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect-app:start:prod\" \"npm run connect-api:start:prod\"",
     "connect-app": "npx react-env --path .env.local --dest ./apps/connect/public -- npm run start --workspace=apps/connect",
-    "connect-app:start:test": "npx react-env --path .env.test.local --dest ./apps/connect/public -- npm run start --workspace=apps/connect",
+    "connect-app:start:test": "npm run start:test -w=apps/connect",
     "connect-app:remote": "npx react-env --path .env.production -- npm run start --workspace=apps/connect",
     "connect-app:build": "npm run build --w=apps/connect",
     "connect-app:start:prod": "npx react-env --path .env.local --dest ./apps/connect/public npm run start:prod --workspace=apps/connect",
@@ -101,7 +101,11 @@
     "sunnyawards:remote": "dotenv -e .env.production -- npm run start --w=apps/sunnyawards",
     "sunnyawards:build": "npm run build --w=apps/sunnyawards",
     "sunnyawards:start:prod": "npm run start:prod --workspace=apps/sunnyawards",
-    "sunnyawards:start:test": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 dotenv -e .env.test.local -- npm run start --workspace=apps/connect"
+    "sunnyawards:start:test": "npm run start:test -w=apps/sunnyawards",
+    "sunnyawards:start:test:ci": "npm run start:test:ci -w=apps/sunnyawards",
+    "sunnyawards:debug:e2e": "npm run debug:e2e -w=apps/sunnyawards",
+    "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards"
+
   },
   "lint-staged": {
     "*.{ts,tsx}": [

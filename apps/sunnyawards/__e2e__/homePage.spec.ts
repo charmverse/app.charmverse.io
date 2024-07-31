@@ -27,20 +27,20 @@ test.beforeAll(async () => {
 });
 
 test.describe('Home page', () => {
-  // test('Open the app and go to home page', async ({ page }) => {
-  //   await page.goto('/');
+  test('Open the app and go to home page', async ({ page }) => {
+    await page.goto('/');
 
-  //   await expect(page.locator('data-test=connect-home-page')).toBeVisible();
+    await expect(page.locator('data-test=connect-home-page')).toBeVisible();
 
-  //   const connectButton = page.locator('data-test=connect-with-farcaster');
+    const connectButton = page.locator('data-test=connect-with-farcaster');
 
-  //   // We are using the modal from Farcaster SDK, so we target by expected text
-  //   const farcasterModal = page.getByText("Scan with your phone's camera to continue.");
+    // We are using the modal from Farcaster SDK, so we target by expected text
+    const farcasterModal = page.getByText("Scan with your phone's camera to continue.");
 
-  //   await connectButton.click();
+    await connectButton.click();
 
-  //   await expect(farcasterModal).toBeVisible();
-  // });
+    await expect(farcasterModal).toBeVisible();
+  });
 
   test('Save new user preferences and go to welcome page', async ({ page }) => {
     await loginBrowserUser({ browserPage: page, userId });
