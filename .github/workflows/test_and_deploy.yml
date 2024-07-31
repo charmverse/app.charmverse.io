@@ -388,7 +388,7 @@ jobs:
 
       - name: Start connect app
         run: |
-          npm run start:test:ci &
+          npm run connect:start:test:ci &
           sleep_loop_ct=0
           until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -450,9 +450,9 @@ jobs:
         uses: ./.github/actions/build
 
 
-      - name: Start connect app
+      - name: Start Sunny Awards app
         run: |
-          npm run start:test:ci &
+          npm run sunnyawards:start:test:ci &
           sleep_loop_ct=0
           until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -476,7 +476,7 @@ jobs:
                       --network "host"  \
                       --ipc=host \
                       mcr.microsoft.com/playwright:v1.42.1-jammy \
-                      npm run connect:test:e2e:ci
+                      npm run sunnyawards:test:e2e:ci
 
   deploy-docker:
     name: Upload Docker image and assets
@@ -675,7 +675,7 @@ jobs:
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test-connect, deploy-docker]
+    needs: [test-connect, 'test-connect-e2e', deploy-docker]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -753,7 +753,7 @@ jobs:
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test-connect, deploy-docker]
+    needs: [test-connect, 'test-sunnyawards-e2e', deploy-docker]
     steps:
       - uses: actions/checkout@v4
         with:
