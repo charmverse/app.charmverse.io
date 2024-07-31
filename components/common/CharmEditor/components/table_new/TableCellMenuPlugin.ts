@@ -8,7 +8,7 @@ import bindScrollHandler, { ScrollHandle } from './ui/bindScrollHandler';
 import createPopUp, { PopUpHandle } from './ui/createPopUp';
 import isElementFullyVisible from './ui/isElementFullyVisible';
 import { atAnchorTopRight } from './ui/PopUpPosition';
-import TableCellMenu from './ui/TableCellMenu';
+import { TableCellMenu } from './ui/TableCellMenu';
 
 class TableCellTooltipView {
   _cellElement: HTMLElement | null = null;

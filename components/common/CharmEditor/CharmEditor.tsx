@@ -54,7 +54,7 @@ import type { CharmNodeViewProps } from './components/nodeView/nodeView';
 import ResizablePDF from './components/pdf/ResizablePDF';
 import { PollNodeView } from './components/poll/PollComponent';
 import Quote from './components/quote/components/Quote';
-import RowActionsMenu from './components/rowActions/RowActionsMenu';
+import { RowActionsMenu } from './components/rowActions/RowActionsMenu';
 import { SuggestionsPopup } from './components/suggestions/SuggestionPopup';
 import { TableOfContents } from './components/tableOfContents/TableOfContents';
 import { TweetNodeView } from './components/tweet/TweetNodeView';

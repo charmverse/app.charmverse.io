@@ -215,7 +215,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   );
 }
 
-export default function RowActionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
+export function RowActionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const menuState: PluginState = usePluginState(pluginKey);
 
   // Fixes the case where undefined menu state throws an error

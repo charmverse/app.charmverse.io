@@ -1,5 +1,5 @@
-import type { EditorState, Selection, Transaction } from 'prosemirror-state';
-import { Transform } from 'prosemirror-transform';
+import type { EditorState, Selection } from 'prosemirror-state';
+import { Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent } from 'react';
 
@@ -14,7 +14,7 @@ const EventType = {
 
 function dryRunEditorStateProxyGetter(state: EditorState, propKey: keyof EditorState): any {
   const val = state[propKey];
-  if (propKey === 'tr' && val instanceof Transform) {
+  if (propKey === 'tr' && val instanceof Transaction) {
     return val.setMeta('dryrun', true);
   }
   return val;
