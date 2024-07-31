@@ -1,13 +1,12 @@
 'use server';
 
-import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
-import { resolveEnsAddress } from '@root/lib/blockchain/resolveEnsAddress';
+import { isTestEnv } from '@root/config/constants';
 import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
 
 import { schema } from './form';
@@ -44,7 +43,9 @@ export const createProjectAction = authActionClient
       });
     }
 
-    await generateOgImage(newProject.id, currentUserId);
+    if (!isTestEnv) {
+      await generateOgImage(newProject.id, currentUserId);
+    }
 
     return { success: true, projectId: newProject.id, projectPath: newProject.path };
   });
