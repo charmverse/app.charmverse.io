@@ -52,9 +52,7 @@ test('Create a project and view details', async ({ page }) => {
 
   const createProject = page.locator('data-test=create-new-project');
 
-  await createProject.click();
-
-  await page.waitForURL('**/projects/new');
+  await Promise.all([page.waitForURL('**/projects/new'), createProject.click()]);
 
   const fieldName = page.locator('data-test=project-form-name >> input');
   const fieldDescription = page.locator('data-test=project-form-description  >> textarea').first();
