@@ -16,7 +16,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
     "@mui/material-nextjs": "^5.15.11",
-    "@serwist/next": "^9.0.3",
+    "@serwist/next": "^9.0.5",
     "@typeschema/yup": "^0.13.3",
     "framer-motion": "^11.3.17",
     "next-safe-action": "^7.4.2",
@@ -24,6 +24,6 @@
   },
   "devDependencies": {
     "@types/web-push": "^3.6.3",
-    "serwist": "^9.0.3"
+    "serwist": "^9.0.5"
   }
 }

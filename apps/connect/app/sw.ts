@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { defaultCache } from '@serwist/next/worker';
 import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist';
 import { Serwist } from 'serwist';
@@ -32,8 +31,6 @@ self.addEventListener('push', async (event) => {
 
   // Keep the service worker alive until the notification is created.
   event.waitUntil(
-    // Show a notification with title 'ServiceWorker Cookbook' and use the payload
-    // as the body.
     self.registration.showNotification(eventData.title, {
       body: eventData.body,
       icon: '/images/manifest/icon-192.png'

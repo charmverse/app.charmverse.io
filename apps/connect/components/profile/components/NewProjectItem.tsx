@@ -1,3 +1,4 @@
+import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import { Add as AddIcon } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import CardActionArea from '@mui/material/CardActionArea';
@@ -5,8 +6,6 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-
-import { CardMotion } from 'components/common/Motions/CardMotion';
 
 export function NewProjectItem({ children, href }: { children: ReactNode; href: string }) {
   return (
