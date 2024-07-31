@@ -13,7 +13,7 @@ const demoAvatar =
 
 export async function GET(request: Request) {
   if (!isTestEnv) {
-    throw new InvalidInputError('This endpoint is only available in test environment');
+    return new Response('This endpoint is only available in test environment', { status: 403 });
   }
 
   const { searchParams } = new URL(request.url);
