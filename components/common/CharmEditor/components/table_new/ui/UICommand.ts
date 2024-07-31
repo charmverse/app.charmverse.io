@@ -31,6 +31,7 @@ class UICommand {
   static EventType = EventType;
 
   shouldRespondToUIEvent = (e: SyntheticEvent | MouseEvent): boolean => {
+    console.log(e.type, UICommand.EventType.CLICK, e.type === UICommand.EventType.CLICK);
     return e.type === UICommand.EventType.CLICK;
   };
 

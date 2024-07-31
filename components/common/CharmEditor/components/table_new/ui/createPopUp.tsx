@@ -1,13 +1,20 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
-import type { PopUpParams, ViewProps } from './PopUp';
-import PopUp from './PopUp';
-import uuid from './uuid';
+import { v1 as uuid } from 'uuid';
 import { createRoot } from 'react-dom/client';
-export type PopUpHandle = {
+import { ClickAwayListener, Popper } from '@mui/material';
+
+export type PopUpParams = {
+  anchor?: any;
+  container?: Element | null;
+  modal?: boolean | null;
+  onClose?: ((val: any) => void) | null;
+  placement?: 'top-end' | 'right';
+};
+
+export type PopUpHandle<T> = {
   close: (val?: any) => void;
-  update: (props: object) => void;
+  update: (props: T) => void;
 };
 
 let modalsCount = 0;
@@ -83,11 +90,11 @@ function getRootElement(id: string, forceCreation: boolean, popUpParams?: PopUpP
   return element;
 }
 
-function renderPopUp(
+function renderPopUp<T>(
   rootId: string,
   close: VoidFunction,
-  View: React.ComponentType<ViewProps>,
-  viewProps: ViewProps,
+  View: (props: T) => React.ReactNode,
+  viewProps: T,
   popUpParams: PopUpParams
 ): void {
   const rootNode = getRootElement(rootId, true, popUpParams);
@@ -96,7 +103,13 @@ function renderPopUp(
     rootNode._reactContainer ||= createRoot(rootNode);
     // @ts-ignore
     const reactRoot = rootNode._reactContainer;
-    const component = <PopUp View={View} close={close} popUpParams={popUpParams} viewProps={viewProps} />;
+    const component = (
+      // <ClickAwayListener onClickAway={close}>
+      <Popper open anchorEl={popUpParams.anchor} placement={popUpParams.placement}>
+        <View {...viewProps} close={close} />
+      </Popper>
+      // </ClickAwayListener>
+    );
     reactRoot.render(component);
   }
 
@@ -124,17 +137,17 @@ function unrenderPopUp(rootId: string): void {
   }
 }
 
-export default function createPopUp(
-  View: React.ComponentType<ViewProps>,
-  viewProps?: ViewProps | null,
+export default function createPopUp<T>(
+  View: (props: T) => React.ReactNode,
+  viewProps?: T | null,
   popUpParams?: PopUpParams | null
-): PopUpHandle {
+): PopUpHandle<T> {
   const rootId = uuid();
 
-  let handle: PopUpHandle | null = null;
+  let handle: PopUpHandle<T> | null = null;
   let currentViewProps = viewProps;
 
-  viewProps = viewProps || {};
+  viewProps = viewProps || ({} as T);
   popUpParams = popUpParams || {};
 
   const modal = popUpParams.modal || !popUpParams.anchor;
@@ -162,8 +175,15 @@ export default function createPopUp(
     onClose && onClose(value);
   };
 
-  const render = renderPopUp.bind(null, rootId, closePopUp, View);
-  const emptyObj = {};
+  const typedRenderPopUp = renderPopUp as (
+    rootId: string,
+    close: VoidFunction,
+    View: (props: T) => React.ReactNode,
+    viewProps: T,
+    popUpParams: PopUpParams
+  ) => void;
+  const render = typedRenderPopUp.bind(null, rootId, closePopUp, View);
+  const emptyObj = {} as T;
 
   handle = {
     close: closePopUp,

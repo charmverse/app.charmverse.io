@@ -5,13 +5,12 @@ import type { SyntheticEvent } from 'react';
 
 import insertTable from './insertTable';
 import createPopUp, { PopUpHandle } from './ui/createPopUp';
-import { atAnchorRight } from './ui/PopUpPosition';
 import TableGridSizeEditor from './ui/TableGridSizeEditor';
 import type { TableGridSizeEditorValue } from './ui/TableGridSizeEditor';
 import UICommand from './ui/UICommand';
 
 class TableInsertCommand extends UICommand {
-  _popUp: PopUpHandle | null = null;
+  _popUp: PopUpHandle<null> | null = null;
 
   shouldRespondToUIEvent = (e: SyntheticEvent | MouseEvent): boolean => {
     return e.type === UICommand.EventType.MOUSEENTER;
@@ -45,7 +44,7 @@ class TableInsertCommand extends UICommand {
       // @ts-ignore
       this._popUp = createPopUp(TableGridSizeEditor, null, {
         anchor,
-        position: atAnchorRight,
+        placement: 'right',
         onClose: (val) => {
           if (this._popUp) {
             this._popUp = null;

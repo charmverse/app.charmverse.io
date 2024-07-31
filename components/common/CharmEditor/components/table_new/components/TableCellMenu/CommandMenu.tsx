@@ -3,15 +3,16 @@ import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent, ReactNode } from 'react';
 import React from 'react';
 
-import CustomMenu from './CustomMenu';
-import CustomMenuItem from './CustomMenuItem';
-import type UICommand from './UICommand';
+import CustomMenu from '../../ui/CustomMenu';
+import CustomMenuItem from '../../ui/CustomMenuItem';
+import { List, ListItemButton, Menu, MenuItem, ListItemText } from '@mui/material';
+import type UICommand from '../../ui/UICommand';
 
 export type CommandMenuProps = {
   commandGroups: any[]; // { [string]: UICommand }[];
   dispatch: (tr: Transaction) => void;
   editorState: EditorState;
-  editorView?: EditorView;
+  editorView: EditorView;
   onCommand: VoidFunction | null;
 };
 
@@ -33,30 +34,29 @@ class CommandMenu extends React.PureComponent<CommandMenuProps> {
           disabled = false;
         }
         children.push(
-          <CustomMenuItem
-            active={command.isActive(editorState)}
+          <ListItemButton
+            dense
+            selected={command.isActive(editorState)}
             disabled={disabled}
             key={label}
-            label={command.renderLabel(editorState) || label}
-            onClick={this._onUIEnter}
-            onMouseEnter={this._onUIEnter}
-            value={command}
-          />
+            onClick={(e) => this._onUIEnter(command, e)}
+          >
+            <ListItemText>{command.renderLabel(editorState) || label}</ListItemText>
+          </ListItemButton>
         );
       });
       if (ii !== jj) {
         children.push(<CustomMenuItem.Separator key={`${String(ii)}-hr`} />);
       }
     });
-    return <CustomMenu>{children}</CustomMenu>;
+    return <List sx={{ bgcolor: 'background.paper' }}>{children}</List>;
   }
 
   _onUIEnter = (command: UICommand, event: SyntheticEvent): void => {
-    if (command.shouldRespondToUIEvent(event)) {
-      this._activeCommand && this._activeCommand.cancel();
-      this._activeCommand = command;
-      this._execute(command, event);
-    }
+    console.log(event, event.type, command.shouldRespondToUIEvent(event));
+    this._activeCommand && this._activeCommand.cancel();
+    this._activeCommand = command;
+    this._execute(command, event);
   };
 
   _execute = (command: UICommand, e: SyntheticEvent) => {

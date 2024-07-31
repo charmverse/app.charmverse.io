@@ -1,19 +1,16 @@
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
-/* eslint-disable-next-line */
-import React from 'react';
 
 import findActionableCell from './findActionableCell';
 import bindScrollHandler, { ScrollHandle } from './ui/bindScrollHandler';
 import createPopUp, { PopUpHandle } from './ui/createPopUp';
 import isElementFullyVisible from './ui/isElementFullyVisible';
-import { atAnchorTopRight } from './ui/PopUpPosition';
-import { TableCellMenu } from './ui/TableCellMenu';
+import { TableCellMenu } from './components/TableCellMenu/TableCellMenu';
 
 class TableCellTooltipView {
   _cellElement: HTMLElement | null = null;
 
-  _popUp: PopUpHandle | null = null;
+  _popUp: PopUpHandle<any> | null = null;
 
   _scrollHandle: ScrollHandle | null = null;
 
@@ -41,7 +38,7 @@ class TableCellTooltipView {
 
     let cellEl: HTMLElement | null = domFound.node as HTMLElement;
     const popUp = this._popUp;
-    const viewPops = {
+    const viewProps = {
       editorState: state,
       editorView: view
     };
@@ -49,6 +46,7 @@ class TableCellTooltipView {
     if (cellEl && !isElementFullyVisible(cellEl)) {
       cellEl = null;
     }
+    console.log('cell El', cellEl);
 
     if (!cellEl) {
       // Closes the popup.
@@ -56,17 +54,16 @@ class TableCellTooltipView {
       this._cellElement = null;
     } else if (popUp && cellEl === this._cellElement) {
       // Updates the popup.
-      popUp.update(viewPops);
+      popUp.update(viewProps);
     } else {
       // Creates a new popup.
       popUp && popUp.close();
       this._cellElement = cellEl;
-      // @ts-ignore
-      this._popUp = createPopUp(TableCellMenu, viewPops, {
+      this._popUp = createPopUp(TableCellMenu, viewProps, {
         anchor: cellEl,
-        autoDismiss: false,
         onClose: this._onClose,
-        position: atAnchorTopRight
+        placement: 'top-end'
+        // position: 'atAnchorTopRight'
       });
       this._onOpen();
     }

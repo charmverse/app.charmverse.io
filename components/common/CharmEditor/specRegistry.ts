@@ -42,7 +42,7 @@ import * as poll from './components/poll/pollSpec';
 import * as quote from './components/quote/quote';
 import * as tabIndent from './components/tabIndent';
 // import { spec as tableSpec } from './components/table/table.schema';
-import { spec as tableSpec } from './components/table_new/TableNodesSpecs';
+import { spec as tableSpec } from './components/table_new/table.specs';
 import { spec as tableOfContentSpec } from './components/tableOfContents/tableOfContents.specs';
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';

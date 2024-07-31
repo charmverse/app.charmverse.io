@@ -4,7 +4,7 @@ import { TextSelection } from 'prosemirror-state';
 import { CellSelection, TableMap } from 'prosemirror-tables';
 import { findParentNodeOfType } from 'prosemirror-utils';
 
-import { TABLE_CELL, TABLE_HEADER } from './NodeNames';
+import { TABLE_CELL, TABLE_HEADER } from '../../nodeNames';
 
 type Result = {
   node: Node;

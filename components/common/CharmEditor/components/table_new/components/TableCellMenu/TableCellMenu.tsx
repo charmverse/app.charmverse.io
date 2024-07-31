@@ -1,49 +1,43 @@
 import { Edit as EditIcon } from '@mui/icons-material';
 import type { EditorState } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
+import { Box, IconButton } from '@mui/material';
 
 import type { Transaction } from 'prosemirror-state';
 import React from 'react';
 
-import { TABLE_COMMANDS_GROUP } from '../ui/EditorToolbarConfig';
-
-import CommandMenu, { CommandMenuProps } from '../ui/CommandMenu';
-import createPopUp from '../ui/createPopUp';
-import { PopUpHandle } from '../ui/createPopUp';
-import CustomButton from '../ui/CustomButton';
-import uuid from '../ui/uuid';
+import { TABLE_COMMANDS_GROUP } from '../../ui/EditorToolbarConfig';
+import CommandMenu, { CommandMenuProps } from './CommandMenu';
+import createPopUp from '../../ui/createPopUp';
+import { PopUpHandle } from '../../ui/createPopUp';
+import { v1 as uuid } from 'uuid';
 
 type Props = {
   editorState: EditorState;
   editorView: EditorView;
 };
 
-export function CommandMenuButton({ editorState, editorView }: Props) {
+export function TableCellMenu({ editorState, editorView }: Props) {
   return (
-    <CommandMenuButtonClass
+    <CommandMenuButton
       className='czi-table-cell-menu'
       commandGroups={TABLE_COMMANDS_GROUP}
       dispatch={editorView.dispatch}
       editorState={editorState}
       editorView={editorView}
-      icon={<EditIcon fontSize='small' sx={{ pointerEvents: 'none' }} />}
-      title='Edit'
     />
   );
 }
 
-class CommandMenuButtonClass extends React.PureComponent<{
+class CommandMenuButton extends React.PureComponent<{
   className?: string | null;
   commandGroups: any[]; // Array<{ [string]: UICommand }>;
   disabled?: boolean | null;
   dispatch: (tr: Transaction) => void;
   editorState: EditorState;
-  editorView?: EditorView;
-  icon?: string | React.ReactNode | null;
-  label?: string | React.ReactNode | null;
-  title?: string;
+  editorView: EditorView;
 }> {
-  _menu: PopUpHandle | null = null;
+  _menu: PopUpHandle<Props> | null = null;
 
   _id = uuid();
 
@@ -52,7 +46,7 @@ class CommandMenuButtonClass extends React.PureComponent<{
   };
 
   render() {
-    const { className, label, commandGroups, editorState, editorView, icon, disabled, title } = this.props;
+    const { commandGroups, editorState, editorView, disabled } = this.props;
     const enabled =
       !disabled &&
       commandGroups.some((group, ii) => {
@@ -69,21 +63,23 @@ class CommandMenuButtonClass extends React.PureComponent<{
       });
 
     const { expanded } = this.state;
-    let buttonClassName = (className ? className + ' ' : '') + 'czi-custom-menu-button';
-    if (expanded) {
-      buttonClassName += ' expanded';
-    }
+    // let buttonClassName = (className ? className + ' ' : '') + 'czi-custom-menu-button';
+    // if (expanded) {
+    //   buttonClassName += ' expanded';
+    // }
 
     return (
-      <CustomButton
-        className={buttonClassName}
-        disabled={!enabled}
-        icon={icon}
-        id={this._id}
-        label={label}
-        onClick={this._onClick}
-        title={title}
-      />
+      <Box sx={{ position: 'relative', top: '24px', right: '4px' }}>
+        <IconButton
+          sx={{ borderRadius: '3px', p: '2px' }}
+          size='small'
+          disabled={!enabled}
+          id={this._id}
+          onClick={this._onClick}
+        >
+          <EditIcon sx={{ fontSize: 16, pointerEvents: 'none' }} />
+        </IconButton>
+      </Box>
     );
   }
 
