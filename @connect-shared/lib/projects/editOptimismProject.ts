@@ -1,6 +1,9 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
+import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
+import { resolveEnsAddress } from '@root/lib/blockchain/resolveEnsAddress';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
@@ -8,15 +11,33 @@ import { v4 } from 'uuid';
 
 import type { FormValues } from './form';
 
-export async function editOptimismProject({
-  userId,
-  input
-}: {
-  input: FormValues & {
+export type EditOptimismProjectValues = FormValues &
+  Partial<
+    Pick<
+      Project,
+      | 'primaryContractAddress'
+      | 'primaryContractDeployTxHash'
+      | 'primaryContractDeployer'
+      | 'mintingWalletAddress'
+      | 'sunnyAwardsProjectType'
+    >
+  > & {
     projectId: string;
+    primaryContractChainId?: string | number;
   };
-  userId: string;
-}) {
+
+export async function editOptimismProject({ userId, input }: { input: EditOptimismProjectValues; userId: string }) {
+  const hasEnsName = !!input.mintingWalletAddress && input.mintingWalletAddress.trim().endsWith('.eth');
+
+  if (hasEnsName) {
+    const resolvedAddress = await resolveEnsAddress(input.mintingWalletAddress as string);
+    if (resolvedAddress) {
+      input.mintingWalletAddress = resolvedAddress;
+    } else {
+      throw new InvalidInputError('Invalid ENS name');
+    }
+  }
+
   const [currentProjectMembers, inputProjectMembers] = await Promise.all([
     prisma.projectMember.findMany({
       where: {
@@ -183,7 +204,14 @@ export async function editOptimismProject({
         github: input.github,
         mirror: input.mirror,
         avatar: input.avatar,
-        coverImage: input.coverImage
+        coverImage: input.coverImage,
+        mintingWalletAddress: input.mintingWalletAddress,
+        primaryContractAddress: input.primaryContractAddress,
+        primaryContractDeployTxHash: input.primaryContractDeployTxHash,
+        primaryContractDeployer: input.primaryContractDeployer,
+        primaryContractChainId: input.primaryContractChainId
+          ? parseInt(input.primaryContractChainId as string)
+          : undefined
       }
     }),
     prisma.projectMember.createMany({

@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 
 import { WelcomePage } from 'components/welcome/WelcomePage';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   other: {
     robots: 'noindex'

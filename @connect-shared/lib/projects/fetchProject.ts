@@ -20,6 +20,12 @@ export type ConnectProjectDetails = Pick<
   | 'mirror'
   | 'twitter'
   | 'websites'
+  | 'sunnyAwardsProjectType'
+  | 'mintingWalletAddress'
+  | 'primaryContractAddress'
+  | 'primaryContractChainId'
+  | 'primaryContractDeployTxHash'
+  | 'primaryContractDeployer'
 > & {
   projectMembers: {
     userId: string | null;
@@ -56,6 +62,12 @@ export async function fetchProject({
       twitter: true,
       websites: true,
       farcasterFrameImage: true,
+      sunnyAwardsProjectType: true,
+      mintingWalletAddress: true,
+      primaryContractAddress: true,
+      primaryContractChainId: true,
+      primaryContractDeployTxHash: true,
+      primaryContractDeployer: true,
       projectMembers: {
         orderBy: [
           {

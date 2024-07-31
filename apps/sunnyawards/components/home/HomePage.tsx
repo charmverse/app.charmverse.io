@@ -16,15 +16,13 @@ export function HomePage() {
       borderRadius='0'
       textAlign='center'
       sx={{
-        '& > .MuiBox-root': {
-          display: 'flex',
-          flexDirection: 'column',
-          gap: { xs: 0, md: 6 },
-          my: { xs: 0, md: 4 },
-          justifyContent: { xs: 'space-evenly', md: 'normal' },
-          alignItems: 'center',
-          height: '100%'
-        }
+        display: 'flex',
+        flexDirection: 'column',
+        gap: { xs: 0, md: 6 },
+        my: { xs: 0, md: 4 },
+        justifyContent: { xs: 'space-evenly', md: 'normal' },
+        alignItems: 'center',
+        height: '100%'
       }}
     >
       <Image

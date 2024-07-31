@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { GrantsListPage } from 'components/grants/GrantsListPage';
+import { GrantsList } from 'components/grants/GrantsList';
 import { getGrants } from 'lib/grants/getGrants';
 
 export const metadata: Metadata = {
@@ -19,5 +19,5 @@ export default async function GrantsPage({
     sort
   });
 
-  return <GrantsListPage grants={grants} currentTab={sort} />;
+  return <GrantsList grants={grants} currentTab={sort} />;
 }

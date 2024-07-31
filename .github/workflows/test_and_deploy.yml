@@ -18,7 +18,7 @@ concurrency:
   group: ci-${{ github.event_name }}-${{ github.ref }}
 
 env:
-  SELECTED_PERMISSION_API_TAG: permissions-proposal-progess
+  SELECTED_PERMISSION_API_TAG: latest
 
 
 jobs:
@@ -213,8 +213,6 @@ jobs:
             test_command: 'npm run test:e2e:ci -- --shard=2/3'
           - test_name: 'Browser e2e test #3'
             test_command: 'npm run test:e2e:ci -- --shard=3/3'
-          # - test_name: 'Connect App E2E'
-          #   test_command: 'npm run connect:test:e2e:ci'
 
     steps:
       - uses: actions/checkout@v4
@@ -271,7 +269,6 @@ jobs:
       - name: Start services
         run: |
           npm run start:test:ci &
-
           sleep_loop_ct=0
           until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -290,7 +287,7 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         # we have to run docker command ourselves to set network=host so that playwright can access the server
         run: |
-          docker run --name mcrmicrosoftcomplaywrightv1343jammy_68c205 \
+          docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
                       --workdir /github/workspace --rm  \
                       -e "REACT_APP_APP_ENV" -e CI=true \
                       -v "/var/run/docker.sock":"/var/run/docker.sock" \
@@ -353,6 +350,133 @@ jobs:
         run: |
           npm run lint -w apps/sunnyawards
           npm run typecheck -w apps/sunnyawards
+
+  test-connect-e2e:
+    name: Test Connect App E2E
+    runs-on: ubuntu-latest
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --hostname postgres
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore dependencies from cache
+        uses: ./.github/actions/install
+
+      - name: Setup test database
+        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+
+
+      - name: Start connect app
+        run: |
+          npm run connect:start:test:ci &
+          sleep_loop_ct=0
+          until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
+            echo "webapp not up in loop $sleep_loop_ct ... sleeping"
+            sleep_loop_ct=$((sleep_loop_ct + 1))
+            sleep 1
+          done
+
+      - name: Run Connect E2E tests
+        env:
+          REACT_APP_APP_ENV: 'test'
+        # we have to run docker command ourselves to set network=host so that playwright can access the server
+        run: |
+          docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
+                      --workdir /github/workspace --rm  \
+                      -e "REACT_APP_APP_ENV" -e CI=true \
+                      -v "/var/run/docker.sock":"/var/run/docker.sock" \
+                      -v "/home/runner/work/_temp/_github_home":"/github/home" \
+                      -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
+                      -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
+                      -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
+                      --network "host"  \
+                      --ipc=host \
+                      mcr.microsoft.com/playwright:v1.42.1-jammy \
+                      npm run connect:test:e2e:ci
+
+  
+  test-sunnyawards-e2e:
+    name: Test Sunny Awards E2E
+    runs-on: ubuntu-latest
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --hostname postgres
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore dependencies from cache
+        uses: ./.github/actions/install
+
+      - name: Setup test database
+        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+
+
+      - name: Start Sunny Awards app
+        run: |
+          npm run sunnyawards:start:test:ci &
+          sleep_loop_ct=0
+          until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
+            echo "webapp not up in loop $sleep_loop_ct ... sleeping"
+            sleep_loop_ct=$((sleep_loop_ct + 1))
+            sleep 1
+          done
+
+      - name: Run Sunny Awards E2E tests
+        env:
+          REACT_APP_APP_ENV: 'test'
+        # we have to run docker command ourselves to set network=host so that playwright can access the server
+        run: |
+          docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
+                      --workdir /github/workspace --rm  \
+                      -e "REACT_APP_APP_ENV" -e CI=true \
+                      -v "/var/run/docker.sock":"/var/run/docker.sock" \
+                      -v "/home/runner/work/_temp/_github_home":"/github/home" \
+                      -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
+                      -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
+                      -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
+                      --network "host"  \
+                      --ipc=host \
+                      mcr.microsoft.com/playwright:v1.42.1-jammy \
+                      npm run sunnyawards:test:e2e:ci
 
   deploy-docker:
     name: Upload Docker image and assets
@@ -551,7 +675,7 @@ jobs:
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test-connect, deploy-docker]
+    needs: [test-connect, 'test-connect-e2e', deploy-docker]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -629,7 +753,7 @@ jobs:
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test-connect, deploy-docker]
+    needs: [test-connect, 'test-sunnyawards-e2e', deploy-docker]
     steps:
       - uses: actions/checkout@v4
         with:

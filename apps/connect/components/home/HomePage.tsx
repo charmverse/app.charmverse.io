@@ -16,19 +16,16 @@ export function HomePage() {
       borderRadius='0'
       textAlign='center'
       sx={{
-        '& > .MuiBox-root': {
-          display: 'flex',
-          flexDirection: 'column',
-          gap: { xs: 0, md: 6 },
-          my: { xs: 0, md: 4 },
-          justifyContent: { xs: 'space-evenly', md: 'normal' },
-          alignItems: 'center',
-          height: '100%'
-        }
+        display: 'flex',
+        flexDirection: 'column',
+        gap: { xs: 0, md: 4 },
+        justifyContent: { xs: 'space-evenly', md: 'normal' },
+        alignItems: 'center',
+        height: '100%'
       }}
     >
       <Image
-        src='/images/sunny-awards.png'
+        src='/images/geral_waving.png'
         width={400}
         height={200}
         sizes='100vw'
@@ -40,11 +37,9 @@ export function HomePage() {
         alt='Charmverse Connect homepage'
       />
       <Typography data-test='connect-home-page' align='center' variant='h4'>
-        Celebrate Onchain Summer with the Sunny Awards
+        Charm Connect: The Home for Builders
       </Typography>
-      <Typography align='center'>
-        Create your project and submit it to the Sunny Awards to compete for 540K OP in total prizes.
-      </Typography>
+      <Typography align='center'>Endorse Builders, Connect with opportunites and get Rewarded.</Typography>
       <WarpcastLogin />
       <MuiLink
         variant='body2'

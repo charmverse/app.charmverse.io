@@ -3,6 +3,8 @@ import { darken, lighten } from '@mui/material/styles';
 export const blueColor = '#009Fb7';
 export const darkBlueColor = darken(blueColor, 0.1);
 
+export const brandColor = '#8742FF'; // purple
+
 // light mode
 export const primaryTextColor = '#37352f';
 export const secondaryTextColor = '#888';

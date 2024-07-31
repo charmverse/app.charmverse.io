@@ -365,7 +365,7 @@ export const makeSelectCardsFromBoard = () =>
 export const makeSelectBoardTemplates = () =>
   createSelector(
     getTemplates,
-    (state, boardId) => boardId,
+    (state: RootState, boardId: string) => boardId,
     (templates, boardId) => {
       if (!templates) {
         return [];

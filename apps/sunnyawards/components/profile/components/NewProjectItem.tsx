@@ -1,6 +1,6 @@
+import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import { Add as AddIcon } from '@mui/icons-material';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 
 export function NewProjectItem({ children, href }: { children: ReactNode; href: string }) {
   return (
-    <Card>
+    <CardMotion>
       <CardActionArea
         LinkComponent={Link}
         href={href}
@@ -31,6 +31,6 @@ export function NewProjectItem({ children, href }: { children: ReactNode; href: 
           <Typography variant='h6'>{children}</Typography>
         </CardContent>
       </CardActionArea>
-    </Card>
+    </CardMotion>
   );
 }

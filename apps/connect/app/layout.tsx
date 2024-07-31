@@ -1,5 +1,4 @@
 import { AppProviders } from '@connect-shared/components/layout/AppProviders';
-import { Footer } from '@connect-shared/components/layout/Footer';
 import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import Box from '@mui/material/Box';
@@ -7,6 +6,7 @@ import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
+import { StickyFooter } from 'components/common/Footer/StickyFooter';
 import { Header } from 'components/common/Header/Header';
 import { NotificationRequest } from 'components/common/NotificationRequest';
 import { appDescription, appName, appTitle, appTitleTemplate } from 'lib/utils/appDetails';
@@ -16,6 +16,10 @@ import 'theme/cssVariables.scss';
 
 export const metadata: Metadata = {
   applicationName: appName,
+  icons: {
+    icon: ['/images/favicon.png'],
+    apple: ['/images/favicon.png']
+  },
   title: {
     default: `${appName} - ${appTitle}`,
     template: appTitleTemplate
@@ -74,7 +78,7 @@ export default async function RootLayout({
             <Box component='main' bgcolor='mainBackground.main' pb={2}>
               {children}
             </Box>
-            <Footer />
+            <StickyFooter />
           </AppProviders>
         </Box>
       </body>

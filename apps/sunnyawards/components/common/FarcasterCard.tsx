@@ -1,5 +1,6 @@
 import { Avatar } from '@connect-shared/components/common/Avatar';
 import type { AvatarSize } from '@connect-shared/components/common/Avatar';
+import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import { DeleteOutline } from '@mui/icons-material';
 import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
@@ -73,10 +74,10 @@ export function FarcasterCard(props: {
   }
 
   return (
-    <Card>
+    <CardMotion>
       <CardActionArea LinkComponent={Link} href={`/u/${props.username}`} hrefLang='en'>
         <FarcasterCardContent {...props} />
       </CardActionArea>
-    </Card>
+    </CardMotion>
   );
 }

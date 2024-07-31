@@ -1,3 +1,4 @@
+import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import type { ProjectsWithMembers } from '@connect-shared/lib/projects/getRecentProjectsWithMembers';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import AvatarGroup from '@mui/material/AvatarGroup';
@@ -9,7 +10,6 @@ import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 
 import { Avatar } from 'components/common/Avatar';
-import { CardMotion } from 'components/common/Motions/CardMotion';
 
 export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
   const projectMembers = project.projectMembers;

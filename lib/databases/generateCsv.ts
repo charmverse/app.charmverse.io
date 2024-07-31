@@ -163,7 +163,7 @@ function encodeText(text: string): string {
   return text.replace(/"/g, '""');
 }
 
-function generateTableArray(
+export function generateTableArray(
   board: Pick<Board, 'fields'>,
   cards: Card[],
   viewToExport: BoardView,
@@ -182,6 +182,7 @@ function generateTableArray(
       : allCardProperties.filter((template: IPropertyTemplate) => visiblePropertyIds.includes(template.id));
 
   const filterGroup = viewToExport.fields.filter || { filters: [] };
+
   const filteredCards = CardFilter.applyFilterGroup(filterGroup, allCardProperties, cards) || [];
 
   if (

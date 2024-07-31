@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { AuthKitProvider, SignInButton, useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
@@ -10,7 +11,6 @@ import { ConnectApiClient } from 'apiClient/apiClient';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import useSWRMutation from 'swr/mutation';
-
 import '@farcaster/auth-kit/styles.css';
 
 import { warpcastConfig } from 'lib/farcaster/config';
@@ -42,7 +42,7 @@ function WarpcastLoginButton() {
   }, []);
 
   if (isAuthenticated) {
-    return null;
+    return <LoadingComponent size={30} label='Logging you in...' />;
   }
 
   return (

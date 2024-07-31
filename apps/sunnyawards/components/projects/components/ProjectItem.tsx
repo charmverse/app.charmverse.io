@@ -1,9 +1,9 @@
 import { Avatar } from '@connect-shared/components/common/Avatar';
+import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import type { ProjectsWithMembers } from '@connect-shared/lib/projects/getRecentProjectsWithMembers';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
@@ -15,7 +15,7 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
   const projectName = project.name || 'Untitled';
 
   return (
-    <Card>
+    <CardMotion>
       <CardActionArea
         LinkComponent={Link}
         href={`/p/${project.path}`}
@@ -77,6 +77,6 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
           </AvatarGroup>
         </CardContent>
       </CardActionArea>
-    </Card>
+    </CardMotion>
   );
 }
