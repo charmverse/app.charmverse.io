@@ -2,6 +2,7 @@ import type { Node } from 'prosemirror-model';
 import { tableNodes } from 'prosemirror-tables';
 
 import type { BaseRawNodeSpec } from '../@bangle.dev/core/specRegistry';
+
 import toCSSColor from './ui/toCSSColor';
 
 const NO_VISIBLE_BORDER_WIDTH = new Set(['0pt', '0px']);
