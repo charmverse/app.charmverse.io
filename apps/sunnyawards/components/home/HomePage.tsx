@@ -35,7 +35,7 @@ export function HomePage() {
           maxWidth: '400px',
           height: 'auto'
         }}
-        alt='Charmverse Connect homepage'
+        alt='Sunny Awards homepage'
       />
       <Typography data-test='connect-home-page' align='center' variant='h4'>
         Celebrate Onchain Summer with the Sunny Awards
