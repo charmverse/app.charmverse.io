@@ -49,6 +49,7 @@ class CommandMenu extends React.PureComponent<CommandMenuProps> {
         children.push(<CustomMenuItem.Separator key={`${String(ii)}-hr`} />);
       }
     });
+    // The popup will use Menu component so no need to wrap it with List
     return children; //<List sx={{ bgcolor: 'background.paper' }}>{children}</List>;
   }
 
