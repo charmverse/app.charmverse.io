@@ -4,6 +4,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { v1 as uuid } from 'uuid';
 
+import { AppThemeProvider } from 'theme/AppThemeProvider';
+
 export type PopUpParams = {
   anchor?: any;
   container?: Element | null;
@@ -107,7 +109,7 @@ function renderPopUp<T>(
         </Popper>
         // </ClickAwayListener>
       );
-    reactRoot.render(component);
+    reactRoot.render(<AppThemeProvider>{component}</AppThemeProvider>);
   }
 }
 

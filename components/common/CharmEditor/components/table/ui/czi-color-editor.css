@@ -1,9 +1,8 @@
 /* @import './czi-vars.css'; */
 
 .czi-color-editor {
-  background: #fff;
-  box-shadow: var(--czi-overlay-shadow);
-  font-family: var(--czi-font-family);
+  /* background: #fff;
+  box-shadow: var(--czi-overlay-shadow); */
   font-size: var(--czi-font-size);
   padding: 4px 10px;
 }
