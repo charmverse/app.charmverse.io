@@ -4,7 +4,7 @@ import type { TypedSchemaItem } from './interfaces';
 
 export const charmProjectMetadataSchemaId = '0xfcaea48b4b51881860b3939fdc023af993ad24346b152b30f1b385d766898504';
 
-export const charmProjectMetadataSchemaDefinition = 'string projectRefUID, string name, string metadataURL';
+export const charmProjectMetadataSchemaDefinition = 'string projectRefUID,string name,string metadataURL';
 
 export type CharmProjectMetadata = {
   projectRefUID: string;
@@ -14,10 +14,11 @@ export type CharmProjectMetadata = {
 
 export function encodeCharmProjectMetadata({ projectRefUID, name, metadataURL }: CharmProjectMetadata) {
   const encoder = new SchemaEncoder(charmProjectMetadataSchemaDefinition);
+
   const encodedData = encoder.encodeData([
-    { name: 'projectRefUID', value: projectRefUID },
-    { name: 'name', value: name },
-    { name: 'metadataURL', value: metadataURL }
+    { name: 'projectRefUID', value: projectRefUID, type: 'string' },
+    { name: 'name', value: name, type: 'string' },
+    { name: 'metadataURL', value: metadataURL, type: 'string' }
   ] as TypedSchemaItem<CharmProjectMetadata>[]);
 
   return encodedData;

@@ -1,12 +1,29 @@
+import { gql } from '@apollo/client';
+import { log } from '@charmverse/core/log';
 import type { CharmProjectCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { optimism } from 'viem/chains';
 
 import { attestOnchain } from '../attestOnchain';
 import type { EasSchemaChain } from '../connectors';
+import { charmverseProjectDataChainId } from '../constants';
+import { easGraphQlClients } from '../external/easGraphQLClients';
+import { charmProjectSchemaId, decodeCharmProject } from '../schemas/charmProject';
 import { storeProjectInS3 } from '../storeProjectInS3';
 
 import { issueUserIdentifierIfNecessary } from './issueUserIdentifier';
+
+const graphQlClient = easGraphQlClients[charmverseProjectDataChainId];
+
+// Utility query for fetching last 100 credentials
+const GET_CREDENTIALS = gql`
+  query ($where: AttestationWhereInput) {
+    attestations(where: $where, orderBy: { timeCreated: desc }, take: 100) {
+      id
+      data
+    }
+  }
+`;
 
 export async function storeCharmverseProjectMetadata({
   projectId,
@@ -41,9 +58,30 @@ export async function storeCharmverseProjectMetadata({
     projectOrProjectId: project.id
   });
 
-  const projectRefUID =
-    project.charmProjectCredentials[0].projectRefUID ??
-    (await attestOnchain({
+  let projectRefUID =
+    project.charmProjectCredentials[0]?.projectRefUID ??
+    graphQlClient
+      .query({
+        query: GET_CREDENTIALS,
+        variables: {
+          where: {
+            schemaId: {
+              equals: charmProjectSchemaId
+            }
+          }
+        }
+      })
+      .then((result) => {
+        return (result.data.attestations as { id: string; data: string }[]).find(
+          (item) => decodeCharmProject(item.data).uid === project.id
+        )?.id;
+      })
+      .catch((err) => {
+        log.error('Error fetching CharmVerse project credential', { err });
+      });
+
+  if (!projectRefUID)
+    projectRefUID = await attestOnchain({
       chainId,
       credentialInputs: {
         recipient: null,
@@ -53,10 +91,10 @@ export async function storeCharmverseProjectMetadata({
         }
       },
       type: 'charmProject'
-    }));
+    });
 
   const projectSnapshotRefUID =
-    project.charmProjectCredentials[0].metadataAttestationUID ??
+    project.charmProjectCredentials[0]?.metadataAttestationUID ??
     (await attestOnchain({
       chainId,
       credentialInputs: {

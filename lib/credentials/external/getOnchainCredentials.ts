@@ -1,14 +1,10 @@
-import type { ApolloClient } from '@apollo/client';
 import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
+import { stringUtils } from '@charmverse/core/utilities';
 import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
-import { isDevEnv, isStagingEnv } from '@root/config/constants';
 import { getAddress } from 'viem';
-import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
-import { ApolloClientWithRedisCache } from '../apolloClientWithRedisCache';
 import type { EasSchemaChain } from '../connectors';
 import { easSchemaChains, easSchemaMainnetChains, getOnChainAttestationUrl } from '../connectors';
 import type { ProposalCredential } from '../schemas/proposal';
@@ -16,46 +12,9 @@ import { proposalCredentialSchemaId } from '../schemas/proposal';
 import type { RewardCredential } from '../schemas/reward';
 import { rewardCredentialSchemaId } from '../schemas/reward';
 
+import { easGraphQlClients } from './easGraphQLClients';
 import type { ExternalCredentialChain } from './schemas';
 import { externalCredentialChains, trackedCharmverseSchemas, trackedSchemas } from './schemas';
-
-// For a specific profile, only refresh attestations every half hour
-const defaultEASCacheDuration = 1800;
-
-const skipRedisCache = isStagingEnv || isDevEnv;
-
-const graphQlClients: Record<ExternalCredentialChain | EasSchemaChain, ApolloClient<any>> = {
-  [optimism.id]: new ApolloClientWithRedisCache({
-    cacheKeyPrefix: 'optimism-easscan',
-    uri: 'https://optimism.easscan.org/graphql',
-    persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache
-  }),
-  [sepolia.id]: new ApolloClientWithRedisCache({
-    cacheKeyPrefix: 'sepolia-easscan',
-    uri: 'https://sepolia.easscan.org/graphql',
-    persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache
-  }),
-  [optimismSepolia.id]: new ApolloClientWithRedisCache({
-    cacheKeyPrefix: 'optimism-sepolia-easscan',
-    uri: 'https://optimism-sepolia.easscan.org/graphql',
-    persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache
-  }),
-  [base.id]: new ApolloClientWithRedisCache({
-    cacheKeyPrefix: 'base-easscan',
-    uri: 'https://base.easscan.org/graphql',
-    persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache
-  }),
-  [arbitrum.id]: new ApolloClientWithRedisCache({
-    uri: 'https://arbitrum.easscan.org/graphql',
-    cacheKeyPrefix: 'arbitrum-easscan',
-    persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache
-  })
-};
 
 /**
  * @timeCreated - Stored as seconds, normalised to milliseconds
@@ -117,7 +76,7 @@ export function getTrackedOnChainCredentials<Chain extends ExternalCredentialCha
     }))
   };
 
-  return graphQlClients[chainId]
+  return easGraphQlClients[chainId]
     .query({
       query: GET_EXTERNAL_CREDENTIALS,
       variables: {
@@ -287,7 +246,7 @@ export async function getOnchainCredentialsById({
 
       const numericalChainId = parseInt(chainId) as EasSchemaChain;
 
-      return graphQlClients[numericalChainId]
+      return easGraphQlClients[numericalChainId]
         .query({
           query: GET_EXTERNAL_CREDENTIALS,
           variables: {
