@@ -1,4 +1,4 @@
-import * as EditorCommands from '../EditorCommand';
+import * as EditorCommands from '../EditorCommands';
 
 const ICON_LABEL_PATTERN = /\[([A-Za-z_\d]+)\](.*)/;
 

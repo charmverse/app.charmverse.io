@@ -3,9 +3,7 @@ import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent, ReactNode } from 'react';
 import React from 'react';
 
-import CustomMenu from '../../ui/CustomMenu';
-import CustomMenuItem from '../../ui/CustomMenuItem';
-import { List, ListItemButton, Menu, MenuItem, ListItemText } from '@mui/material';
+import { Divider, ListItemButton, Menu, MenuItem, ListItemText } from '@mui/material';
 import type UICommand from '../../ui/UICommand';
 
 export type CommandMenuProps = {
@@ -46,7 +44,8 @@ class CommandMenu extends React.PureComponent<CommandMenuProps> {
         );
       });
       if (ii !== jj) {
-        children.push(<CustomMenuItem.Separator key={`${String(ii)}-hr`} />);
+        console.log('add separator');
+        children.push(<Divider />);
       }
     });
     // The popup will use Menu component so no need to wrap it with List

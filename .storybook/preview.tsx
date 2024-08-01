@@ -53,6 +53,17 @@ import 'theme/databases/databases.main.scss';
 import 'react-resizable/css/styles.css';
 import 'theme/styles.scss';
 
+// Prosemirror tables
+// import 'components/common/CharmEditor/components/table_new/ui/czi-table.css';
+import 'components/common/CharmEditor/components/table_new/ui/czi-custom-menu.css';
+import 'components/common/CharmEditor/components/table_new/ui/czi-custom-scrollbar.css';
+import 'components/common/CharmEditor/components/table_new/ui/czi-table-cell-menu.css';
+import 'components/common/CharmEditor/components/table_new/ui/czi-custom-menu-item.css';
+import 'components/common/CharmEditor/components/table_new/ui/czi-table-grid-size-editor.css';
+import 'components/common/CharmEditor/components/table_new/ui/czi-vars.css';
+import 'components/common/CharmEditor/components/table_new/ui/czi-pop-up.css';
+import 'components/common/CharmEditor/components/table_new/ui/czi-color-editor.css';
+
 import { handlers } from './mockApi';
 import { mainnet } from 'viem/chains';
 import { WagmiConfig, http, createConfig } from 'wagmi';

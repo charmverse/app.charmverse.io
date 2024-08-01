@@ -3,7 +3,7 @@ import { setCellAttr } from 'prosemirror-tables';
 import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent } from 'react';
 
-import ColorEditor from './ui/ColorEditor';
+import { ColorEditor } from './ui/ColorEditor';
 import createPopUp, { PopUpHandle } from './ui/createPopUp';
 import UICommand from './ui/UICommand';
 
@@ -40,6 +40,7 @@ class TableBorderColorCommand extends UICommand {
       this._popUp = createPopUp(ColorEditor, null, {
         anchor,
         placement: 'right',
+        popper: 'popover',
         onClose: (val) => {
           if (this._popUp) {
             this._popUp = null;

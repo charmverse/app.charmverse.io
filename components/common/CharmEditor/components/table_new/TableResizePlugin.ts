@@ -86,19 +86,22 @@ class ResizeState {
     let state = this;
     const action = tr.getMeta(PLUGIN_KEY);
     if (action && typeof action.setCellPos === 'number') {
+      console.log('skip update: action', action);
       return new ResizeState(action.setCellPos, action.setForMarginLeft, null);
     }
 
     if (action && action.setDraggingInfo !== undefined) {
+      console.log('skip update no dragging: action', action);
       return new ResizeState(state.cellPos, state.forMarginLeft, action.setDraggingInfo);
     }
-
+    console.log('set dragging info');
     if (state.cellPos && state.cellPos > -1 && tr.docChanged) {
       let cellPos: number | null = tr.mapping.map(state.cellPos, -1);
       if (!pointsAtCell(tr.doc.resolve(cellPos))) {
         cellPos = null;
       }
       state = new ResizeState(cellPos, cellPos ? state.forMarginLeft : false, state.draggingInfo);
+      console.log('set dragging info');
     }
     return state;
   }
@@ -161,6 +164,7 @@ function handleMouseDown(view: EditorView, event: MouseEvent): boolean {
   cancelDrag && cancelDrag(event);
 
   const resizeState = PLUGIN_KEY.getState(view.state) as PluginState;
+  console.log('resizeState', resizeState);
   if (resizeState.cellPos === -1 || resizeState.draggingInfo) {
     console.log('reutrn false', resizeState);
     return false;
@@ -177,6 +181,7 @@ function handleMouseDown(view: EditorView, event: MouseEvent): boolean {
   };
 
   const move = (e: MouseEvent) => {
+    console.log('mouse move');
     if (e.which) {
       if (!dragStarted) {
         handleDragStart(view, encodeURI);
@@ -193,7 +198,7 @@ function handleMouseDown(view: EditorView, event: MouseEvent): boolean {
 
   cancelDrag = finish;
   window.addEventListener('mouseup', finish, true);
-  window.addEventListener('mousemove', move, true);
+  // window.addEventListener('mousemove', move, true);
   event.preventDefault();
   return true;
 }
@@ -203,7 +208,7 @@ function handleDragStart(view: EditorView, event: MouseEvent): void {
   if (resizeState.cellPos === -1 || resizeState.draggingInfo) {
     return;
   }
-
+  console.log('SHOW HANDLEBARS');
   view.dispatch(
     view.state.tr.setMeta(PLUGIN_KEY, {
       setDraggingInfo: calculateDraggingInfo(view, event, resizeState)
@@ -216,6 +221,7 @@ function handleDragStart(view: EditorView, event: MouseEvent): void {
 function handleDragMove(view: EditorView, event: PointerEvent): void {
   const resizeState = PLUGIN_KEY.getState(view.state) as PluginState;
   const { draggingInfo, forMarginLeft } = resizeState;
+  console.log('handle drag', draggingInfo);
   if (!draggingInfo) {
     return;
   }
@@ -329,6 +335,7 @@ function handleDragEnd(view: EditorView, event: PointerEvent): void {
     view.dispatch(tr);
   }
   // Hides the resize handle bars.
+  console.log('HIDE HANDLEBARS');
   view.dispatch(view.state.tr.setMeta(PLUGIN_KEY, { setDraggingInfo: null }));
 }
 

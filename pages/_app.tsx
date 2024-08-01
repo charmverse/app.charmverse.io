@@ -102,11 +102,11 @@ import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
 import { WagmiProvider } from '../components/_app/components/WagmiProvider';
 
-// Prosemirror tablesimport './czi-custom-button.css';
+// Prosemirror tables
+// import 'components/common/CharmEditor/components/table_new/ui/czi-table.css';
 import 'components/common/CharmEditor/components/table_new/ui/czi-custom-menu.css';
 import 'components/common/CharmEditor/components/table_new/ui/czi-custom-scrollbar.css';
 import 'components/common/CharmEditor/components/table_new/ui/czi-table-cell-menu.css';
-import 'components/common/CharmEditor/components/table_new/ui/czi-custom-menu-button.css';
 import 'components/common/CharmEditor/components/table_new/ui/czi-custom-menu-item.css';
 import 'components/common/CharmEditor/components/table_new/ui/czi-table-grid-size-editor.css';
 import 'components/common/CharmEditor/components/table_new/ui/czi-vars.css';

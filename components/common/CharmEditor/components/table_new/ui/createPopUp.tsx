@@ -2,7 +2,7 @@ import React from 'react';
 
 import { v1 as uuid } from 'uuid';
 import { createRoot } from 'react-dom/client';
-import { ClickAwayListener, Menu, Popper } from '@mui/material';
+import { ClickAwayListener, Menu, Popper, Popover } from '@mui/material';
 
 export type PopUpParams = {
   anchor?: any;
@@ -10,7 +10,7 @@ export type PopUpParams = {
   modal?: boolean | null;
   onClose?: ((val: any) => void) | null;
   placement?: 'top-end' | 'right';
-  menuPopper?: boolean; // use Menu component instead of Popper
+  popper?: 'menu' | 'popover';
 };
 
 export type PopUpHandle<T> = {
@@ -104,19 +104,43 @@ function renderPopUp<T>(
     rootNode._reactContainer ||= createRoot(rootNode);
     // @ts-ignore
     const reactRoot = rootNode._reactContainer;
-    const component = popUpParams.menuPopper ? (
-      // <ClickAwayListener onClickAway={close}>
-      <Menu open anchorEl={popUpParams.anchor} onClose={close}>
-        <View {...viewProps} close={close} />
-      </Menu>
-    ) : (
-      // </ClickAwayListener>
-      // <ClickAwayListener onClickAway={close}>
-      <Popper open anchorEl={popUpParams.anchor} placement={popUpParams.placement}>
-        <View {...viewProps} close={close} />
-      </Popper>
-      // </ClickAwayListener>
-    );
+    const component =
+      popUpParams.popper === 'menu' ? (
+        // <ClickAwayListener onClickAway={close}>
+        <Menu open anchorEl={popUpParams.anchor} onClose={close}>
+          <View {...viewProps} close={close} />
+        </Menu>
+      ) : popUpParams.popper === 'popover' ? (
+        // </ClickAwayListener>
+        // <ClickAwayListener onClickAway={close}>
+        <Popover
+          open
+          anchorEl={popUpParams.anchor}
+          anchorOrigin={
+            popUpParams.placement === 'right'
+              ? {
+                  vertical: 'center',
+                  horizontal: 'right'
+                }
+              : popUpParams.placement === 'top-end'
+              ? {
+                  vertical: 'top',
+                  horizontal: 'right'
+                }
+              : undefined
+          }
+          // close popovers on mouse leave
+          slotProps={{ paper: { onMouseLeave: close } }}
+        >
+          <View {...viewProps} close={close} />
+        </Popover>
+      ) : (
+        // <ClickAwayListener onClickAway={close}>
+        <Popper open anchorEl={popUpParams.anchor} placement={popUpParams.placement}>
+          <View {...viewProps} close={close} />
+        </Popper>
+        // </ClickAwayListener>
+      );
     reactRoot.render(component);
   }
 

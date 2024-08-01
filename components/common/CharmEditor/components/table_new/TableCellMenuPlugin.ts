@@ -46,7 +46,6 @@ class TableCellTooltipView {
     if (cellEl && !isElementFullyVisible(cellEl)) {
       cellEl = null;
     }
-    console.log('cell El', cellEl);
 
     if (!cellEl) {
       // Closes the popup.
@@ -63,7 +62,6 @@ class TableCellTooltipView {
         anchor: cellEl,
         onClose: this._onClose,
         placement: 'top-end'
-        // position: 'atAnchorTopRight'
       });
       this._onOpen();
     }

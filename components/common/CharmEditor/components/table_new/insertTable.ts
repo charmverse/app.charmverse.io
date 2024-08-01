@@ -7,7 +7,7 @@ import { PARAGRAPH, TABLE, TABLE_CELL, TABLE_ROW } from '../../nodeNames';
 
 const ZERO_WIDTH_SPACE_CHAR = '\u200b';
 
-export default function insertTable(tr: Transaction, schema: Schema, rows: number, cols: number): Transaction {
+export function insertTable(tr: Transaction, schema: Schema, rows: number, cols: number): Transaction {
   if (!tr.selection || !tr.doc) {
     return tr;
   }

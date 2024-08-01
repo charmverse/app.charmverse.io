@@ -1,8 +1,7 @@
 import Color from 'color';
-import React from 'react';
-
+import { PureComponent, ReactNode } from 'react';
 import clamp from './clamp';
-import CustomButton from './CustomButton';
+import { Button } from 'components/common/Button';
 
 function generateGreyColors(count: number): Color[] {
   let cc = 255;
@@ -32,7 +31,7 @@ function generateRainbowColors(count: number, saturation: number, lightness: num
   return colors;
 }
 
-class ColorEditor extends React.PureComponent<
+export class ColorEditor extends PureComponent<
   {
     close: ((val?: string) => void) | null;
     hex?: string | null;
@@ -40,22 +39,11 @@ class ColorEditor extends React.PureComponent<
   any,
   any
 > {
-  _renderColor = (color: Color, index: number): React.ReactNode => {
+  _renderColor = (color: Color, index: number): ReactNode => {
     const selectedColor = this.props.hex;
     const hex = color.hex().toLowerCase();
-    const style = { backgroundColor: hex };
     const active = selectedColor && selectedColor.toLowerCase() === hex;
-    return (
-      <CustomButton
-        active={!!active}
-        className='czi-color-editor-cell'
-        key={`${hex}-${index}`}
-        label=''
-        onClick={this._onSelectColor}
-        style={style}
-        value={hex}
-      />
-    );
+    return <ColorOption active={!!active} value={hex} key={`${hex}-${index}`} onClick={this._onSelectColor} />;
   };
 
   _onSelectColor = (hex: string): void => {
@@ -68,13 +56,15 @@ class ColorEditor extends React.PureComponent<
     return (
       <div className='czi-color-editor'>
         <div className='czi-color-editor-section'>
-          <CustomButton
-            active={!selectedColor}
-            className='czi-color-editor-color-transparent'
-            label='Transparent'
-            onClick={this._onSelectColor}
-            value='rgba(0,0,0,0)'
-          />
+          <Button
+            variant='outlined'
+            color='secondary'
+            size='small'
+            fullWidth
+            onClick={() => this._onSelectColor('rgba(0,0,0,0)')}
+          >
+            Transparent
+          </Button>
         </div>
         <div className='czi-color-editor-section'>{generateGreyColors(10).map(renderColor)}</div>
         <div className='czi-color-editor-section'>{generateRainbowColors(10, 90, 50).map(renderColor)}</div>
@@ -84,4 +74,26 @@ class ColorEditor extends React.PureComponent<
     );
   }
 }
-export default ColorEditor;
+
+function ColorOption({
+  children,
+  active,
+  value,
+  onClick
+}: {
+  children?: ReactNode;
+  active: boolean;
+  value: string;
+  onClick: (val: string) => void;
+}) {
+  return (
+    <span
+      className='czi-color-option'
+      style={{ backgroundColor: value }}
+      //active={!!active}
+      onClick={() => onClick(value)}
+    >
+      {children}
+    </span>
+  );
+}

@@ -69,7 +69,7 @@ class CommandMenuButton extends React.PureComponent<{
     // }
 
     return (
-      <Box sx={{ position: 'relative', top: '24px', right: '4px' }}>
+      <Box sx={{ position: 'relative', top: '24px', mx: '4px' }}>
         <IconButton
           sx={{ borderRadius: '3px', p: '2px' }}
           size='small'
@@ -115,7 +115,7 @@ class CommandMenuButton extends React.PureComponent<{
       this._menu = createPopUp(CommandMenu, menuProps, {
         anchor: document.getElementById(this._id),
         onClose: this._onClose,
-        menuPopper: true
+        popper: 'menu'
       });
     }
   };

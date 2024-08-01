@@ -3,7 +3,7 @@ import { TextSelection } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent } from 'react';
 
-import insertTable from './insertTable';
+import { insertTable } from './insertTable';
 import createPopUp, { PopUpHandle } from './ui/createPopUp';
 import TableGridSizeEditor from './ui/TableGridSizeEditor';
 import type { TableGridSizeEditorValue } from './ui/TableGridSizeEditor';
@@ -45,6 +45,7 @@ class TableInsertCommand extends UICommand {
       this._popUp = createPopUp(TableGridSizeEditor, null, {
         anchor,
         placement: 'right',
+        popper: 'popover',
         onClose: (val) => {
           if (this._popUp) {
             this._popUp = null;
