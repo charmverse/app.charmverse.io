@@ -1,11 +1,13 @@
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
-import findActionableCell from './findActionableCell';
-import bindScrollHandler, { ScrollHandle } from './ui/bindScrollHandler';
-import createPopUp, { PopUpHandle } from './ui/createPopUp';
-import isElementFullyVisible from './ui/isElementFullyVisible';
 import { TableCellMenu } from './components/TableCellMenu/TableCellMenu';
+import findActionableCell from './findActionableCell';
+import type { ScrollHandle } from './ui/bindScrollHandler';
+import bindScrollHandler from './ui/bindScrollHandler';
+import type { PopUpHandle } from './ui/createPopUp';
+import createPopUp from './ui/createPopUp';
+import isElementFullyVisible from './ui/isElementFullyVisible';
 
 class TableCellTooltipView {
   _cellElement: HTMLElement | null = null;
@@ -49,14 +51,14 @@ class TableCellTooltipView {
 
     if (!cellEl) {
       // Closes the popup.
-      popUp && popUp.close();
+      if (popUp) popUp.close();
       this._cellElement = null;
     } else if (popUp && cellEl === this._cellElement) {
       // Updates the popup.
       popUp.update(viewProps);
     } else {
       // Creates a new popup.
-      popUp && popUp.close();
+      if (popUp) popUp.close();
       this._cellElement = cellEl;
       this._popUp = createPopUp(TableCellMenu, viewProps, {
         anchor: cellEl,
@@ -68,7 +70,7 @@ class TableCellTooltipView {
   }
 
   destroy = (): void => {
-    this._popUp && this._popUp.close();
+    if (this._popUp) this._popUp.close();
     this._popUp = null;
   };
 
@@ -82,7 +84,7 @@ class TableCellTooltipView {
 
   _onClose = (): void => {
     this._popUp = null;
-    this._scrollHandle && this._scrollHandle.dispose();
+    if (this._scrollHandle) this._scrollHandle.dispose();
     this._scrollHandle = null;
   };
 

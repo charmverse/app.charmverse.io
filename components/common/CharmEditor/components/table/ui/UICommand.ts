@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { EditorState, Selection } from 'prosemirror-state';
 import { Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
@@ -31,7 +32,6 @@ class UICommand {
   static EventType = EventType;
 
   shouldRespondToUIEvent = (e: SyntheticEvent | MouseEvent): boolean => {
-    console.log(e.type, UICommand.EventType.CLICK, e.type === UICommand.EventType.CLICK);
     return e.type === UICommand.EventType.CLICK;
   };
 
@@ -71,7 +71,7 @@ class UICommand {
         this.executeWithUserInput(state, dispatch, view, inputs);
       })
       .catch((error) => {
-        console.error(error);
+        log.error('Error executing command', { error });
       });
     return false;
   };

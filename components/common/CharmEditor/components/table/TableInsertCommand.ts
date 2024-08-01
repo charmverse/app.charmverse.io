@@ -4,7 +4,8 @@ import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent } from 'react';
 
 import { insertTable } from './insertTable';
-import createPopUp, { PopUpHandle } from './ui/createPopUp';
+import type { PopUpHandle } from './ui/createPopUp';
+import createPopUp from './ui/createPopUp';
 import TableGridSizeEditor from './ui/TableGridSizeEditor';
 import type { TableGridSizeEditorValue } from './ui/TableGridSizeEditor';
 import UICommand from './ui/UICommand';

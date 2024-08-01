@@ -1,9 +1,10 @@
-import type { Schema, Node, ResolvedPos } from 'prosemirror-model';
+import type { Schema, Node } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import { CellSelection, mergeCells } from 'prosemirror-tables';
 import type { EditorView } from 'prosemirror-view';
 
 import { PARAGRAPH, TABLE_CELL, TEXT } from '../../nodeNames';
+
 import UICommand from './ui/UICommand';
 
 function isBlankParagraphNode(node?: Node): boolean {

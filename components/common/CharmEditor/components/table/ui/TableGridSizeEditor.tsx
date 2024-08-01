@@ -1,7 +1,6 @@
-// import cx from 'classnames';
+/* eslint-disable no-plusplus */
 import React from 'react';
 import type { SyntheticEvent } from 'react';
-import ReactDOM from 'react-dom';
 
 import clamp from './clamp';
 import htmlElementToRect from './htmlElementToRect';
@@ -26,10 +25,7 @@ class GridCell extends React.PureComponent<any, any, any> {
       height: `${CELL_SIZE}px`
     };
     const className = 'czi-table-grid-size-editor-cell';
-    // cx('czi-table-grid-size-editor-cell', {
-    //   selected
-    // });
-    return <div className={className} style={style} />;
+    return <div className={className + (selected ? ' selected' : '')} style={style} />;
   }
 }
 
@@ -59,7 +55,7 @@ class TableGridSizeEditor extends React.PureComponent<{
     if (this._entered) {
       document.removeEventListener('mousemove', this._onMouseMove, true);
     }
-    this._rafID && cancelAnimationFrame(this._rafID);
+    if (this._rafID) cancelAnimationFrame(this._rafID);
   }
 
   _onRef = (ref: any): void => {
@@ -84,7 +80,7 @@ class TableGridSizeEditor extends React.PureComponent<{
   };
 
   _onMouseMove = (e: MouseEvent): void => {
-    const el = this._ref && ReactDOM.findDOMNode(this._ref);
+    const el = this._ref;
     const elRect = el ? htmlElementToRect(el) : null;
     const mouseRect = fromXY(e.screenX, e.screenY, 10);
 
@@ -99,7 +95,7 @@ class TableGridSizeEditor extends React.PureComponent<{
     if (mx !== this._mx || my !== this._my) {
       this._mx = mx;
       this._my = my;
-      this._rafID && cancelAnimationFrame(this._rafID);
+      if (this._rafID) cancelAnimationFrame(this._rafID);
       this._rafID = requestAnimationFrame(this._updateGridSize);
     }
   };

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import Color from 'color';
 
 const RGBA_PATTERN = /^rgba/i;
@@ -41,7 +42,7 @@ export function toCSSColor(source: string): string {
     hex = Color(source).hex().toLowerCase();
     ColorMaping[source] = hex;
   } catch (ex) {
-    console.warn('unable to convert to hex', source);
+    log.error('unable to convert to hex', { source, error: ex });
     ColorMaping[source] = '';
   }
   return hex;
