@@ -1,6 +1,8 @@
+import { log } from '@charmverse/core/log';
 import type { Metadata } from 'next';
 
 import { FeedList } from 'components/feed/FeedList';
+import type { FeedItem } from 'lib/feed/getFeed';
 import { getFeed } from 'lib/feed/getFeed';
 
 export const metadata: Metadata = {
@@ -8,6 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default async function FeedPage() {
-  const feed = await getFeed();
+  let feed: FeedItem[] = [];
+  try {
+    feed = await getFeed();
+  } catch (error) {
+    log.error('Error retrieving feed', { error });
+  }
   return <FeedList feed={feed} />;
 }
