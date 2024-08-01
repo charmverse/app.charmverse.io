@@ -111,8 +111,6 @@ function renderPopUp<T>(
           <View {...viewProps} close={close} />
         </Menu>
       ) : popUpParams.popper === 'popover' ? (
-        // </ClickAwayListener>
-        // <ClickAwayListener onClickAway={close}>
         <Popover
           open
           onClose={close}
