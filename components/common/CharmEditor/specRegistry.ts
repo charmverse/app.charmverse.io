@@ -41,7 +41,8 @@ import { spec as pdfSpec } from './components/pdf/pdf';
 import * as poll from './components/poll/pollSpec';
 import * as quote from './components/quote/quote';
 import * as tabIndent from './components/tabIndent';
-import { spec as tableSpec } from './components/table/table.schema';
+// import { spec as tableSpec } from './components/table/table.schema';
+import { spec as tableSpec } from './components/table/table.specs';
 import { spec as tableOfContentSpec } from './components/tableOfContents/tableOfContents.specs';
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';
@@ -94,7 +95,8 @@ export const specRegistry = new SpecRegistry([
   linkedPageSpec(),
   quote.spec(), // OK
   tabIndent.spec(),
-  tableSpec(), // OK - only for text content
+  // tableSpec(), // OK - only for text content
+  tableSpec, // OK - only for text content
   disclosure.spec(),
   inlineDatabase.spec(),
   deletion,

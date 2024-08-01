@@ -7,7 +7,6 @@ import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
 import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useRoles } from 'hooks/useRoles';
 import { isUUID } from 'lib/utils/strings';
 
@@ -33,7 +32,7 @@ const StyledTypography = styled(Typography)`
   border-bottom: 0.05em solid var(--link-underline);
 `;
 
-export default function Mention({ node }: NodeViewProps) {
+export function Mention({ node }: NodeViewProps) {
   const { showUserProfile } = useMemberProfileDialog();
   const attrs = node.attrs as MentionSpecSchemaAttrs;
   const { getMemberById } = useMembers();

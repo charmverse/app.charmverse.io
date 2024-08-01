@@ -1,27 +1,8 @@
-import { keymap } from 'prosemirror-keymap';
-import * as table from 'prosemirror-tables';
+import { tableEditing } from 'prosemirror-tables';
 
-import { TableView } from './tableView';
+import TableCellMenuPlugin from './TableCellMenuPlugin';
+import TableResizePlugin from './TableResizePlugin';
 
-export function plugins() {
-  const p = [
-    table.columnResizing({
-      View: TableView
-    }),
-    table.tableEditing({ allowTableNodeSelection: true }),
-    // table.columnHandles()
-    keymap({
-      Tab: table.goToNextCell(1),
-      'Shift-Tab': table.goToNextCell(-1)
-    })
-    // @ts-ignore missing type
-    // table.tablePopUpMenu(),
-    // @ts-ignore missing type
-    // table.tableHeadersMenu(),
-    // @ts-ignore missing type
-    // table.selectionShadowPlugin()
-    // @ts-ignore missing type
-    //  table.TableFiltersMenu()
-  ];
-  return p;
-}
+// Tables
+// https://github.com/ProseMirror/prosemirror-tables/blob/master/demo.js
+export const plugins = [new TableCellMenuPlugin(), new TableResizePlugin(), tableEditing()];

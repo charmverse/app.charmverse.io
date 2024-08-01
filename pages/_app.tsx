@@ -102,6 +102,10 @@ import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
 import { WagmiProvider } from '../components/_app/components/WagmiProvider';
 
+// Prosemirror tables
+import 'components/common/CharmEditor/components/table/ui/czi-table-grid-size-editor.css';
+import 'components/common/CharmEditor/components/table/ui/czi-color-editor.css';
+
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
 };

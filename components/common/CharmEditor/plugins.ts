@@ -41,6 +41,7 @@ import { plugins as quotePlugins } from './components/quote/quote';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
+// import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tableOfContentPlugins } from './components/tableOfContents/tableOfContents.plugins';
 import { plugins as threadPlugins } from './components/thread/thread.plugins';
