@@ -7,7 +7,8 @@ import { editOptimismProject } from '@connect-shared/lib/projects/editOptimismPr
 import { schema } from '@connect-shared/lib/projects/form';
 import type { FormValues } from '@connect-shared/lib/projects/form';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
-import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
+import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
+import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 import { revalidatePath } from 'next/cache';
 
 export const actionEditProject = authActionClient
@@ -31,6 +32,17 @@ export const actionEditProject = authActionClient
         userId: currentUserId
       }).catch((err) => {
         log.error('Failed to store and publish updated project metadata attestation', { err, userId: currentUserId });
+      });
+
+      await storeCharmverseProjectMetadata({
+        chainId: charmverseProjectDataChainId,
+        projectId: editedProject.id
+      }).catch((err) => {
+        log.error('Failed to store charmverse project metadata', {
+          err,
+          projectId: editedProject.id,
+          userId: editedProject.createdBy
+        });
       });
     }
 

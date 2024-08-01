@@ -1,5 +1,8 @@
+import { log } from '@charmverse/core/log';
 import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { charmverseProjectDataChainId } from '@root/lib/credentials/constants';
+import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -33,6 +36,18 @@ async function patchProjectController(req: NextApiRequest, res: NextApiResponse<
       id: projectId
     }
   });
+
+  await storeCharmverseProjectMetadata({
+    chainId: charmverseProjectDataChainId,
+    projectId: updatedProject.id
+  }).catch((err) => {
+    log.error('Failed to store charmverse project metadata', {
+      err,
+      projectId: updatedProject.id,
+      userId: req.session.user.id
+    });
+  });
+
   return res.status(201).json(updatedProject);
 }
 
