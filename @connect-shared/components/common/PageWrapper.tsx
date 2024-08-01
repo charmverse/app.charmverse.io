@@ -2,7 +2,7 @@ import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
 import type { ReactNode } from 'react';
 
-export function PageWrapper({ children, header = null, ...restProps }: BoxProps & { header?: ReactNode }) {
+export function PageWrapper({ children, header = null, sx, ...restProps }: BoxProps & { header?: ReactNode }) {
   return (
     <Box
       position='relative'
@@ -15,7 +15,9 @@ export function PageWrapper({ children, header = null, ...restProps }: BoxProps 
       {...restProps}
     >
       {header}
-      <Box p={3}>{children}</Box>
+      <Box p={3} sx={sx}>
+        {children}
+      </Box>
     </Box>
   );
 }

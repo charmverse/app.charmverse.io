@@ -33,7 +33,7 @@ type FormFieldAnswersProps = {
   formFields?: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private' | 'fieldConfig'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
-    formFieldAnswer?: FieldAnswerInput | null;
+    formFieldAnswerId?: string | null;
   })[];
   disabled?: boolean;
   enableComments: boolean;
@@ -130,7 +130,7 @@ export function FormFieldAnswers({
     <FormFieldAnswersContainer>
       {formFields?.map((formField) => {
         const fieldAnswerThreads =
-          (formField.formFieldAnswer?.id ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id] : []) ?? [];
+          (formField.formFieldAnswerId ? fieldAnswerIdThreadRecord[formField.formFieldAnswerId] : []) ?? [];
         return (
           <StyledStack
             key={formField.id}
@@ -156,7 +156,7 @@ export function FormFieldAnswers({
                       onChangeDebounced={saveFormFieldAnswers}
                       inputEndAdornment={
                         pageId &&
-                        formField.formFieldAnswer?.id &&
+                        formField.formFieldAnswerId &&
                         user && (
                           <Box
                             sx={{
@@ -169,7 +169,7 @@ export function FormFieldAnswers({
                             }}
                           >
                             <FormFieldAnswerComment
-                              formFieldAnswerId={formField.formFieldAnswer.id}
+                              formFieldAnswerId={formField.formFieldAnswerId}
                               pageId={pageId}
                               formFieldName='Project profile'
                               disabled={disabled}
@@ -206,7 +206,7 @@ export function FormFieldAnswers({
                     inputEndAdornment={
                       pageId &&
                       formField.type !== 'label' &&
-                      formField.formFieldAnswer?.id &&
+                      formField.formFieldAnswerId &&
                       user && (
                         <Box
                           sx={{
@@ -219,7 +219,7 @@ export function FormFieldAnswers({
                           }}
                         >
                           <FormFieldAnswerComment
-                            formFieldAnswerId={formField.formFieldAnswer.id}
+                            formFieldAnswerId={formField.formFieldAnswerId}
                             pageId={pageId}
                             formFieldName={formField.name}
                             disabled={disabled}

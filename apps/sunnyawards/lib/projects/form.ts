@@ -1,5 +1,6 @@
 import { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
 import { wagmiConfig } from '@root/connectors/config';
+import { resolveEnsAddress } from '@root/lib/blockchain/resolveEnsAddress';
 import { typedKeys } from '@root/lib/utils/objects';
 import { getBytecode, getTransactionReceipt } from '@wagmi/core';
 import type { Address } from 'viem';
@@ -96,15 +97,25 @@ export const schema = yup.object({
     }),
   mintingWalletAddress: yup
     .string()
-    .test('mintingWalletAddress', 'Artwork minting wallet address is required', async (value, context) => {
+    .test('mintingWalletAddress', 'Artwork minting wallet address or ENS is required', async (value, context) => {
       if ((context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType) === 'creator') {
-        return !!value && !!isAddress(value);
-      }
+        if (!value) {
+          return false;
+        }
 
+        let address: string | null = value;
+
+        if (address?.endsWith('.eth')) {
+          address = await resolveEnsAddress(value);
+        }
+
+        return !!address && !!isAddress(address);
+      }
       return true;
     }),
   projectMembers: yup
-    .array(
+    .array()
+    .of(
       yup.object({
         name: yup.string().required(),
         farcasterId: yup.number().required()

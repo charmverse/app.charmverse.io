@@ -6,6 +6,7 @@ import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shar
 import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
+import { isTestEnv } from '@root/config/constants';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 
@@ -54,7 +55,9 @@ export const createProjectAction = authActionClient
       });
     }
 
-    await generateOgImage(newProject.id, currentUserId);
+    if (!isTestEnv) {
+      await generateOgImage(newProject.id, currentUserId);
+    }
 
     return { success: true, projectId: newProject.id, projectPath: newProject.path };
   });

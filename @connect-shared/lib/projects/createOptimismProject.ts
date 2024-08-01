@@ -1,7 +1,9 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { OptionalPrismaTransaction, Project, ProjectSource } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-client';
+import { resolveEnsAddress } from '@root/lib/blockchain/resolveEnsAddress';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath, uid } from '@root/lib/utils/strings';
@@ -31,6 +33,17 @@ export async function createOptimismProject({
     >;
   userId: string;
 } & OptionalPrismaTransaction) {
+  const hasEnsName = !!input.mintingWalletAddress && input.mintingWalletAddress.trim().endsWith('.eth');
+
+  if (hasEnsName) {
+    const resolvedAddress = await resolveEnsAddress(input.mintingWalletAddress as string);
+    if (resolvedAddress) {
+      input.mintingWalletAddress = resolvedAddress;
+    } else {
+      throw new InvalidInputError('Invalid ENS name');
+    }
+  }
+
   const farcasterAccounts = await tx.farcasterUser.findMany({
     where: {
       fid: {

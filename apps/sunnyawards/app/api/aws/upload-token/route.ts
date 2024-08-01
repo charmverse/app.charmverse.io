@@ -1,4 +1,4 @@
-import { STSClient, GetFederationTokenCommand } from '@aws-sdk/client-sts';
+import { GetFederationTokenCommand, STSClient } from '@aws-sdk/client-sts';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import { awsS3Bucket } from '@root/config/constants';
 import { getS3ClientConfig } from '@root/lib/aws/getS3ClientConfig';

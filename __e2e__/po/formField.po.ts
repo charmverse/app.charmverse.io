@@ -13,7 +13,8 @@ export class FormField extends DocumentPage {
     public toggleFormFieldButton = page.locator('data-test=toggle-form-field-button'),
     public fieldType = page.locator('data-test=form-field-type-select'),
     public fieldMoreOptions = page.locator('data-test=form-field-more-options-popup'),
-    public deleteField = page.locator('data-test=delete-form-field')
+    public deleteField = page.locator('data-test=delete-form-field'),
+    public formFieldAnswerComment = page.locator('data-test=form-field-answer-comment')
   ) {
     super(page);
   }
