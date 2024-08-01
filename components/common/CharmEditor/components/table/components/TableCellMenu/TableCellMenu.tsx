@@ -7,7 +7,7 @@ import type { Transaction } from 'prosemirror-state';
 import React from 'react';
 
 import { TABLE_COMMANDS_GROUP } from '../../ui/EditorToolbarConfig';
-import CommandMenu, { CommandMenuProps } from './CommandMenu';
+import { CommandMenu, CommandMenuProps } from './CommandMenu';
 import createPopUp from '../../ui/createPopUp';
 import { PopUpHandle } from '../../ui/createPopUp';
 import { v1 as uuid } from 'uuid';
@@ -20,7 +20,6 @@ type Props = {
 export function TableCellMenu({ editorState, editorView }: Props) {
   return (
     <CommandMenuButton
-      className='czi-table-cell-menu'
       commandGroups={TABLE_COMMANDS_GROUP}
       dispatch={editorView.dispatch}
       editorState={editorState}
@@ -30,7 +29,6 @@ export function TableCellMenu({ editorState, editorView }: Props) {
 }
 
 class CommandMenuButton extends React.PureComponent<{
-  className?: string | null;
   commandGroups: any[]; // Array<{ [string]: UICommand }>;
   disabled?: boolean | null;
   dispatch: (tr: Transaction) => void;

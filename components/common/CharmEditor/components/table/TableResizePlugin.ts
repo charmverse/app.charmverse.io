@@ -1,4 +1,8 @@
-// @ts-nocheck
+/* eslint-disable no-continue */
+
+// Based on https://github.com/chanzuckerberg/czi-prosemirror/blob/540fffb41d74e06064788999871bd23ca6e219a9/src/TableResizePlugin.js
+
+// ...which is based on https://github.com/ProseMirror/prosemirror-tables/tree/master/src
 
 // Copyright (C) 2015-2016 by Marijn Haverbeke <marijnh@gmail.com> and others
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,13 +46,14 @@ import TableNodeView from './ui/TableNodeView';
 
 type DraggingInfo = {
   columnElements: HTMLElement[];
+  columnWidths: number[];
   startX: number;
   tableElement: HTMLElement;
   tableMarginLeft: number;
   tableMarginRight: number;
   tableWidth: number;
   tableWrapperWidth: number;
-  taregtColumnIndex: number;
+  targetColumnIndex: number;
 };
 
 type PointerEvent = {
@@ -61,11 +66,12 @@ const PLUGIN_KEY = new PluginKey('tableColumnResizing');
 const CELL_MIN_WIDTH = 25;
 const HANDLE_WIDTH = 20;
 
-let cancelDrag: VoidFunction | null = null;
+let cancelDrag: ((a?: any) => void) | null = null;
 
-type PluginState = {
-  draggingInfo?: DraggingInfo | null;
+type ResizePluginState = {
   cellPos?: number | null;
+  draggingInfo?: DraggingInfo | null;
+  forMarginLeft?: boolean | null;
 };
 
 // The immutable plugin state that stores the information for resizing.
@@ -83,25 +89,22 @@ class ResizeState {
   }
 
   apply(tr: Transaction): ResizeState {
-    let state = this;
+    let state = this as ResizeState;
     const action = tr.getMeta(PLUGIN_KEY);
     if (action && typeof action.setCellPos === 'number') {
-      console.log('skip update: action', action);
       return new ResizeState(action.setCellPos, action.setForMarginLeft, null);
     }
 
-    if (action && action.setDraggingInfo !== undefined) {
-      console.log('skip update no dragging: action', action);
+    if (action && !action.setDraggingInfo !== undefined) {
       return new ResizeState(state.cellPos, state.forMarginLeft, action.setDraggingInfo);
     }
-    console.log('set dragging info');
+    // console.log('set dragging info');
     if (state.cellPos && state.cellPos > -1 && tr.docChanged) {
       let cellPos: number | null = tr.mapping.map(state.cellPos, -1);
       if (!pointsAtCell(tr.doc.resolve(cellPos))) {
         cellPos = null;
       }
       state = new ResizeState(cellPos, cellPos ? state.forMarginLeft : false, state.draggingInfo);
-      console.log('set dragging info');
     }
     return state;
   }
@@ -109,7 +112,7 @@ class ResizeState {
 
 // Function that handles the mousemove event inside table cell.
 function handleMouseMove(view: EditorView, event: PointerEvent): void {
-  const resizeState = PLUGIN_KEY.getState(view.state) as PluginState;
+  const resizeState = PLUGIN_KEY.getState(view.state) as ResizePluginState;
   if (resizeState.draggingInfo) {
     return;
   }
@@ -122,14 +125,14 @@ function handleMouseMove(view: EditorView, event: PointerEvent): void {
     const { left, right } = target.getBoundingClientRect();
     const offsetLeft = event.clientX - left;
     if (offsetLeft <= HANDLE_WIDTH) {
-      if (target.cellIndex === 0) {
+      if ((target as HTMLTableCellElement).cellIndex === 0) {
         forMarginLeft = true;
-        cell = edgeCell(view, event, 'right');
+        cell = edgeCell(view, event, 'right', HANDLE_WIDTH);
       } else {
-        cell = edgeCell(view, event, 'left');
+        cell = edgeCell(view, event, 'left', HANDLE_WIDTH);
       }
     } else if (right - event.clientX <= HANDLE_WIDTH) {
-      cell = edgeCell(view, event, 'right');
+      cell = edgeCell(view, event, 'right', HANDLE_WIDTH);
     }
   }
 
@@ -148,43 +151,39 @@ function handleMouseMove(view: EditorView, event: PointerEvent): void {
 
 // Function that handles the mouseleave event from the table cell.
 function handleMouseLeave(view: EditorView): void {
-  const resizeState = PLUGIN_KEY.getState(view.state) as PluginState;
+  const resizeState = PLUGIN_KEY.getState(view.state) as ResizePluginState;
   const { cellPos, draggingInfo } = resizeState;
-  if (cellPos > -1 && !draggingInfo) {
+  if (cellPos && cellPos > -1 && !draggingInfo) {
     updateResizeHandle(view, -1, false);
   }
 }
 
 // Function that handles the mousedown event from the table cell.
 function handleMouseDown(view: EditorView, event: MouseEvent): boolean {
-  console.log('mouse down');
   // It's possible that the resize action that happened earlier was inturrupted
   // while its dependent mouse events were stopped or prevented by others.
   // We need to stop the previous resize action if it did not finish.
-  cancelDrag && cancelDrag(event);
+  if (cancelDrag) cancelDrag(event);
 
-  const resizeState = PLUGIN_KEY.getState(view.state) as PluginState;
-  console.log('resizeState', resizeState);
+  const resizeState = PLUGIN_KEY.getState(view.state) as ResizePluginState;
   if (resizeState.cellPos === -1 || resizeState.draggingInfo) {
-    console.log('reutrn false', resizeState);
     return false;
   }
 
   let dragStarted = false;
-  let dragMoveHandler = null;
+  let dragMoveHandler: ReturnType<typeof batchMouseHandler> | null = null;
 
-  const finish = (e: MouseEvent) => {
+  function finish(e: MouseEvent) {
     window.removeEventListener('mouseup', finish, true);
     window.removeEventListener('mousemove', move, true);
-    dragStarted && handleDragEnd(view, e);
+    if (dragStarted) handleDragEnd(view);
     cancelDrag = null;
-  };
+  }
 
-  const move = (e: MouseEvent) => {
-    console.log('mouse move');
+  function move(e: MouseEvent) {
     if (e.which) {
       if (!dragStarted) {
-        handleDragStart(view, encodeURI);
+        handleDragStart(view, e);
         dragStarted = true;
       }
       // Move events should be batched to avoid over-handling the mouse
@@ -194,21 +193,20 @@ function handleMouseDown(view: EditorView, event: MouseEvent): boolean {
     } else {
       finish(e);
     }
-  };
+  }
 
   cancelDrag = finish;
   window.addEventListener('mouseup', finish, true);
-  // window.addEventListener('mousemove', move, true);
+  window.addEventListener('mousemove', move, true);
   event.preventDefault();
   return true;
 }
 
 function handleDragStart(view: EditorView, event: MouseEvent): void {
-  const resizeState = PLUGIN_KEY.getState(view.state) as PluginState;
+  const resizeState = PLUGIN_KEY.getState(view.state) as ResizePluginState;
   if (resizeState.cellPos === -1 || resizeState.draggingInfo) {
     return;
   }
-  console.log('SHOW HANDLEBARS');
   view.dispatch(
     view.state.tr.setMeta(PLUGIN_KEY, {
       setDraggingInfo: calculateDraggingInfo(view, event, resizeState)
@@ -219,13 +217,13 @@ function handleDragStart(view: EditorView, event: MouseEvent): void {
 // Function that handles the mouse event while resizing the table cell.
 // This will temporarily updates the table's style until the resize ends.
 function handleDragMove(view: EditorView, event: PointerEvent): void {
-  const resizeState = PLUGIN_KEY.getState(view.state) as PluginState;
+  const resizeState = PLUGIN_KEY.getState(view.state) as ResizePluginState;
   const { draggingInfo, forMarginLeft } = resizeState;
-  console.log('handle drag', draggingInfo);
   if (!draggingInfo) {
+    // console.log('DO NOT HANDLE DRAG MOVE', resizeState);
     return;
   }
-  const { startX, columnWidths, taregtColumnIndex, columnElements, tableElement, tableMarginLeft, tableMarginRight } =
+  const { startX, columnWidths, targetColumnIndex, columnElements, tableElement, tableMarginLeft, tableMarginRight } =
     draggingInfo;
 
   let totalWidth = 0;
@@ -233,6 +231,7 @@ function handleDragMove(view: EditorView, event: PointerEvent): void {
 
   const dx = event.clientX - startX;
   const lastIndex = columnWidths.length - 1;
+
   const widths = columnWidths.map((cw, index) => {
     let ww;
     if (forMarginLeft) {
@@ -245,13 +244,13 @@ function handleDragMove(view: EditorView, event: PointerEvent): void {
         // The rest columns remain the same,
         ww = cw;
       }
-    } else if (index === taregtColumnIndex && index === lastIndex) {
+    } else if (index === targetColumnIndex && index === lastIndex) {
       // Resize the last column.
       ww = Math.min(cw + tableMarginRight, Math.max(CELL_MIN_WIDTH, cw + dx));
-    } else if (index === taregtColumnIndex) {
+    } else if (index === targetColumnIndex) {
       // Resize the column.
       ww = Math.min(Math.max(CELL_MIN_WIDTH, cw + dx), cw + (columnWidths[index + 1] || 0) - CELL_MIN_WIDTH);
-    } else if (index === taregtColumnIndex + 1) {
+    } else if (index === targetColumnIndex + 1) {
       // Resize the column's previous column.
       ww = Math.min(Math.max(CELL_MIN_WIDTH, cw - dx), cw + (columnWidths[index - 1] || 0) - CELL_MIN_WIDTH);
     } else {
@@ -273,8 +272,8 @@ function handleDragMove(view: EditorView, event: PointerEvent): void {
 }
 
 // Function that handles the mouse event while stop resizing the table cell.
-function handleDragEnd(view: EditorView, event: PointerEvent): void {
-  const resizeState = PLUGIN_KEY.getState(view.state) as PluginState;
+function handleDragEnd(view: EditorView): void {
+  const resizeState = PLUGIN_KEY.getState(view.state) as ResizePluginState;
   const { cellPos, draggingInfo } = resizeState;
   if (!draggingInfo) {
     return;
@@ -284,7 +283,7 @@ function handleDragEnd(view: EditorView, event: PointerEvent): void {
     return parseFloat(colEl.style.width);
   });
 
-  const $cell = view.state.doc.resolve(cellPos);
+  const $cell = view.state.doc.resolve(cellPos!);
   const start = $cell.start(-1);
   const table = $cell.node(-1);
   const map = TableMap.get(table);
@@ -297,7 +296,7 @@ function handleDragEnd(view: EditorView, event: PointerEvent): void {
         continue;
       }
       const pos = map.map[mapIndex];
-      const { attrs } = table.nodeAt(pos);
+      const attrs = table.nodeAt(pos)!.attrs;
       const colspan = attrs.colspan || 1;
       const colwidth = widths.slice(col, col + colspan);
 
@@ -311,7 +310,7 @@ function handleDragEnd(view: EditorView, event: PointerEvent): void {
         continue;
       }
 
-      tr = tr.setNodeMarkup(start + pos, null, setAttr(attrs, 'colwidth', colwidth));
+      tr = tr.setNodeMarkup(start + pos, null, { ...attrs, colwidth });
     }
   }
 
@@ -335,16 +334,19 @@ function handleDragEnd(view: EditorView, event: PointerEvent): void {
     view.dispatch(tr);
   }
   // Hides the resize handle bars.
-  console.log('HIDE HANDLEBARS');
   view.dispatch(view.state.tr.setMeta(PLUGIN_KEY, { setDraggingInfo: null }));
 }
 
 // Helper that prepares the information needed before the resizing starts.
-function calculateDraggingInfo(view: EditorView, event: MouseEvent, resizeState: ResizeState): DraggingInfo | null {
+function calculateDraggingInfo(
+  view: EditorView,
+  event: MouseEvent,
+  resizeState: ResizePluginState
+): DraggingInfo | null {
   const { cellPos, forMarginLeft } = resizeState;
-  const dom = view.domAtPos(cellPos);
-  const tableEl = dom.node.closest('table');
-  const tableWrapper = tableEl.closest('.tableWrapper');
+  const dom = view.domAtPos(cellPos!);
+  const tableEl = (dom.node as HTMLElement).closest('table')!;
+  const tableWrapper = tableEl.closest('.tableWrapper')!;
   const colGroupEl = tableEl.querySelector('colgroup');
   const colEls: HTMLElement[] = colGroupEl ? Array.from(colGroupEl.querySelectorAll('col')) : [];
   const tableWrapperRect = tableWrapper.getBoundingClientRect();
@@ -354,7 +356,7 @@ function calculateDraggingInfo(view: EditorView, event: MouseEvent, resizeState:
   const offsetLeft = startX - tableRect.left;
 
   let tableWidth = 0;
-  let taregtColumnIndex = -1;
+  let targetColumnIndex = -1;
 
   const tableMarginLeftStyle = tableEl.style.marginLeft;
   const tableMarginLeft =
@@ -379,7 +381,7 @@ function calculateDraggingInfo(view: EditorView, event: MouseEvent, resizeState:
     const edgeRight = tableWidth + colWidth + HANDLE_WIDTH / 2;
     if (offsetLeft >= edgeLeft && offsetLeft <= edgeRight) {
       // This is the column to resize.
-      taregtColumnIndex = ii;
+      targetColumnIndex = ii;
     }
     tableWidth += colWidth;
     return colWidth;
@@ -387,10 +389,10 @@ function calculateDraggingInfo(view: EditorView, event: MouseEvent, resizeState:
 
   if (forMarginLeft) {
     // Both the first column and the table's left margin should resize.
-    taregtColumnIndex = 0;
+    targetColumnIndex = 0;
   }
 
-  if (taregtColumnIndex < 0) {
+  if (targetColumnIndex < 0) {
     // Nothing to resize. This happens when the mouse isn't nearby any position
     // that is alllowed to resize a column.
     return null;
@@ -398,8 +400,8 @@ function calculateDraggingInfo(view: EditorView, event: MouseEvent, resizeState:
 
   return {
     columnElements: colEls,
-    taregtColumnIndex,
-    // columnWidths,
+    targetColumnIndex,
+    columnWidths,
     startX,
     tableElement: tableEl,
     tableMarginLeft,
@@ -419,9 +421,17 @@ function domCellAround(target: any): Element {
 
 // Helper that resolves the prose-mirror node postion of a cell from a given
 // event target.
-function edgeCell(view: EditorView, event: PointerEvent, side: string): number {
-  const result = view.posAtCoords({ left: event.clientX, top: event.clientY });
-  const pos = result?.pos;
+function edgeCell(view: EditorView, event: PointerEvent, side: string, handleWidth: number): number {
+  // posAtCoords returns inconsistent positions when cursor is moving
+  // across a collapsed table border. Use an offset to adjust the
+  // target viewport coordinates away from the table border.
+  const offset = side === 'right' ? -handleWidth : handleWidth;
+  const result = view.posAtCoords({
+    left: event.clientX + offset,
+    top: event.clientY
+  });
+  if (!result) return -1;
+  const pos = result.pos;
   const $cell = pos && cellAround(view.state.doc.resolve(pos));
   if (!$cell) {
     return -1;
@@ -446,28 +456,33 @@ function updateResizeHandle(view: EditorView, cellPos: number, forMarginLeft: bo
 }
 
 // Get the decorations that renders the resize handle bars.
-function handleDecorations(state: EditorState, resizeState: ResizeState): DecorationSet {
+function handleDecorations(
+  state: EditorState,
+  resizeState: Pick<ResizeState, 'cellPos' | 'forMarginLeft'>
+): DecorationSet {
   if (!resizeState.cellPos) {
     return DecorationSet.create(state.doc, []);
   }
   const decorations = [];
   const $cell = state.doc.resolve(resizeState.cellPos);
   const table = $cell.node(-1);
-
+  if (!table) {
+    return DecorationSet.empty;
+  }
   const map = TableMap.get(table);
   const start = $cell.start(-1);
-  const col = map.colCount($cell.pos - start) + $cell.nodeAfter.attrs.colspan;
+  const col = map.colCount($cell.pos - start) + $cell.nodeAfter!.attrs.colspan - 1;
   for (let row = 0; row < map.height; row++) {
-    const index = col + row * map.width - 1;
-    // For positions that are have either a different cell or the end
+    const index = col + row * map.width;
+    // For positions that have either a different cell or the end
     // of the table to their right, and either the top of the table or
     // a different cell above them, add a decoration
     if (
-      (col === map.width || map.map[index] !== map.map[index + 1]) &&
-      (row === 0 || map.map[index - 1] !== map.map[index - 1 - map.width])
+      (col === map.width - 1 || map.map[index] !== map.map[index + 1]) &&
+      (row === 0 || map.map[index] !== map.map[index - map.width])
     ) {
       const cellPos = map.map[index];
-      const pos = start + cellPos + table.nodeAt(cellPos).nodeSize - 1;
+      const pos = start + cellPos + table.nodeAt(cellPos)!.nodeSize - 1;
       const dom = document.createElement('div');
       let className = 'column-resize-handle';
       if (resizeState.forMarginLeft) {
@@ -528,7 +543,7 @@ export default class TableResizePlugin extends Plugin {
       key: PLUGIN_KEY,
       state: {
         init(_: any, state: EditorState): ResizeState {
-          this.spec.props.nodeViews[tableNodeTypes(state.schema).table.name] = createTableView;
+          (this as any).spec.props.nodeViews[tableNodeTypes(state.schema).table.name] = createTableView;
           return new ResizeState(-1);
         },
         apply(tr: Transaction, prev: EditorState): EditorState {
@@ -537,8 +552,8 @@ export default class TableResizePlugin extends Plugin {
       },
       props: {
         attributes(state: EditorState) {
-          const resizeState = PLUGIN_KEY.getState(state) as PluginState;
-          return resizeState.cellPos > -1 ? { class: 'resize-cursor' } : {};
+          const resizeState = PLUGIN_KEY.getState(state) as ResizePluginState;
+          return resizeState.cellPos! > -1 ? { class: 'resize-cursor' } : { class: '' };
         },
         handleDOMEvents: {
           // Move events should be batched to avoid over-handling the mouse
@@ -548,8 +563,8 @@ export default class TableResizePlugin extends Plugin {
           mousedown: handleMouseDown
         },
         decorations(state: EditorState): DecorationSet | undefined {
-          const resizeState = PLUGIN_KEY.getState(state) as PluginState;
-          return resizeState.cellPos > -1 ? handleDecorations(state, resizeState) : undefined;
+          const resizeState = PLUGIN_KEY.getState(state) as ResizePluginState;
+          return resizeState.cellPos! > -1 ? handleDecorations(state, resizeState) : undefined;
         },
         nodeViews: {}
       }

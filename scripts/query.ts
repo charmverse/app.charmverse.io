@@ -6,13 +6,20 @@ import { prettyPrint } from 'lib/utils/strings';
  */
 
 async function query() {
-  console.log(
-    await prisma.page.findFirst({
-      where: {
-        id: '9ed3702c-4368-4ed8-9274-3744d9e34c8d'
-      }
-    })
-  );
+  const url = 'https://api.neynar.com/v2/farcaster/webhook';
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      api_key: 'NEYNAR_API_DOCS',
+      'content-type': 'application/json'
+    }
+  };
+
+  fetch(url, options)
+    .then((res) => res.json())
+    .then((json) => console.log(json))
+    .catch((err) => console.error('error:' + err));
 }
 
 query();

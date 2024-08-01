@@ -2,7 +2,7 @@ import React from 'react';
 
 import { v1 as uuid } from 'uuid';
 import { createRoot } from 'react-dom/client';
-import { ClickAwayListener, Menu, Popper, Popover } from '@mui/material';
+import { Menu, Popper, Popover } from '@mui/material';
 
 export type PopUpParams = {
   anchor?: any;
@@ -23,39 +23,6 @@ let popUpsCount = 0;
 
 const Z_INDEX_BASE = 9999;
 const MODAL_MASK_ID = `pop-up-modal-mask-${uuid()}`;
-
-function showModalMask(): void {
-  const root: any = document.body || document.documentElement;
-  let element = document.getElementById(MODAL_MASK_ID);
-  if (!element) {
-    element = document.createElement('div');
-    element.id = MODAL_MASK_ID;
-    element.className = 'czi-pop-up-modal-mask';
-    element.setAttribute('data-mask-type', 'czi-pop-up-modal-mask');
-    element.setAttribute('role', 'dialog');
-    element.setAttribute('aria-modal', 'true');
-  }
-
-  if (root && !element.parentElement) {
-    root.appendChild(element);
-  }
-  const style: any = element.style;
-
-  const selector = '.czi-pop-up-element[data-pop-up-modal]';
-  const zIndex = Array.from(document.querySelectorAll(selector)).reduce(
-    (zz, el) => Math.max(zz, Number((el as HTMLElement).style.zIndex)),
-    0
-  );
-
-  style.zIndex = zIndex - 1;
-}
-
-function hideModalMask(): void {
-  const element = document.getElementById(MODAL_MASK_ID);
-  if (element && element.parentElement) {
-    element.parentElement.removeChild(element);
-  }
-}
 
 function getRootElement(id: string, forceCreation: boolean, popUpParams?: PopUpParams | null): HTMLElement | null {
   const root: any = (popUpParams && popUpParams.container) || document.body || document.documentElement;
@@ -142,12 +109,6 @@ function renderPopUp<T>(
       );
     reactRoot.render(component);
   }
-
-  if (modalsCount > 0) {
-    showModalMask();
-  } else {
-    hideModalMask();
-  }
 }
 
 function unrenderPopUp(rootId: string): void {
@@ -160,10 +121,6 @@ function unrenderPopUp(rootId: string): void {
       rootNode._reactContainer = null;
       rootNode.parentElement && rootNode.parentElement.removeChild(rootNode);
     });
-  }
-
-  if (modalsCount === 0) {
-    hideModalMask();
   }
 }
 

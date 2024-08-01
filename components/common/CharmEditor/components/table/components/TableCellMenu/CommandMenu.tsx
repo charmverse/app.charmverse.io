@@ -14,7 +14,7 @@ export type CommandMenuProps = {
   onCommand: VoidFunction | null;
 };
 
-class CommandMenu extends React.PureComponent<CommandMenuProps> {
+export class CommandMenu extends React.PureComponent<CommandMenuProps> {
   _activeCommand: UICommand | null = null;
 
   render() {
@@ -66,5 +66,3 @@ class CommandMenu extends React.PureComponent<CommandMenuProps> {
     }
   };
 }
-
-export default CommandMenu;

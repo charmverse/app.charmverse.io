@@ -7,4 +7,4 @@ apps/connect/.next/
 background/ceramicServer/generated/
 
 # TODO: lint the files for table component
-components/common/CharmEditor/components/table_new/
+components/common/CharmEditor/components/table/

@@ -47,8 +47,8 @@ export const TABLE_COMMANDS_GROUP = [
     'Insert Table...': TABLE_INSERT_TABLE
   },
   {
-    'Fill Color...': TABLE_BACKGROUND_COLOR,
-    'Border Color....': TABLE_BORDER_COLOR
+    'Edit Fill Color': TABLE_BACKGROUND_COLOR,
+    'Edit Border Color': TABLE_BORDER_COLOR
   },
   {
     'Insert Column Before': TABLE_ADD_COLUMN_BEFORE,
