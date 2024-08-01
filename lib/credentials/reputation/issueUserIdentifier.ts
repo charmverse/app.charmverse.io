@@ -9,7 +9,10 @@ import { charmCredentialChainId } from './constants';
 export async function issueUserIdentifierIfNecessary({
   userId,
   chainId
-}: { userId: string } & { chainId: number }): Promise<CharmUserCredential> {
+}: {
+  userId: string;
+  chainId: number;
+}): Promise<CharmUserCredential> {
   const existingIdentifier = await prisma.charmUserCredential.findFirst({
     where: {
       userId,

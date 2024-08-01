@@ -6,11 +6,11 @@ import { attestOnchain } from '@root/lib/credentials/attestOnchain';
 import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
+import { storeProjectInS3 } from '../../../lib/credentials/storeProjectInS3';
 import { fetchProject } from '../projects/fetchProject';
 
 import { projectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
-import { storeProjectInS3 } from './storeProjectInS3';
 
 const currentGitcoinRound = 'clxokl3hl000013trh6d4lhyo';
 

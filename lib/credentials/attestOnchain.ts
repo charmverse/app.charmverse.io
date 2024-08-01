@@ -9,9 +9,9 @@ import { getEthersProvider } from '../blockchain/getEthersProvider';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
 import { attestationSchemaIds, encodeAttestation } from './schemas';
-import type { AttestationType, CredentialDataInput } from './schemas';
+import type { ExtendedAttestationType, CredentialDataInput } from './schemas';
 
-export type OnChainAttestationInput<T extends AttestationType = AttestationType> = {
+export type OnChainAttestationInput<T extends ExtendedAttestationType = ExtendedAttestationType> = {
   chainId: EasSchemaChain;
   credentialInputs: { recipient: string | null; data: CredentialDataInput<T> };
   type: T;
@@ -19,7 +19,7 @@ export type OnChainAttestationInput<T extends AttestationType = AttestationType>
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-export async function attestOnchain<T extends AttestationType = AttestationType>({
+export async function attestOnchain<T extends ExtendedAttestationType = ExtendedAttestationType>({
   credentialInputs,
   type,
   chainId
@@ -50,7 +50,7 @@ export async function attestOnchain<T extends AttestationType = AttestationType>
   return attestationUid;
 }
 
-export type OnChainAttestationInputWithMetadata<T extends AttestationType = AttestationType> = {
+export type OnChainAttestationInputWithMetadata<T extends ExtendedAttestationType = ExtendedAttestationType> = {
   credential: OnChainAttestationInput<T>;
   credentialMetadata: {
     event: CredentialEventType;

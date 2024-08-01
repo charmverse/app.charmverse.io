@@ -1,23 +1,21 @@
-import type { QualifyingEventType } from '@charmverse/core/prisma-client';
-import { SchemaEncoder, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
-
-import { NULL_ADDRESS } from '../constants';
+import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 
 import type { TypedSchemaItem } from './interfaces';
 
-// This schema ID is bound to change as we move through resolver contract versions
-export const charmProjectSchemaId = '0xffebe1dbfc8c97cd866b63e442d6c725b78bc4c2de0683d332d5de5e6c11bd19';
+export const charmProjectSchemaId = '0xfb79325c991ed799aacb8cc42725c474e2a43e96d972d0c17af5a926e5716105';
 
-export const charmProjectSchemaDefinition = 'string projectUid';
+export const charmProjectSchemaDefinition = 'string uid, string authorRefUID';
 
 export type CharmProject = {
-  projectUid: string;
+  authorRefUID: string;
+  uid: string;
 };
 
-export function encodeCharmProject({ projectUid }: CharmProject) {
+export function encodeCharmProject({ authorRefUID, uid }: CharmProject) {
   const encoder = new SchemaEncoder(charmProjectSchemaDefinition);
   const encodedData = encoder.encodeData([
-    { name: 'projectUid', value: projectUid, type: 'string' }
+    { name: 'uid', value: uid, type: 'string' },
+    { name: 'authorRefUID', value: authorRefUID, type: 'string' }
   ] as TypedSchemaItem<CharmProject>[]);
 
   return encodedData;
@@ -34,5 +32,3 @@ export function decodeCharmProject(rawData: string): CharmProject {
 
   return values as CharmProject;
 }
-
-// console.log(getSchemaUID(charmProjectSchemaId, NULL_ADDRESS, false));

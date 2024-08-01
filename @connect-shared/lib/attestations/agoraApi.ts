@@ -6,7 +6,7 @@ import { getAttestation } from '@root/lib/credentials/getAttestation';
 import { decodeOptimismProjectSnapshotAttestation } from '@root/lib/credentials/schemas/optimismProjectSchemas';
 import { optimism } from 'viem/chains';
 
-import { mapProjectToOptimism } from './mapProjectToOptimism';
+import { mapProjectToOptimism } from '../../../lib/credentials/mapProjectToOptimism';
 
 const AGORA_API_KEY = process.env.AGORA_API_KEY as string;
 

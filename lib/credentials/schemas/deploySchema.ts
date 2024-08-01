@@ -8,6 +8,8 @@ import { easSchemaChains, getEasConnector, getOnChainSchemaUrl } from '../connec
 import { NULL_ADDRESS } from '../constants';
 import { getCharmverseSigner } from '../getCharmverseSigner';
 
+import { charmProjectSchemaDefinition } from './charmProject';
+import { charmProjectMetadataSchemaDefinition } from './charmProjectMetadata';
 import { charmQualifyingEventSchemaDefinition } from './charmQualifyingEvent';
 import { charmUserIdentifierSchemaDefinition } from './charmUserIdentifier';
 import { externalCredentialSchemaDefinition } from './external';
@@ -71,6 +73,20 @@ async function deploySchemaAcrossChains({ schema }: { schema: string }) {
     await deploySchema({ schema, chainId });
   }
 }
+
+async function deployCharmverseProjectSchemas(chainId: EasSchemaChain) {
+  for (const schemaId of [
+    charmUserIdentifierSchemaDefinition,
+    // charmQualifyingEventSchemaDefinition,
+    charmProjectSchemaDefinition,
+    charmProjectMetadataSchemaDefinition
+  ]) {
+    log.info(`Deploying schema...`);
+    await deploySchema({ schema: schemaId, chainId });
+  }
+}
+
+deployCharmverseProjectSchemas(optimismSepolia.id).then(log.info);
 
 // Used when we want to add a new schema to schemas we support
 // lib/credentials/schemas/index.ts
