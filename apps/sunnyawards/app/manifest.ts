@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    id: 'connect',
+    id: 'sunnyawards',
     name: 'Charm Connect - Onchain builder network',
     short_name: 'Charm Connect',
     description: 'Onchain network for connecting web3 developers, projects, organizations',
