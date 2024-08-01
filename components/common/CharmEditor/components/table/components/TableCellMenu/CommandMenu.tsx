@@ -1,9 +1,9 @@
+import { Divider, ListItemButton, Menu, MenuItem, ListItemText } from '@mui/material';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent, ReactNode } from 'react';
 import React from 'react';
 
-import { Divider, ListItemButton, Menu, MenuItem, ListItemText } from '@mui/material';
 import type UICommand from '../../ui/UICommand';
 
 export type CommandMenuProps = {
@@ -16,6 +16,19 @@ export type CommandMenuProps = {
 
 export class CommandMenu extends React.PureComponent<CommandMenuProps> {
   _activeCommand: UICommand | null = null;
+
+  _onUIEnter = (command: UICommand, event: SyntheticEvent): void => {
+    if (this._activeCommand) this._activeCommand.cancel();
+    this._activeCommand = command;
+    this._execute(command, event);
+  };
+
+  _execute = (command: UICommand, e: SyntheticEvent) => {
+    const { dispatch, editorState, editorView, onCommand } = this.props;
+    if (command.execute(editorState, dispatch, editorView, e)) {
+      if (onCommand) onCommand();
+    }
+  };
 
   render() {
     const { commandGroups, editorState, editorView } = this.props;
@@ -44,25 +57,10 @@ export class CommandMenu extends React.PureComponent<CommandMenuProps> {
         );
       });
       if (ii !== jj) {
-        console.log('add separator');
         children.push(<Divider />);
       }
     });
     // The popup will use Menu component so no need to wrap it with List
-    return children; //<List sx={{ bgcolor: 'background.paper' }}>{children}</List>;
+    return children; // <List sx={{ bgcolor: 'background.paper' }}>{children}</List>;
   }
-
-  _onUIEnter = (command: UICommand, event: SyntheticEvent): void => {
-    console.log(event, event.type, command.shouldRespondToUIEvent(event));
-    this._activeCommand && this._activeCommand.cancel();
-    this._activeCommand = command;
-    this._execute(command, event);
-  };
-
-  _execute = (command: UICommand, e: SyntheticEvent) => {
-    const { dispatch, editorState, editorView, onCommand } = this.props;
-    if (command.execute(editorState, dispatch, editorView, e)) {
-      onCommand && onCommand();
-    }
-  };
 }

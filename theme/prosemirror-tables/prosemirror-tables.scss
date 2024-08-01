@@ -4,9 +4,13 @@
   table-layout: fixed;
   width: 100%;
   overflow: hidden;
-  margin: 0 !important;
+  margin: 0;
 }
 
+.ProseMirror .column-resize-handle.for-margin-left {
+  left: 0;
+  right: auto;
+}
 
 .ProseMirror .tableWrapper {
   margin: 1em 0;

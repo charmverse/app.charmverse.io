@@ -1,8 +1,8 @@
-import React from 'react';
-
-import { v1 as uuid } from 'uuid';
-import { createRoot } from 'react-dom/client';
+/* eslint-disable no-plusplus */
 import { Menu, Popper, Popover } from '@mui/material';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { v1 as uuid } from 'uuid';
 
 export type PopUpParams = {
   anchor?: any;
@@ -96,7 +96,7 @@ function renderPopUp<T>(
               : undefined
           }
           // close popovers on mouse leave
-          slotProps={{ paper: { onMouseLeave: close } }}
+          // slotProps={{ paper: { onMouseLeave: close } }}
         >
           <View {...viewProps} close={close} />
         </Popover>
@@ -119,7 +119,7 @@ function unrenderPopUp(rootId: string): void {
       rootNode._reactContainer?.unmount();
       // @ts-ignore
       rootNode._reactContainer = null;
-      rootNode.parentElement && rootNode.parentElement.removeChild(rootNode);
+      if (rootNode.parentElement) rootNode.parentElement.removeChild(rootNode);
     });
   }
 }
@@ -159,7 +159,7 @@ export default function createPopUp<T>(
     unrenderPopUp(rootId);
 
     const onClose = popUpParams && popUpParams.onClose;
-    onClose && onClose(value);
+    if (onClose) onClose(value);
   };
 
   const typedRenderPopUp = renderPopUp as (

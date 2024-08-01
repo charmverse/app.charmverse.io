@@ -1,7 +1,10 @@
 import Color from 'color';
-import { PureComponent, ReactNode } from 'react';
-import clamp from './clamp';
+import type { ReactNode } from 'react';
+import { PureComponent } from 'react';
+
 import { Button } from 'components/common/Button';
+
+import clamp from './clamp';
 
 function generateGreyColors(count: number): Color[] {
   let cc = 255;
@@ -88,9 +91,9 @@ function ColorOption({
 }) {
   return (
     <span
-      className='czi-color-option'
+      className={`czi-color-option${active ? ' active' : ''}`}
       style={{ backgroundColor: value }}
-      //active={!!active}
+      // active={!!active}
       onClick={() => onClick(value)}
     >
       {children}

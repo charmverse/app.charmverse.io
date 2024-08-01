@@ -146,6 +146,7 @@ function handleMouseMove(view: EditorView, event: PointerEvent): void {
       return;
     }
   }
+
   updateResizeHandle(view, cell, forMarginLeft);
 }
 

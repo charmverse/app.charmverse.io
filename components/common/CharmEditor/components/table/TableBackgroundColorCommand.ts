@@ -4,7 +4,8 @@ import type { EditorView } from 'prosemirror-view';
 import type { SyntheticEvent } from 'react';
 
 import { ColorEditor } from './ui/ColorEditor';
-import createPopUp, { PopUpHandle } from './ui/createPopUp';
+import type { PopUpHandle } from './ui/createPopUp';
+import createPopUp from './ui/createPopUp';
 import UICommand from './ui/UICommand';
 
 const setCellBackgroundBlack = setCellAttr('background', '#000000');
@@ -66,7 +67,7 @@ class TableBackgroundColorCommand extends UICommand {
   };
 
   cancel(): void {
-    this._popUp && this._popUp.close(undefined);
+    if (this._popUp) this._popUp.close(undefined);
   }
 }
 

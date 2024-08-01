@@ -1,32 +1,21 @@
 import { Edit as EditIcon } from '@mui/icons-material';
-import type { EditorState } from 'prosemirror-state';
-import type { EditorView } from 'prosemirror-view';
 import { Box, IconButton } from '@mui/material';
-
-import type { Transaction } from 'prosemirror-state';
+import type { EditorState, Transaction } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import React from 'react';
-
-import { TABLE_COMMANDS_GROUP } from '../../ui/EditorToolbarConfig';
-import { CommandMenu, CommandMenuProps } from './CommandMenu';
-import createPopUp from '../../ui/createPopUp';
-import { PopUpHandle } from '../../ui/createPopUp';
 import { v1 as uuid } from 'uuid';
+
+import createPopUp from '../../ui/createPopUp';
+import type { PopUpHandle } from '../../ui/createPopUp';
+import { TABLE_COMMANDS_GROUP } from '../../ui/EditorToolbarConfig';
+
+import type { CommandMenuProps } from './CommandMenu';
+import { CommandMenu } from './CommandMenu';
 
 type Props = {
   editorState: EditorState;
   editorView: EditorView;
 };
-
-export function TableCellMenu({ editorState, editorView }: Props) {
-  return (
-    <CommandMenuButton
-      commandGroups={TABLE_COMMANDS_GROUP}
-      dispatch={editorView.dispatch}
-      editorState={editorState}
-      editorView={editorView}
-    />
-  );
-}
 
 class CommandMenuButton extends React.PureComponent<{
   commandGroups: any[]; // Array<{ [string]: UICommand }>;
@@ -41,6 +30,56 @@ class CommandMenuButton extends React.PureComponent<{
 
   state = {
     expanded: false
+  };
+
+  componentWillUnmount(): void {
+    this._hideMenu();
+  }
+
+  _onClick = (): void => {
+    const expanded = !(this as CommandMenuButton).state.expanded;
+
+    this.setState({
+      expanded
+    });
+    // eslint-disable-next-line no-unused-expressions
+    expanded ? this._showMenu() : this._hideMenu();
+  };
+
+  _hideMenu = (): void => {
+    const menu = this._menu;
+    this._menu = null;
+    if (menu) menu.close();
+  };
+
+  _showMenu = (): void => {
+    const menu = this._menu;
+    const menuProps: CommandMenuProps = {
+      ...this.props,
+      onCommand: this._onCommand
+    };
+    if (menu) {
+      menu.update(menuProps);
+    } else {
+      // @ts-ignore
+      this._menu = createPopUp(CommandMenu, menuProps, {
+        anchor: document.getElementById(this._id),
+        onClose: this._onClose,
+        popper: 'menu'
+      });
+    }
+  };
+
+  _onCommand = (): void => {
+    this.setState({ expanded: false });
+    this._hideMenu();
+  };
+
+  _onClose = (): void => {
+    if (this._menu) {
+      this.setState({ expanded: false });
+      this._menu = null;
+    }
   };
 
   render() {
@@ -80,55 +119,15 @@ class CommandMenuButton extends React.PureComponent<{
       </Box>
     );
   }
-
-  componentWillUnmount(): void {
-    this._hideMenu();
-  }
-
-  _onClick = (): void => {
-    const expanded = !this.state.expanded;
-
-    this.setState({
-      expanded
-    });
-    expanded ? this._showMenu() : this._hideMenu();
-  };
-
-  _hideMenu = (): void => {
-    const menu = this._menu;
-    this._menu = null;
-    menu && menu.close();
-  };
-
-  _showMenu = (): void => {
-    const menu = this._menu;
-    const menuProps: CommandMenuProps = {
-      ...this.props,
-      onCommand: this._onCommand
-    };
-    if (menu) {
-      menu.update(menuProps);
-    } else {
-      // @ts-ignore
-      this._menu = createPopUp(CommandMenu, menuProps, {
-        anchor: document.getElementById(this._id),
-        onClose: this._onClose,
-        popper: 'menu'
-      });
-    }
-  };
-
-  _onCommand = (): void => {
-    this.setState({ expanded: false });
-    this._hideMenu();
-  };
-
-  _onClose = (): void => {
-    if (this._menu) {
-      this.setState({ expanded: false });
-      this._menu = null;
-    }
-  };
 }
 
-export default CommandMenuButton;
+export function TableCellMenu({ editorState, editorView }: Props) {
+  return (
+    <CommandMenuButton
+      commandGroups={TABLE_COMMANDS_GROUP}
+      dispatch={editorView.dispatch}
+      editorState={editorState}
+      editorView={editorView}
+    />
+  );
+}
