@@ -8,24 +8,10 @@
   padding: 4px 10px;
 }
 
-/*
-.czi-color-editor .czi-custom-button.czi-color-editor-color-transparent {
-  display: block;
-  height: auto;
-  margin: 2px;
-  padding: 6px;
-  text-align: center;
-  width: auto;
-}
-
-.czi-color-editor .czi-custom-button.czi-color-editor-color-transparent:hover {
-  background-color: var(--czi-button-hover-background-color);
-} */
-
 .czi-color-option {
   display: inline-block;
   cursor: pointer;
-  border: solid 1px transparent;
+  border: solid 1px var(--background-default);
   height: 18px;
   margin: 1px;
   padding: 0;

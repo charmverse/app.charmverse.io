@@ -115,6 +115,7 @@ function renderPopUp<T>(
         // <ClickAwayListener onClickAway={close}>
         <Popover
           open
+          onClose={close}
           anchorEl={popUpParams.anchor}
           anchorOrigin={
             popUpParams.placement === 'right'
