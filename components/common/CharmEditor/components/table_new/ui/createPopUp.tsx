@@ -2,7 +2,7 @@ import React from 'react';
 
 import { v1 as uuid } from 'uuid';
 import { createRoot } from 'react-dom/client';
-import { ClickAwayListener, Popper } from '@mui/material';
+import { ClickAwayListener, Menu, Popper } from '@mui/material';
 
 export type PopUpParams = {
   anchor?: any;
@@ -10,6 +10,7 @@ export type PopUpParams = {
   modal?: boolean | null;
   onClose?: ((val: any) => void) | null;
   placement?: 'top-end' | 'right';
+  menuPopper?: boolean; // use Menu component instead of Popper
 };
 
 export type PopUpHandle<T> = {
@@ -103,7 +104,13 @@ function renderPopUp<T>(
     rootNode._reactContainer ||= createRoot(rootNode);
     // @ts-ignore
     const reactRoot = rootNode._reactContainer;
-    const component = (
+    const component = popUpParams.menuPopper ? (
+      // <ClickAwayListener onClickAway={close}>
+      <Menu open anchorEl={popUpParams.anchor} onClose={close}>
+        <View {...viewProps} close={close} />
+      </Menu>
+    ) : (
+      // </ClickAwayListener>
       // <ClickAwayListener onClickAway={close}>
       <Popper open anchorEl={popUpParams.anchor} placement={popUpParams.placement}>
         <View {...viewProps} close={close} />

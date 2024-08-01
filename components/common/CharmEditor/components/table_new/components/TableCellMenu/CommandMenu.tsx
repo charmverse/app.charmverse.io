@@ -49,7 +49,7 @@ class CommandMenu extends React.PureComponent<CommandMenuProps> {
         children.push(<CustomMenuItem.Separator key={`${String(ii)}-hr`} />);
       }
     });
-    return <List sx={{ bgcolor: 'background.paper' }}>{children}</List>;
+    return children; //<List sx={{ bgcolor: 'background.paper' }}>{children}</List>;
   }
 
   _onUIEnter = (command: UICommand, event: SyntheticEvent): void => {

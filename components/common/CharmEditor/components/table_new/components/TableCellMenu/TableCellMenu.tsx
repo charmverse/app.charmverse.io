@@ -114,7 +114,8 @@ class CommandMenuButton extends React.PureComponent<{
       // @ts-ignore
       this._menu = createPopUp(CommandMenu, menuProps, {
         anchor: document.getElementById(this._id),
-        onClose: this._onClose
+        onClose: this._onClose,
+        menuPopper: true
       });
     }
   };
