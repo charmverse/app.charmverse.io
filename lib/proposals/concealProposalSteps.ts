@@ -119,7 +119,9 @@ export async function concealProposalSteps<T extends MinimalProposal = MinimalPr
       });
     } else if (previousStep.result) {
       previousStep.id = currentStep.id;
-      previousStep.result = currentStep.result;
+      if (previousStep.result !== 'fail') {
+        previousStep.result = currentStep.result;
+      }
     }
   }
 
