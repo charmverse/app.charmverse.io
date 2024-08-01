@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { charmverseProjectDataChainId } from '@root/lib/credentials/constants';
+import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -22,16 +22,18 @@ async function createProjectController(req: NextApiRequest, res: NextApiResponse
     project: projectAndMembersPayload
   });
 
-  await storeCharmverseProjectMetadata({
-    chainId: charmverseProjectDataChainId,
-    projectId: createdProjectWithMembers.id
-  }).catch((err) => {
-    log.error('Failed to store charmverse project metadata', {
-      err,
-      projectId: createdProjectWithMembers.id,
-      userId: req.session.user.id
+  if (!disableCredentialAutopublish) {
+    await storeCharmverseProjectMetadata({
+      chainId: charmverseProjectDataChainId,
+      projectId: createdProjectWithMembers.id
+    }).catch((err) => {
+      log.error('Failed to store charmverse project metadata', {
+        err,
+        projectId: createdProjectWithMembers.id,
+        userId: req.session.user.id
+      });
     });
-  });
+  }
 
   trackUserAction('add_project', { userId: req.session.user.id, name: projectAndMembersPayload.name });
   return res.status(201).json(createdProjectWithMembers);
