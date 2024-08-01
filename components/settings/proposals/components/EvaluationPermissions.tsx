@@ -4,6 +4,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
 import { capitalize } from 'lodash';
+import { p } from 'prosemirror-test-builder';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import {
@@ -80,6 +81,17 @@ export const approverSystemRole = {
   label: 'Approvers (Current Step)'
 } as const;
 
+export const publicSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Approvers selected for this evaluation'>
+      <PersonIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: 'public',
+  label: 'Public'
+} as const;
+
 // a copy of current reviewer, with a different label for vote
 const currentVoterSystemRole = {
   ...currentReviewerSystemRole,
@@ -102,6 +114,11 @@ export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>
   currentReviewerSystemRole,
   allReviewersSystemRole,
   allMembersSystemRole
+];
+
+export const extraEvaluationRolesWithPublic: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
+  ...extraEvaluationRoles,
+  publicSystemRole
 ];
 
 const permissionOperationPlaceholders = {
@@ -232,7 +249,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
                 return false;
               }}
               value={valuesByOperation[operation] || []}
-              systemRoles={extraEvaluationRoles}
+              systemRoles={operation === 'view' ? extraEvaluationRolesWithPublic : extraEvaluationRoles}
               inputPlaceholder={permissionOperationPlaceholders[operation]}
               onChange={async (options) => updatePermissionOperation(operation, options)}
             />

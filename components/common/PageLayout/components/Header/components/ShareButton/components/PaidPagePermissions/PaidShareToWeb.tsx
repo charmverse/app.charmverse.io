@@ -1,5 +1,6 @@
 import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
+import { capitalize } from '@root/lib/utils/strings';
 
 import charmClient from 'charmClient';
 import { useCreatePermissions, useDeletePermissions } from 'charmClient/hooks/permissions';
@@ -67,11 +68,13 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
       refreshPermissions();
     }
   }
+  const publishProposalInfoLabel = `${capitalize(
+    proposalsLabel
+  )} publishing is controlled by the permissions of the current workflow step.`;
 
-  // In the case of a space with public proposals, we want to override the manual setting
   const disabledToolip =
-    !!space?.publicProposals && currentPage?.type === 'proposal'
-      ? `This toggle is disabled because your space uses public ${proposalsLabel}.`
+    currentPage?.type === 'proposal'
+      ? publishProposalInfoLabel
       : currentPagePermissions?.grant_permissions !== true
       ? 'You cannot update permissions for this page'
       : null;
@@ -87,18 +90,9 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
 
   const baseShareAlertMessage = currentPage ? alerts[currentPage.type] ?? '' : '';
 
-  const publicProposalToggleInfo =
-    space?.publicProposals && !!proposal
-      ? `Your space uses public ${proposalsLabel}. ${
-          proposal?.status === 'draft'
-            ? 'This draft is only visible to authors and reviewers until it is published.'
-            : `Published ${proposalsLabel} are publicly visible.`
-        }`
-      : null;
-
   const shareAlertMessage = (
-    currentPage?.type === 'proposal' && publicProposalToggleInfo
-      ? `${publicProposalToggleInfo ?? ''}\r\n\r\n${baseShareAlertMessage}`
+    currentPage?.type === 'proposal'
+      ? `${publishProposalInfoLabel ?? ''}\r\n\r\n${baseShareAlertMessage}`
       : baseShareAlertMessage
   )?.trim();
 
