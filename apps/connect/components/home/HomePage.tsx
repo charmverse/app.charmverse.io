@@ -19,8 +19,10 @@ export function HomePage() {
         display: 'flex',
         flexDirection: 'column',
         gap: 4,
+        justifyContent: { xs: 'space-evenly', md: 'normal' },
         alignItems: 'center',
-        height: '100%'
+        height: '100%',
+        maxHeight: '40em'
       }}
     >
       <Image
