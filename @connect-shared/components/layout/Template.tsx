@@ -21,8 +21,8 @@ const desktopVariants = {
 export function Template({ children }: { children: ReactNode }) {
   const key = usePathname();
   const theme = useTheme();
-  const matchesDesktop = useMediaQuery(theme.breakpoints.down('md'));
-  if (!matchesDesktop) {
+  const matchesMobile = useMediaQuery(theme.breakpoints.down('md'));
+  if (matchesMobile) {
     return (
       <AnimatePresence mode='wait'>
         <motion.div

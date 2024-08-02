@@ -94,9 +94,6 @@ export function Header({ user }: { user: LoggedInUser | null }) {
                 <MenuItem>
                   <Link href='/profile'>@{farcasterDetails?.username}</Link>
                 </MenuItem>
-                <MenuItem>
-                  <Link href='/grants?sort=new'>Grants</Link>
-                </MenuItem>
                 <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
                 <InstallAppMenuItem>Install</InstallAppMenuItem>
               </Menu>
