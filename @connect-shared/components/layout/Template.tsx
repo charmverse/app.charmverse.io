@@ -44,6 +44,7 @@ export function Template({ children }: { children: ReactNode }) {
   return (
     <AnimatePresence mode='wait'>
       <motion.div
+        style={{ height: '100%' }}
         key={key}
         initial='hidden'
         animate='enter'

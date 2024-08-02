@@ -18,7 +18,7 @@ export function HomePage() {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        gap: { xs: 0, md: 4 },
+        gap: 4,
         justifyContent: { xs: 'space-evenly', md: 'normal' },
         alignItems: 'center',
         height: '100%'
@@ -26,11 +26,10 @@ export function HomePage() {
     >
       <Image
         src='/images/geral_waving.png'
-        width={400}
+        width={300}
         height={200}
         sizes='100vw'
         style={{
-          width: '100%',
           maxWidth: '400px',
           height: 'auto'
         }}

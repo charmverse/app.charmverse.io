@@ -18,7 +18,7 @@ export function HomePage() {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        gap: { xs: 0, md: 6 },
+        gap: 4,
         my: { xs: 0, md: 4 },
         justifyContent: { xs: 'space-evenly', md: 'normal' },
         alignItems: 'center',
