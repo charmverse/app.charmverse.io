@@ -26,7 +26,7 @@ export function HomePage() {
     >
       <Image
         src='/images/geral_waving.png'
-        width={300}
+        width={250}
         height={200}
         sizes='100vw'
         style={{
