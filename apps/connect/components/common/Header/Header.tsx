@@ -60,7 +60,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
       <Container maxWidth={false}>
         <Toolbar disableGutters sx={{ justifyContent: 'space-between' }} variant='dense'>
           <Link href='/'>
-            <Image src='/images/connect-logo.png' width={40} height={40} alt='Connect logo' />
+            <Image src='/images/cv-connect-logo.png' width={40} height={40} alt='Connect logo' />
           </Link>
           {user && (
             <Box display='flex' gap={1} alignItems='center'>
