@@ -60,6 +60,7 @@ export type ProposalFields = {
   pendingRewards?: ProposalPendingReward[];
   rewardsTemplateId?: string; // require a particular template to be used for rewards
   enableRewards?: boolean; // used by form templates to enable rewards for new proposals
+  makeRewardsPublic?: boolean; // make rewards public when they are published
 };
 
 export type ConcealableEvaluationType = ProposalEvaluationType | 'private_evaluation';

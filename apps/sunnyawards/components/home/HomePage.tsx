@@ -18,7 +18,7 @@ export function HomePage() {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        gap: { xs: 0, md: 6 },
+        gap: 4,
         my: { xs: 0, md: 4 },
         justifyContent: { xs: 'space-evenly', md: 'normal' },
         alignItems: 'center',
@@ -35,7 +35,7 @@ export function HomePage() {
           maxWidth: '400px',
           height: 'auto'
         }}
-        alt='Charmverse Connect homepage'
+        alt='Sunny Awards homepage'
       />
       <Typography data-test='connect-home-page' align='center' variant='h4'>
         Celebrate Onchain Summer with the Sunny Awards

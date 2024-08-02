@@ -6,68 +6,20 @@ import { prettyPrint } from 'lib/utils/strings';
  */
 
 async function query() {
+  const url = 'https://api.neynar.com/v2/farcaster/webhook';
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      api_key: 'NEYNAR_API_DOCS',
+      'content-type': 'application/json'
+    }
+  };
 
-  const proposals = await Promise.all([
-    prisma.proposal.findFirstOrThrow({
-      where: {
-        page: {
-          path: 'form-01-23791989818037274'
-        }
-      },
-      select: {
-        form: {
-          select: {
-            id: true,
-            formFields: {
-              select: {
-                id: true,
-              }
-            }
-          }
-        }
-      }
-    }),
-    prisma.proposal.findFirstOrThrow({
-    where: {
-      page: {
-        path: 'form-02-9403447759112731'
-      }
-    },
-    select: {
-      form: {
-        select: {
-          id: true,
-          formFields: {
-            select: {
-              id: true,
-            }
-          }
-        }
-      }
-    },
-
-  }), prisma.proposal.findFirstOrThrow({
-    where: {
-      page: {
-        path: 'form-03-3875067317580556'
-      }
-    },
-    select: {
-      form: {
-        select: {
-          id: true,
-          formFields: {
-            select: {
-              id: true,
-            }
-          }
-        }
-      }
-    },
-    
-  })]);
-
-  prettyPrint({proposals});
+  fetch(url, options)
+    .then((res) => res.json())
+    .then((json) => console.log(json))
+    .catch((err) => console.error('error:' + err));
 }
 
 query();

@@ -8,13 +8,14 @@ import type { ProposalFields } from '@root/lib/proposals/interfaces';
 import type { RewardFields } from '@root/lib/rewards/blocks/interfaces';
 import { createReward } from '@root/lib/rewards/createReward';
 import { assignedWorkflow } from '@root/lib/rewards/getRewardWorkflows';
-import type { RewardReviewer } from '@root/lib/rewards/interfaces';
 import { InvalidInputError } from '@root/lib/utils/errors';
 import { isTruthy } from '@root/lib/utils/types';
 import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 import { publishProposalEventBase } from '@root/lib/webhookPublisher/publishEvent';
 import { relay } from '@root/lib/websockets/relay';
 import { uniqBy } from 'lodash';
+
+import { permissionsApiClient } from '../permissions/api/client';
 
 export async function createRewardsForProposal({ proposalId, userId }: { userId: string; proposalId: string }) {
   if (!proposalId) {
@@ -100,6 +101,20 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
   });
 
   const createdPageIds = (await Promise.all(rewardsPromises)).filter(isTruthy);
+
+  if ((proposal.fields as ProposalFields).makeRewardsPublic) {
+    await Promise.all(
+      createdPageIds.map((p) =>
+        permissionsApiClient.pages.upsertPagePermission({
+          pageId: p,
+          permission: {
+            assignee: { group: 'public' },
+            permissionLevel: 'view'
+          }
+        })
+      )
+    );
+  }
 
   const updatedFields = { ...fields, pendingRewards: rewardsToCreate };
 

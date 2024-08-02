@@ -6,7 +6,7 @@ import Bolt from 'public/images/lightning_bolt.svg';
 export function NotFoundPage({ content = 'The page you are looking for does not exist!' }: { content?: string }) {
   return (
     <Box
-      height='100vh'
+      height='100%'
       width='100%'
       display='flex'
       alignItems='center'

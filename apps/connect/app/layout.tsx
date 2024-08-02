@@ -71,16 +71,18 @@ export default async function RootLayout({
       <body>
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script src='/__ENV.js' />
-        <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
-          <AppProviders theme={theme}>
-            <Header user={user?.data || null} />
-            {session?.user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
-            <Box component='main' bgcolor='mainBackground.main' pb={2}>
-              {children}
+        <AppProviders theme={theme}>
+          <>
+            <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
+              <Header user={user?.data || null} />
+              {session?.user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
+              <Box component='main' bgcolor='mainBackground.main' pb={2}>
+                {children}
+              </Box>
             </Box>
             <StickyFooter />
-          </AppProviders>
-        </Box>
+          </>
+        </AppProviders>
       </body>
     </html>
   );

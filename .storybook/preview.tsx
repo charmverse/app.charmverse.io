@@ -53,6 +53,10 @@ import 'theme/databases/databases.main.scss';
 import 'react-resizable/css/styles.css';
 import 'theme/styles.scss';
 
+// Prosemirror tables
+import 'components/common/CharmEditor/components/table/ui/czi-table-grid-size-editor.css';
+import 'components/common/CharmEditor/components/table/ui/czi-color-editor.css';
+
 import { handlers } from './mockApi';
 import { mainnet } from 'viem/chains';
 import { WagmiConfig, http, createConfig } from 'wagmi';
