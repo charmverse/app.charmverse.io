@@ -11,8 +11,6 @@ RUN apt install openssl -y
 WORKDIR /app
 
 # We should split out dependencies copying into separate layer
-COPY node_modules ./node_modules
-
 COPY . .
 
 ENV PORT 3000
