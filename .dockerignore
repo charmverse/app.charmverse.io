@@ -14,4 +14,3 @@ Dockerfile
 files_to_zip.txt
 jest.config*
 jest.setup*
-apps/connect*
