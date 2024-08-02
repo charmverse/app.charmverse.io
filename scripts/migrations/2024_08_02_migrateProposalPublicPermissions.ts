@@ -92,14 +92,41 @@ async function migrateProposalPublicPermissions() {
 
 
 async function revert() {
-  const data = await prisma.proposalEvaluationPermission.count({
-    where: {
-      systemRole: 'public'
-    }
-  })
+  // const data = await prisma.proposalEvaluationPermission.count({
+  //   where: {
+  //     systemRole: 'public'
+  //   }
+  // })
 
-  console.log('Reverting migration', data)
+  const workflows = await prisma.proposalWorkflow.findMany() as ProposalWorkflowTyped[];
+
+  let current = 0;
+
+  for (const workflow of workflows) {
+
+    current += 1;
+
+    if (workflow.evaluations.some(ev => ev.permissions.some(p => p.systemRole === 'public'))) {
+
+      console.log(`Migrating workflow ${current}/${workflows.length}`)
+
+      await prisma.proposalWorkflow.update({
+        where: {
+          id: workflow.id
+        },
+        data: {
+          evaluations: workflow.evaluations.map(ev => ({...ev, permissions: ev.permissions.filter(p => p.systemRole !== 'public')}))
+        }
+      })
+    } else {
+      console.log(`Skipping workflow ${current}/${workflows.length}`)
+    }
+
+    
+  }
+
+  // console.log('Reverting migration', data)
 }
 // migrateProposalPublicPermissions()
 
-// revert().then(console.log)
+revert().then(console.log)
