@@ -2,7 +2,9 @@ import { Prisma, prisma } from "@charmverse/core/prisma-client"
 
 
 
-
+const ignoreDomains: string[] = [
+  // List maintained in docs
+]
 
 async function migrateProposalPublicPermissions() {
   const proposalsToMigrate = await prisma.proposal.findMany({
