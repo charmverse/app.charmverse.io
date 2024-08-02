@@ -27,11 +27,6 @@ describe('mapProjectToGitcoin', () => {
       mirror: 'https://mirror.xyz/projectx',
       websites: ['https://example.com'],
       path: null,
-      mintingWalletAddress: null,
-      primaryContractAddress: null,
-      primaryContractChainId: null,
-      primaryContractDeployer: null,
-      primaryContractDeployTxHash: null,
       sunnyAwardsProjectType: null,
       projectMembers: [
         {
