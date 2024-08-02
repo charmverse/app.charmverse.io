@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 import { v1 as uuid } from 'uuid';
 
 import { AppThemeProvider } from 'theme/AppThemeProvider';
+import { getDarkMode } from 'theme/darkMode';
 
 export type PopUpParams = {
   anchor?: any;
@@ -109,7 +110,7 @@ function renderPopUp<T>(
         </Popper>
         // </ClickAwayListener>
       );
-    reactRoot.render(<AppThemeProvider>{component}</AppThemeProvider>);
+    reactRoot.render(<AppThemeProvider forceTheme={getDarkMode()}>{component}</AppThemeProvider>);
   }
 }
 
