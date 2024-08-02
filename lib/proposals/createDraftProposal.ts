@@ -26,6 +26,7 @@ export type CreateDraftProposalInput = {
   sourcePageId?: string;
   sourcePostId?: string;
   authors?: string[];
+  makeRewardsPublic?: boolean;
 };
 
 export async function createDraftProposal(input: CreateDraftProposalInput) {
@@ -119,7 +120,8 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
     properties: {},
     enableRewards: true,
     ...(templateFields || {}),
-    pendingRewards: []
+    pendingRewards: [],
+    makeRewardsPublic: !!input.makeRewardsPublic
   };
 
   let formFields: FormFieldInput[] = [];
