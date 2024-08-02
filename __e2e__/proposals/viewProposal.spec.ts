@@ -6,6 +6,8 @@ import { DocumentPage } from '__e2e__/po/document.po';
 import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
 
+import { baseUrl } from 'testing/mockApiCall';
+
 import { generateUser, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
 
 type Fixtures = {
@@ -87,7 +89,8 @@ test.beforeAll(async () => {
           {
             assignee: { group: 'space_member' },
             operation: 'view'
-          }
+          },
+          { assignee: { group: 'public' }, operation: 'view' }
         ]
       }
     ]
@@ -100,7 +103,7 @@ test.beforeAll(async () => {
   });
 });
 
-test.describe.serial('View proposal', () => {
+test.describe('View proposal', () => {
   test('Proposal author can view their own draft proposal and other accessible proposals as well as data about the proposals', async ({
     proposalListPage
   }) => {
@@ -147,7 +150,7 @@ test.describe.serial('View proposal', () => {
     await expect(feedbackRowStatusBadge).toBeVisible();
   });
 
-  test('Proposal can be edited by the author and made public', async ({
+  test('Proposal can be edited by the author, but not made public', async ({
     page,
     proposalListPage,
     documentPage,
@@ -191,16 +194,7 @@ test.describe.serial('View proposal', () => {
 
     await pagePermissions.publishTab.click();
 
-    await expect(pagePermissions.publicShareToggle).toBeVisible();
-
-    await pagePermissions.togglePageIsPublic();
-    await expect(pagePermissions.pageShareLink).toBeVisible();
-
-    const shareLink = await pagePermissions.getPageShareLinkValue();
-
-    expect(shareLink).not.toBe(null);
-
-    publicLink = shareLink as string;
+    await expect(pagePermissions.publicShareToggle).toBeDisabled();
   });
 
   test('Public proposal can be seen by people outside the space', async ({ page, proposalListPage, documentPage }) => {
@@ -208,7 +202,9 @@ test.describe.serial('View proposal', () => {
       browserPage: page
     });
 
-    await page.goto(publicLink);
+    const link = `${baseUrl}/${space.domain}/${discussionProposal.page.path}`;
+
+    await page.goto(link);
 
     // Check we can see the contents
     await proposalListPage.waitForDocumentPage({
