@@ -255,7 +255,7 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
   }
 
   if (proposalProps.proposalPublishedAt) {
-    properties[proposalProps.proposalPublishedAt.id] = proposal.publishedAt?.toISOString() ?? '';
+    properties[proposalProps.proposalPublishedAt.id] = proposal.publishedAt?.getTime() ?? '';
   }
 
   properties = getCardPropertiesFromRubric({
