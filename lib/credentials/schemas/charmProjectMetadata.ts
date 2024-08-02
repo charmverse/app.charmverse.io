@@ -2,7 +2,7 @@ import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 
 import type { TypedSchemaItem } from './interfaces';
 
-export const charmProjectMetadataSchemaId = '0xfcaea48b4b51881860b3939fdc023af993ad24346b152b30f1b385d766898504';
+export const charmProjectMetadataSchemaId = '0x959bd82eb76bb86c083e75e9545ee0145fbd080d6d8b4507ee44e1f5cabeef43';
 
 export const charmProjectMetadataSchemaDefinition = 'string projectRefUID,string name,string metadataURL';
 

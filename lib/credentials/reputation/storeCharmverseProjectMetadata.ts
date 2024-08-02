@@ -94,7 +94,7 @@ export async function storeCharmverseProjectMetadata({
 
   let projectRefUID =
     project.charmProjectCredentials[0]?.projectRefUID ??
-    graphQlClient
+    (await graphQlClient
       .query({
         query: GET_CREDENTIALS,
         variables: {
@@ -112,9 +112,10 @@ export async function storeCharmverseProjectMetadata({
       })
       .catch((err) => {
         log.error('Error fetching CharmVerse project credential', { err });
-      });
+        return null;
+      }));
 
-  if (!projectRefUID)
+  if (!projectRefUID) {
     projectRefUID = await attestOnchain({
       chainId,
       credentialInputs: {
@@ -126,6 +127,7 @@ export async function storeCharmverseProjectMetadata({
       },
       type: 'charmProject'
     });
+  }
 
   const projectSnapshotRefUID =
     project.charmProjectCredentials[0]?.metadataAttestationUID ??

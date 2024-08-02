@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
 import { getChainById } from 'connectors/chains';
-import { optimism, optimismSepolia } from 'viem/chains';
+import { optimismSepolia } from 'viem/chains';
 
 import type { EasSchemaChain } from '../connectors';
 import { easSchemaChains, getEasConnector, getOnChainSchemaUrl } from '../connectors';
@@ -10,9 +10,7 @@ import { getCharmverseSigner } from '../getCharmverseSigner';
 
 import { charmProjectSchemaDefinition } from './charmProject';
 import { charmProjectMetadataSchemaDefinition } from './charmProjectMetadata';
-import { charmQualifyingEventSchemaDefinition } from './charmQualifyingEvent';
 import { charmUserIdentifierSchemaDefinition } from './charmUserIdentifier';
-import { externalCredentialSchemaDefinition } from './external';
 
 import { allSchemaDefinitions } from './index';
 
@@ -82,11 +80,11 @@ async function deployCharmverseProjectSchemas(chainId: EasSchemaChain) {
     charmProjectMetadataSchemaDefinition
   ]) {
     log.info(`Deploying schema...`);
-    await deploySchema({ schema: schemaId, chainId });
+    await deploySchema({ schema: schemaId, chainId: optimismSepolia.id });
   }
 }
 
-deployCharmverseProjectSchemas(optimismSepolia.id).then(log.info);
+// deployCharmverseProjectSchemas(optimism.id).then(log.info);
 
 // Used when we want to add a new schema to schemas we support
 // lib/credentials/schemas/index.ts
