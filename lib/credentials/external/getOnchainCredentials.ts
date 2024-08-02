@@ -12,7 +12,7 @@ import { proposalCredentialSchemaId } from '../schemas/proposal';
 import type { RewardCredential } from '../schemas/reward';
 import { rewardCredentialSchemaId } from '../schemas/reward';
 
-import { easGraphQlClients } from './easGraphQLClients';
+import { easGraphQlClients } from './easGraphQlClients';
 import type { ExternalCredentialChain } from './schemas';
 import { externalCredentialChains, trackedCharmverseSchemas, trackedSchemas } from './schemas';
 
