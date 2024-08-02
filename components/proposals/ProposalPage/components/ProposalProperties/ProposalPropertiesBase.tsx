@@ -27,6 +27,7 @@ export type ProposalPropertiesInput = {
   archived?: boolean;
   sourcePageId?: string;
   sourcePostId?: string;
+  makeRewardsPublic?: boolean | null;
 };
 
 type ProposalPropertiesProps = {

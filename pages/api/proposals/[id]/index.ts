@@ -134,7 +134,8 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     projectId,
     fields,
     selectedCredentialTemplates: newSelectedCredentialTemplates,
-    actorId: userId
+    actorId: userId,
+    makeRewardsPublic: req.body.makeRewardsPublic
   });
 
   return res.status(200).end();
