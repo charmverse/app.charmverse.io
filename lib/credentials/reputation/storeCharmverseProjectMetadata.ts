@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
-import { arrayUtils, stringUtils } from '@charmverse/core/dist/cjs/utilities';
 import { log } from '@charmverse/core/log';
 import type { CharmProjectCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { arrayUtils } from '@charmverse/core/utilities';
 import { optimism } from 'viem/chains';
 
 import { attestOnchain } from '../attestOnchain';

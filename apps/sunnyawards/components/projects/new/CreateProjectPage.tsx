@@ -47,7 +47,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
       sunnyAwardsProjectType: 'other',
       projectMembers: [
         {
-          name: (user?.farcasterUser?.account as FarcasterProfile['body']).displayName,
+          name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
           farcasterId: user?.farcasterUser?.fid
         }
       ]
@@ -77,7 +77,6 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     description: project.description,
     farcasterValues: project.farcasterValues,
     github: project.github,
-    mirror: project.mirror,
     twitter: project.twitter,
     websites: project.websites
   } as ProjectDetailsProps['project'];

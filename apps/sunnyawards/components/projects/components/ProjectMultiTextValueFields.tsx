@@ -11,13 +11,15 @@ export function ProjectMultiTextValueFields({
   label,
   name,
   placeholder,
-  dataTest
+  dataTest,
+  required
 }: {
   control: Control<FormValues>;
   name: keyof FormValues;
   label: string;
   placeholder: string;
   dataTest?: string;
+  required?: boolean;
 }) {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -26,7 +28,9 @@ export function ProjectMultiTextValueFields({
 
   return (
     <Stack>
-      <FormLabel id={`project-${name.toLowerCase().replaceAll(' ', '')}`}>{label}</FormLabel>
+      <FormLabel id={`project-${name.toLowerCase().replaceAll(' ', '')}`} required={required}>
+        {label}
+      </FormLabel>
       <Stack direction='row' gap={1} alignItems='center' mb={1}>
         <Controller
           control={control}
@@ -37,8 +41,9 @@ export function ProjectMultiTextValueFields({
               data-test={dataTest}
               aria-labelledby={`project-${name}-0`}
               placeholder={placeholder}
-              error={!!fieldState.error}
               {..._field}
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message}
             />
           )}
         />
@@ -54,8 +59,9 @@ export function ProjectMultiTextValueFields({
                   fullWidth
                   aria-labelledby={`project-${name}-${index + 1}`}
                   placeholder={placeholder}
-                  error={!!fieldState.error}
                   {..._field}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
                 />
                 <IconButton size='small'>
                   <DeleteIcon fontSize='small' color='error' onClick={() => remove(index + 1)} />
