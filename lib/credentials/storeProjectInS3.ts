@@ -16,27 +16,36 @@ const storageFormats = ['gitcoin', 'optimism', 'charmverse'] as const;
 
 type ProjectStorageFormat = (typeof storageFormats)[number];
 
-export async function storeProjectInS3({
+export async function storeProjectInS3<T = any>({
   projectOrProjectId,
-  storageFormat
+  storageFormat,
+  extraData
 }: {
   projectOrProjectId: ConnectProjectDetails | string;
   storageFormat: ProjectStorageFormat;
+  extraData?: T;
 }): Promise<{ staticFilePath: string; mappedProject: any }> {
   if (!storageFormats.includes(storageFormat)) {
     throw new InvalidInputError('Invalid storage format');
   }
 
-  const project =
+  let project =
     typeof projectOrProjectId === 'string' ? await fetchProject({ id: projectOrProjectId }) : projectOrProjectId;
 
   if (!project) {
     throw new DataNotFoundError('Project not found');
   }
 
+  // Expand extra fields
+  project = { ...project, ...extraData };
+
   let filePath: string;
 
   let formattedProject: any;
+
+  const projectMembers = project.projectMembers
+    .map((m) => ({ farcasterId: m.farcasterUser.fid }))
+    .filter((m) => !!m.farcasterId) as { farcasterId: number }[];
 
   if (storageFormat === 'gitcoin') {
     formattedProject = mapProjectToGitcoin({ project });
@@ -48,9 +57,7 @@ export async function storeProjectInS3({
   } else if (storageFormat === 'optimism') {
     formattedProject = mapProjectToOptimism({
       ...project,
-      projectMembers: project.projectMembers
-        .map((m) => ({ farcasterId: m.farcasterUser.fid }))
-        .filter((m) => !!m.farcasterId) as { farcasterId: number }[]
+      projectMembers
     });
     filePath = getAttestationS3Path({
       schemaId: optimismProjectSnapshotAttestationSchemaId,
@@ -58,7 +65,7 @@ export async function storeProjectInS3({
       charmverseIdType: 'project'
     });
   } else if (storageFormat === 'charmverse') {
-    formattedProject = project;
+    formattedProject = { ...mapProjectToOptimism({ ...project, projectMembers }), ...extraData };
     filePath = getAttestationS3Path({
       schemaId: charmProjectMetadataSchemaId,
       charmverseId: project.id,

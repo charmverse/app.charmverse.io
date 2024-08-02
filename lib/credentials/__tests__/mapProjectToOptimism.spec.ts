@@ -12,7 +12,7 @@ describe('mapProjectToOptimism', () => {
       farcasterValues: ['CharmVerse'],
       github: 'https://github.com/projectx',
       twitter: 'https://twitter.com/projectx',
-      mirror: 'https://mirror.xyz/projectx',
+      mirror: null,
       websites: ['https://example.com'],
       mintingWalletAddress: null,
       primaryContractAddress: null,
@@ -40,7 +40,7 @@ describe('mapProjectToOptimism', () => {
         website: ['https://example.com'],
         farcaster: ['CharmVerse'],
         twitter: 'https://twitter.com/projectx',
-        mirror: 'https://mirror.xyz/projectx'
+        mirror: null
       },
       team: ['123', '456'],
       github: ['https://github.com/projectx'],

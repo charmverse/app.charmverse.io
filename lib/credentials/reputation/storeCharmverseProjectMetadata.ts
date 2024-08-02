@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+import { arrayUtils, stringUtils } from '@charmverse/core/dist/cjs/utilities';
 import { log } from '@charmverse/core/log';
 import type { CharmProjectCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -53,9 +54,42 @@ export async function storeCharmverseProjectMetadata({
     (identifier) => identifier.attestationUID
   );
 
+  const allTeamMembers = await prisma.charmProjectCredential.findMany({
+    where: {
+      projectId: project.id
+    },
+    select: {
+      user: {
+        select: {
+          id: true,
+          charmCredentials: true
+        }
+      }
+    }
+  });
+
+  let teamIdentifiers = [authorRefUID];
+
+  for (const teamMember of allTeamMembers) {
+    let identifierAttestationUID = teamMember.user.charmCredentials[0]?.attestationUID;
+
+    if (!identifierAttestationUID) {
+      identifierAttestationUID = await issueUserIdentifierIfNecessary({ chainId, userId: teamMember.user.id }).then(
+        (val) => val.attestationUID
+      );
+    }
+
+    teamIdentifiers.push(identifierAttestationUID);
+  }
+
+  teamIdentifiers = arrayUtils.uniqueValues(teamIdentifiers);
+
   const { staticFilePath, mappedProject } = await storeProjectInS3({
     storageFormat: 'charmverse',
-    projectOrProjectId: project.id
+    projectOrProjectId: project.id,
+    extraData: {
+      connectUserUIDs: allTeamMembers
+    }
   });
 
   let projectRefUID =
