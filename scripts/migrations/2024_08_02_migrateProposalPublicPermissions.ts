@@ -129,4 +129,4 @@ async function revert() {
 }
 // migrateProposalPublicPermissions()
 
-revert().then(console.log)
+// revert().then(console.log)
