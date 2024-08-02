@@ -7,7 +7,7 @@ import { optimism } from 'viem/chains';
 import { attestOnchain } from '../attestOnchain';
 import type { EasSchemaChain } from '../connectors';
 import { charmverseProjectDataChainId } from '../constants';
-import { easGraphQlClients } from '../external/easGraphQLClients';
+import { easGraphQlClients } from '../external/easGraphQlClients';
 import { charmProjectSchemaId, decodeCharmProject } from '../schemas/charmProject';
 import { storeProjectInS3 } from '../storeProjectInS3';
 

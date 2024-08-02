@@ -1,12 +1,9 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
-import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import { updateProjectAndMembers } from 'lib/projects/updateProjectAndMembers';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -34,19 +31,6 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
     projectId,
     payload: projectUpdatePayload
   });
-
-  if (!disableCredentialAutopublish) {
-    await storeCharmverseProjectMetadata({
-      chainId: charmverseProjectDataChainId,
-      projectId: updatedProjectWithMembers.id
-    }).catch((err) => {
-      log.error('Failed to store charmverse project metadata', {
-        err,
-        projectId: updatedProjectWithMembers.id,
-        userId: req.session.user.id
-      });
-    });
-  }
 
   return res.status(201).json(updatedProjectWithMembers);
 }
