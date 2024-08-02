@@ -5,7 +5,7 @@ import { expect, test } from '__e2e__/utils/test';
 
 import { generateUser, generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe('View a proposal without workflow permissions, but space enabled public proposals', () => {
+test.describe('View a proposal with workflow permissions, and space enabled public proposals', () => {
   let space: Space;
   let admin: User;
   let member: User;
