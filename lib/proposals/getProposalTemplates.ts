@@ -6,8 +6,8 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
 
 export type ProposalTemplateMeta = {
-  pageId: string;
-  proposalId: string;
+  pageId: string; // this is also the canonical id for the proposal template (vs: proposalId)
+  proposalId: string; // necessary for proposal-related actions: publish, archive, etc.
   contentType: 'free_form' | 'structured';
   title: string;
   archived?: boolean;

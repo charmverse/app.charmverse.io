@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import Button from '../../widgets/buttons/button';
@@ -10,6 +10,7 @@ type PropertyLabelProps = {
   required?: boolean;
   highlighted?: boolean;
   fullWidth?: boolean;
+  tooltip?: string;
 };
 
 const Wrapper = styled(({ highlighted, fullWidth, ...props }: any) => <Box {...props} />)<{
@@ -24,7 +25,14 @@ const Asterisk = styled.span`
   color: var(--danger-text);
 `;
 
-export function PropertyLabel({ children, required, fullWidth, readOnly = true, highlighted }: PropertyLabelProps) {
+export function PropertyLabel({
+  children,
+  required,
+  fullWidth,
+  tooltip,
+  readOnly = true,
+  highlighted
+}: PropertyLabelProps) {
   if (readOnly) {
     return (
       <Wrapper
@@ -32,9 +40,13 @@ export function PropertyLabel({ children, required, fullWidth, readOnly = true, 
         highlighted={highlighted}
         fullWidth={fullWidth}
       >
-        <Button rightIcon icon={required && <Asterisk>&nbsp;*</Asterisk>}>
-          {children}
-        </Button>
+        <Tooltip title={tooltip} disableInteractive>
+          <span>
+            <Button rightIcon icon={required && <Asterisk>&nbsp;*</Asterisk>}>
+              {children}
+            </Button>
+          </span>
+        </Tooltip>
       </Wrapper>
     );
   }

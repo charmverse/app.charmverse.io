@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { Box, Menu, Stack } from '@mui/material';
+import { Box, Menu, Stack, Tooltip } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
 import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/databases/board';
@@ -66,6 +66,7 @@ export function CardDetailProperty({
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
   const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
+  const propertyTooltip = property.name.length > 20 ? property.name : '';
   return (
     <Stack
       ref={columnRef}
@@ -81,7 +82,11 @@ export function CardDetailProperty({
       }}
       className='octo-propertyrow'
     >
-      {(readOnly || disableEditPropertyOption) && <PropertyLabel readOnly>{property.name}</PropertyLabel>}
+      {(readOnly || disableEditPropertyOption) && (
+        <PropertyLabel tooltip={propertyTooltip} readOnly>
+          {property.name}
+        </PropertyLabel>
+      )}
       {!readOnly && !disableEditPropertyOption && (
         <Box>
           <PropertyNameContainer
@@ -94,7 +99,11 @@ export function CardDetailProperty({
             }}
           >
             <DragIndicatorIcon className='icons' fontSize='small' color='secondary' />
-            <Button>{property.name}</Button>
+            <Tooltip title={propertyTooltip} disableInteractive>
+              <span>
+                <Button>{property.name}</Button>
+              </span>
+            </Tooltip>
           </PropertyNameContainer>
           <Menu {...bindMenu(changePropertyPopupState)}>
             <PropertyMenu

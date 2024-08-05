@@ -17,7 +17,7 @@ handler.use(requireKeys([{ key: 'frameUrl', valueType: 'string' }], 'query')).ge
 
 async function extractFarcasterMetadataFromUrl(
   req: NextApiRequest,
-  res: NextApiResponse<Frame | null | { error: string }>
+  res: NextApiResponse<Frame | Partial<Frame> | null | { error: string }>
 ) {
   const userId = req.session.user?.id;
   const frameUrl = req.query.frameUrl as string;

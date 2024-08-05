@@ -59,7 +59,7 @@
     .octo-propertyvalue {
       font-size: 14px;
       padding: 4px 8px;
-      height: 32px;
+      // height: 32px; commented out to allow for multi-line text
 
       &.octo-propertyvalue--readonly {
         overflow: hidden;

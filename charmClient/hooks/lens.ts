@@ -1,4 +1,4 @@
-import type { TextOnlyMetadata } from '@lens-protocol/metadata/*';
+import type { TextOnlyMetadata } from '@lens-protocol/metadata';
 
 import { usePOST } from './helpers';
 

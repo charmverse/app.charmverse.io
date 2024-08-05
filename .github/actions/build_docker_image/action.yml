@@ -32,6 +32,8 @@ runs:
       run: |
         npm prune --omit=dev
         rm -rf .next/cache
+        rm -rf apps/connect/.next/cache
+        rm -rf sunnyawards/connect/.next/cache
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
