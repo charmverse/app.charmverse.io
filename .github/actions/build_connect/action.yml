@@ -1,0 +1,26 @@
+name: 'Build connect'
+
+inputs:
+  REACT_APP_APP_ENV:
+    description: '...'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Restore build
+      id: restore_build
+      uses: actions/cache@v4
+      with:
+        path: |
+          apps/connect/.next
+          apps/connect-api/dist
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('@connect-shared/**/*.ts[x]', 'apps/connect-api/**/*.ts', 'apps/connect/**/*.ts[x]', 'apps/connect/**/*.scss') }}
+
+    - name: Build Connect App and API
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      run: |
+        npm run connect:build
+        npm run connect-api:build
