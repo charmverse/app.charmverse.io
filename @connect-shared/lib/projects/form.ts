@@ -10,7 +10,7 @@ export const schema = yup.object({
   description: yup.string().required('Project description is required'),
   avatar: yup.string(),
   coverImage: yup.string(),
-  category: yup.string().oneOf(CATEGORIES).nullable().required(),
+  category: yup.string().oneOf(CATEGORIES).required(),
   websites: yup.array(yup.string().url()).min(1),
   farcasterValues: yup.array(yup.string()),
   github: yup.string(),

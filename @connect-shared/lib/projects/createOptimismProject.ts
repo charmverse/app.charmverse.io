@@ -213,8 +213,8 @@ export async function createOptimismProject({
               teamLead: true,
               updatedBy: userId,
               userId,
-              name: farcasterAccountsRecord[input.projectMembers[0].farcasterId].account.displayName as string,
-              farcasterId: input.projectMembers[0].farcasterId
+              name: farcasterAccountsRecord[input.projectMembers[0]?.farcasterId]?.account.displayName as string,
+              farcasterId: input.projectMembers[0]?.farcasterId
             },
             ...projectMembers.map((member) => ({
               teamLead: false,

@@ -76,6 +76,8 @@ describe('createOptimismProject', () => {
     const createdProject = await createOptimismProject({
       input: {
         name: 'Project',
+        description: 'Project description',
+        category: 'CeFi',
         projectMembers: [
           {
             farcasterId: 1

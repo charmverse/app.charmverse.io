@@ -2,6 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { createProjectMetadataAttestation } from '@connect-shared/lib/attestations/agoraApi';
 import { editOptimismProject } from '@connect-shared/lib/projects/editOptimismProject';
+import type { ProjectCategory } from '@connect-shared/lib/projects/form';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
 import { decodeOptimismProjectAttestation } from '@root/lib/credentials/schemas/optimismProjectSchemas';
@@ -70,7 +71,9 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
       userId,
       input: {
         projectId: optimismProjectAttestation.projectId,
-        ...optimismProjectValues
+        ...optimismProjectValues,
+        description: optimismProjectValues.description || '',
+        category: optimismProjectValues.category as ProjectCategory
       }
     });
     await generateOgImage(optimismProjectAttestation.projectId, userId);
