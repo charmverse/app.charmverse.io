@@ -14,17 +14,17 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: 'en',
     icons: [
       {
-        src: '/images/manifest/logo-192.png',
+        src: '/images/manifest/connect-logo-192.png',
         type: 'image/png',
         sizes: '192x192'
       },
       {
-        src: '/images/manifest/logo-256.png',
+        src: '/images/manifest/connect-logo-256.png',
         type: 'image/png',
         sizes: '256x256'
       },
       {
-        src: '/images/manifest/logo-512.png',
+        src: '/images/manifest/connect-logo-512.png',
         type: 'image/png',
         sizes: '512x512'
       }
