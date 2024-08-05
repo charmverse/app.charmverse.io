@@ -237,6 +237,7 @@ function getCSVColumns({
   visibleProperties: IPropertyTemplate<PropertyType>[];
 }) {
   const columns: string[] = [];
+
   if (!hasTitleProperty) {
     columns.push(`"${encodeText(card.title)}"`);
   }
@@ -278,7 +279,7 @@ function getCSVColumns({
       columns.push(`${baseUrl}${encodeText(Array.isArray(displayValue) ? displayValue[0] : displayValue.toString())}`);
     } else {
       // Export as string
-      columns.push(`"${encodeText(displayValue as string)}"`);
+      columns.push(`"${encodeText(displayValue.toString())}"`);
     }
   });
   return columns;
