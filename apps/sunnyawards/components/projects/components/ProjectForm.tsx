@@ -1,5 +1,6 @@
 'use client';
 
+import { ProjectMultiTextValueFields } from '@connect-shared/components/common/ProjectMultiTextValueFields';
 import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
 import Link from 'next/link';
@@ -11,7 +12,6 @@ import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
 
 import { ProjectBlockchainSelect } from './BlockchainSelect';
 import { ProjectImageField } from './ProjectImageField';
-import { ProjectMultiTextValueFields } from './ProjectMultiTextValueFields';
 
 export function ProjectForm({
   control,
