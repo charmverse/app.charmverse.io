@@ -28,32 +28,42 @@ export async function applyProposalTemplate({
     });
   }
 
-  const template = await prisma.proposal.findUniqueOrThrow({
+  const template = await prisma.page.findUniqueOrThrow({
     where: {
       id: templateId
     },
     include: {
-      authors: true,
-      evaluations: {
+      proposal: {
         include: {
-          reviewers: true,
-          rubricCriteria: true
-        },
-        orderBy: {
-          index: 'asc'
+          authors: true,
+          evaluations: {
+            include: {
+              reviewers: true,
+              rubricCriteria: {
+                orderBy: {
+                  index: 'asc'
+                }
+              }
+            },
+            orderBy: {
+              index: 'asc'
+            }
+          }
         }
-      },
-      page: true
+      }
     }
   });
-  if (!template.workflowId) {
+  if (!template.proposal) {
+    throw new Error('Template does not have a proposal attached');
+  }
+  if (!template.proposal.workflowId) {
     throw new Error('Template does not have a workflow attached');
   }
 
   // apply worfklow first so that evaluations are correctly created
   await applyProposalWorkflow({
     actorId,
-    workflowId: template.workflowId,
+    workflowId: template.proposal.workflowId,
     proposalId
   });
 
@@ -72,11 +82,11 @@ export async function applyProposalTemplate({
 
   // authors should be empty by default for new templates
   // but include authors from templates if they were added
-  const authorsFromTemplate = template?.authors.map(({ userId }) => userId) || [];
+  const authorsFromTemplate = template.proposal.authors.map(({ userId }) => userId) || [];
   const authorIds = [...new Set([actorId].concat(authorsFromTemplate))];
 
   // retrieve permissions and apply evaluation ids to reviewers
-  const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = template.evaluations
+  const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = template.proposal.evaluations
     .map(({ reviewers: evalReviewers }, index) => {
       return evalReviewers.map((reviewer) => ({
         roleId: reviewer.roleId,
@@ -95,8 +105,8 @@ export async function applyProposalTemplate({
       },
       data: {
         fields: { properties: {} },
-        selectedCredentialTemplates: template.selectedCredentialTemplates,
-        formId: template.formId
+        selectedCredentialTemplates: template.proposal.selectedCredentialTemplates,
+        formId: template.proposal.formId
       }
     }),
     prisma.proposalAuthor.deleteMany({
@@ -130,8 +140,8 @@ export async function applyProposalTemplate({
         }
       },
       data: {
-        content: template.page?.content as any,
-        contentText: template.page?.contentText,
+        content: template.content as any,
+        contentText: template.contentText,
         sourceTemplateId: templateId
       }
     })
@@ -139,7 +149,7 @@ export async function applyProposalTemplate({
 
   // update evaluation settings
   await Promise.all(
-    template.evaluations.map(async (evaluation, index) => {
+    template.proposal.evaluations.map(async (evaluation, index) => {
       if (evaluation.type === 'rubric') {
         await prisma.proposalRubricCriteria.deleteMany({
           where: {
