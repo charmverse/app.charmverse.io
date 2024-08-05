@@ -27,6 +27,7 @@ runs:
           dist
           background/ceramicServer/generated
           apps/connect/.next
+          apps/connect/public
           apps/connect-api/dist
           apps/sunnyawards/.next
         key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!apps/sunnyawards/.next', '!dont_cache') }}
@@ -65,6 +66,7 @@ runs:
           dist
           background/ceramicServer/generated
           apps/connect/.next
+          apps/connect/public
           apps/connect-api/dist
           apps/sunnyawards/.next
         key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!apps/sunnyawards/.next', '!dont_cache') }}
