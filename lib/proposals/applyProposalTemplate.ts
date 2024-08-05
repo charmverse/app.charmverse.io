@@ -7,7 +7,7 @@ import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
 
 export type ApplyTemplateRequest = {
   proposalId: string;
-  templateId: string | null;
+  templateId: string | null; // note that templateId belongs to the pages db and NOT proposals
 };
 
 export async function applyProposalTemplate({

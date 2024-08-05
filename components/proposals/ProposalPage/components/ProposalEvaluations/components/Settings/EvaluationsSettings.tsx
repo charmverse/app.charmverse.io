@@ -64,7 +64,7 @@ export function EvaluationsSettings({
   const templatePageOptions = useMemo(
     () =>
       (proposalTemplates || []).map((template) => ({
-        id: template.proposalId,
+        id: template.pageId,
         title: template.title
       })),
     [proposalTemplates]
