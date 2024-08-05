@@ -8,7 +8,7 @@ import type { FarcasterSignerResponse } from 'pages/api/farcaster/signer';
 import { useDELETE, useGET, usePOST } from './helpers';
 
 export function useGetFarcasterFrame(query?: { frameUrl: string; pageId?: string }) {
-  return useGET<Frame | null>(query ? '/api/farcaster/frame' : null, query, {
+  return useGET<Frame | Partial<Frame> | null>(query ? '/api/farcaster/frame' : null, query, {
     revalidateOnFocus: false,
     shouldRetryOnError: false
   });

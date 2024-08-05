@@ -25,6 +25,17 @@ const config = {
   experimental: {
     esmExternals: false,
     webpackBuildWorker: true
+    // turbo: {
+    //   resolveAlias: {
+    //     fs: false
+    //   },
+    //   rules: {
+    //     '*.svg': {
+    //       loaders: ['@svgr/webpack'],
+    //       as: '*.js'
+    //     }
+    //   }
+    // }
   },
   images: {
     // next image is broken in staging/production as of 14.0.1
