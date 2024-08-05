@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
 import { getChainById } from 'connectors/chains';
-import { optimismSepolia } from 'viem/chains';
+import { optimism, optimismSepolia } from 'viem/chains';
 
 import type { EasSchemaChain } from '../connectors';
 import { easSchemaChains, getEasConnector, getOnChainSchemaUrl } from '../connectors';
@@ -31,9 +31,9 @@ async function deploySchema({
 
   const signerAddress = await signer.getAddress();
 
-  // if (signerAddress !== '0x8Bc704386DCE0C4f004194684AdC44Edf6e85f07') {
-  //   throw new Error('Schema must be deployed with CharmVerse Credentials Wallet');
-  // }
+  if (signerAddress !== '0x8Bc704386DCE0C4f004194684AdC44Edf6e85f07') {
+    throw new Error('Schema must be deployed with CharmVerse Credentials Wallet');
+  }
 
   const fullChainName = `${getChainById(chainId)?.chainName} - ${chainId}`;
 
@@ -80,11 +80,11 @@ async function deployCharmverseProjectSchemas(chainId: EasSchemaChain) {
     charmProjectMetadataSchemaDefinition
   ]) {
     log.info(`Deploying schema...`);
-    await deploySchema({ schema: schemaId, chainId: optimismSepolia.id });
+    await deploySchema({ schema: schemaId, chainId });
   }
 }
 
-// deployCharmverseProjectSchemas(optimism.id).then(log.info);
+deployCharmverseProjectSchemas(optimism.id).then(log.info);
 
 // Used when we want to add a new schema to schemas we support
 // lib/credentials/schemas/index.ts

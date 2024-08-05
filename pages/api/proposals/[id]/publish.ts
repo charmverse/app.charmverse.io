@@ -169,16 +169,6 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     spaceId: proposalPage?.spaceId || ''
   });
 
-  const issueCred = proposalPage.space.domain === 'cvt-demo-credentials';
-
-  if (issueCred) {
-    await issueProposalPublishedQualifyingEvent({
-      chainId: optimismSepolia.id,
-      proposalId: proposalPage.proposal.id,
-      userId
-    });
-  }
-
   const spaceDomain = proposalPage.space.domain;
 
   if (spaceDomain === 'op-grants' && proposalPage.type === 'proposal') {
