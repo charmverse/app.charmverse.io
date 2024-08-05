@@ -1,6 +1,5 @@
 import { Row } from '@react-email/row';
-
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import { Button, EmailWrapper, Text } from './components';
 
@@ -9,13 +8,17 @@ export type PageInviteEmailProps = {
   invitingUserName: string;
   pageTitle: string;
   pageId: string;
+  emailBranding?: {
+    artwork: string;
+    color: string;
+  };
 };
 
 export function PageInviteEmail(props: PageInviteEmailProps) {
   const pageLink = `${baseUrl}/invite/page?id=${props.pageId}&email=${encodeURIComponent(props.guestEmail)}`;
 
   return (
-    <EmailWrapper title={`${props.invitingUserName} shared a document`} headerSize='small'>
+    <EmailWrapper emailBranding={props.emailBranding} title={`${props.invitingUserName} shared a document`}>
       <Text>
         {props.invitingUserName} has invited you to <b>view</b> the following document:
       </Text>
@@ -25,6 +28,7 @@ export function PageInviteEmail(props: PageInviteEmailProps) {
         }}
       >
         <Button
+          primaryColor={props.emailBranding?.color}
           variant='outlined'
           style={{
             width: 'fit-content'
@@ -35,6 +39,7 @@ export function PageInviteEmail(props: PageInviteEmailProps) {
         </Button>
       </Row>
       <Button
+        primaryColor={props.emailBranding?.color}
         style={{
           width: 'fit-content'
         }}

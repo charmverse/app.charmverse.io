@@ -20,8 +20,8 @@ import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
+import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -31,7 +31,7 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { PagesMap } from 'lib/pages';
-import { fancyTrim } from 'lib/utilities/strings';
+import { fancyTrim } from 'lib/utils/strings';
 
 import { PageIcon } from '../../PageIcon';
 
@@ -86,7 +86,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const [searchText, setSearchText] = useState('');
   const { space } = useCurrentSpace();
   const currentPagePath = usePageIdFromPath();
-  const { mutatePagesRemove, pages, getPageByPath } = usePages();
+  const { mutatePagesRemove, getPageByPath } = usePages();
   const { navigateToSpacePath } = useCharmRouter();
   const { showMessage } = useSnackbar();
   const { sendMessage } = useWebSocketClient();
@@ -108,7 +108,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   async function restorePage(pageId: string) {
     const page = archivedPages[pageId];
     if (page && space) {
-      if (page.type === 'board' || page.type === 'page') {
+      if (page.type === 'board' || page.type === 'page' || page.type === 'linked_board') {
         sendMessage({
           payload: {
             id: pageId
@@ -132,9 +132,6 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
           });
           return { ..._archivedPages };
         });
-
-        await mutate(`pages/${space.id}`);
-        dispatch(initialDatabaseLoad({ pageId }));
       }
     }
   }
@@ -159,8 +156,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
 
     // If the current page has been deleted permanently route to the first alive page
     if (currentPage && deletePageIds.includes(currentPage.id)) {
-      const firstPage = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
-      navigateToSpacePath(`/${firstPage}`);
+      navigateToSpacePath(`/`);
     }
   }
 

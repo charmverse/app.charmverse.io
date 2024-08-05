@@ -1,8 +1,7 @@
 import type { Page } from '@charmverse/core/prisma';
+import { countBlocks } from '@root/lib/prosemirror/countBlocks';
+import { defaultPaginatedPrismaTaskBatchSize, paginatedPrismaTask } from '@root/lib/utils/paginatedPrismaTask';
 import _sum from 'lodash/sum';
-
-import { countBlocks } from 'lib/prosemirror/countBlocks';
-import { defaultPaginatedPrismaTaskBatchSize, paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
 import type { BlocksCountQuery } from './interfaces';
 

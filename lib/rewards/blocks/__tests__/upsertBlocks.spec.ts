@@ -1,15 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsUser } from '@charmverse/core/test';
+import { testUtilsUser, testUtilsBounties } from '@charmverse/core/test';
+import type { PropertyType } from '@root/lib/databases/board';
+import { getBlocks } from '@root/lib/rewards/blocks/getBlocks';
+import type { RewardBlockInput, RewardBlockUpdateInput } from '@root/lib/rewards/blocks/interfaces';
+import { upsertBlock } from '@root/lib/rewards/blocks/upsertBlock';
+import { upsertBlocks } from '@root/lib/rewards/blocks/upsertBlocks';
 import { v4 } from 'uuid';
 
-import type { PropertyType } from 'lib/focalboard/board';
-import { getBlocks } from 'lib/rewards/blocks/getBlocks';
-import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
-import { upsertBlocks } from 'lib/rewards/blocks/upsertBlocks';
-import { createReward } from 'lib/rewards/createReward';
-
 describe('reward blocks - updateBlocks', () => {
-  it('Should update properties block and reward fields without internal properites', async () => {
+  it('Should update properties block and reward fields without internal properties', async () => {
     const { user: adminUser, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
     });
@@ -20,7 +19,7 @@ describe('reward blocks - updateBlocks', () => {
 
     const textPropertId = v4();
 
-    const propertiesData = {
+    const propertiesData: RewardBlockInput = {
       spaceId: space.id,
       title: 'Properties',
       type: 'board',
@@ -51,19 +50,29 @@ describe('reward blocks - updateBlocks', () => {
       spaceId: space.id
     });
 
-    const { reward } = await createReward({
+    const reward = await testUtilsBounties.generateBounty({
       spaceId: space.id,
-      userId: adminUser.id,
-      customReward: 't-shirt',
-      fields: {
-        properties: {
-          [textPropertId]: 'test1',
-          [v4()]: 'test2'
+      createdBy: adminUser.id,
+      status: 'open',
+      approveSubmitters: false
+    });
+
+    await prisma.bounty.update({
+      where: {
+        id: reward.id
+      },
+      data: {
+        customReward: 't-shirt',
+        fields: {
+          properties: {
+            [textPropertId]: 'test1',
+            [v4()]: 'test2'
+          }
         }
       }
     });
 
-    const propertiesUpdateData = {
+    const propertiesUpdateData: RewardBlockUpdateInput = {
       id: block.id,
       spaceId: space.id,
       title: 'Update',
@@ -83,7 +92,7 @@ describe('reward blocks - updateBlocks', () => {
       }
     };
 
-    const proposalPropertiesUpdateData = {
+    const proposalPropertiesUpdateData: RewardBlockUpdateInput = {
       type: 'card',
       id: reward.id,
       fields: {

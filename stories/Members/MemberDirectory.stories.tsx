@@ -1,7 +1,7 @@
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
-import MemberDirectoryComponent from 'components/members/MemberDirectoryPage';
+import { MemberDirectoryPage as MemberDirectoryComponent } from 'components/members/MemberDirectoryPage';
 
 import { memberProperties } from '../lib/mockData';
 
@@ -16,8 +16,8 @@ export function MemberDirectoryPage() {
 MemberDirectoryPage.parameters = {
   msw: {
     handlers: {
-      getMemberProperties: rest.get('/api/spaces/:spaceId/members/properties', (req, res, ctx) => {
-        return res(ctx.json(memberProperties));
+      getMemberProperties: http.get('/api/spaces/:spaceId/members/properties', () => {
+        return HttpResponse.json(memberProperties);
       })
     }
   }

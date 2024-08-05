@@ -5195,7 +5195,6 @@
                   "hiddenOptionIds": [],
                   "visibleOptionIds": [],
                   "defaultTemplateId": "",
-                  "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": [
@@ -8630,12 +8629,11 @@
         "id": "3f1d1e30-13f1-4c62-801d-f774cc99c2b2",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -8708,7 +8706,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -9201,12 +9199,11 @@
         "id": "638db32f-853c-4bc7-959d-d289906bb440",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -9279,7 +9276,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -9977,12 +9974,11 @@
         "id": "ea98bb01-9127-42b3-bfc3-86d80fdd5f7b",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -10055,7 +10051,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -10820,12 +10816,11 @@
         "id": "49932b20-c7ca-4f17-9ecb-32940c639930",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "702fe846-919a-41f9-a20b-3b40fa07d5d8",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -10898,7 +10893,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,

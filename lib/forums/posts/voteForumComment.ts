@@ -1,9 +1,8 @@
 import type { PostCommentUpDownVote } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishPostCommentVoteEvent } from 'lib/webhookPublisher/publishEvent';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishPostCommentVoteEvent } from '@root/lib/webhookPublisher/publishEvent';
 
 type CommentVote = {
   commentId: string;
@@ -41,17 +40,13 @@ export async function voteForumComment({
       }
     });
 
-    const category = post.category;
-
-    if (category) {
-      trackUserAction(upvoted ? 'upvote_comment' : 'downvote_comment', {
-        resourceId: commentId,
-        spaceId: post.spaceId,
-        userId,
-        categoryName: category.name,
-        postId: post.id
-      });
-    }
+    trackUserAction(upvoted ? 'upvote_comment' : 'downvote_comment', {
+      resourceId: commentId,
+      spaceId: post.spaceId,
+      userId,
+      categoryName: post.category.name,
+      postId: post.id
+    });
 
     const commentVote = await prisma.postCommentUpDownVote.upsert({
       create: {

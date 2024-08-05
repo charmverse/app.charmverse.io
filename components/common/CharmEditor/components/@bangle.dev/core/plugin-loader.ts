@@ -1,20 +1,15 @@
 // References: https://github.com/bangle-io/bangle-editor/blob/13127cf2e4187ebaa6d5e01d80f4e9018fae02a5/lib/core/src/plugin-loader.ts
 
-import type { EditorProps, Schema, EditorState } from '@bangle.dev/pm';
-import {
-  baseKeymap as pmBaseKeymap,
-  gapCursor as pmGapCursor,
-  InputRule,
-  inputRules as pmInputRules,
-  keymap,
-  Plugin,
-  undoInputRule as pmUndoInputRule
-} from '@bangle.dev/pm';
-import { bangleWarn } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
+import { baseKeymap as pmBaseKeymap } from 'prosemirror-commands';
+import { gapCursor as pmGapCursor } from 'prosemirror-gapcursor';
+import { InputRule, inputRules as pmInputRules, undoInputRule as pmUndoInputRule } from 'prosemirror-inputrules';
+import { keymap } from 'prosemirror-keymap';
+import type { Schema } from 'prosemirror-model';
+import { Plugin } from 'prosemirror-state';
+import type { EditorProps } from 'prosemirror-view';
 
-import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
-
+import type { SpecRegistry } from '../../@bangle.dev/core/specRegistry';
 import { dropCursor } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
 import * as editorStateCounter from './editor-state-counter';
@@ -135,10 +130,8 @@ function validateNodeViews(plugins: Plugin[], specRegistry: any) {
   for (const plugin of nodeViewPlugins) {
     for (const name of Object.keys(plugin.props.nodeViews as any)) {
       if (!specRegistry.schema.nodes[name]) {
-        bangleWarn(
-          `When loading your plugins, we found nodeView implementation for the node '${name}' did not have a corresponding spec. Check the plugin:`,
-          plugin,
-          'and your specRegistry',
+        log.warn(
+          `When loading your plugins, we found nodeView implementation for the node '${name}' did not have a corresponding spec. Check the plugin: ${plugin} and your specRegistry`,
           specRegistry
         );
 
@@ -146,10 +139,10 @@ function validateNodeViews(plugins: Plugin[], specRegistry: any) {
       }
 
       if (nodeViewNames.has(name)) {
-        bangleWarn(
-          `When loading your plugins, we found more than one nodeView implementation for the node '${name}'. Bangle can only have a single nodeView implementation, please check the following two plugins`,
-          plugin,
-          nodeViewNames.get(name)
+        log.warn(
+          `When loading your plugins, we found more than one nodeView implementation for the node '${name}'. Bangle can only have a single nodeView implementation, please check the following two plugins ${plugin} ${nodeViewNames.get(
+            name
+          )}`
         );
         throw new Error(`NodeView validation failed. Duplicate nodeViews for '${name}' found.`);
       }

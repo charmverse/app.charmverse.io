@@ -15,19 +15,4 @@ export const REWARD_CHAIN = '__rewardChain';
 export const REWARD_CUSTOM_VALUE = '__rewardCustomValue';
 export const REWARD_APPLICANTS_COUNT = '__rewardApplicantsCount';
 export const REWARD_PROPOSAL_LINK = '__rewardProposalLink';
-
-export const defaultRewardPropertyIds = [
-  REWARD_STATUS_BLOCK_ID,
-  REWARDS_APPLICANTS_BLOCK_ID,
-  APPLICANT_BLOCK_ID,
-  REWARD_REVIEWERS_BLOCK_ID,
-  REWARDS_AVAILABLE_BLOCK_ID,
-  DUE_DATE_ID,
-  CREATED_AT_ID,
-  REWARD_AMOUNT,
-  REWARD_TOKEN,
-  REWARD_CHAIN,
-  REWARD_CUSTOM_VALUE,
-  REWARD_APPLICANTS_COUNT,
-  REWARD_PROPOSAL_LINK
-];
+export const APPLICANT_STATUS_BLOCK_ID = '__applicantStatus';

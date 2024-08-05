@@ -1,10 +1,10 @@
 import type { Application, Bounty, Space, User } from '@charmverse/core/prisma';
+import { refreshPaymentStatus } from '@root/lib/rewards/refreshPaymentStatus';
+import { work } from '@root/lib/rewards/work';
+import { createTransaction } from '@root/lib/transactions/createTransaction';
+import { DataNotFoundError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
-import { refreshPaymentStatus } from 'lib/rewards/refreshPaymentStatus';
-import { work } from 'lib/rewards/work';
-import { createTransaction } from 'lib/transactions/createTransaction';
-import { DataNotFoundError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

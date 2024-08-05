@@ -1,9 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { MemberPropertyValue } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { paginatedPrismaTask } from '@root/lib/utils/paginatedPrismaTask';
 import _sum from 'lodash/sum';
-
-import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
 import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
 

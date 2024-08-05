@@ -10,14 +10,14 @@ concurrency:
 jobs:
   clean-up:
     if: |
-      (github.event.action == 'unlabeled' && github.event.label.name == ':rocket: deploy') ||
-      (github.event.action == 'closed' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))
+      (github.event.action == 'unlabeled' && startsWith(github.event.label.name, ':rocket: deploy')) ||
+      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
     runs-on: ubuntu-latest
     # wait until all deploys are complete to destroy the env
     concurrency: deploy-pr-app-${{ github.head_ref }}
     steps:
       - name: configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -27,10 +27,10 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.x
 
       - name: set STAGE variable in environment for next steps
-        run: echo "STAGE=pr-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+        run: echo "STAGE=${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
 
       - name: checkout the files
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         uses: ./.github/actions/install
@@ -38,9 +38,12 @@ jobs:
       - name: destroy the stack on AWS
         # we need to create a dummy zip file or else cdk throws an error it cannot find the asset
         run: |
-          touch deploy.zip
+          touch stg-webapp-${{ env.STAGE }}.zip
+          touch stg-connect-${{ env.STAGE }}.zip
           npm install aws-cdk-lib --no-audit --no-fund
-          npm run destroy:staging
+          npx cdk destroy -c name=stg-webapp-${{ env.STAGE }} --force
+          npx cdk destroy -c name=stg-connect-${{ env.STAGE }} --force
+          npx cdk destroy -c name=stg-sunnyawards-${{ env.STAGE }} --force
 
       - name: delete the github deployments and the corresponding environment
         uses: strumwolf/delete-deployment-environment@v1.1.0

@@ -1,21 +1,23 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import * as api from 'lib/summon/api';
-import type { SummonUserProfile } from 'lib/summon/interfaces';
+import * as api from '@root/lib/summon/api';
+import { TENANT_URLS } from '@root/lib/summon/constants';
+import type { SummonUserProfile } from '@root/lib/summon/interfaces';
 
 export async function getSummonProfile({
   userId,
-  summonApiUrl = api.SUMMON_BASE_URL
+  spaceId,
+  summonTestUrl
 }: {
-  summonApiUrl?: string;
+  spaceId: string;
   userId: string;
+  summonTestUrl?: string;
 }): Promise<null | SummonUserProfile> {
   const user = await prisma.user.findUnique({
     where: {
       id: userId
     },
     select: {
-      xpsEngineId: true,
       wallets: {
         select: {
           address: true
@@ -33,27 +35,49 @@ export async function getSummonProfile({
   if (!user) {
     return null;
   }
+  const spaceRole = await prisma.spaceRole.findUnique({
+    where: {
+      spaceUser: {
+        userId,
+        spaceId
+      }
+    },
+    include: {
+      space: {
+        select: {
+          xpsEngineId: true
+        }
+      }
+    }
+  });
+
+  if (!spaceRole || !spaceRole.space.xpsEngineId) {
+    log.debug('Space is not connected to Summon', { spaceId });
+    return null;
+  }
+  const summonApiUrl = summonTestUrl || TENANT_URLS[spaceRole.space.xpsEngineId];
 
   const discordUserAccount = user.discordUser?.account as { username: string } | null;
   const userEmail = user.googleAccounts[0]?.email;
   const walletAddresses = user.wallets.map((wallet) => wallet.address);
 
-  const xpsEngineId =
-    user.xpsEngineId ??
-    (await api.findUserXpsEngineId({
+  let xpsUserId = spaceRole?.xpsUserId;
+  if (!xpsUserId) {
+    xpsUserId = await api.findUserXpsEngineId({
       discordUserAccount,
       userEmail,
       walletAddresses,
       summonApiUrl
-    }));
+    });
+  }
 
   // Summon has a bug where it returns the wrong user profile when none exist
-  if (!xpsEngineId || xpsEngineId === '366899703492640833') {
+  if (!xpsUserId || xpsUserId === '366899703492640833') {
     return null;
   }
 
   return api.getUserSummonProfile({
-    xpsEngineId,
+    xpsUserId,
     summonApiUrl
   });
 }

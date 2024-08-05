@@ -1,8 +1,7 @@
 import { MemberPropertyPermissionLevel } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { CreateMemberPropertyPermissionInput } from 'lib/members/interfaces';
-import { InvalidInputError } from 'lib/utilities/errors';
+import type { CreateMemberPropertyPermissionInput } from '@root/lib/members/interfaces';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
 export async function createMemberPropertyPermission(data: CreateMemberPropertyPermissionInput) {
   const space = await prisma.space.findFirst({

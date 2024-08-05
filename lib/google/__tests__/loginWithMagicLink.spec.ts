@@ -1,9 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import type { LoggedInUser } from '@root/models';
 import { v4 as uuid } from 'uuid';
 
-import type { LoggedInUser } from 'models';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { DecodedIdToken } from '../firebaseApp';
 import type { MagicLinkLoginRequest } from '../loginWithMagicLink';
@@ -48,7 +49,7 @@ describe('loginWithMagicLink', () => {
     );
   });
 
-  it('should return the user if they already have a verified email to the user account if they only have a Google Account', async () => {
+  it('should return the user if they already have a verified email to the user account', async () => {
     const loginRequest: MagicLinkLoginRequest = {
       magicLink: {
         // The mocked implementation returns the access token as the email
@@ -112,6 +113,74 @@ describe('loginWithMagicLink', () => {
         ]
       })
     );
+  });
+
+  it('should return the user if they already have a notification email to the user account if they only have a Google Account', async () => {
+    const email = `test-${uuid()}@example.com`;
+    const { user } = await generateUserAndSpace({
+      user: { email }
+    });
+
+    const loginRequest: MagicLinkLoginRequest = {
+      magicLink: {
+        // The mocked implementation returns the access token as the email
+        accessToken: email,
+        avatarUrl
+      }
+    };
+
+    const loginResult = await loginWithMagicLink(loginRequest);
+
+    expect(loginResult.isNew).toBe(false);
+    expect(loginResult.user).toMatchObject(
+      expect.objectContaining<Partial<LoggedInUser>>({
+        id: user.id,
+        verifiedEmails: [
+          {
+            email: loginRequest.magicLink.accessToken,
+            name: loginRequest.magicLink.accessToken
+          }
+        ]
+      })
+    );
+  });
+
+  it('should return the user if they already have a verified email to the unclaimed user account', async () => {
+    const user = await testUtilsUser.generateUser();
+    await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        claimed: false
+      }
+    });
+    const email = `test-${uuid()}@example.com`;
+    await prisma.verifiedEmail.create({
+      data: {
+        avatarUrl,
+        email,
+        name: 'Email',
+        userId: user.id
+      }
+    });
+
+    const loginRequest: MagicLinkLoginRequest = {
+      magicLink: {
+        // The mocked implementation returns the access token as the email
+        accessToken: email,
+        avatarUrl
+      }
+    };
+
+    const loginResult = await loginWithMagicLink(loginRequest);
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: {
+        id: user.id
+      }
+    });
+    expect(updatedUser.claimed).toBe(true);
+    expect(loginResult.isNew).toBe(true);
   });
 
   it('should throw an error if the token decoding failed', async () => {

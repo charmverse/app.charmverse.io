@@ -1,12 +1,12 @@
 import { log } from '@charmverse/core/log';
+import type { StatusAPIResponse as FarcasterAccount } from '@farcaster/auth-kit';
 import List from '@mui/material/List';
+import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
-import useSWRMutation from 'swr/mutation';
 
-import charmClient from 'charmClient';
-import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
+import { useAddUserWallets } from 'charmClient/hooks/profile';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import PrimaryButton from 'components/common/PrimaryButton';
 import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
 import { WalletSign } from 'components/login/components/WalletSign';
 import { AddWalletStep } from 'components/settings/account/components/AddWalletStep';
@@ -18,12 +18,17 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
+import { lowerCaseEqual } from 'lib/utils/strings';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import IdentityProviderItem from './IdentityProviderItem';
 import { TELEGRAM_BOT_ID } from './TelegramLoginIframe';
+
+const WarpcastLogin = dynamic(
+  () => import('components/login/components/WarpcastLogin').then((module) => module.WarpcastLogin),
+  { ssr: false }
+);
 
 type Props = {
   isOpen: boolean;
@@ -38,33 +43,25 @@ const modalTitles: Record<IdentityStepToAdd, string> = {
 };
 
 export function NewIdentityModal({ isOpen, onClose }: Props) {
-  const { isConnectingIdentity } = useWeb3ConnectionManager();
   const { account, isSigning, setAccountUpdatePaused } = useWeb3Account();
   const { user, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const sendingMagicLink = useRef(false);
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
+  const farcasterAccount = user?.farcasterUser?.account as Partial<FarcasterAccount> | undefined;
   const [identityToAdd, setIdentityToAdd] = useState<'email' | 'wallet' | null>(null);
   const isUserWalletActive = !!user?.wallets?.some((w) => lowerCaseEqual(w.address, account));
   const { isOnCustomDomain } = useCustomDomain();
   const { loginWithGooglePopup, isConnectingGoogle } = useGoogleLogin();
 
-  const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
-    '/profile/add-wallets',
-    (_url, { arg }: Readonly<{ arg: AuthSig }>) => charmClient.addUserWallets([arg]),
-    {
-      onSuccess(data) {
-        updateUser(data);
-      }
-    }
-  );
+  const { trigger: signSuccess, isMutating: isVerifyingWallet } = useAddUserWallets();
 
-  const isConnectingWallet = isConnectingIdentity || isVerifyingWallet || isSigning;
+  const isConnectingWallet = isVerifyingWallet || isSigning;
 
   const { connectTelegram, isConnectingToTelegram } = useTelegramConnect();
 
-  const { connect, isConnected, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
+  const { isConnected, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
 
   async function handleConnectEmailRequest(email: string) {
     if (sendingMagicLink.current === false) {
@@ -91,13 +88,20 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
     }
   }
 
-  async function onSignSuccess(authSig: AuthSig) {
-    try {
-      await signSuccess(authSig);
-      onClose();
-    } catch (e: any) {
-      showMessage(e.message || 'Something went wrong', 'error');
-    }
+  async function onSignSuccess(payload: SignatureVerificationPayload) {
+    await signSuccess(
+      { ...payload, address: account as string },
+      {
+        onSuccess: async (data) => {
+          await updateUser(data);
+          onClose();
+        },
+        onError: (e) => {
+          onClose();
+          showMessage(e.message || 'Something went wrong', 'error');
+        }
+      }
+    );
   }
 
   useEffect(() => {
@@ -125,33 +129,35 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
             </IdentityProviderItem>
           ) : (
             <IdentityProviderItem type='Wallet' loading={isConnectingWallet} text='Add wallet address'>
-              <PrimaryButton size='small' onClick={() => setIdentityToAdd('wallet')} disabled={isConnectingWallet}>
+              <Button
+                color='primary'
+                size='small'
+                onClick={() => setIdentityToAdd('wallet')}
+                disabled={isConnectingWallet}
+              >
                 Connect
-              </PrimaryButton>
+              </Button>
             </IdentityProviderItem>
           )}
           {!isConnected && (
             <IdentityProviderItem type='Discord'>
-              <PrimaryButton
+              <Button
+                color='primary'
                 size='small'
                 onClick={() => {
-                  if (isOnCustomDomain) {
-                    popupLogin('/', 'connect');
-                  } else {
-                    connect();
-                  }
-
+                  popupLogin('/', 'connect');
                   onClose();
                 }}
                 disabled={isDiscordLoading}
               >
                 Connect
-              </PrimaryButton>
+              </Button>
             </IdentityProviderItem>
           )}
           {!telegramAccount && !isOnCustomDomain && (
             <IdentityProviderItem type='Telegram'>
-              <PrimaryButton
+              <Button
+                color='primary'
                 disabled={!TELEGRAM_BOT_ID}
                 loading={isConnectingToTelegram}
                 disabledTooltip='Telegram bot is not configured'
@@ -162,12 +168,18 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
                 }}
               >
                 Connect
-              </PrimaryButton>
+              </Button>
+            </IdentityProviderItem>
+          )}
+          {!farcasterAccount && (
+            <IdentityProviderItem type='Farcaster'>
+              <WarpcastLogin type='connect' />
             </IdentityProviderItem>
           )}
           {(!user?.googleAccounts || user.googleAccounts.length === 0) && (
             <IdentityProviderItem type='Google'>
-              <PrimaryButton
+              <Button
+                color='primary'
                 size='small'
                 onClick={() => {
                   loginWithGooglePopup({ type: 'connect' });
@@ -176,15 +188,20 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
                 disabled={isConnectingGoogle}
               >
                 Connect
-              </PrimaryButton>
+              </Button>
             </IdentityProviderItem>
           )}
 
           {!isOnCustomDomain && (
             <IdentityProviderItem type='VerifiedEmail'>
-              <PrimaryButton size='small' onClick={() => setIdentityToAdd('email')} disabled={isConnectingGoogle}>
+              <Button
+                color='primary'
+                size='small'
+                onClick={() => setIdentityToAdd('email')}
+                disabled={isConnectingGoogle}
+              >
                 Connect
-              </PrimaryButton>
+              </Button>
             </IdentityProviderItem>
           )}
         </List>

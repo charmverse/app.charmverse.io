@@ -1,19 +1,16 @@
 import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
-import type { TokenGatePage } from '__e2e__/po/tokenGate.po';
+import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 import { v4 } from 'uuid';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
+import { generateTokenGate } from 'testing/utils/tokenGates';
 
-import type { LoginPage } from '../po/login.po';
-import type { SignUpPage } from '../po/signup.po';
 import { generateUser, generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 
 type Fixtures = {
   sandboxPage: Page;
-  loginPage: LoginPage;
-  signupPage: SignUpPage;
   tokenGatePage: TokenGatePage;
 };
 
@@ -22,7 +19,8 @@ const test = base.extend<Fixtures>({
     const sandbox = await _browser.newContext();
     const page = await sandbox.newPage();
     await use(page);
-  }
+  },
+  tokenGatePage: ({ sandboxPage }, use) => use(new TokenGatePage(sandboxPage))
 });
 
 test('signup - not ignore the logic to redirect user after connect if the user has 0 spaces, and the redirect is to a join page', async ({
@@ -37,4 +35,19 @@ test('signup - not ignore the logic to redirect user after connect if the user h
   await sandboxPage.goto(`${baseUrl}?returnUrl=${encodeURIComponent(`/join?domain=${space.domain}`)}`);
 
   await sandboxPage.waitForURL(`**/join?domain=${space.domain}`);
+});
+
+test('join - user can login through a join page', async ({ tokenGatePage }) => {
+  const { user: user1 } = await generateUserAndSpace();
+  const { space: space2, user: user2 } = await generateUserAndSpace();
+  await generateTokenGate({ spaceId: space2.id, userId: user2.id });
+
+  await tokenGatePage.goToWorkspaceUrl({ domain: space2.domain });
+  await tokenGatePage.waitForWorkspaceURL({ domain: space2.domain });
+  await tokenGatePage.signInButton.click();
+
+  await login({ userId: user1.id, page: tokenGatePage.page });
+
+  await tokenGatePage.page.reload(); // when a user is logging in the page is reloaded
+  await tokenGatePage.verifyButton.click();
 });

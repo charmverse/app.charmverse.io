@@ -1,4 +1,4 @@
-import type { AddFormResponseInput, FormResponse } from 'lib/zapier/interfaces';
+import type { AddFormResponseInput, FormResponse } from '@root/lib/zapier/interfaces';
 
 // Data markdown format from zapier:
 // ### Question 1?\n\nanswer1\n\n\n### Quesiton2?\n\nanswer2f\n\n\n

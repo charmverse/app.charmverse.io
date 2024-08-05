@@ -3,11 +3,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
-import { createUserFromWallet } from 'lib/users/createUser';
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { addUserGoogleAccount, addUserWallet } from 'testing/utils/users';
 
@@ -35,11 +34,11 @@ describe('GET /api/v1/users/search', () => {
     await addUserWallet({ userId: user.id, address: user1Wallet });
 
     user2Wallet = randomETHWalletAddress();
-    user2 = await createUserFromWallet({ address: user2Wallet, email: email2 });
+    user2 = await createUserWithWallet({ address: user2Wallet, email: email2 });
     await addUserToSpace({ spaceId: space.id, userId: user2.id, isAdmin: false });
 
     user3Wallet = randomETHWalletAddress();
-    user3 = await createUserFromWallet({ address: user3Wallet, email: email3 });
+    user3 = await createUserWithWallet({ address: user3Wallet, email: email3 });
     await addUserToSpace({ spaceId: space.id, userId: user3.id, isAdmin: false });
 
     superApiKey = await prisma.superApiToken.create({
@@ -132,7 +131,7 @@ describe('GET /api/v1/users/search', () => {
 
   it('should fail if user is not found or is not a part of the space', async () => {
     const randomEmail = 'random@example.com';
-    await createUserFromWallet({ email: randomEmail });
+    await createUserWithWallet({ email: randomEmail, address: randomETHWalletAddress() });
 
     await request(baseUrl)
       .get(`/api/v1/users/search?&email=${randomEmail}`)

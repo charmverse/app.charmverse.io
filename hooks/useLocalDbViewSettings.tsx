@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { useLocalStorage } from 'hooks/useLocalStorage';
-import type { ISortOption } from 'lib/focalboard/boardView';
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
+import type { ISortOption } from 'lib/databases/boardView';
+import type { FilterGroup } from 'lib/databases/filterGroup';
 
 export type DbViewLocalOptions = {
   localSort: ISortOption[] | null;

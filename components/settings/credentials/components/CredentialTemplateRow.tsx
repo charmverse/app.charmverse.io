@@ -1,17 +1,17 @@
 import type { CredentialTemplate } from '@charmverse/core/prisma-client';
-import { useTheme } from '@emotion/react';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
-import { Box, IconButton, ListItemButton, ListItemText, Popover, Tooltip, useMediaQuery } from '@mui/material';
+import { Box, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
+import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { credentialLabelMap } from 'lib/credentials/constants';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { credentialEventLabels } from 'lib/credentials/constants';
 
 export function CredentialTemplateRow({
   template,
@@ -22,7 +22,7 @@ export function CredentialTemplateRow({
   onClickEdit: (template: CredentialTemplate) => void;
   onClickDelete: (templateId: string) => void;
 }) {
-  const theme = useTheme();
+  const { getFeatureTitle } = useSpaceFeatures();
 
   const isAdmin = useIsAdmin();
 
@@ -32,13 +32,7 @@ export function CredentialTemplateRow({
     open: openDeleteDialog
   } = usePopupState({ variant: 'popover', popupId: 'credential-delete-popup' });
 
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
   const pageMenuAnchor = useRef();
-  const [pageMenuAnchorElement, setPageMenuAnchorElement] = useState<null | Element>(null);
-
-  function closeMenu() {
-    setPageMenuAnchorElement(null);
-  }
 
   return (
     <Box display='flex' justifyContent='space-between'>
@@ -47,64 +41,31 @@ export function CredentialTemplateRow({
         {template.name}
         <Box sx={{ ml: 2 }} gap={2} display='flex'>
           {template.credentialEvents.map((ev) => (
-            <Chip key={ev} label={credentialLabelMap[ev]} variant='outlined' size='small' />
+            <Chip key={ev} label={credentialEventLabels[ev]?.(getFeatureTitle)} variant='outlined' size='small' />
           ))}
         </Box>
       </Box>
       <Box ref={pageMenuAnchor} display='flex' alignSelf='stretch' alignItems='center'>
-        <div>
-          <Tooltip title='View comments, export content and more' arrow>
-            <IconButton
-              size={isLargeScreen ? 'small' : 'medium'}
-              onClick={() => {
-                setPageMenuAnchorElement(pageMenuAnchor.current || null);
-              }}
-            >
-              <MoreHorizIcon data-test='header--show-page-actions' color='secondary' />
-            </IconButton>
-          </Tooltip>
-        </div>
-        <Popover
-          anchorEl={pageMenuAnchorElement}
-          open={!!pageMenuAnchorElement}
-          onClose={closeMenu}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left'
-          }}
-        >
-          <Box>
-            <div>
-              <ListItemButton
-                data-test='edit-credential-template'
-                disabled={!isAdmin}
-                onClick={() => {
-                  setPageMenuAnchorElement(null);
-                  onClickEdit(template);
-                }}
-              >
-                <EditOutlinedIcon
-                  fontSize='small'
-                  sx={{
-                    mr: 1
-                  }}
-                />
-                <ListItemText primary='Edit' />
-              </ListItemButton>
-            </div>
-            <div>
-              <ListItemButton data-test='delete-credential-template' disabled={!isAdmin} onClick={openDeleteDialog}>
-                <DeleteOutlineOutlinedIcon
-                  fontSize='small'
-                  sx={{
-                    mr: 1
-                  }}
-                />
-                <ListItemText primary='Delete' />
-              </ListItemButton>
-            </div>
-          </Box>
-        </Popover>
+        <ContextMenu iconColor='secondary' popupId='credential-context'>
+          <MenuItem
+            data-test='edit-credential-template'
+            disabled={!isAdmin}
+            onClick={() => {
+              onClickEdit(template);
+            }}
+          >
+            <ListItemIcon>
+              <EditOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText primary='Edit' />
+          </MenuItem>
+          <MenuItem data-test='delete-credential-template' disabled={!isAdmin} onClick={openDeleteDialog}>
+            <ListItemIcon>
+              <DeleteOutlineOutlinedIcon />
+            </ListItemIcon>
+            <ListItemText primary='Delete' />
+          </MenuItem>
+        </ContextMenu>
       </Box>
       <ConfirmDeleteModal
         title='Delete credential template'
@@ -115,10 +76,4 @@ export function CredentialTemplateRow({
       />
     </Box>
   );
-
-  // if (isBasePageDocument || isBasePageDatabase || isForumPost) {
-  //   return (
-
-  //   );
-  //   );
 }

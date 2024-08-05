@@ -1,74 +1,144 @@
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
+import styled from '@emotion/styled';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
+import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 
-import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
-import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
+import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import Modal from 'components/common/Modal';
+import UserDisplay from 'components/common/UserDisplay';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { useSnackbar } from 'hooks/useSnackbar';
-import type { PopulatedEvaluation } from 'lib/proposal/interface';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
+import { useUser } from 'hooks/useUser';
+import { getActionButtonLabels } from 'lib/proposals/getActionButtonLabels';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
+import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
-export type Props = {
-  hideReviewer?: boolean;
-  proposalId?: string;
-  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer'>;
-  refreshProposal?: VoidFunction;
+export type PassFailEvaluationProps = {
+  isAppealProcess?: boolean;
+  actionCompletesStep?: boolean;
   confirmationMessage?: string;
+  hideReviewer?: boolean;
   isCurrent: boolean;
+  isReviewer?: boolean;
+  isApprover?: boolean;
   archived?: boolean;
+  onSubmitEvaluationReview: (params: {
+    declineReason: string | null;
+    result: NonNullable<PopulatedEvaluation['result']>;
+    declineMessage?: string;
+  }) => Promise<void>;
+  onResetEvaluationReview?: () => void;
+  isResettingEvaluationReview: boolean;
+  reviewerOptions: {
+    group: string;
+    id: string;
+  }[];
+  isSubmittingReview: boolean;
+  evaluationReviews?: {
+    id: string;
+    reviewerId: string;
+    declineReasons: string[];
+    declineMessage?: string | null;
+    result: ProposalEvaluationResult;
+    completedAt: Date;
+  }[];
+  totalReviews: number;
+  requiredReviews: number;
+  evaluationResult?: PopulatedEvaluation['result'];
+  declineReasonOptions: string[];
+  completedAt?: Date | null;
+  actionLabels?: PopulatedEvaluation['actionLabels'];
 };
 
+const ResultCopyStack = styled(Stack)<{ addPaddingTop?: boolean }>`
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacing(1)};
+  align-items: center;
+  justify-content: center;
+  padding-bottom: ${({ theme }) => theme.spacing(2)};
+  padding-left: ${({ theme }) => theme.spacing(2)};
+  padding-right: ${({ theme }) => theme.spacing(2)};
+  padding-top: ${({ addPaddingTop, theme }) => (addPaddingTop ? theme.spacing(2) : 0)};
+`;
+
 export function PassFailEvaluation({
-  proposalId,
-  hideReviewer,
-  evaluation,
   isCurrent,
-  refreshProposal,
+  isReviewer,
+  isApprover,
+  archived,
+  onSubmitEvaluationReview,
+  hideReviewer,
+  reviewerOptions,
+  isSubmittingReview,
+  evaluationReviews = [],
+  requiredReviews,
+  evaluationResult,
+  isResettingEvaluationReview,
+  onResetEvaluationReview,
+  declineReasonOptions,
+  completedAt,
+  totalReviews,
+  actionLabels: _actionLabels,
   confirmationMessage,
-  archived
-}: Props) {
-  const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
+  isAppealProcess,
+  actionCompletesStep
+}: PassFailEvaluationProps) {
+  const { user } = useUser();
+  const currentUserEvaluationReview = evaluationReviews?.find((review) => review.reviewerId === user?.id);
+  const [declineReason, setDeclineReason] = useState<string | null>(null);
+  const [evaluationReviewId, setEvaluationReviewId] = useState<string | null>(null);
+  const [declineMessage, setDeclineMessage] = useState('');
 
-  const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
-    group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
-    id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
-  }));
-  const { showConfirmation } = useConfirmationModal();
-  const { showMessage } = useSnackbar();
-
-  const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
+  const declineReasonModalPopupState = usePopupState({ variant: 'dialog' });
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
-    : !evaluation.isReviewer
+    : !actionCompletesStep && !isReviewer
     ? 'You are not a reviewer'
-    : isMutating
+    : actionCompletesStep && !isApprover
+    ? 'You are not an approver'
+    : isSubmittingReview
     ? 'Submitting review'
     : archived
     ? 'You cannot move an archived proposal'
     : null;
+  const completedDate = completedAt ? getRelativeTimeInThePast(new Date(completedAt)) : null;
+  const evaluationReviewDeclineInputPopupState = usePopupState({ variant: 'popover' });
 
-  async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
+  const actionLabels = getActionButtonLabels({
+    actionLabels: _actionLabels
+  });
+  const canReview = isReviewer && totalReviews < requiredReviews && !evaluationResult && !currentUserEvaluationReview;
+
+  const canPassFail = (!actionCompletesStep && canReview) || (actionCompletesStep && isApprover);
+
+  const { showConfirmation } = useConfirmationModal();
+  const _onSubmitEvaluationReview = async (result: NonNullable<PopulatedEvaluation['result']>) => {
     if (confirmationMessage) {
       const { confirmed } = await showConfirmation({
         message: confirmationMessage,
-        confirmButton: result === 'pass' ? 'Approve' : 'Decline'
+        confirmButton: result === 'pass' ? actionLabels.approve : actionLabels.reject
       });
       if (!confirmed) {
         return;
       }
     }
-    try {
-      await trigger({
-        evaluationId: evaluation.id,
-        result
-      });
-      refreshProposal?.();
-    } catch (error) {
-      showMessage((error as Error).message, 'error');
-    }
+
+    await onSubmitEvaluationReview({
+      declineReason,
+      result,
+      declineMessage
+    });
+  };
+
+  function onClose() {
+    setDeclineReason(null);
+    setDeclineMessage('');
+    setEvaluationReviewId(null);
+    declineReasonModalPopupState.close();
   }
 
   return (
@@ -78,24 +148,90 @@ export function PassFailEvaluation({
           <Box mb={2}>
             <FormLabel>
               <Typography sx={{ mb: 1 }} variant='subtitle1'>
-                Reviewers
+                {isAppealProcess ? 'Appeal Reviewers' : 'Reviewers'}
               </Typography>
             </FormLabel>
             <UserAndRoleSelect
               data-test='evaluation-reviewer-select'
               systemRoles={[allMembersSystemRole]}
               readOnly={true}
-              value={reviewerOptions as SelectOption[]}
+              wrapColumn
+              value={reviewerOptions}
               onChange={() => {}}
             />
           </Box>
           <FormLabel>
-            <Typography variant='subtitle1'>Result</Typography>
+            <Typography variant='subtitle1'>
+              Result{requiredReviews !== 1 ? ` (required ${requiredReviews})` : ''}
+            </Typography>
           </FormLabel>
         </>
       )}
       <Card variant='outlined'>
-        {!evaluation.result && (
+        {evaluationReviews.length > 0 && (
+          <Stack p={2} gap={2.5}>
+            {evaluationReviews.map((evaluationReview) => {
+              return (
+                <Stack key={evaluationReview.id} gap={1.5}>
+                  <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                    <Stack direction='row' gap={1} alignItems='center'>
+                      <UserDisplay userId={evaluationReview.reviewerId} avatarSize='xSmall' />
+                      <Typography variant='subtitle1'>
+                        {getRelativeTimeInThePast(new Date(evaluationReview.completedAt))}
+                      </Typography>
+                    </Stack>
+                    <Stack direction='row' gap={1.5} alignItems='center'>
+                      {onResetEvaluationReview && evaluationReview.reviewerId === user?.id && !evaluationResult && (
+                        <Button
+                          size='small'
+                          color='secondary'
+                          variant='outlined'
+                          loading={isResettingEvaluationReview}
+                          onClick={onResetEvaluationReview}
+                        >
+                          Undo
+                        </Button>
+                      )}
+                      {evaluationReview.result === 'pass' ? (
+                        <ApprovedIcon fontSize='small' color='success' />
+                      ) : (
+                        <RejectedIcon fontSize='small' color='error' />
+                      )}
+                    </Stack>
+                  </Stack>
+                  {evaluationReview.result === 'fail' && evaluationReview.declineReasons.length ? (
+                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                      <Stack flexDirection='row' gap={1.5} width='calc(100% - 50px)'>
+                        {evaluationReview.declineReasons.map((reason) => (
+                          <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
+                        ))}
+                      </Stack>
+                      {evaluationReview.declineMessage && (
+                        <Tooltip title='View additional comment'>
+                          <div>
+                            <CommentOutlinedIcon
+                              sx={{
+                                cursor: 'pointer'
+                              }}
+                              onClick={() => {
+                                setEvaluationReviewId(evaluationReview.id);
+                                evaluationReviewDeclineInputPopupState.open();
+                              }}
+                              fontSize='small'
+                              color='secondary'
+                            />
+                          </div>
+                        </Tooltip>
+                      )}
+                    </Stack>
+                  ) : null}
+                </Stack>
+              );
+            })}
+          </Stack>
+        )}
+
+        {canPassFail && (
           <Box display='flex' justifyContent='space-between' alignItems='center' p={2}>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
@@ -104,37 +240,114 @@ export function PassFailEvaluation({
             </FormLabel>
             <Box display='flex' justifyContent='flex-end' gap={1}>
               <Button
-                onClick={() => onSubmitReview('fail')}
+                data-test='evaluation-fail-button'
+                onClick={() => {
+                  if (declineReasonOptions.length) {
+                    declineReasonModalPopupState.open();
+                  } else {
+                    _onSubmitEvaluationReview('fail');
+                  }
+                }}
                 disabled={!!disabledTooltip}
                 disabledTooltip={disabledTooltip}
                 color='errorPale'
               >
-                Decline
+                {actionLabels.reject}
               </Button>
               <Button
-                onClick={() => onSubmitReview('pass')}
+                data-test='evaluation-pass-button'
+                onClick={() => _onSubmitEvaluationReview('pass')}
                 disabled={!!disabledTooltip}
                 disabledTooltip={disabledTooltip}
                 color='successPale'
               >
-                Pass
+                {actionLabels.approve}
               </Button>
             </Box>
           </Box>
         )}
-        {evaluation.result === 'pass' && (
-          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+        {!canPassFail && isCurrent && evaluationResult === null && totalReviews === 0 && (
+          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' py={2} px={2}>
+            <Typography variant='body2'>{isAppealProcess ? 'Appeal' : 'Review'} process ongoing</Typography>
+          </Stack>
+        )}
+        {evaluationResult === 'pass' && (
+          <ResultCopyStack addPaddingTop={totalReviews === 0}>
             <ApprovedIcon color='success' />
             <Typography variant='body2'>Approved {completedDate}</Typography>
-          </Stack>
+          </ResultCopyStack>
         )}
-        {evaluation.result === 'fail' && (
-          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+        {evaluationResult === 'fail' && (
+          <ResultCopyStack addPaddingTop={totalReviews === 0}>
             <RejectedIcon color='error' />
             <Typography variant='body2'>Declined {completedDate}</Typography>
-          </Stack>
+          </ResultCopyStack>
         )}
       </Card>
+      <Modal open={!!declineReasonModalPopupState.isOpen} onClose={onClose} title='Reason for decline' size='small'>
+        <Stack gap={1} mb={3}>
+          <Typography>Please select at least one reason for declining this proposal.</Typography>
+          <Select
+            value={declineReason}
+            onChange={(e) => {
+              setDeclineReason(e.target.value);
+            }}
+            renderValue={(selected) => <Chip size='small' variant='outlined' label={selected} sx={{ mr: 0.5 }} />}
+          >
+            {declineReasonOptions.map((reason) => (
+              <MenuItem key={reason} value={reason}>
+                {reason}
+              </MenuItem>
+            ))}
+          </Select>
+        </Stack>
+
+        <Stack gap={1}>
+          <Typography>Additional comment</Typography>
+          <TextField
+            multiline
+            fullWidth
+            rows={5}
+            onChange={(e) => {
+              setDeclineMessage(e.target.value);
+            }}
+            value={declineMessage}
+          />
+        </Stack>
+
+        <Box display='flex' justifyContent='flex-end' mt={3} gap={2}>
+          <Button color='secondary' variant='outlined' onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            color='error'
+            sx={{
+              fontWeight: 'bold'
+            }}
+            loading={isResettingEvaluationReview || isSubmittingReview}
+            data-testid='confirm-delete-button'
+            onClick={async () => {
+              await _onSubmitEvaluationReview('fail');
+              onClose();
+            }}
+            disabled={declineReason === null}
+          >
+            {actionLabels.reject}
+          </Button>
+        </Box>
+      </Modal>
+
+      {evaluationReviewId && !!evaluationReviewDeclineInputPopupState.isOpen && (
+        <Modal open onClose={onClose} title='Additional comment' size='small'>
+          <TextField
+            multiline
+            rows={10}
+            fullWidth
+            value={evaluationReviews.find((review) => review.id === evaluationReviewId)?.declineMessage}
+            disabled
+          />
+        </Modal>
+      )}
     </>
   );
 }

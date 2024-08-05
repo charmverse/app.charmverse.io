@@ -1,7 +1,9 @@
 import type { Space } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
-import { InvalidInputError } from 'lib/utilities/errors';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateUser } from 'testing/utils/users';
 
@@ -12,6 +14,10 @@ beforeAll(async () => {
   const generated = await generateUserAndSpace();
   space = generated.space;
 });
+
+jest.mock('lib/metrics/mixpanel/trackUserAction', () => ({
+  trackUserAction: jest.fn()
+}));
 
 describe('addGuest', () => {
   it('should add a guest by userId', async () => {
@@ -51,6 +57,41 @@ describe('addGuest', () => {
 
     expect(output.isNewUser).toBe(false);
     expect(output.isNewSpaceRole).toBe(true);
+  });
+
+  it('should add a guest by email and update claimed status', async () => {
+    const email = `test-${v4()}@example.com`;
+    const user = await generateUser({ verifiedEmail: email });
+    await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        claimed: false
+      }
+    });
+
+    const output = await addGuest({
+      userIdOrEmail: email,
+      spaceId: space.id
+    });
+
+    const spaceRole = output.user.spaceRoles[0];
+
+    expect(spaceRole.spaceId).toBe(space.id);
+    expect(spaceRole.userId).toBe(user.id);
+    expect(spaceRole.isGuest).toBe(true);
+    expect(spaceRole.isAdmin).toBe(false);
+
+    expect(output.isNewUser).toBe(false);
+    expect(output.isNewSpaceRole).toBe(true);
+
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+    expect(trackUserAction as any).toHaveBeenCalledTimes(1);
+    expect(trackUserAction as any).toBeCalledWith('sign_up', { userId: user.id, identityType: 'VerifiedEmail' });
+    expect(updatedUser?.claimed).toBe(true);
   });
 
   it('should create the user if they do not exist, and mark the spaceRole and user as freshly created', async () => {

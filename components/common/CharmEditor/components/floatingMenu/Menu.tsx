@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import Paper from '@mui/material/Paper';
 import React from 'react';
 
-import type { SubMenu } from './floating-menu';
+import type { SubMenu } from './floatingMenuPlugin';
 
 const StyledMenu = styled(Paper, { shouldForwardProp: (prop: string) => prop !== 'noScroll' })<{
   type?: SubMenu;
@@ -23,15 +23,17 @@ export function Menu({
   children,
   type,
   noScroll,
-  inline
+  inline,
+  'data-test': dataTest
 }: {
   children: React.ReactNode;
   type?: SubMenu;
   noScroll?: boolean;
   inline?: boolean;
+  'data-test'?: string;
 }) {
   return (
-    <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline}>
+    <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline} data-test={dataTest}>
       {children}
     </StyledMenu>
   );

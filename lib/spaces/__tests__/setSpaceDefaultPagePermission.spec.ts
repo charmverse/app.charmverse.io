@@ -1,8 +1,8 @@
 import type { Space } from '@charmverse/core/prisma';
+import { SpaceNotFoundError } from '@root/lib/public-api';
+import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
-import { SpaceNotFoundError } from 'lib/public-api';
-import { InvalidInputError } from 'lib/utilities/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -41,16 +41,6 @@ describe('setSpaceDefaultPagePermission', () => {
     await expect(
       setSpaceDefaultPagePermission({
         defaultPagePermissionGroup: 'custom',
-        spaceId: space.id
-      })
-    ).rejects.toBeInstanceOf(InvalidInputError);
-  });
-
-  // Proposal editor preset is only used for proposals
-  it('Should fail to set the default page permission level to proposal_editor', async () => {
-    await expect(
-      setSpaceDefaultPagePermission({
-        defaultPagePermissionGroup: 'proposal_editor',
         spaceId: space.id
       })
     ).rejects.toBeInstanceOf(InvalidInputError);

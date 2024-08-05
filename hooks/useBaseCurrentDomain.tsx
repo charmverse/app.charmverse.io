@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { useMemo, createContext, useContext, useState, useEffect } from 'react';
 
 import { useSearchByDomain } from 'charmClient/hooks/spaces';
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 
 export type IBaseCurrentDomainContext = {
   isSpaceLoading: boolean;

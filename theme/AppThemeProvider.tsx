@@ -1,3 +1,5 @@
+'use client';
+
 import { Global } from '@emotion/react';
 import type { PaletteMode } from '@mui/material';
 import { CssBaseline } from '@mui/material';
@@ -14,9 +16,10 @@ import { monoFont, serifFont } from 'theme/fonts';
 const defaultMode: PaletteMode = 'light';
 
 export function AppThemeProvider({ children, forceTheme }: { children: React.ReactNode; forceTheme?: PaletteMode }) {
+  const defaultTheme = forceTheme || defaultMode;
   // dark mode: https://mui.com/customization/dark-mode/
-  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>(defaultMode, null);
-  const [mode, setMode] = useState<PaletteMode>(defaultMode);
+  const [savedDarkMode, setSavedDarkMode] = useLocalStorage<PaletteMode | null>(defaultTheme, null);
+  const [mode, setMode] = useState<PaletteMode>(defaultTheme);
 
   const toggleColorMode = useCallback(() => {
     setMode((prevMode: PaletteMode) => {
@@ -27,14 +30,14 @@ export function AppThemeProvider({ children, forceTheme }: { children: React.Rea
 
   // Update the theme only if the mode changes
   const theme = useMemo(() => {
-    const muiTheme = createThemeLightSensitive(forceTheme || mode);
+    const muiTheme = createThemeLightSensitive(mode);
 
     if (typeof window !== 'undefined') {
       setSavedDarkMode(mode);
       setDarkMode(mode === 'dark');
     }
     return muiTheme;
-  }, [mode, forceTheme]);
+  }, [mode, setSavedDarkMode]);
 
   useEffect(() => {
     if (savedDarkMode) {

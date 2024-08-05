@@ -1,6 +1,8 @@
 import { selectors } from '@playwright/test';
 
-import type { PropertyType } from 'lib/focalboard/board';
+import type { PropertyType } from 'lib/databases/board';
+import type { FilterCondition } from 'lib/databases/filterClause';
+import { slugify } from 'lib/utils/strings';
 
 import { GlobalPage } from './global.po';
 
@@ -10,6 +12,12 @@ import { GlobalPage } from './global.po';
 type OptionalBoardId = {
   boardId?: string;
 };
+
+type OptionalIndex = {
+  index?: number;
+};
+
+const zeroIndex = 0;
 
 export class DatabasePage extends GlobalPage {
   /**
@@ -121,5 +129,76 @@ export class DatabasePage extends GlobalPage {
 
   getTemplateMenuEditOption({ pageId }: { pageId: string }) {
     return this.page.locator(`data-test=template-menu-edit-${pageId}`);
+  }
+
+  getShowOnRelatedBoardButton() {
+    return this.page.locator('data-test=show-on-related-board-button');
+  }
+
+  getAddRelationButton() {
+    return this.page.locator('data-test=add-relation-button');
+  }
+
+  getDatabaseTableCell({ templateId, cardId }: { templateId: string; cardId: string }) {
+    return this.page.locator(`data-test=database-card-${cardId}-column-${templateId}`);
+  }
+
+  getCardDetailsTextInput() {
+    return this.page.locator('data-test=card-detail-properties').locator('textarea.octo-propertyvalue').first();
+  }
+
+  getTableRowOpenLocator(cardId: string) {
+    return this.page.locator(`data-test=database-open-button-${cardId}`);
+  }
+
+  async waitForBlocksUpdate() {
+    await this.page.waitForResponse('**/api/blocks');
+  }
+
+  async waitForBlockRelationsUpdate() {
+    await this.page.waitForResponse('**/api/blocks/relation/sync-values');
+  }
+
+  /**
+   * Currently, we only support one filter per board in e2e tests
+   */
+  openFiltersButton(input: OptionalBoardId = {}) {
+    return this.getPageOrBoardLocator(input).locator('data-test=view-filter-button');
+  }
+
+  addFilterButton(input: OptionalBoardId = {}) {
+    return this.getPageOrBoardLocator(input).locator('data-test=add-filter-button');
+  }
+
+  async selectFilterProperty(propertyName: string, input: OptionalBoardId & OptionalIndex = {}) {
+    await this.getPageOrBoardLocator(input)
+      .locator('data-test=filter-property-button')
+      .nth(input.index ?? zeroIndex)
+      .click();
+    await this.page.locator(`data-test=filter-property-select-${slugify(propertyName)}`).click();
+  }
+
+  async selectFilterCondition(condition: FilterCondition, input: OptionalBoardId & OptionalIndex = {}) {
+    await this.getPageOrBoardLocator(input)
+      .locator('data-test=filter-condition-button')
+      .nth(input.index ?? zeroIndex)
+      .click();
+    await this.page.locator(`data-test=filter-condition-option-${condition}`).click();
+  }
+
+  async selectFilterOptionValue(optionId: string, input: OptionalBoardId & OptionalIndex = {}) {
+    await this.getPageOrBoardLocator(input)
+      .locator('data-test=filter-type-select')
+      .nth(input.index ?? zeroIndex)
+      .click();
+    await this.page.locator(`data-test=filter-option-value-${optionId}`).click();
+  }
+
+  async resetDatabaseFilters(input: OptionalBoardId = {}) {
+    await this.getPageOrBoardLocator(input).locator('data-test=reset-database-filters').click();
+  }
+
+  async closeFilterMenu() {
+    await this.page.keyboard.press('Escape');
   }
 }

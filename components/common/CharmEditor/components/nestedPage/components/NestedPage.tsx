@@ -1,23 +1,23 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import type { EditorView } from 'prosemirror-view';
+import { memo } from 'react';
 
-import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
-import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { StaticPage } from 'lib/features/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
+import type { PageMetaLite } from 'lib/pages/interfaces';
 
+import { useGetPageMetaFromCache } from '../../../hooks/useGetPageMetaFromCache';
 import { enableDragAndDrop } from '../../../utils';
+import type { NodeViewProps } from '../../@bangle.dev/core/node-view';
+import { useEditorViewContext } from '../../@bangle.dev/react/hooks';
 import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
-const NestedPageContainer = styled(Link)`
+export const StyledLink = styled(Link)`
   align-items: center;
   cursor: pointer;
   display: flex;
@@ -42,7 +42,7 @@ const NestedPageContainer = styled(Link)`
   }
 `;
 
-const StyledTypography = styled(Typography)`
+export const StyledTypography = styled(Typography)`
   font-weight: 600;
   border-bottom: 0.05em solid var(--link-underline);
 `;
@@ -57,35 +57,37 @@ function resetPageNodeDropPluginState(view: EditorView) {
   }
 }
 
-export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps & { isLinkedPage?: boolean }) {
+function NestedPageComponent({ isLinkedPage = false, node, getPos }: NodeViewProps & { isLinkedPage?: boolean }) {
   const view = useEditorViewContext();
-  const { pages, loadingPages } = usePages();
   const { getFeatureTitle, mappedFeatures } = useSpaceFeatures();
   const { categories } = useForumCategories();
 
-  const documentPage = pages[node.attrs.id];
-  const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
-  const isProposalTemplate = node.attrs.type === 'proposal_template';
+  const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
+  const isDocumentPath = !forumCategoryPage && !staticPage;
+  const { page: documentPage, isLoading } = useGetPageMetaFromCache({
+    pageId: isDocumentPath ? node.attrs.id : null
+  });
   let pageTitle = '';
   if (staticPage) {
     pageTitle = mappedFeatures[staticPage.feature]?.title;
-  } else if (isProposalTemplate) {
-    pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage?.title || 'Untitled'}`;
-  } else if (documentPage) {
-    pageTitle = documentPage?.title || 'Untitled';
   } else if (forumCategoryPage) {
     pageTitle = `${getFeatureTitle('Forum')} > ${forumCategoryPage?.name || 'Untitled'}`;
-  } else if (!loadingPages) {
-    pageTitle = 'No access';
+  } else if (!isLoading || documentPage) {
+    if (documentPage) {
+      pageTitle = documentPage.title || 'Untitled';
+    } else {
+      pageTitle = 'No access';
+    }
   }
 
-  const pageId = documentPage?.id || staticPage?.path || forumCategoryPage?.id;
-  const pagePath = isProposalTemplate
-    ? `/proposals/new?template=${node.attrs.id}`
-    : documentPage
-    ? `/${documentPage.path}`
-    : '';
+  const pageId = node.attrs.id || staticPage?.path || forumCategoryPage?.id;
+  const pagePath =
+    node.attrs?.type === 'proposal_template'
+      ? `/proposals/new?template=${node.attrs.id}`
+      : documentPage
+      ? `/${documentPage.path}`
+      : '';
   const staticPath = staticPage ? `/${staticPage.path}` : '';
   const categoryPath = forumCategoryPage ? `/forum/${forumCategoryPage.path}` : '';
   const appPath = pagePath || staticPath || categoryPath;
@@ -93,7 +95,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
   const fullPath = `${window.location.origin}/${appPath}`;
 
   return (
-    <NestedPageContainer
+    <StyledLink
       data-test={`${isLinkedPage ? 'linked-page' : 'nested-page'}-${pageId}`}
       data-page-type={node.attrs.type ?? documentPage?.type}
       href={appPath}
@@ -121,17 +123,21 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
       }}
     >
       <div>
-        <LinkIcon
-          isLinkedPage={isLinkedPage}
-          documentPage={documentPage}
-          staticPage={staticPage}
-          isCategoryPage={!!forumCategoryPage}
-        />
+        {!isLoading && (
+          <LinkIcon
+            isLinkedPage={isLinkedPage}
+            documentPage={documentPage}
+            staticPage={staticPage}
+            isCategoryPage={!!forumCategoryPage}
+          />
+        )}
       </div>
-      <StyledTypography>{pageTitle}</StyledTypography>
-    </NestedPageContainer>
+      <StyledTypography>{pageTitle || ' '}</StyledTypography>
+    </StyledLink>
   );
 }
+
+export const NestedPage = memo(NestedPageComponent);
 
 function LinkIcon({
   isLinkedPage,
@@ -140,7 +146,7 @@ function LinkIcon({
   isCategoryPage
 }: {
   isLinkedPage: boolean;
-  documentPage?: PageMeta;
+  documentPage?: PageMetaLite;
   staticPage?: StaticPage;
   isCategoryPage: boolean;
 }) {

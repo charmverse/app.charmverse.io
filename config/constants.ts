@@ -34,6 +34,7 @@ export const googleWebClientConfig = {
 };
 
 export const charmverseDiscordInvite = 'https://discord.gg/ACYCzBGC2M';
+export const userManualUrl = 'https://tiny.charmverse.io/user-manual';
 // Google config with sensitive scopes (to eventually replace the primary config)
 export const googleOAuthClientIdSensitive =
   process.env.GOOGLE_OAUTH_CLIENT_ID_SENSITIVE || env('GOOGLE_OAUTH_CLIENT_ID_SENSITIVE');
@@ -52,3 +53,20 @@ export const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
 
 // Ceramic Node
 export const graphQlServerEndpoint = process.env.CERAMIC_GRAPHQL_SERVER as string;
+
+// Github
+export const githubPrivateKey = process.env.GITHUB_APP_PRIVATE_KEY as string;
+export const githubAppId = Number(process.env.GITHUB_APP_ID);
+
+// Docusign
+export const docusignClientId = process.env.DOCUSIGN_CLIENT_ID as string;
+export const docusignClientSecret = process.env.DOCUSIGN_CLIENT_SECRET as string;
+export const docusignOauthBaseUri = process.env.DOCUSIGN_OAUTH_BASE_URI as string;
+
+// export const docusignBaseUri = process.env.DOCUSIGN_BASE_URI as string;
+// export const docusignApiKey = process.env.DOCUSIGN_API_KEY as string;
+// This is a Personal Access Token for the Github API, generated within an individual developer account
+export const githubAccessToken = process.env.GITHUB_ACCESS_TOKEN as string;
+
+// API Client
+export const connectApiHost = env('CONNECT_API_HOST');

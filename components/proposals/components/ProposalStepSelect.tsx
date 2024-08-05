@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
-import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
-import type { IPropertyOption } from 'lib/focalboard/board';
-import type { ProposalWithUsersLite } from 'lib/proposal/interface';
+import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
+import type { PropertyValueDisplayType } from 'components/common/DatabaseEditor/interfaces';
+import type { IPropertyOption } from 'lib/databases/board';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 
@@ -12,6 +12,7 @@ type ProposalProp = {
   currentEvaluationId?: ProposalWithUsersLite['currentEvaluationId'];
   evaluations: ProposalWithUsersLite['evaluations'];
   hasRewards: boolean;
+  hasCredentials: boolean;
   id: string;
   archived: boolean;
 };
@@ -71,9 +72,16 @@ export function ProposalStepSelectBase({
   onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
 }) {
   const hasRewards = proposal.hasRewards;
+  const hasCredentials = proposal.hasCredentials;
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationIndex = proposal.currentStep.index;
   const currentEvaluationResult = proposal.currentStep.result;
+  const currentEvaluationStepRequiredReviews = proposal.currentStep.requiredReviews;
+  const isCurrentEvaluationFinalStep =
+    proposal.currentStep.finalStep ||
+    proposal.currentStep.appealedAt ||
+    proposal.currentEvaluationId === proposal.evaluations[proposal.evaluations.length - 1]?.id;
+
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
 
   const { options } = useMemo(() => {
@@ -93,6 +101,15 @@ export function ProposalStepSelectBase({
         value: evaluation.title,
         color: 'gray'
       })),
+      ...(hasCredentials
+        ? [
+            {
+              id: 'credentials',
+              value: 'Credentials',
+              color: 'gray'
+            }
+          ]
+        : []),
       ...(hasRewards
         ? [
             {
@@ -111,15 +128,28 @@ export function ProposalStepSelectBase({
         index === currentEvaluationIndex ||
         index < currentEvaluationIndex - 1 ||
         index > currentEvaluationIndex + 1 ||
-        // Disable option if it is a vote step and its not in progress
-        (evaluation?.type === 'vote' && evaluation?.result !== null) ||
-        // If we are on the vote step, then we can only go back to the previous step
-        (currentEvaluationStep === 'vote'
-          ? currentEvaluationResult === 'in_progress' && index >= currentEvaluationIndex
-          : false);
+        // Disable option if it is the final step and we are on the final step
+        isCurrentEvaluationFinalStep
+          ? index > currentEvaluationIndex
+          : false ||
+            // Disable option if it is a pass_fail step and it requires more than 1 review
+            (currentEvaluationStepRequiredReviews !== 1 && index > currentEvaluationIndex) ||
+            // Disable option if it is a vote step and its not in progress
+            (evaluation?.type === 'vote' && evaluation?.result !== null) ||
+            // If we are on the vote step, then we can only go back to the previous step
+            (currentEvaluationStep === 'vote'
+              ? currentEvaluationResult === 'in_progress' && index >= currentEvaluationIndex
+              : false);
     });
     return { options: _options };
-  }, [proposal, hasRewards, currentEvaluationStep, currentEvaluationIndex, currentEvaluationResult]);
+  }, [
+    proposal,
+    hasRewards,
+    isCurrentEvaluationFinalStep,
+    currentEvaluationStep,
+    currentEvaluationIndex,
+    currentEvaluationResult
+  ]);
 
   return (
     <TagSelect
@@ -134,11 +164,7 @@ export function ProposalStepSelectBase({
         (currentEvaluationStep === 'vote' && currentEvaluationResult === 'fail')
       }
       options={options}
-      propertyValue={
-        hasPublishedRewards
-          ? proposal.evaluations[proposal.evaluations.length - 1]?.id ?? proposal.currentStep.id
-          : proposal.currentStep.id
-      }
+      propertyValue={proposal.currentStep.id}
       onChange={(values) => {
         const evaluationId = Array.isArray(values) ? values[0] : values;
         if (evaluationId) {

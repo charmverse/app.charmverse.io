@@ -1,22 +1,21 @@
 import { getLogger } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { STATIC_PAGES } from '@root/lib/features/constants';
+import { trashPages } from '@root/lib/pages/trashPages';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
+import { applyStepsToNode } from '@root/lib/prosemirror/applyStepsToNode';
+import { emptyDocument } from '@root/lib/prosemirror/constants';
+import { convertAndSavePage } from '@root/lib/prosemirror/conversions/convertOldListNodes';
+import { extractMentions } from '@root/lib/prosemirror/extractMentions';
+import { extractPreviewImage } from '@root/lib/prosemirror/extractPreviewImage';
+import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import { isUUID } from '@root/lib/utils/strings';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishDocumentEvent } from '@root/lib/webhookPublisher/publishEvent';
 import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
-
-import { STATIC_PAGES } from 'lib/features/constants';
-import { trashPages } from 'lib/pages/trashPages';
-import { permissionsApiClient } from 'lib/permissions/api/client';
-import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isUUID } from 'lib/utilities/strings';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
 import type { AuthenticatedSocketData } from '../authentication';
 import type { AbstractWebsocketBroadcaster } from '../interfaces';
@@ -443,18 +442,20 @@ export class DocumentEventHandler {
 
         // Go through the diffs and see if any of them are for deleting a page.
         try {
-          // If its 2 then its drag and drop within the editor
           const ds = message.ds[0];
-          if (message.ds.length === 1 && ds.stepType === 'replace') {
-            // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
-            // We don't need to restore the page if it was created by the user manually
-            if (ds.slice?.content && ds.from === ds.to && socketEvent !== 'page_created') {
-              ds.slice.content.forEach((node) => {
-                if (isValidPageNode(node)) {
-                  restoredPageIds.push(node.attrs.id);
-                }
-              });
-            } else if (ds.from + 1 === ds.to) {
+
+          if (message.undo && socketEvent !== 'page_created') {
+            message.ds.forEach((_ds) => {
+              if (_ds.stepType === 'replace' && _ds.slice?.content) {
+                _ds.slice.content.forEach((node) => {
+                  if (isValidPageNode(node)) {
+                    restoredPageIds.push(node.attrs.id);
+                  }
+                });
+              }
+            });
+          } else if (message.ds.length === 1 && ds.stepType === 'replace') {
+            if (ds.from + 1 === ds.to) {
               // deleted using row action menu
               const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
               if (isValidPageNode(node)) {
@@ -778,10 +779,14 @@ export class DocumentEventHandler {
     // check if content is empty only if it got changed
     const hasContent = contentText.length > 0;
     const galleryImage =
-      room.doc.type === 'card' || room.doc.type === 'card_synced' ? extractPreviewImage(room.doc.content) : null;
+      room.doc.type === 'card' || room.doc.type === 'card_synced' || room.doc.type === 'bounty'
+        ? extractPreviewImage(room.doc.content)
+        : null;
 
-    const res = await prisma.page.update({
-      where: { id: room.doc.id },
+    await prisma.page.updateMany({
+      where: {
+        OR: [{ id: room.doc.id }, { syncWithPageId: room.doc.id }]
+      },
       data: {
         content: room.doc.content,
         contentText,
@@ -790,9 +795,6 @@ export class DocumentEventHandler {
         version: room.doc.version,
         updatedAt: new Date(),
         updatedBy: userId
-      },
-      select: {
-        spaceId: true
       }
     });
 
@@ -804,9 +806,9 @@ export class DocumentEventHandler {
       this.relay.broadcast(
         {
           type: 'pages_meta_updated',
-          payload: [{ galleryImage, hasContent, spaceId: res.spaceId, id: room.doc.id }]
+          payload: [{ galleryImage, hasContent, spaceId: room.doc.spaceId, id: room.doc.id }]
         },
-        res.spaceId
+        room.doc.spaceId
       );
     }
   }

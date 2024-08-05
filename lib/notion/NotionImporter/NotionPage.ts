@@ -6,15 +6,14 @@ import type {
   ListBlockChildrenParameters,
   PageObjectResponse
 } from '@notionhq/client/build/src/api-endpoints';
+import type { IPropertyTemplate } from '@root/lib/databases/board';
+import { isTruthy } from '@root/lib/utils/types';
+import { relay } from '@root/lib/websockets/relay';
 import promiseRetry from 'promise-retry';
 import { v4 } from 'uuid';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { isTruthy } from 'lib/utilities/types';
-import { relay } from 'lib/websockets/relay';
-
 import { convertPropertyType } from '../convertPropertyType';
-import type { BlocksRecord, ChildBlockListResponse } from '../types';
+import type { BlocksRecord, ChildBlockListResponse } from '../interfaces';
 
 import { CharmverseDatabasePage } from './CharmverseDatabasePage';
 import { CharmversePage } from './CharmversePage';
@@ -105,7 +104,6 @@ export class NotionPage {
         const pageRecord = this.cache.pagesRecord.get(notionPageId) as DatabasePageItem;
 
         const { pageIds } = pageRecord?.notionPage ?? (await this.fetchNotionDatabaseChildPages({ notionPageId }));
-
         if (pageRecord?.charmversePage) {
           return pageRecord.charmversePage;
         }
@@ -116,7 +114,6 @@ export class NotionPage {
           cache: this.cache,
           notionPage: this
         });
-
         const databasePage = await charmverseDatabasePage.create();
 
         relay.broadcast(
@@ -134,7 +131,10 @@ export class NotionPage {
         this.cache.pagesWithoutIntegrationAccess.add(notionPageId);
       }
       if (notionPage) {
-        log.debug(`[notion] Failed to fetch and create notion page ${notionPage.id}`);
+        log.warn(`[notion] Failed to fetch and create notion page ${notionPage.id}`, {
+          error: err,
+          userId: this.userId
+        });
       }
       return null;
     }
@@ -300,7 +300,14 @@ export class NotionPage {
               },
               client,
               cache
-            )
+            ).catch((err) => {
+              log.warn('[notion] Error retrieving child blocks', {
+                error: err,
+                blockId: parentBlockId,
+                spaceId: this.spaceId,
+                userId: this.userId
+              });
+            })
           )
         )
       ).filter(isTruthy);
@@ -354,7 +361,7 @@ export class NotionPage {
         page_id: notionPageId
       })) as unknown as PageObjectResponse;
       this.cache.notionPagesRecord[notionPageId] = pageResponse;
-      log.debug(`[notion]: Retrieved page ${notionPageId} manually`);
+      log.debug(`[notion] Retrieved page ${notionPageId} manually`, { userId: this.userId });
     }
 
     return this.cache.notionPagesRecord[notionPageId];

@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/prisma-client';
+import type { Space } from '@charmverse/core/prisma';
 import { v4 as uuid } from 'uuid';
 
 import { STATIC_PAGES } from 'lib/features/constants';

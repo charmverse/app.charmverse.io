@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { VoteNotification } from 'lib/notifications/interfaces';
+import type { VoteNotification } from '@root/lib/notifications/interfaces';
 
 import { aggregateVoteResult } from '../../votes/aggregateVoteResult';
 import { calculateVoteStatus } from '../../votes/calculateVoteStatus';
@@ -9,7 +8,36 @@ import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
 export async function getPollNotifications({ id, userId }: QueryCondition): Promise<VoteNotification[]> {
   const voteNotifications = await prisma.voteNotification.findMany({
-    where: queryCondition({ id, userId }),
+    where: {
+      ...queryCondition({ id, userId }),
+      vote: {
+        space: {
+          spaceRoles: {
+            some: {
+              userId
+            }
+          }
+        },
+        OR: [
+          {
+            NOT: {
+              page: null
+            },
+            page: {
+              deletedAt: null
+            }
+          },
+          {
+            NOT: {
+              post: null
+            },
+            post: {
+              deletedAt: null
+            }
+          }
+        ]
+      }
+    },
     orderBy: {
       vote: {
         deadline: 'desc'
@@ -19,13 +47,12 @@ export async function getPollNotifications({ id, userId }: QueryCondition): Prom
       id: true,
       type: true,
       vote: {
-        select: {
-          id: true,
-          deadline: true,
-          type: true,
-          status: true,
-          threshold: true,
-          title: true,
+        include: {
+          space: {
+            select: {
+              spaceRoles: true
+            }
+          },
           page: {
             select: {
               id: true,
@@ -43,7 +70,8 @@ export async function getPollNotifications({ id, userId }: QueryCondition): Prom
           userVotes: {
             select: {
               choices: true,
-              userId: true
+              userId: true,
+              tokenAmount: true
             }
           },
           voteOptions: {

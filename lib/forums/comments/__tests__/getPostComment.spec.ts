@@ -1,3 +1,4 @@
+import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -27,7 +28,7 @@ describe('getPostComment', () => {
             id: user.id
           }
         },
-        content: {},
+        content: Prisma.JsonNull,
         contentText: 'comment'
       }
     });

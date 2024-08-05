@@ -6,7 +6,7 @@ import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { getSummonRoleLabel } from 'lib/summon/getSummonRoleLabel';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpace } from 'testing/setupDatabase';
@@ -50,14 +50,14 @@ describe('POST /api/v1/spaces/{spaceId}/members', () => {
 
   it('should respond 200 with user profile and create user if no charmverse user with the provided email or wallet address exist', async () => {
     const wallet = randomETHWalletAddress().toLowerCase();
-    const xpsEngineId = v4();
+    const xpsUserId = v4();
     const tenantId = v4();
     const { listen, router } = createServer();
 
-    router.get('/scan/inventory/:xpsEngineId', (ctx) => {
+    router.get('/v1/xps/scan/inventory/:xpsUserId', (ctx) => {
       ctx.body = {
         data: {
-          user: xpsEngineId,
+          user: xpsUserId,
           tenantId,
           meta: {
             rank: 1
@@ -70,10 +70,10 @@ describe('POST /api/v1/spaces/{spaceId}/members', () => {
 
     const response = await request(baseUrl)
       .post(`/api/v1/spaces/${space.id}/members`)
-      .query({ summonApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
+      .query({ summonTestUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
       .set('Authorization', superApiKey.token)
       .send({
-        summonUserId: xpsEngineId,
+        summonUserId: xpsUserId,
         wallet
       });
 
@@ -105,6 +105,7 @@ describe('POST /api/v1/spaces/{spaceId}/members', () => {
       wallet
     });
     expect(spaceRole).toBeTruthy();
+    expect(spaceRole.xpsUserId).toBe(xpsUserId);
     expect(spaceRoleToRole).toBeTruthy();
 
     // Cleanup.

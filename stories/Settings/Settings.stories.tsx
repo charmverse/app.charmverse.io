@@ -1,10 +1,14 @@
+import { development, LensProvider } from '@lens-protocol/react-web';
+import { bindings as wagmiBindings } from '@lens-protocol/wagmi';
 import { Box, Paper } from '@mui/material';
-import { rest } from 'msw';
+import { wagmiConfig } from '@root/connectors/config';
+import { http, HttpResponse } from 'msw';
 import { useState } from 'react';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { SettingsContent } from 'components/settings/SettingsContent';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
+import { VerifyLoginOtpProvider } from 'hooks/useVerifyLoginOtp';
 
 import { spaces as _spaces } from '../lib/mockData';
 
@@ -22,21 +26,30 @@ function ShowSettingsProfile({ path }: { path: SettingsPath }) {
   function setUnsavedChanges() {}
   return (
     <GlobalContext currentSpace={space}>
-      <Box maxWidth='lg'>
-        <Paper
-          sx={{
-            maxHeight: 800,
-            height: { md: '90vh' }
-          }}
-        >
-          <SettingsContent
-            activePath={activePath}
-            onSelectPath={setActivePath}
-            onClose={onClose}
-            setUnsavedChanges={setUnsavedChanges}
-          />
-        </Paper>
-      </Box>
+      <LensProvider
+        config={{
+          bindings: wagmiBindings(wagmiConfig),
+          environment: development
+        }}
+      >
+        <VerifyLoginOtpProvider>
+          <Box maxWidth='lg'>
+            <Paper
+              sx={{
+                maxHeight: 800,
+                height: { md: '90vh' }
+              }}
+            >
+              <SettingsContent
+                activePath={activePath}
+                onSelectPath={setActivePath}
+                onClose={onClose}
+                setUnsavedChanges={setUnsavedChanges}
+              />
+            </Paper>
+          </Box>
+        </VerifyLoginOtpProvider>
+      </LensProvider>
     </GlobalContext>
   );
 }
@@ -77,6 +90,10 @@ export function proposals() {
   return <ShowSettingsProfile path='proposals' />;
 }
 
+export function integrations() {
+  return <ShowSettingsProfile path='integrations' />;
+}
+
 export default {
   title: 'Settings/Views',
   component: SettingsContent
@@ -85,8 +102,8 @@ export default {
 API.parameters = {
   msw: {
     handlers: {
-      spaces: rest.get(`/api/spaces`, (req, res, ctx) => {
-        return res(ctx.json(spaces));
+      spaces: http.get(`/api/spaces`, () => {
+        return HttpResponse.json(spaces);
       })
     }
   }
@@ -95,17 +112,17 @@ API.parameters = {
 MyAccount.parameters = {
   msw: {
     handlers: {
-      otpCreate: rest.post(`/api/profile/otp`, (_req, res, ctx) => {
-        return res(ctx.json({ code: '12345678', uri: 'tot//', recoveryCode: '1233546546' }));
+      otpCreate: http.post(`/api/profile/otp`, () => {
+        return HttpResponse.json({ code: '12345678', uri: 'tot//', recoveryCode: '1233546546' });
       }),
-      otpGet: rest.get(`/api/profile/otp`, (_req, res, ctx) => {
-        return res(ctx.json({ code: '12345678', uri: 'tot//' }));
+      otpGet: http.get(`/api/profile/otp`, () => {
+        return HttpResponse.json({ code: '12345678', uri: 'tot//' });
       }),
-      otpActivate: rest.put(`/api/profile/otp/activate`, (_req, res, ctx) => {
-        return res(ctx.json({}));
+      otpActivate: http.put(`/api/profile/otp/activate`, () => {
+        return HttpResponse.json({});
       }),
-      otpRecoveryCode: rest.put(`/api/profile/otp/recovery-code`, (_req, res, ctx) => {
-        return res(ctx.json({ code: '1233546546' }));
+      otpRecoveryCode: http.put(`/api/profile/otp/recovery-code`, () => {
+        return HttpResponse.json({ code: '1233546546' });
       })
     }
   }

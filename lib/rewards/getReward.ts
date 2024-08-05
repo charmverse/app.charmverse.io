@@ -1,7 +1,6 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from '@root/lib/utils/errors';
 
 import type { RewardWithUsers } from './interfaces';
 import { mapDbRewardToReward } from './mapDbRewardToReward';
@@ -23,6 +22,21 @@ export function rewardWithUsersInclude() {
         userId: true,
         roleId: true,
         permissionLevel: true
+      }
+    },
+    page: {
+      select: {
+        lensPostLink: true
+      }
+    },
+    proposal: {
+      select: {
+        page: {
+          select: {
+            id: true,
+            title: true
+          }
+        }
       }
     }
   };

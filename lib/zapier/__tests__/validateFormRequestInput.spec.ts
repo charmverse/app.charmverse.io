@@ -1,10 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { createDatabase } from '@root/lib/public-api/createDatabase';
+import { DatabasePageNotFoundError } from '@root/lib/public-api/errors';
+import { InvalidInputError } from '@root/lib/utils/errors';
+import { validateFormRequestInput } from '@root/lib/zapier/validateFormRequestInput';
 import { v4 } from 'uuid';
 
-import { createDatabase } from 'lib/public-api/createDatabase';
-import { DatabasePageNotFoundError } from 'lib/public-api/errors';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let user: User;

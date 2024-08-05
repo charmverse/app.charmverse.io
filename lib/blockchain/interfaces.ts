@@ -9,16 +9,6 @@ export interface ExtendedPoap {
   walletId: string | null;
 }
 
-/**
- * @param rawAddress - Account as detected, without any lowercasing
- */
-export interface AuthSig {
-  sig: `0x${string}`;
-  derivedVia: string;
-  signedMessage: string;
-  address: string;
-}
-
 export interface Collectable {
   title: string;
   date: string;

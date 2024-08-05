@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from '@root/lib/utils/types';
 
 export async function getRewardReviewerIds(bountyId: string): Promise<string[]> {
   const bounty = await prisma.bounty.findUniqueOrThrow({

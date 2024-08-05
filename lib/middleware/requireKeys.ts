@@ -1,9 +1,8 @@
 import { stringUtils } from '@charmverse/core/utilities';
+import type { ISystemError } from '@root/lib/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 import { isAddress } from 'viem';
-
-import type { ISystemError } from 'lib/utilities/errors';
 
 import { ApiError } from './errors';
 

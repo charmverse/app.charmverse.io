@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
-import { isTruthy } from 'lib/utilities/types';
+import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
@@ -21,11 +20,6 @@ const updateVoteStatus = async () => {
   });
 
   const { passedVotes, rejectedVotes } = getVotesByState(votesPassedDeadline);
-
-  const proposalPageIds = votesPassedDeadline
-    .filter((v) => v.context === 'proposal')
-    .map((v) => v.pageId)
-    .filter(isTruthy);
 
   const evaluationsToUpdate = await prisma.proposalEvaluation.findMany({
     where: {
@@ -101,7 +95,7 @@ const updateVoteStatus = async () => {
   ]);
 
   for (const passedEval of passedEvaluations) {
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId: passedEval.proposalId
     });

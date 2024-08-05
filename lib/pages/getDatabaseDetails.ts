@@ -1,8 +1,7 @@
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { DatabasePageNotFoundError } from 'lib/public-api';
-import { isUUID } from 'lib/utilities/strings';
+import { DatabasePageNotFoundError } from '@root/lib/public-api';
+import { isUUID } from '@root/lib/utils/strings';
 
 import { generatePageQuery } from './server/generatePageQuery';
 

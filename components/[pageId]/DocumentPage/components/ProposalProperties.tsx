@@ -1,13 +1,13 @@
 import { Box } from '@mui/material';
 
-import { useUpdateProposal } from 'charmClient/hooks/proposals';
-import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
+import { useUpdateProposal, useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -27,14 +27,12 @@ export function ProposalProperties({
 }: ProposalPropertiesProps) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { showError } = useSnackbar();
-  const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
+  const { data: sourceTemplate } = useGetProposalTemplate(proposal?.page?.sourceTemplateId);
 
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !proposal?.permissions.edit;
-  const readOnlySelectedCredentialTemplates =
-    readOnly || !proposal?.permissions.edit || (sourceTemplate?.selectedCredentialTemplates && !isAdmin);
 
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
@@ -50,6 +48,7 @@ export function ProposalProperties({
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
+    createdAt: proposalPage.createdAt.toString(),
     archived: proposal?.archived ?? false,
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
@@ -58,7 +57,7 @@ export function ProposalProperties({
     selectedCredentialTemplates: proposal?.selectedCredentialTemplates
   };
 
-  async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
+  async function onChangeProperties(values: Omit<UpdateProposalRequest, 'proposalId'>) {
     try {
       await updateProposal(values);
       refreshProposal();
@@ -88,7 +87,6 @@ export function ProposalProperties({
           readOnlyCustomProperties={readOnlyCustomProperties}
           readOnlyRewards={!proposal?.permissions.edit}
           rewardIds={proposal?.rewardIds}
-          readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
           isStructuredProposal={!!proposal?.formId}
           isProposalTemplate={proposalPage.type === 'proposal_template'}
         />

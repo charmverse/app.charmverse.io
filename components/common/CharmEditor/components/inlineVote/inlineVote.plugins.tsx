@@ -7,8 +7,9 @@ import type { RawPlugins } from 'components/common/CharmEditor/components/@bangl
 import { highlightMarkedElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineVoteRows } from 'lib/prosemirror/plugins/inlineVotes/findTotalInlineVotes';
 
-import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
-import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
+import { referenceElement } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 
 import RowDecoration from './components/InlineVoteRowDecoration';
 import { markName } from './inlineVote.constants';
@@ -75,7 +76,7 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
         }
       }
     }),
-    tooltipPlacement.plugins({
+    tooltipPlacementPlugins({
       stateKey: key,
       renderOpts: {
         placement: 'bottom',

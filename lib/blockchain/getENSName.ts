@@ -1,67 +1,58 @@
 import { log } from '@charmverse/core/log';
-import { providers, utils } from 'ethers';
+import { isTestEnv } from '@root/config/constants';
+import { getAddress } from 'viem';
+import { normalize } from 'viem/ens';
 
-import { isTestEnv } from 'config/constants';
+import { getPublicClient } from './publicClient';
 
-const providerKey = process.env.ALCHEMY_API_KEY;
-const providerUrl = `https://eth-mainnet.alchemyapi.io/v2/${providerKey}`;
-const provider = providerKey ? new providers.JsonRpcProvider(providerUrl) : null;
-
-export function getENSName(address: string) {
-  if (!provider) {
-    if (!isTestEnv) {
-      log.warn('No api key provided for Alchemy');
-    }
+export async function getENSName(_address: string) {
+  if (isTestEnv) {
     return null;
   }
+  const publicClient = getPublicClient(1);
+  const address = getAddress(_address);
 
-  return provider.lookupAddress(address).catch((error) => {
-    log.warn('Error looking up ENS name for address', { error });
-    return null;
-  });
+  return publicClient.getEnsName({ address });
 }
 
 export function resolveENSName(ensName: string) {
-  if (!provider) {
-    if (!isTestEnv) {
-      log.warn('No api key provided for Alchemy');
-    }
-    return null;
-  }
+  const publicClient = getPublicClient(1);
 
-  return provider.resolveName(ensName).catch((error) => {
-    log.warn('Error resolving ENS name', { error });
-    return null;
-  });
+  return publicClient.getEnsAddress({ name: normalize(ensName) });
 }
 
 export async function getENSDetails(ensName?: string | null) {
-  if (!ensName) {
+  if (!ensName || isTestEnv) {
     return null;
   }
 
-  if (!provider) {
-    if (!isTestEnv) {
-      log.warn('No api key provided for Alchemy');
-    }
-    return null;
-  }
+  const name = normalize(ensName);
 
-  if (!utils.isValidName(ensName)) {
-    log.warn(`The ens name ${ensName} you provided is not valid`);
-    return null;
-  }
+  const publicClient = getPublicClient(1);
 
   try {
-    const resolver = await provider.getResolver(ensName);
-    const avatar = await provider.getAvatar(ensName);
-    const [description, discord, github, twitter, reddit, linkedin, emails] = await Promise.all(
-      ['description', 'com.discord', 'com.github', 'com.twitter', 'com.reddit', 'com.linkedin', 'emails'].map((text) =>
-        resolver?.getText(text)
+    const [avatar, description, discord, github, twitter, reddit, linkedin, emails] = await Promise.all(
+      ['avatar', 'description', 'com.discord', 'com.github', 'com.twitter', 'com.reddit', 'com.linkedin', 'emails'].map(
+        async (key) => publicClient.getEnsText({ name, key })
       )
     );
 
-    return { avatar, description, discord, github, twitter, reddit, linkedin, emails };
+    const ensData = {
+      avatar,
+      description,
+      discord,
+      github,
+      twitter,
+      reddit,
+      linkedin,
+      emails
+    };
+
+    if (avatar?.startsWith('ipfs')) {
+      ensData.avatar = `https://metadata.ens.domains/mainnet/avatar/${name}`;
+    }
+
+    return ensData;
   } catch (error) {
     log.warn(`Error looking up ENS details for ens name ${ensName}`, { error });
     return null;

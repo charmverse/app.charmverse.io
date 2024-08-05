@@ -49,24 +49,10 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
   const forumPostInfo = usePostByPath();
   const isRewardsList = router.route === '/[domain]/rewards';
   const isProposalsPage = router.route === '/[domain]/proposals';
-  const isNewProposalPage = router.route === '/[domain]/proposals/new';
 
   return (
     <StyledToolbar variant='dense'>
-      <IconButton
-        color='inherit'
-        onClick={openSidebar}
-        edge='start'
-        sx={{
-          display: 'inline-flex',
-          mr: 2,
-          ...(open && { display: 'none' })
-        }}
-      >
-        <Badge badgeContent={unreadNotifications.length} color='error'>
-          <MenuIcon />
-        </Badge>
-      </IconButton>
+      <ToggleSidebarIcon open={open} openSidebar={openSidebar} badgeContent={unreadNotifications.length} />
 
       <Box
         sx={{
@@ -79,12 +65,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         }}
       >
         <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          <PageTitleWithBreadcrumbs
-            pageId={basePage?.id}
-            pageMeta={basePage}
-            pageType={basePage?.type}
-            post={forumPostInfo?.forumPost}
-          />
+          <PageTitleWithBreadcrumbs pageId={basePage?.id} pageMeta={basePage} pageType={basePage?.type} />
         </div>
 
         <Box display='flex' alignItems='center' alignSelf='stretch' mr={-1} gap={0.5}>
@@ -96,6 +77,33 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         </Box>
       </Box>
     </StyledToolbar>
+  );
+}
+
+export function ToggleSidebarIcon({
+  open,
+  openSidebar,
+  badgeContent
+}: {
+  open: boolean;
+  openSidebar: VoidFunction;
+  badgeContent?: number;
+}) {
+  return (
+    <IconButton
+      color='inherit'
+      onClick={openSidebar}
+      edge='start'
+      sx={{
+        display: 'inline-flex',
+        mr: 2,
+        ...(open && { display: 'none' })
+      }}
+    >
+      <Badge badgeContent={badgeContent} color='error'>
+        <MenuIcon />
+      </Badge>
+    </IconButton>
   );
 }
 

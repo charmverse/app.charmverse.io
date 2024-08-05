@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { verifyDiscordGateForSpace } from 'lib/discord/collabland/verifyDiscordGateForSpace';
-import type { CheckDiscordGateResult } from 'lib/discord/interface';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { verifyDiscordGateForSpace } from '@root/lib/discord/collabland/verifyDiscordGateForSpace';
+import type { CheckDiscordGateResult } from '@root/lib/discord/interface';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
 type Props = {
   spaceDomain: string;

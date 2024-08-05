@@ -1,6 +1,8 @@
-import type { Command, Node } from '@bangle.dev/pm';
-import { Fragment, TextSelection } from '@bangle.dev/pm';
 import { findParentNodeOfTypeClosestToPos } from '@bangle.dev/utils';
+import { Fragment } from 'prosemirror-model';
+import type { Node } from 'prosemirror-model';
+import { TextSelection } from 'prosemirror-state';
+import type { Command } from 'prosemirror-state';
 
 // Backspace Use case: When a user hits 'backspace' at the beginning of a summary node
 // Action: Remove the disclosure node

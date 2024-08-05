@@ -1,23 +1,19 @@
-import { prisma } from "@charmverse/core/prisma-client";
-import { stripeClient } from "lib/subscription/stripe";
-import { writeToSameFolder } from "lib/utilities/file";
-
-
+import { prisma } from '@charmverse/core/prisma-client';
+import { stripeClient } from 'lib/subscription/stripe';
+import { writeToSameFolder } from 'lib/utils/file';
 
 let processed = 0;
 let total = 0;
 
 // Request customer IDs from team
-const ignoredCustomerIds: string[] = []
+const ignoredCustomerIds: string[] = [];
 
-if (!ignoredCustomerIds.some(c => c.startsWith('cus'))) {
-  throw new Error('No customer IDs provided for ignore list')
+if (!ignoredCustomerIds.some((c) => c.startsWith('cus'))) {
+  throw new Error('No customer IDs provided for ignore list');
 }
-
 
 // Script 1 - Delete irrelevant subscriptions
 export async function cleanupStripe(cursor?: string): Promise<void> {
-
   let customers = await stripeClient.customers.list({
     created: {
       // March 4th
@@ -25,22 +21,21 @@ export async function cleanupStripe(cursor?: string): Promise<void> {
     },
     limit: 100,
     starting_after: cursor
-  })
+  });
 
   for (const cus of customers.data) {
-    if (typeof cus.id === 'string' && cus.id.startsWith('cus')  && !ignoredCustomerIds.includes(cus.id)) {
+    if (typeof cus.id === 'string' && cus.id.startsWith('cus') && !ignoredCustomerIds.includes(cus.id)) {
       processed += 1;
-      await stripeClient.customers.del(cus.id)
-      .catch(err => {
+      await stripeClient.customers.del(cus.id).catch((err) => {
         const issue = `Error deleting in STRIPE for ${cus.metadata.domain} // ${cus.metadata.spaceId} ${err}`;
-        writeToSameFolder({ fileName: 'stripelog.txt', data: issue, append: true})
-        console.log(issue)
-      })
+        writeToSameFolder({ fileName: 'stripelog.txt', data: issue, append: true });
+        console.log(issue);
+      });
       await prisma.stripeSubscription.deleteMany({
         where: {
-          customerId: cus.id          
+          customerId: cus.id
         }
-      })
+      });
     }
   }
 
@@ -51,14 +46,12 @@ export async function cleanupStripe(cursor?: string): Promise<void> {
   console.log('Total Processed', processed, 'Cursor:', newCursor, 'Position', total);
 
   if (customers.has_more) {
-    return cleanupStripe(newCursor)
+    return cleanupStripe(newCursor);
   }
 }
 
-
 // Script 2 - Migrate spaces
 async function migrateSpaces() {
-
   await prisma.space.updateMany({
     where: {
       paidTier: 'cancelled'
@@ -66,7 +59,7 @@ async function migrateSpaces() {
     data: {
       paidTier: 'community'
     }
-  })
+  });
 }
 
 // Script 3 - Migrate spaces
@@ -81,10 +74,10 @@ async function dropCancelled() {
           where: {
             id: sub.id
           }
-        })
+        });
       }
     } catch (err) {
-      console.log((err as any).code)
+      console.log((err as any).code);
     }
   }
 }

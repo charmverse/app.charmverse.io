@@ -1,23 +1,22 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import ERC721_ABI from 'abis/ERC721.json';
+import ERC721_ABI from '@root/abis/ERC721.json';
+import { GET } from '@root/adapters/http';
+import { getChainById } from '@root/connectors/chains';
+import type { NFTData } from '@root/lib/blockchain/getNFTs';
+import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { lowerCaseEqual } from '@root/lib/utils/strings';
 import { RateLimit } from 'async-sema';
-import { getChainById } from 'connectors/chains';
-import { ethers } from 'ethers';
 import { zkSync, zkSyncTestnet } from 'viem/chains';
 import { Provider } from 'zksync-web3';
-
-import { GET } from 'adapters/http';
-import type { NFTData } from 'lib/blockchain/getNFTs';
-import { lowerCaseEqual } from 'lib/utilities/strings';
 
 import { supportedNetworks, type SupportedChainId } from './config';
 
 const ZK_MAINNET_BLOCK_EXPLORER = 'https://block-explorer-api.mainnet.zksync.io';
 const ZK_TESTNET_BLOCK_EXPLORER = 'https://block-explorer-api.testnets.zksync.dev';
 type IpfsNft = {
-  name: string;
-  description: string;
-  image: string;
+  name?: string;
+  description?: string;
+  image?: string;
 };
 
 type BlockExplorerNft = { timeStamp: string; from: string; to: string; tokenID: string; contractAddress: string };
@@ -43,16 +42,10 @@ class ZkSyncApiClient {
     if (!supportedNetworks.includes(chainId)) {
       throw new Error(`Unsupported chain id: ${chainId}`);
     }
-    this.rpcUrl = (
-      chainId === zkSync.id ? getChainById(zkSync.id)?.rpcUrls[0] : getChainById(zkSyncTestnet.id)?.rpcUrls[0]
-    ) as string;
+    this.rpcUrl = getChainById(chainId)?.rpcUrls[0] as string;
     this.chainId = chainId;
     this.provider = new Provider(this.rpcUrl, chainId);
     this.blockExplorerUrl = chainId === zkSync.id ? ZK_MAINNET_BLOCK_EXPLORER : ZK_TESTNET_BLOCK_EXPLORER;
-  }
-
-  getNftContract(contractAddress: string) {
-    return new ethers.Contract(contractAddress, ERC721_ABI, this.provider);
   }
 
   async getNFTInfo({
@@ -64,11 +57,18 @@ class ZkSyncApiClient {
     tokenId: number | string;
     walletId?: string | null;
   }): Promise<NFTData> {
-    const result = await this.getNftContract(contractAddress).tokenURI(tokenId);
+    const client = getPublicClient(this.chainId);
+    const result = (await client.readContract({
+      abi: ERC721_ABI,
+      address: contractAddress as `0x${string}`,
+      functionName: 'tokenURI',
+      account: walletId as `0x${string}`,
+      args: [BigInt(tokenId || 1).toString()]
+    })) as string;
 
-    const resultSource = await result.replace('ipfs://', 'https://ipfs.io/ipfs/');
+    const resultSource = result.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
-    const data = await GET<IpfsNft>(resultSource);
+    const data = result ? await GET<IpfsNft>(resultSource).catch(() => ({})) : {};
 
     return mapNFTData(
       {
@@ -135,8 +135,7 @@ function mapNFTData(
   const tokenUriDNSVersion = token.image?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '';
   return {
     id: `${token.contractAddress}:${token.tokenId}`,
-    tokenId: String(token.tokenId),
-    tokenIdInt: Number(token.tokenId),
+    tokenId: BigInt(token.tokenId).toString(),
     contract: token.contractAddress,
     imageRaw: tokenUriDNSVersion,
     image: tokenUriDNSVersion,

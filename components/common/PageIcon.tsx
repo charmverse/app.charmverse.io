@@ -25,9 +25,9 @@ export const StyledDatabaseIcon = styled(DatabaseIcon)`
 `;
 
 export const StyledPageIcon = styled(EmojiIcon)`
-  height: 24px;
+  height: 22px;
   z-index: 0;
-  width: 24px;
+  width: 22px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
   &::before {
@@ -106,9 +106,9 @@ export function PageIcon({
       );
     } else if (pageType === 'board' || pageType === 'inline_board' || pageType === 'inline_linked_board') {
       iconComponent = <StyledDatabaseIcon />;
-    } else if (pageType === 'proposal' || pageType === 'proposals') {
+    } else if (pageType === 'proposal' || pageType === 'proposal_template' || pageType === 'proposals') {
       iconComponent = <ProposalIcon />;
-    } else if (pageType === 'rewards') {
+    } else if (pageType === 'rewards' || pageType === 'bounty') {
       iconComponent = <BountyIcon />;
     } else if (pageType === 'members') {
       iconComponent = <MembersIcon />;

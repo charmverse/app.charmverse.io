@@ -1,16 +1,15 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { prismaToUIBlock } from '@root/lib/databases/block';
+import { createPage } from '@root/lib/pages/server/createPage';
+import { getPagePath } from '@root/lib/pages/utils';
+import { emptyDocument } from '@root/lib/prosemirror/constants';
+import { getMarkdownText } from '@root/lib/prosemirror/getMarkdownText';
+import { parseMarkdown } from '@root/lib/prosemirror/markdown/parseMarkdown';
+import { InvalidInputError } from '@root/lib/utils/errors';
+import { relay } from '@root/lib/websockets/relay';
 import { v4 as uuid } from 'uuid';
-
-import { prismaToBlock } from 'lib/focalboard/block';
-import { createPage } from 'lib/pages/server/createPage';
-import { getPagePath } from 'lib/pages/utils';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
-import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { relay } from 'lib/websockets/relay';
 
 import { getDatabaseWithSchema } from './getDatabaseWithSchema';
 import { handleMappedPropertyEdgeCases } from './handleMappedPropertyEdgeCases';
@@ -118,7 +117,11 @@ export async function createDatabaseCardPage({
         path: getPagePath(),
         type: 'card',
         title: pageTitle,
-        parentId: databaseWithSchema.id,
+        parent: {
+          connect: {
+            id: databaseWithSchema.id
+          }
+        },
         id: cardBlock.id,
         space: {
           connect: {
@@ -135,17 +138,9 @@ export async function createDatabaseCardPage({
   relay.broadcast(
     {
       type: 'blocks_created',
-      payload: [prismaToBlock(createdCard.cardBlock)]
+      payload: [prismaToUIBlock(createdCard.cardBlock, createdCard.page)]
     },
     createdCard.cardBlock.spaceId
-  );
-
-  relay.broadcast(
-    {
-      type: 'pages_created',
-      payload: [createdCard.page]
-    },
-    createdCard.page.spaceId
   );
 
   const card = new PageFromBlock(

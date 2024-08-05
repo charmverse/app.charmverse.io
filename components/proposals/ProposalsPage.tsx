@@ -1,14 +1,22 @@
+import styled from '@emotion/styled';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { debounce } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
-import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
-import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
-import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
-import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import { ToggleViewSidebarButton } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ToggleViewSidebarButton';
-import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
+import { Button } from 'components/common/Button';
+import CharmEditor from 'components/common/CharmEditor/CharmEditor';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/specRegistry';
+import Table from 'components/common/DatabaseEditor/components/table/table';
+import { ViewFilterControl } from 'components/common/DatabaseEditor/components/ViewFilterControl';
+import { ToggleViewSidebarButton } from 'components/common/DatabaseEditor/components/viewHeader/ToggleViewSidebarButton';
+import { ViewSettingsRow } from 'components/common/DatabaseEditor/components/ViewSettingsRow';
+import ViewSidebar from 'components/common/DatabaseEditor/components/viewSidebar/viewSidebar';
+import { ViewSortControl } from 'components/common/DatabaseEditor/components/ViewSortControl';
+import mutator from 'components/common/DatabaseEditor/mutator';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -24,11 +32,24 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { createBoard } from 'lib/databases/board';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { NewProposalButton } from './components/NewProposalButton';
 import { useProposalsBoardMutator } from './components/ProposalsBoard/hooks/useProposalsBoardMutator';
 import { ProposalsHeaderRowsMenu } from './components/ProposalsHeaderRowsMenu';
 import { useProposalsBoard } from './hooks/useProposalsBoard';
+
+const StyledButton = styled(Button)`
+  position: absolute;
+  top: -30px;
+  opacity: 0;
+  transition: opacity 0.25s;
+  &:hover {
+    opacity: 1;
+    transition: opacity 0.25s;
+  }
+`;
 
 export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
@@ -40,12 +61,43 @@ export function ProposalsPage({ title }: { title: string }) {
   const isAdmin = useIsAdmin();
   const { showError } = useSnackbar();
   const { user } = useUser();
-  const { board: activeBoard, views, cardPages, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
+  const { board: activeBoard, views, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
   const [showSidebar, setShowSidebar] = useState(false);
-  const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
+  const onShowDescription = useCallback(() => {
+    const oldBlocks = [activeBoard];
+    const newBoard = createBoard({
+      block: activeBoard
+    });
+    newBoard.fields.showDescription = true;
+    mutator.updateBlocks([newBoard], oldBlocks, 'Show description');
+  }, [activeBoard]);
+
+  const onHideDescription = useCallback(() => {
+    const oldBlocks = [activeBoard];
+    const newBoard = createBoard({
+      block: activeBoard
+    });
+    newBoard.fields.showDescription = false;
+    mutator.updateBlocks([newBoard], oldBlocks, 'Hide description');
+  }, [activeBoard]);
+
+  const onDescriptionChange = useMemo(
+    () =>
+      debounce((content: PageContent) => {
+        const oldBlocks = [activeBoard];
+        const newBoard = createBoard({
+          block: activeBoard
+        });
+        newBoard.fields.description = content;
+        mutator.updateBlocks([newBoard], oldBlocks, 'Change description');
+      }, 250),
+    [activeBoard]
+  );
+
   const { trigger: trashPages } = useTrashPages();
+
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
@@ -91,12 +143,50 @@ export function ProposalsPage({ title }: { title: string }) {
     <DatabaseContainer>
       <DatabaseStickyHeader>
         <DatabaseTitle>
+          <Box position='relative'>
+            {isAdmin && (
+              <StyledButton
+                variant='text'
+                color='secondary'
+                size='small'
+                onClick={() => {
+                  if (activeBoard.fields.showDescription) {
+                    onHideDescription();
+                  } else {
+                    onShowDescription();
+                  }
+                }}
+              >
+                {activeBoard.fields.showDescription ? (
+                  <>
+                    <VisibilityOffOutlinedIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 0.5
+                      }}
+                    />
+                    <FormattedMessage id='ViewTitle.hide-description' defaultMessage='Hide description' />
+                  </>
+                ) : (
+                  <>
+                    <VisibilityOutlinedIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 0.5
+                      }}
+                    />
+                    <FormattedMessage id='ViewTitle.show-description' defaultMessage='Show description' />
+                  </>
+                )}
+              </StyledButton>
+            )}
+          </Box>
           <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
             <Typography variant='h1' gutterBottom>
               {title}
             </Typography>
 
-            <Box display='flex'>
+            <Box display='flex' justifyContent='space-between'>
               <Box
                 gap={3}
                 sx={{
@@ -110,7 +200,27 @@ export function ProposalsPage({ title }: { title: string }) {
               </Box>
             </Box>
           </Box>
+
+          {activeBoard.fields.showDescription && (
+            <div className='description'>
+              <CharmEditor
+                disablePageSpecificFeatures
+                isContentControlled
+                content={activeBoard.fields.description}
+                onContentChange={(content: ICharmEditorOutput) => {
+                  onDescriptionChange(content.doc);
+                }}
+                style={{
+                  marginLeft: 35
+                }}
+                disableRowHandles
+                disableNestedPages
+                readOnly={!isAdmin}
+              />
+            </div>
+          )}
         </DatabaseTitle>
+
         <Stack gap={0.75}>
           <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
             {showViewHeaderRowsMenu && (
@@ -120,21 +230,14 @@ export function ProposalsPage({ title }: { title: string }) {
                 cards={cards}
                 checkedIds={checkedIds}
                 setCheckedIds={setCheckedIds}
-                onChange={() => {
-                  refreshProposals();
-                }}
+                onChange={refreshProposals}
                 refreshProposals={refreshProposals}
               />
             )}
             <div className='octo-spacer' />
             <Box className='view-actions'>
               <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
-              <ViewSortControl
-                activeBoard={activeBoard}
-                activeView={activeView}
-                cards={cards}
-                viewSortPopup={viewSortPopup}
-              />
+              <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
               {user && (
                 <ToggleViewSidebarButton
                   onClick={(e) => {
@@ -157,16 +260,17 @@ export function ProposalsPage({ title }: { title: string }) {
       ) : (
         <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
           <Stack>
-            {cardPages.length > 0 ? (
+            {cards.length > 0 ? (
               <Box width='100%'>
                 <Table
+                  boardType='proposals'
                   setSelectedPropertyId={(_setSelectedPropertyId) => {
                     setSelectedPropertyId(_setSelectedPropertyId);
                     setShowSidebar(true);
                   }}
                   board={activeBoard}
                   activeView={activeView}
-                  cardPages={cardPages}
+                  cards={cards}
                   groupByProperty={groupByProperty}
                   views={views}
                   visibleGroups={[]}
@@ -186,7 +290,7 @@ export function ProposalsPage({ title }: { title: string }) {
             ) : (
               <Box sx={{ mt: 3 }}>
                 <EmptyStateVideo
-                  description='Getting started with proposals'
+                  description='Getting started'
                   videoTitle='Proposals | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />

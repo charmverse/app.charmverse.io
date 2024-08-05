@@ -1,15 +1,19 @@
-import { ProposalOperation, ProposalSystemRole, ProposalEvaluationType } from '@charmverse/core/prisma';
+import { ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import PersonIcon from '@mui/icons-material/Person';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
+import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
 import { capitalize } from 'lodash';
+import { p } from 'prosemirror-test-builder';
 
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
+import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import {
   UserAndRoleSelect,
   type SelectOption,
   type SystemRoleOptionPopulated
-} from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { MembersIcon, ProposalIcon } from 'components/common/PageIcon';
+} from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { MembersIcon } from 'components/common/PageIcon';
+import type { ConcealableEvaluationType } from 'lib/proposals/interfaces';
 
 import { evaluationIcons } from '../constants';
 
@@ -39,26 +43,53 @@ export const allMembersSystemRole = {
   label: 'All members'
 } as const;
 
+export const tokenHoldersSystemRole = {
+  ...allMembersSystemRole,
+  label: 'Token holders'
+} as const;
+
 export const authorSystemRole = {
   group: 'system_role',
   icon: (
     <Tooltip title='Author'>
-      <ProposalIcon color='secondary' fontSize='small' />
+      <PersonIcon color='secondary' fontSize='small' />
     </Tooltip>
   ),
   id: ProposalSystemRole.author,
   label: 'Author'
 } as const;
 
-const currentReviewerSystemRole = {
+export const currentReviewerSystemRole = {
   group: 'system_role',
   icon: (
     <Tooltip title='Reviewers selected for this evaluation'>
-      <ProposalIcon color='secondary' fontSize='small' />
+      <PersonIcon color='secondary' fontSize='small' />
     </Tooltip>
   ),
   id: ProposalSystemRole.current_reviewer,
   label: 'Reviewers (Current Step)'
+} as const;
+
+export const approverSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Approvers selected for this evaluation'>
+      <PersonIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: 'approver',
+  label: 'Approvers (Current Step)'
+} as const;
+
+export const publicSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Approvers selected for this evaluation'>
+      <PersonIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: 'public',
+  label: 'Public'
 } as const;
 
 // a copy of current reviewer, with a different label for vote
@@ -67,40 +98,50 @@ const currentVoterSystemRole = {
   label: 'Voters (Current Step)'
 };
 
+export const allReviewersSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Reviewers of any step in this workflow'>
+      <PersonIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: ProposalSystemRole.all_reviewers,
+  label: 'All Reviewers'
+} as SystemRoleOptionPopulated<ProposalSystemRole>;
+
 export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
   authorSystemRole,
   currentReviewerSystemRole,
-  {
-    group: 'system_role',
-    icon: (
-      <Tooltip title='Reviewers of any step in this workflow'>
-        <ProposalIcon color='secondary' fontSize='small' />
-      </Tooltip>
-    ),
-    id: ProposalSystemRole.all_reviewers,
-    label: 'All Reviewers'
-  },
+  allReviewersSystemRole,
   allMembersSystemRole
+];
+
+export const extraEvaluationRolesWithPublic: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
+  ...extraEvaluationRoles,
+  publicSystemRole
 ];
 
 const permissionOperationPlaceholders = {
   [ProposalOperation.view]: 'Only admins can view the proposal',
   [ProposalOperation.comment]: 'No one can comment',
   [ProposalOperation.edit]: 'Only admins can edit the proposal',
-  [ProposalOperation.move]: 'Only admins can change the current step'
+  [ProposalOperation.move]: 'Only admins can change the current step',
+  [ProposalOperation.complete_evaluation]: 'Approvers can mark this step complete'
 };
 
 export function EvaluationPermissionsRow({
   evaluation,
   onDelete,
   onDuplicate,
-  onRename,
+  onEdit,
   onChange,
-  readOnly
+  readOnly,
+  isFirstEvaluation
 }: {
   evaluation: WorkflowEvaluationJson;
   onChange: (evaluation: WorkflowEvaluationJson) => void;
   readOnly: boolean;
+  isFirstEvaluation: boolean;
 } & ContextMenuProps) {
   return (
     <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
@@ -114,13 +155,24 @@ export function EvaluationPermissionsRow({
             evaluation={evaluation}
             onDelete={onDelete}
             onDuplicate={onDuplicate}
-            onRename={onRename}
+            onEdit={onEdit}
             readOnly={readOnly}
           />
         </Box>
 
         <Stack flex={1} className='CardDetail content'>
-          <EvaluationPermissions evaluation={evaluation} onChange={onChange} readOnly={readOnly} />
+          {(evaluation.type as ConcealableEvaluationType) === 'private_evaluation' ? (
+            <Typography variant='body2' color='text.secondary'>
+              This evaluation is private and only visible to reviewers
+            </Typography>
+          ) : (
+            <EvaluationPermissions
+              isFirstEvaluation={isFirstEvaluation}
+              evaluation={evaluation}
+              onChange={onChange}
+              readOnly={readOnly}
+            />
+          )}
         </Stack>
       </Box>
     </Card>
@@ -129,10 +181,12 @@ export function EvaluationPermissionsRow({
 
 export function EvaluationPermissions<T extends EvaluationTemplateFormItem | WorkflowEvaluationJson>({
   evaluation,
+  isFirstEvaluation,
   onChange,
   readOnly
 }: {
   evaluation: T;
+  isFirstEvaluation: boolean; // use a default Move permission for the first evaluation in a workflow
   onChange: (evaluation: T) => void;
   readOnly?: boolean;
 }) {
@@ -170,28 +224,44 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
       {proposalOperations.map((operation) => (
         <Box key={operation} className='octo-propertyrow'>
           <PropertyLabel readOnly>{operation === 'move' ? 'Move Backward' : capitalize(operation)}</PropertyLabel>
-          <UserAndRoleSelect
-            readOnly={readOnly}
-            variant='outlined'
-            wrapColumn
-            // required values cannot be removed
-            isRequiredValue={(option) => {
-              if (operation === 'view') {
-                return option.id === ProposalSystemRole.author || option.id === ProposalSystemRole.current_reviewer;
-              }
-              return false;
-            }}
-            value={valuesByOperation[operation] || []}
-            systemRoles={extraEvaluationRoles}
-            inputPlaceholder={permissionOperationPlaceholders[operation]}
-            onChange={async (options) => updatePermissionOperation(operation, options)}
-          />
+          {isFirstEvaluation && operation === 'move' ? (
+            <Tooltip title='Only authors can move back to Draft'>
+              <span>
+                <UserAndRoleSelect
+                  readOnly
+                  wrapColumn
+                  value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
+                  systemRoles={[authorSystemRole]}
+                  onChange={() => {}}
+                />
+              </span>
+            </Tooltip>
+          ) : (
+            <UserAndRoleSelect
+              readOnly={readOnly}
+              variant='outlined'
+              wrapColumn
+              // required values cannot be removed
+              isRequiredValue={(option) => {
+                if (operation === 'view') {
+                  return option.id === ProposalSystemRole.author || option.id === ProposalSystemRole.current_reviewer;
+                }
+                return false;
+              }}
+              value={valuesByOperation[operation] || []}
+              systemRoles={operation === 'view' ? extraEvaluationRolesWithPublic : extraEvaluationRoles}
+              inputPlaceholder={permissionOperationPlaceholders[operation]}
+              onChange={async (options) => updatePermissionOperation(operation, options)}
+            />
+          )}
         </Box>
       ))}
 
       {/* show evaluation action which is uneditable */}
       <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
-        <PropertyLabel readOnly>Move Forward</PropertyLabel>
+        <PropertyLabel readOnly>
+          {evaluation.type === 'sign_documents' ? 'Prepare Documents' : 'Evaluate'}
+        </PropertyLabel>
         <UserAndRoleSelect
           readOnly
           wrapColumn
@@ -200,6 +270,20 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
           onChange={() => {}}
         />
       </Box>
+
+      {/* show evaluation action which is uneditable */}
+      {approvableEvaluationTypes.includes(evaluation.type as any) && (
+        <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
+          <PropertyLabel readOnly>Complete Step</PropertyLabel>
+          <UserAndRoleSelect
+            readOnly
+            wrapColumn
+            value={[{ group: 'system_role', id: 'approver' }]}
+            systemRoles={[approverSystemRole]}
+            onChange={() => {}}
+          />
+        </Box>
+      )}
     </>
   );
 }

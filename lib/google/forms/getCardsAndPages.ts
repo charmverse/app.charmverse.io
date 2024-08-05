@@ -1,14 +1,12 @@
 import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { PagePermission, Prisma } from '@charmverse/core/prisma';
 import type * as googlForms from '@googleapis/forms';
-import { v4 as uuid } from 'uuid';
-
-import { blockToPrisma } from 'lib/focalboard/block';
-import type { PrismaBlockSortOf } from 'lib/focalboard/block';
-import type { IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
-import { createCard } from 'lib/focalboard/card';
-import { getPagePath } from 'lib/pages';
-import { isTruthy } from 'lib/utilities/types';
+import { blockToPrisma } from '@root/lib/databases/block';
+import type { PrismaBlockSortOf } from '@root/lib/databases/block';
+import type { IPropertyOption, IPropertyTemplate } from '@root/lib/databases/board';
+import { createCard } from '@root/lib/databases/card';
+import { getPagePath } from '@root/lib/pages';
+import { isTruthy } from '@root/lib/utils/types';
 
 type GoogleForm = googlForms.forms_v1.Schema$Form;
 type GoogleFormResponse = googlForms.forms_v1.Schema$FormResponse;
@@ -101,7 +99,11 @@ export function getCardsAndPages(data: GoogleFormInput): CharmVerseModelOutput {
       title: `Response`,
       type: 'card_synced',
       contentText: '',
-      parentId: rootId, // important to inherit permissions
+      parent: {
+        connect: {
+          id: rootId // important to inherit permissions
+        }
+      },
       path: getPagePath(),
       updatedAt: prismaBlock.updatedAt,
       permissions: {

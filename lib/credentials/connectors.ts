@@ -1,13 +1,19 @@
-import { EAS } from '@ethereum-attestation-service/eas-sdk';
-import { arbitrum, base, optimism } from 'viem/chains';
+import { EAS, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
+import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
+import { NULL_ADDRESS } from './constants';
 import type { ExternalCredentialChain } from './external/schemas';
 
-export const easSchemaChains = [optimism.id] as const;
+export const easSchemaMainnetChains = [optimism, arbitrum] as const;
+export const easSchemaTestnetChains = [sepolia, optimismSepolia] as const;
 
-export const defaultCredentialChain = easSchemaChains[0];
+export type EasSchemaChain =
+  | (typeof easSchemaMainnetChains)[number]['id']
+  | (typeof easSchemaTestnetChains)[number]['id'];
 
-export type EasSchemaChain = (typeof easSchemaChains)[number];
+export const easSchemaChains = [...easSchemaMainnetChains, ...easSchemaTestnetChains].map(
+  (c) => c.id
+) as EasSchemaChain[];
 
 type EASConnector = {
   attestationContract: string;
@@ -31,6 +37,16 @@ export const easConnectors: Record<EasSchemaChain | ExternalCredentialChain, EAS
     attestationContract: '0x4200000000000000000000000000000000000021',
     schemaRegistryContract: '0x4200000000000000000000000000000000000020',
     attestationExplorerUrl: 'https://base.easscan.org'
+  },
+  [sepolia.id]: {
+    attestationContract: '0xC2679fBD37d54388Ce493F1DB75320D236e1815e',
+    schemaRegistryContract: '0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0',
+    attestationExplorerUrl: 'https://sepolia.easscan.org'
+  },
+  [optimismSepolia.id]: {
+    attestationContract: '0x4200000000000000000000000000000000000021',
+    schemaRegistryContract: '0x4200000000000000000000000000000000000020',
+    attestationExplorerUrl: 'https://optimism-sepolia.easscan.org'
   }
 };
 
@@ -46,12 +62,14 @@ export function getOnChainAttestationUrl({
 
 export function getOnChainSchemaUrl({
   chainId,
-  schemaId
+  schema
 }: {
   chainId: EasSchemaChain | ExternalCredentialChain;
-  schemaId: string;
+  schema: string;
 }) {
-  return `${easConnectors[chainId].attestationExplorerUrl}/schema/view/${schemaId}`;
+  return `${easConnectors[chainId].attestationExplorerUrl}/schema/view/${
+    schema.startsWith('0x') ? schema : getSchemaUID(schema, NULL_ADDRESS, true)
+  }`;
 }
 
 export function getEasConnector(chainId: EasSchemaChain) {

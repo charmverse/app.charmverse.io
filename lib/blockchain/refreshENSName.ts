@@ -1,9 +1,9 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getUserProfile } from 'lib/users/getUser';
-import { matchWalletAddress } from 'lib/utilities/blockchain';
-import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
-import type { LoggedInUser } from 'models';
+import { getUserProfile } from '@root/lib/users/getUser';
+import { matchWalletAddress, shortWalletAddress } from '@root/lib/utils/blockchain';
+import { InvalidInputError, MissingDataError } from '@root/lib/utils/errors';
+import type { LoggedInUser } from '@root/models';
 
 import { getENSName } from './getENSName';
 
@@ -19,35 +19,49 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
 
   const lowerCaseAddress = address.toLowerCase();
 
-  const user = await getUserProfile('id', userId);
-
-  const wallet = user.wallets.find((w) => matchWalletAddress(lowerCaseAddress, w));
+  const wallet = await prisma.userWallet.findUnique({
+    where: {
+      address: lowerCaseAddress
+    },
+    include: {
+      user: {
+        select: {
+          username: true
+        }
+      }
+    }
+  });
 
   if (!wallet) {
     throw new MissingDataError('No user wallet found with this address');
   }
+  try {
+    const ensName = await getENSName(lowerCaseAddress);
 
-  const walletAddress = wallet.address;
+    if (ensName !== wallet.ensname) {
+      const shouldUpdate = matchWalletAddress(wallet.user.username, wallet);
 
-  const ensName = await getENSName(walletAddress);
-
-  if (ensName) {
-    await prisma.userWallet.update({
-      where: {
-        address: walletAddress
-      },
-      data: {
-        ensname: ensName,
-        // Also update the username if it currently matches the wallet address for this ENS name
-        user: matchWalletAddress(user.username, walletAddress)
-          ? {
-              update: {
-                username: ensName
+      await prisma.userWallet.update({
+        where: {
+          address: lowerCaseAddress
+        },
+        data: {
+          ensname: ensName,
+          // Also update the username
+          user: shouldUpdate
+            ? {
+                update: {
+                  data: {
+                    username: ensName || undefined
+                  }
+                }
               }
-            }
-          : undefined
-      }
-    });
+            : undefined
+        }
+      });
+    }
+  } catch (error) {
+    log.warn('Could not refresh user wallet ENS', { error });
   }
 
   return getUserProfile('id', userId);

@@ -4,8 +4,8 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
-import { updateProposalEvaluation } from 'lib/proposal/updateProposalEvaluation';
+import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
+import { updateProposalEvaluation } from 'lib/proposals/updateProposalEvaluation';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -18,13 +18,21 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { evaluationId, reviewers } = req.body as UpdateEvaluationRequest;
+  const { evaluationId, reviewers, requiredReviews, appealReviewers, finalStep } = req.body as UpdateEvaluationRequest;
 
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: proposalId
     },
     include: {
+      evaluations: {
+        select: {
+          id: true,
+          type: true,
+          result: true,
+          requiredReviews: true
+        }
+      },
       page: {
         select: {
           sourceTemplateId: true,
@@ -59,12 +67,23 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
+  const currentEvaluation = proposal.evaluations.find((e) => e.id === evaluationId);
+  if (currentEvaluation?.requiredReviews !== requiredReviews && !!currentEvaluation?.result) {
+    throw new ActionNotPermittedError('Cannot change the number of required reviews for a completed evaluation');
+  }
+
   await updateProposalEvaluation({
+    currentEvaluationType: currentEvaluation?.type,
     proposalId: proposal.id,
     evaluationId,
     voteSettings: req.body.voteSettings,
     reviewers,
-    actorId: userId
+    evaluationApprovers: req.body.evaluationApprovers,
+    actorId: userId,
+    requiredReviews,
+    spaceId: proposal.spaceId,
+    appealReviewers,
+    finalStep
   });
 
   return res.status(200).end();

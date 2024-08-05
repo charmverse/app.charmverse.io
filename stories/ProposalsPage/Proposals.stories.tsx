@@ -1,22 +1,23 @@
 import { Box } from '@mui/material';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
+import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
 import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
-import { NewProposalPage as ProposalPageComponent } from 'components/proposals/ProposalPage/NewProposalPage';
-import type { PopulatedEvaluation } from 'lib/proposal/interface';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
+import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
-import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members, userProfile } from '../lib/mockData';
 
-import { ProposalsPageStory } from './ProposalsPageStory';
+import { ProposalsPageStory, withProposalProviders } from './components/ProposalsPageStory';
 
 export default {
   title: 'Proposals/Views',
-  component: ProposalPageComponent
+  component: ProposalInEvaluation,
+  decorators: [withProposalProviders, withCharmEditorProviders]
 };
 
 export function ProposalsPage() {
@@ -28,15 +29,6 @@ export function ProposalsPage() {
 }
 
 ProposalsPage.parameters = ProposalsPageStory.parameters;
-
-export function NewProposal() {
-  return (
-    <GlobalContext>
-      <HeaderSpacer />
-      <ProposalPageComponent />
-    </GlobalContext>
-  );
-}
 
 export function ProposalInEvaluation() {
   const page = createMockPage({
@@ -58,7 +50,7 @@ export function ProposalInEvaluation() {
 ProposalInEvaluation.parameters = {
   msw: {
     handlers: {
-      proposal: rest.get('/api/proposals/:proposalId', (req, res, ctx) => {
+      proposal: http.get('/api/proposals/:proposalId', () => {
         const rubricCriteria: PopulatedEvaluation['rubricCriteria'] = [
           {
             id: '1',
@@ -203,7 +195,7 @@ ProposalInEvaluation.parameters = {
             }
           ]
         });
-        return res(ctx.json(proposal));
+        return HttpResponse.json(proposal);
       })
     }
   }

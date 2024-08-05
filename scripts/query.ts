@@ -1,23 +1,25 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { prettyPrint } from 'lib/utils/strings';
 
 /**
  * Use this script to perform database searches.
  */
 
-async function search() {
-  const acc = await prisma.page.findMany({
-    where: {
-      type: 'bounty_template'
-    },
-    select: { createdAt: true, space: true, bounty: { include: { permissions: true } } }
-  });
+async function query() {
+  const url = 'https://api.neynar.com/v2/farcaster/webhook';
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      api_key: 'NEYNAR_API_DOCS',
+      'content-type': 'application/json'
+    }
+  };
 
-  console.log('Acc', acc.length);
-  console.log('Acc', acc.filter((a) => !a.bounty?.permissions.some((p) => p.permissionLevel === 'reviewer')).length);
-  console.log(
-    'Acc',
-    acc.filter((a) => !a.bounty?.permissions.some((p) => p.permissionLevel === 'reviewer')).map((a) => a.createdAt)
-  );
+  fetch(url, options)
+    .then((res) => res.json())
+    .then((json) => console.log(json))
+    .catch((err) => console.error('error:' + err));
 }
 
-search().then(() => console.log('Done'));
+query();

@@ -1,18 +1,31 @@
 import { testUtilsPages } from '@charmverse/core/test';
+import { saveDocumentNotification } from '@root/lib/notifications/saveNotification';
+import { builders } from '@root/lib/prosemirror/builders';
+import { updateUserProfile } from '@root/lib/users/updateUserProfile';
 import { v4 } from 'uuid';
 
-import { saveDocumentNotification } from 'lib/notifications/saveNotification';
-import { updateUserProfile } from 'lib/users/updateUserProfile';
-import { builders } from 'testing/prosemirror/builders';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
-import { sendNotificationEmail } from '../sendNotificationEmail';
+afterEach(() => {
+  jest.resetModules();
+});
+
+afterAll(() => {
+  jest.restoreAllMocks();
+});
 
 describe('sendNotificationEmail()', () => {
   it('Should send a notification email', async () => {
     const { user, space } = await generateUserAndSpace({
       user: { email: `${Math.random()}@charmversetest.io` }
     });
+
+    const sendEmailMock = jest.fn();
+    jest.mock('lib/mailer', () => ({
+      sendEmail: sendEmailMock
+    }));
+
+    const { sendNotificationEmail } = await import('../sendNotificationEmail');
 
     const page = await testUtilsPages.generatePage({
       createdBy: user.id,
@@ -30,8 +43,8 @@ describe('sendNotificationEmail()', () => {
       content: builders.doc(builders.p('Test')).toJSON()
     });
 
-    const notificationsNo = await sendNotificationEmail({ id: notification.id, type: 'documents' });
-    expect(notificationsNo).toBe(true);
+    await sendNotificationEmail({ id: notification.id, type: 'documents' });
+    expect(sendEmailMock).toHaveBeenCalled();
   });
 
   it('Should send a notification only when the user is subscribed to email notifications', async () => {
@@ -44,6 +57,13 @@ describe('sendNotificationEmail()', () => {
       spaceId: space.id
     });
 
+    const sendEmailMock = jest.fn();
+    jest.mock('lib/mailer', () => ({
+      sendEmail: sendEmailMock
+    }));
+
+    const { sendNotificationEmail } = await import('../sendNotificationEmail');
+
     const notification = await saveDocumentNotification({
       createdAt: new Date().toISOString(),
       createdBy: user.id,
@@ -55,12 +75,12 @@ describe('sendNotificationEmail()', () => {
       content: builders.doc(builders.p('Test')).toJSON()
     });
 
-    const notificationsNo = await sendNotificationEmail({ id: notification.id, type: 'documents' });
-    expect(notificationsNo).toBe(false);
+    await sendNotificationEmail({ id: notification.id, type: 'documents' });
+    expect(sendEmailMock).not.toHaveBeenCalled();
 
     await updateUserProfile(user.id, { emailNotifications: true });
 
-    const secondNotificationsNo = await sendNotificationEmail({ id: notification.id, type: 'documents' });
-    expect(secondNotificationsNo).toBe(true);
+    await sendNotificationEmail({ id: notification.id, type: 'documents' });
+    expect(sendEmailMock).toHaveBeenCalled();
   });
 });

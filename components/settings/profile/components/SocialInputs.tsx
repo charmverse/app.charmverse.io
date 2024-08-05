@@ -7,7 +7,7 @@ import type { Social } from 'lib/members/interfaces';
 
 type SocialInputsProps = {
   social?: Social;
-  onChange: (social: Social) => Promise<void>;
+  onChange: (social: Social) => void;
   readOnly?: boolean;
   errors?: FieldErrors<Record<keyof Social, string | null>>;
   required?: Record<keyof Social, boolean>;
@@ -26,60 +26,54 @@ export function SocialInputs(props: SocialInputsProps) {
 
   return (
     <>
-      <Grid item>
-        <FieldWrapper label='X' required={required?.twitterURL}>
-          <TextField
-            fullWidth
-            value={social.twitterURL}
-            disabled={readOnly}
-            error={!!errors?.twitterURL?.message}
-            helperText={errors?.twitterURL?.message}
-            placeholder='https://twitter.com/charmverse'
-            onChange={(event) => {
-              onChange({
-                ...social,
-                twitterURL: event.target.value
-              });
-            }}
-          />
-        </FieldWrapper>
-      </Grid>
-      <Grid item>
-        <FieldWrapper label='Github' required={required?.githubURL}>
-          <TextField
-            value={social.githubURL}
-            disabled={readOnly}
-            fullWidth
-            error={!!errors?.githubURL?.message}
-            helperText={errors?.githubURL?.message}
-            placeholder='https://github.com/charmverse'
-            onChange={(event) => {
-              onChange({
-                ...social,
-                githubURL: event.target.value
-              });
-            }}
-          />
-        </FieldWrapper>
-      </Grid>
-      <Grid item>
-        <FieldWrapper label='LinkedIn' required={required?.linkedinURL}>
-          <TextField
-            value={social.linkedinURL}
-            disabled={readOnly}
-            fullWidth
-            error={!!errors?.linkedinURL?.message}
-            helperText={errors?.linkedinURL?.message}
-            placeholder='https://www.linkedin.com/in/alexchibunpoon/'
-            onChange={(event) => {
-              onChange({
-                ...social,
-                linkedinURL: event.target.value
-              });
-            }}
-          />
-        </FieldWrapper>
-      </Grid>
+      <FieldWrapper label='X' required={required?.twitterURL}>
+        <TextField
+          fullWidth
+          value={social.twitterURL}
+          disabled={readOnly}
+          error={!!errors?.twitterURL?.message}
+          helperText={errors?.twitterURL?.message}
+          placeholder='https://twitter.com/charmverse'
+          onChange={(event) => {
+            onChange({
+              ...social,
+              twitterURL: event.target.value
+            });
+          }}
+        />
+      </FieldWrapper>
+      <FieldWrapper label='Github' required={required?.githubURL}>
+        <TextField
+          value={social.githubURL}
+          disabled={readOnly}
+          fullWidth
+          error={!!errors?.githubURL?.message}
+          helperText={errors?.githubURL?.message}
+          placeholder='https://github.com/charmverse'
+          onChange={(event) => {
+            onChange({
+              ...social,
+              githubURL: event.target.value
+            });
+          }}
+        />
+      </FieldWrapper>
+      <FieldWrapper label='LinkedIn' required={required?.linkedinURL}>
+        <TextField
+          value={social.linkedinURL}
+          disabled={readOnly}
+          fullWidth
+          error={!!errors?.linkedinURL?.message}
+          helperText={errors?.linkedinURL?.message}
+          placeholder='https://www.linkedin.com/in/alexchibunpoon/'
+          onChange={(event) => {
+            onChange({
+              ...social,
+              linkedinURL: event.target.value
+            });
+          }}
+        />
+      </FieldWrapper>
     </>
   );
 }

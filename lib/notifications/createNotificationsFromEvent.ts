@@ -1,5 +1,5 @@
-import { isTruthy } from 'lib/utilities/types';
-import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
+import { isTruthy } from '@root/lib/utils/types';
+import type { WebhookPayload } from '@root/lib/webhookPublisher/interfaces';
 
 import { createCardNotifications } from './cards/createCardNotifications';
 import { createDocumentNotifications } from './documents/createDocumentNotifications';
@@ -25,7 +25,9 @@ export async function createNotificationsFromEvent(
       ? createRewardNotifications(webhookData).then((ids) => ids.map((id) => ({ id, type: 'rewards' as const })))
       : [],
     createDocumentNotifications(webhookData).then((ids) => ids.map((id) => ({ id, type: 'documents' as const }))),
-    createForumNotifications(webhookData).then((ids) => ids.map((id) => ({ id, type: 'forum' as const }))),
+    isNotificationEnabled({ group: 'forum', rules: notificationToggles })
+      ? createForumNotifications(webhookData).then((ids) => ids.map((id) => ({ id, type: 'forum' as const })))
+      : [],
     createCardNotifications(webhookData).then((ids) => ids.map((id) => ({ id, type: 'card' as const })))
   ]).then((results) => {
     return results.flat().filter(isTruthy);

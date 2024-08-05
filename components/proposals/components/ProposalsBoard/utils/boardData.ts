@@ -1,16 +1,16 @@
 import { v4 } from 'uuid';
 
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
-import type { Block } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
-import { createBoard } from 'lib/focalboard/board';
-import { Constants } from 'lib/focalboard/constants';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
+import type { UIBlockWithDetails } from 'lib/databases/block';
+import type { Board } from 'lib/databases/board';
+import { createBoard } from 'lib/databases/board';
+import { Constants } from 'lib/databases/constants';
 import {
   EVALUATION_STATUS_LABELS,
   proposalDbProperties,
   proposalStatusColors
-} from 'lib/focalboard/proposalDbProperties';
-import { createTableView } from 'lib/focalboard/tableView';
+} from 'lib/databases/proposalDbProperties';
+import { createTableView } from 'lib/databases/tableView';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
@@ -19,11 +19,14 @@ import {
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID
-} from 'lib/proposal/blocks/constants';
-import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
-import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+} from 'lib/proposals/blocks/constants';
+import type { ProposalBoardBlock } from 'lib/proposals/blocks/interfaces';
+import type { ProposalEvaluationStatus } from 'lib/proposals/interfaces';
 
 const proposalStatuses = Object.keys(EVALUATION_STATUS_LABELS) as ProposalEvaluationStatus[];
+
+// define properties that will apply to all source fields
+const defaultOptions = { readOnly: true, options: [] };
 
 export function getDefaultBoard({
   storedBoard,
@@ -34,7 +37,7 @@ export function getDefaultBoard({
   customOnly?: boolean;
   evaluationStepTitles: string[];
 }) {
-  const block: Partial<Block> = storedBoard
+  const block: UIBlockWithDetails = storedBoard
     ? blockToFBBlock(storedBoard)
     : createBoard({
         block: {
@@ -59,25 +62,35 @@ export function getDefaultBoard({
   return board;
 }
 
+// NOTE: All properties should have a static id beginning with "__" to avoid conflicts with user-defined properties
 function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: string[] }) {
-  return [
+  const properties = [
     getDefaultStepProperty({ evaluationStepTitles }),
     getDefaultStatusProperty(),
-    proposalDbProperties.proposalAuthor(AUTHORS_BLOCK_ID, 'Author'),
-    proposalDbProperties.proposalReviewer(PROPOSAL_REVIEWERS_BLOCK_ID, 'Reviewers'),
-    proposalDbProperties.proposalCreatedAt(CREATED_AT_ID),
     {
+      ...defaultOptions,
+      ...proposalDbProperties.proposalAuthor({ name: 'Author' })
+    },
+    { ...defaultOptions, ...proposalDbProperties.proposalReviewer() },
+    getPublishedAtProperty(),
+    { ...defaultOptions, ...proposalDbProperties.proposalCreatedAt() },
+    {
+      ...defaultOptions,
       id: `__createdTime`, // these properties are always re-generated so use a static id
       name: 'Last updated time',
-      options: [],
       type: 'updatedTime'
     }
   ];
+  if (properties.some((prop) => !prop.id.startsWith('__'))) {
+    throw new Error('All default properties should have a static id beginning with "__"');
+  }
+  return properties;
 }
 
 export function getDefaultStatusProperty() {
   return {
-    ...proposalDbProperties.proposalStatus(PROPOSAL_STATUS_BLOCK_ID, 'Status'),
+    ...defaultOptions,
+    ...proposalDbProperties.proposalStatus({ name: 'Status' }),
     options: proposalStatuses.map((s) => ({
       id: s,
       value: s,
@@ -88,12 +101,20 @@ export function getDefaultStatusProperty() {
 
 export function getDefaultStepProperty({ evaluationStepTitles }: { evaluationStepTitles: string[] }) {
   return {
-    ...proposalDbProperties.proposalStep(PROPOSAL_STEP_BLOCK_ID, 'Step'),
-    options: ['Draft', ...evaluationStepTitles, 'Rewards'].map((title) => ({
-      id: title,
-      value: title,
-      color: 'propColorGray'
-    }))
+    ...defaultOptions,
+    ...proposalDbProperties.proposalStep({
+      name: 'Step',
+      options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials']
+    })
+  };
+}
+
+export function getPublishedAtProperty() {
+  return {
+    ...defaultOptions,
+    ...proposalDbProperties.proposalPublishedAt({
+      name: 'Publish date'
+    })
   };
 }
 
@@ -116,6 +137,11 @@ export function getDefaultTableView({ board }: { board: Board }) {
 
   // Hide createdAt by default
   view.fields.visiblePropertyIds = view.fields.visiblePropertyIds.filter((id) => id !== CREATED_AT_ID);
+  // make sure title is first. otherwise when it is renmed, it will appear after the other default proposal card properties
+  view.fields.visiblePropertyIds = [
+    Constants.titleColumnId,
+    ...view.fields.visiblePropertyIds.filter((prop) => prop !== Constants.titleColumnId)
+  ];
 
   view.fields.openPageIn = 'full_page';
 

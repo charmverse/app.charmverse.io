@@ -1,6 +1,6 @@
-import { prisma } from "@charmverse/core/prisma-client";
-import { BoardView } from 'lib/focalboard/boardView';
-import { DEFAULT_VIEW_BLOCK_ID, PROPOSAL_STATUS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import { prisma } from '@charmverse/core/prisma-client';
+import { BoardView } from 'lib/databases/boardView';
+import { DEFAULT_VIEW_BLOCK_ID, PROPOSAL_STATUS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { v4 } from 'uuid';
 
 async function addDefaultProposalViewFilter() {
@@ -14,12 +14,15 @@ async function addDefaultProposalViewFilter() {
       fields: true,
       id: true
     }
-  })
+  });
 
   for (const proposalBlock of proposalBlocks) {
     const proposalBlockFields = (proposalBlock as BoardView).fields;
     const hasArchivedFilter = proposalBlockFields.filter?.filters?.some(
-      (filterClauseOrGroup) => "propertyId" in filterClauseOrGroup && filterClauseOrGroup.propertyId === PROPOSAL_STATUS_BLOCK_ID && filterClauseOrGroup.values?.includes('archived')
+      (filterClauseOrGroup) =>
+        'propertyId' in filterClauseOrGroup &&
+        filterClauseOrGroup.propertyId === PROPOSAL_STATUS_BLOCK_ID &&
+        filterClauseOrGroup.values?.includes('archived')
     );
 
     if (!hasArchivedFilter) {
@@ -34,9 +37,9 @@ async function addDefaultProposalViewFilter() {
           fields: {
             ...proposalBlockFields,
             filter: {
-              ...proposalBlockFields.filter ?? {},
+              ...(proposalBlockFields.filter ?? {}),
               filters: [
-                ...proposalBlockFields.filter?.filters ?? [],
+                ...(proposalBlockFields.filter?.filters ?? []),
                 {
                   condition: 'does_not_contain',
                   filterId: v4(),
@@ -48,9 +51,9 @@ async function addDefaultProposalViewFilter() {
             }
           }
         }
-      })
+      });
     }
   }
 }
 
-addDefaultProposalViewFilter()
+addDefaultProposalViewFilter();

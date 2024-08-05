@@ -17,7 +17,6 @@ type Props = {
   showCollectionOptions?: boolean;
   userId: string;
   refreshPropertyValues: VoidFunction;
-  errors: FieldErrors<FieldValues>;
   control: Control<FieldValues, any>;
 };
 
@@ -26,7 +25,6 @@ export function MemberPropertiesForm({
   userId,
   refreshPropertyValues,
   showCollectionOptions,
-  errors,
   control
 }: Props) {
   const { createOption, deleteOption, updateOption } = useMutateMemberPropertyValues(refreshPropertyValues);
@@ -47,13 +45,13 @@ export function MemberPropertiesForm({
               key={property.memberPropertyId}
               name={property.memberPropertyId}
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <FieldTypeRenderer
                   {...field}
                   type={property.type}
                   label={property.name}
                   options={property.options}
-                  error={errors[property.memberPropertyId] as any}
+                  error={error ? error?.message || 'invalid input' : ''}
                   onCreateOption={(option) => createOption(property, option)}
                   onUpdateOption={(option) => updateOption(property, option)}
                   onDeleteOption={(option) => deleteOption(property, option)}

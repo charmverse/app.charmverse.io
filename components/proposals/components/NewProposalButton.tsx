@@ -4,25 +4,31 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Box, ButtonGroup, MenuItem, Stack, Tooltip, Typography, ListItemIcon, ListItemText } from '@mui/material';
+import { getAbsolutePath } from '@root/lib/utils/browser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import { useRef } from 'react';
 
+import charmClient from 'charmClient/charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
+import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 import { EditIcon } from 'components/common/Icons/EditIcon';
 import Modal from 'components/common/Modal';
 import { ArchiveProposalAction } from 'components/common/PageActions/components/ArchiveProposalAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
+import { PublishProposalAction } from 'components/common/PageActions/components/PublishProposalAction';
 import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import type { TemplateItem } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import type { ProposalContentType } from 'lib/proposals/createDraftProposal';
 
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
-import type { ProposalPageAndPropertiesInput } from '../ProposalPage/NewProposalPage';
 
 const ProposalTemplateMenu = styled(Stack)`
   border: 1px solid ${({ theme }) => theme.palette.divider};
@@ -50,15 +56,22 @@ export function NewProposalButton() {
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
   const { trigger: trashPages } = useTrashPages();
-
   const canCreateProposal = spacePermissions?.createProposals;
 
+  const { space } = useCurrentSpace();
+  const { data: workflows } = useGetProposalWorkflows(space?.id);
+
+  const templatesRequired = !!space?.requireProposalTemplate;
+
+  const hasWorkflows = !!workflows?.length;
+
   const proposalTemplatePages: TemplateItem[] = (proposalTemplates || []).map((proposal) => ({
-    id: proposal.page.id,
-    title: proposal.page.title,
-    proposalId: proposal.id,
-    isStructuredProposal: !!proposal.formId,
-    archived: !!proposal.archived
+    id: proposal.pageId,
+    title: proposal.title,
+    proposalId: proposal.proposalId,
+    isStructuredProposal: proposal.contentType === 'structured',
+    archived: !!proposal.archived,
+    draft: proposal.draft
   }));
 
   function deleteProposalTemplate(pageId: string) {
@@ -69,12 +82,17 @@ export function NewProposalButton() {
     navigateToSpacePath(`/${pageId}`);
   }
 
-  function createTemplate(proposalType: ProposalPageAndPropertiesInput['proposalType']) {
-    navigateToSpacePath('/proposals/new', { type: 'proposal_template', proposalType });
+  function createTemplate(contentType: ProposalContentType) {
+    navigateToSpacePath('/proposals/new', { type: 'proposal_template', contentType });
   }
 
-  function createFromTemplate(pageId: string) {
-    navigateToSpacePath(`/proposals/new`, { template: pageId });
+  function createFromTemplate(template: TemplateItem) {
+    if (space?.domain === 'op-grants') {
+      charmClient.track.trackActionOp('click_proposal_creation_button', {
+        spaceId: space.id
+      });
+    }
+    navigateToSpacePath(`/proposals/new`, { template: template.id });
   }
 
   function duplicateTemplate(pageId: string) {
@@ -83,17 +101,47 @@ export function NewProposalButton() {
 
   return (
     <>
-      <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
+      <Tooltip
+        title={
+          !canCreateProposal
+            ? 'You do not have the permission to create a proposal.'
+            : !hasWorkflows
+            ? 'Add a workflow from the space settings to start using proposals'
+            : ''
+        }
+      >
         <Box>
           <ButtonGroup variant='contained' ref={buttonRef}>
-            <Button disabled={!canCreateProposal} href='/proposals/new' data-test='new-proposal-button'>
+            <Button
+              disabled={!canCreateProposal || !hasWorkflows}
+              onClick={() => {
+                if (space?.domain === 'op-grants') {
+                  charmClient.track.trackActionOp('click_proposal_creation_button', {
+                    spaceId: space.id
+                  });
+                }
+                if (templatesRequired) {
+                  popupState.open();
+                }
+              }}
+              // We don't want to navigate to the new proposal page if the space enforces creating templates from a proposal
+              href={templatesRequired ? undefined : '/proposals/new'}
+              data-test='new-proposal-button'
+            >
               Create
             </Button>
             <Button
               data-test='proposal-template-select'
               size='small'
-              disabled={!canCreateProposal}
-              onClick={popupState.open}
+              disabled={!canCreateProposal || !hasWorkflows}
+              onClick={() => {
+                if (space?.domain === 'op-grants') {
+                  charmClient.track.trackActionOp('click_proposal_creation_button', {
+                    spaceId: space.id
+                  });
+                }
+                popupState.open();
+              }}
             >
               <KeyboardArrowDown />
             </Button>
@@ -126,14 +174,13 @@ export function NewProposalButton() {
               </ListItemIcon>
               <ListItemText>Edit</ListItemText>
             </MenuItem>
-            {isAdmin && (
-              <CopyPageLinkAction
-                path={`/proposals/new?template=${pageId}`}
-                message='Link copied. NOTE: anyone can join your space using this link.'
-              />
-            )}
+            <CopyPageLinkAction
+              path={`/proposals/new?template=${pageId}`}
+              message='Link copied. NOTE: anyone can join your space using this link.'
+            />
 
             <MenuItem
+              data-test='duplicate-template-button'
               onClick={() => {
                 duplicateTemplate(pageId);
               }}
@@ -155,6 +202,9 @@ export function NewProposalButton() {
             </MenuItem>
             <span onClick={(e) => e.stopPropagation()}>
               <ArchiveProposalAction proposalId={proposalId!} />
+            </span>
+            <span onClick={(e) => e.stopPropagation()}>
+              <PublishProposalAction proposalId={proposalId!} />
             </span>
           </>
         )}

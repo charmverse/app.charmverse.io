@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { addTransaction } from 'lib/charms/addTransaction';
-import type { TransactionRecipient, TransactionResult } from 'lib/charms/addTransaction';
-import type { CharmActionTrigger } from 'lib/charms/constants';
-import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
+import { addTransaction } from '@root/lib/charms/addTransaction';
+import type { TransactionRecipient, TransactionResult } from '@root/lib/charms/addTransaction';
+import type { CharmActionTrigger } from '@root/lib/charms/constants';
+import { getUserOrSpaceWallet } from '@root/lib/charms/getUserOrSpaceWallet';
 
 /**
  * Spend space's charms by admin
@@ -28,10 +27,13 @@ export async function addCharms({
     throw new Error('Wallet not found');
   }
 
-  const { id, balance } = wallet;
+  const { id, balance, totalBalance } = wallet;
 
   const res = await prisma.$transaction([
-    prisma.charmWallet.update({ where: { id }, data: { balance: balance + amount } }),
+    prisma.charmWallet.update({
+      where: { id },
+      data: { balance: balance + amount, totalBalance: totalBalance + amount }
+    }),
     addTransaction({ fromAddress: undefined, toAddress: id, amount, metadata: { actorId, actionTrigger } })
   ]);
 

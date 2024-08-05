@@ -5,9 +5,9 @@ import { test as base, expect } from '@playwright/test';
 import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 
-import { baseUrl } from 'config/constants';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { CardFields } from 'lib/focalboard/card';
+import { baseUrl } from '@root/config/constants';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import type { CardFields } from 'lib/databases/card';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
 import { generateBoard } from 'testing/setupDatabase';
 
@@ -79,8 +79,7 @@ test.beforeAll(async () => {
     addPageContent: true,
     boardPageType: 'inline_board',
     views: 1,
-    cardCount: sourceDatabaseCardCount,
-    parentId: documentPage.id
+    cardCount: sourceDatabaseCardCount
   });
 
   inlineLinkedDatabase = await generateBoard({
@@ -90,8 +89,7 @@ test.beforeAll(async () => {
     boardPageType: 'inline_linked_board',
     views: 1,
     cardCount: 0,
-    linkedSourceId: standaloneDatabase.id,
-    parentId: documentPage.id
+    linkedSourceId: standaloneDatabase.id
   });
 
   await prisma.page.update({
@@ -100,8 +98,8 @@ test.beforeAll(async () => {
     },
     data: {
       content: generatePageContentWithInlineDatabaseRefs({
-        inlineDatabaseId: inlineDatabase.id,
-        inlineLinkedDatabaseId: inlineLinkedDatabase.id
+        inlineDBPageId: inlineDatabase.id,
+        inlineLinkedDBPageId: inlineLinkedDatabase.id
       })
     }
   });

@@ -1,13 +1,13 @@
-import type { PluginKey } from '@bangle.dev/pm';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Stack, Typography } from '@mui/material';
 import { bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import type { PluginKey } from 'prosemirror-state';
 import { useState } from 'react';
 
 import { MenuButton } from 'components/common/CharmEditor/components/floatingMenu/Icon';
 
-import InlineCommandPalette from '../inlinePalette/components/InlineCommandPalette';
+import InlineCommandPalette from './components/InlineCommandPalette';
 
 type Props = {
   pluginKey: PluginKey;

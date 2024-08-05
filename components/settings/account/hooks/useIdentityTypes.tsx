@@ -1,20 +1,28 @@
+import type { StatusAPIResponse as FarcasterAccount } from '@farcaster/auth-kit';
 import { useMemo } from 'react';
 
+import type { IdentityIconSize } from 'components/settings/profile/components/IdentityIcon';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import type { IntegrationModel } from 'components/settings/profile/components/IdentityModal';
-import { useFarcasterProfile } from 'hooks/useFarcasterProfile';
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/blockchain';
-import randomName from 'lib/utilities/randomName';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utils/blockchain';
+import randomName from 'lib/utils/randomName';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useLensProfile } from './useLensProfile';
 
-export function useIdentityTypes() {
+export function useIdentityTypes(
+  {
+    size = 'medium'
+  }: {
+    size?: IdentityIconSize | number;
+  } = {
+    size: 'medium'
+  }
+) {
   const { user } = useUser();
   const { lensProfile } = useLensProfile();
-  const { farcasterProfile } = useFarcasterProfile();
 
   const identityTypes: IntegrationModel[] = useMemo(() => {
     if (!user) {
@@ -31,7 +39,7 @@ export function useIdentityTypes() {
         username: wallet.ensname ?? address,
         secondaryUserName: address,
         isInUse: user.identityType === 'Wallet' && matchWalletAddress(user.username, wallet),
-        icon: <IdentityIcon type='Wallet' />
+        icon: <IdentityIcon size={size} type='Wallet' />
       });
     });
 
@@ -42,7 +50,7 @@ export function useIdentityTypes() {
         username: discordAccount.username || '',
         secondaryUserName: `${discordAccount.username} #${discordAccount.discriminator}`,
         isInUse: user.identityType === 'Discord',
-        icon: <IdentityIcon type='Discord' />
+        icon: <IdentityIcon size={size} type='Discord' />
       });
     }
 
@@ -52,7 +60,7 @@ export function useIdentityTypes() {
         type: 'Telegram',
         username: telegramAccount.username || `${telegramAccount.first_name} ${telegramAccount.last_name}`,
         isInUse: user.identityType === 'Telegram',
-        icon: <IdentityIcon type='Telegram' />
+        icon: <IdentityIcon size={size} type='Telegram' />
       });
     }
 
@@ -62,7 +70,7 @@ export function useIdentityTypes() {
         username: acc.name,
         secondaryUserName: acc.email,
         isInUse: user.identityType === 'Google' && user.username === acc.name,
-        icon: <IdentityIcon type='Google' />
+        icon: <IdentityIcon size={size} type='Google' />
       });
     });
 
@@ -72,7 +80,7 @@ export function useIdentityTypes() {
         username: verifiedEmail.email,
         isInUse:
           user.identityType === 'VerifiedEmail' && [verifiedEmail.email, verifiedEmail.name].includes(user.username),
-        icon: <IdentityIcon type='VerifiedEmail' />
+        icon: <IdentityIcon size={size} type='VerifiedEmail' />
       });
     });
 
@@ -81,16 +89,17 @@ export function useIdentityTypes() {
         type: 'Lens',
         username: lensProfile.metadata?.displayName ?? (lensProfile.handle?.fullHandle ?? '').split('/')[1] ?? '',
         isInUse: user.identityType === 'Lens',
-        icon: <IdentityIcon type='Lens' />
+        icon: <IdentityIcon size={size} type='Lens' />
       });
     }
 
-    if (farcasterProfile) {
+    if (user.farcasterUser?.account) {
+      const farcasterAccount = user.farcasterUser.account as Partial<FarcasterAccount>;
       types.push({
         type: 'Farcaster',
-        username: farcasterProfile.body.username ?? '',
+        username: farcasterAccount.username ?? '',
         isInUse: user.identityType === 'Farcaster',
-        icon: <IdentityIcon type='Farcaster' />
+        icon: <IdentityIcon size={size} type='Farcaster' />
       });
     }
 
@@ -98,11 +107,11 @@ export function useIdentityTypes() {
       type: 'RandomName',
       username: user.identityType === 'RandomName' && user.username ? user.username : randomName(),
       isInUse: user.identityType === 'RandomName',
-      icon: <IdentityIcon type='RandomName' />
+      icon: <IdentityIcon size={size} type='RandomName' />
     });
 
     return types;
-  }, [user, lensProfile, farcasterProfile]);
+  }, [user, lensProfile, size]);
 
   return identityTypes;
 }

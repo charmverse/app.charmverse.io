@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-interface DraggableListItemProps extends BoxProps {
+export interface DraggableListItemProps extends BoxProps {
   name: string;
   itemId: string;
   disabled?: boolean;

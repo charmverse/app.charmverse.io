@@ -6,7 +6,7 @@ import { getLayout } from 'components/common/BaseLayout/getLayout';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE } from 'lib/discord/constants';
-import { deleteCookie, getCookie } from 'lib/utilities/browser';
+import { deleteCookie, getCookie } from 'lib/utils/browser';
 
 import Footer from './components/Footer';
 import { LoginPageContent } from './LoginPageContent';
@@ -22,7 +22,7 @@ export function LoginPageView() {
   const isLoggedIn = !!user;
 
   useEffect(() => {
-    setTitleState('Welcome');
+    setTitleState(''); // use default title
     if (discordCookie) {
       deleteCookie(AUTH_CODE_COOKIE);
     }

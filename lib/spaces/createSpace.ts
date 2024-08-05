@@ -2,27 +2,25 @@ import path from 'node:path';
 
 import type { Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { STATIC_PAGES } from '@root/lib/features/constants';
+import { generateDefaultPostCategories } from '@root/lib/forums/categories/generateDefaultPostCategories';
+import { setDefaultPostCategory } from '@root/lib/forums/categories/setDefaultPostCategory';
+import { generateDefaultPropertiesInput } from '@root/lib/members/generateDefaultPropertiesInput';
+import { logSpaceCreation } from '@root/lib/metrics/postToDiscord';
+import { convertJsonPagesToPrisma } from '@root/lib/pages/server/convertJsonPagesToPrisma';
+import { createPage } from '@root/lib/pages/server/createPage';
+import { generateFirstDiff } from '@root/lib/pages/server/generateFirstDiff';
+import { setupDefaultPaymentMethods } from '@root/lib/payment-methods/setupDefaultPaymentMethods';
+import { updateSpacePermissionConfigurationMode } from '@root/lib/permissions/meta';
+import { memberProfileNames } from '@root/lib/profile/memberProfiles';
+import { createDefaultProposal } from '@root/lib/proposals/createDefaultProposal';
+import { getDefaultWorkflows } from '@root/lib/proposals/workflows/defaultWorkflows';
+import { upsertDefaultRewardsBoard } from '@root/lib/rewards/blocks/upsertDefaultRewardsBoard';
+import { createDefaultReward, createDefaultRewardTemplate } from '@root/lib/rewards/createDefaultReward';
+import { defaultFreeBlockQuota } from '@root/lib/subscription/constants';
+import { importSpaceData } from '@root/lib/templates/importSpaceData';
+import { createSigningSecret, subscribeToAllEvents } from '@root/lib/webhookPublisher/subscribeToEvents';
 
-import { STATIC_PAGES } from 'lib/features/constants';
-import { generateDefaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
-import { setDefaultPostCategory } from 'lib/forums/categories/setDefaultPostCategory';
-import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
-import { logSpaceCreation } from 'lib/metrics/postToDiscord';
-import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
-import { createPage } from 'lib/pages/server/createPage';
-import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
-import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import { memberProfileNames } from 'lib/profile/memberProfiles';
-import { createDefaultProposal } from 'lib/proposal/createDefaultProposal';
-import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
-import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
-import { createDefaultReward } from 'lib/rewards/createDefaultReward';
-import { defaultFreeBlockQuota } from 'lib/subscription/constants';
-import { getImportData } from 'lib/templates/getImportData';
-import { importSpaceData } from 'lib/templates/importSpaceData';
-import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
-import { createSigningSecret, subscribeToAllEvents } from 'lib/webhookPublisher/subscribeToEvents';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
 import type { SpaceTemplateType } from './config';
@@ -71,7 +69,7 @@ export async function createWorkspace({
     }
   }
 
-  const userList = [userId, ...extraAdmins];
+  const userList = Array.from(new Set([userId, ...extraAdmins]));
 
   let signingSecret: string | null = null;
   if (webhookUrl) {
@@ -215,6 +213,11 @@ export async function createWorkspace({
 
   // Create a test reward, and the default rewards views
   await createDefaultReward({
+    spaceId: space.id,
+    userId: space.createdBy
+  });
+
+  await createDefaultRewardTemplate({
     spaceId: space.id,
     userId: space.createdBy
   });

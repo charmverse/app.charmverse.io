@@ -1,4 +1,4 @@
-export const memberProfileNames = ['charmverse', 'collection', 'ens', 'lens', 'summon'] as const;
+export const memberProfileNames = ['charmverse', 'collection', 'ens', 'lens', 'summon', 'credentials'] as const;
 
 export type MemberProfileName = (typeof memberProfileNames)[number];
 
@@ -7,7 +7,8 @@ export const memberProfileLabels: Record<MemberProfileName, string> = {
   collection: 'Collection',
   ens: 'ENS',
   lens: 'Lens',
-  summon: 'Summon'
+  summon: 'Summon',
+  credentials: 'Credentials'
 };
 
 export type MemberProfileJson = {

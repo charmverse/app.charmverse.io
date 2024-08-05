@@ -6,9 +6,8 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import { DateTimePicker } from '@mui/x-date-pickers';
+import { getChainById } from '@root/connectors/chains';
 import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
-import { getChainById } from 'connectors/chains';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 import { getAddress } from 'viem';
@@ -17,6 +16,7 @@ import charmClient from 'charmClient';
 import { useUpdateSnapshotProposal } from 'charmClient/hooks/proposals';
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
+import { DateTimePicker } from 'components/common/DateTimePicker';
 import FieldLabel from 'components/common/form/FieldLabel';
 import InputEnumToOption from 'components/common/form/InputEnumToOptions';
 import InputGeneratorText from 'components/common/form/InputGeneratorText';
@@ -25,13 +25,13 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot/interfaces';
 import { SnapshotVotingMode } from 'lib/snapshot/interfaces';
-import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from 'lib/utilities/errors';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from 'lib/utils/errors';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 import ConnectSnapshot from './ConnectSnapshot';
 import { InputVotingStrategies } from './InputVotingStrategies';
@@ -41,7 +41,6 @@ interface Props {
   pageId: string;
   proposalId: string;
   evaluationId: string;
-  durationDays?: number;
 }
 
 const MAX_SNAPSHOT_PROPOSAL_CHARACTERS = 20000;
@@ -380,10 +379,10 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
                   value={startDate}
                   onChange={(value) => {
                     if (value instanceof DateTime) {
-                      setStartDate(value as DateTime);
+                      setStartDate(value);
                     }
                   }}
-                  renderInput={(props) => <TextField fullWidth {...props} />}
+                  slotProps={{ textField: { fullWidth: true } }}
                 />
               </div>
 
@@ -405,19 +404,18 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
                     value={endDate}
                     onChange={(value) => {
                       if (value instanceof DateTime) {
-                        setEndDate(value as DateTime);
+                        setEndDate(value);
                       }
                     }}
                     disabled={!!snapshotSpace.voting.period}
-                    renderInput={(props) => (
-                      <TextField
-                        fullWidth
-                        disabled={!!snapshotSpace.voting.period}
-                        {...props}
-                        error={!endDateAfterStart}
-                        helperText={!endDateAfterStart ? 'End date must be after start date' : null}
-                      />
-                    )}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        disabled: !!snapshotSpace.voting.period,
+                        error: !endDateAfterStart,
+                        helperText: !endDateAfterStart ? 'End date must be after start date' : null
+                      }
+                    }}
                   />
                 </div>
               </Tooltip>

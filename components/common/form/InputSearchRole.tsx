@@ -36,7 +36,11 @@ function InputSearchRoleBase({
   placeholder,
   readOnly,
   ...props
-}: Partial<ComponentProps<typeof Autocomplete>> & { filter?: IRolesFilter } & { showWarningOnNoRoles?: boolean }) {
+}: Partial<ComponentProps<typeof Autocomplete>> & {
+  placeholder?: string;
+  filter?: IRolesFilter;
+  showWarningOnNoRoles?: boolean;
+}) {
   const { roles } = useRoles();
   const { openSettings } = useSettingsDialog();
   const defaultRole =
@@ -68,7 +72,6 @@ function InputSearchRoleBase({
       loading={!roles}
       sx={{ minWidth: 150 }}
       disableCloseOnSelect={disableCloseOnSelect}
-      placeholder={filteredRoles.length > 0 || roles?.length === 0 ? placeholder : ''}
       noOptionsText='No options available'
       // @ts-ignore - not sure why this fails
       options={filteredRoles}

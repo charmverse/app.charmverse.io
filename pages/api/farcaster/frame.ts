@@ -1,15 +1,15 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import * as http from '@root/adapters/http';
 import type { Frame } from 'frames.js';
 import { getFrame } from 'frames.js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import * as http from 'adapters/http';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isLocalhostUrl } from 'lib/utilities/strings';
+import { isLocalhostUrl } from 'lib/utils/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -19,7 +19,7 @@ async function extractFarcasterMetadataFromUrl(
   req: NextApiRequest,
   res: NextApiResponse<Frame | null | { error: string }>
 ) {
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id;
   const frameUrl = req.query.frameUrl as string;
   const pageId = req.query.pageId as string | undefined;
   const localhostUrl = isLocalhostUrl(frameUrl);
@@ -27,7 +27,7 @@ async function extractFarcasterMetadataFromUrl(
     throw new InvalidInputError('Invalid Farcaster frame URL');
   }
   const unparsedFrameHtml = await http.GET<string>(frameUrl);
-  const frame = getFrame({
+  const { frame } = getFrame({
     htmlString: unparsedFrameHtml,
     url: frameUrl
   });

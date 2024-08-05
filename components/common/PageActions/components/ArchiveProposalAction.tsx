@@ -6,9 +6,6 @@ import { useArchiveProposal } from 'charmClient/hooks/proposals';
 import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-/**
- * We only want to refresh individual page data if user is currently on the page
- */
 export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
   const { trigger: archiveProposal } = useArchiveProposal({ proposalId });
   const { proposal } = useProposal({
@@ -22,7 +19,7 @@ export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
   const label = proposal?.archived ? 'Unarchive' : 'Archive';
 
   return (
-    <Tooltip title={disabled ? `You cannot ${label.toLowerCase()} this proposal` : ''}>
+    <Tooltip title={disabled ? `You cannot ${label.toLowerCase()} this proposal` : ''} disableInteractive>
       <div>
         <MenuItem
           data-test='header--archive-current-proposal'
@@ -30,6 +27,7 @@ export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
           onClick={async () => {
             try {
               await archiveProposal({ archived: !proposal?.archived });
+              // refreshProposal();
             } catch (error) {
               showError(error);
             }

@@ -1,22 +1,25 @@
 import { v4 as uuid } from 'uuid';
 
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { OptionalNullable } from 'lib/utilities/types';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { OptionalNullable } from 'lib/utils/types';
 
-export function createMockProposal(
-  input: Partial<ProposalWithUsersAndRubric> = {}
-): OptionalNullable<ProposalWithUsersAndRubric> {
+type ProposalInput = Partial<Omit<ProposalWithUsersAndRubric, 'evaluations' | 'fields'>> & {
+  evaluations?: Partial<ProposalWithUsersAndRubric['evaluations'][number]>[];
+  fields?: Partial<ProposalWithUsersAndRubric['fields']>;
+};
+
+export function createMockProposal(input: ProposalInput = {}): OptionalNullable<ProposalWithUsersAndRubric> {
   const id = uuid();
   return {
-    lensPostLink: null,
+    workflowId: 'test',
+    issuedCredentials: [],
+    isPublic: false,
     publishToLens: null,
     archived: false,
     createdBy: '',
     selectedCredentialTemplates: [],
     id,
-    authors: [],
-    reviewers: [],
-    evaluations: [],
+    authors: [{ proposalId: 'id', userId: 'someone' }],
     reviewedAt: null,
     reviewedBy: null,
     spaceId: '',
@@ -28,8 +31,8 @@ export function createMockProposal(
     },
     permissions: {
       view: true,
-      review: true,
-      vote: true,
+      view_notes: true,
+      view_private_fields: true,
       comment: true,
       edit: true,
       delete: true,
@@ -38,8 +41,27 @@ export function createMockProposal(
       make_public: true,
       archive: true,
       unarchive: true,
-      move: true
+      move: true,
+      evaluate_appeal: true,
+      complete_evaluation: true
     },
-    ...input
+    ...input,
+    evaluations: (input.evaluations || []).map((evaluation) => ({
+      id: uuid(),
+      index: 0,
+      proposalId: id,
+      type: 'rubric',
+      title: 'Rubric',
+      result: null,
+      rubricAnswers: [],
+      totalReviews: 0,
+      draftRubricAnswers: [],
+      rubricCriteria: [],
+      reviewers: [],
+      permissions: [],
+      requiredReviews: 1,
+      declineReasonOptions: [],
+      ...evaluation
+    }))
   };
 }

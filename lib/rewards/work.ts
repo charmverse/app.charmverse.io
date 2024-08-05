@@ -1,17 +1,17 @@
 import type { Application, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utilities/errors';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
+import { InvalidStateError } from '@root/lib/middleware';
+import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from '@root/lib/utils/errors';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishBountyEvent } from '@root/lib/webhookPublisher/publishEvent';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
 import { getRewardOrThrow } from './getReward';
 import { statusesAcceptingNewWork } from './shared';
 
 export type WorkUpsertData = { userId: string; rewardId: string; applicationId?: string } & Partial<
-  Pick<Application, 'message' | 'submission' | 'submissionNodes' | 'walletAddress' | 'rewardInfo'>
+  Pick<Application, 'message' | 'messageNodes' | 'submission' | 'submissionNodes' | 'walletAddress' | 'rewardInfo'>
 >;
 
 /**
@@ -22,6 +22,7 @@ export type WorkUpsertData = { userId: string; rewardId: string; applicationId?:
 export async function work({
   rewardId,
   message,
+  messageNodes,
   userId,
   submission,
   submissionNodes,
@@ -34,6 +35,10 @@ export async function work({
   }
 
   const reward = await getRewardOrThrow({ rewardId });
+
+  if (reward.status === 'draft') {
+    throw new InvalidStateError(`Cannot apply to a draft reward`);
+  }
 
   const userApplications = reward.applications.filter((a) => a.createdBy === userId);
 
@@ -79,6 +84,7 @@ export async function work({
     submissionNodes: submissionNodesAsString,
     rewardInfo,
     message,
+    messageNodes: messageNodes as Prisma.JsonObject,
     walletAddress
   };
 

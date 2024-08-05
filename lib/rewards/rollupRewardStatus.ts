@@ -1,7 +1,7 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { countValueOccurrences } from '../utilities/numbers';
+import { countValueOccurrences } from '../utils/numbers';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
 import { getRewardOrThrow } from './getReward';
@@ -13,6 +13,12 @@ export async function rollupRewardStatus({ rewardId }: { rewardId: string }): Pr
       id: rewardId
     },
     select: {
+      space: {
+        select: {
+          domain: true
+        }
+      },
+      createdBy: true,
       status: true,
       maxSubmissions: true,
       applications: {
@@ -23,14 +29,18 @@ export async function rollupRewardStatus({ rewardId }: { rewardId: string }): Pr
     }
   });
 
-  const capReached = countRemainingSubmissionSlots({
+  if (reward.status === 'draft') {
+    return getRewardOrThrow({ rewardId });
+  }
+
+  const remainingSlots = countRemainingSubmissionSlots({
     applications: reward.applications,
     limit: reward.maxSubmissions
   });
 
   let newStatus: RewardStatus | null = null;
 
-  if (capReached) {
+  if (remainingSlots === null || remainingSlots > 0) {
     newStatus = 'open';
   } else {
     const submissionSummary = countValueOccurrences<ApplicationStatus>(reward.applications, 'status');

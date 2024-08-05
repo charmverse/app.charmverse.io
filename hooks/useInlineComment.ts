@@ -1,11 +1,11 @@
-import type { Node } from '@bangle.dev/pm';
+import type { Node } from 'prosemirror-model';
 import type { EditorView } from 'prosemirror-view';
 
 import { threadPluginKey } from 'components/common/CharmEditor/components/thread/thread.plugins';
 import { extractTextFromSelection } from 'lib/prosemirror/plugins/inlineComments/extractTextFromSelection';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { useMembers } from './useMembers';
 import { usePages } from './usePages';

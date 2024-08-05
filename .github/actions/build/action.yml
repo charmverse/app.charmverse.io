@@ -1,15 +1,15 @@
-name: "Build application"
+name: 'Build application'
 
 inputs:
-  REACT_APP_APP_ENV:
-    description: "..."
-    required: false
   save_cache:
-    description: "Whether to save the cache"
+    description: 'Whether to save the cache'
+    required: false
+  REACT_APP_APP_ENV:
+    description: '...'
     required: false
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     # - name: Show GitHub context
     #   shell: bash
@@ -19,30 +19,52 @@ runs:
 
     - name: Restore build
       id: restore_build
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: |
           .next
           .env.test.local
           dist
           background/ceramicServer/generated
-        # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}
+          apps/connect/.next
+          apps/connect-api/dist
+          apps/sunnyawards/.next
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!apps/sunnyawards/.next', '!dont_cache') }}
 
     - name: Build
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
       run: npm run build
 
+    - name: Build Connect App
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      run: |
+        npm run connect:build
+
+    - name: Build Connect API
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      run: |
+        npm run connect-api:build
+
+    - name: Build Sunny Awards
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      run: |
+        npm run sunnyawards:build
+
     # building cache key takes almost a minute, so we only run this if we are saving the cache
     - name: Cache build
       if: inputs.save_cache
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         path: |
           .next
           .env.test.local
           dist
           background/ceramicServer/generated
-        # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}
+          apps/connect/.next
+          apps/connect-api/dist
+          apps/sunnyawards/.next
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!apps/sunnyawards/.next', '!dont_cache') }}

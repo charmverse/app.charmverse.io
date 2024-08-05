@@ -4,8 +4,8 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { updateProposalWorkflow } from 'lib/proposal/updateProposalWorkflow';
-import type { UpdateWorkflowRequest } from 'lib/proposal/updateProposalWorkflow';
+import { applyProposalWorkflow } from 'lib/proposals/applyProposalWorkflow';
+import type { UpdateWorkflowRequest } from 'lib/proposals/applyProposalWorkflow';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -61,7 +61,7 @@ async function updateWorkflowEndpoint(req: NextApiRequest, res: NextApiResponse)
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
-  await updateProposalWorkflow({
+  await applyProposalWorkflow({
     proposalId: proposal.id,
     workflowId,
     actorId: userId

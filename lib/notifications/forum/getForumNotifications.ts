@@ -6,7 +6,19 @@ import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
 export async function getPostNotifications({ id, userId }: QueryCondition): Promise<PostNotification[]> {
   const postNotifications = await prisma.postNotification.findMany({
-    where: queryCondition({ id, userId }),
+    where: {
+      ...queryCondition({ id, userId }),
+      post: {
+        deletedAt: null,
+        space: {
+          spaceRoles: {
+            some: {
+              userId
+            }
+          }
+        }
+      }
+    },
     select: {
       id: true,
       type: true,

@@ -1,10 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
-import type { ReactNode } from 'react';
-
-import type { FeatureJson } from 'lib/features/constants';
-import { constructFeaturesRecord } from 'lib/features/constructFeaturesRecord';
-import { getFeatureTitle } from 'lib/features/getFeatureTitle';
+import { type FeatureJson } from '@root/lib/features/constants';
+import { getFeatureTitle } from '@root/lib/features/getFeatureTitle';
 import type {
   ApplicationCommentNotificationType,
   BountyNotification,
@@ -16,7 +13,9 @@ import type {
   NotificationActor,
   PostNotification,
   ProposalNotification
-} from 'lib/notifications/interfaces';
+} from '@root/lib/notifications/interfaces';
+import { getActionButtonLabels } from '@root/lib/proposals/getActionButtonLabels';
+import type { ReactNode } from 'react';
 
 import { getNotificationUrl } from './getNotificationUrl';
 
@@ -153,13 +152,7 @@ function getRewardContent({
   const { createdBy, type } = notification;
   const username = authorUsername ?? createdBy?.username;
   switch (type) {
-    case 'application.created': {
-      return (
-        <span>
-          <strong>{username}</strong> applied for a {rewardTitle}
-        </span>
-      );
-    }
+    case 'application.created':
     case 'submission.created': {
       return (
         <span>
@@ -182,45 +175,83 @@ function getRewardContent({
     case 'application.payment_completed': {
       return `You have been paid for a ${rewardTitle}`;
     }
+    case 'credential.created': {
+      return `You have been issued a credential for a ${rewardTitle}`;
+    }
     default: {
       return '';
     }
   }
 }
 
-function getProposalContent(n: ProposalNotification, actorUsername?: string): string | ReactNode {
-  const { type, createdBy } = n;
+function getProposalContent({
+  notification,
+  actorUsername,
+  spaceFeatures
+}: {
+  notification: ProposalNotification;
+  actorUsername?: string;
+  spaceFeatures: FeatureJson[];
+}): string | ReactNode {
+  const proposalFeatureTitle = getFeatureTitle('proposal', spaceFeatures);
+  const { type, createdBy } = notification;
   const username = actorUsername ?? createdBy?.username;
   switch (type) {
+    case 'draft_reminder': {
+      return `Reminder: Your ${proposalFeatureTitle}, ${notification.pageTitle}, in space ${notification.spaceName} is an unpublished draft. Visit CharmVerse to publish it.`;
+    }
     case 'start_discussion': {
       return username ? (
         <span>
           <strong>{username}</strong> requested feedback for a proposal
         </span>
       ) : (
-        `Feedback requested for a proposal`
+        `Feedback requested for a ${proposalFeatureTitle}`
       );
     }
+    case 'proposal_appealed': {
+      return `The ${proposalFeatureTitle} has been appealed and requires your review.`;
+    }
+    case 'proposal_published': {
+      return `Your ${proposalFeatureTitle} has been successfully submitted`;
+    }
     case 'vote_passed': {
-      return `The vote on ${n.pageTitle} has passed. View results.`;
+      return (
+        notification.previousEvaluation?.notificationLabels?.approve ||
+        `The vote on ${notification.pageTitle} has passed. View results.`
+      );
     }
     case 'reward_published': {
-      return `Your proposal reward has been created`;
-    }
-    case 'proposal_passed': {
-      return `Your proposal has passed`;
-    }
-    case 'proposal_failed': {
-      return `Your proposal has failed in ${n.evaluation?.title ?? 'current step'}`;
+      return `Your ${proposalFeatureTitle} reward has been created`;
     }
     case 'step_passed': {
-      return `Your proposal has been moved to ${n.evaluation?.title ?? 'the next step'}`;
+      return (
+        notification.previousEvaluation?.notificationLabels?.approve ||
+        `Your ${proposalFeatureTitle} has successfully completed the ${notification.previousEvaluation?.title} step and is now moving to the ${notification.evaluation?.title} step`
+      );
+    }
+    case 'proposal_failed': {
+      const actionLabels = getActionButtonLabels(notification.evaluation);
+      return (
+        notification.evaluation.notificationLabels?.reject ||
+        `The status of your ${proposalFeatureTitle} has changed to: ${actionLabels.reject}`
+      );
+    }
+    case 'proposal_passed': {
+      const actionLabels = getActionButtonLabels(notification.evaluation);
+      return (
+        notification.evaluation?.notificationLabels?.approve ||
+        `The status of your ${proposalFeatureTitle} has changed to: ${actionLabels.approve}`
+      );
     }
     case 'vote': {
-      return `Voting started for a proposal`;
+      return `Voting started for a ${proposalFeatureTitle}`;
     }
     case 'review_required': {
-      return `Review required for a proposal`;
+      return `Review required for a ${proposalFeatureTitle}`;
+    }
+    case 'credential_created': {
+      return `You have been issued a credential for a proposal`;
     }
     default: {
       return '';
@@ -242,7 +273,6 @@ export function getNotificationMetadata({
   pageTitle: string;
 } {
   const href = getNotificationUrl(notification);
-  const { mappedFeatures } = constructFeaturesRecord(spaceFeatures);
 
   try {
     switch (notification.group) {
@@ -251,10 +281,7 @@ export function getNotificationMetadata({
           content: getRewardContent({
             notification: notification as BountyNotification,
             authorUsername: actorUsername,
-            rewardTitle: getFeatureTitle({
-              featureTitle: 'reward',
-              mappedFeatures
-            })
+            rewardTitle: getFeatureTitle('reward', spaceFeatures)
           }),
           href,
           pageTitle: notification.pageTitle
@@ -287,7 +314,11 @@ export function getNotificationMetadata({
 
       case 'proposal': {
         return {
-          content: getProposalContent(notification as ProposalNotification, actorUsername),
+          content: getProposalContent({
+            notification: notification as ProposalNotification,
+            actorUsername,
+            spaceFeatures
+          }),
           href,
           pageTitle: notification.pageTitle
         };
@@ -296,6 +327,19 @@ export function getNotificationMetadata({
       case 'vote': {
         return {
           content: `Polling started for "${notification.title}"`,
+          href,
+          pageTitle: notification.pageTitle
+        };
+      }
+
+      case 'custom': {
+        return {
+          content: (
+            <div>
+              Are you interested in Grants & Fellowships? You can apply for an Orange DAO Fellowship in one click with
+              your CharmVerse profile.
+            </div>
+          ),
           href,
           pageTitle: notification.pageTitle
         };

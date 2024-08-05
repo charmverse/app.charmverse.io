@@ -1,29 +1,27 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
+import { isNumber } from '@root/lib/utils/numbers';
 import { getAddress } from 'viem';
 
-import { isNumber } from 'lib/utilities/numbers';
-
 import { getPublicClient } from '../../blockchain/publicClient';
-import type { Hypersub } from '../interfaces';
+import type { AccessControlCondition } from '../interfaces';
 
 import { subscriptionTokenV1ABI } from './abi';
 
-type GetHypersubPayload = {
-  chainId: number;
-  contract: string;
+type GetHypersubPayload = Pick<AccessControlCondition, 'chain' | 'contractAddress'> & {
   walletAddress?: string;
 };
 
-export async function getHypersubDetails(values: GetHypersubPayload): Promise<Hypersub & { validKey?: boolean }> {
-  const { chainId: initialChain, contract, walletAddress: initialWalletAddress } = values;
+export async function getHypersubDetails(props: GetHypersubPayload) {
+  const { chain, contractAddress, walletAddress } = props;
 
-  if (!isNumber(Number(initialChain))) {
+  if (!isNumber(Number(chain))) {
     throw new InvalidInputError('Chain must be a number');
   }
 
-  // Validate address and throw an error if it's not
-  const address = getAddress(contract);
-  const chainId = Number(initialChain);
+  // Validate address and throw an error if it's not valid
+  const address = getAddress(contractAddress);
+  const chainId = Number(chain);
 
   try {
     const publicClient = getPublicClient(chainId);
@@ -34,30 +32,33 @@ export async function getHypersubDetails(values: GetHypersubPayload): Promise<Hy
       functionName: 'name'
     });
 
-    const hypersubMetadata: Hypersub = {
+    const hypersubMetadata = {
+      ...props,
       name,
-      contract,
-      chainId,
       image: '/images/logos/fabric-xyz.svg'
     };
 
-    if (initialWalletAddress) {
-      const walletAddress = getAddress(initialWalletAddress);
-      const balanceOf = await publicClient.readContract({
-        address,
-        abi: subscriptionTokenV1ABI,
-        functionName: 'balanceOf',
-        args: [walletAddress]
-      });
-
-      return {
-        ...hypersubMetadata,
-        validKey: balanceOf > 0
-      };
-    }
-
     return hypersubMetadata;
   } catch (error: any) {
+    log.error('Error fetching hypersub details. Check the contract address and chain', { error });
     throw new DataNotFoundError('Error fetching hypersub details. Check the contract address and chain.');
   }
+}
+
+export async function validateHypersubCondition<T extends Required<GetHypersubPayload>>(
+  props: T
+): Promise<T & { validKey?: boolean }> {
+  const { chain, contractAddress, walletAddress: initialWalletAddress } = props;
+  const publicClient = getPublicClient(chain);
+  const address = getAddress(contractAddress);
+  const walletAddress = getAddress(initialWalletAddress);
+
+  const balanceOf = await publicClient.readContract({
+    address,
+    abi: subscriptionTokenV1ABI,
+    functionName: 'balanceOf',
+    args: [walletAddress]
+  });
+
+  return balanceOf > 0 ? { ...props, validKey: true } : props;
 }

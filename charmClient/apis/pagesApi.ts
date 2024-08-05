@@ -1,11 +1,13 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, PageComment, ProfileItem } from '@charmverse/core/prisma';
+import * as http from '@root/adapters/http';
 
-import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';
+import type { FilterGroup } from 'lib/databases/filterGroup';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import type { PageWithContent } from 'lib/pages/interfaces';
+import type { PageLockToggle, PageLockToggleResult } from 'lib/pages/togglePageLock';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];
@@ -13,15 +15,11 @@ export interface UpdateProfileItemRequest {
 
 export class PagesApi {
   getPages({ spaceId }: { spaceId: string }) {
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`);
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { filter: 'sidebar_view' });
   }
 
   getArchivedPages(spaceId: string) {
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { archived: true });
-  }
-
-  searchPages(spaceId: string, search: string, limit?: number) {
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { search, limit });
   }
 
   getPage(pageId: string, spaceId?: string) {
@@ -66,7 +64,29 @@ export class PagesApi {
     return http.POST(`/api/pages/${pageId}/sync-page-comments`);
   }
 
-  exportZippedDatabasePage({ databaseId }: { databaseId: string }) {
-    return http.GET(`/api/pages/${databaseId}/export-database`);
+  exportZippedDatabasePage({
+    databaseId,
+    filter,
+    viewId
+  }: {
+    viewId?: string;
+    databaseId: string;
+    filter?: FilterGroup | null;
+  }) {
+    let customFilter = '';
+    try {
+      customFilter = JSON.stringify(filter);
+    } catch (err) {
+      //
+    }
+
+    return http.GET(
+      `/api/pages/${databaseId}/export-database`,
+      (filter && customFilter) || viewId ? { viewId, filter: customFilter } : undefined
+    );
+  }
+
+  togglePageLock({ isLocked, pageId }: PageLockToggle): Promise<PageLockToggleResult> {
+    return http.PUT(`/api/pages/${pageId}/toggle-lock`, { isLocked });
   }
 }

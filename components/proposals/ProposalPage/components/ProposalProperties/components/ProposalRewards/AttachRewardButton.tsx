@@ -1,51 +1,32 @@
-import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
+import { Typography } from '@mui/material';
+
 import { Button } from 'components/common/Button';
-import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
+import { AddAPropertyButton } from 'components/common/DatabaseEditor/components/properties/AddAProperty';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 export function AttachRewardButton({
   createNewReward,
   variant = 'card_property',
-  isProposalTemplate
+  disabled = false
 }: {
+  disabled?: boolean;
   createNewReward: VoidFunction;
   variant?: 'solid_button' | 'card_property';
-  isProposalTemplate?: boolean;
 }) {
   const { getFeatureTitle } = useSpaceFeatures();
   if (variant === 'card_property') {
     return (
-      <AddAPropertyButton style={{ marginTop: 0 }} onClick={createNewReward}>
+      <AddAPropertyButton disabled={disabled} style={{ marginTop: 0 }} data-test='add-reward' onClick={createNewReward}>
         + Add a {getFeatureTitle('reward')}
       </AddAPropertyButton>
     );
   } else {
     return (
-      <Button size='small' onClick={createNewReward}>
-        + Add a {getFeatureTitle('reward')}
+      <Button size='small' disabled={disabled} onClick={createNewReward}>
+        <Typography fontWeight={700} variant='subtitle1'>
+          + Add a {getFeatureTitle('reward')}
+        </Typography>
       </Button>
     );
   }
-}
-
-export function getDisabledTooltip({
-  newPageValues,
-  rewardValues,
-  isProposalTemplate
-}: {
-  newPageValues: NewPageValues | null;
-  rewardValues: UpdateableRewardFields;
-  isProposalTemplate: boolean;
-}) {
-  let disabledTooltip: string | undefined;
-  if (!newPageValues?.title) {
-    disabledTooltip = 'Page title is required';
-  } else if (!rewardValues.reviewers?.length) {
-    disabledTooltip = 'Reviewer is required';
-  } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0 && !isProposalTemplate) {
-    disabledTooltip = 'You need to assign at least one submitter';
-  }
-
-  return disabledTooltip;
 }

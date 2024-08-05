@@ -1,7 +1,7 @@
 import type { ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Alert, Box, FormGroup, FormLabel, Stack, TextField, Rating, Typography } from '@mui/material';
-import { useEffect, useMemo, useState, forwardRef } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 
@@ -10,11 +10,11 @@ import {
   useUpsertDraftRubricCriteriaAnswers,
   useDeleteRubricCriteriaAnswers
 } from 'charmClient/hooks/proposals';
-import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import { Button } from 'components/common/Button';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { getNumberFromString } from 'lib/utilities/numbers';
+import type { RubricAnswerData } from 'lib/proposals/rubric/upsertRubricAnswers';
+import { getNumberFromString } from 'lib/utils/numbers';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
@@ -25,7 +25,7 @@ type Props = {
   answers?: ProposalRubricCriteriaAnswer[];
   draftAnswers?: ProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
-  onSubmit: (props: { isDraft: boolean }) => void;
+  onSubmit: (props: { isDraft: boolean }) => Promise<void>;
   archived?: boolean;
 };
 
@@ -141,16 +141,25 @@ export function RubricAnswersForm({
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { isDirty }
   } = useForm<FormInput>({
     // mode: 'onChange',
     defaultValues: {
       answers: showDraftAnswers ? mapAnswersToFormValues(draftAnswers) : mapAnswersToFormValues(answers)
     }
-    // resolver: yupResolver(schema(hasCustomReward))
   });
 
-  const { fields } = useFieldArray({ control, name: 'answers' });
+  const { fields } = useFieldArray({
+    control,
+    name: 'answers'
+  });
+
+  const answerValues = watch('answers');
+
+  const answersError = answerValues.some((value) => typeof (value.response as any)?.score !== 'number')
+    ? 'Every question of the evaluation must be answered'
+    : undefined;
 
   async function submitAnswers(values: FormInput) {
     const { confirmed } = await showConfirmation({
@@ -160,11 +169,8 @@ export function RubricAnswersForm({
     if (!confirmed) {
       return;
     }
-    // answers are optional - filter out ones with no score
-    const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
     await upsertRubricCriteriaAnswer({
-      // @ts-ignore -  TODO: make answer types match
-      answers: filteredAnswers,
+      answers: values.answers as unknown as RubricAnswerData[],
       evaluationId
     });
     // if draft is showing, delete it now that we updated the answers
@@ -281,6 +287,7 @@ export function RubricAnswersForm({
           <CriteriaInput
             key={field.id}
             criteria={criteriaList[index]}
+            value={answerValues[index]}
             field={field}
             index={index}
             control={control}
@@ -291,14 +298,16 @@ export function RubricAnswersForm({
         <Box display='flex' gap={2}>
           <Stack direction='row' gap={2}>
             <Button
+              data-test='save-rubric-answers'
               sx={{ alignSelf: 'start' }}
-              disabled={disabled || (!isDirty && !showDraftAnswers)}
+              disabled={answersError || disabled || (!isDirty && !showDraftAnswers)}
               disabledTooltip={
-                archived
+                answersError ||
+                (archived
                   ? 'You cannot evaluate an archived proposal'
                   : disabled
                   ? 'You must be a reviewer to submit an evaluation'
-                  : undefined
+                  : undefined)
               }
               loading={isSaving}
               onClick={handleSubmit(submitAnswers)}
@@ -338,6 +347,7 @@ function CriteriaInput({
   criteria,
   disabled,
   field,
+  value,
   index,
   control,
   register
@@ -345,6 +355,7 @@ function CriteriaInput({
   criteria: ProposalRubricCriteria;
   disabled?: boolean;
   field: FieldArrayWithId<FormInput, 'answers', 'id'>;
+  value: FormInput['answers'][number]; // a readonly prop so we can do validation between fields
   index: number;
   control: any;
   register: UseFormRegister<FormInput>;
@@ -354,10 +365,10 @@ function CriteriaInput({
   const IconContainerComponent = useMemo(
     () =>
       // eslint-disable-next-line react/no-unstable-nested-components
-      function NumberIcon({ value, ...other }: { value: number }) {
+      function NumberIcon({ value: _value, ...other }: { value: number }) {
         return (
           <Box {...other} mx={0.5}>
-            <StyledIcon className='icon'>{convertMUIRatingToActual(value, parameters.min)}</StyledIcon>
+            <StyledIcon className='icon'>{convertMUIRatingToActual(_value, parameters.min)}</StyledIcon>
           </Box>
         );
       },
@@ -401,14 +412,17 @@ function CriteriaInput({
                     </Typography>
                   </FormLabel>
                   <IntegerInput
+                    data-test='rubric-criteria-score-input'
                     onChange={(score) => {
                       _field.onChange(score);
                     }}
                     disabled={disabled}
                     error={
-                      _field.value &&
-                      (_field.value < parameters.min || _field.value > parameters.max) &&
-                      'Invalid score'
+                      (typeof _field.value === 'number' &&
+                        (_field.value < parameters.min || _field.value > parameters.max) &&
+                        'Invalid score') ||
+                      (!!value.comment && typeof _field.value !== 'number' && 'Score is required') ||
+                      ''
                     }
                     inputProps={{
                       placeholder: 'N/A',
@@ -426,6 +440,7 @@ function CriteriaInput({
           />
         </Box>
         <TextField
+          data-test='rubric-criteria-score-comment'
           disabled={disabled}
           multiline
           placeholder='Add comments'
@@ -452,16 +467,19 @@ function IntegerInput({
   onChange,
   inputProps,
   disabled,
-  error
+  error,
+  'data-test': dataTest
 }: {
   value?: number | string | null;
   onChange: (num: number | null) => void;
   error?: string;
   inputProps?: any;
   disabled?: boolean;
+  'data-test'?: string;
 }) {
   return (
     <NumberInputField
+      data-test={dataTest}
       disableArrows
       inline
       error={error}

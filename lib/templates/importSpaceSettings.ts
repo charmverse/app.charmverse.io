@@ -12,11 +12,10 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
+import type { BoardFields } from '@root/lib/databases/board';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
+import { getSpace } from '@root/lib/spaces/getSpace';
 import { v4 as uuid } from 'uuid';
-
-import type { BoardFields } from 'lib/focalboard/board';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
-import { getSpace } from 'lib/spaces/getSpace';
 
 import { getImportData } from './getImportData';
 import type { ImportParams } from './interfaces';
@@ -36,7 +35,7 @@ export async function importSpaceSettings({
 }: ImportParams & { oldNewRoleIdHashMap: Record<string, string> }): Promise<SpaceImportResult> {
   const { space } = await getImportData(importParams);
   if (!space) {
-    throw new DataNotFoundError(`No space to import`);
+    throw new DataNotFoundError(`No space to import: ${importParams.exportName}`);
   }
 
   const targetSpace = await getSpace(targetSpaceIdOrDomain);

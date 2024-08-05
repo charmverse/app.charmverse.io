@@ -1,12 +1,11 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { firebaseApp } from 'lib/google/firebaseApp';
-import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
-import { sessionUserRelations } from 'lib/session/config';
-import { getUserProfile } from 'lib/users/getUser';
-import type { LoggedInUser } from 'models';
+import { firebaseApp } from '@root/lib/google/firebaseApp';
+import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { getUserProfile } from '@root/lib/users/getUser';
+import type { LoggedInUser } from '@root/models';
 
 import type { LoginWithGoogleRequest } from './loginWithGoogle';
 
@@ -26,7 +25,7 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
     throw new InvalidInputError(`No email found in verification result`);
   }
 
-  const [matchedUser, googleAccount] = await Promise.all([
+  const [matchedUser, googleAccount, notificationEmailUser] = await Promise.all([
     prisma.user.findFirst({
       where: {
         verifiedEmails: {
@@ -46,12 +45,18 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
           include: sessionUserRelations
         }
       }
+    }),
+    prisma.user.findFirst({
+      where: {
+        email: verificationResult.email
+      },
+      include: sessionUserRelations
     })
   ]);
 
   let user: LoggedInUser | null = matchedUser;
 
-  let userWillBeCreated = false;
+  let isNew = false;
 
   if (!user && googleAccount) {
     await prisma.verifiedEmail.create({
@@ -63,8 +68,18 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
       }
     });
     user = googleAccount.user;
+  } else if (!user && notificationEmailUser) {
+    await prisma.verifiedEmail.create({
+      data: {
+        avatarUrl: magicLink.avatarUrl ?? verificationResult.picture ?? '',
+        email: verificationResult.email,
+        name: verificationResult.name || verificationResult.email,
+        user: { connect: { id: notificationEmailUser.id } }
+      }
+    });
+    user = notificationEmailUser;
   } else if (!user) {
-    userWillBeCreated = true;
+    isNew = true;
     user = await prisma.user.create({
       data: {
         username: verificationResult.email,
@@ -83,6 +98,19 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
     });
   } else {
     const userId = user.id;
+
+    if (user.claimed === false) {
+      await prisma.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          claimed: true
+        }
+      });
+
+      isNew = true;
+    }
 
     const spaceRoles = await prisma.spaceRole.findMany({
       where: {
@@ -121,7 +149,7 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
   const updatedUser = await getUserProfile('id', (user as LoggedInUser).id);
 
   return {
-    isNew: userWillBeCreated,
+    isNew,
     user: updatedUser
   };
 }

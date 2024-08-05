@@ -1,6 +1,6 @@
 import type { Page, Locator } from '@playwright/test';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import { GlobalPage } from './global.po';
 
@@ -10,6 +10,8 @@ export class ProposalsListPage extends GlobalPage {
     public emptyState = page.locator('data-test=empty-state'),
     public proposalTemplateSelect = page.locator('data-test=proposal-template-select'),
     public addNewTemplate = page.locator('data-test=new-template-button'),
+    public templateContextMenu = page.locator('data-test=template-context-menu'),
+    public duplicateTemplateButton = page.locator('data-test=duplicate-template-button'),
     public createProposalButton = page.locator('data-test=new-proposal-button'),
     public proposalTemplateFreeFormOption = page.locator('data-test=free_form-proposal-template-menu'),
     public structuredProposalTemplateMenu = page.locator('data-test=structured-proposal-template-menu')
@@ -19,6 +21,10 @@ export class ProposalsListPage extends GlobalPage {
 
   goToProposals(domain: string) {
     return this.page.goto(`${baseUrl}/${domain}/proposals`);
+  }
+
+  goToNewProposalForm(domain: string, queryString: string = '') {
+    return this.page.goto(`${baseUrl}/${domain}/proposals/new${queryString}`);
   }
 
   waitForProposalsList() {

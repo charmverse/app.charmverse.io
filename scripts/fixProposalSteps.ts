@@ -1,8 +1,6 @@
-import { Page, Proposal, ProposalReviewer, Vote, VoteStatus } from '@charmverse/core/prisma';
+import { ProposalReviewer } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { getVote } from 'lib/votes/getVote';
-import { ExtendedVote } from 'lib/votes/interfaces';
+import { DataNotFoundError } from 'lib/utils/errors';
 
 export async function updateProposalSteps({ spaceDomain }: { spaceDomain: string }) {
   const templates = await prisma.page.findMany({

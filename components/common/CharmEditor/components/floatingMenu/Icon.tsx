@@ -8,6 +8,7 @@ export type MenuButtonProps = {
   isDisabled?: boolean;
   hints: string[];
   onClick?: React.MouseEventHandler;
+  'data-test'?: string;
 };
 
 const StyledMenuButton = styled(ListItemButton, { shouldForwardProp: (prop) => prop !== 'active' })<{
@@ -35,7 +36,14 @@ const StyledMenuButton = styled(ListItemButton, { shouldForwardProp: (prop) => p
   }
 `;
 
-export function MenuButton({ children, isActive = false, isDisabled, hints, onClick }: MenuButtonProps) {
+export function MenuButton({
+  children,
+  isActive = false,
+  isDisabled,
+  hints,
+  onClick,
+  'data-test': dataTest
+}: MenuButtonProps) {
   return (
     <Tooltip
       title={
@@ -70,6 +78,7 @@ export function MenuButton({ children, isActive = false, isDisabled, hints, onCl
           }}
           aria-label={hints.join('\n')}
           active={isActive}
+          data-test={dataTest}
           onClick={onClick}
         >
           {children}

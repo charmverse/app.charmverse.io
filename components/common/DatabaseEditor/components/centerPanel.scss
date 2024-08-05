@@ -1,0 +1,90 @@
+.CenterPanel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+
+  .octo-board {
+    flex: 0 1 auto;
+
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.BoardComponent {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+
+  > * {
+    padding-left: 24px;
+    padding-right: 24px;
+
+    @media screen and (min-width: 768px) {
+      padding-left: 80px;
+      padding-right: 80px;
+    }
+
+    &.PageBanner {
+      // padding-top: 24px;
+      padding: 0;
+      position: sticky;
+      left: 0;
+
+      @media screen and (max-width: 768px) {
+        padding: 0 8px;
+      }
+    }
+  }
+
+  > .top-head {
+    position: sticky;
+    left: 0;
+    background: rgb(var(--center-channel-bg-rgb));
+    z-index: 2;
+  }
+
+  > .container-container {
+    flex-grow: 1;
+    min-width: fit-content;
+
+    // @media (max-width: 768px) {
+    //     margin-left: 0;
+    //     padding-left: 20px;
+    //     -webkit-overflow-scrolling: touch;
+    // }
+    > div {
+      position: relative;
+      height: 100%;
+
+      .full-page & {
+        padding-bottom: var(--page-layout-pb);
+      }
+    }
+
+    &.sidebar-visible {
+      margin-right: 0;
+      min-width: unset;
+
+      > div {
+        overflow: hidden;
+      }
+    }
+  }
+
+  // hide view actions for embedded databases
+
+  &.embedded-board .view-actions {
+    opacity: 0;
+  }
+
+  &.embedded-board:hover .view-actions {
+    opacity: 1;
+  }
+}
+
+.view-actions {
+  display: flex;
+  transition: opacity 0.2s ease-in-out;
+}

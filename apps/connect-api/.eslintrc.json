@@ -1,0 +1,16 @@
+{
+  "extends": "../../.eslintrc.json",
+  "rules": {
+    "@next/next/no-html-link-for-pages": "off",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true,
+        "packageDir": [
+          "./",
+          "../../"
+        ]
+      }
+    ]
+  }
+}

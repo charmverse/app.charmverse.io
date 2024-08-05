@@ -1,7 +1,8 @@
+import type { IdentityType } from '@charmverse/core/prisma-client';
+import { isTestEnv } from '@root/config/constants';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { isTestEnv } from 'config/constants';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -14,14 +15,17 @@ if (isTestEnv) {
 export type TestLoginRequest = {
   anonymousUserId?: string;
   userId?: string;
+  otpUser?: { id: string; method: IdentityType };
 };
 
 async function login(req: NextApiRequest, res: NextApiResponse) {
-  const { anonymousUserId, userId } = req.body as TestLoginRequest;
+  const { anonymousUserId, userId, otpUser } = req.body as TestLoginRequest;
 
   if (userId) {
     req.session.user = { id: userId };
-  } else {
+  } else if (otpUser) {
+    req.session.otpUser = otpUser;
+  } else if (anonymousUserId) {
     req.session.anonymousUserId = anonymousUserId;
   }
 

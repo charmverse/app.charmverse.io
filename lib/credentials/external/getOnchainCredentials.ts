@@ -1,35 +1,59 @@
 import type { ApolloClient } from '@apollo/client';
 import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
+import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
 import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
+import { isDevEnv, isStagingEnv } from '@root/config/constants';
 import { getAddress } from 'viem';
-import { arbitrum, base, optimism } from 'viem/chains';
+import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
 import { ApolloClientWithRedisCache } from '../apolloClientWithRedisCache';
 import type { EasSchemaChain } from '../connectors';
-import { getOnChainAttestationUrl } from '../connectors';
+import { easSchemaChains, easSchemaMainnetChains, getOnChainAttestationUrl } from '../connectors';
+import type { ProposalCredential } from '../schemas/proposal';
+import { proposalCredentialSchemaId } from '../schemas/proposal';
+import type { RewardCredential } from '../schemas/reward';
+import { rewardCredentialSchemaId } from '../schemas/reward';
 
 import type { ExternalCredentialChain } from './schemas';
-import { externalCredentialChains, trackedSchemas } from './schemas';
+import { externalCredentialChains, trackedCharmverseSchemas, trackedSchemas } from './schemas';
 
 // For a specific profile, only refresh attestations every half hour
 const defaultEASCacheDuration = 1800;
 
-const graphQlClients: Record<ExternalCredentialChain, ApolloClient<any>> = {
+const skipRedisCache = isStagingEnv || isDevEnv;
+
+const graphQlClients: Record<ExternalCredentialChain | EasSchemaChain, ApolloClient<any>> = {
   [optimism.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://optimism.easscan.org/graphql',
-    persistForSeconds: defaultEASCacheDuration
+    persistForSeconds: defaultEASCacheDuration,
+    skipRedisCache
+  }),
+  [sepolia.id]: new ApolloClientWithRedisCache({
+    cacheKeyPrefix: 'sepolia-easscan',
+    uri: 'https://sepolia.easscan.org/graphql',
+    persistForSeconds: defaultEASCacheDuration,
+    skipRedisCache
+  }),
+  [optimismSepolia.id]: new ApolloClientWithRedisCache({
+    cacheKeyPrefix: 'optimism-sepolia-easscan',
+    uri: 'https://optimism-sepolia.easscan.org/graphql',
+    persistForSeconds: defaultEASCacheDuration,
+    skipRedisCache
   }),
   [base.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'base-easscan',
     uri: 'https://base.easscan.org/graphql',
-    persistForSeconds: defaultEASCacheDuration
+    persistForSeconds: defaultEASCacheDuration,
+    skipRedisCache
   }),
   [arbitrum.id]: new ApolloClientWithRedisCache({
     uri: 'https://arbitrum.easscan.org/graphql',
     cacheKeyPrefix: 'arbitrum-easscan',
-    persistForSeconds: defaultEASCacheDuration
+    persistForSeconds: defaultEASCacheDuration,
+    skipRedisCache
   })
 };
 
@@ -47,6 +71,13 @@ export type EASAttestationFromApi<T = any> = {
   type: 'onchain' | 'charmverse' | 'gitcoin';
   verificationUrl: string | null;
   iconUrl?: string | null;
+  issuedCredentialId?: string;
+};
+
+export type EASAttestationWithFavorite<T = any> = EASAttestationFromApi<T> & {
+  index: number;
+  // If its favorite then the value is non null
+  favoriteCredentialId: string | null;
 };
 
 const GET_EXTERNAL_CREDENTIALS = gql`
@@ -58,28 +89,31 @@ const GET_EXTERNAL_CREDENTIALS = gql`
       attester
       recipient
       schemaId
+      timeCreated
     }
   }
 `;
 
-function getTrackedOnChainCredentials({
+export function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | EasSchemaChain, Data = any>({
   chainId,
-  wallets
+  wallets,
+  schemas,
+  type = 'onchain'
 }: {
-  chainId: ExternalCredentialChain;
-  wallets: string[];
-}): Promise<EASAttestationFromApi[]> {
-  const recipient = wallets.map((w) => getAddress(w));
+  schemas: Record<Chain, { schemaId: string; issuers?: string[] }[]>;
+  chainId: Chain;
+  wallets?: string[];
+  type?: 'onchain' | 'charmverse';
+}): Promise<EASAttestationFromApi<Data>[]> {
+  const recipient = wallets?.map((w) => getAddress(w));
 
   const query = {
-    OR: trackedSchemas[chainId].map((_schema) => ({
+    OR: schemas[chainId].map((_schema) => ({
       schemaId: {
         equals: _schema.schemaId
       },
-      attester: {
-        in: _schema.issuers
-      },
-      recipient: { in: recipient }
+      attester: _schema.issuers ? { in: _schema.issuers } : undefined,
+      recipient: recipient ? { in: recipient } : undefined
     }))
   };
 
@@ -91,31 +125,210 @@ function getTrackedOnChainCredentials({
       }
     })
     .then(({ data }) => {
-      return data.attestations.map(
-        (attestation: any) =>
-          ({
-            ...attestation,
-            type: 'external',
-            chainId,
-            content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
-              acc[val.name] = val.value.value;
-              return acc;
-            }, {} as any),
-            timeCreated: attestation.timeCreated * 1000,
-            verificationUrl: getOnChainAttestationUrl({ chainId, attestationId: attestation.id })
-          } as EASAttestationFromApi)
-      );
+      return data.attestations.map((attestation: any) => {
+        return {
+          ...attestation,
+          chainId,
+          type,
+          content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
+            acc[val.name] = val.value.value;
+            return acc;
+          }, {} as any),
+          timeCreated: attestation.timeCreated * 1000,
+          verificationUrl: getOnChainAttestationUrl({ chainId, attestationId: attestation.id })
+        };
+      });
     });
 }
 
-export async function getAllOnChainAttestations({ wallets }: { wallets: string[] }): Promise<EASAttestationFromApi[]> {
+export async function getCharmverseOnchainCredentials({
+  wallets,
+  includeTestnets
+}: {
+  wallets: string[];
+  includeTestnets?: boolean;
+}) {
+  const charmverseAttestations = await Promise.all(
+    (includeTestnets ? easSchemaChains : easSchemaMainnetChains.map((c) => c.id)).map((chainId) =>
+      getTrackedOnChainCredentials({ chainId, wallets, schemas: trackedCharmverseSchemas, type: 'charmverse' }).catch(
+        (err) => {
+          log.error(
+            `Error fetching on chain EAS attestations for wallets ${wallets.join(', ')} on chainId ${chainId}`,
+            {
+              wallets,
+              chainId,
+              error: err
+            }
+          );
+          return [] as EASAttestationFromApi[];
+        }
+      )
+    )
+  ).then((results) => results.flat());
+
+  const { rewardCredentials, proposalCredentials } = charmverseAttestations.reduce(
+    (acc, val) => {
+      if (val.schemaId === rewardCredentialSchemaId) {
+        const submissionId = (val.content as RewardCredential).rewardURL.split('/').pop()?.trim();
+        if (submissionId && stringUtils.isUUID(submissionId)) {
+          acc.rewardCredentials.push({ ...val, submissionId });
+        }
+      } else if (val.schemaId === proposalCredentialSchemaId) {
+        const proposalPageId = (val.content as ProposalCredential).URL.split('/').pop()?.trim();
+        if (proposalPageId && stringUtils.isUUID(proposalPageId)) {
+          acc.proposalCredentials.push({ ...val, proposalPageId });
+        }
+      }
+      return acc;
+    },
+    { rewardCredentials: [], proposalCredentials: [] } as {
+      rewardCredentials: (EASAttestationFromApi & { submissionId: string })[];
+      proposalCredentials: (EASAttestationFromApi & { proposalPageId: string })[];
+    }
+  );
+
+  const rewardCredentialIconUrls = (
+    rewardCredentials.length
+      ? await prisma.application.findMany({
+          where: {
+            id: {
+              in: rewardCredentials.map((c) => c.submissionId)
+            }
+          },
+          select: {
+            id: true,
+            bounty: {
+              select: {
+                space: {
+                  select: {
+                    credentialLogo: true
+                  }
+                }
+              }
+            }
+          }
+        })
+      : []
+  ).reduce((acc, val) => {
+    const iconUrl = val.bounty.space.credentialLogo;
+    acc[val.id] = iconUrl;
+    return acc;
+  }, {} as Record<string, string | null>);
+
+  const proposalCredentialIconUrls = (
+    proposalCredentials.length
+      ? await prisma.proposal.findMany({
+          where: {
+            page: {
+              id: {
+                in: proposalCredentials.map((c) => c.proposalPageId)
+              }
+            }
+          },
+          select: {
+            id: true,
+            space: {
+              select: {
+                credentialLogo: true
+              }
+            }
+          }
+        })
+      : []
+  ).reduce((acc, val) => {
+    const iconUrl = val.space.credentialLogo;
+    acc[val.id] = iconUrl;
+    return acc;
+  }, {} as Record<string, string | null>);
+
+  return {
+    rewardCredentials: rewardCredentials.map((attestation) => {
+      const iconUrl = (attestation as (typeof rewardCredentials)[number]).submissionId
+        ? rewardCredentialIconUrls[(attestation as (typeof rewardCredentials)[number]).submissionId]
+        : null;
+
+      attestation.iconUrl = iconUrl;
+
+      return attestation;
+    }),
+    proposalCredentials: proposalCredentials.map((attestation) => {
+      const iconUrl = (attestation as (typeof proposalCredentials)[number]).proposalPageId
+        ? proposalCredentialIconUrls[(attestation as (typeof proposalCredentials)[number]).proposalPageId]
+        : null;
+
+      attestation.iconUrl = iconUrl;
+      return attestation;
+    })
+  };
+}
+
+export async function getOnchainCredentialsById({
+  attestations
+}: {
+  attestations: { id: string; chainId: EasSchemaChain }[];
+}): Promise<EASAttestationFromApi[]> {
+  const groupedByChain = attestations.reduce((acc, val) => {
+    if (!acc[val.chainId]) {
+      acc[val.chainId] = [];
+    }
+
+    acc[val.chainId].push(val.id);
+
+    return acc;
+  }, {} as Record<EasSchemaChain, string[]>);
+
+  const foundAttestations = await Promise.all(
+    Object.entries(groupedByChain).map(([chainId, attestationIds]) => {
+      const query = {
+        id: {
+          in: attestationIds
+        }
+      };
+
+      const numericalChainId = parseInt(chainId) as EasSchemaChain;
+
+      return graphQlClients[numericalChainId]
+        .query({
+          query: GET_EXTERNAL_CREDENTIALS,
+          variables: {
+            where: query
+          }
+        })
+        .then(({ data }) => {
+          return data.attestations.map((attestation: any) => {
+            return {
+              ...attestation,
+              chainId,
+              type: 'onchain',
+              content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
+                acc[val.name] = val.value.value;
+                return acc;
+              }, {} as any),
+              timeCreated: attestation.timeCreated * 1000,
+              verificationUrl: getOnChainAttestationUrl({ chainId: numericalChainId, attestationId: attestation.id })
+            } as EASAttestationFromApi;
+          });
+        });
+    })
+  ).then((data) => data.flat());
+
+  return foundAttestations;
+}
+
+export async function getAllOnChainAttestations({
+  wallets,
+  includeTestnets
+}: {
+  wallets: string[];
+  includeTestnets?: boolean;
+}): Promise<EASAttestationWithFavorite[]> {
   if (!wallets.length) {
     return [];
   }
 
-  const attestations = await Promise.all(
+  const otherCredentials = await Promise.all(
     externalCredentialChains.map((chainId) =>
-      getTrackedOnChainCredentials({ chainId, wallets }).catch((err) => {
+      getTrackedOnChainCredentials({ chainId, wallets, schemas: trackedSchemas }).catch((err) => {
         log.error(`Error fetching on chain EAS attestations for wallets ${wallets.join(', ')} on chainId ${chainId}`, {
           wallets,
           chainId,
@@ -126,5 +339,41 @@ export async function getAllOnChainAttestations({ wallets }: { wallets: string[]
     )
   ).then((results) => results.flat());
 
-  return attestations;
+  const { proposalCredentials, rewardCredentials } = await getCharmverseOnchainCredentials({
+    wallets,
+    includeTestnets
+  });
+
+  const favoriteCredentials = await prisma.favoriteCredential.findMany({
+    where: {
+      attestationId: {
+        in: [...proposalCredentials, ...rewardCredentials, ...otherCredentials].map((a) => a.id)
+      }
+    },
+    select: {
+      index: true,
+      attestationId: true,
+      id: true
+    }
+  });
+
+  return [...proposalCredentials, ...rewardCredentials, ...otherCredentials].map((attestation) => {
+    const favoriteCredential = favoriteCredentials.find((f) => f.attestationId === attestation.id);
+
+    if (favoriteCredential) {
+      return {
+        ...attestation,
+        index: favoriteCredential.index,
+        favoriteCredentialId: favoriteCredential.id,
+        iconUrl: null
+      };
+    }
+
+    return {
+      ...attestation,
+      index: -1,
+      favoriteCredentialId: null,
+      iconUrl: null
+    };
+  });
 }

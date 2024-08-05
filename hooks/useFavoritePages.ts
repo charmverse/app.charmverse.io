@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import charmClient from 'charmClient';
+import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 
 export type FavoritePage = {
@@ -10,6 +11,7 @@ export type FavoritePage = {
 
 export function useFavoritePages() {
   const { user, updateUser } = useUser();
+  const { pages } = usePages();
 
   const favorites: FavoritePage[] = useMemo(() => {
     const items = user?.favorites || [];
@@ -17,7 +19,8 @@ export function useFavoritePages() {
 
     return items;
   }, [user?.favorites]);
-  const favoritePageIds = useMemo(() => favorites.map((f) => f.pageId), [favorites]);
+  // filter out page ids that are not from this space
+  const favoritePageIds = useMemo(() => favorites.map((f) => f.pageId).filter((id) => pages[id]), [favorites, pages]);
 
   const reorderFavorites = async ({ reorderId, nextSiblingId }: { reorderId: string; nextSiblingId: string }) => {
     const siblings = favorites.filter(({ pageId }) => pageId !== reorderId) ?? [];

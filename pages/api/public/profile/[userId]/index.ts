@@ -5,8 +5,8 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
-import { isUUID } from 'lib/utilities/strings';
+import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
+import { isUUID } from 'lib/utils/strings';
 
 export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;

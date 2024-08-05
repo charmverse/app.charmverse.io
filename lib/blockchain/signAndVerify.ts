@@ -1,76 +1,91 @@
-import { SiweMessage } from 'lit-siwe';
-import { getAddress, recoverMessageAddress } from 'viem';
+import { log } from '@charmverse/core/log';
+import { SiweMessage } from 'siwe';
+import { hashMessage, parseAbi } from 'viem';
 
-import { InvalidInputError } from '../utilities/errors';
-import { lowerCaseEqual } from '../utilities/strings';
+import { InvalidInputError } from '../utils/errors';
 
-import type { AuthSig } from './interfaces';
+import { getPublicClient } from './publicClient';
 
 /**
- * @host - Domain prefixed with protocol ie. http://localhost:3000
+ * @domain - Domain prefixed with protocol ie. http://localhost:3000
  */
-export type SignatureToGenerate = {
+export type SignatureVerificationPayload = {
+  message: SiweMessage;
+  signature: `0x${string}`;
+};
+
+/**
+ * An external address is necessary from SiweMessage content as we can't rely on the address in the message for EIP-712 signature verification
+ */
+export type SignatureVerificationPayloadWithAddress = SignatureVerificationPayload & {
   address: string;
-  chainId: number;
-  host: string;
 };
 
-export type SignaturePayload = {
-  domain: string;
-  address: string; // convert to EIP-55 format or else SIWE complains
-  uri: string;
-  version: '1';
-  chainId: number;
-  nonce?: string;
-  issuedAt?: string;
-};
+export async function getSiweFields({ message, signature, domain }: SignatureVerificationPayload & { domain: string }) {
+  const siweMessage = new SiweMessage(message);
+  const fields = await siweMessage.verify({ signature, domain });
 
-export function generateSignaturePayload({ address, chainId, host }: SignatureToGenerate): SignaturePayload {
-  const domain = host.match('https') ? host.split('https://')[1] : host.split('http://')[1];
-  const uri = host;
-
-  return {
-    domain,
-    address: getAddress(address), // convert to EIP-55 format or else SIWE complains
-    uri,
-    version: '1',
-    chainId
-  };
+  return fields;
 }
 
-export type SignatureVerification = {
-  address: string;
-  host: string;
-  signature: AuthSig;
-};
-
 /**
- * Use this for
+ * Use this for validating wallet signatures
  */
-export async function isValidWalletSignature({ address, host, signature }: SignatureVerification): Promise<boolean> {
-  if (!address || !host || !signature) {
+export async function isValidWalletSignature({
+  message,
+  signature,
+  domain
+}: SignatureVerificationPayload & { domain: string }): Promise<boolean> {
+  if (!message || !signature || !domain) {
     throw new InvalidInputError('A wallet address, host and signature are required');
   }
 
-  const chainId = signature.signedMessage.split('Chain ID:')[1]?.split('\n')[0]?.trim();
-  const nonce = signature.signedMessage.split('Nonce:')[1]?.split('\n')[0]?.trim();
-  const issuedAt = signature.signedMessage.split('Issued At:')[1]?.split('\n')[0]?.trim();
+  try {
+    const fields = await getSiweFields({ message, signature, domain });
 
-  const payload = {
-    ...generateSignaturePayload({ address, chainId: parseInt(chainId), host }),
-    nonce,
-    issuedAt
-  };
-
-  const message = new SiweMessage(payload);
-
-  const body = message.prepareMessage();
-
-  const signatureAddress = await recoverMessageAddress({ message: body, signature: signature.sig });
-
-  if (!lowerCaseEqual(signatureAddress, address)) {
-    return false;
+    if (fields.success) {
+      return true;
+    }
+  } catch (err: any) {
+    log.error('Error validating wallet signature', { error: err.error });
   }
 
-  return true;
+  return false;
+}
+
+const EIP1271_MAGIC_VALUE = '0x1626ba7e';
+
+const gnosisEipVerifyAbi = parseAbi([
+  'function isValidSignature(bytes32 _messageHash, bytes _signature) public view returns (bytes4)'
+]);
+
+/**
+ * Used for validating Gnosis Safe signatures
+ */
+export async function verifyEIP1271Signature({
+  message,
+  signature,
+  address
+}: SignatureVerificationPayloadWithAddress): Promise<boolean> {
+  const chainId = message.chainId;
+  const parsedMessage = new SiweMessage(message).toMessage();
+
+  const messageHash = hashMessage(parsedMessage);
+
+  const client = getPublicClient(chainId);
+
+  const data = await client
+    .readContract({
+      address: address as any,
+      account: address as any,
+      abi: gnosisEipVerifyAbi,
+      args: messageHash ? [messageHash, signature] : (null as any),
+      functionName: 'isValidSignature'
+    })
+    .catch((err) => {
+      // We might be trying to read a contract that does not exist
+      return null;
+    });
+
+  return data === EIP1271_MAGIC_VALUE;
 }

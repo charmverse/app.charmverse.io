@@ -39,7 +39,7 @@ export function RewardActions({ rewardId, onClick }: { rewardId: string; onClick
     }
   }
 
-  async function closereward() {
+  async function closeReward() {
     try {
       await charmClient.rewards.closeReward(rewardId);
       if (refreshReward) {
@@ -77,7 +77,7 @@ export function RewardActions({ rewardId, onClick }: { rewardId: string; onClick
       </Tooltip>
       <Tooltip title={!isMarkRewardCompletedEnabled ? disabledMarkRewardCompletedTooltipMessage : ''}>
         <div>
-          <MenuItem dense onClick={closereward} disabled={!isMarkRewardCompletedEnabled}>
+          <MenuItem dense onClick={closeReward} disabled={!isMarkRewardCompletedEnabled}>
             <CheckCircleOutlinedIcon
               sx={{
                 mr: 1

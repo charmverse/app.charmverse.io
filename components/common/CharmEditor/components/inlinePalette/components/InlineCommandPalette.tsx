@@ -1,5 +1,4 @@
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
-import { selectionTooltip } from '@bangle.dev/tooltip';
 import styled from '@emotion/styled';
 import { ClickAwayListener } from '@mui/material';
 import Grow from '@mui/material/Grow';
@@ -11,9 +10,9 @@ import type { PopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useMemo, useCallback, useEffect, useState } from 'react';
 
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-
-import type { NestedPagePluginState } from '../../nestedPage';
+import { useEditorViewContext } from '../../@bangle.dev/react/hooks';
+import { hideSelectionTooltip } from '../../@bangle.dev/tooltip/selectionTooltip';
+import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import { GroupLabel } from '../../PopoverMenu';
 import { useInlinePaletteItems, useInlinePaletteQuery } from '../hooks';
 import { PaletteItem, PALETTE_ITEM_REGULAR_TYPE } from '../paletteItem';
@@ -46,6 +45,18 @@ function getItemsAndHints(
     .filter((item) => (typeof item.hidden === 'function' ? !item.hidden(view.state) : !item.hidden))
     .filter((item) => queryMatch(item, query) && item.type === PALETTE_ITEM_REGULAR_TYPE)
     .map((item) => ({ ...item, _isItemDisabled: isItemDisabled(item) }));
+
+  if (query) {
+    // Apply the sort based on priority only if the items are in the same group and there is a search query
+    return {
+      items: items.sort((a, b) => {
+        if (a.group === b.group) {
+          return (b.priority ?? 0) - (a.priority ?? 0);
+        }
+        return 0;
+      })
+    };
+  }
 
   return { items };
 }
@@ -124,7 +135,7 @@ export default function InlineCommandPalette({
 
   function closeSubMenu() {
     if (menuKey) {
-      selectionTooltip.hideSelectionTooltip(menuKey)(view.state, view.dispatch, view);
+      hideSelectionTooltip(menuKey)(view.state, view.dispatch, view);
     }
   }
 

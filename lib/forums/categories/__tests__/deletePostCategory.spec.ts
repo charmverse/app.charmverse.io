@@ -1,8 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createForumPost } from '@root/lib/forums/posts/createForumPost';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
-import { createForumPost } from 'lib/forums/posts/createForumPost';
-import { InvalidInputError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
@@ -47,7 +47,7 @@ describe('deletePostCategory', () => {
     });
 
     await createForumPost({
-      content: {},
+      content: null,
       spaceId: space.id,
       categoryId: category.id,
       title: 'Test Post',

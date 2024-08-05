@@ -1,20 +1,30 @@
-import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import styled from '@emotion/styled';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box, Grid, Stack, Typography } from '@mui/material';
+import { debounce } from 'lodash';
 import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
-import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
-import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
-import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
-import AddViewMenu from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
-import { getVisibleAndHiddenGroups } from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
-import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
-import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import { ToggleViewSidebarButton } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ToggleViewSidebarButton';
-import ViewHeaderDisplayByMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderDisplayByMenu';
-import ViewTabs from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewTabs';
-import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
+import { Button } from 'components/common/Button';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import CharmEditor from 'components/common/CharmEditor/CharmEditor';
+import AddViewMenu from 'components/common/DatabaseEditor/components/addViewMenu';
+import { getVisibleAndHiddenGroups } from 'components/common/DatabaseEditor/components/centerPanel';
+import { CreateLinkedView } from 'components/common/DatabaseEditor/components/createLinkedView';
+import Gallery from 'components/common/DatabaseEditor/components/gallery/gallery';
+import Kanban from 'components/common/DatabaseEditor/components/kanban/kanban';
+import Table from 'components/common/DatabaseEditor/components/table/table';
+import { ViewFilterControl } from 'components/common/DatabaseEditor/components/ViewFilterControl';
+import { ToggleViewSidebarButton } from 'components/common/DatabaseEditor/components/viewHeader/ToggleViewSidebarButton';
+import ViewHeaderDisplayByMenu from 'components/common/DatabaseEditor/components/viewHeader/viewHeaderDisplayByMenu';
+import ViewTabs from 'components/common/DatabaseEditor/components/viewHeader/viewTabs';
+import { ViewSettingsRow } from 'components/common/DatabaseEditor/components/ViewSettingsRow';
+import ViewSidebar from 'components/common/DatabaseEditor/components/viewSidebar/viewSidebar';
+import { ViewSortControl } from 'components/common/DatabaseEditor/components/ViewSortControl';
+import mutator from 'components/common/DatabaseEditor/mutator';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -26,28 +36,38 @@ import {
 import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
-import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
-import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
+import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import type { Card, CardPage } from 'lib/focalboard/card';
-import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
-import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
-import { defaultRewardViews, supportedRewardViewTypes } from 'lib/rewards/blocks/views';
+import { createBoard } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
+import { viewTypeToBlockId } from 'lib/databases/customBlocks/constants';
+import type { PageContent } from 'lib/prosemirror/interfaces';
+import { APPLICANT_STATUS_BLOCK_ID, DUE_DATE_ID, REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
+import { supportedRewardViewTypes } from 'lib/rewards/blocks/views';
 
+import { RewardsHeaderRowsMenu } from './components/RewardsHeaderRowsMenu';
 import { useRewards } from './hooks/useRewards';
 
-const CalendarFullView = dynamic(
-  () => import('../common/BoardEditor/focalboard/src/components/calendar/fullCalendar'),
-  { ssr: false }
-);
+const CalendarFullView = dynamic(() => import('../common/DatabaseEditor/components/calendar/fullCalendar'), {
+  ssr: false
+});
+
+const StyledButton = styled(Button)`
+  position: absolute;
+  top: -30px;
+  opacity: 0;
+  transition: opacity 0.25s;
+  &:hover {
+    opacity: 1;
+    transition: opacity 0.25s;
+  }
+`;
 
 export function RewardsPage({ title }: { title: string }) {
-  useRewardsNavigation();
-
   const { space: currentSpace } = useCurrentSpace();
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { isFreeSpace } = useIsFreeSpace();
@@ -56,35 +76,46 @@ export function RewardsPage({ title }: { title: string }) {
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
   const { getRewardPage } = useRewardPage();
   const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
-
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const isAdmin = useIsAdmin();
 
-  const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoard();
+  const { board: activeBoard, views, cards, activeView } = useRewardsBoardAndBlocks();
 
   const [showSidebar, setShowSidebar] = useState(false);
-  const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
 
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
     if ((!_groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
-      _groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
+      if (activeView.fields.sourceType === 'reward_applications') {
+        _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === APPLICANT_STATUS_BLOCK_ID);
+      } else {
+        _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === REWARD_STATUS_BLOCK_ID);
+      }
     }
 
     return _groupByProperty;
-  }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
+  }, [
+    activeBoard?.fields.cardProperties,
+    activeView?.fields.groupById,
+    activeView?.fields.viewType,
+    activeView.fields.sourceType
+  ]);
 
-  const { visible: visibleGroups, hidden: hiddenGroups } = activeView
-    ? getVisibleAndHiddenGroups(
-        cardPages as CardPage[],
-        activeView.fields.visibleOptionIds,
-        activeView.fields.hiddenOptionIds,
-        groupByProperty
-      )
-    : { visible: [], hidden: [] };
+  const { visible: visibleGroups, hidden: hiddenGroups } = useMemo(
+    () =>
+      activeView
+        ? getVisibleAndHiddenGroups(
+            cards,
+            activeView.fields.visibleOptionIds,
+            activeView.fields.hiddenOptionIds,
+            groupByProperty
+          )
+        : { visible: [], hidden: [] },
+    [activeView, cards, groupByProperty]
+  );
 
   useRewardsBoardMutator();
-
   const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
 
@@ -100,14 +131,8 @@ export function RewardsPage({ title }: { title: string }) {
 
   function openPage(rewardId: string | null) {
     if (!rewardId) return;
-
     const pageId = getRewardPage(rewardId)?.id || rewardId;
-
-    if (openPageIn === 'center_peek') {
-      updateURLQuery({ id: pageId });
-    } else if (openPageIn === 'full_page') {
-      navigateToSpacePath(`/${pageId}`);
-    }
+    navigateToSpacePath(`/${pageId}`);
   }
 
   const onDelete = useCallback(async (rewardId: string) => {
@@ -118,13 +143,40 @@ export function RewardsPage({ title }: { title: string }) {
     if (id && (!rewardId || id === rewardId)) {
       openPage(id);
     } else if (id) {
-      if (openPageIn === 'center_peek') {
-        updateURLQuery({ applicationId: id });
-      } else if (openPageIn === 'full_page') {
-        navigateToSpacePath(`/rewards/applications/${id}`);
-      }
+      navigateToSpacePath(`/rewards/applications/${id}`);
     }
   };
+
+  const onDescriptionChange = useMemo(
+    () =>
+      debounce((content: PageContent) => {
+        const oldBlocks = [activeBoard];
+        const newBoard = createBoard({
+          block: activeBoard
+        });
+        newBoard.fields.description = content;
+        mutator.updateBlocks([newBoard], oldBlocks, 'Change description');
+      }, 250),
+    [activeBoard]
+  );
+
+  const onShowDescription = useCallback(() => {
+    const oldBlocks = [activeBoard];
+    const newBoard = createBoard({
+      block: activeBoard
+    });
+    newBoard.fields.showDescription = true;
+    mutator.updateBlocks([newBoard], oldBlocks, 'Show description');
+  }, [activeBoard]);
+
+  const onHideDescription = useCallback(() => {
+    const oldBlocks = [activeBoard];
+    const newBoard = createBoard({
+      block: activeBoard
+    });
+    newBoard.fields.showDescription = false;
+    mutator.updateBlocks([newBoard], oldBlocks, 'Hide description');
+  }, [activeBoard]);
 
   const showView = (boardViewId: string) => {
     const viewId = Object.entries(viewTypeToBlockId).find(([, blockId]) => blockId === boardViewId)?.[0] ?? boardViewId;
@@ -132,7 +184,7 @@ export function RewardsPage({ title }: { title: string }) {
     updateURLQuery({ viewId });
   };
 
-  if (isLoadingAccess) {
+  if (isLoadingAccess || !activeBoard) {
     return null;
   }
 
@@ -140,10 +192,50 @@ export function RewardsPage({ title }: { title: string }) {
     return <ErrorPage message='You cannot access rewards for this space' />;
   }
 
+  const showViewHeaderRowsMenu = checkedIds.length !== 0 && activeBoard;
+
   return (
     <DatabaseContainer>
       <DatabaseStickyHeader>
         <DatabaseTitle>
+          <Box position='relative'>
+            {isAdmin && (
+              <StyledButton
+                variant='text'
+                color='secondary'
+                size='small'
+                onClick={() => {
+                  if (activeBoard.fields.showDescription) {
+                    onHideDescription();
+                  } else {
+                    onShowDescription();
+                  }
+                }}
+              >
+                {activeBoard.fields.showDescription ? (
+                  <>
+                    <VisibilityOffOutlinedIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 0.5
+                      }}
+                    />
+                    <FormattedMessage id='ViewTitle.hide-description' defaultMessage='Hide description' />
+                  </>
+                ) : (
+                  <>
+                    <VisibilityOutlinedIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 0.5
+                      }}
+                    />
+                    <FormattedMessage id='ViewTitle.show-description' defaultMessage='Show description' />
+                  </>
+                )}
+              </StyledButton>
+            )}
+          </Box>
           <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
             <Typography variant='h1' gutterBottom>
               {title}
@@ -159,41 +251,69 @@ export function RewardsPage({ title }: { title: string }) {
                   flexDirection: 'row-reverse'
                 }}
               >
-                <NewRewardButton showPage={openPage} />
+                <NewRewardButton />
               </Box>
             </Box>
           </Box>
-        </DatabaseTitle>
-        <>
-          <Stack direction='row' alignItems='center' justifyContent='space-between' gap={1}>
-            <Stack mb={0.5} direction='row' alignItems='center'>
-              <ViewTabs
-                openViewOptions={() => setShowSidebar(true)}
-                board={activeBoard}
-                views={views}
+          {activeBoard.fields.showDescription && (
+            <div className='description'>
+              <CharmEditor
+                disablePageSpecificFeatures
+                isContentControlled
+                content={activeBoard.fields.description}
+                onContentChange={(content: ICharmEditorOutput) => {
+                  onDescriptionChange(content.doc);
+                }}
+                style={{
+                  marginLeft: 35
+                }}
+                disableRowHandles
+                disableNestedPages
                 readOnly={!isAdmin}
-                showView={showView}
-                activeView={activeView}
-                disableUpdatingUrl
-                maxTabsShown={3}
-                readOnlyViewIds={defaultRewardViews}
-                supportedViewTypes={supportedRewardViewTypes}
               />
+            </div>
+          )}
+        </DatabaseTitle>
+        <Stack gap={0.75}>
+          <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
+            {showViewHeaderRowsMenu ? (
+              <RewardsHeaderRowsMenu
+                visiblePropertyIds={activeView?.fields.visiblePropertyIds}
+                board={activeBoard}
+                cards={cards as Card[]}
+                checkedIds={checkedIds}
+                setCheckedIds={setCheckedIds}
+              />
+            ) : (
+              <>
+                <ViewTabs
+                  openViewOptions={() => setShowSidebar(true)}
+                  board={activeBoard}
+                  views={views}
+                  readOnly={!isAdmin}
+                  showView={showView}
+                  activeView={activeView}
+                  disableUpdatingUrl
+                  maxTabsShown={3}
+                  supportedViewTypes={supportedRewardViewTypes}
+                />
+                {isAdmin && views.length <= 3 && (
+                  <Stack mb='-5px'>
+                    <AddViewMenu
+                      board={activeBoard}
+                      activeView={activeView}
+                      views={views}
+                      showView={showView}
+                      supportedViewTypes={supportedRewardViewTypes}
+                    />
+                  </Stack>
+                )}
+              </>
+            )}
 
-              {!!views.length && views.length <= 3 && (
-                <Stack mb='-5px'>
-                  <AddViewMenu
-                    board={activeBoard}
-                    activeView={activeView}
-                    views={views}
-                    showView={showView}
-                    supportedViewTypes={supportedRewardViewTypes}
-                  />
-                </Stack>
-              )}
-            </Stack>
+            <div className='octo-spacer' />
 
-            <Stack direction='row' alignItems='center' mb={1} gap={0.5}>
+            <Box className='view-actions'>
               {withDisplayBy && (
                 <ViewHeaderDisplayByMenu
                   properties={activeBoard?.fields.cardProperties ?? []}
@@ -204,12 +324,7 @@ export function RewardsPage({ title }: { title: string }) {
 
               <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
-              <ViewSortControl
-                activeBoard={activeBoard}
-                activeView={activeView}
-                cards={cards as Card[]}
-                viewSortPopup={viewSortPopup}
-              />
+              <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards as Card[]} />
 
               {isAdmin && (
                 <ToggleViewSidebarButton
@@ -220,12 +335,11 @@ export function RewardsPage({ title }: { title: string }) {
                   }}
                 />
               )}
-            </Stack>
-          </Stack>
-          <Divider />
+            </Box>
+          </div>
 
           <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
-        </>
+        </Stack>
       </DatabaseStickyHeader>
 
       {loadingData ? (
@@ -235,26 +349,38 @@ export function RewardsPage({ title }: { title: string }) {
       ) : (
         <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
           <Stack>
-            {rewards && rewards?.length > 0 ? (
+            {!activeView?.fields?.sourceType && activeView.fields.viewType === 'board' ? (
+              <Box width='100%'>
+                <CreateLinkedView
+                  rootBoard={activeBoard}
+                  views={views}
+                  showView={showView}
+                  isReward
+                  view={activeView}
+                />
+              </Box>
+            ) : rewards && rewards?.length > 0 ? (
               <Box width='100%'>
                 {activeView.fields.viewType === 'table' && (
                   <Table
+                    boardType='rewards'
                     setSelectedPropertyId={(_setSelectedPropertyId) => {
                       setSelectedPropertyId(_setSelectedPropertyId);
                       setShowSidebar(true);
                     }}
+                    setCheckedIds={setCheckedIds}
+                    checkedIds={checkedIds}
                     board={activeBoard}
                     activeView={activeView}
-                    cardPages={cardPages as CardPage[]}
+                    cards={cards}
                     groupByProperty={groupByProperty}
                     views={views}
-                    visibleGroups={[]}
+                    visibleGroups={visibleGroups}
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     disableAddingCards
                     showCard={showRewardOrApplication}
                     readOnlyTitle
-                    readOnlyRows
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}
                     onCardClicked={() => {}}
@@ -268,7 +394,7 @@ export function RewardsPage({ title }: { title: string }) {
                 {activeView.fields.viewType === 'calendar' && (
                   <CalendarFullView
                     board={activeBoard}
-                    cards={cards as Card[]}
+                    cards={cards}
                     activeView={activeView}
                     readOnly={!isAdmin}
                     dateDisplayProperty={dateDisplayProperty}
@@ -282,14 +408,15 @@ export function RewardsPage({ title }: { title: string }) {
                   <Kanban
                     board={activeBoard}
                     activeView={activeView}
-                    cards={cards as Card[]}
+                    cards={cards}
                     groupByProperty={groupByProperty}
-                    visibleGroups={visibleGroups.filter((g) => !!g.option.id)}
-                    hiddenGroups={hiddenGroups.filter((g) => !!g.option.id)}
+                    visibleGroups={visibleGroups.filter((g) => !!g.id)}
+                    hiddenGroups={hiddenGroups.filter((g) => !!g.id)}
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     addCard={async () => {}}
-                    onCardClicked={(e, card) => showRewardOrApplication(card.id)}
+                    isApplication={activeView.fields.sourceType === 'reward_applications'}
+                    onCardClicked={(_e, card) => showRewardOrApplication(card.id, card?.parentId)}
                     showCard={showRewardOrApplication}
                     disableAddingCards
                     readOnlyTitle
@@ -297,11 +424,24 @@ export function RewardsPage({ title }: { title: string }) {
                     hideLinkedBounty
                   />
                 )}
+
+                {activeView.fields.viewType === 'gallery' && (
+                  <Gallery
+                    board={activeBoard}
+                    cards={cards}
+                    activeView={activeView}
+                    readOnly={!isAdmin}
+                    onCardClicked={(_e, card) => showRewardOrApplication(card.id, card?.parentId)}
+                    selectedCardIds={[]}
+                    addCard={() => {}}
+                    disableAddingCards={true}
+                  />
+                )}
               </Box>
             ) : (
               <Box sx={{ mt: 3 }}>
                 <EmptyStateVideo
-                  description='Getting started with rewards'
+                  description='Getting started'
                   videoTitle='Rewards | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/bounties'
                 />
@@ -313,21 +453,21 @@ export function RewardsPage({ title }: { title: string }) {
                 sidebarView={selectedPropertyId ? 'card-property' : undefined}
                 setSelectedPropertyId={setSelectedPropertyId}
                 selectedPropertyId={selectedPropertyId}
-                cards={cards as Card[]}
+                cards={cards}
                 views={views}
                 board={activeBoard}
                 rootBoard={activeBoard}
                 view={activeView}
                 isOpen={!!showSidebar}
                 closeSidebar={() => setShowSidebar(false)}
-                hideLayoutSelectOptions={defaultRewardViews.includes(activeView?.id || '')}
-                hideSourceOptions
-                hideGroupOptions
+                hideLayoutOptions
+                hideLayoutSelectOptions={undefined}
                 groupByProperty={groupByProperty}
                 page={undefined}
                 pageId={undefined}
                 showView={() => {}}
                 supportedViewTypes={supportedRewardViewTypes}
+                isReward
               />
             )}
           </Stack>

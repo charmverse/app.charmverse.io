@@ -6,7 +6,7 @@ import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
 import { markRewardAsPaid } from 'lib/rewards/markRewardAsPaid';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

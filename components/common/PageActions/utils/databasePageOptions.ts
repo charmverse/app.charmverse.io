@@ -1,14 +1,13 @@
-import type { ApiPageKey } from '@charmverse/core/prisma';
 import { chunk } from 'lodash';
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
 import charmClient from 'charmClient';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import { createCard } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import { createCard } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 import type { Member } from 'lib/members/interfaces';
 import { focalboardColorsMap } from 'theme/colors';
 
@@ -28,7 +27,7 @@ export const isNumber = (n: string) => !Number.isNaN(+n);
 export const validDate = (dt: string) => {
   const date = new Date(isNumber(dt) ? +dt : dt);
 
-  if (!Number.isNaN(date.valueOf()) && date.getFullYear() > 1970) {
+  if (!Number.isNaN(date.valueOf()) && date.getFullYear() > 2001) {
     return date;
   }
   return null;
@@ -115,6 +114,11 @@ export function createNewPropertiesForBoard(
 
     return { ...defaultProps, options, type: 'multiSelect' };
   }
+
+  if (propValues.length === 0) {
+    return { ...defaultProps, type: 'text' };
+  }
+
   if (propValues.every(validateAllBlockDates)) {
     return { ...defaultProps, type: 'date' };
   }
@@ -318,23 +322,24 @@ export function transformCsvResults(results: ParseResult<Record<string, string>>
 
 export async function addNewCards({
   board,
+  boardPageId,
   views,
   results,
   spaceId,
   userId,
-  members,
-  apiPageKeys
+  members
 }: {
   board: Board;
+  boardPageId: string;
   views: BoardView[] | null;
   results: ParseResult<Record<string, string>>;
   spaceId: string;
   userId: string;
   members: Record<string, Member>;
-  apiPageKeys?: ApiPageKey[];
 }) {
+  const apiPageKeys = await charmClient.getApiPageKeys({ pageId: boardPageId });
   // We assume that the first column is the title so we rename it accordingly
-  const { csvData, headers } = transformCsvResults(results, apiPageKeys ? 'Form Response' : undefined);
+  const { csvData, headers } = transformCsvResults(results, apiPageKeys?.length ? 'Form Response' : undefined);
 
   const containsTitleProperty = board.fields.cardProperties.find(
     (cardProperty) => cardProperty.id === Constants.titleColumnId

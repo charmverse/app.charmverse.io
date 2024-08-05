@@ -9,9 +9,8 @@ type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: numb
 
 export function CharmEditorInputField({ placeholder, error, ...inputProps }: Props) {
   const theme = useTheme();
-
   return (
-    <FieldWrapper inputEndAdornmentAlignItems='flex-start' {...inputProps}>
+    <FieldWrapper inputEndAdornmentAlignItems='flex-start' {...inputProps} error={!!error}>
       <CharmEditor
         onContentChange={({ doc, rawText }) => {
           inputProps.onChange?.({ content: doc, contentText: rawText });

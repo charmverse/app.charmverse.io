@@ -1,15 +1,17 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { GoogleLoginOauthParams } from '@root/lib/google/authorization/authClient';
+import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfile } from '@root/lib/metrics/mixpanel/updateTrackUserProfile';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { getUserProfile } from '@root/lib/users/getUser';
+import { postUserCreate } from '@root/lib/users/postUserCreate';
+import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from '@root/lib/utils/errors';
+import { uid } from '@root/lib/utils/strings';
+import type { LoggedInUser } from '@root/models';
 
-import type { GoogleLoginOauthParams } from 'lib/google/authorization/authClient';
-import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
-import { sessionUserRelations } from 'lib/session/config';
-import { getUserProfile } from 'lib/users/getUser';
-import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
-import type { LoggedInUser } from 'models';
+import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
 
@@ -38,7 +40,7 @@ export async function loginWithGoogle({
       throw new InvalidInputError(`Email required to complete signup`);
     }
 
-    const [matchedUser, verifiedEmail] = await Promise.all([
+    const [matchedUser, verifiedEmail, userWithNotificationEmail] = await Promise.all([
       prisma.user.findFirst({
         where: {
           googleAccounts: {
@@ -58,6 +60,12 @@ export async function loginWithGoogle({
             include: sessionUserRelations
           }
         }
+      }),
+      prisma.user.findFirst({
+        where: {
+          email
+        },
+        include: sessionUserRelations
       })
     ]);
 
@@ -77,6 +85,16 @@ export async function loginWithGoogle({
         }
       });
       user = verifiedEmail.user;
+    } else if (!matchedUser && userWithNotificationEmail) {
+      await prisma.googleAccount.create({
+        data: {
+          avatarUrl,
+          email,
+          name: displayName,
+          user: { connect: { id: userWithNotificationEmail.id } }
+        }
+      });
+      user = userWithNotificationEmail;
     } else if (!matchedUser) {
       user = await prisma.user.create({
         data: {
@@ -92,7 +110,8 @@ export async function loginWithGoogle({
         },
         include: sessionUserRelations
       });
-      trackUserAction('sign_up', { userId: user.id, identityType: 'Google', ...signupAnalytics });
+
+      postUserCreate({ user, identityType: 'Google', signupAnalytics });
     } else {
       await prisma.googleAccount.update({
         where: {
@@ -106,6 +125,11 @@ export async function loginWithGoogle({
     }
 
     trackUserAction('sign_in', { userId: (user as LoggedInUser).id, identityType: 'Google' });
+
+    await trackOpSpaceClickSigninEvent({
+      userId: (user as LoggedInUser).id,
+      identityType: 'Google'
+    });
 
     const updatedUser = await getUserProfile('id', (user as LoggedInUser).id);
 

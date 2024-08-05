@@ -1,9 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { isSpaceDomain } from 'lib/spaces/utils';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { isSpaceDomain } from '@root/lib/spaces/utils';
+import { getSpaceUrl } from '@root/lib/utils/browser';
 
 export function getDefaultPage({
   lastViewedSpaceId,

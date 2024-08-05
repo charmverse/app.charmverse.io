@@ -5,9 +5,9 @@ import { v4 as uuid } from 'uuid';
 
 import { generateBoard } from 'testing/setupDatabase';
 
-import { modifyChildPages } from '../modifyChildPages';
+import { trashOrDeletePage } from '../trashOrDeletePage';
 
-describe('modifyChildPages', () => {
+describe('trashOrDeletePage', () => {
   test('should delete child pages', async () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace();
 
@@ -32,7 +32,7 @@ describe('modifyChildPages', () => {
       }
     });
 
-    const deletedChildPageIds = await modifyChildPages(board.id, user.id, 'delete');
+    const deletedChildPageIds = await trashOrDeletePage(board.id, user.id, 'delete');
 
     expect(deletedChildPageIds.length === pages.length).toBeTruthy();
   });
@@ -107,7 +107,7 @@ describe('modifyChildPages', () => {
       }
     });
 
-    const deletedChildPageIds = await modifyChildPages(board.id, user.id, 'delete');
+    const deletedChildPageIds = await trashOrDeletePage(board.id, user.id, 'delete');
 
     const cardNotificationAfterDelete = await prisma.cardNotification.findUnique({
       where: {
@@ -123,7 +123,7 @@ describe('modifyChildPages', () => {
 
     const board = await generateBoard({ createdBy: user.id, spaceId: space.id });
 
-    const archivedChildPageIds = await modifyChildPages(board.id, user.id, 'trash');
+    const archivedChildPageIds = await trashOrDeletePage(board.id, user.id, 'trash');
 
     const archivedPages = await prisma.page.findMany({
       where: {
@@ -154,8 +154,8 @@ describe('modifyChildPages', () => {
 
     const board = await generateBoard({ createdBy: user.id, spaceId: space.id });
 
-    await modifyChildPages(board.id, user.id, 'trash');
-    const restoredChildPageIds = await modifyChildPages(board.id, user.id, 'restore');
+    await trashOrDeletePage(board.id, user.id, 'trash');
+    const restoredChildPageIds = await trashOrDeletePage(board.id, user.id, 'restore');
 
     const restoredPages = await prisma.page.findMany({
       where: {

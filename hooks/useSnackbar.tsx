@@ -1,6 +1,8 @@
-import type { AlertColor, SnackbarOrigin, SnackbarProps } from '@mui/material';
+import type { AlertColor, SnackbarProps } from '@mui/material';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+
+import { useCharmRouter } from './useCharmRouter';
 
 type IContext = {
   isOpen: boolean;
@@ -34,17 +36,21 @@ export const SnackbarContext = createContext<Readonly<IContext>>({
   setAutoHideDuration: () => {}
 });
 
+const defaultAutoHideDuration = 5000;
+
 export function SnackbarProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
   const [actions, setActions] = useState<ReactNode[]>([]);
   const [severity, setSeverity] = useState<AlertColor>('info');
   const [message, setMessage] = useState<null | ReactNode>(null);
-  const [autoHideDuration, setAutoHideDuration] = useState<null | number>(5000);
+  const [autoHideDuration, setAutoHideDuration] = useState<null | number>(defaultAutoHideDuration);
+
+  const { router, updateURLQuery } = useCharmRouter();
 
   const resetState = () => {
     setIsOpen(false);
     setActions([]);
-    setAutoHideDuration(5000);
+    setAutoHideDuration(defaultAutoHideDuration);
   };
 
   const handleClose: SnackbarProps['onClose'] = (_, reason) => {
@@ -54,18 +60,32 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
     resetState();
   };
 
-  function showMessage(msg: ReactNode, newSeverity?: AlertColor) {
-    newSeverity = newSeverity ?? 'info';
-    setMessage(msg);
-    setSeverity(newSeverity);
-    setIsOpen(true);
-  }
+  const showMessage = useCallback(
+    (msg: ReactNode, newSeverity?: AlertColor) => {
+      newSeverity = newSeverity ?? 'info';
+      setMessage(msg);
+      setSeverity(newSeverity);
+      setIsOpen(true);
+    },
+    [setIsOpen, setMessage, setSeverity]
+  );
 
   // error can be a string or instance of Error
   function showError(error: any, defaultMessage?: string) {
-    const errorMessage = error?.message || error || defaultMessage;
+    // error?.errorType is from our webapp api, ex 404 response
+    const errorMessage = error?.message || error?.errorType || (typeof error === 'string' ? error : defaultMessage);
     showMessage(errorMessage, 'error');
   }
+
+  useEffect(() => {
+    if (router.query.callbackError) {
+      showMessage(decodeURIComponent(router.query.callbackError as string), 'error');
+
+      setTimeout(() => {
+        updateURLQuery({ callbackError: null });
+      }, defaultAutoHideDuration);
+    }
+  }, [router.query.callbackError]);
 
   const value = useMemo<IContext>(
     () => ({
@@ -83,7 +103,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       setIsOpen,
       setMessage
     }),
-    [isOpen, message, autoHideDuration, actions, severity]
+    [isOpen, message, showMessage, autoHideDuration, actions, severity]
   );
 
   return <SnackbarContext.Provider value={value}>{children}</SnackbarContext.Provider>;

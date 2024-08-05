@@ -1,9 +1,8 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getRewardReviewerIds } from 'lib/rewards/getRewardReviewerIds';
-import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { getRewardReviewerIds } from '@root/lib/rewards/getRewardReviewerIds';
+import type { WebhookEvent } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
 import { saveRewardNotification } from '../saveNotification';
 
@@ -255,7 +254,34 @@ export async function createRewardNotifications(webhookData: {
 
       break;
     }
+    case WebhookEventNames.RewardCredentialCreated: {
+      const applicationId = webhookData.event.application.id;
+      const bountyId = webhookData.event.bounty.id;
+      const spaceId = webhookData.spaceId;
+      const userId = webhookData.event.user.id;
 
+      const application = await prisma.application.findUniqueOrThrow({
+        where: {
+          id: applicationId
+        },
+        select: {
+          createdBy: true
+        }
+      });
+
+      const { id } = await saveRewardNotification({
+        bountyId,
+        createdAt: webhookData.createdAt,
+        createdBy: userId,
+        spaceId,
+        type: 'credential.created',
+        userId: application.createdBy,
+        applicationId
+      });
+      ids.push(id);
+
+      break;
+    }
     default:
       break;
   }

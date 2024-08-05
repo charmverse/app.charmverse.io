@@ -1,11 +1,10 @@
 // References: https://github.com/bangle-io/bangle-editor/blob/dev/components/base-components/src/link.ts
 /* eslint-disable max-len */
-import { link } from '@bangle.dev/base-components';
-import type { MarkType, Schema } from '@bangle.dev/pm';
-import { InputRule, Plugin } from '@bangle.dev/pm';
-import { mapSlice, matchAllPlus } from '@bangle.dev/utils';
-import type { Node } from 'prosemirror-model';
-import type { PluginKey } from 'prosemirror-state';
+import { mapSlice, matchAllPlus, assertNotUndefined, filter, getMarkAttrs } from '@bangle.dev/utils';
+import { InputRule } from 'prosemirror-inputrules';
+import type { MarkType, Schema } from 'prosemirror-model';
+import { Plugin } from 'prosemirror-state';
+import type { Command, EditorState, PluginKey } from 'prosemirror-state';
 import { v4 } from 'uuid';
 
 import { insertNode } from 'lib/prosemirror/insertNode';
@@ -82,7 +81,7 @@ function pasteLink(regexp: RegExp) {
         if (!singleMatch) {
           return false;
         }
-        return link.createLink(text)(state, dispatch);
+        return createLink(text)(state, dispatch);
       }
     }
   });
@@ -176,4 +175,129 @@ export function linkPlugins({ key }: { key: PluginKey }) {
       markPasteRule(LINK_REGEX, type, (match) => ({ href: match }))
     ];
   };
+}
+/**
+ * Sets the selection to href
+ * @param {*} href
+ */
+export function createLink(href: string) {
+  return filter(
+    (state) => queryIsLinkAllowedInRange(state.selection.$from.pos, state.selection.$to.pos)(state),
+    (state, dispatch) => {
+      const [from, to] = [state.selection.$from.pos, state.selection.$to.pos];
+      const linkMark = getTypeFromSchema(state.schema);
+      const tr = state.tr.removeMark(from, to, linkMark);
+
+      if (href.trim()) {
+        const mark = getTypeFromSchema(state.schema).create({
+          href
+        });
+        tr.addMark(from, to, mark);
+      }
+
+      if (dispatch) {
+        dispatch(tr);
+      }
+      return true;
+    }
+  );
+}
+
+function queryIsLinkAllowedInRange(from: number, to: number) {
+  return (state: EditorState): boolean | undefined => {
+    const $from = state.doc.resolve(from);
+    const $to = state.doc.resolve(to);
+    const _link = getTypeFromSchema(state.schema);
+    if ($from.parent === $to.parent && $from.parent.isTextblock) {
+      return $from.parent.type.allowsMarkType(_link);
+    }
+
+    return undefined;
+  };
+}
+
+function getTypeFromSchema(schema: Schema) {
+  const markType = schema.marks[linkPluginName];
+  assertNotUndefined(markType, `markType ${linkPluginName} not found`);
+  return markType;
+}
+
+export function queryLinkAttrs() {
+  return (state: EditorState) => {
+    const { $from } = state.selection;
+
+    const pos = $from.pos - $from.textOffset;
+
+    const $pos = state.doc.resolve(pos);
+    const node = state.doc.nodeAt(pos);
+    const { nodeAfter } = $pos;
+
+    if (!nodeAfter) {
+      return undefined;
+    }
+
+    const type = getTypeFromSchema(state.schema);
+
+    const mark = type.isInSet(nodeAfter.marks || []);
+
+    if (mark) {
+      return {
+        href: mark.attrs.href,
+        text: node!.textContent
+      };
+    }
+
+    return undefined;
+  };
+}
+
+export function updateLink(href?: string): Command {
+  return (state, dispatch) => {
+    if (!state.selection.empty) {
+      return setLink(state.selection.$from.pos, state.selection.$to.pos, href)(state, dispatch);
+    }
+
+    const { $from } = state.selection;
+    const pos = $from.pos - $from.textOffset;
+    const node = state.doc.nodeAt(pos);
+    let to = pos;
+
+    if (node) {
+      to += node.nodeSize;
+    }
+
+    return setLink(pos, to, href)(state, dispatch);
+  };
+}
+
+function isTextAtPos(pos: number) {
+  return (state: EditorState) => {
+    const node = state.doc.nodeAt(pos);
+    return !!node && node.isText;
+  };
+}
+
+function setLink(from: number, to: number, href?: string) {
+  href = href && href.trim();
+  return filter(
+    (state) => isTextAtPos(from)(state),
+    (state, dispatch) => {
+      const linkMark = getTypeFromSchema(state.schema);
+      const tr = state.tr.removeMark(from, to, linkMark);
+      if (href) {
+        const mark = getTypeFromSchema(state.schema).create({
+          href
+        });
+        tr.addMark(from, to, mark);
+      }
+      if (dispatch) {
+        dispatch(tr);
+      }
+      return true;
+    }
+  );
+}
+
+export function queryIsLinkActive() {
+  return (state: EditorState) => Boolean(getTypeFromSchema(state.schema).isInSet(state.selection.$from.marks()));
 }

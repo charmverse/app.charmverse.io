@@ -3,15 +3,15 @@ import type { Page } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
 import { useCallback, useEffect } from 'react';
 
+import charmClient from 'charmClient';
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import debouncePromise from 'lib/utils/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
 import { DocumentPageWithSidebars } from '../DocumentPage/DocumentPageWithSidebars';
@@ -21,26 +21,41 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
   const { space: currentSpace } = useCurrentSpace();
-  useRewardsNavigation();
-  const { error: pageWithContentError, page, updatePage } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
+  const {
+    error: pageWithContentError,
+    page,
+    updatePage,
+    refreshPage
+  } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
 
   const readOnly =
     (page?.permissionFlags.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
 
   useEffect(() => {
-    if (page) {
+    if (page && currentSpace) {
       trackPageView({
         type: page.type,
         pageId: page.id,
         spaceId: page.spaceId,
-        spaceDomain: currentSpace?.domain
+        spaceDomain: currentSpace.domain,
+        spaceCustomDomain: currentSpace.customDomain
       });
+      if (currentSpace?.domain === 'op-grants') {
+        if (page.type === 'proposal') {
+          charmClient.track.trackActionOp('successful_application_form_open', {});
+        }
+        charmClient.track.trackActionOp('page_view', {
+          type: page.type,
+          path: page.path,
+          url: window.location.href
+        });
+      }
       setCurrentPageId(page.id);
     }
     return () => {
       resetPageProps();
     };
-  }, [page?.id]);
+  }, [page?.id, !!currentSpace]);
 
   // reset page id on unmount
   useEffect(() => {
@@ -89,7 +104,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
 
   useEffect(() => {
     // make sure current page is loaded
-    if (page?.title) {
+    if (page) {
       setTitleState(page.title || 'Untitled');
     }
   }, [page?.title]);
@@ -120,7 +135,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
       // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (
         <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
-          <DocumentPageWithSidebars page={page} readOnly={readOnly} savePage={savePage} />
+          <DocumentPageWithSidebars refreshPage={refreshPage} page={page} readOnly={readOnly} savePage={savePage} />
         </Box>
       );
     }

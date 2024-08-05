@@ -1,7 +1,7 @@
 import type { DiscordUser } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
+import { softDeleteUserWithoutConnectableIdentities } from './softDeleteUserWithoutConnectableIdentities';
 
 export async function mergeUserDiscordAccounts({
   currentUserId,

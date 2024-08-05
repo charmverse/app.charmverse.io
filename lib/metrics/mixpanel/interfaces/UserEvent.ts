@@ -1,7 +1,6 @@
 import type { IdentityType } from '@charmverse/core/prisma';
-
-import type { SpaceTemplateType } from 'lib/spaces/config';
-import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
+import type { SpaceTemplateType } from '@root/lib/spaces/config';
+import type { TokenGateJoinType } from '@root/lib/tokenGates/interfaces';
 
 import type { BaseEvent, BaseEventWithoutGroup } from './BaseEvent';
 
@@ -21,6 +20,7 @@ export type SignupAnalytics = {
   signupLandingUrl: string;
   signupSource: SignupSource;
   signupCampaign: string;
+  referrerCode: string;
 };
 
 export type UserSignupEvent = BaseEventWithoutGroup &
@@ -48,13 +48,6 @@ export type CreateNewSpace = BaseEvent & {
   source?: string;
 };
 
-export type ViewFarcasterFrame = BaseEvent & {
-  frameUrl: string;
-  pageId: string;
-};
-
-export type AddFarcasterFrame = ViewFarcasterFrame;
-
 export type AppLoaded = BaseEventWithoutGroup & { spaceId?: string };
 
 export interface UserEventMap {
@@ -69,6 +62,4 @@ export interface UserEventMap {
   app_loaded: AppLoaded;
   delete_otp: UserOtp;
   add_otp: UserOtp;
-  add_farcaster_frame: AddFarcasterFrame;
-  view_farcaster_frame: ViewFarcasterFrame;
 }

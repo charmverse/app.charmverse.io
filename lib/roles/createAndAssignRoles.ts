@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { findOrCreateRoles } from 'lib/roles/createRoles';
-import type { ExternalRole } from 'lib/roles/interfaces';
+import { findOrCreateRoles } from '@root/lib/roles/createRoles';
+import type { ExternalRole } from '@root/lib/roles/interfaces';
 
 export async function createAndAssignRoles({
   userId,

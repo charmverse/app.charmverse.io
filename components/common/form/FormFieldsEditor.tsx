@@ -1,50 +1,48 @@
+import type { FormFieldType } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import debounce from 'lodash/debounce';
 import { useRef, useEffect, useState, useMemo } from 'react';
 import { v4 } from 'uuid';
 
 import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
-import { useSnackbar } from 'hooks/useSnackbar';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
 import { Button } from '../Button';
 
-import { checkFormFieldErrors } from './checkFormFieldErrors';
-import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
-import type { FormFieldInput } from './interfaces';
 
 export function FormFieldsEditor({
   proposalId,
+  expandFieldsByDefault,
   formFields: initialFormFields,
   readOnly
 }: {
   proposalId: string;
+  expandFieldsByDefault?: boolean;
   formFields: FormFieldInput[];
   readOnly?: boolean;
 }) {
   const [formFields, setFormFields] = useState([...initialFormFields]);
-  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
+  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(
+    expandFieldsByDefault ? [] : formFields.map((field) => field.id)
+  );
   const { trigger } = useUpdateProposalFormFields({ proposalId });
-  const { showError } = useSnackbar();
   const debouncedUpdate = useMemo(() => {
-    return debounce(trigger, 500);
+    return debounce(trigger, 200);
   }, [trigger]);
 
   async function updateFormFields(_formFields: FormFieldInput[]) {
     if (readOnly) {
       return;
     }
-    const errors = checkFormFieldErrors(_formFields);
     setFormFields(_formFields);
-    if (errors) {
-      return;
-    }
     try {
       await debouncedUpdate({ formFields: _formFields });
     } catch (error) {
-      showError(error, 'Error saving form fields');
+      // dont show error modal, the UI should show red borders now instead
     }
   }
 
@@ -129,7 +127,8 @@ export function ControlledFormFieldsEditor({
         options: [],
         private: false,
         required: true,
-        id: fieldId
+        id: fieldId,
+        fieldConfig: null
       }
     ]);
 
@@ -200,10 +199,20 @@ export function ControlledFormFieldsEditor({
     setFormFields(newFormFields);
   }
 
+  const formFieldTypeFrequencyCount = formFields.reduce((acc, formField) => {
+    if (formField.type in acc) {
+      acc[formField.type] += 1;
+    } else {
+      acc[formField.type] = 1;
+    }
+    return acc;
+  }, {} as Record<FormFieldType, number>);
+
   return (
     <Stack gap={1}>
       {formFields.map((formField) => (
         <FormField
+          formFieldTypeFrequencyCount={formFieldTypeFrequencyCount}
           readOnly={readOnly}
           toggleOpen={() => {
             toggleCollapse(formField.id);

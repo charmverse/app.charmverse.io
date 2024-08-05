@@ -1,17 +1,17 @@
-import type { EditorView } from '@bangle.dev/pm';
-import { Node } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
-import type { CryptoCurrency, FiatCurrency } from 'connectors/chains';
+import type { CryptoCurrency, FiatCurrency } from '@root/connectors/chains';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
+import { Node } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import type { CSSProperties } from 'react';
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useSWRConfig } from 'swr';
 
 import charmClient from 'charmClient';
@@ -22,15 +22,16 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
+import { ButtonNodeView } from './components/button/ButtonNodeView';
 import Callout from './components/callout/components/Callout';
 import { CryptoPriceNodeView } from './components/cryptoPrice/CryptoPriceNodeView';
-import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
-import { FarcasterFrameNodeView } from './components/farcasterFrame/FarcasterFrameNodeView';
+import { EmojiPopup } from './components/emojiSuggest/EmojiPopup';
+import { FarcasterFrameNodeView } from './components/farcasterFrame/components/FarcasterFrameNodeView';
 import type { FrontendParticipant } from './components/fiduswriter/collab';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
 import fiduswriterStyles from './components/fiduswriter/styles';
@@ -38,20 +39,22 @@ import type { ConnectionEvent } from './components/fiduswriter/ws';
 import { File } from './components/file/File';
 import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import * as iframe from './components/iframe';
+import ResizableImage from './components/image/ResizableImage';
 import { InlineCommentThread } from './components/inlineComment/components/InlineCommentThread';
 import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { LinksPopup } from './components/link/LinksPopup';
-import LinkedPagesList from './components/linkedPage/components/LinkedPagesList';
-import { Mention, MentionSuggest } from './components/mention/components';
-import NestedPage from './components/nestedPage/components/NestedPage';
+import { LinkedPage } from './components/linkedPage/components/LinkedPage';
+import { LinkedPagesPopup } from './components/linkedPage/components/LinkedPagesPopup';
+import { Mention } from './components/mention/components/Mention';
+import { MentionsPopup } from './components/mention/components/MentionsPopup';
+import { NestedPage } from './components/nestedPage/components/NestedPage';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
 import ResizablePDF from './components/pdf/ResizablePDF';
 import { PollNodeView } from './components/poll/PollComponent';
 import Quote from './components/quote/components/Quote';
-import ResizableImage from './components/ResizableImage';
-import RowActionsMenu from './components/rowActions/RowActionsMenu';
+import { RowActionsMenu } from './components/rowActions/RowActionsMenu';
 import { SuggestionsPopup } from './components/suggestions/SuggestionPopup';
 import { TableOfContents } from './components/tableOfContents/TableOfContents';
 import { TweetNodeView } from './components/tweet/TweetNodeView';
@@ -177,7 +180,6 @@ type CharmEditorProps = {
   postId?: string;
   containerWidth?: number;
   pageType?: PageType | 'post';
-  snapshotProposalId?: string | null;
   pagePermissions?: PagePermissionFlags;
   onParticipantUpdate?: (participants: FrontendParticipant[]) => void;
   placeholderText?: string;
@@ -210,7 +212,6 @@ function CharmEditor({
   containerWidth,
   pageType,
   setEditorState,
-  snapshotProposalId,
   pagePermissions,
   placeholderText,
   focusOnInit,
@@ -258,32 +259,40 @@ function CharmEditor({
     }
   }, 1000);
 
-  const sendPageEvent = throttle(() => {
-    if (currentSpace && pageType && pageId) {
-      if (enableSuggestingMode) {
-        charmClient.track.trackAction('page_suggestion_created', {
-          pageId,
-          spaceId: currentSpace.id
-        });
-      } else {
-        charmClient.track.trackAction('edit_page', {
-          pageId,
-          spaceId: currentSpace.id
-        });
-      }
-    }
-  }, 1000);
+  const sendPageEvent = useMemo(
+    () =>
+      throttle(() => {
+        if (currentSpace && pageType && pageId) {
+          if (enableSuggestingMode) {
+            charmClient.track.trackAction('page_suggestion_created', {
+              pageId,
+              spaceId: currentSpace.id
+            });
+          } else {
+            charmClient.track.trackAction('edit_page', {
+              pageId,
+              spaceId: currentSpace.id
+            });
+          }
+        }
+      }, 1000),
+    [currentSpace, pageType, pageId, enableSuggestingMode]
+  );
 
-  const debouncedUpdate = debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
-    const doc = view.state.doc.toJSON() as PageContent;
-    const rawText = view.state.doc.textContent as string;
-    if (pageId && prevDoc) {
-      onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
-    }
-    if (onContentChange) {
-      onContentChange({ doc, rawText });
-    }
-  }, 100);
+  const debouncedUpdate = useMemo(
+    () =>
+      debounce((view: EditorView, prevDoc?: EditorState['doc']) => {
+        const doc = view.state.doc.toJSON() as PageContent;
+        const rawText = view.state.doc.textContent as string;
+        if (pageId && prevDoc) {
+          onThreadResolveDebounced(pageId, view.state.doc, prevDoc);
+        }
+        if (onContentChange) {
+          onContentChange({ doc, rawText });
+        }
+      }, 100),
+    [onContentChange, pageId, onThreadResolveDebounced]
+  );
 
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -310,6 +319,9 @@ function CharmEditor({
       onContentChange: (view: EditorView, prevDoc: Node) => {
         debouncedUpdate(view, prevDoc);
         sendPageEvent();
+        if (setCharmEditorView) {
+          setCharmEditorView(view);
+        }
       },
       placeholderText,
       onError(err) {
@@ -389,6 +401,7 @@ function CharmEditor({
       linksPluginKey={linksPluginKey}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
+      floatingMenuPluginKey={floatingMenuPluginKey}
       readOnly={readOnly}
       enableComments={enableComments}
       onConnectionEvent={onConnectionEvent}
@@ -401,7 +414,12 @@ function CharmEditor({
       editorRef={editorRef}
       pmViewOpts={{
         editable: () => !readOnly,
-        plugins: []
+        plugins: [],
+        attributes: () => ({
+          translate: readOnly ? 'yes' : 'no',
+          class: 'bangle-editor',
+          'data-test': 'charm-editor-input'
+        })
       }}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
@@ -479,7 +497,7 @@ function CharmEditor({
             return <NestedPage {...props} />;
           }
           case 'linkedPage': {
-            return <NestedPage isLinkedPage {...props} />;
+            return <LinkedPage {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
@@ -489,6 +507,9 @@ function CharmEditor({
           }
           case 'bookmark': {
             return <BookmarkNodeView {...allProps} />;
+          }
+          case 'button': {
+            return <ButtonNodeView {...allProps} />;
           }
           case 'poll': {
             return <PollNodeView {...allProps} />;
@@ -526,9 +547,9 @@ function CharmEditor({
         disableNestedPage={disableNestedPage}
         pageId={pageId}
       />
-      {!disableMention && <MentionSuggest pluginKey={mentionPluginKey} />}
-      <LinkedPagesList pluginKey={linkedPagePluginKey} />
-      <EmojiSuggest pluginKey={emojiPluginKey} />
+      {!disableMention && <MentionsPopup pageId={pageId} pluginKey={mentionPluginKey} />}
+      <LinkedPagesPopup pageId={pageId} pluginKey={linkedPagePluginKey} />
+      <EmojiPopup pluginKey={emojiPluginKey} />
       {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlineCommandPalette
         linkedPagePluginKey={linkedPagePluginKey}

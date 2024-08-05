@@ -14,7 +14,7 @@ export const ConfirmationModalContext = createContext<Readonly<IContext>>({
     message: '',
     isOpen: false,
     onCancel: () => {},
-    onConfirm: async () => {}
+    onConfirm: () => {}
   },
   showConfirmation: () => Promise.resolve({})
 });
@@ -43,7 +43,14 @@ export function ConfirmationModalProvider({ children }: { children: ReactNode })
       if (typeof msg === 'string') {
         setProps({ isOpen: true, message: msg, onCancel, onConfirm });
       } else {
-        setProps({ isOpen: true, message: msg.message, title: msg.title, onCancel, onConfirm });
+        setProps({
+          isOpen: true,
+          message: msg.message,
+          title: msg.title,
+          onCancel,
+          confirmButton: msg.confirmButton,
+          onConfirm
+        });
       }
     });
   }

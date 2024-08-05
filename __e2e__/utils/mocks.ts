@@ -1,16 +1,15 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, SpaceOperation } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from '@ethersproject/wallet';
 import type { Page as BrowserPage } from '@playwright/test';
 import { v4 as uuid } from 'uuid';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
-import { createUserFromWallet } from 'lib/users/createUser';
-import type { LoggedInUser } from 'models';
-import { createPage } from 'testing/setupDatabase';
+import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { LoggedInUser } from '@root/models';
+import { createPage, createUserWithWallet } from 'testing/setupDatabase';
 
 export async function loginBrowserUser({
   browserPage,
@@ -87,19 +86,6 @@ export async function createSpace({
 }
 
 /**
- * @deprecated - mock data should be generated directly, not using webapp features
- */
-export async function getPages({
-  browserPage,
-  spaceId
-}: {
-  browserPage: BrowserPage;
-  spaceId: string;
-}): Promise<PageWithPermissions[]> {
-  return browserPage.request.get(`${baseUrl}/api/spaces/${spaceId}/pages`).then((res) => res.json());
-}
-
-/**
  *
  * @deprecated - Use generateUserAndSpace() instead. Mock data should be generated directly, not using webapp features
  *
@@ -124,14 +110,12 @@ export async function createUserAndSpace({
   address: string;
   privateKey: string;
   space: Space;
-  pages: PageWithPermissions[];
 }> {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
   const user = await createUser({ browserPage, address });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode, paidTier });
-  const pages = await getPages({ browserPage, spaceId: space.id });
 
   const updatedRole = await prisma.spaceRole.update({
     where: {
@@ -168,8 +152,7 @@ export async function createUserAndSpace({
     space,
     address,
     privateKey: wallet.privateKey,
-    user,
-    pages
+    user
   };
 }
 
@@ -294,6 +277,9 @@ type UserAndSpaceInput = {
   publicBountyBoard?: boolean;
   skipOnboarding?: boolean;
   email?: string;
+  memberSpacePermissions?: SpaceOperation[];
+  pageContent?: PageContent;
+  paidTier?: Space['paidTier'];
 };
 
 export async function generateUserAndSpace({
@@ -302,12 +288,15 @@ export async function generateUserAndSpace({
   spaceDomain = `domain-${uuid()}`,
   publicBountyBoard,
   skipOnboarding = true,
-  email = `${uuid()}@gmail.com`
+  email = `${uuid()}@gmail.com`,
+  memberSpacePermissions,
+  pageContent,
+  paidTier
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
-  const user = await createUserFromWallet({ address, email });
+  const user = await createUserWithWallet({ address, email });
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
@@ -346,10 +335,11 @@ export async function generateUserAndSpace({
         },
         permittedGroups: {
           create: {
-            operations: ['reviewProposals'],
+            operations: memberSpacePermissions ?? ['reviewProposals'],
             spaceId
           }
-        }
+        },
+        paidTier
       }
     });
   }
@@ -358,6 +348,7 @@ export async function generateUserAndSpace({
     spaceId: space.id,
     createdBy: user.id,
     title: 'Test Page',
+    content: pageContent,
     pagePermissions: [
       {
         spaceId: space.id,

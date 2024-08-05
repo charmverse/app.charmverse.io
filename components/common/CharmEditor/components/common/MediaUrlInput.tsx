@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 
-import { isUrl } from 'lib/utilities/strings';
+import { isUrl } from 'lib/utils/strings';
 
 type InputProps = {
   placeholder: string;
@@ -9,10 +9,11 @@ type InputProps = {
   isValid?: (url: string) => boolean;
   onSubmit: (url: string) => void;
   multiline?: boolean;
+  initialValue?: string;
 };
 
 export function MediaUrlInput(props: InputProps) {
-  const [embedUrl, setEmbedUrl] = useState('');
+  const [embedUrl, setEmbedUrl] = useState(props.initialValue ?? '');
 
   return (
     <Box display='flex' flexDirection='column' gap={2} alignItems='center'>

@@ -1,20 +1,10 @@
 import { log } from '@charmverse/core/log';
-import type { AuthSig } from '@lit-protocol/types';
+import { getSpaceMembershipWithRoles } from '@root/lib/spaces/getSpaceMembershipWithRoles';
+import { applyTokenGates } from '@root/lib/tokenGates/applyTokenGates';
+import { evaluateTokenGateEligibility } from '@root/lib/tokenGates/evaluateEligibility';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
-import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
-import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
-import { evaluateTokenGateEligibility } from 'lib/tokenGates/evaluateEligibility';
-import { InvalidInputError } from 'lib/utilities/errors';
-
-export async function reevaluateRoles({
-  authSig,
-  userId,
-  spaceId
-}: {
-  spaceId: string;
-  authSig: AuthSig;
-  userId: string;
-}) {
+export async function reevaluateRoles({ userId, spaceId }: { spaceId: string; userId: string }) {
   try {
     const spaceMembership = await getSpaceMembershipWithRoles({ spaceId, userId });
     if (!spaceMembership) {
@@ -30,7 +20,7 @@ export async function reevaluateRoles({
 
     const { eligibleGates } = await evaluateTokenGateEligibility({
       spaceIdOrDomain: spaceId,
-      authSig
+      userId
     });
 
     await applyTokenGates({
@@ -39,8 +29,7 @@ export async function reevaluateRoles({
       commit: true,
       joinType: 'token_gate',
       reevaluate: true,
-      tokens: eligibleGates ?? [],
-      walletAddress: authSig.address
+      tokenGateIds: eligibleGates ?? []
     });
 
     const updatedSpaceMembership = await getSpaceMembershipWithRoles({ spaceId, userId });

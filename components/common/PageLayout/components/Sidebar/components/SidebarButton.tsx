@@ -28,7 +28,7 @@ export const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
     color: inherit;
   }
   svg {
-    font-size: 1.2em;
+    font-size: 18px;
     margin-right: ${theme.spacing(1)};
   }
 `;

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import type { SxProps, Theme, TextFieldProps } from '@mui/material';
+import type { TextFieldProps } from '@mui/material';
 import { TextField } from '@mui/material';
 import { forwardRef } from 'react';
 
@@ -7,7 +7,10 @@ import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 
 type Props = ControlFieldProps &
-  FieldProps & { disableArrows?: boolean } & Pick<TextFieldProps, 'fullWidth' | 'inputProps' | 'sx'>;
+  FieldProps & { disableArrows?: boolean; 'data-test'?: string } & Pick<
+    TextFieldProps,
+    'fullWidth' | 'inputProps' | 'sx'
+  >;
 
 const StyledTextField = styled(TextField)<{ disableArrows: boolean }>`
   ${({ disableArrows }) =>
@@ -40,6 +43,7 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props>(
       placeholder,
       disableArrows = false,
       inputEndAdornment,
+      'data-test': dataTest,
       ...textFieldProps
     }: Props,
     ref
@@ -53,8 +57,10 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props>(
         label={label}
         inline={inline}
         iconLabel={iconLabel}
+        error={!!error}
       >
         <StyledTextField
+          data-test={dataTest}
           error={!!error}
           required={required}
           placeholder={placeholder}

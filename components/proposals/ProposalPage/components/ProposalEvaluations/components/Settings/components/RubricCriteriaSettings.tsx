@@ -1,26 +1,19 @@
-import type { ProposalRubricCriteriaAnswer, ProposalStatus } from '@charmverse/core/prisma-client';
+import type { ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { DeleteOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
 import { Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
+import debounce from 'lodash/debounce';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
-import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
+import { AddAPropertyButton } from 'components/common/DatabaseEditor/components/properties/AddAProperty';
+import { TextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import { DraggableListItem } from 'components/common/DraggableListItem';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ReactDndProvider from 'components/common/ReactDndProvider';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
-import { getNumberFromString } from 'lib/utilities/numbers';
-
-export type RangeProposalCriteria = {
-  id: string;
-  index: number;
-  title: string;
-  description?: string | null;
-  type: 'range';
-  parameters: { min: number | null; max: number | null };
-};
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import type { RangeProposalCriteria } from 'lib/proposals/workflows/getNewCriteria';
+import { getNewCriteria } from 'lib/proposals/workflows/getNewCriteria';
+import { getNumberFromString } from 'lib/utils/numbers';
 
 type Props = {
   readOnly?: boolean;
@@ -70,20 +63,13 @@ export const CriteriaRow = styled(Box)`
     color: var(--secondary-text);
   }
 `;
-
-export function getNewCriteria({ parameters }: Partial<RangeProposalCriteria> = {}): RangeProposalCriteria {
-  return {
-    id: uuid(),
-    index: -1,
-    description: '',
-    title: '',
-    type: 'range',
-    parameters: parameters || { min: 1, max: 5 }
-  };
-}
-
-export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value, onChange, answers }: Props) {
-  const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>(value);
+export function RubricCriteriaSettings({
+  readOnly,
+  showDeleteConfirmation,
+  value: criteriaList,
+  onChange,
+  answers
+}: Props) {
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
 
   function addCriteria() {
@@ -93,7 +79,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     const lastCriteria = criteriaList[criteriaList.length - 1];
     const newCriteria = getNewCriteria(lastCriteria);
     const updatedList = [...criteriaList, newCriteria];
-    setCriteriaList(updatedList);
+    onChange(updatedList);
   }
 
   function deleteCriteria(id: string) {
@@ -102,28 +88,36 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     }
     setRubricCriteriaIdToDelete(null);
     const updatedList = criteriaList.filter((c) => c.id !== id);
-    setCriteriaList(updatedList);
 
     onChange(updatedList);
   }
 
-  function setCriteriaProperty(id: string, updates: Partial<RangeProposalCriteria>) {
-    if (readOnly) {
-      return;
-    }
-    const criteria = criteriaList.find((c) => c.id === id);
-    if (criteria) {
-      Object.assign(criteria, updates);
-      setCriteriaList([...criteriaList]);
-      if (criteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
-        onChange(criteriaList);
+  const setCriteriaProperty = useCallback(
+    (id: string, updates: Partial<RangeProposalCriteria>) => {
+      if (readOnly) {
+        return;
       }
-    }
-  }
+      const combinedCriteriaList = [...criteriaList];
+      const criteria = combinedCriteriaList.find((c) => c.id === id);
+
+      if (criteria) {
+        Object.assign(criteria, updates);
+
+        if (criteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
+          onChange(combinedCriteriaList);
+        }
+      }
+    },
+    [answers, criteriaList, onChange, readOnly]
+  );
+
+  const debouncedSetCriteriaProperty = useMemo(() => debounce(setCriteriaProperty, 300), [setCriteriaProperty]);
 
   useEffect(() => {
-    setCriteriaList(value);
-  }, [value]);
+    return () => {
+      debouncedSetCriteriaProperty.cancel();
+    };
+  }, [debouncedSetCriteriaProperty]);
 
   function handleClickDelete(criteriaId: string) {
     if (showDeleteConfirmation) {
@@ -142,7 +136,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     const droppedOnIndex = newOrder.findIndex((val) => val.id === droppedOnProperty); // find the index of the space that was dropped on
     const newIndex = propIndex <= droppedOnIndex ? droppedOnIndex + 1 : droppedOnIndex; // if the dragged property was dropped on a space with a higher index, the new index needs to include 1 extra
     newOrder.splice(newIndex, 0, deletedElements[0]); // add the property to the new index
-    setCriteriaList(newOrder);
+
     onChange(newOrder);
   }
 
@@ -167,10 +161,10 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
                 sx={{ flexGrow: 1 }}
                 multiline
                 fullWidth
-                onChange={(e) => setCriteriaProperty(criteria.id, { title: e.target.value })}
+                onChange={(e) => debouncedSetCriteriaProperty(criteria.id, { title: e.target.value })}
                 placeholder='Add a label...'
                 disabled={readOnly}
-                defaultValue={criteria.title}
+                defaultValue={criteria.title || ''}
                 data-test='edit-rubric-criteria-label'
               />
               {!readOnly && (
@@ -188,7 +182,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
               multiline
               fullWidth
               data-test='edit-rubric-criteria-description'
-              onChange={(e) => setCriteriaProperty(criteria.id, { description: e.target.value })}
+              onChange={(e) => debouncedSetCriteriaProperty(criteria.id, { description: e.target.value })}
               placeholder='Add a description...'
               disabled={readOnly}
               sx={{ flexGrow: 1, width: '100%' }}
@@ -201,7 +195,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
                     inputProps={{ type: 'number' }}
                     data-test='edit-rubric-criteria-min-score'
                     onChange={(e) => {
-                      setCriteriaProperty(criteria.id, {
+                      debouncedSetCriteriaProperty(criteria.id, {
                         parameters: { ...criteria.parameters, min: getNumberFromString(e.target.value) }
                       });
                     }}
@@ -228,7 +222,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
                     }}
                     data-test='edit-rubric-criteria-max-score'
                     onChange={(e) => {
-                      setCriteriaProperty(criteria.id, {
+                      debouncedSetCriteriaProperty(criteria.id, {
                         parameters: { ...criteria.parameters, max: getNumberFromString(e.target.value) }
                       });
                     }}
@@ -262,15 +256,13 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
           question='Are you sure you want to delete this criteria? Any linked answers will also be deleted'
         />
       )}
-      {!readOnly && (
-        <AddAPropertyButton
-          dataTest='add-rubric-criteria-button'
-          style={{ flex: 'none', margin: 0 }}
-          onClick={addCriteria}
-        >
-          + Add a criteria
-        </AddAPropertyButton>
-      )}
+      <AddAPropertyButton
+        data-test='add-rubric-criteria-button'
+        style={{ display: readOnly ? 'none' : 'block', flex: 'none', margin: 0 }}
+        onClick={addCriteria}
+      >
+        + Add a criteria
+      </AddAPropertyButton>
     </ReactDndProvider>
   );
 }

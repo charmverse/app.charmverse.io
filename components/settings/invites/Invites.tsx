@@ -1,15 +1,12 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Box, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useContext, useEffect, useRef } from 'react';
-import { useAccount } from 'wagmi';
 
 import { useTrackPageView } from 'charmClient/hooks/track';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Loader from 'components/common/Loader';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
-import { useWeb3Account } from 'hooks/useWeb3Account';
 
 import Legend from '../Legend';
 
@@ -24,29 +21,8 @@ export function Invites({ space }: { space: Space }) {
   const popupInvitesState = usePopupState({ variant: 'popover', popupId: 'invites' });
   const popupTokenGateState = usePopupState({ variant: 'popover', popupId: 'token-gate' });
 
-  const isOpeningTokenGate = useRef(false);
-
-  const { connectWallet } = useContext(Web3Connection);
-  const { account } = useWeb3Account();
-  const { isConnected } = useAccount();
-
   const { publicInvites, isLoadingInvites } = useSpaceInvitesList();
   useTrackPageView({ type: 'settings/invites' });
-  function handleTokenGate() {
-    if (account || isConnected) {
-      popupTokenGateState.open();
-    } else {
-      isOpeningTokenGate.current = true;
-      connectWallet();
-    }
-  }
-
-  useEffect(() => {
-    if (account && isOpeningTokenGate.current) {
-      popupTokenGateState.open();
-      isOpeningTokenGate.current = false;
-    }
-  }, [account, isConnected]);
 
   return (
     <>
@@ -65,7 +41,7 @@ export function Invites({ space }: { space: Space }) {
         </Typography>
         <InviteActions
           onOpenInvitesClick={popupInvitesState.open}
-          onOpenTokenGateClick={handleTokenGate}
+          onOpenTokenGateClick={popupTokenGateState.open}
           isAdmin={isAdmin}
         />
       </Legend>

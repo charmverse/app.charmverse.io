@@ -3,25 +3,38 @@ import { log } from '@charmverse/core/log';
 import { resolvePageTree } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { STATIC_PAGES } from '@root/lib/features/constants';
+import { ActionNotPermittedError } from '@root/lib/middleware';
+import { createPage } from '@root/lib/pages/server/createPage';
+import { trashPages } from '@root/lib/pages/trashPages';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
+import { applyStepsToNode } from '@root/lib/prosemirror/applyStepsToNode';
+import { emptyDocument } from '@root/lib/prosemirror/constants';
+import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import { authSecret } from '@root/lib/session/authSecret';
+import type { ClientMessage, SealedUserId } from '@root/lib/websockets/interfaces';
 import { unsealData } from 'iron-session';
+import type { Node } from 'prosemirror-model';
+import { TextSelection } from 'prosemirror-state';
+import { findParentNode } from 'prosemirror-utils';
 import type { Socket } from 'socket.io';
 
-import { STATIC_PAGES } from 'lib/features/constants';
-import { ActionNotPermittedError } from 'lib/middleware';
-import { createPage } from 'lib/pages/server/createPage';
-import { trashPages } from 'lib/pages/trashPages';
-import { permissionsApiClient } from 'lib/permissions/api/client';
-import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { authSecret } from 'lib/session/authSecret';
-import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
+import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 
 import type { DocumentRoom } from './documentEvents/docRooms';
 import type { DocumentEventHandler } from './documentEvents/documentEvents';
 import type { ProsemirrorJSONStep } from './documentEvents/interfaces';
 import type { AbstractWebsocketBroadcaster } from './interfaces';
+
+function checkIsInsideTableCell(position: number, doc: Node) {
+  const selection = TextSelection.create(doc, position);
+  const predicate = (node: Node) => {
+    return node.type.name === specRegistry.schema.nodes.table_cell.name;
+  };
+  const parent = findParentNode(predicate)(selection);
+  return !!parent;
+}
 
 export class SpaceEventHandler {
   socketEvent = 'message';
@@ -256,6 +269,63 @@ export class SpaceEventHandler {
           message
         });
         this.sendError(errorMessage);
+      }
+    } else if (message.type === 'page_duplicated') {
+      const duplicatedPage = await prisma.page.findUniqueOrThrow({
+        where: {
+          id: message.payload.pageId
+        },
+        select: {
+          id: true,
+          parentId: true,
+          type: true,
+          path: true
+        }
+      });
+
+      if (
+        duplicatedPage.parentId &&
+        (duplicatedPage.type === 'board' || duplicatedPage.type === 'page' || duplicatedPage.type === 'linked_board')
+      ) {
+        const pageDetails = await this.getPageDetails({
+          childPageId: duplicatedPage.id,
+          pageId: duplicatedPage.parentId
+        });
+
+        const { documentNode, documentRoom, participant, content } = pageDetails;
+        const lastValidPos = documentNode.content.size;
+        try {
+          if (documentRoom && participant) {
+            await participant.handleDiff(
+              {
+                type: 'diff',
+                ds: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId: duplicatedPage.id, pos: lastValidPos }),
+                doc: documentRoom.doc.content,
+                c: participant.messages.client,
+                s: participant.messages.server,
+                v: documentRoom.doc.version,
+                rid: 0,
+                cid: -1
+              },
+              {
+                socketEvent: 'page_created'
+              }
+            );
+          } else {
+            await this.applyDiffAndSaveDocument({
+              content,
+              pageId: duplicatedPage.parentId,
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId: duplicatedPage.id, pos: lastValidPos })
+            });
+          }
+        } catch (err) {
+          log.error(`Error duplicating a page and adding it to parent page content`, {
+            error: err,
+            pageId: duplicatedPage.id,
+            userId: this.userId,
+            message
+          });
+        }
       }
     } else if (message.type === 'page_reordered_sidebar_to_sidebar' && this.userId && this.spaceId) {
       const { pageId, newParentId } = message.payload;
@@ -705,6 +775,11 @@ export class SpaceEventHandler {
       const { documentRoom, participant, content, position: _nodePos } = pageDetails;
       const position = nodePos ?? _nodePos;
 
+      let isInsideTableCell;
+      if (position !== null) {
+        isInsideTableCell = checkIsInsideTableCell(position, getNodeFromJson(content));
+      }
+
       if (documentRoom && participant && position !== null) {
         await participant.handleDiff(
           {
@@ -713,7 +788,19 @@ export class SpaceEventHandler {
               {
                 stepType: 'replace',
                 from: position,
-                to: position + 1
+                to: position + 1,
+                slice: isInsideTableCell
+                  ? {
+                      content: [
+                        {
+                          type: 'paragraph',
+                          attrs: {
+                            track: []
+                          }
+                        }
+                      ]
+                    }
+                  : undefined
               }
             ],
             doc: documentRoom.doc.content,
@@ -734,7 +821,19 @@ export class SpaceEventHandler {
               {
                 from: position,
                 to: position + 1,
-                stepType: 'replace'
+                stepType: 'replace',
+                slice: isInsideTableCell
+                  ? {
+                      content: [
+                        {
+                          type: 'paragraph',
+                          attrs: {
+                            track: []
+                          }
+                        }
+                      ]
+                    }
+                  : undefined
               }
             ]
           });

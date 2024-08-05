@@ -1,13 +1,12 @@
 import { log } from '@charmverse/core/log';
 import type { Page, PageDiff } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { InvalidInputError } from 'lib/utilities/errors';
-import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
+import { applyStepsToNode } from '@root/lib/prosemirror/applyStepsToNode';
+import { emptyDocument } from '@root/lib/prosemirror/constants';
+import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import { InvalidInputError } from '@root/lib/utils/errors';
+import type { ProsemirrorJSONStep } from '@root/lib/websockets/documentEvents/interfaces';
 
 type RestoreInput = {
   pageId: string;
@@ -21,7 +20,7 @@ export function replayDocumentHistory(diffs: PageDiff[]): PageContent {
     // Make sure diffs are in correct order
     .sort((a, b) => a.version - b.version)
     // Extract prosemirror change step
-    .map((diff) => (diff.data as any).ds as ProsemirrorJSONStep)
+    .map((diff) => (diff.data as any).ds as ProsemirrorJSONStep[])
     // Diff ds is stored as an array, unwind this
     .flat()
     // Just in case there are some null diffs

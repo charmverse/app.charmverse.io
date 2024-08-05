@@ -1,40 +1,87 @@
 import { log } from '@charmverse/core/log';
-import Safe from '@safe-global/safe-core-sdk';
-import EthersAdapter from '@safe-global/safe-ethers-lib';
-import { ethers } from 'ethers';
+import type { UserGnosisSafe } from '@charmverse/core/prisma-client';
 import { useEffect, useState } from 'react';
+import useSWR from 'swr';
+import { getAddress } from 'viem';
 
-import { useWeb3Account } from 'hooks/useWeb3Account';
-import { isTruthy } from 'lib/utilities/types';
+import charmClient from 'charmClient';
+import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
-export default function useSafes(safeAddresses: string[]) {
-  const [safes, setSafes] = useState<Safe[]>([]);
-  const { account, signer } = useWeb3Account();
+import useMultiWalletSigs from './useMultiWalletSigs';
+import { useUser } from './useUser';
+import { useWeb3Account } from './useWeb3Account';
 
-  async function loadSafes() {
-    if (!signer) return;
-
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    });
-
-    const _safes = await Promise.all(
-      safeAddresses.map((safeAddress) =>
-        Safe.create({ ethAdapter, safeAddress }).catch((error) => {
-          log.warn('Error retrieving safe', error.message);
-        })
-      )
-    );
-
-    setSafes(_safes.filter(isTruthy));
-  }
+export function useGnosisSafes(chainIdToUse?: number) {
+  const { user } = useUser();
+  const { data: existingSafesData, mutate: refreshSafes } = useMultiWalletSigs();
+  const { account, chainId } = useWeb3Account();
+  const _chainId = chainIdToUse ?? chainId ?? 1;
+  const [safeApiClient, setSafeApiClient] = useState<Awaited<ReturnType<typeof getSafeApiClient>> | null>(null);
 
   useEffect(() => {
-    if (safeAddresses.length && account && signer) {
-      loadSafes();
+    async function getSafeClient() {
+      if (_chainId) {
+        try {
+          setSafeApiClient(await getSafeApiClient({ chainId: _chainId }));
+        } catch (_) {
+          log.warn('Failed to get SafeApiClient', {
+            chainId: _chainId
+          });
+          setSafeApiClient(null);
+        }
+      }
     }
-  }, [account, safeAddresses.join(), signer]);
 
-  return safes;
+    getSafeClient();
+  }, [_chainId]);
+
+  const { data: safeInfos } = useSWR(
+    account && _chainId ? `/connected-gnosis-safes/${account}/${_chainId}` : null,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    () =>
+      safeApiClient &&
+      safeApiClient
+        .getSafesByOwner(getAddress(account!))
+        .then(async (response) =>
+          Promise.all(response.safes.map((safeAddress) => safeApiClient.getSafeInfo(safeAddress)))
+        )
+  );
+
+  useEffect(() => {
+    // This allows auto-syncing of safes, so the user does not need to visit their account to setup their safes
+    if (safeInfos && existingSafesData && user) {
+      const safesToAdd: Parameters<(typeof charmClient)['gnosisSafe']['setMyGnosisSafes']>[0] = [];
+
+      for (const foundSafe of safeInfos) {
+        if (
+          foundSafe.owners.some((owner) => lowerCaseEqual(owner, account as string)) &&
+          !existingSafesData.some((_existingSafe) => lowerCaseEqual(_existingSafe.address, foundSafe.address))
+        ) {
+          safesToAdd.push({
+            address: foundSafe.address,
+            userId: user.id,
+            chainId: _chainId,
+            isHidden: false,
+            owners: foundSafe.owners,
+            threshold: foundSafe.nonce
+          });
+        }
+      }
+
+      if (safesToAdd.length) {
+        charmClient.gnosisSafe.setMyGnosisSafes([...safesToAdd, ...existingSafesData]).then(() => refreshSafes());
+      }
+    }
+  }, [safeInfos?.length, existingSafesData?.length, user, account, _chainId]);
+
+  const safeDataRecord =
+    existingSafesData?.reduce<Record<string, UserGnosisSafe>>((record, userGnosisSafe) => {
+      if (!record[userGnosisSafe.address]) {
+        record[userGnosisSafe.address] = userGnosisSafe;
+      }
+      return record;
+    }, {}) ?? {};
+
+  return safeDataRecord;
 }

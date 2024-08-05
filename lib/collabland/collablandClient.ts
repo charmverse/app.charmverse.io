@@ -1,23 +1,22 @@
 import { GET, POST } from '@charmverse/core/http';
 import { getLogger } from '@charmverse/core/log';
+import { isProdEnv } from '@root/config/constants';
+import { COLLABLAND_API_URL, COLLAB_API_KEY } from '@root/lib/collabland/config';
+import type { CollablandUserResult } from '@root/lib/collabland/interfaces';
+import type { ExternalRole } from '@root/lib/roles';
 import { RateLimit } from 'async-sema';
 
-import { COLLABLAND_API_URL } from 'lib/collabland/config';
-import type { CollablandUserResult } from 'lib/collabland/interfaces';
-import type { ExternalRole } from 'lib/roles';
-
 const log = getLogger('collabland-client');
-const API_KEY = process.env.COLLAB_API_KEY as string;
 
 const DEFAULT_HEADERS = {
   Accept: 'application/json',
   'Content-Type': 'application/json',
-  'X-API-KEY': API_KEY
+  'X-API-KEY': COLLAB_API_KEY
 };
 
 log.debug('Using collabland API URL:', COLLABLAND_API_URL);
 
-const rateLimiter = RateLimit(1, { timeUnit: 5000 }); // 1 request per 5s
+const rateLimiter = RateLimit(1, { timeUnit: isProdEnv ? 5000 : 1 }); // 1 request per 5s
 
 export interface BountyEventSubject {
   id: string; // discord user id
@@ -82,7 +81,7 @@ function getHeaders(customHeaders: HeadersInit = {}) {
 }
 
 export function getCredentials({ aeToken }: { aeToken: string }) {
-  if (!API_KEY) {
+  if (!COLLAB_API_KEY) {
     log.warn('No API Key provided for collab.land');
     return [];
   }
@@ -96,7 +95,7 @@ export function getCredentials({ aeToken }: { aeToken: string }) {
 
 // @ref: https://api-qa.collab.land/explorer/#/VeramoController/VeramoController.requestToIssueVcred
 export function createCredential<T = BountyEventSubject>({ subject }: { subject: T }) {
-  if (!API_KEY) {
+  if (!COLLAB_API_KEY) {
     log.warn('No API Key provided for collab.land');
     return null;
   }
@@ -117,6 +116,13 @@ export async function getDiscordUserState({
   discordServerId: string;
   discordUserId: string;
 }) {
+  if (!COLLAB_API_KEY) {
+    log.warn('No API Key provided for collab.land when calling getDiscordUserState');
+    return {
+      isVerified: false,
+      roles: []
+    };
+  }
   try {
     await rateLimiter();
     const res = await GET<CollablandUserResult>(
@@ -151,6 +157,10 @@ export async function getDiscordUserState({
 }
 
 export async function getGuildRoles(discordServerId: string) {
+  if (!COLLAB_API_KEY) {
+    log.warn('No API Key provided for collab.land when calling getGuildRoles');
+    return [];
+  }
   await rateLimiter();
   const allRoles = await GET<ExternalRole[]>(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, null, {
     headers: getHeaders()

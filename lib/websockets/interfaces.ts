@@ -1,16 +1,17 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Page, PageType, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
+import type { UIBlockWithDetails } from '@root/lib/databases/block';
+import type { FailedImportsError } from '@root/lib/notion/interfaces';
+import type { ProposalWithUsersLite } from '@root/lib/proposals/getProposals';
+import type { RewardBlockWithTypedFields } from '@root/lib/rewards/blocks/interfaces';
+import type { ExtendedVote, VoteTask } from '@root/lib/votes/interfaces';
 import type { Node } from 'prosemirror-model';
 import type { Server, Socket } from 'socket.io';
 
-import type { Block } from 'lib/focalboard/block';
-import type { FailedImportsError } from 'lib/notion/types';
-import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
-
-export type Resource = { id: string };
-export type ResourceWithSpaceId = Resource & { spaceId: string };
+export type Resource<T = object> = { id: string } & T;
+export type ResourceWithSpaceId = Resource<{ spaceId: string }>;
 
 export type SealedUserId = {
   userId: string;
@@ -22,17 +23,22 @@ export type SocketAuthResponse = {
 
 type BlocksUpdated = {
   type: 'blocks_updated';
-  payload: (Partial<Block> & ResourceWithSpaceId)[];
+  payload: (Partial<UIBlockWithDetails> & ResourceWithSpaceId)[];
+};
+
+type RewardBlocksUpdated = {
+  type: 'reward_blocks_updated';
+  payload: RewardBlockWithTypedFields[];
 };
 
 type BlocksCreated = {
   type: 'blocks_created';
-  payload: Block[];
+  payload: UIBlockWithDetails[];
 };
 
 type BlocksDeleted = {
   type: 'blocks_deleted';
-  payload: (Resource & Pick<Block, 'type'>)[];
+  payload: Resource[];
 };
 
 type PagesMetaUpdated = {
@@ -77,19 +83,15 @@ type PostPublished = {
 
 type PostUpdated = {
   type: 'post_updated';
-  payload: {
-    id: string;
+  payload: Resource<{
     categoryId: string;
     createdBy: string;
-  };
+  }>;
 };
 
 type PostDeleted = {
   type: 'post_deleted';
-  payload: {
-    categoryId: string;
-    id: string;
-  };
+  payload: Resource<{ categoryId: string }>;
 };
 
 type ErrorMessage = {
@@ -154,6 +156,13 @@ type PageReorderedEditorToEditor = {
   };
 };
 
+type PageDuplicated = {
+  type: 'page_duplicated';
+  payload: {
+    pageId: string;
+  };
+};
+
 type SpaceSubscriptionUpdated = {
   type: 'space_subscription';
   payload: {
@@ -184,12 +193,9 @@ type PagesRestored = {
   payload: Resource[];
 };
 
-type ProposalsArchived = {
-  type: 'proposals_archived';
-  payload: {
-    archived: boolean;
-    proposalIds: string[];
-  };
+type ProposalsUpdated = {
+  type: 'proposals_updated';
+  payload: Resource<Partial<Pick<ProposalWithUsersLite, 'archived' | 'currentStep'>>>[];
 };
 
 export type ClientMessage =
@@ -199,9 +205,11 @@ export type ClientMessage =
   | PageCreated
   | PageReorderedSidebarToSidebar
   | PageReorderedSidebarToEditor
-  | PageReorderedEditorToEditor;
+  | PageReorderedEditorToEditor
+  | PageDuplicated;
 
 export type ServerMessage =
+  | RewardBlocksUpdated
   | BlocksUpdated
   | BlocksCreated
   | BlocksDeleted
@@ -219,7 +227,7 @@ export type ServerMessage =
   | SpaceSubscriptionUpdated
   | NotionImportCompleted
   | PagesRestored
-  | ProposalsArchived;
+  | ProposalsUpdated;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

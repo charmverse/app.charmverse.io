@@ -1,8 +1,8 @@
 import type { Block, BlockCount } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsBounties, testUtilsForum, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { emptyDocument } from '@root/lib/prosemirror/constants';
 
-import { emptyDocument } from 'lib/prosemirror/constants';
 import { generateSchema } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 
@@ -125,13 +125,13 @@ describe('countSpaceBlocks - count blocks', () => {
     const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
-      content: {}
+      content: null
     });
 
     const page2 = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
-      content: {}
+      content: null
     });
 
     const { details, total } = await countSpaceBlocks({ spaceId: space.id });
@@ -148,7 +148,7 @@ describe('countSpaceBlocks - count blocks', () => {
     const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
-      content: {}
+      content: null
     });
 
     const { comment: threadComment } = await testUtilsPages.generateCommentWithThreadAndPage({
@@ -200,7 +200,7 @@ describe('countSpaceBlocks - count blocks', () => {
       spaceId: space.id,
       categoryId: postCategory.id,
       // Empty content
-      content: {}
+      content: null
     });
 
     const { total, details } = await countSpaceBlocks({
@@ -225,7 +225,7 @@ describe('countSpaceBlocks - count blocks', () => {
       spaceId: space.id,
       categoryId: postCategory.id,
       // Empty content
-      content: {}
+      content: null
     });
 
     const totalComments = 3;
@@ -320,7 +320,7 @@ describe('countSpaceBlocks - count blocks', () => {
     const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
-      content: {}
+      content: null
     });
 
     const { total, details } = await countSpaceBlocks({ spaceId: space.id });
@@ -347,7 +347,7 @@ describe('countSpaceBlocks - count blocks', () => {
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',
-      content: {}
+      content: null
     });
 
     const { details, total } = await countSpaceBlocks({
@@ -496,7 +496,7 @@ describe('countSpaceBlocksAndSave', () => {
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',
-      content: {}
+      content: null
     });
 
     const { count, details } = await countSpaceBlocksAndSave({

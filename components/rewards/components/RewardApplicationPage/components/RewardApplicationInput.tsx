@@ -5,14 +5,14 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, FormLabel, IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { Button } from 'components/common/Button';
-import { useLocalStorage } from 'hooks/useLocalStorage';
+import { CharmEditor } from 'components/common/CharmEditor';
 import { useUser } from 'hooks/useUser';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 
@@ -20,8 +20,8 @@ import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardAp
  * @expandedOnLoad Use this to expand the application initially
  */
 interface IApplicationFormProps {
-  onSubmit: (applicationMessage: string) => Promise<boolean>;
-  rewardId: string;
+  onSubmit: (data: { message: string; messageNodes: string }) => Promise<boolean>;
+  onCancel?: VoidFunction;
   application?: Application;
   readOnly?: boolean;
   disableCollapse?: boolean;
@@ -30,7 +30,8 @@ interface IApplicationFormProps {
 }
 
 export const schema = yup.object({
-  message: yup.string().required('Please enter a submission.')
+  message: yup.string().required('Please enter a submission.'),
+  messageNodes: yup.mixed<string>().required()
 });
 
 type FormValues = yup.InferType<typeof schema>;
@@ -38,7 +39,7 @@ type FormValues = yup.InferType<typeof schema>;
 export function ApplicationInput({
   readOnly = false,
   onSubmit,
-  rewardId,
+  onCancel,
   application,
   disableCollapse,
   expandedOnLoad,
@@ -47,9 +48,7 @@ export function ApplicationInput({
   const [isVisible, setIsVisible] = useState(expandedOnLoad);
   const { user } = useUser();
 
-  const [applicationMessage, setApplicationMessage] = useLocalStorage(`${rewardId}.${user?.id}.application`, '');
   const {
-    register,
     handleSubmit,
     formState: { errors, isValid },
     setValue,
@@ -57,13 +56,11 @@ export function ApplicationInput({
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      // Default to saved message in local storage
-      message: (application?.message as string) ?? applicationMessage
+      message: application?.message as string,
+      messageNodes: application?.messageNodes as any as string
     },
     resolver: yupResolver(schema)
   });
-
-  const applicationExample = 'Explain why you are the right person or team to work on this';
 
   const currentApplicationMessage = watch('message');
 
@@ -99,49 +96,56 @@ export function ApplicationInput({
       </Box>
       <Collapse in={isVisible} timeout='auto' unmountOnExit>
         <form
-          onSubmit={handleSubmit((formValue) => onSubmit(formValue.message))}
+          onSubmit={handleSubmit((formValue) =>
+            onSubmit({
+              message: formValue.message,
+              messageNodes: formValue.messageNodes
+            })
+          )}
           style={{ margin: 'auto', width: '100%' }}
         >
           <Grid container direction='column' spacing={1}>
-            <Grid item>
-              <TextField
-                {...register('message')}
-                autoFocus
-                placeholder={applicationExample}
-                minRows={5}
-                multiline
-                variant='outlined'
-                type='text'
-                fullWidth
-                disabled={readOnly}
-                onChange={(ev) => {
-                  // Only store in local storage if no application exists yet
-                  const newText = ev.target.value;
-                  if (!application) {
-                    setApplicationMessage(newText);
-                  }
-
-                  setValue('message', newText, {
+            <Grid item data-test='application-input'>
+              <CharmEditor
+                content={application?.messageNodes as PageContent}
+                onContentChange={(content) => {
+                  setValue('message', content.rawText, {
+                    shouldValidate: true
+                  });
+                  setValue('messageNodes', content.doc as any, {
                     shouldValidate: true
                   });
                 }}
-                sx={{
-                  '.Mui-disabled': {
-                    color: 'var(--text-primary) !important',
-                    WebkitTextFillColor: 'var(--text-primary) !important'
-                  }
+                style={{
+                  backgroundColor: 'var(--input-bg)',
+                  border: '1px solid var(--input-border)',
+                  borderRadius: 3,
+                  minHeight: 130,
+                  left: 0
                 }}
+                readOnly={readOnly}
+                placeholderText='Explain why you are the right person or team to work on this'
+                key={`${readOnly}.${application?.status}`}
+                disableRowHandles
+                isContentControlled
+                disableNestedPages
               />
               {errors?.message && <Alert severity='error'>{errors.message.message}</Alert>}
             </Grid>
 
             {!readOnly && (
               <Grid item display='flex' gap={1} justifyContent='flex-end'>
+                {onCancel && (
+                  <Button disabled={isSaving} onClick={onCancel} color='error' variant='outlined'>
+                    Cancel
+                  </Button>
+                )}
                 <Button
                   disabled={
                     !isValid || (!!currentApplicationMessage && currentApplicationMessage === application?.message)
                   }
                   type='submit'
+                  data-test='submit-application-button'
                   loading={isSaving}
                 >
                   {!application ? ' Apply' : 'Update'}

@@ -4,16 +4,20 @@ import { useRouter } from 'next/router';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getAbsolutePath } from 'lib/utilities/browser';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 export function CopyPageLinkAction({
   path,
   onComplete,
-  message
+  message,
+  typographyProps,
+  isApplication
 }: {
+  isApplication?: boolean;
   path: string;
   onComplete?: VoidFunction;
   message?: string;
+  typographyProps?: Record<string, unknown>;
 }) {
   const { showMessage } = useSnackbar();
   const router = useRouter();
@@ -24,12 +28,18 @@ export function CopyPageLinkAction({
   }
 
   return (
-    <CopyToClipboard text={getAbsolutePath(path, router.query.domain as string | undefined)} onCopy={onClick}>
+    <CopyToClipboard
+      text={getAbsolutePath(
+        isApplication ? `/rewards/applications${path}` : path,
+        router.query.domain as string | undefined
+      )}
+      onCopy={onClick}
+    >
       <MenuItem data-testid='copy-link-page-action' dense>
         <ListItemIcon>
           <LinkIcon fontSize='small' />
         </ListItemIcon>
-        <ListItemText>Copy link</ListItemText>
+        <ListItemText primaryTypographyProps={typographyProps}>Copy link</ListItemText>
       </MenuItem>
     </CopyToClipboard>
   );

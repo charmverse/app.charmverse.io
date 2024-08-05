@@ -1,10 +1,9 @@
 import { log } from '@charmverse/core/log';
-import type { PageMeta } from '@charmverse/core/pages';
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';
-import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
+import type { PageMeta } from '@root/lib/pages/interfaces';
+import { exportWorkspacePages } from '@root/lib/templates/exportWorkspacePages';
+import { importWorkspacePages } from '@root/lib/templates/importWorkspacePages';
 
 export type DuplicatePageResponse = {
   pages: PageMeta[];

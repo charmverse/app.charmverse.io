@@ -1,8 +1,8 @@
 import type { SxProps } from '@mui/material';
 import { Chip, Stack, Tooltip, Typography } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 
-import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { EmptyPlaceholder } from 'components/common/DatabaseEditor/components/properties/EmptyPlaceholder';
 
 type Props = {
   value: string | string[];
@@ -37,7 +37,12 @@ export function SelectPreview({
   return (
     <Stack data-test='select-preview' sx={sx} gap={name ? 0.5 : 0}>
       {name && (
-        <Typography component='span' fontWeight='bold' variant={size === 'small' ? 'subtitle2' : 'body1'}>
+        <Typography
+          data-test='select-preview-name'
+          component='span'
+          fontWeight='bold'
+          variant={size === 'small' ? 'subtitle2' : 'body1'}
+        >
           {name}
         </Typography>
       )}
@@ -53,6 +58,7 @@ export function SelectPreview({
           {valueOptions.length !== 0
             ? valueOptions.map((valueOption) => (
                 <Chip
+                  data-test={`select-preview-value-${valueOption.id}`}
                   sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
                   label={valueOption.name}
                   color={valueOption.color}

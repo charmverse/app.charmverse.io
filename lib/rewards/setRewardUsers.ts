@@ -1,8 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
 import { getRewardOrThrow } from './getReward';
 import type { RewardReviewer, RewardWithUsers } from './interfaces';
@@ -32,7 +31,7 @@ export async function setRewardUsers({
     if (!stringUtils.isUUID(rewardId)) {
       throw new InvalidInputError(`Please provide a valid reward id`);
     }
-    if ('allowedSubmitterRoles' in users || 'assignedSubmitters' in users) {
+    if (users.allowedSubmitterRoles !== undefined || users.assignedSubmitters !== undefined) {
       await _tx.bountyPermission.deleteMany({
         where: {
           bountyId: rewardId,
@@ -71,8 +70,8 @@ export async function setRewardUsers({
           data: users.reviewers.map((reviewer) => ({
             bountyId: rewardId,
             permissionLevel: 'reviewer',
-            roleId: reviewer.group === 'role' ? reviewer.id : undefined,
-            userId: reviewer.group === 'user' ? reviewer.id : undefined
+            roleId: reviewer.roleId,
+            userId: reviewer.userId
           }))
         });
       }

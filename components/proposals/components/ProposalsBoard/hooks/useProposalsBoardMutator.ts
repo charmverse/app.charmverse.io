@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
 
-import type { BlockUpdater } from 'components/common/BoardEditor/charmClient.interface';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { blockToFBBlock, fbBlockToBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import type { BlockUpdater } from 'components/common/DatabaseEditor/charmClient.interface';
+import mutator from 'components/common/DatabaseEditor/mutator';
+import { blockToFBBlock, fbBlockToBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
-import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { ProposalBlockWithTypedFields, ProposalPropertyValues } from 'lib/proposal/blocks/interfaces';
+import type { BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import { Constants } from 'lib/databases/constants';
+import type { ProposalBlockWithTypedFields, ProposalPropertyValues } from 'lib/proposals/blocks/interfaces';
 
 export function useProposalsBoardMutator() {
   const { updateBlock, createBlock, getBlock, updateBlocks } = useProposalBlocks();
@@ -48,7 +49,7 @@ export function useProposalsBoardMutator() {
 
     if (fbBlockInput.fields.cardProperties) {
       fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
-        (p: IPropertyTemplate) => !p.id.startsWith('__')
+        (p: IPropertyTemplate) => !p.id.startsWith('__') || p.id === Constants.titleColumnId
       );
     }
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
@@ -70,7 +71,7 @@ export function useProposalsBoardMutator() {
 
       if (fbBlockInput.fields.cardProperties) {
         fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
-          (p: IPropertyTemplate) => !p.id.startsWith('__')
+          (p: IPropertyTemplate) => !p.id.startsWith('__') || p.id === Constants.titleColumnId
         );
       }
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);

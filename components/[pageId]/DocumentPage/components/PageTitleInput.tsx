@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 
 import { useIMEComposition } from 'hooks/useIMEComposition';
-import { isTouchScreen } from 'lib/utilities/browser';
+import { isTouchScreen } from 'lib/utils/browser';
 
 const StyledPageTitle = styled(TextField)`
   &.MuiFormControl-root {
@@ -107,7 +107,11 @@ export function PageTitleInput({
   }, [value, updatedAtExternal, updatedAt, setTitle]);
 
   if (readOnly) {
-    return <StyledReadOnlyTitle data-test='editor-page-title'>{value || 'Untitled'}</StyledReadOnlyTitle>;
+    return (
+      <StyledReadOnlyTitle variant='h1' data-test='editor-page-title'>
+        {value || 'Untitled'}
+      </StyledReadOnlyTitle>
+    );
   }
   return (
     <StyledPageTitle

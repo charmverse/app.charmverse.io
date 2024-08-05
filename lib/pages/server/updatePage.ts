@@ -46,11 +46,25 @@ export async function updatePage(
     data.path = newPath;
   }
 
-  return prisma.page.update({
+  await prisma.page.update({
+    where: { id: page.id },
+    data
+  });
+
+  // keeps some fields in sync
+  if (data.title) {
+    await prisma.page.updateMany({
+      where: { syncWithPageId: page.id },
+      data: {
+        title: data.title
+      }
+    });
+  }
+
+  return prisma.page.findUniqueOrThrow({
     where: {
       id: page.id
     },
-    data,
     select: pageMetaSelect()
   }) as Promise<PageMeta>;
 }

@@ -5,26 +5,24 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import CenterPanel from 'components/common/DatabaseEditor/components/centerPanel';
+import DatabasePortal from 'components/common/DatabaseEditor/DatabasePortal';
+import mutator from 'components/common/DatabaseEditor/mutator';
+import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/DatabaseEditor/store/boards';
 import {
-  getCurrentBoard,
-  setCurrent as setCurrentBoard
-} from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import {
-  getCurrentBoardViews,
-  setCurrent as setCurrentView
-} from 'components/common/BoardEditor/focalboard/src/store/views';
-import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+  initialDatabaseLoad,
+  databaseViewsLoad,
+  blockLoad
+} from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
+import { getCurrentBoardViews, setCurrent as setCurrentView } from 'components/common/DatabaseEditor/store/views';
+import { Utils } from 'components/common/DatabaseEditor/utils';
 import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useFocalboardViews } from 'hooks/useFocalboardViews';
+import { useDatabaseViews } from 'hooks/useDatabaseViews';
 import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { Board } from 'lib/databases/board';
 
 /**
  *
@@ -40,7 +38,8 @@ interface Props {
 
 export function DatabasePage({ page, setPage, readOnly = false, pagePermissions }: Props) {
   const router = useRouter();
-  const board = useAppSelector(getCurrentBoard);
+  const board = useAppSelector(getCurrentBoard) as Board | undefined; // TODO: why do types from getCurrentBoard not include undefined
+
   const boardViews = useAppSelector(getCurrentBoardViews);
   // grab the first board view if current view is not specified
   const { showMessage } = useSnackbar();
@@ -49,9 +48,9 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
-  const { setFocalboardViewsRecord } = useFocalboardViews();
+  const { setViewsRecord } = useDatabaseViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-  const { pages } = usePages();
+
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);
@@ -85,7 +84,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
       dispatch(setCurrentBoard(boardId));
       // Note: current view in Redux is only used for search, which we currently are not using at the moment
       dispatch(setCurrentView(urlViewId || ''));
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [boardId]: urlViewId }));
+      setViewsRecord((record) => ({ ...record, [boardId]: urlViewId }));
     }
   }, [page.boardId, boardViews]);
 
@@ -94,8 +93,14 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   useEffect(() => {
     if (page.id && (!board || page.id !== board.id)) {
       dispatch(initialDatabaseLoad({ pageId: page.id }));
+      // extra call to load the board and views as it takes less time when u have lots of cards
+      dispatch(blockLoad({ blockId: page.id }));
+      dispatch(databaseViewsLoad({ pageId: page.id as string }));
+    } else if (board?.fields.sourceType === 'proposals' && board.id === page.id) {
+      // always refresh proposal source board
+      dispatch(initialDatabaseLoad({ pageId: page.id }));
     }
-  }, [page.id]);
+  }, [board?.id, page.id]);
 
   useHotkeys('ctrl+z,cmd+z', () => {
     Utils.log('Undo');
@@ -136,7 +141,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
         navigateToSpacePath(`/${cardId}`);
       }
     },
-    [router.query, activeView, pages]
+    [router.query, activeView]
   );
 
   const showView = useCallback(
@@ -153,40 +158,42 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     [router.query]
   );
 
-  if (board) {
-    return (
-      <>
-        <div data-test='database-page' className='focalboard-body full-page'>
-          <DbViewSettingsProvider>
-            <CenterPanel
-              currentRootPageId={page.id}
-              readOnly={Boolean(readOnlyBoard)}
-              board={board}
-              setPage={setPage}
-              pageIcon={page.icon}
-              showCard={showCard}
-              showView={showView}
-              activeView={activeView || undefined}
-              views={boardViews}
-              page={page}
-            />
-            {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-              <PageDialog
-                key={shownCardId}
-                pageId={shownCardId}
-                onClose={() => {
-                  showCard(null);
-                }}
-                readOnly={readOnly}
-              />
-            )}
-          </DbViewSettingsProvider>
-        </div>
-        {/** include the root portal for focalboard's popup */}
-        <FocalBoardPortal />
-      </>
-    );
+  if (!board) {
+    return null;
   }
 
-  return null;
+  return (
+    <>
+      <div data-test='database-page' className='focalboard-body full-page'>
+        <DbViewSettingsProvider>
+          <CenterPanel
+            currentRootPageId={page.id}
+            readOnly={Boolean(readOnlyBoard)}
+            board={board}
+            setPage={setPage}
+            pageIcon={page.icon}
+            showCard={showCard}
+            showView={showView}
+            activeView={activeView || undefined}
+            views={boardViews}
+            page={page}
+          />
+          {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
+            <PageDialog
+              showCard={showCard}
+              key={shownCardId}
+              pageId={shownCardId}
+              onClose={() => {
+                showCard(null);
+              }}
+              currentBoardId={board.id}
+              readOnly={readOnly}
+            />
+          )}
+        </DbViewSettingsProvider>
+      </div>
+      {/** include the root portal for focalboard's popup */}
+      <DatabasePortal />
+    </>
+  );
 }

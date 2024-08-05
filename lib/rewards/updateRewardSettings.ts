@@ -1,8 +1,7 @@
 import type { Bounty as Reward } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { InvalidInputError, PositiveNumbersOnlyError } from '@root/lib/utils/errors';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
 import type { RewardReviewer, RewardWithUsers } from './interfaces';
@@ -14,21 +13,32 @@ export type UpdateableRewardFields = Partial<
     | 'chainId'
     | 'rewardAmount'
     | 'rewardToken'
+    | 'rewardType'
     | 'approveSubmitters'
     | 'allowMultipleApplications'
     | 'maxSubmissions'
     | 'dueDate'
     | 'customReward'
     | 'fields'
+    | 'selectedCredentialTemplates'
+    | 'fields'
   >
-> & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] | null; assignedSubmitters?: string[] | null };
+> & {
+  reviewers?: RewardReviewer[];
+  allowedSubmitterRoles?: string[] | null;
+  assignedSubmitters?: string[] | null;
+};
 
 export type RewardUpdate = {
   rewardId: string;
   updateContent: UpdateableRewardFields;
 };
 
-export async function updateRewardSettings({ rewardId, updateContent }: RewardUpdate): Promise<RewardWithUsers> {
+export async function updateRewardSettings({
+  rewardId,
+  updateContent,
+  isPublished
+}: RewardUpdate & { isPublished?: boolean }): Promise<RewardWithUsers> {
   if (!stringUtils.isUUID(rewardId)) {
     throw new InvalidInputError(`Valid reward id is required`);
   }
@@ -42,6 +52,7 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
       id: rewardId
     },
     select: {
+      status: true,
       maxSubmissions: true,
       applications: {
         select: {
@@ -67,16 +78,19 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
         id: rewardId
       },
       data: {
+        status: isPublished ? 'open' : reward.status,
         customReward: updateContent.customReward,
         updatedAt: new Date(),
         dueDate: updateContent.dueDate,
         chainId: updateContent.chainId,
         rewardAmount: updateContent.rewardAmount,
         rewardToken: updateContent.rewardToken,
+        rewardType: updateContent.rewardType,
         allowMultipleApplications: isAssignedReward ? false : updateContent.allowMultipleApplications,
         approveSubmitters: isAssignedReward ? false : updateContent.approveSubmitters,
         maxSubmissions: isAssignedReward ? 1 : updateContent.maxSubmissions,
-        fields: updateContent.fields as any
+        fields: updateContent.fields as any,
+        selectedCredentialTemplates: updateContent.selectedCredentialTemplates
       },
       select: { id: true }
     });

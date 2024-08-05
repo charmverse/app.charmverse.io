@@ -3780,12 +3780,11 @@
         "id": "369d3e45-2631-477e-9d59-9e91dc37730f",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": null,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -3996,7 +3995,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -5620,12 +5619,11 @@
         "id": "58e80db0-f652-4646-a863-8746ff6cce5f",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": null,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -5836,7 +5834,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -7412,12 +7410,11 @@
         "id": "fb14e697-3d01-48ce-9577-8904f7f68cd4",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": null,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -7628,7 +7625,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -10876,12 +10873,11 @@
         "id": "a6b0a11a-55dc-4b32-a9d9-a983bb172df2",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": null,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -11092,7 +11088,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -12277,12 +12273,11 @@
         "id": "0f0d9678-ceea-4572-ac3c-1c849a485598",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": null,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -12493,7 +12488,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -13280,12 +13275,11 @@
         "id": "cb1e7538-bc11-4404-86fe-06f080cde83f",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -13358,7 +13352,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -14647,12 +14641,11 @@
         "id": "bd19b04e-f43a-486c-9f41-1fd9cebcbe8b",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": null,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -14863,7 +14856,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -15717,12 +15710,11 @@
         "id": "07fe5bb1-46e1-4eb5-8684-fbfa094425e4",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "3055a63c-b535-41fb-a178-281db8170bfe",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -15795,7 +15787,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -24143,7 +24135,6 @@
                     "a3eba456-28d2-4b4d-93a9-b09c985d3b64"
                   ],
                   "defaultTemplateId": "",
-                  "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": [
@@ -24267,7 +24258,6 @@
                     "2711e75f-ca53-4ca9-99a1-86874cb3cdab"
                   ],
                   "defaultTemplateId": "",
-                  "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": ["__title", "432d6b75-2446-49f0-acde-8b7129c695e3"]
@@ -24387,7 +24377,6 @@
                     "a3eba456-28d2-4b4d-93a9-b09c985d3b64"
                   ],
                   "defaultTemplateId": "",
-                  "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": ["432d6b75-2446-49f0-acde-8b7129c695e3"]
@@ -24983,7 +24972,6 @@
                     ""
                   ],
                   "defaultTemplateId": "",
-                  "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": [
@@ -26540,7 +26528,6 @@
                       "hiddenOptionIds": [],
                       "visibleOptionIds": [],
                       "defaultTemplateId": "",
-                      "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
                       "visiblePropertyIds": [
@@ -26798,7 +26785,6 @@
                       "hiddenOptionIds": [],
                       "visibleOptionIds": [],
                       "defaultTemplateId": "",
-                      "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
                       "visiblePropertyIds": [
@@ -27249,7 +27235,6 @@
                       "hiddenOptionIds": [],
                       "visibleOptionIds": [],
                       "defaultTemplateId": "",
-                      "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
                       "visiblePropertyIds": [

@@ -1,6 +1,7 @@
-import { prisma } from "@charmverse/core/prisma-client";
+// @ts-nocheck
+import { prisma } from '@charmverse/core/prisma-client';
 import { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import { createForm } from 'lib/form/createForm';
+import { createForm } from 'lib/forms/createForm';
 import { v4 } from 'uuid';
 
 async function splitStructuredProposalForms() {
@@ -8,7 +9,7 @@ async function splitStructuredProposalForms() {
   const proposalTemplates = await prisma.proposal.findMany({
     where: {
       page: {
-        type: "proposal_template"
+        type: 'proposal_template'
       },
       formId: {
         not: null
@@ -20,8 +21,8 @@ async function splitStructuredProposalForms() {
         select: {
           formFields: {
             orderBy: {
-              index: "asc"
-            },
+              index: 'asc'
+            }
           }
         }
       },
@@ -30,9 +31,9 @@ async function splitStructuredProposalForms() {
           id: true
         }
       },
-      formId: true,
+      formId: true
     }
-  })
+  });
 
   const existingFormIds: Set<string> = new Set();
   const totalProposals = proposalTemplates.length;
@@ -44,14 +45,16 @@ async function splitStructuredProposalForms() {
         continue;
       }
       if (existingFormIds.has(proposalTemplate.formId)) {
-        const newFormFieldIds = proposalTemplate.form.formFields.map(() => v4())
+        const newFormFieldIds = proposalTemplate.form.formFields.map(() => v4());
         // Create new form with new form field ids
-        const newFormId = await createForm(proposalTemplate.form.formFields.map((formField, index) => ({
-          ...formField,
-          id: newFormFieldIds[index],
-          options: formField.options as SelectOptionType[]
-        })));
-        
+        const newFormId = await createForm(
+          proposalTemplate.form.formFields.map((formField, index) => ({
+            ...formField,
+            id: newFormFieldIds[index],
+            options: formField.options as SelectOptionType[]
+          }))
+        );
+
         // Get all the proposals that use this template
         const proposals = await prisma.proposal.findMany({
           where: {
@@ -66,8 +69,8 @@ async function splitStructuredProposalForms() {
               }
             }
           }
-        })
-  
+        });
+
         await prisma.$transaction([
           prisma.proposal.update({
             where: {
@@ -89,26 +92,30 @@ async function splitStructuredProposalForms() {
             }
           }),
           // Update the form field ids for all form answers for all proposals that use this template
-          ...proposals.map(proposal => proposal.formAnswers.map((formAnswer, index) => (
-            prisma.formFieldAnswer.update({
-              where: {
-                id: formAnswer.id
-              },
-              data: {
-                fieldId: newFormFieldIds[index]
-              }
-            })
-          ))).flat()
-        ])
+          ...proposals
+            .map((proposal) =>
+              proposal.formAnswers.map((formAnswer, index) =>
+                prisma.formFieldAnswer.update({
+                  where: {
+                    id: formAnswer.id
+                  },
+                  data: {
+                    fieldId: newFormFieldIds[index]
+                  }
+                })
+              )
+            )
+            .flat()
+        ]);
       }
-      existingFormIds.add(proposalTemplate.formId)
+      existingFormIds.add(proposalTemplate.formId);
     } catch (err) {
-      console.log(`Failed to split proposal template ${proposalTemplate.id}`)
+      console.log(`Failed to split proposal template ${proposalTemplate.id}`);
     } finally {
       currentProposal++;
-      console.log(`Completed ${currentProposal}/${totalProposals} proposals`)
+      console.log(`Completed ${currentProposal}/${totalProposals} proposals`);
     }
   }
 }
 
-splitStructuredProposalForms()
+splitStructuredProposalForms();

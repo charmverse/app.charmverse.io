@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 
 import type { Props as EvaluationsReviewProps } from './components/Review/EvaluationsReview';
 import { EvaluationsReview } from './components/Review/EvaluationsReview';
@@ -12,16 +12,19 @@ export type ProposalEvaluationsProps = {
   proposal?: EvaluationsReviewProps['proposal'];
   proposalInput?: ProposalSettingsProps['proposal'];
   onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
+  onChangeTemplate: ProposalSettingsProps['onChangeTemplate'];
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
   onChangeRewardSettings?: ProposalSettingsProps['onChangeRewardSettings'];
+  onChangeSelectedCredentialTemplates: ProposalSettingsProps['onChangeSelectedCredentialTemplates'];
   refreshProposal?: VoidFunction;
-  isReviewer?: boolean; // TODO: we need to know the reviewer for each step instead
   pagePath?: string;
   pageTitle?: string;
   templateId?: string | null;
   isProposalTemplate: boolean;
   isStructuredProposal: boolean;
   expanded?: boolean;
+  refreshPage?: VoidFunction;
+  pageLensPostLink?: string | null;
 };
 
 // display evaluation steps or their settings, depending if a proposal is published or not
@@ -31,32 +34,36 @@ export function ProposalEvaluations({
   proposal,
   proposalInput,
   onChangeEvaluation,
+  onChangeTemplate,
   onChangeWorkflow,
   onChangeRewardSettings,
   refreshProposal,
-  isReviewer,
+  onChangeSelectedCredentialTemplates,
   pagePath,
   pageTitle,
   isUnpublishedProposal,
   templateId,
   isProposalTemplate,
   isStructuredProposal,
-  expanded = true
+  expanded,
+  pageLensPostLink,
+  refreshPage
 }: ProposalEvaluationsProps) {
+  const isAdmin = useIsAdmin();
+
   if (isUnpublishedProposal) {
-    const isNotNewProposal = !!proposal;
     return (
       <EvaluationsSettings
         proposal={proposalInput}
         readOnly={!!readOnlyProposalPermissions}
         templateId={templateId}
+        expandedSidebar={expanded}
         onChangeEvaluation={onChangeEvaluation}
+        onChangeTemplate={onChangeTemplate}
         onChangeWorkflow={onChangeWorkflow}
-        isReviewer={!!isReviewer}
-        requireWorkflowChangeConfirmation={isNotNewProposal}
-        expanded={expanded}
         isTemplate={isProposalTemplate}
         onChangeRewardSettings={onChangeRewardSettings}
+        onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         isStructuredProposal={!!isStructuredProposal}
       />
     );
@@ -67,13 +74,15 @@ export function ProposalEvaluations({
         pageTitle={pageTitle}
         pageId={pageId}
         proposal={proposal}
+        pageLensPostLink={pageLensPostLink}
         onChangeEvaluation={onChangeEvaluation}
+        readOnlyCredentialTemplates={!isAdmin}
+        onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         refreshProposal={refreshProposal}
+        refreshPage={refreshPage}
         templateId={templateId}
-        expanded={expanded}
+        expanded={expanded ?? true}
       />
     );
   }
 }
-
-export const ProposalSidebar = memo(ProposalEvaluations);

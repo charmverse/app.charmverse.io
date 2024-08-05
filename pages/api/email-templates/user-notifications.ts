@@ -14,7 +14,7 @@ import type {
 } from 'lib/notifications/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
-import randomName from 'lib/utilities/randomName';
+import randomName from 'lib/utils/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
 
 import { templatesContainer } from './page-invite';
@@ -178,6 +178,9 @@ const createProposalNotification = ({
     read: false,
     evaluation: {
       title: 'Review'
+    },
+    previousEvaluation: {
+      title: 'Feedback'
     }
   };
 };
@@ -284,6 +287,15 @@ const templates = {
       }),
       user,
       spaceFeatures: []
+    });
+  },
+  'Notify the user about OrangeDAO invite notifications': () => {
+    return emails.getOrangeDaoSpaceInviteEmail({
+      pagePath: 'orange-dao',
+      pageTitle: 'OrangeDAO fellowship',
+      spaceDomain: 'orange-dao',
+      spaceName: 'OrangeDAO',
+      user
     });
   }
 };

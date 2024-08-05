@@ -15,12 +15,11 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-
-import { mapPostCategoryPermissionToAssignee } from 'lib/permissions/forum/mapPostCategoryPermissionToAssignee';
+import { mapPostCategoryPermissionToAssignee } from '@root/lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import {
   mapSpacePermissionToAssignee,
   type AssignedSpacePermission
-} from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
+} from '@root/lib/permissions/spaces/mapSpacePermissionToAssignee';
 
 import type { SpaceDataExport } from '../exportSpaceData';
 import { exportSpaceData } from '../exportSpaceData';
@@ -344,7 +343,6 @@ describe('exportSpaceData', () => {
               columnWrappedIds: [],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: ['__status', '__evaluationType', '__authors', '__reviewers']
@@ -408,7 +406,6 @@ describe('exportSpaceData', () => {
               columnWrappedIds: ['__title'],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: [

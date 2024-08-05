@@ -21,6 +21,8 @@ const globalCSS = css`
     )}
     --input-bg: ${colors.inputBackground};
     --input-border: ${colors.inputBorder};
+    /* input-border that doesnt change in dark mode */
+    --input-border-light-mode: ${colors.inputBorder};
     --input-border-hover: #37352f;
     --button-text-hover: var(--input-bg);
     --primary-color: ${colors.blueColor};
@@ -78,11 +80,8 @@ const globalCSS = css`
     --button-bg-rgb: 0, 159, 183;
     --button-danger-color-rgb: 255, 255, 255;
     --button-danger-bg-rgb: 210, 75, 78;
-  }
 
-  /* lit protocol */
-  .lsm-light-theme {
-    --lsm-accent-color: ${colors.blueColor};
+    --icon-bg: rgba(230, 230, 230);
   }
 
   /* dark theme */
@@ -114,6 +113,8 @@ const globalCSS = css`
 
     /* copied from MUI palette */
     --mui-action-hover: rgba(255, 255, 255, 0.055);
+
+    --icon-bg: rgba(70, 70, 70);
   }
 `;
 

@@ -1,13 +1,28 @@
-import { VoteType } from '@charmverse/core/prisma';
 import type { UserVote } from '@charmverse/core/prisma';
+import { VoteType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import { Box, Button, Card, Chip, Divider, FormControl, List, ListItem, ListItemText, Typography } from '@mui/material';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import {
+  Box,
+  Button,
+  Card,
+  Chip,
+  Divider,
+  FormControl,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  Typography
+} from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
+import { getChainById } from '@root/connectors/chains';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import millify from 'millify';
 import type { EditorView } from 'prosemirror-view';
-import React from 'react';
+import React, { useRef } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -15,7 +30,9 @@ import Avatar from 'components/common/Avatar';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { MultiChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/MultiChoiceForm';
 import { SingleChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/SingleChoiceForm';
+import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
+import { TokenBadge } from 'components/common/TokenBadge';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
@@ -63,6 +80,7 @@ export function VoteDetail({
   const { deadline, totalVotes, content, id, title, userChoice, voteOptions, aggregatedResult, type, maxChoices } =
     vote;
   const { user } = useUser();
+  const anchorRef = useRef<HTMLElement>(null);
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () =>
     charmClient.votes.getUserVotes(id)
   );
@@ -76,13 +94,12 @@ export function VoteDetail({
     <Box
       sx={{
         fontWeight: 'bold',
-        mt: 1,
         display: 'flex',
         alignItems: 'center',
         gap: 1
       }}
     >
-      <span>Votes</span> <Chip size='small' label={totalVotes} />
+      <span>Votes</span> <Chip size='small' label={totalVotes < 1 ? totalVotes : millify(totalVotes)} />
     </Box>
   );
 
@@ -132,13 +149,19 @@ export function VoteDetail({
     }
   }
 
+  const [blockExplorerUrl] =
+    (vote.strategy === 'token' && vote.chainId ? getChainById(vote.chainId)?.blockExplorerUrls : []) ?? [];
+
+  const chain = vote.chainId ? getChainById(vote.chainId) : null;
+
   return (
     <VotesWrapper data-test='vote-container' detailed={detailed} id={`vote.${vote.id}`}>
-      <Box display='flex' justifyContent='space-between' alignItems='center'>
+      <Box ref={anchorRef} display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold' component='span'>
           {title || 'Poll on this proposal'}
         </Typography>
         <VoteActionsMenu
+          anchorRef={anchorRef}
           deleteVote={deleteVote}
           cancelVote={cancelVote}
           isProposalVote={!!isProposal}
@@ -158,7 +181,29 @@ export function VoteDetail({
           <CharmEditor disablePageSpecificFeatures isContentControlled content={content as PageContent} readOnly />
         </Box>
       )}
-      {!detailed && voteCountLabel}
+      <Stack flexDirection='row' mt={1} justifyContent='space-between' alignItems='center'>
+        {!detailed && voteCountLabel}
+      </Stack>
+      {vote.strategy === 'token' && vote.blockNumber && chain && blockExplorerUrl ? (
+        <Stack flexDirection='row' justifyContent='space-between' mt={1}>
+          <TokenBadge chainId={vote.chainId!} tokenAddress={vote.tokenAddress!} />
+          <Link href={`${blockExplorerUrl}/block/${vote.blockNumber}`} target='_blank' rel='noreferrer'>
+            <Tooltip title={`View block on ${chain.chainName} explorer`}>
+              <Stack flexDirection='row' alignItems='center' gap={0.5}>
+                <Typography style={{ margin: 0 }} color='secondary' variant='subtitle1' my={0} component='span'>
+                  {vote.blockNumber}
+                </Typography>
+                <OpenInNewIcon
+                  color='secondary'
+                  sx={{
+                    fontSize: 16
+                  }}
+                />
+              </Stack>
+            </Tooltip>
+          </Link>
+        </Stack>
+      ) : null}
       <Tooltip
         placement='top-start'
         title={disableVote ? 'You do not have the permissions to participate in this vote' : ''}
@@ -168,10 +213,11 @@ export function VoteDetail({
             <SingleChoiceForm
               value={userVoteChoice?.[0]}
               voteOptions={voteOptions}
-              disabled={isVotingClosed(vote) || !user || !!disableVote}
+              disabled={vote.votingPower === 0 || isVotingClosed(vote) || !user || !!disableVote}
               totalVotes={totalVotes}
               aggregatedResult={aggregatedResult}
               onChange={onVoteChange}
+              showAggregateResult={vote.strategy === 'token'}
             />
           )}
 
@@ -179,18 +225,33 @@ export function VoteDetail({
             <MultiChoiceForm
               value={userVoteChoice}
               voteOptions={voteOptions}
-              disabled={isVotingClosed(vote) || !user || !!disableVote}
+              disabled={vote.votingPower === 0 || isVotingClosed(vote) || !user || !!disableVote}
               totalVotes={totalVotes}
               aggregatedResult={aggregatedResult}
               onChange={onVoteChange}
               maxChoices={maxChoices}
               hasPassedDeadline={hasPassedDeadline}
+              showAggregateResult={vote.strategy === 'token'}
             />
           )}
         </StyledFormControl>
       </Tooltip>
       {!detailed && (
-        <Box display='flex' justifyContent='flex-end'>
+        <Box
+          alignItems='center'
+          display='flex'
+          justifyContent={vote.strategy === 'token' ? 'space-between' : 'flex-end'}
+        >
+          {vote.strategy === 'token' && (
+            <Stack gap={0.5}>
+              <Typography variant='subtitle1'>
+                Your voting power: {vote.votingPower < 1 ? vote.votingPower : millify(vote.votingPower)}
+              </Typography>
+              <Typography variant='subtitle1'>
+                Total voting power: {vote.totalVotingPower ? millify(vote.totalVotingPower) : 'N/A'}
+              </Typography>
+            </Stack>
+          )}
           <Button
             data-test='view-poll-details-button'
             color='secondary'
@@ -223,6 +284,8 @@ export function VoteDetail({
               return null;
             }
 
+            const userVotePower = userVote.tokenAmount ? parseFloat(userVote.tokenAmount) : null;
+
             return (
               <React.Fragment key={userVote.userId}>
                 <ListItem
@@ -245,6 +308,7 @@ export function VoteDetail({
                   />
                   <Typography fontWeight={500} color='secondary'>
                     {choices.join(', ')}
+                    {userVotePower ? ` (${userVotePower < 1 ? userVotePower : millify(userVotePower)})` : ''}
                   </Typography>
                 </ListItem>
                 <Divider />

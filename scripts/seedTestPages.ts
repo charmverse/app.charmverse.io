@@ -1,8 +1,8 @@
 import type { Prisma } from '@charmverse/core/prisma';
-import  { prisma } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { createPage } from 'lib/pages/server/createPage';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 import { boardWithCardsArgs } from 'testing/generateBoardStub';
 import { pageStubToCreate } from 'testing/generatePageStub';
 
@@ -133,7 +133,7 @@ export async function seedTestBoards({
   spaceDomain: string;
   boardCount?: number;
   cardCount?: number;
-  boardTitle?: string
+  boardTitle?: string;
 }) {
   const space = await prisma.space.findUnique({
     where: {
@@ -211,12 +211,12 @@ async function cleanSpacePages({ spaceDomain }: { spaceDomain: string }) {
 //   process.exit(1)
 // })
 
-seedTestBoards({spaceDomain: 'mushy-beige-angelfish', boardCount: 50, cardCount: 40, boardTitle: 'Board'})
+seedTestBoards({ spaceDomain: 'mushy-beige-angelfish', boardCount: 50, cardCount: 40, boardTitle: 'Board' })
   .then(() => console.log('Done'))
-.catch(e => {
-  console.error(e)
-  process.exit(1)
-})
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
 
 // seedTestPages({ spaceDomain: 'gross-blush-vicuna', pagesToCreate: 10000, nestedPercent: 92 })
 //   .then(() => {

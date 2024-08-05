@@ -1,42 +1,53 @@
-import type { SpaceResourcesRequest } from '@charmverse/core/permissions';
-import type { Page, Bounty } from '@charmverse/core/prisma-client';
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { rewardWithUsersInclude } from '@root/lib/rewards/getReward';
+import { mapDbRewardToReward } from '@root/lib/rewards/mapDbRewardToReward';
 
-import { rewardWithUsersInclude } from 'lib/rewards/getReward';
-import type { RewardReviewer } from 'lib/rewards/interfaces';
-import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import type { RewardTemplate } from './getRewardTemplate';
 
-export type RewardTemplate = {
-  reward: Bounty & {
-    reviewers: RewardReviewer[];
-    allowedSubmitterRoles: string[] | null;
-  };
-  page: Page;
-};
-
-export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequest): Promise<RewardTemplate[]> {
-  const { spaceRole } = await hasAccessToSpace({
-    spaceId,
-    userId
+export async function getRewardTemplates({
+  spaceId,
+  userId
+}: {
+  spaceId: string;
+  userId: string;
+}): Promise<RewardTemplate[]> {
+  const isAdmin = await prisma.spaceRole.findFirst({
+    where: {
+      userId,
+      spaceId,
+      isAdmin: true
+    }
   });
 
-  if (!spaceRole) {
-    return [];
-  }
+  const bountyWhereInput: Prisma.BountyWhereInput = {
+    spaceId,
+    page: {
+      type: 'bounty_template',
+      deletedAt: null
+    }
+  };
 
   return prisma.bounty
     .findMany({
       where: {
-        spaceId,
-        page: {
-          type: 'bounty_template',
-          deletedAt: null
-        }
+        OR: [
+          {
+            ...bountyWhereInput,
+            status: 'draft',
+            createdBy: isAdmin ? undefined : userId
+          },
+          {
+            ...bountyWhereInput,
+            status: {
+              notIn: ['draft']
+            }
+          }
+        ]
       },
       include: {
-        page: true,
-        ...rewardWithUsersInclude()
+        ...rewardWithUsersInclude(),
+        page: true
       }
     })
     .then((bounties) =>
@@ -49,10 +60,7 @@ export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequ
         .map(({ reward, page }) => {
           const { applications, ...mappedReward } = mapDbRewardToReward(reward);
 
-          return {
-            reward: mappedReward,
-            page
-          };
+          return { ...mappedReward, page };
         })
     );
 }

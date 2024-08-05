@@ -3,7 +3,7 @@ import { htmlToText } from 'html-to-text';
 
 import { getPageInviteEmail } from './emails';
 import type { PageInviteEmailProps } from './emails/templates/PageInviteEmail';
-import client, { SENDER_ADDRESS, DOMAIN } from './mailgunClient';
+import client, { DOMAIN, SENDER_ADDRESS } from './mailgunClient';
 
 export interface EmailRecipient {
   email: string;
@@ -16,6 +16,7 @@ interface EmailProps {
   subject: string;
   to: EmailRecipient;
   attachment?: { data: Buffer; name: string };
+  senderAddress?: string;
 }
 
 export async function sendEmail({ html, subject, to, attachment }: EmailProps) {
@@ -30,7 +31,6 @@ export async function sendEmail({ html, subject, to, attachment }: EmailProps) {
   return client?.messages.create(DOMAIN, {
     from: SENDER_ADDRESS,
     to: [recipientAddress],
-    // bcc: ['matt.casey@charmverse.io'],
     subject,
     text: htmlToText(html),
     html,

@@ -1,8 +1,8 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { prisma, type Bounty, type Role, type Space, type User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError, PositiveNumbersOnlyError } from '@root/lib/utils/errors';
+import { v4 as uuid } from 'uuid';
 
-import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 import { generateBounty } from 'testing/setupDatabase';
 
 import type { UpdateableRewardFields } from '../updateRewardSettings';
@@ -42,10 +42,9 @@ describe('updateRewardSettings', () => {
     const submitterRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
     const reviewerRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
 
-    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [
-      { group: 'role', id: reviewerRole.id },
-      { group: 'user', id: user.id }
-    ];
+    const reviewers = [{ roleId: reviewerRole.id }, { userId: user.id }];
+
+    const credentialTemplateId = uuid();
 
     const updateContent: UpdateableRewardFields = {
       rewardAmount: 1000,
@@ -58,7 +57,8 @@ describe('updateRewardSettings', () => {
       customReward: 'Custom Reward Description',
       fields: ['Field1', 'Field2'],
       reviewers,
-      allowedSubmitterRoles: [submitterRole.id]
+      allowedSubmitterRoles: [submitterRole.id],
+      selectedCredentialTemplates: [credentialTemplateId]
     };
 
     const updatedReward = await updateRewardSettings({ rewardId: reward.id, updateContent });
@@ -70,10 +70,7 @@ describe('updateRewardSettings', () => {
     const submitterRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
     const reviewerRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
 
-    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [
-      { group: 'role', id: reviewerRole.id },
-      { group: 'user', id: user.id }
-    ];
+    const reviewers = [{ roleId: reviewerRole.id }, { userId: user.id }];
 
     const updateContent: UpdateableRewardFields = {
       rewardAmount: 1000,

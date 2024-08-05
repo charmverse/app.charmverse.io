@@ -13,23 +13,22 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 
 import Avatar from 'components/common/Avatar';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import type { Social, Member } from 'lib/members/interfaces';
+import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+import type { Member, Social } from 'lib/members/interfaces';
 
-import { useMemberDialog } from '../hooks/useMemberDialog';
+import { useMemberProfileDialog } from '../hooks/useMemberProfileDialog';
 
-import { DiscordSocialIcon } from './DiscordSocialIcon';
-import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
+import { MemberPropertyTextMultiline } from './MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledTableCell = styled(TableCell)`
@@ -52,8 +51,7 @@ function MemberDirectoryTableRow({
   const twitterHandle = twitterUrl.split('/').at(-1);
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
-  const { showUserId } = useMemberDialog();
-  const { openSettings } = useSettingsDialog();
+  const { openEditProfile } = useMemberProfileDialog();
   const { formatDate } = useDateFormatter();
 
   if (visibleProperties.length === 0) {
@@ -73,7 +71,7 @@ function MemberDirectoryTableRow({
             className='icons'
             onClick={(e) => {
               e.stopPropagation();
-              openSettings('profile');
+              openEditProfile();
             }}
             style={{
               opacity: 1
@@ -173,6 +171,13 @@ function MemberDirectoryTableRow({
               return (
                 <TableCell key={property.id}>
                   <Typography variant='body2'>{(memberProperty.value as string) ?? '-'}</Typography>
+                </TableCell>
+              );
+            }
+            case 'farcaster': {
+              return (
+                <TableCell key={property.id}>
+                  <Typography variant='body2'>{member.farcasterUser ? member.farcasterUser.username : '-'}</Typography>
                 </TableCell>
               );
             }

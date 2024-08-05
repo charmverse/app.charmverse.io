@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`src/components/gallery/GalleryCard without block content should match snapshot 1`] = `
+<div>
+  <span
+    class="variable variable"
+  >
+    <div
+      class="GalleryCard selected MuiBox-root css-1oaiypi"
+      data-test="gallery-card-cardId"
+      draggable="true"
+      style="opacity: 1;"
+    >
+      <div
+        data-testid="page-actions-context-menu"
+      >
+        <button
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+          tabindex="0"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+            data-testid="MoreHorizIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+            />
+          </svg>
+        </button>
+      </div>
+      <div
+        class="gallery-title"
+      >
+        <div>
+          title
+        </div>
+      </div>
+      <div
+        class="gallery-props"
+      />
+    </div>
+  </span>
+</div>
+`;

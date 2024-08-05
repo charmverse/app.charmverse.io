@@ -9,15 +9,16 @@ import Stack from '@mui/material/Stack';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 
+import { useGetPageMeta } from 'charmClient/hooks/pages';
 import { useCreatePermissions, useDeletePermissions } from 'charmClient/hooks/permissions';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
-import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { canReceiveManualPermissionUpdates } from 'lib/pages';
 
 import { AddPagePermissionsInput } from '../common/AddPagePermissionsInput';
+import { CopyLinkFooter } from '../common/CopyLinkFooter';
 
 import AddPagePermissionsForm from './AddPagePermissionsForm';
 import { PagePermissionRow } from './PagePermissionRow';
@@ -59,10 +60,11 @@ interface Props {
   pageId: string;
   refreshPermissions: () => void;
   pagePermissions: AssignedPagePermission[];
+  onCopyLink: VoidFunction;
 }
 
-export default function PaidPagePermissions({ pageId, pagePermissions, refreshPermissions }: Props) {
-  const { page } = usePage({ pageIdOrPath: pageId });
+export default function PaidPagePermissions({ pageId, pagePermissions, refreshPermissions, onCopyLink }: Props) {
+  const { data: page } = useGetPageMeta(pageId);
   const { space } = useCurrentSpace();
   const { mutateMembers: refreshMembers } = useMembers();
   const { trigger: deletePermission } = useDeletePermissions();
@@ -157,6 +159,7 @@ export default function PaidPagePermissions({ pageId, pagePermissions, refreshPe
           />
         ))}
       </Stack>
+      <CopyLinkFooter pagePath={page?.path} onCopyLink={onCopyLink} />
     </Box>
   );
 }

@@ -1,27 +1,27 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsCredentials, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import _isEqual from 'lodash/isEqual';
 import request from 'supertest';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
-import { createForm } from 'lib/form/createForm';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import { createForm } from 'lib/forms/createForm';
+import type { FormFieldInput } from 'lib/forms/interfaces';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let author: User;
+let admin: User;
 let reviewer: User;
 let space: Space;
+
 let authorCookie: string;
 
 beforeAll(async () => {
-  const generated1 = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
-  space = generated1.space;
-  author = generated1.user;
-
-  const generated2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
-  reviewer = generated2;
+  ({ space, user: author } = await testUtilsUser.generateUserAndSpace({ isAdmin: false }));
+  admin = await testUtilsUser.generateSpaceUser({ isAdmin: true, spaceId: space.id });
+  reviewer = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
   authorCookie = await loginUser(author.id);
 });
@@ -37,7 +37,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
     });
     const proposal = (
       await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).set('Cookie', authorCookie).expect(200)
-    ).body as ProposalWithUsers;
+    ).body as ProposalWithUsersAndRubric;
 
     expect(proposal).toMatchObject(
       expect.objectContaining({
@@ -74,14 +74,15 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
 
     const fieldsInput: FormFieldInput[] = [
       {
-        id: v4(),
+        id: uuid(),
         type: 'short_text',
         name: 'name',
         description: 'description',
         index: 0,
         options: [],
         private: false,
-        required: true
+        required: true,
+        fieldConfig: null
       }
     ];
     const formId = await createForm(fieldsInput);
@@ -92,7 +93,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
 
     const proposal = (
       await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).set('Cookie', authorCookie).expect(200)
-    ).body as ProposalWithUsers;
+    ).body as ProposalWithUsersAndRubric;
 
     expect(proposal).toMatchObject(
       expect.objectContaining({
@@ -123,7 +124,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
   });
 
   it("should throw error if proposal doesn't exist", async () => {
-    await request(baseUrl).get(`/api/proposals/${v4()}`).set('Cookie', authorCookie).expect(404);
+    await request(baseUrl).get(`/api/proposals/${uuid()}`).set('Cookie', authorCookie).expect(404);
   });
 
   // Users should not be able to access draft proposals that they are not authors or reviewers of
@@ -162,6 +163,59 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(200);
+  });
+
+  it('should only allow admins to update credentials if the proposal uses a template', async () => {
+    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
+
+    const secondCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
+
+    const template = await testUtilsProposals.generateProposalTemplate({
+      spaceId: space.id,
+      userId: author.id,
+      pageType: 'proposal_template',
+      selectedCredentialTemplateIds: [credentialTemplate.id]
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      userId: author.id,
+      spaceId: space.id,
+      sourceTemplateId: template.id,
+      selectedCredentialTemplateIds: [credentialTemplate.id]
+    });
+
+    const adminCookie = await loginUser(admin.id);
+
+    const updateContent: Partial<UpdateProposalRequest> = {
+      selectedCredentialTemplates: [secondCredentialTemplate.id]
+    };
+
+    await request(baseUrl)
+      .put(`/api/proposals/${proposal.id}`)
+      .set('Cookie', authorCookie)
+      .send(updateContent)
+      .expect(401);
+
+    await request(baseUrl)
+      .put(`/api/proposals/${proposal.id}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
+
+    const proposalAfterUpdate = await prisma.proposal.findUniqueOrThrow({
+      where: { id: proposal.id },
+      select: {
+        selectedCredentialTemplates: true
+      }
+    });
+
+    expect(proposalAfterUpdate.selectedCredentialTemplates).toEqual([secondCredentialTemplate.id]);
   });
 
   it('should update a proposal templates settings if the user is a space admin', async () => {
@@ -207,6 +261,44 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(200);
+  });
+
+  it('should not overwrite selected credential templates if this is not provided', async () => {
+    const { user: adminUser, space: adminSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    const adminCookie = await loginUser(adminUser.id);
+
+    const proposalAuthor = await testUtilsUser.generateSpaceUser({ isAdmin: false, spaceId: adminSpace.id });
+
+    const templateId = uuid();
+
+    const { page, id: proposalId } = await testUtilsProposals.generateProposal({
+      userId: proposalAuthor.id,
+      spaceId: adminSpace.id,
+      proposalStatus: 'published',
+      selectedCredentialTemplateIds: [templateId]
+    });
+
+    const updateContent: Partial<UpdateProposalRequest> = {
+      fields: {
+        properties: {},
+        pendingRewards: [{ draftId: uuid(), page: { content: { type: 'doc' as const }, contentText: '' }, reward: {} }]
+      }
+    };
+
+    await request(baseUrl)
+      .put(`/api/proposals/${page.proposalId}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
+
+    const proposalAfterUpdate = await prisma.proposal.findUniqueOrThrow({
+      where: { id: proposalId },
+      select: {
+        selectedCredentialTemplates: true
+      }
+    });
+
+    expect(proposalAfterUpdate.selectedCredentialTemplates).toEqual([templateId]);
   });
 
   it('should fail to update a proposal template if the user is not a space admin', async () => {

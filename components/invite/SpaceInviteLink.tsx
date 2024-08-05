@@ -12,8 +12,7 @@ import { LoginButton } from 'components/login/components/LoginButton';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { useWeb3Account } from 'hooks/useWeb3Account';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 import { CenteredBox } from './components/CenteredBox';
 
@@ -24,16 +23,13 @@ export type Props = {
 
 export default function InvitationPage({ invite, space }: Props) {
   const { user } = useUser();
-  const { walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [isBannedFromSpace, setIsBannedFromSpace] = useState(false);
   async function joinSpace() {
-    let loggedInUser = user;
     try {
-      if (!user && verifiableWalletDetected && walletAuthSignature) {
-        loggedInUser = await charmClient.createUser({
-          address: walletAuthSignature.address,
-          walletSignature: walletAuthSignature
+      if (space.domain === 'op-grants' && user) {
+        charmClient.track.trackActionOp('click_signup', {
+          signinMethod: user.identityType
         });
       }
       await charmClient.acceptInvite({ id: invite.id });
@@ -54,7 +50,7 @@ export default function InvitationPage({ invite, space }: Props) {
       log.error('Error accepting invite', {
         inviteId: invite.id,
         spaceId: space.id,
-        userId: loggedInUser?.id,
+        userId: user?.id,
         error
       });
     }

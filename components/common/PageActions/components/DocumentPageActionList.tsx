@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
@@ -13,19 +14,22 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import charmClient from 'charmClient';
+import { useGetPageMarkdown } from 'charmClient/hooks/pages';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { Button } from 'components/common/Button';
 import { SetAsHomePageAction } from 'components/common/PageActions/components/SetAsHomePageAction';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageUpdates, PageWithContent } from 'lib/pages';
+import { lockablePageTypes } from 'lib/pages/constants';
 import { fontClassName } from 'theme/fonts';
 
-import { exportMarkdown } from '../utils/exportMarkdown';
+import { downloadMarkdownFile } from '../utils/downloadMarkdownFile';
 
 import { AddToFavoritesAction } from './AddToFavoritesAction';
 import { ArchiveProposalAction } from './ArchiveProposalAction';
@@ -34,7 +38,9 @@ import { DocumentHistory } from './DocumentHistory';
 import { DuplicatePageAction } from './DuplicatePageAction';
 import { ExportMarkdownAction } from './ExportMarkdownAction';
 import { ExportToPDFAction } from './ExportToPDFAction';
+import { PublishProposalAction } from './PublishProposalAction';
 import { RewardActions } from './RewardActions';
+import { TogglePageLockAction } from './TogglePageLockAction';
 import { UndoAction } from './UndoAction';
 
 export type PageActionMeta = Pick<
@@ -55,6 +61,8 @@ export type PageActionMeta = Pick<
   | 'type'
   | 'updatedAt'
   | 'updatedBy'
+  | 'isLocked'
+  | 'lockedBy'
 >;
 
 export const documentTypes: PageType[] = [
@@ -102,6 +110,7 @@ type Props = {
   onDelete?: VoidFunction;
   isInsideDialog?: boolean;
   isStructuredProposal?: boolean;
+  refreshPage: VoidFunction;
 };
 export function DocumentPageActionList({
   isInsideDialog,
@@ -110,7 +119,8 @@ export function DocumentPageActionList({
   onDelete,
   pagePermissions,
   undoEditorChanges,
-  isStructuredProposal
+  isStructuredProposal,
+  refreshPage
 }: Props) {
   const pageId = page.id;
   const { navigateToSpacePath } = useCharmRouter();
@@ -121,10 +131,14 @@ export function DocumentPageActionList({
   const { members } = useMembers();
   const { setActiveView } = usePageSidebar();
   const pageType = page.type;
+  const { trigger: getPageMarkdown } = useGetPageMarkdown(pageId);
   const isExportablePage = documentTypes.includes(pageType as PageType);
+  const { space } = useCurrentSpace();
   const basePageBounty = rewards?.find((r) => r.id === pageId);
 
-  const canCreateProposal = spacePermissions?.createProposals;
+  const canCreateProposal = spacePermissions?.createProposals && pagePermissions?.edit_content;
+
+  const isLockablePageType = lockablePageTypes.includes(page.type);
 
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
@@ -145,6 +159,15 @@ export function DocumentPageActionList({
     setPageProperty({ fontFamily });
   }
 
+  async function onTogglePageLock() {
+    await charmClient.pages.togglePageLock({
+      pageId,
+      isLocked: !page.isLocked
+    });
+    await refreshPage();
+    onComplete();
+  }
+
   async function onDeletePage() {
     await deletePage({
       pageId
@@ -157,16 +180,19 @@ export function DocumentPageActionList({
   }
 
   async function exportMarkdownPage() {
-    const _page = await charmClient.pages.getPage(pageId);
-    exportMarkdown({
-      content: _page.content,
-      id: _page.id,
-      members,
-      spaceId: _page.spaceId,
-      title: _page.title
-    }).catch(() => {
+    try {
+      const markdownContent = await getPageMarkdown();
+      await downloadMarkdownFile({
+        markdownContent,
+        pageId,
+        spaceId: space!.id,
+        title: page.title
+      });
+    } catch (error) {
+      log.error('Error exporting markdown', { error });
       showMessage('Error exporting markdown', 'error');
-    });
+      return;
+    }
     onComplete();
   }
 
@@ -241,6 +267,7 @@ export function DocumentPageActionList({
         <>
           <Divider />
           <ListItemButton
+            data-test='view-comments-button'
             disabled={!pagePermissions?.comment}
             onClick={() => {
               setActiveView('comments');
@@ -273,6 +300,13 @@ export function DocumentPageActionList({
           <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
           <SetAsHomePageAction pageId={pageId} onComplete={onComplete} />
         </>
+      )}
+      {isLockablePageType && (
+        <TogglePageLockAction
+          isLocked={!!page.isLocked}
+          onClick={onTogglePageLock}
+          disabled={!pagePermissions?.edit_lock}
+        />
       )}
       {page && (
         <DuplicatePageAction
@@ -314,6 +348,7 @@ export function DocumentPageActionList({
         disabled={!pagePermissions?.delete || page.deletedAt !== null || !!page.syncWithPageId}
       />
       {page.proposalId && <ArchiveProposalAction proposalId={page.proposalId} />}
+      {page.proposalId && <PublishProposalAction proposalId={page.proposalId} />}
       {undoEditorChanges && <UndoAction onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />}
       <Divider />
       <ExportMarkdownAction disabled={!isExportablePage} onClick={exportMarkdownPage} />

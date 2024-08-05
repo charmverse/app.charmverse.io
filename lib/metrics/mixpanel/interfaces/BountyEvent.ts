@@ -16,6 +16,8 @@ type BountyCreatedEvent = BountyRewardEvent & {
 
 type BountyPaidEvent = BountyEvent & {
   walletType: 'Gnosis Safe' | 'Individual Wallet';
+  rewardToken?: string | null;
+  rewardAmount?: string | number | null;
 };
 
 export interface BountyEventMap {

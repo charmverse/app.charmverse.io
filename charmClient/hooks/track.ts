@@ -1,8 +1,9 @@
+import type { ViewOpPageEvent } from '@root/lib/metrics/mixpanel/opEvents';
 import { useEffect } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
-import { getBrowserPath } from 'lib/utilities/browser';
+import { getBrowserPath } from 'lib/utils/browser';
 
 import { TrackApi } from '../apis/trackApi';
 
@@ -27,8 +28,18 @@ export function useTrackPageView(page: Omit<PageEventMap['page_view'], 'spaceId'
       trackPageView({
         spaceId: currentSpace.id,
         spaceDomain: currentSpace.domain,
+        spaceCustomDomain: currentSpace.customDomain,
         ...page
       });
     }
   }, [currentSpace?.id]);
+}
+
+export function useTrackOpPageView(page: Omit<ViewOpPageEvent, 'userId'>) {
+  const { space: currentSpace } = useCurrentSpace();
+  useEffect(() => {
+    if (currentSpace?.domain === 'op-grants') {
+      track.trackActionOp('page_view', page);
+    }
+  }, [currentSpace?.id, page]);
 }

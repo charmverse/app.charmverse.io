@@ -1,54 +1,37 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, NotFoundError } from 'lib/middleware';
+import { getProposalTemplate } from 'lib/proposals/getProposalTemplate';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).delete(deleteProposalTemplateController);
+handler.get(getTemplateController);
 
-async function deleteProposalTemplateController(req: NextApiRequest, res: NextApiResponse) {
-  const userId = req.session.user.id;
+async function getTemplateController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersAndRubric>) {
+  const pageId = req.query.id as string;
+  const userId = req.session.user?.id as string | undefined;
 
-  const templateId = req.query.id;
-
-  if (!templateId) {
-    throw new InvalidInputError('No proposalId provided');
+  if (!pageId) {
+    throw new InvalidInputError('Page ID is required');
   }
 
-  const proposal = await prisma.proposal.findUnique({
-    where: {
-      id: templateId as string
-    }
+  const proposal = await getProposalTemplate({ pageId });
+
+  const { isAdmin } = await hasAccessToSpace({
+    spaceId: proposal.spaceId,
+    userId
   });
 
-  if (!proposal) {
-    throw new DataNotFoundError(`No proposal template found with id ${templateId}`);
+  if (proposal.archived && !isAdmin) {
+    throw new NotFoundError();
   }
 
-  const { spaceId } = proposal;
-
-  const { error } = await hasAccessToSpace({
-    spaceId,
-    userId,
-    adminOnly: true
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  await prisma.proposal.delete({
-    where: {
-      id: templateId as string
-    }
-  });
-
-  res.status(200).send({ success: true });
+  return res.status(200).json(proposal);
 }
 
 export default withSessionRoute(handler);

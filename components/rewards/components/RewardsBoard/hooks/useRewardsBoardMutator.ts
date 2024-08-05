@@ -1,15 +1,15 @@
-import type { Block } from '@charmverse/core/prisma';
 import { useEffect } from 'react';
 
-import type { BlockUpdater } from 'components/common/BoardEditor/charmClient.interface';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { blockToFBBlock, fbBlockToBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import type { BlockUpdater } from 'components/common/DatabaseEditor/charmClient.interface';
+import mutator from 'components/common/DatabaseEditor/mutator';
+import { blockToFBBlock, fbBlockToBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
+import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
+import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { usePages } from 'hooks/usePages';
-import { useRewardBlocks } from 'hooks/useRewardBlocks';
-import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import { Constants } from 'lib/databases/constants';
 import type { RewardBlockInput, RewardBlockUpdateInput } from 'lib/rewards/blocks/interfaces';
 
 export function useRewardsBoardMutator() {
@@ -22,7 +22,7 @@ export function useRewardsBoardMutator() {
     deleteBlocks: deleteRewardBlocks,
     deleteBlock: deleteRewardBlock
   } = useRewardBlocks();
-  const { activeView } = useRewardsBoard();
+  const { activeView } = useRewardsBoardAndBlocks();
   const { rewards, updateReward } = useRewards();
   const { pages, deletePage } = usePages();
 
@@ -52,14 +52,14 @@ export function useRewardsBoardMutator() {
 
     if (!currentBlock) return;
 
-    const currentFBBlock = blockToFBBlock(currentBlock as Block);
+    const currentFBBlock = blockToFBBlock(currentBlock);
     const fbBlockInput = Object.assign(currentFBBlock, updates, {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
     });
 
     if (fbBlockInput.fields.cardProperties) {
       fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
-        (p: IPropertyTemplate) => !p.id.startsWith('__')
+        (p: IPropertyTemplate) => !p.id.startsWith('__') || p.id === Constants.titleColumnId
       );
     }
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
@@ -68,7 +68,7 @@ export function useRewardsBoardMutator() {
     const updatedBlock = await updateBlock(blockInput as unknown as RewardBlockUpdateInput);
     if (!updatedBlock) return;
 
-    const fbBlock = blockToFBBlock(updatedBlock as Block);
+    const fbBlock = blockToFBBlock(updatedBlock);
     updater([fbBlock]);
   };
 
@@ -81,16 +81,17 @@ export function useRewardsBoardMutator() {
 
       if (fbBlockInput.fields.cardProperties) {
         fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
-          (p: IPropertyTemplate) => !p.id.startsWith('__')
+          (p: IPropertyTemplate) => !p.id.startsWith('__') || p.id === Constants.titleColumnId
         );
       }
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
       return fbBlockToBlock(fbBlockInput);
     });
+
     const updatedBlocks = await updateBlocks(updatedBlockInput as unknown as RewardBlockUpdateInput[]);
     if (!updatedBlocks) return;
 
-    const fbBlocks = (updatedBlocks as Block[]).map(blockToFBBlock) || [];
+    const fbBlocks = updatedBlocks.map(blockToFBBlock) || [];
     updater(fbBlocks);
   };
 
@@ -100,7 +101,7 @@ export function useRewardsBoardMutator() {
 
     if (!newBlocks) return [];
 
-    const newFBBlocks = (newBlocks as Block[]).map(blockToFBBlock);
+    const newFBBlocks = newBlocks.map(blockToFBBlock);
     updater(newFBBlocks);
 
     return newFBBlocks;
@@ -111,7 +112,7 @@ export function useRewardsBoardMutator() {
     if (!rootBlocks) return;
 
     const fbBlocks = rootBlocks.map((rootBlock) => ({
-      ...blockToFBBlock(rootBlock as Block),
+      ...blockToFBBlock(rootBlock),
       deletedAt: new Date().getTime()
     }));
     updater(fbBlocks);
@@ -130,7 +131,7 @@ export function useRewardsBoardMutator() {
     const rootBlock = await deleteRewardBlock(blockId);
     if (!rootBlock) return;
 
-    const fbBlock = blockToFBBlock(rootBlock as Block);
+    const fbBlock = blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
   };
@@ -141,5 +142,5 @@ export function useRewardsBoardMutator() {
 
     // restore default mutator updaters on unmount
     return () => mutator.setCustomMutatorUpdaters(null);
-  });
+  }, []);
 }

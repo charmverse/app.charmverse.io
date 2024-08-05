@@ -1,8 +1,7 @@
+import { getNFTUrl } from '@root/lib/blockchain/utils';
 import type { TokenResponseItem } from '@zoralabs/zdk';
 import { ZDKChain, ZDKNetwork } from '@zoralabs/zdk';
 import { zoraTestnet } from 'viem/chains';
-
-import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 
 import type { NFTData } from '../../getNFTs';
 
@@ -45,8 +44,7 @@ export async function getNFT({
 export function mapNFTData(token: TokenResponseItem['token'], walletId: string | null = null) {
   return {
     id: `${token.collectionAddress}:${token.tokenId}`,
-    tokenId: token.tokenId,
-    tokenIdInt: parseInt(token.tokenId),
+    tokenId: BigInt(token.tokenId).toString(),
     contract: token.collectionAddress,
     imageRaw: token.image?.url?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '',
     image: token.image?.url?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '',

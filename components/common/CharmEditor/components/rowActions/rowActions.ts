@@ -1,8 +1,8 @@
-import type { EditorView, PluginKey } from '@bangle.dev/pm';
-import { Plugin } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 import throttle from 'lodash/throttle';
-import { NodeSelection } from 'prosemirror-state';
+import type { PluginKey } from 'prosemirror-state';
+import { Plugin, NodeSelection } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 // @ts-ignore
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
@@ -300,6 +300,10 @@ export function getNodeForRowPosition({
   while (topPos.depth > 1 || (topPos.depth === 1 && topPos.parentOffset > 0)) {
     const parentOffset = topPos.pos - (topPos.parentOffset > 0 ? topPos.parentOffset : 1); // if parentOffset is 0, step back by 1
     const parentOffsetNode = view.state.doc.resolve(parentOffset);
+    const nodeAfterType = topPos.nodeAfter?.type.name;
+    if (nodeAfterType === 'page') {
+      break;
+    }
     if (parentOffsetNode.node().type.name !== 'columnBlock') {
       topPos = parentOffsetNode;
     } else {
@@ -311,7 +315,7 @@ export function getNodeForRowPosition({
 
   let pmNode = topPos.node();
   // handle top-level children, where pmNode === doc
-  if (rowNodeOffset && rowNodeOffset > 0) {
+  if (rowNodeOffset !== undefined && rowNodeOffset >= 0) {
     const child = pmNode.maybeChild(rowNodeOffset);
     pmNode = child || pmNode;
   }
@@ -346,4 +350,34 @@ export function getNodeForRowPosition({
     nodeEnd,
     nodeStart
   };
+}
+
+export function deleteRowNode({
+  view,
+  rowPosition,
+  rowNodeOffset
+}: {
+  view: EditorView;
+  rowPosition?: number;
+  rowNodeOffset?: number;
+}) {
+  const node = getNodeForRowPosition({ view, rowPosition, rowNodeOffset });
+  if (node) {
+    let start = node.nodeStart;
+    let end = node.nodeEnd;
+    // fix for toggles, but also assuming that pos 1 or 0 is always the first line anyway
+    if (start === 1) {
+      start = 0;
+      end -= 1;
+    } else if (node.node.type.name === 'disclosureDetails' || node.node.type.name === 'blockquote') {
+      // This removes disclosureSummary node
+      start -= 2;
+    }
+
+    view.dispatch(view.state.tr.deleteRange(start, end));
+
+    return node;
+  }
+
+  return null;
 }

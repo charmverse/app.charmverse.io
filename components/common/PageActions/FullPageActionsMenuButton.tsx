@@ -13,6 +13,7 @@ import { DatabasePageActionList } from 'components/common/PageActions/components
 import type { PageActionMeta } from 'components/common/PageActions/components/DocumentPageActionList';
 import { DocumentPageActionList, documentTypes } from 'components/common/PageActions/components/DocumentPageActionList';
 import { ForumPostActionList } from 'components/common/PageActions/components/ForumPostActionList';
+import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
@@ -35,7 +36,7 @@ export function FullPageActionsMenuButton({
 }: Props) {
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
-  const { page: pageFromId } = usePage({ pageIdOrPath: pageId });
+  const { page: pageFromId, refreshPage } = usePage({ pageIdOrPath: pageId });
   const pageMenuAnchor = useRef();
   const isForumPost = !!post || router.route === '/[domain]/forum/post/[pagePath]';
   const theme = useTheme();
@@ -90,10 +91,18 @@ export function FullPageActionsMenuButton({
         onDelete={onDelete}
         undoEditorChanges={undoEditorChanges}
         isStructuredProposal={!!proposalDetails?.formId}
+        refreshPage={refreshPage}
       />
     );
   } else if (isBasePageDatabase && page) {
-    pageOptionsList = <DatabasePageActionList page={page} pagePermissions={pagePermissions} onComplete={closeMenu} />;
+    pageOptionsList = (
+      <DatabasePageActionList
+        page={page}
+        pagePermissions={pagePermissions}
+        onComplete={closeMenu}
+        refreshPage={refreshPage}
+      />
+    );
   } else if (isForumPost && post) {
     pageOptionsList = (
       <ForumPostActionList
@@ -112,6 +121,7 @@ export function FullPageActionsMenuButton({
         <div>
           <Tooltip title='View comments, export content and more' arrow>
             <IconButton
+              data-test='page-context-menu-button'
               size={isLargeScreen ? 'small' : 'medium'}
               onClick={() => {
                 setPageMenuAnchorElement(pageMenuAnchor.current || null);
@@ -130,7 +140,7 @@ export function FullPageActionsMenuButton({
             horizontal: 'left'
           }}
         >
-          {pageOptionsList}
+          <DbViewSettingsProvider>{pageOptionsList}</DbViewSettingsProvider>
         </Popover>
       </Box>
     );

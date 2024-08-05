@@ -9,8 +9,8 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { trackPageView } from 'charmClient/hooks/track';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';
@@ -18,7 +18,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 import type { FormInputs } from '../interfaces';
 import { DraftPostList } from '../PostList/DraftPostList';
@@ -110,11 +110,24 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
   }, []);
 
   useEffect(() => {
-    if (spaceId && post?.id) {
-      trackPageView({ spaceId, postId: post.id, type: 'post', spaceDomain: space?.domain });
+    if (spaceId && post?.id && space) {
+      trackPageView({
+        spaceId,
+        postId: post.id,
+        type: 'post',
+        spaceDomain: space.domain,
+        spaceCustomDomain: space.customDomain
+      });
+      if (space.domain === 'op-grants') {
+        charmClient.track.trackActionOp('page_view', {
+          type: 'post',
+          path: post.path,
+          url: window.location.href
+        });
+      }
       setFormInputs(post);
     }
-  }, [post?.id]);
+  }, [post?.id, !!space]);
 
   return (
     <>

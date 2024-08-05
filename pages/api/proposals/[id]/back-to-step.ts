@@ -3,8 +3,8 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, requireKeys, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { goBackToStep } from 'lib/proposal/goBackToStep';
-import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
+import { goBackToStep } from 'lib/proposals/goBackToStep';
+import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

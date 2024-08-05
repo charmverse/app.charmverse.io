@@ -1,14 +1,14 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
-import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import type { RootState } from 'components/common/BoardEditor/focalboard/src/store';
-import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { createTableView } from 'lib/focalboard/tableView';
+import Table from 'components/common/DatabaseEditor/components/table/table';
+import type { RootState } from 'components/common/DatabaseEditor/store';
+import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import { createTableView } from 'lib/databases/tableView';
 import { createMockBoard, createMockCard } from 'testing/mocks/block';
 import { createMockPage } from 'testing/mocks/page';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
@@ -28,6 +28,7 @@ const schema = generateSchemasForAllSupportedFieldTypes();
 board.fields.cardProperties = Object.values(schema) as IPropertyTemplate[];
 
 const boardPage: PageMeta = {
+  lensPostLink: null,
   id: board.id,
   boardId: board.id,
   bountyId: null,
@@ -139,10 +140,7 @@ export function DatabaseTableView() {
           onCardClicked={voidFunction}
           selectedCardIds={[]}
           visibleGroups={[]}
-          cardPages={[
-            { card: card1, page: page1 },
-            { card: card2, page: page2 }
-          ]}
+          cards={[card1, card2]}
         />
       </div>
     </GlobalContext>
@@ -152,17 +150,18 @@ export function DatabaseTableView() {
 DatabaseTableView.parameters = {
   msw: {
     handlers: {
-      pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
-        return res(ctx.json([boardPage, page1, page2]));
+      pages: http.get('/api/spaces/:spaceId/pages', () => {
+        return HttpResponse.json([boardPage, page1, page2]);
       }),
-      getBlock: rest.get('/api/blocks/:pageId', (req, res, ctx) => {
-        return res(ctx.json(reduxStore.getState().cards.cards[req.params.pageId as string]));
+      getBlock: http.get('/api/blocks/:pageId', ({ params }) => {
+        return HttpResponse.json(reduxStore.getState().cards.cards[params.pageId as string]);
       }),
-      updateBlocks: rest.put('/api/blocks', async (req, res, ctx) => {
-        return res(ctx.json(req.json()));
+      updateBlocks: http.put('/api/blocks', async ({ request }) => {
+        const body = await request.json();
+        return HttpResponse.json(body);
       }),
-      views: rest.get('/api/blocks/:pageId/views', (req, res, ctx) => {
-        return res(ctx.json([view]));
+      views: http.get('/api/blocks/:pageId/views', () => {
+        return HttpResponse.json([view]);
       })
     }
   }

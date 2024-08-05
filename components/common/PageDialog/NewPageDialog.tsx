@@ -1,8 +1,9 @@
 import { Box } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { usePreventReload } from 'hooks/usePreventReload';
 
@@ -14,7 +15,8 @@ export function NewPageDialog({
   onCancel,
   isSaving,
   isOpen,
-  disabledTooltip
+  disabledTooltip,
+  toolbar
 }: {
   children: React.ReactNode;
   contentUpdated: boolean;
@@ -24,6 +26,7 @@ export function NewPageDialog({
   isSaving?: boolean;
   disabledTooltip?: string;
   isOpen: boolean;
+  toolbar?: ReactNode;
 }) {
   const mounted = useRef(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -57,6 +60,7 @@ export function NewPageDialog({
           close();
         }
       }}
+      toolbar={toolbar}
       footerActions={
         <Box display='flex' gap={1}>
           {!!onCancel && (

@@ -1,17 +1,17 @@
+import type { BountyStatus } from '@charmverse/core/prisma';
 import { Divider, Stack } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 
-import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
+import { RewardSignupButton } from 'components/rewards/components/RewardProperties/components/RewardSignupButton';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
+import type { UpdateableRewardFieldsWithType } from 'components/rewards/hooks/useNewReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
-import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
+import debouncePromise from 'lib/utils/debouncePromise';
 
-import { RewardSignupButton } from '../../../rewards/components/RewardProperties/components/RewardSignupButton';
+type RewardsValue = UpdateableRewardFieldsWithType & { id?: string; status?: BountyStatus };
 
 export function RewardProperties(props: {
   readOnly?: boolean;
@@ -37,28 +37,27 @@ export function RewardProperties(props: {
     readOnlyTemplate
   } = props;
   const { updateReward } = useRewards();
-  const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | undefined>(
-    initialReward
-  );
+  const [currentReward, setCurrentReward] = useState<RewardsValue | undefined>();
   useEffect(() => {
     if (initialReward) {
-      setCurrentReward(initialReward);
+      setCurrentReward({
+        ...initialReward
+      });
     }
   }, [initialReward]);
 
-  const { mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();
 
   const debouncedUpdateReward = useMemo(() => debouncePromise(updateReward, 500), [updateReward]);
 
   const readOnly = parentReadOnly || !isSpaceMember || props.readOnly;
 
-  async function applyRewardUpdates(updates: Partial<UpdateableRewardFields>) {
+  async function applyRewardUpdates(updates: Partial<RewardsValue>) {
     if (readOnly) {
       return;
     }
 
-    setCurrentReward((_currentReward) => ({ ...(_currentReward as RewardWithUsers), ...updates }));
+    setCurrentReward((_currentReward) => ({ rewardType: 'token', ..._currentReward, ...updates }));
     if (currentReward?.id) {
       debouncedUpdateReward({ rewardId: currentReward.id, updateContent: updates }).then(() => {
         rewardChanged?.();
@@ -69,32 +68,32 @@ export function RewardProperties(props: {
   if (!currentReward) {
     return null;
   }
+
+  const rewardPropertiesFormProps = {
+    pageId,
+    values: currentReward,
+    onChange: applyRewardUpdates,
+    readOnly,
+    expandedByDefault: expandedRewardProperties,
+    templateId,
+    isTemplate,
+    readOnlyTemplate,
+    selectTemplate: () => {},
+    rewardStatus: currentReward.status
+  };
+
   return (
     <Stack flex={1}>
-      <RewardPropertiesForm
-        pageId={pageId}
-        refreshPermissions={refreshPagePermissionsList}
-        values={currentReward}
-        onChange={applyRewardUpdates}
-        readOnly={readOnly}
-        expandedByDefault={expandedRewardProperties}
-        templateId={templateId}
-        isTemplate={isTemplate}
-        readOnlyTemplate={readOnlyTemplate}
-        // templates are not enabled for existing pages
-        selectTemplate={() => {}}
-        rewardStatus={currentReward.status}
-      />
-
+      <RewardPropertiesForm {...rewardPropertiesFormProps} />
       {!isTemplate && (
         <>
-          {!!currentReward?.id && showApplications && (
+          {!!currentReward?.id && showApplications && initialReward && initialReward?.status !== 'draft' && (
             <>
               <Divider sx={{ my: 1 }} />
               <Stack>
                 <RewardApplications
                   applicationRequired={currentReward.approveSubmitters ?? false}
-                  rewardId={currentReward.id}
+                  reward={initialReward}
                 />
               </Stack>
             </>

@@ -8,11 +8,12 @@ import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import Legend from 'components/settings/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
+import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
-import { scrollIntoView } from 'lib/utilities/browser';
+import { scrollIntoView } from 'lib/utils/browser';
 
 import { UpgradeChip, UpgradeWrapper } from '../subscription/UpgradeWrapper';
 
@@ -25,7 +26,6 @@ import { MemberRoleRow } from './components/MemberRoleRow';
 import { DefaultPagePermissions } from './components/RolePermissions/components/DefaultPagePermissions';
 import { RoleRow } from './components/RoleRow';
 import { CustomRolesInfoModal } from './CustomRolesInfoModal';
-import { useImportDiscordRoles } from './hooks/useImportDiscordRoles';
 
 const formAnchorId = 'new-role-form-anchor';
 
@@ -47,7 +47,7 @@ export function RoleSettings({ space }: { space: Space }) {
 
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const { isValidating } = useImportDiscordRoles();
+  const { isLoading: isValidating } = useDiscordConnection();
 
   function showCreateRoleForm() {
     setIsCreateFormVisible(true);
@@ -164,7 +164,7 @@ export function RoleSettings({ space }: { space: Space }) {
       )}
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <ImportDiscordRolesMenuItem />
+        <ImportDiscordRolesMenuItem onClose={handleClose} />
         <ImportGuildRolesMenuItem onClose={handleClose} />
       </Menu>
 

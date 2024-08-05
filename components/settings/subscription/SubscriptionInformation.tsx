@@ -21,7 +21,7 @@ import { communityProduct } from 'lib/subscription/constants';
 import { generatePriceDetails } from 'lib/subscription/generatePriceDetails';
 import type { SpaceSubscriptionWithStripeData } from 'lib/subscription/getActiveSpaceSubscription';
 import type { UpdateSubscriptionRequest } from 'lib/subscription/updateProSubscription';
-import { formatDate } from 'lib/utilities/dates';
+import { formatDate } from 'lib/utils/dates';
 import type { UpgradeSubscriptionRequest } from 'pages/api/spaces/[id]/upgrade-subscription';
 
 import { PaymentMethod } from './PaymentMethod';

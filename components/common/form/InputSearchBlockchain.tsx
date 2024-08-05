@@ -1,22 +1,23 @@
 import type { BoxProps, SxProps, Theme } from '@mui/material';
+import { Box, ListItemIcon, ListItemText, Autocomplete, MenuItem, TextField } from '@mui/material/';
 import type { AutocompleteProps } from '@mui/material/Autocomplete';
-import Autocomplete from '@mui/material/Autocomplete';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import type { IChainDetails } from 'connectors/chains';
-import { RPCList, getChainById } from 'connectors/chains';
+import type { IChainDetails } from '@root/connectors/chains';
+import { getChainList, getChainById } from '@root/connectors/chains';
 import { useEffect, useState, useMemo } from 'react';
 
-import { isTruthy } from 'lib/utilities/types';
+import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { isTruthy } from 'lib/utils/types';
 
-interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'> {
-  onChange?: (chainId: number) => void;
+interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, boolean, true>>, 'onChange'> {
+  onChange?: (chainId: number | null) => void;
   defaultChainId?: number; // allow setting a default
   hideInputIcon?: boolean;
   chainId?: number; // allow overriding from the parent
   sx?: SxProps<Theme>;
   chains?: number[];
   fullWidth?: boolean;
+  disableClearable?: boolean;
 }
 
 export function InputSearchBlockchain({
@@ -28,13 +29,17 @@ export function InputSearchBlockchain({
   sx = {},
   disabled,
   readOnly,
-  fullWidth
+  fullWidth,
+  disableClearable = true
 }: Props) {
   const [value, setValue] = useState<IChainDetails | null>(null);
+  const { space } = useCurrentSpace();
 
   const options = useMemo(() => {
-    return chains ? chains.map((chain) => getChainById(chain)).filter(isTruthy) : RPCList;
-  }, [chains]);
+    return chains
+      ? chains.map((chain) => getChainById(chain)).filter(isTruthy)
+      : getChainList({ enableTestnets: !!space?.enableTestnets });
+  }, [chains, space?.enableTestnets]);
 
   useEffect(() => {
     if (defaultChainId && !value) {
@@ -62,31 +67,25 @@ export function InputSearchBlockchain({
       // @ts-ignore - autocomplete types are a mess
       // dummy bounty object with chainName to show N/A for empty value
       value={value}
-      onChange={(_, _value: IChainDetails) => {
-        if (_value?.chainId) {
-          onChange(_value.chainId);
-          setValue(_value);
-        }
+      onChange={(_, _value: IChainDetails | null) => {
+        onChange(_value?.chainId ?? null);
+        setValue(_value);
       }}
       sx={{ minWidth: 150, ...sx }}
       options={options}
-      disableClearable
+      data-test='chain-options'
+      disableClearable={disableClearable}
       autoHighlight
       size='small'
       getOptionLabel={(option) => `${option.chainName}`}
-      renderOption={(props, option) => (
-        <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
-          <IconLogo src={option.iconUrl} />
-          <Box component='span'>{option.chainName}</Box>
-        </Box>
-      )}
+      renderOption={(props, option) => <Chain info={option} data-test={`select-chain-${option.chainId}`} {...props} />}
       renderInput={(params) => (
         <TextField
           {...params}
           InputProps={{
             ...params.InputProps,
             placeholder: 'Select a chain',
-            startAdornment: !hideInputIcon && value && <IconLogo src={value?.iconUrl} ml={1} />
+            startAdornment: !hideInputIcon && value && <BlockchainLogo src={value?.iconUrl} sx={{ ml: 0.5 }} />
           }}
         />
       )}
@@ -97,10 +96,13 @@ export function InputSearchBlockchain({
   );
 }
 
-function IconLogo({ src, ...props }: { src?: string } & BoxProps) {
+export function Chain({ info, ...props }: { info: Pick<IChainDetails, 'chainName' | 'iconUrl'> }) {
   return (
-    <Box width='1em' height='1em' display='flex' justifyContent='center' {...props}>
-      <img src={src} style={{ height: '1em', marginRight: '0.5em' }} className='lsm-chain-selector-options-icons' />
-    </Box>
+    <MenuItem {...props}>
+      <ListItemIcon>
+        <BlockchainLogo src={info.iconUrl} sx={{ ml: '-4px' }} />
+      </ListItemIcon>
+      <ListItemText>{info.chainName}</ListItemText>
+    </MenuItem>
   );
 }

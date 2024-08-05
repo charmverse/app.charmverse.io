@@ -15072,7 +15072,6 @@
                       "columnWrappedIds": [],
                       "visibleOptionIds": [],
                       "defaultTemplateId": "",
-                      "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
                       "visiblePropertyIds": [
@@ -16814,12 +16813,11 @@
         "id": "21408047-a36a-4fa6-8e00-cdb5b1e0fa39",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__title": "",
@@ -18828,12 +18826,11 @@
         "id": "56ab7c3a-ddeb-4d04-9060-825bdc37e374",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__title": "",
@@ -20842,12 +20839,11 @@
         "id": "d48e7614-246a-4892-99df-9730a45e1edc",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__title": "",
@@ -22856,12 +22852,11 @@
         "id": "756e48d7-c4cf-4088-a5bd-0d4bc10a5a20",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "9e215a8f-d4b6-4097-af71-e1d148995d23",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__title": "",

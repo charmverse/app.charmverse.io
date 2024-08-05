@@ -3,9 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
 import { onError, onNoMatch } from 'lib/middleware';
 import { NotFoundError } from 'lib/middleware/errors';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
@@ -14,8 +14,9 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isUUID } from 'lib/utilities/strings';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { isUUID } from 'lib/utils/strings';
+import { isTruthy } from 'lib/utils/types';
+import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -245,7 +246,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
         where: {
           deletedAt: null,
           id: {
-            in: [card.parentId, card.rootId].filter(Boolean)
+            in: [card.parentId, card.rootId].filter(isTruthy)
           }
         }
       })) as unknown as Board[];
@@ -295,7 +296,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   return res.status(200).json({
     bounty: bounty
       ? {
-          ...mapDbRewardToReward({ ...bounty, applications: [] }),
+          ...mapDbRewardToReward({ ...bounty, applications: [], proposal: null }),
           page: {
             ...page
           }

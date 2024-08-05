@@ -1,4 +1,7 @@
 import { log } from '@charmverse/core/log';
+import { isTestEnv } from '@root/config/constants';
+import { trackOpSpaceSuccessfulSigninEvent } from '@root/lib/metrics/mixpanel/trackOpSpaceSigninEvent';
+import type { LoggedInUser } from '@root/models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,7 +10,6 @@ import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesFo
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { InvalidStateError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -21,11 +23,13 @@ async function loginDiscordCodeHandler(
 
   try {
     const signupAnalytics = extractSignupAnalytics(req.cookies as any);
+    const discordApiUrl = isTestEnv ? (req.body.discordApiUrl as string) : undefined;
     const user = await loginByDiscord({
       code: tempAuthCode,
       hostName: req.headers.host,
       userId: req.session.anonymousUserId,
       signupAnalytics,
+      discordApiUrl,
       authFlowType: 'popup'
     });
 
@@ -48,6 +52,10 @@ async function loginDiscordCodeHandler(
 
     log.info(`User ${user.id} logged in with Discord`, { userId: user.id, method: 'discord' });
 
+    await trackOpSpaceSuccessfulSigninEvent({
+      userId: user.id,
+      identityType: 'Discord'
+    });
     return res.status(200).json(user);
   } catch (error) {
     log.warn('Error while logging to Discord', error);

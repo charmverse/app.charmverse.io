@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ExternalRole } from '@root/lib/roles';
 import { v4 } from 'uuid';
 
-import type { ExternalRole } from 'lib/roles';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addSpaceDiscordServerId, createDiscordUser } from 'testing/utils/discord';
 import { createRole } from 'testing/utils/roles';

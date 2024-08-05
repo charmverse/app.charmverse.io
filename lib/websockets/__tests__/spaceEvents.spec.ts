@@ -2,12 +2,11 @@
 import type { Page, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { getPagePath } from '@root/lib/pages';
+import { builders as _ } from '@root/lib/prosemirror/builders';
+import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { v4 } from 'uuid';
-
-import { getPagePath } from 'lib/pages';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { builders as _ } from 'testing/prosemirror/builders';
 
 import { WebsocketBroadcaster } from '../broadcaster';
 import type { DocumentRoom } from '../documentEvents/docRooms';
@@ -276,6 +275,101 @@ describe('page delete event handler', () => {
       },
       parentPage.spaceId
     );
+  });
+});
+
+describe('page_duplicated event handler', () => {
+  it(`Should add the nested page in the parent document content when it is not being viewed`, async () => {
+    const { childPages, spaceEventHandler, parentPage } = await socketSetup({
+      content: contentWithChildPageNode
+    });
+
+    const newChildPage = await testUtilsPages.generatePage({
+      createdBy: parentPage.createdBy,
+      spaceId: parentPage.spaceId,
+      parentId: parentPage.id
+    });
+
+    const message: ClientMessage = {
+      type: 'page_duplicated',
+      payload: {
+        pageId: newChildPage.id
+      }
+    };
+
+    await spaceEventHandler.onMessage(message);
+
+    const parentPageWithContent = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    expect(parentPageWithContent.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.page({
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
+        }),
+        _.p('2'),
+        _.page({
+          id: newChildPage.id
+        })
+      ).toJSON()
+    );
+  });
+
+  it(`Should add the nested page in the parent document content when it is being viewed`, async () => {
+    const { childPages, spaceEventHandler, parentPage, socketEmitMockFn } = await socketSetup({
+      participants: true,
+      content: contentWithChildPageNode
+    });
+
+    const newChildPage = await testUtilsPages.generatePage({
+      createdBy: parentPage.createdBy,
+      spaceId: parentPage.spaceId,
+      parentId: parentPage.id
+    });
+
+    const message: ClientMessage = {
+      type: 'page_duplicated',
+      payload: {
+        pageId: newChildPage.id
+      }
+    };
+
+    await spaceEventHandler.onMessage(message);
+
+    const parentPageWithContent = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    expect(parentPageWithContent.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.page({
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
+        }),
+        _.p('2'),
+        _.page({
+          id: newChildPage.id
+        })
+      ).toJSON()
+    );
+
+    expect(socketEmitMockFn).toHaveBeenCalled();
   });
 });
 

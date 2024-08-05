@@ -1,9 +1,8 @@
 import type { Application, ApplicationStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getReward } from 'lib/rewards/getReward';
-import { verifyOrRejectApplications } from 'lib/rewards/verifyOrRejectApplications';
-import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
+import { issueOffchainRewardCredentialsIfNecessary } from '@root/lib/credentials/issueOffchainRewardCredentialsIfNecessary';
+import { verifyOrRejectApplications } from '@root/lib/rewards/verifyOrRejectApplications';
+import { WrongStateError } from '@root/lib/utils/errors';
 
 import { rollupRewardStatus } from './rollupRewardStatus';
 
@@ -65,6 +64,14 @@ export async function reviewApplication({ applicationId, decision, userId }: App
 
   await verifyOrRejectApplications(application.bountyId);
   await rollupRewardStatus({ rewardId: application.bountyId });
+
+  if (nextStatus === 'complete') {
+    await issueOffchainRewardCredentialsIfNecessary({
+      event: 'reward_submission_approved',
+      rewardId: application.bountyId,
+      submissionId: applicationId
+    });
+  }
 
   return updated;
 }

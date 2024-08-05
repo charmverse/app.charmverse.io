@@ -1,7 +1,7 @@
-import type { EditorView, MarkType, Node, Schema } from '@bangle.dev/pm';
+import type { ExtendedVote } from '@root/lib/votes/interfaces';
+import type { MarkType, Node, Schema } from 'prosemirror-model';
 import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
-
-import type { ExtendedVote } from 'lib/votes/interfaces';
+import type { EditorView } from 'prosemirror-view';
 
 export function findTotalInlineVotes(view: EditorView, node: Node, votes: Record<string, ExtendedVote>) {
   const inlineVoteMarkSchema = view.state.schema.marks['inline-vote'] as MarkType;

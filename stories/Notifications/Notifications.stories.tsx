@@ -14,7 +14,7 @@ import type {
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
-import { getCurrentDate } from 'lib/utilities/dates';
+import { getCurrentDate } from 'lib/utils/dates';
 
 import { members } from '../lib/mockData';
 
@@ -144,6 +144,9 @@ const proposals: ProposalNotification[] = proposalNotificationTypes
     status: 'published' as const,
     evaluation: {
       title: 'Review'
+    },
+    previousEvaluation: {
+      title: 'Feedback'
     }
   }))
   .map((notification) => ({ ...baseFields, ...notification, id: uuid() }));

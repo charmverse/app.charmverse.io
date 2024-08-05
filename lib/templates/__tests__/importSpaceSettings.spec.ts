@@ -1,4 +1,3 @@
-import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import type {
   MemberProperty,
   MemberPropertyPermission,
@@ -9,11 +8,11 @@ import type {
   User
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import type { BoardFields } from '@root/lib/databases/board';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
 import { v4 as uuid } from 'uuid';
-
-import type { BoardFields } from 'lib/focalboard/board';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
 
 import type { SpaceDataExport } from '../exportSpaceData';
 import type { SpaceSettingsExport } from '../exportSpaceSettings';
@@ -177,7 +176,6 @@ describe('importSpaceSettings', () => {
               columnWrappedIds: [],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: ['__category', '__status', '__evaluationType', '__authors', '__reviewers']
@@ -241,7 +239,6 @@ describe('importSpaceSettings', () => {
               columnWrappedIds: ['__title'],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: [
@@ -261,6 +258,7 @@ describe('importSpaceSettings', () => {
 
     proposalWorkflow = {
       createdAt: new Date(),
+      privateEvaluations: false,
       id: uuid(),
       index: 0,
       spaceId: sourceSpace.id,
@@ -286,7 +284,8 @@ describe('importSpaceSettings', () => {
             { operation: 'archive', systemRole: 'author' }
           ]
         }
-      ]
+      ],
+      draftReminder: false
     };
 
     dataToImport = {
@@ -458,7 +457,6 @@ describe('importSpaceSettings', () => {
             columnWrappedIds: [],
             visibleOptionIds: [],
             defaultTemplateId: '',
-            collapsedOptionIds: [],
             columnCalculations: {},
             kanbanCalculations: {},
             visiblePropertyIds: [
@@ -519,7 +517,6 @@ describe('importSpaceSettings', () => {
             columnWrappedIds: ['__title'],
             visibleOptionIds: [],
             defaultTemplateId: '',
-            collapsedOptionIds: [],
             columnCalculations: {},
             kanbanCalculations: {},
             visiblePropertyIds: [
@@ -716,6 +713,7 @@ describe('importSpaceSettings', () => {
           index: proposalWorkflow.index,
           title: proposalWorkflow.title,
           spaceId: targetSpace.id,
+          privateEvaluations: proposalWorkflow.privateEvaluations,
           // id: expect.stringMatching(existingProposalWorkflow.id),
           createdAt: expect.any(Date),
           evaluations: [
@@ -741,7 +739,8 @@ describe('importSpaceSettings', () => {
                 { operation: 'archive', systemRole: 'author' }
               ]
             }
-          ]
+          ],
+          draftReminder: false
         },
         {
           ...existingProposalWorkflow

@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidStateError, NotFoundError } from '@root/lib/middleware';
 import type { Stripe } from 'stripe';
-
-import { InvalidStateError, NotFoundError } from 'lib/middleware';
 
 import { communityProduct } from './constants';
 import { getActiveSpaceSubscription } from './getActiveSpaceSubscription';

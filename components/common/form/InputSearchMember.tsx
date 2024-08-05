@@ -9,7 +9,7 @@ import { v4 } from 'uuid';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
-import { isValidEmail } from 'lib/utilities/strings';
+import { isValidEmail } from 'lib/utils/strings';
 
 const renderDiv = (props: any & { children: ReactNode }) => <div>{props.children}</div>;
 
@@ -46,6 +46,7 @@ interface Props extends Omit<AutocompleteProps<Member, boolean, boolean, boolean
   helperText?: ReactNode;
   error?: boolean;
   popupField?: boolean;
+  placeholder?: string;
 }
 
 function InputSearchMemberBase({
@@ -63,6 +64,7 @@ function InputSearchMemberBase({
   const inputRef = createRef<HTMLInputElement>();
 
   const filteredOptions = filter ? filterMembers(options, filter) : options;
+  // console.log('filteredOptions', filteredOptions);
   return (
     <StyledAutocomplete
       PopperComponent={popupField ? renderDiv : undefined}
@@ -97,6 +99,7 @@ function InputSearchMemberBase({
       renderOption={(_props, user) => (
         <UserDisplay
           {...(_props as any)}
+          data-test={`user-option-${user.id}`}
           userId={user.id}
           avatarSize='small'
           avatarIcon={user.id.startsWith('email') ? <EmailIcon fontSize='large' /> : undefined}
@@ -137,45 +140,47 @@ interface IInputSearchMemberMultipleProps
   helperText?: ReactNode;
   error?: boolean;
   popupField?: boolean;
+  placeholder?: string;
 }
 
 export function InputSearchMemberMultiple({
   onChange,
   disableCloseOnSelect,
   defaultValue,
+  multiple = true,
   ...props
 }: IInputSearchMemberMultipleProps) {
-  const { members, membersRecord } = useMembers();
-  const defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
-  const [value, setValue] = useState<Member[]>(defaultMembers);
+  const { members, isLoading, membersRecord } = useMembers();
+  const [value, setValue] = useState<Member[]>([]);
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
+    setValue(users);
     onChange(
       users.map((user) => (user.id.startsWith('email') ? user.username : user.id)),
       reason
     );
-    setValue(users);
   }
 
   useEffect(() => {
-    if (defaultValue && value.length === 0) {
-      const _defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
-      if (_defaultMembers.length > 0) {
-        setValue(_defaultMembers);
+    if (!isLoading) {
+      const defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
+      if (defaultMembers.length > 0) {
+        setValue(defaultMembers);
       }
     }
-  }, [defaultValue, membersRecord]);
+    // only run once members are loaded
+  }, [isLoading]);
 
   return (
     <InputSearchMemberBase
       filterSelectedOptions
-      multiple
+      multiple={multiple}
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}
       isOptionEqualToValue={(option, val) => option.id === val.id}
       {...props}
-      placeholder={defaultValue?.length !== 0 || value.length !== 0 ? undefined : props.placeholder ?? 'Select members'}
+      placeholder={defaultValue?.length || value.length ? undefined : props.placeholder ?? 'Select members'}
       options={members.filter((member) => !member.isBot)}
     />
   );

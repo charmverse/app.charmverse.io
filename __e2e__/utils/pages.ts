@@ -24,19 +24,23 @@ export function generatePage(
           id: options.createdBy
         }
       },
+      parent: options.parentId
+        ? {
+            connect: {
+              id: options.parentId
+            }
+          }
+        : undefined,
       space: {
         connect: {
           id: options.spaceId
         }
       },
-      permissions: options.pagePermissions
-        ? {
-            createMany: {
-              data: options.pagePermissions || [{ spaceId: options.spaceId, permissionLevel: 'full_access' }]
-            }
-          }
-        : undefined,
-      parentId: options.parentId,
+      permissions: {
+        createMany: {
+          data: options.pagePermissions || [{ spaceId: options.spaceId, permissionLevel: 'full_access' }]
+        }
+      },
       deletedAt: options.deletedAt ?? null,
       boardId: options.boardId ?? null,
       diffs: options.content

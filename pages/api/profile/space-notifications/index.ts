@@ -5,7 +5,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ClientUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import { getUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

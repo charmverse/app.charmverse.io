@@ -1,17 +1,26 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { TENANT_URLS } from '@root/lib/summon/constants';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 
-import { SUMMON_BASE_URL } from 'lib/summon/api';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace, generateSpaceUser } from 'testing/setupDatabase';
 
 import { getSummonProfile } from '../getSummonProfile';
+
+const [DEFAULT_TENANT_ID, SUMMON_BASE_URL] = Object.entries(TENANT_URLS)[0];
 
 const mockSandbox = fetchMock.sandbox();
 
 jest.mock('undici', () => {
   return { fetch: (...args: any[]) => mockSandbox(...args) };
+});
+
+let spaceId: string;
+
+beforeAll(async () => {
+  const { space } = await generateUserAndSpace({ xpsEngineId: DEFAULT_TENANT_ID });
+  spaceId = space.id;
 });
 
 afterAll(() => {
@@ -28,14 +37,14 @@ const summonIdentityErrorResponse = {
 
 describe('getSummonProfile', () => {
   it(`Should return null if not user exist`, async () => {
-    const summonProfile = await getSummonProfile({ userId: v4() });
+    const summonProfile = await getSummonProfile({ userId: v4(), spaceId });
     expect(summonProfile).toBeNull();
   });
 
   it(`Should return null if user doesn't have any summon account connected with wallet address, email or discord account`, async () => {
     const walletAddress = randomETHWalletAddress().toLowerCase();
     const emailAddress = `test-${v4()}@gmail.com`;
-    const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
+    const { user } = await generateUserAndSpace({ walletAddress });
 
     await prisma.googleAccount.create({
       data: {
@@ -58,30 +67,33 @@ describe('getSummonProfile', () => {
     });
 
     mockSandbox
-      .get(`${SUMMON_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, summonIdentityErrorResponse)
+      .get(`${SUMMON_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, summonIdentityErrorResponse)
       .get(
-        `${SUMMON_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(`${discordUsername}`)}`,
+        `${SUMMON_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(`${discordUsername}`)}`,
         summonIdentityErrorResponse
       )
-      .get(`${SUMMON_BASE_URL}/scan/identity?email=${encodeURIComponent(emailAddress)}`, summonIdentityErrorResponse);
+      .get(
+        `${SUMMON_BASE_URL}/v1/xps/scan/identity?email=${encodeURIComponent(emailAddress)}`,
+        summonIdentityErrorResponse
+      );
 
-    const summonProfile = await getSummonProfile({ userId: user.id });
+    const summonProfile = await getSummonProfile({ userId: user.id, spaceId });
 
     expect(summonProfile).toBeNull();
   });
 
   it(`Should return summon profile attached with user's wallet address`, async () => {
-    const walletAddress = randomETHWalletAddress().toLowerCase();
-    const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
+    const user = await generateSpaceUser({ spaceId });
+    const walletAddress = user.wallets[0].address;
     mockSandbox
-      .get(`${SUMMON_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, {
+      .get(`${SUMMON_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, {
         data: {
           userId: user.id
         },
         message: '',
         status: 0
       })
-      .get(`${SUMMON_BASE_URL}/scan/inventory/${user.id}`, {
+      .get(`${SUMMON_BASE_URL}/v1/xps/scan/inventory/${user.id}`, {
         data: {
           user: user.id
         },
@@ -89,7 +101,7 @@ describe('getSummonProfile', () => {
         status: 0
       });
 
-    const summonProfile = await getSummonProfile({ userId: user.id });
+    const summonProfile = await getSummonProfile({ userId: user.id, spaceId });
 
     expect(summonProfile).toStrictEqual({
       id: user.id,
@@ -100,9 +112,9 @@ describe('getSummonProfile', () => {
 
   it(`Should return summon profile attached with user's discord handle`, async () => {
     const discordUsername = `test123`;
-    const walletAddress = randomETHWalletAddress().toLowerCase();
+    const user = await generateSpaceUser({ spaceId });
+    const walletAddress = user.wallets[0].address;
 
-    const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
     await prisma.discordUser.create({
       data: {
         account: {
@@ -114,15 +126,15 @@ describe('getSummonProfile', () => {
     });
 
     mockSandbox
-      .get(`${SUMMON_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, summonIdentityErrorResponse)
-      .get(`${SUMMON_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(`${discordUsername}`)}`, {
+      .get(`${SUMMON_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, summonIdentityErrorResponse)
+      .get(`${SUMMON_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(`${discordUsername}`)}`, {
         data: {
           userId: user.id
         },
         message: '',
         status: 0
       })
-      .get(`${SUMMON_BASE_URL}/scan/inventory/${user.id}`, {
+      .get(`${SUMMON_BASE_URL}/v1/xps/scan/inventory/${user.id}`, {
         data: {
           user: user.id
         },
@@ -130,7 +142,7 @@ describe('getSummonProfile', () => {
         status: 0
       });
 
-    const summonProfile = await getSummonProfile({ userId: user.id });
+    const summonProfile = await getSummonProfile({ userId: user.id, spaceId });
 
     expect(summonProfile).toStrictEqual({
       id: user.id,
@@ -143,8 +155,8 @@ describe('getSummonProfile', () => {
     const discordUsername = `test`;
     const discordDiscriminator = v4();
     const emailAddress = `test-${v4()}@gmail.com`;
-    const walletAddress = randomETHWalletAddress().toLowerCase();
-    const { user } = await generateUserAndSpaceWithApiToken({ walletAddress });
+    const user = await generateSpaceUser({ spaceId });
+    const walletAddress = user.wallets[0].address;
 
     await prisma.googleAccount.create({
       data: {
@@ -167,21 +179,21 @@ describe('getSummonProfile', () => {
     });
 
     mockSandbox
-      .get(`${SUMMON_BASE_URL}/scan/identity?walletAddress=${walletAddress}`, summonIdentityErrorResponse)
+      .get(`${SUMMON_BASE_URL}/v1/xps/scan/identity?walletAddress=${walletAddress}`, summonIdentityErrorResponse)
       .get(
-        `${SUMMON_BASE_URL}/scan/identity?discordHandle=${encodeURIComponent(
+        `${SUMMON_BASE_URL}/v1/xps/scan/identity?discordHandle=${encodeURIComponent(
           `${discordUsername}#${discordDiscriminator}`
         )}`,
         summonIdentityErrorResponse
       )
-      .get(`${SUMMON_BASE_URL}/scan/identity?email=${encodeURIComponent(emailAddress)}`, {
+      .get(`${SUMMON_BASE_URL}/v1/xps/scan/identity?email=${encodeURIComponent(emailAddress)}`, {
         data: {
           userId: user.id
         },
         message: '',
         status: 0
       })
-      .get(`${SUMMON_BASE_URL}/scan/inventory/${user.id}`, {
+      .get(`${SUMMON_BASE_URL}/v1/xps/scan/inventory/${user.id}`, {
         data: {
           user: user.id
         },
@@ -189,7 +201,7 @@ describe('getSummonProfile', () => {
         status: 0
       });
 
-    const summonProfile = await getSummonProfile({ userId: user.id });
+    const summonProfile = await getSummonProfile({ userId: user.id, spaceId });
 
     expect(summonProfile).toStrictEqual({
       id: user.id,

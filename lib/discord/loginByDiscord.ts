@@ -1,18 +1,19 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
+import { getDiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
+import { getDiscordCallbackUrl } from '@root/lib/discord/getDiscordCallbackUrl';
+import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { logSignupViaDiscord } from '@root/lib/metrics/postToDiscord';
+import type { OauthFlowType } from '@root/lib/oauth/interfaces';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { postUserCreate } from '@root/lib/users/postUserCreate';
+import { DisabledAccountError } from '@root/lib/utils/errors';
+import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { getDiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
-import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
-import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
-import type { OauthFlowType } from 'lib/oauth/interfaces';
-import { sessionUserRelations } from 'lib/session/config';
-import { DisabledAccountError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
 
 type LoginWithDiscord = {
   code: string;
@@ -29,7 +30,7 @@ export async function loginByDiscord({
   discordApiUrl,
   userId = v4(),
   signupAnalytics = {},
-  authFlowType = 'page'
+  authFlowType
 }: LoginWithDiscord) {
   const discordAccount = await getDiscordAccount({
     code,
@@ -51,6 +52,11 @@ export async function loginByDiscord({
     if (discordUser.user.deletedAt) {
       throw new DisabledAccountError();
     }
+
+    await trackOpSpaceClickSigninEvent({
+      userId: discordUser.user.id,
+      identityType: 'Discord'
+    });
 
     trackUserAction('sign_in', { userId: discordUser.user.id, identityType: 'Discord' });
     return discordUser.user;
@@ -95,8 +101,7 @@ export async function loginByDiscord({
       include: sessionUserRelations
     });
 
-    updateTrackUserProfile(newUser);
-    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Discord', ...signupAnalytics });
+    postUserCreate({ user: newUser, identityType: 'Discord', signupAnalytics });
     logSignupViaDiscord();
 
     return newUser;

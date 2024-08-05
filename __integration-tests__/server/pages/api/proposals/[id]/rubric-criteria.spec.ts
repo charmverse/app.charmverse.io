@@ -3,8 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
-import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
+import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
+import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCriteria';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('PUT /api/proposals/[id]/rubric-criteria - Update proposal rubric criteria', () => {
@@ -122,7 +122,7 @@ function rubricProposal({ userId, spaceId }: { userId: string; spaceId: string }
               max: 4,
               min: 1
             }
-          } as ProposalRubricCriteriaWithTypedParams
+          } as RubricCriteriaTyped
         ]
       }
     ]

@@ -1,6 +1,6 @@
-import { prisma } from "@charmverse/core/prisma-client";
-import { getDefaultEvaluation } from "lib/proposal/workflows/defaultEvaluation";
-import { decisionMatrixWorkflowTitle } from "lib/proposal/workflows/defaultWorkflows";
+import { prisma } from '@charmverse/core/prisma-client';
+import { getDefaultEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
+import { decisionMatrixWorkflowTitle } from 'lib/proposals/workflows/defaultWorkflows';
 
 async function fixProposalWorkflows() {
   await prisma.proposalWorkflow.updateMany({
@@ -24,5 +24,5 @@ async function fixProposalWorkflows() {
         })
       ]
     }
-  })
+  });
 }

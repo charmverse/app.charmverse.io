@@ -1,12 +1,12 @@
-import { wrappingInputRule } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { filter } from '@bangle.dev/utils';
+import { wrappingInputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
 import type { EditorState } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
-import { isMac } from 'lib/utilities/browser';
+import { isMac } from 'lib/utils/browser';
 
 import { backspaceKeyCommand, enterKeyCommand, indentCommand, listItemMergeCommand, updateNodeAttrs } from './commands';
 import { ListItemNodeView } from './listItemNodeView';

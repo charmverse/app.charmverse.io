@@ -1,16 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PageObjectResponse, RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
-
-import {
-  MIN_EMBED_WIDTH,
-  MAX_EMBED_WIDTH,
-  MIN_EMBED_HEIGHT
-} from 'components/common/CharmEditor/components/iframe/config';
-import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmEditor/components/nft/utils';
-import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
-import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
-import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
-import { isPdfEmbedLink } from 'lib/pdf/extractPdfEmbedLink';
+import { extractAttrsFromUrl as extractNFTAttrs } from '@root/lib/blockchain/utils';
+import { isPdfEmbedLink } from '@root/lib/pdf/extractPdfEmbedLink';
 import type {
   TextContent,
   MentionNode,
@@ -21,14 +12,23 @@ import type {
   ColumnLayoutNode,
   ColumnBlockNode,
   TextMark
-} from 'lib/prosemirror/interfaces';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
-import { isTruthy } from 'lib/utilities/types';
+} from '@root/lib/prosemirror/interfaces';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from '@root/lib/prosemirror/plugins/image/constants';
+import { isTruthy } from '@root/lib/utils/types';
+
+import {
+  MIN_EMBED_WIDTH,
+  MAX_EMBED_WIDTH,
+  MIN_EMBED_HEIGHT
+} from 'components/common/CharmEditor/components/iframe/config';
+import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
+import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
+import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 
 import { convertRichText } from '../convertRichText';
 import { getPageTitleText } from '../getPageTitle';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
-import type { BlockWithChildren, BlocksRecord } from '../types';
+import type { BlockWithChildren, BlocksRecord } from '../interfaces';
 
 import type { CharmversePage } from './CharmversePage';
 import type { NotionPage } from './NotionPage';
@@ -168,7 +168,10 @@ export class NotionBlock {
       } catch (err) {
         if (block) {
           log.warn(`[notion] Failed to convert notion ${block.type}:${block.id} block to charmverse block`, {
-            spaceId: this.notionPage.spaceId
+            block,
+            spaceId: this.notionPage.spaceId,
+            userId: this.notionPage.userId,
+            error: err
           });
           const notionPage = this.notionPage.cache.notionPagesRecord[
             this.charmversePage.notionPageId
@@ -187,6 +190,13 @@ export class NotionBlock {
               blocks: [...failedImportsRecord.blocks, [block.id, block.type]]
             };
           }
+        } else {
+          log.warn('[notion] Error when converting blocks for a page', {
+            spaceId: this.notionPage.spaceId,
+            userId: this.notionPage.userId,
+            error: err,
+            blockIds
+          });
         }
       }
     }
@@ -532,7 +542,18 @@ export class NotionBlock {
         const charmversePage = await this.notionPage.fetchAndCreatePage({
           notionPageId: block.id
         });
-
+        // Notion api doesn't support linked databases. See: https://developers.notion.com/reference/retrieve-a-database
+        if (!charmversePage && block.type === 'child_database') {
+          return {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: '[Linked database could not be imported]'
+              }
+            ]
+          };
+        }
         return {
           type: 'page',
           attrs: {

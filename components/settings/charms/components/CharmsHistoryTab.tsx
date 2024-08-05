@@ -1,5 +1,5 @@
 import { ArrowDownward } from '@mui/icons-material';
-import { Box, CircularProgress, Divider, Grid, Stack, Typography } from '@mui/material';
+import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 
 import { useTransactionHistory } from 'charmClient/hooks/charms';
 import LoadingComponent, { LoadingIcon } from 'components/common/LoadingComponent';
@@ -38,27 +38,25 @@ export function CharmsHistoryTab() {
       <Stack gap={2}>
         {transactions.map((transaction, i) => (
           <>
-            <Grid key={transaction.id} container display='flex' gap={1} alignItems='center'>
-              <Grid item xs={1}>
-                <Stack direction='row' alignItems='center' gap={0.5}>
-                  <Typography variant='subtitle1'>
+            <Stack direction='row' gap={1} alignItems='center' justifyContent='space-between'>
+              <Stack direction='row' gap={1} alignItems='center'>
+                <Stack direction='row' alignItems='center' gap={0.5} minWidth='30px'>
+                  <Typography
+                    variant='subtitle1'
+                    color={transaction.metadata.isReceived ? ({ palette }) => palette.primary.main : 'secondary'}
+                  >
                     {transaction.metadata.isReceived ? '+' : '-'}
                     {transaction.amount}
                   </Typography>
-                  <Typography variant='caption' color='secondary'>
-                    Charms
-                  </Typography>
                 </Stack>
-              </Grid>
-              <Grid item xs={8}>
+
                 <Typography>{getTransactionDescription(transaction)}</Typography>
-              </Grid>
-              <Grid item xs={2} justifyContent='flex-end'>
-                <Typography color='secondary' variant='subtitle1'>
-                  {formatDateTime(transaction.createdAt)}
-                </Typography>
-              </Grid>
-            </Grid>
+              </Stack>
+
+              <Typography color='secondary' variant='subtitle1'>
+                {formatDateTime(transaction.createdAt)}
+              </Typography>
+            </Stack>
             <Divider />
           </>
         ))}
@@ -81,21 +79,29 @@ export function CharmsHistoryTab() {
   );
 }
 
-const receivedLabels: Record<CharmActionTrigger, string> = {
-  [CharmActionTrigger.referral]: 'Invited member to space'
+const receivedLabels: Record<CharmActionTrigger, (data: { amount: number }) => string> = {
+  [CharmActionTrigger.referral]: ({ amount }) => `Received ${getAmountLabel(amount)} for a referral`,
+  [CharmActionTrigger.referralReferee]: ({ amount }) => `Received ${getAmountLabel(amount)} from a referral`,
+  [CharmActionTrigger.createFirstProposal]: ({ amount }) =>
+    `Received ${getAmountLabel(amount)} for publishing first proposal`,
+  [CharmActionTrigger.ETHDenver24ScavengerHunt]: ({ amount }) =>
+    `Received ${getAmountLabel(amount)} (Eth Denver 24 Scavenger Hunt)`
 };
 
 function getTransactionDescription(transaction: HistoryTransaction) {
   if (transaction.metadata.isReceived) {
-    return (
-      (transaction.metadata.actionTrigger && receivedLabels[transaction.metadata.actionTrigger]) ||
-      'You have received Charms'
-    );
+    const labelFn = transaction.metadata.actionTrigger && receivedLabels[transaction.metadata.actionTrigger];
+
+    return labelFn ? labelFn(transaction) : `Received ${getAmountLabel(transaction.amount)}`;
   }
 
   if (transaction.metadata.recipientName && transaction.metadata.recipientType === 'space') {
-    return `You have applied Charms to ${transaction.metadata.recipientName} space`;
+    return `Applied ${getAmountLabel(transaction.amount)} to ${transaction.metadata.recipientName} space`;
   }
 
-  return 'You have sent Charms';
+  return `Sent ${getAmountLabel(transaction.amount)}`;
+}
+
+function getAmountLabel(amount: number) {
+  return `${amount} Charm${amount !== 1 ? 's' : ''}`;
 }

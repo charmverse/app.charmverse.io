@@ -1,6 +1,5 @@
-import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors/chains';
-
-import { getTimeDifference } from 'lib/utilities/dates';
+import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@root/connectors/chains';
+import { getTimeDifference } from '@root/lib/utils/dates';
 
 import { getPriceFromCoinMarketCap, getPriceFromCryptoCompare } from './dataSources';
 

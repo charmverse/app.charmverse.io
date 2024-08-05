@@ -3,19 +3,20 @@ import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 
 export type MaybeString = string | null | undefined;
 
 // eslint-disable-next-line default-param-last
-export function useGET<T = unknown>(path: string | undefined | null, query: any = {}, swrOptions?: SWRConfiguration) {
+export function useGET<T = unknown>(path: MaybeString, query: any = {}, swrOptions?: SWRConfiguration) {
   const requestUrl = path ? path + getQueryString(query) : null;
   return useSWR<T>(requestUrl, http.GET, swrOptions);
 }
 
-export function useGETImmutable<T = unknown>(path: string | undefined | null, query: any = {}) {
+// eslint-disable-next-line default-param-last
+export function useGETImmutable<T = unknown>(path: MaybeString, query: any = {}, swrOptions?: SWRConfiguration) {
   const requestUrl = path ? path + getQueryString(query) : null;
-  return useSWRImmutable<T>(requestUrl, http.GET);
+  return useSWRImmutable<T>(requestUrl, http.GET, swrOptions);
 }
 
 export function useDELETE<T>(path: string) {
@@ -30,15 +31,19 @@ export function usePOST<T, U = unknown>(path: string) {
   });
 }
 
-export function usePUT<T, U = unknown>(path: string) {
-  return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
-    return http.PUT<U>(url, arg);
-  });
+export function usePUT<T, U = unknown>(path: string, options?: { revalidate?: boolean }) {
+  return useSWRMutation<U, Error, string, T>(
+    path,
+    (url: string, { arg }: { arg: any }) => {
+      return http.PUT<U>(url, arg);
+    },
+    options
+  );
 }
 
 // To be used when you need to trigger a get request on demand
-export function useGETtrigger<T, U = unknown>(path: string) {
-  return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
+export function useGETtrigger<T, U = unknown>(path: MaybeString) {
+  return useSWRMutation<U, Error, string, T>(path || '', (url: string, { arg }: { arg: any }) => {
     const requestUrl = url + getQueryString(arg);
     return http.GET<U>(requestUrl);
   });

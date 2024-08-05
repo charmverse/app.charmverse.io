@@ -5,6 +5,8 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Card,
+  Checkbox,
   Chip,
   IconButton,
   ListItemIcon,
@@ -12,6 +14,7 @@ import {
   Menu,
   MenuItem,
   Stack,
+  Switch,
   TextField,
   Tooltip,
   Typography
@@ -20,13 +23,15 @@ import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/ho
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
+import { VisibilityIcon } from 'components/common/Icons/VisibilityIcon';
 import MultiTabs from 'components/common/MultiTabs';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getDefaultEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
+import { getDefaultEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
 
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
+import { EvaluationNotificationsRow } from './EvaluationNotifications';
 import { EvaluationPermissionsRow } from './EvaluationPermissions';
 import { EvaluationRow } from './EvaluationRow';
 
@@ -75,6 +80,16 @@ export function ProposalWorkflowItem({
 
   function updateWorkflowTitle(title: string) {
     onUpdate({ ...workflow, title });
+    setUnsavedChanges(true);
+  }
+
+  function updateDraftReminder(draftReminder: boolean) {
+    onUpdate({ ...workflow, draftReminder });
+    setUnsavedChanges(true);
+  }
+
+  function updatePrivateEvaluations(privateEvaluations: boolean) {
+    onUpdate({ ...workflow, privateEvaluations });
     setUnsavedChanges(true);
   }
 
@@ -172,66 +187,127 @@ export function ProposalWorkflowItem({
           ) : (
             <Typography color={!workflow.title ? 'secondary' : 'inherit'}>{workflow.title || 'Untitled'}</Typography>
           )}
-          {!readOnly && (
-            <span onClick={(e) => e.stopPropagation()}>
-              <Menu {...bindMenu(popupState)} onClick={popupState.close}>
-                <MenuItem onClick={duplicateWorkflow}>
-                  <ListItemIcon>
-                    <ContentCopyOutlined fontSize='small' />
-                  </ListItemIcon>
-                  <ListItemText>Duplicate</ListItemText>
-                </MenuItem>
-                <Tooltip title={preventDelete ? 'There must be at least one workflow' : ''}>
-                  <span>
-                    <MenuItem onClick={deleteWorkflow} disabled={preventDelete}>
-                      <ListItemIcon>
-                        <DeleteOutlined fontSize='small' />
-                      </ListItemIcon>
-                      <ListItemText>Delete</ListItemText>
-                    </MenuItem>
-                  </span>
-                </Tooltip>
-              </Menu>
-              <Box display='flex' gap={2} alignItems='center'>
-                {!isExpanded && hasUnsavedChanges && (
-                  <Chip variant='outlined' size='small' color='warning' label='unsaved changes' />
-                )}
-                <IconButton size='small' {...bindTrigger(popupState)}>
-                  <MoreHoriz fontSize='small' />
-                </IconButton>
-              </Box>
-            </span>
-          )}
+
+          <Box display='flex' justifyContent='flex-end' alignItems='center'>
+            {!isExpanded && hasUnsavedChanges && (
+              <Chip variant='outlined' size='small' color='warning' label='unsaved changes' sx={{ mr: 1 }} />
+            )}
+            {!readOnly && (
+              <span onClick={(e) => e.stopPropagation()}>
+                <Menu {...bindMenu(popupState)} onClick={popupState.close}>
+                  <MenuItem onClick={duplicateWorkflow}>
+                    <ListItemIcon>
+                      <ContentCopyOutlined fontSize='small' />
+                    </ListItemIcon>
+                    <ListItemText>Duplicate</ListItemText>
+                  </MenuItem>
+                  <Tooltip title={preventDelete ? 'There must be at least one workflow' : ''}>
+                    <span>
+                      <MenuItem onClick={deleteWorkflow} disabled={preventDelete}>
+                        <ListItemIcon>
+                          <DeleteOutlined fontSize='small' />
+                        </ListItemIcon>
+                        <ListItemText>Delete</ListItemText>
+                      </MenuItem>
+                    </span>
+                  </Tooltip>
+                  <Tooltip
+                    title={
+                      workflow.privateEvaluations
+                        ? 'Only reviewers can see all evaluation steps'
+                        : 'All users can see all evaluation steps'
+                    }
+                  >
+                    <span>
+                      <MenuItem
+                        onClick={() => {
+                          updatePrivateEvaluations(!workflow.privateEvaluations);
+                        }}
+                        disabled={preventDelete}
+                      >
+                        <ListItemIcon>
+                          <VisibilityIcon visible={!workflow.privateEvaluations} size='small' />
+                        </ListItemIcon>
+                        <ListItemText>
+                          {workflow.privateEvaluations ? 'Show evaluations' : 'Hide evaluations'}
+                        </ListItemText>
+                      </MenuItem>
+                    </span>
+                  </Tooltip>
+                </Menu>
+                <Box display='flex' gap={2} alignItems='center'>
+                  <IconButton size='small' {...bindTrigger(popupState)}>
+                    <MoreHoriz fontSize='small' />
+                  </IconButton>
+                </Box>
+              </span>
+            )}
+          </Box>
         </Box>
       </AccordionSummary>
       <AccordionDetails>
-        <MultiTabs tabs={['Steps', 'Permissions']}>
+        <MultiTabs tabs={['Steps', 'Permissions', 'Notifications']}>
           {({ value }) => (
             <Box pt={2}>
               {value === 'Steps' &&
-                workflow.evaluations.map((evaluation) => (
+                workflow.evaluations.map((evaluation, index) => (
                   <EvaluationRow
                     key={evaluation.id}
                     evaluation={evaluation}
                     onDelete={deleteEvaluationStep}
                     onDuplicate={duplicateEvaluationStep}
-                    onRename={openEvaluationStep}
+                    onEdit={openEvaluationStep}
                     onChangeOrder={changeEvaluationStepOrder}
                     readOnly={readOnly}
+                    privateEvaluationsEnabled={!!workflow.privateEvaluations}
                   />
                 ))}
               {value === 'Permissions' &&
-                workflow.evaluations.map((evaluation) => (
+                workflow.evaluations.map((evaluation, index) => (
                   <EvaluationPermissionsRow
                     key={evaluation.id}
+                    isFirstEvaluation={index === 0}
                     evaluation={evaluation}
                     onDelete={deleteEvaluationStep}
                     onDuplicate={duplicateEvaluationStep}
-                    onRename={openEvaluationStep}
+                    onEdit={openEvaluationStep}
                     onChange={updateEvaluationStep}
                     readOnly={readOnly}
                   />
                 ))}
+
+              {value === 'Notifications' && (
+                <>
+                  <Card variant='outlined' sx={{ mb: 1 }}>
+                    <Stack p={2}>
+                      <Typography variant='h6' sx={{ flexGrow: 1 }}>
+                        Draft
+                      </Typography>
+                      <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                        <Typography variant='body2' sx={{ flexGrow: 1 }}>
+                          Remind authors to submit their draft after 24 hours
+                        </Typography>
+                        <Switch
+                          checked={!!workflow.draftReminder}
+                          onChange={(e) => updateDraftReminder(e.target.checked)}
+                          disabled={readOnly}
+                        />
+                      </Stack>
+                    </Stack>
+                  </Card>
+                  {workflow.evaluations.map((evaluation, index) => (
+                    <EvaluationNotificationsRow
+                      key={evaluation.id}
+                      evaluation={evaluation}
+                      readOnly={readOnly}
+                      onChange={updateEvaluationStep}
+                      nextEvaluationTitle={
+                        workflow.evaluations.length > index + 1 ? workflow.evaluations[index + 1].title : undefined
+                      }
+                    />
+                  ))}
+                </>
+              )}
 
               <Box display='flex' justifyContent='space-between' alignItems='center'>
                 <Button disabled={readOnly} variant='text' onClick={() => openNewEvaluationStepModal()} height='1px'>
@@ -257,7 +333,12 @@ export function ProposalWorkflowItem({
           )}
         </MultiTabs>
 
-        <EvaluationDialog evaluation={activeEvaluation} onClose={closeEvaluationStep} onSave={updateEvaluationStep} />
+        <EvaluationDialog
+          isFirstEvaluation={workflow.evaluations[0]?.id === activeEvaluation?.id}
+          evaluation={activeEvaluation}
+          onClose={closeEvaluationStep}
+          onSave={updateEvaluationStep}
+        />
       </AccordionDetails>
     </Accordion>
   );

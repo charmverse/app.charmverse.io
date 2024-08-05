@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 
+// We use a special config for ceramic which compiles its dependencies to avoid ESM issues
+
 import * as esbuild from 'esbuild';
 
 esbuild

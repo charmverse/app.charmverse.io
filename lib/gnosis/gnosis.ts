@@ -1,46 +1,19 @@
 import { log } from '@charmverse/core/log';
-import EthersAdapter from '@safe-global/safe-ethers-lib';
+import { getChainById, getChainList } from '@root/connectors/chains';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
-import SafeServiceClient from '@safe-global/safe-service-client';
 import { RateLimit } from 'async-sema';
-import { RPCList, getChainById } from 'connectors/chains';
-import { ethers } from 'ethers';
 import uniqBy from 'lodash/uniqBy';
 import { getAddress } from 'viem';
 import { mantle, mantleTestnet } from 'viem/chains';
 
 import { getMantleSafeData, getMantleSafesByOwner } from './mantleClient';
-import { getSafeApiClient, isSupportedSafeApiChain } from './safe/getSafeApiClient';
+import { getSafeApiClient } from './safe/getSafeApiClient';
+import { isSupportedSafeApiChain } from './safe/isSupportedSafeApiChain';
 
 export type GnosisTransaction = SafeMultisigTransactionListResponse['results'][number];
 
 function getGnosisRPCUrl(chainId: number) {
   return getChainById(chainId)?.gnosisUrl;
-}
-
-interface GetGnosisServiceProps {
-  signer: ethers.Signer | ethers.providers.Provider;
-  chainId?: number;
-  serviceUrl?: string;
-}
-
-export function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
-  const txServiceUrl = serviceUrl || (chainId && getGnosisRPCUrl(chainId));
-  if (!txServiceUrl) {
-    return null;
-  }
-
-  const ethAdapter = new EthersAdapter({
-    ethers,
-    signerOrProvider: signer
-  });
-
-  const safeService = new SafeServiceClient({
-    txServiceUrl,
-    ethAdapter
-  });
-
-  return safeService;
 }
 
 interface GetSafesForAddressProps {
@@ -87,7 +60,7 @@ export async function getSafesForAddress({ chainId, address }: GetSafesForAddres
     if (supported) {
       const rateLimiter = RateLimit(5);
 
-      const apiClient = getSafeApiClient({ chainId });
+      const apiClient = await getSafeApiClient({ chainId });
       return apiClient.getSafesByOwner(checksumAddress).then((userSafesResponse) =>
         Promise.all(
           userSafesResponse.safes.map(async (safeAddr) => {
@@ -102,12 +75,12 @@ export async function getSafesForAddress({ chainId, address }: GetSafesForAddres
   }
 }
 
-export async function getSafesForAddresses(addresses: string[]) {
+export async function getSafesForAddresses(addresses: string[], enableTestnets: boolean) {
   const userSafes: SafeData[] = [];
 
   for (const address of addresses) {
     const safes = await Promise.all(
-      RPCList.map((network) => getSafesForAddress({ chainId: network.chainId, address }))
+      getChainList({ enableTestnets }).map((network) => getSafesForAddress({ chainId: network.chainId, address }))
     ).then((list) => list.flat());
     userSafes.push(...safes);
   }

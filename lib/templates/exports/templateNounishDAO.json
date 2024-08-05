@@ -10670,7 +10670,6 @@
                           "hiddenOptionIds": [],
                           "visibleOptionIds": [],
                           "defaultTemplateId": "",
-                          "collapsedOptionIds": [],
                           "columnCalculations": {},
                           "kanbanCalculations": {},
                           "visiblePropertyIds": [
@@ -12647,7 +12646,6 @@
                           "hiddenOptionIds": [],
                           "visibleOptionIds": [],
                           "defaultTemplateId": "",
-                          "collapsedOptionIds": [],
                           "columnCalculations": {},
                           "kanbanCalculations": {},
                           "visiblePropertyIds": [
@@ -12804,7 +12802,6 @@
                       "hiddenOptionIds": [],
                       "visibleOptionIds": [],
                       "defaultTemplateId": "",
-                      "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
                       "visiblePropertyIds": []
@@ -14406,7 +14403,6 @@
                   "hiddenOptionIds": [],
                   "visibleOptionIds": [],
                   "defaultTemplateId": "",
-                  "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": [
@@ -15838,12 +15834,11 @@
         "id": "ce64b1bf-ecb4-4b3a-b032-fc2f720c537e",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -15916,7 +15911,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -16547,12 +16542,11 @@
         "id": "d7ee618c-eb94-401f-a77e-e7d7d01b22d5",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -16625,7 +16619,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -17323,12 +17317,11 @@
         "id": "f8242c1b-99ca-4f33-86c3-1ad185c1d4a2",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -17401,7 +17394,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -18071,12 +18064,11 @@
         "id": "0e0a615d-ab26-4f8a-9741-09db3f41d27d",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -18149,7 +18141,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -18936,12 +18928,11 @@
         "id": "c2815c44-fc1b-465d-bf85-ff4dd1f12281",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -19014,7 +19005,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -19888,12 +19879,11 @@
         "id": "71dfabd1-3965-4f7a-ae8d-d7b9e768a187",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -19966,7 +19956,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -20731,12 +20721,11 @@
         "id": "1d858293-e4f1-4cda-b39e-ce6eb0845089",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -20809,7 +20798,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -21574,12 +21563,11 @@
         "id": "9cb95e95-3971-401e-bebf-4295f3d06b1e",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "278a443d-e0eb-49ea-ad39-411dea8164b9",
-        "status": "draft",
+        "status": "published",
         "archived": false,
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
@@ -21652,7 +21640,7 @@
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,

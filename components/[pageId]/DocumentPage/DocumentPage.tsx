@@ -1,58 +1,60 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
-import { Box, Tab, Tabs, Typography, useMediaQuery } from '@mui/material';
+import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { useElementSize } from 'usehooks-ts';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FormProvider } from 'react-hook-form';
+import { useResizeObserver } from 'usehooks-ts';
 
-import { useGetReward } from 'charmClient/hooks/rewards';
-import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
-import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import { blockLoad, databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { focusEventName } from 'components/common/CharmEditor/constants';
+import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
+import { makeSelectBoard } from 'components/common/DatabaseEditor/store/boards';
+import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/DatabaseEditor/store/cards';
+import { blockLoad, databaseViewsLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
+import { makeSelectSortedViews } from 'components/common/DatabaseEditor/store/views';
+import { FormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import LoadingComponent from 'components/common/LoadingComponent';
+import { useProposalFormAnswers } from 'components/proposals/hooks/useProposalFormAnswers';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
-import { ProposalFormFieldsInput } from 'components/proposals/ProposalPage/components/ProposalFormFieldsInput';
-import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
-import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
-import { useRewards } from 'components/rewards/hooks/useRewards';
+import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
+import { RewardStickyFooter } from 'components/rewards/components/RewardStickyFooter';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';
 import { PageComments } from './components/CommentsFooter/PageComments';
+import { ConnectionErrorBanner } from './components/ConnectionErrorBanner';
 import PageBanner from './components/PageBanner';
-import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import { PageEditorContainer } from './components/PageEditorContainer';
 import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { PageTitleInput } from './components/PageTitleInput';
-import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
+import { ProposalNotesBanner } from './components/ProposalNotesBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { SyncedPageBanner } from './components/SyncedPageBanner';
 import type { IPageSidebarContext } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
+import { useReward } from './hooks/useReward';
 
 export const defaultPageTop = 56; // we need to add some room for the announcement banner and other banners
 
@@ -68,6 +70,8 @@ export type DocumentPageProps = {
   setEditorState?: (state: EditorState) => void;
   sidebarView?: IPageSidebarContext['activeView'];
   setSidebarView?: IPageSidebarContext['setActiveView'];
+  showCard?: (cardId: string | null) => void;
+  showParentChip?: boolean;
 };
 
 function DocumentPageComponent({
@@ -77,82 +81,110 @@ function DocumentPageComponent({
   readOnly = false,
   setEditorState,
   sidebarView,
-  setSidebarView
+  setSidebarView,
+  showCard,
+  showParentChip
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
-  const { getFeatureTitle } = useSpaceFeatures();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const { setView: setCharmEditorView } = useCharmEditorView();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const dispatch = useAppDispatch();
   const [currentTab, setCurrentTab] = useState<number>(0);
-  const [containerRef, { width: containerWidth }] = useElementSize();
-  const { creatingInlineReward } = useRewards();
   const isMdScreen = useMdScreen();
   const isAdmin = useIsAdmin();
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
+  const rewardId = page.bountyId;
+  const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
+  const {
+    proposal,
+    refreshProposal,
+    onChangeEvaluation,
+    onChangeTemplate,
+    onChangeWorkflow,
+    onChangeRewardSettings,
+    onChangeSelectedCredentialTemplates
+  } = useProposal({
     proposalId
+  });
+
+  const {
+    control,
+    formFields,
+    getFieldState,
+    applyProject,
+    applyProjectMembers,
+    isLoadingAnswers,
+    projectForm,
+    onSave,
+    refreshProposalFormAnswers
+  } = useProposalFormAnswers({
+    proposal
+  });
+
+  const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
+    rewardId
   });
 
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly || !!proposal?.archived;
 
   const card = useAppSelector((state) => {
-    if (page?.type !== 'card' && page?.type !== 'card_template') {
+    if (page?.type !== 'card' && page?.type !== 'card_template' && page?.type !== 'card_synced') {
       return null;
     }
     return state.cards.cards[page.id] ?? state.cards.templates[page.id];
   });
 
-  const board = useAppSelector((state) => {
-    if (!card) {
-      return null;
-    }
+  const selectBoard = useMemo(makeSelectBoard, []);
+  const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
+  const selectSortedViews = useMemo(makeSelectSortedViews, []);
+  const board = useAppSelector((state) => selectBoard(state, card?.parentId ?? ''));
+  const boardViews = useAppSelector((state) => selectSortedViews(state, board?.id || ''));
+  const currentViewId = router.query.viewId as string | undefined;
+  const activeView = boardViews.find((view) => view.id === currentViewId);
+  const cards = useAppSelector((state) =>
+    selectViewCardsSortedFilteredAndGrouped(state, {
+      boardId: board?.id || '',
+      viewId: ''
+    })
+  );
 
-    return state.boards.boards[card.parentId];
-  });
-
-  const cards = useAppSelector((state) => {
-    return board
-      ? [...Object.values(state.cards.cards), ...Object.values(state.cards.templates)].filter(
-          (c) => c.parentId === board.id
-        )
-      : [];
-  });
-
-  const boardViews = useAppSelector((state) => {
-    if (board) {
-      return Object.values(state.views.views).filter((view) => view.parentId === board.id);
-    }
-    return [];
-  });
-
-  const activeBoardView = boardViews[0];
-
-  const showPageBanner = page.type !== 'proposal' && page.type !== 'proposal_template';
+  const showPageBanner =
+    page.type !== 'proposal' &&
+    page.type !== 'proposal_template' &&
+    page.type !== 'proposal_notes' &&
+    page.type !== 'bounty' &&
+    page.type !== 'bounty_template';
   const pageTop = showPageBanner ? getPageTop(page) : defaultPageTop;
 
   const { threads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
   // Check if we are on the rewards page, as parent chip is only shown on rewards page
   const isRewardsPage = router.pathname === '/[domain]/rewards';
-  const showParentChip = !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
-  const { data: reward } = useGetReward({ rewardId: page.bountyId });
+  const _showParentChip =
+    showParentChip ?? !!(page.type === 'card' && rewardId && card?.parentId && insideModal && isRewardsPage);
+
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
-  const hideCardDetails = isRewardsPage && page.bountyId;
+  const hideCardDetails = isRewardsPage && rewardId;
 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
   const isPageTemplate = page.type.includes('template');
 
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
 
-  const isStructuredProposal = Boolean(proposal && proposal.formId);
+  const isStructuredProposal = Boolean(proposal?.formId);
   const isUnpublishedProposal = proposal?.status === 'draft' || page.type === 'proposal_template';
+  const readOnlyTitle =
+    readOnly ||
+    !!enableSuggestingMode ||
+    !!page.syncWithPageId ||
+    !!proposal?.archived ||
+    page.type === 'proposal_notes';
 
   // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
   const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content + !!proposal?.archived;
@@ -160,6 +192,26 @@ function DocumentPageComponent({
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
+
+  const _showCard = useCallback(
+    async (cardId: string | null) => {
+      if (showCard) {
+        showCard(cardId);
+      } else {
+        if (cardId === null) {
+          updateURLQuery({ cardId: null });
+          return;
+        }
+
+        if (insideModal) {
+          updateURLQuery({ viewId: router.query.viewId as string, cardId });
+        } else {
+          navigateToSpacePath(`/${cardId}`);
+        }
+      }
+    },
+    [router.query, showCard]
+  );
 
   function onConnectionEvent(event: ConnectionEvent) {
     if (event.type === 'error') {
@@ -208,6 +260,8 @@ function DocumentPageComponent({
     }
   }, [printRef, _printRef]);
 
+  const containerWidthRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
     // TODO: use a ref passed down instead
@@ -217,290 +271,316 @@ function DocumentPageComponent({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
 
   return (
-    <Box ref={containerRef} id='file-drop-container' display='flex' flexDirection='column' height='100%'>
-      <Box
-        ref={printRef}
-        className={`document-print-container ${fontClassName} drag-area-container`}
-        display='flex'
-        flexDirection='column'
-        flexGrow={1}
-        overflow='auto'
-        onDrop={handleImageFileDrop({
-          pageId: page.id,
-          readOnly,
-          parentElementId: 'file-drop-container'
-        })}
-      >
-        {/* show either deleted banner or archived, but not both */}
-        {page?.deletedAt ? (
-          <AlertContainer>
-            <PageDeleteBanner pageType={page.type} pageId={page.id} />
-          </AlertContainer>
-        ) : (
-          !!proposal?.archived && (
-            <AlertContainer>
-              <ProposalArchivedBanner proposalId={proposal.id} disabled={!proposal.permissions.delete} />
-            </AlertContainer>
-          )
-        )}
-        {connectionError && (
-          <AlertContainer>
-            <PageConnectionBanner />
-          </AlertContainer>
-        )}
-        {page?.convertedProposalId && (
-          <AlertContainer>
-            <ProposalBanner type='page' proposalId={page.convertedProposalId} />
-          </AlertContainer>
-        )}
-        {board?.fields.sourceType && (
-          <AlertContainer>
-            <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
-          </AlertContainer>
-        )}
-        <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
-        {/* temporary? disable editing of page meta data when in suggestion mode */}
-        {page.headerImage && (
-          <PageBanner headerImage={page.headerImage} readOnly={readOnly || !!enableSuggestingMode} setPage={savePage} />
-        )}
-        <PageEditorContainer
-          data-test='page-charmeditor'
-          className={fontFamilyClassName}
-          top={pageTop}
-          fullWidth={isSmallScreen || (page.fullWidth ?? false)}
+    <Box id='file-drop-container' display='flex' flexDirection='column' height='100%'>
+      <FormProvider {...projectForm}>
+        <Box
+          ref={printRef}
+          className={`document-print-container ${fontClassName} drag-area-container`}
+          display='flex'
+          flexDirection='column'
+          flexGrow={1}
+          overflow='auto'
+          onDrop={handleImageFileDrop({
+            pageId: page.id,
+            readOnly,
+            parentElementId: 'file-drop-container'
+          })}
         >
-          {/* temporary? disable editing of page title when in suggestion mode */}
-          {showPageBanner ? (
-            <PageHeader
+          {/** we need a reference for width to handle inline dbs */}
+          <Box ref={containerWidthRef} width='100%' />
+          {/* show either deleted banner or archived, but not both */}
+          {page.deletedAt && (
+            <AlertContainer>
+              <PageDeleteBanner pageType={page.type} pageId={page.id} />
+            </AlertContainer>
+          )}
+          {connectionError && (
+            <AlertContainer>
+              <ConnectionErrorBanner />
+            </AlertContainer>
+          )}
+          {page.convertedProposalId && (
+            <AlertContainer>
+              <ProposalBanner type='page' proposalId={page.convertedProposalId} />
+            </AlertContainer>
+          )}
+          {(board?.fields.sourceType === 'proposals' || board?.fields.sourceType === 'rewards') && (
+            <AlertContainer>
+              <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
+            </AlertContainer>
+          )}
+          {page.type === 'proposal_notes' && (
+            <AlertContainer>
+              <ProposalNotesBanner />
+            </AlertContainer>
+          )}
+          <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
+          {/* temporary? disable editing of page meta data when in suggestion mode */}
+          {page.headerImage && (
+            <PageBanner
               headerImage={page.headerImage}
-              // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
-              key={page.id}
-              icon={page.icon}
-              title={page.title}
-              updatedAt={page.updatedAt.toString()}
               readOnly={readOnly || !!enableSuggestingMode}
               setPage={savePage}
-              readOnlyTitle={!!page.syncWithPageId}
-              parentId={showParentChip ? card.parentId : null}
-              insideModal={insideModal}
-              pageId={page.id}
-              focusDocumentEditor={focusDocumentEditor}
-            />
-          ) : (
-            <PageTitleInput
-              key={page.id}
-              value={page.title}
-              focusDocumentEditor={focusDocumentEditor}
-              updatedAt={page.updatedAt.toString()}
-              onChange={(updates) => savePage(updates as { title: string; updatedAt: any })}
-              readOnly={readOnly || !!enableSuggestingMode || !!page.syncWithPageId || !!proposal?.archived}
             />
           )}
-          {proposalId && !isMdScreen && (
-            <Tabs
-              sx={{
-                mb: 1
-              }}
-              indicatorColor='primary'
-              value={currentTab}
-            >
-              <Tab label='Document' value={0} onClick={() => setCurrentTab(0)} />
-              <Tab
-                sx={{
-                  px: 1.5,
-                  fontSize: 14,
-                  minHeight: 0
-                  // '&.MuiTab-root': {
-                  //   color: 'palette.secondary.main'
-                  // }
-                }}
-                label='Evaluation'
-                value={1}
-                onClick={() => setCurrentTab(1)}
+          <PageEditorContainer
+            data-test='page-charmeditor'
+            className={fontFamilyClassName}
+            top={pageTop}
+            fullWidth={isSmallScreen || (page.fullWidth ?? false)}
+          >
+            {/* temporary? disable editing of page title when in suggestion mode */}
+            {showPageBanner ? (
+              <PageHeader
+                headerImage={page.headerImage}
+                // Commented for now, as we need to preserve cursor position between re-renders caused by updating this
+                key={page.id}
+                icon={page.icon}
+                title={page.title}
+                updatedAt={page.updatedAt.toString()}
+                readOnly={readOnly || !!enableSuggestingMode}
+                setPage={savePage}
+                readOnlyTitle={!!page.syncWithPageId}
+                parentId={_showParentChip && card ? card.parentId : null}
+                insideModal={insideModal}
+                pageId={page.id}
+                githubIssueUrl={reward?.githubIssueUrl}
+                focusDocumentEditor={focusDocumentEditor}
               />
-            </Tabs>
-          )}
-          {currentTab === 1 && (
-            <ProposalEvaluations
-              pagePath={page.path}
-              pageTitle={page.title}
-              pageId={page.id}
-              isUnpublishedProposal={isUnpublishedProposal}
-              readOnlyProposalPermissions={!proposal?.permissions.edit}
-              isProposalTemplate={page.type === 'proposal_template'}
-              isReviewer={proposal?.permissions.evaluate}
-              isStructuredProposal={isStructuredProposal}
-              proposal={proposal}
-              proposalInput={proposal}
-              templateId={proposal?.page?.sourceTemplateId}
-              onChangeEvaluation={onChangeEvaluation}
-              refreshProposal={refreshProposal}
-              onChangeWorkflow={onChangeWorkflow}
-            />
-          )}
+            ) : (
+              <PageTitleInput
+                key={page.id}
+                value={page.title}
+                focusDocumentEditor={focusDocumentEditor}
+                updatedAt={page.updatedAt.toString()}
+                onChange={(updates) => savePage(updates as { title: string; updatedAt: any })}
+                readOnly={readOnlyTitle}
+              />
+            )}
+            {(proposalId || rewardId) && !isMdScreen && (
+              <Tabs
+                sx={{
+                  mb: 1
+                }}
+                indicatorColor='primary'
+                value={currentTab}
+              >
+                <Tab label='Document' value={0} onClick={() => setCurrentTab(0)} />
+                <Tab
+                  sx={{
+                    px: 1.5,
+                    fontSize: 14,
+                    minHeight: 0
+                    // '&.MuiTab-root': {
+                    //   color: 'palette.secondary.main'
+                    // }
+                  }}
+                  label='Evaluation'
+                  value={1}
+                  onClick={() => setCurrentTab(1)}
+                />
+              </Tabs>
+            )}
+            {currentTab === 1 &&
+              (page.type === 'proposal_template' || page.type === 'proposal' ? (
+                <ProposalEvaluations
+                  pageLensPostLink={page.lensPostLink}
+                  pagePath={page.path}
+                  pageTitle={page.title}
+                  pageId={page.id}
+                  isUnpublishedProposal={isUnpublishedProposal}
+                  readOnlyProposalPermissions={!proposal?.permissions.edit}
+                  isProposalTemplate={page.type === 'proposal_template'}
+                  isStructuredProposal={isStructuredProposal}
+                  proposal={proposal}
+                  proposalInput={proposal}
+                  templateId={proposal?.page?.sourceTemplateId}
+                  expanded
+                  onChangeEvaluation={onChangeEvaluation}
+                  onChangeTemplate={onChangeTemplate}
+                  refreshProposal={refreshProposal}
+                  onChangeWorkflow={onChangeWorkflow}
+                  onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
+                />
+              ) : page.type === 'bounty' || page.type === 'bounty_template' ? (
+                <RewardEvaluations
+                  isTemplate={page.type === 'bounty_template'}
+                  templateId={page.sourceTemplateId}
+                  isDraft={reward?.status === 'draft'}
+                  reward={reward}
+                  readOnly={readOnly}
+                  refreshReward={refreshReward}
+                  page={page}
+                  rewardInput={reward}
+                  expanded
+                  onChangeReward={updateReward}
+                  onChangeWorkflow={onChangeRewardWorkflow}
+                />
+              ) : null)}
 
-          {currentTab === 0 && (
-            <>
-              <CardPropertiesWrapper>
-                {/* Property list */}
-                {card && board && !hideCardDetails && (
-                  <>
+            {currentTab === 0 && (
+              <>
+                <CardPropertiesWrapper>
+                  {/* Property list */}
+                  {card && board && !hideCardDetails && (
                     <CardDetailProperties
                       syncWithPageId={page.syncWithPageId}
                       board={board}
                       card={card}
+                      activeView={activeView}
+                      showCard={_showCard}
                       cards={cards}
-                      activeView={activeBoardView}
                       views={boardViews}
                       readOnly={readOnly}
                       pageUpdatedAt={page.updatedAt.toString()}
                       pageUpdatedBy={page.updatedBy}
+                      disableEditPropertyOption={!!board.isLocked}
                     />
-                    <AddBountyButton readOnly={readOnly} cardId={page.id} />
-                  </>
-                )}
-                {proposalId && (
-                  <ProposalProperties
-                    pageId={page.id}
-                    proposalId={proposalId}
-                    readOnly={readonlyProposalProperties}
-                    proposalPage={page}
-                    proposal={proposal}
-                    refreshProposal={refreshProposal}
-                  />
-                )}
-                {reward && (
-                  <RewardProperties
-                    reward={reward}
-                    pageId={page.id}
-                    pagePath={page.path}
-                    readOnly={readOnly}
-                    showApplications
-                    expandedRewardProperties
-                    templateId={page.sourceTemplateId || undefined}
-                    isTemplate={page.type === 'bounty_template'}
-                  />
-                )}
-                {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
-              </CardPropertiesWrapper>
-              {proposal && proposal.formId ? (
-                <Box mb={10}>
-                  {page.type === 'proposal_template' ? (
+                  )}
+                  {proposalId && (
+                    <ProposalProperties
+                      pageId={page.id}
+                      proposalId={proposalId}
+                      readOnly={readonlyProposalProperties}
+                      proposalPage={page}
+                      proposal={proposal}
+                      refreshProposal={refreshProposal}
+                    />
+                  )}
+                  {reward && (
+                    <RewardProperties
+                      reward={reward}
+                      pageId={page.id}
+                      pagePath={page.path}
+                      readOnly={readOnly}
+                      showApplications
+                      expandedRewardProperties={false}
+                      templateId={page.sourceTemplateId || undefined}
+                      isTemplate={page.type === 'bounty_template'}
+                    />
+                  )}
+                </CardPropertiesWrapper>
+                {proposal && proposal.formId ? (
+                  page.type === 'proposal_template' ? (
                     <FormFieldsEditor
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                       proposalId={proposal.id}
-                      formFields={proposal?.form.formFields ?? []}
+                      expandFieldsByDefault={proposal.status === 'draft'}
+                      formFields={proposal.form?.formFields ?? []}
                     />
                   ) : (
-                    <ProposalFormFieldsInput
-                      pageId={page.id}
-                      isReviewer={(proposal?.permissions.evaluate || proposal?.permissions.review) ?? false}
-                      proposalId={proposal.id}
-                      formFields={proposal?.form.formFields ?? []}
-                      readOnly={!user || !pagePermissions.edit_content || !!proposal?.archived}
-                      threads={threads}
-                      isDraft={proposal?.status === 'draft'}
-                    />
-                  )}
-                </Box>
-              ) : (
-                <CharmEditor
-                  placeholderText={
-                    page.type === 'bounty' || page.type === 'bounty_template'
-                      ? `Describe the reward. Type '/' to see the list of available commands`
-                      : undefined
-                  }
-                  key={editorKey}
-                  content={page.content as PageContent}
-                  readOnly={readOnly || !!page.syncWithPageId || !!proposal?.archived}
-                  autoFocus={false}
-                  sidebarView={sidebarView}
-                  setSidebarView={setSidebarView}
-                  pageId={page.id}
-                  disablePageSpecificFeatures={isSharedPage}
-                  enableSuggestingMode={enableSuggestingMode}
-                  enableVoting={page.type !== 'proposal'}
-                  enableComments={enableComments}
-                  containerWidth={containerWidth}
-                  pageType={page.type}
-                  pagePermissions={pagePermissions ?? undefined}
-                  onConnectionEvent={onConnectionEvent}
-                  setEditorState={setEditorState}
-                  onParticipantUpdate={onParticipantUpdate}
-                  setCharmEditorView={setCharmEditorView}
-                  style={{
-                    // 5 lines
-                    minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
-                  }}
-                  disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
-                  allowClickingFooter={true}
-                  threadIds={threadIds}
-                />
-              )}
-
-              {isStructuredProposal && proposal?.fields?.enableRewards && (
-                <>
-                  <Box my={1}>
-                    <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
-                  </Box>
-                  <ProposalRewards
-                    pendingRewards={proposal.fields.pendingRewards || []}
-                    requiredTemplateId={proposal.fields.rewardsTemplateId}
-                    reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
-                    assignedSubmitters={proposal.authors.map((a) => a.userId)}
-                    variant='solid_button'
-                    readOnly={!proposal.permissions.edit}
-                    rewardIds={proposal.rewardIds || []}
-                    onSave={(pendingReward) => {
-                      const isExisting = proposal.fields?.pendingRewards?.find(
-                        (r) => r.draftId === pendingReward.draftId
-                      );
-                      if (!isExisting) {
-                        onChangeRewardSettings({
-                          pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
-                        });
-
-                        return;
-                      }
-
-                      onChangeRewardSettings({
-                        pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
-                          if (draft.draftId === pendingReward.draftId) {
-                            return pendingReward;
+                    <LoadingComponent isLoading={isLoadingAnswers}>
+                      <FormFieldAnswers
+                        milestoneProps={{
+                          containerWidth,
+                          pendingRewards: proposal.fields?.pendingRewards || [],
+                          requiredTemplateId: proposal.fields?.rewardsTemplateId,
+                          reviewers: proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat(),
+                          assignedSubmitters: proposal.authors.map((a) => a.userId),
+                          readOnly: !proposal.permissions.edit,
+                          rewardIds: proposal.rewardIds || [],
+                          onSave: (pendingReward) => {
+                            const isExisting = proposal.fields?.pendingRewards?.find(
+                              (r) => r.draftId === pendingReward.draftId
+                            );
+                            if (!isExisting) {
+                              onChangeRewardSettings({
+                                pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                              });
+                            } else {
+                              onChangeRewardSettings({
+                                pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
+                                  if (draft.draftId === pendingReward.draftId) {
+                                    return pendingReward;
+                                  }
+                                  return draft;
+                                })
+                              });
+                            }
+                            refreshProposalFormAnswers();
+                          },
+                          onDelete: (draftId: string) => {
+                            onChangeRewardSettings({
+                              pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
+                                (draft) => draft.draftId !== draftId
+                              )
+                            });
                           }
-                          return draft;
-                        })
-                      });
+                        }}
+                        control={control}
+                        disabled={!proposal.permissions.edit}
+                        enableComments={proposal.permissions.comment}
+                        formFields={formFields}
+                        getFieldState={getFieldState}
+                        onSave={onSave}
+                        pageId={page.id}
+                        threads={threads}
+                        // This is required to reinstate the form field state after the proposal is published, necessary to show the correct project id
+                        key={proposal?.status === 'draft' ? 'draft' : 'published'}
+                        projectId={proposal.projectId}
+                        proposalId={proposal.id}
+                        applyProject={applyProject}
+                        applyProjectMembers={applyProjectMembers}
+                      />
+                    </LoadingComponent>
+                  )
+                ) : (
+                  <CharmEditor
+                    placeholderText={
+                      (page.type === 'bounty' || page.type === 'bounty_template') && !readOnly
+                        ? `Type '/' to see the list of available commands`
+                        : undefined
+                    }
+                    key={editorKey}
+                    content={page.content as PageContent}
+                    readOnly={readOnly || !!page.syncWithPageId || !!proposal?.archived}
+                    autoFocus={false}
+                    sidebarView={sidebarView}
+                    setSidebarView={setSidebarView}
+                    pageId={page.id}
+                    disablePageSpecificFeatures={isSharedPage}
+                    enableSuggestingMode={enableSuggestingMode}
+                    enableVoting={page.type !== 'proposal'}
+                    enableComments={enableComments}
+                    containerWidth={containerWidth}
+                    pageType={page.type}
+                    pagePermissions={pagePermissions ?? undefined}
+                    onConnectionEvent={onConnectionEvent}
+                    setEditorState={setEditorState}
+                    onParticipantUpdate={onParticipantUpdate}
+                    setCharmEditorView={setCharmEditorView}
+                    style={{
+                      // 5 lines
+                      minHeight: proposalId || page?.type.includes('card') ? '150px' : 'unset'
                     }}
-                    onDelete={(draftId: string) => {
-                      onChangeRewardSettings({
-                        pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
-                          (draft) => draft.draftId !== draftId
-                        )
-                      });
-                    }}
+                    disableNestedPages={page?.type === 'proposal' || page?.type === 'proposal_template'}
+                    allowClickingFooter={true}
+                    threadIds={threadIds}
                   />
-                </>
-              )}
+                )}
 
-              {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
-                <Box>
-                  {/* add negative margin to offset height of .charm-empty-footer */}
-                  <PageComments page={page} canCreateComments={pagePermissions.comment} />
-                </Box>
-              )}
-            </>
-          )}
-        </PageEditorContainer>
-      </Box>
-      {page.type === 'proposal' && proposal?.status === 'draft' && (
-        <ProposalStickyFooter
-          page={page}
-          proposal={proposal}
-          isStructuredProposal={isStructuredProposal}
-          refreshProposal={refreshProposal}
-        />
-      )}
+                {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
+                  <Box className='dont-print-me'>
+                    {/* add negative margin to offset height of .charm-empty-footer */}
+                    <PageComments page={page} canComment={pagePermissions.comment} />
+                  </Box>
+                )}
+              </>
+            )}
+          </PageEditorContainer>
+        </Box>
+        {proposal?.status === 'draft' && (
+          <ProposalStickyFooter
+            page={page}
+            proposal={proposal}
+            formAnswersControl={control}
+            isStructuredProposal={isStructuredProposal}
+          />
+        )}
+        {(page.type === 'bounty' || page.type === 'bounty_template') && reward?.status === 'draft' && (
+          <RewardStickyFooter page={page} reward={reward} refreshReward={refreshReward} />
+        )}
+      </FormProvider>
     </Box>
   );
 }

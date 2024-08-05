@@ -1,9 +1,8 @@
 import { Stack, Typography } from '@mui/material';
-import { type ReactNode } from 'react';
-import useSWRMutation from 'swr/mutation';
+import type { LoggedInUser } from '@root/models';
+import dynamic from 'next/dynamic';
 
-import charmClient from 'charmClient';
-import { Button } from 'components/common/Button';
+import { useAddUserWallets } from 'charmClient/hooks/profile';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { WalletSign } from 'components/login/components/WalletSign';
 import { TelegramLoginIframe } from 'components/settings/account/components/TelegramLoginIframe';
@@ -12,44 +11,22 @@ import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
-import type { AuthSig } from 'lib/blockchain/interfaces';
+import { useAccount } from 'hooks/wagmi';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { shortenHex } from 'lib/utilities/blockchain';
-import type { LoggedInUser } from 'models';
+import { shortenHex } from 'lib/utils/blockchain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useRequiredMemberProperties } from '../../members/hooks/useRequiredMemberProperties';
 
-function ConnectedAccount({
-  icon,
-  label,
-  required,
-  disabled,
-  children,
-  onClick,
-  loading
-}: {
-  required: boolean;
-  label: string;
-  icon: ReactNode;
-  disabled?: boolean;
-  children?: ReactNode;
-  onClick?: VoidFunction;
-  loading?: boolean;
-}) {
-  return (
-    <Stack gap={1} minWidth={275} width='fit-content'>
-      <FieldWrapper label={label} required={required}>
-        <Button loading={loading} onClick={onClick} color='secondary' variant='outlined' disabled={disabled}>
-          <Stack flexDirection='row' alignItems='center' justifyContent='space-between' width='100%' gap={2}>
-            {children}
-            {!loading ? icon : null}
-          </Stack>
-        </Button>
-      </FieldWrapper>
-    </Stack>
-  );
-}
+import { ConnectedAccount } from './ConnectedAccount';
+
+const FarcasterConnect = dynamic(
+  () => import('./FarcasterConnect').then((module) => module.FarcasterConnectWithProvider),
+  {
+    ssr: false
+  }
+);
 
 function DiscordAccountConnect({
   isDiscordRequired,
@@ -93,16 +70,19 @@ function WalletConnect({
   setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
   const { updateUser } = useUser();
+  const { trigger: signSuccessTrigger, isMutating: isVerifyingWallet } = useAddUserWallets();
+  const { address } = useAccount();
 
-  const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
-    '/profile/add-wallets',
-    (_url, { arg }: Readonly<{ arg: AuthSig }>) => charmClient.addUserWallets([arg]),
-    {
-      onSuccess(data) {
-        updateUser(data);
+  const signSuccess = async (payload: SignatureVerificationPayload) => {
+    await signSuccessTrigger(
+      { ...payload, address: address as string },
+      {
+        onSuccess(data) {
+          updateUser(data);
+        }
       }
-    }
-  );
+    );
+  };
 
   return connectedWallet ? (
     <ConnectedAccount
@@ -220,17 +200,19 @@ export function ConnectedAccounts({
   user: LoggedInUser;
   setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
-  const { isGoogleRequired, isDiscordRequired, isWalletRequired, isTelegramRequired } = useRequiredMemberProperties({
-    userId: user.id
-  });
+  const { isGoogleRequired, isDiscordRequired, isWalletRequired, isTelegramRequired, isFarcasterRequired } =
+    useRequiredMemberProperties({
+      userId: user.id
+    });
 
   const connectedGoogleAccount = user.googleAccounts?.[0];
   const connectedDiscordAccount = user.discordUser;
   const connectedTelegramAccount = user.telegramUser;
   const connectedWallet = user.wallets?.[0];
+  const connectedFarcaster = user.farcasterUser;
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1.5}>
       <DiscordAccountConnect
         setIsOnboardingModalOpen={setIsOnboardingModalOpen}
         isDiscordRequired={isDiscordRequired}
@@ -251,6 +233,7 @@ export function ConnectedAccounts({
         isWalletRequired={isWalletRequired}
         connectedWallet={connectedWallet}
       />
+      <FarcasterConnect isFarcasterRequired={isFarcasterRequired} connectedFarcasterAccount={connectedFarcaster} />
     </Stack>
   );
 }

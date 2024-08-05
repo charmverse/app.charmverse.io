@@ -1,5 +1,5 @@
 import { blockquote } from '@bangle.dev/base-components';
-import { chainCommands } from '@bangle.dev/pm';
+import { chainCommands } from 'prosemirror-commands';
 
 import * as heading from '../heading';
 import * as listItem from '../listItemNew/commands';

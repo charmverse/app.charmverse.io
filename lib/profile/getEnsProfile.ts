@@ -1,17 +1,16 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getENSDetails } from 'lib/blockchain';
+import { getENSDetails } from '@root/lib/blockchain/getENSName';
 
 export type EnsProfile = {
   ensname: string | null;
-  description?: string;
+  description?: string | null;
   avatar?: string | null;
-  discord?: string;
-  github?: string;
-  twitter?: string;
-  reddit?: string;
-  linkedin?: string;
-  emails?: string;
+  discord?: string | null;
+  github?: string | null;
+  twitter?: string | null;
+  reddit?: string | null;
+  linkedin?: string | null;
+  emails?: string | null;
 };
 
 export async function getEnsProfile({ userId }: { userId: string }) {
@@ -34,10 +33,10 @@ export async function getEnsProfile({ userId }: { userId: string }) {
 
   for (const wallet of userWallets) {
     const ensDetails = await getENSDetails(wallet.ensname);
-    if (ensDetails) {
+    if (ensDetails && wallet.ensname) {
       ensProfile = {
         ...ensDetails,
-        ensname: wallet.ensname
+        ensname: wallet.ensname || ''
       };
     }
   }

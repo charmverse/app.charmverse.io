@@ -7,7 +7,7 @@ import { Button } from 'components/common/Button';
 import { VotesWrapper } from 'components/common/CharmEditor/components/inlineVote/components/VotesWrapper';
 import Loader from 'components/common/LoadingComponent';
 import { useDateFormatter } from 'hooks/useDateFormatter';
-import { percent } from 'lib/utilities/numbers';
+import { percent } from 'lib/utils/numbers';
 
 import { useSnapshotVoting } from '../hooks/useSnapshotVoting';
 

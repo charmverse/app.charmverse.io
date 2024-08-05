@@ -1,4 +1,4 @@
-import { stringToHumanFormat } from 'lib/metrics/mixpanel/utils';
+import { stringToHumanFormat } from '@root/lib/metrics/mixpanel/utils';
 
 import type { SignupEvent } from './client';
 import { isEnabled, sendEvent } from './client';

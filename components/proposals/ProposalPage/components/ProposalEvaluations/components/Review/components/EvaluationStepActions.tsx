@@ -1,17 +1,18 @@
 import { Edit as EditIcon } from '@mui/icons-material';
 import { Box, IconButton, Tooltip } from '@mui/material';
 
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import { ResetResultButton } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Review/components/ResetResultButton';
+import type { PopulatedEvaluation, ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
-import type { ProposalEvaluationValues } from '../../Settings/components/EvaluationStepSettings';
-
+import { EditStepButton } from './EditStepButton';
 import { GoBackButton } from './GoBackButton';
 
 type Props = {
   proposalId?: string;
   permissions?: ProposalWithUsersAndRubric['permissions'];
-  evaluation?: ProposalEvaluationValues;
+  evaluation?: PopulatedEvaluation;
   isPreviousStep: boolean;
+  isCurrentStep: boolean;
   refreshProposal?: VoidFunction;
   openSettings?: () => void;
   archived?: boolean;
@@ -24,12 +25,22 @@ export function EvaluationStepActions({
   permissions,
   evaluation,
   isPreviousStep,
+  isCurrentStep,
   openSettings,
   refreshProposal,
   archived
 }: Props) {
   return (
     <Box display='flex' gap={1} onClick={preventAccordionToggle}>
+      {isCurrentStep && !!evaluation?.result && (
+        <ResetResultButton
+          evaluation={evaluation}
+          proposalId={proposalId}
+          onSubmit={refreshProposal}
+          archived={archived}
+          hasMovePermission={!!permissions?.move}
+        />
+      )}
       {isPreviousStep && refreshProposal && proposalId && (
         <GoBackButton
           proposalId={proposalId}
@@ -41,16 +52,12 @@ export function EvaluationStepActions({
       )}
 
       {evaluation && !archived && (
-        <Tooltip
-          disableInteractive
-          title={!permissions?.edit ? 'You do not have permission to edit this evaluation' : 'Edit'}
-        >
-          <span className='show-on-hover' style={{ opacity: !evaluation ? 0 : undefined }}>
-            <IconButton color='secondary' disabled={!permissions?.edit} size='small' onClick={() => openSettings?.()}>
-              <EditIcon fontSize='small' />
-            </IconButton>
-          </span>
-        </Tooltip>
+        <EditStepButton
+          readOnlyTooltip='You do not have permission to edit this evaluation'
+          readOnly={!permissions?.edit}
+          hidden={!evaluation}
+          onClick={openSettings}
+        />
       )}
     </Box>
   );

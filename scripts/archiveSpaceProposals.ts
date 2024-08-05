@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { archiveProposals } from 'lib/proposal/archiveProposals';
+import { archiveProposals } from 'lib/proposals/archiveProposals';
 import { createBotUser } from 'lib/spaces/createBotUser';
 
 const spaceDomain = '';

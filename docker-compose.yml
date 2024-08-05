@@ -76,6 +76,86 @@ services:
     profiles:
       - stg-ceramic
 
+  prd-connect:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npx react-env --path .env --dest ./apps/connect/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/connect --keepAliveTimeout 70000'
+      ]
+    profiles:
+      - prd-connect
+
+  stg-connect:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/connect/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/connect --keepAliveTimeout 70000'
+      ]
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-connect
+
+  prd-connect-api:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'npm run connect-api:start:prod']
+    ports:
+      - '80:3000'
+    profiles:
+      - prd-connect-api
+
+  stg-connect-api:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'npm run connect-api:start:prod']
+    environment:
+      - REACT_APP_APP_ENV=staging
+    ports:
+      - '4000:3000'
+    profiles:
+      - stg-connect
+
+  prd-sunnyawards:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npx react-env --path .env --dest ./apps/sunnyawards/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/sunnyawards --keepAliveTimeout 70000'
+      ]
+    profiles:
+      - prd-sunnyawards
+
+  stg-sunnyawards:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/sunnyawards/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/sunnyawards --keepAliveTimeout 70000'
+      ]
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-sunnyawards
+
   prd-ceramic:
     extends:
       service: defaults
@@ -102,6 +182,7 @@ services:
       - '3002:3000'
     environment:
       - REACT_APP_APP_ENV=staging
+      - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
       - stg-sockets
       - stg-webapp
@@ -170,4 +251,6 @@ services:
       - prd-cron
       - prd-webapp
       - prd-sockets
+      - prd-connect
+      - prd-connect-api
       - ddtst

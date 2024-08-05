@@ -9,24 +9,34 @@ import { AddIcon } from 'components/common/Icons/AddIcon';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useUser } from 'hooks/useUser';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { statusesAcceptingNewWork } from 'lib/rewards/shared';
 
 type Props = {
   rewardId?: string;
+  reward?: Pick<RewardWithUsers, 'id' | 'applications' | 'status' | 'allowMultipleApplications' | 'approveSubmitters'>;
   addIcon?: boolean;
   variant?: ButtonProps['variant'];
   buttonSize?: ButtonProps['size'];
   color?: ButtonProps['color'];
 };
 
-export function NewWorkButton({ color, buttonSize, addIcon, rewardId, variant = 'contained' }: Props) {
-  const { rewards } = useRewards();
+export function NewWorkButton({
+  color,
+  buttonSize,
+  addIcon,
+  rewardId: _rewardId,
+  reward: _reward,
+  variant = 'contained'
+}: Props) {
+  const rewardId = _rewardId ?? _reward?.id;
   const { user } = useUser();
-  const { updateURLQuery } = useCharmRouter();
+  const { navigateToSpacePath } = useCharmRouter();
+  const { rewards } = useRewards();
 
   const reward = useMemo(() => {
-    return rewards?.find((r) => r.id === rewardId);
-  }, [rewardId, rewards]);
+    return _reward ?? rewards?.find((r) => r.id === rewardId);
+  }, [_reward, rewards, rewardId]);
 
   const hasApplication = !!user && reward?.applications.some((app) => app.createdBy === user.id);
 
@@ -38,9 +48,7 @@ export function NewWorkButton({ color, buttonSize, addIcon, rewardId, variant = 
 
   async function newApplication() {
     if (!reward) return;
-
-    // open modal with empty submission
-    updateURLQuery({ id: rewardId, applicationId: 'new' });
+    navigateToSpacePath(`/rewards/applications/new`, { rewardId });
   }
 
   if (
@@ -61,6 +69,7 @@ export function NewWorkButton({ color, buttonSize, addIcon, rewardId, variant = 
           variant={variant}
           disabled={!permissions?.work}
           onClick={newApplication}
+          data-test='new-work-button'
         >
           {addIcon ? (
             <AddIcon

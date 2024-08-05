@@ -1,4 +1,5 @@
-import { VoteType } from '@charmverse/core/prisma';
+import type { PaymentMethod } from '@charmverse/core/prisma';
+import { VoteStrategy, VoteType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -11,22 +12,26 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Switch,
   TextField,
   Tooltip,
   Typography
 } from '@mui/material';
+import { getChainById } from '@root/connectors/chains';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
-import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
+import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
+import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
+import { isTruthy } from 'lib/utils/types';
 
 type CreateVoteModalProps = {
   readOnly?: boolean;
   onChange?: (vote: ProposalEvaluationInput['voteSettings']) => void;
   value: ProposalEvaluationInput['voteSettings'];
+  isPublishedProposal?: boolean;
 };
 
 const StyledVoteSettings = styled.div`
@@ -35,14 +40,76 @@ const StyledVoteSettings = styled.div`
   }
 `;
 
-export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps) {
+export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }: CreateVoteModalProps) {
   const [passThreshold, setPassThreshold] = useState<number>(value?.threshold || 50);
   // Default values for approval type vote
   const [voteType, setVoteType] = useState<VoteType>(value?.type ?? VoteType.Approval);
   const [options, setOptions] = useState<string[]>(value?.options ?? ['Yes', 'No', 'Abstain']);
   const [maxChoices, setMaxChoices] = useState(value?.maxChoices ?? 1);
   const [durationDays, setDurationDays] = useState(value?.durationDays ?? 5);
-  const [publishToSnapshot, setPublishToSnapshot] = useState(value?.publishToSnapshot ?? false);
+  const [voteStrategy, setVoteStrategy] = useState<VoteStrategy>(value?.strategy ?? 'regular');
+  const [voteToken, setVoteToken] = useState<null | {
+    chainId: number;
+    tokenAddress: string;
+  }>(
+    value?.chainId && value?.tokenAddress && value?.strategy === 'token'
+      ? {
+          chainId: value.chainId,
+          tokenAddress: value.tokenAddress
+        }
+      : null
+  );
+  const [paymentMethods] = usePaymentMethods({
+    filterUSDCPaymentMethods: true,
+    filterNativeTokens: true
+  });
+
+  const [availableCryptos, setAvailableCryptos] = useState<{ chainId: number; tokenAddress: string }[]>(
+    paymentMethods.map((method) => {
+      return {
+        chainId: method.chainId,
+        tokenAddress: method.contractAddress || ''
+      };
+    })
+  );
+
+  function refreshCryptoList(chainId: number, rewardToken?: string) {
+    // Set the default chain currency
+    const selectedChain = getChainById(chainId);
+
+    if (selectedChain) {
+      const nativeCurrency = selectedChain.nativeCurrency.symbol;
+
+      const cryptosToDisplay = [nativeCurrency];
+
+      const contractAddresses = paymentMethods
+        .filter((method) => method.chainId === chainId)
+        .map((method) => {
+          return method.contractAddress;
+        })
+        .filter(isTruthy);
+      cryptosToDisplay.push(...contractAddresses);
+
+      setAvailableCryptos([
+        ...availableCryptos,
+        {
+          chainId,
+          tokenAddress: rewardToken || nativeCurrency
+        }
+      ]);
+      setVoteToken({
+        tokenAddress: rewardToken || nativeCurrency,
+        chainId
+      });
+    }
+    return selectedChain?.nativeCurrency.symbol;
+  }
+
+  async function onNewPaymentMethod(paymentMethod: PaymentMethod) {
+    if (paymentMethod.contractAddress) {
+      refreshCryptoList(paymentMethod.chainId, paymentMethod.contractAddress);
+    }
+  }
 
   // useEffect on the values to call onChange() doesnt seem ideal and triggers on the first load, but it works for now. TODO: use react-hook-form?
   useEffect(() => {
@@ -58,12 +125,15 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
           type: voteType,
           options,
           maxChoices: voteType === VoteType.Approval ? 1 : maxChoices,
-          publishToSnapshot,
-          durationDays
+          durationDays,
+          blockNumber: null,
+          chainId: voteToken?.chainId ?? null,
+          tokenAddress: voteToken?.tokenAddress ?? null,
+          strategy: voteStrategy
         });
       }
     }
-  }, [voteType, options, maxChoices, durationDays, passThreshold, publishToSnapshot]);
+  }, [voteType, options, maxChoices, durationDays, voteToken, passThreshold, voteStrategy]);
 
   function handleVoteTypeChange(_voteType: VoteType) {
     if (_voteType !== value?.type) {
@@ -78,21 +148,73 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
 
   return (
     <StyledVoteSettings data-test='evaluation-vote-settings'>
-      <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
-        <FormLabel>
-          <Typography component='span' variant='subtitle1'>
-            Publish to Snapshot
-          </Typography>
-        </FormLabel>
-        <Switch
-          disabled={readOnly}
-          checked={publishToSnapshot}
-          onChange={(e, checked) => setPublishToSnapshot(checked)}
+      <RadioGroup value={voteStrategy}>
+        <FormControlLabel
+          disabled={readOnly || isPublishedProposal}
+          control={<Radio size='small' />}
+          value={VoteStrategy.regular}
+          label='One account one vote'
+          onChange={() => {
+            setVoteStrategy('regular');
+            setVoteToken(null);
+          }}
         />
-      </Stack>
+        <FormControlLabel
+          disabled={readOnly || isPublishedProposal}
+          control={<Radio size='small' />}
+          value={VoteStrategy.token}
+          label='Token voting'
+          onChange={() => {
+            setVoteStrategy('token');
+          }}
+        />
+        <FormControlLabel
+          disabled={readOnly || isPublishedProposal}
+          control={<Radio size='small' />}
+          value={VoteStrategy.snapshot}
+          label='Publish to Snapshot'
+          onChange={() => {
+            setVoteStrategy('snapshot');
+            setVoteToken(null);
+          }}
+        />
+      </RadioGroup>
       <Divider sx={{ mt: 1, mb: 2 }} />
-      {!publishToSnapshot && (
+      {voteStrategy === 'token' || voteStrategy === 'regular' ? (
         <>
+          {voteStrategy === 'token' ? (
+            <>
+              <Typography component='span' variant='subtitle1'>
+                Token
+              </Typography>
+              <InputSearchCrypto
+                disabled={readOnly || isPublishedProposal}
+                readOnly={readOnly}
+                cryptoList={availableCryptos}
+                chainId={voteToken?.chainId}
+                placeholder='Empty'
+                value={voteToken ?? undefined}
+                defaultValue={voteToken ?? undefined}
+                onChange={setVoteToken}
+                showChain
+                key={`${voteToken?.chainId}.${voteToken?.tokenAddress}`}
+                onNewPaymentMethod={(newPaymentMethod) => {
+                  onNewPaymentMethod(newPaymentMethod).then(() => {
+                    if (newPaymentMethod.contractAddress) {
+                      setVoteToken({
+                        chainId: newPaymentMethod.chainId,
+                        tokenAddress: newPaymentMethod.contractAddress
+                      });
+                    }
+                  });
+                }}
+                sx={{
+                  width: '100%',
+                  mb: 2
+                }}
+              />
+            </>
+          ) : null}
           <Stack
             data-test='vote-duration'
             direction='row'
@@ -134,11 +256,13 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
               value={VoteType.Approval}
               control={<Radio />}
               label='Yes / No / Abstain'
+              data-test='vote-type-approval'
             />
             <FormControlLabel
               disabled={readOnly}
               value={VoteType.SingleChoice}
               control={<Radio />}
+              data-test='vote-type-custom-options'
               label='Custom Options'
               sx={{ mr: 0 }}
             />
@@ -180,7 +304,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
             </Stack>
           )}
         </>
-      )}
+      ) : null}
     </StyledVoteSettings>
   );
 }
@@ -202,6 +326,7 @@ function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
           >
             <TextField
               // Disable changing text for No change option
+              data-test='inline-vote-option'
               fullWidth
               placeholder={`Option ${index + 1}`}
               value={option}
@@ -215,6 +340,7 @@ function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
                 <IconButton
                   disabled={options.length <= 2}
                   size='small'
+                  data-test='delete-vote-option'
                   onClick={() => {
                     setOptions([...options.slice(0, index), ...options.slice(index + 1)]);
                   }}
@@ -232,6 +358,7 @@ function InlineVoteOptions({ options, setOptions }: InlineVoteOptionsProps) {
           variant='outlined'
           color='secondary'
           size='small'
+          data-test='add-vote-option'
           onClick={() => {
             setOptions([...options, '']);
           }}

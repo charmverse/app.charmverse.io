@@ -1,11 +1,34 @@
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
-
-import { uid } from 'lib/utilities/strings';
 
 import { createWorkspaceApi } from '../createWorkspaceApi';
 import type { CreateWorkspaceRequestBody } from '../interfaces';
+
+jest.mock('lib/blockchain/getNFTs', () => {
+  return {
+    getNFTs: (input: { wallets: any[] }) => {
+      return [];
+    }
+  };
+});
+
+jest.mock('lib/discord/collabland/upsertUserRolesFromDiscord', () => {
+  return {
+    upsertUserRolesFromDiscord: () => Promise.resolve()
+  };
+});
+
+jest.mock('lib/discord/collabland/upsertSpaceRolesFromDiscord', () => {
+  return {
+    upsertSpaceRolesFromDiscord: () => Promise.resolve()
+  };
+});
+
+afterAll(async () => {
+  jest.resetModules();
+});
 
 describe('createWorkspaceApi', () => {
   it('should create a space allowing for an xpsengine and discord integration, and register the token used to create the space, as well as auto create a bot user', async () => {

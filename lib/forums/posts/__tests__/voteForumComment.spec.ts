@@ -1,7 +1,7 @@
 import type { PostCommentUpDownVote, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createPostComment } from '@root/lib/forums/comments/createPostComment';
 
-import { createPostComment } from 'lib/forums/comments/createPostComment';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
 
@@ -25,7 +25,7 @@ describe('voteForumPost', () => {
     });
 
     const comment = await createPostComment({
-      content: {} as any,
+      content: null as any,
       contentText: '',
       postId: createdPost.id!,
       userId: user.id
@@ -55,7 +55,7 @@ describe('voteForumPost', () => {
     });
 
     const comment = await createPostComment({
-      content: {} as any,
+      content: null as any,
       contentText: '',
       postId: createdPost.id!,
       userId: user.id
@@ -95,7 +95,7 @@ describe('voteForumPost', () => {
     });
 
     const comment = await createPostComment({
-      content: {} as any,
+      content: null as any,
       contentText: '',
       postId: createdPost.id!,
       userId: user.id

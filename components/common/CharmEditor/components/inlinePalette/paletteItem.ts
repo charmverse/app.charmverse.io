@@ -1,6 +1,5 @@
-import type { PluginKey } from '@bangle.dev/pm';
 import type { SpaceOperation } from '@charmverse/core/prisma';
-import type { EditorState, Transaction } from 'prosemirror-state';
+import type { PluginKey, EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
 export const PALETTE_ITEM_REGULAR_TYPE = 'REGULAR_TYPE';
@@ -41,6 +40,7 @@ export interface PaletteItemTypeNoGroup {
   _isItemDisabled?: boolean;
   showInFloatingMenu?: boolean; // make it appear in the floating menu to convert highlighted text
   icon?: JSX.Element | null | undefined;
+  priority?: number;
 }
 
 export interface PaletteItemType extends PaletteItemTypeNoGroup {
@@ -80,6 +80,8 @@ export class PaletteItem implements PaletteItemType {
 
   keybinding?: string;
 
+  priority?: number;
+
   constructor(obj: PaletteItemType) {
     const {
       uid,
@@ -97,6 +99,7 @@ export class PaletteItem implements PaletteItemType {
       skipFiltering,
       showInFloatingMenu,
       icon,
+      priority,
       ...otherKeys
     } = obj;
 
@@ -122,6 +125,7 @@ export class PaletteItem implements PaletteItemType {
     this.skipFiltering = skipFiltering ?? false;
     this._isItemDisabled = false;
     this.icon = icon;
+    this.priority = priority;
     this.showInFloatingMenu = showInFloatingMenu;
   }
 }

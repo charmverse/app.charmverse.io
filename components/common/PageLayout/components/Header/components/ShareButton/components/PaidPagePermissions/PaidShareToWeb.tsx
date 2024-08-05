@@ -1,5 +1,6 @@
 import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
+import { capitalize } from '@root/lib/utils/strings';
 
 import charmClient from 'charmClient';
 import { useCreatePermissions, useDeletePermissions } from 'charmClient/hooks/permissions';
@@ -7,6 +8,7 @@ import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import ShareToWeb from '../common/ShareToWeb';
 
@@ -20,8 +22,7 @@ interface Props {
 
 const alerts: Partial<Record<PageType, string>> = {
   board: "Updates to this board's permissions, including whether it is public, will also apply to its cards.",
-  card_template: 'This card template inherits permissions from its parent board.',
-  proposal: 'Proposal permissions for space members are managed at the category level.'
+  card_template: 'This card template inherits permissions from its parent board.'
 };
 
 export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermissions }: Props) {
@@ -30,6 +31,10 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
   const { page: currentPage } = usePage({ pageIdOrPath: pageId });
+
+  const { getFeatureTitle } = useSpaceFeatures();
+
+  const proposalsLabel = getFeatureTitle('proposals');
 
   const { data: proposal } = useGetProposalDetails(currentPage?.proposalId);
   const { trigger: deletePermission, isMutating: isDeletingPermissions } = useDeletePermissions();
@@ -63,12 +68,14 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
       refreshPermissions();
     }
   }
+  const publishProposalInfoLabel = `${capitalize(
+    proposalsLabel
+  )} publishing is controlled by the permissions of the current workflow step.`;
 
-  // In the case of a space with public proposals, we want to override the manual setting
   const disabledToolip =
-    !!space?.publicProposals && currentPage?.type === 'proposal'
-      ? 'This toggle is disabled because your space uses public proposals.'
-      : currentPagePermissions?.edit_isPublic !== true
+    currentPage?.type === 'proposal'
+      ? publishProposalInfoLabel
+      : currentPagePermissions?.grant_permissions !== true
       ? 'You cannot update permissions for this page'
       : null;
 
@@ -81,21 +88,13 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
         // All proposals beyond draft are public
         (currentPage?.type === 'proposal' && proposal?.status !== 'draft')));
 
-  const baseShareAlertMessage = currentPage ? alerts[currentPage.type] : '';
+  const baseShareAlertMessage = currentPage ? alerts[currentPage.type] ?? '' : '';
 
-  const publicProposalToggleInfo =
-    space?.publicProposals && !!proposal
-      ? `Your space uses public proposals. ${
-          proposal?.status === 'draft'
-            ? 'This draft is only visible to authors and reviewers until it is progressed to the discussion stage.'
-            : 'Proposals in discussion stage and beyond are publicly visible.'
-        }`
-      : null;
-
-  const shareAlertMessage =
-    currentPage?.type === 'proposal' && publicProposalToggleInfo
-      ? `${publicProposalToggleInfo ?? ''}\r\n\r\n${baseShareAlertMessage}`
-      : baseShareAlertMessage;
+  const shareAlertMessage = (
+    currentPage?.type === 'proposal'
+      ? `${publishProposalInfoLabel ?? ''}\r\n\r\n${baseShareAlertMessage}`
+      : baseShareAlertMessage
+  )?.trim();
 
   return (
     <>
@@ -109,6 +108,7 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
         disabledTooltip={disabledToolip}
         isLoading={isDeletingPermissions || isCreatingPermission}
         shareAlertMessage={shareAlertMessage}
+        pageType={currentPage?.type}
       />
       {isShareChecked && publicPermission && currentPage?.type !== 'proposal' && (
         <PermissionInheritedFrom permission={publicPermission} />

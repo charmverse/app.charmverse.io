@@ -10,7 +10,7 @@ import { usePluginState } from '../@bangle.dev/react/hooks';
 import { InlineCommentSubMenu } from '../inlineComment/components/InlineCommentSubMenu';
 import { TextColorMenuDropdown } from '../textColor/ColorMenuDropdown';
 
-import type { SubMenu } from './floating-menu';
+import type { SubMenu } from './floatingMenuPlugin';
 import { LinkSubMenu } from './LinkSubMenu';
 import { Menu } from './Menu';
 import {
@@ -66,7 +66,7 @@ function MenuByType(props: MenuProps) {
   if ((type as FloatingMenuVariant) === 'commentOnlyMenu' && pagePermissions?.comment) {
     return (
       <Menu>
-        <InlineCommentButton enableComments menuKey={pluginKey} />
+        <InlineCommentButton menuKey={pluginKey} />
       </Menu>
     );
   }
@@ -92,7 +92,7 @@ function MenuByType(props: MenuProps) {
           <StrikeButton />
           <CodeButton />
           <FloatingLinkButton menuKey={pluginKey} />
-          {displayInlineCommentButton && <InlineCommentButton enableComments menuKey={pluginKey} />}
+          {displayInlineCommentButton && <InlineCommentButton menuKey={pluginKey} />}
         </MenuGroup>
         {!inline && (
           <MenuGroup>
@@ -124,7 +124,7 @@ function MenuByType(props: MenuProps) {
 
   if (type === 'inlineCommentSubMenu' && !inline) {
     return (
-      <Menu type={type} noScroll>
+      <Menu type={type} noScroll data-test='inline-comment-menu'>
         <InlineCommentSubMenu pageType={props.pageType} pageId={pageId} pluginKey={pluginKey} />
       </Menu>
     );

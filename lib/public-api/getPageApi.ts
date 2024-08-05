@@ -1,9 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getPage } from 'lib/pages/server';
-import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
+import { getPage } from '@root/lib/pages/server';
+import { getMarkdownText } from '@root/lib/prosemirror/getMarkdownText';
 
 import { PageNotFoundError } from './errors';
+import type { UserProfile } from './interfaces';
+import { getUserProfile, userProfileSelect } from './searchUserProfile';
 
 /**
  * @swagger
@@ -20,6 +21,9 @@ import { PageNotFoundError } from './errors';
  *          type: string
  *          format: date-time
  *          example: 2022-04-04T21:32:38.317Z
+ *        author:
+ *          type: object
+ *          $ref: '#/components/schemas/SearchUserResponseBody'
  *        content:
  *          type: object
  *          properties:
@@ -44,6 +48,7 @@ export type PublicApiPage = {
   };
   title: string;
   url: string;
+  author: UserProfile;
 };
 
 type Props = {
@@ -59,6 +64,7 @@ export async function getPageApi({ pageIdOrPath, spaceId }: Props): Promise<Publ
     throw new PageNotFoundError(pageIdOrPath);
   }
 
+  const user = await prisma.user.findUniqueOrThrow({ where: { id: page.createdBy }, select: userProfileSelect });
   const markdown = await getMarkdownText(page.content);
 
   const apiPage: PublicApiPage = {
@@ -68,6 +74,7 @@ export async function getPageApi({ pageIdOrPath, spaceId }: Props): Promise<Publ
       text: page.contentText ?? '',
       markdown
     },
+    author: getUserProfile(user),
     title: page.title ?? '',
     url: `${process.env.DOMAIN}/${space?.domain}/${page.path}`
   };

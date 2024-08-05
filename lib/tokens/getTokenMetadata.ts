@@ -1,6 +1,6 @@
 import { POST } from '@charmverse/core/http';
-
-import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy/client';
+import { isTestEnv } from '@root/config/constants';
+import { getAlchemyBaseUrl } from '@root/lib/blockchain/provider/alchemy/client';
 
 import type { ITokenMetadata, ITokenMetadataRequest } from './tokenData';
 /**
@@ -11,12 +11,15 @@ export function getTokenMetadata({ chainId, contractAddress }: ITokenMetadataReq
     if (!chainId || !contractAddress) {
       reject(new Error('Please provide a valid chainId and contractAddress'));
     }
-
     let baseUrl = '';
     try {
       baseUrl = getAlchemyBaseUrl(chainId);
     } catch (e: unknown) {
       reject(e);
+    }
+
+    if (isTestEnv) {
+      reject(new Error('Cannot fetch token metadata in test environment'));
     }
 
     POST(baseUrl, {

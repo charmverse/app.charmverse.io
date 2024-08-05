@@ -19,20 +19,32 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { useEffect, useRef } from 'react';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
+import type { FormFieldInput } from 'lib/forms/interfaces';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { mergeRefs } from 'lib/utilities/react';
+import { mergeRefs } from 'lib/utils/react';
 
 import { CharmEditor } from '../CharmEditor';
 import PopperPopup from '../PopperPopup';
 
-import { fieldTypeIconRecord, fieldTypeLabelRecord, fieldTypePlaceholderRecord, formFieldTypes } from './constants';
+import {
+  fieldTypeIconRecord,
+  fieldTypeLabelRecord,
+  fieldTypePlaceholderRecord,
+  formFieldTypes,
+  nonDuplicateFieldTypes,
+  nonPrivateFieldTypes
+} from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
-import type { SelectOptionType } from './fields/Select/interfaces';
-import type { FormFieldInput } from './interfaces';
+import { ProjectFieldEditor } from './fields/ProjectField/ProjectFieldEditor';
+import { isWalletConfig } from './fields/utils';
 
 export const FormFieldContainer = styled(Stack, {
   shouldForwardProp(propName) {
@@ -64,6 +76,7 @@ export interface FormFieldProps {
   onDeleteOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
   shouldFocus?: boolean;
+  formFieldTypeFrequencyCount?: Record<FormFieldType, number>;
 }
 
 function ExpandedFormField({
@@ -74,22 +87,49 @@ function ExpandedFormField({
   onCreateOption,
   onDeleteOption,
   onUpdateOption,
-  shouldFocus
+  shouldFocus,
+  formFieldTypeFrequencyCount
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
   const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
-
   // Auto focus on title text field when expanded
   useEffect(() => {
     if (titleTextFieldRef.current && shouldFocus) {
       titleTextFieldRef.current.querySelector('input')?.focus();
     }
   }, [titleTextFieldRef]);
+  const isCharmverseSpace = useIsCharmverseSpace();
+  const { space } = useCurrentSpace();
+
+  const formFieldType = formField.type;
+  const filteredFormFieldTypes = useMemo(() => {
+    if (!formFieldTypeFrequencyCount) {
+      return formFieldTypes.filter((_formFieldType) => {
+        if (_formFieldType === 'optimism_project_profile' && space?.domain !== 'op-grants') {
+          return false;
+        }
+        return true;
+      });
+    }
+
+    return formFieldTypes.filter((_formFieldType) => {
+      if (_formFieldType === 'optimism_project_profile' && space?.domain !== 'op-grants' && !isCharmverseSpace) {
+        return false;
+      }
+      const nonDuplicateFieldType = nonDuplicateFieldTypes.includes(_formFieldType);
+      if (nonDuplicateFieldType) {
+        return !formFieldTypeFrequencyCount[_formFieldType] || _formFieldType === formFieldType;
+      }
+
+      return true;
+    });
+  }, [formFieldTypeFrequencyCount, isCharmverseSpace, formFieldType, !!space?.domain]);
 
   return (
     <>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' pr={4}>
         <Select<FormFieldType>
+          data-test='form-field-type-select'
           value={formField.type}
           onChange={(e) =>
             updateFormField({
@@ -102,9 +142,9 @@ function ExpandedFormField({
           }}
           variant='outlined'
         >
-          {formFieldTypes.map((fieldType) => {
+          {filteredFormFieldTypes.map((fieldType) => {
             return (
-              <MenuItem key={fieldType} value={fieldType}>
+              <MenuItem data-test={`form-field-type-option-${fieldType}`} key={fieldType} value={fieldType}>
                 <Stack flexDirection='row' gap={1} alignItems='center'>
                   {fieldTypeIconRecord[fieldType]}
                   {fieldTypeLabelRecord[fieldType]}
@@ -117,13 +157,13 @@ function ExpandedFormField({
           closeOnClick
           popupContent={
             <MenuList>
-              <MenuItem onClick={onDuplicate}>
+              <MenuItem onClick={onDuplicate} disabled={formField.type === 'project_profile'}>
                 <ListItemIcon>
                   <ContentCopyOutlinedIcon fontSize='small' />
                 </ListItemIcon>
                 <Typography variant='subtitle1'>Duplicate</Typography>
               </MenuItem>
-              <MenuItem onClick={onDelete}>
+              <MenuItem data-test='delete-form-field' onClick={onDelete}>
                 <ListItemIcon>
                   <DeleteOutlinedIcon fontSize='small' />
                 </ListItemIcon>
@@ -132,77 +172,108 @@ function ExpandedFormField({
             </MenuList>
           }
         >
-          <IconButton size='small' sx={{ mt: '-20px' }}>
+          <IconButton data-test='form-field-more-options-popup' size='small' sx={{ mt: '-20px' }}>
             <MoreHoriz fontSize='small' />
           </IconButton>
         </PopperPopup>
       </Stack>
-      <TextField
-        value={formField.name}
-        onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
-        placeholder='Title (required)'
-        error={!formField.name}
-        ref={titleTextFieldRef}
-        data-test='form-field-name-input'
-      />
-      <CharmEditor
-        isContentControlled
-        content={(formField.description ?? emptyDocument) as PageContent}
-        onContentChange={({ doc }) => {
-          updateFormField({
-            description: doc,
-            id: formField.id
-          });
-        }}
-        colorMode='dark'
-        style={{
-          left: 0,
-          paddingLeft: theme.spacing(2)
-        }}
-        disableMention
-        disableNestedPages
-        disablePageSpecificFeatures
-        disableRowHandles
-        placeholderText='Add your description here (optional)'
-        focusOnInit={false}
-      />
-      <FieldTypeRenderer
-        type={formField.type as any}
-        onCreateOption={onCreateOption}
-        onDeleteOption={onDeleteOption}
-        onUpdateOption={onUpdateOption}
-        placeholder={fieldTypePlaceholderRecord[formField.type]}
-        // Enable select and multiselect fields to be able to create options
-        disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
-        options={formField.options}
-      />
-      <Divider
-        sx={{
-          my: 1
-        }}
-      />
-
-      {formField.type !== 'label' && (
-        <Stack gap={0.5} flexDirection='row' alignItems='center'>
-          <Switch
-            data-test='form-field-required-switch'
-            size='small'
-            checked={formField.required}
-            onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
+      {formField.type !== 'project_profile' && (
+        <>
+          <TextField
+            value={formField.name}
+            onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
+            placeholder='Title (required)'
+            error={!formField.name}
+            ref={titleTextFieldRef}
+            data-test='form-field-name-input'
           />
-          <Typography>Required</Typography>
-        </Stack>
+          <CharmEditor
+            isContentControlled
+            content={(formField.description ?? emptyDocument) as PageContent}
+            onContentChange={({ doc }) => {
+              updateFormField({
+                description: doc,
+                id: formField.id
+              });
+            }}
+            colorMode='dark'
+            style={{
+              left: 0,
+              paddingLeft: theme.spacing(2)
+            }}
+            disableMention
+            disableNestedPages
+            disablePageSpecificFeatures
+            disableRowHandles
+            placeholderText='Add your description here (optional)'
+            focusOnInit={false}
+          />
+        </>
+      )}
+      {formField.type === 'project_profile' ? (
+        <ProjectFieldEditor
+          fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
+          onChange={(fieldConfig) => {
+            updateFormField({
+              id: formField.id,
+              fieldConfig
+            });
+          }}
+        />
+      ) : (
+        <FieldTypeRenderer
+          rows={undefined}
+          maxRows={10}
+          type={formField.type as any}
+          onCreateOption={onCreateOption}
+          onDeleteOption={onDeleteOption}
+          onUpdateOption={onUpdateOption}
+          walletInputConfig={{
+            chainId: isWalletConfig(formField.fieldConfig) ? formField.fieldConfig.chainId : undefined,
+            onChangeChainId: (chainId) => {
+              updateFormField({
+                fieldConfig: { chainId },
+                id: formField.id
+              });
+            }
+          }}
+          placeholder={fieldTypePlaceholderRecord[formField.type]}
+          // Enable select and multiselect fields to be able to create options
+          disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
+          options={formField.options}
+        />
       )}
 
-      <Stack gap={0.5} flexDirection='row' alignItems='center'>
-        <Switch
-          data-test='form-field-private-switch'
-          size='small'
-          checked={formField.private}
-          onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
-        />
-        <Typography>Private (Authors & Reviewers can view)</Typography>
-      </Stack>
+      {formField.type !== 'label' && formField.type !== 'project_profile' && (
+        <>
+          <Divider
+            sx={{
+              my: 1
+            }}
+          />
+          <Stack gap={0.5} flexDirection='row' alignItems='center'>
+            <Switch
+              data-test='form-field-required-switch'
+              size='small'
+              checked={formField.required}
+              onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
+            />
+            <Typography>Required</Typography>
+          </Stack>
+        </>
+      )}
+
+      {!nonPrivateFieldTypes.includes(formField.type) && (
+        <Stack gap={0.5} flexDirection='row' alignItems='center'>
+          <Switch
+            data-test='form-field-private-switch'
+            size='small'
+            checked={formField.private}
+            onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
+          />
+          <Typography>Private (Authors & Reviewers can view)</Typography>
+        </Stack>
+      )}
     </>
   );
 }
@@ -279,7 +350,7 @@ export function FormField(
       }}
     >
       {!readOnly && (
-        <div ref={readOnly ? null : drag}>
+        <div ref={readOnly ? () => {} : (drag as any)}>
           <DragIndicatorIcon
             fontSize='small'
             color='secondary'
@@ -293,16 +364,30 @@ export function FormField(
         <Stack gap={1} width='100%' ml={1}>
           {!isOpen || readOnly ? (
             <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
-              <FieldTypeRenderer
-                labelEndAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
-                type={formField.type as any}
-                description={formField.description as PageContent}
-                disabled
-                label={formField.name}
-                required={formField.required}
-                options={formField.options}
-                placeholder={fieldTypePlaceholderRecord[formField.type]}
-              />
+              {formField.type === 'project_profile' ? (
+                <ProjectFieldEditor fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig} />
+              ) : (
+                <FieldTypeRenderer
+                  labelEndAdornment={
+                    formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined
+                  }
+                  walletInputConfig={
+                    // Only show if chainId is present in field config and its a valid chainId
+                    isWalletConfig(formField.fieldConfig) && formField.fieldConfig.chainId
+                      ? {
+                          chainId: formField.fieldConfig.chainId
+                        }
+                      : undefined
+                  }
+                  type={formField.type as any}
+                  description={formField.description as PageContent}
+                  disabled
+                  label={formField.name}
+                  required={formField.required}
+                  options={formField.options}
+                  placeholder={fieldTypePlaceholderRecord[formField.type]}
+                />
+              )}
             </div>
           ) : (
             <ExpandedFormField {...props} shouldFocus={shouldFocus} />

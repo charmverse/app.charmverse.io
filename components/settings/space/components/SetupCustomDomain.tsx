@@ -19,10 +19,8 @@ import {
   Typography,
   Stack
 } from '@mui/material';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import type { UseFormRegister } from 'react-hook-form';
 
-import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
@@ -32,32 +30,24 @@ import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/Up
 import { useCustomDomainVerification } from 'hooks/useCustomDomainVerification';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useSpaces } from 'hooks/useSpaces';
-import { isValidDomainName } from 'lib/utilities/domains/isValidDomainName';
+
+import type { FormValues } from '../SpaceSettings';
 
 const CNAME_INSTRUCTIONS_URL = 'https://app.charmverse.io/charmverse/page-7475001106586148';
 const CAA_INSTRUCTIONS_URL = 'https://app.charmverse.io/charmverse/custom-domain-troubleshooting-16172974411857632';
 
-type FormValues = {
-  customDomain: string;
-};
-
-export function SetupCustomDomain({ space }: { space: Space }) {
-  const { setSpace } = useSpaces();
+export function SetupCustomDomain({
+  space,
+  errorMessage,
+  register
+}: {
+  space: Space;
+  errorMessage?: string;
+  register: UseFormRegister<FormValues>;
+}) {
   const { isFreeSpace } = useIsFreeSpace();
 
   const isAdmin = useIsAdmin();
-  const { showMessage } = useSnackbar();
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setError,
-    formState: { errors, isDirty }
-  } = useForm<FormValues>({
-    defaultValues: { customDomain: space.customDomain ?? '' }
-  });
 
   const {
     isCustomDomainVerified,
@@ -69,68 +59,33 @@ export function SetupCustomDomain({ space }: { space: Space }) {
     isRefreshing
   } = useCustomDomainVerification();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  async function onSubmit(values: FormValues) {
-    try {
-      setIsSubmitting(true);
-      const res = await charmClient.spaces.updateCustomDomain({ spaceId: space.id, customDomain: values.customDomain });
-      setSpace({ ...space, customDomain: res.customDomain || '' });
-
-      showMessage('Custom domain updated', 'success');
-      reset({ customDomain: res.customDomain || '' });
-    } catch (err: any) {
-      if (err.message) {
-        setError('customDomain', { message: err.message });
-      } else {
-        showMessage('Failed to save custom domain', 'error');
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
   return (
-    <Stack mt={3}>
+    <Stack>
       <Stack direction='row' gap={1}>
-        <FieldLabel>Custom space URL domain</FieldLabel>
+        <FieldLabel>Custom Domain</FieldLabel>
         <Stack>
           <UpgradeChip upgradeContext='custom_domain' />
         </Stack>
       </Stack>
-      <Typography variant='caption' color='text.secondary' mb={2}>
+      <Typography variant='caption' mb={2}>
         Add a custom domain you own to access your app through it. You will be prompted with further instructions after
         saving.
       </Typography>
       <UpgradeWrapper upgradeContext='custom_domain'>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack direction='row' alignItems='start' spacing={1}>
-            <TextField
-              {...register('customDomain', {
-                validate: (value) => !value || isValidDomainName(value) || 'Please provide valid domain name.'
-              })}
-              InputProps={{
-                startAdornment: <InputAdornment position='start'>https://</InputAdornment>
-              }}
-              disabled={!isAdmin || isFreeSpace}
-              fullWidth
-              error={!!errors.customDomain}
-              helperText={errors.customDomain?.message || ''}
-              data-test='space-custom-domain-input'
-              placeholder='dao.example.com'
-            />
-
-            <Button
-              disableElevation
-              data-test='submit-space-custom-domain'
-              disabled={!isDirty || isSubmitting || isFreeSpace}
-              type='submit'
-              size='large'
-            >
-              Save domain
-            </Button>
-          </Stack>
-        </form>
+        <Stack direction='row' alignItems='start' spacing={1}>
+          <TextField
+            {...register('customDomain')}
+            InputProps={{
+              startAdornment: <InputAdornment position='start'>https://</InputAdornment>
+            }}
+            disabled={!isAdmin || isFreeSpace}
+            fullWidth
+            error={!!errorMessage}
+            helperText={errorMessage}
+            data-test='space-custom-domain-input'
+            placeholder='dao.example.com'
+          />
+        </Stack>
 
         {!!space.customDomain && isAdmin && (
           <Accordion
@@ -223,7 +178,9 @@ export function SetupCustomDomain({ space }: { space: Space }) {
                           <TableRow>
                             <TableCell>
                               <LabelWithCopy
-                                label={customDomainVerification?.certificateDetails?.dnsValidation?.name || ''}
+                                label={removeEndingPeriod(
+                                  customDomainVerification?.certificateDetails?.dnsValidation?.name || ''
+                                )}
                               />
                             </TableCell>
                             <TableCell>
@@ -279,4 +236,9 @@ export function SetupCustomDomain({ space }: { space: Space }) {
       </UpgradeWrapper>
     </Stack>
   );
+}
+
+// DNS setups usually do not expect the trailing period, so we remove it
+function removeEndingPeriod(domain: string) {
+  return domain.replace(/\.$/, '');
 }

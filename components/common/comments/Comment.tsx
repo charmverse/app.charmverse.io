@@ -4,26 +4,25 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
+import { isProdEnv } from '@root/config/constants';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from 'components/common/Button';
-import { CharmEditor } from 'components/common/CharmEditor';
+import { CharmEditor, InlineCharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
-import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
-import { isProdEnv } from 'config/constants';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { CommentPermissions, CommentWithChildren, GenericCommentWithVote } from 'lib/comments';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
+import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
 import Link from '../Link';
 
@@ -80,7 +79,7 @@ export function Comment({
   });
   const commentContainerRef = useRef<HTMLDivElement | null>(null);
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
-  const { showUserId } = useMemberDialog();
+  const { showUserProfile } = useMemberProfileDialog();
   const { commentId } = router.query as { commentId: string | null };
   async function saveCommentContent() {
     await handleUpdateComment({
@@ -176,7 +175,7 @@ export function Comment({
               mr={1}
               onClick={() => {
                 if (commentUser) {
-                  showUserId(commentUser.id);
+                  showUserProfile(commentUser.id);
                 }
               }}
             >

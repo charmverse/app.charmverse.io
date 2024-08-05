@@ -1,4 +1,8 @@
-import { arbitrum, base, optimism } from 'viem/chains';
+import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
+
+import type { EasSchemaChain } from '../connectors';
+import { proposalCredentialSchemaId } from '../schemas/proposal';
+import { rewardCredentialSchemaId } from '../schemas/reward';
 
 export const externalCredentialChains = [optimism.id, base.id, arbitrum.id] as const;
 
@@ -7,10 +11,11 @@ export type ExternalCredentialChain = (typeof externalCredentialChains)[number];
 /**
  * Utility for configuration relating to the schema
  * @fields specific fields of the attestation we want to show the user
+ * @issuers list of issuers that we should filter for
  */
 export type TrackedSchemaParams = {
   schemaId: string;
-  issuers: string[];
+  issuers?: string[];
   title: string;
   organization: string;
   iconUrl: string;
@@ -22,6 +27,7 @@ export type TrackedSchemaParams = {
 const baseLogo = '/images/cryptoLogos/base-logo.svg';
 const optimismLogo = '/images/cryptoLogos/optimism.svg';
 const devfolioLogo = '/images/logos/devfolio.png';
+const charmverseLogo = '/images/logo_black_lightgrey.png';
 
 // Optimism schemas ------------------
 // https://optimism.easscan.org/schema/view/0xfdcfdad2dbe7489e0ce56b260348b7f14e8365a8a325aef9834818c00d46b31b
@@ -47,6 +53,22 @@ const optimismRetroPgfContributionSchema: TrackedSchemaParams = {
       name: 'RetroPGF_Contribution'
     }
   ]
+};
+
+const optimismCharmverseProposalSchema: TrackedSchemaParams = {
+  schemaId: proposalCredentialSchemaId,
+  title: 'Proposal',
+  organization: 'CharmVerse',
+  iconUrl: charmverseLogo,
+  fields: [{ name: 'Event' }]
+};
+
+const optimismCharmverseRewardSchema: TrackedSchemaParams = {
+  schemaId: rewardCredentialSchemaId,
+  title: 'Reward',
+  organization: 'CharmVerse',
+  iconUrl: charmverseLogo,
+  fields: [{ name: 'Event' }]
 };
 
 // Base schemas ----------------------
@@ -90,6 +112,13 @@ export const trackedSchemas: Record<ExternalCredentialChain, TrackedSchemaParams
   [optimism.id]: [optimismRetroPgfBadgeHolderSchema, optimismRetroPgfContributionSchema],
   [base.id]: [baseVerifiedAccountSchema],
   [arbitrum.id]: [arbitrumDevfolioQuadraticVotingAttestationSchema, arbitrumDevfolioOnchainCredentialAttestationSchema]
+};
+
+export const trackedCharmverseSchemas: Record<EasSchemaChain, TrackedSchemaParams[]> = {
+  [arbitrum.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
+  [optimismSepolia.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
+  [optimism.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
+  [sepolia.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema]
 };
 
 /**

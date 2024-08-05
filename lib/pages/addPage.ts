@@ -1,19 +1,19 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
+import type { Board } from '@root/lib/databases/board';
+import { createBoard } from '@root/lib/databases/board';
+import type { BoardView } from '@root/lib/databases/boardView';
+import type { Card } from '@root/lib/databases/card';
+import { createTableView } from '@root/lib/databases/tableView';
+import type { PageCreated } from '@root/lib/websockets/interfaces';
 import type { NextRouter } from 'next/router';
 import { mutate } from 'swr';
 import { v4 } from 'uuid';
 
 import charmClient from 'charmClient';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import mutator from 'components/common/DatabaseEditor/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
-import type { Board } from 'lib/focalboard/board';
-import { createBoard } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
-import { createTableView } from 'lib/focalboard/tableView';
-import type { PageCreated } from 'lib/websockets/interfaces';
 
 import { getPagePath } from './utils';
 

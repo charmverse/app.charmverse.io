@@ -1,14 +1,15 @@
 import type { EditorState, EditorView, PluginKey } from '@bangle.dev/pm';
-import { Decoration, DecorationSet } from '@bangle.dev/pm';
 import { Plugin } from 'prosemirror-state';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 import { createRoot } from 'react-dom/client';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 
-import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
-import { referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
+import { referenceElement } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 import { threadPluginKey } from '../thread/thread.plugins';
 
 import RowDecoration from './components/InlineCommentRowDecoration';
@@ -77,7 +78,7 @@ export function plugin({ key }: { key: PluginKey }): RawPlugins {
         }
       }
     }),
-    tooltipPlacement.plugins({
+    tooltipPlacementPlugins({
       stateKey: key,
       renderOpts: {
         placement: 'bottom',
@@ -144,6 +145,7 @@ function getDecorations(state: EditorState) {
       const container = document.createElement('div');
       container.className = 'charm-row-decoration-comments charm-row-decoration';
       container.setAttribute('data-ids', newIds.join(','));
+      container.setAttribute('data-test', 'charmverse-inline-comment-icon');
       createRoot(container).render(<RowDecoration count={newIds.length} />);
 
       decorations.push(Decoration.widget(firstPos, () => container, { key: commentIds.join(',') }));

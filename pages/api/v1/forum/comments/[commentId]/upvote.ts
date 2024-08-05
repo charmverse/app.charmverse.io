@@ -2,11 +2,13 @@ import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { voteForumComment } from 'lib/forums/posts/voteForumComment';
 import { requireKeys } from 'lib/middleware';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
 import { userProfileSelect, getUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import type { PublicApiPostComment } from '../../posts/[postId]/comments/index';
 
@@ -50,6 +52,10 @@ async function upvoteOnComment(req: NextApiRequest, res: NextApiResponse<PublicA
   const userId = req.body.userId as string;
   const commentId = req.query.commentId as string;
 
+  if (!userId || !commentId) {
+    throw new InvalidInputError('User ID or comment ID is undefined');
+  }
+
   const { postId } = await prisma.postComment.findFirstOrThrow({
     where: {
       id: commentId,
@@ -77,34 +83,12 @@ async function upvoteOnComment(req: NextApiRequest, res: NextApiResponse<PublicA
     throw new UnauthorisedActionError('User does not have access to this space');
   }
 
-  if (req.body.upvoted === null) {
-    await prisma.postCommentUpDownVote.delete({
-      where: {
-        createdBy_commentId: {
-          commentId,
-          createdBy: userId
-        }
-      }
-    });
-  } else {
-    await prisma.postCommentUpDownVote.upsert({
-      where: {
-        createdBy_commentId: {
-          commentId,
-          createdBy: userId
-        }
-      },
-      create: {
-        createdBy: userId,
-        upvoted: req.body.upvoted,
-        comment: { connect: { id: commentId } },
-        post: { connect: { id: postId } }
-      },
-      update: {
-        upvoted: req.body.upvoted
-      }
-    });
-  }
+  await voteForumComment({
+    upvoted: !!req.body.upvoted,
+    commentId,
+    postId,
+    userId
+  });
 
   const comment = await prisma.postComment.findUniqueOrThrow({
     where: {

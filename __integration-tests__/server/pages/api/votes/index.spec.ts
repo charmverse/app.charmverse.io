@@ -3,7 +3,7 @@ import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { VoteDTO } from 'lib/votes/interfaces';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -71,7 +71,8 @@ describe('POST /api/votes - Create a new poll', () => {
       threshold: 50,
       voteOptions: ['1', '2', '3'],
       createdBy: user.id,
-      maxChoices: 1
+      maxChoices: 1,
+      strategy: 'regular'
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send(newVote).expect(201);
@@ -97,7 +98,8 @@ describe('POST /api/votes - Create a new poll', () => {
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      maxChoices: 1
+      maxChoices: 1,
+      strategy: 'regular'
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', nonAdminUserCookie).send(newVote).expect(201);
@@ -120,7 +122,8 @@ describe('POST /api/votes - Create a new poll', () => {
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      maxChoices: 1
+      maxChoices: 1,
+      strategy: 'regular'
     };
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send(newVote).expect(404);
   });
@@ -144,7 +147,8 @@ describe('POST /api/votes - Create a new poll', () => {
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      maxChoices: 1
+      maxChoices: 1,
+      strategy: 'regular'
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send(newVote).expect(401);

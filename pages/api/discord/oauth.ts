@@ -1,3 +1,4 @@
+import { isTestEnv } from '@root/config/constants';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,7 +10,6 @@ import { withSessionRoute } from 'lib/session/withSession';
 
 const discordClientId = process.env.DISCORD_OAUTH_CLIENT_ID as string;
 const discordUrl = `https://discord.com/api/oauth2/authorize?prompt=consent&client_id=${discordClientId}&response_type=code`;
-
 const handler = nc({
   onError,
   onNoMatch
@@ -24,7 +24,7 @@ async function oauth(req: NextApiRequest, res: NextApiResponse) {
     authFlowType?: OauthFlowType;
   };
 
-  const authFlowType = query.authFlowType ?? 'page';
+  const authFlowType = query.authFlowType ?? 'popup';
   const host = req.headers.host;
   const redirect = getDiscordRedirectUrl(host, query.redirect);
   const callbackUrl = getDiscordCallbackUrl(host, authFlowType);

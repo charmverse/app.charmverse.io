@@ -1,19 +1,23 @@
-import type { Provider } from '@ethersproject/providers';
-
-import { getSafeContract } from 'lib/gnosis/safe/getSafeContract';
+import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { SafeAbi } from '@root/lib/gnosis/safe/abi/SafeAbi';
+import { getAddress } from 'viem';
 
 export async function getSafeOwners({
   address,
-  provider
+  chainId
 }: {
   address: string;
-  provider: Provider;
-}): Promise<string[] | null> {
+  chainId: number;
+}): Promise<readonly `0x${string}`[] | null> {
   try {
-    const safeContract = getSafeContract({ providerOrSigner: provider, address });
-    const owners: string[] = await safeContract.getOwners();
+    const publicClient = getPublicClient(chainId);
+    const owners = await publicClient.readContract({
+      abi: SafeAbi,
+      address: getAddress(address),
+      functionName: 'getOwners'
+    });
 
-    return owners;
+    return owners.map((o) => o.toLowerCase() as `0x${string}`);
   } catch (e) {
     return null;
   }

@@ -1,5 +1,3 @@
-import type { Command, EditorState, Node, Schema } from '@bangle.dev/pm';
-import { keymap, setBlockType, textblockTypeInputRule } from '@bangle.dev/pm';
 import {
   copyEmptyCommand,
   cutEmptyCommand,
@@ -9,10 +7,18 @@ import {
 } from '@bangle.dev/pm-commands';
 import { browser, filter, findParentNodeOfType, insertEmpty, createObject } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
+import { setBlockType } from 'prosemirror-commands';
+import { textblockTypeInputRule } from 'prosemirror-inputrules';
+import { keymap } from 'prosemirror-keymap';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
+import type { Node, Schema } from 'prosemirror-model';
+import { NodeSelection } from 'prosemirror-state';
+import type { Command, EditorState, PluginKey } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import { slugify } from 'lib/utils/strings';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -182,4 +188,25 @@ export function insertEmptyParaBelow() {
   return filter(checkIsInHeading, (state, dispatch, view) => {
     return insertEmpty(state.schema.nodes.paragraph, 'below', false)(state, dispatch, view);
   });
+}
+
+export function scrollToHeadingNode({ view, headingSlug }: { view: EditorView; headingSlug: string }) {
+  let nodePos: number | undefined;
+  view.state.doc.descendants((node, pos) => {
+    if (node.type.name === 'heading' && slugify(node.textContent) === headingSlug) {
+      nodePos = pos;
+      return false;
+    }
+  });
+  if (typeof nodePos === 'number') {
+    view.dispatch(
+      view.state.tr
+        .setSelection(NodeSelection.create(view.state.doc, nodePos))
+        // disable floating menu or other tooltips from appearing
+        .setMeta('skip-selection-tooltip', true)
+    );
+    // scroll to top of the heading node
+    const domTopPosition = view.coordsAtPos(nodePos).top;
+    document.querySelector('.document-print-container')?.scrollTo({ top: domTopPosition });
+  }
 }

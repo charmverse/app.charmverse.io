@@ -1,9 +1,9 @@
-import type { DOMOutputSpec, EditorView } from '@bangle.dev/pm';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Autorenew from '@mui/icons-material/Autorenew';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
-import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors/chains';
-import { CryptoCurrencies, getChainById } from 'connectors/chains';
+import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@root/connectors/chains';
+import { CryptoCurrencies, getChainById } from '@root/connectors/chains';
+import type { EditorView } from 'prosemirror-view';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -15,8 +15,8 @@ import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency'
 import { RelativeTime } from 'components/common/RelativeTime';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
-import { formatMoney } from 'lib/utilities/formatting';
-import { isTruthy } from 'lib/utilities/types';
+import { formatMoney } from 'lib/utils/formatting';
+import { isTruthy } from 'lib/utils/types';
 
 import { enableDragAndDrop } from '../../utils';
 
@@ -63,7 +63,7 @@ export function CryptoPriceNodeView({
     })
     .map((method) => method.contractAddress) as string[];
 
-  const cryptoList = (CryptoCurrencies as string[]).concat(customCryptoContractAddresses);
+  const cryptoList = CryptoCurrencies.concat(customCryptoContractAddresses);
 
   useEffect(() => {
     setBaseCurrency(base);

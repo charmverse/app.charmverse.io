@@ -21,9 +21,11 @@ env:
   SELECTED_PERMISSION_API_TAG: latest
 
 jobs:
-  build-test-env:
-    name: Build test env
+  build-app:
+    name: Build app
     runs-on: ubuntu-latest
+    outputs:
+      head-commit-message: ${{ steps.get_head_commit_message.outputs.commit_message }}
     steps:
       - name: Print Triggering event context payload
         env:
@@ -31,7 +33,7 @@ jobs:
         run: |
           echo "$workflow_event_context"
           echo "Workflow and code ref: ${{github.ref}}"
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -47,12 +49,18 @@ jobs:
         with:
           save_cache: true
 
-  test:
+      # source https://github.com/orgs/community/discussions/28474
+      - name: Print head git commit message
+        id: get_head_commit_message
+        run: echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
+
+  validate-code:
     name: Validate code
     runs-on: ubuntu-latest
-    needs: build-test-env
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -66,10 +74,11 @@ jobs:
       - run: npm run lint
       - run: npm run verifydeps
 
-  integration-test:
+  test-matrix:
     name: Tests
     runs-on: ubuntu-latest
-    needs: build-test-env
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -107,15 +116,14 @@ jobs:
             test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 2/2'
           - test_name: 'Browser tests'
             test_command: 'npm run test:browser'
-          - test_name: 'Browser e2e test #1'
-            test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci -- --shard=1/2'
-          - test_name: 'Browser e2e test #2'
-            test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci -- --shard=2/2'
           - test_name: 'Serverless tests'
             test_command: 'npm run serverless:start & sleep 10 && npm run test:serverless'
+          # We need to fix jest transpilation before we can run connect API tests
+          # - test_name: 'Connect API - Tests'
+          #   test_command: 'npm run connect-api:test'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
@@ -124,15 +132,16 @@ jobs:
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
           mask-aws-account-id: 'no'
+
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: true
       - name: Run permissions api docker image
@@ -171,13 +180,308 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         run: ${{matrix.test_command}}
 
-  deploy:
-    name: Deploy to production
+  e2e-test-matrix:
+    name: Tests
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    needs: [test, integration-test]
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --hostname postgres
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+    strategy:
+      max-parallel: 10
+      fail-fast: false
+      matrix:
+        include:
+          - test_name: 'Browser e2e test #1'
+            test_command: 'npm run test:e2e:ci -- --shard=1/3'
+          - test_name: 'Browser e2e test #2'
+            test_command: 'npm run test:e2e:ci -- --shard=2/3'
+          - test_name: 'Browser e2e test #3'
+            test_command: 'npm run test:e2e:ci -- --shard=3/3'
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - name: Restore dependencies from cache
+        uses: ./.github/actions/install
+
+      - name: Setup test database
+        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+          mask-aws-account-id: 'no'
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: true
+      - name: Run permissions api docker image
+        id: run_permissions_api
+        run: |
+          docker inspect postgres
+          docker network ls
+          cat /etc/hosts
+          echo "network ${{ job.services.postgres.network }}"
+          docker run -d --name permissions-api  \
+                      -h permissions-api \
+                      -p "3001:3001"     \
+                      -e HOST=0.0.0.0    \
+                      -e PORT=3001       \
+                      -v $PWD/nodes_modules/@charmverse/core:/apps/node_modules/@charmverse/core \
+                      --network "${{ job.services.postgres.network }}"  \
+                      -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
+                      ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
+                      node --experimental-specifier-resolution=node ./dist/main.js
+
+          sleep_loop_ct=0
+          until curl localhost:3001/api/health || [[ $sleep_loop_ct > 30 ]]; do
+            docker ps
+            docker logs permissions-api
+            docker inspect permissions-api
+            echo "permission api not up in loop $sleep_loop_ct ... sleeping"
+            sleep_loop_ct=$((sleep_loop_ct + 1))
+            sleep 1
+          done
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+
+      - name: Start services
+        run: |
+          npm run start:test:ci &
+          sleep_loop_ct=0
+          until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
+            echo "webapp not up in loop $sleep_loop_ct ... sleeping"
+            sleep_loop_ct=$((sleep_loop_ct + 1))
+            sleep 1
+          done
+
+      # this doesnt seem to be any faster than pulling from Docker registry
+      # - name: Cache Playwright Docker image
+      #   uses: ScribeMD/docker-cache@0.4.0
+      #   with:
+      #     # include the version we want to cache
+      #     key: docker-${{ runner.os }}-v1.42.1-jammy
+      - name: Run ${{matrix.test_name}}
+        env:
+          REACT_APP_APP_ENV: 'test'
+        # we have to run docker command ourselves to set network=host so that playwright can access the server
+        run: |
+          docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
+                      --workdir /github/workspace --rm  \
+                      -e "REACT_APP_APP_ENV" -e CI=true \
+                      -v "/var/run/docker.sock":"/var/run/docker.sock" \
+                      -v "/home/runner/work/_temp/_github_home":"/github/home" \
+                      -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
+                      -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
+                      -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
+                      --network "host"  \
+                      --ipc=host \
+                      mcr.microsoft.com/playwright:v1.42.1-jammy \
+                      ${{matrix.test_command}}
+        # uses: docker://mcr.microsoft.com/playwright:v1.34.3-jammy
+        # with:
+        #   args: ${{matrix.test_command}}
+
+  test-connect:
+    name: Test Connect App
+    runs-on: ubuntu-latest
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --hostname postgres
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore dependencies from cache
+        uses: ./.github/actions/install
+
+      - name: Setup test database
+        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+
+      - name: Validate Webapp
+        run: |
+          npm run lint -w apps/connect
+          npm run typecheck -w apps/connect
+
+      - name: Validate API
+        run: |
+          npm run lint -w apps/connect-api
+
+      - name: Validate Sunny Awards
+        run: |
+          npm run lint -w apps/sunnyawards
+          npm run typecheck -w apps/sunnyawards
+
+  test-connect-e2e:
+    name: Test Connect App E2E
+    runs-on: ubuntu-latest
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --hostname postgres
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore dependencies from cache
+        uses: ./.github/actions/install
+
+      - name: Setup test database
+        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+
+      - name: Start connect app
+        run: |
+          npm run connect:start:test:ci &
+          sleep_loop_ct=0
+          until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
+            echo "webapp not up in loop $sleep_loop_ct ... sleeping"
+            sleep_loop_ct=$((sleep_loop_ct + 1))
+            sleep 1
+          done
+
+      - name: Run Connect E2E tests
+        env:
+          REACT_APP_APP_ENV: 'test'
+        # we have to run docker command ourselves to set network=host so that playwright can access the server
+        run: |
+          docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
+                      --workdir /github/workspace --rm  \
+                      -e "REACT_APP_APP_ENV" -e CI=true \
+                      -v "/var/run/docker.sock":"/var/run/docker.sock" \
+                      -v "/home/runner/work/_temp/_github_home":"/github/home" \
+                      -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
+                      -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
+                      -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
+                      --network "host"  \
+                      --ipc=host \
+                      mcr.microsoft.com/playwright:v1.42.1-jammy \
+                      npm run connect:test:e2e:ci
+
+  test-sunnyawards-e2e:
+    name: Test Sunny Awards E2E
+    runs-on: ubuntu-latest
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --hostname postgres
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore dependencies from cache
+        uses: ./.github/actions/install
+
+      - name: Setup test database
+        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+
+      - name: Start Sunny Awards app
+        run: |
+          npm run sunnyawards:start:test:ci &
+          sleep_loop_ct=0
+          until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
+            echo "webapp not up in loop $sleep_loop_ct ... sleeping"
+            sleep_loop_ct=$((sleep_loop_ct + 1))
+            sleep 1
+          done
+
+      - name: Run Sunny Awards E2E tests
+        env:
+          REACT_APP_APP_ENV: 'test'
+        # we have to run docker command ourselves to set network=host so that playwright can access the server
+        run: |
+          docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
+                      --workdir /github/workspace --rm  \
+                      -e "REACT_APP_APP_ENV" -e CI=true \
+                      -v "/var/run/docker.sock":"/var/run/docker.sock" \
+                      -v "/home/runner/work/_temp/_github_home":"/github/home" \
+                      -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
+                      -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
+                      -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
+                      --network "host"  \
+                      --ipc=host \
+                      mcr.microsoft.com/playwright:v1.42.1-jammy \
+                      npm run sunnyawards:test:e2e:ci
+
+  deploy-docker:
+    name: Upload Docker image and assets
+    runs-on: ubuntu-latest
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    needs: build-app
+    steps:
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: Inject slug/short variables
@@ -186,12 +490,11 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
 
-      - name: Calculate Build ID and add to env file
+      - name: Calculate Build ID
         id: get_build_id
         run: |
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
-          echo "REACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/webapp.env
 
       - name: Build app
         uses: ./.github/actions/build
@@ -205,6 +508,53 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
+        with:
+          ecr_registry: charmverse-web3-workspace
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Upload static assets to S3
+        run: |
+          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
+          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+
+      - name: Upload JS source maps to Datadog
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: |
+          npm install -g @datadog/datadog-ci
+          datadog-ci sourcemaps upload .next/static       \
+            --service=webapp                              \
+            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
+            --minified-path-prefix=https://cdn.charmverse.io/_next/static
+
+  deploy-main:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    needs: [validate-code, test-matrix, e2e-test-matrix, deploy-docker]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.x
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
+      - name: Calculate Build ID and add to env file
+        id: get_build_id
+        run: |
+          build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          echo "REACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/webapp.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -231,26 +581,21 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
 
-      - name: Package Webapp and upload web assets to s3
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
+      - name: Package webapp
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
-          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
-      - name: Update and Package background worker
+      - name: Package cron worker
         run: |
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
-      - name: Update and Package ceramic server
+      - name: Package ceramic server
         run: |
           rm -rf .ebextensions && mv .ebextensions_ceramic .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
 
-      - name: Update and Package websockets
+      - name: Package websockets
         id: pkg_websocket
         run: |
           rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
@@ -281,7 +626,7 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Deploy Websockets to Beanstalk
+      - name: Deploy websockets to Beanstalk
         if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
         uses: einaregilsson/beanstalk-deploy@v21
         with:
@@ -295,7 +640,7 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github
 
-      - name: Deploy Background to Beanstalk
+      - name: Deploy cron worker to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -308,17 +653,7 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Use datadog ci package to upload js maps
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-        run: |
-          npm install -g @datadog/datadog-ci
-          datadog-ci sourcemaps upload .next/static       \
-            --service=webapp                              \
-            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
-            --minified-path-prefix=https://cdn.charmverse.io/_next/static
-
-      - name: Deploy Ceramic to Beanstalk
+      - name: Deploy ceramic to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -331,12 +666,139 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-  #    if: github.ref == 'refs/heads/main' && failure()
-  discord_alert:
-    name: Notify discord of failure
+  deploy-connect:
+    name: Deploy Connect Webapp
+    runs-on: ubuntu-latest
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    needs: [test-connect, 'test-connect-e2e', deploy-docker]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.x
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
+      - name: Set the docker compose env variables
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_connect/00_env_vars.config
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Package and deploy
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ prd-connect.zip
+          npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
+          npx cdk deploy --method=direct -c name=prd-connect
+
+  deploy-connect-api:
+    name: Deploy Connect API
+    runs-on: ubuntu-latest
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    needs: [test-connect, deploy-docker]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.x
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
+      - name: Set the docker compose env variables
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_connect_api/00_env_vars.config
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Package and deploy
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_connect_api .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ prd-connect-api.zip
+          npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
+          npx cdk deploy --method=direct -c name=prd-connect-api
+
+  deploy-sunnyawards:
+    name: Deploy Sunny Awards
+    runs-on: ubuntu-latest
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    needs: [test-connect, 'test-sunnyawards-e2e', deploy-docker]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.x
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
+      - name: Set the docker compose env variables
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_sunnyawards/00_env_vars.config
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Package and deploy
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ prd-sunnyawards.zip
+          npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
+          npx cdk deploy --method=direct -c name=prd-sunnyawards
+
+  discord-alert:
+    name: Notify Discord of failure
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
-    needs: [build-test-env, test, integration-test, deploy]
+    # pass in all steps so we can check if any failed
+    needs:
+      [
+        build-app,
+        validate-code,
+        test-matrix,
+        e2e-test-matrix,
+        deploy-docker,
+        deploy-main,
+        deploy-connect,
+        deploy-connect-api
+      ]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')

@@ -1,9 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import * as summonProfile from '@root/lib/profile/getSummonProfile';
+import { TENANT_URLS } from '@root/lib/summon/constants';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import { v4 } from 'uuid';
 
-import * as summonProfile from 'lib/profile/getSummonProfile';
-import { createUserFromWallet } from 'lib/users/createUser';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 
 import { syncSummonSpaceRoles } from '../syncSummonSpaceRoles';
@@ -12,20 +13,37 @@ jest.mock('lib/profile/getSummonProfile', () => ({
   getSummonProfile: jest.fn().mockResolvedValue(null)
 }));
 
+const spaceXpsEngineId = Object.keys(TENANT_URLS)[0];
+
+afterEach(async () => {
+  // xpsEngineId must be unique, so remove it from any spaces
+  await prisma.space.updateMany({
+    where: {
+      xpsEngineId: {
+        not: null
+      }
+    },
+    data: {
+      xpsEngineId: null
+    }
+  });
+});
+
 describe('syncSummonSpaceRoles', () => {
   it(`Should do nothing if the space does not have a tenant ID`, async () => {
-    const { space } = await generateUserAndSpaceWithApiToken();
+    const { space } = await generateUserAndSpace();
     const { totalSpaceRolesAdded, totalSpaceRolesUpdated } = await syncSummonSpaceRoles({ spaceId: space.id });
     expect(totalSpaceRolesAdded).toBe(0);
     expect(totalSpaceRolesUpdated).toBe(0);
   });
 
   it(`Should create new role if it doesn't exist and assign it to the user`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
     const userXpsEngineId = v4();
     const user2XpsEngineId = v4();
-    const spaceXpsEngineId = v4();
-    const user2 = await createUserFromWallet();
+    const user2 = await createUserWithWallet({
+      address: randomETHWalletAddress()
+    });
 
     await addUserToSpace({
       isAdmin: false,
@@ -113,8 +131,10 @@ describe('syncSummonSpaceRoles', () => {
   });
 
   it(`Should create new role for a single user if userId is also passed`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
-    const user2 = await createUserFromWallet();
+    const { space, user } = await generateUserAndSpace();
+    const user2 = await createUserWithWallet({
+      address: randomETHWalletAddress()
+    });
 
     await addUserToSpace({
       isAdmin: false,
@@ -123,7 +143,6 @@ describe('syncSummonSpaceRoles', () => {
     });
 
     const userXpsEngineId = v4();
-    const spaceXpsEngineId = v4();
 
     (summonProfile.getSummonProfile as jest.Mock<any, any>).mockResolvedValue({
       tenantId: spaceXpsEngineId,
@@ -192,9 +211,8 @@ describe('syncSummonSpaceRoles', () => {
   });
 
   it(`Should skip updating role if it already exist and space role to role if it doesn't change`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
     const userXpsEngineId = v4();
-    const spaceXpsEngineId = v4();
 
     (summonProfile.getSummonProfile as jest.Mock<any, any>).mockResolvedValue({
       tenantId: spaceXpsEngineId,
@@ -243,9 +261,8 @@ describe('syncSummonSpaceRoles', () => {
   });
 
   it(`Should skip creating role if it already exist and but space role to role if it changes`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
     const userXpsEngineId = v4();
-    const spaceXpsEngineId = v4();
 
     (summonProfile.getSummonProfile as jest.Mock<any, any>).mockResolvedValue({
       tenantId: spaceXpsEngineId,

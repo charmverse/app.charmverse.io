@@ -1,7 +1,6 @@
 import type { GoogleAccount, Page, Role, Space, SuperApiToken, User, UserWallet } from '@charmverse/core/prisma';
 import type { SpaceApiToken } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
@@ -13,16 +12,12 @@ import { baseUrl } from 'testing/mockApiCall';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
-type ProposalWithDetails = ProposalWithUsers & {
-  page: Page;
-};
-
 type UserWithDetails = User & {
   wallets: UserWallet[];
   googleAccounts: GoogleAccount[];
 };
 
-let proposal: ProposalWithDetails;
+let proposal: Awaited<ReturnType<typeof testUtilsProposals.generateProposal>>;
 let proposalAuthor: UserWithDetails;
 let proposalReviewer: UserWithDetails;
 let reviewerRole: Role;
@@ -175,6 +170,7 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
         ]),
         title: proposal.page.title,
         currentStep: {
+          startedAt: proposal.page.createdAt.toISOString(),
           result: 'in_progress',
           title: 'pass_fail',
           type: 'pass_fail'
@@ -222,6 +218,7 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
           }
         ]),
         currentStep: {
+          startedAt: proposal.page.createdAt.toISOString(),
           result: 'in_progress',
           title: 'pass_fail',
           type: 'pass_fail'

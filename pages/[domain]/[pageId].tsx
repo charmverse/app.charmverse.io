@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSidePropsContext } from 'next';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import { EditorPage } from 'components/[pageId]/EditorPage/EditorPage';
@@ -8,16 +7,18 @@ import { SharedPage } from 'components/[pageId]/SharedPage/SharedPage';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
-import { getPagePath } from 'lib/utilities/domains/getPagePath';
-import { isUUID } from 'lib/utilities/strings';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
+import { getCanonicalURL } from 'lib/utils/domains/getCanonicalURL';
+import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
+import { getPagePath } from 'lib/utils/domains/getPagePath';
+import { isUUID } from 'lib/utils/strings';
 import type { GlobalPageProps } from 'pages/_app';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
@@ -57,6 +58,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         type: true,
         space: {
           select: {
+            customDomain: true,
+            domain: true,
             paidTier: true,
             publicProposals: true,
             spaceImage: true
@@ -93,12 +96,19 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         page.space.paidTier === 'free' ||
         (page.type === 'proposal' && page.space.publicProposals)
       ) {
+        const canonicalUrl = getCanonicalURL({
+          req: ctx.req,
+          path: page.path,
+          spaceDomain: page.space.domain,
+          spaceCustomDomain: page.space.customDomain
+        });
         return {
           props: {
             openGraphData: {
               title: page.title,
               description: page.contentText?.slice(0, 200),
-              image: page.space?.spaceImage
+              image: page.space?.spaceImage,
+              canonicalUrl
             }
           } as Pick<GlobalPageProps, 'openGraphData'>
         };
@@ -114,7 +124,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 export default function PageView() {
   const { publicPage } = useSharedPage();
   const basePageId = usePageIdFromPath();
-  const router = useRouter();
+  const { router, clearURLQuery, updateURLQuery } = useCharmRouter();
   const { isSpaceMember } = useIsSpaceMember();
   const { user } = useUser();
   const { space } = useCurrentSpace();
@@ -154,6 +164,15 @@ export default function PageView() {
       unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    // reload is used by new proposal endpoint. see pages/[domain]/proposals/new.tsx
+    if (router.query.reload) {
+      setTimeout(() => {
+        window.location.search = '';
+      }, 0);
+    }
+  }, [router.query.reload, clearURLQuery]);
 
   if (!isSpaceMember && publicPage) {
     if (subscriptionEnded) {

@@ -1,9 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import type { MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { requireKeys } from 'lib/middleware';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -76,7 +78,8 @@ async function voteComment(req: NextApiRequest, res: NextApiResponse<PublicApiPr
       }
     },
     select: {
-      id: true
+      id: true,
+      spaceId: true
     }
   });
 
@@ -105,6 +108,12 @@ async function voteComment(req: NextApiRequest, res: NextApiResponse<PublicApiPr
       update: {
         upvoted: req.body.upvoted
       }
+    });
+    const userAction: MixpanelEventName = req.body.upvoted ? 'upvote_proposal_comment' : 'downvote_proposal_comment';
+    trackUserAction(userAction, {
+      resourceId: proposal.id,
+      spaceId: proposal.spaceId,
+      userId
     });
   }
 

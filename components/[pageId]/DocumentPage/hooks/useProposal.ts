@@ -4,12 +4,14 @@ import {
   useUpdateProposalEvaluation,
   useGetProposalDetails,
   useUpsertRubricCriteria,
+  useUpdateTemplate,
   useUpdateWorkflow,
   useUpdateProposal
 } from 'charmClient/hooks/proposals';
+import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 export function useProposal({ proposalId }: { proposalId?: string | null }) {
@@ -17,22 +19,29 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
-  const { trigger: updateProposalWorkflow } = useUpdateWorkflow({ proposalId });
+  const { trigger: applyProposalTemplate } = useUpdateTemplate({ proposalId });
+  const { trigger: applyProposalWorkflow } = useUpdateWorkflow({ proposalId });
   const { subscribe } = useWebSocketClient();
-
+  const { refreshIssuableCredentials } = useProposalCredentials({ proposalId });
   useEffect(() => {
-    function handleArchivedEvent(value: WebSocketPayload<'proposals_archived'>) {
-      if (value.proposalIds.some((id) => id === proposal?.id)) {
+    function handleUpdateEvent(proposals: WebSocketPayload<'proposals_updated'>) {
+      const match = proposals.find(({ id }) => id === proposal?.id);
+      if (match) {
         refreshProposal(
-          (prev) => ({
-            ...prev!,
-            archived: value.archived
-          }),
+          (prev) =>
+            prev
+              ? {
+                  ...prev,
+                  currentEvaluationId: match.currentStep ? match.currentStep?.id : prev.currentEvaluationId,
+                  archived: match.archived ?? prev.archived,
+                  status: match.currentStep ? (match.currentStep.step === 'draft' ? 'draft' : 'published') : prev.status
+                }
+              : undefined,
           { revalidate: false }
         );
       }
     }
-    const unsubscribeFromPageRestores = subscribe('proposals_archived', handleArchivedEvent);
+    const unsubscribeFromPageRestores = subscribe('proposals_updated', handleUpdateEvent);
     return () => {
       unsubscribeFromPageRestores();
     };
@@ -59,8 +68,13 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
         }
         await refreshProposal();
       },
+      onChangeTemplate: async (value: { id: string } | null) => {
+        // null will remove the template
+        await applyProposalTemplate({ templateId: value?.id || null });
+        await refreshProposal();
+      },
       onChangeWorkflow: async ({ id }: { id: string }) => {
-        await updateProposalWorkflow({ workflowId: id });
+        await applyProposalWorkflow({ workflowId: id });
         await refreshProposal();
       },
       onChangeRewardSettings: async (values: Partial<ProposalFields>) => {
@@ -73,8 +87,17 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
           });
           await refreshProposal();
         }
+      },
+      onChangeSelectedCredentialTemplates: async (templateIds: string[]) => {
+        if (proposal) {
+          await updateProposal({
+            selectedCredentialTemplates: templateIds
+          });
+          await refreshProposal();
+          await refreshIssuableCredentials();
+        }
       }
     }),
-    [proposal, refreshProposal, updateProposalEvaluation, updateProposalWorkflow, upsertRubricCriteria, updateProposal]
+    [proposal, refreshProposal, updateProposalEvaluation, applyProposalWorkflow, upsertRubricCriteria, updateProposal]
   );
 }

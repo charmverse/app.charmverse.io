@@ -1,10 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { Board, IPropertyTemplate } from '@root/lib/databases/board';
+import type { Card } from '@root/lib/databases/card';
+import { countBlocks } from '@root/lib/prosemirror/countBlocks';
+import { paginatedPrismaTask } from '@root/lib/utils/paginatedPrismaTask';
 import _sum from 'lodash/sum';
-
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
-import { countBlocks } from 'lib/prosemirror/countBlocks';
-import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
 
 import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
 

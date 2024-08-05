@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PaymentMethod } from '@charmverse/core/prisma';
-import type { IChainDetails } from 'connectors/chains';
-import { getChainById, getChainBySymbol } from 'connectors/chains';
+import type { IChainDetails } from '@root/connectors/chains';
+import { getChainById, getChainBySymbol } from '@root/connectors/chains';
 
 import type { SupportedChainId } from '../blockchain/provider/alchemy/config';
 
@@ -30,6 +30,7 @@ export function getTokenInfo({ chainId = 1, methods, symbolOrAddress }: getToken
   const paymentMethod = methods.find(
     (method) => method.contractAddress === symbolOrAddress || method.tokenSymbol === symbolOrAddress
   );
+
   if (paymentMethod) {
     return getTokenAndChainInfo(paymentMethod);
   }

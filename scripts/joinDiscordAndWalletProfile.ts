@@ -3,7 +3,7 @@ import { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { sessionUserRelations } from 'lib/session/config';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
 import { isAddress } from 'viem';
 
 /**
@@ -78,37 +78,37 @@ async function attachWalletToProfileWithDiscord({
 }: {
   discordId: string;
   walletAddress: string;
-  commit?: boolean
+  commit?: boolean;
 }): Promise<User> {
-
   if (!discordId) {
-    throw new InvalidInputError('Discord ID is required')
+    throw new InvalidInputError('Discord ID is required');
   }
 
   const discordProfiles = await queryDiscord({
-    discordDiscriminator: discordId 
-  })
+    discordDiscriminator: discordId
+  });
 
   if (discordProfiles.length !== 1) {
-    throw new InvalidInputError('Found multiple profiles. Enter the specific discordId')
+    throw new InvalidInputError('Found multiple profiles. Enter the specific discordId');
   }
 
   const targetDiscordProfile = discordProfiles[0];
 
   if (!walletAddress) {
-    throw new InvalidInputError('Wallet address is required')
+    throw new InvalidInputError('Wallet address is required');
   }
 
   const walletToReattach = await prisma.userWallet.findFirstOrThrow({
-    where: isAddress(walletAddress) ? {
-      address: walletAddress.toLowerCase()
-    } : {
-      ensname: walletAddress
-    }
-  })
+    where: isAddress(walletAddress)
+      ? {
+          address: walletAddress.toLowerCase()
+        }
+      : {
+          ensname: walletAddress
+        }
+  });
 
-  console.log('Will attach wallet', walletToReattach, '\n\n----\n\n TO \n\n----\n\n', targetDiscordProfile)
-
+  console.log('Will attach wallet', walletToReattach, '\n\n----\n\n TO \n\n----\n\n', targetDiscordProfile);
 
   if (commit) {
     await prisma.userWallet.update({
@@ -116,9 +116,9 @@ async function attachWalletToProfileWithDiscord({
         id: walletToReattach.id
       },
       data: {
-        user: {connect: {id: targetDiscordProfile.userId}}
+        user: { connect: { id: targetDiscordProfile.userId } }
       }
-    })
+    });
   }
 
   const updatedUser = await prisma.user.findUniqueOrThrow({
@@ -126,7 +126,7 @@ async function attachWalletToProfileWithDiscord({
       id: targetDiscordProfile.userId
     },
     include: sessionUserRelations
-  })
+  });
 
   const oldUser = await prisma.user.findUniqueOrThrow({
     where: {
@@ -140,15 +140,15 @@ async function attachWalletToProfileWithDiscord({
   if (identities === 0) {
     await prisma.user.update({
       where: {
-        id: oldUser.id,
+        id: oldUser.id
       },
       data: {
         deletedAt: new Date()
       }
-    })
+    });
   }
 
-  return updatedUser
+  return updatedUser;
 }
 
 /**
@@ -166,10 +166,8 @@ async function attachWalletToProfileWithDiscord({
 
 // use attachWalletToProfileWithDiscord or attachDiscordToProfileWithWallet depending on the requested direction
 
-
 attachWalletToProfileWithDiscord({
-  discordId: "1234",
-  walletAddress: "0x7904667C340601AaB73939372C016dC5102732A2",
+  discordId: '1234',
+  walletAddress: '0x7904667C340601AaB73939372C016dC5102732A2',
   commit: false
-})
-.then(data => console.log('Data', data))
+}).then((data) => console.log('Data', data));

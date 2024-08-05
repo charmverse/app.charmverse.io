@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { GetQrCodeModal } from 'components/settings/account/components/otp/components/GetQrCodeModal';
@@ -64,8 +64,8 @@ export default {
 ResetRecoveryCodeModalStory.parameters = {
   msw: {
     handlers: {
-      otpRecoveryCode: rest.put(`/api/profile/otp/recovery-code`, (_req, res, ctx) => {
-        return res(ctx.json({ recoveryCode: '1233546546', code: '12354354', uri: 'tot//' }));
+      otpRecoveryCode: http.put(`/api/profile/otp/recovery-code`, () => {
+        return HttpResponse.json({ recoveryCode: '1233546546', code: '12354354', uri: 'tot//' });
       })
     }
   }
@@ -74,11 +74,11 @@ ResetRecoveryCodeModalStory.parameters = {
 TwoFactorAuthSetupModalStory.parameters = {
   msw: {
     handlers: {
-      otpCreate: rest.post(`/api/profile/otp`, (_req, res, ctx) => {
-        return res(ctx.json({ code: '12345678', uri: 'tot//', recoveryCode: '1233546546' }));
+      otpCreate: http.post(`/api/profile/otp`, () => {
+        return HttpResponse.json({ code: '12345678', uri: 'tot//', recoveryCode: '1233546546' });
       }),
-      otpActivate: rest.put(`/api/profile/otp/activate`, (_req, res, ctx) => {
-        return res(ctx.json({}));
+      otpActivate: http.put(`/api/profile/otp/activate`, () => {
+        return HttpResponse.json({});
       })
     }
   }
@@ -87,8 +87,8 @@ TwoFactorAuthSetupModalStory.parameters = {
 GetQrCodeModalStory.parameters = {
   msw: {
     handlers: {
-      otpGet: rest.get(`/api/profile/otp`, (_req, res, ctx) => {
-        return res(ctx.json({ code: '12345678', uri: 'tot//' }));
+      otpGet: http.get(`/api/profile/otp`, () => {
+        return HttpResponse.json({ code: '12345678', uri: 'tot//' });
       })
     }
   }

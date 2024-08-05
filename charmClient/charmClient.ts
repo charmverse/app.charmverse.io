@@ -1,38 +1,34 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ApiPageKey,
-  Block,
   FavoritePage,
   InviteLink,
   Page,
   PaymentMethod,
-  Space,
   TelegramUser,
-  TokenGateToRole,
   User,
-  UserDetails,
-  UserWallet
+  UserDetails
 } from '@charmverse/core/prisma';
-import type { FiatCurrency, IPairQuote } from 'connectors/chains';
+import * as http from '@root/adapters/http';
+import type { FiatCurrency, IPairQuote } from '@root/connectors/chains';
+import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
+import type { LoggedInUser } from '@root/models';
 
-import * as http from 'adapters/http';
-import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/BoardEditor/utils/blockUtils';
-import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
-import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
+import type { ExtendedPoap } from 'lib/blockchain/interfaces';
+import type { BlockWithDetails, BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
-import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
-import type { FailedImportsError } from 'lib/notion/types';
-import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
+import type { FailedImportsError } from 'lib/notion/interfaces';
+import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import { encodeFilename } from 'lib/utilities/encodeFilename';
+import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
-import type { LoggedInUser } from 'models';
-import type { SyncRelationPropertyPayload } from 'pages/api/blocks/sync-relation-property';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -51,6 +47,7 @@ import { NotificationsApi } from './apis/notificationsApi';
 import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
+import { ProjectsApi } from './apis/projectsApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { PublicProfileApi } from './apis/publicProfileApi';
 import { RewardsApi } from './apis/rewardsApi';
@@ -115,34 +112,13 @@ class CharmClient {
 
   credentials = new CredentialsApi();
 
+  projects = new ProjectsApi();
+
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');
   }
 
-  async login({ address, walletSignature }: Web3LoginRequest) {
-    const user = await http.POST<LoggedInUser | { otpRequired: true }>('/api/session/login', {
-      address,
-      walletSignature
-    });
-    return user;
-  }
-
-  async logout() {
-    await http.POST('/api/session/logout');
-  }
-
-  getUser() {
-    return http.GET<LoggedInUser>('/api/profile');
-  }
-
-  createUser({ address, walletSignature }: Web3LoginRequest) {
-    return http.POST<LoggedInUser>('/api/profile', {
-      address,
-      walletSignature
-    });
-  }
-
-  updateUser(data: Partial<User> & { addressesToAdd?: AuthSig[] }) {
+  updateUser(data: Partial<User>) {
     return http.PUT<LoggedInUser>('/api/profile', data);
   }
 
@@ -158,14 +134,6 @@ class CharmClient {
     return http.PUT<UserDetails>('/api/profile/details', data);
   }
 
-  addUserWallets(data: AuthSig[]) {
-    return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
-  }
-
-  removeUserWallet(address: Pick<UserWallet, 'address'>) {
-    return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
-  }
-
   getPublicPageByViewId(viewId: string) {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
@@ -179,7 +147,7 @@ class CharmClient {
   }
 
   deletePageForever(pageId: string) {
-    return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
+    return http.DELETE<TrashOrDeletePageResponse>(`/api/pages/${pageId}`);
   }
 
   favoritePage(pageId: string) {
@@ -238,27 +206,27 @@ class CharmClient {
     return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
   }
 
-  getBlock({ blockId }: { blockId: string }): Promise<FBBlock> {
-    return http.GET<Block>(`/api/blocks/${blockId}`).then(blockToFBBlock);
+  getBlock({ blockId }: { blockId: string }) {
+    return http.GET<BlockWithDetails>(`/api/blocks/${blockId}`).then(blockToFBBlock);
   }
 
-  getSubtree({ pageId }: { pageId: string }): Promise<FBBlock[]> {
+  getSubtree({ pageId }: { pageId: string }) {
     return http
-      .GET<Block[]>(`/api/blocks/${pageId}/subtree`)
+      .GET<BlockWithDetails[]>(`/api/blocks/${pageId}/subtree`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
 
   getViews({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${pageId}/views`)
+      .GET<BlockWithDetails[]>(`/api/blocks/${pageId}/views`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
 
   getComments({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${pageId}/comments`)
+      .GET<BlockWithDetails[]>(`/api/blocks/${pageId}/comments`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
@@ -268,14 +236,16 @@ class CharmClient {
   }
 
   async deleteBlock(blockId: string, updater: BlockUpdater): Promise<void> {
-    const { rootBlock } = await http.DELETE<{ deletedCount: number; rootBlock: Block }>(`/api/blocks/${blockId}`);
+    const { rootBlock } = await http.DELETE<{ deletedCount: number; rootBlock: BlockWithDetails }>(
+      `/api/blocks/${blockId}`
+    );
     const fbBlock = blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
   }
 
   async deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void> {
-    const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, { blockIds });
+    const rootBlocks = await http.DELETE<BlockWithDetails[]>(`/api/blocks`, { blockIds });
     const fbBlocks = rootBlocks.map((rootBlock) => ({
       ...blockToFBBlock(rootBlock),
       deletedAt: new Date().getTime()
@@ -285,28 +255,28 @@ class CharmClient {
 
   async insertBlocks(fbBlocks: FBBlock[], updater: BlockUpdater): Promise<FBBlock[]> {
     const blocksInput = fbBlocks.map(fbBlockToBlock);
-    const newBlocks = await http.POST<Block[]>('/api/blocks', blocksInput);
+    const newBlocks = await http.POST<BlockWithDetails[]>('/api/blocks', blocksInput);
     const newFBBlocks = newBlocks.map(blockToFBBlock);
     updater(newFBBlocks);
     return newFBBlocks;
   }
 
   async patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void> {
-    const currentFBBlock: FBBlock = blockToFBBlock(await http.GET<Block>(`/api/blocks/${blockId}`));
+    const currentFBBlock: FBBlock = blockToFBBlock(await http.GET<BlockWithDetails>(`/api/blocks/${blockId}`));
     const { deletedFields = [], updatedFields = {}, ...updates } = blockPatch;
     const fbBlockInput = Object.assign(currentFBBlock, updates, {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
     });
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
-    const blockInput = fbBlockToBlock(fbBlockInput);
-    const updatedBlocks = await http.PUT<Block[]>('/api/blocks', [blockInput]);
+    const { isLocked, ...blockInput } = fbBlockToBlock(fbBlockInput);
+    const updatedBlocks = await http.PUT<BlockWithDetails[]>('/api/blocks', [blockInput]);
     const fbBlock = blockToFBBlock(updatedBlocks[0]);
     updater([fbBlock]);
   }
 
   async updateBlock(blockInput: FBBlock) {
     const newBlock = fbBlockToBlock(blockInput);
-    return http.PUT<Block[]>('/api/blocks', [newBlock]);
+    return http.PUT<BlockWithDetails[]>('/api/blocks', [newBlock]);
   }
 
   async patchBlocks(_blocks: FBBlock[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void> {
@@ -319,7 +289,7 @@ class CharmClient {
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
       return fbBlockToBlock(fbBlockInput);
     });
-    const updatedBlocks = await http.PUT<Block[]>('/api/blocks', updatedBlockInput);
+    const updatedBlocks = await http.PUT<BlockWithDetails[]>('/api/blocks', updatedBlockInput);
     const fbBlocks = updatedBlocks.map(blockToFBBlock);
     updater(fbBlocks);
   }
@@ -355,12 +325,14 @@ class CharmClient {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
-  createProposalSource({ pageId }: { pageId: string }) {
-    return http.POST<void>(`/api/pages/${pageId}/proposal-source`);
-  }
-
-  updateProposalSource({ pageId }: { pageId: string }) {
-    return http.PUT<void>(`/api/pages/${pageId}/proposal-source`);
+  createProposalSource({
+    selectedProperties,
+    pageId
+  }: {
+    selectedProperties: SelectedProposalProperties;
+    pageId: string;
+  }) {
+    return http.POST<void>(`/api/pages/${pageId}/proposal-source`, { selectedProperties });
   }
 
   getBuildId() {
@@ -398,8 +370,8 @@ class CharmClient {
     return http.GET<string | null>('/api/resolve-ens', { ens });
   }
 
-  syncRelationProperty(payload: SyncRelationPropertyPayload) {
-    return http.PUT<void>('/api/blocks/sync-relation-property', payload);
+  searchFarcasterUser({ username }: { username: string }) {
+    return http.GET<FarcasterUser[]>(`/api/farcaster/search-by-username`, { username });
   }
 }
 

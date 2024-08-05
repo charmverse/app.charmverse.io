@@ -15,13 +15,13 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import type { MouseEvent } from 'react';
 import { useCallback, useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useUserDetails } from 'components/settings/profile/hooks/useUserDetails';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -35,16 +35,24 @@ import { NotificationCountBox } from './NotificationsPopover';
 import SpaceListItem from './SpaceListItem';
 import WorkspaceAvatar from './WorkspaceAvatar';
 
-const StyledButton = styled(Button)(
-  ({ theme, fullWidth }) => `
+const StyledButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'enableHover'
+})<{ enableHover: boolean }>(
+  ({ theme, enableHover, fullWidth }) => `
   justify-content: flex-start;
   padding: ${fullWidth ? theme.spacing(0.3, 5, 0.3, 2) : theme.spacing(0.5, 1)};
 
-  // disable hover UX on ios which converts first click to a hover event
+  ${!enableHover && `background-color: transparent !important; cursor: default;`}
+
+  ${
+    // disable hover UX on ios which converts first click to a hover event
+    enableHover &&
+    `
   @media (pointer: fine) {
     &:hover: {
-      backgroundColor: ${theme.palette.action.hover};
+      background-color: ${theme.palette.action.hover};
     }
+  }`
   }
   ${theme.breakpoints.up('lg')} {
     padding-right: ${fullWidth ? theme.spacing(2) : 0};
@@ -64,17 +72,16 @@ const SidebarHeader = styled(Box)(
       duration: theme.transitions.duration.shorter
     })}
   }
-  
+
   & .MuiIconButton-root {
     background-color: ${theme.palette.background.light};
     border-radius: 4px;
     padding: 2px;
   }
-
   & .MuiIconButton-root:hover {
     background-color: ${theme.palette.background.default};
   }
-  `
+`
 );
 
 const StyledCreateSpaceForm = styled(CreateSpaceForm)`
@@ -90,13 +97,12 @@ const StyledCreateSpaceForm = styled(CreateSpaceForm)`
 
 export default function SidebarSubmenu({
   closeSidebar,
-  logoutCurrentUser,
-  openProfileModal
+  logoutCurrentUser
 }: {
   closeSidebar: () => void;
   logoutCurrentUser: () => void;
-  openProfileModal: (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => void;
 }) {
+  const { showUserProfile } = useMemberProfileDialog();
   const { notifications = [], otherSpacesUnreadNotifications } = useNotifications();
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
@@ -135,11 +141,12 @@ export default function SidebarSubmenu({
     <SidebarHeader className='sidebar-header' position='relative'>
       <StyledButton
         data-test='sidebar-space-menu'
-        endIcon={<KeyboardArrowDownIcon fontSize='small' />}
+        enableHover={!!user}
+        endIcon={user ? <KeyboardArrowDownIcon fontSize='small' /> : null}
         variant='text'
         color='inherit'
         fullWidth={!!currentSpace}
-        {...bindTrigger(menuPopupState)}
+        {...(user ? bindTrigger(menuPopupState) : {})}
       >
         {currentSpace ? (
           <>
@@ -154,7 +161,11 @@ export default function SidebarSubmenu({
       </StyledButton>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)} sx={{ maxWidth: '330px' }}>
         <MenuItem
-          onClick={openProfileModal}
+          onClick={() => {
+            if (user) {
+              showUserProfile(user.id);
+            }
+          }}
           sx={{
             display: 'grid',
             gridTemplateColumns: 'auto 1fr',

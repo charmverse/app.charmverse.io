@@ -1,17 +1,13 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { Box, Button, Tooltip } from '@mui/material';
 import { useState } from 'react';
-import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { StyledBanner } from 'components/common/Banners/Banner';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
@@ -19,9 +15,7 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
   const [isMutating, setIsMutating] = useState(false);
   const { space } = useCurrentSpace();
   const { navigateToSpacePath } = useCharmRouter();
-  const { pages } = usePages();
   const { sendMessage } = useWebSocketClient();
-  const dispatch = useAppDispatch();
   const { showMessage } = useSnackbar();
   const { permissions } = usePagePermissions({ pageIdOrPath: pageId });
   const { trigger: trashPages } = useTrashPages();
@@ -42,8 +36,6 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
           });
         } else {
           await trashPages({ pageIds: [pageId], trash: false });
-          await mutate(`pages/${space.id}`);
-          dispatch(initialDatabaseLoad({ pageId }));
         }
       } catch (err) {
         showMessage((err as any).message ?? 'Could not restore page', 'error');
@@ -57,10 +49,7 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
     try {
       setIsMutating(true);
       await charmClient.deletePageForever(pageId);
-      const path = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
-      if (path) {
-        await navigateToSpacePath(`/${path}`);
-      }
+      await navigateToSpacePath(`/`);
     } catch (err) {
       showMessage((err as any).message ?? 'Could not delete page', 'error');
     } finally {

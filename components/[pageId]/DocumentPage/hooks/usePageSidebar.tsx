@@ -1,9 +1,7 @@
-import type { ReactNode, Dispatch, SetStateAction } from 'react';
-import { createContext, useContext, useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
-import { useCurrentPage } from 'hooks/useCurrentPage';
-
-export type PageSidebarView = 'comments' | 'suggestions' | 'proposal_evaluation';
+export type PageSidebarView = 'comments' | 'suggestions' | 'proposal_evaluation' | 'reward_evaluation';
 
 export type IPageSidebarContext = {
   activeView: PageSidebarView | null;
@@ -16,22 +14,24 @@ export const PageSidebarContext = createContext<IPageSidebarContext | null>(null
 
 export function PageSidebarProvider({ children }: { children: ReactNode }) {
   const [activeView, setActiveView] = useState<IPageSidebarContext['activeView']>(null);
-  const { currentPageId } = useCurrentPage();
 
-  function _setActiveView(view: PageSidebarView | null | ((view: PageSidebarView | null) => PageSidebarView | null)) {
-    // handle case when a callback is used as the new value
-    if (typeof view === 'function') {
-      return setActiveView((prevView) => {
-        return view(prevView);
-      });
-    } else {
-      return setActiveView(view);
-    }
-  }
+  const _setActiveView = useCallback(
+    (view: PageSidebarView | null | ((view: PageSidebarView | null) => PageSidebarView | null)) => {
+      // handle case when a callback is used as the new value
+      if (typeof view === 'function') {
+        return setActiveView((prevView) => {
+          return view(prevView);
+        });
+      } else {
+        return setActiveView(view);
+      }
+    },
+    [setActiveView]
+  );
 
-  function closeSidebar() {
+  const closeSidebar = useCallback(() => {
     _setActiveView(null);
-  }
+  }, [_setActiveView]);
 
   const value = useMemo<IPageSidebarContext>(
     () => ({
@@ -39,7 +39,7 @@ export function PageSidebarProvider({ children }: { children: ReactNode }) {
       setActiveView: _setActiveView,
       closeSidebar
     }),
-    [activeView, currentPageId, _setActiveView]
+    [activeView, _setActiveView, closeSidebar]
   );
 
   return <PageSidebarContext.Provider value={value}>{children}</PageSidebarContext.Provider>;

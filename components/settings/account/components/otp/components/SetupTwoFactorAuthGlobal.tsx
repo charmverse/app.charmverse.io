@@ -4,7 +4,6 @@ import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
 
 import { TwoFactorAuthSetupModal } from './TwoFactorAuthSetupModal';
@@ -15,20 +14,14 @@ export function SetupTwoFactorAuthGlobal() {
   const { space } = useCurrentSpace();
   const activeOtp = !!user?.otp?.activatedAt;
   const spaceRequiresOtp = !!space?.requireMembersTwoFactorAuth;
-  const isCharmverseSpace = useIsCharmverseSpace();
 
   useEffect(() => {
-    if (!activeOtp && spaceRequiresOtp && otpSetupModal.isOpen === false && isCharmverseSpace) {
+    if (!activeOtp && spaceRequiresOtp && otpSetupModal.isOpen === false) {
       otpSetupModal.open();
     }
-  }, [activeOtp, spaceRequiresOtp, isCharmverseSpace]);
+  }, [activeOtp, spaceRequiresOtp]);
 
-  if (
-    !isCharmverseSpace ||
-    !user ||
-    !space?.requireMembersTwoFactorAuth ||
-    (user.otp?.activatedAt && !otpSetupModal.isOpen)
-  ) {
+  if (!user || !space?.requireMembersTwoFactorAuth || (user.otp?.activatedAt && !otpSetupModal.isOpen)) {
     return null;
   }
 

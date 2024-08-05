@@ -1,15 +1,16 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box, useMediaQuery } from '@mui/material';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
-import type { FormFieldValue } from 'components/common/form/interfaces';
+import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useRequiredMemberPropertiesForm } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
+import type { FormFieldValue } from 'lib/forms/interfaces';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from '../../../../../../hooks/useMemberPropertyValues';
@@ -49,7 +50,8 @@ export function DialogContainer({
   title,
   fluidSize,
   hideCloseButton,
-  footerActions
+  footerActions,
+  'data-test': dataTest
 }: {
   onClose?: VoidFunction;
   title: string;
@@ -57,12 +59,14 @@ export function DialogContainer({
   fluidSize?: boolean;
   hideCloseButton?: boolean;
   footerActions?: React.ReactNode;
+  'data-test'?: string;
 }) {
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <StyledDialog
+      data-test={dataTest}
       toolbar={<div />}
       fluidSize={fluidSize}
       hideCloseButton={hideCloseButton}
@@ -81,13 +85,19 @@ export function DialogContainer({
 
 export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
   const { refreshPropertyValues } = useMemberPropertyValues(userId);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { control, errors, isValid, isDirty, isSubmitting, onSubmit, onFormChange } = useRequiredMemberPropertiesForm({
+  const { control, isValid, isDirty, onSubmit, onFormChange } = useRequiredMemberPropertiesForm({
     userId
   });
 
   async function saveForm() {
-    await onSubmit();
+    setIsSubmitting(true);
+    try {
+      await onSubmit();
+    } finally {
+      setIsSubmitting(false);
+    }
     onClose();
   }
 
@@ -99,7 +109,6 @@ export function MemberPropertiesFormDialog({ userId, onClose }: Props) {
     <DialogContainer title='Edit profile' onClose={onClose}>
       <MemberPropertiesForm
         control={control}
-        errors={errors}
         userId={userId}
         refreshPropertyValues={refreshPropertyValues}
         onChange={onMemberDetailsChange}

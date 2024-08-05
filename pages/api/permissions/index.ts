@@ -16,8 +16,8 @@ import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPe
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { addGuest } from 'lib/roles/addGuest';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
-import { isValidEmail } from 'lib/utilities/strings';
+import { DataNotFoundError } from 'lib/utils/errors';
+import { isValidEmail } from 'lib/utils/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -53,17 +53,29 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     permission: PagePermissionAssignmentByValues;
   };
 
+  const pageWithType = await prisma.page.findUniqueOrThrow({
+    where: {
+      id: pageId as string
+    },
+    select: {
+      type: true
+    }
+  });
+
+  if (
+    (pageWithType.type === 'proposal' || pageWithType.type === 'proposal_template') &&
+    permissionData.assignee.group !== 'public'
+  ) {
+    throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
+  }
+
   const computedPermissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId: req.session.user.id
   });
 
-  if (permissionData.assignee.group === 'public' && computedPermissions.edit_isPublic !== true) {
-    throw new ActionNotPermittedError('You cannot make page public.');
-  } else if (permissionData.assignee.group !== 'public' && computedPermissions.grant_permissions !== true) {
-    throw new ActionNotPermittedError('You cannot manage permissions for this page');
-  } else if (permissionData.permissionLevel === 'proposal_editor') {
-    throw new ActionNotPermittedError('This permission level can only be created automatically by proposals.');
+  if (!computedPermissions.grant_permissions) {
+    throw new ActionNotPermittedError('You cannot edit permissions for this page');
   } else if (permissionData.assignee.group === 'public' && permissionData.permissionLevel !== 'view') {
     throw new ActionNotPermittedError('Only view permissions can be provided to public.');
   }
@@ -154,6 +166,12 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
 
   updateTrackPageProfile(pageId);
 
+  log.info('User added page permissions', {
+    pageId,
+    permission: createdPermission,
+    userId: req.session.user.id
+  });
+
   return res.status(201).json(createdPermission);
 }
 async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
@@ -173,15 +191,19 @@ async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
     userId: req.session.user.id
   });
 
-  if (permission.public && computedPermissions.edit_isPublic !== true) {
-    throw new ActionNotPermittedError('You cannot manage permissions for this page');
-  } else if (!permission.public && computedPermissions.grant_permissions !== true) {
-    throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  if (!computedPermissions.grant_permissions) {
+    throw new ActionNotPermittedError('You cannot edit permissions for this page');
   }
 
   await req.premiumPermissionsClient.pages.deletePagePermission({ permissionId });
 
   updateTrackPageProfile(permission.pageId);
+
+  log.info('User removed page permissions', {
+    pageId: permission.pageId,
+    permission,
+    userId: req.session.user.id
+  });
 
   return res.status(200).json({
     success: true

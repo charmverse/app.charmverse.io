@@ -3,20 +3,18 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { useGetCredentialTemplates } from 'charmClient/hooks/credentialHooks';
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
-import { CredentialSelect } from 'components/credentials/CredentialsSelect';
+import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
+import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/components/CustomPropertiesAdapter';
 import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { ProposalEvaluationValues } from '../ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 
 export type ProposalPropertiesInput = {
+  createdAt: string; // this is necessary for Created Time custom property
   content?: PageContent | null;
   contentText?: string; // required to know if we can overwrite content when selecting a template
   authors: string[];
@@ -29,6 +27,7 @@ export type ProposalPropertiesInput = {
   archived?: boolean;
   sourcePageId?: string;
   sourcePostId?: string;
+  makeRewardsPublic?: boolean | null;
 };
 
 type ProposalPropertiesProps = {
@@ -39,7 +38,6 @@ type ProposalPropertiesProps = {
   readOnlyRewards?: boolean;
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   readOnlyCustomProperties?: string[];
-  readOnlySelectedCredentialTemplates?: boolean;
   rewardIds?: string[] | null;
   proposalId?: string;
   isStructuredProposal: boolean;
@@ -53,7 +51,6 @@ export function ProposalPropertiesBase({
   readOnlyAuthors,
   setProposalFormInputs,
   readOnlyCustomProperties,
-  readOnlySelectedCredentialTemplates,
   readOnlyRewards,
   rewardIds,
   proposalId,
@@ -62,11 +59,6 @@ export function ProposalPropertiesBase({
 }: ProposalPropertiesProps) {
   const { mappedFeatures } = useSpaceFeatures();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
-  const { space } = useCurrentSpace();
-
-  const { data: credentialTemplates } = useGetCredentialTemplates({ spaceId: space?.id });
-
-  const showCredentialSelect = !!credentialTemplates?.length;
 
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat();
@@ -125,17 +117,6 @@ export function ProposalPropertiesBase({
                 wrapColumn
                 showEmptyPlaceholder
               />
-              {showCredentialSelect && (
-                <CredentialSelect
-                  readOnly={readOnlySelectedCredentialTemplates}
-                  selectedCredentialTemplates={proposalFormInputs.selectedCredentialTemplates}
-                  onChange={(selectedCredentialTemplates) =>
-                    setProposalFormInputs({
-                      selectedCredentialTemplates
-                    })
-                  }
-                />
-              )}
             </Box>
           </div>
         </Box>
@@ -143,7 +124,7 @@ export function ProposalPropertiesBase({
         <CustomPropertiesAdapter
           readOnly={readOnlyAuthors}
           readOnlyProperties={readOnlyCustomProperties}
-          proposal={proposalFormInputs}
+          proposalForm={proposalFormInputs}
           proposalId={proposalId}
           onChange={(properties: ProposalFields['properties']) => {
             setProposalFormInputs({

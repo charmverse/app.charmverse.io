@@ -1,11 +1,12 @@
-import { createMemberPropertyPermission } from 'lib/members/createMemberPropertyPermission';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createMemberPropertyPermission } from '@root/lib/members/createMemberPropertyPermission';
+import { InvalidInputError } from '@root/lib/utils/errors';
+
+import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateMemberProperty } from 'testing/utils/members';
 
 describe('createMemberPropertyPermission', () => {
   it('should create member property permission', async () => {
-    const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const { user: adminUser, space } = await generateUserAndSpace({ isAdmin: true });
 
     const prop = await generateMemberProperty({
       type: 'text',
@@ -22,8 +23,8 @@ describe('createMemberPropertyPermission', () => {
   });
 
   it('should throw an error when trying to create permission for a property and role from different spaces', async () => {
-    const { user: adminUser, space } = await generateUserAndSpaceWithApiToken(undefined, true);
-    const { user: adminUser2, space: space2 } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const { user: adminUser, space } = await generateUserAndSpace({ isAdmin: true });
+    const { user: adminUser2, space: space2 } = await generateUserAndSpace({ isAdmin: true });
 
     const prop = await generateMemberProperty({
       type: 'text',

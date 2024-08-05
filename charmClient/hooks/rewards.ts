@@ -1,4 +1,4 @@
-import type { Application, ApplicationComment, PageComment } from '@charmverse/core/prisma-client';
+import type { Application, ApplicationComment } from '@charmverse/core/prisma-client';
 
 import type { BountyPermissionFlags } from 'lib/permissions/bounties/interfaces';
 import type {
@@ -7,10 +7,12 @@ import type {
   RewardBlockWithTypedFields
 } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
+import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import type { ApplicationWithTransactions, RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 
-import { useGET, usePOST, usePUT, useDELETE } from './helpers';
+import type { MaybeString } from './helpers';
+import { useGET, usePOST, usePUT, useDELETE, useGETImmutable } from './helpers';
 
 export function useGetRewardPermissions({ rewardId }: { rewardId?: string }) {
   return useGET<BountyPermissionFlags>(rewardId ? `/api/rewards/${rewardId}/permissions` : null);
@@ -40,38 +42,22 @@ export function useGetRewards({ spaceId }: { spaceId?: string }) {
   return useGET<RewardWithUsers[]>(spaceId ? `/api/rewards?spaceId=${spaceId}` : null);
 }
 
-export function useGetRewardBlocks({ spaceId }: { spaceId?: string }) {
-  return useGET<RewardBlockWithTypedFields[]>(spaceId ? `/api/spaces/${spaceId}/rewards/blocks` : null);
+export function useGetRewardBlocks({ spaceId, type }: { spaceId?: string; type?: 'board' }) {
+  return useGET<RewardBlockWithTypedFields[]>(spaceId ? `/api/spaces/${spaceId}/rewards/blocks` : null, { type });
 }
 
 // // Mutative requests
 
 export function useCreateReward() {
-  return usePOST<Omit<RewardCreationData, 'userId'>>('/api/rewards');
+  return usePOST<Omit<RewardCreationData, 'userId'>, RewardWithUsers>('/api/rewards');
 }
-
-// export function useUpsertRubricCriteria({ rewardId }: { rewardId: string }) {
-//   return usePUT<Pick<RubricCriteriaUpsert, 'rubricCriteria'>>(`/api/rewards/${rewardId}/rubric-criteria`);
-// }
-
-// export function useUpsertRubricCriteriaAnswers({ rewardId }: { rewardId: MaybeString }) {
-//   return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/rewards/${rewardId}/rubric-answers`);
-// }
-
-// export function useUpsertDraftRubricCriteriaAnswers({ rewardId }: { rewardId: MaybeString }) {
-//   return usePUT<Pick<RubricAnswerUpsert, 'answers'>>(`/api/rewards/${rewardId}/rubric-answers`);
-// }
-
-// export function useDeleteRubricCriteriaAnswers({ rewardId }: { rewardId: MaybeString }) {
-//   return useDELETE<{ isDraft: boolean }>(`/api/rewards/${rewardId}/rubric-answers`);
-// }
-
-// export function useUpdateRewardLensProperties({ rewardId }: { rewardId: string }) {
-//   return usePUT<Omit<UpdateRewardLensPropertiesRequest, 'rewardId'>>(`/api/rewards/${rewardId}/update-lens-properties`);
-// }
 
 export function useGetRewardTemplatesBySpace(spaceId?: string | null) {
   return useGET<RewardTemplate[]>(spaceId ? `/api/spaces/${spaceId}/reward-templates` : null);
+}
+
+export function useGetRewardTemplate(pageId: MaybeString) {
+  return useGET<RewardTemplate>(pageId ? `/api/rewards/templates/${pageId}` : null);
 }
 
 export function useUpdateRewardBlocks(spaceId: string) {
@@ -82,4 +68,12 @@ export function useUpdateRewardBlocks(spaceId: string) {
 
 export function useDeleteRewardBlocks(spaceId: string) {
   return useDELETE<{ blockIds: string[] }>(`/api/spaces/${spaceId}/rewards/blocks`);
+}
+
+export function useGetRewardWorkflows(spaceId: MaybeString) {
+  return useGETImmutable<RewardWorkflow[]>(spaceId ? `/api/spaces/${spaceId}/rewards/workflows` : null);
+}
+
+export function usePublishReward(rewardId: string) {
+  return usePUT<undefined, RewardWithUsers>(`/api/rewards/${rewardId}/publish`);
 }

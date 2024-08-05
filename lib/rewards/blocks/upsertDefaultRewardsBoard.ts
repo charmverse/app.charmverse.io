@@ -1,19 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
+import { DEFAULT_BOARD_BLOCK_ID } from '@root/lib/databases/customBlocks/constants';
 
-import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import {
-  DEFAULT_BOARD_BLOCK_ID,
-  DEFAULT_BOARD_VIEW_BLOCK_ID,
-  DEFAULT_CALENDAR_VIEW_BLOCK_ID,
-  DEFAULT_TABLE_VIEW_BLOCK_ID
-} from 'lib/focalboard/customBlocks/constants';
-import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
-import {
-  defaultRewardViews,
-  generateDefaultBoardView,
-  generateDefaultCalendarView,
-  generateDefaultTableView
-} from 'lib/rewards/blocks/views';
+import { APPLICANT_STATUS_BLOCK_ID } from './constants';
+import { upsertBlock } from './upsertBlock';
+import { defaultRewardViews, generateDefaultBoardView, generateDefaultTableView } from './views';
 
 export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: string; userId?: string }) {
   let updateUserId = userId;
@@ -26,7 +17,7 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
   }
 
   if (!updateUserId) {
-    throw new Error('User id not found, cannot craete default rewards board');
+    throw new Error('User id not found, cannot create default rewards board');
   }
 
   // safety check - if default board exists, do not override existing fields
@@ -59,29 +50,32 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
     }
   });
 
-  // table view
+  // table view for rewards
   await upsertBlock({
     spaceId,
     userId: updateUserId,
-    data: generateDefaultTableView({ spaceId }),
+    data: generateDefaultTableView({
+      spaceId,
+      block: {
+        fields: {},
+        title: 'Rewards'
+      }
+    }),
     // do not override view if it exists already
     createOnly: true
   });
 
-  // board view
+  // board view for applicants
   await upsertBlock({
     spaceId,
     userId: updateUserId,
-    data: generateDefaultBoardView({ spaceId }),
-    // do not override view if it exists already
-    createOnly: true
-  });
-
-  // // calendar view
-  await upsertBlock({
-    spaceId,
-    userId: updateUserId,
-    data: generateDefaultCalendarView({ spaceId }),
+    data: generateDefaultBoardView({
+      spaceId,
+      block: {
+        fields: { sourceType: 'reward_applications' },
+        title: 'Submissions'
+      }
+    }),
     // do not override view if it exists already
     createOnly: true
   });

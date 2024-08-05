@@ -1,9 +1,9 @@
-import type { Node } from '@bangle.dev/pm';
-import { Step } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
+import type { ProsemirrorJSONStep } from '@root/lib/websockets/documentEvents/interfaces';
+import type { Node } from 'prosemirror-model';
+import { Step } from 'prosemirror-transform';
 
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
-import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
 
 export function applyStepsToNode(steps: ProsemirrorJSONStep[], node: Node): Node {
   return steps.reduce<Node>((n, stepJson, index) => {
@@ -17,7 +17,7 @@ export function applyStepsToNode(steps: ProsemirrorJSONStep[], node: Node): Node
         throw new Error('Failed to apply step');
       }
     } catch (err) {
-      log.warn(`An error occurred at step number`, index, 'with step', stepJson);
+      log.warn(`An error occurred when applying prosemirror step:`, stepJson);
       throw err;
     }
   }, node);

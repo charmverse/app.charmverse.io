@@ -1,12 +1,12 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
 import { Alert } from '@mui/material';
+import type { LoggedInUser } from '@root/models';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
 import { ConnectedAccounts } from 'components/_app/components/ConnectedAccounts';
 import { Button } from 'components/common/Button';
-import type { FormFieldValue } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
 import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
@@ -24,7 +24,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
-import type { LoggedInUser } from 'models';
+import type { FormFieldValue } from 'lib/forms/interfaces';
 
 import type { OnboardingStep } from '../hooks/useOnboarding';
 import { useOnboarding } from '../hooks/useOnboarding';
@@ -113,16 +113,15 @@ function UserOnboardingDialog({
   hasEmptyRequiredProperties?: boolean;
   setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { requiredPropertiesWithoutValue } = useRequiredMemberProperties({
     userId: currentUser.id
   });
   const {
     control: memberPropertiesControl,
-    errors: memberPropertiesErrors,
     isValid: isMemberPropertiesValid,
     onFormChange: onMemberPropertiesChange,
     isDirty: isMemberPropertiesDirty,
-    isSubmitting: isMemberPropertiesSubmitting,
     onSubmit: onSubmitMemberProperties
   } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
@@ -134,17 +133,14 @@ function UserOnboardingDialog({
     values: userDetailsValues,
     onFormChange: onUserDetailsChange,
     isDirty: isUserDetailsDirty,
-    isSubmitting: isUserDetailsSubmitting,
     onSubmit: onSubmitUserDetails
   } = useRequiredUserDetailsForm({
     userId: currentUser.id
   });
-
   const { refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
 
   const isFormDirty = isMemberPropertiesDirty || isUserDetailsDirty;
-
   usePreventReload(isFormDirty);
 
   async function saveForm() {
@@ -152,9 +148,13 @@ function UserOnboardingDialog({
       completeOnboarding?.();
       return;
     }
-
-    await onSubmitMemberProperties();
-    await onSubmitUserDetails();
+    setIsSubmitting(true);
+    try {
+      await onSubmitMemberProperties();
+      await onSubmitUserDetails();
+    } finally {
+      setIsSubmitting(false);
+    }
     completeOnboarding?.();
   }
 
@@ -194,6 +194,7 @@ function UserOnboardingDialog({
 
   return (
     <DialogContainer
+      data-test='onboarding-dialog'
       fluidSize={currentStep === 'email_step'}
       title={title}
       onClose={currentStep !== 'email_step' ? handleClose : undefined}
@@ -204,7 +205,7 @@ function UserOnboardingDialog({
             disableElevation
             size='large'
             onClick={saveForm}
-            loading={isUserDetailsSubmitting || isMemberPropertiesSubmitting}
+            loading={isSubmitting}
             disabled={isSaveButtonDisabled}
             disabledTooltip={!isFormDirty ? 'No changes to save' : 'Please fill out all required fields'}
           >
@@ -233,7 +234,6 @@ function UserOnboardingDialog({
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
             control={memberPropertiesControl}
-            errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}
             onChange={(values) =>
               onMemberPropertiesChange(

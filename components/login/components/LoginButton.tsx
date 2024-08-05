@@ -7,7 +7,9 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import type { LoggedInUser } from '@root/models';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
 import { useRef, useState } from 'react';
@@ -20,9 +22,8 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
-import type { SystemError } from 'lib/utilities/errors';
-import type { LoggedInUser } from 'models/User';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
+import type { SystemError } from 'lib/utils/errors';
 
 import { DiscordLoginHandler } from './DiscordLoginHandler';
 import { EmailAddressForm } from './EmailAddressForm';
@@ -56,11 +57,16 @@ const StyledButton = styled(Button)`
 
 type Props = {
   redirectUrl?: string;
-  showSignup: boolean;
+  showSignup?: boolean;
+  signInLabel?: string;
   emailOnly?: boolean;
 };
 
-export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
+const WarpcastLogin = dynamic(() => import('./WarpcastLogin').then((module) => module.WarpcastLogin), {
+  ssr: false
+});
+
+export function LoginButton({ redirectUrl, signInLabel = 'Sign in', showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
   const { resetSigning } = useWeb3Account();
 
@@ -98,8 +104,9 @@ export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
         size='large'
         onClick={handleClickOpen}
         variant={showSignup ? 'outlined' : undefined}
+        data-test='signin-button'
       >
-        Sign in
+        {signInLabel}
       </StyledButton>
       <LoginHandler emailOnly={emailOnly} redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />
     </Box>
@@ -138,7 +145,6 @@ function LoginHandler(props: DialogProps) {
   async function handleMagicLinkRequest(email: string) {
     if (sendingMagicLink.current === false) {
       sendingMagicLink.current = true;
-      // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email, redirectUrl });
         showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
@@ -152,9 +158,9 @@ function LoginHandler(props: DialogProps) {
     }
   }
 
-  async function handleWeb3Login(authSig: AuthSig) {
+  async function handleWeb3Login(payload: SignatureVerificationPayload) {
     try {
-      const resp = await loginFromWeb3Account(authSig);
+      const resp = await loginFromWeb3Account(payload);
       if (resp?.id) {
         handleLogin({ identityType: 'Wallet' });
       }
@@ -216,6 +222,11 @@ function LoginHandler(props: DialogProps) {
             </DialogTitle>
           )}
           {!loginMethod && !props.emailOnly && <DiscordLoginHandler redirectUrl={returnUrl ?? redirectUrl ?? '/'} />}
+          {!loginMethod && !props.emailOnly && (
+            <ListItem>
+              <WarpcastLogin type='login' />
+            </ListItem>
+          )}
 
           {/* Google login method */}
           {!loginMethod && (

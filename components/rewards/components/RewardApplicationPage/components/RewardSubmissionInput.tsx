@@ -1,8 +1,6 @@
-import { isEmptyDocument } from '@bangle.dev/utils';
 import type { Application } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, FormLabel } from '@mui/material';
-import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
@@ -17,27 +15,28 @@ import { useUser } from 'hooks/useUser';
 import type { BountyPermissionFlags } from 'lib/permissions/bounties';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { RewardType } from 'lib/rewards/interfaces';
 import type { WorkUpsertData } from 'lib/rewards/work';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import type { SystemError } from 'lib/utilities/errors';
 
 import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 
-const schema = (customReward?: boolean) => {
+const schema = (rewardType: RewardType) => {
   return yup.object({
     submission: yup.string().required(),
     submissionNodes: yup.mixed<string>().required(),
-    walletAddress: customReward
-      ? yup.string()
-      : yup
-          .string()
-          .required()
-          .test('verifyContractFormat', 'Invalid wallet address', (address) => {
-            if (address.endsWith('eth')) {
-              return true;
-            }
-            return isValidChainAddress(address);
-          }),
+    walletAddress:
+      rewardType === 'token'
+        ? yup
+            .string()
+            .required()
+            .test('verifyContractFormat', 'Invalid wallet address', (address) => {
+              if (address.endsWith('eth')) {
+                return true;
+              }
+              return isValidChainAddress(address);
+            })
+        : yup.string(),
     rewardInfo: yup.string()
   });
 };
@@ -52,11 +51,12 @@ interface Props {
       Pick<WorkUpsertData, 'submission' | 'submissionNodes' | 'walletAddress' | 'rewardInfo' | 'applicationId'>
     >
   ) => Promise<boolean>;
+  onCancel?: VoidFunction;
   readOnly?: boolean;
   permissions?: BountyPermissionFlags;
   expandedOnLoad?: boolean;
   alwaysExpanded?: boolean;
-  hasCustomReward: boolean;
+  rewardType: RewardType;
   refreshSubmission: VoidFunction;
   currentUserIsAuthor: boolean;
   isSaving?: boolean;
@@ -67,9 +67,10 @@ export function RewardSubmissionInput({
   readOnly = false,
   submission,
   onSubmit: onSubmitProp,
-  hasCustomReward,
+  rewardType,
   currentUserIsAuthor,
-  isSaving
+  isSaving,
+  onCancel
 }: Props) {
   const { user } = useUser();
   const [isEditorTouched, setIsEditorTouched] = useState(false);
@@ -78,7 +79,7 @@ export function RewardSubmissionInput({
     register,
     handleSubmit,
     setValue,
-    getValues,
+    watch,
     formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -87,12 +88,10 @@ export function RewardSubmissionInput({
       submissionNodes: submission?.submissionNodes as any as string,
       walletAddress: submission?.walletAddress ?? user?.wallets[0]?.address ?? ''
     },
-    resolver: yupResolver(schema(hasCustomReward))
+    resolver: yupResolver(schema(rewardType))
   });
 
-  const formValues = getValues();
-
-  const [formError, setFormError] = useState<SystemError | null>(null);
+  const submissionNodes = watch('submissionNodes');
 
   async function onSubmit(values: FormValues) {
     const hasSaved = await onSubmitProp({
@@ -100,7 +99,6 @@ export function RewardSubmissionInput({
       ...values
     });
     if (hasSaved) {
-      setFormError(null);
       setIsEditorTouched(false);
     }
   }
@@ -119,7 +117,7 @@ export function RewardSubmissionInput({
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
         <Grid container direction='column' spacing={2}>
-          <Grid item>
+          <Grid item data-test='submission-input'>
             <CharmEditor
               content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
               onContentChange={(content) => {
@@ -147,7 +145,7 @@ export function RewardSubmissionInput({
             />
           </Grid>
 
-          {(currentUserIsAuthor || permissions?.review) && !hasCustomReward && (
+          {(currentUserIsAuthor || permissions?.review) && rewardType === 'token' && (
             <Grid item>
               <InputLabel>Address/ENS to receive reward</InputLabel>
               <TextField
@@ -161,7 +159,7 @@ export function RewardSubmissionInput({
             </Grid>
           )}
 
-          {(currentUserIsAuthor || permissions?.review) && hasCustomReward && (
+          {(currentUserIsAuthor || permissions?.review) && rewardType === 'custom' && (
             <Grid item>
               <InputLabel>Information for custom reward</InputLabel>
               <TextField
@@ -179,23 +177,23 @@ export function RewardSubmissionInput({
 
           {!readOnly && (
             <Grid item display='flex' gap={1} justifyContent='flex-end'>
+              {onCancel && (
+                <Button disabled={isSaving} onClick={onCancel} color='error' variant='outlined'>
+                  Cancel
+                </Button>
+              )}
               <Button
                 disabled={
                   (!isValid && submission?.status === 'inProgress') ||
                   !isEditorTouched ||
-                  checkIsContentEmpty(formValues.submissionNodes as unknown as PageContent)
+                  checkIsContentEmpty(submissionNodes as unknown as PageContent)
                 }
+                data-test='submit-submission-button'
                 type='submit'
                 loading={isSaving}
               >
                 {submission?.id ? 'Update' : 'Submit'}
               </Button>
-            </Grid>
-          )}
-
-          {formError && (
-            <Grid item>
-              <Alert severity={formError.severity}>{formError.message}</Alert>
             </Grid>
           )}
         </Grid>

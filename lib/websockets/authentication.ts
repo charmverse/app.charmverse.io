@@ -2,13 +2,13 @@ import { IncomingMessage, ServerResponse } from 'http';
 
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { authSecret } from '@root/config/constants';
+import { ActionNotPermittedError } from '@root/lib/middleware';
+import type { SessionData } from '@root/lib/session/config';
+import { getIronOptions } from '@root/lib/session/getIronOptions';
+import type { SealedUserId } from '@root/lib/websockets/interfaces';
 import { getIronSession, unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
-
-import { ActionNotPermittedError } from 'lib/middleware';
-import { authSecret } from 'lib/session/authSecret';
-import { getIronOptions } from 'lib/session/getIronOptions';
-import type { SealedUserId } from 'lib/websockets/interfaces';
 
 export type SocketUser = { id: string; avatar: string | null; name: string };
 export type AuthenticatedSocketData = { user: SocketUser };
@@ -48,6 +48,9 @@ export async function authOnConnect(socket: AuthenticatedSocket, next: (err?: Er
 }
 
 async function getUserIdFromToken(authToken: string) {
+  if (!authSecret) {
+    throw new Error('Auth secret not defined');
+  }
   return unsealData<SealedUserId>(authToken, {
     password: authSecret
   });
@@ -58,5 +61,5 @@ function getSessionFromSocket(socket: Socket) {
   const req = new IncomingMessage();
   req.headers = socket.handshake.headers;
   const res = new ServerResponse(req);
-  return getIronSession(req, res, getIronOptions());
+  return getIronSession<SessionData>(req, res, getIronOptions());
 }

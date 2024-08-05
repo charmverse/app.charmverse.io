@@ -2,14 +2,14 @@ import { memo, useEffect, useState } from 'react';
 
 import MultiTabs from 'components/common/MultiTabs';
 import { isPdfEmbedLink } from 'lib/pdf/extractPdfEmbedLink';
-import { isUrl } from 'lib/utilities/strings';
+import { isUrl } from 'lib/utils/strings';
 
+import { extractAttrsFromUrl as extractNFTAttrs } from '../../../../../lib/blockchain/utils';
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
 import { extractEmbedType, extractIframeProps } from '../iframe/utils';
-import { extractAttrsFromUrl as extractNFTAttrs } from '../nft/utils';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
 import { extractTweetAttrs } from '../tweet/tweetSpec';

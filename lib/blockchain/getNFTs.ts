@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
+import { isTestEnv } from '@root/config/constants';
 import orderBy from 'lodash/orderBy';
-
-import { isTestEnv } from 'config/constants';
 
 // Alchemy APIs
 import {
@@ -18,7 +17,7 @@ import {
   getNFT as getNFTFromAnkr,
   getNFTOwners as getNFTOwnersFromAnkr
 } from './provider/ankr/client';
-import { supportedMainnets as supportedMainnetsByAnkr } from './provider/ankr/config';
+import { supportedChainIds as supportedMainnetsByAnkr } from './provider/ankr/config';
 import type { SupportedChainId as SupportedChainIdByAnkr } from './provider/ankr/config';
 // ZKSync APIs
 import { getClient as getZKSyncClient } from './provider/zksync/client';
@@ -38,7 +37,6 @@ export type SupportedChainId = SupportedChainIdByAlchemy | SupportedChainIdByAnk
 export type NFTData = {
   id: string;
   tokenId: string;
-  tokenIdInt: number | null;
   contract: string;
   title: string;
   description: string;

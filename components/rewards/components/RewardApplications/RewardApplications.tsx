@@ -1,23 +1,22 @@
-import type { ApplicationStatus } from '@charmverse/core/prisma';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Box, Divider, Grid, IconButton, Stack, Tooltip } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import type { LoggedInUser } from '@root/models';
 import { useMemo } from 'react';
 
-import { useGetReward } from 'charmClient/hooks/rewards';
 import UserDisplay from 'components/common/UserDisplay';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { ApplicationMeta } from 'lib/rewards/interfaces';
-import { formatDate, formatDateTime } from 'lib/utilities/dates';
-import type { LoggedInUser } from 'models';
+import { submissionStatuses } from 'lib/rewards/constants';
+import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
+import { formatDate, formatDateTime } from 'lib/utils/dates';
 
 import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
 
 type Props = {
-  rewardId: string;
+  reward: RewardWithUsers;
   applicationRequired: boolean;
 };
 
@@ -51,6 +50,8 @@ function ApplicationRows({
   openApplication: (applicationId: string) => void;
   applications: ApplicationMeta[];
 }) {
+  const { navigateToSpacePath } = useCharmRouter();
+
   const { getMemberById } = useMembers();
 
   return (
@@ -67,7 +68,7 @@ function ApplicationRows({
           }
           return (
             <Grid container display='flex' gap={2} key={application.id} alignItems='center' minWidth={500}>
-              <Grid item xs={4} md={5} display='flex' flexDirection='row' gap={1}>
+              <Grid item xs={4} display='flex' flexDirection='row' gap={1}>
                 <UserDisplay avatarSize='small' userId={member.id} fontSize='small' hideName showMiniProfile />
                 <Typography
                   sx={{
@@ -99,7 +100,12 @@ function ApplicationRows({
 
               <Grid item xs={1}>
                 <Tooltip title={`View ${isApplication ? 'application' : 'submission'} details`}>
-                  <IconButton size='small' onClick={() => openApplication(application.id)}>
+                  <IconButton
+                    size='small'
+                    onClick={() => {
+                      navigateToSpacePath(`/rewards/applications/${application.id}`);
+                    }}
+                  >
                     <ArrowForwardIosIcon fontSize='small' color='secondary' />
                   </IconButton>
                 </Tooltip>
@@ -126,12 +132,9 @@ function ApplicationRows({
   );
 }
 
-export function RewardApplications({ rewardId, applicationRequired }: Props) {
+export function RewardApplications({ applicationRequired, reward }: Props) {
   const { updateURLQuery } = useCharmRouter();
-
   const { user } = useUser();
-
-  const { data: reward } = useGetReward({ rewardId });
 
   const { applications, submissions } = useMemo(() => {
     if (!reward) {
@@ -140,15 +143,6 @@ export function RewardApplications({ rewardId, applicationRequired }: Props) {
         submissions: []
       };
     }
-
-    const submissionStatuses: ApplicationStatus[] = [
-      'submission_rejected',
-      'review',
-      'processing',
-      'paid',
-      'complete',
-      'cancelled'
-    ];
 
     if (applicationRequired) {
       return {
@@ -190,7 +184,7 @@ export function RewardApplications({ rewardId, applicationRequired }: Props) {
           >
             There are no {applicationRequired ? 'applications' : 'submissions'} yet.
           </Typography>
-          <NewWorkButton rewardId={rewardId} />
+          <NewWorkButton reward={reward} />
         </Stack>
       </Stack>
     );
@@ -200,7 +194,7 @@ export function RewardApplications({ rewardId, applicationRequired }: Props) {
     return (
       <>
         <Stack flex={1} direction='row' my={1}>
-          <NewWorkButton rewardId={rewardId} />
+          <NewWorkButton reward={reward} />
         </Stack>
         <ApplicationRows isApplication={false} openApplication={openApplication} applications={submissions} />
         <Divider
@@ -216,7 +210,7 @@ export function RewardApplications({ rewardId, applicationRequired }: Props) {
   return (
     <>
       <Stack flex={1} direction='row' my={1}>
-        <NewWorkButton rewardId={rewardId} />
+        <NewWorkButton reward={reward} />
       </Stack>
       <ApplicationRows isApplication={false} openApplication={openApplication} applications={submissions} />
     </>

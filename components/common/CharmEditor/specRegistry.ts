@@ -6,6 +6,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { spec as bookmarkSpec } from './components/bookmark/bookmarkSpec';
 import * as bulletList from './components/bulletList';
+import * as button from './components/button/button.specs';
 import * as callout from './components/callout/callout';
 import * as columnLayout from './components/columnLayout/columnLayout.schema';
 import { spec as cryptoPriceSpec } from './components/cryptoPrice/cryptoPriceSpec';
@@ -15,13 +16,15 @@ import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
 import { spec as farcasterFrameSpec } from './components/farcasterFrame/farcasterFrameSpec';
 import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
 import { specs as fileSpecs } from './components/file/file.specs';
+import { hardBreakSpec } from './components/hardBreak';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
-import * as iframe from './components/iframe';
-import * as inlineComment from './components/inlineComment';
+import * as iframe from './components/iframe/iframeSpec';
+import * as image from './components/image/imageSpecs';
+import * as inlineComment from './components/inlineComment/inlineComment.specs';
 import * as inlineDatabase from './components/inlineDatabase';
-import { spec as inlinePaletteSpecs } from './components/inlinePalette';
-import * as inlineVote from './components/inlineVote';
+import { spec as inlinePaletteSpecs } from './components/inlinePalette/inlinePaletteSpec';
+import * as inlineVote from './components/inlineVote/inlineVote.specs';
 import { spec as linkSpec } from './components/link/link.specs';
 import { linkedPageSpec } from './components/linkedPage/linkedPage.specs';
 import * as listItem from './components/listItem/listItem';
@@ -29,22 +32,21 @@ import { spec as bulletListItemSpec } from './components/listItemNew/bulletListS
 import { spec as listItemSpec } from './components/listItemNew/listItemSpecs';
 import { spec as markSpec } from './components/listItemNew/markSpec';
 import { spec as orderedListItemSpec } from './components/listItemNew/orderedListSpecs';
-import { mentionSpecs } from './components/mention';
-import { nestedPageSpec } from './components/nestedPage';
+import { mentionSpecs } from './components/mention/mention.specs';
+import { nestedPageSpec } from './components/nestedPage/nestedPage.specs';
 import * as nft from './components/nft/nft.specs';
 import * as orderedList from './components/orderedList';
 import { spec as paragraphSpec } from './components/paragraph/paragraph';
 import { spec as pdfSpec } from './components/pdf/pdf';
 import * as poll from './components/poll/pollSpec';
 import * as quote from './components/quote/quote';
-import * as image from './components/ResizableImage';
 import * as tabIndent from './components/tabIndent';
-import { spec as tableSpec } from './components/table/table.schema';
+// import { spec as tableSpec } from './components/table/table.schema';
+import { spec as tableSpec } from './components/table/table.specs';
 import { spec as tableOfContentSpec } from './components/tableOfContents/tableOfContents.specs';
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';
 import * as video from './components/video/videoSpec';
-import { hardBreakSpec } from './specs/hardBreakSpec';
 
 export interface ICharmEditorOutput {
   doc: PageContent;
@@ -93,7 +95,8 @@ export const specRegistry = new SpecRegistry([
   linkedPageSpec(),
   quote.spec(), // OK
   tabIndent.spec(),
-  tableSpec(), // OK - only for text content
+  // tableSpec(), // OK - only for text content
+  tableSpec, // OK - only for text content
   disclosure.spec(),
   inlineDatabase.spec(),
   deletion,
@@ -104,6 +107,7 @@ export const specRegistry = new SpecRegistry([
   video.spec(),
   textColor.spec(),
   nft.spec(),
+  button.spec(),
   poll.spec(),
   bookmarkSpec(),
   tableOfContentSpec(),

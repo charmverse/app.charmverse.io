@@ -2,16 +2,16 @@ import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
-import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useRoles } from 'hooks/useRoles';
-import { isUUID } from 'lib/utilities/strings';
+import { isUUID } from 'lib/utils/strings';
 
+import { useGetPageMetaFromCache } from '../../../hooks/useGetPageMetaFromCache';
+import type { NodeViewProps } from '../../@bangle.dev/core/node-view';
 import type { MentionSpecSchemaAttrs } from '../mention.specs';
 
 const MentionContainer = styled(Link)`
@@ -32,18 +32,21 @@ const StyledTypography = styled(Typography)`
   border-bottom: 0.05em solid var(--link-underline);
 `;
 
-export default function Mention({ node }: NodeViewProps) {
-  const { showUserId } = useMemberDialog();
+export function Mention({ node }: NodeViewProps) {
+  const { showUserProfile } = useMemberProfileDialog();
   const attrs = node.attrs as MentionSpecSchemaAttrs;
   const { getMemberById } = useMembers();
-  const { pages } = usePages();
   const member = getMemberById(attrs.value);
   const { roles } = useRoles();
   const { space } = useCurrentSpace();
 
+  const isDocumentPath = attrs.type === 'page';
+  const { page, isLoading } = useGetPageMetaFromCache({
+    pageId: isDocumentPath ? node.attrs.value : null
+  });
+
   let value: ReactNode = null;
   if (attrs.type === 'page') {
-    const page = pages[attrs.value];
     const href =
       page?.type === 'proposal_template'
         ? `/${space?.domain}/proposals/new?template=${page.id}`
@@ -67,7 +70,7 @@ export default function Mention({ node }: NodeViewProps) {
     value = (
       <MentionContainer color='secondary'>
         <Typography
-          onClick={() => member?.id && showUserId(member.id)}
+          onClick={() => member?.id && showUserProfile(member.id)}
           component='span'
           color='secondary'
           sx={{ cursor: 'pointer' }}

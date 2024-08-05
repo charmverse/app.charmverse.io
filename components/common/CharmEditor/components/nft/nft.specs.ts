@@ -1,7 +1,7 @@
-import type { Node } from '@bangle.dev/pm';
+import type { SupportedChainId } from '@root/lib/blockchain/getNFTs';
+import type { Node } from 'prosemirror-model';
 
-import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
-import type { SupportedChainId } from 'lib/blockchain/getNFTs';
+import type { RawSpecs } from '../@bangle.dev/core/specRegistry';
 
 import { name } from './config';
 

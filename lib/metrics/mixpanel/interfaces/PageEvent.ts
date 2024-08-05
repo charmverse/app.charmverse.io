@@ -13,6 +13,7 @@ export type StaticPageType =
   | 'members_list'
   | 'settings/my-account'
   | 'settings/my-profile'
+  | 'settings/my-projects'
   | 'settings/my-charms'
   | 'settings/api'
   | 'settings/space'
@@ -21,6 +22,8 @@ export type StaticPageType =
   | 'settings/invites'
   | 'settings/credentials'
   | 'settings/proposals'
+  | 'settings/integrations'
+  | 'settings/notifications'
   | 'billing/marketing'
   | 'billing/checkout'
   | 'billing/settings';
@@ -29,7 +32,9 @@ type ViewPageEvent = PageEvent & {
   postId?: string;
   meta?: { pathname: string };
   type: PageType | 'post' | StaticPageType;
+  // include these to remove from URL
   spaceDomain?: string;
+  spaceCustomDomain?: string | null;
 };
 
 export interface PageEventMap {

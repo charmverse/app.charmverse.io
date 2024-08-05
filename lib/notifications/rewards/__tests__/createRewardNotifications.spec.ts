@@ -1,11 +1,16 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { reviewApplication } from '@root/lib/rewards/reviewApplication';
+import { work } from '@root/lib/rewards/work';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
+import {
+  getApplicationEntity,
+  getRewardEntity,
+  getSpaceEntity,
+  getUserEntity
+} from '@root/lib/webhookPublisher/entities';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
-import { reviewApplication } from 'lib/rewards/reviewApplication';
-import { work } from 'lib/rewards/work';
-import { createUserFromWallet } from 'lib/users/createUser';
-import { getApplicationEntity, getRewardEntity, getSpaceEntity, getUserEntity } from 'lib/webhookPublisher/entities';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { generateBounty, generateUserAndSpace } from 'testing/setupDatabase';
+import { createUserWithWallet, generateUserAndSpace, generateBounty } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
@@ -193,7 +198,9 @@ describe(`Test reward events and notifications`, () => {
 
   it(`Should create reward notifications for application.submitted event`, async () => {
     const { space, user } = await generateUserAndSpace();
-    const user2 = await createUserFromWallet();
+    const user2 = await createUserWithWallet({
+      address: randomETHWalletAddress()
+    });
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -266,12 +273,16 @@ describe(`Test reward events and notifications`, () => {
 
   it(`Should create reward notifications for application.approved event`, async () => {
     const { space, user } = await generateUserAndSpace();
-    const bountyReviewer = await createUserFromWallet();
+    const bountyReviewer = await createUserWithWallet({
+      address: randomETHWalletAddress()
+    });
     await addUserToSpace({
       spaceId: space.id,
       userId: bountyReviewer.id
     });
-    const user2 = await createUserFromWallet();
+    const user2 = await createUserWithWallet({
+      address: randomETHWalletAddress()
+    });
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id
@@ -367,7 +378,9 @@ describe(`Test reward events and notifications`, () => {
 
   it(`Should create reward notifications for application.payment_completed event`, async () => {
     const { space, user } = await generateUserAndSpace();
-    const user2 = await createUserFromWallet();
+    const user2 = await createUserWithWallet({
+      address: randomETHWalletAddress()
+    });
     await addUserToSpace({
       spaceId: space.id,
       userId: user2.id

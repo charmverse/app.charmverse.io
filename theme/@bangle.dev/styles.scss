@@ -32,24 +32,6 @@
   pointer-events: none;
 }
 
-.ProseMirror.resize-cursor {
-  cursor: ew-resize;
-  cursor: col-resize;
-}
-
-/* Give selected cells a blue overlay */
-.ProseMirror .selectedCell:after {
-  z-index: 2;
-  position: absolute;
-  content: '';
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background: rgba(200, 200, 255, 0.4);
-  pointer-events: none;
-}
-
 .ProseMirror-menubar-wrapper {
   border: 1px solid silver;
   outline: none;
@@ -222,33 +204,33 @@ img.ProseMirror-separator {
 }
 
 // nested list styles
-ul li {
-  ul li {
-    list-style-type: circle;
+// ul li {
+//   ul li {
+//     list-style-type: circle;
 
-    ul li {
-      list-style-type: square;
+//     ul li {
+//       list-style-type: square;
 
-      ul li {
-        list-style-type: disc;
-      }
-    }
-  }
-}
+//       ul li {
+//         list-style-type: disc;
+//       }
+//     }
+//   }
+// }
 
-ol li {
-  ol li {
-    list-style-type: lower-alpha;
+// ol li {
+//   ol li {
+//     list-style-type: lower-alpha;
 
-    ol li {
-      list-style-type: lower-roman;
+//     ol li {
+//       list-style-type: lower-roman;
 
-      ol li {
-        list-style-type: circle;
-      }
-    }
-  }
-}
+//       ol li {
+//         list-style-type: circle;
+//       }
+//     }
+//   }
+// }
 
 .bangle-editor li > span {
   display: block;
@@ -623,4 +605,44 @@ ol li {
 /** hide tab when a user suggested to delete a list item - it should not exist yet **/
 li .insertion > .charm-tab {
   display: none;
+}
+
+/** Copied from tooltip **/
+.bangle-tooltip {
+  display: none;
+  z-index: 30;
+}
+
+.bangle-tooltip[data-show] {
+  display: block;
+}
+
+.bangle-tooltip-arrow,
+.bangle-tooltip-arrow::before {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  z-index: -1;
+}
+
+.bangle-tooltip-arrow::before {
+  content: '';
+  transform: rotate(45deg);
+  background: #333;
+}
+
+.bangle-tooltip[data-popper-placement^='top'] > .bangle-tooltip-arrow {
+  bottom: -4px;
+}
+
+.bangle-tooltip[data-popper-placement^='bottom'] > .bangle-tooltip-arrow {
+  top: -4px;
+}
+
+.bangle-tooltip[data-popper-placement^='left'] > .bangle-tooltip-arrow {
+  right: -4px;
+}
+
+.bangle-tooltip[data-popper-placement^='right'] > .bangle-tooltip-arrow {
+  left: -4px;
 }

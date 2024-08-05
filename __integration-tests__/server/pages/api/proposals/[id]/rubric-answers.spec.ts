@@ -5,10 +5,10 @@ import request from 'supertest';
 
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
-  ProposalRubricCriteriaWithTypedParams
-} from 'lib/proposal/rubric/interfaces';
-import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
-import { upsertRubricCriteria } from 'lib/proposal/rubric/upsertRubricCriteria';
+  RubricCriteriaTyped
+} from 'lib/proposals/rubric/interfaces';
+import type { RubricAnswerUpsert } from 'lib/proposals/rubric/upsertRubricAnswers';
+import { upsertRubricCriteria } from 'lib/proposals/rubric/upsertRubricCriteria';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('PUT /api/proposals/[id]/rubric-answers - Update proposal rubric criteria answers', () => {
@@ -16,7 +16,7 @@ describe('PUT /api/proposals/[id]/rubric-answers - Update proposal rubric criter
   let reviewer: User;
   let space: Space;
   let proposal: Proposal & { evaluations: { id: string }[] };
-  let rubricCriteria: ProposalRubricCriteriaWithTypedParams;
+  let rubricCriteria: RubricCriteriaTyped;
 
   beforeAll(async () => {
     const generated1 = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spacePaidTier: 'free' });
@@ -102,7 +102,7 @@ describe('DELETE /api/proposals/[id]/rubric-answers - Delete proposal rubric cri
   let reviewer: User;
   let space: Space;
   let proposal: Proposal & { evaluations: { id: string }[] };
-  let rubricCriteria: ProposalRubricCriteriaWithTypedParams;
+  let rubricCriteria: RubricCriteriaTyped;
 
   beforeAll(async () => {
     const generated1 = await testUtilsUser.generateUserAndSpace({ isAdmin: false, spacePaidTier: 'free' });

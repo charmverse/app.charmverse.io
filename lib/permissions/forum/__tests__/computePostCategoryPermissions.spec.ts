@@ -2,10 +2,9 @@ import { AvailablePostCategoryPermissions } from '@charmverse/core/permissions';
 import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { PostCategory, Space, User } from '@charmverse/core/prisma';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
+import { PostCategoryNotFoundError } from '@root/lib/forums/categories/errors';
+import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
-
-import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
-import { InvalidInputError } from 'lib/utilities/errors';
 
 import { computePostCategoryPermissions } from '../computePostCategoryPermissions';
 

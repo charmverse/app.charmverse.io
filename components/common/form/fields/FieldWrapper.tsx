@@ -1,6 +1,7 @@
 import { Stack, type SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { memo } from 'react';
 import type { ReactNode } from 'react';
 
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -25,8 +26,9 @@ export function FieldWrapperContainer({
   sx?: SxProps;
   children: ReactNode;
 }) {
+  // 100% width is necessary to contain the charm editor input field inside its width
   return (
-    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' sx={sx}>
+    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' width='100%' sx={sx}>
       {children}
     </Box>
   );
@@ -35,6 +37,7 @@ export function FieldWrapperContainer({
 type ContentProps = {
   children?: ReactNode;
   iconLabel?: ReactNode;
+  error?: boolean | string;
   required?: boolean;
   description?: PageContent;
   labelEndAdornment?: ReactNode;
@@ -43,7 +46,7 @@ type ContentProps = {
 };
 
 // a wrapper for FieldWrapper with props for label and description
-export function FieldWrapper({
+function FieldWrapperComponent({
   sx,
   labelEndAdornment,
   description,
@@ -53,6 +56,7 @@ export function FieldWrapper({
   inline,
   iconLabel,
   inputEndAdornment,
+  error,
   inputEndAdornmentAlignItems = 'center'
 }: ContentProps & FieldWrapperProps) {
   if (!label) {
@@ -65,7 +69,7 @@ export function FieldWrapper({
         <Box alignItems='center' display='flex' gap={1}>
           {iconLabel ?? null}
           {label && (
-            <FieldLabel data-test='field-label'>
+            <FieldLabel data-test='field-label' color={error ? 'error' : undefined}>
               {label}
               {required && (
                 <Typography component='span' color='error'>
@@ -78,17 +82,25 @@ export function FieldWrapper({
         </Box>
       )}
       <ReadonlyCharmContent content={description} />
-      <Stack gap={1} alignItems={inputEndAdornmentAlignItems} flexDirection='row'>
-        <div style={{ flexGrow: 1 }}>{children}</div>
+      <Stack alignItems={inputEndAdornmentAlignItems} flexDirection='row'>
+        <div style={{ flexGrow: 1, overflowX: 'hidden' }}>{children}</div>
         {inputEndAdornment}
       </Stack>
     </FieldWrapperContainer>
   );
 }
 
+export const FieldWrapper = memo(FieldWrapperComponent);
+
 export function ReadonlyCharmContent({ content }: { content?: PageContent | null }) {
   if (!content || checkIsContentEmpty(content)) {
     return null;
   }
-  return <CharmEditor readOnly isContentControlled content={content} />;
+  return (
+    // Do not remove this div without testing PDF export on proposal forms first!
+    // For unknown reasons, it prevents elements from being pushed down at the top of the exported pages
+    <div>
+      <CharmEditor readOnly isContentControlled content={content} />
+    </div>
+  );
 }

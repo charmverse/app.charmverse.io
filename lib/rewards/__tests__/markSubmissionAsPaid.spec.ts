@@ -1,7 +1,7 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { testUtilsUser } from '@charmverse/core/test';
+import { WrongStateError } from '@root/lib/utils/errors';
 
-import { WrongStateError } from 'lib/utilities/errors';
 import { generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
 import { markSubmissionAsPaid } from '../markSubmissionAsPaid';

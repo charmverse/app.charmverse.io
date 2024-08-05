@@ -1,4 +1,3 @@
-import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { MessageOutlined } from '@mui/icons-material';
 import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
 import { Box, Stack, Tooltip, Typography } from '@mui/material';
@@ -10,8 +9,8 @@ import { InlineCommentInput } from 'components/[pageId]/DocumentPage/components/
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
-import { highlightDomElement } from 'lib/utilities/browser';
-import { isTruthy } from 'lib/utilities/types';
+import { highlightDomElement } from 'lib/utils/browser';
+import { isTruthy } from 'lib/utils/types';
 
 import { ThreadContainer } from '../CharmEditor/components/inlineComment/components/InlineCommentSubMenu';
 import PageThread from '../CharmEditor/components/thread/PageThread';
@@ -126,7 +125,7 @@ function FormFieldAnswerThreads({
           {unResolvedThreads.map((resolvedThread) => (
             <ThreadContainer key={resolvedThread.id} elevation={4}>
               <PageThread
-                canCreateComments
+                enableComments
                 inline
                 key={resolvedThread.id}
                 threadId={resolvedThread?.id}
@@ -159,14 +158,14 @@ function FormFieldAnswerThreads({
 export function FormFieldAnswerInput({
   pageId,
   disabled,
-  formFieldAnswer,
-  canCreateComments,
+  formFieldAnswerId,
+  enableComments,
   formFieldName
 }: {
   disabled?: boolean;
   pageId: string;
-  formFieldAnswer: FormFieldAnswer;
-  canCreateComments?: boolean;
+  formFieldAnswerId: string;
+  enableComments?: boolean;
   formFieldName: string;
 }) {
   const { trigger: createThread } = useCreateThread();
@@ -184,13 +183,13 @@ export function FormFieldAnswerInput({
         id: threadAccessGroup.id,
         group: threadAccessGroup.group
       })),
-      fieldAnswerId: formFieldAnswer.id
+      fieldAnswerId: formFieldAnswerId
     });
     await refetchThreads();
     setIsOpen(false);
   };
 
-  if (!canCreateComments) {
+  if (!enableComments) {
     return null;
   }
 
@@ -203,7 +202,7 @@ export function FormFieldAnswerInput({
       }}
       open={isOpen}
     >
-      <Tooltip title={!disabled ? 'Add a comment' : "You don't have permission to add a comment"}>
+      <Tooltip title='Add a comment'>
         <Box
           sx={{
             display: 'flex',
@@ -231,19 +230,20 @@ export function FormFieldAnswerComment({
   pageId,
   disabled,
   fieldAnswerThreads = [],
-  formFieldAnswer,
-  canCreateComments,
+  formFieldAnswerId,
+  enableComments,
   formFieldName
 }: {
   disabled?: boolean;
   pageId: string;
   fieldAnswerThreads?: ThreadWithComments[];
-  formFieldAnswer: FormFieldAnswer;
-  canCreateComments?: boolean;
+  formFieldAnswerId: string;
+  enableComments?: boolean;
   formFieldName: string;
 }) {
   return (
     <Stack
+      data-test='form-field-answer-comment'
       flexDirection={{
         md: 'row',
         xs: 'column-reverse'
@@ -265,8 +265,8 @@ export function FormFieldAnswerComment({
           formFieldName={formFieldName}
           disabled={disabled}
           pageId={pageId}
-          formFieldAnswer={formFieldAnswer}
-          canCreateComments={canCreateComments}
+          formFieldAnswerId={formFieldAnswerId}
+          enableComments={enableComments}
         />
       </span>
     </Stack>

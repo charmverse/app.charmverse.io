@@ -1,7 +1,7 @@
-import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
-import type { EditorState, EditorView } from '@bangle.dev/pm';
-import { PluginKey } from '@bangle.dev/pm';
-import { Plugin } from 'prosemirror-state';
+import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
+import type { EditorState } from 'prosemirror-state';
+import { PluginKey, Plugin } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
@@ -9,6 +9,7 @@ import type { RawPlugins } from 'components/common/CharmEditor/components/@bangl
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
 import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugins';
+import * as button from './components/button/button.plugins';
 import * as callout from './components/callout/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout/columnLayout.plugins';
@@ -16,12 +17,13 @@ import * as disclosure from './components/disclosure';
 import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';
 import * as emoji from './components/emojiSuggest/emojiSuggest.plugins';
 import { plugins as filePlugins } from './components/file/file.plugins';
-import * as floatingMenu from './components/floatingMenu';
+import * as floatingMenu from './components/floatingMenu/floatingMenu.plugins';
+import * as hardBreak from './components/hardBreak';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import * as inlineComment from './components/inlineComment';
-import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
+import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalettePlugin';
 import * as inlineVote from './components/inlineVote';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { linkedPagePluginKeyName } from './components/linkedPage/linkedPage.constants';
@@ -30,7 +32,7 @@ import * as listItem from './components/listItem/listItem';
 import { plugins as listPlugins } from './components/listItemNew/listItemPlugins';
 import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import { mentionPluginKeyName, mentionPlugins } from './components/mention';
-import { nestedPagePlugins, pageNodeDropPlugin } from './components/nestedPage';
+import { nestedPagePlugins, pageNodeDropPlugin } from './components/nestedPage/nestedPage.plugins';
 import * as nft from './components/nft/nft.plugins';
 import { plugins as paragraphPlugins } from './components/paragraph/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';
@@ -39,6 +41,7 @@ import { plugins as quotePlugins } from './components/quote/quote';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
 import * as tabIndent from './components/tabIndent';
+// import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tableOfContentPlugins } from './components/tableOfContents/tableOfContents.plugins';
 import { plugins as threadPlugins } from './components/thread/thread.plugins';
@@ -207,6 +210,7 @@ export function charmEditorPlugins({
     tablePlugins,
     disclosure.plugins(),
     nft.plugins(),
+    button.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
     iframe.plugins(),

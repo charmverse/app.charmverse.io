@@ -1,14 +1,14 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
-import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
-import type { RootState } from 'components/common/BoardEditor/focalboard/src/store';
-import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { createTableView } from 'lib/focalboard/tableView';
+import Kanban from 'components/common/DatabaseEditor/components/kanban/kanban';
+import type { RootState } from 'components/common/DatabaseEditor/store';
+import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import { createTableView } from 'lib/databases/tableView';
 import { createMockBoard, createMockCard } from 'testing/mocks/block';
 import { createMockPage } from 'testing/mocks/page';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
@@ -32,6 +32,7 @@ const schema = generateSchemasForAllSupportedFieldTypes();
 board.fields.cardProperties = Object.values(schema) as IPropertyTemplate[];
 
 const boardPage: PageMeta = {
+  lensPostLink: null,
   id: board.id,
   boardId: board.id,
   bountyId: null,
@@ -149,8 +150,8 @@ export function DatabaseKanbanView() {
           onCardClicked={voidFunction}
           selectedCardIds={[]}
           visibleGroups={[
-            { cardPages: [{ card: card1, page: page1 }], cards: [card1], option: schema.select.options[0] },
-            { cardPages: [{ card: card2, page: page2 }], cards: [card2], option: schema.select.options[1] }
+            { id: card1.id, cards: [card1], option: schema.select.options[0] },
+            { id: card2.id, cards: [card2], option: schema.select.options[1] }
           ]}
         />
       </div>
@@ -161,17 +162,18 @@ export function DatabaseKanbanView() {
 DatabaseKanbanView.parameters = {
   msw: {
     handlers: {
-      pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
-        return res(ctx.json([boardPage, page1, page2]));
+      pages: http.get('/api/spaces/:spaceId/pages', () => {
+        return HttpResponse.json([boardPage, page1, page2]);
       }),
-      getBlock: rest.get('/api/blocks/:pageId', (req, res, ctx) => {
-        return res(ctx.json(reduxStore.getState().cards.cards[req.params.pageId as string]));
+      getBlock: http.get('/api/blocks/:pageId', ({ params }) => {
+        return HttpResponse.json(reduxStore.getState().cards.cards[params.pageId as string]);
       }),
-      updateBlocks: rest.put('/api/blocks', async (req, res, ctx) => {
-        return res(ctx.json(req.json()));
+      updateBlocks: http.put('/api/blocks', async ({ request }) => {
+        const body = await request.json();
+        return HttpResponse.json(body);
       }),
-      views: rest.get('/api/blocks/:pageId/views', (req, res, ctx) => {
-        return res(ctx.json([view]));
+      views: http.get('/api/blocks/:pageId/views', () => {
+        return HttpResponse.json([view]);
       })
     }
   }

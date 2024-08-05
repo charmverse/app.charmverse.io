@@ -1,8 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { InvalidStateError } from '@root/lib/middleware';
+import { assignRole, listRoleMembers } from '@root/lib/roles';
 import { v4 } from 'uuid';
 
-import { InvalidStateError } from 'lib/middleware';
-import { assignRole, listRoleMembers } from 'lib/roles';
 import {
   generateRole,
   generateSpaceUser,
@@ -11,7 +11,7 @@ import {
 } from 'testing/setupDatabase';
 
 import { ExpectedAnError } from '../../../testing/errors';
-import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from '../../utilities/errors';
+import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from '../../utils/errors';
 
 let user: User;
 let space: Space;

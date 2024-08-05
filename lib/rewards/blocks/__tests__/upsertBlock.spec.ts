@@ -1,16 +1,17 @@
+import type { PropertyType } from '@root/lib/databases/board';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
+import { getBlocks } from '@root/lib/rewards/blocks/getBlocks';
+import type { RewardBlockInput, RewardBlockUpdateInput } from '@root/lib/rewards/blocks/interfaces';
+import { upsertBlock } from '@root/lib/rewards/blocks/upsertBlock';
 import { v4 } from 'uuid';
 
-import type { PropertyType } from 'lib/focalboard/board';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
-import { getBlocks } from 'lib/rewards/blocks/getBlocks';
-import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('reward blocks - updateBlock', () => {
   it('Should create board block', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
 
-    const propertiesData = {
+    const propertiesData: RewardBlockInput = {
       spaceId: space.id,
       title: 'Properties',
       type: 'board',
@@ -52,9 +53,9 @@ describe('reward blocks - updateBlock', () => {
   });
 
   it('Should update board block', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
 
-    const propertiesData = {
+    const propertiesData: RewardBlockInput = {
       spaceId: space.id,
       title: 'Properties',
       type: 'board',
@@ -85,12 +86,16 @@ describe('reward blocks - updateBlock', () => {
       spaceId: space.id
     });
 
-    const propertiesUpdateData = {
+    const propertiesUpdateData: RewardBlockUpdateInput = {
       id: block.id,
       spaceId: space.id,
       title: 'Update',
       type: 'board',
       fields: {
+        viewIds: [],
+        icon: '',
+        columnCalculations: {},
+        description: null as any,
         cardProperties: [
           {
             id: v4(),
@@ -117,9 +122,9 @@ describe('reward blocks - updateBlock', () => {
   });
 
   it('Should update properties block if it already exists', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
 
-    const propertiesData = {
+    const propertiesData: RewardBlockInput = {
       spaceId: space.id,
       title: 'Properties',
       type: 'board',
@@ -144,7 +149,7 @@ describe('reward blocks - updateBlock', () => {
       }
     };
 
-    const propertiesData2 = {
+    const propertiesData2: RewardBlockInput = {
       spaceId: space.id,
       title: 'Properties 2',
       type: 'board',
@@ -182,7 +187,7 @@ describe('reward blocks - updateBlock', () => {
     });
 
     expect(properties2.id).toEqual(properties.id);
-    expect(properties2.fields).toMatchObject(propertiesData2.fields);
+    expect(properties2.fields).toMatchObject(propertiesData2.fields!);
 
     const blocks = await getBlocks({
       spaceId: space.id
@@ -192,9 +197,9 @@ describe('reward blocks - updateBlock', () => {
   });
 
   it('Should update view block if it already exists', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
 
-    const propertiesData = {
+    const propertiesData: RewardBlockInput = {
       spaceId: space.id,
       id: '__defaultView',
       title: 'Properties',
@@ -204,7 +209,7 @@ describe('reward blocks - updateBlock', () => {
       } as unknown as BoardViewFields
     };
 
-    const propertiesData2 = {
+    const propertiesData2: RewardBlockInput = {
       spaceId: space.id,
       title: 'Properties 2',
       id: '__defaultView',
@@ -227,7 +232,7 @@ describe('reward blocks - updateBlock', () => {
     });
 
     expect(properties2.id).toEqual(properties.id);
-    expect(properties2.fields).toMatchObject(propertiesData2.fields);
+    expect(properties2.fields).toMatchObject(propertiesData2.fields!);
 
     const blocks = await getBlocks({
       spaceId: space.id

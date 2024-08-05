@@ -1,11 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { searchUserProfile } from '@root/lib/public-api/searchUserProfile';
+import { DataNotFoundError, InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
-import { searchUserProfile } from 'lib/public-api/searchUserProfile';
-import { createUserFromWallet } from 'lib/users/createUser';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
 import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { addUserGoogleAccount, generateUser } from 'testing/utils/users';
 
@@ -20,17 +19,17 @@ let space: Space;
 
 beforeAll(async () => {
   user1Wallet = randomETHWalletAddress();
-  const generated = await generateUserAndSpaceWithApiToken({ walletAddress: user1Wallet });
+  const generated = await generateUserAndSpace({ walletAddress: user1Wallet });
   user = generated.user;
   space = generated.space;
   await addUserGoogleAccount({ userId: user.id, email: 'user1@gmail.com' });
 
   user2Wallet = randomETHWalletAddress();
-  user2 = await createUserFromWallet({ address: user2Wallet, email: 'user2@example.com' });
+  user2 = await createUserWithWallet({ address: user2Wallet, email: 'user2@example.com' });
   await addUserToSpace({ spaceId: space.id, userId: user2.id, isAdmin: false });
 
   user3Wallet = randomETHWalletAddress();
-  user3 = await createUserFromWallet({ address: user3Wallet, email: 'user3@example.com' });
+  user3 = await createUserWithWallet({ address: user3Wallet, email: 'user3@example.com' });
   await addUserToSpace({ spaceId: space.id, userId: user3.id, isAdmin: false });
 });
 

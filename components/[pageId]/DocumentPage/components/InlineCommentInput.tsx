@@ -5,9 +5,9 @@ import type { Theme } from '@mui/material';
 import { Box, Divider, Stack, Typography, useMediaQuery } from '@mui/material';
 import { useState } from 'react';
 
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
 import { InlineCharmEditor } from 'components/common/CharmEditor';
+import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -41,7 +41,7 @@ export function InlineCommentInput({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
-    <Box p={1}>
+    <Box p={1} width='100%'>
       {pageType === 'proposal' && (
         <Stack height='fit-content' gap={0.5}>
           <Stack flexDirection='row' gap={0.5} alignItems='center'>
@@ -82,6 +82,7 @@ export function InlineCommentInput({
           />
         </Box>
         <Button
+          data-test='save-new-inline-comment-button'
           disabled={isEmpty || isSubmitting}
           size='small'
           onClick={async (event: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement, MouseEvent>) => {

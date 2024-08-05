@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import CircleIcon from '@mui/icons-material/Circle';
 import Alert from '@mui/material/Alert';
@@ -13,11 +14,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
+import { useGetPageMeta } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePage } from 'hooks/usePage';
-import { getAbsolutePath } from 'lib/utilities/browser';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -53,6 +54,7 @@ export type ShareToWebProps = {
   handleDiscovery?: (newValue: boolean) => void;
   disabledTooltip?: string | null;
   shareAlertMessage?: string | null;
+  pageType?: PageType;
 };
 
 export default function ShareToWeb({
@@ -64,11 +66,12 @@ export default function ShareToWeb({
   handlePublish,
   handleDiscovery,
   shareAlertMessage,
-  disabledTooltip
+  disabledTooltip,
+  pageType
 }: ShareToWebProps) {
   const [copied, setCopied] = useState<boolean>(false);
 
-  const { page } = usePage({ pageIdOrPath: pageId });
+  const { data: page } = useGetPageMeta(pageId);
 
   const { space } = useCurrentSpace();
   const router = useRouter();
@@ -98,6 +101,8 @@ export default function ShareToWeb({
       return typeof window !== 'undefined' ? getAbsolutePath(`/${page.path}`, space?.domain) : '';
     }
   }
+
+  const hideAllowDiscovery = pageType === 'proposal';
 
   return (
     <Box my={1} gap={2} display='flex' flexDirection='column'>
@@ -132,23 +137,27 @@ export default function ShareToWeb({
               </CopyToClipboard>
             }
           />
-          <Box display='flex' alignItems='center' justifyContent='space-between' mt={1}>
-            <InputLabel htmlFor='discovery-toggle' color='primary'>
-              Add to sidebar
-            </InputLabel>
-            <Switch
-              id='discovery-toggle'
-              data-test='toggle-allow-page-discovery'
-              checked={discoveryChecked}
-              disabled={disabled}
-              onChange={(_, checked) => {
-                handleDiscovery?.(checked);
-              }}
-            />
-          </Box>
-          <Typography width={{ xs: '100%', md: '80%' }} variant='body2'>
-            Anyone with access to the space will see this page in the sidebar
-          </Typography>
+          {!hideAllowDiscovery && (
+            <>
+              <Box display='flex' alignItems='center' justifyContent='space-between' mt={1}>
+                <InputLabel htmlFor='discovery-toggle' color='primary'>
+                  Add to sidebar
+                </InputLabel>
+                <Switch
+                  id='discovery-toggle'
+                  data-test='toggle-allow-page-discovery'
+                  checked={discoveryChecked}
+                  disabled={disabled}
+                  onChange={(_, checked) => {
+                    handleDiscovery?.(checked);
+                  }}
+                />
+              </Box>
+              <Typography width={{ xs: '100%', md: '80%' }} variant='body2'>
+                Anyone with access to the space will see this page in the sidebar
+              </Typography>
+            </>
+          )}
         </Box>
       )}
       {shareAlertMessage && (
@@ -158,9 +167,17 @@ export default function ShareToWeb({
       )}
       <UpgradeWrapper upgradeContext={!disabledTooltip ? 'page_permissions' : undefined}>
         <Tooltip title={disabled && disabledTooltip ? disabledTooltip : ''}>
-          <Button onClick={handlePublish} disabled={disabled} data-test='toggle-public-page' loading={isLoading}>
-            {shareChecked ? 'Unpublish' : 'Publish to web'}
-          </Button>
+          <Box>
+            <Button
+              fullWidth
+              onClick={handlePublish}
+              disabled={disabled}
+              data-test='toggle-public-page'
+              loading={isLoading}
+            >
+              {shareChecked ? 'Unpublish' : 'Publish to web'}
+            </Button>
+          </Box>
         </Tooltip>
       </UpgradeWrapper>
     </Box>

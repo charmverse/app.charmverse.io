@@ -7,13 +7,10 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { updateCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import type { Block } from 'lib/focalboard/block';
+import mutator from 'components/common/DatabaseEditor/mutator';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
-import { isTruthy } from 'lib/utilities/types';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
@@ -31,7 +28,7 @@ export type PagesContext = {
   updatePage: (updates: PageUpdates, revalidate?: boolean) => Promise<void>;
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => Promise<any>;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
-  deletePage: (data: { pageId: string; board?: Block }) => Promise<PageMeta | null | undefined>;
+  deletePage: (data: { pageId: string; board?: UIBlockWithDetails }) => Promise<PageMeta | null | undefined>;
   mutatePagesList: (data: PagesMap<PageMeta>) => Promise<any>;
 };
 
@@ -55,10 +52,8 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
-  const dispatch = useAppDispatch();
   const { sendMessage, subscribe } = useWebSocketClient();
   const { trigger: trashPages } = useTrashPages();
-  const pagesDispatched = useRef(false);
   const {
     data,
     mutate: mutatePagesList,
@@ -81,7 +76,9 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     { refreshInterval, revalidateOnFocus: false }
   );
 
-  const pages = data || {};
+  const pages = useMemo<PagesMap>(() => {
+    return data || {};
+  }, [data]);
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     let updatedData: PagesContext['pages'] = {};
@@ -99,20 +96,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     return updatedData;
   };
 
-  useEffect(() => {
-    if (data && !isLoading && !pagesDispatched.current) {
-      const cardPages = Object.values(data)
-        .filter(isTruthy)
-        .filter((page) => page.type === 'card');
-
-      if (cardPages.length) {
-        dispatch(updateCards(cardPages.map((page) => ({ id: page.id, title: page.title }))));
-      }
-      pagesDispatched.current = true;
-    }
-  }, [data, isLoading]);
-
-  async function deletePage({ pageId, board }: { pageId: string; board?: Block }) {
+  async function deletePage({ pageId, board }: { pageId: string; board?: UIBlockWithDetails }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter(
       (p) => !p?.deletedAt && (p?.type === 'page' || p?.type === 'board' || p?.type === 'card')
@@ -120,7 +104,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
     const pageType = page?.type;
 
-    if (page && user && currentSpace) {
+    if (user && currentSpace) {
       if (pageType === 'page' || pageType === 'board') {
         sendMessage({
           payload: {
@@ -142,7 +126,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
           );
         }
       } else {
-        const result = await trashPages({ pageIds: [page.id], trash: true });
+        const result = await trashPages({ pageIds: [pageId], trash: true });
         if (!result) {
           return;
         }
@@ -230,15 +214,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
             return pageMap;
           }, {});
-
-          const cardPages = Object.values(pagesToUpdate)
-            .filter(isTruthy)
-            .filter((page) => page.type === 'card');
-
-          if (cardPages.length) {
-            dispatch(updateCards(cardPages.map((page) => ({ id: page.id, title: page.title }))));
-          }
-
           return {
             ..._existingPages,
             ...pagesToUpdate
@@ -257,16 +232,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       const newPages = value.reduce<PagesMap>((pageMap, page) => {
         if (page.spaceId === currentSpaceId.current) {
           pageMap[page.id] = page;
-          if (page.type === 'card') {
-            dispatch(
-              updateCards([
-                {
-                  id: page.id,
-                  title: page.title
-                }
-              ])
-            );
-          }
         }
         return pageMap;
       }, {});
@@ -306,6 +271,13 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     [mutatePagesList]
   );
 
+  const handleRestoreEvent = useCallback(
+    (value: WebSocketPayload<'pages_restored'>) => {
+      mutatePagesList();
+    },
+    [mutatePagesList]
+  );
+
   useEffect(() => {
     currentSpaceId.current = currentSpace?.id;
   }, [currentSpace]);
@@ -319,12 +291,15 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
 
+    const unsubscribeFromPageRestores = subscribe('pages_restored', handleRestoreEvent);
+
     return () => {
       unsubscribeFromPageUpdates();
       unsubscribeFromNewPages?.();
       unsubscribeFromPageDeletes();
+      unsubscribeFromPageRestores();
     };
-  }, [spaceRole]);
+  }, [spaceRole?.isGuest]);
 
   const value: PagesContext = useMemo(
     () => ({

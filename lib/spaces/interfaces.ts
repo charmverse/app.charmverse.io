@@ -1,6 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-
-import type { DomainCertificateDetails } from 'lib/aws/interfaces';
+import type { DomainCertificateDetails } from '@root/lib/aws/interfaces';
 
 // This type is unused for now. We are returning the full space document to the user.
 // This should either be deleted, or picked up again in the future.

@@ -9,6 +9,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
+import { Stack } from '@mui/system';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -21,7 +22,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useSpaces } from 'hooks/useSpaces';
-import { getAbsolutePath } from 'lib/utilities/browser';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 import { TogglePublicProposalTemplates } from './TogglePublicProposalTemplates';
 
@@ -127,11 +128,16 @@ export default function ShareProposals({ padding = 1 }: Props) {
       </Grid>
       <Grid item>
         {!isFreeSpace && (
-          <Typography variant='body2' color='secondary'>
-            {proposalsArePublic
-              ? 'Anyone outside this space can view proposals, except drafts.'
-              : 'Proposals can only be seen by space members.'}
-          </Typography>
+          <Stack gap={2}>
+            <Typography variant='body2' color='secondary'>
+              {proposalsArePublic
+                ? 'Anyone outside this space can view this page'
+                : 'Proposals can only be seen by space members'}
+            </Typography>
+            <Typography variant='body2' color='secondary'>
+              Visibility of individual proposals is controlled by their workflow permissions
+            </Typography>
+          </Stack>
         )}
         {isFreeSpace && <Alert severity='info'>All proposals in free spaces are publicly visible, except drafts</Alert>}
       </Grid>

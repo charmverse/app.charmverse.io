@@ -1,7 +1,6 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
 
 import type { CardNotification } from '../interfaces';
 import type { QueryCondition } from '../utils';
@@ -9,7 +8,19 @@ import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
 export async function getCardNotifications({ id, userId }: QueryCondition): Promise<CardNotification[]> {
   const cardNotifications = await prisma.cardNotification.findMany({
-    where: queryCondition({ id, userId }),
+    where: {
+      ...queryCondition({ id, userId }),
+      card: {
+        deletedAt: null,
+        space: {
+          spaceRoles: {
+            some: {
+              userId
+            }
+          }
+        }
+      }
+    },
     select: {
       id: true,
       type: true,

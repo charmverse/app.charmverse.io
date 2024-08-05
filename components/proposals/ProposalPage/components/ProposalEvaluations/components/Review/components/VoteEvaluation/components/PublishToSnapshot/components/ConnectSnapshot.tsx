@@ -15,8 +15,8 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
-import type { SystemError } from 'lib/utilities/errors';
-import { isTruthy } from 'lib/utilities/types';
+import type { SystemError } from 'lib/utils/errors';
+import { isTruthy } from 'lib/utils/types';
 
 export const schema = yup.object({
   snapshotDomain: yup

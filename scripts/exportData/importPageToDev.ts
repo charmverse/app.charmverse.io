@@ -16,13 +16,13 @@ import { v4 as uuid } from 'uuid';
  */
 
 // Details for production environment
-const originalPagePath = 'page-7220252559428284';
+const originalPagePath = 'april-13th-仮-020636547043172193';
 
 // Detais for developer environment
-const destinationSpaceDomain = 'cute-azure-mastodon';
+const destinationSpaceDomain = 'free-space';
 const destinationUserName = 'mattcasey.eth';
 
-const fileName = `./page-backup-05-22.json`;
+const fileName = `./page-backup-04-15.json`;
 const pathName = path.join(process.cwd(), fileName);
 
 type RestoreData = Awaited<ReturnType<typeof queryData>>;
@@ -113,5 +113,5 @@ function upload() {
     .then((r) => console.log('Uploaded records', { pageId: r[0].id, pagePath: r[0].path }));
 }
 
-//download();
+// download();
 upload();

@@ -1,16 +1,15 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getSummonProfile } from 'lib/profile/getSummonProfile';
+import { getSummonProfile } from '@root/lib/profile/getSummonProfile';
 
 import { getSummonRoleLabel } from './getSummonRoleLabel';
 
 export async function syncSummonSpaceRoles({
   spaceId,
   userId,
-  summonApiUrl
+  summonTestUrl
 }: {
-  summonApiUrl?: string;
+  summonTestUrl?: string;
   userId?: string;
   spaceId: string;
 }) {
@@ -44,9 +43,10 @@ export async function syncSummonSpaceRoles({
     },
     select: {
       id: true,
+      spaceId: true,
+      xpsUserId: true,
       user: {
         select: {
-          xpsEngineId: true,
           id: true,
           discordUser: {
             select: {
@@ -108,16 +108,20 @@ export async function syncSummonSpaceRoles({
 
   for (const spaceRole of spaceRoles) {
     try {
-      const summonProfile = await getSummonProfile({ userId: spaceRole.user.id, summonApiUrl });
+      const summonProfile = await getSummonProfile({
+        userId: spaceRole.user.id,
+        spaceId: spaceRole.spaceId,
+        summonTestUrl
+      });
       const userRank = summonProfile ? Math.floor(summonProfile.meta.rank) : null;
       if (summonProfile && userRank) {
-        if (!spaceRole.user.xpsEngineId) {
-          await prisma.user.update({
+        if (!spaceRole.xpsUserId) {
+          await prisma.spaceRole.update({
             where: {
-              id: spaceRole.user.id
+              id: spaceRole.id
             },
             data: {
-              xpsEngineId: summonProfile.id
+              xpsUserId: summonProfile.id
             }
           });
         }

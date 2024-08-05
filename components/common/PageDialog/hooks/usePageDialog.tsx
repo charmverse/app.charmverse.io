@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-
-import { useCharmRouter } from 'hooks/useCharmRouter';
+import { createContext, useContext, useMemo, useState } from 'react';
 
 export interface PageDialogContext {
   bountyId?: string;
@@ -10,7 +8,6 @@ export interface PageDialogContext {
   hideToolsMenu?: boolean;
   onClose?: () => void;
   applicationId?: string;
-  isNewApplication?: boolean;
 }
 
 interface Context {

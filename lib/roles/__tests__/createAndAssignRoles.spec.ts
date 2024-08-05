@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { createAndAssignRoles } from '@root/lib/roles/createAndAssignRoles';
 import { v4 } from 'uuid';
 
-import { createAndAssignRoles } from 'lib/roles/createAndAssignRoles';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('createAndAssignRoles', () => {

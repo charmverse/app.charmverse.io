@@ -1,4 +1,4 @@
-import { SystemError } from 'lib/utilities/errors';
+import { SystemError } from '@root/lib/utils/errors';
 
 export class PostNotFoundError extends SystemError {
   constructor(postId: string) {

@@ -1,14 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { blockToPrisma } from '@root/lib/databases/block';
+import { createCard } from '@root/lib/databases/card';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { v4 } from 'uuid';
-
-import { createCard } from 'lib/focalboard/card';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
-import type { BlocksRecord } from '../types';
+import type { BlocksRecord } from '../interfaces';
 
 import { NotionBlock } from './NotionBlock';
 import type { DatabasePageItem, NotionCache, RegularPageItem } from './NotionCache';
@@ -49,10 +49,6 @@ export class CharmversePage {
   }
 
   async create() {
-    const pageContent: PageContent = {
-      type: 'doc',
-      content: []
-    };
     const pageRecord = this.cache.pagesRecord.get(this.notionPageId) as RegularPageItem;
     const notionPage = this.cache.notionPagesRecord[this.notionPageId] as PageObjectResponse;
     const notionParentPageId =
@@ -115,7 +111,8 @@ export class CharmversePage {
           : null;
 
         await prisma.block.create({
-          data: {
+          data: blockToPrisma({
+            parentId: '',
             ...createCard({
               title: notionPageTitle,
               id: this.charmversePageId,
@@ -132,10 +129,9 @@ export class CharmversePage {
               createdBy: this.notionPage.userId,
               updatedBy: this.notionPage.userId
             }),
-            deletedAt: null,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          }
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime()
+          })
         });
       }
 
@@ -146,7 +142,6 @@ export class CharmversePage {
       // Optimistically create the page
       const createdCharmversePage = await createPrismaPage({
         id: this.charmversePageId,
-        content: pageContent,
         headerImage: headerImageUrl,
         spaceId: this.notionPage.spaceId,
         createdBy: this.notionPage.userId,
@@ -172,7 +167,10 @@ export class CharmversePage {
 
       const convertedBlocks = await notionBlock.convertBlocks(this.topLevelBlockIds);
 
-      pageContent.content?.push(...convertedBlocks);
+      const pageContent: PageContent = {
+        type: 'doc',
+        content: convertedBlocks
+      };
 
       await prisma.page.update({
         where: {

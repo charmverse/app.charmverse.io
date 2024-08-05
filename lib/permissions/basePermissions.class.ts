@@ -1,4 +1,4 @@
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from '@root/lib/utils/objects';
 
 import type { AbstractPermissions, UserPermissionFlags } from './interfaces';
 

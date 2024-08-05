@@ -2,19 +2,17 @@
 import type { Application, Bounty, Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { expect, test } from '__e2e__/testWithFixtures';
 import { login } from '__e2e__/utils/session';
 
 import { REWARD_APPLICATION_STATUS_LABELS } from 'components/rewards/components/RewardApplicationStatusChip';
 import { generateBounty } from 'testing/setupDatabase';
-
-import { test, expect } from '../utils/test';
 
 test.describe('Review reward', () => {
   let space: Space;
   let adminUser: User;
   let spaceMember: User;
   let reward: Bounty;
-  let rewardDocument: Page;
   let application: Application;
   let applicationFromMember: Application;
 
@@ -27,11 +25,6 @@ test.describe('Review reward', () => {
       status: 'open',
       maxSubmissions: 10,
       rewardToken: 'ETH'
-    });
-    rewardDocument = await prisma.page.findUniqueOrThrow({
-      where: {
-        id: reward.id
-      }
     });
     application = await prisma.application.create({
       data: {
@@ -67,14 +60,18 @@ test.describe('Review reward', () => {
     });
   });
 
-  test('Reward creator can review their own application', async ({ page, rewardPage }) => {
+  test('Reward creator can review their own application', async ({ page, rewardPage, databasePage }) => {
     await login({ page, userId: adminUser.id });
 
-    await rewardPage.openApplication({
-      applicationId: application.id,
-      rewardPagePath: rewardDocument.path,
+    await rewardPage.gotoRewardPage({
       spaceDomain: space.domain
     });
+
+    const secondRow = databasePage.getTableRowByIndex({ index: 1 });
+
+    await secondRow.hover();
+
+    await databasePage.getTableRowOpenLocator(application.id).click();
 
     await expect(rewardPage.rewardApplicationPage).toBeVisible();
 
@@ -101,7 +98,6 @@ test.describe('Review reward', () => {
 
     await rewardPage.openApplication({
       applicationId: applicationFromMember.id,
-      rewardPagePath: rewardDocument.path,
       spaceDomain: space.domain
     });
 

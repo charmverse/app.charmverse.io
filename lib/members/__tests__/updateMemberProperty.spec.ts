@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
-import { InvalidInputError } from 'lib/utilities/errors';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateMemberProperty } from 'testing/utils/members';
 

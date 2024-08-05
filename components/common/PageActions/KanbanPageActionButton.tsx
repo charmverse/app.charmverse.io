@@ -1,36 +1,20 @@
-import type { PageType } from '@charmverse/core/prisma';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton } from '@mui/material';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
-import { PageActionsMenu } from './components/PageActionsMenu';
+import type { PageActionMeta } from './components/DatabaseRowActionsMenu';
+import { DatabaseRowActionsMenu } from './components/DatabaseRowActionsMenu';
 
 type Props = {
-  page?: {
-    createdBy: string;
-    type?: PageType;
-    id: string;
-    updatedAt: Date;
-    path: string;
-    deletedAt: Date | null;
-    parentId?: string | null;
-    title: string | null;
-    proposalId: string | null;
-  };
+  page?: PageActionMeta;
   readOnly?: boolean;
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
-  hideDuplicateAction?: boolean;
+  isApplication?: boolean;
 };
 
-export function KanbanPageActionsMenuButton({
-  page,
-  onClickDelete,
-  hideDuplicateAction,
-  onClickEdit,
-  readOnly
-}: Props) {
+export function KanbanPageActionsMenuButton({ isApplication, page, onClickDelete, onClickEdit, readOnly }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -44,12 +28,12 @@ export function KanbanPageActionsMenuButton({
         <MoreHorizIcon color='secondary' fontSize='small' />
       </IconButton>
       {page && (
-        <PageActionsMenu
+        <DatabaseRowActionsMenu
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}
           page={page}
+          isApplication={isApplication}
           onClickDelete={onClickDelete}
-          hideDuplicateAction={hideDuplicateAction}
           onClickEdit={onClickEdit}
           readOnly={readOnly}
         />

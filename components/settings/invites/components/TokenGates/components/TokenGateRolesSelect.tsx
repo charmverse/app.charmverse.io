@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useRoles } from 'hooks/useRoles';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 /**

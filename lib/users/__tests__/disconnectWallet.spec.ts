@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { sessionUserRelations } from '@root/lib/session/config';
 import { v4 } from 'uuid';
 
-import { sessionUserRelations } from 'lib/session/config';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { disconnectWallet } from '../disconnectWallet';
@@ -20,7 +20,7 @@ describe('disconnectWallet', () => {
           create: {
             id: walletId,
             address: walletAddress,
-            ensname: 'test.eth'
+            ensname: `${Math.random()}test.eth`
           }
         },
         profileItems: {

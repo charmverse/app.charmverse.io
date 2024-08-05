@@ -3,10 +3,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getForumPost } from 'lib/forums/posts/getForumPost';
+import { voteForumPost } from 'lib/forums/posts/voteForumPost';
 import { requireKeys } from 'lib/middleware';
 import { superApiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import { getPublicForumPost } from '../index';
 import type { PublicApiForumPost } from '../index';
@@ -14,33 +16,6 @@ import type { PublicApiForumPost } from '../index';
 const handler = superApiHandler();
 
 handler.post(requireKeys(['userId', 'upvoted'], 'body'), upvoteDownvotePost);
-
-/**
- * @swagger
- * components
- *   schemas:
- *     UpvoteInput:
- *       type: object
- *       properties:
- *         userId:
- *           type: string
- *           format: uuid
- *           description: User ID of the user who is performing the upvote / downvote
- *           example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
- *         upvoted:
- *           type: boolean
- *           nullable: true
- *           description: true for an upvote, false for a downvote, null to delete the user's upvote / downvote
- *           example: true
- *       required:
- *         - userId
- *         - upvoted
- */
-
-export interface UpvoteInput {
-  userId: string;
-  upvoted: boolean | null;
-}
 
 /**
  * @swagger
@@ -74,9 +49,39 @@ export interface UpvoteInput {
  *
  */
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     UpvoteInput:
+ *       type: object
+ *       properties:
+ *         userId:
+ *           type: string
+ *           format: uuid
+ *           description: User ID of the user who is performing the upvote / downvote
+ *           example: "69a54a56-50d6-4f7b-b350-2d9c312f81f3"
+ *         upvoted:
+ *           type: boolean
+ *           nullable: true
+ *           description: true for an upvote, false for a downvote, null to delete the user's upvote / downvote
+ *           example: true
+ *       required:
+ *         - userId
+ *         - upvoted
+ */
+
+export interface UpvoteInput {
+  userId: string;
+  upvoted: boolean | null;
+}
 async function upvoteDownvotePost(req: NextApiRequest, res: NextApiResponse<PublicApiForumPost>) {
   const { userId, upvoted } = req.body as UpvoteInput;
   const postId = req.query.postId as string;
+
+  if (!userId || !postId) {
+    throw new InvalidInputError('User ID or post ID is undefined');
+  }
 
   const proposal = await prisma.post.findFirstOrThrow({
     where: {
@@ -102,34 +107,13 @@ async function upvoteDownvotePost(req: NextApiRequest, res: NextApiResponse<Publ
     throw new UnauthorisedActionError('User does not have access to this space');
   }
 
-  if (upvoted === null) {
-    await prisma.postUpDownVote.delete({
-      where: {
-        createdBy_postId: {
-          postId,
-          createdBy: userId
-        }
-      }
-    });
-  } else {
-    await prisma.postUpDownVote.upsert({
-      where: {
-        createdBy_postId: {
-          postId,
-          createdBy: userId
-        }
-      },
-      create: {
-        createdBy: userId,
-        upvoted,
-        post: { connect: { id: postId } }
-      },
-      update: {
-        upvoted
-      }
-    });
-  }
-  const post = await getForumPost({ postId: req.query.postId as string });
+  await voteForumPost({
+    postId,
+    userId,
+    upvoted
+  });
+
+  const post = await getForumPost({ postId });
   const { category, space, author } = await prisma.post.findFirstOrThrow({
     where: {
       id: req.query.postId as string

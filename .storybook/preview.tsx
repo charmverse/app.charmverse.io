@@ -7,56 +7,59 @@ import { IntlProvider } from 'react-intl';
 import ReactDndProvider from '../components/common/ReactDndProvider';
 import { LocalizationProvider } from '../components/_app/LocalizationProvider';
 
-import '@bangle.dev/tooltip/style.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/print.scss';
-import 'components/common/BoardEditor/focalboard/src/components/calculations/calculation.scss';
-import 'components/common/BoardEditor/focalboard/src/components/calendar/fullcalendar.scss';
-import 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetail.scss';
-import 'components/common/BoardEditor/focalboard/src/components/centerPanel.scss';
-import 'components/common/BoardEditor/focalboard/src/components/dialog.scss';
-import 'components/common/BoardEditor/focalboard/src/components/gallery/gallery.scss';
-import 'components/common/BoardEditor/focalboard/src/components/gallery/galleryCard.scss';
-import 'components/common/BoardEditor/focalboard/src/components/kanban/calculation/calculation.scss';
-import 'components/common/BoardEditor/focalboard/src/components/kanban/calculation/calculationOption.scss';
-import 'components/common/BoardEditor/focalboard/src/components/kanban/kanban.scss';
-import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanCard.scss';
-import 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/dateRange/dateRange.scss';
-import 'components/common/BoardEditor/focalboard/src/components/properties/link/link.scss';
-import 'components/common/BoardEditor/focalboard/src/components/table/calculation/calculationRow.scss';
-import 'components/common/BoardEditor/focalboard/src/components/table/horizontalGrip.scss';
-import 'components/common/BoardEditor/focalboard/src/components/table/table.scss';
-import 'components/common/BoardEditor/focalboard/src/components/table/tableRow.scss';
-import 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeader.scss';
-import 'components/common/BoardEditor/focalboard/src/components/viewTitle.scss';
-import 'components/common/BoardEditor/focalboard/src/styles/labels.scss';
-import 'components/common/BoardEditor/focalboard/src/styles/_markdown.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/buttons/iconButton.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/editable.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/label.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/menu/colorOption.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/menu/labelOption.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/menu/menu.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/menu/separatorOption.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/menu/subMenuOption.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/menuWrapper.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu.scss';
-import 'components/common/BoardEditor/focalboard/src/widgets/checkbox.scss';
+import 'components/common/DatabaseEditor/components/calculations/calculation.scss';
+import 'components/common/DatabaseEditor/components/calendar/fullcalendar.scss';
+import 'components/common/DatabaseEditor/components/cardDetail/cardDetail.scss';
+import 'components/common/DatabaseEditor/components/centerPanel.scss';
+import 'components/common/DatabaseEditor/components/dialog.scss';
+import 'components/common/DatabaseEditor/components/gallery/gallery.scss';
+import 'components/common/DatabaseEditor/components/gallery/galleryCard.scss';
+import 'components/common/DatabaseEditor/components/kanban/calculation/calculation.scss';
+import 'components/common/DatabaseEditor/components/kanban/calculation/calculationOption.scss';
+import 'components/common/DatabaseEditor/components/kanban/kanban.scss';
+import 'components/common/DatabaseEditor/components/kanban/kanbanCard.scss';
+import 'components/common/DatabaseEditor/components/kanban/kanbanColumn.scss';
+import 'components/common/DatabaseEditor/components/properties/dateRange/dateRange.scss';
+import 'components/common/DatabaseEditor/components/properties/link/link.scss';
+import 'components/common/DatabaseEditor/components/table/calculation/calculationRow.scss';
+import 'components/common/DatabaseEditor/components/table/horizontalGrip.scss';
+import 'components/common/DatabaseEditor/components/table/table.scss';
+import 'components/common/DatabaseEditor/components/table/tableRow.scss';
+import 'components/common/DatabaseEditor/components/viewHeader/viewHeader.scss';
+import 'components/common/DatabaseEditor/components/viewTitle.scss';
+import 'components/common/DatabaseEditor/styles/labels.scss';
+import 'components/common/DatabaseEditor/styles/_markdown.scss';
+import 'components/common/DatabaseEditor/widgets/buttons/iconButton.scss';
+import 'components/common/DatabaseEditor/widgets/editable.scss';
+import 'components/common/DatabaseEditor/widgets/emojiPicker.scss';
+import 'components/common/DatabaseEditor/widgets/label.scss';
+import 'components/common/DatabaseEditor/widgets/menu/colorOption.scss';
+import 'components/common/DatabaseEditor/widgets/menu/labelOption.scss';
+import 'components/common/DatabaseEditor/widgets/menu/menu.scss';
+import 'components/common/DatabaseEditor/widgets/menu/separatorOption.scss';
+import 'components/common/DatabaseEditor/widgets/menu/subMenuOption.scss';
+import 'components/common/DatabaseEditor/widgets/menuWrapper.scss';
+import 'components/common/DatabaseEditor/widgets/propertyMenu.scss';
+import 'components/common/DatabaseEditor/widgets/checkbox.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
-import 'theme/focalboard/focalboard.button.scss';
-import 'theme/focalboard/focalboard.main.scss';
+import 'theme/databases/databases.button.scss';
+import 'theme/databases/databases.main.scss';
 import 'react-resizable/css/styles.css';
 import 'theme/styles.scss';
 
+// Prosemirror tables
+import 'components/common/CharmEditor/components/table/ui/czi-table-grid-size-editor.css';
+import 'components/common/CharmEditor/components/table/ui/czi-color-editor.css';
+
 import { handlers } from './mockApi';
-import { WagmiConfig, configureChains, createConfig, mainnet } from 'wagmi';
-import { publicProvider } from 'wagmi/providers/public';
+import { mainnet } from 'viem/chains';
+import { WagmiConfig, http, createConfig } from 'wagmi';
 
 // Initialize MSW - https://storybook.js.org/addons/msw-storybook-addon
 initialize({
@@ -74,7 +77,7 @@ const preview: Preview = {
       ]
     },
     layout: 'fullscreen', // removes padding around the views
-    actions: { argTypesRegex: '^on[A-Z].*' },
+    // actions: { argTypesRegex: '^on[A-Z].*' }, config from storybook 7
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -114,9 +117,11 @@ export const withMuiTheme = (Story, context) => {
   );
 };
 
-const { publicClient } = configureChains([mainnet], [publicProvider()]);
 export const wagmiConfig = createConfig({
-  publicClient
+  chains: [mainnet],
+  transports: {
+    [mainnet.id]: http()
+  }
 });
 
 export const globalProviders = (Story, context) => {

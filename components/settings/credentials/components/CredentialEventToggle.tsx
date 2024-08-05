@@ -2,7 +2,9 @@ import type { CredentialEventType } from '@charmverse/core/prisma';
 import { Box, FormControlLabel, Switch } from '@mui/material';
 
 import { Typography } from 'components/common/Typography';
-import { credentialLabelMap } from 'lib/credentials/constants';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { credentialEventLabels } from 'lib/credentials/constants';
+import type { FeatureTitleVariation } from 'lib/features/getFeatureTitle';
 
 export type CredentialToggled = {
   credentialEvent: CredentialEventType;
@@ -15,12 +17,17 @@ type ToggleProps = {
   disabled?: boolean;
   credentialEvent: CredentialEventType;
 };
-export const credentialDescriptionMap: Record<CredentialEventType, string> = {
-  proposal_created: 'Issue when a proposal is published',
-  proposal_approved: 'Issue when a proposal is approved'
+
+type LabelFn = (getFeatureTitle: (featureWord: FeatureTitleVariation) => string) => string;
+
+const credentialDescriptionMap: Partial<Record<CredentialEventType, LabelFn>> = {
+  proposal_created: (map) => `Issue when a ${map('proposal')} is published`,
+  proposal_approved: (map) => `Issue when a ${map('proposal')} is approved`,
+  reward_submission_approved: () => `Issue when a submission is approved`
 };
 
 export function CredentialEventToggle({ checked, onChange, disabled, credentialEvent }: ToggleProps) {
+  const { getFeatureTitle } = useSpaceFeatures();
   return (
     <Box display='flex' justifyContent='flex-start' alignItems='center' gap={2}>
       <FormControlLabel
@@ -42,12 +49,12 @@ export function CredentialEventToggle({ checked, onChange, disabled, credentialE
         }
         label={
           <Typography fontWeight='bold' sx={{ minWidth: '100px' }}>
-            {credentialLabelMap[credentialEvent]}
+            {credentialEventLabels[credentialEvent]?.(getFeatureTitle)}
           </Typography>
         }
         labelPlacement='end'
       />
-      <Typography>{credentialDescriptionMap[credentialEvent]}</Typography>
+      <Typography>{credentialDescriptionMap[credentialEvent]?.(getFeatureTitle)}</Typography>
     </Box>
   );
 }

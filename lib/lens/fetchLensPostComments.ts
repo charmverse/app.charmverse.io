@@ -1,7 +1,5 @@
 import type { CommentFragment } from '@lens-protocol/client';
 
-import { lensClient } from './lensClient';
-
 const MAX_COMMENT_DEPTH = 5;
 
 type CommentFragmentWithMeta = CommentFragment & { parentId: string; depth: number };
@@ -16,6 +14,8 @@ export async function fetchLensPageComments({
   if (depth === MAX_COMMENT_DEPTH) {
     return [];
   }
+
+  const { lensClient } = await import('./lensClient');
 
   const comments: CommentFragmentWithMeta[] = [];
   let publicationFetchAllResponse = await lensClient.publication.fetchAll({

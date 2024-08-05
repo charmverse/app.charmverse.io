@@ -10,8 +10,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/components/WorkspaceAvatar';
 import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import type { ErrorType } from 'lib/utilities/errors';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
+import type { ErrorType } from 'lib/utils/errors';
 import splashImage from 'public/images/artwork/world.png';
 
 import { LoginButton } from './components/LoginButton';
@@ -81,7 +81,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
         maxWidth: { md: '520px' }
       }}
     >
-      The solution for token communities to build relationships, work together and vote
+      Manage grants. Connect with builders. Forge new ideas.
     </Typography>
   );
 
@@ -89,7 +89,8 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
     `Login to ${spaceFromPath?.name}`
   ) : customDomain === null ? (
     <>
-      Powering the Future <br /> of Work through Web3
+      The Network for <br />
+      Onchain Communities
     </>
   ) : null;
 

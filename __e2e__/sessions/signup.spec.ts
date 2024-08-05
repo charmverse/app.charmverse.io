@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
 import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 
 import { LoginPage } from '../po/login.po';
 import { SignUpPage } from '../po/signup.po';

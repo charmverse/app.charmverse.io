@@ -1,5 +1,5 @@
 import HowToVoteIcon from '@mui/icons-material/HowToVoteOutlined';
-import { Stack, Tooltip, Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
@@ -10,7 +10,7 @@ import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposals/interfaces';
 
 import { PublishToSnapshot } from './components/PublishToSnapshot/PublishToSnapshot';
 import { SnapshotVoteDetails } from './components/SnapshotVoteDetails';
@@ -26,7 +26,8 @@ export type Props = {
 export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, refreshProposal }: Props) {
   const { data: votes, mutate: refreshVotes, isLoading } = useGetVotesForPage(pageId ? { pageId } : undefined);
   const { showMessage } = useSnackbar();
-  const isReviewer = isCurrent && proposal.permissions.evaluate;
+  const canSubmitVote = isCurrent && proposal.permissions.evaluate && !proposal.archived;
+  const canCreateVote = isCurrent && proposal.permissions.create_vote && !proposal.archived;
   const vote = votes?.find((v) => v.id === evaluation.voteId);
   const hasVote = !!vote;
   const { view } = useCharmEditorView();
@@ -67,15 +68,15 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, refres
   if (!vote) {
     if (evaluation.snapshotId) {
       return <SnapshotVoteDetails snapshotProposalId={evaluation.snapshotId} />;
-    } else if (evaluation.voteSettings?.publishToSnapshot) {
+    } else if (evaluation.voteSettings?.strategy === 'snapshot') {
       return (
         <Tooltip
-          title={!isReviewer ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
+          title={!canCreateVote ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
         >
           <span>
             <PublishToSnapshot
               renderContent={({ label, onClick, icon }) => (
-                <Button disabled={!isReviewer} onClick={onClick}>
+                <Button disabled={!canCreateVote} onClick={onClick}>
                   {icon}
                   <Typography>{label}</Typography>
                 </Button>
@@ -109,7 +110,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, refres
 
   vote.title = evaluation.title;
 
-  if (evaluation.voteSettings?.publishToSnapshot) {
+  if (evaluation.voteSettings?.strategy === 'snapshot') {
     return evaluation.snapshotId ? null : (
       <NoCommentsMessage
         icon={
@@ -134,7 +135,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, refres
       vote={vote}
       detailed={false}
       isProposal={true}
-      disableVote={!isReviewer || !!proposal?.archived}
+      disableVote={!canSubmitVote}
       view={view}
     />
   );

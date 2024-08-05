@@ -1,21 +1,22 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { UserMentionMetadata } from '@root/lib/prosemirror/extractMentions';
+import type { CardPropertyEntity } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
-import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
 
 import {
-  getRewardEntity,
-  getUserEntity,
+  getApplicationCommentEntity,
+  getApplicationEntity,
   getCommentEntity,
-  getSpaceEntity,
-  getPostEntity,
-  getProposalEntity,
   getDocumentEntity,
   getInlineCommentEntity,
-  getVoteEntity,
-  getApplicationEntity,
-  getApplicationCommentEntity
+  getPostEntity,
+  getProposalEntity,
+  getRewardEntity,
+  getSpaceEntity,
+  getUserEntity,
+  getVoteEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
@@ -96,6 +97,11 @@ type BountyEventContext = {
       userId: string;
       applicationId: string;
     }
+  | {
+      scope: WebhookEventNames.RewardCredentialCreated;
+      userId: string;
+      applicationId: string;
+    }
 );
 
 export async function publishBountyEvent(context: BountyEventContext) {
@@ -125,7 +131,8 @@ export async function publishBountyEvent(context: BountyEventContext) {
 
     case WebhookEventNames.RewardApplicationRejected:
     case WebhookEventNames.RewardSubmissionApproved:
-    case WebhookEventNames.RewardApplicationPaymentCompleted: {
+    case WebhookEventNames.RewardApplicationPaymentCompleted:
+    case WebhookEventNames.RewardCredentialCreated: {
       const [application, user] = await Promise.all([
         getApplicationEntity(context.applicationId),
         getUserEntity(context.userId)
@@ -161,20 +168,49 @@ export async function publishProposalEvent({ currentEvaluationId, proposalId, sp
       index: 'asc'
     },
     select: {
-      index: true,
+      proposal: {
+        select: {
+          space: {
+            select: {
+              domain: true
+            }
+          }
+        }
+      },
       id: true,
-      result: true
+      result: true,
+      finalStep: true,
+      appealable: true,
+      appealedAt: true
     }
   });
 
-  const lastEvaluation = proposalEvaluations[proposalEvaluations.length - 1];
+  const finalEvaluation =
+    proposalEvaluations.find((proposalEvaluation) => proposalEvaluation.finalStep || proposalEvaluation.appealedAt) ??
+    proposalEvaluations[proposalEvaluations.length - 1];
 
-  if (lastEvaluation.id === currentEvaluationId && lastEvaluation.result) {
+  if (finalEvaluation.id === currentEvaluationId && finalEvaluation.result) {
     await publishProposalEventBase({
       proposalId,
-      scope: lastEvaluation.result === 'fail' ? WebhookEventNames.ProposalFailed : WebhookEventNames.ProposalPassed,
+      scope: finalEvaluation.result === 'fail' ? WebhookEventNames.ProposalFailed : WebhookEventNames.ProposalPassed,
       spaceId
     });
+
+    const isOpGrantsDomain = finalEvaluation.proposal.space.domain === 'op-grants';
+
+    if (isOpGrantsDomain) {
+      if (finalEvaluation.result === 'fail') {
+        trackOpUserAction('proposal_failed', {
+          proposalId,
+          userId
+        });
+      } else {
+        trackOpUserAction('proposal_passed', {
+          proposalId,
+          userId
+        });
+      }
+    }
   }
 
   await publishProposalEventBase({
@@ -188,6 +224,19 @@ export async function publishProposalEvent({ currentEvaluationId, proposalId, sp
 
 type ProposalEventBaseContext =
   | {
+      scope: WebhookEventNames.ProposalAppealed;
+      proposalId: string;
+      spaceId: string;
+      currentEvaluationId: string;
+      userId: string;
+    }
+  | {
+      scope: WebhookEventNames.ProposalPublished;
+      proposalId: string;
+      spaceId: string;
+      userId: string;
+    }
+  | {
       scope: WebhookEventNames.ProposalPassed | WebhookEventNames.ProposalFailed;
       proposalId: string;
       spaceId: string;
@@ -198,6 +247,12 @@ type ProposalEventBaseContext =
       proposalId: string;
       scope: WebhookEventNames.ProposalStatusChanged;
       currentEvaluationId: string;
+    }
+  | {
+      scope: WebhookEventNames.ProposalCredentialCreated;
+      proposalId: string;
+      spaceId: string;
+      userId: string;
     };
 
 export async function publishProposalEventBase(context: ProposalEventBaseContext) {
@@ -214,12 +269,39 @@ export async function publishProposalEventBase(context: ProposalEventBaseContext
         currentEvaluationId: context.currentEvaluationId
       });
     }
+    case WebhookEventNames.ProposalPublished: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space,
+        user
+      });
+    }
+    case WebhookEventNames.ProposalAppealed: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space,
+        user
+      });
+    }
     case WebhookEventNames.ProposalPassed:
     case WebhookEventNames.ProposalFailed: {
       return publishWebhookEvent(context.spaceId, {
         scope: context.scope,
         proposal,
         space
+      });
+    }
+    case WebhookEventNames.ProposalCredentialCreated: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space,
+        user
       });
     }
     default: {

@@ -2,9 +2,10 @@ import type { IdentityType, UserDetails as UserDetailsType } from '@charmverse/c
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import type { SxProps, Theme } from '@mui/material';
-import { Box, Grid, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
+import type { LoggedInUser } from '@root/models';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
@@ -16,13 +17,11 @@ import {
   useRequiredMemberProperties,
   useRequiredUserDetailsForm
 } from 'components/members/hooks/useRequiredMemberProperties';
-import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityTypes';
 import Avatar from 'components/settings/space/components/LargeAvatar';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { shortWalletAddress } from 'lib/utilities/blockchain';
-import type { LoggedInUser } from 'models';
+import { shortWalletAddress } from 'lib/utils/blockchain';
 
 import { useUpdateProfileAvatar } from '../hooks/useUpdateProfileAvatar';
 import { useUserDetails } from '../hooks/useUserDetails';
@@ -68,30 +67,28 @@ function EditIconContainer({
 }
 
 export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }: UserDetailsProps) {
-  const identityTypes = useIdentityTypes();
   const { isBioRequired, isTimezoneRequired, isLinkedinRequired, isGithubRequired, isTwitterRequired } =
     useRequiredMemberProperties({ userId: user.id });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
-  const { saveUser } = useUserDetails();
 
-  const setDescription = async (description: string) => {
+  const setDescription = (description: string) => {
     onChange({ description });
   };
 
-  const setTimezone = async (timezone: string | null = null) => {
+  const setTimezone = (timezone: string | null = null) => {
     onChange({ timezone });
   };
 
-  const setSocial = async (social: Social) => {
+  const setSocial = (social: Social) => {
     onChange({ social });
   };
 
   return (
     <>
-      <Grid container direction='column' spacing={2} mt={1} sx={sx}>
-        <Grid item>
+      <Stack spacing={2} mt={1} sx={sx} width='100%'>
+        <Box width='fit-content'>
           <Avatar
             name={user.username || ''}
             image={user.avatar}
@@ -102,30 +99,24 @@ export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }
             isSaving={isSavingAvatar}
             isNft={hasNftAvatar(user)}
           />
-        </Grid>
-        <Grid item width='100%'>
-          <EditIconContainer data-testid='edit-identity' onClick={identityModalState.open}>
-            <IdentityIcon type={user.identityType as IdentityType} />
-            <Typography variant='h1' noWrap>
-              {shortWalletAddress(user.username)}
-            </Typography>
-          </EditIconContainer>
-        </Grid>
-        <Grid item>
-          <UserDescription
-            description={userDetails?.description || ''}
-            onChange={setDescription}
-            error={errors?.description}
-            required={isBioRequired}
-          />
-        </Grid>
-        <Grid item>
-          <TimezoneAutocomplete
-            required={isTimezoneRequired}
-            userTimezone={userDetails?.timezone}
-            onChange={setTimezone}
-          />
-        </Grid>
+        </Box>
+        <EditIconContainer data-testid='edit-identity' onClick={identityModalState.open}>
+          <IdentityIcon type={user.identityType as IdentityType} />
+          <Typography variant='h1' noWrap>
+            {shortWalletAddress(user.username)}
+          </Typography>
+        </EditIconContainer>
+        <UserDescription
+          description={userDetails?.description || ''}
+          onChange={setDescription}
+          error={errors?.description}
+          required={isBioRequired}
+        />
+        <TimezoneAutocomplete
+          required={isTimezoneRequired}
+          userTimezone={userDetails?.timezone}
+          onChange={setTimezone}
+        />
         <SocialInputs
           errors={errors?.social as FieldErrors<Record<keyof Social, string | null>>}
           required={{
@@ -137,16 +128,8 @@ export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }
           social={userDetails?.social as Social}
           onChange={setSocial}
         />
-      </Grid>
-      <IdentityModal
-        isOpen={identityModalState.isOpen}
-        close={identityModalState.close}
-        save={(username: string, identityType: IdentityType) => {
-          saveUser({ username, identityType });
-        }}
-        identityTypes={identityTypes}
-        identityType={(user?.identityType || 'Wallet') as IdentityType}
-      />
+      </Stack>
+      <IdentityModal isOpen={identityModalState.isOpen} close={identityModalState.close} />
     </>
   );
 }
@@ -158,7 +141,6 @@ export function UserDetailsFormWithSave({
   const { isDirty, isValid, onFormChange, values, errors, isSubmitting, onSubmit } = useRequiredUserDetailsForm({
     userId: user.id
   });
-
   usePreventReload(isDirty);
 
   async function saveForm() {
@@ -172,7 +154,7 @@ export function UserDetailsFormWithSave({
     return () => {
       setUnsavedChanges(false);
     };
-  }, [isDirty]);
+  }, [isDirty, setUnsavedChanges]);
 
   return (
     <>

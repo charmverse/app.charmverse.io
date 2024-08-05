@@ -1,4 +1,4 @@
-import type { Node } from '@bangle.dev/pm';
+import type { Node } from 'prosemirror-model';
 
 export type Participant = {
   id: string;
@@ -73,6 +73,7 @@ export type ClientDiffMessage = {
   // ti?: string; // new title
   doc?: Node;
   v: number;
+  undo?: boolean;
 };
 
 export type ClientSubscribeMessage = {

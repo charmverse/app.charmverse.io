@@ -5,36 +5,45 @@ import type { KeyedMutator } from 'swr';
 import charmClient from 'charmClient';
 import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { ProposalWithUsersLite } from 'lib/proposal/interface';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 type ProposalsContextType = {
   proposals: ProposalWithUsersLite[] | undefined;
   mutateProposals: KeyedMutator<ProposalWithUsersLite[]>;
   isLoading: boolean;
-  updateProposal: (proposal: UpdateProposalRequest) => Promise<void>;
+  updateProposal: (proposal: Pick<UpdateProposalRequest, 'proposalId' | 'fields'>) => Promise<void>;
   proposalsMap: Record<string, ProposalWithUsersLite | undefined>;
 };
 
 export const ProposalsContext = createContext<ProposalsContextType | null>(null);
 
 export function ProposalsProvider({ children }: { children: ReactNode }) {
-  const { loadingPages } = usePages();
   const { space } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
 
   const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
 
-  const updateProposal = useCallback(
-    async (proposal: UpdateProposalRequest) => {
-      if (proposal) {
-        await charmClient.proposals.updateProposal(proposal);
-
-        mutateProposals();
-      }
+  const updateProposal: ProposalsContextType['updateProposal'] = useCallback(
+    async ({ proposalId, ...updates }) => {
+      await charmClient.proposals.updateProposal({ proposalId, ...updates });
+      mutateProposals(
+        (list) => {
+          if (!list) return list;
+          return list.map((proposal) => {
+            if (proposal.id === proposalId) {
+              return {
+                ...proposal,
+                ...updates
+              };
+            }
+            return proposal;
+          });
+        },
+        { revalidate: false }
+      );
     },
     [mutateProposals]
   );
@@ -48,15 +57,17 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
   }, [proposals]);
 
   useEffect(() => {
-    function handleArchivedEvent(payload: WebSocketPayload<'proposals_archived'>) {
+    function handleArchivedEvent(updated: WebSocketPayload<'proposals_updated'>) {
       mutateProposals(
         (list) => {
           if (!list) return list;
           return list.map((proposal) => {
-            if (payload.proposalIds.includes(proposal.id)) {
+            const updatedMatch = updated.find((p) => p.id === proposal.id);
+            if (updatedMatch) {
               return {
                 ...proposal,
-                archived: payload.archived
+                archived: updatedMatch.archived ?? proposal.archived,
+                currentStep: updatedMatch.currentStep ?? proposal.currentStep
               };
             }
             return proposal;
@@ -65,9 +76,42 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
         { revalidate: false }
       );
     }
-    const unsubscribeFromProposalArchived = subscribe('proposals_archived', handleArchivedEvent);
+    function handleUpdatedEvent(updated: WebSocketPayload<'pages_meta_updated'>) {
+      mutateProposals(
+        (list) => {
+          if (!list) return list;
+          return list.map((proposal) => {
+            const updatedMatch = updated.find((p) => p.id === proposal.pageId);
+            if (updatedMatch) {
+              return {
+                ...proposal,
+                title: updatedMatch.title || proposal.title
+              };
+            }
+            return proposal;
+          });
+        },
+        { revalidate: false }
+      );
+    }
+    function handleDeleteEvent(deleted: WebSocketPayload<'pages_deleted'>) {
+      mutateProposals(
+        (list) => {
+          if (!list) return list;
+          return list.filter((proposal) => {
+            return !deleted.some((p) => p.id === proposal.pageId);
+          });
+        },
+        { revalidate: false }
+      );
+    }
+    const unsubscribeFromProposalArchived = subscribe('proposals_updated', handleArchivedEvent);
+    const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdatedEvent);
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
     return () => {
       unsubscribeFromProposalArchived();
+      unsubscribeFromPageUpdates();
+      unsubscribeFromPageDeletes();
     };
   }, [mutateProposals, subscribe]);
 
@@ -75,11 +119,11 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
     () => ({
       proposals,
       mutateProposals,
-      isLoading: isLoading || loadingPages,
+      isLoading,
       updateProposal,
       proposalsMap
     }),
-    [isLoading, loadingPages, mutateProposals, proposals, updateProposal]
+    [isLoading, mutateProposals, proposals, proposalsMap, updateProposal]
   );
 
   return <ProposalsContext.Provider value={value}>{children}</ProposalsContext.Provider>;

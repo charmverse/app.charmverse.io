@@ -35,7 +35,7 @@ import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import InlineCharmEditor from '../../InlineCharmEditor';
+import { InlineCharmEditor } from '../../index';
 import { scrollToThread } from '../inlineComment/inlineComment.utils';
 
 const ContextBorder = styled.div`
@@ -192,7 +192,7 @@ function EditCommentCharmEditor({
 
   return (
     <>
-      <Box onClick={onContainerClick} flex={1} width='100%'>
+      <Box data-test='comment-message' onClick={onContainerClick} flex={1} width='100%'>
         <Box sx={{ marginLeft: `${32 - 4}px`, paddingLeft: '4px', bgcolor: isEditable ? 'background.default' : '' }}>
           <InlineCharmEditor
             readOnly={!isEditable}
@@ -242,7 +242,7 @@ interface PageThreadProps {
   threadId: string;
   inline?: boolean;
   showFindButton?: boolean;
-  canCreateComments?: boolean;
+  enableComments?: boolean;
   onDeleteComment?: (threadId: string) => void;
   onToggleResolve?: (threadId: string, resolved: boolean) => void;
   sx?: SxProps<Theme>;
@@ -298,7 +298,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
       showFindButton = false,
       threadId,
       inline = false,
-      canCreateComments,
+      enableComments,
       scrollToThreadElement
     },
     ref
@@ -422,7 +422,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                       {commentIndex === 0 && !isSmallScreen && (
                         <ThreadHeaderButton
                           text={thread.resolved ? 'Un-resolve' : 'Resolve'}
-                          disabled={isMutating || !canCreateComments}
+                          disabled={isMutating || !enableComments}
                           onClick={toggleResolved}
                         />
                       )}
@@ -525,7 +525,7 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
             </MenuItem>
           </Menu>
         </div>
-        {canCreateComments && !thread.resolved && (
+        {enableComments && !thread.resolved && (
           <AddCommentCharmEditor
             readOnly={Boolean(editedCommentId)}
             key={counter}

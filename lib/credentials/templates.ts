@@ -1,19 +1,26 @@
 import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
 export async function getCredentialTemplates({ spaceId }: { spaceId: string }): Promise<CredentialTemplate[]> {
   if (!stringUtils.isUUID(spaceId)) {
     throw new InvalidInputError(`Invalid spaceId: ${spaceId}`);
   }
 
-  const credentials = await prisma.credentialTemplate.findMany({
-    where: {
-      spaceId
-    }
-  });
+  const credentials = await prisma.credentialTemplate
+    .findMany({
+      where: {
+        spaceId
+      }
+    })
+    .then((templates) =>
+      templates.map((template) =>
+        template.schemaType === 'reward'
+          ? template
+          : { ...template, credentialEvents: template.credentialEvents.filter((ev) => ev === 'proposal_approved') }
+      )
+    );
 
   return credentials;
 }
@@ -58,6 +65,10 @@ export async function createCredentialTemplate({
   spaceId,
   credentialEvents
 }: CreateCredentialTemplateInput): Promise<CredentialTemplate> {
+  if (!schemaType) {
+    throw new InvalidInputError(`schemaType is required: ${schemaType}`);
+  }
+
   return prisma.credentialTemplate.create({
     data: {
       name,

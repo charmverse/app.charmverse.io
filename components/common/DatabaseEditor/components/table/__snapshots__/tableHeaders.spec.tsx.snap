@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/table/TableHeaders should match snapshot 1`] = `
+<div>
+  <span
+    class="variable variable"
+  >
+    <div
+      class="octo-table-header TableHeaders"
+      id="mainBoardHeader"
+    >
+      <div
+        class="octo-table-cell header-cell disable-drag-selection"
+        data-test="table-property-text"
+        draggable="true"
+        style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+      >
+        <div
+          class="MuiStack-root css-19zgtxi-MuiStack-root"
+        >
+          <div>
+            <div>
+              <span
+                class="Label empty "
+              >
+                <div
+                  style="margin-right: 4px; display: flex;"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-fatq9v-MuiSvgIcon-root"
+                    data-testid="SubjectIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
+                    />
+                  </svg>
+                </div>
+                <span
+                  aria-label="Title"
+                  class="MuiTypography-root MuiTypography-subtitle1 css-1to5392-MuiTypography-root"
+                  data-mui-internal-clone-element="true"
+                >
+                  Title
+                </span>
+                <button
+                  class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-10xxybu-MuiButtonBase-root-MuiIconButton-root"
+                  tabindex="0"
+                  type="button"
+                />
+              </span>
+            </div>
+          </div>
+        </div>
+        <div
+          class="octo-spacer"
+        />
+        <div
+          class="HorizontalGrip"
+          draggable="true"
+        />
+      </div>
+      <div
+        class="octo-table-cell header-cell disable-drag-selection"
+        style="flex-grow: 1;"
+      >
+        <button
+          class="Button size--small"
+          type="button"
+        >
+          <span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+              data-test="add-table-prop"
+              data-testid="AddIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+              />
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </span>
+</div>
+`;

@@ -1,17 +1,19 @@
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { FeatureJson } from '@root/lib/features/constants';
+import * as mailer from '@root/lib/mailer';
+import * as emails from '@root/lib/mailer/emails';
+import { getMemberUsernameBySpaceRole } from '@root/lib/members/getMemberUsername';
+import { getCardNotifications } from '@root/lib/notifications/cards/getCardNotifications';
+import { getDocumentNotifications } from '@root/lib/notifications/documents/getDocumentNotifications';
+import { getPostNotifications } from '@root/lib/notifications/forum/getForumNotifications';
+import type { Notification, NotificationGroup } from '@root/lib/notifications/interfaces';
+import { getPollNotifications } from '@root/lib/notifications/polls/getPollNotifications';
+import { getProposalNotifications } from '@root/lib/notifications/proposals/getProposalNotifications';
+import { getBountyNotifications } from '@root/lib/notifications/rewards/getRewardNotifications';
+import type { MessagesSendResult } from 'mailgun.js';
 
-import type { FeatureJson } from 'lib/features/constants';
-import * as mailer from 'lib/mailer';
-import * as emails from 'lib/mailer/emails';
-import { getMemberUsernameBySpaceRole } from 'lib/members/getMemberUsername';
-import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
-import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
-import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
-import type { Notification, NotificationGroup } from 'lib/notifications/interfaces';
-import { getPollNotifications } from 'lib/notifications/polls/getPollNotifications';
-import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
-import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotifications';
+import { blueColor } from 'theme/colors';
 
 const notificationSelectFields = {
   notificationMetadata: {
@@ -21,7 +23,10 @@ const notificationSelectFields = {
 
 export type NotificationEmailInput = { id: string; type: NotificationGroup };
 
-export async function sendNotificationEmail({ id, type }: NotificationEmailInput): Promise<boolean> {
+export async function sendNotificationEmail({
+  id,
+  type
+}: NotificationEmailInput): Promise<MessagesSendResult | undefined> {
   switch (type) {
     case 'card': {
       const {
@@ -31,9 +36,9 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getCardNotifications({ id });
+        const notifications = await getCardNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -43,7 +48,6 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
@@ -55,9 +59,9 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getPostNotifications({ id });
+        const notifications = await getPostNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -67,7 +71,6 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
@@ -79,9 +82,9 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getDocumentNotifications({ id });
+        const notifications = await getDocumentNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -91,7 +94,6 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
@@ -103,9 +105,9 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getPollNotifications({ id });
+        const notifications = await getPollNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -115,7 +117,6 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
@@ -127,9 +128,9 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getProposalNotifications({ id });
+        const notifications = await getProposalNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -139,7 +140,6 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
@@ -151,9 +151,9 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getBountyNotifications({ id });
+        const notifications = await getBountyNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -163,14 +163,12 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
     default:
       throw new Error(`Unknown notification type: ${type}`);
   }
-  return false;
 }
 
 async function sendEmail({
@@ -186,7 +184,9 @@ async function sendEmail({
       id: notificationSpaceId
     },
     select: {
-      features: true
+      features: true,
+      emailBrandArtwork: true,
+      emailBrandColor: true
     }
   });
   const spaceFeatures = (space.features ?? []) as FeatureJson[];
@@ -202,7 +202,7 @@ async function sendEmail({
 
   const notificationTargetSpaceRole = await prisma.spaceRole.findFirstOrThrow({
     where: {
-      userId: notification.createdBy.id,
+      userId: user.id,
       spaceId: notificationSpaceId
     },
     select: {
@@ -216,7 +216,11 @@ async function sendEmail({
   const template = emails.getPendingNotificationEmail({
     notification,
     user: { ...user, username: primaryIdentity },
-    spaceFeatures
+    spaceFeatures,
+    emailBranding: {
+      artwork: space.emailBrandArtwork || '',
+      color: space.emailBrandColor || blueColor
+    }
   });
   const result = await mailer.sendEmail({
     to: {

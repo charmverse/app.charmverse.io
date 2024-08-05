@@ -7,7 +7,6 @@ import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { TwoFactorAuthSetupModal } from 'components/settings/account/components/otp/components/TwoFactorAuthSetupModal';
 import Legend from 'components/settings/Legend';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
 
 import { DeleteOtpModal } from './otp/components/DeleteOtpModal';
@@ -24,16 +23,11 @@ export function TwoFactorAuthUser() {
   const { user } = useUser();
   const activeOtp = !!user?.otp?.activatedAt;
 
-  const isCharmverseSpace = useIsCharmverseSpace();
-
-  if (!isCharmverseSpace) {
-    return null;
-  }
-
   return (
     <Box mt={4}>
       <Legend
         noBorder
+        wrap
         helperText='Use a mobile authentication app to get a verification code to enter CharmVerse everytime you login.'
       >
         Two-factor Authentication

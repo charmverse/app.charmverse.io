@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 
 import { PendingNotification } from 'lib/mailer/emails/templates/NotificationTemplate';
 import { emptyDocument } from 'lib/prosemirror/constants';
-import { getCurrentDate } from 'lib/utilities/dates';
+import { getCurrentDate } from 'lib/utils/dates';
 
 const userId = v4();
 

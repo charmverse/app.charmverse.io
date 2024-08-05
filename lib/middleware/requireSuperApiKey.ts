@@ -2,10 +2,9 @@ import crypto from 'node:crypto';
 
 import type { SuperApiToken } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidApiKeyError } from '@root/lib/middleware/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
-
-import { InvalidApiKeyError } from 'lib/middleware/errors';
 
 declare module 'http' {
   interface IncomingMessage {
@@ -33,8 +32,9 @@ export async function provisionSuperApiKey(name: string, token?: string): Promis
 export async function requireSuperApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const detectedApiKey = getAPIKeyFromRequest(req);
 
-  const superApiTokenData = detectedApiKey ? await getVerifiedSuperApiToken(detectedApiKey) : null;
-
+  const superApiTokenData = detectedApiKey
+    ? await getVerifiedSuperApiToken(detectedApiKey, req.query?.spaceId as string)
+    : null;
   if (superApiTokenData) {
     req.superApiToken = superApiTokenData.superApiKey;
     req.spaceIdRange = superApiTokenData.spaceIdRange;

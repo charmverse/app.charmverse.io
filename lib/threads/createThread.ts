@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError } from '@root/lib/utils/errors';
 
 import type { ThreadCreatePayload, ThreadWithComments } from './interfaces';
 import { threadIncludeClause } from './utils';

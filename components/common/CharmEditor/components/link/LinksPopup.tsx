@@ -20,8 +20,9 @@ import { createPortal } from 'react-dom';
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { isReturnKey } from 'lib/utils/react';
 
-import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import type { LinkPluginState } from './link.plugins';
 
@@ -118,7 +119,7 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
   }
 
   function updateLink(e: React.KeyboardEvent) {
-    if (e.code === 'Enter') {
+    if (isReturnKey(e)) {
       updateLinkNode(e);
 
       // close edit popover on save

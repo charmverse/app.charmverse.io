@@ -1,23 +1,24 @@
+import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import { useEffect, useState } from 'react';
 import type { RefObject } from 'react';
 import { flushSync } from 'react-dom';
 
-import { saveRenderHandlers } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
-import type { NodeView, RenderHandlers } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
+import type { NodeView, RenderHandlers } from '../core/node-view';
+import { saveRenderHandlers } from '../core/node-view';
 
 export const nodeViewUpdateStore = new WeakMap();
 
 type NodeViewsUpdater = (nodeViewUpdateStore: NodeView[]) => NodeView[];
 type UpdateNodeViewsFunction = (updater: NodeViewsUpdater) => void;
 
-const nodeViewRenderHandlers = (updateNodeViews: UpdateNodeViewsFunction): RenderHandlers => ({
+export const nodeViewRenderHandlers = (updateNodeViews: UpdateNodeViewsFunction): RenderHandlers => ({
   create: (nodeView, _nodeViewProps) => {
-    // log.debug('create', objectUid.get(nodeView), new Error().stack);
+    log.debug('create node', objectUid.get(nodeView)); // , new Error().stack);
     updateNodeViews((nodeViews) => [...nodeViews, nodeView]);
   },
   update: (nodeView, _nodeViewProps) => {
-    // log.debug('update', objectUid.get(nodeView));
+    log.debug('update node', objectUid.get(nodeView));
     const updateCallback = nodeViewUpdateStore.get(nodeView);
     // If updateCallback is undefined (which can happen if react took long to mount),
     // we are still okay, as the latest nodeViewProps will be accessed whenever it mounts.

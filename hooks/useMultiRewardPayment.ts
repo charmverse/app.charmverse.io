@@ -1,20 +1,14 @@
 import type { Bounty } from '@charmverse/core/prisma';
 import { Interface } from '@ethersproject/abi';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 import { ethers } from 'ethers';
-import { useCallback, useState } from 'react';
-import useSWR from 'swr';
+import { useCallback } from 'react';
 import { getAddress, parseUnits } from 'viem';
 
-import { useRewards } from 'components/rewards/hooks/useRewards';
+import charmClient from 'charmClient';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { SafeData } from 'lib/gnosis';
-import { getSafesForAddress } from 'lib/gnosis';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { eToNumber } from 'lib/utilities/numbers';
-import { isTruthy } from 'lib/utilities/types';
+import { eToNumber } from 'lib/utils/numbers';
 
 import { usePages } from './usePages';
 
@@ -28,35 +22,11 @@ export interface TransactionWithMetadata
   title: string;
 }
 
-export function useMultiRewardPayment({
-  rewards
-}: {
-  rewards: Pick<RewardWithUsers, 'applications' | 'chainId' | 'id' | 'rewardAmount' | 'rewardToken'>[];
-  selectedApplicationIds?: string[];
-}) {
-  const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
-  const { account, chainId } = useWeb3Account();
-
+export function useMultiRewardPayment() {
   const { pages } = usePages();
-
   const [paymentMethods] = usePaymentMethods();
-  const { data: gnosisSafes } = useSWR(
-    account && chainId ? `/connected-gnosis-safes/${account}` : null,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    () => getSafesForAddress({ chainId: chainId!, address: account! })
-  );
-
-  const bountiesToPay = rewards.filter((reward) => {
-    return (
-      gnosisSafes?.some((safe) => reward.chainId === safe.chainId) &&
-      isTruthy(reward.rewardAmount) &&
-      isTruthy(reward.rewardToken) &&
-      isTruthy(reward.chainId)
-    );
-  });
-
   const prepareGnosisSafeRewardPayment = useCallback(
-    ({
+    async ({
       recipientAddress,
       recipientUserId,
       token,
@@ -75,8 +45,17 @@ export function useMultiRewardPayment({
       applicationId: string;
       title?: string;
     }) => {
+      const resolvedRecipientAddress =
+        recipientAddress.endsWith('.eth') && ethers.utils.isValidName(recipientAddress)
+          ? await charmClient.resolveEnsName(recipientAddress)
+          : getAddress(recipientAddress);
+
+      if (!resolvedRecipientAddress) {
+        return null;
+      }
+
       let data = '0x';
-      let to = recipientAddress;
+      let to: string | null = resolvedRecipientAddress;
       let value = parseUnits(eToNumber(amount), 18).toString();
 
       // assume this is ERC20 if its not a native token
@@ -85,15 +64,12 @@ export function useMultiRewardPayment({
         const paymentMethod = paymentMethods.find((method) => method.contractAddress === token);
         const erc20 = new Interface(ERC20_ABI);
         const parsedAmount = parseUnits(eToNumber(amount), paymentMethod!.tokenDecimals).toString();
-        data = erc20.encodeFunctionData('transfer', [getAddress(recipientAddress), parsedAmount]);
+        data = erc20.encodeFunctionData('transfer', [resolvedRecipientAddress, parsedAmount]);
         // send the request to the token contract
         to = token;
         value = '0';
       } else {
-        to =
-          recipientAddress.endsWith('.eth') && ethers.utils.isValidName(recipientAddress)
-            ? recipientAddress
-            : getAddress(recipientAddress);
+        to = resolvedRecipientAddress;
       }
 
       const defaultTitle = 'Untitled';
@@ -115,13 +91,7 @@ export function useMultiRewardPayment({
     []
   );
 
-  const isDisabled = bountiesToPay.length === 0;
-
   return {
-    isDisabled,
-    prepareGnosisSafeRewardPayment,
-    gnosisSafes,
-    gnosisSafeData,
-    setGnosisSafeData
+    prepareGnosisSafeRewardPayment
   };
 }

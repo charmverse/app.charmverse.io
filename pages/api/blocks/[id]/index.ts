@@ -1,13 +1,17 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { BlockTypes } from 'lib/focalboard/block';
+import type { BlockWithDetails } from 'lib/databases/block';
+import { applyPageToBlock } from 'lib/databases/block';
+import type { BoardFields } from 'lib/databases/board';
+import { getPageByBlockId } from 'lib/databases/getPageByBlockId';
+import { applyPropertiesToCard } from 'lib/databases/proposalsSource/applyPropertiesToCards';
+import { getCardPropertiesFromProposal } from 'lib/databases/proposalsSource/getCardProperties';
 import { ActionNotPermittedError, ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { trashOrDeletePage } from 'lib/pages/trashOrDeletePage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
@@ -15,7 +19,8 @@ import { relay } from 'lib/websockets/relay';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getBlock).delete(deleteBlock);
-async function getBlock(req: NextApiRequest, res: NextApiResponse<Block>) {
+
+async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetails>) {
   const blockId = req.query.id as string;
 
   const block = await prisma.block.findUniqueOrThrow({
@@ -24,10 +29,19 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<Block>) {
     }
   });
 
-  const pageId = block.type === 'view' ? block.rootId : block.id;
+  const permissionsBlockId = block.type === 'view' ? block.rootId : block.id;
+
+  const [page, permissionsPage] = await Promise.all([
+    getPageByBlockId(block.id),
+    getPageByBlockId(permissionsBlockId, { id: true })
+  ]);
+
+  if (!permissionsPage) {
+    throw new DataNotFoundError(`Page not found for permissions: ${permissionsBlockId}`);
+  }
 
   const permissions = await permissionsApiClient.pages.computePagePermissions({
-    resourceId: pageId,
+    resourceId: permissionsPage.id,
     userId: req.session.user?.id
   });
 
@@ -35,12 +49,45 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<Block>) {
     throw new DataNotFoundError('Block not found');
   }
 
-  return res.status(200).json(block);
+  const result = page ? applyPageToBlock(block, page) : (block as BlockWithDetails);
+
+  // apply readonly properties from source page (eg. proposal)
+  if (page?.syncWithPageId) {
+    const proposalPermission = await permissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: page.syncWithPageId,
+      userId: page.createdBy
+    });
+    const space = await prisma.space.findFirstOrThrow({
+      where: {
+        id: result.spaceId
+      },
+      select: {
+        id: true,
+        features: true,
+        credentialTemplates: true,
+        useOnchainCredentials: true
+      }
+    });
+    const { boardBlock, card: proposalCardProps } = await getCardPropertiesFromProposal({
+      boardId: block.rootId,
+      pageId: page.syncWithPageId,
+      space
+    });
+    const updatedFields = applyPropertiesToCard({
+      boardProperties: (boardBlock.fields as any as BoardFields).cardProperties,
+      block: result,
+      proposalProperties: proposalCardProps,
+      canViewPrivateFields: proposalPermission.view_private_fields
+    });
+    Object.assign(result, updatedFields);
+  }
+
+  return res.status(200).json(result);
 }
 
 async function deleteBlock(
   req: NextApiRequest,
-  res: NextApiResponse<{ deletedCount: number; rootBlock: Block } | { error: string }>
+  res: NextApiResponse<{ deletedCount: number; rootBlock: BlockWithDetails } | { error: string }>
 ) {
   const blockId = req.query.id as string;
   const userId = req.session.user.id as string;
@@ -76,7 +123,7 @@ async function deleteBlock(
       throw new ActionNotPermittedError();
     }
 
-    const deletedChildPageIds = await modifyChildPages(blockId, userId, 'trash');
+    const deletedChildPageIds = await trashOrDeletePage(blockId, userId, 'trash');
     deletedCount = deletedChildPageIds.length;
     relay.broadcast(
       {
@@ -129,7 +176,7 @@ async function deleteBlock(
     relay.broadcast(
       {
         type: 'blocks_deleted',
-        payload: [{ id: blockId, type: rootBlock.type }]
+        payload: [{ id: blockId }]
       },
       spaceId
     );
@@ -148,13 +195,13 @@ async function deleteBlock(
     relay.broadcast(
       {
         type: 'blocks_deleted',
-        payload: [{ id: blockId, type: rootBlock.type as BlockTypes }]
+        payload: [{ id: blockId }]
       },
       spaceId
     );
   }
 
-  return res.status(200).json({ deletedCount, rootBlock });
+  return res.status(200).json({ deletedCount, rootBlock: rootBlock as BlockWithDetails });
 }
 
 export default withSessionRoute(handler);

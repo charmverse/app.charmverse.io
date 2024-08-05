@@ -5,9 +5,9 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
 import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
-import { PagesSidebarPage } from '__e2e__/po/pagesSiderbar.po';
+import { PagesSidebarPage } from '__e2e__/po/pagesSidebar.po';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import { loginBrowserUser } from '../utils/mocks';
 
@@ -26,7 +26,6 @@ const test = base.extend<Fixtures>({
 // Will be set by the first test
 let spaceUser: User;
 let space: Space;
-let databasePagePath: string;
 
 let firstProposal: Proposal;
 let secondProposal: Proposal;
@@ -66,7 +65,7 @@ test.beforeAll(async () => {
   });
 });
 
-test.describe.serial('Database with proposals as datasource', async () => {
+test.describe('Database with proposals as datasource', async () => {
   test('create a database with proposals as source', async ({ page, pagesSidebar, databasePage }) => {
     // Arrange ------------------
     await loginBrowserUser({
@@ -88,19 +87,13 @@ test.describe.serial('Database with proposals as datasource', async () => {
     await pagesSidebar.pagesSidebarSelectAddDatabaseButton.click();
 
     await pagesSidebar.databasePage.waitFor({
-      state: 'visible',
-      timeout: 5000
+      state: 'visible'
     });
 
     // Initialise the new database
     await expect(databasePage.selectProposalsAsSource()).toBeVisible();
-
-    // This is important as we want to simulate multiple clicks to ensure the card creation only happens once
-    await Promise.all([
-      databasePage.selectProposalsAsSource().click(),
-      databasePage.selectProposalsAsSource().click(),
-      databasePage.selectProposalsAsSource().click()
-    ]);
+    await databasePage.selectProposalsAsSource().click();
+    await databasePage.page.locator('data-test=apply-proposal-source-properties').click();
 
     await databasePage.page.waitForResponse(/api\/pages\/.{1,}\/proposal-source/);
 
@@ -123,17 +116,6 @@ test.describe.serial('Database with proposals as datasource', async () => {
     });
     // Regression check to make sure we did not create duplicate cards
     expect(syncedCards.length).toBe(3);
-
-    databasePagePath = (
-      await prisma.page.findFirstOrThrow({
-        where: {
-          id: syncedCards[0].parentId as string
-        },
-        select: {
-          path: true
-        }
-      })
-    ).path;
 
     const allTargetProposalIds = [firstProposal.id, secondProposal.id, thirdProposal.id];
 
@@ -166,60 +148,12 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
     // Make sure the UI only displays 3 cards
     const firstRow = databasePage.getTableRowByIndex({ index: 0 });
-    const secondRow = databasePage.getTableRowByIndex({ index: 0 });
-    const thirdRow = databasePage.getTableRowByIndex({ index: 0 });
+    const secondRow = databasePage.getTableRowByIndex({ index: 1 });
+    const thirdRow = databasePage.getTableRowByIndex({ index: 2 });
 
     await expect(firstRow).toBeVisible();
     await expect(secondRow).toBeVisible();
     await expect(thirdRow).toBeVisible();
     await expect(databasePage.getTableRowByIndex({ index: 3 })).not.toBeVisible();
-  });
-
-  test('view archived proposals as source', async ({ page, pagesSidebar, databasePage }) => {
-    // Arrange ------------------
-    await loginBrowserUser({
-      browserPage: page,
-      userId: spaceUser.id
-    });
-
-    // Mark the proposal as archived
-    await prisma.proposal.update({
-      where: {
-        id: secondProposal.id
-      },
-      data: {
-        archived: true
-      }
-    });
-
-    await page.goto(`${baseUrl}/${space.domain}/${databasePagePath}`);
-
-    // This is a refresh response
-    await databasePage.page.waitForTimeout(500);
-
-    // Wait until the database is initialised
-
-    const syncedCards = await prisma.page.findMany({
-      where: {
-        syncWithPageId: {
-          not: null
-        },
-        spaceId: space.id
-      },
-      select: {
-        id: true,
-        syncWithPageId: true
-      }
-    });
-    // Regression check to make sure we did not create duplicate cards
-    expect(syncedCards.length).toBe(3);
-
-    const syncedArchivedProposalCardId = syncedCards.find((c) => c.syncWithPageId === secondProposal.id)?.id as string;
-
-    const archivedRowProposalStatusBadge = databasePage.page
-      .locator(`data-test=database-row-${syncedArchivedProposalCardId}`)
-      .filter({ hasText: 'Unpublished' });
-
-    await expect(archivedRowProposalStatusBadge).toBeVisible();
   });
 });

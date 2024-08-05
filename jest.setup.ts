@@ -11,7 +11,9 @@ afterAll(() => {
 jest.mock('lib/blockchain/getENSName', () => ({
   ...jest.requireActual('lib/blockchain/getENSName'),
   __esModule: true,
-  default: jest.fn().mockImplementation(() => Promise.resolve(null))
+  getENSName: jest.fn().mockImplementation(() => Promise.resolve(null)),
+  getENSDetails: jest.fn().mockImplementation(() => Promise.resolve(null)),
+  resolveENSName: jest.fn().mockImplementation(() => Promise.resolve(null))
 }));
 
 jest.mock('lib/blockchain/provider/alchemy/client', () => ({

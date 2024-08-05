@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { PageType } from '@charmverse/core/prisma-client';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -12,14 +13,14 @@ import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEvent } from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import mutator from 'components/common/DatabaseEditor/mutator';
+import { getSortedBoards } from 'components/common/DatabaseEditor/store/boards';
+import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/DatabaseEditor/store/cards';
+import { useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
+import { getCurrentBoardViews, getView } from 'components/common/DatabaseEditor/store/views';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { ImportAction } from 'components/common/Modal/ConfirmImportModal';
 import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';
@@ -27,25 +28,28 @@ import { AddToFavoritesAction } from 'components/common/PageActions/components/A
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
 import { SetAsHomePageAction } from 'components/common/PageActions/components/SetAsHomePageAction';
-import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { lockablePageTypes } from 'lib/pages/constants';
 
 import { addNewCards, isValidCsvResult } from '../utils/databasePageOptions';
 
 import { DocumentHistory } from './DocumentHistory';
 import type { PageActionMeta } from './DocumentPageActionList';
+import { TogglePageLockAction } from './TogglePageLockAction';
 
 type Props = {
   onComplete: VoidFunction;
   page: PageActionMeta;
   pagePermissions?: PagePermissionFlags;
+  refreshPage?: VoidFunction;
 };
 
-export function DatabasePageActionList({ pagePermissions, onComplete, page }: Props) {
+export function DatabasePageActionList({ pagePermissions, onComplete, page, refreshPage }: Props) {
   const pageId = page.id;
   const router = useRouter();
   const { pages, deletePage, mutatePagesRemove } = usePages();
@@ -58,7 +62,13 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   const { user } = useUser();
   const { space: currentSpace } = useCurrentSpace();
   const importConfirmationPopup = usePopupState({ variant: 'popover', popupId: 'import-confirmation-popup' });
-  const { keys } = useApiPageKeys(pageId);
+  const localViewSettings = useLocalDbViewSettings(view?.id);
+
+  useEffect(() => {
+    if (view?.id && localViewSettings?.viewId !== view?.id) {
+      localViewSettings?.setViewId(view?.id);
+    }
+  }, [localViewSettings, view?.id]);
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
@@ -83,6 +93,16 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
     })
   );
 
+  const isLockablePageType = lockablePageTypes.includes(page.type as PageType);
+
+  async function onTogglePageLock() {
+    await charmClient.pages.togglePageLock({
+      pageId: page.id,
+      isLocked: !page.isLocked
+    });
+    refreshPage?.();
+  }
+
   async function onDeletePage() {
     await deletePage({
       pageId
@@ -102,7 +122,9 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
       const exportName = `${boardPage?.title ?? 'Untitled'} database export`;
 
       const generatedZip = await charmClient.pages.exportZippedDatabasePage({
-        databaseId: pageId
+        databaseId: pageId,
+        filter: localViewSettings?.localFilters || null,
+        viewId: view?.id
       });
 
       const zipDataUrl = URL.createObjectURL(generatedZip as any);
@@ -170,12 +192,12 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
             try {
               await addNewCards({
                 board,
+                boardPageId: pageId,
                 members: membersRecord,
                 results,
                 spaceId: currentSpace.id,
                 userId: user.id,
-                views: boardViews,
-                apiPageKeys: keys
+                views: boardViews
               });
 
               const spaceId = currentSpace?.id;
@@ -201,6 +223,13 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
     <List dense>
       <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
       <SetAsHomePageAction pageId={pageId} onComplete={onComplete} />
+      {isLockablePageType && (
+        <TogglePageLockAction
+          isLocked={!!page.isLocked}
+          onClick={onTogglePageLock}
+          disabled={!pagePermissions?.edit_lock}
+        />
+      )}
       <DuplicatePageAction
         onComplete={onComplete}
         pageId={pageId}
@@ -276,7 +305,9 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
           createdAt: new Date(board.createdAt),
           createdBy: board.createdBy,
           updatedAt: new Date(board.updatedAt),
-          updatedBy: board.updatedBy
+          updatedBy: board.updatedBy,
+          isLocked: page.isLocked,
+          lockedBy: page.lockedBy
         }}
       />
       <ConfirmImportModal

@@ -2,17 +2,17 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import { v4 } from 'uuid';
 
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import { useGetProposalBlocks, useUpdateProposalBlocks } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type {
   ProposalBlockInput,
   ProposalBlockWithTypedFields,
   ProposalBoardBlock
-} from 'lib/proposal/blocks/interfaces';
+} from 'lib/proposals/blocks/interfaces';
 
 export type ProposalBlocksContextType = {
   proposalBlocks: ProposalBlockWithTypedFields[] | undefined;

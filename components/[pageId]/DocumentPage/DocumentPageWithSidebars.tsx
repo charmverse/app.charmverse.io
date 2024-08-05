@@ -6,23 +6,26 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
-import { DocumentColumnLayout, DocumentColumn } from './components/DocumentColumnLayout';
+import { DocumentColumn, DocumentColumnLayout } from './components/DocumentColumnLayout';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { ProposalSidebar } from './components/Sidebar/ProposalSidebar';
+import { RewardSidebar } from './components/Sidebar/RewardSidebar';
 import type { DocumentPageProps } from './DocumentPage';
 import { DocumentPage } from './DocumentPage';
 import { usePageSidebar } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
+import { useReward } from './hooks/useReward';
 
 type DocumentPageWithSidebarsProps = DocumentPageProps & {
   readOnly?: boolean;
   insideModal?: boolean;
+  refreshPage?: VoidFunction;
 };
 
 function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps) {
-  const { page, readOnly = false } = props;
+  const { page, readOnly = false, refreshPage } = props;
   const { router } = useCharmRouter();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode } = useCharmEditor();
@@ -30,9 +33,22 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const isMdScreen = useMdScreen();
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
+  const rewardId = page.bountyId;
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow } = useProposal({
+  const {
+    proposal,
+    refreshProposal,
+    onChangeEvaluation,
+    onChangeTemplate,
+    onChangeWorkflow,
+    onChangeRewardSettings,
+    onChangeSelectedCredentialTemplates
+  } = useProposal({
     proposalId
+  });
+
+  const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
+    rewardId
   });
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
@@ -81,17 +97,21 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
   const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    proposalId ? 'proposal_evaluation' : null
+    proposalId ? 'proposal_evaluation' : rewardId ? 'reward_evaluation' : null
   );
   const internalSidebarView = defaultSidebarView || sidebarView;
 
   useEffect(() => {
     setActiveView(defaultSidebarView);
     setDefaultView(null);
+    return () => {
+      // clear sidebar so we can show left sidebar
+      setActiveView(null);
+    };
   }, []);
 
   return (
-    <DocumentColumnLayout>
+    <DocumentColumnLayout data-test='document-page'>
       <DocumentColumn>
         <DocumentPage
           {...props}
@@ -117,23 +137,49 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
       )}
       {(page.type === 'proposal' || page.type === 'proposal_template') && (
         <ProposalSidebar
-          isOpen={internalSidebarView === 'proposal_evaluation'}
+          sidebarProps={{
+            isOpen: internalSidebarView === 'proposal_evaluation',
+            openSidebar: () => setActiveView('proposal_evaluation'),
+            closeSidebar
+          }}
+          pageLensPostLink={page.lensPostLink}
+          refreshPage={refreshPage}
           pagePath={page.path}
           pageTitle={page.title}
           pageId={page.id}
           isUnpublishedProposal={isUnpublishedProposal}
           readOnlyProposalPermissions={!proposal?.permissions.edit}
           isProposalTemplate={page.type === 'proposal_template'}
-          isReviewer={proposal?.permissions.evaluate}
           isStructuredProposal={isStructuredProposal}
-          closeSidebar={closeSidebar}
-          openSidebar={() => setActiveView('proposal_evaluation')}
           proposal={proposal}
           proposalInput={proposal}
           templateId={proposal?.page?.sourceTemplateId}
           onChangeEvaluation={onChangeEvaluation}
+          onChangeTemplate={onChangeTemplate}
           refreshProposal={refreshProposal}
           onChangeWorkflow={onChangeWorkflow}
+          onChangeRewardSettings={onChangeRewardSettings}
+          onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
+        />
+      )}
+      {(page.type === 'bounty' || page.type === 'bounty_template') && reward && (
+        <RewardSidebar
+          sidebarProps={{
+            isOpen: internalSidebarView === 'reward_evaluation',
+            openSidebar: () => setActiveView('reward_evaluation'),
+            closeSidebar
+          }}
+          isDraft={reward.status === 'draft'}
+          refreshReward={refreshReward}
+          page={page}
+          expanded={false}
+          onChangeWorkflow={onChangeRewardWorkflow}
+          onChangeReward={updateReward}
+          isTemplate={page.type === 'bounty_template'}
+          templateId={page.sourceTemplateId}
+          reward={reward}
+          rewardInput={reward}
+          readOnly={props.readOnly}
         />
       )}
     </DocumentColumnLayout>

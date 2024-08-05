@@ -1,14 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { prismaToBlock } from '@root/lib/databases/block';
+import type { IPropertyTemplate } from '@root/lib/databases/board';
+import { getDatabaseDetails } from '@root/lib/pages/getDatabaseDetails';
+import { createDatabaseCardPage } from '@root/lib/public-api/createDatabaseCardPage';
+import { InvalidInputError } from '@root/lib/utils/errors';
+import { relay } from '@root/lib/websockets/relay';
+import type { AddFormResponseInput, FormResponse } from '@root/lib/zapier/interfaces';
+import { parseFormData } from '@root/lib/zapier/parseFormData';
 import { v4 } from 'uuid';
-
-import { prismaToBlock } from 'lib/focalboard/block';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
-import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { relay } from 'lib/websockets/relay';
-import type { AddFormResponseInput, FormResponse } from 'lib/zapier/interfaces';
-import { parseFormData } from 'lib/zapier/parseFormData';
 
 export async function createFormResponseCard({
   spaceId,

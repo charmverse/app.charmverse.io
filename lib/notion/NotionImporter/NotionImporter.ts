@@ -1,9 +1,8 @@
 import { getLogger } from '@charmverse/core/log';
 import { Client } from '@notionhq/client';
 import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { relay } from '@root/lib/websockets/relay';
 import { v4 } from 'uuid';
-
-import { relay } from 'lib/websockets/relay';
 
 import { createPrismaPage } from '../createPrismaPage';
 
@@ -90,7 +89,10 @@ export class NotionImporter {
       notionPagesRecord[notionPage.id] = notionPage;
     });
 
-    log.debug(`[notion] Fetching content for ${notionPages.length} pages`, { spaceId: this.spaceId });
+    log.debug(`[notion] Fetching content for ${notionPages.length} pages`, {
+      spaceId: this.spaceId,
+      userId: this.userId
+    });
 
     const workspacePageId = v4();
 

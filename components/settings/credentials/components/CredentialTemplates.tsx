@@ -1,32 +1,33 @@
-import type { CredentialTemplate } from '@charmverse/core/prisma-client';
+import type { AttestationType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { Box, Tooltip } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import Stack from '@mui/material/Stack';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { useGetCredentialTemplates } from 'charmClient/hooks/credentialHooks';
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { Typography } from 'components/common/Typography';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { capitalize } from 'lib/utils/strings';
 
 import { CredentialTemplateDialog } from './CredentialTemplateDialog';
 import { CredentialTemplateRow } from './CredentialTemplateRow';
 
 export function CredentialTemplates() {
-  const { space } = useCurrentSpace();
+  const { getFeatureTitle } = useSpaceFeatures();
 
   const [selectedTemplate, setSelectedTemplate] = useState<CredentialTemplate | null>(null);
 
-  const { isOpen, close, open } = usePopupState({ variant: 'popover', popupId: 'credential-popup' });
+  const [selectedNewCredentialType, setSelectedNewCredentialType] = useState<AttestationType | null>(null);
 
   const isAdmin = useIsAdmin();
   const { showMessage } = useSnackbar();
 
-  const { data: credentialTemplates, mutate: refreshCredentialTemplates } = useGetCredentialTemplates({
-    spaceId: space?.id
-  });
+  const { credentialTemplates, refreshCredentialTemplates, proposalCredentialTemplates, rewardCredentialTemplates } =
+    useGetCredentialTemplates();
 
   async function handleDelete(templateId: string) {
     try {
@@ -37,41 +38,93 @@ export function CredentialTemplates() {
     }
   }
 
-  function openDialog(template?: CredentialTemplate) {
+  function openDialog({
+    template,
+    newTemplateType
+  }: {
+    template?: CredentialTemplate;
+    newTemplateType?: AttestationType;
+  }) {
     setSelectedTemplate(template ?? null);
-    open();
+    setSelectedNewCredentialType(newTemplateType ?? null);
   }
 
   function closeDialog() {
     setSelectedTemplate(null);
-    close();
+    setSelectedNewCredentialType(null);
   }
 
   if (!credentialTemplates) {
     return <LoadingComponent />;
   }
 
+  const isOpen = !!selectedTemplate || !!selectedNewCredentialType;
+
   return (
-    <Box>
-      {credentialTemplates.map((template) => (
-        <CredentialTemplateRow
-          key={template.id}
-          template={template}
-          onClickDelete={handleDelete}
-          onClickEdit={openDialog}
-        />
-      ))}
-      <Tooltip title={!isAdmin ? 'Only space admins can create workflows' : ''} arrow>
-        <Button onClick={open} variant='text' sx={{ width: '120px' }} dataTest='add-credential'>
-          + Add a credential
-        </Button>
-      </Tooltip>
+    <Stack display='flex' flexDirection='column' gap={2}>
+      <Typography variant='body1'>
+        Create credentials with EAS attestations to be awarded for {getFeatureTitle('Proposals').toLowerCase()} or{' '}
+        {getFeatureTitle('Rewards').toLowerCase()}
+      </Typography>
+      <Box>
+        <Box display='flex' alignItems='center' flexDirection='row' justifyContent='space-between'>
+          <Typography variant='subtitle1'>{capitalize(getFeatureTitle('proposals'))}</Typography>
+          <Tooltip title={!isAdmin ? 'Only space admins can create credentials' : ''} arrow>
+            <Button
+              onClick={() => openDialog({ newTemplateType: 'proposal' })}
+              color='secondary'
+              variant='outlined'
+              size='small'
+              disabled={!isAdmin}
+              dataTest='add-proposal-credential'
+            >
+              + Add a credential
+            </Button>
+          </Tooltip>
+        </Box>
+
+        {proposalCredentialTemplates?.map((template) => (
+          <CredentialTemplateRow
+            key={template.id}
+            template={template}
+            onClickDelete={handleDelete}
+            onClickEdit={(credentialTemplate) => openDialog({ template: credentialTemplate })}
+          />
+        ))}
+      </Box>
+      <Box>
+        <Box display='flex' alignItems='center' flexDirection='row' justifyContent='space-between'>
+          <Typography variant='subtitle1'>{capitalize(getFeatureTitle('rewards'))}</Typography>
+          <Tooltip title={!isAdmin ? 'Only space admins can create credentials' : ''} arrow>
+            <Button
+              onClick={() => openDialog({ newTemplateType: 'reward' })}
+              color='secondary'
+              variant='outlined'
+              size='small'
+              disabled={!isAdmin}
+              dataTest='add-proposal-credential'
+            >
+              + Add a credential
+            </Button>
+          </Tooltip>
+        </Box>
+
+        {rewardCredentialTemplates?.map((template) => (
+          <CredentialTemplateRow
+            key={template.id}
+            template={template}
+            onClickDelete={handleDelete}
+            onClickEdit={(credentialTemplate) => openDialog({ template: credentialTemplate })}
+          />
+        ))}
+      </Box>
       <CredentialTemplateDialog
+        newCredentialTemplateType={selectedNewCredentialType}
         credentialTemplate={selectedTemplate}
         isOpen={isOpen}
         onClose={closeDialog}
         refreshTemplates={refreshCredentialTemplates}
       />
-    </Box>
+    </Stack>
   );
 }

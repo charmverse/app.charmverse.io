@@ -1,6 +1,5 @@
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
 import type { NFTData, NFTRequest } from 'lib/blockchain/getNFTs';
-import type { LoggedInUser } from 'models';
 
 export class BlockchainApi {
   getNFT(params: NFTRequest) {
@@ -9,9 +8,5 @@ export class BlockchainApi {
 
   listNFTs(userId: string) {
     return http.GET<NFTData[]>(`/api/nft/list/${userId}`);
-  }
-
-  refreshENSName(address: string) {
-    return http.POST<LoggedInUser>(`/api/nft/refresh-ensname`, { address });
   }
 }

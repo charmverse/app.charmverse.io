@@ -1,5 +1,5 @@
 import CommentIcon from '@mui/icons-material/Comment';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Box, Divider, Card, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
@@ -9,18 +9,21 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { LoginButton } from 'components/login/components/LoginButton';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useUser } from 'hooks/useUser';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 type Props = {
   page: PageWithContent;
-  canCreateComments: boolean;
+  canComment: boolean;
 };
 
-export function PageComments({ page, canCreateComments }: Props) {
+export function PageComments({ page, canComment }: Props) {
+  const { user } = useUser();
   const router = useRouter();
   const {
     comments,
@@ -38,9 +41,9 @@ export function PageComments({ page, canCreateComments }: Props) {
   const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
   const [, setCreatedComment] = useState<PageCommentWithVote | null>(null);
   const commentPermissions: CommentPermissions = {
-    add_comment: canCreateComments ?? false,
-    upvote: canCreateComments ?? false,
-    downvote: canCreateComments ?? false,
+    add_comment: canComment ?? false,
+    upvote: canComment ?? false,
+    downvote: canComment ?? false,
     delete_comments: isAdmin
   };
 
@@ -50,10 +53,10 @@ export function PageComments({ page, canCreateComments }: Props) {
   }
 
   useEffect(() => {
-    if (page.type === 'proposal' && proposal?.lensPostLink) {
+    if (page.type === 'proposal' && page?.lensPostLink) {
       syncPageCommentsWithLensPost();
     }
-  }, [page.id, proposal?.lensPostLink, page.type]);
+  }, [page.id, page?.lensPostLink, page.type]);
 
   useEffect(() => {
     const commentId = router.query.commentId;
@@ -80,7 +83,14 @@ export function PageComments({ page, canCreateComments }: Props) {
     <>
       <Divider sx={{ my: 3 }} />
 
-      {canCreateComments && <CommentForm handleCreateComment={createComment} />}
+      {canComment && <CommentForm handleCreateComment={createComment} />}
+      {!user && (
+        <Card variant='outlined' sx={{ mb: 2 }}>
+          <Box p={2} display='flex' justifyContent='center' width='100%'>
+            <LoginButton signInLabel='Sign in to comment' />
+          </Box>
+        </Card>
+      )}
 
       {isLoadingComments ? (
         <Box height={100}>
@@ -101,7 +111,7 @@ export function PageComments({ page, canCreateComments }: Props) {
                   handleUpdateComment={updateComment}
                   handleDeleteComment={deleteComment}
                   handleVoteComment={isProposal ? voteComment : undefined}
-                  lensPostLink={proposal?.lensPostLink}
+                  lensPostLink={page?.lensPostLink}
                 />
               ))}
             </Stack>
@@ -114,7 +124,7 @@ export function PageComments({ page, canCreateComments }: Props) {
                 No Comments Yet
               </Typography>
 
-              {canCreateComments && <Typography color='secondary'>Be the first to share what you think!</Typography>}
+              {canComment && <Typography color='secondary'>Be the first to share what you think!</Typography>}
             </Stack>
           )}
         </>

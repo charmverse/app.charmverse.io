@@ -17,6 +17,7 @@ interface ImageSelectorProps {
   children: ReactNode;
   galleryImages?: { [category: string]: string[] };
   uploadDisclaimer?: string;
+  closeOnImageSelect?: boolean;
 }
 
 export default function ImageSelector({
@@ -24,19 +25,35 @@ export default function ImageSelector({
   children,
   galleryImages,
   onImageSelect,
-  uploadDisclaimer
+  uploadDisclaimer,
+  closeOnImageSelect
 }: ImageSelectorProps) {
   const [embedLink, setEmbedLink] = useState('');
   const tabs: [string, ReactNode][] = [];
 
+  const [open, setOpen] = useState(autoOpen);
+
+  function handleImageSelect(imageSrc: string) {
+    if (closeOnImageSelect) {
+      setOpen(false);
+    }
+    onImageSelect(imageSrc);
+  }
+
   if (galleryImages) {
-    tabs.push(['Gallery', <ImageSelectorGallery key='gallery' onImageClick={onImageSelect} items={galleryImages} />]);
+    tabs.push([
+      'Gallery',
+      <ImageSelectorGallery key='gallery' onImageClick={handleImageSelect} items={galleryImages} />
+    ]);
   }
 
   return (
     <PopperPopup
       autoOpen={autoOpen}
       paperSx={selectorPopupSizeConfig}
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
       popupContent={
         <Box>
           <MultiTabs
@@ -57,7 +74,7 @@ export default function ImageSelector({
                 >
                   <ImageUploadButton
                     resizeType={ResizeType.Artwork}
-                    setImage={onImageSelect}
+                    setImage={handleImageSelect}
                     uploadDisclaimer={uploadDisclaimer}
                   />
                 </Box>
@@ -85,7 +102,7 @@ export default function ImageSelector({
                       width: 250
                     }}
                     onClick={() => {
-                      onImageSelect(embedLink);
+                      handleImageSelect(embedLink);
                       setEmbedLink('');
                     }}
                   >

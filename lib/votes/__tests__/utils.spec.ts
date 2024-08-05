@@ -3,7 +3,7 @@ import type { Vote } from '@charmverse/core/prisma';
 import { VOTE_STATUS } from '../interfaces';
 import { isVotingClosed } from '../utils';
 
-const vote: Vote = {
+const vote: Omit<Vote, 'tokenAddress' | 'chainId' | 'blockNumber'> = {
   id: '516f10e5-0218-436d-abb0-17eda9d7e2cd',
   pageId: '9d9c4435-dd36-4a46-883e-f164821db41a',
   postId: null,
@@ -19,7 +19,8 @@ const vote: Vote = {
   context: 'proposal',
   content: null,
   contentText: '',
-  maxChoices: 1
+  maxChoices: 1,
+  strategy: 'regular'
 };
 
 describe('voting status', () => {

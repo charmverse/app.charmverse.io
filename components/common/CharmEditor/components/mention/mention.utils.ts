@@ -1,10 +1,8 @@
-import type { Command } from '@bangle.dev/pm';
-import type { PluginKey } from 'prosemirror-state';
+import type { Command, PluginKey } from 'prosemirror-state';
 import { v4 } from 'uuid';
 
-import type { SuggestPluginState } from 'lib/prosemirror/interfaces';
-
-import { suggestTooltip } from '../@bangle.dev/tooltip';
+import type { SuggestPluginState } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { replaceSuggestMarkWith } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { UserDataPluginKey } from '../charm/charm.plugins';
 
 export function selectMention(key: PluginKey<SuggestPluginState>, mentionValue: string, mentionType: string): Command {
@@ -21,7 +19,7 @@ export function selectMention(key: PluginKey<SuggestPluginState>, mentionValue: 
       const suggestPluginState = key.getState(state);
       if (suggestPluginState) {
         const suggestTooltipKey = suggestPluginState.suggestTooltipKey;
-        return suggestTooltip.replaceSuggestMarkWith(suggestTooltipKey, mentionNode)(state, dispatch, view);
+        return replaceSuggestMarkWith(suggestTooltipKey, mentionNode)(state, dispatch, view);
       }
     }
     return false;

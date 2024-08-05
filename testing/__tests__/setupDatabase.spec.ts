@@ -1,56 +1,50 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { InvalidInputError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { InvalidInputError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 
-import { generateRole, generateUserAndSpaceWithApiToken } from '../setupDatabase';
+import { generateRole, generateUserAndSpace } from '../setupDatabase';
 
-describe('generateUserAndSpaceWithApiToken', () => {
+describe('generateUserAndSpace', () => {
   // Random key format - Ensures no conflicts if this is run against an existing database
   const walletAddress = Math.random().toString();
 
   it('should return a user and space', async () => {
-    const generated = await generateUserAndSpaceWithApiToken({ walletAddress });
+    const generated = await generateUserAndSpace();
 
     expect(generated.user).toBeInstanceOf(Object);
     expect(generated.space).toBeInstanceOf(Object);
   });
 
-  it('should always return the same user and space for the same wallet address', async () => {
-    const generated = await generateUserAndSpaceWithApiToken({ walletAddress });
-    const generated2 = await generateUserAndSpaceWithApiToken({ walletAddress });
-
-    expect(generated.user.id).toEqual(generated2.user.id);
-    expect(generated.space.id).toEqual(generated2.space.id);
-  });
-
   it('should return the API token object for the space', async () => {
-    const generated = await generateUserAndSpaceWithApiToken({ walletAddress });
+    const generated = await generateUserAndSpace({ walletAddress, apiToken: '12345' });
 
-    expect(generated.apiToken).toBeDefined();
-    expect(generated.apiToken).toBeInstanceOf(Object);
-    expect(generated.apiToken.spaceId).toEqual(generated.space.id);
-    expect(typeof generated.apiToken.token).toBe('string');
+    expect(generated.space).toBeDefined();
+    expect(generated.space.apiToken).toBeInstanceOf(Object);
+    expect(generated.space.apiToken?.spaceId).toEqual(generated.space.id);
+    expect(typeof generated.space.apiToken?.token).toBe('string');
   });
 
-  it('should always return the same api token for that space', async () => {
-    const generated = await generateUserAndSpaceWithApiToken({ walletAddress });
-    const generated2 = await generateUserAndSpaceWithApiToken({ walletAddress });
+  it('should return api token only if required', async () => {
+    const generated = await generateUserAndSpace({ apiToken: '12345' });
+    const generated2 = await generateUserAndSpace();
 
-    expect(generated.apiToken.token).toEqual(generated2.apiToken.token);
+    expect(generated.space.apiToken?.token).toBe('12345');
+    expect(generated2.space.apiToken?.token).toBe(undefined);
   });
 
-  it('should always generate a different wallet address, space and user if no address is provided', async () => {
-    const generated = await generateUserAndSpaceWithApiToken();
-    const generated2 = await generateUserAndSpaceWithApiToken();
+  it('should always generate a wallet address, if wallet address is provided', async () => {
+    const generated = await generateUserAndSpace({ walletAddress: '0x1234' });
+    const generated2 = await generateUserAndSpace();
 
     expect(generated.user.id).not.toEqual(generated2.user.id);
-
     expect(generated.space.id).not.toEqual(generated2.space.id);
 
-    expect(generated.user.wallets[0].address).not.toEqual(generated2.user.wallets[0].address);
+    expect(generated.user.wallets[0].address).toBe('0x1234');
+    expect(generated2.user.wallets?.[0]?.address).toBe(undefined);
   });
 });
+
 describe('generateRole', () => {
   it('should generate a role and optionally assign some users to it', async () => {
     const users = await Promise.all([

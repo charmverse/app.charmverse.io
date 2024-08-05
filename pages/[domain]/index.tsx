@@ -35,7 +35,15 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   // 2. send user to default page for the space
 
-  let destination = await getDefaultPageForSpace({ host: context.req.headers.host, space, userId: sessionUserId });
+  const pageRedirect = await getDefaultPageForSpace({ host: context.req.headers.host, space, userId: sessionUserId });
+
+  if (pageRedirect == null) {
+    return {
+      props: {}
+    };
+  }
+
+  let destination = pageRedirect;
 
   // append existing query params, lie 'account' or 'subscription'
   Object.keys(context.query).forEach((key) => {

@@ -121,7 +121,10 @@ export default function Callout({
             />
           </Menu>
         </CalloutEmoji>
-        {children}
+        {/** Wrap children in a container  to prevent iframe embeds escaping the parent * */}
+        <Box flexGrow={1} sx={{ overflowX: 'hidden' }}>
+          {children}
+        </Box>
       </StyledCallout>
     </Box>
   );

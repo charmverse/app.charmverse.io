@@ -17,9 +17,9 @@ import { usePostDialog } from 'components/forum/components/PostDialog/hooks/useP
 import { usePostPermissions } from 'hooks/usePostPermissions';
 import type { ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import type { Member } from 'lib/members/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
-import { fancyTrim } from 'lib/utilities/strings';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
+import { getRelativeTimeInThePast } from 'lib/utils/dates';
+import { fancyTrim } from 'lib/utils/strings';
 
 import { PostSummary } from './PostSummary';
 

@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
+import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
 const StyledTypography = styled(Typography)`
   color: ${({ theme }) => theme.palette.grey[300]};
@@ -21,6 +21,8 @@ export function DocumentHistory({
     updatedBy: string;
     deletedAt?: Date | null;
     deletedBy?: string | null;
+    isLocked?: boolean | null;
+    lockedBy?: string | null;
   };
 }) {
   const { getMemberById } = useMembers();
@@ -29,6 +31,7 @@ export function DocumentHistory({
   const createdBy = getMemberById(page.createdBy)?.username ?? 'Unknown user';
   const updatedBy = getMemberById(page.updatedBy)?.username ?? createdBy;
   const deletedBy = getMemberById(page.deletedBy)?.username ?? null;
+  const lockedBy = page.lockedBy ? getMemberById(page.lockedBy)?.username ?? 'Unknown user' : null;
 
   const tooltipCreatedAt = getRelativeTimeInThePast(new Date(page.createdAt));
   const tooltipUpdatedAt = getRelativeTimeInThePast(new Date(page.updatedAt));
@@ -75,6 +78,11 @@ export function DocumentHistory({
           </>
         ) : (
           <>
+            {page.lockedBy && page.isLocked && (
+              <Typography sx={{ mb: 1 }} variant='subtitle2'>
+                Locked by <strong>{lockedBy}</strong>
+              </Typography>
+            )}
             <Typography variant='subtitle2'>
               Last edited by <strong>{updatedBy}</strong>
             </Typography>

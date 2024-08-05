@@ -1,13 +1,13 @@
 import type { UserDetails } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import { useFormFields } from 'components/common/form/hooks/useFormFields';
+import { useFormFieldsWithState } from 'components/common/form/hooks/useFormFields';
 import type { EditableFields } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -22,9 +22,9 @@ const requiredString = (msg: string) => yup.string().required(msg).ensure().trim
 
 const nonRequiredString = yup.string().notRequired().trim();
 
-const TWITTER_URL_REGEX = /^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?twitter\.com\/([a-zA-Z0-9_]+)/i;
-const GITHUB_URL_REGEX = /^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([^\s\\]{1,})+\/?$/i;
-const LINKEDIN_URL_REGEX =
+export const TWITTER_URL_REGEX = /^$|^http(?:s)?:\/\/(?:www\.)?(?:mobile\.)?\b(x|twitter)\.com\/([a-zA-Z0-9_]+)/i;
+export const GITHUB_URL_REGEX = /^$|^http(?:s)?:\/\/(?:www\.)?github\.([a-z])+\/([^\s\\]{1,})+\/?$/i;
+export const LINKEDIN_URL_REGEX =
   /^$|^http(?:s)?:\/\/((www|\w\w)\.)?linkedin.com\/((in\/[^/]+\/?)|(company\/[^/]+\/?)|(pub\/[^/]+\/((\w|\d)+\/?){3}))$/i;
 
 export function useRequiredMemberProperties({ userId }: { userId: string }) {
@@ -54,6 +54,7 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     const _isDiscordRequired = _requiredProperties.find((p) => p.type === 'discord');
     const _isWalletRequired = _requiredProperties.find((p) => p.type === 'wallet');
     const _isTelegramRequired = _requiredProperties.find((p) => p.type === 'telegram');
+    const _isFarcasterRequired = _requiredProperties.find((p) => p.type === 'farcaster');
 
     const userDetailsSocial = userDetails?.social as Social;
 
@@ -85,20 +86,26 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
       requiredPropertiesWithoutValue.push('github');
     }
 
-    if (currentUser && _isWalletRequired && (currentUser.wallets ?? []).length === 0) {
-      requiredPropertiesWithoutValue.push('wallet');
-    }
+    if (currentUser) {
+      if (_isWalletRequired && (currentUser.wallets ?? []).length === 0) {
+        requiredPropertiesWithoutValue.push('wallet');
+      }
 
-    if (currentUser && _isGoogleRequired && (currentUser.googleAccounts ?? []).length === 0) {
-      requiredPropertiesWithoutValue.push('google');
-    }
+      if (_isGoogleRequired && (currentUser.googleAccounts ?? []).length === 0) {
+        requiredPropertiesWithoutValue.push('google');
+      }
 
-    if (currentUser && _isDiscordRequired && !currentUser.discordUser) {
-      requiredPropertiesWithoutValue.push('discord');
-    }
+      if (_isDiscordRequired && !currentUser.discordUser) {
+        requiredPropertiesWithoutValue.push('discord');
+      }
 
-    if (currentUser && _isTelegramRequired && !currentUser.telegramUser) {
-      requiredPropertiesWithoutValue.push('telegram');
+      if (_isTelegramRequired && !currentUser.telegramUser) {
+        requiredPropertiesWithoutValue.push('telegram');
+      }
+
+      if (_isFarcasterRequired && !currentUser.farcasterUser) {
+        requiredPropertiesWithoutValue.push('farcaster');
+      }
     }
 
     return {
@@ -114,7 +121,8 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
       isGoogleRequired: !!_isGoogleRequired,
       isDiscordRequired: !!_isDiscordRequired,
       isWalletRequired: !!_isWalletRequired,
-      isTelegramRequired: !!_isTelegramRequired
+      isTelegramRequired: !!_isTelegramRequired,
+      isFarcasterRequired: !!_isFarcasterRequired
     };
   }, [userDetails, memberPropertyValues, currentSpace?.id, currentUser]);
 
@@ -141,13 +149,18 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
       }));
   }, [memberProperties]);
 
-  const { getValues, control, errors, isDirty, isSubmitting, isValid, onFormChange, onSubmit } = useFormFields({
+  const {
+    control,
+    formState: { isDirty, isValid },
+    onFormChange,
+    onSubmit
+  } = useFormFieldsWithState({
     fields: nonDefaultMemberProperties,
-    onSubmit: async (values) => {
+    onSubmit: async (_values) => {
       if (space) {
         await updateSpaceValues(
           space.id,
-          Object.entries(values).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
+          Object.entries(_values).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
         );
         refreshPropertyValues();
         mutateMembers();
@@ -155,15 +168,10 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
     }
   });
 
-  const values = getValues();
-
   return {
-    values,
     control,
     isValid,
-    errors,
     isDirty,
-    isSubmitting,
     onSubmit,
     onFormChange
   };
@@ -180,13 +188,15 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
   } = useRequiredMemberProperties({ userId });
   const { showMessage } = useSnackbar();
   const { mutateMembers } = useMembers();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
-    formState: { errors, isValid, isDirty, isSubmitting },
+    formState: { errors, isValid, isDirty },
     setValue,
     handleSubmit,
     getValues,
-    reset
+    reset,
+    watch
   } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -226,18 +236,23 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     });
   }
 
-  const values = getValues();
+  const values = watch();
 
   function onSubmit() {
     if (isDirty && isValid) {
+      setIsSubmitting(true);
       return handleSubmit(async (_values) => {
-        await charmClient.updateUserDetails(getValues());
-        await Promise.all([mutate('/current-user-details'), mutateMembers()]);
-        reset(_values, {
-          keepDirty: false,
-          keepDirtyValues: false
-        });
-        showMessage('Profile updated', 'success');
+        try {
+          await charmClient.updateUserDetails(getValues());
+          await Promise.all([mutate('/current-user-details'), mutateMembers()]);
+          reset(_values, {
+            keepDirty: false,
+            keepDirtyValues: false
+          });
+          showMessage('Profile updated', 'success');
+        } finally {
+          setIsSubmitting(false);
+        }
       })();
     }
   }

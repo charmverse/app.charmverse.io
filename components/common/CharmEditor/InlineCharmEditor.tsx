@@ -1,9 +1,9 @@
 import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
-import type { EditorView } from '@bangle.dev/pm';
-import { Node, PluginKey } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
 import debounce from 'lodash/debounce';
-import { Plugin } from 'prosemirror-state';
+import { Node } from 'prosemirror-model';
+import { Plugin, PluginKey } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
@@ -14,17 +14,20 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { userDataPlugin } from './components/charm/charm.plugins';
-import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
+import { EmojiPopup } from './components/emojiSuggest/EmojiPopup';
 import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';
 import { plugins as emojiPlugins } from './components/emojiSuggest/emojiSuggest.plugins';
 import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
-import * as floatingMenu from './components/floatingMenu';
 import FloatingMenu from './components/floatingMenu/FloatingMenu';
+import * as floatingMenu from './components/floatingMenu/floatingMenu.plugins';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
-import { mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
-import { Mention, MentionSuggest } from './components/mention/components';
+import { Mention } from './components/mention/components/Mention';
+import { MentionsPopup } from './components/mention/components/MentionsPopup';
+import { mentionPluginKeyName } from './components/mention/mention.constants';
+import { mentionPlugins } from './components/mention/mention.plugins';
+import { mentionSpecs } from './components/mention/mention.specs';
 import { placeholderPlugin } from './components/placeholder/placeholder';
 import * as tabIndent from './components/tabIndent';
 
@@ -229,7 +232,12 @@ export default function CharmEditor({
       noPadding={noPadding}
       pmViewOpts={{
         editable: () => !readOnly,
-        plugins: []
+        plugins: [],
+        attributes: () => ({
+          translate: readOnly ? 'yes' : 'no',
+          class: 'bangle-editor',
+          'data-test': 'charm-editor-input'
+        })
       }}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
@@ -244,8 +252,8 @@ export default function CharmEditor({
       }}
     >
       <FloatingMenu inline pluginKey={floatingMenuPluginKey} />
-      <MentionSuggest pluginKey={mentionPluginKey} />
-      <EmojiSuggest pluginKey={emojiPluginKey} />
+      <MentionsPopup pluginKey={mentionPluginKey} />
+      <EmojiPopup pluginKey={emojiPluginKey} />
       {currentSpace && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}
       {children}
     </StyledReactBangleEditor>

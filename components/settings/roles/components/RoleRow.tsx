@@ -42,7 +42,7 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
   let description: ReactNode = null;
   if (role.source === 'collabland') {
     descriptionIcon = CollabLandIcon;
-    description = <>This role is managed by Collab.land. Visit https://collab.land/ to modify this role</>;
+    description = <>This role is managed by Collab.Land. Visit https://collab.land/ to modify this role</>;
   } else if (role.source === 'guild_xyz') {
     descriptionIcon = GuildXYZIcon;
     description = <>This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role</>;

@@ -8,7 +8,6 @@ import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from 'lib/met
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import { createReward } from 'lib/rewards/createReward';
@@ -16,7 +15,7 @@ import { rewardWithUsersInclude } from 'lib/rewards/getReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utils/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -49,6 +48,7 @@ async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUs
 
   const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
+    filter: 'reward',
     userId
   });
 
@@ -73,7 +73,7 @@ async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUs
 }
 
 async function createRewardController(req: NextApiRequest, res: NextApiResponse<RewardWithUsers>) {
-  const { spaceId, linkedPageId } = req.body as RewardCreationData;
+  const { spaceId } = req.body as RewardCreationData;
 
   const { id: userId } = req.session.user;
 
@@ -90,15 +90,7 @@ async function createRewardController(req: NextApiRequest, res: NextApiResponse<
     userId: req.session.user.id
   });
 
-  if (linkedPageId) {
-    relay.broadcast(
-      {
-        type: 'pages_meta_updated',
-        payload: [{ bountyId: createdReward.id, spaceId: createdReward.spaceId, id: linkedPageId }]
-      },
-      createdReward.spaceId
-    );
-  } else if (createdPageId) {
+  if (createdPageId) {
     const pages = await getPageMetaList([createdPageId]);
     relay.broadcast(
       {

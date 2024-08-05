@@ -4,47 +4,40 @@ import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef } from 'react';
 
+import charmClient from 'charmClient/charmClient';
 import { trackPageView } from 'charmClient/hooks/track';
 import { DocumentPage } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
-import type { PageDialogContext } from 'components/common/PageDialog/hooks/usePageDialog';
+import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import debouncePromise from 'lib/utils/debouncePromise';
 
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
 import { DocumentHeaderElements } from '../PageLayout/components/Header/components/DocumentHeaderElements';
-
-const RewardApplicationPage = dynamic(
-  () =>
-    import('../../rewards/components/RewardApplicationPage/RewardApplicationPage').then(
-      (mod) => mod.RewardApplicationPage
-    ),
-  { ssr: false }
-);
 
 interface Props {
   pageId?: string;
   onClose: () => void;
   readOnly?: boolean;
   hideToolsMenu?: boolean;
-  applicationContext?: PageDialogContext;
+  showCard?: (cardId: string | null) => void;
+  currentBoardId?: string; // the board we are looking at, to determine if we should show the parent chip
 }
-
 function PageDialogBase(props: Props) {
-  const { hideToolsMenu = false, pageId, readOnly, applicationContext } = props;
+  const { hideToolsMenu = false, currentBoardId, pageId, readOnly, showCard } = props;
 
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
+  const { space } = useCurrentSpace();
   const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
@@ -52,18 +45,11 @@ function PageDialogBase(props: Props) {
   const { page } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
-  const fullPageUrl = page?.path
-    ? `/${domain}/${page?.path}`
-    : applicationContext
-    ? `/${domain}/rewards/applications/${applicationContext.applicationId}`
-    : null;
+  const fullPageUrl = page?.path ? `/${domain}/${page?.path}` : null;
 
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
-  let contentType = pageId ? 'page' : null;
-  if (applicationContext?.applicationId || (applicationContext?.isNewApplication && applicationContext?.pageId)) {
-    contentType = 'application';
-  }
+  const contentType = pageId ? 'page' : null;
 
   // keep track if charmeditor is mounted. There is a bug that it calls the update method on closing the modal, but content is empty
   useEffect(() => {
@@ -81,10 +67,23 @@ function PageDialogBase(props: Props) {
   }, [!!contentType]);
 
   useEffect(() => {
-    if (page?.id) {
-      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type, spaceDomain: domain });
+    if (page?.id && space) {
+      trackPageView({
+        spaceId: page.spaceId,
+        pageId: page.id,
+        type: page.type,
+        spaceDomain: domain,
+        spaceCustomDomain: space.customDomain
+      });
+      if (space.domain === 'op-grants') {
+        charmClient.track.trackActionOp('page_view', {
+          type: page.type,
+          path: page.path,
+          url: window.location.href
+        });
+      }
     }
-  }, [page?.id]);
+  }, [page?.id, space?.customDomain]);
 
   function close() {
     popupState.close();
@@ -149,7 +148,7 @@ function PageDialogBase(props: Props) {
         page && <FullPageActionsMenuButton isInsideDialog page={page} onDelete={close} />
       }
       toolbar={
-        (contentType === 'page' || contentType === 'application') && (
+        contentType === 'page' && (
           <Box display='flex' justifyContent='space-between'>
             <Button
               data-test='open-as-page'
@@ -165,7 +164,7 @@ function PageDialogBase(props: Props) {
             </Button>
             {page && (
               <Box display='flex' alignItems='center' gap={0.5}>
-                <DocumentHeaderElements isInsideDialog headerHeight={0} page={page} />
+                <DocumentHeaderElements headerHeight={0} page={page} />
               </Box>
             )}
           </Box>
@@ -174,13 +173,13 @@ function PageDialogBase(props: Props) {
       onClose={close}
     >
       {page && contentType === 'page' && (
-        <DocumentPage insideModal page={page} savePage={savePage} readOnly={readOnlyPage} />
-      )}
-      {contentType === 'application' && applicationContext && (
-        <RewardApplicationPage
-          applicationId={applicationContext.applicationId || null}
-          rewardId={applicationContext.pageId || null}
-          closeDialog={close}
+        <DocumentPage
+          showParentChip={currentBoardId !== page.parentId} // show parent chip if parent is not the current board
+          showCard={showCard}
+          insideModal
+          page={page}
+          savePage={savePage}
+          readOnly={readOnlyPage}
         />
       )}
     </Dialog>

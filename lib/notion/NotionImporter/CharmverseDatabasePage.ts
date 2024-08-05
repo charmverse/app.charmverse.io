@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { DatabaseObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { blockToPrisma } from '@root/lib/databases/block';
+import { createBoard } from '@root/lib/databases/board';
+import { createBoardView } from '@root/lib/databases/boardView';
 import { v4 } from 'uuid';
-
-import { createBoard } from 'lib/focalboard/board';
-import { createBoardView } from 'lib/focalboard/boardView';
 
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';
@@ -52,7 +52,9 @@ export class CharmverseDatabasePage {
               notionPageId:
                 notionPage.parent.type === 'page_id'
                   ? notionPage.parent.page_id
-                  : this.cache.blockPageIdRecord.get(notionPage.parent.block_id) ?? notionPage.parent.block_id
+                  : notionPage.parent.type === 'block_id'
+                  ? this.cache.blockPageIdRecord.get(notionPage.parent.block_id) ?? notionPage.parent.block_id
+                  : this.cache.blockPageIdRecord.get(notionPage.parent.database_id) ?? notionPage.parent.database_id
             })
           : null;
 
@@ -79,8 +81,8 @@ export class CharmverseDatabasePage {
         createdBy: this.notionPage.userId,
         updatedBy: this.notionPage.userId,
         deletedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime()
       };
 
       // Optimistically create the page
@@ -100,14 +102,16 @@ export class CharmverseDatabasePage {
 
       await prisma.block.createMany({
         data: [
-          {
+          blockToPrisma({
+            parentId: '',
             ...view,
             ...commonBlockData
-          },
-          {
+          }),
+          blockToPrisma({
+            parentId: '',
             ...board,
             ...commonBlockData
-          }
+          })
         ]
       });
 

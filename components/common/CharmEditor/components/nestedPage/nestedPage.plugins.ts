@@ -1,6 +1,5 @@
-import { TextSelection } from '@bangle.dev/pm';
 import type { PageType } from '@charmverse/core/prisma-client';
-import { Plugin } from 'prosemirror-state';
+import { TextSelection, Plugin } from 'prosemirror-state';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';

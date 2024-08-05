@@ -1,4 +1,4 @@
-import { Divider, Stack } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 
 import { useSpacesCharmsState, useTransferCharms } from 'charmClient/hooks/charms';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -27,6 +27,8 @@ export function ApplyCharmsTab({ charmWallet, onRefresh }: Props) {
 
   return (
     <Stack gap={2}>
+      <Typography variant='subtitle1'>Apply charms to space</Typography>
+
       {spacesState.map((s, i) => (
         <>
           {i > 0 && <Divider />}

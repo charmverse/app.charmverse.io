@@ -1,7 +1,6 @@
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { createSigningSecret } from '@root/lib/webhookPublisher/subscribeToEvents';
 import { jwtVerify } from 'jose';
-
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { createSigningSecret } from 'lib/webhookPublisher/subscribeToEvents';
 
 import type { SignedPayloadFields } from '../authentication';
 import { signJwt } from '../authentication';

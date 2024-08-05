@@ -1,8 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { BoardFields } from 'lib/focalboard/board';
-import { CardFields } from 'lib/focalboard/card';
-import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { Utils } from 'components/common/DatabaseEditor/utils';
+import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 
 async function init() {
   const views = await prisma.block.findMany({
@@ -20,7 +18,7 @@ async function init() {
       counts.needsDate++;
 
       const template: IPropertyTemplate = {
-        id: Utils.createGuid(IDType.BlockID),
+        id: Utils.createGuid(),
         name: 'Date',
         type: 'date',
         options: []

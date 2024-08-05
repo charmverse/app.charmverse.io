@@ -2,64 +2,19 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { deletePostComment } from 'lib/forums/comments/deletePostComment';
 import { requireKeys } from 'lib/middleware';
-import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
+import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import type { PublicApiPostComment } from '../../posts/[postId]/comments';
 
-const handler = superApiHandler();
-
-handler.delete(deletePostComment).put(requireKeys(['contentMarkdown'], 'body'), updatePostComment);
-
-/**
- * @swagger
- * /forum/comments/{commentId}:
- *   delete:
- *     summary: Delete a post comment
- *     tags:
- *      - 'Partner API'
- *     parameters:
- *       - name: commentId
- *         in: params
- *         required: true
- *         type: string
- *         description: ID of the comment to update
- *
- */
-async function deletePostComment(req: NextApiRequest, res: NextApiResponse) {
-  // This should never be undefined, but adding this safeguard for future proofing
-
-  const result = await prisma.postComment.findFirstOrThrow({
-    where: {
-      id: req.query.commentId as string,
-      post: {
-        spaceId: req.authorizedSpaceId
-          ? req.authorizedSpaceId
-          : {
-              in: req.spaceIdRange
-            }
-      }
-    },
-    select: {
-      id: true
-    }
-  });
-
-  if (result) {
-    await prisma.postComment.delete({
-      where: {
-        id: result.id
-      }
-    });
-  }
-
-  log.debug('[public-api] Deleted comment', { query: req.query, result });
-
-  return res.status(200).end();
-}
+const handler = superApiHandler()
+  .delete(deletePostCommentEndpoint)
+  .put(requireKeys(['contentMarkdown'], 'body'), updatePostCommentEndpoint);
 
 /**
  * @swagger
@@ -103,8 +58,13 @@ async function deletePostComment(req: NextApiRequest, res: NextApiResponse) {
  *                $ref: '#/components/schemas/ForumPostComment'
  *
  */
-async function updatePostComment(req: NextApiRequest, res: NextApiResponse<PublicApiPostComment>) {
+
+async function updatePostCommentEndpoint(req: NextApiRequest, res: NextApiResponse<PublicApiPostComment>) {
+  const commentId = req.query.commentId;
   // This should never be undefined, but adding this safeguard for future proofing
+  if (typeof commentId !== 'string') {
+    throw new InvalidInputError('Comment Id is undefined');
+  }
 
   const newCommentText = req.body.contentMarkdown;
 
@@ -165,6 +125,52 @@ async function updatePostComment(req: NextApiRequest, res: NextApiResponse<Publi
   log.debug('[public-api] Updated comment content', { query: req.query, commentId: postComment.id });
 
   return res.status(200).json(apiComment);
+}
+
+/**
+ * @swagger
+ * /forum/comments/{commentId}:
+ *   delete:
+ *     summary: Delete a post comment
+ *     tags:
+ *      - 'Partner API'
+ *     parameters:
+ *       - name: commentId
+ *         in: params
+ *         required: true
+ *         type: string
+ *         description: ID of the comment to delete
+ *
+ */
+async function deletePostCommentEndpoint(req: NextApiRequest, res: NextApiResponse) {
+  const commentId = req.query.commentId;
+  // This should never be undefined, but adding this safeguard for future proofing
+  if (typeof commentId !== 'string') {
+    throw new InvalidInputError('Comment Id is undefined');
+  }
+
+  const result = await prisma.postComment.findFirstOrThrow({
+    where: {
+      id: req.query.commentId as string,
+      post: {
+        spaceId: req.authorizedSpaceId
+          ? req.authorizedSpaceId
+          : {
+              in: req.spaceIdRange
+            }
+      }
+    },
+    select: {
+      id: true,
+      createdBy: true
+    }
+  });
+
+  await deletePostComment({ commentId: result.id, userId: result.createdBy });
+
+  log.debug('[public-api] Deleted comment', { query: req.query, result });
+
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

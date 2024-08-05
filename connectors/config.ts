@@ -1,61 +1,46 @@
 import env from '@beam-australia/react-env';
-import { RPCList } from 'connectors/chains';
-import type { Address } from 'viem';
-import { createPublicClient, custom, createWalletClient, http } from 'viem';
-import type { Connector } from 'wagmi';
-import { createConfig, configureChains, mainnet } from 'wagmi';
-import * as wagmiChains from 'wagmi/chains';
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
-import { InjectedConnector } from 'wagmi/connectors/injected';
-import { MockConnector } from 'wagmi/connectors/mock';
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
-import { publicProvider } from 'wagmi/providers/public';
+import { isTestEnv } from '@root/config/constants';
+import { coinbaseWallet, walletConnect, injected, mock } from '@wagmi/connectors';
+import type { Address, Chain, Transport } from 'viem';
+import { custom, http } from 'viem';
+import { mainnet } from 'viem/chains';
+import { createConfig } from 'wagmi';
+
+import { getChainList } from './chains';
 
 import 'viem/window';
-import { isTestEnv } from 'config/constants';
-import { isTruthy } from 'lib/utilities/types';
 
-const wagmiChainList = Object.values(wagmiChains);
+const allChains = getChainList({ enableTestnets: true });
+
 // map our RPC list to the wagmi chain list
-const supportedChains = RPCList.map((rpc) => wagmiChainList.find((ch) => ch.id === rpc.chainId)).filter(isTruthy);
+const viemChains = allChains.map((rpc) => rpc.viem) as [Chain, ...Chain[]];
 
-const { chains, publicClient } = configureChains(supportedChains, [publicProvider()]);
-
-const connectors: Connector[] = [
-  new InjectedConnector({
-    chains,
-    options: {
-      name: 'Injected',
-      shimDisconnect: true
-    }
+const connectors = [
+  injected({
+    shimDisconnect: true
+    // target: {
+    //   name: 'Injected'
+    // }
   }),
-  new CoinbaseWalletConnector({
-    chains,
-    options: {
-      appName: 'CharmVerse.io'
-    }
-  })
+  coinbaseWallet({
+    appName: 'CharmVerse.io'
+  }),
+  ...(env('WALLETCONNECT_PROJECTID') ? [walletConnect({ projectId: env('WALLETCONNECT_PROJECTID') })] : [])
 ];
 
-const walletConnectProjectId = env('WALLETCONNECT_PROJECTID');
-if (walletConnectProjectId) {
-  connectors.push(
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId: walletConnectProjectId
-      }
-    })
-  );
-}
-
 export const wagmiConfig = createConfig({
-  autoConnect: true,
+  chains: viemChains,
   connectors,
-  publicClient
+  ssr: true, // prevents error: "localStorage not defined"  during npm run build
+  transports: viemChains.reduce<Record<string, Transport>>((acc, chain) => {
+    acc[chain.id] = http();
+    return acc;
+  }, {})
 });
 
-export const getTestWagmiConfig = () => {
+// get wagmi config based on env - TODO: do we need a method? or just override the wagmiConfig export?
+export const getWagmiConfig = () => {
+  return wagmiConfig;
   if (!isTestEnv) {
     return wagmiConfig;
   }
@@ -73,33 +58,28 @@ export const getTestWagmiConfig = () => {
       typeof window.ethereum !== 'undefined' ? custom(window.ethereum) : http(mainnet.rpcUrls.default.http[0]);
 
     return createConfig({
-      autoConnect: !!storedAccount,
+      // autoConnect: !!storedAccount,
+      chains: [mainnet],
       connectors: [
-        new MockConnector({
-          chains: [mainnet],
-          options: {
-            walletClient: createWalletClient({
-              chain: mainnet,
-              transport,
-              account
-            }),
-            flags: {
-              isAuthorized: true
-            }
-          }
+        mock({
+          // walletClient: createWalletClient({
+          //   chain: mainnet,
+          //   transport,
+          //   account
+          // }),
+          accounts: [account]
+          // flags: {
+          //   isAuthorized: true
+          // }
         }),
-        new InjectedConnector({
-          chains,
-          options: {
-            name: 'Injected',
-            shimDisconnect: true
-          }
+        injected({
+          shimDisconnect: true
         })
       ],
-      publicClient: createPublicClient({
-        chain: mainnet,
-        transport
-      })
+      transports: {
+        [mainnet.id]: transport
+      }
     });
   }
+  return wagmiConfig;
 };

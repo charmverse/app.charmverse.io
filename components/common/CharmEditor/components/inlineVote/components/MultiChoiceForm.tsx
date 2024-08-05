@@ -1,8 +1,9 @@
 import type { VoteOptions } from '@charmverse/core/prisma-client';
 import { Box, Checkbox, Chip, FormControlLabel, FormGroup, Stack, Typography } from '@mui/material';
+import millify from 'millify';
 import { useMemo } from 'react';
 
-import { percent } from 'lib/utilities/numbers';
+import { percent } from 'lib/utils/numbers';
 
 type Props = {
   value: string[] | undefined | null;
@@ -13,6 +14,7 @@ type Props = {
   aggregatedResult: Record<string, number>;
   maxChoices: number | null;
   hasPassedDeadline: boolean;
+  showAggregateResult?: boolean;
 };
 
 export function MultiChoiceForm({
@@ -23,7 +25,8 @@ export function MultiChoiceForm({
   totalVotes,
   aggregatedResult,
   maxChoices,
-  hasPassedDeadline
+  hasPassedDeadline,
+  showAggregateResult
 }: Props) {
   const sortedVoteOptions = useMemo(() => {
     if (!hasPassedDeadline) return voteOptions;
@@ -69,7 +72,12 @@ export function MultiChoiceForm({
             label={
               <Box display='flex' justifyContent='space-between' flexGrow={1}>
                 <Stack direction='row' spacing={1} justifyContent='space-between' mr={1} flex={1}>
-                  <Typography fontWeight={hasOptionPassed(index) ? 'bold' : 'normal'}>{name}</Typography>
+                  <Typography fontWeight={hasOptionPassed(index) ? 'bold' : 'normal'}>
+                    {name}
+                    {showAggregateResult && aggregatedResult?.[name]
+                      ? ` (${aggregatedResult[name] < 1 ? aggregatedResult[name] : millify(aggregatedResult[name])})`
+                      : ''}
+                  </Typography>
                   {hasOptionPassed(index) && <Chip color='primary' size='small' label='Passed' />}
                 </Stack>
 

@@ -1,8 +1,8 @@
-import type { EditorView, Mark, MarkType } from '@bangle.dev/pm';
+import { isTruthy } from '@root/lib/utils/types';
+import type { Mark, MarkType } from 'prosemirror-model';
 import type { NodeWithPos } from 'prosemirror-utils';
 import { findChildrenByMark } from 'prosemirror-utils';
-
-import { isTruthy } from 'lib/utilities/types';
+import type { EditorView } from 'prosemirror-view';
 
 export function removeInlineCommentMark(view: EditorView, threadId: string, deleteThread?: boolean) {
   deleteThread = deleteThread ?? false;

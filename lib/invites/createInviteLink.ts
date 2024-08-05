@@ -1,6 +1,6 @@
-import { uuid } from '@bangle.dev/utils';
 import type { InviteLink, PublicInviteLinkContext } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { v4 as uuid } from 'uuid';
 
 export type InviteLinkInput = {
   spaceId: string;

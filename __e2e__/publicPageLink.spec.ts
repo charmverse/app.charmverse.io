@@ -1,28 +1,21 @@
-import type { Browser } from '@playwright/test';
-import { chromium, expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import { createUserAndSpace } from './utils/mocks';
 import { generatePageWithLinkedPage } from './utils/pages';
 
-let browser: Browser;
-
-test.beforeAll(async () => {
-  // Set headless to false in chromium.launch to visually debug the test
-  browser = await chromium.launch();
-});
-
-test('click on link for another public page in same workspace and make sure that page renders', async () => {
+test('click on link for another public page in same workspace and make sure that page renders', async ({
+  browser,
+  page
+}) => {
   // Arrange ------------------
-
-  const loggedInPage = await browser.newContext().then((c) => c.newPage());
 
   const publicContext = await browser.newContext();
   const publicPage = await publicContext.newPage();
 
-  const { space } = await createUserAndSpace({ browserPage: loggedInPage, permissionConfigurationMode: 'open' });
+  const { space } = await createUserAndSpace({ browserPage: page, permissionConfigurationMode: 'open' });
 
   const firstPageId = v4();
   const secondPageId = v4();
@@ -57,8 +50,6 @@ test('click on link for another public page in same workspace and make sure that
   const secondPageUrl = `${publicSharePrefix}/${secondPage.path}`;
 
   // Act
-
-  const page = publicPage;
 
   // Visit the first page and go to the second page
   await page.goto(firstPageUrl);

@@ -7,7 +7,7 @@ import nc from 'next-connect';
 import { ApiError, onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { isUniqueConstraintError } from 'lib/utilities/errors/prisma';
+import { isUniqueConstraintError } from 'lib/utils/errors/prisma';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

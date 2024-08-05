@@ -1,20 +1,19 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsSpaces } from '@charmverse/core/test';
-import { expect, test } from '__e2e__/utils/test';
+import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe.serial('Archive Proposal', () => {
+test.describe('Archive Proposal', () => {
   test('Archive proposal and assert all actions are disabled, and proposal is not visible in the proposals list', async ({
-    proposalListPage,
+    proposalsListPage: proposalListPage,
     documentPage,
-    proposalPage
+    proposalPage,
+    page
   }) => {
     const { space, user: admin } = await generateUserAndSpace({
       isAdmin: true,
-      onboarded: true,
-      skipOnboarding: true,
       spaceDomain: `cvt-${uuid()}`
     });
 
@@ -88,7 +87,13 @@ test.describe.serial('Archive Proposal', () => {
 
     await expect(documentPage.charmEditor).toBeVisible();
 
-    await proposalPage.toggleArchiveProposal();
+    await proposalPage.pageTopLevelMenu.click();
+
+    await expect(proposalPage.archiveProposalAction).toBeEnabled();
+
+    await Promise.all([page.waitForResponse('**/api/proposals/*/archive'), proposalPage.archiveProposalAction.click()]);
+
+    await page.reload();
 
     await expect(documentPage.charmEditor).toHaveAttribute('contenteditable', 'false');
 
@@ -103,7 +108,7 @@ test.describe.serial('Archive Proposal', () => {
 
     expect(updatedProposal.archived).toBe(true);
 
-    await expect(proposalPage.moveFromFeedbackEvaluation).toBeDisabled();
+    await expect(proposalPage.passFeedbackEvaluation).toBeDisabled();
 
     // Visit proposals list page and assert archived proposal is not visible
 
@@ -137,7 +142,10 @@ test.describe.serial('Archive Proposal', () => {
     });
 
     expect(updatedProposal2.archived).toBe(false);
-    await expect(proposalPage.moveFromFeedbackEvaluation).not.toBeDisabled();
+
+    await page.reload();
+
+    await expect(proposalPage.passFeedbackEvaluation).not.toBeDisabled();
     await expect(documentPage.charmEditor).toHaveAttribute('contenteditable', 'true');
   });
 });

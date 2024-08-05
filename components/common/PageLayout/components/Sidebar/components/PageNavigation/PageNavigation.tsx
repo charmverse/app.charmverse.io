@@ -1,4 +1,4 @@
-import type { PageMeta, PageNodeWithChildren } from '@charmverse/core/pages';
+import type { PageNodeWithChildren } from '@charmverse/core/pages';
 import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
 import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
@@ -19,7 +19,8 @@ import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
-import { isTruthy } from 'lib/utilities/types';
+import type { PageMeta } from 'lib/pages/interfaces';
+import { isTruthy } from 'lib/utils/types';
 
 import { NavIconHover } from './components/NavIconHover';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
@@ -61,10 +62,10 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
   const pagesArray: MenuNode[] = isFavorites
     ? Object.values(pages)
-        .filter((page): page is PageMeta => isTruthy(page))
+        .filter((page): page is PageMeta => isTruthy(page) && !page.hideFromSidebar)
         .map(mapPageToMenuNode)
     : filterVisiblePages(pages)
-        .filter((page): page is PageMeta => isTruthy(page))
+        .filter((page): page is PageMeta => isTruthy(page) && !page.hideFromSidebar)
         .map(mapPageToMenuNode);
 
   const currentPageId = currentPage?.id ?? '';

@@ -10,8 +10,8 @@ import charmClient from 'charmClient';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
-import type { FailedImportsError } from 'lib/notion/types';
-import { deleteCookie, getCookie } from 'lib/utilities/browser';
+import type { FailedImportsError } from 'lib/notion/interfaces';
+import { deleteCookie, getCookie } from 'lib/utils/browser';
 import type { NotionImportCompleted } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';

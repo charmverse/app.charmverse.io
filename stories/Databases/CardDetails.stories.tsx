@@ -1,14 +1,14 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { Paper } from '@mui/material';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
-import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { createTableView } from 'lib/focalboard/tableView';
+import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
+import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import { createTableView } from 'lib/databases/tableView';
 import { createMockBoard, createMockCard } from 'testing/mocks/block';
 import { createMockPage } from 'testing/mocks/page';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
@@ -31,6 +31,7 @@ const schema = generateSchemasForAllSupportedFieldTypes();
 board.fields.cardProperties = Object.values(schema) as IPropertyTemplate[];
 
 const boardPage: PageMeta = {
+  lensPostLink: null,
   id: board.id,
   boardId: board.id,
   bountyId: null,
@@ -63,7 +64,7 @@ const card1 = createMockCard(board);
 card1.fields.properties = {
   [schema.text.id]: 'First',
   [schema.checkbox.id]: 'true',
-  [schema.date.id]: '{"from":"1695067400713"}',
+  [schema.date.id]: '{"from":1695067400713}',
   [schema.email.id]: 'test1@example.com',
   [schema.multiSelect.id]: [schema.multiSelect.options[0].id, schema.multiSelect.options[1].id],
   [schema.number.id]: 7223,
@@ -124,8 +125,8 @@ export function CardPropsView() {
 CardPropsView.parameters = {
   msw: {
     handlers: {
-      pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
-        return res(ctx.json([boardPage, page1]));
+      pages: http.get('/api/spaces/:spaceId/pages', () => {
+        return HttpResponse.json([boardPage, page1]);
       })
     }
   }

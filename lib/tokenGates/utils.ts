@@ -1,62 +1,98 @@
-import { ALL_LIT_CHAINS as ALL_LIT_CHAINS_ORIGINAL, LIT_CHAINS as LIT_CHAINS_ORIGINAL } from '@lit-protocol/constants';
-import type { AccsDefaultParams } from '@lit-protocol/types';
-import { base, zora } from 'viem/chains';
+import type { AccessControlCondition } from '@root/lib/tokenGates/interfaces';
+import { isTruthy } from '@root/lib/utils/types';
 
-import type { TokenGateAccessType } from 'lib/tokenGates/interfaces';
+type GateType = 'Wallet' | 'Collectibles' | 'Tokens' | 'Community' | 'Credential';
 
-export function getAccessType(condition: AccsDefaultParams): TokenGateAccessType {
-  const { method, parameters } = condition;
+type AccessType =
+  | 'ERC721'
+  | 'ERC1155'
+  | 'POAP'
+  | 'Unlock'
+  | 'Hypersub'
+  | 'ERC20'
+  | 'Wallet'
+  | 'Hats'
+  | 'Guild'
+  | 'Builder'
+  | 'Moloch'
+  | 'Gitcoin holder'
+  | 'Gitcoin score';
 
-  if (!method && parameters.includes(':userAddress')) {
-    return 'individual_wallet';
-  }
+/**
+ * Used for creating analytics events
+ * @param condition AccessControlCondition
+ */
+export function getAccessType(condition: AccessControlCondition): AccessType | null {
+  const { type, quantity } = condition;
 
-  switch (method) {
-    case 'ownerOf':
-      return 'individual_nft';
-
-    case 'eventId':
-      return 'poap_collectors';
-
-    case 'members':
-      return 'dao_members';
-
-    case 'balanceOf':
-    case 'eth_getBalance':
-      return 'group_token_or_nft';
-
+  switch (type) {
+    case 'Wallet':
+      return 'Wallet';
+    case 'ERC721':
+      return 'ERC721';
+    case 'POAP':
+      return 'POAP';
+    case 'MolochDAOv2.1':
+      return 'Moloch';
+    case 'Builder':
+      return 'Builder';
+    case 'Hypersub':
+      return 'Hypersub';
+    case 'Unlock':
+      return 'Unlock';
+    case 'GitcoinPassport':
+      if (quantity === '0') {
+        return 'Gitcoin holder';
+      } else {
+        return 'Gitcoin score';
+      }
+    case 'Guildxyz':
+      return 'Guild';
+    case 'ERC1155':
+      return 'ERC1155';
+    case 'ERC20':
+      return 'ERC20';
+    case 'Hats':
+      return 'Hats';
     default:
-      return 'group_token_or_nft';
+      return null;
   }
 }
 
-export function getAccessTypes(conditions: AccsDefaultParams[]): TokenGateAccessType[] {
-  return conditions.map((c) => getAccessType(c));
+/**
+ * Used for creating analytics events
+ * @param condition AccessControlCondition
+ */
+export function getGateType(condition: AccessControlCondition): GateType | null {
+  const { type } = condition;
+
+  switch (type) {
+    case 'Wallet':
+      return 'Wallet';
+    case 'ERC20':
+      return 'Tokens';
+    case 'GitcoinPassport':
+      return 'Credential';
+    case 'MolochDAOv2.1':
+    case 'Builder':
+    case 'Guildxyz':
+    case 'Hats':
+      return 'Community';
+    case 'ERC721':
+    case 'ERC1155':
+    case 'POAP':
+    case 'Hypersub':
+    case 'Unlock':
+      return 'Collectibles';
+    default:
+      return null;
+  }
 }
 
-const baseChain = {
-  contractAddress: null,
-  chainId: base.id,
-  name: base.name,
-  symbol: 'ETH',
-  decimals: 18,
-  rpcUrls: base.rpcUrls.default.http.slice(),
-  blockExplorerUrls: [base.blockExplorers.default.url],
-  type: null,
-  vmType: 'EVM'
-};
+export function getAccessTypes(conditions: AccessControlCondition[]): AccessType[] {
+  return conditions.map((c) => getAccessType(c)).filter(isTruthy);
+}
 
-const zoraChain = {
-  contractAddress: null,
-  chainId: zora.id,
-  name: zora.name,
-  symbol: zora.nativeCurrency.symbol,
-  decimals: zora.nativeCurrency.decimals,
-  rpcUrls: zora.rpcUrls.default.http.slice(),
-  blockExplorerUrls: [zora.blockExplorers.default.url],
-  type: null,
-  vmType: 'EVM'
-};
-
-export const ALL_LIT_CHAINS = Object.assign(ALL_LIT_CHAINS_ORIGINAL, { base: baseChain, zora: zoraChain });
-export const LIT_CHAINS = Object.assign(LIT_CHAINS_ORIGINAL, { base: baseChain, zora: zoraChain });
+export function getGateTypes(conditions: AccessControlCondition[]): GateType[] {
+  return conditions.map((c) => getGateType(c)).filter(isTruthy);
+}

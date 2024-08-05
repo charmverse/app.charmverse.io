@@ -1,4 +1,4 @@
-import { blockquote, bold, code, history, italic, link, strike, underline } from '@bangle.dev/base-components';
+import { blockquote, bold, code, history, italic, strike, underline } from '@bangle.dev/base-components';
 import type { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import { KeyboardArrowDown } from '@mui/icons-material';
@@ -11,11 +11,12 @@ import { useEditorViewContext } from 'components/common/CharmEditor/components/@
 
 import * as heading from '../heading';
 import { createInlineComment } from '../inlineComment';
+import * as link from '../link/link';
 import { defaultKeys as paragraphKeys, queryIsTopLevelParagraph, convertToParagraph } from '../paragraph/paragraph';
 import { getCSSColor, queryActiveColor } from '../textColor/textColorUtils';
 
-import type { SubMenu } from './floating-menu';
-import { defaultKeys as floatingMenuKeys, toggleSubMenu, focusFloatingMenuInput } from './floating-menu';
+import { defaultKeys as floatingMenuKeys, toggleSubMenu, focusFloatingMenuInput } from './floatingMenuPlugin';
+import type { SubMenu } from './floatingMenuPlugin';
 import { MenuButton } from './Icon';
 import {
   BoldIcon,
@@ -73,10 +74,9 @@ export function InlineActionButton({
   hints = [],
   children,
   menuKey,
-  enable,
   subMenu,
   commandFn
-}: ButtonProps & { commandFn: () => Command; subMenu: SubMenu; menuKey: PluginKey; enable: boolean }) {
+}: ButtonProps & { commandFn: () => Command; subMenu: SubMenu; menuKey: PluginKey }) {
   const view = useEditorViewContext();
 
   const onClick = useCallback(
@@ -102,12 +102,7 @@ export function InlineActionButton({
   );
 
   return (
-    <MenuButton
-      onClick={onClick}
-      hints={hints}
-      // Figure out when the button will be disabled
-      isDisabled={!enable}
-    >
+    <MenuButton onClick={onClick} data-test='add-inline-comment-button' hints={hints}>
       {children}
     </MenuButton>
   );
@@ -120,17 +115,10 @@ export function InlineCommentButton({
       <MessageOutlinedIcon sx={{ fontSize: 14 }} />
     </ComponentIcon>
   ),
-  menuKey,
-  enableComments
-}: ButtonProps & { menuKey: PluginKey; enableComments: boolean }) {
+  menuKey
+}: ButtonProps & { menuKey: PluginKey }) {
   return (
-    <InlineActionButton
-      commandFn={createInlineComment}
-      enable={enableComments}
-      menuKey={menuKey}
-      hints={hints}
-      subMenu='inlineCommentSubMenu'
-    >
+    <InlineActionButton commandFn={createInlineComment} menuKey={menuKey} hints={hints} subMenu='inlineCommentSubMenu'>
       {children}
     </InlineActionButton>
   );

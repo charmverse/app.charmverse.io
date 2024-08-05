@@ -5,7 +5,7 @@ import { memo } from 'react';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import type { PageSidebarView } from '../../hooks/usePageSidebar';
@@ -137,16 +137,16 @@ function SidebarContents({
       {sidebarView === 'comments' &&
         (proposal?.formId ? (
           <FormCommentsSidebar
-            canCreateComments={!!proposal.permissions?.comment}
+            enableComments={!!proposal.permissions?.comment}
             openSidebar={openSidebar!}
             threads={threads}
-            formFields={proposal.form.formFields}
+            formFields={proposal.form?.formFields ?? []}
           />
         ) : (
           <EditorCommentsSidebar
             openSidebar={openSidebar!}
             threads={threads}
-            canCreateComments={!!pagePermissions?.comment}
+            enableComments={!!pagePermissions?.comment}
           />
         ))}
     </>

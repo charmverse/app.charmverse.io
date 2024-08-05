@@ -1,11 +1,10 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { IdentityType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { sessionUserRelations } from 'lib/session/config';
-import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/blockchain';
-import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
-import type { LoggedInUser } from 'models';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { matchWalletAddress, shortWalletAddress } from '@root/lib/utils/blockchain';
+import { InsecureOperationError, InvalidInputError } from '@root/lib/utils/errors';
+import type { LoggedInUser } from '@root/models';
 
 import { getUserProfile } from './getUser';
 

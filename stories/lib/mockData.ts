@@ -1,7 +1,7 @@
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from '@root/lib/members/interfaces';
+import type { ProposalTemplateMeta } from '@root/lib/proposals/getProposalTemplates';
+import type { LoggedInUser } from '@root/models';
 
-import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from 'lib/members/interfaces';
-import type { LoggedInUser } from 'models/User';
 import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
 import { createMockSpace } from 'testing/mocks/space';
 import { createMockSpaceMember } from 'testing/mocks/spaceMember';
@@ -96,4 +96,4 @@ export const spaceRoles: ListSpaceRolesResponse[] = [
   { id: '2', name: 'Grant Reviewer', spacePermissions: [], source: null }
 ];
 
-export const proposalTemplates: ProposalWithUsers[] = [];
+export const proposalTemplates: ProposalTemplateMeta[] = [];

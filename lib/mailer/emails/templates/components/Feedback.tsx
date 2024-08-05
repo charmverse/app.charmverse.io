@@ -2,8 +2,7 @@ import { Column } from '@react-email/column';
 import { Container } from '@react-email/container';
 import { Img } from '@react-email/img';
 import { Row } from '@react-email/row';
-
-import { charmverseDiscordInvite } from 'config/constants';
+import { charmverseDiscordInvite } from '@root/config/constants';
 
 import Link from './Link';
 import Text from './Text';
@@ -11,7 +10,7 @@ import Text from './Text';
 const domain = process.env.DOMAIN;
 const chatIconPath = '/images/icons/speech-bubbles.png';
 
-export default function Feedback() {
+export default function Feedback({ primaryColor }: { primaryColor?: string }) {
   return (
     <Container
       style={{
@@ -35,7 +34,10 @@ export default function Feedback() {
             <strong>Do you have any feedback on this email?</strong>
           </Row>
           <Row>
-            Please share it with us on <Link href={charmverseDiscordInvite}>Discord</Link>
+            Please share it with us on{' '}
+            <Link primaryColor={primaryColor} href={charmverseDiscordInvite}>
+              Discord
+            </Link>
           </Row>
         </Text>
       </Column>

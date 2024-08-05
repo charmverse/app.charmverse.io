@@ -4,13 +4,12 @@ import { SubscriptionRequiredError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ApiError, InvalidApiKeyError } from '@root/lib/middleware/errors';
+import { getVerifiedSuperApiToken } from '@root/lib/middleware/requireSuperApiKey';
+import { getPermissionsClient } from '@root/lib/permissions/api';
+import { uid } from '@root/lib/utils/strings';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
-
-import { ApiError, InvalidApiKeyError } from 'lib/middleware/errors';
-import { getVerifiedSuperApiToken } from 'lib/middleware/requireSuperApiKey';
-import { getPermissionsClient } from 'lib/permissions/api';
-import { uid } from 'lib/utilities/strings';
 
 declare module 'http' {
   /**
@@ -149,7 +148,6 @@ export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Sp
 export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   try {
     const apiKeyCheck = await setRequestSpaceFromApiKey(req);
-
     if (apiKeyCheck.apiKey.type === 'space') {
       const client = await getPermissionsClient({ resourceId: req.authorizedSpaceId, resourceIdType: 'space' });
 

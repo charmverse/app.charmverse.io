@@ -1,9 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { prismaToBlock } from 'lib/focalboard/block';
-import { relay } from 'lib/websockets/relay';
+import { prismaToBlock } from '@root/lib/databases/block';
+import { relay } from '@root/lib/websockets/relay';
 
 import { DatabasePageNotFoundError } from './errors';
 import type { PageProperty } from './interfaces';

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { blocksPerCharm, defaultFreeBlockQuota } from 'lib/subscription/constants';
+import { getSpaceBlockCount } from '@root/lib/spaces/getSpaceBlockCount';
+import { blocksPerCharm, defaultFreeBlockQuota } from '@root/lib/subscription/constants';
 
 export type SpaceCharmsStatus = {
   spaceId: string;
@@ -26,24 +26,23 @@ export async function getSpacesCharmsStatus(userId: string) {
         select: {
           balance: true
         }
-      },
-      blockCounts: {
-        orderBy: { createdAt: 'desc' },
-        take: 1,
-        select: {
-          count: true
-        }
       }
     }
   });
 
-  const spaceCharmsStatuses: SpaceCharmsStatus[] = spaces.map((space) => ({
-    spaceId: space.id,
-    balance: space.charmWallet?.balance || 0,
-    balanceNeeded: countCharmsNeeded(space.blockCounts[0].count)
-  }));
+  const spaceCharmsStatuses = await Promise.all(spaces.map(getSpaceStatus));
 
   return spaceCharmsStatuses;
+}
+
+async function getSpaceStatus(space: { id: string; charmWallet: { balance: number } | null }) {
+  const blockCount = await getSpaceBlockCount({ spaceId: space.id });
+
+  return {
+    spaceId: space.id,
+    balance: space.charmWallet?.balance || 0,
+    balanceNeeded: countCharmsNeeded(blockCount.count || 0)
+  };
 }
 
 function countCharmsNeeded(blockCount: number) {

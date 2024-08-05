@@ -1,10 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let author: User;
@@ -42,7 +42,7 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
     });
     // Unauthenticated request
     const proposal = (await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).expect(200))
-      .body as ProposalWithUsers;
+      .body as ProposalWithUsersAndRubric;
 
     expect(proposal).toMatchObject(
       expect.objectContaining({

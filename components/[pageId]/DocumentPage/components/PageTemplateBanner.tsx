@@ -9,7 +9,6 @@ import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 const StyledPageTemplateBanner = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'card'
@@ -57,7 +56,7 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId, customTitle 
   }
 
   return (
-    <StyledPageTemplateBanner card={isShowingCard}>
+    <StyledPageTemplateBanner card={isShowingCard} data-test='template-page-banner'>
       <Grid container display='flex' gap={1} alignItems='center' fontSize={theme.palette.templateBanner.fontSize}>
         <Grid item xs={2}>
           {isShowingCard && (

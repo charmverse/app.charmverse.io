@@ -1,11 +1,6 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
-import type {
-  WorkflowEvaluationJson,
-  ProposalWorkflowTyped,
-  PermissionJson
-} from '@charmverse/core/dist/cjs/proposals';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   Page,
@@ -20,16 +15,22 @@ import type {
   User
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { WorkflowEvaluationJson, ProposalWorkflowTyped, PermissionJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { blockToPrisma, prismaToBlock } from '@root/lib/databases/block';
+import type { Board } from '@root/lib/databases/board';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
 import { v4 } from 'uuid';
 
-import { prismaToBlock } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
+import { createMockBoard, createMockView } from 'testing/mocks/block';
+import type { MockPageInput } from 'testing/mocks/page';
+import { createMockPage } from 'testing/mocks/page';
+import { createMockSpace } from 'testing/mocks/space';
 import { createPage, generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
-import type { WorkspacePagesExport } from '../exportWorkspacePages';
+import type { RelatedPageData, ExportedPage, WorkspacePagesExport } from '../exportWorkspacePages';
 import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
-import { importWorkspacePages } from '../importWorkspacePages';
+import { importWorkspacePages, _generateNewPages } from '../importWorkspacePages';
 
 jest.mock('node:fs/promises');
 
@@ -196,7 +197,9 @@ describe('importWorkspacePages - proposal content', () => {
   let sourceSpaceRole: Role;
   let sourceWorkflow: ProposalWorkflowTyped;
   let sourceProposal: Proposal & {
-    evaluations: (ProposalEvaluation & {
+    evaluations: (Omit<ProposalEvaluation, 'finalStep'> & {
+      finalStep?: boolean | null;
+    } & {
       reviewers: ProposalReviewer[];
       permissions: ProposalEvaluationPermission[];
       rubricCriteria: ProposalRubricCriteria[];
@@ -256,6 +259,7 @@ describe('importWorkspacePages - proposal content', () => {
 
     sourceProposal = await testUtilsProposals
       .generateProposal({
+        proposalStatus: 'published',
         spaceId: sourceSpace.id,
         userId: sourceSpaceUser.id,
         evaluationInputs: [
@@ -354,7 +358,7 @@ describe('importWorkspacePages - proposal content', () => {
       id: copiedProposal.id,
       fields: {},
       evaluations: [
-        {
+        expect.objectContaining({
           completedAt: null,
           decidedBy: null,
           index: 0,
@@ -369,9 +373,17 @@ describe('importWorkspacePages - proposal content', () => {
           proposalId: copiedProposal.id,
           permissions: [],
           reviewers: [],
-          rubricCriteria: []
-        },
-        {
+          rubricCriteria: [],
+          actionLabels: null,
+          requiredReviews: 1,
+          appealable: false,
+          appealedAt: null,
+          appealRequiredReviews: null,
+          finalStep: null,
+          appealedBy: null,
+          declinedAt: null
+        }),
+        expect.objectContaining({
           completedAt: null,
           decidedBy: null,
           index: 1,
@@ -384,6 +396,15 @@ describe('importWorkspacePages - proposal content', () => {
           voteSettings: null,
           id: copiedSecondEvaluation.id,
           proposalId: copiedProposal.id,
+          actionLabels: null,
+          requiredReviews: 1,
+          appealable: false,
+          appealedBy: null,
+          declinedAt: null,
+          appealedAt: null,
+          appealRequiredReviews: null,
+          finalStep: null,
+          appealReason: null,
           permissions: expect.arrayContaining<ProposalEvaluationPermission>([
             expect.objectContaining({
               operation: rolePermission.operation as any,
@@ -444,7 +465,7 @@ describe('importWorkspacePages - proposal content', () => {
               id: expect.any(String)
             })
           ])
-        }
+        })
       ]
     });
   });
@@ -512,7 +533,7 @@ describe('importWorkspacePages - proposal content', () => {
       fields: {},
       workflowId: targetSpaceWorkflow.id,
       evaluations: [
-        {
+        expect.objectContaining({
           completedAt: null,
           decidedBy: null,
           index: 0,
@@ -527,9 +548,17 @@ describe('importWorkspacePages - proposal content', () => {
           proposalId: copiedProposal.id,
           permissions: [],
           reviewers: [],
-          rubricCriteria: []
-        },
-        {
+          rubricCriteria: [],
+          actionLabels: null,
+          requiredReviews: 1,
+          appealable: false,
+          appealedAt: null,
+          appealRequiredReviews: null,
+          finalStep: null,
+          appealedBy: null,
+          declinedAt: null
+        }),
+        expect.objectContaining({
           completedAt: null,
           decidedBy: null,
           index: 1,
@@ -542,6 +571,11 @@ describe('importWorkspacePages - proposal content', () => {
           voteSettings: null,
           id: copiedSecondEvaluation.id,
           proposalId: copiedProposal.id,
+          actionLabels: null,
+          requiredReviews: 1,
+          appealedBy: null,
+          declinedAt: null,
+          appealReason: null,
           permissions: expect.arrayContaining<ProposalEvaluationPermission>([
             expect.objectContaining({
               operation: rolePermission.operation as any,
@@ -585,8 +619,12 @@ describe('importWorkspacePages - proposal content', () => {
               proposalId: copiedProposal.id,
               id: expect.any(String)
             })
-          ])
-        }
+          ]),
+          appealable: false,
+          appealedAt: null,
+          appealRequiredReviews: null,
+          finalStep: null
+        })
       ]
     });
   });
@@ -676,3 +714,62 @@ describe('importWorkspacePages - proposal content', () => {
   //   });
   // });
 });
+
+describe('_generateNewPages', () => {
+  it('should replace the source id on views', () => {
+    const oldId = 'old-id';
+    const viewTitle = 'View to replace title';
+    const sourcePages = [
+      mockPageNode({
+        id: oldId,
+        type: 'board',
+        blocks: {
+          board: blockToPrisma(createMockBoard()),
+          views: [blockToPrisma(createMockView())]
+        }
+      }),
+      mockPageNode({
+        type: 'inline_linked_board',
+        blocks: {
+          board: blockToPrisma(createMockBoard()),
+          views: [
+            blockToPrisma(
+              createMockView({
+                fields: {
+                  linkedSourceId: oldId
+                },
+                title: viewTitle
+              })
+            )
+          ]
+        }
+      })
+    ];
+    const targetSpace = createMockSpace();
+    const result = _generateNewPages({
+      sourcePages,
+      targetSpace
+    });
+    expect(result.pageArgs).toHaveLength(2);
+    expect(result.blockArgs).toHaveLength(4);
+    const newBoard = result.pageArgs.find((page) => page.type === 'board')!;
+    const updatedView = result.blockArgs.find((block) => block.title === viewTitle);
+    expect(updatedView).toBeTruthy();
+    expect((updatedView!.fields as BoardViewFields).linkedSourceId).toBe(newBoard.id);
+  });
+});
+
+function mockPageNode({
+  children: _children = [],
+  permissions: _permissions = [],
+  ...input
+}: MockPageInput & { children?: MockPageInput[]; permissions?: any[] } & Partial<RelatedPageData>): ExportedPage {
+  const mockPage = createMockPage(input);
+  const children = _children.map((child) => mockPageNode(child));
+  return {
+    isTemplate: false,
+    permissions: _permissions,
+    ...mockPage,
+    children
+  };
+}

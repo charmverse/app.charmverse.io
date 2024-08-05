@@ -4,14 +4,13 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import PrimaryButton from 'components/common/PrimaryButton';
-import { WalletSign } from 'components/login/components/WalletSign';
+import { LoginButton } from 'components/login/components/LoginButton';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 import { DiscordGate } from './components/DiscordGate/DiscordGate';
 import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';
@@ -43,11 +42,13 @@ export function SpaceAccessGate({
     onSuccess: onJoinSpace
   });
 
-  const summonGate = useSummonGate({
-    joinType,
-    space,
-    onSuccess: onJoinSpace
-  });
+  // leaving this here for now in case we change our mind in the next few weeks - July 29/2024
+  const summonGate: any = {};
+  // const summonGate = useSummonGate({
+  //   joinType,
+  //   space,
+  //   onSuccess: onJoinSpace
+  // });
 
   const tokenGate = useTokenGates({
     account,
@@ -66,16 +67,16 @@ export function SpaceAccessGate({
     }
   }
 
-  async function onWalletSignature(authSig: AuthSig) {
+  async function evaluateUserWallet() {
     if (!user) {
       try {
-        await loginFromWeb3Account(authSig);
+        await loginFromWeb3Account();
       } catch (err: any) {
         showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
         return;
       }
     }
-    await tokenGate.evaluateEligibility(authSig);
+    await tokenGate.evaluateEligibility();
   }
 
   function onError(error: any) {
@@ -87,9 +88,10 @@ export function SpaceAccessGate({
   }
 
   function joinSpace() {
-    if (summonGate.isVerified) {
-      summonGate.joinSpace(onError);
-    } else if (tokenGate.isVerified) {
+    // if (summonGate.isVerified) {
+    //   summonGate.joinSpace(onError);
+    // } else if (tokenGate.isVerified) {
+    if (tokenGate.isVerified) {
       tokenGate.joinSpace(onError);
     } else if (discordGate.isVerified) {
       discordGate.joinSpace(onError);
@@ -100,18 +102,17 @@ export function SpaceAccessGate({
 
   const walletGateEnabled = summonGate.isEnabled || tokenGate.isEnabled;
   const isVerified = summonGate.isVerified || tokenGate.isVerified || discordGate.isVerified;
+  const isVerifying = summonGate.isVerifying || tokenGate.isVerifying || discordGate.isVerifying;
   const isJoiningSpace = summonGate.joiningSpace || tokenGate.joiningSpace || discordGate.joiningSpace;
 
   const noGateConditions =
     !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled && tokenGate.tokenGates?.length === 0;
 
-  const hasRoles = tokenGate.tokenGateResult?.eligibleGates
-    ?.map((gate) => gate.tokenGateId)
-    .some((id) =>
-      tokenGate.tokenGates?.find((tk) => {
-        return tk.id === id && tk.tokenGateToRoles.length > 0;
-      })
-    );
+  const hasRoles = tokenGate.tokenGateResult?.eligibleGates.some((id) =>
+    tokenGate.tokenGates?.find((tk) => {
+      return tk.id === id && tk.tokenGateToRoles.length > 0;
+    })
+  );
 
   return (
     <>
@@ -137,13 +138,13 @@ export function SpaceAccessGate({
 
       {discordGate.isEnabled && <DiscordGate {...discordGate} />}
 
-      {summonGate.isEnabled && <SummonGate {...summonGate} />}
+      {/* {summonGate.isEnabled && <SummonGate {...summonGate} />}
 
       {summonGate.isEnabled && tokenGate.isEnabled && (
         <Typography color='secondary' align='center'>
           OR
         </Typography>
-      )}
+      )} */}
 
       {tokenGate.isEnabled && <TokenGate {...tokenGate} displayAccordion={discordGate.isEnabled} />}
 
@@ -160,14 +161,22 @@ export function SpaceAccessGate({
           </PrimaryButton>
         </Box>
       )}
-
-      {walletGateEnabled && !isVerified && (
+      {!user && (
+        <Box sx={{ '.MuiButton-root': { width: '100%' } }}>
+          <LoginButton showSignup={false} />
+        </Box>
+      )}
+      {walletGateEnabled && !isVerified && !!user && (
         <Box mb={2}>
-          <WalletSign
-            loading={summonGate.isVerifying}
-            signSuccess={onWalletSignature}
-            buttonStyle={{ width: '100%' }}
-          />
+          <PrimaryButton
+            fullWidth
+            loading={isVerifying}
+            disabled={isVerifying}
+            onClick={evaluateUserWallet}
+            data-test='verify-token-gate-btn'
+          >
+            Verify
+          </PrimaryButton>
         </Box>
       )}
       {walletGateEnabled &&

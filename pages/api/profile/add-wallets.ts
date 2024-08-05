@@ -1,39 +1,27 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { LoggedInUser } from '@root/models';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import { refreshENSName } from 'lib/blockchain/refreshENSName';
-import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getUserProfile } from 'lib/users/getUser';
-import { shortenHex } from 'lib/utilities/blockchain';
-import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
-import type { LoggedInUser } from 'models';
+import { shortenHex } from 'lib/utils/blockchain';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).post(addWalletsController);
+handler.use(requireUser).use(requireWalletSignature).post(addWalletsController);
 
 async function addWalletsController(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: string }>) {
   const userId = req.session.user.id;
-  const addressesToAdd = req.body.addressesToAdd as AuthSig[];
-
-  for (const addressToVerify of addressesToAdd) {
-    if (
-      !isValidWalletSignature({
-        address: addressToVerify.address,
-        signature: addressToVerify,
-        host: req.headers.origin as string
-      })
-    ) {
-      throw new InsecureOperationError('Could not verify wallet');
-    }
-  }
+  const payload = req.body as SignatureVerificationPayload;
+  const walletAddress = payload.message.address.toLowerCase();
 
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
@@ -51,7 +39,7 @@ async function addWalletsController(req: NextApiRequest, res: NextApiResponse<Lo
 
   const isBannedFromSpace = await checkUserSpaceBanStatus({
     userId,
-    walletAddresses: addressesToAdd.map((s) => s.address),
+    walletAddresses: [walletAddress],
     spaceIds: userSpaceIds
   });
 
@@ -60,22 +48,18 @@ async function addWalletsController(req: NextApiRequest, res: NextApiResponse<Lo
   }
 
   try {
-    await prisma.userWallet.createMany({
-      data: addressesToAdd.map((signature) => ({
+    await prisma.userWallet.create({
+      data: {
         userId: req.session.user.id,
-        address: signature.address.toLowerCase()
-      }))
+        address: walletAddress
+      }
     });
   } catch (e) {
-    log.error('Error adding wallet', e, { userId, addresses: addressesToAdd.map((s) => shortenHex(s.address)) });
+    log.error('Error adding wallet', e, { userId, address: shortenHex(walletAddress) });
     throw new InvalidInputError('Wallet is already connected with another account');
   }
 
-  for (const authSig of addressesToAdd) {
-    await refreshENSName({ userId, address: authSig.address });
-  }
-
-  const updatedProfile = await getUserProfile('id', userId);
+  const updatedProfile = await refreshENSName({ userId, address: walletAddress });
 
   updateTrackUserProfile(updatedProfile);
 

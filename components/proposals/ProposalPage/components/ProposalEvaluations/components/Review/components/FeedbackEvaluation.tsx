@@ -1,35 +1,26 @@
 import { Box, Card, Stack, FormLabel, Typography } from '@mui/material';
 
-import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
-import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import { useSubmitEvaluationReview } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
+import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { authorSystemRole, allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PopulatedEvaluation } from 'lib/proposal/interface';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
+import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
 export type Props = {
   proposalId?: string;
-  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'title'>;
+  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'title' | 'isReviewer'>;
   isCurrent: boolean;
-  hasMovePermission: boolean;
   nextStep?: { title: string };
   onSubmit?: VoidFunction;
   archived?: boolean;
 };
 
-export function FeedbackEvaluation({
-  hasMovePermission,
-  proposalId,
-  evaluation,
-  isCurrent,
-  nextStep,
-  onSubmit,
-  archived
-}: Props) {
+export function FeedbackEvaluation({ proposalId, evaluation, isCurrent, nextStep, onSubmit, archived }: Props) {
   const { showMessage } = useSnackbar();
-  const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
+  const { trigger, isMutating } = useSubmitEvaluationReview({ proposalId });
   const reviewerOptions: SelectOption[] = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
@@ -38,10 +29,10 @@ export function FeedbackEvaluation({
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
-    : !hasMovePermission
-    ? 'You do not have permission to move this proposal'
+    : !evaluation.isReviewer
+    ? 'You do not have permission to pass or reject this proposal'
     : archived
-    ? 'You cannot move an archived proposal'
+    ? 'You cannot pass or reject an archived proposal'
     : null;
 
   async function onMoveForward() {
@@ -66,8 +57,9 @@ export function FeedbackEvaluation({
         </FormLabel>
         <UserAndRoleSelect
           data-test='evaluation-reviewer-select'
+          wrapColumn
           systemRoles={[authorSystemRole, allMembersSystemRole]}
-          readOnly={true}
+          readOnly
           value={reviewerOptions}
           onChange={() => {}}
         />
@@ -80,7 +72,7 @@ export function FeedbackEvaluation({
             onClick={onMoveForward}
             disabled={!!disabledTooltip}
             disabledTooltip={disabledTooltip}
-            data-test='move-from-feedback-evaluation'
+            data-test='pass-feedback-evaluation'
           >
             {nextStep ? `Move to ${nextStep.title}` : `Complete ${evaluation.title}`}
           </Button>

@@ -1,15 +1,14 @@
 /* eslint-disable no-continue */
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getPermissionsClient } from 'lib/permissions/api';
-import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ThreadAccessGroup } from 'lib/threads';
-import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { getPermissionsClient } from '@root/lib/permissions/api';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
+import type { UserMentionMetadata } from '@root/lib/prosemirror/extractMentions';
+import { extractMentions } from '@root/lib/prosemirror/extractMentions';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import type { ThreadAccessGroup } from '@root/lib/threads';
+import type { WebhookEvent } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
 import { saveDocumentNotification } from '../saveNotification';
 
@@ -64,7 +63,7 @@ async function getUserIdsFromMentionNode({
   spaceId: string;
   group: 'role' | 'user';
   value: string;
-}) {
+}): Promise<string[]> {
   const targetUserIds: string[] = [];
 
   if (group === 'role') {
@@ -214,7 +213,8 @@ export async function createDocumentNotifications(webhookData: {
         }
       });
 
-      const notificationTargetUserIds = data.document.authors.map((author) => author.id);
+      const notificationTargetUserIds =
+        threadAccessGroups.length === 0 ? data.document.authors.map((author) => author.id) : [];
 
       // Get all the users that have access to the thread
       for (const threadAccessGroup of threadAccessGroups) {
@@ -251,11 +251,6 @@ export async function createDocumentNotifications(webhookData: {
         ids.push(id);
         notificationSentUserIds.add(previousInlineComment.userId);
       }
-
-      const permissionsClient = await getPermissionsClient({
-        resourceId: webhookData.spaceId,
-        resourceIdType: 'space'
-      });
 
       for (const userId of new Set(notificationTargetUserIds)) {
         if (

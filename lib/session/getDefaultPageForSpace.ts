@@ -3,11 +3,11 @@ import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Space } from '@charmverse/core/prisma';
 import { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { PageEventMap, StaticPageType } from 'lib/metrics/mixpanel/interfaces/PageEvent';
-import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
-import { permissionsApiClient } from 'lib/permissions/api/client';
-import { fullyDecodeURI, getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
+import type { PageEventMap, StaticPageType } from '@root/lib/metrics/mixpanel/interfaces/PageEvent';
+import { filterVisiblePages } from '@root/lib/pages/filterVisiblePages';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
+import { fullyDecodeURI, getSpaceUrl, getSubdomainPath } from '@root/lib/utils/browser';
+import { getCustomDomainFromHost } from '@root/lib/utils/domains/getCustomDomainFromHost';
 
 type ViewMeta = PageEventMap['page_view']['meta'];
 
@@ -34,7 +34,7 @@ export async function getDefaultPageForSpace({
     : getDefaultPageForSpaceWithNonLoggedInUser({ space, host }));
   // encode to handle Japanese characters
   // call fullyDecodeURI to handle cases where we saved the pathname with encoded characters
-  return encodeURI(fullyDecodeURI(defaultPage));
+  return defaultPage ? encodeURI(fullyDecodeURI(defaultPage)) : null;
 }
 
 async function getDefaultPageForSpaceWithNonLoggedInUser({
@@ -43,12 +43,9 @@ async function getDefaultPageForSpaceWithNonLoggedInUser({
 }: {
   space: Pick<Space, 'id' | 'domain' | 'customDomain' | 'homePageId'>;
   host?: string;
-}): Promise<string> {
-  const defaultReturnValue = `join?domain=${space.domain}`;
-  const defaultSpaceUrl = getSpaceUrl(space, host);
-
+}): Promise<string | null> {
   if (!space.homePageId) {
-    return defaultReturnValue;
+    return null;
   }
 
   const page = await prisma.page.findFirst({
@@ -63,10 +60,11 @@ async function getDefaultPageForSpaceWithNonLoggedInUser({
   });
 
   if (page) {
+    const defaultSpaceUrl = getSpaceUrl(space, host);
     return `${defaultSpaceUrl}/${page.path}`;
-  } else {
-    return defaultReturnValue;
   }
+
+  return null;
 }
 
 // get default page when we have a space domain
@@ -116,6 +114,7 @@ async function getDefaultPageForSpaceRaw({
 
   const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
+    filter: 'not_card',
     userId,
     archived: false
   });

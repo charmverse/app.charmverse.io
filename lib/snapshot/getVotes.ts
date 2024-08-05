@@ -1,6 +1,5 @@
 import { gql } from '@apollo/client';
-
-import type { VoteChoice } from 'lib/snapshot/interfaces';
+import type { VoteChoice } from '@root/lib/snapshot/interfaces';
 
 import client from './graphql-client';
 
@@ -38,7 +37,7 @@ export async function getUserProposalVotes({
         choice
         vp
       }
-    }    
+    }
   `
   });
 

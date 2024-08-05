@@ -8,7 +8,7 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { useMembers } from 'hooks/useMembers';
-import type { ISystemError } from 'lib/utilities/errors';
+import type { ISystemError } from 'lib/utils/errors';
 
 export const schema = yup.object({
   name: yup.string().required('Please provide a valid role name')

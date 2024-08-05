@@ -1,37 +1,39 @@
-import { prisma } from "@charmverse/core/prisma-client";
-import { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import { BoardViewFields } from 'lib/focalboard/boardView';
-import { Constants } from 'lib/focalboard/constants';
-import { proposalDbProperties } from 'lib/focalboard/proposalDbProperties';
+import { prisma } from '@charmverse/core/prisma-client';
+import { BoardFields, IPropertyTemplate } from 'lib/databases/board';
+import { BoardViewFields } from 'lib/databases/boardView';
+import { Constants } from 'lib/databases/constants';
+import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
 
 async function addProposalAuthorColumn() {
   const proposalBoardBlocks = await prisma.block.findMany({
     where: {
-      type: "board",
+      type: 'board',
       fields: {
-        path: ["sourceType"],
-        equals: "proposals"
+        path: ['sourceType'],
+        equals: 'proposals'
       }
     },
     select: {
       id: true,
-      fields: true,
+      fields: true
     }
-  })
+  });
 
   const totalBoardBlocks = proposalBoardBlocks.length;
   let currentBlock = 0;
 
   for (const proposalBoardBlock of proposalBoardBlocks) {
     try {
-      let proposalAuthorProperty = (proposalBoardBlock.fields as unknown as BoardFields).cardProperties?.find(boardCardProperty => {
-        return boardCardProperty.type === "proposalAuthor"
-      }) as IPropertyTemplate
+      let proposalAuthorProperty = (proposalBoardBlock.fields as unknown as BoardFields).cardProperties?.find(
+        (boardCardProperty) => {
+          return boardCardProperty.type === 'proposalAuthor';
+        }
+      ) as IPropertyTemplate;
 
-      const transactions: any[] = []
+      const transactions: any[] = [];
 
       if (!proposalAuthorProperty) {
-        proposalAuthorProperty = proposalDbProperties.proposalAuthor()
+        proposalAuthorProperty = proposalDbProperties.proposalAuthor();
 
         transactions.push(
           prisma.block.update({
@@ -40,39 +42,40 @@ async function addProposalAuthorColumn() {
             },
             data: {
               fields: {
-                ...proposalBoardBlock.fields as unknown as BoardFields,
+                ...(proposalBoardBlock.fields as unknown as BoardFields),
                 cardProperties: [
                   proposalAuthorProperty,
-                  ...(proposalBoardBlock.fields as unknown as BoardFields).cardProperties || [],
+                  ...((proposalBoardBlock.fields as unknown as BoardFields).cardProperties || [])
                 ]
               } as any
             }
           })
-        )
+        );
       }
 
       const viewBlocks = await prisma.block.findMany({
         where: {
-          type: "view",
+          type: 'view',
           parentId: proposalBoardBlock.id
         },
         select: {
           id: true,
-          fields: true,
+          fields: true
         }
-      })
+      });
 
       await prisma.$transaction([
         ...transactions,
-        ...viewBlocks.map(viewBlock => {
+        ...viewBlocks.map((viewBlock) => {
           const viewBlockFields = viewBlock.fields as unknown as BoardViewFields;
           const hasTitleProperty = viewBlockFields.visiblePropertyIds.includes(Constants.titleColumnId);
 
-          const viewBlockVisiblePropertyIds = viewBlockFields.visiblePropertyIds.filter(
-            visiblePropertyId => visiblePropertyId !== proposalAuthorProperty.id
-            ) || []
+          const viewBlockVisiblePropertyIds =
+            viewBlockFields.visiblePropertyIds.filter(
+              (visiblePropertyId) => visiblePropertyId !== proposalAuthorProperty.id
+            ) || [];
 
-          viewBlockVisiblePropertyIds.splice(hasTitleProperty ? 1 : 0, 0, proposalAuthorProperty.id)
+          viewBlockVisiblePropertyIds.splice(hasTitleProperty ? 1 : 0, 0, proposalAuthorProperty.id);
 
           return prisma.block.update({
             where: {
@@ -80,20 +83,20 @@ async function addProposalAuthorColumn() {
             },
             data: {
               fields: {
-                ...viewBlock.fields as unknown as BoardViewFields,
+                ...(viewBlock.fields as unknown as BoardViewFields),
                 visiblePropertyIds: viewBlockVisiblePropertyIds
               }
             }
-          })
+          });
         })
-      ])
+      ]);
     } catch (_) {
-      console.log(`Failed to update board block ${proposalBoardBlock.id}`)
+      console.log(`Failed to update board block ${proposalBoardBlock.id}`);
     } finally {
       currentBlock++;
-      console.log(`Updated ${currentBlock} of ${totalBoardBlocks} board blocks`)
+      console.log(`Updated ${currentBlock} of ${totalBoardBlocks} board blocks`);
     }
   }
 }
 
-addProposalAuthorColumn()
+addProposalAuthorColumn();

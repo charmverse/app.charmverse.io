@@ -57,6 +57,11 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
     readonly: true,
     hidden: true
   },
+  farcaster: {
+    label: 'Farcaster',
+    default: true,
+    hidden: true
+  },
   google: {
     label: 'Google',
     default: true,
@@ -75,9 +80,6 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
   email: {
     label: 'Email'
   },
-  multiselect: {
-    label: 'Multi-select'
-  },
   number: {
     label: 'Number'
   },
@@ -86,6 +88,9 @@ export const MEMBER_PROPERTY_CONFIG: Record<MemberPropertyType, MemberPropertyCo
   },
   select: {
     label: 'Select'
+  },
+  multiselect: {
+    label: 'Multi-select'
   },
   text: {
     label: 'Text'

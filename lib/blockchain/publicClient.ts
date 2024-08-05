@@ -1,8 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { getChainById } from 'connectors/chains';
+import { isTestEnv } from '@root/config/constants';
+import { getChainById } from '@root/connectors/chains';
+import { getAlchemyBaseUrl } from '@root/lib/blockchain/provider/alchemy/client';
 import { createPublicClient, http } from 'viem';
 
-import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy/client';
+import { getAnkrBaseUrl } from './provider/ankr/client';
+import { isAnkrChain } from './provider/ankr/config';
 
 /**
  * Create a viem public client for a given chain.
@@ -17,14 +20,36 @@ export const getPublicClient = (chainId: number) => {
   const chainDetails = getChainById(chainId);
 
   if (!chainDetails) {
-    throw new InvalidInputError('Chain not supported');
+    throw new InvalidInputError(`Chain id ${chainId} not supported`);
   }
 
-  const provider = chainDetails.alchemyUrl ? getAlchemyBaseUrl(chainDetails.chainId) : chainDetails.rpcUrls[0];
+  if (isTestEnv) {
+    throw new Error('Cannot create a public client in test environment. Please mock the client instead');
+  }
+
+  let providerUrl: string | null = null;
+
+  try {
+    providerUrl = chainDetails.alchemyUrl
+      ? getAlchemyBaseUrl(chainDetails.chainId)
+      : isAnkrChain(chainId)
+      ? getAnkrBaseUrl(chainId)
+      : chainDetails.rpcUrls[0];
+  } catch (err) {
+    if (!providerUrl && !chainDetails.rpcUrls.length) {
+      throw new InvalidInputError('No RPC url available for the chain');
+    } else {
+      providerUrl = chainDetails.rpcUrls[0];
+    }
+  }
+
   const chain = chainDetails.viem;
 
   return createPublicClient({
     chain,
-    transport: http(provider)
+    transport: http(providerUrl, {
+      retryCount: 1,
+      timeout: 5000
+    })
   });
 };

@@ -19,8 +19,6 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
   let pageWithSpacePermission: Page;
   let publicPage: Page;
 
-  let proposalVisibleInProposalsEvaluationPermissionsModel: Proposal;
-
   beforeAll(async () => {
     ({ user: admin, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: true }));
     normalMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
@@ -48,29 +46,13 @@ describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
       title: 'public page',
       pagePermissions: [{ assignee: { group: 'public' }, permissionLevel: 'view', allowDiscovery: true }]
     });
-
-    proposalVisibleInProposalsEvaluationPermissionsModel = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: admin.id,
-      title: 'proposal visible in evaluations model',
-      proposalStatus: 'published',
-      evaluationInputs: [
-        {
-          evaluationType: 'vote',
-          permissions: [{ operation: 'view', assignee: { group: 'space_member' } }],
-          reviewers: [{ group: 'user', id: reviewerUser.id }]
-        }
-      ]
-    });
   });
 
   it('should return pages a user can access and respond with status code 200', async () => {
     const response = (
       await request(baseUrl).get(`/api/spaces/${space.id}/pages`).set('Cookie', normalMemberCookie).expect(200)
     ).body as PageMeta[];
-    const expectedPageIds = arrayUtils
-      .extractUuids([pageWithSpacePermission, proposalVisibleInProposalsEvaluationPermissionsModel, publicPage])
-      .sort();
+    const expectedPageIds = arrayUtils.extractUuids([pageWithSpacePermission, publicPage]).sort();
 
     expect(arrayUtils.extractUuids(response).sort()).toEqual(expectedPageIds);
   });

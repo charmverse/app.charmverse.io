@@ -19,12 +19,12 @@ import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
-import type { PopulatedEvaluation } from 'lib/proposal/interface';
-import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
-import { isNumber } from 'lib/utilities/numbers';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
+import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import { isNumber } from 'lib/utils/numbers';
 
-import { PassFailEvaluation } from '../PassFailEvaluation';
+import { PassFailEvaluationContainer } from '../PassFailEvaluationContainer';
 
 type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
@@ -34,6 +34,7 @@ type Props = {
   evaluation?: PopulatedEvaluation;
   refreshProposal?: VoidFunction;
   archived?: boolean;
+  authors: string[];
 };
 
 type CriteriaSummaryType = 'sum' | 'average';
@@ -68,7 +69,8 @@ export function RubricResults({
   refreshProposal,
   isCurrent,
   proposalId,
-  archived
+  archived,
+  authors
 }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
@@ -226,27 +228,6 @@ export function RubricResults({
           <Typography color='secondary'>N/A</Typography>
         )}
       </Box>
-      {evaluation && (
-        <>
-          <Divider sx={{ my: 1 }} />
-          <Box mx={2}>
-            <Typography variant='subtitle1' sx={{ mb: 1 }}>
-              Decision
-            </Typography>
-
-            <PassFailEvaluation
-              isCurrent={isCurrent}
-              hideReviewer
-              archived={archived}
-              key='results'
-              evaluation={evaluation}
-              proposalId={proposalId}
-              confirmationMessage='Please verify that all reviewers have submitted a response. This will submit the final review for this step.'
-              refreshProposal={refreshProposal}
-            />
-          </Box>
-        </>
-      )}
     </>
   );
 }

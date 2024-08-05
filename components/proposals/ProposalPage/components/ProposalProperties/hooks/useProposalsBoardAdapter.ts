@@ -1,24 +1,19 @@
-import type { PageMeta } from '@charmverse/core/pages';
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { objectUtils } from '@charmverse/core/utilities';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
-import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { sortCards } from 'components/common/DatabaseEditor/store/cards';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
-import type { BlockTypes } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
-import { CardFilter } from 'lib/focalboard/cardFilter';
-import { Constants } from 'lib/focalboard/constants';
-import { PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card, CardWithRelations } from 'lib/databases/card';
+import { CardFilter } from 'lib/databases/cardFilter';
+import { PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
@@ -26,35 +21,20 @@ import {
   PROPOSAL_STEP_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
-  PROPOSAL_EVALUATION_TYPE_ID
-} from 'lib/proposal/blocks/constants';
-import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import type { ProposalFields, ProposalWithUsersLite } from 'lib/proposal/interface';
-
-export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
+  PROPOSAL_EVALUATION_TYPE_ID,
+  PROPOSAL_PUBLISHED_AT_ID
+} from 'lib/proposals/blocks/constants';
+import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 
 export function useProposalsBoardAdapter() {
-  const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { proposals, mutateProposals, isLoading: isProposalsLoading } = useProposals();
-  const { pages, loadingPages: isPagesLoading } = usePages();
+  const { proposals, proposalsMap, mutateProposals, isLoading: isProposalsLoading } = useProposals();
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
-  const proposalPage = pages[boardProposal?.id || ''];
-  const proposalData = proposals?.find((p) => p.id === boardProposal?.id);
 
-  const proposal = {
-    ...boardProposal,
-    ...proposalData,
-    fields: {
-      ...proposalData?.fields,
-      properties: {
-        ...proposalData?.fields?.properties,
-        ...boardProposal?.fields?.properties
-      }
-    }
-  };
-  const isLoading = isProposalsLoading || isPagesLoading;
+  const isLoading = isProposalsLoading;
 
   const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
 
@@ -77,50 +57,46 @@ export function useProposalsBoardAdapter() {
       }),
     [evaluationStepTitles, proposalBoardBlock]
   );
-
   const activeView = useMemo(() => {
     // use saved default block or build on the fly
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ board });
+      const boardView = getDefaultTableView({ board });
+      // sort by created at desc by default
+      if (!boardView.fields.sortOptions?.length) {
+        boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
+      }
+      return boardView;
     }
     const boardView = blockToFBBlock(viewBlock) as BoardView;
-    // sort by created at desc by default
-    if (!boardView.fields.sortOptions?.length) {
-      boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
-    }
 
     return boardView;
   }, [board, proposalBlocks]);
 
-  const cardPages: CardPage[] = useMemo(() => {
-    let cards =
-      proposals
-        ?.map((p) => {
-          const page = pages[p?.id];
-          const isStructuredProposal = !!p.formId;
-          return {
-            ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
-            isStructuredProposal,
-            proposal: {
-              archived: p.archived,
-              currentEvaluationId: p.currentEvaluationId,
-              id: p.id,
-              status: p.status,
-              currentStep: p.currentStep,
-              sourceTemplateId: page?.sourceTemplateId,
-              evaluations: p.evaluations,
-              hasRewards: (p.fields?.pendingRewards ?? []).length > 0 || (p.rewardIds ?? []).length > 0
-            }
-          } as CardPage;
-        })
-        .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
+  const sortedCards: CardWithRelations[] = useMemo(() => {
+    let cards = (proposals || []).map((p) => {
+      const isStructuredProposal = !!p.formId;
+      return {
+        ...mapProposalToCard({ proposal: p, spaceId: space?.id }),
+        isStructuredProposal,
+        proposal: {
+          archived: p.archived,
+          currentEvaluationId: p.currentEvaluationId,
+          id: p.id,
+          // status: p.status,
+          currentStep: p.currentStep,
+          sourceTemplateId: p.templateId,
+          evaluations: p.evaluations,
+          hasRewards: (p.fields?.pendingRewards ?? []).length > 0 || (p.rewardIds ?? []).length > 0,
+          hasCredentials: !!p.selectedCredentialTemplates.length
+        }
+      } as CardWithRelations;
+    });
 
     const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
     if (filter) {
-      const cardsRaw = cards.map((cp) => cp.card);
       const filteredCardsIds = CardFilter.applyFilterGroup(
         filter,
         [
@@ -136,10 +112,10 @@ export function useProposalsBoardAdapter() {
             type: 'proposalEvaluationType'
           }
         ],
-        cardsRaw
+        cards
       ).map((c) => c.id);
 
-      cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
+      cards = cards.filter((cp) => filteredCardsIds.includes(cp.id));
     }
 
     const sortedCardPages = activeView
@@ -153,7 +129,6 @@ export function useProposalsBoardAdapter() {
     localViewSettings?.localFilters,
     localViewSettings?.localSort,
     membersRecord,
-    pages,
     proposals,
     space?.id
   ]);
@@ -164,81 +139,56 @@ export function useProposalsBoardAdapter() {
     evaluationStepTitles
   });
 
-  // card from current proposal
-  const card: Card<ProposalPropertyValue> = mapProposalToCardPage({
-    proposal: proposal as ProposalWithUsersLite,
-    proposalPage,
-    spaceId: space?.id
-  }).card;
-
-  // each proposal with fields reflects a card
-  const cards: Card[] = cardPages.map((cp) => cp.card);
-
   const views: BoardView[] = [];
 
   return {
     board,
     boardCustomProperties,
-    card,
-    cards,
-    cardPages,
+    cards: sortedCards,
+    proposalsMap,
     activeView,
     isLoading,
     refreshProposals: mutateProposals,
-    views,
-    proposalPage,
-    boardProposal,
-    setBoardProposal
+    views
   };
 }
 
 // build mock card from proposal and page data
-function mapProposalToCardPage({
+export function mapProposalToCard({
   proposal,
-  proposalPage,
   spaceId
 }: {
-  proposal: ProposalWithUsersLite | null;
-  proposalPage?: PageMeta;
+  proposal: ProposalWithUsersLite;
   spaceId?: string;
-}) {
-  const proposalFields: ProposalFields = proposal?.fields || { properties: {} };
-  const proposalSpaceId = proposal?.spaceId || spaceId || '';
+}): Card<ProposalPropertyValue> {
+  const proposalFields: ProposalFields = proposal.fields || { properties: {} };
+  const proposalSpaceId = spaceId || '';
   proposalFields.properties = {
     ...proposalFields.properties,
-    [Constants.titleColumnId]: proposalPage?.title || '',
+    // [Constants.titleColumnId]: proposal.title,
     // add default field values on the fly
-    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.archived ? 'archived' : proposal?.currentStep?.result ?? 'in_progress',
+    [PROPOSAL_PUBLISHED_AT_ID]: proposal.publishedAt ? new Date(proposal.publishedAt).getTime() : '',
+    [PROPOSAL_STATUS_BLOCK_ID]: proposal.archived ? 'archived' : proposal.currentStep?.result ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
-    [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentStep?.title ?? 'Draft',
-    [PROPOSAL_EVALUATION_TYPE_ID]: proposal?.currentStep?.step ?? 'draft',
+    [PROPOSAL_STEP_BLOCK_ID]: proposal.currentStep?.title ?? 'Draft',
+    [PROPOSAL_EVALUATION_TYPE_ID]: proposal.currentStep?.step ?? 'draft',
     [PROPOSAL_REVIEWERS_BLOCK_ID]:
       proposal && 'reviewers' in proposal
-        ? proposal.reviewers.map(
-            (r) =>
-              ({
-                group: r.userId ? 'user' : r.roleId ? 'role' : 'system_role',
-                id: r.userId ?? r.roleId ?? r.systemRole
-              } as TargetPermissionGroup<'user' | 'role'>)
-          )
+        ? proposal.reviewers.map(({ userId, roleId, systemRole }) => ({ userId, roleId, systemRole }))
         : []
   };
-
   const card: Card<ProposalPropertyValue> = {
-    id: proposal?.id || '',
+    id: proposal.id,
     spaceId: proposalSpaceId,
-    parentId: '',
-    schema: 1,
-    title: proposalPage?.title || '',
+    title: proposal.title,
     rootId: proposalSpaceId,
-    type: 'card' as BlockTypes,
-    updatedBy: proposalPage?.updatedBy || '',
-    createdBy: proposalPage?.createdBy || '',
-    createdAt: proposalPage?.createdAt ? new Date(proposalPage?.createdAt).getTime() : 0,
-    updatedAt: proposalPage?.updatedAt ? new Date(proposalPage?.updatedAt).getTime() : 0,
-    deletedAt: null,
+    type: 'card' as const,
+    updatedBy: proposal.updatedBy,
+    createdBy: proposal.createdBy,
+    createdAt: new Date(proposal.createdAt).getTime(),
+    updatedAt: new Date(proposal.updatedAt).getTime(),
     fields: { properties: {}, ...proposalFields, contentOrder: [] }
   };
 
-  return { card, page: proposalPage };
+  return card;
 }

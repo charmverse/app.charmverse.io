@@ -4,8 +4,8 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { InvalidStateError } from 'lib/middleware';
-import type { ProposalEvaluationResultExtended } from 'lib/proposal/interface';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import type { ProposalEvaluationResultExtended } from 'lib/proposals/interfaces';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -110,6 +110,14 @@ type ProposalReviewer = {
  *                - rubric
  *                - pass_fail
  *                - feedback
+ *            startedAt:
+ *              type: string
+ *              format: date-time
+ *              example: 2022-04-04T21:32:38.317Z
+ *            completedAt:
+ *              type: string
+ *              format: date-time
+ *              example: 2022-04-04T21:32:38.317Z
  */
 export type PublicApiProposal = {
   id: string;
@@ -128,6 +136,8 @@ export type PublicApiProposal = {
     title: string;
     result: ProposalEvaluationResultExtended;
     type: ProposalEvaluationType | 'draft';
+    startedAt: string;
+    completedAt?: string;
   };
 };
 
@@ -242,6 +252,8 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
 
   const publicApiProposalList: PublicApiProposal[] = proposals.map((proposal, index) => {
     const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+    const previousEvaluation =
+      currentEvaluation && currentEvaluation.index > 0 ? proposal.evaluations[currentEvaluation.index - 1] : null;
     const isActiveVote = currentEvaluation?.result === null && currentEvaluation?.type === 'vote';
     const apiProposal: PublicApiProposal = {
       id: proposal.id,
@@ -255,10 +267,13 @@ async function listProposals(req: NextApiRequest, res: NextApiResponse<PublicApi
       currentStep: currentEvaluation
         ? {
             result: currentEvaluation.result ?? 'in_progress',
+            startedAt: (previousEvaluation?.completedAt || proposal.page?.createdAt || new Date()).toISOString(),
+            completedAt: currentEvaluation?.completedAt?.toISOString(),
             title: currentEvaluation.title,
             type: currentEvaluation.type
           }
         : {
+            startedAt: (proposal.page?.createdAt || new Date()).toISOString(),
             result: 'in_progress',
             title: 'Draft',
             type: 'draft'

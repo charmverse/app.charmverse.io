@@ -1,8 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma';
-
-import { emptyDocument } from 'lib/prosemirror/constants';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ClientDiffMessage } from 'lib/websockets/documentEvents/interfaces';
+import { emptyDocument } from '@root/lib/prosemirror/constants';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import type { ClientDiffMessage } from '@root/lib/websockets/documentEvents/interfaces';
 
 /**
  * @createdBy - Should be provided from the creator of the page

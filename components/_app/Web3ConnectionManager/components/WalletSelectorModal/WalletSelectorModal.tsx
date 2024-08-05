@@ -1,14 +1,14 @@
 import { log } from '@charmverse/core/log';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { Connector } from 'wagmi';
-import { useAccount, useConnect } from 'wagmi';
 
 import { useMetamaskConnect } from 'components/_app/Web3ConnectionManager/hooks/useMetamaskConnect';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
+import { useAccount, useConnect } from 'hooks/wagmi';
 
 import { useWeb3ConnectionManager } from '../../Web3ConnectionManager';
 
@@ -16,11 +16,12 @@ import { ConnectorButton } from './components/ConnectorButton';
 import processConnectionError from './utils/processConnectionError';
 
 export function WalletSelector() {
-  const { closeWalletSelectorModal, isWalletSelectorModalOpen, isConnectingIdentity } = useWeb3ConnectionManager();
-  const { pendingConnector, error, isLoading, connectAsync, connectors } = useConnect();
+  const { closeWalletSelectorModal, isWalletSelectorModalOpen } = useWeb3ConnectionManager();
+  const { error, connectAsync, connectors } = useConnect();
   const { connector: activeConnector, isConnected } = useAccount();
+  const [isLoadingConnectorId, setLoadingConnectorId] = useState<string | null>(null);
 
-  const coinbaseWalletConnector = connectors.find((c) => c.id === 'coinbaseWallet');
+  const coinbaseWalletConnector = connectors.find((c) => c.type === 'coinbaseWallet');
   const injectedConnector = connectors.find((c) => c.id === 'injected');
   const walletConnectConnector = connectors.find((c) => c.id === 'walletConnect');
 
@@ -33,10 +34,12 @@ export function WalletSelector() {
 
   const handleConnect = async (_connector: Connector) => {
     try {
+      setLoadingConnectorId(_connector.id);
       await connectAsync({ connector: _connector });
     } catch (err) {
       log.warn('Wallet connection error', { error: err });
     }
+    setLoadingConnectorId(null);
   };
 
   const { label, connectMetamask } = useMetamaskConnect(() => injectedConnector && handleConnect(injectedConnector));
@@ -61,9 +64,9 @@ export function WalletSelector() {
             name={label}
             onClick={connectMetamask}
             iconUrl='metamask.png'
-            disabled={isWalletConnected(injectedConnector?.id) || isLoading}
+            disabled={isWalletConnected(injectedConnector?.id) || !!isLoadingConnectorId}
             isActive={isWalletConnected(injectedConnector?.id)}
-            isLoading={isLoading && pendingConnector?.id === injectedConnector?.id}
+            isLoading={!!isLoadingConnectorId && isLoadingConnectorId === injectedConnector?.id}
           />
         </Grid>
 
@@ -72,9 +75,9 @@ export function WalletSelector() {
             name='WalletConnect'
             onClick={() => walletConnectConnector && handleConnect(walletConnectConnector)}
             iconUrl='walletconnect.svg'
-            disabled={isWalletConnected(walletConnectConnector?.id) || isLoading}
+            disabled={isWalletConnected(walletConnectConnector?.id) || !!isLoadingConnectorId}
             isActive={isWalletConnected(walletConnectConnector?.id)}
-            isLoading={isLoading && pendingConnector?.id === walletConnectConnector?.id}
+            isLoading={!!isLoadingConnectorId && isLoadingConnectorId === walletConnectConnector?.id}
           />
         </Grid>
         <Grid item xs={12}>
@@ -82,9 +85,9 @@ export function WalletSelector() {
             name='Coinbase Wallet'
             onClick={() => coinbaseWalletConnector && handleConnect(coinbaseWalletConnector)}
             iconUrl='coinbasewallet.png'
-            disabled={isWalletConnected(coinbaseWalletConnector?.id) || isLoading}
+            disabled={isWalletConnected(coinbaseWalletConnector?.id) || !!isLoadingConnectorId}
             isActive={isWalletConnected(coinbaseWalletConnector?.id)}
-            isLoading={isLoading && pendingConnector?.id === coinbaseWalletConnector?.id}
+            isLoading={!!isLoadingConnectorId && isLoadingConnectorId === coinbaseWalletConnector?.id}
           />
         </Grid>
 

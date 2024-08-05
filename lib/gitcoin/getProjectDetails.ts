@@ -1,22 +1,22 @@
-import { log } from '@charmverse/core/log';
-import type { Provider } from '@ethersproject/providers';
-import type { BigNumber } from 'ethers';
+import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { getSafeOwners } from '@root/lib/gnosis/safe/getSafeOwners';
+import { fetchFileByHash, getIpfsFileUrl } from '@root/lib/ipfs/fetchFileByHash';
+import { getAddress } from 'viem';
 
-import { getProjectRegistryContract } from 'lib/gitcoin/getProjectRegistryContract';
-import { getSafeOwners } from 'lib/gnosis/safe/getSafeOwners';
-import { fetchFileByHash, getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
+import { ProjectRegistryAbi } from './abi/ProjectRegistry';
+import { PROJECT_REGISTRY_ADDRESSES } from './constants';
+import type { ChainId } from './projectsCount';
 
 type MetadataOnchainDetails = {
   pointer: string;
-  protocol: BigNumber;
+  protocol: bigint;
 };
 
-type ProjectOnchainDetails = {
-  id: BigNumber;
-  metadata: MetadataOnchainDetails;
-};
+export type Owners = readonly `0x${string}`[];
 
-type ProjectMetadata = {
+type ProjectOnchainDetails = readonly [bigint, MetadataOnchainDetails];
+
+export type ProjectMetadata = {
   title: string;
   description: string;
   website: string;
@@ -29,26 +29,37 @@ type ProjectMetadata = {
 
 export type GitcoinProjectDetails = {
   projectId: number;
+  chainId: number;
   metadata: ProjectMetadata;
-  owners: string[];
+  owners: Owners;
   metadataUrl: string;
 };
 
 export async function getProjectDetails({
   chainId,
-  projectId,
-  provider
+  projectId
 }: {
   projectId: number;
-  chainId: number;
-  provider: Provider;
+  chainId: ChainId;
 }): Promise<GitcoinProjectDetails | null> {
-  const projectRegistry = getProjectRegistryContract({ providerOrSigner: provider, chainId });
+  const publicClient = getPublicClient(chainId);
 
-  const onchainOwners: string[] = await projectRegistry.getProjectOwners(projectId);
-  const metadataDetails: ProjectOnchainDetails = await projectRegistry.projects(projectId);
-  const ipfsHash = metadataDetails.metadata.pointer;
-  const owners = await getProjectOwners(onchainOwners, provider);
+  const onchainOwners = (await publicClient.readContract({
+    address: getAddress(PROJECT_REGISTRY_ADDRESSES[chainId]),
+    abi: ProjectRegistryAbi,
+    functionName: 'getProjectOwners',
+    args: [BigInt(projectId)]
+  })) as `0x${string}`[];
+
+  const metadataDetails: ProjectOnchainDetails = await publicClient.readContract({
+    address: getAddress(PROJECT_REGISTRY_ADDRESSES[chainId]),
+    abi: ProjectRegistryAbi,
+    functionName: 'projects',
+    args: [BigInt(projectId)]
+  });
+
+  const ipfsHash = metadataDetails[1]?.pointer;
+  const owners = await getProjectOwners(onchainOwners, chainId);
 
   if (!ipfsHash) {
     return null;
@@ -58,23 +69,26 @@ export async function getProjectDetails({
 
   return {
     projectId,
+    chainId,
     metadata,
     owners: owners.length ? owners : onchainOwners,
     metadataUrl: getIpfsFileUrl(ipfsHash)
   };
 }
 
-async function getProjectOwners(ownerAddresses: string[], provider: Provider) {
-  const promises = ownerAddresses.map((address) => getSafeOwners({ address, provider }));
+export async function getProjectOwners(ownerAddresses: Owners, chainId: number) {
+  const promises = ownerAddresses.map(async (address) => {
+    const owners = await getSafeOwners({ address, chainId });
+
+    if (owners?.length) {
+      return owners;
+    }
+    return [address];
+  });
+
   const results = await Promise.all(promises);
 
-  const owners = results.reduce<string[]>((acc, o) => {
-    if (o?.length) {
-      return [...acc, ...o];
-    }
-
-    return acc;
-  }, []);
+  const owners = [...new Set(results.flat())];
 
   return owners;
 }

@@ -8,9 +8,9 @@ import { useEditorViewContext, usePluginState } from 'components/common/CharmEdi
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
-import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipSpec';
 import PageThread from '../../thread/PageThread';
 import type { InlineCommentPluginState } from '../inlineComment.plugins';
 
@@ -71,11 +71,11 @@ export function InlineCommentThread({
           }}
           timeout={250}
         >
-          <Box display='flex' flexDirection='column' gap={1}>
+          <Box display='flex' flexDirection='column' gap={1} data-test='inline-comment-thread'>
             {unResolvedThreads.map((resolvedThread) => (
               <ThreadContainer key={resolvedThread.id} elevation={4}>
                 <PageThread
-                  canCreateComments={permissions?.comment}
+                  enableComments={permissions?.comment}
                   inline={ids.length === 1}
                   key={resolvedThread.id}
                   threadId={resolvedThread?.id}

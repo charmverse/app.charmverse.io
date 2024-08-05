@@ -1,51 +1,36 @@
-import { RPCList } from 'connectors/chains';
-
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
-import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
-import type { Block } from 'lib/focalboard/block';
-import { createBoard } from 'lib/focalboard/board';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { DEFAULT_CALENDAR_VIEW_BLOCK_ID, DEFAULT_TABLE_VIEW_BLOCK_ID } from 'lib/focalboard/customBlocks/constants';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
+import type { UIBlockWithDetails as FBBlock, BlockWithDetails } from 'lib/databases/block';
+import { createBoard } from 'lib/databases/board';
+import type { FeatureTitleVariation } from 'lib/features/getFeatureTitle';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/rewards/blocks/constants';
-import type { RewardPropertiesBlock } from 'lib/rewards/blocks/interfaces';
-import {
-  generateDefaultBoardView,
-  generateDefaultCalendarView,
-  generateDefaultTableView
-} from 'lib/rewards/blocks/views';
+import { defaultRewardViews } from 'lib/rewards/blocks/views';
 
-export const tokenChainOptions: IPropertyTemplate['options'] = RPCList.map((rpc) => ({
-  id: rpc.chainId.toString(),
-  value: rpc.chainName,
-  color: ''
-}));
+import { getDefaultRewardProperties } from './getDefaultRewardProperties';
 
 export function getDefaultBoard({
   storedBoard,
-  customOnly = false,
-  hasMilestoneRewards = false
+  getFeatureTitle
 }: {
-  storedBoard: RewardPropertiesBlock | undefined;
-  customOnly?: boolean;
-  hasMilestoneRewards?: boolean;
+  storedBoard: (Omit<BlockWithDetails, 'fields'> & { fields: any }) | undefined;
+  getFeatureTitle: (featureName: FeatureTitleVariation) => string;
 }) {
-  const block: Partial<Block> = storedBoard
+  const block: Partial<FBBlock> = storedBoard
     ? blockToFBBlock(storedBoard)
     : createBoard({
         block: {
           id: DEFAULT_BOARD_BLOCK_ID,
           fields: {
             cardProperties: [],
-            viewIds: [DEFAULT_TABLE_VIEW_BLOCK_ID, DEFAULT_BOARD_BLOCK_ID, DEFAULT_CALENDAR_VIEW_BLOCK_ID]
+            viewIds: defaultRewardViews
           }
         }
       });
 
-  const cardProperties = [...getDefaultRewardProperties(hasMilestoneRewards), ...(block.fields?.cardProperties || [])];
+  const cardProperties = [...getDefaultRewardProperties({ getFeatureTitle }), ...(block.fields?.cardProperties || [])];
 
   block.fields = {
     ...(block.fields || {}),
-    cardProperties: customOnly ? cardProperties.filter((p) => !p.id.startsWith('__')) : cardProperties
+    cardProperties
   };
 
   const board = createBoard({
@@ -53,17 +38,4 @@ export function getDefaultBoard({
   });
 
   return board;
-}
-
-export function getDefaultView({ viewType, spaceId }: { viewType: string; spaceId: string }) {
-  if (viewType === 'board') {
-    return generateDefaultBoardView({ spaceId });
-  }
-
-  if (viewType === 'calendar') {
-    return generateDefaultCalendarView({ spaceId });
-  }
-
-  // default to table view
-  return generateDefaultTableView({ spaceId });
 }

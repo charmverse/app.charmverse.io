@@ -44,7 +44,9 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       ...workflow,
       isNew: true,
       id: uuid(),
-      index: lowestIndex - 1
+      index: lowestIndex - 1,
+      privateEvaluations: false,
+      draftReminder: false
     };
     // insert the new evaluation after the existing one
     if (existingIndex > -1) {
@@ -115,7 +117,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       </Box>
       {loadingWorkflows && <LoadingComponent minHeight={200} />}
       <Box mb={2}>
-        {workflows.map((workflow, index) => (
+        {workflows.map((workflow) => (
           <ProposalWorkflowItem
             key={workflow.id}
             workflow={workflow}

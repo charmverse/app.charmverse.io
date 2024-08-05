@@ -1,5 +1,5 @@
 import { history } from '@bangle.dev/base-components';
-import { EditorState } from '@bangle.dev/pm';
+import { EditorState, NodeSelection } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
@@ -24,10 +24,11 @@ import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
-import { isTouchScreen } from 'lib/utilities/browser';
+import { isTouchScreen } from 'lib/utils/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
+import { scrollToHeadingNode } from '../../heading';
 import { threadPluginKey } from '../../thread/thread.plugins';
 import { convertFileToBase64, imageFileDropEventName } from '../base-components/image';
 import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
@@ -67,6 +68,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   pageType?: PageType | 'post';
   postId?: string;
   threadIds?: string[];
+  floatingMenuPluginKey?: PluginKey;
   setCharmEditorView?: (view: EditorView | null) => void;
 }
 
@@ -74,6 +76,7 @@ const warningText = 'You have unsaved changes. Please confirm changes.';
 
 export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, BangleEditorProps>(function ReactEditor(
   {
+    floatingMenuPluginKey,
     inline = false,
     pageId,
     state,
@@ -145,6 +148,19 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       editor.view.dispatch(editor.view.state.tr.setMeta(threadPluginKey, threadIds));
     }
   }, [(threadIds ?? []).join(','), isLoadingRef.current]);
+
+  useEffect(() => {
+    const locationHash = window.location.hash.slice(1);
+    if (editor && locationHash && !isLoadingRef.current) {
+      // delay scrolling to allow images and embeds to be loaded
+      setTimeout(() => {
+        scrollToHeadingNode({
+          view: editor.view,
+          headingSlug: locationHash
+        });
+      });
+    }
+  }, [isLoadingRef.current, !!editor]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {
@@ -339,24 +355,25 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         }}
       >
         <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />
-        <div ref={renderRef} id={pageId} className={className} style={style} />
+        <div translate={readOnly ? 'yes' : 'no'} ref={renderRef} id={pageId} className={className} style={style} />
         {allowClickingFooter && (
           <div contentEditable='false' className='charm-empty-footer' onMouseDown={onClickEditorBottom} />
         )}
       </div>
-      {nodeViews.map((nodeView) => {
-        return nodeView.containerDOM
-          ? reactDOM.createPortal(
-              <NodeViewWrapper
-                nodeViewUpdateStore={nodeViewUpdateStore}
-                nodeView={nodeView}
-                renderNodeViews={renderNodeViews!}
-              />,
-              nodeView.containerDOM,
-              objectUid.get(nodeView)
-            )
-          : null;
-      })}
+      {editor?.view &&
+        nodeViews.map((nodeView) => {
+          return nodeView.containerDOM
+            ? reactDOM.createPortal(
+                <NodeViewWrapper
+                  nodeViewUpdateStore={nodeViewUpdateStore}
+                  nodeView={nodeView}
+                  renderNodeViews={renderNodeViews!}
+                />,
+                nodeView.containerDOM,
+                objectUid.get(nodeView)
+              )
+            : null;
+        })}
     </EditorViewContext.Provider>
   );
 });

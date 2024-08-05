@@ -7,7 +7,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
+export function useProposalTemplates({ load = true, detailed = false }: { detailed?: boolean; load?: boolean } = {}) {
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
   const [spacePermissions] = useCurrentSpacePermissions();
@@ -16,7 +16,7 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
     data: proposalTemplates,
     mutate,
     isLoading: isLoadingTemplates
-  } = useGetProposalTemplatesBySpace(load ? space?.id : null);
+  } = useGetProposalTemplatesBySpace(load ? space?.id : null, detailed);
 
   const usableTemplates = isAdmin || spacePermissions?.createProposals ? proposalTemplates : [];
 
@@ -24,7 +24,7 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
       mutate(
         (templates) => {
-          return templates?.filter((p) => !value.some((val) => val.id === p.id));
+          return templates?.filter((template) => !value.some((val) => val.id === template.pageId));
         },
         {
           revalidate: false
@@ -38,18 +38,20 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
       }
     }
 
-    function handleArchivedEvent(payload: WebSocketPayload<'proposals_archived'>) {
+    function handleUpdateEvent(proposals: WebSocketPayload<'proposals_updated'>) {
       mutate(
         (list) => {
           if (!list) return list;
-          return list.map((proposal) => {
-            if (payload.proposalIds.includes(proposal.id)) {
+          return list.map((template) => {
+            const match = proposals.find((p) => p.id === template.proposalId);
+            if (match) {
               return {
-                ...proposal,
-                archived: payload.archived
+                ...template,
+                archived: match.archived,
+                draft: match.currentStep ? match.currentStep.step === 'draft' : template.draft
               };
             }
-            return proposal;
+            return template;
           });
         },
         { revalidate: false }
@@ -57,7 +59,7 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
     }
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
     const unsubscribeFromPageCreated = subscribe('pages_created', handleCreateEvent);
-    const unsubscribeFromProposalArchived = subscribe('proposals_archived', handleArchivedEvent);
+    const unsubscribeFromProposalArchived = subscribe('proposals_updated', handleUpdateEvent);
     return () => {
       unsubscribeFromPageDeletes();
       unsubscribeFromPageCreated();
@@ -67,13 +69,6 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
 
   return {
     proposalTemplates: usableTemplates,
-    proposalTemplatePages: usableTemplates?.map((t) => t.page),
     isLoadingTemplates
   };
-}
-
-// TODO:  add an endpoint for a single template or return it along with the proposal??
-export function useProposalTemplateById(id: undefined | string | null) {
-  const { proposalTemplates } = useProposalTemplates({ load: !!id });
-  return proposalTemplates?.find((template) => template.page.id === id);
 }

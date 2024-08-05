@@ -2,7 +2,7 @@ import { Add, Remove } from '@mui/icons-material';
 import { Stack, TextField } from '@mui/material';
 
 import { Button } from 'components/common/Button';
-import { getNumberFromString } from 'lib/utilities/numbers';
+import { getNumberFromString } from 'lib/utils/numbers';
 
 type Props = {
   value: number;

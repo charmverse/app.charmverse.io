@@ -7,13 +7,13 @@ export default function RewardApplicationPageComponent() {
   const router = useRouter();
 
   const applicationId = router.query.applicationId as string;
+  const rewardId = router.query.rewardId as string;
 
   if (!applicationId) {
     return null;
   }
-  // TODO - Add event type
-  // useTrackPageView({ type: 'b' });
-  return <RewardApplicationPage applicationId={applicationId} />;
+
+  return <RewardApplicationPage applicationId={applicationId} rewardId={rewardId} />;
 }
 
 RewardApplicationPageComponent.getLayout = getPageLayout;

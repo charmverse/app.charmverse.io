@@ -1,3 +1,5 @@
+'use client';
+
 import styled from '@emotion/styled';
 import { Tooltip } from '@mui/material';
 import MaterialButton from '@mui/material/Button';
@@ -8,7 +10,7 @@ import type { ComponentProps, ElementType, MouseEventHandler } from 'react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getSubdomainPath } from 'lib/utilities/browser';
+import { getSubdomainPath } from 'lib/utils/browser';
 
 const StyledButton = styled(MaterialButton)`
   white-space: nowrap;

@@ -132,7 +132,7 @@ describe('getDefaultPageForSpace()', () => {
     expect(url).toEqual(`/${space.domain}/${page.path}%20?id=123`);
   });
 
-  it('should not include subdomain when going to custom domain', async () => {
+  it('should not include subdomain when visiting custom domain', async () => {
     const customDomain = 'work.charmverse.fyi';
     const { space, user } = await generateUserAndSpace({
       spaceCustomDomain: customDomain
@@ -206,7 +206,7 @@ describe('getDefaultPageForSpace - non logged in user', () => {
 
     const redirect = await getDefaultPageForSpace({ space: updatedSpace, userId: undefined });
 
-    expect(redirect).toEqual(`join?domain=${updatedSpace.domain}`);
+    expect(redirect).toEqual(null);
   });
 
   it('should return the join page if there is no home page', async () => {
@@ -214,7 +214,19 @@ describe('getDefaultPageForSpace - non logged in user', () => {
 
     const redirect = await getDefaultPageForSpace({ space, userId: undefined });
 
-    expect(redirect).toEqual(`join?domain=${space.domain}`);
+    expect(redirect).toEqual(null);
+  });
+
+  it('should return main custom domain page (login) if there is no homepage', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+    const updatedSpace = await prisma.space.update({
+      where: { id: space.id },
+      data: { customDomain: 'test.charm.fyi' }
+    });
+
+    const redirect = await getDefaultPageForSpace({ space: updatedSpace, userId: undefined, host: 'test.charm.fyi' });
+
+    expect(redirect).toEqual(null);
   });
 });
 

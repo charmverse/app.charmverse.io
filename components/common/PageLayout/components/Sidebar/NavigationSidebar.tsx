@@ -4,17 +4,17 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import SearchIcon from '@mui/icons-material/Search';
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from '@mui/icons-material/SettingsOutlined';
 import type { BoxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
+import { userManualUrl } from '@root/config/constants';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useMemo, useState } from 'react';
 
 import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
 import { BlockCounts } from 'components/settings/subscription/BlockCounts';
-import { charmverseDiscordInvite } from 'config/constants';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -27,17 +27,16 @@ import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
-import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 
-import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
 import { FeatureLink } from './components/FeatureLink';
 import { NotificationUpdates } from './components/NotificationsPopover';
 import PageNavigation from './components/PageNavigation';
 import NewPageMenu from './components/PageNavigation/components/NewPageMenu';
+import { SearchInWorkspaceModal } from './components/SearchInWorkspaceModal';
 import { SectionName } from './components/SectionName';
 import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
 import SidebarSubmenu from './components/SidebarSubmenu';
@@ -119,9 +118,10 @@ function SidebarBox({ icon, label, ...props }: { icon: any; label: string } & Bo
 interface SidebarProps {
   closeSidebar: () => void;
   navAction?: () => void;
+  enableSpaceFeatures: boolean;
 }
 
-export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
+export function NavigationSidebar({ closeSidebar, enableSpaceFeatures, navAction }: SidebarProps) {
   const { navigateToSpacePath, router } = useCharmRouter();
   const { user, logoutUser } = useUser();
   const { space } = useCurrentSpace();
@@ -129,17 +129,19 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
-  const { logoutWallet } = useWeb3Account();
   const isMobile = useSmallScreen();
   const { hasAccess: showMemberFeatures, isLoadingAccess } = useHasMemberLevel('member');
   const { favoritePageIds } = useFavoritePages();
 
   const { openSettings } = useSettingsDialog();
 
-  const handleModalClick = (path?: SettingsPath) => {
-    openSettings(path);
-    navAction?.();
-  };
+  const handleModalClick = useCallback(
+    (path?: SettingsPath) => {
+      openSettings(path);
+      navAction?.();
+    },
+    [navAction, openSettings]
+  );
   const searchInWorkspaceModalState = usePopupState({ variant: 'popover', popupId: 'search-in-workspace-modal' });
 
   const openSearchLabel = useKeydownPress(searchInWorkspaceModalState.toggle, { key: 'p', ctrl: true });
@@ -163,7 +165,6 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
   );
 
   async function logoutCurrentUser() {
-    logoutWallet();
     await logoutUser();
     router.push('/');
   }
@@ -188,55 +189,63 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
         <Box mb={6}>
           <PageNavigation onClick={navAction} />
         </Box>
-        <Box mb={2}>
-          <SidebarBox
-            onClick={() => handleModalClick(isMobile ? undefined : 'space')}
-            icon={<SettingsIcon color='secondary' fontSize='small' />}
-            label='Settings'
-            data-test='sidebar-settings'
-          />
-          <SidebarLink
-            active={false}
-            external
-            href={charmverseDiscordInvite}
-            icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
-            label='Support & Feedback'
-            target='_blank'
-            onClick={navAction}
-          />
-          <SidebarBox
-            data-test='sidebar--trash-toggle'
-            onClick={() => {
-              setShowingTrash(true);
-            }}
-            icon={<DeleteOutlinedIcon fontSize='small' />}
-            label='Trash'
-          />
-          <Box my={2} />
+        {enableSpaceFeatures && (
+          <Box mb={2}>
+            <SidebarBox
+              onClick={() => handleModalClick(isMobile ? undefined : 'space')}
+              icon={<SettingsIcon color='secondary' fontSize='small' />}
+              label='Settings'
+              data-test='sidebar-settings'
+            />
+            <SidebarLink
+              active={false}
+              external
+              href={userManualUrl}
+              icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
+              label='Support & Feedback'
+              target='_blank'
+              onClick={navAction}
+            />
+            <SidebarBox
+              data-test='sidebar--trash-toggle'
+              onClick={() => {
+                setShowingTrash(true);
+              }}
+              icon={<DeleteOutlinedIcon fontSize='small' />}
+              label='Trash'
+            />
+            <Box my={2} />
 
-          {
-            // Don't show block counts for free or entreprise spaces
-            space?.paidTier === 'community' && (
-              <Box ml={2}>
-                <BlockCounts />
-              </Box>
-            )
-          }
-        </Box>
+            {
+              // Don't show block counts for free or entreprise spaces
+              space?.paidTier === 'community' && (
+                <Box ml={2}>
+                  <BlockCounts />
+                </Box>
+              )
+            }
+          </Box>
+        )}
       </>
     );
-  }, [favoritePageIds, userSpacePermissions, isMobile, navAction, addPage, showMemberFeatures]);
+  }, [
+    favoritePageIds,
+    enableSpaceFeatures,
+    space?.paidTier,
+    userSpacePermissions,
+    handleModalClick,
+    isMobile,
+    navAction,
+    addPage,
+    showMemberFeatures
+  ]);
 
   const { features } = useSpaceFeatures();
 
   return (
     <SidebarContainer>
       <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-        <SidebarSubmenu
-          closeSidebar={closeSidebar}
-          logoutCurrentUser={logoutCurrentUser}
-          openProfileModal={() => handleModalClick('profile')}
-        />
+        <SidebarSubmenu closeSidebar={closeSidebar} logoutCurrentUser={logoutCurrentUser} />
         {space && (
           <>
             <Box mb={2}>
@@ -265,7 +274,7 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
                 close={searchInWorkspaceModalState.close}
               />
 
-              {!isLoadingAccess && (
+              {!isLoadingAccess && enableSpaceFeatures && (
                 <>
                   {showMemberFeatures && (
                     <SidebarBox

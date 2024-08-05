@@ -1,6 +1,7 @@
-import type { EditorState, Node } from '@bangle.dev/pm';
 import { createElement } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
+import type { Node } from 'prosemirror-model';
+import type { EditorState } from 'prosemirror-state';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import type { UpdateAttrsFunction } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';

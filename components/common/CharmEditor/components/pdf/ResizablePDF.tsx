@@ -1,4 +1,3 @@
-import type { EditorState, EditorView, Slice, Transaction } from '@bangle.dev/pm';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
@@ -7,7 +6,10 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { Box, ListItem, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import dynamic from 'next/dynamic';
+import type { Slice } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
+import type { EditorState, Transaction } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import type { HTMLAttributes } from 'react';
 import { memo, useMemo, useState } from 'react';
 
@@ -118,16 +120,16 @@ const PDF = memo((props: PDFViewerProps) => {
   }
 
   return (
-    <Box>
+    <Box style={{ lineHeight: 'initial' /* override line-height 0 from BlockAligner */ }}>
       <PDFViewer onLoadSuccess={onDocumentLoadSuccess} pageNumber={pageNumber} url={url} width={width} />
       <div>
         <p>
           Page {pageNumber || (pageCount ? 1 : '--')} of {pageCount || '--'}
         </p>
-        <IconButton onClick={previousPage} disabled={pageNumber <= 1}>
+        <IconButton onClick={previousPage} disabled={pageNumber <= 1} size='small'>
           <NavigateBeforeIcon fontSize='small' />
         </IconButton>
-        <IconButton onClick={nextPage} disabled={!pageCount || pageNumber >= pageCount}>
+        <IconButton onClick={nextPage} disabled={!pageCount || pageNumber >= pageCount} size='small'>
           <NavigateNextIcon fontSize='small' />
         </IconButton>
       </div>

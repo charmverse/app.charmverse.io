@@ -11,14 +11,14 @@ import Menu from '@mui/material/Menu';
 import Tooltip from '@mui/material/Tooltip';
 import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import type { ReactNode, SyntheticEvent } from 'react';
+import type { ReactNode, DragEvent, SyntheticEvent } from 'react';
 import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
+import { getSortedBoards } from 'components/common/DatabaseEditor/store/boards';
+import { useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import Link from 'components/common/Link';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
@@ -32,10 +32,10 @@ import { usePages } from 'hooks/usePages';
 import { greyColor2 } from 'theme/colors';
 
 import { PageIcon } from '../../../../../../PageIcon';
-import AddNewCard from '../../../../AddNewCard';
 import PageTitle from '../../../../PageTitle';
 import { StyledIconButton } from '../../AddIconButton';
 
+import AddNewCard from './AddNewCard';
 import NewPageMenu from './NewPageMenu';
 import TreeItemContent from './TreeItemContent';
 
@@ -149,6 +149,13 @@ const PageAnchor = styled(Link)`
   padding: 2px 0;
   position: relative;
 
+  .page-icon {
+    font-size: 14px;
+  }
+  svg {
+    font-size: 20px;
+  }
+
   .page-actions {
     display: flex;
     gap: 4px;
@@ -239,6 +246,14 @@ export function PageLink({
     event.stopPropagation();
     event.preventDefault();
   }, []);
+
+  const onDragStart = useCallback(
+    (event: DragEvent) => {
+      event.dataTransfer.setData('sidebar-page', JSON.stringify({ pageId, pageType }));
+    },
+    [pageId, pageType]
+  );
+
   const triggerState = bindTrigger(popupState);
 
   function handleIconClicked(ev: any) {
@@ -247,15 +262,8 @@ export function PageLink({
   }
 
   return (
-    <PageAnchor
-      href={href}
-      onClick={stopPropagation}
-      color='inherit'
-      onDragStart={(event) => {
-        event.dataTransfer.setData('sidebar-page', JSON.stringify({ pageId, pageType }));
-      }}
-    >
-      <span onClick={preventDefault}>
+    <PageAnchor href={href} onClick={stopPropagation} color='inherit' onDragStart={onDragStart}>
+      <span className='page-icon' onClick={preventDefault}>
         <PageIcon
           pageType={pageType}
           isEditorEmpty={isEmptyContent}
@@ -396,13 +404,21 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         anchorOrigin={anchorOrigin}
         transformOrigin={transformOrigin}
       >
-        {Boolean(anchorEl) && <PageActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={pagePath} />}
+        {Boolean(anchorEl) && <PageItemActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={pagePath} />}
       </Menu>
     </>
   );
 });
 
-function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
+function PageItemActionsMenu({
+  closeMenu,
+  pageId,
+  pagePath
+}: {
+  closeMenu: () => void;
+  pageId: string;
+  pagePath: string;
+}) {
   const boards = useAppSelector(getSortedBoards);
   const currentPage = usePageFromPath();
   const { deletePage, pages } = usePages();

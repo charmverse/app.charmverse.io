@@ -1,8 +1,7 @@
 import type { GoogleAccount, Prisma, User, UserWallet } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { UserProfile } from 'lib/public-api/interfaces';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import type { UserProfile } from '@root/lib/public-api/interfaces';
+import { DataNotFoundError, InvalidInputError } from '@root/lib/utils/errors';
 
 export type UserInfo = Pick<User, 'id' | 'avatar' | 'email' | 'username'> & {
   googleAccounts: Pick<GoogleAccount, 'email'>[];

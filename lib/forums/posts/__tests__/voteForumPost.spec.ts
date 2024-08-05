@@ -21,7 +21,7 @@ describe('voteForumPost', () => {
     const category1 = await generatePostCategory({ name: 'First', spaceId: space.id });
 
     const createdPost = await createForumPost({
-      content: {},
+      content: null,
       contentText: '',
       createdBy: user.id,
       spaceId: space.id,

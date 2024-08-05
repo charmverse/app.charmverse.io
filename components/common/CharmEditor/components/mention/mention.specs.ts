@@ -1,9 +1,9 @@
-import type { DOMOutputSpec } from '@bangle.dev/pm';
+import type { DOMOutputSpec, Node } from 'prosemirror-model';
 
-import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import type { Member } from 'lib/members/interfaces';
 
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import type { RawSpecs } from '../@bangle.dev/core/specRegistry';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import { mentionNodeName, mentionSuggestMarkName, mentionTrigger } from './mention.constants';
 
@@ -43,9 +43,28 @@ export function mentionSpecs(): RawSpecs {
         group: 'inline',
         draggable: false,
         atom: true,
-        parseDOM: [{ tag: 'span.charm-mention-value' }],
-        toDOM: (): DOMOutputSpec => {
-          return ['span', { class: 'charm-mention-value' }];
+        parseDOM: [
+          {
+            tag: 'span.charm-mention-value',
+            getAttrs: (dom: any) => {
+              return {
+                type: dom.getAttribute('data-type'),
+                value: dom.getAttribute('data-value'),
+                id: dom.getAttribute('data-id')
+              };
+            }
+          }
+        ],
+        toDOM: (node: Node): DOMOutputSpec => {
+          return [
+            'span',
+            {
+              class: 'charm-mention-value',
+              'data-type': node.attrs.type,
+              'data-value': node.attrs.value,
+              'data-id': node.attrs.id
+            }
+          ];
         }
       },
       markdown: {

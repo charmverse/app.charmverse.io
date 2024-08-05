@@ -2,11 +2,20 @@
   "extends": "./tsconfig.json",
   "exclude": [
     "node_modules",
-    "__e2e__"
+    "__e2e__",
+    "apps"
   ],
   "compilerOptions": {
     "jsx": "preserve",
     "paths": {
+      "@root/abis/*": [
+        "./abis/*"
+      ],
+      "@root/adapters/*": ["./adapters/*"],
+      "@root/connectors/*": ["./connectors/*"],
+      "@root/config/*": ["./config/*"],
+      "@root/lib/*": ["./lib/*"],
+      "@root/models": ["./models"],
       "@charmverse/core/prisma": [
         "node_modules/@charmverse/core/dist/esm/prisma"
       ],

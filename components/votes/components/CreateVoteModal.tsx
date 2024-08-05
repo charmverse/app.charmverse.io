@@ -101,7 +101,8 @@ export function CreateVoteModal({
       threshold: +passThreshold,
       context: 'inline',
       type: voteTypeToSave,
-      maxChoices: maxChoicesToSave
+      maxChoices: maxChoicesToSave,
+      strategy: 'regular'
     });
 
     if (onCreateVote) {
@@ -178,9 +179,9 @@ export function CreateVoteModal({
             {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
             <Stack>
               <DateTimePicker
+                disablePast
                 minDate={DateTime.fromMillis(Date.now())}
                 value={deadline}
-                disableMaskedInput
                 onAccept={async (value) => {
                   if (value) {
                     setDeadline(value);
@@ -191,19 +192,17 @@ export function CreateVoteModal({
                     setDeadline(value);
                   }
                 }}
-                renderInput={(props) => (
-                  <TextField
-                    {...props}
-                    inputProps={{
-                      ...props.inputProps,
+                slotProps={{
+                  textField: {
+                    inputProps: {
                       readOnly: true
-                    }}
-                    fullWidth
-                    onClick={() => {
+                    },
+                    fullWidth: true,
+                    onClick: () => {
                       setIsDateTimePickerOpen((_isDateTimePickerOpen) => !_isDateTimePickerOpen);
-                    }}
-                  />
-                )}
+                    }
+                  }
+                }}
                 onClose={() => setIsDateTimePickerOpen(false)}
                 open={isDateTimePickerOpen}
               />

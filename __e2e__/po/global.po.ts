@@ -1,21 +1,18 @@
 import type { Locator, Page } from '@playwright/test';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 
 export class GlobalPage {
-  readonly dialog: Locator;
-
-  readonly closeModal: Locator;
-
-  readonly openAsPageButton: Locator;
-
-  readonly databasePage: Locator;
-
-  constructor(public page: Page) {
-    this.dialog = page.locator('data-test=dialog');
-    this.closeModal = page.locator('data-test=close-modal');
-    this.openAsPageButton = page.locator('data-test=open-as-page');
-    this.databasePage = this.page.locator('data-test=database-page');
+  // eslint-disable-next-line no-useless-constructor
+  constructor(
+    public page: Page,
+    public dialog = page.locator('data-test=dialog'),
+    public closeModal = page.locator('data-test=close-modal'),
+    public openAsPageButton = page.locator('data-test=open-as-page'),
+    public databasePage = page.locator('data-test=database-page'),
+    public errorPage = page.locator('data-test=error-page')
+  ) {
+    // silence is golden
   }
 
   async goToHomePage(domain?: string) {

@@ -24,11 +24,11 @@ import {
   testUtilsProposals,
   testUtilsUser
 } from '@charmverse/core/test';
+import { pageMetaSelect } from '@root/lib/pages/server/pageMetaSelect';
+import { mapPostCategoryPermissionToAssignee } from '@root/lib/permissions/forum/mapPostCategoryPermissionToAssignee';
+import type { AssignedSpacePermission } from '@root/lib/permissions/spaces/mapSpacePermissionToAssignee';
+import { mapSpacePermissionToAssignee } from '@root/lib/permissions/spaces/mapSpacePermissionToAssignee';
 
-import { pageMetaSelect } from 'lib/pages/server/pageMetaSelect';
-import { mapPostCategoryPermissionToAssignee } from 'lib/permissions/forum/mapPostCategoryPermissionToAssignee';
-import type { AssignedSpacePermission } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
-import { mapSpacePermissionToAssignee } from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
 import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
 import { exportSpaceData, type SpaceDataExport } from '../exportSpaceData';
@@ -321,7 +321,6 @@ describe('importSpaceData', () => {
               columnWrappedIds: [],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: ['__status', '__evaluationType', '__authors', '__reviewers']
@@ -385,7 +384,6 @@ describe('importSpaceData', () => {
               columnWrappedIds: ['__title'],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: [

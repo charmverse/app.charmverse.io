@@ -1,14 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
+import { lensClient } from '@root/lib/lens/lensClient';
+import { createPageComment } from '@root/lib/pages/comments/createPageComment';
+import { syncPageCommentsWithLensPost } from '@root/lib/pages/comments/syncPageCommentsWithLensPost';
+import { updatePageComment } from '@root/lib/pages/comments/updatePageComment';
 import { generateSpaceRole } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
 
-import { lensClient } from 'lib/lens/lensClient';
-import { createPageComment } from 'lib/pages/comments/createPageComment';
-import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
-import { updatePageComment } from 'lib/pages/comments/updatePageComment';
-import { createProposal } from 'lib/proposal/createProposal';
-import { updateProposalLensProperties } from 'lib/proposal/updateProposalLensProperties';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 jest.mock('lib/lens/lensClient', () => ({
@@ -172,9 +170,13 @@ describe('syncPageCommentsWithLensPost', () => {
       userId: user.id
     });
 
-    await updateProposalLensProperties({
-      proposalId: space1ProposalPage.id,
-      lensPostLink: lensPost1Id
+    await prisma.page.update({
+      where: {
+        id: space1ProposalPage.page.id
+      },
+      data: {
+        lensPostLink: lensPost1Id
+      }
     });
 
     // This comment already exist in charmverse so we should not create it again
@@ -239,9 +241,13 @@ describe('syncPageCommentsWithLensPost', () => {
       userId: user.id
     });
 
-    await updateProposalLensProperties({
-      proposalId: space2ProposalPage.id,
-      lensPostLink: lensPost2Id
+    await prisma.page.update({
+      where: {
+        id: space2ProposalPage.page.id
+      },
+      data: {
+        lensPostLink: lensPost2Id
+      }
     });
 
     const pageComments = await syncPageCommentsWithLensPost({

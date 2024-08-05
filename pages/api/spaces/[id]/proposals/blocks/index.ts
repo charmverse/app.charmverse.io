@@ -4,10 +4,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { NotFoundError, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
-import { deleteBlocks } from 'lib/proposal/blocks/deleteBlocks';
-import { getBlocks } from 'lib/proposal/blocks/getBlocks';
-import type { ProposalBlockUpdateInput, ProposalBlockWithTypedFields } from 'lib/proposal/blocks/interfaces';
-import { upsertBlocks } from 'lib/proposal/blocks/upsertBlocks';
+import { deleteBlocks } from 'lib/proposals/blocks/deleteBlocks';
+import { getBlocks } from 'lib/proposals/blocks/getBlocks';
+import type { ProposalBlockUpdateInput, ProposalBlockWithTypedFields } from 'lib/proposals/blocks/interfaces';
+import { upsertBlocks } from 'lib/proposals/blocks/upsertBlocks';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
@@ -47,7 +47,6 @@ async function getProposalBlocksHandler(req: NextApiRequest, res: NextApiRespons
       throw new NotFoundError();
     }
   }
-
   const proposalBlocks = await getBlocks({
     spaceId,
     ids: blockId ? [blockId] : undefined
