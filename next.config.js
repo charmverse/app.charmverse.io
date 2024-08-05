@@ -22,13 +22,13 @@ const config = {
   compiler: {
     styledComponents: true
   },
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        fs: false
-      }
-    }
-  },
+  // experimental: {
+  //   turbo: {
+  //     resolveAlias: {
+  //       fs: false
+  //     }
+  //   }
+  // },
   images: {
     // next image is broken in staging/production as of 14.0.1
     unoptimized: true
