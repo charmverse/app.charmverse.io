@@ -43,9 +43,7 @@ export default function GrantsPage({
     }
   }, []);
 
-  if (loading && !grants.length) {
-    return <GrantsListPageSkeleton />;
-  }
+  return <GrantsListPageSkeleton />;
 
   return (
     <GrantsList loading={loading} grants={grants} currentTab={sort} fetchMoreItems={fetchItems} hasMore={!!cursor} />
