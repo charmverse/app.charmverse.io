@@ -43,15 +43,6 @@ const config = {
   },
   transpilePackages: esmModules,
   modularizeImports: {
-    '@mui/material': {
-      transform: '@mui/material/{{member}}'
-    },
-    '@mui/icons-material': {
-      transform: '@mui/icons-material/{{member}}'
-    },
-    '@mui/system': {
-      transform: '@mui/system/{{member}}'
-    },
     lodash: {
       transform: 'lodash/{{member}}'
     }
