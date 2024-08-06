@@ -481,38 +481,7 @@ jobs:
     name: Upload Docker image and assets
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
-    if: github.ref != 'refs/heads/main' && !(failure() || cancelled())
-    needs: build-app
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.x
-
-      - name: Install dependencies
-        uses: ./.github/actions/install
-
-      - name: Build app
-        uses: ./.github/actions/build
-        with:
-          REACT_APP_APP_ENV: 'production'
-
-      - name: Build and Push Docker image
-        id: docker_build_push
-        uses: ./.github/actions/build_docker_image
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
-        with:
-          ecr_registry: charmverse-web3-workspace
-
-  upload-static-assets:
-    name: Upload Docker image and assets
-    runs-on: ubuntu-latest
-    # run whether previous jobs were successful or skipped
-    if: github.ref != 'refs/heads/main' && !(failure() || cancelled())
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
     needs: build-app
     steps:
       - uses: actions/checkout@v4
@@ -535,12 +504,15 @@ jobs:
         with:
           REACT_APP_APP_ENV: 'production'
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Build and Push Docker image
+        id: docker_build_push
+        uses: ./.github/actions/build_docker_image
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          ecr_registry: charmverse-web3-workspace
 
       - name: Upload static assets to S3
         run: aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
