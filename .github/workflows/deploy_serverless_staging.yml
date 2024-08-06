@@ -64,7 +64,7 @@ jobs:
         run: node copyPrismaFiles.js
           ls -lA ./serverless/
       - name: serverless deploy ${{ matrix.function_name }}
-        uses: serverless/github-action@v3.2
+        uses: ryanlawson/serverless-github-action@v1.0
         with:
           args: deploy --force --function ${{ matrix.function_name }}
         env:
