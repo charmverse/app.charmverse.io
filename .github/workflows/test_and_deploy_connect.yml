@@ -305,8 +305,6 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build_connect
-        with:
-          REACT_APP_APP_ENV: 'production'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
