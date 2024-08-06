@@ -1,6 +1,6 @@
 service: cvServerless
 
-frameworkVersion: "3"
+frameworkVersion: "4"
 
 useDotenv: true
 
@@ -12,18 +12,16 @@ package:
     - serverless/schema.prisma
 
 plugins:
-  # This plugins allows to use TS
-  - serverless-esbuild
   # This plugins gives superpowers to serverless and allows us to deploy SQS queues easily
   - serverless-lift
   - serverless-scriptable-plugin
   - serverless-offline
 
 custom:
-  esbuild:
-    external: ["canvas"]
-    watch:
-      pattern: ["serverless/**/*.ts"] # match only typescript files in serverless directory
+  # esbuild:
+  #   external: ["canvas"]
+  #   watch:
+  #     pattern: ["serverless/**/*.ts"] # match only typescript files in serverless directory
   scriptHooks:
     package:initialize: node ./copyPrismaFiles.js
 
