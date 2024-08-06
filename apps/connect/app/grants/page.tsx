@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { GrantsListPageSkeleton } from 'components/grants/components/GrantsListPageSkeleton';
 import { GrantsList } from 'components/grants/GrantsList';
 
-const connectApiClient = new ConnectApiClient();
+export const dynamic = 'force-dynamic';
 
 export default function GrantsPage({
   searchParams
@@ -21,6 +21,7 @@ export default function GrantsPage({
   const [loading, setLoading] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const hasFetched = useRef(false);
+  const connectApiClient = new ConnectApiClient();
 
   const fetchItems = useCallback(async () => {
     if (loading) return;
@@ -43,7 +44,9 @@ export default function GrantsPage({
     }
   }, []);
 
-  return <GrantsListPageSkeleton />;
+  if (loading && !grants.length) {
+    return <GrantsListPageSkeleton />;
+  }
 
   return (
     <GrantsList loading={loading} grants={grants} currentTab={sort} fetchMoreItems={fetchItems} hasMore={!!cursor} />
