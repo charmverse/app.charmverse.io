@@ -365,8 +365,7 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-connect.zip
-          npm install -g aws-cdk
-          npx cdk deploy --method=direct -c name=prd-connect
+          npx aws-cdk deploy --method=direct -c name=prd-connect
 
   deploy-connect-api:
     name: Deploy Connect API
@@ -401,8 +400,7 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect_api .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-connect-api.zip
-          npm install -g aws-cdk
-          npx cdk deploy --method=direct -c name=prd-connect-api
+          npx aws-cdk deploy --method=direct -c name=prd-connect-api
 
   deploy-sunnyawards:
     name: Deploy Sunny Awards
@@ -437,8 +435,7 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-sunnyawards.zip
-          npm install -g aws-cdk
-          npx cdk deploy --method=direct -c name=prd-sunnyawards
+          npx aws-cdk deploy --method=direct -c name=prd-sunnyawards
 
   deploy-staging:
     name: Deploy to staging
