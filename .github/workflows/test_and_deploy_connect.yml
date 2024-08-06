@@ -448,8 +448,8 @@ jobs:
   deploy-staging:
     name: Deploy to staging
     if: |
-      (github.event.action == 'labeled' && startsWith(github.event.label.name, ':rocket: deploy-connect')) ||
-      (github.event.action == 'labeled' && startsWith(github.event.label.name, ':rocket: deploy-sunnyawards')) ||
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-connect') ||
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
       (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
 
     runs-on: ubuntu-latest

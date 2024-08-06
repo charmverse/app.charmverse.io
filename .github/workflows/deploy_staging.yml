@@ -13,7 +13,7 @@ concurrency:
 jobs:
   deploy:
     if: |
-      (github.event.action == 'labeled' && startsWith(github.event.label.name, ':rocket: deploy')) ||
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy') ||
       (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic')))
 
     runs-on: ubuntu-latest
@@ -31,10 +31,7 @@ jobs:
           build_id=${{ hashFiles('package-lock.json', 'pages/api/**/*.[jt]s', 'lib/**/*.[jt]s') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
-          if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy')}}; then stack='stg-webapp'; fi
-          if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect')}}; then stack='stg-connect'; fi
-          if ${{contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')}}; then stack='stg-sunnyawards'; fi
-          full_stage_name="$stack-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
+          full_stage_name="stg-webapp-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
 
           # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
           stage_name=`echo "$full_stage_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
@@ -215,7 +212,7 @@ jobs:
         if: >
           (github.event.action == 'labeled' && github.event.label.name == 'deploy-ceramic') ||
           (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'deploy-ceramic'))
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -235,7 +232,7 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
       - name: Deploy websockets to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
