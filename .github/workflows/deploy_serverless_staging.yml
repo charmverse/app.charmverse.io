@@ -5,6 +5,7 @@ on:
     types: [labeled, opened, synchronize]
     paths:
       # Trigger the job only when the serverless config or files have been changed
+      - .github/workflows/deploy_serverless_staging.yml
       - serverless/**
       - serverless.yml
       - lib/**

@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       # Trigger the job only when the serverless config or files have been changed
+      - .github/workflows/deploy_serverless_prod.yml
+      - package-lock.json
       - serverless/**
       - serverless.yml
       - lib/**
