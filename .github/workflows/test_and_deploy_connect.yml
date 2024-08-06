@@ -361,7 +361,7 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-connect.zip
-          npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
+          npm install -g aws-cdk
           npx cdk deploy --method=direct -c name=prd-connect
 
   deploy-connect-api:
@@ -397,7 +397,7 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect_api .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-connect-api.zip
-          npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
+          npm install -g aws-cdk
           npx cdk deploy --method=direct -c name=prd-connect-api
 
   deploy-sunnyawards:
@@ -433,7 +433,7 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ prd-sunnyawards.zip
-          npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
+          npm install -g aws-cdk
           npx cdk deploy --method=direct -c name=prd-sunnyawards
 
   deploy-staging:
@@ -561,7 +561,7 @@ jobs:
         id: cdk_deploy
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ ${{env.STAGE_NAME}}.zip
-          npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
+          npm install -g aws-cdk
           npx cdk deploy -c name=${{env.STAGE_NAME}} --method=direct --outputs-file cdk.out.json
           env_url=$(jq --raw-output '.[$ENV.STAGE_NAME].DeploymentUrl' ./cdk.out.json)
           echo "env_url=$env_url" >> $GITHUB_OUTPUT
