@@ -345,6 +345,10 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
+      # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
         with:
@@ -380,6 +384,10 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
+      # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
+      - name: Install dependencies
+        uses: ./.github/actions/install
+
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
         with:
@@ -414,6 +422,10 @@ jobs:
           fetch-depth: 0
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
+
+      # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
+      - name: Install dependencies
+        uses: ./.github/actions/install
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -466,6 +478,7 @@ jobs:
           # export the stage name so that it can be used in other steps
           echo "STAGE_NAME=$stage_name" >> $GITHUB_ENV
 
+      # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
       - name: Install dependencies
         uses: ./.github/actions/install
 
