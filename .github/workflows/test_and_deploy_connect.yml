@@ -446,7 +446,7 @@ jobs:
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
     concurrency: deploy-pr-app-${{ github.head_ref }}
-    needs: [build-app, deploy-docker]
+    # needs: [deploy-docker]
     steps:
       - uses: actions/checkout@v4
 
@@ -561,8 +561,8 @@ jobs:
         id: cdk_deploy
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ ${{env.STAGE_NAME}}.zip
-          npm install -g aws-cdk
-          npx cdk deploy -c name=${{env.STAGE_NAME}} --method=direct --outputs-file cdk.out.json
+          npm install -g ts-node tsconfig-paths
+          npx aws-cdk deploy -c name=${{env.STAGE_NAME}} --method=direct --outputs-file cdk.out.json
           env_url=$(jq --raw-output '.[$ENV.STAGE_NAME].DeploymentUrl' ./cdk.out.json)
           echo "env_url=$env_url" >> $GITHUB_OUTPUT
 
