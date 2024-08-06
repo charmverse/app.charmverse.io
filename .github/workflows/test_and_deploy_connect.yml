@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.ebextensions*'
+      - '.ebextensions*/**'
       - '.ebstalk.apps.env/**'
       - '.github/**'
       - 'apps/connect/**'
@@ -20,7 +20,7 @@ on:
   pull_request:
     branches: ['**']
     paths:
-      - '.ebextensions*'
+      - '.ebextensions*/**'
       - '.ebstalk.apps.env/**'
       - '.github/**'
       - 'apps/connect/**'
