@@ -70,7 +70,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   // We only expose this account if there is no active user, or the account is linked to the current user
   const [storedAccount, setStoredAccount] = useState<string | null>(null);
 
-  const { user, updateUser, logoutUser } = useUser();
+  const { user, updateUser } = useUser();
   const { trigger: login } = useLogin();
   const { trigger: createUser } = useCreateUser();
 
@@ -161,20 +161,6 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     // Case 2: user is logged in and account is linked to user or user is adding a new wallet
     else if (account && (userOwnsAddress || accountUpdatePaused)) {
       setStoredAccount(account.toLowerCase());
-    }
-    // Case 3: user is switching wallets
-    else if (
-      account &&
-      // storedAccount means they logged in with a different wallet previously
-      storedAccount &&
-      user &&
-      // Only apply the following logic to users that have at least 1 wallet
-      user?.wallets.length > 0 &&
-      !userOwnsAddress
-    ) {
-      log.debug('Logging out user due to wallet switch');
-      setStoredAccount(null);
-      logoutUser();
     }
   }, [account, isConnecting, accountUpdatePaused, !!user, storedAccount]);
 
