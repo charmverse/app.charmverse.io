@@ -3,8 +3,6 @@ import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 
-import 'server-only';
-
 export function GrantsListPageSkeleton() {
   return (
     <PageWrapper>

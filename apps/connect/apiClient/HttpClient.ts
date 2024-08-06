@@ -5,7 +5,7 @@ export class HttpClient {
   readonly baseUrl: string;
 
   constructor() {
-    const connectApiHost = env('CONNECT_API_HOST');
+    const connectApiHost = 'http://localhost:4000';
     if (!connectApiHost) {
       throw new Error('REACT_APP_CONNECT_API_HOST is not defined');
     }

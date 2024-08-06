@@ -29,19 +29,26 @@ function getParsedDateValue(dateStr: string | undefined): DateValue | null {
   return date ? { from: date.getTime(), to: date.getTime() } : null;
 }
 
-export async function getGrants(
-  {
-    sort
-  }: {
-    sort: 'new' | 'upcoming';
-  } = {
-    sort: 'new'
-  }
-): Promise<Grant[]> {
+export type GetGrantsPayload = {
+  sort: 'new' | 'upcoming';
+  cursor: string | null;
+  limit: number;
+};
+
+export type GetGrantsResponse = {
+  items: Grant[];
+  cursor: string | null;
+};
+
+export async function getGrants({ sort, cursor, limit }: GetGrantsPayload): Promise<GetGrantsResponse> {
   if (!grantsDatabaseBoardId) {
     log.warn('Returning 0 grants because an id was not provided for the grants tracker database');
-    return [];
+    return {
+      items: [],
+      cursor: null
+    };
   }
+
   const [grantsDatabase, grantsCards] = await Promise.all([
     prisma.block.findUnique({
       where: {
@@ -72,7 +79,10 @@ export async function getGrants(
 
   if (!grantsDatabase) {
     log.warn('Returning 0 grants because we could not find the grants tracker database', { grantsDatabaseBoardId });
-    return [];
+    return {
+      items: [],
+      cursor: null
+    };
   }
 
   const boardProperties = (grantsDatabase.fields as unknown as BoardFields).cardProperties;
@@ -123,44 +133,54 @@ export async function getGrants(
     );
   }
 
-  return grantsCards
-    .filter((card) => {
-      const cardProperties = (card.fields as CardFields).properties;
-      const publishDatePropertyValue = publishDateProperty
-        ? (cardProperties[publishDateProperty.id] as string | undefined)
-        : undefined;
-      const publishDate = getParsedDateValue(publishDatePropertyValue);
-      return publishDate && publishDate.from <= new Date().getTime();
-    })
-    .map((card) => {
-      const cardProperties = (card.fields as CardFields).properties;
-      return {
-        id: card.id,
-        name: card.page?.title ?? 'Untitled',
-        description: descriptionProperty ? (cardProperties[descriptionProperty.id] as string) : undefined,
-        banner: bannerProperty ? (cardProperties[bannerProperty.id] as string) : undefined,
-        logo: logoProperty ? (cardProperties[logoProperty.id] as string) : undefined,
-        launchDate: launchDateProperty
-          ? getParsedDateValue(cardProperties[launchDateProperty.id] as string)
-          : undefined,
-        createdAt: card.createdAt.toISOString(),
-        applyLink: applyLinkProperty ? (cardProperties[applyLinkProperty.id] as string) : undefined,
-        status: statusProperty ? statusRecord[cardProperties[statusProperty.id] as string] : undefined,
-        announcement: announcementProperty ? (cardProperties[announcementProperty.id] as string) : undefined,
-        publishDate: publishDateProperty
-          ? getParsedDateValue(cardProperties[publishDateProperty.id] as string)
-          : undefined
-      } as Grant;
-    })
-    .sort((g1, g2) => {
-      if (sort === 'new') {
-        return (g2.publishDate?.from ?? 0) - (g1.publishDate?.from ?? 0);
-      } else {
-        if (!g1.launchDate || !g2.launchDate) {
-          return 0;
-        }
+  const filteredGrants = grantsCards.filter((card) => {
+    const cardId = card.id;
+    const cardProperties = (card.fields as CardFields).properties;
+    const publishDatePropertyValue = publishDateProperty
+      ? (cardProperties[publishDateProperty.id] as string | undefined)
+      : undefined;
+    const publishDate = getParsedDateValue(publishDatePropertyValue);
+    return publishDate && publishDate.from <= new Date().getTime();
+  });
 
-        return g1.launchDate.from - g2.launchDate.from;
+  const transformedGrants = filteredGrants.map((card) => {
+    const cardProperties = (card.fields as CardFields).properties;
+    return {
+      id: card.id,
+      name: card.page?.title ?? 'Untitled',
+      description: descriptionProperty ? (cardProperties[descriptionProperty.id] as string) : undefined,
+      banner: bannerProperty ? (cardProperties[bannerProperty.id] as string) : undefined,
+      logo: logoProperty ? (cardProperties[logoProperty.id] as string) : undefined,
+      launchDate: launchDateProperty ? getParsedDateValue(cardProperties[launchDateProperty.id] as string) : undefined,
+      createdAt: card.createdAt.toISOString(),
+      applyLink: applyLinkProperty ? (cardProperties[applyLinkProperty.id] as string) : undefined,
+      status: statusProperty ? statusRecord[cardProperties[statusProperty.id] as string] : undefined,
+      announcement: announcementProperty ? (cardProperties[announcementProperty.id] as string) : undefined,
+      publishDate: publishDateProperty
+        ? getParsedDateValue(cardProperties[publishDateProperty.id] as string)
+        : undefined
+    } as Grant;
+  });
+
+  const sortedGrants = transformedGrants.sort((g1, g2) => {
+    if (sort === 'new') {
+      return (g2.publishDate?.from ?? 0) - (g1.publishDate?.from ?? 0);
+    } else {
+      if (!g1.launchDate || !g2.launchDate) {
+        return 0;
       }
-    });
+
+      return g1.launchDate.from - g2.launchDate.from;
+    }
+  });
+
+  // Implement cursor-based pagination
+  const startIndex = cursor ? sortedGrants.findIndex((grant) => grant.id === cursor) + 1 : 0;
+  const paginatedGrants = sortedGrants.slice(startIndex, startIndex + limit);
+  const nextCursor = paginatedGrants.length === limit ? paginatedGrants[paginatedGrants.length - 1].id : null;
+
+  return {
+    items: paginatedGrants,
+    cursor: nextCursor
+  };
 }
