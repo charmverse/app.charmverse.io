@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import Link from 'components/common/Link';
 
+import { getHeadingLink } from '../heading';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 // Table Of Contents inspiration: https://tiptap.dev/guide/node-views/examples#table-of-contents
@@ -123,7 +124,7 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
           color='inherit'
           draggable={false}
           key={item.id}
-          href={`#${item.id}`}
+          href={getHeadingLink(item.text)}
           onClick={() => highlightHeading(item)}
           external
           className={`toc-item--${item.level}`}
