@@ -341,9 +341,6 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
-      - name: Install dependencies
-        uses: ./.github/actions/install
-
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
         with:
@@ -380,9 +377,6 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
-      - name: Install dependencies
-        uses: ./.github/actions/install
-
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
         with:
@@ -418,9 +412,6 @@ jobs:
           fetch-depth: 0
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
-
-      - name: Install dependencies
-        uses: ./.github/actions/install
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -566,13 +557,10 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
 
-      - name: Package
-        run: |
-          cat files_to_zip.txt | zip --symlinks -r@ ${{env.STAGE_NAME}}.zip
-
       - name: Deploy to staging
         id: cdk_deploy
         run: |
+          cat files_to_zip.txt | zip --symlinks -r@ ${{env.STAGE_NAME}}.zip
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force
           npx cdk deploy -c name=${{env.STAGE_NAME}} --method=direct --outputs-file cdk.out.json
           env_url=$(jq --raw-output '.[$ENV.STAGE_NAME].DeploymentUrl' ./cdk.out.json)
