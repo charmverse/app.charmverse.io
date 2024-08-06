@@ -14,7 +14,7 @@ jobs:
   deploy:
     if: |
       (github.event.action == 'labeled' && startsWith(github.event.label.name, ':rocket: deploy')) ||
-      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic')))
+      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic')))
 
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
@@ -164,9 +164,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Upload static assets to S3
-        run: |
-          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
-          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+        run: aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Override config with Connect app
         # wrap the condition in "${{}}" because the string includes a colon

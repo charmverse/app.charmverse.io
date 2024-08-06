@@ -6,8 +6,14 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'apps/**'
+      - '@connect-shared/**'
   pull_request:
     branches: ['**']
+    paths-ignore:
+      - 'apps/**'
+      - '@connect-shared/**'
   workflow_dispatch:
     inputs:
       core_pkg_version:
@@ -118,9 +124,6 @@ jobs:
             test_command: 'npm run test:browser'
           - test_name: 'Serverless tests'
             test_command: 'npm run serverless:start & sleep 10 && npm run test:serverless'
-          # We need to fix jest transpilation before we can run connect API tests
-          # - test_name: 'Connect API - Tests'
-          #   test_command: 'npm run connect-api:test'
 
     steps:
       - uses: actions/checkout@v4
@@ -511,17 +514,8 @@ jobs:
         with:
           ecr_registry: charmverse-web3-workspace
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
       - name: Upload static assets to S3
-        run: |
-          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
-          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+        run: aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Upload JS source maps to Datadog
         env:
@@ -788,17 +782,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
     # pass in all steps so we can check if any failed
-    needs:
-      [
-        build-app,
-        validate-code,
-        test-matrix,
-        e2e-test-matrix,
-        deploy-docker,
-        deploy-main,
-        deploy-connect,
-        deploy-connect-api
-      ]
+    needs: [build-app, validate-code, test-matrix, e2e-test-matrix, deploy-docker, deploy-main]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
