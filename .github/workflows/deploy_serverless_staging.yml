@@ -67,7 +67,7 @@ jobs:
       - name: serverless deploy ${{ matrix.function_name }}
         uses: ryanlawson/serverless-github-action@v1.0
         with:
-          args: deploy --force function -f ${{ matrix.function_name }}
+          args: deploy function -f ${{ matrix.function_name }} --force
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
