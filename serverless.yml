@@ -2,8 +2,6 @@ service: cvServerless
 
 frameworkVersion: "4"
 
-useDotenv: true
-
 # Create an optimized package for our functions
 package:
   individually: true
