@@ -21,8 +21,8 @@ on:
     branches: ['**']
     paths:
       - '.ebextensions*'
-      - '.ebstalk.apps.env'
-      - '.github'
+      - '.ebstalk.apps.env/**'
+      - '.github/**'
       - 'apps/connect/**'
       - '@connect-shared/**'
       - 'abis/**'
