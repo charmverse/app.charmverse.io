@@ -15,12 +15,15 @@ runs:
       with:
         path: |
           apps/connect/.next
+          apps/connect/public
           apps/connect-api/dist
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('@connect-shared/**/*.ts[x]', 'apps/connect-api/**/*.ts', 'apps/connect/**/*.ts[x]', 'apps/connect/**/*.scss') }}
+          apps/sunnyawards/.next
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('@connect-shared/**/*.ts[x]', 'apps/connect-api/**/*.ts', 'apps/connect/**/*.ts[x]', 'apps/connect/**/*.scss', 'apps/sunnyawards/**/*.ts[x]',, 'apps/sunnyawards/**/*.scss') }}
 
-    - name: Build Connect App and API
+    - name: Build apps
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
       run: |
         npm run connect:build
         npm run connect-api:build
+        npm run sunnyawards:build
