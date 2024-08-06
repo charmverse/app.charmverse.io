@@ -465,8 +465,8 @@ jobs:
           # export the stage name so that it can be used in other steps
           echo "STAGE_NAME=$stage_name" >> $GITHUB_ENV
 
-      # - name: Install dependencies
-      #   uses: ./.github/actions/install
+      - name: Install dependencies
+        uses: ./.github/actions/install
 
       # - name: Build app
       #   uses: ./.github/actions/build_connect
@@ -561,7 +561,6 @@ jobs:
         id: cdk_deploy
         run: |
           cat files_to_zip.txt | zip --symlinks -r@ ${{env.STAGE_NAME}}.zip
-          npm install -g ts-node tsconfig-paths
           npx aws-cdk deploy -c name=${{env.STAGE_NAME}} --method=direct --outputs-file cdk.out.json
           env_url=$(jq --raw-output '.[$ENV.STAGE_NAME].DeploymentUrl' ./cdk.out.json)
           echo "env_url=$env_url" >> $GITHUB_OUTPUT
