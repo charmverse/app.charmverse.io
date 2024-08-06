@@ -445,8 +445,8 @@ jobs:
 
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
-    concurrency: deploy-pr-app-${{ github.head_ref }}
-    # needs: [deploy-docker]
+    concurrency: deploy-staging-${{ github.head_ref }}
+    needs: [deploy-docker]
     steps:
       - uses: actions/checkout@v4
 
