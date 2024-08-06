@@ -543,9 +543,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Upload static assets to S3
-        run: |
-          aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
-          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+        run: aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Upload JS source maps to Datadog
         env:
