@@ -1,8 +1,7 @@
 import { arrayUtils } from '@charmverse/core/utilities';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from '@root/lib/proposals/rubric/interfaces';
+import { isNumber, roundNumber } from '@root/lib/utils/numbers';
 import { mean, sum } from 'lodash';
-
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
-import { isNumber, roundNumber } from 'lib/utils/numbers';
 
 /**
  * null if no answers available

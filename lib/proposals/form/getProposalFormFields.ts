@@ -1,6 +1,6 @@
-import type { FormFieldInput } from 'lib/forms/interfaces';
-import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
+import { createDefaultProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
 
 export function getProposalFormFields(fields: FormFieldInput[] | null | undefined, canViewPrivateFields: boolean) {
   if (!fields) {

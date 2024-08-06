@@ -1,8 +1,8 @@
+import type { IPropertyTemplate } from '@root/lib/databases/board';
+import * as constants from '@root/lib/projects/formField';
+import { getFieldConfig } from '@root/lib/projects/formField';
 import { v4 } from 'uuid';
 
-import type { IPropertyTemplate } from 'lib/databases/board';
-import * as constants from 'lib/projects/formField';
-import { getFieldConfig } from 'lib/projects/formField';
 import { getFormInput, getProjectProfileFieldConfig } from 'testing/mocks/form';
 
 import { getBoardProperties } from '../getBoardProperties';
@@ -45,6 +45,8 @@ describe('getBoardProperties', () => {
   it('Should return custom properties from rubric criteria', () => {
     const user1Id = v4();
     const user2Id = v4();
+    const template1Id = v4();
+    const template2Id = v4();
     const properties = getBoardProperties({
       evaluationSteps: [
         {
@@ -73,7 +75,15 @@ describe('getBoardProperties', () => {
             }
           ],
           title: 'Rubric Evaluation 1',
-          type: 'rubric'
+          type: 'rubric',
+          proposal: {
+            page: {
+              title: 'Proposal 1',
+              type: 'proposal',
+              id: v4(),
+              sourceTemplateId: template1Id
+            }
+          }
         },
         {
           rubricCriteria: [
@@ -95,12 +105,65 @@ describe('getBoardProperties', () => {
             }
           ],
           title: 'Rubric Evaluation 2',
-          type: 'rubric'
+          type: 'rubric',
+          proposal: {
+            page: {
+              title: 'Proposal 2',
+              type: 'proposal',
+              id: v4(),
+              sourceTemplateId: template2Id
+            }
+          }
+        },
+        {
+          rubricCriteria: [
+            {
+              title: 'Rubric Criteria 1',
+              description: 'Rubric Criteria 1 Description',
+              answers: []
+            },
+            {
+              title: 'Rubric Criteria 2',
+              answers: []
+            }
+          ],
+          title: 'Rubric Evaluation 1',
+          type: 'rubric',
+          proposal: {
+            page: {
+              title: 'Proposal 1',
+              type: 'proposal_template',
+              id: template1Id
+            }
+          }
+        },
+        {
+          rubricCriteria: [
+            {
+              title: 'Rubric Criteria 1',
+              description: 'Rubric Criteria 1 new Description',
+              answers: []
+            },
+            {
+              title: 'Rubric Criteria 2.1',
+              answers: []
+            }
+          ],
+          title: 'Rubric Evaluation 2',
+          type: 'rubric',
+          proposal: {
+            page: {
+              title: 'Template 2',
+              type: 'proposal_template',
+              id: template2Id
+            }
+          }
         },
         {
           rubricCriteria: [],
           title: 'Feedback',
-          type: 'feedback'
+          type: 'feedback',
+          proposal: {}
         }
       ]
     });
@@ -253,7 +316,14 @@ describe('getBoardProperties', () => {
         {
           title: 'Rubric Evaluation',
           type: 'rubric',
-          rubricCriteria: []
+          rubricCriteria: [],
+          proposal: {
+            page: {
+              title: 'Template 1',
+              type: 'proposal_template',
+              id: v4()
+            }
+          }
         }
       ]
     });
@@ -268,7 +338,14 @@ describe('getBoardProperties', () => {
         {
           title: 'Rubric Evaluation',
           type: 'rubric',
-          rubricCriteria: []
+          rubricCriteria: [],
+          proposal: {
+            page: {
+              title: 'Template 1',
+              type: 'proposal_template',
+              id: v4()
+            }
+          }
         }
       ]
     });
@@ -281,7 +358,8 @@ describe('getBoardProperties', () => {
         {
           title: 'Rubric Evaluation',
           type: 'rubric',
-          rubricCriteria: []
+          rubricCriteria: [],
+          proposal: {}
         }
       ]
     });
@@ -342,5 +420,351 @@ describe('getBoardProperties', () => {
     const projectMemberWalletProperty = properties.find((r) => r.id === constants.PROJECT_MEMBER_WALLETS_ID);
     expect(projectWalletProperty).toBeTruthy();
     expect(projectMemberWalletProperty).toBeTruthy();
+  });
+
+  it('should return rubric evaluation & criteria properties with custom filter', async () => {
+    const user1Id = v4();
+    const user2Id = v4();
+    const template1Id = v4();
+    const template2Id = v4();
+
+    const properties = getBoardProperties({
+      selectedProperties: {
+        customProperties: [],
+        defaults: [],
+        project: [],
+        projectMember: [],
+        templateProperties: [
+          {
+            formFields: [],
+            rubricEvaluations: [
+              {
+                evaluationId: v4(),
+                title: 'Rubric 1',
+                properties: ['average', 'total', 'reviewers']
+              },
+              {
+                evaluationId: v4(),
+                title: 'Rubric 2',
+                properties: ['criteriaTotal', 'criteriaAverage']
+              }
+            ],
+            templateId: template1Id
+          },
+          {
+            formFields: [],
+            rubricEvaluations: [
+              {
+                evaluationId: v4(),
+                title: 'Rubric 1',
+                properties: ['reviewerScore', 'reviewerComment']
+              }
+            ],
+            templateId: template2Id
+          }
+        ]
+      },
+      evaluationSteps: [
+        {
+          rubricCriteria: [
+            {
+              title: 'Criteria 1',
+              answers: [
+                {
+                  user: {
+                    id: user1Id,
+                    username: 'user1'
+                  }
+                },
+                {
+                  user: {
+                    id: user2Id,
+                    username: 'user2'
+                  }
+                }
+              ]
+            },
+            {
+              title: 'Criteria 2',
+              answers: []
+            }
+          ],
+          title: 'Rubric 1',
+          type: 'rubric',
+          proposal: {
+            page: {
+              title: 'Proposal 1',
+              type: 'proposal',
+              id: v4(),
+              sourceTemplateId: template1Id
+            }
+          }
+        },
+        {
+          rubricCriteria: [
+            {
+              title: 'Criteria 1',
+              answers: [
+                {
+                  user: {
+                    id: user1Id,
+                    username: 'user1'
+                  }
+                }
+              ]
+            },
+            {
+              title: 'Criteria 2',
+              answers: [
+                {
+                  user: {
+                    id: user2Id,
+                    username: 'user2'
+                  }
+                }
+              ]
+            }
+          ],
+          title: 'Rubric 2',
+          type: 'rubric',
+          proposal: {
+            page: {
+              title: 'Proposal 1',
+              type: 'proposal',
+              id: v4(),
+              sourceTemplateId: template1Id
+            }
+          }
+        },
+        {
+          rubricCriteria: [
+            {
+              title: 'Criteria 1',
+              answers: [
+                {
+                  user: {
+                    id: user1Id,
+                    username: 'user1'
+                  }
+                }
+              ]
+            }
+          ],
+          title: 'Rubric 1',
+          type: 'rubric',
+          proposal: {
+            page: {
+              title: 'Proposal 2',
+              type: 'proposal',
+              id: v4(),
+              sourceTemplateId: template2Id
+            }
+          }
+        },
+        {
+          rubricCriteria: [
+            {
+              title: 'Criteria 1',
+              answers: []
+            },
+            {
+              title: 'Criteria 2',
+              answers: []
+            }
+          ],
+          title: 'Rubric 1',
+          type: 'rubric',
+          proposal: {
+            page: {
+              title: 'Template 1',
+              type: 'proposal_template',
+              id: template1Id
+            }
+          }
+        },
+        {
+          rubricCriteria: [
+            {
+              title: 'Criteria 1',
+              answers: []
+            },
+            {
+              title: 'Criteria 2',
+              answers: []
+            }
+          ],
+          title: 'Rubric 2',
+          type: 'rubric',
+          proposal: {
+            page: {
+              title: 'Template 1',
+              type: 'proposal_template',
+              id: template1Id
+            }
+          }
+        },
+        {
+          rubricCriteria: [
+            {
+              title: 'Criteria 1',
+              answers: []
+            }
+          ],
+          title: 'Rubric 1',
+          type: 'rubric',
+          proposal: {
+            page: {
+              title: 'Template 2',
+              type: 'proposal_template',
+              id: template2Id
+            }
+          }
+        },
+        {
+          rubricCriteria: [],
+          title: 'Feedback',
+          type: 'feedback',
+          proposal: {}
+        }
+      ]
+    });
+
+    const template1Rubric1AverageProperty = properties.find(
+      (r) => r.evaluationTitle === 'Rubric 1' && r.type === 'proposalEvaluationAverage' && r.templateId === template1Id
+    );
+    const template1Rubric1TotalProperty = properties.find(
+      (r) => r.evaluationTitle === 'Rubric 1' && r.type === 'proposalEvaluationTotal' && r.templateId === template1Id
+    );
+    const template1Rubric1ReviewersProperty = properties.find(
+      (r) => r.evaluationTitle === 'Rubric 1' && r.type === 'proposalEvaluatedBy' && r.templateId === template1Id
+    );
+
+    const template1Rubric2AverageProperty = properties.find(
+      (r) => r.evaluationTitle === 'Rubric 2' && r.type === 'proposalEvaluationAverage' && r.templateId === template1Id
+    );
+    const template1Rubric2TotalProperty = properties.find(
+      (r) => r.evaluationTitle === 'Rubric 2' && r.type === 'proposalEvaluationTotal' && r.templateId === template1Id
+    );
+    const template1Rubric2ReviewersProperty = properties.find(
+      (r) => r.evaluationTitle === 'Rubric 2' && r.type === 'proposalEvaluatedBy' && r.templateId === template1Id
+    );
+    const template2Rubric1AverageProperty = properties.find(
+      (r) => r.evaluationTitle === 'Rubric 1' && r.type === 'proposalEvaluationAverage' && r.templateId === template2Id
+    );
+    const template2Rubric1TotalProperty = properties.find(
+      (r) => r.evaluationTitle === 'Rubric 1' && r.type === 'proposalEvaluationTotal' && r.templateId === template2Id
+    );
+    const template2Rubric1ReviewersProperty = properties.find(
+      (r) => r.evaluationTitle === 'Rubric 1' && r.type === 'proposalEvaluatedBy' && r.templateId === template2Id
+    );
+
+    expect(template1Rubric1AverageProperty).toBeTruthy();
+    expect(template1Rubric1TotalProperty).toBeTruthy();
+    expect(template1Rubric1ReviewersProperty).toBeTruthy();
+    expect(
+      properties.find(
+        (property) =>
+          property.evaluationTitle === 'Rubric 1' &&
+          property.type === 'proposalRubricCriteriaTotal' &&
+          property.templateId === template1Id
+      )
+    ).toBeFalsy();
+    expect(
+      properties.find(
+        (property) =>
+          property.evaluationTitle === 'Rubric 1' &&
+          property.type === 'proposalRubricCriteriaAverage' &&
+          property.templateId === template1Id
+      )
+    ).toBeFalsy();
+    expect(
+      properties.find(
+        (property) =>
+          property.evaluationTitle === 'Rubric 1' &&
+          property.type === 'proposalRubricCriteriaReviewerComment' &&
+          property.templateId === template1Id
+      )
+    ).toBeFalsy();
+    expect(
+      properties.find(
+        (property) =>
+          property.evaluationTitle === 'Rubric 1' &&
+          property.type === 'proposalRubricCriteriaReviewerScore' &&
+          property.templateId === template1Id
+      )
+    ).toBeFalsy();
+
+    expect(template1Rubric2AverageProperty).toBeFalsy();
+    expect(template1Rubric2TotalProperty).toBeFalsy();
+    expect(template1Rubric2ReviewersProperty).toBeFalsy();
+    expect(
+      properties.filter(
+        (property) =>
+          property.evaluationTitle === 'Rubric 2' &&
+          property.type === 'proposalRubricCriteriaTotal' &&
+          property.templateId === template1Id
+      ).length
+    ).toBe(2);
+    expect(
+      properties.filter(
+        (property) =>
+          property.evaluationTitle === 'Rubric 2' &&
+          property.type === 'proposalRubricCriteriaAverage' &&
+          property.templateId === template1Id
+      ).length
+    ).toBe(2);
+
+    expect(
+      properties.find(
+        (property) =>
+          property.evaluationTitle === 'Rubric 2' &&
+          property.type === 'proposalRubricCriteriaReviewerComment' &&
+          property.templateId === template1Id
+      )
+    ).toBeFalsy();
+    expect(
+      properties.find(
+        (property) =>
+          property.evaluationTitle === 'Rubric 2' &&
+          property.type === 'proposalRubricCriteriaReviewerScore' &&
+          property.templateId === template1Id
+      )
+    ).toBeFalsy();
+
+    expect(template2Rubric1AverageProperty).toBeFalsy();
+    expect(template2Rubric1TotalProperty).toBeFalsy();
+    expect(template2Rubric1ReviewersProperty).toBeFalsy();
+    expect(
+      properties.find(
+        (property) =>
+          property.evaluationTitle === 'Rubric 1' &&
+          property.type === 'proposalRubricCriteriaTotal' &&
+          property.templateId === template2Id
+      )
+    ).toBeFalsy();
+    expect(
+      properties.find(
+        (property) =>
+          property.evaluationTitle === 'Rubric 1' &&
+          property.type === 'proposalRubricCriteriaAverage' &&
+          property.templateId === template2Id
+      )
+    ).toBeFalsy();
+    expect(
+      properties.find(
+        (property) =>
+          property.evaluationTitle === 'Rubric 1' &&
+          property.type === 'proposalRubricCriteriaReviewerComment' &&
+          property.templateId === template2Id
+      )
+    ).toBeTruthy();
+    expect(
+      properties.find(
+        (property) =>
+          property.evaluationTitle === 'Rubric 1' &&
+          property.type === 'proposalRubricCriteriaReviewerScore' &&
+          property.templateId === template2Id
+      )
+    ).toBeTruthy();
   });
 });

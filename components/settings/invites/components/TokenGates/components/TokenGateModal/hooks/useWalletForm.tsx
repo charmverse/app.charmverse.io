@@ -1,6 +1,6 @@
+import { wagmiConfig } from '@root/connectors/config';
 import type { GetEnsAddressReturnType } from '@wagmi/core';
 import { getEnsAddress } from '@wagmi/core';
-import { wagmiConfig } from 'connectors/config';
 import { isValidName } from 'ethers/lib/utils';
 import { useCallback } from 'react';
 import type { Resolver } from 'react-hook-form';

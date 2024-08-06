@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { DEFAULT_MEMBER_PROPERTIES } from 'lib/members/constants';
+import { DEFAULT_MEMBER_PROPERTIES } from '@root/lib/members/constants';
 
 export function deleteMemberProperty(id: string) {
   return prisma.memberProperty.deleteMany({

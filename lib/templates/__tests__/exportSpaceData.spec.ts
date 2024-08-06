@@ -15,12 +15,11 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-
-import { mapPostCategoryPermissionToAssignee } from 'lib/permissions/forum/mapPostCategoryPermissionToAssignee';
+import { mapPostCategoryPermissionToAssignee } from '@root/lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import {
   mapSpacePermissionToAssignee,
   type AssignedSpacePermission
-} from 'lib/permissions/spaces/mapSpacePermissionToAssignee';
+} from '@root/lib/permissions/spaces/mapSpacePermissionToAssignee';
 
 import type { SpaceDataExport } from '../exportSpaceData';
 import { exportSpaceData } from '../exportSpaceData';

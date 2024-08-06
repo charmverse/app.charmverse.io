@@ -5,6 +5,7 @@ import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import { getProposalTemplates } from 'lib/proposals/getProposalTemplates';
 
 import { applyPropertiesToCardsAndFilter } from './applyPropertiesToCards';
 import { createMissingCards } from './createMissingCards';
@@ -67,11 +68,18 @@ export async function getBlocksAndRefresh(board: BlockWithDetails, blocks: Block
   })) as null | { fields: BoardFields };
 
   const proposalCustomProperties = (proposalBoardBlock?.fields.cardProperties ?? []) as IPropertyTemplate[];
+  const proposalTemplates = await getProposalTemplates({
+    spaceId: board.spaceId,
+    evaluationsAndFormFields: true,
+    userId: board.createdBy
+  });
+
   const updatedBoard = await updateBoardProperties({
     boardId: board.id,
     selectedProperties: createSelectedPropertiesStateFromBoardProperties({
       cardProperties: board.fields.cardProperties ?? [],
-      proposalCustomProperties
+      proposalCustomProperties,
+      proposalTemplates
     })
   });
 

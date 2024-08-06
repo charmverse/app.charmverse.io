@@ -1,16 +1,17 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { GoogleLoginOauthParams } from '@root/lib/google/authorization/authClient';
+import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfile } from '@root/lib/metrics/mixpanel/updateTrackUserProfile';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { getUserProfile } from '@root/lib/users/getUser';
+import { postUserCreate } from '@root/lib/users/postUserCreate';
+import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from '@root/lib/utils/errors';
+import { uid } from '@root/lib/utils/strings';
+import type { LoggedInUser } from '@root/models';
 
-import type { GoogleLoginOauthParams } from 'lib/google/authorization/authClient';
-import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
-import { sessionUserRelations } from 'lib/session/config';
-import { getUserProfile } from 'lib/users/getUser';
-import { postUserCreate } from 'lib/users/postUserCreate';
-import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from 'lib/utils/errors';
-import { uid } from 'lib/utils/strings';
-import type { LoggedInUser } from 'models';
+import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
 
@@ -124,6 +125,11 @@ export async function loginWithGoogle({
     }
 
     trackUserAction('sign_in', { userId: (user as LoggedInUser).id, identityType: 'Google' });
+
+    await trackOpSpaceClickSigninEvent({
+      userId: (user as LoggedInUser).id,
+      identityType: 'Google'
+    });
 
     const updatedUser = await getUserProfile('id', (user as LoggedInUser).id);
 

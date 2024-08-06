@@ -2,16 +2,13 @@ import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { CredentialEventType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getFeatureTitle } from '@root/lib/features/getFeatureTitle';
+import { getSubmissionPagePermalink } from '@root/lib/pages/getPagePermalink';
 import { optimism } from 'viem/chains';
 
-import { getFeatureTitle } from 'lib/features/getFeatureTitle';
-import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
-
 import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
-import { credentialEventLabels } from './constants';
+import { credentialEventLabels, disableCredentialAutopublish } from './constants';
 import type { CredentialDataInput } from './schemas';
-
-const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
 export async function issueOffchainRewardCredentialsIfNecessary({
   rewardId,
@@ -22,7 +19,7 @@ export async function issueOffchainRewardCredentialsIfNecessary({
   event: Extract<CredentialEventType, 'reward_submission_approved'>;
   submissionId?: string;
 }): Promise<void> {
-  if (disablePublishedCredentials) {
+  if (disableCredentialAutopublish) {
     log.warn('Published credentials are disabled');
     return;
   }

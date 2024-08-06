@@ -106,7 +106,7 @@ describe('POST /api/permissions - Add page permissions', () => {
     await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(401);
   });
 
-  it('should allow a proposal editor to make a proposal page public and respond 201', async () => {
+  it('should not allow a proposal editor to make a proposal page public and respond 401', async () => {
     const page = await testUtilsProposals.generateProposal({
       userId: user.id,
       spaceId: space.id
@@ -120,7 +120,7 @@ describe('POST /api/permissions - Add page permissions', () => {
       }
     };
 
-    await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(201);
+    await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(401);
   });
 
   it('should fail if trying to provide permissions other than "view" to the public and respond 401', async () => {

@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { InvalidStateError } from 'lib/middleware';
-import type { ProposalFields } from 'lib/proposals/interfaces';
+import { InvalidStateError } from '@root/lib/middleware';
+import type { ProposalFields } from '@root/lib/proposals/interfaces';
 
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 

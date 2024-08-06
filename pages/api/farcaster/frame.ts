@@ -1,11 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import * as http from '@root/adapters/http';
 import type { Frame } from 'frames.js';
 import { getFrame } from 'frames.js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import * as http from 'adapters/http';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -17,7 +17,7 @@ handler.use(requireKeys([{ key: 'frameUrl', valueType: 'string' }], 'query')).ge
 
 async function extractFarcasterMetadataFromUrl(
   req: NextApiRequest,
-  res: NextApiResponse<Frame | null | { error: string }>
+  res: NextApiResponse<Frame | Partial<Frame> | null | { error: string }>
 ) {
   const userId = req.session.user?.id;
   const frameUrl = req.query.frameUrl as string;

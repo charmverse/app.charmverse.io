@@ -1,10 +1,9 @@
 import type { UserVote, Vote, VoteOptions } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError, UndesirableOperationError } from '@root/lib/utils/errors';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishUserProposalEvent } from '@root/lib/webhookPublisher/publishEvent';
 import { BigNumber } from 'ethers';
-
-import { InvalidInputError, UndesirableOperationError } from 'lib/utils/errors';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishUserProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { getVotingPowerForVotes } from './getVotingPowerForVotes';
 import { isVotingClosed } from './utils';

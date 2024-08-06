@@ -42,11 +42,13 @@ export function SpaceAccessGate({
     onSuccess: onJoinSpace
   });
 
-  const summonGate = useSummonGate({
-    joinType,
-    space,
-    onSuccess: onJoinSpace
-  });
+  // leaving this here for now in case we change our mind in the next few weeks - July 29/2024
+  const summonGate: any = {};
+  // const summonGate = useSummonGate({
+  //   joinType,
+  //   space,
+  //   onSuccess: onJoinSpace
+  // });
 
   const tokenGate = useTokenGates({
     account,
@@ -86,9 +88,10 @@ export function SpaceAccessGate({
   }
 
   function joinSpace() {
-    if (summonGate.isVerified) {
-      summonGate.joinSpace(onError);
-    } else if (tokenGate.isVerified) {
+    // if (summonGate.isVerified) {
+    //   summonGate.joinSpace(onError);
+    // } else if (tokenGate.isVerified) {
+    if (tokenGate.isVerified) {
       tokenGate.joinSpace(onError);
     } else if (discordGate.isVerified) {
       discordGate.joinSpace(onError);
@@ -135,13 +138,13 @@ export function SpaceAccessGate({
 
       {discordGate.isEnabled && <DiscordGate {...discordGate} />}
 
-      {summonGate.isEnabled && <SummonGate {...summonGate} />}
+      {/* {summonGate.isEnabled && <SummonGate {...summonGate} />}
 
       {summonGate.isEnabled && tokenGate.isEnabled && (
         <Typography color='secondary' align='center'>
           OR
         </Typography>
-      )}
+      )} */}
 
       {tokenGate.isEnabled && <TokenGate {...tokenGate} displayAccordion={discordGate.isEnabled} />}
 

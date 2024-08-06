@@ -1,19 +1,19 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@root/config/constants';
+import { CardFilter } from '@root/lib/databases/cardFilter';
+import type { FilterGroup } from '@root/lib/databases/filterGroup';
+import { getRelatedBlocks } from '@root/lib/databases/getRelatedBlocks';
+import { getBlocks as getBlocksForProposalSource } from '@root/lib/databases/proposalsSource/getBlocks';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
+import { formatDate, formatDateTime } from '@root/lib/utils/dates';
+import { isTruthy } from '@root/lib/utils/types';
 import { sortBy } from 'lodash';
 
 import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
 import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import { Utils } from 'components/common/DatabaseEditor/utils';
 import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
-import { baseUrl } from 'config/constants';
-import { CardFilter } from 'lib/databases/cardFilter';
-import type { FilterGroup } from 'lib/databases/filterGroup';
-import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
-import { getBlocks as getBlocksForProposalSource } from 'lib/databases/proposalsSource/getBlocks';
-import { permissionsApiClient } from 'lib/permissions/api/client';
-import { formatDate, formatDateTime } from 'lib/utils/dates';
-import { isTruthy } from 'lib/utils/types';
 
 import type { Board, IPropertyTemplate, PropertyType } from './board';
 import type { BoardView } from './boardView';
@@ -163,7 +163,7 @@ function encodeText(text: string): string {
   return text.replace(/"/g, '""');
 }
 
-function generateTableArray(
+export function generateTableArray(
   board: Pick<Board, 'fields'>,
   cards: Card[],
   viewToExport: BoardView,
@@ -173,13 +173,17 @@ function generateTableArray(
 ): { rows: string[][]; rowIds: string[] } {
   const rows: string[][] = [];
   const visiblePropertyIds: string[] = viewToExport.fields.visiblePropertyIds;
+
+  const allCardProperties = board.fields.cardProperties as IPropertyTemplate[];
+
   const cardProperties =
     !visiblePropertyIds || visiblePropertyIds.length === 0
-      ? (board.fields.cardProperties as IPropertyTemplate[])
-      : board.fields.cardProperties.filter((template: IPropertyTemplate) => visiblePropertyIds.includes(template.id));
+      ? allCardProperties
+      : allCardProperties.filter((template: IPropertyTemplate) => visiblePropertyIds.includes(template.id));
 
   const filterGroup = viewToExport.fields.filter || { filters: [] };
-  const filteredCards = CardFilter.applyFilterGroup(filterGroup, cardProperties, cards) || [];
+
+  const filteredCards = CardFilter.applyFilterGroup(filterGroup, allCardProperties, cards) || [];
 
   if (
     viewToExport.fields.viewType === 'calendar' &&
@@ -233,6 +237,7 @@ function getCSVColumns({
   visibleProperties: IPropertyTemplate<PropertyType>[];
 }) {
   const columns: string[] = [];
+
   if (!hasTitleProperty) {
     columns.push(`"${encodeText(card.title)}"`);
   }
@@ -252,6 +257,7 @@ function getCSVColumns({
     } else if (
       propertyTemplate.type === 'number' ||
       propertyTemplate.type === 'proposalEvaluationAverage' ||
+      propertyTemplate.type === 'proposalEvaluationReviewerAverage' ||
       propertyTemplate.type === 'proposalEvaluationTotal' ||
       propertyTemplate.type === 'proposalRubricCriteriaTotal' ||
       propertyTemplate.type === 'proposalRubricCriteriaAverage'
@@ -273,7 +279,7 @@ function getCSVColumns({
       columns.push(`${baseUrl}${encodeText(Array.isArray(displayValue) ? displayValue[0] : displayValue.toString())}`);
     } else {
       // Export as string
-      columns.push(`"${encodeText(displayValue as string)}"`);
+      columns.push(`"${encodeText(displayValue.toString())}"`);
     }
   });
   return columns;

@@ -1,11 +1,28 @@
-import type { OPProjectData } from 'lib/optimism/getOpProjects';
+import type { OptimismProjectFormValues } from 'components/common/form/fields/Optimism/optimismProjectFormValues';
+import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
 
-import { useGET } from './helpers';
+import { useGET, usePOST, usePUT } from './helpers';
 
 export function useGetOpProjects(enabled: boolean = true) {
-  return useGET<OPProjectData[]>(enabled ? '/api/optimism/projects' : undefined);
+  return useGET<OptimismProjectAttestationContent[]>(enabled ? '/api/optimism/projects' : undefined);
 }
 
 export function useGetOpProject(attestationId?: string) {
-  return useGET<OPProjectData | null>(attestationId ? `/api/optimism/projects/${attestationId}` : undefined);
+  return useGET<OptimismProjectAttestationContent | null>(
+    attestationId ? `/api/optimism/projects/${attestationId}` : undefined
+  );
+}
+
+export function useCreateOptimismProject() {
+  return usePOST<
+    OptimismProjectFormValues,
+    {
+      title: string;
+      projectRefUID: string;
+    }
+  >('/api/optimism/projects');
+}
+
+export function useEditOptimismProject(attestationId: string) {
+  return usePUT<OptimismProjectFormValues>(`/api/optimism/projects/${attestationId}`);
 }

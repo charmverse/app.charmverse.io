@@ -1,14 +1,17 @@
-import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
+import type { ProposalEvaluation, ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
 import { Box, FormLabel, Stack, Switch, TextField, Typography } from '@mui/material';
-import { useEffect } from 'react';
+import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
+import { useEffect, useState } from 'react';
 
 import { useGetAllowedDocusignUsersAndRoles } from 'charmClient/hooks/docusign';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import {
   allMembersSystemRole,
   authorSystemRole,
-  tokenHoldersSystemRole
+  tokenHoldersSystemRole,
+  currentReviewerSystemRole
 } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -35,6 +38,7 @@ type Props = {
     | 'requiredReviews'
     | 'appealRequiredReviews'
     | 'appealReviewers'
+    | 'evaluationApprovers'
     | 'appealable'
     | 'finalStep'
   >;
@@ -54,6 +58,8 @@ export function EvaluationStepSettings({
 
   const { space } = useCurrentSpace();
 
+  const [editingApprovers, setEditingApprovers] = useState(false);
+
   // reviewers are also readOnly when using a template with reviewers pre-selected
   const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
   const readOnlyAppealReviewers =
@@ -69,6 +75,12 @@ export function EvaluationStepSettings({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
+
+  const approverOptions = evaluation.evaluationApprovers?.map((reviewer) => ({
+    group: reviewer.roleId ? 'role' : 'user',
+    id: (reviewer.roleId ?? reviewer.userId) as string
+  }));
+
   const appealReviewerOptions =
     evaluation.appealReviewers?.map((reviewer) => ({
       group: reviewer.roleId ? 'role' : 'user',
@@ -78,6 +90,8 @@ export function EvaluationStepSettings({
   const requiredReviews = evaluation.requiredReviews;
   const appealRequiredReviews = evaluation.appealRequiredReviews;
   const finalStep = evaluation.finalStep;
+
+  const showApprovers = approvableEvaluationTypes.includes(evaluation.type as ProposalEvaluationType);
 
   const { data: allowedDocusignUsersAndRoles } = useGetAllowedDocusignUsersAndRoles({
     spaceId: evaluation.type === 'sign_documents' ? (space?.id as string) : null
@@ -117,6 +131,17 @@ export function EvaluationStepSettings({
     });
   }
 
+  function handleOnChangeApprovers(approvers: SelectOption[]) {
+    onChange({
+      evaluationApprovers: approvers
+        .map((a) => ({
+          roleId: a.group === 'role' ? a.id : null,
+          userId: a.group === 'user' ? a.id : null
+        }))
+        .filter((a) => a.userId || a.roleId)
+    });
+  }
+
   useEffect(() => {
     if (isTokenVoting) {
       handleOnChangeReviewers([tokenHoldersSystemRole]);
@@ -125,15 +150,19 @@ export function EvaluationStepSettings({
 
   return (
     <>
-      <FormLabel required>
-        <Typography component='span' variant='subtitle1'>
-          {evaluation.type === 'vote'
-            ? 'Voters'
-            : requiredReviews !== 1
-            ? `Reviewers (required ${requiredReviews})`
-            : 'Reviewers'}
-        </Typography>
-      </FormLabel>
+      {/** Proposal reviewers */}
+      <Box display='flex' flexDirection='column'>
+        <FormLabel required>
+          <Typography component='span' variant='subtitle1'>
+            {evaluation.type === 'vote'
+              ? 'Voters'
+              : requiredReviews !== 1
+              ? `Reviewers (required ${requiredReviews})`
+              : 'Reviewers'}
+          </Typography>
+        </FormLabel>
+        <Typography variant='caption'>Who can evaluate the proposal during this step</Typography>
+      </Box>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
         <UserAndRoleSelect
           data-test={`proposal-${evaluation.type}-select`}
@@ -151,6 +180,33 @@ export function EvaluationStepSettings({
           required
         />
       </Box>
+      {/** Proposal approvers - Can close out the current step */}
+      {showApprovers && (
+        <>
+          <Box display='flex' flexDirection='column'>
+            <FormLabel required>
+              <Typography component='span' variant='subtitle1'>
+                Approvers
+              </Typography>
+            </FormLabel>
+            <Typography variant='caption'>
+              Who can move this proposal to the next step. Defaults to current reviewer if no user or role is selected
+            </Typography>
+          </Box>
+          <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
+            <UserAndRoleSelect
+              data-test={`proposal-${evaluation.type}-approver-select`}
+              options={allowedUsersAndRoles}
+              emptyPlaceholderContent='Select user or role'
+              value={approverOptions ?? []}
+              readOnly={readOnlyReviewers}
+              systemRoles={[]}
+              variant='outlined'
+              onChange={handleOnChangeApprovers}
+            />
+          </Box>
+        </>
+      )}
       {evaluation.type === 'pass_fail' && (
         <Box className='octo-propertyrow'>
           <Box mb={2}>

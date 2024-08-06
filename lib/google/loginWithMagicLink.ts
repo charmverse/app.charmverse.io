@@ -1,12 +1,11 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-
-import { firebaseApp } from 'lib/google/firebaseApp';
-import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
-import { sessionUserRelations } from 'lib/session/config';
-import { getUserProfile } from 'lib/users/getUser';
-import type { LoggedInUser } from 'models';
+import { firebaseApp } from '@root/lib/google/firebaseApp';
+import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
+import { sessionUserRelations } from '@root/lib/session/config';
+import { getUserProfile } from '@root/lib/users/getUser';
+import type { LoggedInUser } from '@root/models';
 
 import type { LoginWithGoogleRequest } from './loginWithGoogle';
 

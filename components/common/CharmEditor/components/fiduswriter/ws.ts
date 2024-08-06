@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { log } from '@charmverse/core/log';
+import { websocketsHost } from '@root/config/constants';
 import type { Plugin } from 'prosemirror-state';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
-import { websocketsHost } from 'config/constants';
 import type {
   ClientDiffMessage,
   ClientMessage,

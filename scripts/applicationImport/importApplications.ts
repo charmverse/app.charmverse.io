@@ -1,6 +1,6 @@
 import { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { FormField, prisma } from '@charmverse/core/prisma-client';
-import { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import { SelectOptionType } from 'lib/forms/interfaces';
 import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
 import { readFileSync } from 'fs';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
@@ -395,9 +395,6 @@ function parseMilestones({
         content: parsedContent,
         contentText: content,
         title,
-        icon: null,
-        headerImage: null,
-        updatedAt: new Date(),
         type: 'bounty'
       }
     });

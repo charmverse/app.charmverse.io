@@ -1,7 +1,7 @@
 import type { CharmWallet } from '@charmverse/core/prisma-client';
+import { getUserOrSpaceWallet } from '@root/lib/charms/getUserOrSpaceWallet';
+import { rewardCharmsForProposal } from '@root/lib/charms/triggers/rewardCharmsForProposal';
 
-import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
-import { rewardCharmsForProposal } from 'lib/charms/triggers/rewardCharmsForProposal';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('rewardCharmsFormProposal', () => {

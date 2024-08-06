@@ -1,23 +1,22 @@
-import type { AvatarSize } from '@connect/components/common/Avatar';
-import { Avatar } from '@connect/components/common/Avatar';
+import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import { DeleteOutline } from '@mui/icons-material';
-import { Box, Card, CardActionArea, CardContent, IconButton, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
+
+import { Avatar } from 'components/common/Avatar';
+import type { AvatarSize } from 'components/common/Avatar';
 
 function FarcasterCardContent({
   avatar,
   name,
   bio,
   username,
-  fid,
   avatarSize = 'xLarge',
   onDelete
 }: {
   name?: string;
   bio?: string;
   username?: string;
-  fid?: number;
   avatar?: string;
   avatarSize?: AvatarSize;
   onDelete?: VoidFunction;
@@ -28,10 +27,7 @@ function FarcasterCardContent({
         display: 'flex',
         gap: 2,
         alignItems: 'center',
-        flexDirection: {
-          xs: 'column',
-          sm: 'row'
-        }
+        flexDirection: 'row'
       }}
     >
       <Stack
@@ -52,7 +48,7 @@ function FarcasterCardContent({
           )}
         </Stack>
         <Typography variant='subtitle1' color='secondary'>
-          @{username || 'N/A'} #{fid || 'N/A'}
+          @{username || 'N/A'}
         </Typography>
         <Typography>{bio}</Typography>
       </Box>
@@ -70,7 +66,7 @@ export function FarcasterCard(props: {
   onDelete?: VoidFunction;
   enableLink?: boolean;
 }) {
-  if (!props.enableLink) {
+  if (!props.enableLink || !props.username) {
     return (
       <Card>
         <FarcasterCardContent {...props} />
@@ -79,10 +75,10 @@ export function FarcasterCard(props: {
   }
 
   return (
-    <Card>
+    <CardMotion>
       <CardActionArea LinkComponent={Link} href={`/u/${props.username}`} hrefLang='en'>
         <FarcasterCardContent {...props} />
       </CardActionArea>
-    </Card>
+    </CardMotion>
   );
 }

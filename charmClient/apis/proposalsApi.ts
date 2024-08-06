@@ -1,4 +1,5 @@
-import * as http from 'adapters/http';
+import * as http from '@root/adapters/http';
+
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';

@@ -1,11 +1,11 @@
+import { isUUID } from '@root/lib/utils/strings';
 import { capitalize } from 'lodash';
 
-import { isUUID } from 'lib/utils/strings';
-
 import type { MixpanelEventName, MixpanelTrackBase } from './interfaces';
+import type { MixpanelOpEventName } from './opEvents';
 
 // format event_name to Event name
-export function eventNameToHumanFormat(eventName: MixpanelEventName) {
+export function eventNameToHumanFormat(eventName: MixpanelEventName | MixpanelOpEventName) {
   return capitalize(eventName.toLowerCase().replaceAll('_', ' '));
 }
 

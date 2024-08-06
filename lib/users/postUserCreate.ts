@@ -1,10 +1,9 @@
 import type { IdentityType } from '@charmverse/core/prisma';
-
-import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
-import { processSignupReferral } from 'lib/users/processSignupReferral';
-import type { LoggedInUser } from 'models';
+import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfile } from '@root/lib/metrics/mixpanel/updateTrackUserProfile';
+import { processSignupReferral } from '@root/lib/users/processSignupReferral';
+import type { LoggedInUser } from '@root/models';
 
 export async function postUserCreate({
   user,

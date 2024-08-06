@@ -2,13 +2,13 @@ import { log } from '@charmverse/core/log';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import { Stack, Typography } from '@mui/material';
+import * as http from '@root/adapters/http';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
-import * as http from 'adapters/http';
 import { useCreateFarcasterSigner } from 'charmClient/hooks/farcaster';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';

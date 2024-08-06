@@ -1,5 +1,5 @@
-import { GET } from 'adapters/http';
-import { githubAccessToken } from 'config/constants';
+import { GET } from '@root/adapters/http';
+import { githubAccessToken } from '@root/config/constants';
 
 import type { GithubUserName } from './getMergedPullRequests';
 

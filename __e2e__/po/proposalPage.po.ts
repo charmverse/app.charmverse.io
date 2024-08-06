@@ -70,7 +70,8 @@ export class ProposalPage extends DocumentPage {
     public goBackButton = page.locator('data-test=evaluation-go-back-button'),
     public rubricCriteriaScore = page.locator('data-test=rubric-criteria-score-input >> input'),
     public rubricCriteriaComment = page.locator('data-test=rubric-criteria-score-comment >> textarea').first(),
-    public saveRubricAnswers = page.locator('data-test=save-rubric-answers')
+    public saveRubricAnswers = page.locator('data-test=save-rubric-answers'),
+    public selectApprover = page.locator('data-test=proposal-rubric-approver-select')
   ) {
     super(page);
   }
@@ -87,7 +88,7 @@ export class ProposalPage extends DocumentPage {
     return this.page.locator(`data-test=select-option-${optionId}`);
   }
 
-  waitForNewProposalPage() {
+  async waitForNewProposalPage() {
     return expect(this.documentTitleInput).toBeVisible();
   }
 

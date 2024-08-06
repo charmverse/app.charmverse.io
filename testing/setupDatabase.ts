@@ -45,7 +45,7 @@ import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { InvalidInputError } from 'lib/utils/errors';
 import { typedKeys } from 'lib/utils/objects';
 import { uid } from 'lib/utils/strings';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 import type { CustomBoardProps } from './generateBoardStub';
 import { boardWithCardsArgs } from './generateBoardStub';

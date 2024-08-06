@@ -12,10 +12,10 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectOptionItem } from 'components/common/form/fields/Select/SelectOptionItem';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 

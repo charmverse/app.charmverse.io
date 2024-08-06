@@ -1,4 +1,4 @@
-import { getAppApexDomain } from 'lib/utils/domains/getAppApexDomain';
+import { getAppApexDomain } from '@root/lib/utils/domains/getAppApexDomain';
 
 import { getPagePath } from '../getPagePath';
 

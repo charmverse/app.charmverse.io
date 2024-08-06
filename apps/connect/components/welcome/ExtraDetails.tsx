@@ -1,9 +1,9 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { schema } from '@connect/lib/profile/form';
-import type { FormValues } from '@connect/lib/profile/form';
-import { actionOnboarding } from '@connect/lib/profile/onboardingAction';
+import type { FormValues } from '@connect-shared/lib/profile/form';
+import { schema } from '@connect-shared/lib/profile/form';
+import { onboardingAction } from '@connect-shared/lib/profile/onboardingAction';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
@@ -23,12 +23,12 @@ const defaultValues = { email: '', terms: false, notify: true } as const;
 
 export function ExtraDetails() {
   const router = useRouter();
-  // @ts-ignore
-  const { executeAsync, result, isExecuting, hasErrored } = useAction(actionOnboarding, {
+
+  const { execute, result, isExecuting, hasErrored } = useAction(onboardingAction, {
     onSuccess() {
       router.push('/profile');
     },
-    onError(err) {
+    onError(err: any) {
       log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
     }
   });
@@ -51,8 +51,12 @@ export function ExtraDetails() {
 
   const validationError = validationErrors.map((err) => <span key={err}>{err}</span>);
 
+  const onSubmit = (data: FormValues) => {
+    execute(data);
+  };
+
   return (
-    <form onSubmit={handleSubmit(executeAsync)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
         <FormLabel id='form-email'>Email</FormLabel>
         <Controller
@@ -60,6 +64,7 @@ export function ExtraDetails() {
           name='email'
           render={({ field, fieldState: { error } }) => (
             <TextField
+              data-test='onboarding-email'
               placeholder='Your email'
               autoFocus
               aria-labelledby='form-email'
@@ -75,7 +80,7 @@ export function ExtraDetails() {
           name='notify'
           render={({ field: { onChange, value } }) => (
             <FormControlLabel
-              control={<Checkbox onChange={onChange} checked={!!value} />}
+              control={<Checkbox data-test='onboarding-notify-grants' onChange={onChange} checked={!!value} />}
               label='Notify me of new opportunities (grants, accelerators, etc)'
             />
           )}
@@ -84,7 +89,10 @@ export function ExtraDetails() {
           control={control}
           name='terms'
           render={({ field: { onChange, value } }) => (
-            <FormControlLabel control={<Checkbox onChange={onChange} checked={!!value} />} label='Terms and Service' />
+            <FormControlLabel
+              control={<Checkbox data-test='onboarding-accept-terms' onChange={onChange} checked={!!value} />}
+              label='Terms and Service'
+            />
           )}
         />
         {hasErrored && validationErrors?.length > 0 && (
@@ -93,7 +101,7 @@ export function ExtraDetails() {
         <FormHelperText error={!!hasErrored}>{result.serverError?.message || result.fetchError}</FormHelperText>
       </FormControl>
       <Box display='flex' justifyContent='flex-end'>
-        <Button size='large' type='submit' disabled={!isValid || isExecuting}>
+        <Button data-test='finish-onboarding' size='large' type='submit' disabled={!isValid || isExecuting}>
           Next
         </Button>
       </Box>

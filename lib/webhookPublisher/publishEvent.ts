@@ -1,8 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { UserMentionMetadata } from '@root/lib/prosemirror/extractMentions';
+import type { CardPropertyEntity } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
-import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
 
 import {
   getApplicationCommentEntity,
@@ -167,6 +168,15 @@ export async function publishProposalEvent({ currentEvaluationId, proposalId, sp
       index: 'asc'
     },
     select: {
+      proposal: {
+        select: {
+          space: {
+            select: {
+              domain: true
+            }
+          }
+        }
+      },
       id: true,
       result: true,
       finalStep: true,
@@ -185,6 +195,22 @@ export async function publishProposalEvent({ currentEvaluationId, proposalId, sp
       scope: finalEvaluation.result === 'fail' ? WebhookEventNames.ProposalFailed : WebhookEventNames.ProposalPassed,
       spaceId
     });
+
+    const isOpGrantsDomain = finalEvaluation.proposal.space.domain === 'op-grants';
+
+    if (isOpGrantsDomain) {
+      if (finalEvaluation.result === 'fail') {
+        trackOpUserAction('proposal_failed', {
+          proposalId,
+          userId
+        });
+      } else {
+        trackOpUserAction('proposal_passed', {
+          proposalId,
+          userId
+        });
+      }
+    }
   }
 
   await publishProposalEventBase({

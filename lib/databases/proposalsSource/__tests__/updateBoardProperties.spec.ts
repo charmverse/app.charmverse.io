@@ -1,12 +1,13 @@
+import type { ProposalEvaluationTestInput } from '@charmverse/core/dist/cjs/lib/testing/proposals';
 import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { objectUtils } from '@charmverse/core/utilities';
+import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import { InvalidStateError } from '@root/lib/middleware';
 import { v4 as uuid } from 'uuid';
 
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
-import { InvalidStateError } from 'lib/middleware';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 
@@ -77,10 +78,26 @@ describe('updateBoardProperties()', () => {
 
     const rootId = uuid();
 
+    const proposalTemplate = await testUtilsProposals.generateProposal({
+      spaceId: spaceWithRubrics.id,
+      userId: spaceUser.id,
+      evaluationType: 'rubric',
+      pageType: 'proposal_template'
+    });
+
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: spaceWithRubrics.id,
       userId: spaceUser.id,
       evaluationType: 'rubric'
+    });
+
+    await prisma.page.update({
+      where: {
+        id: proposal.page.id
+      },
+      data: {
+        sourceTemplateId: proposalTemplate.page.id
+      }
     });
 
     const databaseBlock = await prisma.block.create({
@@ -143,30 +160,60 @@ describe('updateBoardProperties()', () => {
 
     const rootId = uuid();
 
-    await testUtilsProposals.generateProposal({
+    const evaluationInputs: ProposalEvaluationTestInput[] = [
+      {
+        evaluationType: 'feedback',
+        permissions: [],
+        reviewers: [],
+        title: 'Feedback'
+      },
+      {
+        evaluationType: 'rubric',
+        permissions: [],
+        reviewers: [],
+        title: 'Rubric 1',
+        rubricCriteria: [
+          {
+            title: 'Criteria 1'
+          },
+          {
+            title: 'Criteria 2'
+          }
+        ]
+      },
+      {
+        evaluationType: 'rubric',
+        permissions: [],
+        reviewers: [],
+        title: 'Rubric 2',
+        rubricCriteria: [
+          {
+            title: 'Criteria 1'
+          },
+          {
+            title: 'Criteria 2.1'
+          }
+        ]
+      }
+    ];
+
+    const proposalTemplate1 = await testUtilsProposals.generateProposal({
+      spaceId: spaceWithRubrics.id,
+      userId: spaceUser.id,
+      evaluationInputs,
+      pageType: 'proposal_template'
+    });
+
+    const proposal1 = await testUtilsProposals.generateProposal({
+      spaceId: spaceWithRubrics.id,
+      userId: spaceUser.id,
+      evaluationInputs
+    });
+
+    const proposalTemplate2 = await testUtilsProposals.generateProposal({
       spaceId: spaceWithRubrics.id,
       userId: spaceUser.id,
       evaluationInputs: [
-        {
-          evaluationType: 'feedback',
-          permissions: [],
-          reviewers: [],
-          title: 'Feedback'
-        },
-        {
-          evaluationType: 'rubric',
-          permissions: [],
-          reviewers: [],
-          title: 'Rubric 1',
-          rubricCriteria: [
-            {
-              title: 'Criteria 1'
-            },
-            {
-              title: 'Criteria 2'
-            }
-          ]
-        },
         {
           evaluationType: 'rubric',
           permissions: [],
@@ -174,14 +221,12 @@ describe('updateBoardProperties()', () => {
           title: 'Rubric 2',
           rubricCriteria: [
             {
-              title: 'Criteria 1'
-            },
-            {
-              title: 'Criteria 2.1'
+              title: 'Criteria 3'
             }
           ]
         }
-      ]
+      ],
+      pageType: 'proposal_template'
     });
 
     const proposal2 = await testUtilsProposals.generateProposal({
@@ -202,31 +247,48 @@ describe('updateBoardProperties()', () => {
       ]
     });
 
-    await prisma.page.updateMany({
-      where: {
-        proposalId: proposal2.id
-      },
-      data: {
-        deletedAt: new Date()
-      }
-    });
-
-    await prisma.block.create({
-      data: {
-        parentId: rootId,
-        rootId,
-        id: rootId,
-        schema: -1,
-        title: 'Example',
-        type: 'board',
-        updatedBy: user.id,
-        fields: {
-          sourceType: 'proposals'
+    await Promise.all([
+      prisma.page.update({
+        where: {
+          id: proposal1.page.id
         },
-        space: { connect: { id: spaceWithRubrics.id } },
-        user: { connect: { id: spaceUser.id } }
-      }
-    });
+        data: {
+          sourceTemplateId: proposalTemplate2.page.id
+        }
+      }),
+      prisma.page.update({
+        where: {
+          id: proposal2.page.id
+        },
+        data: {
+          sourceTemplateId: proposalTemplate2.page.id
+        }
+      }),
+      prisma.page.updateMany({
+        where: {
+          proposalId: proposal2.id
+        },
+        data: {
+          deletedAt: new Date()
+        }
+      }),
+      prisma.block.create({
+        data: {
+          parentId: rootId,
+          rootId,
+          id: rootId,
+          schema: -1,
+          title: 'Example',
+          type: 'board',
+          updatedBy: user.id,
+          fields: {
+            sourceType: 'proposals'
+          },
+          space: { connect: { id: spaceWithRubrics.id } },
+          user: { connect: { id: spaceUser.id } }
+        }
+      })
+    ]);
 
     await updateBoardProperties({
       boardId: rootId
@@ -340,6 +402,22 @@ describe('updateBoardProperties()', () => {
     const { user: spaceAdmin, space: testSpace } = await generateUserAndSpace({ isAdmin: true });
     const rootId = uuid();
 
+    const proposalTemplate1 = await testUtilsProposals.generateProposal({
+      authors: [spaceAdmin.id],
+      pageType: 'proposal_template',
+      reviewers: [],
+      spaceId: testSpace.id,
+      userId: spaceAdmin.id
+    });
+
+    const proposalTemplate2 = await testUtilsProposals.generateProposal({
+      authors: [spaceAdmin.id],
+      pageType: 'proposal_template',
+      reviewers: [],
+      spaceId: testSpace.id,
+      userId: spaceAdmin.id
+    });
+
     const proposal = await generateProposal({
       spaceId: testSpace.id,
       userId: spaceAdmin.id
@@ -350,11 +428,30 @@ describe('updateBoardProperties()', () => {
       userId: spaceAdmin.id
     });
 
+    await Promise.all([
+      prisma.page.updateMany({
+        where: {
+          path: proposal.page.path
+        },
+        data: {
+          sourceTemplateId: proposalTemplate1.page.id
+        }
+      }),
+      prisma.page.updateMany({
+        where: {
+          path: proposal2.page.path
+        },
+        data: {
+          sourceTemplateId: proposalTemplate2.page.id
+        }
+      })
+    ]);
+
     const form1 = await prisma.form.create({
       data: {
         proposal: {
           connect: {
-            id: proposal.id
+            id: proposalTemplate1.id
           }
         },
         formFields: {
@@ -397,7 +494,7 @@ describe('updateBoardProperties()', () => {
       data: {
         proposal: {
           connect: {
-            id: proposal2.id
+            id: proposalTemplate2.id
           }
         },
         formFields: {
@@ -421,6 +518,33 @@ describe('updateBoardProperties()', () => {
     });
 
     const form1Fields = form1.formFields;
+
+    await Promise.all([
+      prisma.proposal.update({
+        where: {
+          id: proposal.id
+        },
+        data: {
+          form: {
+            connect: {
+              id: form1.id
+            }
+          }
+        }
+      }),
+      prisma.proposal.update({
+        where: {
+          id: proposal2.id
+        },
+        data: {
+          form: {
+            connect: {
+              id: form2.id
+            }
+          }
+        }
+      })
+    ]);
 
     await prisma.block.create({
       data: {

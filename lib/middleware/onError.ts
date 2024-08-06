@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
+import { DataNotFoundError, SystemError } from '@root/lib/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-import { DataNotFoundError, SystemError } from 'lib/utils/errors';
 
 import { UnknownError } from './errors';
 import { isSystemError } from './isSystemError';

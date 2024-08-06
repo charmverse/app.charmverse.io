@@ -1,6 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-
-import { getDiscordUserState } from 'lib/collabland/collablandClient';
+import { getDiscordUserState } from '@root/lib/collabland/collablandClient';
 
 type Props = {
   discordUserId?: string;

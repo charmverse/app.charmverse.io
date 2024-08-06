@@ -11,8 +11,7 @@ import type { ControlFieldProps, FieldProps } from 'components/common/form/inter
 import { AttachRewardButton } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/AttachRewardButton';
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
-import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
-import type { FormFieldValue, FieldType, OpProjectFieldValue } from 'lib/forms/interfaces';
+import type { UploadedFileInfo, FormFieldValue, FieldType, OpProjectFieldValue } from 'lib/forms/interfaces';
 
 import { InputSearchBlockchain } from '../InputSearchBlockchain';
 
@@ -22,7 +21,7 @@ import { FieldWrapper } from './FieldWrapper';
 import { FileField } from './FileField';
 import { ImageField } from './ImageField';
 import { LabelField } from './LabelField';
-import { OptimismProjectSelector } from './OptimismProjectSelector';
+import { OptimismProjectSelector } from './Optimism/OptimismProjectSelector';
 import { PersonInputField } from './PersonInputField';
 
 type TextInputConfig = {

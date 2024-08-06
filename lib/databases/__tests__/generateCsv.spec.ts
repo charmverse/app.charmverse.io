@@ -1,15 +1,17 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
+import { createMissingCards } from '@root/lib/databases/proposalsSource/createMissingCards';
 import { v4 } from 'uuid';
 
-import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { generateBoard } from 'testing/setupDatabase';
 import { generateProposalSourceDb } from 'testing/utils/proposals';
 
-import type { IPropertyOption, IPropertyTemplate } from '../board';
+import type { Board, IPropertyOption, IPropertyTemplate } from '../board';
 import type { BoardViewFields } from '../boardView';
 import { Constants } from '../constants';
-import { loadAndGenerateCsv } from '../generateCsv';
+import { generateTableArray, loadAndGenerateCsv } from '../generateCsv';
+
+import { generateTableArrayInput } from './cardStubs';
 
 describe('loadAndGenerateCsv()', () => {
   it('should throw an error if databaseId is not provided', async () => {
@@ -203,5 +205,42 @@ describe('loadAndGenerateCsv()', () => {
     expect(firstRow).toContain('Feedback');
     expect(firstRow).toContain('Test project');
     expect(firstRow).toContain('first guy,second guy');
+  });
+});
+
+describe('generateTableArray()', () => {
+  it('should return a table array with correct properties and filters applied', async () => {
+    const { board, cardMap, cards, context, formatters, view } = generateTableArrayInput;
+
+    const results = generateTableArray(
+      board as any,
+      cards as any,
+      view as any,
+      formatters as any,
+      context,
+      cardMap as any
+    );
+
+    // Tests that correct columns are provided and that all data was taken into account, even if Proposal Step is hidden as a column
+    expect(results.rows).toStrictEqual([
+      [
+        'Title',
+        'Reviewer Notes',
+        'Proposal Authors',
+        'Proposal Status',
+        'Publish Date',
+        'Proposal Url',
+        'Proposal Reviewers'
+      ],
+      [
+        '"Getting Started"',
+        '""',
+        'test',
+        '"In Progress"',
+        '"N/A"',
+        'http://127.0.0.1:3335/demo-space-domain/getting-started-8198984395372089',
+        ''
+      ]
+    ]);
   });
 });

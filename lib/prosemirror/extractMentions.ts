@@ -1,4 +1,4 @@
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 
 export interface UserMentionMetadata {
   id: string;

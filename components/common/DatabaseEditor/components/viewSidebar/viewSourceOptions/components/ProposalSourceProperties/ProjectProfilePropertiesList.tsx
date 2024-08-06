@@ -124,6 +124,7 @@ export function ProjectProfilePropertiesReadonlyList({
     <SelectedPropertiesList
       items={selectedProjectFields.map((propertyFieldProperty) => propertyFieldProperty.columnTitle)}
       title='Project Profile'
+      titleVariant='h6'
     >
       {selectedProjectMemberFields.length === 0 ? null : (
         <SelectedPropertiesList
@@ -132,6 +133,7 @@ export function ProjectProfilePropertiesReadonlyList({
           }}
           items={selectedProjectMemberFields.map((projectMemberFieldProperty) => projectMemberFieldProperty.label)}
           title='Project Member'
+          titleVariant='body2'
           hideDivider
         />
       )}

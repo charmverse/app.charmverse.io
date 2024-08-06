@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       # Trigger the job only when the serverless config or files have been changed
+      - .github/workflows/deploy_serverless_prod.yml
+      - package-lock.json
       - serverless/**
       - serverless.yml
       - lib/**
@@ -59,10 +61,11 @@ jobs:
         run: node copyPrismaFiles.js
           ls -lA ./serverless/
       - name: serverless deploy ${{ matrix.function_name }}
-        uses: serverless/github-action@v3.2
+        uses: ryanlawson/serverless-github-action@v1.0
         with:
-          args: deploy --stage prod --function ${{ matrix.function_name }}
+          args: deploy function -f ${{ matrix.function_name }} --stage prod
         env:
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1

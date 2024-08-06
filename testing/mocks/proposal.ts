@@ -42,7 +42,8 @@ export function createMockProposal(input: ProposalInput = {}): OptionalNullable<
       archive: true,
       unarchive: true,
       move: true,
-      evaluate_appeal: true
+      evaluate_appeal: true,
+      complete_evaluation: true
     },
     ...input,
     evaluations: (input.evaluations || []).map((evaluation) => ({
@@ -53,6 +54,7 @@ export function createMockProposal(input: ProposalInput = {}): OptionalNullable<
       title: 'Rubric',
       result: null,
       rubricAnswers: [],
+      totalReviews: 0,
       draftRubricAnswers: [],
       rubricCriteria: [],
       reviewers: [],

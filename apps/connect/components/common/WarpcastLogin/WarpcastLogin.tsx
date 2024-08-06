@@ -1,47 +1,71 @@
 'use client';
 
-import { useFarcasterConnection } from '@connect/hooks/useFarcasterConnection';
-import { AuthKitProvider, type AuthClientError } from '@farcaster/auth-kit';
-import Button from '@mui/material/Button';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { log } from '@charmverse/core/log';
+import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
+import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
+import { AuthKitProvider, SignInButton, useProfile } from '@farcaster/auth-kit';
+import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
+import { Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import { ConnectApiClient } from 'apiClient/apiClient';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
+import useSWRMutation from 'swr/mutation';
+import '@farcaster/auth-kit/styles.css';
 
 import { warpcastConfig } from 'lib/farcaster/config';
 
-import { FarcasterLoginModal } from './components/WarpcastModal';
-
 function WarpcastLoginButton() {
   const router = useRouter();
+  const { isAuthenticated } = useProfile();
 
-  const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
-
-  const onSuccessCallback = useCallback(async () => {
-    popupState.close();
-    router.push('/profile');
-  }, [popupState.close]);
-
-  const onErrorCallback = useCallback((err?: AuthClientError) => {
-    popupState.close();
-  }, []);
-
-  const onClick = useCallback(() => {
-    popupState.open();
-  }, []);
-
-  const { signIn, url } = useFarcasterConnection({
-    onSuccess: onSuccessCallback,
-    onError: onErrorCallback,
-    onClick
+  const { trigger, error } = useSWRMutation('login', (_, { arg }: { arg: StatusAPIResponse }) => {
+    const connectApiClient = new ConnectApiClient();
+    return connectApiClient.loginViaFarcaster(arg);
   });
 
+  const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
+    trigger(res, {
+      onSuccess: (user) => {
+        revalidatePathAction();
+        log.info('User logged in', { userId: user.id });
+        router.push('/profile');
+      },
+      onError: (err) => {
+        log.error('Server error while logging in with Warpcast', { error: err });
+      }
+    });
+  }, []);
+
+  const onErrorCallback = useCallback((err?: AuthClientError) => {
+    log.error('There was an error while logging in with Warpcast', { error: err });
+  }, []);
+
+  if (isAuthenticated) {
+    return <LoadingComponent size={30} label='Logging you in...' />;
+  }
+
   return (
-    <>
-      <Button size='large' onClick={signIn} fullWidth>
-        Connect with Farcaster
-      </Button>
-      <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />
-    </>
+    <Box
+      width='100%'
+      data-test='connect-with-farcaster'
+      sx={{
+        '.fc-authkit-signin-button': {
+          button: {
+            width: '100%',
+            maxWidth: 400,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 1,
+            mx: 'auto'
+          }
+        }
+      }}
+    >
+      <SignInButton onSuccess={onSuccessCallback} onError={onErrorCallback} hideSignOut />
+      {error?.message && <Typography variant='body2'>There was an error while logging in</Typography>}
+    </Box>
   );
 }
 

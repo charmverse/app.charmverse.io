@@ -1,6 +1,5 @@
 import type { CredentialEventType } from '@charmverse/core/prisma-client';
-
-import type { FeatureTitleVariation } from 'lib/features/getFeatureTitle';
+import type { FeatureTitleVariation } from '@root/lib/features/getFeatureTitle';
 
 // Labels require a mapper to rename features based on the space's settings
 type LabelFn = (getFeatureTitle: (featureWord: FeatureTitleVariation) => string) => string;
@@ -9,6 +8,8 @@ type LabelFn = (getFeatureTitle: (featureWord: FeatureTitleVariation) => string)
 export const proposalCreatedVerb = 'Published';
 export const proposalApprovedVerb = 'Approved';
 export const rewardSubmissionApprovedVerb = 'Approved';
+
+export const disableCredentialAutopublish = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
 export const credentialEventLabels: Partial<Record<CredentialEventType, LabelFn>> = {
   proposal_created: (map) => `${proposalCreatedVerb} ${map('Proposal')}`,

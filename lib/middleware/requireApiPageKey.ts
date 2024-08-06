@@ -1,10 +1,9 @@
 import { InvalidInputError, SubscriptionRequiredError } from '@charmverse/core/errors';
 import type { ApiPageKey } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getPermissionsClient } from '@root/lib/permissions/api';
 import type { NextApiRequest } from 'next';
 import type { NextHandler } from 'next-connect';
-
-import { getPermissionsClient } from 'lib/permissions/api';
 
 import { InvalidApiKeyError } from './errors';
 

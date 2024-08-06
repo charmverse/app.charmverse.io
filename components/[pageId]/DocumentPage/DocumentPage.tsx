@@ -48,7 +48,6 @@ import { PageEditorContainer } from './components/PageEditorContainer';
 import PageHeader, { getPageTop } from './components/PageHeader';
 import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { PageTitleInput } from './components/PageTitleInput';
-import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
 import { ProposalNotesBanner } from './components/ProposalNotesBanner';
 import { ProposalProperties } from './components/ProposalProperties';
@@ -290,16 +289,10 @@ function DocumentPageComponent({
           {/** we need a reference for width to handle inline dbs */}
           <Box ref={containerWidthRef} width='100%' />
           {/* show either deleted banner or archived, but not both */}
-          {page.deletedAt ? (
+          {page.deletedAt && (
             <AlertContainer>
               <PageDeleteBanner pageType={page.type} pageId={page.id} />
             </AlertContainer>
-          ) : (
-            !!proposal?.archived && (
-              <AlertContainer>
-                <ProposalArchivedBanner proposalId={proposal.id} disabled={!proposal.permissions.delete} />
-              </AlertContainer>
-            )
           )}
           {connectionError && (
             <AlertContainer>
@@ -402,6 +395,7 @@ function DocumentPageComponent({
                   proposal={proposal}
                   proposalInput={proposal}
                   templateId={proposal?.page?.sourceTemplateId}
+                  expanded
                   onChangeEvaluation={onChangeEvaluation}
                   onChangeTemplate={onChangeTemplate}
                   refreshProposal={refreshProposal}

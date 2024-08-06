@@ -110,7 +110,7 @@ export function EvaluationsReview({
   const templatePageOptions = useMemo(
     () =>
       (proposalTemplates || []).map((template) => ({
-        id: template.proposalId,
+        id: template.pageId,
         title: template.title
       })),
     [proposalTemplates]

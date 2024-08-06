@@ -1,12 +1,11 @@
 import type { User } from '@charmverse/core/prisma-client';
 import { render } from '@react-email/render';
+import type { FeatureJson } from '@root/lib/features/constants';
+import { getNotificationMetadata } from '@root/lib/notifications/getNotificationMetadata';
+import type { Notification } from '@root/lib/notifications/interfaces';
 import { htmlToText } from 'html-to-text';
 import type { ReactElement } from 'react';
 import ReactDOMServer from 'react-dom/server';
-
-import type { FeatureJson } from 'lib/features/constants';
-import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
-import type { Notification } from 'lib/notifications/interfaces';
 
 import type { EmailVerificationProps } from './templates/EmailVerificationTemplate';
 import {

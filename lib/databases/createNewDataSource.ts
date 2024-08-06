@@ -1,9 +1,9 @@
 import type { PageType } from '@charmverse/core/prisma';
+import type { Board } from '@root/lib/databases/board';
+import { createTableView } from '@root/lib/databases/tableView';
 
 import mutator from 'components/common/DatabaseEditor/mutator';
 import type { PagesContext } from 'hooks/usePages';
-import type { Board } from 'lib/databases/board';
-import { createTableView } from 'lib/databases/tableView';
 
 // to create a 'data source', this function just changes the board type to 'inline_board or 'linked_board' and adds a view to it
 export async function createNewDataSource({

@@ -4,14 +4,13 @@ import { Hr } from '@react-email/hr';
 import { Img } from '@react-email/img';
 import { Row } from '@react-email/row';
 import { Section } from '@react-email/section';
-
-import { baseUrl } from 'config/constants';
-import type { FeatureJson } from 'lib/features/constants';
-import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
-import type { Notification } from 'lib/notifications/interfaces';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import { getFormattedDateTime } from 'lib/utils/dates';
-import { fancyTrim } from 'lib/utils/strings';
+import { baseUrl } from '@root/config/constants';
+import type { FeatureJson } from '@root/lib/features/constants';
+import { getNotificationMetadata } from '@root/lib/notifications/getNotificationMetadata';
+import type { Notification } from '@root/lib/notifications/interfaces';
+import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
+import { getFormattedDateTime } from '@root/lib/utils/dates';
+import { fancyTrim } from '@root/lib/utils/strings';
 
 import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';
 

@@ -1,10 +1,8 @@
+import type { UIBlockWithDetails } from '@root/lib/databases/block';
+import { createBlock } from '@root/lib/databases/block';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import { replaceS3Domain } from '@root/lib/utils/url';
 import { v4 } from 'uuid';
-
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-import type { UIBlockWithDetails } from 'lib/databases/block';
-import { createBlock } from 'lib/databases/block';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { replaceS3Domain } from 'lib/utils/url';
 
 import type { Card } from './card';
 import { Constants } from './constants';
@@ -17,10 +15,12 @@ export const proposalPropertyTypesList = [
   'proposalRubricCriteriaAverage',
   'proposalRubricCriteriaTotal',
   'proposalEvaluationAverage',
+  'proposalEvaluationReviewerAverage',
   'proposalAuthor',
   'proposalReviewer',
   'proposalEvaluationType',
   'proposalCreatedAt',
+  'proposalPublishedAt',
   'proposalStep',
   'proposalReviewerNotes',
   'proposalRubricCriteriaReviewerScore',
@@ -83,6 +83,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   evaluationTitle?: string; // store the title of the evaluation to group properties together
   criteriaTitle?: string; // store the title of the rubric evaluation criteria to group rubric criteria score properties together
   reviewerId?: string; // store the reviewer id for rubric evaluation criteria score properties
+  templateId?: string; // store the proposal template id for rubric evaluation properties
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals' | 'reward_applications' | 'rewards';

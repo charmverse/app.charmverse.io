@@ -1,13 +1,13 @@
 'use client';
 
+import { grey } from '@mui/material/colors';
 import { darken, experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
 
 import {
   backgroundColor,
   backgroundColorDarkMode,
   backgroundLightColorDarkMode,
-  blueColor,
-  darkBlueColor,
+  brandColor,
   inputBackground,
   inputBackgroundDarkMode,
   inputBorder,
@@ -41,7 +41,7 @@ const extendedTheme = extendTheme({
           primary: primaryTextColor
         },
         primary: {
-          main: blueColor
+          main: brandColor
         },
         secondary: {
           main: secondaryTextColor
@@ -51,7 +51,9 @@ const extendedTheme = extendTheme({
         },
         inputBackground: {
           main: inputBackground
-        }
+        },
+        footerBackground: { main: grey[200] },
+        mainBackground: { main: grey[200] }
       }
     },
     dark: {
@@ -71,8 +73,8 @@ const extendedTheme = extendTheme({
           primary: primaryTextColorDarkMode
         },
         primary: {
-          main: darkBlueColor,
-          dark: darken(darkBlueColor, 0.2)
+          main: brandColor,
+          dark: darken(brandColor, 0.2)
         },
         secondary: {
           main: secondaryTextColorDarkMode
@@ -82,7 +84,9 @@ const extendedTheme = extendTheme({
         },
         inputBackground: {
           main: inputBackgroundDarkMode
-        }
+        },
+        footerBackground: { main: grey[700] },
+        mainBackground: { main: backgroundColorDarkMode }
       }
     }
   },
@@ -90,6 +94,14 @@ const extendedTheme = extendTheme({
     MuiPopover: {
       defaultProps: {
         disableRestoreFocus: true
+      }
+    },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          color: theme.vars.palette.text.primary,
+          marginBottom: 5
+        })
       }
     },
     MuiAppBar: {},

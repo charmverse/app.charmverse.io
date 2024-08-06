@@ -259,7 +259,6 @@ function getCardsFromPendingRewards(
       rewardPage: {
         createdAt: new Date(),
         createdBy: '',
-        icon: null,
         type: 'bounty',
         path: '',
         galleryImage: '',

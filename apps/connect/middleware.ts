@@ -1,18 +1,27 @@
-import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
+import { getSession } from '@connect-shared/lib/session/getSession';
+import { isTruthy } from '@root/lib/utils/types';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import type { SessionData } from 'lib/session/config';
-import { getIronOptions } from 'lib/session/getIronOptions';
-
-// @TODO Update projects to be public
 export async function middleware(request: NextRequest) {
-  const session = await getIronSession<SessionData>(cookies(), getIronOptions());
+  const session = await getSession();
   const user = session.user;
   const path = request.nextUrl.pathname;
-  // Make /p/ project pages public
-  if (!user && path !== '/' && !path.startsWith('/p/') && !path.startsWith('/u/')) {
+
+  // Make /p/ project pages public, /u/ user pages public
+  const projectPathChunks = path.split('/').filter(isTruthy);
+  const isEditProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'edit';
+  const isNewProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'new';
+  const isProjectPath = projectPathChunks[0] === 'p' && !isEditProjectPath && !isNewProjectPath;
+
+  if (
+    !user &&
+    path !== '/' &&
+    !isProjectPath &&
+    !path.startsWith('/u/') &&
+    !path.startsWith('/grants') &&
+    !path.startsWith('/feed')
+  ) {
     return NextResponse.redirect(new URL('/', request.url));
   } else if (user && path === '/') {
     return NextResponse.redirect(new URL('/profile', request.url));
@@ -28,8 +37,9 @@ export const config = {
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
+     * - images (image files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)'
+    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest|sw.js).*)'
   ]
 };

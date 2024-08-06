@@ -1,13 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsSpaces } from '@charmverse/core/test';
-import { expect, test } from '__e2e__/utils/test';
+import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
 test.describe('Archive Proposal', () => {
   test('Archive proposal and assert all actions are disabled, and proposal is not visible in the proposals list', async ({
-    proposalListPage,
+    proposalsListPage: proposalListPage,
     documentPage,
     proposalPage,
     page
@@ -87,7 +87,13 @@ test.describe('Archive Proposal', () => {
 
     await expect(documentPage.charmEditor).toBeVisible();
 
-    await Promise.all([page.waitForResponse('**/api/proposals/*/archive'), proposalPage.toggleArchiveProposal()]);
+    await proposalPage.pageTopLevelMenu.click();
+
+    await expect(proposalPage.archiveProposalAction).toBeEnabled();
+
+    await Promise.all([page.waitForResponse('**/api/proposals/*/archive'), proposalPage.archiveProposalAction.click()]);
+
+    await page.reload();
 
     await expect(documentPage.charmEditor).toHaveAttribute('contenteditable', 'false');
 
@@ -136,6 +142,9 @@ test.describe('Archive Proposal', () => {
     });
 
     expect(updatedProposal2.archived).toBe(false);
+
+    await page.reload();
+
     await expect(proposalPage.passFeedbackEvaluation).not.toBeDisabled();
     await expect(documentPage.charmEditor).toHaveAttribute('contenteditable', 'true');
   });

@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
-
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import type { AbstractWebsocketBroadcaster } from 'lib/websockets/interfaces';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import type { AbstractWebsocketBroadcaster } from '@root/lib/websockets/interfaces';
 
 import { trashOrDeletePage } from './trashOrDeletePage';
 
@@ -24,7 +23,7 @@ export async function trashPages({
     modifiedChildPageIds.push(...(await trashOrDeletePage(pageId, userId, trash ? 'trash' : 'restore')));
     trackUserAction(trash ? 'archive_page' : 'restore_page', { userId, spaceId, pageId });
     log.info(`User ${trash ? 'trashed' : 'restored'} a page`, {
-      pageIds: modifiedChildPageIds,
+      pageId,
       spaceId,
       userId
     });

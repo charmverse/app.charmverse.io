@@ -1,5 +1,5 @@
-import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import type { WebhookEvent } from '@root/lib/webhookPublisher/interfaces';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 
 import { saveCardNotification } from '../saveNotification';
 

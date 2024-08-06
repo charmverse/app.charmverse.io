@@ -1,7 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { Dialog, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
+import { Dialog, Divider, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -12,30 +12,36 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { defaultProposalPropertyTypes } from 'lib/databases/proposalDbProperties';
 
 import { CustomPropertiesList, CustomPropertiesReadonlyList } from './CustomPropertiesList';
-import { FormFieldPropertiesList, FormFieldPropertiesReadonlyList } from './FormFieldPropertiesList';
+import { FormFieldPropertiesList } from './FormFieldPropertiesList';
 import { ProjectProfilePropertiesList, ProjectProfilePropertiesReadonlyList } from './ProjectProfilePropertiesList';
 import { ProposalDefaultPropertiesList, ProposalDefaultPropertiesReadonlyList } from './ProposalDefaultPropertiesList';
-import {
-  RubricEvaluationPropertiesList,
-  RubricEvaluationPropertiesReadonlyList
-} from './RubricEvaluationPropertiesList';
+import { RubricEvaluationPropertiesList } from './RubricEvaluationPropertiesList';
+import { TemplatePropertiesReadonlyList } from './TemplatePropertiesReadonlyList';
+
+export type RubricEvaluationProperty =
+  | 'average'
+  | 'total'
+  | 'reviewers'
+  | 'criteriaTotal'
+  | 'reviewerScore'
+  | 'reviewerComment'
+  | 'criteriaAverage'
+  | 'reviewerAverage';
 
 export type SelectedProposalProperties = {
   projectMember: string[];
   project: string[];
   customProperties: string[];
-  rubricEvaluations: {
-    title: string;
-    average?: boolean;
-    total?: boolean;
-    reviewers?: boolean;
-    criteriaTotal?: boolean;
-    reviewerScore?: boolean;
-    reviewerComment?: boolean;
-    criteriaAverage?: boolean;
+  templateProperties: {
+    templateId: string;
+    rubricEvaluations: {
+      title: string;
+      properties: RubricEvaluationProperty[];
+      evaluationId: string;
+    }[];
+    formFields: string[];
   }[];
   defaults: string[];
-  formFields: string[];
 };
 
 type SelectedGroup =
@@ -43,11 +49,8 @@ type SelectedGroup =
       group: 'projectProfile';
     }
   | {
-      group: 'formFields';
+      group: 'templateProperties';
       pageId: string;
-    }
-  | {
-      group: 'rubricEvaluations';
     }
   | {
       group: 'customProperties';
@@ -73,9 +76,11 @@ function ProposalSourcePropertiesGroup({
         (proposal) =>
           !proposal.archived &&
           !proposal.draft &&
-          proposal.formFields &&
-          proposal.formFields.filter((formField) => formField.type !== 'project_profile' && formField.type !== 'label')
-            .length > 0
+          ((proposal.formFields &&
+            proposal.formFields.filter(
+              (formField) => formField.type !== 'project_profile' && formField.type !== 'label'
+            ).length > 0) ||
+            (proposal.evaluations?.length && proposal.evaluations.some((evaluation) => evaluation.type === 'rubric')))
       )
       .map((proposal) => ({
         pageId: proposal.pageId,
@@ -113,17 +118,6 @@ function ProposalSourcePropertiesGroup({
         </MenuItem>
         <MenuItem
           dense
-          selected={selectedGroup.group === 'rubricEvaluations'}
-          onClick={() => {
-            setSelectedGroup({
-              group: 'rubricEvaluations'
-            });
-          }}
-        >
-          <ListItemText>Proposal Rubric Evaluations</ListItemText>
-        </MenuItem>
-        <MenuItem
-          dense
           selected={selectedGroup.group === 'customProperties'}
           onClick={() => {
             setSelectedGroup({
@@ -141,10 +135,10 @@ function ProposalSourcePropertiesGroup({
             <MenuItem
               key={template.pageId}
               dense
-              selected={selectedGroup.group === 'formFields' && selectedGroup.pageId === template.pageId}
+              selected={selectedGroup.group === 'templateProperties' && selectedGroup.pageId === template.pageId}
               onClick={() => {
                 setSelectedGroup({
-                  group: 'formFields',
+                  group: 'templateProperties',
                   pageId: template.pageId
                 });
               }}
@@ -200,29 +194,36 @@ function ProposalSourcePropertiesSelector({
           />
         </>
       )}
-      {selectedGroup.group === 'rubricEvaluations' && (
-        <>
-          <Typography variant='h6'>Proposal rubric evaluations properties</Typography>
-          <RubricEvaluationPropertiesList
-            selectedProperties={selectedProperties}
-            setSelectedProperties={setSelectedProperties}
-          />
-        </>
-      )}
       {selectedGroup.group === 'customProperties' && (
         <>
           <Typography variant='h6'>Custom properties</Typography>
           <CustomPropertiesList selectedProperties={selectedProperties} setSelectedProperties={setSelectedProperties} />
         </>
       )}
-      {selectedGroup.group === 'formFields' && (
+      {selectedGroup.group === 'templateProperties' && (
         <>
-          <Typography variant='h6'>Form field properties</Typography>
-          <FormFieldPropertiesList
-            templatePageId={selectedGroup.pageId}
-            selectedProperties={selectedProperties}
-            setSelectedProperties={setSelectedProperties}
+          <Typography variant='h6'>Template properties</Typography>
+          <Stack gap={1}>
+            <Typography fontWeight='bold'>Rubric evaluation properties</Typography>
+            <RubricEvaluationPropertiesList
+              selectedProperties={selectedProperties}
+              setSelectedProperties={setSelectedProperties}
+              templateId={selectedGroup.pageId}
+            />
+          </Stack>
+          <Divider
+            sx={{
+              my: 1
+            }}
           />
+          <Stack gap={1}>
+            <Typography fontWeight='bold'>Form field properties</Typography>
+            <FormFieldPropertiesList
+              templateId={selectedGroup.pageId}
+              selectedProperties={selectedProperties}
+              setSelectedProperties={setSelectedProperties}
+            />
+          </Stack>
         </>
       )}
     </>
@@ -242,9 +243,8 @@ function ProposalSourcePropertiesList({
   const noPropertiesSelected =
     selectedProperties.project.length === 0 &&
     selectedProperties.projectMember.length === 0 &&
-    selectedProperties.formFields.length === 0 &&
+    selectedProperties.templateProperties.length === 0 &&
     selectedProperties.customProperties.length === 0 &&
-    selectedProperties.rubricEvaluations.length === 0 &&
     selectedProperties.defaults.length === 0;
 
   return (
@@ -259,9 +259,8 @@ function ProposalSourcePropertiesList({
         <Stack p={2}>
           <ProposalDefaultPropertiesReadonlyList selectedProperties={selectedProperties} />
           <ProjectProfilePropertiesReadonlyList selectedProperties={selectedProperties} />
-          <RubricEvaluationPropertiesReadonlyList selectedProperties={selectedProperties} />
+          <TemplatePropertiesReadonlyList selectedProperties={selectedProperties} />
           <CustomPropertiesReadonlyList selectedProperties={selectedProperties} />
-          <FormFieldPropertiesReadonlyList selectedProperties={selectedProperties} />
           {noPropertiesSelected && <Typography variant='caption'>No properties selected</Typography>}
         </Stack>
       </Stack>
@@ -301,8 +300,7 @@ export function ProposalSourcePropertiesDialog({
     projectMember: [],
     project: [],
     defaults: [...defaultProposalPropertyTypes],
-    formFields: [],
-    rubricEvaluations: [],
+    templateProperties: [],
     customProperties: [],
     ...initialSelectedProperties
   });

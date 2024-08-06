@@ -9,9 +9,11 @@ import type {
   User,
   UserDetails
 } from '@charmverse/core/prisma';
-import type { FiatCurrency, IPairQuote } from 'connectors/chains';
+import * as http from '@root/adapters/http';
+import type { FiatCurrency, IPairQuote } from '@root/connectors/chains';
+import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
+import type { LoggedInUser } from '@root/models';
 
-import * as http from 'adapters/http';
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
@@ -27,7 +29,6 @@ import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
-import type { LoggedInUser } from 'models';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -367,6 +368,10 @@ class CharmClient {
 
   resolveEnsName(ens: string) {
     return http.GET<string | null>('/api/resolve-ens', { ens });
+  }
+
+  searchFarcasterUser({ username }: { username: string }) {
+    return http.GET<FarcasterUser[]>(`/api/farcaster/search-by-username`, { username });
   }
 }
 

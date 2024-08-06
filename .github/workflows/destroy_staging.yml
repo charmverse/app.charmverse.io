@@ -11,7 +11,7 @@ jobs:
   clean-up:
     if: |
       (github.event.action == 'unlabeled' && startsWith(github.event.label.name, ':rocket: deploy')) ||
-      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect')))
+      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
     runs-on: ubuntu-latest
     # wait until all deploys are complete to destroy the env
     concurrency: deploy-pr-app-${{ github.head_ref }}
@@ -43,6 +43,7 @@ jobs:
           npm install aws-cdk-lib --no-audit --no-fund
           npx cdk destroy -c name=stg-webapp-${{ env.STAGE }} --force
           npx cdk destroy -c name=stg-connect-${{ env.STAGE }} --force
+          npx cdk destroy -c name=stg-sunnyawards-${{ env.STAGE }} --force
 
       - name: delete the github deployments and the corresponding environment
         uses: strumwolf/delete-deployment-environment@v1.1.0

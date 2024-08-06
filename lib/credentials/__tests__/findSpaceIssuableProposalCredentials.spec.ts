@@ -1,9 +1,8 @@
 import { prisma, type CredentialTemplate } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { getPagePermalink } from '@root/lib/pages/getPagePermalink';
+import { randomETHWallet, randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import { v4 as uuid } from 'uuid';
-
-import { getPagePermalink } from 'lib/pages/getPagePermalink';
-import { randomETHWallet, randomETHWalletAddress } from 'lib/utils/blockchain';
 
 import { proposalApprovedVerb } from '../constants';
 import type {

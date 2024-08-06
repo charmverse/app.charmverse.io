@@ -1,10 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
+import { renameRelationProperty } from '@root/lib/databases/relationProperty/renameRelationProperty';
+import { syncRelationProperty } from '@root/lib/databases/relationProperty/syncRelationProperty';
 import { v4 } from 'uuid';
 
-import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
-import { renameRelationProperty } from 'lib/databases/relationProperty/renameRelationProperty';
-import { syncRelationProperty } from 'lib/databases/relationProperty/syncRelationProperty';
 import { generateBoard } from 'testing/setupDatabase';
 
 describe('renameRelationProperty', () => {

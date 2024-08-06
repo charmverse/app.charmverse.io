@@ -1,9 +1,8 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
+import { PublicLockV13 } from '@root/lib/tokenGates/unlock/abi';
+import { isNumber } from '@root/lib/utils/numbers';
 import { getAddress } from 'viem';
-
-import { PublicLockV13 } from 'lib/tokenGates/unlock/abi';
-import { isNumber } from 'lib/utils/numbers';
 
 import { getPublicClient } from '../../blockchain/publicClient';
 import type { AccessControlCondition } from '../interfaces';

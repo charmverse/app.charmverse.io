@@ -1,17 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { randomETHWallet } from '@root/lib/utils/blockchain';
 import { v4 } from 'uuid';
 
-import { randomETHWallet } from 'lib/utils/blockchain';
-
-import { createDefaultProjectAndMembersPayload } from '../constants';
+import { createDefaultProject, defaultProjectMember } from '../constants';
 import { createProject } from '../createProject';
 import { updateProjectAndMembers } from '../updateProjectAndMembers';
 
 describe('updateProjectAndMembers', () => {
   it('should update a project with members and connect with new users', async () => {
-    const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
-
     const { user: projectTeamLead } = await testUtilsUser.generateUserAndSpace();
     const projectTeamLeadEmail = `${v4()}@gmail.com`;
     const projectTeamLeadAddress = randomETHWallet().address.toLowerCase();
@@ -91,46 +88,42 @@ describe('updateProjectAndMembers', () => {
     const createdProject = await createProject({
       userId: projectTeamLead.id,
       project: {
-        ...defaultProjectAndMembersPayload,
+        ...createDefaultProject(),
         name: 'Test project',
         projectMembers: [
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
+            teamLead: true,
             name: 'Team Lead',
             email: projectTeamLeadEmail,
             userId: projectTeamLead.id,
             walletAddress: projectTeamLeadAddress
-          },
+          }),
           // Update user with wallet address
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: '',
             name: 'Wallet address user',
             walletAddress: walletAddressUserAddress,
             userId: walletAddressUser.id
-          },
+          }),
           // Remove project user without any user connected
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: '',
             name: 'Random Project user',
             walletAddress: ''
-          },
+          }),
           // Remove project user with user connected
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: verifiedEmailUserEmail,
             name: 'Verified Email Project user',
             walletAddress: '',
             userId: verifiedEmailUser.id
-          },
+          }),
           // Connect user id with a project member without any wallet address or email
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: '',
             name: 'Random Project user 2',
             walletAddress: ''
-          }
+          })
         ]
       }
     });
@@ -139,7 +132,7 @@ describe('updateProjectAndMembers', () => {
       projectId: createdProject.id,
       userId: projectTeamLead.id,
       payload: {
-        ...defaultProjectAndMembersPayload,
+        ...createDefaultProject(),
         blog: 'https://blog.com',
         projectMembers: [
           // Making sure team lead doesn't get connected with a different user
@@ -153,29 +146,25 @@ describe('updateProjectAndMembers', () => {
             walletAddress: updatedWalletAddressUserAddress
           },
           // Connect new user with google account
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             email: googleAccountUserEmail
-          },
+          }),
           // Add new user with wallet address
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             name: 'New Wallet Project Member',
             walletAddress: newWalletUserAddress,
             email: ''
-          },
+          }),
           // Add new user with google account
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             name: 'New Google Account Project Member',
             email: newGoogleAccountUserEmail
-          },
+          }),
           // Add new user with verified email
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
             name: 'New Verified Email Project Member',
             email: newVerifiedEmailUserEmail
-          },
+          }),
           // Remove project user without any user connected
           {
             ...createdProject.projectMembers[2],

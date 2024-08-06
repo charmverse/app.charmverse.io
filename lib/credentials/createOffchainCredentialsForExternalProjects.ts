@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
-
-import { createOffchainCredentialsForProjects as createGitcoinOffchainCredentialsForProjects } from 'lib/gitcoin/createProjectCredentials';
-import { createOffchainCredentialsForProjects as createQuestbookOffchainCredentialsForProjects } from 'lib/questbook/createProjectCredentials';
+import { createOffchainCredentialsForProjects as createGitcoinOffchainCredentialsForProjects } from '@root/lib/gitcoin/createProjectCredentials';
+import { createOffchainCredentialsForProjects as createQuestbookOffchainCredentialsForProjects } from '@root/lib/questbook/createProjectCredentials';
 
 export async function createOffchainCredentialsForExternalProjects() {
   await createGitcoinOffchainCredentialsForProjects().catch((error) => {

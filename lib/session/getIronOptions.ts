@@ -1,7 +1,7 @@
+import { authSecret, baseUrl, cookieName } from '@root/config/constants';
 import type { SessionOptions } from 'iron-session';
 
 // import the "optional" auth secret here so it doesnt throw an error at build time
-import { authSecret, baseUrl, cookieName } from 'config/constants';
 
 export function getIronOptions({ domain }: { domain?: string } = {}): SessionOptions {
   if (!authSecret) {

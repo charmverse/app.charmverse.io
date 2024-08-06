@@ -210,7 +210,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   const { members, membersRecord } = useMembers();
   const { isFreeSpace } = useIsFreeSpace();
 
-  const selectInputValue: T[] = inputValue
+  const selectInputValue: T[] = (inputValue ?? [])
     .map((elem) => {
       if (typeof elem === 'string') {
         const user = membersRecord[elem];

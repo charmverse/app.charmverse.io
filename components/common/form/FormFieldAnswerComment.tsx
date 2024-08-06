@@ -243,6 +243,7 @@ export function FormFieldAnswerComment({
 }) {
   return (
     <Stack
+      data-test='form-field-answer-comment'
       flexDirection={{
         md: 'row',
         xs: 'column-reverse'

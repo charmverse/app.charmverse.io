@@ -2,8 +2,7 @@ import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { ProposalAppealReviewer, ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { privateEvaluationSteps } from '@charmverse/core/proposals';
-
-import { getAssignedRoleIds } from 'lib/roles/getAssignedRoleIds';
+import { getAssignedRoleIds } from '@root/lib/roles/getAssignedRoleIds';
 
 import type { ProposalWithUsersAndRubric } from './interfaces';
 
@@ -120,7 +119,9 @@ export async function concealProposalSteps<T extends MinimalProposal = MinimalPr
       });
     } else if (previousStep.result) {
       previousStep.id = currentStep.id;
-      previousStep.result = currentStep.result;
+      if (previousStep.result !== 'fail') {
+        previousStep.result = currentStep.result;
+      }
     }
   }
 

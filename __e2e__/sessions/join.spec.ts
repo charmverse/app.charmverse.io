@@ -3,7 +3,7 @@ import { test as base } from '@playwright/test';
 import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 import { v4 } from 'uuid';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 import { generateTokenGate } from 'testing/utils/tokenGates';
 
 import { generateUser, generateUserAndSpace } from '../utils/mocks';

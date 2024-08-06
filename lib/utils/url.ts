@@ -34,3 +34,24 @@ export function replaceS3Domain<T extends string | undefined | null>(url: T) {
   if (!url) return url;
   return url.replace('https://s3.amazonaws.com/charm.public/', 'https://cdn.charmverse.io/');
 }
+// replace url with / into the full path of the url
+export function replaceUrl(link: string, domain: string) {
+  let protocol = '';
+  let href = link;
+  let text = link;
+
+  try {
+    const url = new URL(link);
+    protocol = url.protocol;
+    href = url.href;
+    text = (url.pathname.startsWith('/') ? url.pathname.slice(1) : url.pathname) || url.hostname;
+  } catch (e) {
+    protocol = 'https://';
+    href = `${protocol}${domain}/${link}`;
+  }
+
+  return {
+    href,
+    text
+  };
+}

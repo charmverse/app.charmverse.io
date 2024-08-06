@@ -1,7 +1,6 @@
 import type { Comment, Prisma } from '@charmverse/core/prisma';
-
-import type { UserPermissionFlags } from 'lib/permissions/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { UserPermissionFlags } from '@root/lib/permissions/interfaces';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 
 export type CommentCreate = Pick<Comment, 'content' | 'threadId' | 'userId'>;
 

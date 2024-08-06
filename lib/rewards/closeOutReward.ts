@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { issueOffchainRewardCredentialsIfNecessary } from '@root/lib/credentials/issueOffchainRewardCredentialsIfNecessary';
 
-import { issueOffchainRewardCredentialsIfNecessary } from 'lib/credentials/issueOffchainRewardCredentialsIfNecessary';
+import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
 
 import { submissionIsComplete } from './countRemainingSubmissionSlots';
 import { getRewardOrThrow } from './getReward';
@@ -31,6 +32,23 @@ export async function closeOutReward(rewardId: string): Promise<RewardWithUsers>
       }
     })
   ]);
+
+  const space = await prisma.space.findUnique({
+    where: {
+      id: reward.spaceId
+    },
+    select: {
+      id: true,
+      domain: true
+    }
+  });
+
+  if (space?.domain === 'op-grants') {
+    trackOpUserAction('reward_completed', {
+      userId: reward.createdBy,
+      rewardId
+    });
+  }
 
   await issueOffchainRewardCredentialsIfNecessary({
     event: 'reward_submission_approved',

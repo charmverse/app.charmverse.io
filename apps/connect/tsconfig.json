@@ -2,11 +2,7 @@
   "compilerOptions": {
     "outDir": "../../dist/apps/connect",
     "rootDir": "../../",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext", "webworker"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -24,12 +20,20 @@
       }
     ],
     "paths": {
-      "@connect/*": ["./*"],
-      "adapters/*": ["../../adapters/*"],
-      "lib/*": ["../../lib/*"],
-      "config/*": ["../../config/*"],
-      "models/*": ["../../models/*"],
-      "connectors/*": ["../../connectors/*"],
+      "@connect-shared/*": ["../../@connect-shared/*"],
+      "apiClient/*": ["./apiClient/*"],
+      "components/*": ["./components/*"],
+      "hooks/*": ["./hooks/*"],
+      "lib/*": ["./lib/*"],
+      "public/*": ["./public/*"],
+      "theme/*": ["./theme/*"],
+      "@root/abis/*": ["../../abis/*"],
+      "@root/adapters/*": ["../../adapters/*"],
+      "@root/config/*": ["../../config/*"],
+      "@root/connectors/*": ["../../connectors/*"],
+      "@root/lib/*": ["../../lib/*"],
+      "@root/hooks/*": ["../../hooks/*"],
+      "@root/models": ["../../models"],
       "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
       "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
       "@charmverse/core/shared": ["../../node_modules/@charmverse/core/dist/cjs/shared"],
@@ -46,6 +50,6 @@
       "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["../../node_modules", ".next/"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../@connect-shared/components/common/NotFoundPage.tsx"],
+  "exclude": ["../../node_modules", ".next/", "public/sw.js", "sw.js"]
 }

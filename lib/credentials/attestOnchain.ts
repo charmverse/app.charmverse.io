@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
 import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getChainById } from 'connectors/chains';
+import { credentialsWalletPrivateKey } from '@root/config/constants';
+import { getChainById } from '@root/connectors/chains';
 import { Wallet, providers } from 'ethers';
 
-import { credentialsWalletPrivateKey } from 'config/constants';
+import { getEthersProvider } from '../blockchain/getEthersProvider';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
 import { attestationSchemaIds, encodeAttestation } from './schemas';
@@ -20,14 +21,9 @@ const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttestationInput): Promise<string> {
   const schemaId = attestationSchemaIds[type];
-  const rpcUrl = getChainById(chainId)?.rpcUrls[0];
+  const rpcUrl = getChainById(chainId)?.rpcUrls[0] as string;
 
-  // This solution fixes ethers 5.7 not working with recent Next.js v14+ versions
-  // https://github.com/ethers-io/ethers.js/issues/4469#issuecomment-1932145334
-  const provider = new providers.JsonRpcProvider({
-    url: rpcUrl as string,
-    skipFetchSetup: true
-  });
+  const provider = getEthersProvider({ rpcUrl });
 
   const wallet = new Wallet(credentialsWalletPrivateKey as string, provider);
 

@@ -16,12 +16,12 @@ import type {
 } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-
-import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
-import type { FormFieldInput } from 'lib/forms/interfaces';
-import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import type { ProjectWithMembers } from 'lib/projects/interfaces';
-import { getProposalFormFields } from 'lib/proposals/form/getProposalFormFields';
+import { arrayUtils } from '@charmverse/core/utilities';
+import type { EASAttestationFromApi } from '@root/lib/credentials/external/getOnchainCredentials';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
+import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
+import { getProposalFormFields } from '@root/lib/proposals/form/getProposalFormFields';
 
 import { getProposalProjectFormAnswers } from './form/getProposalProjectFormAnswers';
 import type { PopulatedEvaluation, ProposalFields, ProposalWithUsersAndRubric, TypedFormField } from './interfaces';
@@ -53,6 +53,8 @@ export function mapDbProposalToProposal({
       authors: ProposalAuthor[];
       evaluations: (ProposalEvaluation & {
         appealReviewers: ProposalAppealReviewer[];
+        reviews: ProposalEvaluationReview[];
+        appealReviews: ProposalEvaluationAppealReview[];
         reviewers: ProposalReviewer[];
         rubricAnswers: ProposalRubricCriteriaAnswer[];
         rubricCriteria: ProposalRubricCriteria[];
@@ -87,12 +89,23 @@ export function mapDbProposalToProposal({
     const workflowEvaluation = workflow?.evaluations.find(
       (e) => e.title === evaluation.title && e.type === evaluation.type
     );
-    const reviews = proposalEvaluationReviews?.filter((review) => review.evaluationId === evaluation.id);
     const appealReviews = proposalEvaluationAppealReviews?.filter((review) => review.evaluationId === evaluation.id);
     const stepPermissions = permissionsByStep?.[evaluation.id];
+
+    let rubricAnswers = evaluation.rubricAnswers;
+    let draftRubricAnswers = evaluation.draftRubricAnswers;
+    let reviews = evaluation.reviews;
+    const totalReviews = evaluation.appealedAt
+      ? evaluation.appealReviews.length
+      : evaluation.type === 'rubric'
+      ? // 1 answer per user per rubric, we care about unique respondents
+        arrayUtils.uniqueValues(evaluation.rubricAnswers.map((a) => a.userId)).length
+      : evaluation.reviews.length;
+
     if (!stepPermissions?.evaluate) {
-      evaluation.draftRubricAnswers = [];
-      evaluation.rubricAnswers = [];
+      draftRubricAnswers = [];
+      rubricAnswers = [];
+      reviews = [];
     }
 
     return {
@@ -100,9 +113,13 @@ export function mapDbProposalToProposal({
       appealReviewers: evaluation.appealReviewers || [],
       reviews,
       appealReviews,
+      totalReviews,
+      rubricAnswers,
+      draftRubricAnswers,
       declineReasonOptions: workflowEvaluation?.declineReasons ?? [],
       isReviewer: !!stepPermissions?.evaluate,
-      isAppealReviewer: !!stepPermissions?.evaluate_appeal
+      isAppealReviewer: !!stepPermissions?.evaluate_appeal,
+      isApprover: !!stepPermissions?.complete_evaluation
     } as PopulatedEvaluation;
   });
   const pageFields = page?.type === 'proposal_template' ? page : { sourceTemplateId: page?.sourceTemplateId };

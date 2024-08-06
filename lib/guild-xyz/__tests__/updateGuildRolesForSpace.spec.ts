@@ -1,7 +1,7 @@
 import type { Role, Space, SpaceRole, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 
 let user1: User;

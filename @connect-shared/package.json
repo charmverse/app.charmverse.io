@@ -1,0 +1,19 @@
+{
+  "name": "connect-shared",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mui/material-nextjs": "^5.16.6",
+    "framer-motion": "^11.3.17",
+    "next-safe-action": "^7.4.2"
+  }
+}

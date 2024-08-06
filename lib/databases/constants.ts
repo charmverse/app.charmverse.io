@@ -1,4 +1,4 @@
-import { randomIntFromInterval } from 'lib/utils/random';
+import { randomIntFromInterval } from '@root/lib/utils/random';
 
 class Constants {
   static readonly menuColors = {

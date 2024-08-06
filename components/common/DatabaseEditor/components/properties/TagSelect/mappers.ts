@@ -1,4 +1,5 @@
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
+
 import type { IPropertyOption } from 'lib/databases/board';
 
 import { convertFocalboardToMUIColor } from '../../../utils/convertFocalboardToMUIColor';

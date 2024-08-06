@@ -1,14 +1,14 @@
 import { Box, Tooltip } from '@mui/material';
+import { isProdEnv } from '@root/config/constants';
 import { useState } from 'react';
 
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
+import { InlineCharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
-import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
-import { isProdEnv } from 'config/constants';
 import { useCreateLensPublication } from 'hooks/useCreateLensPublication';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';

@@ -1,5 +1,6 @@
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import { Box, Card, FormLabel, Stack, TextField, Typography } from '@mui/material';
+import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
@@ -35,6 +36,7 @@ type Props = {
     | 'reviewers'
     | 'result'
     | 'isReviewer'
+    | 'isApprover'
     | 'actionLabels'
     | 'requiredReviews'
     | 'reviews'
@@ -49,11 +51,14 @@ type Props = {
     | 'isAppealReviewer'
     | 'appealReviews'
     | 'appealReason'
+    | 'totalReviews'
   >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
   isCurrent: boolean;
   archived?: boolean;
+  // Refers to the step that will be completed when the evaluation is completed
+  actionCompletesStep?: boolean;
 };
 export function PassFailEvaluationContainer({
   proposalId,
@@ -63,7 +68,8 @@ export function PassFailEvaluationContainer({
   refreshProposal,
   confirmationMessage,
   archived,
-  authors
+  authors,
+  actionCompletesStep
 }: Props) {
   const appealReasonPopupState = usePopupState({
     variant: 'dialog'
@@ -170,7 +176,9 @@ export function PassFailEvaluationContainer({
     hideReviewer,
     isCurrent,
     isReviewer: evaluation.isReviewer,
+    isApprover: evaluation.isApprover,
     archived,
+    actionCompletesStep,
     onSubmitEvaluationReview,
     onResetEvaluationReview: evaluation.appealedAt ? undefined : onResetEvaluationReview,
     isResettingEvaluationReview,
@@ -179,6 +187,7 @@ export function PassFailEvaluationContainer({
       id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
     })),
     isSubmittingReview: isSubmittingEvaluationReview,
+    totalReviews: evaluation.totalReviews,
     evaluationReviews: evaluation.reviews,
     requiredReviews: evaluation.requiredReviews,
     evaluationResult: evaluation.appealedAt ? 'fail' : evaluation.result,

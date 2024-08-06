@@ -1,7 +1,7 @@
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { useCallback, useMemo, useEffect } from 'react';
 
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import { useProjectForm } from 'components/proposals/hooks/useProjectForm';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
@@ -15,6 +15,7 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
   });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId: proposal?.id });
 
+  // only calculate this once on load, since answers will become stale and override the formFIelds
   const formFields = useMemo(
     () =>
       answers &&
@@ -24,12 +25,12 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
         );
         return {
           ...formField,
-          formFieldAnswer: proposalFormFieldAnswer,
+          formFieldAnswerId: proposalFormFieldAnswer?.id,
           value: proposalFormFieldAnswer?.value as FormFieldValue,
           options: (formField.options ?? []) as SelectOptionType[]
         };
       }),
-    [proposal?.form?.formFields, answers]
+    [!!proposal?.form?.formFields, !!answers]
   );
 
   // get Answers form

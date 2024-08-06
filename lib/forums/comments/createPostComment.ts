@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 
 import type { CreatePostCommentInput } from './interface';
 

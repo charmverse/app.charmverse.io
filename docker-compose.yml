@@ -1,6 +1,6 @@
 services:
   defaults:
-    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
+    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/${IMGNAME}:${IMGTAG}'
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}", "version": "${IMGTAG}"}]'
       com.datadoghq.tags.env: '${SERVICE_ENV:-tst}'
@@ -85,7 +85,7 @@ services:
       [
         'sh',
         '-c',
-        'npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/connect --keepAliveTimeout 70000'
+        'npx react-env --path .env --dest ./apps/connect/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/connect --keepAliveTimeout 70000'
       ]
     profiles:
       - prd-connect
@@ -99,7 +99,7 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/connect --keepAliveTimeout 70000'
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/connect/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/connect --keepAliveTimeout 70000'
       ]
     environment:
       - REACT_APP_APP_ENV=staging
@@ -125,6 +125,36 @@ services:
       - '4000:3000'
     profiles:
       - stg-connect
+
+  prd-sunnyawards:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npx react-env --path .env --dest ./apps/sunnyawards/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/sunnyawards --keepAliveTimeout 70000'
+      ]
+    profiles:
+      - prd-sunnyawards
+
+  stg-sunnyawards:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/sunnyawards/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/sunnyawards --keepAliveTimeout 70000'
+      ]
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-sunnyawards
 
   prd-ceramic:
     extends:

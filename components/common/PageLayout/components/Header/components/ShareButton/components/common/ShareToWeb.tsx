@@ -167,9 +167,17 @@ export default function ShareToWeb({
       )}
       <UpgradeWrapper upgradeContext={!disabledTooltip ? 'page_permissions' : undefined}>
         <Tooltip title={disabled && disabledTooltip ? disabledTooltip : ''}>
-          <Button onClick={handlePublish} disabled={disabled} data-test='toggle-public-page' loading={isLoading}>
-            {shareChecked ? 'Unpublish' : 'Publish to web'}
-          </Button>
+          <Box>
+            <Button
+              fullWidth
+              onClick={handlePublish}
+              disabled={disabled}
+              data-test='toggle-public-page'
+              loading={isLoading}
+            >
+              {shareChecked ? 'Unpublish' : 'Publish to web'}
+            </Button>
+          </Box>
         </Tooltip>
       </UpgradeWrapper>
     </Box>

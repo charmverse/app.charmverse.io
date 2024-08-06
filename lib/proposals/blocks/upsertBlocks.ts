@@ -1,15 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { filterInternalProperties } from 'lib/databases/utilities';
+import { filterInternalProperties } from '@root/lib/databases/utilities';
 import type {
   ProposalBlockUpdateInput,
   ProposalBlockWithTypedFields,
   ProposalPropertiesField,
   ProposalPropertyValues
-} from 'lib/proposals/blocks/interfaces';
-import { upsertBlock } from 'lib/proposals/blocks/upsertBlock';
-import { updateProposal } from 'lib/proposals/updateProposal';
+} from '@root/lib/proposals/blocks/interfaces';
+import { upsertBlock } from '@root/lib/proposals/blocks/upsertBlock';
+import { updateProposal } from '@root/lib/proposals/updateProposal';
 
 export async function upsertBlocks({
   blocksData,

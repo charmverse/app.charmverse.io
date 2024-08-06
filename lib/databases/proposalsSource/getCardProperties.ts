@@ -40,8 +40,9 @@ export type ProposalData = {
     id: string;
     title: string;
     path: string;
+    sourceTemplateId: string | null;
   };
-  proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates'> & {
+  proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates' | 'publishedAt'> & {
     authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
     evaluations: (Pick<
       ProposalEvaluation,
@@ -67,6 +68,7 @@ const pageSelectObject = {
   proposal: {
     select: {
       id: true,
+      publishedAt: true,
       authors: {
         select: {
           userId: true,
@@ -119,7 +121,8 @@ const pageSelectObject = {
         }
       }
     }
-  }
+  },
+  sourceTemplateId: true
 } satisfies Prisma.PageSelect;
 
 export async function getCardPropertiesFromProposals({
@@ -251,10 +254,15 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     properties[proposalProps.proposalAuthor.id] = proposal.authors.map((author) => author.userId);
   }
 
+  if (proposalProps.proposalPublishedAt) {
+    properties[proposalProps.proposalPublishedAt.id] = proposal.publishedAt?.getTime() ?? '';
+  }
+
   properties = getCardPropertiesFromRubric({
     properties,
     evaluations: proposal.evaluations.filter((e) => e.type === 'rubric'),
-    templates: cardProperties
+    cardProperties,
+    templateId: page.sourceTemplateId
   });
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
@@ -290,6 +298,7 @@ export function getCardPropertyTemplates({ cardProperties }: { cardProperties: I
     proposalStatus: cardProperties.find((prop) => prop.type === 'proposalStatus'),
     proposalStep: cardProperties.find((prop) => prop.type === 'proposalStep'),
     proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl'),
-    proposalReviewer: cardProperties.find((prop) => prop.type === 'proposalReviewer')
+    proposalReviewer: cardProperties.find((prop) => prop.type === 'proposalReviewer'),
+    proposalPublishedAt: cardProperties.find((prop) => prop.type === 'proposalPublishedAt')
   };
 }

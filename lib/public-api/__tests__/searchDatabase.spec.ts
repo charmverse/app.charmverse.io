@@ -1,11 +1,11 @@
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import type { CardPage as ApiPage, PageFromBlock } from '@root/lib/public-api';
+import { createDatabase } from '@root/lib/public-api/createDatabase';
+import { createDatabaseCardPage } from '@root/lib/public-api/createDatabaseCardPage';
+import { uniqueValues } from '@root/lib/utils/array';
 
-import type { CardPage as ApiPage, PageFromBlock } from 'lib/public-api';
-import { createDatabase } from 'lib/public-api/createDatabase';
-import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
-import { uniqueValues } from 'lib/utils/array';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
 
 import { searchDatabase } from '../searchDatabase';

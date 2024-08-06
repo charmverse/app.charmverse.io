@@ -1,8 +1,7 @@
+import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { getSafeOwners } from '@root/lib/gnosis/safe/getSafeOwners';
+import { fetchFileByHash, getIpfsFileUrl } from '@root/lib/ipfs/fetchFileByHash';
 import { getAddress } from 'viem';
-
-import { getPublicClient } from 'lib/blockchain/publicClient';
-import { getSafeOwners } from 'lib/gnosis/safe/getSafeOwners';
-import { fetchFileByHash, getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
 
 import { ProjectRegistryAbi } from './abi/ProjectRegistry';
 import { PROJECT_REGISTRY_ADDRESSES } from './constants';
@@ -45,12 +44,12 @@ export async function getProjectDetails({
 }): Promise<GitcoinProjectDetails | null> {
   const publicClient = getPublicClient(chainId);
 
-  const onchainOwners = await publicClient.readContract({
+  const onchainOwners = (await publicClient.readContract({
     address: getAddress(PROJECT_REGISTRY_ADDRESSES[chainId]),
     abi: ProjectRegistryAbi,
     functionName: 'getProjectOwners',
     args: [BigInt(projectId)]
-  });
+  })) as `0x${string}`[];
 
   const metadataDetails: ProjectOnchainDetails = await publicClient.readContract({
     address: getAddress(PROJECT_REGISTRY_ADDRESSES[chainId]),

@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
 
 import { PostNotFoundError } from './errors';
 

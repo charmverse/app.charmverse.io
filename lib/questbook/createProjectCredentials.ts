@@ -1,11 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { signAndPublishCharmverseCredential } from '@root/lib/credentials/attestOffchain';
+import type { ExternalProjectMetadata } from '@root/lib/credentials/schemas/external';
+import { getProjectOwners } from '@root/lib/gitcoin/getProjectDetails';
 import { optimism } from 'viem/chains';
 import { getAddress } from 'viem/utils';
-
-import { signAndPublishCharmverseCredential } from 'lib/credentials/attestOffchain';
-import type { ExternalProjectMetadata } from 'lib/credentials/schemas/external';
-import { getProjectOwners } from 'lib/gitcoin/getProjectDetails';
 
 import { getGrantApplicationsWithMeta } from './getGrantApplications';
 import { QUESTBOOK_SUPPORTED_CHAINS } from './graphql/endpoints';
@@ -17,7 +16,7 @@ export async function createOffchainCredentialsForProjects() {
     log.info(`Running ${approvedApplications.length} approved applications from questbook, on chain ${chainId}`);
 
     for (const application of approvedApplications) {
-      const recepient = getAddress(application.recipient);
+      const recepient = getAddress(application.recipient) as `0x{string}`;
       const owners = await getProjectOwners([recepient], chainId);
       const updatedAt = Number(application.date || 0) * 1000;
       const credentialDate = updatedAt ? new Date(updatedAt).toISOString() : new Date().toISOString();

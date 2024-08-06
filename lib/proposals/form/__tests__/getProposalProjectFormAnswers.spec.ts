@@ -1,12 +1,12 @@
 import type { User } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import { createDefaultProject, defaultProjectMember } from '@root/lib/projects/constants';
+import { createProject } from '@root/lib/projects/createProject';
+import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
+import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
 import { v4 } from 'uuid';
 
-import type { FormFieldInput } from 'lib/forms/interfaces';
-import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
-import { createProject } from 'lib/projects/createProject';
-import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { getProjectProfileFieldConfig } from 'testing/mocks/form';
 
@@ -43,19 +43,18 @@ describe('getProposalProjectFormAnswers', () => {
   let projectWithMembers: ProjectWithMembers;
 
   beforeAll(async () => {
-    const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
     const generated = await testUtilsUser.generateUserAndSpace();
     user = generated.user;
     projectWithMembers = await createProject({
       project: {
-        ...defaultProjectAndMembersPayload,
+        ...createDefaultProject(),
         walletAddress: randomETHWalletAddress(),
         projectMembers: [
-          {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
+          defaultProjectMember({
+            teamLead: true,
             walletAddress: randomETHWalletAddress(),
             email: `${v4()}@gmail.com`
-          }
+          })
         ]
       },
       userId: user.id

@@ -1,11 +1,11 @@
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { IPropertyTemplate, BoardFields } from '@root/lib/databases/board';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import { InvalidStateError } from '@root/lib/middleware/errors';
+import { DEFAULT_BOARD_BLOCK_ID } from '@root/lib/proposals/blocks/constants';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
-import type { FormFieldInput } from 'lib/forms/interfaces';
-import { InvalidStateError } from 'lib/middleware/errors';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
 import { getBoardProperties } from './getBoardProperties';
 
@@ -42,13 +42,31 @@ export async function updateBoardProperties({
     prisma.proposalEvaluation.findMany({
       where: {
         proposal: {
+          archived: false,
           spaceId: boardBlock.spaceId,
           page: {
+            // Need only proposal templates for rubric evaluation & criteria properties
+            // Need only proposals for rubric evaluation criteria score properties
+            type: {
+              in: ['proposal_template', 'proposal']
+            },
             deletedAt: null
           }
         }
       },
       select: {
+        proposal: {
+          select: {
+            page: {
+              select: {
+                sourceTemplateId: true,
+                type: true,
+                title: true,
+                id: true
+              }
+            }
+          }
+        },
         type: true,
         title: true,
         rubricCriteria: {
@@ -77,9 +95,10 @@ export async function updateBoardProperties({
         proposal: {
           some: {
             page: {
-              type: 'proposal',
+              type: 'proposal_template',
               deletedAt: null
             },
+            archived: false,
             spaceId: boardBlock.spaceId
           }
         }
@@ -94,6 +113,7 @@ export async function updateBoardProperties({
           select: {
             page: {
               select: {
+                id: true,
                 createdAt: true
               }
             }
@@ -116,7 +136,13 @@ export async function updateBoardProperties({
 
   const formFields: FormFieldInput[] = forms
     .sort((a, b) => (a.proposal[0]?.page?.createdAt.getTime() ?? 0) - (b.proposal[0]?.page?.createdAt.getTime() ?? 0))
-    .flatMap((p) => p.formFields.map((field) => ({ ...field, options: field.options as FormFieldInput['options'] })));
+    .flatMap((p) =>
+      p.formFields.map((field) => ({
+        ...field,
+        pageId: p.proposal[0].page?.id,
+        options: field.options as FormFieldInput['options']
+      }))
+    );
 
   const proposalCustomProperties = (proposalBoardBlock?.fields.cardProperties ?? []) as IPropertyTemplate[];
   const boardProperties = getBoardProperties({

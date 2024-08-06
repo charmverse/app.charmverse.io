@@ -17,11 +17,11 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson, ProposalWorkflowTyped, PermissionJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { blockToPrisma, prismaToBlock } from '@root/lib/databases/block';
+import type { Board } from '@root/lib/databases/board';
+import type { BoardViewFields } from '@root/lib/databases/boardView';
 import { v4 } from 'uuid';
 
-import { blockToPrisma, prismaToBlock } from 'lib/databases/block';
-import type { Board } from 'lib/databases/board';
-import type { BoardViewFields } from 'lib/databases/boardView';
 import { createMockBoard, createMockView } from 'testing/mocks/block';
 import type { MockPageInput } from 'testing/mocks/page';
 import { createMockPage } from 'testing/mocks/page';

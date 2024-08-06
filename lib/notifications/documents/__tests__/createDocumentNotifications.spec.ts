@@ -1,20 +1,18 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser, testUtilsBounties } from '@charmverse/core/test';
-import { v4 } from 'uuid';
-
-import { addComment } from 'lib/comments/addComment';
-import { createPostComment } from 'lib/forums/comments/createPostComment';
-import { createForumPost } from 'lib/forums/posts/createForumPost';
-import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
-import { createPageComment } from 'lib/pages/comments/createPageComment';
-import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { builders as _ } from 'lib/prosemirror/builders';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import { work } from 'lib/rewards/work';
-import { assignRole } from 'lib/roles';
-import { createThread } from 'lib/threads';
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
+import { addComment } from '@root/lib/comments/addComment';
+import { createPostComment } from '@root/lib/forums/comments/createPostComment';
+import { createForumPost } from '@root/lib/forums/posts/createForumPost';
+import { createNotificationsFromEvent } from '@root/lib/notifications/createNotificationsFromEvent';
+import { createPageComment } from '@root/lib/pages/comments/createPageComment';
+import { upsertPostCategoryPermission } from '@root/lib/permissions/forum/upsertPostCategoryPermission';
+import { builders as _ } from '@root/lib/prosemirror/builders';
+import { emptyDocument } from '@root/lib/prosemirror/constants';
+import type { UserMentionMetadata } from '@root/lib/prosemirror/extractMentions';
+import { work } from '@root/lib/rewards/work';
+import { assignRole } from '@root/lib/roles';
+import { createThread } from '@root/lib/threads';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import {
   getApplicationCommentEntity,
   getCommentEntity,
@@ -23,8 +21,10 @@ import {
   getPostEntity,
   getSpaceEntity,
   getUserEntity
-} from 'lib/webhookPublisher/entities';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+} from '@root/lib/webhookPublisher/entities';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { v4 } from 'uuid';
+
 import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { createRole } from 'testing/utils/roles';

@@ -18,7 +18,7 @@ export function OptimismProjectLink({ value }: { value?: OpProjectFieldValue }) 
   }
 
   return (
-    <Link href={`https://retrolist.app/project/${value.attestationId}`} target='_blank'>
+    <Link href={`https://retrolist.app/project/${value.projectRefUID}`} target='_blank'>
       <Stack direction='row' gap={0.5} alignItems='center'>
         <Typography>{value.projectTitle}</Typography>
         <LaunchIcon fontSize='small' />

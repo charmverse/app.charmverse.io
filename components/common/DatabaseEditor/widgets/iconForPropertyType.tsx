@@ -25,6 +25,7 @@ export const iconForPropertyType = (propertyType: PropertyType | 'title', props?
     case 'createdBy':
       return <PersonIcon fontSize='small' {...props} />;
     case 'createdTime':
+    case 'proposalPublishedAt':
       return <AccessTimeIcon fontSize='small' {...props} />;
     case 'date':
       return <EventNoteIcon fontSize='small' {...props} />;
@@ -35,6 +36,7 @@ export const iconForPropertyType = (propertyType: PropertyType | 'title', props?
     case 'multiSelect':
       return <FormatListBulletedIcon fontSize='small' {...props} />;
     case 'proposalEvaluationAverage':
+    case 'proposalEvaluationReviewerAverage':
     case 'proposalEvaluationTotal':
     case 'proposalRubricCriteriaTotal':
     case 'proposalRubricCriteriaAverage':

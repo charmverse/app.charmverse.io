@@ -1,6 +1,6 @@
 // playwright-dev-page.ts
 import type { Locator, Page } from '@playwright/test';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 
 import { baseUrl } from 'testing/mockApiCall';
 

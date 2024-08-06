@@ -1,6 +1,5 @@
-import request from 'supertest';
-
 import { app } from '@connect-api/server';
+import request from 'supertest';
 
 describe('GET /health', () => {
   // Simple heuristic, admin can always see everything

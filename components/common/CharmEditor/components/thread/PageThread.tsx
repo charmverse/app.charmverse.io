@@ -35,7 +35,7 @@ import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import InlineCharmEditor from '../../InlineCharmEditor';
+import { InlineCharmEditor } from '../../index';
 import { scrollToThread } from '../inlineComment/inlineComment.utils';
 
 const ContextBorder = styled.div`

@@ -4,10 +4,14 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Box, ButtonGroup, MenuItem, Stack, Tooltip, Typography, ListItemIcon, ListItemText } from '@mui/material';
+import { getAbsolutePath } from '@root/lib/utils/browser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useRouter } from 'next/router';
 import { useRef } from 'react';
 
+import charmClient from 'charmClient/charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
+import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 import { EditIcon } from 'components/common/Icons/EditIcon';
@@ -18,6 +22,7 @@ import { PublishProposalAction } from 'components/common/PageActions/components/
 import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import type { TemplateItem } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -51,8 +56,14 @@ export function NewProposalButton() {
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
   const { trigger: trashPages } = useTrashPages();
-
   const canCreateProposal = spacePermissions?.createProposals;
+
+  const { space } = useCurrentSpace();
+  const { data: workflows } = useGetProposalWorkflows(space?.id);
+
+  const templatesRequired = !!space?.requireProposalTemplate;
+
+  const hasWorkflows = !!workflows?.length;
 
   const proposalTemplatePages: TemplateItem[] = (proposalTemplates || []).map((proposal) => ({
     id: proposal.pageId,
@@ -76,6 +87,11 @@ export function NewProposalButton() {
   }
 
   function createFromTemplate(template: TemplateItem) {
+    if (space?.domain === 'op-grants') {
+      charmClient.track.trackActionOp('click_proposal_creation_button', {
+        spaceId: space.id
+      });
+    }
     navigateToSpacePath(`/proposals/new`, { template: template.id });
   }
 
@@ -85,17 +101,47 @@ export function NewProposalButton() {
 
   return (
     <>
-      <Tooltip title={!canCreateProposal ? 'You do not have the permission to create a proposal.' : ''}>
+      <Tooltip
+        title={
+          !canCreateProposal
+            ? 'You do not have the permission to create a proposal.'
+            : !hasWorkflows
+            ? 'Add a workflow from the space settings to start using proposals'
+            : ''
+        }
+      >
         <Box>
           <ButtonGroup variant='contained' ref={buttonRef}>
-            <Button disabled={!canCreateProposal} href='/proposals/new' data-test='new-proposal-button'>
+            <Button
+              disabled={!canCreateProposal || !hasWorkflows}
+              onClick={() => {
+                if (space?.domain === 'op-grants') {
+                  charmClient.track.trackActionOp('click_proposal_creation_button', {
+                    spaceId: space.id
+                  });
+                }
+                if (templatesRequired) {
+                  popupState.open();
+                }
+              }}
+              // We don't want to navigate to the new proposal page if the space enforces creating templates from a proposal
+              href={templatesRequired ? undefined : '/proposals/new'}
+              data-test='new-proposal-button'
+            >
               Create
             </Button>
             <Button
               data-test='proposal-template-select'
               size='small'
-              disabled={!canCreateProposal}
-              onClick={popupState.open}
+              disabled={!canCreateProposal || !hasWorkflows}
+              onClick={() => {
+                if (space?.domain === 'op-grants') {
+                  charmClient.track.trackActionOp('click_proposal_creation_button', {
+                    spaceId: space.id
+                  });
+                }
+                popupState.open();
+              }}
             >
               <KeyboardArrowDown />
             </Button>

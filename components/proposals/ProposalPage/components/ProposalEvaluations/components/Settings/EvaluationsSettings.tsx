@@ -25,7 +25,10 @@ import { RewardSettings } from './components/RewardSettings';
 import { RubricTemplatesButton } from './components/RubricTemplatesButton';
 
 export type Props = {
-  proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId' | 'selectedCredentialTemplates'>;
+  proposal?: Pick<
+    ProposalPropertiesInput,
+    'fields' | 'evaluations' | 'workflowId' | 'selectedCredentialTemplates' | 'makeRewardsPublic'
+  >;
   isTemplate?: boolean;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
@@ -61,7 +64,7 @@ export function EvaluationsSettings({
   const templatePageOptions = useMemo(
     () =>
       (proposalTemplates || []).map((template) => ({
-        id: template.proposalId,
+        id: template.pageId,
         title: template.title
       })),
     [proposalTemplates]

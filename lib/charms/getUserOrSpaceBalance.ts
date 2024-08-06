@@ -1,4 +1,4 @@
-import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
+import { getUserOrSpaceWallet } from '@root/lib/charms/getUserOrSpaceWallet';
 
 export type CharmsBalance = { id: string | null; balance: number };
 

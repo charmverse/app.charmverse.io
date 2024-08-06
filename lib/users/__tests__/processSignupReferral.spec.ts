@@ -1,7 +1,9 @@
-import { getUserOrSpaceBalance } from 'lib/charms/getUserOrSpaceBalance';
-import { getReferralCode } from 'lib/users/getReferralCode';
-import { processSignupReferral } from 'lib/users/processSignupReferral';
+import { getUserOrSpaceBalance } from '@root/lib/charms/getUserOrSpaceBalance';
+
 import { generateUserAndSpace } from 'testing/setupDatabase';
+
+import { getReferralCode } from '../getReferralCode';
+import { processSignupReferral } from '../processSignupReferral';
 
 describe('processSignupReferral', () => {
   it('Should successfully process valid referral code and add charms to referee', async () => {

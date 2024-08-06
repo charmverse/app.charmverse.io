@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-
-import type { BoardFields } from 'lib/databases/board';
-import { DEFAULT_BOARD_VIEW_BLOCK_ID, DEFAULT_TABLE_VIEW_BLOCK_ID } from 'lib/databases/customBlocks/constants';
+import type { BoardFields } from '@root/lib/databases/board';
+import { DEFAULT_BOARD_VIEW_BLOCK_ID, DEFAULT_TABLE_VIEW_BLOCK_ID } from '@root/lib/databases/customBlocks/constants';
 
 import { DEFAULT_BOARD_BLOCK_ID } from '../constants';
 import { upsertDefaultRewardsBoard } from '../upsertDefaultRewardsBoard';

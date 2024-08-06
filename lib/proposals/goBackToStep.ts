@@ -1,11 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getDraftStep } from 'lib/proposals/getCurrentStep';
-import { isTruthy } from 'lib/utils/types';
-import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
-import { relay } from 'lib/websockets/relay';
+import { getDraftStep } from '@root/lib/proposals/getCurrentStep';
+import { isTruthy } from '@root/lib/utils/types';
+import { publishProposalEvent } from '@root/lib/webhookPublisher/publishEvent';
+import { relay } from '@root/lib/websockets/relay';
 
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 
@@ -130,6 +129,7 @@ export async function goBackToStep({
         id: proposalId
       },
       data: {
+        publishedAt: null,
         status: 'draft'
       }
     });

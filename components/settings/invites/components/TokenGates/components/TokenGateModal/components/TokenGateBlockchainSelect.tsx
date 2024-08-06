@@ -1,16 +1,13 @@
 import { FormHelperText, ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
 import type { SelectProps } from '@mui/material/Select';
-import { getChainById, getChainList } from 'connectors/chains';
-import type { IChainDetails } from 'connectors/chains';
+import { getChainById, getChainList } from '@root/connectors/chains';
+import type { IChainDetails } from '@root/connectors/chains';
 import { forwardRef } from 'react';
 import type { Ref, ReactNode } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { isAnkrChain } from 'lib/blockchain/provider/ankr/config';
-import { isZkSyncChain } from 'lib/blockchain/provider/zksync/config';
-import { isZoraChain } from 'lib/blockchain/provider/zora/config';
 
 function SelectField(
   props: SelectProps<string> & { helperMessage?: ReactNode; chains?: IChainDetails[] },
@@ -19,12 +16,7 @@ function SelectField(
   const { helperMessage, chains: chainsProp, ...restProps } = props;
 
   const { space } = useCurrentSpace();
-  const chainList =
-    chainsProp ||
-    getChainList({ enableTestnets: !!space?.enableTestnets }).filter(
-      (chain) =>
-        !!chain.alchemyUrl || isAnkrChain(chain.chainId) || isZkSyncChain(chain.chainId) || isZoraChain(chain.chainId)
-    );
+  const chainList = chainsProp || getChainList({ enableTestnets: !!space?.enableTestnets });
 
   return (
     <FieldWrapper label='Blockchain'>

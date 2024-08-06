@@ -1,9 +1,8 @@
+import { isTruthy } from '@root/lib/utils/types';
 import type { Mark, MarkType } from 'prosemirror-model';
 import type { NodeWithPos } from 'prosemirror-utils';
 import { findChildrenByMark } from 'prosemirror-utils';
 import type { EditorView } from 'prosemirror-view';
-
-import { isTruthy } from 'lib/utils/types';
 
 export function removeInlineCommentMark(view: EditorView, threadId: string, deleteThread?: boolean) {
   deleteThread = deleteThread ?? false;

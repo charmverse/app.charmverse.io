@@ -1,11 +1,11 @@
 import { Button, Chip, MenuItem, TextField, Typography, Paper, Box } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import type { ReactNode } from 'react';
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectOptionItem } from 'components/common/form/fields/Select/SelectOptionItem';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';

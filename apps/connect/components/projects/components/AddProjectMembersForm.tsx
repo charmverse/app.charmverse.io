@@ -1,14 +1,12 @@
-import { log } from '@charmverse/core/log';
-import { actionCreateProject } from '@connect/lib/actions/createProject';
-import type { FormValues } from '@connect/lib/projects/form';
+import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { FormValues } from '@connect-shared/lib/projects/form';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Button, Stack, Typography } from '@mui/material';
-import { useAction } from 'next-safe-action/hooks';
+import { isTruthy } from '@root/lib/utils/types';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
-
-import type { LoggedInUser } from 'models/User';
 
 import { FarcasterCard } from '../../common/FarcasterCard';
 
@@ -22,33 +20,27 @@ export function AddProjectMembersForm({
   handleSubmit,
   onBack,
   user,
-  onSuccess
+  initialFarcasterProfiles = [],
+  execute,
+  isExecuting
 }: {
+  initialFarcasterProfiles?: FarcasterProfile[];
   user: LoggedInUser;
   onBack: VoidFunction;
   control: Control<FormValues>;
   isValid: boolean;
   handleSubmit: UseFormHandleSubmit<FormValues>;
-  onSuccess: ({ projectPath, projectId }: { projectPath: string; projectId: string }) => void;
+  execute: (data: FormValues) => void;
+  isExecuting: boolean;
 }) {
   const { append, remove } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
     control
   });
-  const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] = useState<FarcasterProfile[]>([]);
-  // @ts-ignore
-  const { execute, isExecuting } = useAction(actionCreateProject, {
-    onSuccess: (data) => {
-      onSuccess({ projectId: data.data?.projectId as string, projectPath: data.data?.projectPath as string });
-    },
-    onError(err) {
-      log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
-    }
-  });
+  const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] =
+    useState<FarcasterProfile[]>(initialFarcasterProfiles);
 
-  const farcasterDetails = user.farcasterUser?.account as Required<
-    Pick<FarcasterBody, 'bio' | 'username' | 'displayName' | 'pfpUrl'>
-  >;
+  const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
     <form
@@ -67,11 +59,11 @@ export function AddProjectMembersForm({
         />
         <Stack gap={1}>
           <SearchFarcasterUser
+            filteredFarcasterIds={selectedFarcasterProfiles.map((profile) => profile.fid).filter(isTruthy)}
             setSelectedProfile={(farcasterProfile) => {
               if (farcasterProfile) {
                 append({
-                  farcasterId: farcasterProfile.fid!,
-                  name: farcasterProfile.displayName!
+                  farcasterId: farcasterProfile.fid!
                 });
                 setSelectedFarcasterProfiles([...selectedFarcasterProfiles, farcasterProfile]);
               }
@@ -108,9 +100,20 @@ export function AddProjectMembersForm({
           >
             Back
           </Button>
-          <Button disabled={!isValid || isExecuting} type='submit'>
-            Publish
-          </Button>
+          <Stack direction='row' gap={1}>
+            {isExecuting && (
+              <LoadingComponent
+                height={20}
+                size={20}
+                minHeight={20}
+                label='Submitting your project onchain'
+                flexDirection='row-reverse'
+              />
+            )}
+            <Button data-test='project-form-publish' disabled={!isValid || isExecuting} type='submit'>
+              Publish
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
     </form>

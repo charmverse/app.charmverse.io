@@ -1,6 +1,6 @@
+import { InvalidStateError, NotFoundError } from '@root/lib/middleware';
 import { v4 } from 'uuid';
 
-import { InvalidStateError, NotFoundError } from 'lib/middleware';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { stripeMock, stripeMockIds } from 'testing/stripeMock';
 import { addSpaceSubscription } from 'testing/utils/spaces';

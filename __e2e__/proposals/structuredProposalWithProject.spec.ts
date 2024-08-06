@@ -3,10 +3,10 @@ import type { Space, User } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
-import { loginBrowserUser } from '__e2e__/utils/mocks';
+import { generateUser, loginBrowserUser } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
 
-import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { createDefaultProject, defaultProjectMember } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
@@ -15,7 +15,6 @@ import { randomETHWalletAddress } from 'lib/utils/blockchain';
 
 let space: Space;
 let spaceAdmin: User;
-let spaceMember: User;
 let defaultWorkflows: ProposalWorkflowTyped[];
 let project: ProjectWithMembers;
 let proposalTemplateId: string;
@@ -31,34 +30,8 @@ test.beforeAll(async () => {
 
   space = generated.space;
 
-  spaceAdmin = await testUtilsUser.generateSpaceUser({
-    spaceId: space.id,
-    isAdmin: true
-  });
-
-  spaceMember = await testUtilsUser.generateSpaceUser({
-    spaceId: space.id,
-    isAdmin: false
-  });
-
-  await Promise.all([spaceAdmin.id]);
-
-  await prisma.spaceRole.updateMany({
-    where: {
-      OR: [
-        {
-          userId: spaceAdmin.id,
-          spaceId: space.id
-        },
-        {
-          userId: spaceMember.id,
-          spaceId: space.id
-        }
-      ]
-    },
-    data: {
-      onboarded: true
-    }
+  spaceAdmin = await generateUser({
+    space: { id: space.id, isAdmin: true }
   });
 
   // Set to an exact workflow so selectors always work
@@ -75,22 +48,20 @@ test.beforeAll(async () => {
     }
   ];
 
-  const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
   project = await createProject({
     project: {
-      ...defaultProjectAndMembersPayload,
+      ...createDefaultProject(),
       name: 'Test Project',
       projectMembers: [
-        {
-          ...defaultProjectAndMembersPayload.projectMembers[0],
+        defaultProjectMember({
+          teamLead: true,
           email: `test@${v4()}.com`,
           name: 'Test Member'
-        },
-        {
-          ...defaultProjectAndMembersPayload.projectMembers[0],
+        }),
+        defaultProjectMember({
           email: `test@${v4()}.com`,
           name: 'Test Member 2'
-        }
+        })
       ]
     },
     userId: spaceAdmin.id
@@ -446,12 +417,15 @@ test.describe.serial('Structured proposal template with project', () => {
     });
   });
 
-  test.skip('Visit an existing proposal as a space member should hide private project fields', async ({
+  test('Visit an existing proposal as a space member should hide private project fields', async ({
     projectSettings,
     documentPage,
     proposalPage,
     proposalsListPage
   }) => {
+    const spaceMember = await generateUser({
+      space: { id: space.id }
+    });
     await loginBrowserUser({
       browserPage: proposalsListPage.page,
       userId: spaceMember.id
@@ -482,14 +456,7 @@ test.describe.serial('Structured proposal template with project', () => {
 
     await proposalPage.page.waitForURL(`**/${proposalPath}`);
 
-    // Wallet address was manually made public so it should be visible
-    expect(
-      (await projectSettings
-        .getProjectField({
-          fieldName: 'walletAddress'
-        })
-        .inputValue()) !== ''
-    ).toBeTruthy();
+    await expect(projectSettings.getProjectField({ fieldName: 'name' })).toHaveValue('Updated Project Name');
 
     await expect(
       projectSettings.getProjectField({

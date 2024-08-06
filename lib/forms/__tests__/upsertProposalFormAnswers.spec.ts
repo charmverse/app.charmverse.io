@@ -1,11 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { FormFieldAnswer, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createForm } from '@root/lib/forms/createForm';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import { upsertProposalFormAnswers } from '@root/lib/forms/upsertProposalFormAnswers';
 import { v4 } from 'uuid';
 
-import { createForm } from 'lib/forms/createForm';
-import type { FormFieldInput } from 'lib/forms/interfaces';
-import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 

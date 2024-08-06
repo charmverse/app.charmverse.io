@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import { watchAccount } from '@wagmi/core';
-import { getWagmiConfig } from 'connectors/config';
+import { getWagmiConfig } from '@root/connectors/config';
 import type { Signer } from 'ethers';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -21,7 +21,7 @@ import type {
 import type { SystemError } from 'lib/utils/errors';
 import { MissingWeb3AccountError } from 'lib/utils/errors';
 import { lowerCaseEqual } from 'lib/utils/strings';
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 
 import { useUser } from './useUser';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';

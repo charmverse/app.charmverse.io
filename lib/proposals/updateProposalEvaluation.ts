@@ -1,4 +1,10 @@
-import type { Prisma, ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma';
+import type {
+  Prisma,
+  ProposalAppealReviewer,
+  ProposalEvaluationApprover,
+  ProposalEvaluationType,
+  ProposalReviewer
+} from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { VoteSettings } from './interfaces';
@@ -11,7 +17,8 @@ export type UpdateEvaluationRequest = {
   voteSettings?: VoteSettings | null;
   requiredReviews?: number | null;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
-  appealReviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[] | null;
+  appealReviewers?: Partial<Pick<ProposalAppealReviewer, 'userId' | 'roleId'>>[] | null;
+  evaluationApprovers?: Partial<Pick<ProposalEvaluationApprover, 'userId' | 'roleId'>>[] | null;
   finalStep?: boolean | null;
 };
 
@@ -21,6 +28,7 @@ export async function updateProposalEvaluation({
   evaluationId,
   voteSettings,
   reviewers,
+  evaluationApprovers,
   appealReviewers,
   actorId,
   requiredReviews,
@@ -56,6 +64,22 @@ export async function updateProposalEvaluation({
           evaluationId,
           proposalId,
           ...reviewer
+        }))
+      });
+    }
+
+    if (evaluationApprovers) {
+      await tx.proposalEvaluationApprover.deleteMany({
+        where: {
+          evaluationId,
+          proposalId
+        }
+      });
+      await tx.proposalEvaluationApprover.createMany({
+        data: evaluationApprovers.map((approver) => ({
+          evaluationId,
+          proposalId,
+          ...approver
         }))
       });
     }

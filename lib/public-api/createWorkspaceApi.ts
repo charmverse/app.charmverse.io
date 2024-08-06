@@ -1,24 +1,23 @@
 import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { baseUrl } from 'config/constants';
-import { upsertSpaceRolesFromDiscord } from 'lib/discord/collabland/upsertSpaceRolesFromDiscord';
-import { upsertUserRolesFromDiscord } from 'lib/discord/collabland/upsertUserRolesFromDiscord';
-import { upsertUserForDiscordId } from 'lib/discord/upsertUserForDiscordId';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
-import type { SpaceApiResponse } from 'lib/public-api/interfaces';
-import { staticSpaceTemplates } from 'lib/spaces/config';
-import type { SpaceCreateInput } from 'lib/spaces/createSpace';
-import { createWorkspace } from 'lib/spaces/createSpace';
-import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
-import { createOrGetUserFromWallet } from 'lib/users/createUser';
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import { InvalidInputError } from 'lib/utils/errors';
-import { isValidUrl } from 'lib/utils/isValidUrl';
-import { uid } from 'lib/utils/strings';
-import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
+import { baseUrl } from '@root/config/constants';
+import { upsertSpaceRolesFromDiscord } from '@root/lib/discord/collabland/upsertSpaceRolesFromDiscord';
+import { upsertUserRolesFromDiscord } from '@root/lib/discord/collabland/upsertUserRolesFromDiscord';
+import { upsertUserForDiscordId } from '@root/lib/discord/upsertUserForDiscordId';
+import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { updateTrackGroupProfile } from '@root/lib/metrics/mixpanel/updateTrackGroupProfile';
+import type { SpaceApiResponse } from '@root/lib/public-api/interfaces';
+import { staticSpaceTemplates } from '@root/lib/spaces/config';
+import type { SpaceCreateInput } from '@root/lib/spaces/createSpace';
+import { createWorkspace } from '@root/lib/spaces/createSpace';
+import { getAvailableDomainName } from '@root/lib/spaces/getAvailableDomainName';
+import { createOrGetUserFromWallet } from '@root/lib/users/createUser';
+import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
+import { InvalidInputError } from '@root/lib/utils/errors';
+import { isValidUrl } from '@root/lib/utils/isValidUrl';
+import { uid } from '@root/lib/utils/strings';
+import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
+import { publishMemberEvent } from '@root/lib/webhookPublisher/publishEvent';
 
 import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from './interfaces';
 

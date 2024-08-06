@@ -1,10 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { signAndPublishCharmverseCredential } from '@root/lib/credentials/attestOffchain';
+import type { ExternalProjectMetadata } from '@root/lib/credentials/schemas/external';
 import { optimism } from 'viem/chains';
 import { getAddress } from 'viem/utils';
-
-import { signAndPublishCharmverseCredential } from 'lib/credentials/attestOffchain';
-import type { ExternalProjectMetadata } from 'lib/credentials/schemas/external';
 
 import { GITCOIN_SUPPORTED_CHAINS } from './constants';
 import { getProjectOwners } from './getProjectDetails';
@@ -18,7 +17,7 @@ export async function createOffchainCredentialsForProjects() {
 
     for (const application of approvedApplications) {
       const metadata = application.metadata;
-      const recepient = getAddress(metadata.recipient);
+      const recepient = getAddress(metadata.recipient) as `0x${string}`;
       const owners = await getProjectOwners([recepient], chainId);
       const approvedStatusSnapshot = application.statusSnapshots?.find((s) => String(s.status) === '1');
       const approvedSnapshotDate = new Date((Number(approvedStatusSnapshot?.timestamp) || 0) * 1000).toISOString();

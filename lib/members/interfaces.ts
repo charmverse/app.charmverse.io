@@ -10,8 +10,7 @@ import type {
   UserDetails,
   VisibilityView
 } from '@charmverse/core/prisma';
-
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { SelectOptionType } from '@root/lib/forms/interfaces';
 
 export type MemberPropertyValueType = string | number | string[] | null | boolean | Record<string, any>;
 

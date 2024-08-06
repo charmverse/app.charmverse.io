@@ -1,0 +1,32 @@
+/* @import './czi-vars.css'; */
+
+.czi-color-editor {
+  /* background: #fff;
+  box-shadow: var(--czi-overlay-shadow); */
+  font-size: var(--czi-font-size);
+  padding: 4px 10px;
+}
+
+.czi-color-option {
+  display: inline-block;
+  cursor: pointer;
+  border: solid 1px var(--background-default);
+  height: 18px;
+  margin: 1px;
+  padding: 0;
+  width: 18px;
+}
+
+.czi-color-option.active,
+.czi-color-option:hover {
+  outline: solid 1px #ccc;
+}
+
+.czi-color-editor-section {
+  margin: 8px 0;
+  width: 200px;
+}
+
+.czi-color-editor-section .czi-color-editor-cell {
+  border-radius: 0;
+}

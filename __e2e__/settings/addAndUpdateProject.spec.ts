@@ -3,7 +3,7 @@ import { test as base, expect } from '@playwright/test';
 import { ProjectSettings } from '__e2e__/po/settings/projectSettings.po';
 import { v4 } from 'uuid';
 
-import { baseUrl } from 'config/constants';
+import { baseUrl } from '@root/config/constants';
 import { randomETHWallet } from 'lib/utils/blockchain';
 import { generateSpaceUser } from 'testing/setupDatabase';
 

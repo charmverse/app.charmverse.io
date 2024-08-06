@@ -1,6 +1,6 @@
-import { getCommonSpaceIds } from 'lib/members/getCommonSpaceIds';
-import { getSpacesPropertyValues } from 'lib/members/getSpacesPropertyValues';
-import type { CommonSpacesInput, PropertyValue } from 'lib/members/interfaces';
+import { getCommonSpaceIds } from '@root/lib/members/getCommonSpaceIds';
+import { getSpacesPropertyValues } from '@root/lib/members/getSpacesPropertyValues';
+import type { CommonSpacesInput, PropertyValue } from '@root/lib/members/interfaces';
 
 type CommonSpaceProps = CommonSpacesInput & {
   spaceId: string;

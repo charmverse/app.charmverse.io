@@ -3,7 +3,6 @@ import { Divider, ListItemIcon, MenuItem, Typography, Box } from '@mui/material'
 import type { PluginKey } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { PagesList } from 'components/common/PagesList';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
@@ -14,13 +13,14 @@ import type { Member } from 'lib/members/interfaces';
 import { safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
 import { sanitizeForRegex } from 'lib/utils/strings';
 
+import { useEditorViewContext, usePluginState } from '../../@bangle.dev/react/hooks';
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggestTooltipPlugin';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipSpec';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
 
-export function _MentionsPopup({ pluginKey, pageId }: { pluginKey: PluginKey<MentionPluginState>; pageId?: string }) {
+function _MentionsPopup({ pluginKey, pageId }: { pluginKey: PluginKey<MentionPluginState>; pageId?: string }) {
   const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
   const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   if (isVisible) {

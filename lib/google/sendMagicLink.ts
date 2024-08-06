@@ -1,3 +1,4 @@
+import { googleWebClientConfig } from '@root/config/constants';
 import admin from 'firebase-admin';
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';

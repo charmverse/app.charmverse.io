@@ -1,4 +1,4 @@
-import { baseUrl, isDevEnv } from 'config/constants';
+import { baseUrl, isDevEnv } from '@root/config/constants';
 
 import { getAppApexDomain } from './domains/getAppApexDomain';
 import { getCustomDomainFromHost } from './domains/getCustomDomainFromHost';

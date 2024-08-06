@@ -1,23 +1,32 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { PageType, ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { IPropertyTemplate } from '@root/lib/databases/board';
+import { proposalDbProperties } from '@root/lib/databases/proposalDbProperties';
+import type { FormFieldInput, SelectOptionType } from '@root/lib/forms/interfaces';
+import { projectFieldProperties, projectMemberFieldProperties } from '@root/lib/projects/formField';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import type { IPropertyTemplate } from 'lib/databases/board';
-import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
-import type { FormFieldInput } from 'lib/forms/interfaces';
-import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { filterBoardProperties } from './filterBoardProperties';
 
 // Note: maybe we should instead hav ea whitelist of form field answers that we support?
-export const excludedFieldTypes = ['project_profile', 'label'];
+export const excludedFieldTypes = ['project_profile', 'label', 'optimism_project_profile'];
+
+type PartialPropertyTemplate = Omit<IPropertyTemplate, 'options'>;
 
 // define properties that will apply to all source fields
 const defaultOptions = { readOnly: true, readOnlyValues: true, options: [] };
 
-type EvaluationStep = {
+export type EvaluationStep = {
+  proposal: {
+    page?: {
+      type: PageType;
+      id?: string | null;
+      title: string;
+      sourceTemplateId?: string | null;
+    } | null;
+  };
   title: string;
   type: ProposalEvaluationType;
   rubricCriteria: {
@@ -44,16 +53,17 @@ export function getBoardProperties({
   proposalCustomProperties?: IPropertyTemplate[];
   evaluationSteps?: EvaluationStep[];
   currentCardProperties?: IPropertyTemplate[];
-  formFields?: FormFieldInput[];
+  formFields?: (FormFieldInput & { pageId?: string })[];
 }) {
+  const proposalTemplateEvaluations = evaluationSteps.filter(
+    (step) => step.proposal.page?.type === 'proposal_template'
+  );
+  const proposalEvaluations = evaluationSteps.filter((step) => step.proposal.page?.type === 'proposal');
+
   const evaluationStepTitles: Set<string> = new Set();
-  const rubricStepTitles: Set<string> = new Set();
-  evaluationSteps.forEach((e) => {
-    evaluationStepTitles.add(e.title);
-    if (e.type === 'rubric') {
-      rubricStepTitles.add(e.title);
-    }
-  });
+  for (const evaluationStep of evaluationSteps) {
+    evaluationStepTitles.add(evaluationStep.title);
+  }
 
   const boardProperties = [...currentCardProperties];
 
@@ -61,6 +71,7 @@ export function getBoardProperties({
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalReviewerNotes());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalAuthor());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalStatus());
+  applyToPropertiesByType(boardProperties, proposalDbProperties.proposalPublishedAt());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalUrl());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
   applyToPropertiesByType(boardProperties, {
@@ -74,24 +85,24 @@ export function getBoardProperties({
     })
   );
 
-  // properties per each evaluation step
-  applyProposalEvaluationProperties(boardProperties, Array.from(rubricStepTitles));
-
   // custom properties from the original proposals container
   proposalCustomProperties.forEach((cardProp) => {
     applyToPropertiesById(boardProperties, cardProp);
   });
 
+  // properties per each evaluation step
+  applyProposalEvaluationProperties(boardProperties, proposalTemplateEvaluations);
+
+  // properties for each unique questions on rubric evaluation step
+  applyRubricEvaluationQuestionProperties(boardProperties, proposalTemplateEvaluations);
+
+  applyRubricEvaluationReviewerProperties(boardProperties, proposalEvaluations, proposalTemplateEvaluations);
+
   // properties related to form proposals
   applyFormFieldProperties(boardProperties, formFields);
 
-  // properties for each unique questions on rubric evaluation step
-  applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps);
-
   // properties related to project profile
   applyProjectProfileProperties(boardProperties);
-
-  applyRubricEvaluationReviewerProperties(boardProperties, evaluationSteps);
 
   if (!selectedProperties) {
     return boardProperties;
@@ -100,15 +111,24 @@ export function getBoardProperties({
   return filterBoardProperties({
     boardProperties,
     proposalCustomProperties,
-    selectedProperties
+    selectedProperties,
+    evaluationSteps: proposalTemplateEvaluations
   });
 }
 
 function applyRubricEvaluationReviewerProperties(
   boardProperties: IPropertyTemplate[],
-  evaluationSteps: EvaluationStep[]
+  evaluationSteps: EvaluationStep[],
+  templateEvaluationSteps: EvaluationStep[]
 ) {
   evaluationSteps.forEach((evaluationStep) => {
+    const templateEvaluationStep = templateEvaluationSteps.find(
+      (step) => step.proposal.page?.id === evaluationStep.proposal.page?.sourceTemplateId
+    );
+    const templatePage = templateEvaluationStep?.proposal.page;
+    if (!templatePage) {
+      return;
+    }
     if (evaluationStep.type === 'rubric') {
       evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
         rubricCriteria.answers.forEach((answer) => {
@@ -117,18 +137,22 @@ function applyRubricEvaluationReviewerProperties(
               p.type === 'proposalRubricCriteriaReviewerScore' &&
               p.evaluationTitle === evaluationStep.title &&
               p.criteriaTitle === rubricCriteria.title &&
-              p.reviewerId === answer.user.id
+              p.reviewerId === answer.user.id &&
+              p.templateId === templatePage.id
           );
           if (existingCriteriaReviewerScorePropIndex === -1) {
             boardProperties.push({
               id: uuid(),
               type: 'proposalRubricCriteriaReviewerScore',
-              name: `${evaluationStep.title} - ${rubricCriteria.title} - ${answer.user.username} - Score`,
+              name: `${templatePage ? `${templatePage.title} - ` : ''}${evaluationStep.title} - ${
+                rubricCriteria.title
+              } - ${answer.user.username} - Score`,
               evaluationTitle: evaluationStep.title,
               criteriaTitle: rubricCriteria.title,
               reviewerId: answer.user.id,
               private: false,
-              options: []
+              options: [],
+              templateId: templatePage.id ?? undefined
             });
           }
 
@@ -137,18 +161,22 @@ function applyRubricEvaluationReviewerProperties(
               p.type === 'proposalRubricCriteriaReviewerComment' &&
               p.evaluationTitle === evaluationStep.title &&
               p.criteriaTitle === rubricCriteria.title &&
-              p.reviewerId === answer.user.id
+              p.reviewerId === answer.user.id &&
+              p.templateId === templatePage.id
           );
           if (existingCriteriaReviewerCommentPropIndex === -1) {
             boardProperties.push({
               id: uuid(),
               type: 'proposalRubricCriteriaReviewerComment',
-              name: `${evaluationStep.title} - ${rubricCriteria.title} - ${answer.user.username} - Comment`,
+              name: `${templatePage ? `${templatePage.title} - ` : ''}${evaluationStep.title} - ${
+                rubricCriteria.title
+              } - ${answer.user.username} - Comment`,
               evaluationTitle: evaluationStep.title,
               criteriaTitle: rubricCriteria.title,
               reviewerId: answer.user.id,
               private: false,
-              options: []
+              options: [],
+              templateId: templatePage.id ?? undefined
             });
           }
         });
@@ -161,56 +189,42 @@ function applyRubricEvaluationQuestionProperties(
   boardProperties: IPropertyTemplate[],
   evaluationSteps: EvaluationStep[]
 ) {
-  const rubricCriteriaEvaluationTitlesRecord: Record<
-    string,
-    {
-      evaluationTitle: string;
-      rubricCriteriaDescription: string;
-    }
-  > = {};
-  evaluationSteps.forEach((evaluationStep) => {
+  for (const evaluationStep of evaluationSteps) {
     if (evaluationStep.type === 'rubric') {
       evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
-        if (!rubricCriteriaEvaluationTitlesRecord[rubricCriteria.title]) {
-          rubricCriteriaEvaluationTitlesRecord[rubricCriteria.title] = {
-            evaluationTitle: evaluationStep.title,
-            rubricCriteriaDescription: rubricCriteria.description || ''
-          };
-        }
+        const page = evaluationStep.proposal.page;
+        const commonProps: Partial<IPropertyTemplate> = {
+          evaluationTitle: evaluationStep.title,
+          criteriaTitle: rubricCriteria.title,
+          private: false,
+          readOnly: true,
+          readOnlyValues: true,
+          templateId: page?.id ?? undefined,
+          tooltip: rubricCriteria.description || ''
+        };
+
+        applyToPropertiesByTemplateId(boardProperties, {
+          ...commonProps,
+          id: uuid(),
+          type: 'proposalRubricCriteriaTotal',
+          name: `${page ? `${page.title} - ` : ''}${evaluationStep.title} - ${rubricCriteria.title} (Criteria total)`
+        });
+
+        applyToPropertiesByTemplateId(boardProperties, {
+          ...commonProps,
+          id: uuid(),
+          type: 'proposalRubricCriteriaAverage',
+          name: `${page ? `${page.title} - ` : ''}${evaluationStep.title} - ${rubricCriteria.title} (Criteria average)`
+        });
       });
     }
-  });
-
-  Object.entries(rubricCriteriaEvaluationTitlesRecord).forEach(
-    ([rubricCriteriaTitle, { evaluationTitle, rubricCriteriaDescription }]) => {
-      applyToPropertiesByTypeAndName(boardProperties, {
-        id: uuid(),
-        type: 'proposalRubricCriteriaTotal',
-        name: `${evaluationTitle}: ${rubricCriteriaTitle} (Criteria total)`,
-        tooltip: rubricCriteriaDescription,
-        readOnly: true,
-        readOnlyValues: true,
-        evaluationTitle,
-        criteriaTitle: rubricCriteriaTitle,
-        private: false
-      });
-
-      applyToPropertiesByTypeAndName(boardProperties, {
-        id: uuid(),
-        type: 'proposalRubricCriteriaAverage',
-        name: `${evaluationTitle}: ${rubricCriteriaTitle} (Criteria average)`,
-        tooltip: rubricCriteriaDescription,
-        readOnly: true,
-        readOnlyValues: true,
-        evaluationTitle,
-        criteriaTitle: rubricCriteriaTitle,
-        private: false
-      });
-    }
-  );
+  }
 }
 
-function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFields: FormFieldInput[]) {
+function applyFormFieldProperties(
+  boardProperties: IPropertyTemplate[],
+  formFields: (FormFieldInput & { pageId?: string })[]
+) {
   formFields.forEach((formField) => {
     let boardPropertyType: IPropertyTemplate['type'] | null = null;
     let boardPropertyOptions: IPropertyTemplate['options'] = [];
@@ -256,7 +270,8 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
         formFieldId: formField.id,
         readOnly: true,
         readOnlyValues: true,
-        private: formField.private
+        private: formField.private,
+        templateId: formField.pageId
       };
 
       applyFormFieldToProperties(boardProperties, fieldProperty);
@@ -283,32 +298,64 @@ function applyProjectProfileProperties(boardProperties: IPropertyTemplate[]) {
   });
 }
 
-function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[], rubricStepTitles: string[]) {
-  for (const rubricStepTitle of rubricStepTitles) {
-    applyToPropertiesByTypeAndName(boardProperties, {
-      id: uuid(),
-      type: 'proposalEvaluatedBy',
-      name: `${rubricStepTitle} (Step reviewers)`,
-      evaluationTitle: rubricStepTitle
-    });
-
-    applyToPropertiesByTypeAndName(boardProperties, {
-      id: uuid(),
-      type: 'proposalEvaluationTotal',
-      name: `${rubricStepTitle} (Step total)`,
-      evaluationTitle: rubricStepTitle
-    });
-
-    applyToPropertiesByTypeAndName(boardProperties, {
-      id: uuid(),
-      type: 'proposalEvaluationAverage',
-      name: `${rubricStepTitle} (Step average)`,
-      evaluationTitle: rubricStepTitle
-    });
+function applyToPropertiesByTemplateId(
+  boardProperties: IPropertyTemplate[],
+  { id, ...fieldProperty }: PartialPropertyTemplate
+) {
+  const existingPropIndex = boardProperties.findIndex(
+    (p) =>
+      p.type === fieldProperty.type &&
+      p.templateId === fieldProperty.templateId &&
+      p.evaluationTitle === fieldProperty.evaluationTitle &&
+      p.criteriaTitle === fieldProperty.criteriaTitle
+  );
+  if (existingPropIndex === -1) {
+    boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
+  } else {
+    const existingProp = boardProperties[existingPropIndex];
+    boardProperties[existingPropIndex] = { id: existingProp.id, ...defaultOptions, ...fieldProperty };
   }
 }
 
-type PartialPropertyTemplate = Omit<IPropertyTemplate, 'options'>;
+function applyProposalEvaluationProperties(
+  boardProperties: IPropertyTemplate[],
+  evaluationSteps: EvaluationStep[] = []
+) {
+  for (const evaluationStep of evaluationSteps) {
+    const page = evaluationStep.proposal.page;
+    applyToPropertiesByTemplateId(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluatedBy',
+      name: `${page ? `${page.title} - ` : ''}${evaluationStep.title} (Step reviewers)`,
+      evaluationTitle: evaluationStep.title,
+      templateId: page?.id ?? undefined
+    });
+
+    applyToPropertiesByTemplateId(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluationTotal',
+      name: `${page ? `${page.title} - ` : ''}${evaluationStep.title} (Step total)`,
+      evaluationTitle: evaluationStep.title,
+      templateId: page?.id ?? undefined
+    });
+
+    applyToPropertiesByTemplateId(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluationAverage',
+      name: `${page ? `${page.title} - ` : ''}${evaluationStep.title} (Step average)`,
+      evaluationTitle: evaluationStep.title,
+      templateId: page?.id ?? undefined
+    });
+
+    applyToPropertiesByTemplateId(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluationReviewerAverage',
+      name: `${page ? `${page.title} - ` : ''}${evaluationStep.title} (Step reviewer average)`,
+      evaluationTitle: evaluationStep.title,
+      templateId: page?.id ?? undefined
+    });
+  }
+}
 
 function applyToPropertiesById(boardProperties: IPropertyTemplate[], fieldProperty: PartialPropertyTemplate) {
   const existingPropIndex = boardProperties.findIndex((p) => p.id === fieldProperty.id);
@@ -327,24 +374,6 @@ function applyToPropertiesByType(
   { id, ...fieldProperty }: PartialPropertyTemplate
 ) {
   const existingPropIndex = boardProperties.findIndex((p) => p.type === fieldProperty.type);
-  if (existingPropIndex === -1) {
-    boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
-  } else {
-    const existingProp = boardProperties[existingPropIndex];
-    boardProperties[existingPropIndex] = { id: existingProp.id, ...defaultOptions, ...fieldProperty };
-  }
-}
-
-function applyToPropertiesByTypeAndName(
-  boardProperties: IPropertyTemplate[],
-  { id, ...fieldProperty }: PartialPropertyTemplate
-) {
-  const existingPropIndex = boardProperties.findIndex(
-    (p) =>
-      p.type === fieldProperty.type &&
-      p.evaluationTitle === fieldProperty.evaluationTitle &&
-      p.criteriaTitle === fieldProperty.criteriaTitle
-  );
   if (existingPropIndex === -1) {
     boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
   } else {

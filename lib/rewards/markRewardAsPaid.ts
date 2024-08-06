@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { issueOffchainRewardCredentialsIfNecessary } from 'lib/credentials/issueOffchainRewardCredentialsIfNecessary';
-import { InvalidInputError } from 'lib/utils/errors';
+import { issueOffchainRewardCredentialsIfNecessary } from '@root/lib/credentials/issueOffchainRewardCredentialsIfNecessary';
+import { InvalidInputError } from '@root/lib/utils/errors';
 
 import { paidRewardStatuses } from './constants';
 import { getRewardOrThrow, rewardWithUsersInclude } from './getReward';

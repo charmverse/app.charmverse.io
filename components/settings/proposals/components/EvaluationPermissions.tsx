@@ -2,7 +2,9 @@ import { ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
+import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
 import { capitalize } from 'lodash';
+import { p } from 'prosemirror-test-builder';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import {
@@ -68,6 +70,28 @@ export const currentReviewerSystemRole = {
   label: 'Reviewers (Current Step)'
 } as const;
 
+export const approverSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Approvers selected for this evaluation'>
+      <PersonIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: 'approver',
+  label: 'Approvers (Current Step)'
+} as const;
+
+export const publicSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Approvers selected for this evaluation'>
+      <PersonIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: 'public',
+  label: 'Public'
+} as const;
+
 // a copy of current reviewer, with a different label for vote
 const currentVoterSystemRole = {
   ...currentReviewerSystemRole,
@@ -92,11 +116,17 @@ export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>
   allMembersSystemRole
 ];
 
+export const extraEvaluationRolesWithPublic: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
+  ...extraEvaluationRoles,
+  publicSystemRole
+];
+
 const permissionOperationPlaceholders = {
   [ProposalOperation.view]: 'Only admins can view the proposal',
   [ProposalOperation.comment]: 'No one can comment',
   [ProposalOperation.edit]: 'Only admins can edit the proposal',
-  [ProposalOperation.move]: 'Only admins can change the current step'
+  [ProposalOperation.move]: 'Only admins can change the current step',
+  [ProposalOperation.complete_evaluation]: 'Approvers can mark this step complete'
 };
 
 export function EvaluationPermissionsRow({
@@ -219,7 +249,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
                 return false;
               }}
               value={valuesByOperation[operation] || []}
-              systemRoles={extraEvaluationRoles}
+              systemRoles={operation === 'view' ? extraEvaluationRolesWithPublic : extraEvaluationRoles}
               inputPlaceholder={permissionOperationPlaceholders[operation]}
               onChange={async (options) => updatePermissionOperation(operation, options)}
             />
@@ -230,7 +260,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
       {/* show evaluation action which is uneditable */}
       <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
         <PropertyLabel readOnly>
-          {evaluation.type === 'sign_documents' ? 'Prepare Documents' : 'Move Forward'}
+          {evaluation.type === 'sign_documents' ? 'Prepare Documents' : 'Evaluate'}
         </PropertyLabel>
         <UserAndRoleSelect
           readOnly
@@ -240,6 +270,20 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
           onChange={() => {}}
         />
       </Box>
+
+      {/* show evaluation action which is uneditable */}
+      {approvableEvaluationTypes.includes(evaluation.type as any) && (
+        <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
+          <PropertyLabel readOnly>Complete Step</PropertyLabel>
+          <UserAndRoleSelect
+            readOnly
+            wrapColumn
+            value={[{ group: 'system_role', id: 'approver' }]}
+            systemRoles={[approverSystemRole]}
+            onChange={() => {}}
+          />
+        </Box>
+      )}
     </>
   );
 }

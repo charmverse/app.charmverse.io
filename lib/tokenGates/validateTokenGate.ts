@@ -2,8 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma-client';
 
 import type { TokenGate } from './interfaces';
-import { validateTokenGateCondition } from './validateTokenGateCondition';
-
+import { validateTokenGateConditionWithDelegates } from './validateTokenGateConditionWithDelegates';
 /**
  * Used for validating token gates. Returns token gate id or null if not valid
  * @param tokenGate TokenGate
@@ -12,11 +11,10 @@ import { validateTokenGateCondition } from './validateTokenGateCondition';
  */
 export async function validateTokenGate(tokenGate: TokenGate, walletAddress: string): Promise<string | null> {
   const tokenGatesValid = await Promise.all(
-    tokenGate.conditions.accessControlConditions?.map(async (condition) =>
-      validateTokenGateCondition(condition, walletAddress)
-    ) || []
+    (tokenGate.conditions.accessControlConditions || []).map((condition) =>
+      validateTokenGateConditionWithDelegates(condition, walletAddress)
+    )
   );
-
   const allConditionsAreValid = tokenGate.conditions.operator === 'AND' && tokenGatesValid.every((v) => v);
 
   const someConditionsAreValid =

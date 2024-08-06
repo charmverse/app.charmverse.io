@@ -1,39 +1,57 @@
-import { PageTitle } from '@connect/components/common/PageTitle';
-import { PageWrapper } from '@connect/components/common/PageWrapper';
-import { WarpcastLogin } from '@connect/components/common/WarpcastLogin/WarpcastLogin';
-import { ProjectItemSkeleton } from '@connect/components/projects/components/ProjectItemSkeleton';
-import { ProjectsList } from '@connect/components/projects/components/ProjectsList';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
+import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { Suspense } from 'react';
+import Image from 'next/image';
+
+import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 
 export function HomePage() {
   return (
-    <PageWrapper>
-      <Box display='flex' gap={2} flexDirection='column'>
-        <PageTitle>Onchain Summer</PageTitle>
-        <Typography align='center' my={2}>
-          Create your profile, add projects and compete for 540K OP in total prizes on Gitcoin.
-        </Typography>
-        <Box gap={1} display='flex' flexDirection='column' alignItems='center'>
-          <WarpcastLogin />
-          <MuiLink href='https://warpcast.com' target='_blank' rel='noopener'>
-            <Typography variant='caption'>Don't have a Farcaster account?</Typography>
-          </MuiLink>
-        </Box>
-        <Divider />
-      </Box>
-      <Box mt={2} gap={2} display='flex' flexDirection='column'>
-        <Typography variant='h5'>Recent Projects</Typography>
-        <Suspense fallback={<ProjectItemSkeleton />}>
-          <ProjectsList />
-        </Suspense>
-        <Typography align='left' variant='caption' component='p'>
-          Powered by CharmVerse
-        </Typography>
-      </Box>
+    <PageWrapper
+      display='flex'
+      flexDirection='column'
+      alignItems='center'
+      maxWidth='100vw'
+      border='none'
+      borderRadius='0'
+      textAlign='center'
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 4,
+        justifyContent: { xs: 'space-evenly', md: 'normal' },
+        alignItems: 'center',
+        height: '100%',
+        maxHeight: '40em'
+      }}
+    >
+      <Image
+        src='/images/geral_waving.png'
+        width={250}
+        height={200}
+        sizes='100vw'
+        style={{
+          maxWidth: '400px',
+          height: 'auto'
+        }}
+        alt='Charmverse Connect homepage'
+      />
+      <Typography data-test='connect-home-page' align='center' variant='h4'>
+        Charm Connect: The Home for Builders
+      </Typography>
+      <Typography align='center'>Endorse Builders, Connect with opportunites and get Rewarded.</Typography>
+      <WarpcastLogin />
+      <MuiLink
+        variant='body2'
+        href='https://warpcast.com/~/signup'
+        target='_blank'
+        rel='noopener'
+        color='text.primary'
+        fontWeight={500}
+        display='block'
+      >
+        Don't have a Farcaster account?
+      </MuiLink>
     </PageWrapper>
   );
 }

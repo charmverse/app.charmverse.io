@@ -1,7 +1,6 @@
+import { isValidEmail } from '@root/lib/utils/strings';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
-
-import { isValidEmail } from 'lib/utils/strings';
 
 import { projectFieldProperties, projectMemberFieldProperties } from './formField';
 import type { ProjectField, ProjectMemberField, ProjectAndMembersFieldConfig } from './formField';
@@ -23,7 +22,7 @@ function addMatchersToSchema({
         }
 
         if (value) {
-          return isAddress(value) || value.endsWith('.eth');
+          return value.endsWith('.eth') || isAddress(value);
         }
 
         return true;

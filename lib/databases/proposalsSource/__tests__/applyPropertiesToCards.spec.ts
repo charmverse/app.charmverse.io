@@ -1,9 +1,9 @@
 import type { FormField, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { prismaToBlock } from '@root/lib/databases/block';
+import type { Board, IPropertyTemplate } from '@root/lib/databases/board';
 
-import { prismaToBlock } from 'lib/databases/block';
-import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import { generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalSourceDb } from 'testing/utils/proposals';
 
@@ -56,6 +56,20 @@ describe('applyPropertiesToCard', () => {
       isAdmin: true
     });
 
+    const proposalTemplate = await testUtilsProposals.generateProposal({
+      authors: [proposalAuthor.id],
+      proposalStatus: 'published',
+      pageType: 'proposal_template',
+      reviewers: [
+        {
+          group: 'user',
+          id: proposalAuthor.id
+        }
+      ],
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
     const proposal = await testUtilsProposals.generateProposal({
       authors: [proposalAuthor.id],
       proposalStatus: 'published',
@@ -67,6 +81,15 @@ describe('applyPropertiesToCard', () => {
       ],
       spaceId: testSpace.id,
       userId: proposalAuthor.id
+    });
+
+    await prisma.page.update({
+      where: {
+        id: proposal.page.id
+      },
+      data: {
+        sourceTemplateId: proposalTemplate.page.id
+      }
     });
 
     const form = await prisma.form.create({
@@ -88,12 +111,25 @@ describe('applyPropertiesToCard', () => {
         },
         proposal: {
           connect: {
-            id: proposal.id
+            id: proposalTemplate.id
           }
         }
       },
       include: {
         formFields: true
+      }
+    });
+
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        form: {
+          connect: {
+            id: form.id
+          }
+        }
       }
     });
 

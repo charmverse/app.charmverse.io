@@ -1,8 +1,8 @@
 import type { ApplicationStatus, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { WrongStateError } from '@root/lib/utils/errors';
 
-import { WrongStateError } from 'lib/utils/errors';
 import { generateBounty } from 'testing/setupDatabase';
 
 import type { Reward } from '../interfaces';

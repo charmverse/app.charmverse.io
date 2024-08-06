@@ -3,15 +3,17 @@ import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import { Construct } from 'constructs';
 
+export type Options = {
+  sslCert: string;
+};
+
 export class ProductionStack extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps) {
-    super(scope, id, props);
+  constructor(scope: Construct, appName: string, props: StackProps, options: Options) {
+    super(scope, appName, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
-      path: `${__dirname}/../${id}.zip`
+      path: `${__dirname}/../${appName}.zip`
     });
-    // Create a ElasticBeanStalk app. - must be 40 characters or less
-    const appName = sanitizeAppName(id);
 
     const ebApp = new elasticbeanstalk.CfnApplication(this, 'Application', {
       applicationName: appName
@@ -42,6 +44,8 @@ export class ProductionStack extends Stack {
       },
       Version: 1
     };
+
+    const sslCert = 'arn:aws:acm:us-east-1:310849459438:certificate/4618b240-08da-4d91-98c1-ac12362be229';
 
     // list of all options: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
     const optionSettingProperties: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] = [
@@ -88,7 +92,7 @@ export class ProductionStack extends Stack {
       {
         namespace: 'aws:elbv2:listener:443',
         optionName: 'SSLCertificateArns',
-        value: 'arn:aws:acm:us-east-1:310849459438:certificate/b960ff5c-ed3e-4e65-b2c4-ecc64e696902'
+        value: options.sslCert
       },
       {
         namespace: 'aws:elbv2:listener:443',
@@ -159,13 +163,4 @@ export class ProductionStack extends Stack {
       versionLabel: appVersionProps.ref
     });
   }
-}
-
-// Member must contain only letters, digits, and the dash character and may not start or end with a dash
-function sanitizeAppName(name: string) {
-  return name
-    .replace(/[^a-zA-Z0-9-]/g, '')
-    .slice(0, 40)
-    .replace(/^-/, '0')
-    .replace(/-$/, '0');
 }

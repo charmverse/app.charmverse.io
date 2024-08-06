@@ -1,4 +1,4 @@
-import { isProdEnv, isStagingEnv } from 'config/constants';
+import { isProdEnv, isStagingEnv } from '@root/config/constants';
 
 const cookieDomains = {
   dev: 'local.io',

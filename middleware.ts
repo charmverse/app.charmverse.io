@@ -1,7 +1,7 @@
+import { isDevEnv } from '@root/config/constants';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { isDevEnv } from 'config/constants';
 import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
 import { getAppApexDomain } from 'lib/utils/domains/getAppApexDomain';
 import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';

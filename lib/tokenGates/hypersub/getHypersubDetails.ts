@@ -1,8 +1,7 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
+import { isNumber } from '@root/lib/utils/numbers';
 import { getAddress } from 'viem';
-
-import { isNumber } from 'lib/utils/numbers';
 
 import { getPublicClient } from '../../blockchain/publicClient';
 import type { AccessControlCondition } from '../interfaces';

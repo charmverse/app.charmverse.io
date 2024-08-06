@@ -1,20 +1,21 @@
 import { objectUtils } from '@charmverse/core/utilities';
-import { v4 as uuid } from 'uuid';
-
-import type { IPropertyTemplate, ProposalPropertyType } from 'lib/databases/board';
-import type { Constants } from 'lib/databases/constants';
+import type { IPropertyTemplate, ProposalPropertyType } from '@root/lib/databases/board';
+import type { Constants } from '@root/lib/databases/constants';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
+  PROPOSAL_PUBLISHED_AT_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID
-} from 'lib/proposals/blocks/constants';
+} from '@root/lib/proposals/blocks/constants';
 import type {
   ProposalEvaluationResultExtended,
   ProposalEvaluationStatus,
   ProposalEvaluationStep
-} from 'lib/proposals/interfaces';
+} from '@root/lib/proposals/interfaces';
+import { v4 as uuid } from 'uuid';
+
 import type { BrandColor } from 'theme/colors';
 
 export const EVALUATION_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = {
@@ -80,6 +81,12 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalEvaluationAverage'
   }),
+  proposalEvaluationReviewerAverage: () => ({
+    id: uuid(),
+    name: 'Proposal Evaluation Reviewer Average',
+    options: [],
+    type: 'proposalEvaluationReviewerAverage'
+  }),
   proposalEvaluationTotal: () => ({
     id: uuid(),
     name: 'Proposal Evaluation Total',
@@ -103,6 +110,12 @@ export const proposalDbProperties: {
     name: name || 'Proposal Authors',
     options: [],
     type: 'proposalAuthor'
+  }),
+  proposalPublishedAt: ({ name } = {}) => ({
+    id: PROPOSAL_PUBLISHED_AT_ID,
+    name: name || 'Publish Date',
+    options: [],
+    type: 'proposalPublishedAt'
   }),
   proposalRubricCriteriaReviewerComment: () => ({
     id: uuid(),
@@ -180,7 +193,8 @@ export const defaultProposalProperties = [
   proposalDbProperties.proposalStep(),
   proposalDbProperties.proposalUrl(),
   proposalDbProperties.proposalAuthor(),
-  proposalDbProperties.proposalReviewer()
+  proposalDbProperties.proposalReviewer(),
+  proposalDbProperties.proposalPublishedAt()
 ];
 
 export const defaultProposalPropertyTypes = defaultProposalProperties.map((p) => p.type);

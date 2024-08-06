@@ -124,7 +124,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 export default function PageView() {
   const { publicPage } = useSharedPage();
   const basePageId = usePageIdFromPath();
-  const { router, clearURLQuery } = useCharmRouter();
+  const { router, clearURLQuery, updateURLQuery } = useCharmRouter();
   const { isSpaceMember } = useIsSpaceMember();
   const { user } = useUser();
   const { space } = useCurrentSpace();
@@ -165,8 +165,8 @@ export default function PageView() {
     };
   }, []);
 
-  // reload is used by new proposal endpoint. see pages/[domain]/proposals/new.tsx
   useEffect(() => {
+    // reload is used by new proposal endpoint. see pages/[domain]/proposals/new.tsx
     if (router.query.reload) {
       setTimeout(() => {
         window.location.search = '';

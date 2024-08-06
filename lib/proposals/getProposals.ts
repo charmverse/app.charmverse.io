@@ -10,14 +10,13 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { sortBy } from 'lodash';
-
 import type {
   IssuableProposalCredentialAuthor,
   IssuableProposalCredentialSpace,
   ProposalWithJoinedData
-} from 'lib/credentials/findIssuableProposalCredentials';
-import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
+} from '@root/lib/credentials/findIssuableProposalCredentials';
+import { generateCredentialInputsForProposal } from '@root/lib/credentials/findIssuableProposalCredentials';
+import { sortBy } from 'lodash';
 
 import type { ProposalStep } from './getCurrentStep';
 import { getCurrentStep } from './getCurrentStep';
@@ -25,7 +24,7 @@ import type { ProposalFields } from './interfaces';
 
 export type ProposalWithUsersLite = Pick<
   Proposal,
-  'createdBy' | 'id' | 'selectedCredentialTemplates' | 'spaceId' | 'workflowId'
+  'createdBy' | 'id' | 'selectedCredentialTemplates' | 'spaceId' | 'workflowId' | 'publishedAt'
 > & {
   archived?: boolean;
   authors: ProposalAuthor[];
@@ -186,6 +185,7 @@ function mapDbProposalToProposalLite({
     archived: proposal.archived || undefined,
     formId: rest.formId || undefined,
     spaceId: rest.spaceId,
+    publishedAt: rest.publishedAt,
     workflowId: rest.workflowId,
     // spaceId: rest.spaceId,
     evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({

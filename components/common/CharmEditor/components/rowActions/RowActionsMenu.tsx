@@ -26,6 +26,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { isMac } from 'lib/utils/browser';
 import { slugify } from 'lib/utils/strings';
 
+import { getHeadingLink } from '../heading';
 import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';
 
 import { deleteRowNode, getNodeForRowPosition, type PluginState } from './rowActions';
@@ -87,12 +88,8 @@ function Component({ menuState }: { menuState: PluginState }) {
     const node = topPos.node();
 
     if (node && node.type.name === 'heading') {
-      const text = node.textContent;
-
-      const url = new URL(window.location.href);
-      url.hash = '';
-      const urlWithoutHash = url.toString();
-      copyFn(`${urlWithoutHash}#${slugify(text)}`).then(() => {
+      const link = getHeadingLink(node.textContent);
+      copyFn(link).then(() => {
         showMessage('Link copied to clipboard', 'success');
       });
     }
@@ -215,7 +212,7 @@ function Component({ menuState }: { menuState: PluginState }) {
   );
 }
 
-export default function RowActionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
+export function RowActionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const menuState: PluginState = usePluginState(pluginKey);
 
   // Fixes the case where undefined menu state throws an error

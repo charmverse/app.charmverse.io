@@ -2,7 +2,7 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import type { LoggedInUser } from 'models';
+import type { LoggedInUser } from '@root/models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import {
   generateCommentWithThreadAndPage,

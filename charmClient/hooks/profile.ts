@@ -1,7 +1,7 @@
 import type { UserWallet } from '@charmverse/core/prisma-client';
+import type { LoggedInUser } from '@root/models';
 
 import type { SignatureVerificationPayloadWithAddress } from 'lib/blockchain/signAndVerify';
-import type { LoggedInUser } from 'models';
 import type { EmailPreferences } from 'pages/api/profile/onboarding-email';
 
 import { useDELETE, useGETtrigger, usePOST, usePUT } from './helpers';

@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isTruthy } from 'lib/utils/types';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
+import { isTruthy } from '@root/lib/utils/types';
 
 import type { DocumentNotification } from '../interfaces';
 import type { QueryCondition } from '../utils';
@@ -11,16 +10,21 @@ export async function getDocumentNotifications({ id, userId }: QueryCondition): 
   const documentNotifications = await prisma.documentNotification.findMany({
     where: {
       ...queryCondition({ id, userId }),
-      page: {
-        deletedAt: null,
-        space: {
-          spaceRoles: {
-            some: {
-              userId
+      OR: [
+        {
+          page: {
+            deletedAt: null,
+            space: {
+              spaceRoles: {
+                some: {
+                  userId
+                }
+              }
             }
           }
-        }
-      }
+        },
+        { pageId: null }
+      ]
     },
     select: {
       id: true,

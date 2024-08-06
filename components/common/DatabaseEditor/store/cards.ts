@@ -1,6 +1,6 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
-import { getChainList } from 'connectors/chains';
+import { getChainList } from '@root/connectors/chains';
 
 import type { Board } from 'lib/databases/board';
 import type { BoardView, ISortOption } from 'lib/databases/boardView';
@@ -197,6 +197,7 @@ export function sortCards(
           template.type === 'date' ||
           template.type === 'tokenAmount' ||
           template.type === 'proposalEvaluationAverage' ||
+          template.type === 'proposalEvaluationReviewerAverage' ||
           template.type === 'proposalEvaluationTotal' ||
           template.type === 'proposalRubricCriteriaTotal' ||
           template.type === 'proposalRubricCriteriaAverage'
@@ -364,7 +365,7 @@ export const makeSelectCardsFromBoard = () =>
 export const makeSelectBoardTemplates = () =>
   createSelector(
     getTemplates,
-    (state, boardId) => boardId,
+    (state: RootState, boardId: string) => boardId,
     (templates, boardId) => {
       if (!templates) {
         return [];

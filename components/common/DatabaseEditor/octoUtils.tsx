@@ -1,5 +1,5 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
-import { getChainById } from 'connectors/chains';
+import { getChainById } from '@root/connectors/chains';
 import { DateTime } from 'luxon';
 
 import type { UIBlockWithDetails } from 'lib/databases/block';
@@ -77,6 +77,10 @@ class OctoUtils {
       }
       case 'proposalEvaluationType': {
         displayValue = PROPOSAL_STEP_LABELS[propertyValue as ProposalEvaluationStep];
+        break;
+      }
+      case 'proposalPublishedAt': {
+        displayValue = propertyValue ? formatDateTime(new Date(propertyValue as string)) : 'N/A';
         break;
       }
       case 'person':
