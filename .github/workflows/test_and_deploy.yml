@@ -180,6 +180,7 @@ jobs:
 
       - name: Run ${{matrix.test_name}}
         env:
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
           REACT_APP_APP_ENV: 'test'
         run: ${{matrix.test_command}}
 
@@ -341,6 +342,13 @@ jobs:
           AWS_REGION: us-east-1
         with:
           ecr_registry: charmverse-web3-workspace
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Upload static assets to S3
         run: aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
