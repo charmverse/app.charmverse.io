@@ -270,9 +270,18 @@ function CardDetailProperties(props: Props) {
     [mutator, props.boardType, board, activeView, isSmallScreen]
   );
 
+  let boardProperties = board.fields.cardProperties || [];
+
+  if (board.fields.sourceType === 'proposals') {
+    // remove properties that belong to a different template
+    boardProperties = board.fields?.cardProperties.filter(
+      (property) => !property.templateId || card.fields.properties[property.id] !== undefined
+    );
+  }
+
   return (
     <div className='octo-propertylist' data-test='card-detail-properties'>
-      {board.fields?.cardProperties.map((propertyTemplate) => {
+      {boardProperties.map((propertyTemplate) => {
         const readOnly = props.readOnly || props.readOnlyProperties?.includes(propertyTemplate.id) || false;
         const isReadonlyTemplateProperty = readOnly || !!propertyTemplate.readOnly;
 

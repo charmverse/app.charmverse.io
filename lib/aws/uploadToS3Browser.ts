@@ -2,7 +2,6 @@
 // We can replace with the actual library once next-s3-upload updates their AWS-SDK dependency to V3
 // see this issue for more: https://github.com/ryanto/next-s3-upload/issues/15
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { XhrHttpHandler } from '@aws-sdk/xhr-http-handler';
 
 type Config = {
   onUploadPercentageProgress?: (progress: number) => void;
@@ -23,6 +22,7 @@ export async function uploadToS3(
 
   const { S3Client } = await import('@aws-sdk/client-s3');
   const { Upload } = await import('@aws-sdk/lib-storage');
+  const { XhrHttpHandler } = await import('@aws-sdk/xhr-http-handler');
 
   const client = new S3Client({
     credentials: {

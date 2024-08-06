@@ -25,6 +25,17 @@ const config = {
   experimental: {
     esmExternals: false,
     webpackBuildWorker: true
+    // turbo: {
+    //   resolveAlias: {
+    //     fs: false
+    //   },
+    //   rules: {
+    //     '*.svg': {
+    //       loaders: ['@svgr/webpack'],
+    //       as: '*.js'
+    //     }
+    //   }
+    // }
   },
   images: {
     // next image is broken in staging/production as of 14.0.1
@@ -32,15 +43,6 @@ const config = {
   },
   transpilePackages: esmModules,
   modularizeImports: {
-    '@mui/material': {
-      transform: '@mui/material/{{member}}'
-    },
-    '@mui/icons-material': {
-      transform: '@mui/icons-material/{{member}}'
-    },
-    '@mui/system': {
-      transform: '@mui/system/{{member}}'
-    },
     lodash: {
       transform: 'lodash/{{member}}'
     }

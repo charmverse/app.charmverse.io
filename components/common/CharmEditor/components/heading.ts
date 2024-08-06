@@ -210,3 +210,10 @@ export function scrollToHeadingNode({ view, headingSlug }: { view: EditorView; h
     document.querySelector('.document-print-container')?.scrollTo({ top: domTopPosition });
   }
 }
+
+export function getHeadingLink(content: string) {
+  const url = new URL(window.location.href);
+  url.hash = '';
+  const urlWithoutHash = url.toString();
+  return `${urlWithoutHash}#${slugify(content)}`;
+}

@@ -48,7 +48,7 @@ export function useFarcasterFrame(args?: { pageId?: string; frameUrl: string }) 
 
       const frameAction = await triggerFrameAction({
         fid: farcasterUser.fid,
-        postUrl: farcasterFrame.postUrl ?? args?.frameUrl,
+        postUrl: farcasterFrame.postUrl ?? args!.frameUrl,
         privateKey: farcasterUser.privateKey,
         pageId: args?.pageId,
         postType: button.action,

@@ -21,7 +21,7 @@ export type FrameActionResponse =
       location: string | null;
     }
   | {
-      frame: Frame | null;
+      frame: Frame | Partial<Frame> | null;
     };
 
 export type FrameActionRequest = {
