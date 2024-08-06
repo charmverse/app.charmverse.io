@@ -1,0 +1,24 @@
+name: 'Build connect'
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Restore build
+      id: restore_build
+      uses: actions/cache@v4
+      with:
+        path: |
+          apps/connect/.next
+          apps/connect/public
+          apps/connect-api/dist
+          apps/sunnyawards/.next
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('@connect-shared/**/*.ts[x]', 'apps/connect-api/**/*.ts', 'apps/connect/**/*.ts[x]', 'apps/connect/**/*.scss', 'apps/sunnyawards/**/*.ts[x]', 'apps/sunnyawards/**/*.scss') }}
+
+    - name: Build apps
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      run: |
+        npm run connect:build
+        npm run connect-api:build
+        npm run sunnyawards:build
