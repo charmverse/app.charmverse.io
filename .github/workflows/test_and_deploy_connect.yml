@@ -258,7 +258,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
@@ -267,6 +267,11 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build_connect
+
+      - name: Remove unused code
+        run: |
+          rm -rf components
+          rm -rf pages
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -287,7 +292,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
@@ -332,7 +337,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
@@ -371,7 +376,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
@@ -410,7 +415,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
 
