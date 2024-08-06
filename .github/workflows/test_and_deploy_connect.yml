@@ -257,7 +257,11 @@ jobs:
     name: Upload Docker image
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
-    if: github.ref != 'refs/heads/main' && !(failure() || cancelled())
+    if: |
+      (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-connect') ||
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
+      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
     needs: build-app
     steps:
       - uses: actions/checkout@v4
@@ -376,7 +380,7 @@ jobs:
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test-connect, deploy-docker]
+    needs: [test-connect, test-connect-e2e, deploy-docker]
     steps:
       - uses: actions/checkout@v4
         with:
