@@ -80,7 +80,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { signer, provider } = useWeb3Signer({ chainId });
 
   const requestSignature = useCallback(async () => {
-    if (!account || !chainId) {
+    if (!account) {
       throw new MissingWeb3AccountError();
     }
 
@@ -92,7 +92,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         address: getAddress(account), // convert to EIP-55 format or else SIWE complains
         uri: globalThis.location.origin,
         version: '1',
-        chainId: 1 // this chainId is provided to prevent replay attacks, but we are just asking the user to verify their address
+        chainId: chainId || 1
       };
 
       const message = new SiweMessage(preparedMessage);
