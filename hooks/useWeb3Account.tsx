@@ -1,8 +1,9 @@
 import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
-import { watchAccount } from '@wagmi/core';
 import { getWagmiConfig } from '@root/connectors/config';
+import type { LoggedInUser } from '@root/models';
+import { watchAccount } from '@wagmi/core';
 import type { Signer } from 'ethers';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -21,7 +22,6 @@ import type {
 import type { SystemError } from 'lib/utils/errors';
 import { MissingWeb3AccountError } from 'lib/utils/errors';
 import { lowerCaseEqual } from 'lib/utils/strings';
-import type { LoggedInUser } from '@root/models';
 
 import { useUser } from './useUser';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';
@@ -70,7 +70,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   // We only expose this account if there is no active user, or the account is linked to the current user
   const [storedAccount, setStoredAccount] = useState<string | null>(null);
 
-  const { user, updateUser, logoutUser } = useUser();
+  const { user, updateUser } = useUser();
   const { trigger: login } = useLogin();
   const { trigger: createUser } = useCreateUser();
 
@@ -80,19 +80,19 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { signer, provider } = useWeb3Signer({ chainId });
 
   const requestSignature = useCallback(async () => {
-    if (!account || !chainId) {
+    if (!account) {
       throw new MissingWeb3AccountError();
     }
 
     setIsSigning(true);
 
     try {
-      const preparedMessage = {
+      const preparedMessage: Partial<SiweMessage> = {
         domain: window.location.host,
         address: getAddress(account), // convert to EIP-55 format or else SIWE complains
         uri: globalThis.location.origin,
         version: '1',
-        chainId
+        chainId: chainId || 1
       };
 
       const message = new SiweMessage(preparedMessage);
@@ -161,20 +161,6 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     // Case 2: user is logged in and account is linked to user or user is adding a new wallet
     else if (account && (userOwnsAddress || accountUpdatePaused)) {
       setStoredAccount(account.toLowerCase());
-    }
-    // Case 3: user is switching wallets
-    else if (
-      account &&
-      // storedAccount means they logged in with a different wallet previously
-      storedAccount &&
-      user &&
-      // Only apply the following logic to users that have at least 1 wallet
-      user?.wallets.length > 0 &&
-      !userOwnsAddress
-    ) {
-      log.debug('Logging out user due to wallet switch');
-      setStoredAccount(null);
-      logoutUser();
     }
   }, [account, isConnecting, accountUpdatePaused, !!user, storedAccount]);
 

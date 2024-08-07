@@ -40,6 +40,7 @@ jobs:
         run: |
           touch stg-webapp-${{ env.STAGE }}.zip
           touch stg-connect-${{ env.STAGE }}.zip
+          touch stg-sunnyawards-${{ env.STAGE }}.zip
           npm install aws-cdk-lib --no-audit --no-fund
           npx cdk destroy -c name=stg-webapp-${{ env.STAGE }} --force
           npx cdk destroy -c name=stg-connect-${{ env.STAGE }} --force
