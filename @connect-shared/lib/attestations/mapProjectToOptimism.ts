@@ -58,6 +58,7 @@ export type ProjectDetails = Pick<
   | 'category'
   | 'name'
   | 'farcasterValues'
+  | 'github'
   | 'twitter'
   | 'websites'
   | 'primaryContractAddress'

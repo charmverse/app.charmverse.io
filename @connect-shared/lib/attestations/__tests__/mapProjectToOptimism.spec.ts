@@ -12,7 +12,6 @@ describe('mapProjectToOptimism', () => {
       farcasterValues: ['CharmVerse'],
       github: 'https://github.com/projectx',
       twitter: 'https://twitter.com/projectx',
-      mirror: 'https://mirror.xyz/projectx',
       websites: ['https://example.com'],
       mintingWalletAddress: null,
       primaryContractAddress: null,
