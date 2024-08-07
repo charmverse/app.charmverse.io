@@ -26,34 +26,12 @@ runs:
           .env.test.local
           dist
           background/ceramicServer/generated
-          apps/connect/.next
-          apps/connect/public
-          apps/connect-api/dist
-          apps/sunnyawards/.next
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!apps/sunnyawards/.next', '!dont_cache') }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}
 
     - name: Build
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
       run: npm run build
-
-    - name: Build Connect App
-      shell: bash
-      if: steps.restore_build.outputs.cache-hit != 'true'
-      run: |
-        npm run connect:build
-
-    - name: Build Connect API
-      shell: bash
-      if: steps.restore_build.outputs.cache-hit != 'true'
-      run: |
-        npm run connect-api:build
-
-    - name: Build Sunny Awards
-      shell: bash
-      if: steps.restore_build.outputs.cache-hit != 'true'
-      run: |
-        npm run sunnyawards:build
 
     # building cache key takes almost a minute, so we only run this if we are saving the cache
     - name: Cache build
@@ -65,8 +43,4 @@ runs:
           .env.test.local
           dist
           background/ceramicServer/generated
-          apps/connect/.next
-          apps/connect/public
-          apps/connect-api/dist
-          apps/sunnyawards/.next
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps/connect/.next', '!apps/connect-api/dist', '!apps/sunnyawards/.next', '!dont_cache') }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}

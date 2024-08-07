@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { Post } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -124,6 +125,8 @@ async function deleteForumPostController(req: NextApiRequest, res: NextApiRespon
   }
 
   const post = await deleteForumPost(postId);
+
+  log.info('Post deleted', { postId, userId });
 
   if (!post.isDraft) {
     relay.broadcast(

@@ -1,6 +1,6 @@
 services:
   defaults:
-    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-web3-workspace:${IMGTAG}'
+    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/${IMGNAME}:${IMGTAG}'
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}", "version": "${IMGTAG}"}]'
       com.datadoghq.tags.env: '${SERVICE_ENV:-tst}'

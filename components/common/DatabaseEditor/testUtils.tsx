@@ -76,6 +76,7 @@ export function mockMatchMedia(result: { matches: boolean }): void {
 }
 
 export function mockStateStore(middleware: Middleware[], state: unknown): MockStoreEnhanced<unknown, unknown> {
+  // @ts-ignore - redux-mock-store is no longer maintained
   const mockStore = configureStore(middleware);
   return mockStore(state);
 }
