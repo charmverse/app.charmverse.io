@@ -94,6 +94,12 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
     columnPropertyId: PROJECT_DESCRIPTION_ID
   },
   {
+    field: 'twitter',
+    label: 'X.com',
+    columnTitle: 'Project X Account',
+    columnPropertyId: PROJECT_TWITTER_ID
+  },
+  {
     field: 'website',
     label: 'Website',
     columnTitle: 'Project Website',

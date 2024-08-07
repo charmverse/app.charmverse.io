@@ -130,10 +130,6 @@ test('Create a project and view details', async ({ page }) => {
   const projectGithub = page.locator('data-test=project-details-github');
   await expect(projectGithub).toHaveText(projectData.projectFormGithub.replace(/https?:\/\/www.github.com\//, ''));
 
-  // Check project Mirror
-  const projectMirror = page.locator('data-test=project-details-mirror');
-  await expect(projectMirror).toHaveText(projectData.projectFormMirror.replace(/https?:\/\/www.mirror.xyz\//, ''));
-
   // Check project description
 
   // For some reason in CI environment, this assertion fails - Commenting out for now until we fix

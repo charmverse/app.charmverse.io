@@ -379,6 +379,7 @@ describe('getBoardProperties', () => {
     });
     expect(properties.some((r) => r.id === constants.PROJECT_NAME_ID)).toBeTruthy();
     expect(properties.some((r) => r.id === constants.PROJECT_DESCRIPTION_ID)).toBeTruthy();
+    expect(properties.some((r) => r.id === constants.PROJECT_TWITTER_ID)).toBeTruthy();
     expect(properties.some((r) => r.id === constants.PROJECT_WEBSITE_ID)).toBeTruthy();
     expect(properties.some((r) => r.id === constants.PROJECT_WALLET_ID)).toBeTruthy();
     // project team members

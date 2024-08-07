@@ -230,8 +230,6 @@ long text
 
 ### Project Profile
 
-- GitHub: ${project.github}
-
 - Project Members
 
   - First guy
