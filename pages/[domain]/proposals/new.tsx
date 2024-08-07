@@ -11,7 +11,7 @@ import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { getPagePath } from 'lib/utils/domains/getPagePath';
 
-export const getServerSideProps = withSessionSsr<{ error?: boolean }>(async (context) => {
+export const getServerSideProps = withSessionSsr<{ error?: string }>(async (context) => {
   const template = context.query?.template as string | undefined;
   const pageType = context.query.type as PageType | undefined;
   const sourcePageId = context.query.sourcePageId as string | undefined;
@@ -118,7 +118,7 @@ export const getServerSideProps = withSessionSsr<{ error?: boolean }>(async (con
         spaceId: space.id
       });
       return {
-        props: { error: true }
+        props: { error: 'The selected template is invalid' }
       };
     }
   }
@@ -198,9 +198,9 @@ export const getServerSideProps = withSessionSsr<{ error?: boolean }>(async (con
 });
 
 // user will never see this page and instead be redirected somewhere else
-export default function PageView({ error }: { error?: boolean }) {
+export default function PageView({ error }: { error?: string }) {
   if (error) {
-    return <ErrorPage />;
+    return <ErrorPage message={error} />;
   }
   return null;
 }
