@@ -36,8 +36,18 @@ export async function createFarcasterCastFromReactionEvent(
       };
     }
 
-    await prisma.farcasterCast.create({
-      data: {
+    await prisma.farcasterCast.upsert({
+      where: {
+        hash: message.data.cast.hash
+      },
+      update: {
+        action,
+        totalLikes: farcasterCast.reactions.likes_count,
+        totalRecasts: farcasterCast.reactions.recasts_count,
+        totalComments: farcasterCast.replies.count,
+        timestamp: new Date(message.created_at)
+      },
+      create: {
         action,
         authorFid: message.data.cast.author.fid,
         hash: message.data.cast.hash,
@@ -46,7 +56,8 @@ export async function createFarcasterCastFromReactionEvent(
         embeds: farcasterCast.embeds as any[],
         totalComments: farcasterCast.replies.count,
         totalLikes: farcasterCast.reactions.likes_count,
-        totalRecasts: farcasterCast.reactions.recasts_count
+        totalRecasts: farcasterCast.reactions.recasts_count,
+        timestamp: new Date(message.created_at)
       }
     });
   }

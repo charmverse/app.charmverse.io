@@ -15,7 +15,8 @@ export async function createFarcasterCastFromCastEvent(message: CastEvent): Prom
       embeds: message.data.embeds as any[],
       totalComments: message.data.replies.count,
       totalLikes: message.data.reactions.likes_count,
-      totalRecasts: message.data.reactions.recasts_count
+      totalRecasts: message.data.reactions.recasts_count,
+      timestamp: new Date(message.created_at)
     }
   });
 
