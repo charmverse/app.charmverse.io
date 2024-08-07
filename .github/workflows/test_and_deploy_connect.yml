@@ -336,51 +336,24 @@ jobs:
             --release-version=${{ steps.get_build_id.outputs.build_id }}  \
             --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
-  deploy-connect:
-    name: Deploy Connect Webapp
-    runs-on: ubuntu-latest
+  deploy-production:
+    name: Deploy ${{ matrix.name }}
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
     needs: [test-connect, 'test-connect-e2e', deploy-docker]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.x
-
-      # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
-      - name: Install dependencies
-        uses: ./.github/actions/install
-
-      - name: Set the docker compose env variables
-        uses: mikefarah/yq@master
-        with:
-          cmd: |
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_connect/00_env_vars.config
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Package and deploy
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ prd-connect.zip
-          npx aws-cdk deploy --method=direct -c name=prd-connect
-
-  deploy-connect-api:
-    name: Deploy Connect API
     runs-on: ubuntu-latest
-    # run whether previous jobs were successful or skipped
-    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test-connect, test-connect-e2e, deploy-docker]
+    strategy:
+      matrix:
+        include:
+          - name: Connect App
+            stack: prd-connect
+            ebextensions: .ebextensions_connect
+          - name: Connect API
+            stack: prd-connect-api
+            ebextensions: .ebextensions_connect_api
+          - name: Sunny Awards
+            stack: prd-sunnyawards
+            ebextensions: .ebextensions_sunnyawards
     steps:
       - uses: actions/checkout@v4
         with:
@@ -399,7 +372,8 @@ jobs:
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_connect_api/00_env_vars.config
+              ' ${{ matrix.ebextensions }}/00_env_vars.config
+            rm -rf .ebextensions && mv ${{ matrix.ebextensions }} .ebextensions
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -410,48 +384,8 @@ jobs:
 
       - name: Package and deploy
         run: |
-          rm -rf .ebextensions && mv .ebextensions_connect_api .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ prd-connect-api.zip
-          npx aws-cdk deploy --method=direct -c name=prd-connect-api
-
-  deploy-sunnyawards:
-    name: Deploy Sunny Awards
-    runs-on: ubuntu-latest
-    # run whether previous jobs were successful or skipped
-    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test-connect, test-sunnyawards-e2e, deploy-docker]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.x
-
-      # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
-      - name: Install dependencies
-        uses: ./.github/actions/install
-
-      - name: Set the docker compose env variables
-        uses: mikefarah/yq@master
-        with:
-          cmd: |
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_sunnyawards/00_env_vars.config
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Package and deploy
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ prd-sunnyawards.zip
-          npx aws-cdk deploy --method=direct -c name=prd-sunnyawards
+          cat files_to_zip.txt | zip --symlinks -r@ ${{ matrix.stack }}.zip
+          npx aws-cdk deploy --method=direct -c name=${{ matrix.stack }}
 
   deploy-staging:
     name: Deploy to staging
@@ -600,7 +534,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
     # pass in all steps so we can check if any failed
-    needs: [build-app, deploy-docker, deploy-connect, deploy-connect-api, deploy-sunnyawards]
+    needs: [build-app, deploy-docker, deploy-production]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
