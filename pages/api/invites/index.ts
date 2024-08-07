@@ -8,6 +8,7 @@ import { getSpaceInviteLinks } from 'lib/invites/getSpaceInviteLinks';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -43,8 +44,17 @@ async function getInviteLinks(req: NextApiRequest, res: NextApiResponse<InviteLi
     return res.status(200).json([]);
   }
 
+  const spaceId = req.query.spaceId as string;
+
+  const { error } = await hasAccessToSpace({
+    spaceId,
+    userId: req.session.user.id,
+    adminOnly: true
+  });
+
   const invites = await getSpaceInviteLinks({
-    spaceId: req.query.spaceId as string
+    isAdmin: !error,
+    spaceId
   });
 
   return res.status(200).json(invites);

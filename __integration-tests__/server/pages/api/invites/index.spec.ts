@@ -71,6 +71,7 @@ describe('GET /api/invites - Get space invites', () => {
     expect(invites).toHaveLength(1);
     expect(invites[0]).toMatchObject<InviteLinkWithRoles>({
       ...invite,
+      code: '', // code will be empty for non-admins
       createdAt: new Date(invite.createdAt).toISOString() as any,
       roleIds: []
     });
