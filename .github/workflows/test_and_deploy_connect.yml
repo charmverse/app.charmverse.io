@@ -494,22 +494,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # - name: Upload static assets to S3
-      #   run: |
-      #     aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
-      #     aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
-
       - name: Override config with Connect app
         # wrap the condition in "${{}}" because the string includes a colon
         # see https://github.com/actions/runner/issues/1019
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') }}"
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
+          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Override config with Sunny Awards
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') }}"
         run: |
           rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
+          aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Deploy to staging
         id: cdk_deploy
