@@ -11,7 +11,7 @@ import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { getPagePath } from 'lib/utils/domains/getPagePath';
 
-export const getServerSideProps = withSessionSsr(async (context) => {
+export const getServerSideProps = withSessionSsr<{ error?: boolean }>(async (context) => {
   const template = context.query?.template as string | undefined;
   const pageType = context.query.type as PageType | undefined;
   const sourcePageId = context.query.sourcePageId as string | undefined;
@@ -114,7 +114,8 @@ export const getServerSideProps = withSessionSsr(async (context) => {
       log.error('Failed to create draft proposal', {
         error,
         query: context.query,
-        userId: sessionUserId
+        userId: sessionUserId,
+        spaceId: space.id
       });
       return {
         props: { error: true }
@@ -179,12 +180,12 @@ export const getServerSideProps = withSessionSsr(async (context) => {
         permanent: false
       }
     };
-  } catch (err) {
+  } catch (error) {
     log.warn('User could not join space via template', {
       template,
       userId: sessionUserId,
       spaceId: space.id,
-      err
+      error
     });
 
     return {
