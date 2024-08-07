@@ -17,15 +17,15 @@ export async function createFarcasterCastFromReactionEvent(
 
     if (type === 'reaction.created') {
       if (reactionType === 1) {
-        action = FarcasterCastAction.recast_created;
-      } else if (reactionType === 2) {
         action = FarcasterCastAction.like_created;
+      } else if (reactionType === 2) {
+        action = FarcasterCastAction.recast_created;
       }
     } else if (type === 'reaction.deleted') {
       if (reactionType === 1) {
-        action = FarcasterCastAction.recast_removed;
-      } else if (reactionType === 2) {
         action = FarcasterCastAction.like_removed;
+      } else if (reactionType === 2) {
+        action = FarcasterCastAction.recast_removed;
       }
     }
 

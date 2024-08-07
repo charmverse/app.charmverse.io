@@ -8,9 +8,13 @@ export async function removeFarcasterCastFromReactionEvent(
   message: ReactionEvent
 ): Promise<WebhookMessageProcessResult> {
   const castHash = message.data.cast.hash;
-  await prisma.farcasterCast.delete({
-    where: { hash: castHash }
-  });
+  try {
+    await prisma.farcasterCast.delete({
+      where: { hash: castHash }
+    });
+  } catch (_) {
+    //
+  }
 
   return {
     success: true,
