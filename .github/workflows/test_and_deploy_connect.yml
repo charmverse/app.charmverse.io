@@ -397,7 +397,7 @@ jobs:
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
     concurrency: deploy-staging-${{ github.head_ref }}
-    needs: [upload-docker, upload-static-assets]
+    needs: [upload-docker]
     steps:
       - uses: actions/checkout@v4
 
