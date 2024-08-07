@@ -1,7 +1,6 @@
 import { GET } from '@root/adapters/http';
+import type { Cast } from '@root/lib/neynar/interfaces';
 import { isTruthy } from '@root/lib/utils/types';
-
-import type { Cast } from './getFarcasterUserReactions';
 
 type CastsResponse = {
   result: {

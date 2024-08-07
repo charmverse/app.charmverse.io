@@ -1,6 +1,5 @@
 import { GET } from '@root/adapters/http';
-
-import type { Cast } from './getFarcasterUserReactions';
+import type { Cast } from '@root/lib/neynar/interfaces';
 
 const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
 
