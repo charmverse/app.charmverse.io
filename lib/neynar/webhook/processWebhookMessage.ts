@@ -5,6 +5,7 @@ import type { WebhookMessageProcessResult } from '@root/lib/collabland/webhook/i
 import { createFarcasterCastFromCastEvent } from '../createFarcasterCastFromCastEvent';
 import { createFarcasterCastFromReactionEvent } from '../createFarcasterCastFromReactionEvent';
 import type { Cast } from '../interfaces';
+import { removeFarcasterCastFromReactionEvent } from '../removeFarcasterCastFromReactionEvent';
 
 type UserDehydrated = {
   object: 'user_dehydrated';
@@ -59,7 +60,7 @@ const messageHandlers: MessageHandlers = {
   },
 
   'reaction.deleted': async (message) => {
-    return createFarcasterCastFromReactionEvent(message);
+    return removeFarcasterCastFromReactionEvent(message);
   },
 
   'cast.created': async (message) => {
@@ -96,8 +97,9 @@ export async function verifyWebhookMessagePermission(message: NeynarWebhookPaylo
   if (!neynarSignature) {
     return false;
   }
-  const hmac = createHmac('sha256', process.env.NEYNAR_API_KEY!);
-  const digest = `sha256=${hmac.update(JSON.stringify(message.body)).digest('hex')}`;
+  const generatedSignature = createHmac('sha512', process.env.NEYNAR_WEBHOOK_SECRET!)
+    .update(JSON.stringify(message.body))
+    .digest('hex');
 
-  return neynarSignature === digest;
+  return neynarSignature === generatedSignature;
 }
