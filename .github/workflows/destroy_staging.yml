@@ -25,6 +25,8 @@ jobs:
 
       - name: inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
+        with:
+          short-length: 7
 
       - name: set STAGE variable in environment for next steps
         run: echo "STAGE=${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
