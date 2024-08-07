@@ -12,7 +12,6 @@ import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/Wor
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
-import { useDocusign } from 'components/signing/hooks/useDocusign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -87,7 +86,6 @@ export function EvaluationsReview({
   const { showMessage } = useSnackbar();
 
   const isAdmin = useIsAdmin();
-  const { envelopes } = useDocusign();
 
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const [showEditCredentials, setShowEditCredentials] = useState(false);
