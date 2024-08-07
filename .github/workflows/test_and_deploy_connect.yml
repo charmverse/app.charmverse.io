@@ -253,7 +253,7 @@ jobs:
                       mcr.microsoft.com/playwright:v1.42.1-jammy \
                       npm run sunnyawards:test:e2e:ci
 
-  deploy-docker:
+  upload-docker:
     name: Upload Docker image
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
@@ -292,10 +292,10 @@ jobs:
           ecr_registry: charmverse-connect
 
   upload-static-assets:
-    name: Upload static assets
+    name: Upload assets in production
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
-    if: github.ref != 'refs/heads/main' && !(failure() || cancelled())
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
     needs: build-app
     steps:
       - uses: actions/checkout@v4
@@ -323,8 +323,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # - name: Upload static assets to S3
-      #   run: aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+      - name: Upload static assets to S3
+        run: |
+          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+          aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Upload JS source maps to Datadog
         env:
@@ -340,7 +342,7 @@ jobs:
     name: Deploy ${{ matrix.name }}
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test-connect, 'test-connect-e2e', deploy-docker]
+    needs: [test-connect, test-connect-e2e, test-sunnyawards-e2e, upload-docker, upload-static-assets]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -397,7 +399,7 @@ jobs:
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
     concurrency: deploy-staging-${{ github.head_ref }}
-    needs: [deploy-docker]
+    needs: [upload-docker, upload-static-assets]
     steps:
       - uses: actions/checkout@v4
 
@@ -492,22 +494,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # - name: Upload static assets to S3
-      #   run: |
-      #     aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
-      #     aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
-
       - name: Override config with Connect app
         # wrap the condition in "${{}}" because the string includes a colon
         # see https://github.com/actions/runner/issues/1019
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') }}"
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
+          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Override config with Sunny Awards
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') }}"
         run: |
           rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
+          aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Deploy to staging
         id: cdk_deploy
@@ -534,7 +533,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
     # pass in all steps so we can check if any failed
-    needs: [build-app, deploy-docker, deploy-production]
+    needs: [build-app, upload-docker, deploy-production]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
