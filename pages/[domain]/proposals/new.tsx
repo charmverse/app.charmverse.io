@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import ErrorPage from 'components/common/errors/ErrorPage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { CreateDraftProposalInput, ProposalContentType } from 'lib/proposals/createDraftProposal';
 import { createDraftProposal } from 'lib/proposals/createDraftProposal';
@@ -97,17 +98,28 @@ export const getServerSideProps = withSessionSsr(async (context) => {
         };
       }
     }
-    const proposal = await createDraftProposal(newDraftParams);
-    return {
-      redirect: {
-        destination: getPagePath({
-          hostName: context.req.headers.host,
-          path: proposal.page.path,
-          spaceDomain: space.domain
-        }),
-        permanent: false
-      }
-    };
+    try {
+      const proposal = await createDraftProposal(newDraftParams);
+      return {
+        redirect: {
+          destination: getPagePath({
+            hostName: context.req.headers.host,
+            path: proposal.page.path,
+            spaceDomain: space.domain
+          }),
+          permanent: false
+        }
+      };
+    } catch (error) {
+      log.error('Failed to create draft proposal', {
+        error,
+        query: context.query,
+        userId: sessionUserId
+      });
+      return {
+        props: { error: true }
+      };
+    }
   }
 
   if (space.requireProposalTemplate && !template) {
@@ -185,6 +197,9 @@ export const getServerSideProps = withSessionSsr(async (context) => {
 });
 
 // user will never see this page and instead be redirected somewhere else
-export default function PageView() {
+export default function PageView({ error }: { error?: boolean }) {
+  if (error) {
+    return <ErrorPage />;
+  }
   return null;
 }
