@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import * as fs from 'fs';
+import { isTruthy } from 'lib/utils/types';
 
 /**
  * Create a back up of projects and also clean up some fields
@@ -21,7 +22,7 @@ async function query() {
         member.telegram,
         member.twitter,
         member.warpcast
-      ].filter(Boolean);
+      ].filter(isTruthy);
       return prisma.projectMember.update({
         where: {
           id: member.id
@@ -33,7 +34,16 @@ async function query() {
     });
     const websites = project.websites.length
       ? project.websites
-      : [project.website, project.linkedin, project.otherUrl, project.twitter, project.warpcast].filter(Boolean);
+      : [
+          project.website,
+          project.blog,
+          project.mirror,
+          project.twitter,
+          project.otherUrl,
+          project.communityUrl,
+          project.demoUrl,
+          project.github
+        ].filter(isTruthy);
     await prisma.$transaction([
       prisma.project.update({
         where: {
