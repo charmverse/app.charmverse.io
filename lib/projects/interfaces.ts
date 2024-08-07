@@ -2,34 +2,10 @@ import type { Project, ProjectMember } from '@charmverse/core/prisma';
 
 export type ProjectPayload = Pick<
   Project,
-  | 'name'
-  | 'excerpt'
-  | 'description'
-  | 'twitter'
-  | 'website'
-  | 'github'
-  | 'blog'
-  | 'demoUrl'
-  | 'communityUrl'
-  | 'otherUrl'
-  | 'walletAddress'
-  | 'deletedAt'
+  'name' | 'description' | 'twitter' | 'websites' | 'walletAddress' | 'deletedAt'
 >;
 
-export type ProjectMemberPayload = Pick<
-  ProjectMember,
-  | 'email'
-  | 'github'
-  | 'linkedin'
-  | 'name'
-  | 'otherUrl'
-  | 'previousProjects'
-  | 'teamLead'
-  | 'telegram'
-  | 'twitter'
-  | 'walletAddress'
-  | 'warpcast'
->;
+export type ProjectMemberPayload = Pick<ProjectMember, 'email' | 'socialUrls' | 'name' | 'teamLead' | 'walletAddress'>;
 
 export type ProjectAndMembersPayload = ProjectPayload & {
   // project member with id is for updates existing project members

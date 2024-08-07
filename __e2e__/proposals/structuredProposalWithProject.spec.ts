@@ -101,7 +101,7 @@ test.describe.serial('Structured proposal template with project', () => {
 
     await documentPage.documentTitleInput.fill('Structured proposal template');
     await proposalFormFieldPage.toggleProjectFieldConfig({
-      fieldName: 'project-excerpt',
+      fieldName: 'project-description',
       required: false
     });
 
@@ -164,7 +164,7 @@ test.describe.serial('Structured proposal template with project', () => {
     ]);
 
     await expect(proposalFormFieldPage.getProjectFieldLabel('name')).toHaveText('Project Name*');
-    await expect(proposalFormFieldPage.getProjectFieldLabel('excerpt')).toHaveText(
+    await expect(proposalFormFieldPage.getProjectFieldLabel('description')).toHaveText(
       'Describe your project in one sentence'
     );
     await expect(proposalFormFieldPage.getProjectFieldLabel('member-name')).toHaveText('Name*');
@@ -221,7 +221,7 @@ test.describe.serial('Structured proposal template with project', () => {
     await proposalFormFieldPage.clickProjectOption(project.id);
     await proposalFormFieldPage.fillProjectField({ fieldName: 'walletAddress', content: randomETHWalletAddress() });
     await proposalFormFieldPage.fillProjectField({
-      fieldName: 'excerpt',
+      fieldName: 'description',
       content: 'This is my project',
       textArea: true
     });
@@ -253,7 +253,7 @@ test.describe.serial('Structured proposal template with project', () => {
         }
       }
     });
-    expect(projectAfterUpdate.excerpt).toBe('This is my project');
+    expect(projectAfterUpdate.description).toBe('This is my project');
     expect(projectAfterUpdate.projectMembers[0].email).toBe('john@gmail.com');
 
     // Add a new project member and update their project fields
@@ -390,7 +390,7 @@ test.describe.serial('Structured proposal template with project', () => {
           select: {
             id: true,
             name: true,
-            excerpt: true,
+            description: true,
             walletAddress: true,
             projectMembers: {
               select: {

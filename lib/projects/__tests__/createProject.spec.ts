@@ -78,7 +78,7 @@ describe('createProject', () => {
     const createdProjectWithMembers = await createProject({
       project: {
         ...createDefaultProject(),
-        blog: 'https://blog.com',
+        websites: ['https://blog.com'],
         projectMembers: [
           // Project lead
           defaultProjectMember({
@@ -146,7 +146,7 @@ describe('createProject', () => {
 
     expect(createdProjectWithMembers).toEqual(
       expect.objectContaining({
-        blog: 'https://blog.com',
+        websites: ['https://blog.com'],
         projectMembers: expect.arrayContaining([
           expect.objectContaining({
             teamLead: true,

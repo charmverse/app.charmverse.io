@@ -378,27 +378,14 @@ describe('getBoardProperties', () => {
       ]
     });
     expect(properties.some((r) => r.id === constants.PROJECT_NAME_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_EXCERPT_ID)).toBeTruthy();
     expect(properties.some((r) => r.id === constants.PROJECT_DESCRIPTION_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_TWITTER_ID)).toBeTruthy();
     expect(properties.some((r) => r.id === constants.PROJECT_WEBSITE_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_GITHUB_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_BLOG_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_DEMO_URL_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_COMMUNITY_URL_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_OTHER_URL_ID)).toBeTruthy();
     expect(properties.some((r) => r.id === constants.PROJECT_WALLET_ID)).toBeTruthy();
     // project team members
     expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_NAMES_ID)).toBeTruthy();
     expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_WALLETS_ID)).toBeTruthy();
     expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_EMAILS_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_TWITTERS_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_WARPCASTS_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_GITHUBS_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_LINKEDINS_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_TELEGRAMS_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_OTHER_URLS_ID)).toBeTruthy();
-    expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_PREVIOUS_PROJECTS_ID)).toBeTruthy();
+    expect(properties.some((r) => r.id === constants.PROJECT_MEMBER_SOCIAL_URLS_ID)).toBeTruthy();
   });
 
   it('Should return private properties for project profile', () => {

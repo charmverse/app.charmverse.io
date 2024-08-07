@@ -48,16 +48,10 @@ export async function createProject(payload: {
     data: {
       id: projectId,
       description: project.description,
-      excerpt: project.excerpt,
       name: project.name,
       walletAddress: project.walletAddress?.toLowerCase(),
-      blog: project.blog,
-      communityUrl: project.communityUrl,
-      github: project.github,
-      otherUrl: project.otherUrl,
-      demoUrl: project.demoUrl,
       twitter: project.twitter,
-      website: project.website,
+      websites: project.websites,
       createdBy: payload.userId,
       updatedBy: payload.userId,
       projectMembers: {

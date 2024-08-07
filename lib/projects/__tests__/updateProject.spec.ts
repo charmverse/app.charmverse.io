@@ -133,7 +133,7 @@ describe('updateProjectAndMembers', () => {
       userId: projectTeamLead.id,
       payload: {
         ...createDefaultProject(),
-        blog: 'https://blog.com',
+        websites: ['https://blog.com'],
         projectMembers: [
           // Making sure team lead doesn't get connected with a different user
           {
@@ -207,7 +207,7 @@ describe('updateProjectAndMembers', () => {
 
     expect(updatedProjectWithMembers).toEqual(
       expect.objectContaining({
-        blog: 'https://blog.com',
+        websites: ['https://blog.com'],
         projectMembers: expect.arrayContaining([
           expect.objectContaining({
             teamLead: true,

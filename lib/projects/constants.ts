@@ -13,15 +13,9 @@ export function createDefaultProject(): ProjectAndMembersPayload {
   return {
     name: '',
     deletedAt: null,
-    excerpt: '',
     description: '',
     twitter: '',
-    website: '',
-    github: '',
-    blog: '',
-    demoUrl: '',
-    communityUrl: '',
-    otherUrl: '',
+    websites: [],
     walletAddress: '',
     projectMembers: []
   };
@@ -32,31 +26,19 @@ type ProjectMemberPayload = ProjectAndMembersPayload['projectMembers'][number];
 export function defaultProjectMember({
   walletAddress = '',
   email = '',
-  github = '',
-  linkedin = '',
+  socialUrls = [],
   name = '',
-  telegram = '',
-  twitter = '',
   teamLead = false,
   userId
 }: Partial<
-  Pick<
-    ProjectMemberPayload,
-    'email' | 'github' | 'linkedin' | 'name' | 'teamLead' | 'telegram' | 'twitter' | 'userId' | 'walletAddress'
-  >
+  Pick<ProjectMemberPayload, 'email' | 'name' | 'teamLead' | 'socialUrls' | 'userId' | 'walletAddress'>
 > = {}): ProjectMemberPayload {
   return {
     name,
     teamLead,
     walletAddress,
     email,
-    twitter,
-    warpcast: '',
-    github,
-    linkedin,
-    telegram,
-    otherUrl: '',
-    previousProjects: '',
+    socialUrls,
     userId
   };
 }
