@@ -19,6 +19,7 @@ const nextConfig = {
   images: {
     unoptimized: true
   },
+  productionBrowserSourceMaps: true,
   webpack(_config) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     // _config.resolve.alias.canvas = false;
