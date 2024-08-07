@@ -1,11 +1,11 @@
 import type { IframelyResponse } from '@root/lib/iframely/getIframely';
 import { getIframely } from '@root/lib/iframely/getIframely';
+import type { Cast } from '@root/lib/neynar/interfaces';
 import { isTruthy } from '@root/lib/utils/types';
 import { uniqBy } from 'lodash';
 
 import { getEmbeddedCasts } from './getEmbeddedCasts';
 import { getFarcasterUserCasts } from './getFarcasterUserCasts';
-import type { Cast } from './getFarcasterUserReactions';
 import { getFarcasterUserReactions } from './getFarcasterUserReactions';
 
 export type FeedItem = { type: 'recast' | 'like' | 'cast'; cast: Cast; hash: string };

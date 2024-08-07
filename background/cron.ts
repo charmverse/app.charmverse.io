@@ -13,11 +13,11 @@ import { indexPendingCredentialsTask } from './tasks/indexPendingCredentialsTask
 import { task as processCollablandWebhookMessages } from './tasks/processCollablandWebhookMessages';
 import { task as processGithubWebhookMessages } from './tasks/processGithubWebhookMessages';
 import { task as processMailgunWebhookMessages } from './tasks/processMailgunWebhookMessages';
+import { task as processNeynarWebhookMessages } from './tasks/processNeynarWebhookMessages';
 import { task as processSynapsWebhookMessages } from './tasks/processSynapsWebhookMessages';
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
 import { refreshDocusignOAuthTask } from './tasks/refreshDocusignOAuthTask';
 import { sendDraftProposalNotificationTask } from './tasks/sendDraftProposalNotificationTask';
-import { task as sendPushNotificationsToSunyAppTask } from './tasks/sendPushNotificationsToSunyAppTask';
 import { task as storeOptimismProjectAttestations } from './tasks/storeOptimismProjectAttestations';
 import { syncOptimismReviewsTask } from './tasks/syncOptimismReviews';
 import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
@@ -38,6 +38,9 @@ processGithubWebhookMessages();
 
 // Start processing synaps webhook messages
 processSynapsWebhookMessages();
+
+// Start processing neynar webhook messages
+processNeynarWebhookMessages();
 
 // Start processing mailgun webhook messages
 processMailgunWebhookMessages();

@@ -1,6 +1,5 @@
+import type { Cast } from '@root/lib/neynar/interfaces';
 import { isTruthy } from '@root/lib/utils/types';
-
-import type { Cast } from './getFarcasterUserReactions';
 
 export function createCastParagraphChunks(cast: Cast) {
   const castParagraphsChunks = cast.text.split('\n').map((text) =>
