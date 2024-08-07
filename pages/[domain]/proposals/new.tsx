@@ -67,7 +67,9 @@ export const getServerSideProps = withSessionSsr<{ error?: string }>(async (cont
     if (space.requireProposalTemplate && !template && pageType !== 'proposal_template') {
       log.warn('User is a member but space requires a template to create proposals', { spaceId: space.id });
 
-      return { notFound: true };
+      return {
+        props: { error: 'You must select a template to create a proposal' }
+      };
     }
     const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
       resourceId: space.id,
@@ -80,7 +82,7 @@ export const getServerSideProps = withSessionSsr<{ error?: string }>(async (cont
         spaceId: space.id
       });
       return {
-        notFound: true
+        props: { error: 'You do not have permission to create a proposal' }
       };
     }
     if (sourcePageId) {
@@ -94,7 +96,7 @@ export const getServerSideProps = withSessionSsr<{ error?: string }>(async (cont
           pageId: sourcePageId
         });
         return {
-          notFound: true
+          props: { error: 'You do not have permission to convert this to a proposal' }
         };
       }
     }
