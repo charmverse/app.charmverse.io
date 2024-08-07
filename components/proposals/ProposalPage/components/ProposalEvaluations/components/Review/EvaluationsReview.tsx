@@ -67,7 +67,7 @@ export type Props = {
   refreshPage?: VoidFunction;
 };
 
-export function FEvaluationsReview({
+export function EvaluationsReview({
   pagePath,
   pageTitle,
   pageId,
