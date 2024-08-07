@@ -50,7 +50,6 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       description: project.description ?? undefined,
       farcasterValues: project.farcasterValues,
       github: project.github ?? undefined,
-      mirror: project.mirror ?? undefined,
       twitter: project.twitter ?? undefined,
       websites: project.websites,
       projectMembers:
@@ -88,7 +87,6 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     description: projectValues.description,
     farcasterValues: projectValues.farcasterValues,
     github: projectValues.github,
-    mirror: projectValues.mirror,
     twitter: projectValues.twitter,
     websites: projectValues.websites
   } as ProjectDetailsProps['project'];
