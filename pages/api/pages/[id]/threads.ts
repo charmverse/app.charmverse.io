@@ -19,7 +19,7 @@ async function getThreads(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (computed.comment !== true) {
-    throw new NotFoundError('Page not found');
+    return res.status(200).json([]);
   }
 
   const threads = await getPageThreads({ pageId, userId });
