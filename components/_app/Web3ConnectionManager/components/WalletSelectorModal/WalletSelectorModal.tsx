@@ -73,7 +73,13 @@ export function WalletSelector() {
         <Grid item xs={12}>
           <ConnectorButton
             name='WalletConnect'
-            onClick={() => walletConnectConnector && handleConnect(walletConnectConnector)}
+            onClick={() => {
+              if (walletConnectConnector) {
+                handleConnect(walletConnectConnector);
+              } else {
+                log.warn('WalletConnect connector not found');
+              }
+            }}
             iconUrl='walletconnect.svg'
             disabled={isWalletConnected(walletConnectConnector?.id) || !!isLoadingConnectorId}
             isActive={isWalletConnected(walletConnectConnector?.id)}
@@ -83,7 +89,13 @@ export function WalletSelector() {
         <Grid item xs={12}>
           <ConnectorButton
             name='Coinbase Wallet'
-            onClick={() => coinbaseWalletConnector && handleConnect(coinbaseWalletConnector)}
+            onClick={() => {
+              if (coinbaseWalletConnector) {
+                handleConnect(coinbaseWalletConnector);
+              } else {
+                log.warn('Coinbase connector not found');
+              }
+            }}
             iconUrl='coinbasewallet.png'
             disabled={isWalletConnected(coinbaseWalletConnector?.id) || !!isLoadingConnectorId}
             isActive={isWalletConnected(coinbaseWalletConnector?.id)}
