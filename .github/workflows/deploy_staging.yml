@@ -24,6 +24,8 @@ jobs:
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
+        with:
+          short-length: 7
 
       - name: Calculate Build ID and Stage env var
         id: get_build_id

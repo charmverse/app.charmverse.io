@@ -267,8 +267,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.x
 
       - name: Install dependencies
         uses: ./.github/actions/install
@@ -301,8 +299,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.x
 
       - name: Install dependencies
         uses: ./.github/actions/install
@@ -362,6 +358,8 @@ jobs:
           fetch-depth: 0
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
+        with:
+          short-length: 7
 
       # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
       - name: Install dependencies
@@ -399,12 +397,14 @@ jobs:
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
     concurrency: deploy-staging-${{ github.head_ref }}
-    needs: [upload-docker, upload-static-assets]
+    needs: [upload-docker]
     steps:
       - uses: actions/checkout@v4
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
+        with:
+          short-length: 7
 
       - name: Calculate Stage env var
         run: |
