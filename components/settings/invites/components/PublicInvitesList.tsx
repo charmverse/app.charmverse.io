@@ -93,20 +93,22 @@ function InviteRow({ invite, isAdmin, updateInviteLinkRoles, deleteInviteLink }:
           />
         </TableCell>
         <TableCell width={90}>
-          <Tooltip arrow placement='top' title={copied ? 'Copied!' : 'Click to copy link'} disableInteractive>
-            <Box component='span'>
-              <CopyToClipboard text={getInviteLink(invite.code)} onCopy={onCopy}>
-                <Chip
-                  sx={{ width: 90 }}
-                  clickable
-                  color='secondary'
-                  size='small'
-                  variant='outlined'
-                  label={copied ? 'Copied!' : 'Copy Link'}
-                />
-              </CopyToClipboard>
-            </Box>
-          </Tooltip>
+          {isAdmin && (
+            <Tooltip arrow placement='top' title={copied ? 'Copied!' : 'Click to copy link'} disableInteractive>
+              <Box component='span'>
+                <CopyToClipboard text={getInviteLink(invite.code)} onCopy={onCopy}>
+                  <Chip
+                    sx={{ width: 90 }}
+                    clickable
+                    color='secondary'
+                    size='small'
+                    variant='outlined'
+                    label={copied ? 'Copied!' : 'Copy Link'}
+                  />
+                </CopyToClipboard>
+              </Box>
+            </Tooltip>
+          )}
         </TableCell>
         <TableCell width={30}>
           {isAdmin && (
