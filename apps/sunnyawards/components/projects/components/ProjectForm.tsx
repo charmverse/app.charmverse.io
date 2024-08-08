@@ -1,6 +1,6 @@
 'use client';
 
-import { MultiTextInputField } from '@connect-shared/components/common/MultiextInputField';
+import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
 import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
 import Link from 'next/link';

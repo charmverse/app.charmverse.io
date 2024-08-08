@@ -1,4 +1,4 @@
-import { MultiTextInputField } from '@connect-shared/components/common/MultiextInputField';
+import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
 import type { FormValues } from '@connect-shared/lib/projects/form';
 import { CATEGORIES } from '@connect-shared/lib/projects/form';
 import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
