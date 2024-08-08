@@ -5,6 +5,8 @@ import * as yup from 'yup';
 import { projectFieldProperties, projectMemberFieldProperties } from './formField';
 import type { ProjectField, ProjectMemberField, ProjectAndMembersFieldConfig } from './formField';
 
+type FieldSchema = yup.StringSchema | yup.ArraySchema<(string | undefined)[] | undefined, yup.AnyObject, '', ''>;
+
 function addMatchersToSchema({
   fieldType,
   isRequired,
@@ -12,42 +14,50 @@ function addMatchersToSchema({
 }: {
   fieldType: ProjectField | ProjectMemberField;
   isRequired: boolean;
-  schemaObject: Record<string, yup.StringSchema>;
+  schemaObject: Record<string, FieldSchema>;
 }) {
   if (fieldType === 'walletAddress') {
-    schemaObject[fieldType] = schemaObject[fieldType]!.test('is-valid-address', 'Invalid wallet address', (value) => {
-      try {
+    schemaObject[fieldType] = (schemaObject[fieldType] as yup.StringSchema).test(
+      'is-valid-address',
+      'Invalid wallet address',
+      (value) => {
+        try {
+          if (isRequired && !value) {
+            return false;
+          }
+
+          if (value) {
+            return value.endsWith('.eth') || isAddress(value);
+          }
+
+          return true;
+        } catch {
+          return false;
+        }
+      }
+    );
+  } else if (fieldType === 'email') {
+    schemaObject[fieldType] = (schemaObject[fieldType] as yup.StringSchema).test(
+      'is-valid-email',
+      'Invalid email address',
+      (value) => {
         if (isRequired && !value) {
           return false;
         }
 
         if (value) {
-          return value.endsWith('.eth') || isAddress(value);
+          return isValidEmail(value);
         }
 
         return true;
-      } catch {
-        return false;
       }
-    });
-  } else if (fieldType === 'email') {
-    schemaObject[fieldType] = schemaObject[fieldType]!.test('is-valid-email', 'Invalid email address', (value) => {
-      if (isRequired && !value) {
-        return false;
-      }
-
-      if (value) {
-        return isValidEmail(value);
-      }
-
-      return true;
-    });
+    );
   }
 }
 
 export function createProjectYupSchema({ fieldConfig }: { fieldConfig?: ProjectAndMembersFieldConfig }) {
-  const yupProjectSchemaObject: Partial<Record<ProjectField, yup.StringSchema>> = {};
-  const yupProjectMemberSchemaObject: Partial<Record<ProjectMemberField, yup.StringSchema>> = {};
+  const yupProjectSchemaObject: Partial<Record<ProjectField, FieldSchema>> = {};
+  const yupProjectMemberSchemaObject: Partial<Record<ProjectMemberField, FieldSchema>> = {};
   projectFieldProperties.forEach((projectFieldProperty) => {
     const projectFieldConfig = fieldConfig?.[projectFieldProperty.field] ?? {
       required: false,
@@ -78,11 +88,11 @@ export function createProjectYupSchema({ fieldConfig }: { fieldConfig?: ProjectA
     };
     projectMemberFieldConfig.required = projectMemberFieldConfig.required ?? false;
     if (projectMemberFieldConfig.show !== false) {
+      let fieldSchema = projectMemberFieldProperty.multiple ? yup.array().of(yup.string()) : yup.string();
       if (projectMemberFieldConfig.required) {
-        yupProjectMemberSchemaObject[projectMemberFieldProperty.field as ProjectMemberField] = yup.string().required();
-      } else {
-        yupProjectMemberSchemaObject[projectMemberFieldProperty.field as ProjectMemberField] = yup.string();
+        fieldSchema = fieldSchema.required();
       }
+      yupProjectMemberSchemaObject[projectMemberFieldProperty.field as ProjectMemberField] = fieldSchema;
 
       addMatchersToSchema({
         fieldType: projectMemberFieldProperty.field as ProjectField | ProjectMemberField,
@@ -91,7 +101,6 @@ export function createProjectYupSchema({ fieldConfig }: { fieldConfig?: ProjectA
       });
     }
   });
-
   return yup
     .object({
       projectMembers: yup.array().of(yup.object(yupProjectMemberSchemaObject))

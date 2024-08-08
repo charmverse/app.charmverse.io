@@ -25,7 +25,7 @@ export async function addProjectMember({
       updatedBy: userId,
       email: payload.email,
       teamLead: false,
-      socialUrls: payload.socialUrls,
+      socialUrls: payload.socialUrls?.filter(Boolean),
       walletAddress: payload.walletAddress?.toLowerCase()?.trim(),
       userId: connectedUserId
     }

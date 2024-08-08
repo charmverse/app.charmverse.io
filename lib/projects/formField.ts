@@ -9,6 +9,7 @@ export type ProjectFieldProperty = {
   alwaysRequired?: boolean;
   // This will allow the template author to set the field as private (only visible to authors, reviewers & admins)
   allowPrivate?: boolean;
+  multiple?: boolean;
 
   // for database features
   columnTitle: string;
@@ -73,6 +74,7 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'socialUrls',
     label: 'Social Links',
+    multiple: true,
     columnTitle: 'Project Member URL',
     columnPropertyId: PROJECT_MEMBER_SOCIAL_URLS_ID
   }
@@ -101,16 +103,17 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
     columnPropertyId: PROJECT_TWITTER_ID
   },
   {
-    field: 'websites',
-    label: 'Websites',
-    columnTitle: 'Project Websites',
-    columnPropertyId: PROJECT_WEBSITE_ID
-  },
-  {
     field: 'github',
     label: 'GitHub',
     columnTitle: 'Project GitHub',
     columnPropertyId: PROJECT_GITHUB_ID
+  },
+  {
+    field: 'websites',
+    label: 'Websites',
+    multiple: true,
+    columnTitle: 'Project Websites',
+    columnPropertyId: PROJECT_WEBSITE_ID
   },
   {
     field: 'walletAddress',

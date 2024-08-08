@@ -1,9 +1,10 @@
 import { MenuItem, Select, Stack, Typography } from '@mui/material';
 
 import FieldLabel from 'components/common/form/FieldLabel';
-import { FieldsEditor } from 'components/settings/projects/components/FieldsEditor';
 import { projectMemberFieldProperties, projectFieldProperties } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+
+import { FieldsEditor } from './FieldsEditor';
 
 export function ProjectFieldEditor({
   onChange,

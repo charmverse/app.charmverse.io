@@ -11,7 +11,7 @@ export function createDefaultProjectAndMembersPayload(): ProjectAndMembersPayloa
 
 export function createDefaultProject(): ProjectAndMembersPayload {
   return {
-    name: '',
+    name: 'hoopah',
     deletedAt: null,
     description: '',
     twitter: '',
@@ -28,7 +28,7 @@ export function defaultProjectMember({
   walletAddress = '',
   email = '',
   socialUrls = [],
-  name = '',
+  name = 'hoopah',
   teamLead = false,
   userId
 }: Partial<

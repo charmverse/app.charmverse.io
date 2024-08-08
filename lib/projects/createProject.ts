@@ -38,6 +38,7 @@ export async function createProject(payload: {
 
       return {
         ...member,
+        socialUrls: member.socialUrls.filter(Boolean),
         userId: connectedUserId,
         updatedBy: payload.userId
       };
@@ -52,7 +53,7 @@ export async function createProject(payload: {
       walletAddress: project.walletAddress?.toLowerCase(),
       twitter: project.twitter,
       github: project.github,
-      websites: project.websites,
+      websites: project.websites.filter(Boolean),
       createdBy: payload.userId,
       updatedBy: payload.userId,
       projectMembers: {

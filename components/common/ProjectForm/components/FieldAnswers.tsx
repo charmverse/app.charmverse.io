@@ -29,17 +29,24 @@ function FieldAnswer({
   });
 
   const registeredField = register(name, {
-    setValueAs: (value) => (typeof value === 'string' ? value?.trim() : value)
+    setValueAs: (value) =>
+      typeof value === 'string' ? value?.trim() : Array.isArray(value) ? value.filter((v) => Boolean(v.trim())) : value
   });
-
   const isShown = getFieldConfig(fieldConfig).show;
   if (!isShown) {
     return null;
   }
 
-  if (property.field === 'websites') {
+  if (property.field === 'websites' || property.field === 'socialUrls') {
     return (
-      <MultiTextInputField control={control} name='websites' label='Websites' placeholder='https://charmverse.io' />
+      <MultiTextInputField
+        control={control}
+        disabled={disabled}
+        label={property.label}
+        placeholder='https://charmverse.io'
+        {...registeredField}
+        name={field.name as any}
+      />
     );
   }
 
@@ -68,12 +75,12 @@ function FieldAnswer({
 export function FieldAnswers({
   fieldConfig,
   properties,
-  name,
+  namePrefix,
   disabled,
   onChange
 }: {
   disabled?: boolean;
-  name?: string;
+  namePrefix?: string;
   fieldConfig: FieldConfig;
   properties: ProjectFieldProperty[];
   onChange?: (onChange: Record<string, any>) => void;
@@ -82,7 +89,7 @@ export function FieldAnswers({
     <Stack display='flex' flexDirection='column' gap={2} width='100%'>
       {properties.map((property) => (
         <FieldAnswer
-          name={(name ? `${name}.${property.field}` : property.field) as Path<ProjectAndMembersPayload>}
+          name={(namePrefix ? `${namePrefix}.${property.field}` : property.field) as Path<ProjectAndMembersPayload>}
           fieldConfig={fieldConfig[property.field]}
           key={property.field as string}
           disabled={disabled}
