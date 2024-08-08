@@ -176,9 +176,14 @@ function ProjectRow({
       updateProjectAndMembers(
         {
           ...projectValues,
+          // handle the MultiTextInput returning [undefined] at first
+          websites: projectValues.websites.map((str) => str?.trim()).filter(Boolean),
           projectMembers: projectValues.projectMembers.map((member, index) => ({
             ...projectWithMembers.projectMembers[index],
-            ...member
+            ...member,
+            socialUrls: (member.socialUrls || projectWithMembers.projectMembers[index])
+              .map((str) => str?.trim())
+              .filter(Boolean)
           }))
         },
         {

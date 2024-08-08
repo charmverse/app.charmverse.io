@@ -112,6 +112,7 @@ export async function updateProjectAndMembers({
         name: payload.name,
         walletAddress: payload.walletAddress?.toLowerCase(),
         twitter: payload.twitter,
+        // note: the UI sends undefined at first if no website is given
         websites: payload.websites.map((url) => url?.trim()),
         deletedAt: payload.deletedAt
       }

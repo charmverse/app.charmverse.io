@@ -34,7 +34,16 @@ export function CreateProjectForm({
 
   async function saveProject() {
     const project = form.getValues();
-    const createdProjectWithMembers = await createProject(project);
+    const createdProjectWithMembers = await createProject({
+      ...project,
+      // handle the MultiTextInput returning [undefined] at first
+      websites: project.websites.map((str) => str?.trim()).filter(Boolean),
+      projectMembers: project.projectMembers.map((member) => ({
+        ...member,
+        socialUrls: member.socialUrls.map((str) => str?.trim()).filter(Boolean)
+      }))
+    });
+
     onSave(createdProjectWithMembers);
     form.reset();
   }
