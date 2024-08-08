@@ -17,7 +17,7 @@ import { ProposalIcon } from 'components/common/PageIcon';
 
 export const premiumSettingSections = ['roles', 'api'] as const;
 
-type SpaceSettingsSection =
+export type SpaceSettingsSection =
   | 'space'
   | 'roles'
   | 'invites'
