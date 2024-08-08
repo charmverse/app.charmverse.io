@@ -112,7 +112,7 @@ export async function updateProjectAndMembers({
         name: payload.name,
         walletAddress: payload.walletAddress?.toLowerCase(),
         twitter: payload.twitter,
-        websites: payload.websites.map((url) => url.trim()),
+        websites: payload.websites.map((url) => url?.trim()),
         deletedAt: payload.deletedAt
       }
     }),
