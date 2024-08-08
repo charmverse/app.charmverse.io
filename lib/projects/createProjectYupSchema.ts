@@ -72,11 +72,6 @@ export function createProjectYupSchema({ fieldConfig: fieldsConfig }: { fieldCon
         fieldSchema = fieldSchema.required();
       }
       yupProjectSchemaObject[field as ProjectField] = fieldSchema;
-      if (fieldConfig.required) {
-        yupProjectSchemaObject[field as ProjectField] = yup.string().required();
-      } else {
-        yupProjectSchemaObject[field as ProjectField] = yup.string();
-      }
 
       addMatchersToSchema({
         fieldType: field as ProjectField | ProjectMemberField,
@@ -91,7 +86,9 @@ export function createProjectYupSchema({ fieldConfig: fieldsConfig }: { fieldCon
       required: false,
       show: true
     };
+
     fieldConfig.required = fieldConfig.required ?? false;
+
     if (fieldConfig.show !== false) {
       let fieldSchema = multiple ? yup.array().of(yup.string()) : yup.string();
       if (fieldConfig.required) {
