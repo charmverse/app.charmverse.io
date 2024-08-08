@@ -17,7 +17,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
 import { isUrl } from 'lib/utils/strings';
 
-import Legend from '../Legend';
+import Legend from '../components/Legend';
 import { UpgradeChip } from '../subscription/UpgradeWrapper';
 
 export const schema = yup.object({

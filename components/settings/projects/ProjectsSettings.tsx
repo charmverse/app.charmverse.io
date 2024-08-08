@@ -23,7 +23,7 @@ import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import { useUser } from 'hooks/useUser';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';

@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
