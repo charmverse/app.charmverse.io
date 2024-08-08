@@ -19,7 +19,7 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { PageIcon } from 'components/common/PageIcon';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 import { usePreventReload } from 'hooks/usePreventReload';

@@ -8,7 +8,7 @@ import Loader from 'components/common/Loader';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 
-import Legend from '../Legend';
+import Legend from '../components/Legend';
 
 import { InviteLinkList } from './components/InviteLinks';
 import InviteActions from './components/InviteLinks/components/InviteActions';

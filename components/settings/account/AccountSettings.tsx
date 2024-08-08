@@ -2,7 +2,7 @@ import { Box, InputLabel } from '@mui/material';
 
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { AccountPreferences } from 'components/settings/account/components/AccountPreferences';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 
 import { UserIdentities } from '../profile/components/IdentityModal';
 
