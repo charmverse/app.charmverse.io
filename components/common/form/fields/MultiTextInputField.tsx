@@ -1,8 +1,10 @@
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
-import { Button, IconButton, Stack, TextField } from '@mui/material';
+import { IconButton, Stack, TextField } from '@mui/material';
 import type { FieldValues, Control, FieldArrayPath, Path } from 'react-hook-form';
 import { Controller, useFieldArray } from 'react-hook-form';
+
+import { Button } from 'components/common/Button';
 
 import { FieldWrapper } from './FieldWrapper';
 
