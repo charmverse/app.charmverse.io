@@ -29,11 +29,11 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
   const rubricCriteria = evaluation?.rubricCriteria;
   const myRubricAnswers = useMemo(
     () => evaluation?.rubricAnswers.filter((answer) => answer.userId === user?.id) || [],
-    [user?.id, evaluation?.rubricAnswers]
+    [user?.id, !!evaluation?.rubricAnswers]
   );
   const myDraftRubricAnswers = useMemo(
     () => evaluation?.draftRubricAnswers.filter((answer) => answer.userId === user?.id),
-    [user?.id, evaluation?.draftRubricAnswers]
+    [user?.id, !!evaluation?.draftRubricAnswers]
   );
 
   const canViewRubricAnswers = isAdmin || canAnswerRubric;

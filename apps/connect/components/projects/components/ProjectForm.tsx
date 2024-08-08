@@ -1,4 +1,4 @@
-import { ProjectMultiTextValueFields } from '@connect-shared/components/common/ProjectMultiTextValueFields';
+import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
 import type { FormValues } from '@connect-shared/lib/projects/form';
 import { CATEGORIES } from '@connect-shared/lib/projects/form';
 import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
@@ -66,11 +66,11 @@ export function ProjectForm({
           />
         </Stack>
 
-        <ProjectMultiTextValueFields
+        <MultiTextInputField
           control={control}
           name='websites'
           label='Websites'
-          dataTest='project-form-websites'
+          data-test='project-form-websites'
           placeholder='https://charmverse.io'
           required
         />
@@ -102,13 +102,14 @@ export function ProjectForm({
           />
         </Stack>
 
-        <ProjectMultiTextValueFields
+        <MultiTextInputField
           control={control}
           name='farcasterValues'
           label='Farcaster'
-          dataTest='project-form-farcaster-values'
+          data-test='project-form-farcaster-values'
           placeholder='https://warpcast.com/charmverse'
         />
+
         <Stack>
           <FormLabel id='project-twitter'>X</FormLabel>
           <Stack direction='row' gap={1} alignItems='center'>

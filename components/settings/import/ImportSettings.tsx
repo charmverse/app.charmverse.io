@@ -10,7 +10,7 @@ import { Button } from 'components/common/Button';
 import { ImportZippedMarkdown } from 'components/common/ImportZippedMarkdown';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useNotionImport } from 'hooks/useNotionImport';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';

@@ -10,7 +10,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
 
-import Legend from '../Legend';
+import Legend from '../components/Legend';
 import Avatar from '../space/components/LargeAvatar';
 
 import type { UpdateableCredentialProps } from './components/CredentialsOnChainConfig';

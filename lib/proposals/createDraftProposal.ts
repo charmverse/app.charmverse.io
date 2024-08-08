@@ -84,6 +84,10 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
       }
     }));
 
+  if (template && !workflow) {
+    throw new Error('Template has no workflow assigned');
+  }
+
   // authors should be empty by default for new templates
   // but include authors from templates if they were added
   const authorsFromTemplate = template?.proposal?.authors.map(({ userId }) => userId) || [];

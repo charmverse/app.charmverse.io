@@ -14,7 +14,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { optimism } from 'viem/chains';
 
-import type { OptimismProjectFormValues } from 'components/common/form/fields/Optimism/optimismProjectFormValues';
+import type { OptimismProjectFormValues } from 'components/common/ProjectForm/components/Optimism/optimismProjectFormValues';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getOpProjectsByAttestationId } from 'lib/optimism/getOpProjectsByAttestationId';
 

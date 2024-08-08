@@ -25,7 +25,7 @@ import { useUserPreferences } from 'hooks/useUserPreferences';
 import { formatDateTime, getCurrentDate } from 'lib/utils/dates';
 import debounce from 'lib/utils/debounce';
 
-import Legend from '../../Legend';
+import Legend from '../../components/Legend';
 
 export const schema = yup.object({
   email: yup.string().ensure().trim().email(),

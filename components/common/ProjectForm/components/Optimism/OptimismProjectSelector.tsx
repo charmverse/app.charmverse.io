@@ -7,8 +7,8 @@ import { useUser } from 'hooks/useUser';
 import type { OpProjectFieldValue } from 'lib/forms/interfaces';
 import { fancyTrim } from 'lib/utils/strings';
 
-import type { ControlFieldProps, FieldProps } from '../../interfaces';
-import { FieldWrapper } from '../FieldWrapper';
+import { FieldWrapper } from '../../../form/fields/FieldWrapper';
+import type { ControlFieldProps, FieldProps } from '../../../form/interfaces';
 
 import { OptimismProjectDisplay } from './OptimismProjectDisplay';
 import { OptimismProjectForm } from './OptimismProjectForm';

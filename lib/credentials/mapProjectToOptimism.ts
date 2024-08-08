@@ -59,7 +59,6 @@ export type ProjectDetails = Pick<
   | 'name'
   | 'farcasterValues'
   | 'github'
-  | 'mirror'
   | 'twitter'
   | 'websites'
   | 'primaryContractAddress'
@@ -99,7 +98,7 @@ export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
       website: input.websites || [],
       farcaster: input.farcasterValues || [],
       twitter: input.twitter || '',
-      mirror: input.mirror || null
+      mirror: null
     },
     team: input.projectMembers.map((member) => member.farcasterId.toString()),
     github: input.github ? [input.github] : [],

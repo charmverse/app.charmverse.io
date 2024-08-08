@@ -1,5 +1,4 @@
 import { DELETE, GET, POST, PUT } from '@root/adapters/http';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import {
@@ -9,7 +8,6 @@ import {
   useGetSpaceDocusignEnvelopes
 } from 'charmClient/hooks/docusign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { EvaluationDocumentToSign } from 'lib/proposals/documentsToSign/addEnvelopeToEvaluation';
 import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 

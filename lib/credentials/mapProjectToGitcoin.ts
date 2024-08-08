@@ -25,14 +25,6 @@ function generateContributionLinks(input: ConnectProjectDetails) {
     });
   }
 
-  if (input.mirror) {
-    links.push({
-      description: 'Mirror Profile',
-      type: contributionTypes.OTHER,
-      url: input.mirror
-    });
-  }
-
   if (input.websites) {
     input.websites.forEach((url) => {
       links.push({

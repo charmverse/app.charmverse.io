@@ -18,7 +18,7 @@ import {
   useRequiredUserDetailsForm
 } from 'components/members/hooks/useRequiredMemberProperties';
 import { SetupTwoFactorAuthGlobal } from 'components/settings/account/components/otp/components/SetupTwoFactorAuthGlobal';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';

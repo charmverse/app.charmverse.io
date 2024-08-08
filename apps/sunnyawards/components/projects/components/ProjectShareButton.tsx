@@ -12,6 +12,10 @@ export function ShareButton({ projectId }: { projectId: string }) {
     setUrl(window.location.href);
   }, []);
 
+  if (!projectId) {
+    return null;
+  }
+
   return (
     <Button
       LinkComponent={Link}
@@ -20,7 +24,6 @@ export function ShareButton({ projectId }: { projectId: string }) {
       )}
       target='_blank'
       rel='noopener noreferrer'
-      disabled={!projectId}
       color='secondary'
       variant='outlined'
       startIcon={<ShareIcon fontSize='small' />}

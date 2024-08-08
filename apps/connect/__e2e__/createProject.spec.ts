@@ -81,10 +81,6 @@ test('Create a project and view details', async ({ page }) => {
 
   await confirmButton.click();
 
-  const addTeam = page.locator('data-test=project-form-add-team');
-
-  await expect(addTeam).toBeVisible();
-
   const publishButton = page.locator('data-test=project-form-publish');
 
   await Promise.all([page.waitForURL('**/p/*/publish'), publishButton.click()]);

@@ -6,7 +6,7 @@ import { bindPopper, bindTrigger, usePopupState } from 'material-ui-popup-state/
 import { Button } from 'components/common/Button';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { TwoFactorAuthSetupModal } from 'components/settings/account/components/otp/components/TwoFactorAuthSetupModal';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import { useUser } from 'hooks/useUser';
 
 import { DeleteOtpModal } from './otp/components/DeleteOtpModal';

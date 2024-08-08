@@ -1,11 +1,15 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack } from '@mui/material';
-import { useFormContext } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 
 import { useCreateProject } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
-import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
+import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
-import { ProjectFormAnswers } from './ProjectForm';
+import { ProjectForm } from './ProjectForm';
 
 export function CreateProjectForm({
   onCancel,
@@ -14,21 +18,39 @@ export function CreateProjectForm({
   onSave: (project: ProjectWithMembers) => void;
   onCancel: VoidFunction;
 }) {
+  const schema = createProjectYupSchema({
+    fieldConfig: createDefaultProjectAndMembersFieldConfig()
+  });
+  const form = useForm({
+    defaultValues: createDefaultProjectAndMembersPayload(),
+    reValidateMode: 'onChange',
+    resolver: yupResolver(schema),
+    criteriaMode: 'all',
+    mode: 'onChange'
+  });
   const { trigger: createProject, isMutating } = useCreateProject();
-  const { formState, getValues, reset } = useFormContext<ProjectAndMembersPayload>();
 
-  const isValid = formState.isValid;
+  const isValid = form.formState.isValid;
 
   async function saveProject() {
-    const project = getValues();
-    const createdProjectWithMembers = await createProject(project);
+    const project = form.getValues();
+    const createdProjectWithMembers = await createProject({
+      ...project,
+      // handle the MultiTextInput returning [undefined] at first
+      websites: project.websites.map((str) => str?.trim()).filter(Boolean),
+      projectMembers: project.projectMembers.map((member) => ({
+        ...member,
+        socialUrls: member.socialUrls.map((str) => str?.trim()).filter(Boolean)
+      }))
+    });
+
     onSave(createdProjectWithMembers);
-    reset();
+    form.reset();
   }
 
   return (
-    <>
-      <ProjectFormAnswers isTeamLead />
+    <FormProvider {...form}>
+      <ProjectForm isTeamLead />
       <Box
         sx={{
           display: 'flex',
@@ -47,7 +69,7 @@ export function CreateProjectForm({
             variant='outlined'
             color='error'
             onClick={() => {
-              reset();
+              form.reset();
               onCancel();
             }}
           >
@@ -63,6 +85,6 @@ export function CreateProjectForm({
           </Button>
         </Stack>
       </Box>
-    </>
+    </FormProvider>
   );
 }

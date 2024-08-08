@@ -7,7 +7,13 @@ export type InviteLinkWithRoles = InviteLink & {
   roleIds: string[];
 };
 
-export async function getSpaceInviteLinks({ spaceId }: { spaceId: string }): Promise<InviteLinkWithRoles[]> {
+export async function getSpaceInviteLinks({
+  isAdmin,
+  spaceId
+}: {
+  isAdmin: boolean;
+  spaceId: string;
+}): Promise<InviteLinkWithRoles[]> {
   if (!stringUtils.isUUID(spaceId)) {
     throw new InvalidInputError(`Valid spaceId is required`);
   }
@@ -26,8 +32,10 @@ export async function getSpaceInviteLinks({ spaceId }: { spaceId: string }): Pro
   });
 
   let mappedLinks = links.map((link) => {
+    const code = isAdmin ? link.code : '';
     return {
       ...link,
+      code,
       roleIds: link.inviteLinkToRoles.map((linkToRole) => linkToRole.roleId)
     };
   });

@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import ErrorPage from 'components/common/errors/ErrorPage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { CreateDraftProposalInput, ProposalContentType } from 'lib/proposals/createDraftProposal';
 import { createDraftProposal } from 'lib/proposals/createDraftProposal';
@@ -10,7 +11,7 @@ import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { getPagePath } from 'lib/utils/domains/getPagePath';
 
-export const getServerSideProps = withSessionSsr(async (context) => {
+export const getServerSideProps = withSessionSsr<{ error?: string }>(async (context) => {
   const template = context.query?.template as string | undefined;
   const pageType = context.query.type as PageType | undefined;
   const sourcePageId = context.query.sourcePageId as string | undefined;
@@ -66,7 +67,9 @@ export const getServerSideProps = withSessionSsr(async (context) => {
     if (space.requireProposalTemplate && !template && pageType !== 'proposal_template') {
       log.warn('User is a member but space requires a template to create proposals', { spaceId: space.id });
 
-      return { notFound: true };
+      return {
+        props: { error: 'You must select a template to create a proposal' }
+      };
     }
     const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
       resourceId: space.id,
@@ -79,7 +82,7 @@ export const getServerSideProps = withSessionSsr(async (context) => {
         spaceId: space.id
       });
       return {
-        notFound: true
+        props: { error: 'You do not have permission to create a proposal' }
       };
     }
     if (sourcePageId) {
@@ -93,21 +96,33 @@ export const getServerSideProps = withSessionSsr(async (context) => {
           pageId: sourcePageId
         });
         return {
-          notFound: true
+          props: { error: 'You do not have permission to convert this to a proposal' }
         };
       }
     }
-    const proposal = await createDraftProposal(newDraftParams);
-    return {
-      redirect: {
-        destination: getPagePath({
-          hostName: context.req.headers.host,
-          path: proposal.page.path,
-          spaceDomain: space.domain
-        }),
-        permanent: false
-      }
-    };
+    try {
+      const proposal = await createDraftProposal(newDraftParams);
+      return {
+        redirect: {
+          destination: getPagePath({
+            hostName: context.req.headers.host,
+            path: proposal.page.path,
+            spaceDomain: space.domain
+          }),
+          permanent: false
+        }
+      };
+    } catch (error) {
+      log.error('Failed to create draft proposal', {
+        error,
+        query: context.query,
+        userId: sessionUserId,
+        spaceId: space.id
+      });
+      return {
+        props: { error: 'The selected template is invalid' }
+      };
+    }
   }
 
   if (space.requireProposalTemplate && !template) {
@@ -167,12 +182,12 @@ export const getServerSideProps = withSessionSsr(async (context) => {
         permanent: false
       }
     };
-  } catch (err) {
+  } catch (error) {
     log.warn('User could not join space via template', {
       template,
       userId: sessionUserId,
       spaceId: space.id,
-      err
+      error
     });
 
     return {
@@ -185,6 +200,9 @@ export const getServerSideProps = withSessionSsr(async (context) => {
 });
 
 // user will never see this page and instead be redirected somewhere else
-export default function PageView() {
+export default function PageView({ error }: { error?: string }) {
+  if (error) {
+    return <ErrorPage message={error} />;
+  }
   return null;
 }

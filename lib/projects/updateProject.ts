@@ -16,7 +16,9 @@ export async function updateProject({
       id: projectId
     },
     data: {
-      ...projectValuesWithoutId
+      ...projectValuesWithoutId,
+      // our multitextinput form field sometimes sends [undefined] at first if no website is given
+      websites: projectValuesWithoutId.websites?.map((url) => url?.trim()).filter(Boolean)
     }
   });
 }

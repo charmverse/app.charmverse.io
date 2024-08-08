@@ -27,7 +27,8 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
     },
     ref
   ) => {
-    const InputProps = (inputProps.value as string)?.startsWith('http')
+    const showLinkIcon = typeof inputProps.value === 'string' && inputProps.value.startsWith('http');
+    const InputProps = showLinkIcon
       ? {
           endAdornment: (
             <IconButton color='secondary' href={inputProps.value as string} target='_blank' size='small' sx={{ p: 0 }}>
