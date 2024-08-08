@@ -106,9 +106,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     >
       <Box gap={2} display='flex' flexDirection='column'>
         <ProjectDetails project={projectDetails} />
-        <Typography variant='h5' data-test='project-form-add-team'>
-          Edit team members
-        </Typography>
+        <Typography variant='h5'>Edit team members</Typography>
         <AddProjectMembersForm
           user={user}
           onBack={() => {
