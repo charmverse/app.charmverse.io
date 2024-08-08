@@ -28,7 +28,7 @@ function FieldAnswer({
   });
 
   const registeredField = register(name, {
-    setValueAs: (value) => value?.trim()
+    setValueAs: (value) => (typeof value === 'string' ? value?.trim() : value)
   });
 
   const isShown = getFieldConfig(fieldConfig).show;

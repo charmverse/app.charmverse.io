@@ -14,6 +14,7 @@ export function getDefaultProjectValues({ user }: { user: LoggedInUser | null })
     projectMembers: [
       defaultProjectMember({
         email: userEmail ?? '',
+        teamLead: true,
         walletAddress: primaryWallet?.ensname ?? primaryWallet?.address ?? ''
       })
     ]
