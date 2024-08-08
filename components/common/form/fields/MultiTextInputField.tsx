@@ -13,13 +13,15 @@ export function MultiTextInputField<T extends FieldValues>({
   label,
   name,
   placeholder,
-  disabled
+  disabled,
+  'data-test': dataTest
 }: {
   disabled?: boolean;
   control: Control<T>;
   name: keyof T;
   label: string;
   placeholder: string;
+  'data-test'?: string;
 }) {
   const typedName = name as FieldArrayPath<T>;
   const { fields, append, remove } = useFieldArray({
@@ -37,6 +39,7 @@ export function MultiTextInputField<T extends FieldValues>({
             render={({ field: _field, fieldState }) => (
               <TextField
                 disabled={disabled}
+                data-test={dataTest}
                 fullWidth
                 placeholder={placeholder}
                 error={!!fieldState.error}

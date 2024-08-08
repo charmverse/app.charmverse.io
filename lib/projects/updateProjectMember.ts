@@ -30,7 +30,7 @@ export async function updateProjectMember({
     data: {
       email: projectMemberValues.email,
       name: projectMemberValues.name,
-      socialUrls: projectMemberValues.socialUrls?.map((url) => url.trim()).filter(Boolean),
+      socialUrls: projectMemberValues.socialUrls?.map((url) => url?.trim()).filter(Boolean),
       walletAddress: projectMemberValues.walletAddress?.toLowerCase()?.trim(),
       userId: connectedUserId
     }

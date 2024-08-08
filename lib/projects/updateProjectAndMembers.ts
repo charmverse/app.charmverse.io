@@ -71,7 +71,8 @@ export async function updateProjectAndMembers({
           data: {
             name: projectMember.name,
             email: projectMember.email,
-            socialUrls: projectMember.socialUrls.map((url) => url.trim()),
+            // our multitextinput form field sometimes sends [undefined] at first if no website is given
+            socialUrls: projectMember.socialUrls.map((url) => url?.trim()).filter(Boolean),
             walletAddress: projectMember.walletAddress?.toLowerCase()?.trim(),
             updatedBy: userId,
             userId: connectedUserId

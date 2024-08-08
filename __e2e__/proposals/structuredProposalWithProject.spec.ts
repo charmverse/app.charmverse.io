@@ -110,7 +110,7 @@ test.describe.serial('Structured proposal template with project', () => {
       private: false
     });
 
-    for (const field of ['description', 'websites', 'twitter', 'github']) {
+    for (const field of ['websites', 'twitter', 'github']) {
       await proposalFormFieldPage.toggleProjectFieldConfig({
         fieldName: `project-${field}`,
         show: false
@@ -146,9 +146,7 @@ test.describe.serial('Structured proposal template with project', () => {
     ]);
 
     await expect(proposalFormFieldPage.getProjectFieldLabel('name')).toHaveText('Project Name*');
-    await expect(proposalFormFieldPage.getProjectFieldLabel('description')).toHaveText(
-      'Describe your project in one sentence'
-    );
+    await expect(proposalFormFieldPage.getProjectFieldLabel('description')).toHaveText('Describe your project');
     await expect(proposalFormFieldPage.getProjectFieldLabel('member-name')).toHaveText('Name*');
     await expect(proposalFormFieldPage.getProjectFieldLabel('member-email')).toHaveText('Email*');
 
