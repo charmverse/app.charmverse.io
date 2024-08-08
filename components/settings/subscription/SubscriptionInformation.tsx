@@ -11,7 +11,7 @@ import * as yup from 'yup';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUserPreferences } from 'hooks/useUserPreferences';

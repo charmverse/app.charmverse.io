@@ -13,7 +13,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { SubscriptionPeriod } from 'lib/subscription/constants';
 import type { CreateProSubscriptionRequest } from 'lib/subscription/interfaces';
 
-import Legend from '../Legend';
+import Legend from '../components/Legend';
 
 import { CheckoutForm } from './CheckoutForm';
 import { CreateSubscriptionInformation } from './CreateSubscriptionInformation';

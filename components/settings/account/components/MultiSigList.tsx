@@ -23,7 +23,7 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import Link from 'components/common/Link';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import { useImportSafes } from 'hooks/useImportSafes';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useUser } from 'hooks/useUser';
