@@ -38,7 +38,6 @@ export function CreateProjectForm({
     onSave(createdProjectWithMembers);
     form.reset();
   }
-  const values = form.watch();
 
   return (
     <FormProvider {...form}>

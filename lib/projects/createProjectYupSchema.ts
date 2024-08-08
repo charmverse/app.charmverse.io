@@ -55,48 +55,53 @@ function addMatchersToSchema({
   }
 }
 
-export function createProjectYupSchema({ fieldConfig }: { fieldConfig?: ProjectAndMembersFieldConfig }) {
+export function createProjectYupSchema({ fieldConfig: fieldsConfig }: { fieldConfig?: ProjectAndMembersFieldConfig }) {
   const yupProjectSchemaObject: Partial<Record<ProjectField, FieldSchema>> = {};
   const yupProjectMemberSchemaObject: Partial<Record<ProjectMemberField, FieldSchema>> = {};
-  projectFieldProperties.forEach((projectFieldProperty) => {
-    const projectFieldConfig = fieldConfig?.[projectFieldProperty.field] ?? {
+  projectFieldProperties.forEach(({ field, multiple }) => {
+    const fieldConfig = fieldsConfig?.[field] ?? {
       required: false,
       show: true
     };
 
-    projectFieldConfig.required = projectFieldConfig.required ?? false;
+    fieldConfig.required = fieldConfig.required ?? false;
 
-    if (projectFieldConfig.show !== false) {
-      if (projectFieldConfig.required) {
-        yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = yup.string().required();
+    if (fieldConfig.show !== false) {
+      let fieldSchema = multiple ? yup.array().of(yup.string()) : yup.string();
+      if (fieldConfig.required) {
+        fieldSchema = fieldSchema.required();
+      }
+      yupProjectSchemaObject[field as ProjectField] = fieldSchema;
+      if (fieldConfig.required) {
+        yupProjectSchemaObject[field as ProjectField] = yup.string().required();
       } else {
-        yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = yup.string();
+        yupProjectSchemaObject[field as ProjectField] = yup.string();
       }
 
       addMatchersToSchema({
-        fieldType: projectFieldProperty.field as ProjectField | ProjectMemberField,
-        isRequired: !!projectFieldConfig.required,
+        fieldType: field as ProjectField | ProjectMemberField,
+        isRequired: !!fieldConfig.required,
         schemaObject: yupProjectSchemaObject
       });
     }
   });
 
-  projectMemberFieldProperties.forEach((projectMemberFieldProperty) => {
-    const projectMemberFieldConfig = fieldConfig?.projectMember[projectMemberFieldProperty.field] ?? {
+  projectMemberFieldProperties.forEach(({ field, multiple }) => {
+    const fieldConfig = fieldsConfig?.projectMember[field] ?? {
       required: false,
       show: true
     };
-    projectMemberFieldConfig.required = projectMemberFieldConfig.required ?? false;
-    if (projectMemberFieldConfig.show !== false) {
-      let fieldSchema = projectMemberFieldProperty.multiple ? yup.array().of(yup.string()) : yup.string();
-      if (projectMemberFieldConfig.required) {
+    fieldConfig.required = fieldConfig.required ?? false;
+    if (fieldConfig.show !== false) {
+      let fieldSchema = multiple ? yup.array().of(yup.string()) : yup.string();
+      if (fieldConfig.required) {
         fieldSchema = fieldSchema.required();
       }
-      yupProjectMemberSchemaObject[projectMemberFieldProperty.field as ProjectMemberField] = fieldSchema;
+      yupProjectMemberSchemaObject[field as ProjectMemberField] = fieldSchema;
 
       addMatchersToSchema({
-        fieldType: projectMemberFieldProperty.field as ProjectField | ProjectMemberField,
-        isRequired: !!projectMemberFieldConfig.required,
+        fieldType: field as ProjectField | ProjectMemberField,
+        isRequired: !!fieldConfig.required,
         schemaObject: yupProjectMemberSchemaObject
       });
     }

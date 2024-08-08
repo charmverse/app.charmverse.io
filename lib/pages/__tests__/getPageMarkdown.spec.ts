@@ -230,6 +230,8 @@ long text
 
 ### Project Profile
 
+- GitHub: https://github.com/charmverse/app.charmverse.io
+
 - Project Members
 
   - First guy

@@ -38,7 +38,6 @@ export function MultiTextInputField<T extends FieldValues>({
               disabled={disabled}
               data-test={dataTest}
               fullWidth
-              defaultValue=''
               placeholder={placeholder}
               error={!!fieldState.error}
               {..._field}

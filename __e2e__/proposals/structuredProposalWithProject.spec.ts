@@ -110,16 +110,7 @@ test.describe.serial('Structured proposal template with project', () => {
       private: false
     });
 
-    for (const field of [
-      'description',
-      'website',
-      'twitter',
-      'github',
-      'blog',
-      'demoUrl',
-      'communityUrl',
-      'otherUrl'
-    ]) {
+    for (const field of ['description', 'websites', 'twitter', 'github']) {
       await proposalFormFieldPage.toggleProjectFieldConfig({
         fieldName: `project-${field}`,
         show: false
@@ -128,16 +119,7 @@ test.describe.serial('Structured proposal template with project', () => {
       await proposalFormFieldPage.page.waitForTimeout(50);
     }
 
-    for (const field of [
-      'telegram',
-      'twitter',
-      'linkedin',
-      'otherUrl',
-      'walletAddress',
-      'warpcast',
-      'github',
-      'previousProjects'
-    ]) {
+    for (const field of ['socialUrls', 'walletAddress']) {
       await proposalFormFieldPage.toggleProjectFieldConfig({
         fieldName: `project-member-${field}`,
         show: false
