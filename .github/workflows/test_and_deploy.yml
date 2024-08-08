@@ -376,6 +376,8 @@ jobs:
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
+        with:
+          short-length: 7
 
       - name: Install dependencies
         uses: ./.github/actions/install

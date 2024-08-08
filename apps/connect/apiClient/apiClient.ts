@@ -1,6 +1,7 @@
 'use client';
 
 import env from '@beam-australia/react-env';
+import type { GetGrantsPayload, GetGrantsResponse } from '@connect-shared/lib/grants/getGrants';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { GET } from '@root/adapters/http';
@@ -35,5 +36,9 @@ export class ConnectApiClient extends HttpClient {
     return this.GET<FarcasterUser[]>('/api/farcaster/get-by-username', {
       username
     });
+  }
+
+  async getGrants(payload: GetGrantsPayload) {
+    return this.GET<GetGrantsResponse>('/api/grants/list', payload);
   }
 }

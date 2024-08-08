@@ -50,13 +50,15 @@ export function InvitesTable() {
         <TableHead>
           <TableRow sx={{ '&:first-of-type th': { borderTop: '1px solid lightgray' } }}>
             <TableCell sx={{ padding: '10px 16px' }}>Description</TableCell>
-            <TableCell>Uses</TableCell>
-            <TableCell>Expires</TableCell>
+            <TableCell align='center'>Uses</TableCell>
+            <TableCell align='center'>Expires</TableCell>
             <TableCell sx={{ width: 150 }}>Assigned Role</TableCell>
-            <TableCell sx={{ width: 90 + padding }} align='center'>
-              Link
-            </TableCell>
-            <TableCell sx={{ width: 30 + padding }}>{/** Delete */}</TableCell>
+            {isAdmin && (
+              <TableCell sx={{ width: 90 + padding }} align='center'>
+                Link
+              </TableCell>
+            )}
+            {isAdmin && <TableCell sx={{ width: 30 + padding }}>{/** Delete */}</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -83,12 +85,14 @@ export function InvitesTable() {
                   <Typography variant='body2'>Private Link</Typography>
                 </TableCell>
                 <TableCell>
-                  <Typography>
+                  <Typography align='center'>
                     {invite.useCount}
                     {invite.maxUses > 0 ? ` / ${invite.maxUses}` : ''}
                   </Typography>
                 </TableCell>
-                <TableCell width={150}>{getExpires(invite)}</TableCell>
+                <TableCell align='center' width={150}>
+                  {getExpires(invite)}
+                </TableCell>
                 <TableCell width={150}>
                   <Tooltip arrow placement='top' title={!isValid.valid ? isValid.message ?? 'Invite invalid' : ''}>
                     <div>
@@ -109,36 +113,38 @@ export function InvitesTable() {
                     </div>
                   </Tooltip>
                 </TableCell>
-                <TableCell width={90}>
-                  <Tooltip
-                    arrow
-                    placement='top'
-                    title={
-                      !isValid.valid
-                        ? isValid.message ?? 'Invite invalid'
-                        : copied[invite.id]
-                        ? 'Copied!'
-                        : 'Click to copy link'
-                    }
-                    disableInteractive
-                  >
-                    <Box component='span'>
-                      <CopyToClipboard text={getInviteLink(invite.code)} onCopy={() => onCopy(invite.id)}>
-                        <Chip
-                          disabled={!isValid.valid}
-                          sx={{ width: 90 }}
-                          clickable
-                          color='secondary'
-                          size='small'
-                          variant='outlined'
-                          label={copied[invite.id] ? 'Copied!' : 'Copy Link'}
-                        />
-                      </CopyToClipboard>
-                    </Box>
-                  </Tooltip>
-                </TableCell>
-                <TableCell width={30}>
-                  {isAdmin && (
+                {isAdmin && (
+                  <TableCell width={90}>
+                    <Tooltip
+                      arrow
+                      placement='top'
+                      title={
+                        !isValid.valid
+                          ? isValid.message ?? 'Invite invalid'
+                          : copied[invite.id]
+                          ? 'Copied!'
+                          : 'Click to copy link'
+                      }
+                      disableInteractive
+                    >
+                      <Box component='span'>
+                        <CopyToClipboard text={getInviteLink(invite.code)} onCopy={() => onCopy(invite.id)}>
+                          <Chip
+                            disabled={!isValid.valid}
+                            sx={{ width: 90 }}
+                            clickable
+                            color='secondary'
+                            size='small'
+                            variant='outlined'
+                            label={copied[invite.id] ? 'Copied!' : 'Copy Link'}
+                          />
+                        </CopyToClipboard>
+                      </Box>
+                    </Tooltip>
+                  </TableCell>
+                )}
+                {isAdmin && (
+                  <TableCell width={30 + padding}>
                     <Tooltip arrow placement='top' title='Delete'>
                       <ButtonChip
                         className='row-actions'
@@ -150,8 +156,8 @@ export function InvitesTable() {
                         onClick={() => triggerInviteDeletion(invite)}
                       />
                     </Tooltip>
-                  )}
-                </TableCell>
+                  </TableCell>
+                )}
               </TableRow>
             );
           })}

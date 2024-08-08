@@ -2,7 +2,7 @@ import { Stack } from '@mui/material';
 
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { ProfileTabs } from 'components/members/components/MemberProfile/components/ProfileTabs';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import { useUser } from 'hooks/useUser';
 
 import { UserDetailsFormWithSave } from './components/UserDetailsForm';

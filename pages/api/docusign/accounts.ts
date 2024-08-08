@@ -1,3 +1,4 @@
+import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,8 +12,8 @@ import { withSessionRoute } from 'lib/session/withSession';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
-  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'spaceId' }))
   .get(listDocusignAccounts)
+  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'spaceId' }))
   .put(requireKeys(['docusignAccountId'], 'body'), updateUsedDocusignAccount);
 // .post(requireKeys(['signers', 'templateId'], 'body'), createEnvelopeController);
 
@@ -34,6 +35,12 @@ handler
 // }
 
 async function listDocusignAccounts(req: NextApiRequest, res: NextApiResponse) {
+  const spaceId = req.query.spaceId as string;
+  const userId = req.session.user.id;
+  const { error } = await hasAccessToSpace({ spaceId, userId, adminOnly: true });
+  if (error) {
+    return res.status(200).json([]);
+  }
   const credentials = await getSpaceDocusignCredentials({ spaceId: req.query.spaceId as string });
 
   const docusignAccounts = await getUserDocusignAccountsInfo({
