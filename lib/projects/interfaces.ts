@@ -2,7 +2,7 @@ import type { Project, ProjectMember } from '@charmverse/core/prisma';
 
 export type ProjectPayload = Pick<
   Project,
-  'name' | 'description' | 'twitter' | 'websites' | 'walletAddress' | 'deletedAt'
+  'name' | 'description' | 'twitter' | 'github' | 'websites' | 'walletAddress' | 'deletedAt'
 >;
 
 export type ProjectMemberPayload = Pick<ProjectMember, 'email' | 'socialUrls' | 'name' | 'teamLead' | 'walletAddress'>;

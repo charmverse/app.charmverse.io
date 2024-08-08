@@ -2,6 +2,7 @@ import { Stack } from '@mui/material';
 import type { Path } from 'react-hook-form';
 import { useController, useFormContext } from 'react-hook-form';
 
+import { MultiTextInputField } from 'components/common/form/fields/MultiTextInputField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import { getFieldConfig } from 'lib/projects/formField';
 import type { ProjectFieldProperty, FieldConfig, ProjectFieldConfig } from 'lib/projects/formField';
@@ -34,6 +35,12 @@ function FieldAnswer({
   const isShown = getFieldConfig(fieldConfig).show;
   if (!isShown) {
     return null;
+  }
+
+  if (property.field === 'websites') {
+    return (
+      <MultiTextInputField control={control} name='websites' label='Websites' placeholder='https://charmverse.io' />
+    );
   }
 
   return (

@@ -51,6 +51,7 @@ export async function createProject(payload: {
       name: project.name,
       walletAddress: project.walletAddress?.toLowerCase(),
       twitter: project.twitter,
+      github: project.github,
       websites: project.websites,
       createdBy: payload.userId,
       updatedBy: payload.userId,

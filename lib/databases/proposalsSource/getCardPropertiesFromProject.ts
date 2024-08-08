@@ -19,6 +19,7 @@ export function getCardPropertiesFromProject(project: ProjectInformation): Prope
     [constants.PROJECT_NAME_ID]: project.name,
     [constants.PROJECT_DESCRIPTION_ID]: project.description ?? '',
     [constants.PROJECT_TWITTER_ID]: project.twitter ?? '',
+    [constants.PROJECT_GITHUB_ID]: project.github ?? '',
     [constants.PROJECT_WEBSITE_ID]: project.websites ?? '',
     [constants.PROJECT_WALLET_ID]: project.walletAddress ?? '',
     [constants.PROJECT_MEMBER_NAMES_ID]: members.map((member) => member.name).filter(isTruthy),

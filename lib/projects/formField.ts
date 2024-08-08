@@ -40,6 +40,7 @@ export const PROJECT_NAME_ID = '__project_name';
 export const PROJECT_DESCRIPTION_ID = '__project_description';
 export const PROJECT_TWITTER_ID = '__project_twitter';
 export const PROJECT_WEBSITE_ID = '__project_website';
+export const PROJECT_GITHUB_ID = '__project_github';
 export const PROJECT_WALLET_ID = '__project_walletAddress';
 // project team members
 export const PROJECT_MEMBER_NAMES_ID = '__projectMembers_name';
@@ -100,10 +101,16 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
     columnPropertyId: PROJECT_TWITTER_ID
   },
   {
-    field: 'website',
-    label: 'Website',
-    columnTitle: 'Project Website',
+    field: 'websites',
+    label: 'Websites',
+    columnTitle: 'Project Websites',
     columnPropertyId: PROJECT_WEBSITE_ID
+  },
+  {
+    field: 'github',
+    label: 'GitHub',
+    columnTitle: 'Project GitHub',
+    columnPropertyId: PROJECT_GITHUB_ID
   },
   {
     field: 'walletAddress',

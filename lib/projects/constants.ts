@@ -15,6 +15,7 @@ export function createDefaultProject(): ProjectAndMembersPayload {
     deletedAt: null,
     description: '',
     twitter: '',
+    github: '',
     websites: [],
     walletAddress: '',
     projectMembers: []

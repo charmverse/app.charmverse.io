@@ -5,6 +5,7 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers): 
     description: projectWithMembers.description,
     name: projectWithMembers.name,
     twitter: projectWithMembers.twitter,
+    github: projectWithMembers.github,
     walletAddress: projectWithMembers.walletAddress,
     websites: projectWithMembers.websites,
     deletedAt: projectWithMembers.deletedAt,

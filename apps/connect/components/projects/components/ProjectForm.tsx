@@ -1,3 +1,4 @@
+import { MultiTextInputField } from '@connect-shared/components/common/MultiextInputField';
 import type { FormValues } from '@connect-shared/lib/projects/form';
 import { CATEGORIES } from '@connect-shared/lib/projects/form';
 import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
@@ -6,7 +7,6 @@ import type { Control } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { ProjectImageField } from './ProjectImageField';
-import { ProjectMultiTextValueFields } from './ProjectMultiTextValueFields';
 
 export function ProjectForm({
   control,
@@ -87,18 +87,18 @@ export function ProjectForm({
             )}
           />
         </Stack>
-        <ProjectMultiTextValueFields
+        <MultiTextInputField
           control={control}
           name='websites'
           label='Websites'
-          dataTest='project-form-websites'
+          data-test='project-form-websites'
           placeholder='https://charmverse.io'
         />
-        <ProjectMultiTextValueFields
+        <MultiTextInputField
           control={control}
           name='farcasterValues'
           label='Farcaster'
-          dataTest='project-form-farcaster-values'
+          data-test='project-form-farcaster-values'
           placeholder='https://warpcast.com/charmverse'
         />
         <Stack>

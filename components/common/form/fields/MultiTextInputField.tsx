@@ -1,14 +1,12 @@
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { Button, IconButton, Stack, TextField } from '@mui/material';
-import type { Control, FieldArrayPath } from 'react-hook-form';
+import type { FieldValues, Control, FieldArrayPath, Path } from 'react-hook-form';
 import { Controller, useFieldArray } from 'react-hook-form';
 
-import { FieldWrapper } from '../FieldWrapper';
+import { FieldWrapper } from './FieldWrapper';
 
-import type { OptimismProjectFormValues } from './optimismProjectFormValues';
-
-export function ProjectMultiTextValueFields({
+export function MultiTextInputField<T extends FieldValues>({
   control,
   label,
   name,
@@ -16,14 +14,15 @@ export function ProjectMultiTextValueFields({
   disabled
 }: {
   disabled?: boolean;
-  control: Control<OptimismProjectFormValues>;
-  name: keyof OptimismProjectFormValues;
+  control: Control<T>;
+  name: keyof T;
   label: string;
   placeholder: string;
 }) {
+  const typedName = name as FieldArrayPath<T>;
   const { fields, append, remove } = useFieldArray({
     control,
-    name: name as FieldArrayPath<OptimismProjectFormValues>
+    name: typedName
   });
 
   return (
@@ -32,7 +31,7 @@ export function ProjectMultiTextValueFields({
         <Stack direction='row' gap={1} alignItems='center' mb={1}>
           <Controller
             control={control}
-            name={`${name}.0` as FieldArrayPath<OptimismProjectFormValues>}
+            name={`${typedName}.0` as Path<T>}
             render={({ field: _field, fieldState }) => (
               <TextField
                 disabled={disabled}
@@ -48,7 +47,7 @@ export function ProjectMultiTextValueFields({
           <Stack key={field.id} gap={1} mb={1} direction='row'>
             <Controller
               control={control}
-              name={`${name}.${index + 1}` as FieldArrayPath<OptimismProjectFormValues>}
+              name={`${typedName}.${index + 1}` as Path<T>}
               render={({ field: _field, fieldState }) => (
                 <Stack width='100%' gap={1} alignItems='center' flexDirection='row'>
                   <TextField
