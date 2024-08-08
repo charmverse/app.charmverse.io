@@ -37,12 +37,10 @@ async function query() {
       : [
           project.website,
           project.blog,
-          project.mirror,
-          project.twitter,
+          project.mirror ? 'https://mirror.xyz/' + project.mirror : undefined,
           project.otherUrl,
           project.communityUrl,
-          project.demoUrl,
-          project.github
+          project.demoUrl
         ].filter(isTruthy);
     await prisma.$transaction([
       prisma.project.update({
