@@ -200,7 +200,7 @@ describe(`createSelectedPropertiesStateFromBoardProperties`, () => {
     expect(selectedPropertiesState).toMatchObject<SelectedProposalProperties>({
       customProperties: [proposalCustomProperty1Id, proposalCustomProperty2Id],
       defaults: ['proposalReviewerNotes', 'proposalStatus'],
-      project: ['name', 'excerpt'],
+      project: ['name', 'description'],
       projectMember: ['name', 'walletAddress'],
       templateProperties: [
         {
