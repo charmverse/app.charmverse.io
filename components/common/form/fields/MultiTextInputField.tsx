@@ -1,29 +1,32 @@
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
-import { Button, IconButton, Stack, TextField } from '@mui/material';
-import type { Control, FieldArrayPath } from 'react-hook-form';
+import { IconButton, Stack, TextField } from '@mui/material';
+import type { FieldValues, Control, FieldArrayPath, Path } from 'react-hook-form';
 import { Controller, useFieldArray } from 'react-hook-form';
 
-import { FieldWrapper } from '../FieldWrapper';
+import { Button } from 'components/common/Button';
 
-import type { OptimismProjectFormValues } from './optimismProjectFormValues';
+import { FieldWrapper } from './FieldWrapper';
 
-export function ProjectMultiTextValueFields({
+export function MultiTextInputField<T extends FieldValues>({
   control,
   label,
   name,
   placeholder,
-  disabled
+  disabled,
+  'data-test': dataTest
 }: {
   disabled?: boolean;
-  control: Control<OptimismProjectFormValues>;
-  name: keyof OptimismProjectFormValues;
+  control: Control<T>;
+  name: keyof T;
   label: string;
   placeholder: string;
+  'data-test'?: string;
 }) {
+  const typedName = name as FieldArrayPath<T>;
   const { fields, append, remove } = useFieldArray({
     control,
-    name: name as FieldArrayPath<OptimismProjectFormValues>
+    name: typedName
   });
 
   return (
@@ -32,10 +35,11 @@ export function ProjectMultiTextValueFields({
         <Stack direction='row' gap={1} alignItems='center' mb={1}>
           <Controller
             control={control}
-            name={`${name}.0` as FieldArrayPath<OptimismProjectFormValues>}
+            name={`${typedName}.0` as Path<T>}
             render={({ field: _field, fieldState }) => (
               <TextField
                 disabled={disabled}
+                data-test={dataTest}
                 fullWidth
                 placeholder={placeholder}
                 error={!!fieldState.error}
@@ -48,7 +52,7 @@ export function ProjectMultiTextValueFields({
           <Stack key={field.id} gap={1} mb={1} direction='row'>
             <Controller
               control={control}
-              name={`${name}.${index + 1}` as FieldArrayPath<OptimismProjectFormValues>}
+              name={`${typedName}.${index + 1}` as Path<T>}
               render={({ field: _field, fieldState }) => (
                 <Stack width='100%' gap={1} alignItems='center' flexDirection='row'>
                   <TextField

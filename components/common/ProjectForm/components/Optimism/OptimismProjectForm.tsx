@@ -14,13 +14,13 @@ import { Button } from 'components/common/Button';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import { useUser } from 'hooks/useUser';
 
-import { SearchFarcasterUser } from '../../SearchFarcasterUser';
-import { FieldWrapper } from '../FieldWrapper';
-import { TextInputField } from '../TextInputField';
+import { FieldWrapper } from '../../../form/fields/FieldWrapper';
+import { MultiTextInputField } from '../../../form/fields/MultiTextInputField';
+import { TextInputField } from '../../../form/fields/TextInputField';
+import { SearchFarcasterUser } from '../../../form/SearchFarcasterUser';
 
 import type { OptimismProjectFormValues } from './optimismProjectFormValues';
 import { OPTIMISM_PROJECT_CATEGORIES, optimismProjectSchema } from './optimismProjectFormValues';
-import { ProjectMultiTextValueFields } from './ProjectMultiTextValueFields';
 
 export type FarcasterProfile = {
   username: string;
@@ -328,7 +328,7 @@ export function OptimismProjectForm({
         )}
       />
 
-      <ProjectMultiTextValueFields
+      <MultiTextInputField
         control={control}
         name='websites'
         disabled={isMutating}
@@ -336,7 +336,7 @@ export function OptimismProjectForm({
         placeholder='https://acme-inc.com'
       />
 
-      <ProjectMultiTextValueFields
+      <MultiTextInputField
         control={control}
         name='farcasterValues'
         disabled={isMutating}

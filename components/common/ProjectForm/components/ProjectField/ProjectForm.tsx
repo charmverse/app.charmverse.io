@@ -5,16 +5,16 @@ import { Divider, IconButton, MenuItem, Select, Stack, Typography } from '@mui/m
 import type { KeyedMutator } from 'swr';
 
 import FieldLabel from 'components/common/form/FieldLabel';
-import { FieldAnswers } from 'components/settings/projects/components/FieldAnswers';
-import { ProjectMemberFieldAnswers } from 'components/settings/projects/components/ProjectMemberFields';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { ProjectFieldValue } from 'lib/forms/interfaces';
 import { defaultProjectMember } from 'lib/projects/constants';
-import { projectFieldProperties } from 'lib/projects/formField';
+import { projectMemberFieldProperties, projectFieldProperties } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { isTruthy } from 'lib/utils/types';
+
+import { FieldAnswers } from '../FieldAnswers';
 
 import { useProjectUpdates } from './useProjectUpdates';
 
@@ -135,10 +135,10 @@ export function ProjectForm({
         Team Info
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
-      <ProjectMemberFieldAnswers
-        projectMemberIndex={0}
-        disabled={!isTeamLead || disabled}
+      <FieldAnswers
+        namePrefix='projectMembers[0]'
         fieldConfig={fieldConfig.projectMember}
+        properties={projectMemberFieldProperties}
         onChange={(updates) => onProjectMemberUpdate(teamLeadMemberId!, updates)}
       />
       {showTeamMemberSection && (
@@ -157,13 +157,14 @@ export function ProjectForm({
                     <DeleteOutlineOutlinedIcon fontSize='small' color={disabled ? 'disabled' : 'error'} />
                   </IconButton>
                 </Stack>
-                <ProjectMemberFieldAnswers
+                <FieldAnswers
+                  disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}
+                  namePrefix={`projectMembers[${index + 1}]`}
+                  fieldConfig={fieldConfig.projectMember}
+                  properties={projectMemberFieldProperties}
                   onChange={(updates) => {
                     onProjectMemberUpdate(projectMember.id, updates);
                   }}
-                  projectMemberIndex={index + 1}
-                  disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}
-                  fieldConfig={fieldConfig.projectMember}
                 />
               </Stack>
               <Divider sx={{ my: 1 }} />

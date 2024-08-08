@@ -1,5 +1,7 @@
 import { FormControlLabel, Stack, Switch, Typography } from '@mui/material';
+import { useForm } from 'react-hook-form';
 
+import { MultiTextInputField } from 'components/common/form/fields/MultiTextInputField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { FieldConfig, ProjectFieldProperty } from 'lib/projects/formField';
 
@@ -14,6 +16,7 @@ export function FieldsEditor({
   properties: ProjectFieldProperty[];
   isProjectMember?: boolean;
 }) {
+  const { control } = useForm();
   return (
     <Stack display='flex' flexDirection='column' gap={2}>
       {properties.map((property) => {
@@ -29,13 +32,23 @@ export function FieldsEditor({
             key={property.label}
             data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-container`}
           >
-            <TextInputField
-              label={property.label}
-              multiline={property.multiline}
-              rows={property.rows ?? 1}
-              disabled
-              required={fieldConfig?.[property.field]?.required}
-            />
+            {property.multiple ? (
+              <MultiTextInputField
+                placeholder=''
+                control={control}
+                disabled
+                label={property.label}
+                name='example-input'
+              />
+            ) : (
+              <TextInputField
+                label={property.label}
+                multiline={property.multiline}
+                rows={property.rows ?? 1}
+                disabled
+                required={fieldConfig?.[property.field]?.required}
+              />
+            )}
             {/** Required fields must always be required and shown */}
             {onChange && !property.alwaysRequired && (
               <Stack gap={1} flexDirection='row' px={1} alignItems='center'>

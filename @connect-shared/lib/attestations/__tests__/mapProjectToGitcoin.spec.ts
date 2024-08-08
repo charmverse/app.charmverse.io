@@ -19,7 +19,6 @@ describe('mapProjectToGitcoin', () => {
       farcasterFrameImage: null,
       github: 'https://github.com/projectx',
       twitter: 'https://twitter.com/projectx',
-      mirror: 'https://mirror.xyz/projectx',
       websites: ['https://example.com'],
       path: null,
       mintingWalletAddress: null,

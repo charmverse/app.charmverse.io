@@ -6,7 +6,6 @@ import type { UseFormGetFieldState } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
-import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { ProjectFieldValue, FormFieldValue } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
@@ -48,7 +47,6 @@ export function ProjectFieldAnswer({
   });
   const { user } = useUser();
   const { data: projectsWithMembers, mutate: refreshProjects } = useGetProjects();
-  const { membersRecord } = useMembers();
   const { trigger: createProject } = useCreateProject();
 
   const selectedProject = projectsWithMembers?.find((_project) => _project.id === projectId);
@@ -86,10 +84,7 @@ export function ProjectFieldAnswer({
   }
 
   async function addNewProject() {
-    const defaultProjectValues = getDefaultProjectValues({
-      user,
-      userMemberRecord: user ? membersRecord[user.id] : undefined
-    });
+    const defaultProjectValues = getDefaultProjectValues({ user });
     const createdProject = await createProject(defaultProjectValues);
     // update the dropdown list of projects
     await refreshProjects(

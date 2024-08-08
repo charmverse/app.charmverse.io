@@ -84,10 +84,6 @@ test('Create a project and view details', async ({ page }) => {
 
   await confirmButton.click();
 
-  const addTeam = page.locator('data-test=project-form-add-team');
-
-  await expect(addTeam).toBeVisible();
-
   const publishButton = page.locator('data-test=project-form-publish');
 
   await publishButton.click();
@@ -144,10 +140,6 @@ test('Create a project and view details', async ({ page }) => {
   // Check project GitHub
   const projectGithub = page.locator('data-test=project-details-github');
   await expect(projectGithub).toHaveText(projectData.projectFormGithub.replace(/https?:\/\/www.github.com\//, ''));
-
-  // Check project Mirror
-  const projectMirror = page.locator('data-test=project-details-mirror');
-  await expect(projectMirror).toHaveText(projectData.projectFormMirror.replace(/https?:\/\/www.mirror.xyz\//, ''));
 
   // Check project description
 

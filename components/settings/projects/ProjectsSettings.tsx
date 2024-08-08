@@ -25,14 +25,69 @@ import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/components/Legend';
 import { useUser } from 'hooks/useUser';
-import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
 import { CreateProjectForm } from './components/CreateProjectForm';
-import { ProjectFormAnswers } from './components/ProjectForm';
+import { ProjectForm } from './components/ProjectForm';
+
+export function ProjectsSettings() {
+  useTrackPageView({ type: 'settings/my-projects' });
+
+  const { data: projectsWithMembers, mutate } = useGetProjects();
+  const [openedAccordion, setOpenedAccordion] = useState<null | string>(null);
+  const [isCreateProjectFormOpen, setIsCreateProjectFormOpen] = useState(false);
+
+  return (
+    <>
+      <Legend>My Projects</Legend>
+      <Typography variant='h6'>Projects</Typography>
+      <Box display='flex' alignItems='center' justifyContent='space-between' mb={2}>
+        <Typography variant='body1'>
+          Projects can be used to autofill proposal and grant request information.
+        </Typography>
+        <Button
+          size='small'
+          data-test='add-project-button'
+          onClick={() => {
+            setOpenedAccordion(null);
+            setIsCreateProjectFormOpen(true);
+          }}
+        >
+          New
+        </Button>
+      </Box>
+
+      {isCreateProjectFormOpen && (
+        <CreateProjectForm
+          onCancel={() => {
+            setIsCreateProjectFormOpen(false);
+          }}
+          onSave={() => {
+            setIsCreateProjectFormOpen(false);
+          }}
+        />
+      )}
+
+      {projectsWithMembers && projectsWithMembers.length !== 0 && (
+        <Box mb={3}>
+          {projectsWithMembers.map((projectWithMembers) => (
+            <ProjectRow
+              mutate={mutate}
+              isExpanded={openedAccordion === projectWithMembers.id}
+              onExpand={() => setOpenedAccordion(projectWithMembers.id)}
+              onClose={() => setOpenedAccordion(null)}
+              key={projectWithMembers.id}
+              projectWithMembers={projectWithMembers}
+            />
+          ))}
+        </Box>
+      )}
+    </>
+  );
+}
 
 function ProjectRow({
   projectWithMembers,
@@ -121,9 +176,14 @@ function ProjectRow({
       updateProjectAndMembers(
         {
           ...projectValues,
+          // handle the MultiTextInput returning [undefined] at first
+          websites: projectValues.websites.map((str) => str?.trim()).filter(Boolean),
           projectMembers: projectValues.projectMembers.map((member, index) => ({
             ...projectWithMembers.projectMembers[index],
-            ...member
+            ...member,
+            socialUrls: (member.socialUrls || projectWithMembers.projectMembers[index])
+              .map((str) => str?.trim())
+              .filter(Boolean)
           }))
         },
         {
@@ -244,7 +304,7 @@ function ProjectRow({
         </AccordionSummary>
         <AccordionDetails>
           <FormProvider {...form}>
-            <ProjectFormAnswers isTeamLead={isTeamLead} />
+            <ProjectForm isTeamLead={isTeamLead} />
           </FormProvider>
         </AccordionDetails>
       </Accordion>
@@ -288,74 +348,6 @@ function ProjectRow({
         question='Are you sure you want to delete this project?'
         onConfirm={deleteProject}
       />
-    </>
-  );
-}
-
-export function ProjectsSettings() {
-  useTrackPageView({ type: 'settings/my-projects' });
-  const { data: projectsWithMembers, mutate } = useGetProjects();
-  const form = useForm({
-    defaultValues: createDefaultProjectAndMembersPayload(),
-    reValidateMode: 'onChange',
-    resolver: yupResolver(
-      createProjectYupSchema({
-        fieldConfig: createDefaultProjectAndMembersFieldConfig()
-      })
-    ),
-    criteriaMode: 'all',
-    mode: 'onChange'
-  });
-  const [openedAccordion, setOpenedAccordion] = useState<null | string>(null);
-  const [isCreateProjectFormOpen, setIsCreateProjectFormOpen] = useState(false);
-
-  return (
-    <>
-      <Legend>My Projects</Legend>
-      <Typography variant='h6'>Projects</Typography>
-      <Box display='flex' alignItems='center' justifyContent='space-between' mb={2}>
-        <Typography variant='body1'>
-          Projects can be used to autofill proposal and grant request information.
-        </Typography>
-        <Button
-          size='small'
-          data-test='add-project-button'
-          onClick={() => {
-            setOpenedAccordion(null);
-            setIsCreateProjectFormOpen(true);
-          }}
-        >
-          New
-        </Button>
-      </Box>
-
-      {isCreateProjectFormOpen && (
-        <FormProvider {...form}>
-          <CreateProjectForm
-            onCancel={() => {
-              setIsCreateProjectFormOpen(false);
-            }}
-            onSave={() => {
-              setIsCreateProjectFormOpen(false);
-            }}
-          />
-        </FormProvider>
-      )}
-
-      {projectsWithMembers && projectsWithMembers.length !== 0 && (
-        <Box mb={3}>
-          {projectsWithMembers.map((projectWithMembers) => (
-            <ProjectRow
-              mutate={mutate}
-              isExpanded={openedAccordion === projectWithMembers.id}
-              onExpand={() => setOpenedAccordion(projectWithMembers.id)}
-              onClose={() => setOpenedAccordion(null)}
-              key={projectWithMembers.id}
-              projectWithMembers={projectWithMembers}
-            />
-          ))}
-        </Box>
-      )}
     </>
   );
 }

@@ -196,7 +196,6 @@ export async function createOptimismProject({
       farcasterValues: input.farcasterValues?.filter(isTruthy),
       twitter: input.twitter,
       github: input.github,
-      mirror: input.mirror,
       avatar: input.avatar,
       coverImage: input.coverImage,
       primaryContractAddress: input.primaryContractAddress,

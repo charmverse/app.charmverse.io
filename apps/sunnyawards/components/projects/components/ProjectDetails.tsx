@@ -14,7 +14,7 @@ import { ShareButton } from './ProjectShareButton';
 export type ProjectDetailsProps = {
   project: Pick<
     ConnectProjectDetails,
-    'farcasterValues' | 'github' | 'mirror' | 'twitter' | 'name' | 'websites' | 'description' | 'id' | 'path'
+    'farcasterValues' | 'github' | 'twitter' | 'name' | 'websites' | 'description' | 'id' | 'path'
   >;
   showEditButton?: boolean;
 };
@@ -22,7 +22,6 @@ export type ProjectDetailsProps = {
 export function ProjectDetails({ project, showEditButton = false }: ProjectDetailsProps) {
   const farcasterLink = project?.farcasterValues[0] ? replaceUrl(project.farcasterValues[0], 'warpcast.com') : null;
   const githubLink = project?.github ? replaceUrl(project.github, 'github.com') : null;
-  const mirrorLink = project?.mirror ? replaceUrl(project.mirror, 'mirror.xyz') : null;
   const twitterLink = project?.twitter ? replaceUrl(project.twitter, 'twitter.com') : null;
 
   return (
@@ -84,16 +83,6 @@ export function ProjectDetails({ project, showEditButton = false }: ProjectDetai
             <Link href={githubLink.href} passHref target='_blank'>
               <Typography variant='body1' data-test='project-details-github'>
                 {githubLink.text}
-              </Typography>
-            </Link>
-          </Stack>
-        )}
-        {mirrorLink && (
-          <Stack direction='row' gap={1} alignItems='center' data-test='project-mirror'>
-            <img src='/images/mirror-xyz.png' width={25} height={25} />
-            <Link href={mirrorLink.href} passHref target='_blank'>
-              <Typography variant='body1' data-test='project-details-mirror'>
-                {mirrorLink.text}
               </Typography>
             </Link>
           </Stack>

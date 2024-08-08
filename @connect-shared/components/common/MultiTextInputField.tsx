@@ -1,41 +1,43 @@
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
-import { Button, FormLabel, IconButton, Stack, TextField } from '@mui/material';
-import type { Control, FieldArrayPath } from 'react-hook-form';
+import { IconButton, Stack, TextField, Button, FormLabel } from '@mui/material';
+import type { FieldValues, Control, FieldArrayPath, Path } from 'react-hook-form';
 import { Controller, useFieldArray } from 'react-hook-form';
 
-import type { FormValues } from 'lib/projects/form';
-
-export function ProjectMultiTextValueFields({
+export function MultiTextInputField<T extends FieldValues>({
   control,
   label,
   name,
   placeholder,
-  dataTest
+  disabled,
+  'data-test': dataTest
 }: {
-  control: Control<FormValues>;
-  name: keyof FormValues;
+  disabled?: boolean;
+  control: Control<T>;
+  name: keyof T;
   label: string;
   placeholder: string;
-  dataTest?: string;
+  ['data-test']?: string;
 }) {
+  const typedName = name as FieldArrayPath<T>;
   const { fields, append, remove } = useFieldArray({
     control,
-    name: name as FieldArrayPath<FormValues>
+    name: typedName
   });
 
   return (
     <Stack>
-      <FormLabel id={`project-${name.toLowerCase().replaceAll(' ', '')}`}>{label}</FormLabel>
+      <FormLabel id={`project-${typedName.toLowerCase().replaceAll(' ', '')}`}>{label}</FormLabel>
       <Stack direction='row' gap={1} alignItems='center' mb={1}>
         <Controller
           control={control}
-          name={`${name}.0` as FieldArrayPath<FormValues>}
+          name={`${typedName}.0` as Path<T>}
           render={({ field: _field, fieldState }) => (
             <TextField
-              fullWidth
+              aria-labelledby={`project-${typedName}-0`}
+              disabled={disabled}
               data-test={dataTest}
-              aria-labelledby={`project-${name}-0`}
+              fullWidth
               placeholder={placeholder}
               error={!!fieldState.error}
               {..._field}
@@ -47,18 +49,19 @@ export function ProjectMultiTextValueFields({
         <Stack key={field.id} gap={1} mb={1} direction='row'>
           <Controller
             control={control}
-            name={`${name}.${index + 1}` as FieldArrayPath<FormValues>}
+            name={`${typedName}.${index + 1}` as Path<T>}
             render={({ field: _field, fieldState }) => (
               <Stack width='100%' gap={1} alignItems='center' flexDirection='row'>
                 <TextField
+                  aria-labelledby={`project-${typedName}-${index + 1}`}
+                  disabled={disabled}
                   fullWidth
-                  aria-labelledby={`project-${name}-${index + 1}`}
                   placeholder={placeholder}
                   error={!!fieldState.error}
                   {..._field}
                 />
-                <IconButton size='small'>
-                  <DeleteIcon fontSize='small' color='error' onClick={() => remove(index + 1)} />
+                <IconButton disabled={disabled} size='small' onClick={() => remove(index + 1)}>
+                  <DeleteIcon fontSize='small' color='error' />
                 </IconButton>
               </Stack>
             )}
@@ -71,6 +74,7 @@ export function ProjectMultiTextValueFields({
         }}
         startIcon={<AddIcon fontSize='small' />}
         size='small'
+        disabled={disabled}
         variant='outlined'
         color='secondary'
         onClick={() => {
