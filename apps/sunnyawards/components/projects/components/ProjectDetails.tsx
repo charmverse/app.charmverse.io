@@ -42,61 +42,36 @@ export function ProjectDetails({ project, showEditButton = false }: ProjectDetai
           <ShareButton projectId={project.id} data-test='share-button' />
         </Stack>
       </Stack>
-      <Stack gap={1.5}>
+      <Stack gap={1.5} flexDirection='row'>
         {project.websites[0] && (
-          <Stack direction='row' gap={1} alignItems='center' data-test='project-website'>
+          <Link href={project.websites[0]} passHref target='_blank' data-test='project-website'>
             <LanguageIcon color='secondary' />
-            <Link href={project.websites[0]} passHref target='_blank'>
-              <Typography data-test='project-details-website' variant='body1'>
-                {project.websites[0].replace(/https?:\/\//, '')}
-              </Typography>
-            </Link>
-          </Stack>
+          </Link>
         )}
         {farcasterLink && (
-          <Stack direction='row' gap={1} alignItems='center' data-test='project-farcaster'>
+          <Link href={farcasterLink.href} passHref target='_blank' data-test='project-farcaster'>
             <img src='/images/farcaster.png' width={25} height={25} />
-            <Link href={farcasterLink.href} passHref target='_blank'>
-              <Typography variant='body1' data-test='project-details-farcaster'>
-                {farcasterLink.text}
-              </Typography>
-            </Link>
-          </Stack>
+          </Link>
         )}
         {twitterLink && (
-          <Stack direction='row' gap={1} alignItems='center' data-test='project-twitter'>
+          <Link href={twitterLink.href} passHref target='_blank' data-test='project-twitter'>
             <FaXTwitter
               style={{
                 width: 24,
                 height: 24
               }}
             />
-            <Link href={twitterLink.href} passHref target='_blank'>
-              <Typography variant='body1' data-test='project-details-twitter'>
-                {twitterLink.text}
-              </Typography>
-            </Link>
-          </Stack>
+          </Link>
         )}
         {githubLink && (
-          <Stack direction='row' gap={1} alignItems='center' data-test='project-github'>
+          <Link href={githubLink.href} passHref target='_blank' data-test='project-github'>
             <GitHubIcon />
-            <Link href={githubLink.href} passHref target='_blank'>
-              <Typography variant='body1' data-test='project-details-github'>
-                {githubLink.text}
-              </Typography>
-            </Link>
-          </Stack>
+          </Link>
         )}
         {mirrorLink && (
-          <Stack direction='row' gap={1} alignItems='center' data-test='project-mirror'>
+          <Link href={mirrorLink.href} passHref target='_blank' data-test='project-mirror'>
             <img src='/images/mirror-xyz.png' width={25} height={25} />
-            <Link href={mirrorLink.href} passHref target='_blank'>
-              <Typography variant='body1' data-test='project-details-mirror'>
-                {mirrorLink.text}
-              </Typography>
-            </Link>
-          </Stack>
+          </Link>
         )}
       </Stack>
       {project.description && <ProjectDescription description={project.description} />}

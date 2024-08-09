@@ -127,10 +127,6 @@ test('Create a project and view details', async ({ page }) => {
   const projectName = page.locator('data-test=project-name');
   await expect(projectName).toHaveText(projectData.projectFormName);
 
-  // Check project website
-  const projectWebsite = page.locator('data-test=project-details-website');
-  await expect(projectWebsite).toHaveText(projectData.projectFormWebsites[0].replace(/https?:\/\//, ''));
-
   // Check project Farcaster
   const projectFarcaster = page.locator('data-test=project-details-farcaster');
   await expect(projectFarcaster).toHaveText(

@@ -9,6 +9,9 @@ import {
   backgroundLightColorDarkMode,
   blueColor,
   darkBlueColor,
+  farcasterBrandColor,
+  farcasterBrandColorDark,
+  farcasterBrandColorLight,
   inputBackground,
   inputBackgroundDarkMode,
   inputBorder,
@@ -16,7 +19,10 @@ import {
   primaryTextColor,
   primaryTextColorDarkMode,
   secondaryTextColor,
-  secondaryTextColorDarkMode
+  secondaryTextColorDarkMode,
+  sunnysColor,
+  sunnysColorLight,
+  footerBackground
 } from './colors';
 
 export const defaultFont =
@@ -53,8 +59,10 @@ const extendedTheme = extendTheme({
         inputBackground: {
           main: inputBackground
         },
-        footerBackground: { main: grey[200] },
-        mainBackground: { main: grey[200] }
+        footerBackground: { main: footerBackground },
+        mainBackground: { main: grey[200] },
+        farcaster: { main: farcasterBrandColor, dark: farcasterBrandColorDark, light: farcasterBrandColorLight },
+        gold: { main: sunnysColor, light: sunnysColorLight }
       }
     },
     dark: {
@@ -86,8 +94,10 @@ const extendedTheme = extendTheme({
         inputBackground: {
           main: inputBackgroundDarkMode
         },
-        footerBackground: { main: grey[700] },
-        mainBackground: { main: backgroundColorDarkMode }
+        footerBackground: { main: footerBackground },
+        mainBackground: { main: backgroundColorDarkMode },
+        farcaster: { main: farcasterBrandColor, dark: farcasterBrandColorDark, light: farcasterBrandColorLight },
+        gold: { main: sunnysColor, light: sunnysColorLight }
       }
     }
   },
@@ -159,13 +169,19 @@ const extendedTheme = extendTheme({
         disableElevation: true
       },
       styleOverrides: {
-        root: {
-          textTransform: 'none'
-        },
+        root: ({ ownerState, theme }) => ({
+          textTransform: 'none',
+          ...(ownerState.variant === 'contained'
+            ? {
+                color: theme.vars.palette.textPrimary.disabled,
+                backgroundColor: theme.vars.palette.gold.main,
+                '&:hover': {
+                  backgroundColor: theme.vars.palette.gold.main
+                }
+              }
+            : {})
+        }),
         text: ({ theme, variant, color }) => ({
-          '&:hover': {
-            backgroundColor: theme.vars.palette.inputBackground.main
-          },
           color: color || (variant === 'outlined' || variant === 'text' ? theme.vars.palette.primary.main : 'inherit')
         })
       }
@@ -293,15 +309,16 @@ const extendedTheme = extendTheme({
     MuiLink: {
       styleOverrides: {
         root: ({ theme }) => ({
-          color: theme.vars.palette.primary.main,
+          color: theme.vars.palette.gold.main,
           '&:hover': {
-            color: theme.vars.palette.primary.dark
+            color: theme.vars.palette.gold.main
           },
           fontFamily: defaultFont
         })
       },
       defaultProps: {
-        underline: 'none'
+        underline: 'none',
+        color: 'gold.main'
       }
     }
   }

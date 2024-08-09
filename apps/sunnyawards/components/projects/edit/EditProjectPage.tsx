@@ -75,7 +75,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
 
   if (!showTeamMemberForm) {
     return (
-      <PageWrapper>
+      <PageWrapper bgcolor='transparent'>
         <ProjectForm
           control={control}
           isValid={isValid}
@@ -102,6 +102,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
 
   return (
     <PageWrapper
+      bgcolor='transparent'
       header={
         <ProjectHeader name={projectValues.name} avatar={projectValues.avatar} coverImage={projectValues.coverImage} />
       }
