@@ -73,9 +73,9 @@ export async function GET() {
   return Response.json(
     {
       type: 'composer',
-      name: 'Weekly Updates',
+      name: 'Product Updates',
       icon: 'pencil',
-      description: 'Create a weekly updates frame for your product',
+      description: 'Create a product updates frame for your cast',
       aboutUrl: baseUrl,
       imageUrl: 'https://connect.charmverse.io/favicon.ico',
       action: {
