@@ -14,7 +14,7 @@ test('Create a project and view details', async ({ page }) => {
     projectFormGithub: 'https://www.github.com/acme-inc-github',
     projectFormWebsites: ['https://www.acme-inc.com'],
     projectFormFarcasterValues: ['https://warpcast.com/acme-inc-warpcast']
-  };
+  } as const;
 
   const userId = await testUtilsUser.generateUser().then((user) => user.id);
 
@@ -60,14 +60,13 @@ test('Create a project and view details', async ({ page }) => {
   const fieldFarcasterValues = page.locator('data-test=project-form-farcaster-values  >> input');
   const fieldTwitter = page.locator('data-test=project-form-twitter  >> input');
   const fieldGithub = page.locator('data-test=project-form-github  >> input');
-  const fieldMirror = page.locator('data-test=project-form-mirror >> input');
 
   await fieldName.fill(projectData.projectFormName);
 
   await fieldDescription.fill(projectData.projectFormDescription);
 
   await fieldCategory.focus();
-  await page.keyboard.type(projectData.projectFormCategory);
+  await fieldCategory.fill(projectData.projectFormCategory);
 
   await fieldWebsites.fill(projectData.projectFormWebsites[0]);
 
