@@ -3,7 +3,6 @@ import { testUtilsUser, testUtilsCredentials } from '@charmverse/core/test';
 import { getSubmissionPagePermalink } from '@root/lib/pages/getPagePermalink';
 import { randomETHWallet } from '@root/lib/utils/blockchain';
 import { pseudoRandomHexString } from '@root/lib/utils/random';
-import { use } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import { randomETHWalletAddress } from 'testing/generateStubs';

@@ -1,15 +1,15 @@
 import type { ExternalCredential } from './external';
 import { encodeExternalCredential } from './external';
 import type { GitcoinProjectCredential } from './gitcoinProjectSchema';
-import { encodeGitcoinProjectCredential } from './gitcoinProjectSchema';
+import { encodeGitcoinProjectCredential } from './gitcoinProjectUtils';
 import type { AttestationType, CredentialData } from './interfaces';
 import type {
   OptimismProjectAttestationData,
   OptimismProjectSnapshotAttestationMetaData
 } from './optimismProjectSchemas';
-import { encodeOptimismProjectAttestation, encodeOptimismProjectSnapshotAttestation } from './optimismProjectSchemas';
+import { encodeOptimismProjectAttestation, encodeOptimismProjectSnapshotAttestation } from './optimismProjectUtils';
 import type { ProposalCredential } from './proposal';
-import { encodeProposalCredential } from './proposal';
+import { encodeProposalCredential } from './proposalUtils';
 import type { RewardCredential } from './reward';
 import { encodeRewardCredential } from './rewardUtils';
 

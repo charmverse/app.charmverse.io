@@ -1,7 +1,3 @@
-import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
-
-import type { TypedSchemaItem } from './interfaces';
-
 export const rewardCredentialSchemaId = '0xe44e40484c72af72b4661e37058a8204390f96bb9c8f73e943b0bf6e6fa03d7b';
 
 export const rewardCredentialSchemaDefinition =

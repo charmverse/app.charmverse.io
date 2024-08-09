@@ -15,7 +15,7 @@ import { proposalApprovedVerb } from './constants';
 import { getEasInstance } from './getEasInstance';
 import { saveIssuedCredential } from './saveIssuedCredential';
 import type { ProposalCredential } from './schemas/proposal';
-import { decodeProposalCredential } from './schemas/proposal';
+import { decodeProposalCredential } from './schemas/proposalUtils';
 
 type IndexableCredential = {
   attestationId: string;

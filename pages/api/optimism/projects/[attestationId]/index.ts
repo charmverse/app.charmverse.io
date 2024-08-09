@@ -4,7 +4,7 @@ import { createProjectMetadataAttestation } from '@connect-shared/lib/attestatio
 import { editOptimismProject } from '@connect-shared/lib/projects/editOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
-import { decodeOptimismProjectAttestation } from '@root/lib/credentials/schemas/optimismProjectSchemas';
+import { decodeOptimismProjectAttestation } from '@root/lib/credentials/schemas/optimismProjectUtils';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import type { OptimismProjectMetadata } from '@root/lib/optimism/storeOptimismProjectAttestations';
 import { withSessionRoute } from '@root/lib/session/withSession';

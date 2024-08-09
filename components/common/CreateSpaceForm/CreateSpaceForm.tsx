@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
+import styled from '@emotion/styled';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -296,3 +297,14 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     </div>
   );
 }
+
+export const StyledCreateSpaceForm = styled(CreateSpaceForm)`
+  // add styling so that the container takes full height of screen
+  ${({ theme }) => theme.breakpoints.down('md')} {
+    .space-templates-container {
+      max-height: calc(100vh - 250px);
+      padding: 0;
+      margin: 0;
+    }
+  }
+`;
