@@ -1,9 +1,8 @@
+import * as http from '@root/adapters/http';
 import type { SWRConfiguration } from 'swr';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
-
-import * as http from '@root/adapters/http';
 
 export type MaybeString = string | null | undefined;
 
@@ -49,11 +48,17 @@ export function useGETtrigger<T, U = unknown>(path: MaybeString) {
   });
 }
 
-function getQueryString(query: any = {}) {
-  // map optional query inputs into the url
-  const queryStr = Object.keys(query)
-    .filter((key) => !!query[key])
-    .map((key) => `${key}=${encodeURIComponent(query[key])}`)
+type Params = { [key: string]: string | string[] | undefined };
+
+function getQueryString(params: Params) {
+  const queryString = Object.keys(params)
+    .filter((key) => !!params[key])
+    .map((key) => {
+      const value = params[key] || '';
+      return Array.isArray(value)
+        ? `${value.map((v: string) => `${key}[]=${encodeURIComponent(v)}`).join('&')}`
+        : `${key}=${encodeURIComponent(value)}`;
+    })
     .join('&');
-  return queryStr ? `?${queryStr}` : '';
+  return queryString ? `?${queryString}` : '';
 }
