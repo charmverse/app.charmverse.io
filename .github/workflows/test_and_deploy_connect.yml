@@ -20,6 +20,7 @@ on:
       - 'hooks/**'
       - 'models/**'
   pull_request:
+    types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
       - '.ebextensions*/**'
@@ -260,7 +261,7 @@ jobs:
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: |
-      (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
+      github.ref == 'refs/heads/main' ||
       (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-connect') ||
       (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
       (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
