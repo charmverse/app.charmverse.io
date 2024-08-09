@@ -114,8 +114,6 @@ test('Create a project and view details', async ({ page }) => {
 
   expect(href?.endsWith(`/p/${project.path}`)).toBe(true);
 
-  await page.pause();
-
   // Go to page and make sure it looks right
   await page.goto(`/p/${project.path}`);
 
@@ -124,15 +122,15 @@ test('Create a project and view details', async ({ page }) => {
   await expect(projectName).toHaveText(projectData.projectFormName);
 
   // Check project Farcaster
-  const projectFarcaster = page.locator('data-test=project-details-farcaster');
+  const projectFarcaster = page.locator('data-test=project-farcaster');
   await expect(projectFarcaster).toBeVisible();
 
   // Check project Twitter
-  const projectTwitter = page.locator('data-test=project-details-twitter');
+  const projectTwitter = page.locator('data-test=project-twitter');
   await expect(projectTwitter).toBeVisible();
 
   // Check project GitHub
-  const projectGithub = page.locator('data-test=project-details-github');
+  const projectGithub = page.locator('data-test=project-github');
   await expect(projectGithub).toBeVisible();
 
   // Check project description

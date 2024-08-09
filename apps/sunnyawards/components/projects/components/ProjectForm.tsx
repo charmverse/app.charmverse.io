@@ -212,6 +212,7 @@ export function ProjectForm({
                 renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
                 error={!!fieldState.error}
                 {...field}
+                value={field.value || ''}
               >
                 {CATEGORIES.map((category) => (
                   <MenuItem key={category} value={category}>

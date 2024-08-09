@@ -42,7 +42,7 @@ export function HomePage() {
       <Typography data-test='connect-home-page' align='center' variant='h4'>
         Celebrate Onchain Summer with the Sunny Awards
       </Typography>
-      <Typography align='center'>
+      <Typography align='center' data-test='homepage-description'>
         Create your project and submit it to the{' '}
         <MuiLink href='https://www.thesunnyawards.fun/' rel='noopener noreferrer nofollow' target='_blank'>
           The Sunnys
