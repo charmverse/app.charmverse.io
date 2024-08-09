@@ -50,7 +50,7 @@ export function useGETtrigger<T, U = unknown>(path: MaybeString) {
 
 type Params = { [key: string]: string | string[] | undefined };
 
-function getQueryString(params: Params) {
+function getQueryString(params: Params = {}) {
   const queryString = Object.keys(params)
     .filter((key) => !!params[key])
     .map((key) => {
