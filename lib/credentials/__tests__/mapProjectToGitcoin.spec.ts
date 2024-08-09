@@ -73,11 +73,6 @@ describe('mapProjectToGitcoin', () => {
           url: 'https://twitter.com/projectx'
         },
         {
-          description: 'Mirror Profile',
-          type: 'Other',
-          url: 'https://mirror.xyz/projectx'
-        },
-        {
           description: 'Website',
           type: 'Other',
           url: 'https://example.com'
