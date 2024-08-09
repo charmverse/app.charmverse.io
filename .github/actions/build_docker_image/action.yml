@@ -28,9 +28,11 @@ runs:
   steps:
 
     - name: Check Docker Version
+      shell: bash
       run: docker --version
 
     - name: Install Latest Docker
+      shell: bash
       run: |
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
         sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
@@ -38,6 +40,7 @@ runs:
         sudo apt-get install docker-ce
 
     - name: Check Docker Version
+      shell: bash
       run: docker --version
 
     - name: Prune dev dependencies and calculate img tag
