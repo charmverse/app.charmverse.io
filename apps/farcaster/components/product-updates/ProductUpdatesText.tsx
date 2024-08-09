@@ -13,24 +13,39 @@ export function ProductUpdatesText({
     .slice(0, 10);
 
   return (
-    <ol
+    <div
       style={{
         padding: 10,
-        gap: 0,
         height: '100%',
         backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
-        wordBreak: 'break-all',
-        listStyleType: 'disc'
+        gap: 10
       }}
     >
-      <p style={{ fontWeight: 'bold', fontSize: 20 }}>{projectName}</p>
-      <p style={{ fontWeight: 500, fontSize: 18 }}>{createdAtLocal}</p>
-      {lines.map((line, index) => {
-        const hasNumberAtStart = /^\d+\.\s/.test(line);
-        return <li key={`${index.toString()}`}>{hasNumberAtStart ? line : `${index + 1}. ${line}`}</li>;
-      })}
-    </ol>
+      <p style={{ fontSize: 20 }}>{projectName}</p>
+      <p style={{ fontSize: 18 }}>{createdAtLocal}</p>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        {lines.map((line, index) => {
+          const numberReplacedLine = line.replace(/^\d+\.\s/, '');
+          return (
+            <p
+              style={{
+                wordBreak: 'break-word',
+                marginTop: 10
+              }}
+              key={`${index.toString()}`}
+            >
+              • {numberReplacedLine}
+            </p>
+          );
+        })}
+      </div>
+    </div>
   );
 }
