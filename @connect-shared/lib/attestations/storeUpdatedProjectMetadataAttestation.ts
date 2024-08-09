@@ -5,7 +5,7 @@ import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
 import { fetchProject } from '../projects/fetchProject';
 
-import { storeProjectMetadataViaAgora } from './agoraApi';
+import { createProjectViaAgora, storeProjectMetadataViaAgora } from './agoraApi';
 
 // Format for metadata.json:
 // attestations/{schemaId}/project-{charmverse_uid}/metadata.json
@@ -42,18 +42,27 @@ export async function storeUpdatedProjectMetadataAttestation({
     throw new DataNotFoundError('Farcaster profile not found');
   }
 
-  const existingOptimismAttestation = await prisma.optimismProjectAttestation.findFirstOrThrow({
-    where: {
-      projectId: project.id
-    },
-    select: {
-      projectRefUID: true
-    }
-  });
+  let projectRefUIDFromDb = await prisma.optimismProjectAttestation
+    .findFirst({
+      where: {
+        projectId: project.id
+      },
+      select: {
+        projectRefUID: true
+      }
+    })
+    .then((result) => result?.projectRefUID);
+
+  if (!projectRefUIDFromDb) {
+    projectRefUIDFromDb = await createProjectViaAgora({
+      farcasterId: farcasterUser.fid,
+      projectName: project.name
+    }).then((result) => result.attestationId);
+  }
 
   await storeProjectMetadataViaAgora({
     farcasterId: farcasterUser.fid,
-    projectRefUID: existingOptimismAttestation.projectRefUID,
+    projectRefUID: projectRefUIDFromDb as string,
     projectId
   });
 }

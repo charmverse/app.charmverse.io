@@ -33,6 +33,7 @@ async function patchProjectController(req: NextApiRequest, res: NextApiResponse<
       id: projectId
     }
   });
+
   return res.status(201).json(updatedProject);
 }
 

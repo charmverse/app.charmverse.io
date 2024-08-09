@@ -7,13 +7,12 @@ import { Wallet } from 'ethers';
 
 import { getEthersProvider } from '../blockchain/getEthersProvider';
 
-import { type EasSchemaChain } from './connectors';
+import type { EasSchemaChain } from './connectors';
 import { getEasInstance } from './getEasInstance';
-import { attestationSchemaIds } from './schemas';
-import { encodeAttestation } from './schemas/encodeAttestation';
-import type { AttestationType, CredentialDataInput } from './schemas/interfaces';
+import type { ExtendedAttestationType, CredentialDataInput } from './schemas';
+import { attestationSchemaIds, encodeAttestation } from './schemas';
 
-export type OnChainAttestationInput<T extends AttestationType = AttestationType> = {
+export type OnChainAttestationInput<T extends ExtendedAttestationType = ExtendedAttestationType> = {
   chainId: EasSchemaChain;
   credentialInputs: { recipient: string | null; data: CredentialDataInput<T> };
   type: T;
@@ -21,7 +20,11 @@ export type OnChainAttestationInput<T extends AttestationType = AttestationType>
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-export async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttestationInput): Promise<string> {
+export async function attestOnchain<T extends ExtendedAttestationType = ExtendedAttestationType>({
+  credentialInputs,
+  type,
+  chainId
+}: OnChainAttestationInput<T>): Promise<string> {
   const schemaId = attestationSchemaIds[type];
   const rpcUrl = getChainById(chainId)?.rpcUrls[0] as string;
 
@@ -48,7 +51,7 @@ export async function attestOnchain({ credentialInputs, type, chainId }: OnChain
   return attestationUid;
 }
 
-export type OnChainAttestationInputWithMetadata<T extends AttestationType = AttestationType> = {
+export type OnChainAttestationInputWithMetadata<T extends ExtendedAttestationType = ExtendedAttestationType> = {
   credential: OnChainAttestationInput<T>;
   credentialMetadata: {
     event: CredentialEventType;

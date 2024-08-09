@@ -3,7 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { optimismSepolia } from 'viem/chains';
 
+import { issueProposalPublishedQualifyingEvent } from 'lib/credentials/reputation/issueProposalPublishedQualifyingEvent';
 import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
 import { trackOpUserAction } from 'lib/metrics/mixpanel/trackOpUserAction';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';

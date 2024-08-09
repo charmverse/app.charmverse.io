@@ -10,13 +10,15 @@ export function MultiTextInputField<T extends FieldValues>({
   name,
   placeholder,
   disabled,
+  required,
   'data-test': dataTest
 }: {
-  disabled?: boolean;
   control: Control<T>;
   name: keyof T;
   label: string;
   placeholder: string;
+  disabled?: boolean;
+  required?: boolean;
   ['data-test']?: string;
 }) {
   const typedName = name as FieldArrayPath<T>;
@@ -27,7 +29,9 @@ export function MultiTextInputField<T extends FieldValues>({
 
   return (
     <Stack>
-      <FormLabel id={`project-${typedName.toLowerCase().replaceAll(' ', '')}`}>{label}</FormLabel>
+      <FormLabel required={required} id={`project-${typedName.toLowerCase().replaceAll(' ', '')}`}>
+        {label}
+      </FormLabel>
       <Stack direction='row' gap={1} alignItems='center' mb={1}>
         <Controller
           control={control}
@@ -69,9 +73,7 @@ export function MultiTextInputField<T extends FieldValues>({
         </Stack>
       ))}
       <Button
-        sx={{
-          width: 'fit-content'
-        }}
+        sx={{ width: 'fit-content' }}
         startIcon={<AddIcon fontSize='small' />}
         size='small'
         disabled={disabled}

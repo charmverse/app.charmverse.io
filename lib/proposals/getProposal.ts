@@ -117,9 +117,7 @@ export async function getProposal({
   ]);
 
   const isPublicPage =
-    proposal.space.publicProposals ||
-    proposal.space.paidTier === 'free' ||
-    !!proposal.page?.permissions.some((perm) => perm.public);
+    proposal.status === 'published' && currentEvaluation?.permissions.some((p) => p.systemRole === 'public');
 
   return mapDbProposalToProposal({
     proposalEvaluationReviews,

@@ -16,15 +16,14 @@ export type ProjectCategory = (typeof CATEGORIES)[number];
 export const schema = yup.object({
   id: yup.string(),
   name: yup.string().required('Project name is required'),
-  description: yup.string(),
+  description: yup.string().required('Project description is required'),
   avatar: yup.string(),
   coverImage: yup.string(),
-  category: yup.string().oneOf(CATEGORIES).nullable().optional(),
-  websites: yup.array(yup.string().url()),
+  category: yup.string().oneOf(CATEGORIES).nullable().required(),
+  websites: yup.array(yup.string().url()).min(1),
   farcasterValues: yup.array(yup.string()),
-  github: yup.string(),
-  twitter: yup.string(),
-  mirror: yup.string(),
+  github: yup.string().optional(),
+  twitter: yup.string().optional(),
   sunnyAwardsProjectType: yup.string().oneOf(SUNNY_AWARD_CATEGORIES).required(),
   primaryContractChainId: yup.string().test('isChainId', 'Invalid chain ID', async (value, context) => {
     if ((context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType) === 'app') {

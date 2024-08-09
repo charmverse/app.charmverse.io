@@ -102,11 +102,11 @@ export default function ShareToWeb({
     }
   }
 
-  const hideAllowDiscovery = pageType === 'proposal';
+  const hideAllowDiscovery = pageType === 'proposal' || pageType === 'proposal_template';
 
   return (
     <Box my={1} gap={2} display='flex' flexDirection='column'>
-      {!shareChecked && !shareLink ? (
+      {!shareChecked ? (
         <Box>
           <Box>
             <Typography variant='h6' textAlign='center' mb={1}>
@@ -124,19 +124,21 @@ export default function ShareToWeb({
             <CircleIcon color='primary' fontSize='small' />
             <Typography variant='body2'>This page is live on the web. Anyone with the link can view it.</Typography>
           </Box>
-          <StyledInput
-            data-test='share-link'
-            fullWidth
-            disabled
-            value={shareLink || ''}
-            endAdornment={
-              <CopyToClipboard data-test='copy-button' text={shareLink ?? ''} onCopy={onCopy}>
-                <InputAdornment position='end'>
-                  <CopyButton>{copied ? 'Copied!' : 'Copy'}</CopyButton>
-                </InputAdornment>
-              </CopyToClipboard>
-            }
-          />
+          {shareLink && (
+            <StyledInput
+              data-test='share-link'
+              fullWidth
+              disabled
+              value={shareLink || ''}
+              endAdornment={
+                <CopyToClipboard data-test='copy-button' text={shareLink ?? ''} onCopy={onCopy}>
+                  <InputAdornment position='end'>
+                    <CopyButton>{copied ? 'Copied!' : 'Copy'}</CopyButton>
+                  </InputAdornment>
+                </CopyToClipboard>
+              }
+            />
+          )}
           {!hideAllowDiscovery && (
             <>
               <Box display='flex' alignItems='center' justifyContent='space-between' mt={1}>

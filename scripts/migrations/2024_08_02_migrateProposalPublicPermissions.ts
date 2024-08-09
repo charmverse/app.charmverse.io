@@ -57,6 +57,12 @@ async function migrateProposalPublicPermissions() {
 
   console.log(`Migrating ${proposalsToMigrate.length} proposals`);
 
+  const workflowUpdates = await prisma.proposalWorkflow.findMany({
+    where: {
+      
+    }
+  })
+
   await prisma.proposalEvaluationPermission.createMany({
     data: proposalsToMigrate.flatMap((proposal) =>
       proposal.evaluations.map(

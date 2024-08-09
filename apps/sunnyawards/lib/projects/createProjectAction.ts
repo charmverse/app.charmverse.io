@@ -3,11 +3,11 @@
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
-import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { isTestEnv } from '@root/config/constants';
-import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
+import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
+import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 
 import { schema } from './form';
 
@@ -35,11 +35,15 @@ export const createProjectAction = authActionClient
         log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
       });
 
-      await storeProjectMetadataAndPublishGitcoinAttestation({
-        projectIdOrPath: newProject.id,
-        userId: currentUserId
+      await storeCharmverseProjectMetadata({
+        chainId: charmverseProjectDataChainId,
+        projectId: newProject.id
       }).catch((err) => {
-        log.error('Failed to store project metadata and publish gitcoin attestation', { err, userId: currentUserId });
+        log.error('Failed to store charmverse project metadata', {
+          err,
+          projectId: newProject.id,
+          userId: newProject.createdBy
+        });
       });
     }
 

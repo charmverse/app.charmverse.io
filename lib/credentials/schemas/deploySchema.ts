@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
-import { getChainById } from '@root/connectors/chains';
-import { optimism } from 'viem/chains';
+import { getChainById } from 'connectors/chains';
+import { optimism, optimismSepolia } from 'viem/chains';
 
 import type { EasSchemaChain } from '../connectors';
 import { easSchemaChains, getEasConnector } from '../connectors';
@@ -9,11 +9,21 @@ import { NULL_ADDRESS } from '../constants';
 import { getCharmverseSigner } from '../getCharmverseSigner';
 import { getOnChainSchemaUrl } from '../getOnChainSchemaUrl';
 
-import { externalCredentialSchemaDefinition } from './external';
+import { charmProjectSchemaDefinition } from './charmProject';
+import { charmProjectMetadataSchemaDefinition } from './charmProjectMetadata';
+import { charmUserIdentifierSchemaDefinition } from './charmUserIdentifier';
 
 import { allSchemaDefinitions } from './index';
 
-async function deploySchema({ schema, chainId }: { schema: string; chainId: EasSchemaChain }) {
+async function deploySchema({
+  schema,
+  chainId,
+  resolver = NULL_ADDRESS
+}: {
+  schema: string;
+  chainId: EasSchemaChain;
+  resolver?: string;
+}) {
   const connector = getEasConnector(chainId);
 
   const schemaRegistry = new SchemaRegistry(connector.schemaRegistryContract);
@@ -31,7 +41,7 @@ async function deploySchema({ schema, chainId }: { schema: string; chainId: EasS
   schemaRegistry.connect(signer);
 
   // SchemaUID is deterministic
-  const schemaUid = getSchemaUID(schema, NULL_ADDRESS, true);
+  const schemaUid = getSchemaUID(schema, resolver, true);
 
   const deployedSchema = await schemaRegistry.getSchema({ uid: schemaUid }).catch((err) => {
     log.info(`Schema not found on ${fullChainName}`);
@@ -46,7 +56,7 @@ async function deploySchema({ schema, chainId }: { schema: string; chainId: EasS
 
     await schemaRegistry.register({
       schema,
-      resolverAddress: NULL_ADDRESS,
+      resolverAddress: resolver,
       revocable: true
     });
 
@@ -63,6 +73,20 @@ async function deploySchemaAcrossChains({ schema }: { schema: string }) {
   }
 }
 
+async function deployCharmverseProjectSchemas(chainId: EasSchemaChain) {
+  for (const schemaId of [
+    charmUserIdentifierSchemaDefinition,
+    // charmQualifyingEventSchemaDefinition,
+    charmProjectSchemaDefinition,
+    charmProjectMetadataSchemaDefinition
+  ]) {
+    log.info(`Deploying schema...`);
+    await deploySchema({ schema: schemaId, chainId });
+  }
+}
+
+deployCharmverseProjectSchemas(optimism.id).then(log.info);
+
 // Used when we want to add a new schema to schemas we support
 // lib/credentials/schemas/index.ts
 async function deploySchemasOnNewChain({ chainId }: { chainId: EasSchemaChain }) {
@@ -76,9 +100,21 @@ async function deploySchemasOnNewChain({ chainId }: { chainId: EasSchemaChain })
 //   schema: externalCredentialSchemaDefinition
 // }).then(log.info);
 
-log.info(
-  getOnChainSchemaUrl({
-    chainId: optimism.id,
-    schema: externalCredentialSchemaDefinition
-  })
-);
+// log.info(
+//   getOnChainSchemaUrl({
+//     chainId: optimism.id,
+//     schema: externalCredentialSchemaDefinition
+//   })
+// );
+
+// deploySchema({
+//   chainId: optimismSepolia.id,
+//   schema: charmUserIdentifierSchemaDefinition
+//   // resolver: '0xda8793f28080ac2473032dc50497b93de0c1c67b'
+// }).then(console.log);
+
+// deploySchema({
+//   chainId: optimismSepolia.id,
+//   schema: charmQualifyingEventSchemaDefinition,
+//   resolver: '0x2AEc1DedD9A63173d673BCaa60564a4bae38bc38'
+// }).then(console.log);

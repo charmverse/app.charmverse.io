@@ -39,10 +39,10 @@ describe('mapProjectToOptimism', () => {
         website: ['https://example.com'],
         farcaster: ['CharmVerse'],
         twitter: 'https://twitter.com/projectx',
-        mirror: 'https://mirror.xyz/projectx'
+        mirror: null
       },
       team: ['123', '456'],
-      github: ['https://github.com/projectx'],
+      github: 'https://github.com/projectx',
       packages: [], // Placeholder
       contracts: [], // Placeholder
       grantsAndFunding: {

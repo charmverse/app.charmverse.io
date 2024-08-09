@@ -1,5 +1,6 @@
 import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { capitalize } from '@root/lib/utils/strings';
 
 import charmClient from 'charmClient';
@@ -81,12 +82,7 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
 
   const isShareChecked =
     // If not using space wide proposals, go by the page permissions
-    (!space?.publicProposals && !!publicPermission) ||
-    (!!space?.publicProposals &&
-      // If space has public proposals, don't interfere with non-proposal pages
-      ((currentPage?.type !== 'proposal' && !!publicPermission) ||
-        // All proposals beyond draft are public
-        (currentPage?.type === 'proposal' && proposal?.status !== 'draft')));
+    (currentPage?.type !== 'proposal' && !!publicPermission) || !!proposal?.isPublic;
 
   const baseShareAlertMessage = currentPage ? alerts[currentPage.type] ?? '' : '';
 

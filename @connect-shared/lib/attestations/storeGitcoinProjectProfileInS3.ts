@@ -6,10 +6,9 @@ import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
 import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
 import { replaceS3Domain } from '@root/lib/utils/url';
 
+import { getAttestationS3Path } from '../../../lib/credentials/getAttestationS3Path';
 import type { ConnectProjectDetails } from '../projects/fetchProject';
 import { fetchProject } from '../projects/fetchProject';
-
-import { getAttestationS3Path } from './getAttestationS3Path';
 
 type GitcoinUserProfile = {
   name: string;
