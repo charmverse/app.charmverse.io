@@ -60,6 +60,7 @@ export function AddProjectMembersForm({
         />
         <Stack gap={1}>
           <SearchFarcasterUser
+            disabled={isExecuting}
             filteredFarcasterIds={selectedFarcasterProfiles.map((profile) => profile.fid).filter(isTruthy)}
             setSelectedProfile={(farcasterProfile) => {
               if (farcasterProfile) {

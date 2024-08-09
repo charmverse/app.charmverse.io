@@ -13,7 +13,7 @@ export function StickyFooter() {
     <>
       {/* include element to add spacing at the bottom of the page */}
       <Box height='56px' />
-      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, borderRadius: 0 }} elevation={3}>
         <BottomNavigation showLabels value={getActiveButton(pathname)}>
           <BottomNavigationAction
             label='Profile'
