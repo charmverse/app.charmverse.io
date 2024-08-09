@@ -1,9 +1,7 @@
 import * as adapters from '@root/adapters/http';
-import { isProdEnv } from '@root/config/constants';
+import { baseUrl } from '@root/config/constants';
 
 import { encrypt } from 'lib/crypto';
-
-const baseUrl = isProdEnv ? 'https://farcaster.charmverse.io' : 'http://localhost:3000';
 
 export async function POST(req: Request) {
   const data = (await req.json()) as {
