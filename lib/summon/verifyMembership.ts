@@ -38,7 +38,7 @@ export async function verifyMembership({
     }
     const summonApiUrl = TENANT_URLS[space.xpsEngineId];
     if (!summonApiUrl) {
-      log.debug('Space does not have a Summon URL', { spaceId });
+      log.debug('Space does not have a Summon URL', { spaceId, xpsEngineId: space.xpsEngineId });
       return { isVerified: false, reason: 'Space does not have a Summon URL' };
     }
 
