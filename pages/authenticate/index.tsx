@@ -54,6 +54,9 @@ export default function Authenticate() {
 
     await validateMagicLink(emailForSignIn)
       .then((data) => {
+        if (!data) {
+          return;
+        }
         if ('id' in data) {
           showMessage('Logged in with email. Redirecting you now', 'success');
           redirectLoggedInUser();

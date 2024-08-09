@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import { PageInviteEmail } from 'lib/mailer/emails/templates/PageInviteEmail';
+import { PageInviteTemplate } from 'lib/mailer/emails/templates/PageInviteTemplate';
 
 export default {
   title: 'Emails/Page Invite',
@@ -9,7 +9,7 @@ export default {
 
 export function PageInviteEmailTemplate() {
   return (
-    <PageInviteEmail
+    <PageInviteTemplate
       guestEmail='john.doe@gmail.com'
       invitingUserName='John Doe'
       pageId={v4()}

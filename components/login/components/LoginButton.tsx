@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import EmailIcon from '@mui/icons-material/Email';
+import EmailIcon from '@mui/icons-material/EmailOutlined';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
