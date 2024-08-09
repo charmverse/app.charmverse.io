@@ -7,9 +7,11 @@ import { Wallet, providers } from 'ethers';
 
 import { getEthersProvider } from '../blockchain/getEthersProvider';
 
-import { getEasInstance, type EasSchemaChain } from './connectors';
-import { attestationSchemaIds, encodeAttestation } from './schemas';
-import type { AttestationType, CredentialDataInput } from './schemas';
+import { type EasSchemaChain } from './connectors';
+import { getEasInstance } from './getEasInstance';
+import { attestationSchemaIds } from './schemas';
+import { encodeAttestation } from './schemas/encodeAttestation';
+import type { AttestationType, CredentialDataInput } from './schemas/interfaces';
 
 export type OnChainAttestationInput<T extends AttestationType = AttestationType> = {
   chainId: EasSchemaChain;

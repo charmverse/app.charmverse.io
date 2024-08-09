@@ -4,9 +4,10 @@ import { getChainById } from '@root/connectors/chains';
 import { optimism } from 'viem/chains';
 
 import type { EasSchemaChain } from '../connectors';
-import { easSchemaChains, getEasConnector, getOnChainSchemaUrl } from '../connectors';
+import { easSchemaChains, getEasConnector } from '../connectors';
 import { NULL_ADDRESS } from '../constants';
 import { getCharmverseSigner } from '../getCharmverseSigner';
+import { getOnChainSchemaUrl } from '../getOnChainSchemaUrl';
 
 import { externalCredentialSchemaDefinition } from './external';
 
