@@ -13,7 +13,7 @@ import { createComposerActionFrameAction } from 'lib/createComposerActionFrame/a
 import { schema, type FormValues } from 'lib/createComposerActionFrame/schema';
 import type { ConnectProjectMinimal } from 'lib/getConnectProjectsByFid';
 
-export function SearchConnectProjects({
+export function WeeklyUpdatesComposerAction({
   farcasterUser,
   connectProjects
 }: {
@@ -24,8 +24,7 @@ export function SearchConnectProjects({
     control,
     formState: { isValid },
     handleSubmit,
-    reset,
-    watch
+    reset
   } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
@@ -35,8 +34,6 @@ export function SearchConnectProjects({
     resolver: yupResolver(schema),
     mode: 'onChange'
   });
-
-  const text = watch('text');
 
   const { execute, isExecuting } = useAction(createComposerActionFrameAction, {
     onSuccess: (data) => {

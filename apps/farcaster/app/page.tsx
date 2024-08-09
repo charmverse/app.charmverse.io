@@ -4,7 +4,7 @@ import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { decrypt } from 'lib/crypto';
 import { getConnectProjectsByFid } from 'lib/getConnectProjectsByFid';
 
-import { SearchConnectProjects } from '../components/SearchConnectProjects';
+import { WeeklyUpdatesComposerAction } from '../components/WeeklyUpdatesComposerAction';
 
 export default async function Home({
   searchParams
@@ -31,7 +31,7 @@ export default async function Home({
 
   return (
     <PageWrapper>
-      <SearchConnectProjects farcasterUser={farcasterUser} connectProjects={connectProjects} />
+      <WeeklyUpdatesComposerAction farcasterUser={farcasterUser} connectProjects={connectProjects} />
     </PageWrapper>
   );
 }

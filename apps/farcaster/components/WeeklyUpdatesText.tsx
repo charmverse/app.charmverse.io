@@ -8,6 +8,10 @@ export function WeeklyUpdatesText({ text }: { text: string }) {
     // Tried with ol but it was not working
     <div
       style={{
+        padding: 10,
+        gap: 0,
+        height: '100%',
+        backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
         wordBreak: 'break-all'
