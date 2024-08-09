@@ -424,9 +424,6 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
 
-      # - name: Build app
-      #   uses: ./.github/actions/build_connect
-
       - name: Replace env_var with staging settings
         run: |
           ebextension_files=$(ls .ebextensions*/00_env_vars.config)
@@ -500,15 +497,15 @@ jobs:
         # wrap the condition in "${{}}" because the string includes a colon
         # see https://github.com/actions/runner/issues/1019
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') }}"
+        # aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
-          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Override config with Sunny Awards
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') }}"
+        # aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
         run: |
           rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
-          aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Deploy to staging
         id: cdk_deploy
