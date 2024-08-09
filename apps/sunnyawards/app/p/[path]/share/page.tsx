@@ -16,19 +16,17 @@ export default function PublishProjectPage({ params }: { params: { path: string 
       textAlign='center'
       bgcolor='transparent'
       sx={{
-        '& > .MuiBox-root': {
-          display: 'flex',
-          flexDirection: 'column',
-          gap: { xs: 0, md: 6 },
-          my: { xs: 0, md: 4 },
-          justifyContent: { xs: 'space-evenly', md: 'normal' },
-          alignItems: 'center',
-          height: '100%'
-        }
+        display: 'flex',
+        flexDirection: 'column',
+        gap: { xs: 1, md: 4 },
+        my: { xs: 0, md: 4 },
+        justifyContent: { xs: 'space-evenly', md: 'normal' },
+        alignItems: 'center',
+        height: '100%'
       }}
     >
       <Image
-        src='/images/sunny-awards.png'
+        src='/images/sunny-awards-banner.webp'
         width={500}
         height={200}
         sizes='100vw'

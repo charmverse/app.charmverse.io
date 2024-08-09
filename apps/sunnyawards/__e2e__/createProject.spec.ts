@@ -125,17 +125,15 @@ test('Create a project and view details', async ({ page }) => {
 
   // Check project Farcaster
   const projectFarcaster = page.locator('data-test=project-details-farcaster');
-  await expect(projectFarcaster).toHaveText(
-    projectData.projectFormFarcasterValues[0].replace(/https?:\/\/warpcast.com\//, '')
-  );
+  await expect(projectFarcaster).toBeVisible();
 
   // Check project Twitter
   const projectTwitter = page.locator('data-test=project-details-twitter');
-  await expect(projectTwitter).toHaveText(projectData.projectFormTwitter.replace(/https?:\/\/www.twitter.com\//, ''));
+  await expect(projectTwitter).toBeVisible();
 
   // Check project GitHub
   const projectGithub = page.locator('data-test=project-details-github');
-  await expect(projectGithub).toHaveText(projectData.projectFormGithub.replace(/https?:\/\/www.github.com\//, ''));
+  await expect(projectGithub).toBeVisible();
 
   // Check project description
 

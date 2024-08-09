@@ -74,7 +74,8 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         sx={(theme) => ({
           fontSize: '18px',
           bgcolor: theme.palette.farcaster.main,
-          '&:hover': { background: theme.palette.farcaster.dark }
+          color: theme.palette.text.primary,
+          '&:hover': { background: theme.palette.farcaster.dark, color: theme.palette.text.primary }
         })}
         startIcon={<WarpcastIcon />}
         {...props}

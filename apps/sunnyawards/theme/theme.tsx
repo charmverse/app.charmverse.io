@@ -173,9 +173,10 @@ const extendedTheme = extendTheme({
           textTransform: 'none',
           ...(ownerState.variant === 'contained'
             ? {
-                color: theme.vars.palette.textPrimary.disabled,
+                color: theme.vars.palette.text.disabled,
                 backgroundColor: theme.vars.palette.gold.main,
                 '&:hover': {
+                  color: theme.vars.palette.text.disabled,
                   backgroundColor: theme.vars.palette.gold.main
                 }
               }

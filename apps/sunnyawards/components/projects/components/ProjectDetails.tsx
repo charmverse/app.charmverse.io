@@ -2,7 +2,7 @@ import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchPr
 import EditIcon from '@mui/icons-material/Edit';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LanguageIcon from '@mui/icons-material/Language';
-import { IconButton, Stack, Typography } from '@mui/material';
+import { Box, IconButton, Stack, Typography } from '@mui/material';
 import { replaceUrl } from '@root/lib/utils/url';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
@@ -25,7 +25,7 @@ export function ProjectDetails({ project, showEditButton = false }: ProjectDetai
   const twitterLink = project?.twitter ? replaceUrl(project.twitter, 'twitter.com') : null;
 
   return (
-    <Stack data-test='project-details'>
+    <Box data-test='project-details'>
       <Stack direction='row' mb={2} justifyContent='space-between' alignItems='center' flexWrap='wrap' gap={1}>
         <Typography variant='h5' data-test='project-name'>
           {project.name}
@@ -41,15 +41,15 @@ export function ProjectDetails({ project, showEditButton = false }: ProjectDetai
           <ShareButton projectId={project.id} data-test='share-button' />
         </Stack>
       </Stack>
-      <Stack gap={1.5} flexDirection='row'>
-        {project.websites[0] && (
-          <Link href={project.websites[0]} passHref target='_blank' data-test='project-website'>
-            <LanguageIcon color='secondary' />
-          </Link>
-        )}
+      <Stack gap={1.5} flexDirection='row' color='text.primary'>
         {farcasterLink && (
           <Link href={farcasterLink.href} passHref target='_blank' data-test='project-farcaster'>
             <img src='/images/farcaster.png' width={25} height={25} />
+          </Link>
+        )}
+        {project.websites[0] && (
+          <Link href={project.websites[0]} passHref target='_blank' data-test='project-website'>
+            <LanguageIcon />
           </Link>
         )}
         {twitterLink && (
@@ -69,6 +69,6 @@ export function ProjectDetails({ project, showEditButton = false }: ProjectDetai
         )}
       </Stack>
       {project.description && <ProjectDescription description={project.description} />}
-    </Stack>
+    </Box>
   );
 }
