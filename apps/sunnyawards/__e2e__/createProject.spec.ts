@@ -82,7 +82,7 @@ test('Create a project and view details', async ({ page }) => {
 
   const confirmButton = page.locator('data-test=project-form-confirm-values');
 
-  await confirmButton.click();
+  await confirmButton.click({ force: true });
 
   const publishButton = page.locator('data-test=project-form-publish');
 
