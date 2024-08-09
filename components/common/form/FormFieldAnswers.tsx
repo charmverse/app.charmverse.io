@@ -16,11 +16,11 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import { hoverIconsStyle } from '../Icons/hoverIconsStyle';
+import { ProjectFieldAnswer } from '../ProjectForm/components/ProjectField/ProjectFieldAnswer';
 
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import { FieldWrapper } from './fields/FieldWrapper';
-import { ProjectFieldAnswer } from './fields/ProjectField/ProjectFieldAnswer';
 import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
 

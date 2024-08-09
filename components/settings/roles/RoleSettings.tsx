@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import ImportGuildRolesMenuItem from 'components/settings/roles/components/ImportGuildRolesMenuItem';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useIsAdmin } from 'hooks/useIsAdmin';

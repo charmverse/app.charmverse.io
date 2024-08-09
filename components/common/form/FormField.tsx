@@ -33,6 +33,7 @@ import { mergeRefs } from 'lib/utils/react';
 
 import { CharmEditor } from '../CharmEditor';
 import PopperPopup from '../PopperPopup';
+import { ProjectFieldEditor } from '../ProjectForm/components/ProjectField/ProjectFieldEditor';
 
 import {
   fieldTypeIconRecord,
@@ -43,7 +44,6 @@ import {
   nonPrivateFieldTypes
 } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
-import { ProjectFieldEditor } from './fields/ProjectField/ProjectFieldEditor';
 import { isWalletConfig } from './fields/utils';
 
 export const FormFieldContainer = styled(Stack, {

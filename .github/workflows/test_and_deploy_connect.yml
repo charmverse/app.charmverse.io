@@ -165,7 +165,7 @@ jobs:
 
       - name: Start connect app
         run: |
-          npm run connect:start:test:ci &
+          npm run connect:start:test:ci &> connect.log &
           sleep_loop_ct=0
           until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -178,6 +178,7 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         # we have to run docker command ourselves to set network=host so that playwright can access the server
         run: |
+          [[ "${{ runner.debug }}" = "1" ]] && tail -f connect.log &
           docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
                       --workdir /github/workspace --rm  \
                       -e "REACT_APP_APP_ENV" -e CI=true \
@@ -227,7 +228,7 @@ jobs:
 
       - name: Start Sunny Awards app
         run: |
-          npm run sunnyawards:start:test:ci &
+          npm run sunnyawards:start:test:ci &> connect.log &
           sleep_loop_ct=0
           until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -240,6 +241,7 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         # we have to run docker command ourselves to set network=host so that playwright can access the server
         run: |
+          [[ "${{ runner.debug }}" = "1" ]] && tail -f connect.log &
           docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
                       --workdir /github/workspace --rm  \
                       -e "REACT_APP_APP_ENV" -e CI=true \

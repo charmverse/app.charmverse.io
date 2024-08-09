@@ -82,7 +82,7 @@ export function SearchFarcasterUser({
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder='Search for a Farcaster user'
+          placeholder='Add a team member'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />

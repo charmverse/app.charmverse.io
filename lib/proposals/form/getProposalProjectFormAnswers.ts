@@ -24,6 +24,8 @@ export function getProposalProjectFormAnswers({
     if (key in projectWithMembers) {
       if (key === 'deletedAt') {
         projectWithMembers[key] = null;
+      } else if (key === 'websites') {
+        projectWithMembers[key] = [];
       } else {
         projectWithMembers[key] = '';
       }
@@ -35,6 +37,8 @@ export function getProposalProjectFormAnswers({
       if (key in projectMember) {
         if (key === 'teamLead') {
           projectMember[key] = false;
+        } else if (key === 'socialUrls') {
+          projectMember[key] = [];
         } else {
           projectMember[key] = '';
         }

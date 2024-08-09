@@ -15,7 +15,7 @@ import CommunityIcon from 'public/images/subscriptions/community.svg';
 import EnterpriseIcon from 'public/images/subscriptions/enterprise.svg';
 import FreeIcon from 'public/images/subscriptions/free.svg';
 
-import Legend from '../Legend';
+import Legend from '../components/Legend';
 
 import { ConfirmFreeDowngradeModal } from './ConfirmFreeDowngradeModal';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';

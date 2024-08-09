@@ -77,7 +77,6 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     description: project.description,
     farcasterValues: project.farcasterValues,
     github: project.github,
-    mirror: project.mirror,
     twitter: project.twitter,
     websites: project.websites
   } as ProjectDetailsProps['project'];
@@ -89,9 +88,6 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     >
       <Box gap={2} display='flex' flexDirection='column'>
         <ProjectDetails project={projectDetails} />
-        <Typography variant='h5' data-test='project-form-add-team'>
-          Add team members
-        </Typography>
         <AddProjectMembersForm
           user={user}
           onBack={() => {

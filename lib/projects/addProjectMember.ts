@@ -24,15 +24,9 @@ export async function addProjectMember({
       name: payload.name || '',
       updatedBy: userId,
       email: payload.email,
-      github: payload.github,
-      linkedin: payload.linkedin,
-      otherUrl: payload.otherUrl,
-      previousProjects: payload.previousProjects,
       teamLead: false,
-      telegram: payload.telegram,
-      twitter: payload.twitter,
+      socialUrls: payload.socialUrls?.filter(Boolean),
       walletAddress: payload.walletAddress?.toLowerCase()?.trim(),
-      warpcast: payload.warpcast,
       userId: connectedUserId
     }
   });

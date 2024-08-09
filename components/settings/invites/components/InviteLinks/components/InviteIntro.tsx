@@ -4,7 +4,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import { memo } from 'react';
 
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 
 const StyledList = styled(List)`
   list-style-type: disc;

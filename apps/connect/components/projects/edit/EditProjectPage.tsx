@@ -50,7 +50,6 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       description: project.description ?? undefined,
       farcasterValues: project.farcasterValues,
       github: project.github ?? undefined,
-      mirror: project.mirror ?? undefined,
       twitter: project.twitter ?? undefined,
       websites: project.websites,
       projectMembers:
@@ -88,7 +87,6 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     description: projectValues.description,
     farcasterValues: projectValues.farcasterValues,
     github: projectValues.github,
-    mirror: projectValues.mirror,
     twitter: projectValues.twitter,
     websites: projectValues.websites
   } as ProjectDetailsProps['project'];
@@ -105,9 +103,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     >
       <Box gap={2} display='flex' flexDirection='column'>
         <ProjectDetails project={projectDetails} />
-        <Typography variant='h5' data-test='project-form-add-team'>
-          Edit team members
-        </Typography>
+        <Typography variant='h5'>Edit team members</Typography>
         <AddProjectMembersForm
           user={user}
           onBack={() => {

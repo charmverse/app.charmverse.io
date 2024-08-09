@@ -29,15 +29,9 @@ export async function updateProjectMember({
     },
     data: {
       email: projectMemberValues.email,
-      github: projectMemberValues.github,
-      linkedin: projectMemberValues.linkedin,
       name: projectMemberValues.name,
-      otherUrl: projectMemberValues.otherUrl,
-      previousProjects: projectMemberValues.previousProjects,
-      telegram: projectMemberValues.telegram,
-      twitter: projectMemberValues.twitter,
+      socialUrls: projectMemberValues.socialUrls?.map((url) => url?.trim()).filter(Boolean),
       walletAddress: projectMemberValues.walletAddress?.toLowerCase()?.trim(),
-      warpcast: projectMemberValues.warpcast,
       userId: connectedUserId
     }
   });
