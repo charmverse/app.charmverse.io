@@ -13,6 +13,7 @@ import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPag
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import type { UploadedFileInfo, FormFieldValue, FieldType, OpProjectFieldValue } from 'lib/forms/interfaces';
 
+import { OptimismProjectSelector } from '../../ProjectForm/components/Optimism/OptimismProjectSelector';
 import { InputSearchBlockchain } from '../InputSearchBlockchain';
 
 import { CharmEditorInputField } from './CharmEditorInputField';
@@ -21,7 +22,6 @@ import { FieldWrapper } from './FieldWrapper';
 import { FileField } from './FileField';
 import { ImageField } from './ImageField';
 import { LabelField } from './LabelField';
-import { OptimismProjectSelector } from './Optimism/OptimismProjectSelector';
 import { PersonInputField } from './PersonInputField';
 
 type TextInputConfig = {

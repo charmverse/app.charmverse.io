@@ -1,4 +1,4 @@
-import type { OptimismProjectFormValues } from 'components/common/form/fields/Optimism/optimismProjectFormValues';
+import type { OptimismProjectFormValues } from 'components/common/ProjectForm/components/Optimism/optimismProjectFormValues';
 import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
 
 import { useGET, usePOST, usePUT } from './helpers';

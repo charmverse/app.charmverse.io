@@ -71,14 +71,9 @@ export async function updateProjectAndMembers({
           data: {
             name: projectMember.name,
             email: projectMember.email,
+            // our multitextinput form field sometimes sends [undefined] at first if no website is given
+            socialUrls: projectMember.socialUrls.map((url) => url?.trim()).filter(Boolean),
             walletAddress: projectMember.walletAddress?.toLowerCase()?.trim(),
-            twitter: projectMember.twitter,
-            warpcast: projectMember.warpcast,
-            github: projectMember.github,
-            linkedin: projectMember.linkedin,
-            telegram: projectMember.telegram,
-            otherUrl: projectMember.otherUrl,
-            previousProjects: projectMember.previousProjects,
             updatedBy: userId,
             userId: connectedUserId
           }
@@ -114,16 +109,11 @@ export async function updateProjectAndMembers({
       },
       data: {
         description: payload.description,
-        excerpt: payload.excerpt,
         name: payload.name,
         walletAddress: payload.walletAddress?.toLowerCase(),
-        blog: payload.blog,
-        communityUrl: payload.communityUrl,
-        github: payload.github,
-        otherUrl: payload.otherUrl,
-        demoUrl: payload.demoUrl,
         twitter: payload.twitter,
-        website: payload.website,
+        // note: the UI sends undefined at first if no website is given
+        websites: payload.websites.map((url) => url?.trim()),
         deletedAt: payload.deletedAt
       }
     }),

@@ -17,7 +17,6 @@ export type ConnectProjectDetails = Pick<
   | 'farcasterFrameImage'
   | 'farcasterValues'
   | 'github'
-  | 'mirror'
   | 'twitter'
   | 'websites'
   | 'sunnyAwardsProjectType'
@@ -58,7 +57,6 @@ export async function fetchProject({
       farcasterValues: true,
       github: true,
       path: true,
-      mirror: true,
       twitter: true,
       websites: true,
       farcasterFrameImage: true,

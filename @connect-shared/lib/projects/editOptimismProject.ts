@@ -202,7 +202,6 @@ export async function editOptimismProject({ userId, input }: { input: EditOptimi
         farcasterValues: input.farcasterValues?.filter(isTruthy),
         twitter: input.twitter,
         github: input.github,
-        mirror: input.mirror,
         avatar: input.avatar,
         coverImage: input.coverImage,
         mintingWalletAddress: input.mintingWalletAddress,

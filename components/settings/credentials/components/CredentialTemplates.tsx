@@ -76,7 +76,7 @@ export function CredentialTemplates() {
               variant='outlined'
               size='small'
               disabled={!isAdmin}
-              dataTest='add-proposal-credential'
+              data-test='add-proposal-credential'
             >
               + Add a credential
             </Button>
@@ -102,7 +102,7 @@ export function CredentialTemplates() {
               variant='outlined'
               size='small'
               disabled={!isAdmin}
-              dataTest='add-proposal-credential'
+              data-test='add-proposal-credential'
             >
               + Add a credential
             </Button>

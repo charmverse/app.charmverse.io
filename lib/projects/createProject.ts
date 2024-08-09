@@ -38,6 +38,7 @@ export async function createProject(payload: {
 
       return {
         ...member,
+        socialUrls: member.socialUrls.map((url) => url?.trim()).filter(Boolean),
         userId: connectedUserId,
         updatedBy: payload.userId
       };
@@ -48,16 +49,11 @@ export async function createProject(payload: {
     data: {
       id: projectId,
       description: project.description,
-      excerpt: project.excerpt,
       name: project.name,
       walletAddress: project.walletAddress?.toLowerCase(),
-      blog: project.blog,
-      communityUrl: project.communityUrl,
-      github: project.github,
-      otherUrl: project.otherUrl,
-      demoUrl: project.demoUrl,
       twitter: project.twitter,
-      website: project.website,
+      github: project.github,
+      websites: project.websites.map((url) => url?.trim()).filter(Boolean),
       createdBy: payload.userId,
       updatedBy: payload.userId,
       projectMembers: {

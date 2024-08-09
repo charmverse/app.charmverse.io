@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import {
-  PROJECT_EXCERPT_ID,
+  PROJECT_DESCRIPTION_ID,
   PROJECT_MEMBER_NAMES_ID,
   PROJECT_MEMBER_WALLETS_ID,
   PROJECT_NAME_ID
@@ -44,7 +44,7 @@ describe(`createSelectedPropertiesStateFromBoardProperties`, () => {
           options: []
         },
         {
-          id: PROJECT_EXCERPT_ID,
+          id: PROJECT_DESCRIPTION_ID,
           type: 'text',
           name: 'Project excerpt',
           options: []
@@ -200,7 +200,7 @@ describe(`createSelectedPropertiesStateFromBoardProperties`, () => {
     expect(selectedPropertiesState).toMatchObject<SelectedProposalProperties>({
       customProperties: [proposalCustomProperty1Id, proposalCustomProperty2Id],
       defaults: ['proposalReviewerNotes', 'proposalStatus'],
-      project: ['name', 'excerpt'],
+      project: ['name', 'description'],
       projectMember: ['name', 'walletAddress'],
       templateProperties: [
         {
