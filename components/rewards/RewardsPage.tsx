@@ -9,8 +9,8 @@ import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import AddViewMenu from 'components/common/DatabaseEditor/components/addViewMenu';
 import { getVisibleAndHiddenGroups } from 'components/common/DatabaseEditor/components/centerPanel';
 import { CreateLinkedView } from 'components/common/DatabaseEditor/components/createLinkedView';
