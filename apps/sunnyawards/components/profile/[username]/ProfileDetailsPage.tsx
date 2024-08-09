@@ -13,7 +13,7 @@ export async function ProfileDetailsPage({ user }: { user: Pick<LoggedInUser, 'f
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
-    <PageWrapper>
+    <PageWrapper bgcolor='transparent'>
       <Box gap={2} display='flex' flexDirection='column'>
         <FarcasterCard
           fid={user.farcasterUser?.fid}

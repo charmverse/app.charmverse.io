@@ -39,7 +39,7 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
           flexDirection='column'
           alignItems='start'
           gap={0.5}
-          sx={{ p: 0 }}
+          p='0'
         >
           <Box>
             <Typography

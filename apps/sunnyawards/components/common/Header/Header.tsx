@@ -8,7 +8,7 @@ import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePath
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
+import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar, Link as MuiLink } from '@mui/material';
 import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -48,17 +48,18 @@ export function Header({ user }: { user: LoggedInUser | null }) {
     <AppBar
       position='static'
       sx={{
-        backgroundColor: path === '/' ? 'background.default' : { xs: 'background.default', md: 'mainBackground.main' },
+        backgroundColor: 'transparent',
         boxShadow: 'none',
         pt: 1
       }}
     >
       <Container maxWidth={false}>
         <Toolbar disableGutters sx={{ justifyContent: 'space-between' }} variant='dense'>
-          <Link href='/'>
-            <Image src='/images/sunnyawards-logo.png' width={15} height={40} alt='Connect logo' />
-          </Link>
-          {user && (
+          <MuiLink component={Link} href='/' fontSize={21} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Image src='/images/sunnys-icon.webp' width={15} height={34} alt='Connect logo' />
+            THE SUNNYS
+          </MuiLink>
+          {user ? (
             <Box display='flex' gap={1} alignItems='center'>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
@@ -90,6 +91,15 @@ export function Header({ user }: { user: LoggedInUser | null }) {
                 <MenuItem onClick={() => logoutUser({})}>Sign Out</MenuItem>
               </Menu>
             </Box>
+          ) : (
+            <MuiLink
+              href='https://www.thesunnyawards.fun/'
+              rel='noopener noreferrer nofollow'
+              target='_blank'
+              sx={{ fontWeight: '500' }}
+            >
+              Join The Sunnys
+            </MuiLink>
           )}
         </Toolbar>
       </Container>

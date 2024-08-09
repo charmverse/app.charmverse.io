@@ -58,7 +58,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
 
   if (!showTeamMemberForm) {
     return (
-      <PageWrapper>
+      <PageWrapper bgcolor='transparent'>
         <ProjectForm
           control={control}
           isValid={isValid}
@@ -82,7 +82,10 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   } as ProjectDetailsProps['project'];
 
   return (
-    <PageWrapper header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}>
+    <PageWrapper
+      bgcolor='transparent'
+      header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}
+    >
       <Box gap={2} display='flex' flexDirection='column'>
         <ProjectDetails project={projectDetails} />
         <AddProjectMembersForm

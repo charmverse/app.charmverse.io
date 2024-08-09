@@ -1,10 +1,10 @@
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import { useSignIn } from '@farcaster/auth-kit';
+import type { LoggedInUser } from '@root/models';
 import { useCallback, useEffect } from 'react';
 
 import { useFarcasterConnect, useFarcasterLogin } from 'charmClient/hooks/farcaster';
 import type { LoginType } from 'lib/farcaster/interfaces';
-import type { LoggedInUser } from '@root/models';
 
 import { useUser } from './useUser';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';

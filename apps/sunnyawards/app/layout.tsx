@@ -35,10 +35,20 @@ export default async function RootLayout({
       <body>
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script src='/__ENV.js' strategy='beforeInteractive' />
-        <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
+        <Box
+          display='grid'
+          gridTemplateRows='auto 1fr auto'
+          minHeight='100vh'
+          sx={{
+            background: {
+              xs: 'linear-gradient(180deg, rgba(4,3,34,1) 0%, rgba(1,0,122,1) 50%, rgba(4,3,34,1) 100%);',
+              md: 'linear-gradient(90deg, rgba(4,3,34,1) 0%, rgba(1,0,122,1) 50%, rgba(4,3,34,1) 100%);'
+            }
+          }}
+        >
           <AppProviders theme={theme}>
             <Header user={user?.data || null} />
-            <Box component='main' bgcolor='mainBackground.main' pb={2}>
+            <Box component='main' pb={2}>
               {children}
             </Box>
             <Footer />

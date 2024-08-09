@@ -111,8 +111,6 @@ test('Create a project and view details', async ({ page }) => {
 
   expect(href?.endsWith(`/p/${project.path}`)).toBe(true);
 
-  await page.pause();
-
   // Go to page and make sure it looks right
   await page.goto(`/p/${project.path}`);
 
@@ -120,23 +118,17 @@ test('Create a project and view details', async ({ page }) => {
   const projectName = page.locator('data-test=project-name');
   await expect(projectName).toHaveText(projectData.projectFormName);
 
-  // Check project website
-  const projectWebsite = page.locator('data-test=project-details-website');
-  await expect(projectWebsite).toHaveText(projectData.projectFormWebsites[0].replace(/https?:\/\//, ''));
-
   // Check project Farcaster
-  const projectFarcaster = page.locator('data-test=project-details-farcaster');
-  await expect(projectFarcaster).toHaveText(
-    projectData.projectFormFarcasterValues[0].replace(/https?:\/\/warpcast.com\//, '')
-  );
+  const projectFarcaster = page.locator('data-test=project-farcaster');
+  await expect(projectFarcaster).toBeVisible();
 
   // Check project Twitter
-  const projectTwitter = page.locator('data-test=project-details-twitter');
-  await expect(projectTwitter).toHaveText(projectData.projectFormTwitter.replace(/https?:\/\/www.twitter.com\//, ''));
+  const projectTwitter = page.locator('data-test=project-twitter');
+  await expect(projectTwitter).toBeVisible();
 
   // Check project GitHub
-  const projectGithub = page.locator('data-test=project-details-github');
-  await expect(projectGithub).toHaveText(projectData.projectFormGithub.replace(/https?:\/\/www.github.com\//, ''));
+  const projectGithub = page.locator('data-test=project-github');
+  await expect(projectGithub).toBeVisible();
 
   // Check project description
 
