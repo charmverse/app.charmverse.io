@@ -54,7 +54,6 @@ export async function createProductUpdatesFrame(input: FormValues) {
   const productUpdatesFrame = await prisma.productUpdatesFarcasterFrame.create({
     data: {
       id: frameId,
-      authorFid: input.authorFid,
       projectId: input.projectId,
       text: input.text,
       image: fileUrl,
