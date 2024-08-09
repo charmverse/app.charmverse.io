@@ -1,7 +1,7 @@
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 
-import { ProductUpdatesComposerAction } from 'components/ProductUpdatesComposerAction';
+import { ProductUpdatesComposerAction } from 'components/product-updates/ProductUpdatesComposerAction';
 import { decrypt } from 'lib/crypto';
 import { getConnectProjectsByFid } from 'lib/getConnectProjectsByFid';
 

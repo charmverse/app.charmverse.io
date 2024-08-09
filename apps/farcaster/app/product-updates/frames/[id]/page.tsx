@@ -1,6 +1,6 @@
 'use server';
 
-import { getComposerActionFrame } from 'lib/getComposerActionFrame';
+import { getProductUpdatesFrame } from 'lib/product-updates/getFrame';
 
 export default async function FramesPage({
   params
@@ -9,39 +9,28 @@ export default async function FramesPage({
     id: string;
   };
 }) {
-  const { nextComposerActionFrameId, previousComposerActionFrameId, image, project } = await getComposerActionFrame(
-    params.id
-  );
+  const { nextFrameId, previousFrameId, image, project } = await getProductUpdatesFrame(params.id);
 
-  if (!previousComposerActionFrameId && !nextComposerActionFrameId) {
+  if (!previousFrameId && !nextFrameId) {
     return (
       <>
         <meta name='fc:frame' content='vNext' />
         <meta name='og:image' content={image} />
         <meta name='fc:frame:image' content={image} />
-        <meta name='fc:frame:button:1' content='View project' />
-        <meta name='fc:frame:button:1:action' content='link' />
-        <meta name='fc:frame:button:1:target' content={`https://connect.charmverse.io/p/${project.path}`} />
       </>
     );
-  } else if (!previousComposerActionFrameId && nextComposerActionFrameId) {
+  } else if (!previousFrameId && nextFrameId) {
     return (
       <>
         <meta name='fc:frame' content='vNext' />
         <meta name='og:image' content={image} />
         <meta name='fc:frame:image' content={image} />
-        <meta name='fc:frame:button:1' content='View project' />
+        <meta name='fc:frame:button:1' content='Next' />
         <meta name='fc:frame:button:1:action' content='link' />
-        <meta name='fc:frame:button:1:target' content={`https://connect.charmverse.io/p/${project.path}`} />
-        <meta name='fc:frame:button:2' content='Next' />
-        <meta name='fc:frame:button:2:action' content='link' />
-        <meta
-          name='fc:frame:button:2:target'
-          content={`https://connect.charmverse.io/frames/${nextComposerActionFrameId}`}
-        />
+        <meta name='fc:frame:button:1:target' content={`https://connect.charmverse.io/frames/${nextFrameId}`} />
       </>
     );
-  } else if (previousComposerActionFrameId && !nextComposerActionFrameId) {
+  } else if (previousFrameId && !nextFrameId) {
     return (
       <>
         <meta name='fc:frame' content='vNext' />
@@ -49,13 +38,7 @@ export default async function FramesPage({
         <meta name='fc:frame:image' content={image} />
         <meta name='fc:frame:button:1' content='Previous' />
         <meta name='fc:frame:button:1:action' content='link' />
-        <meta
-          name='fc:frame:button:1:target'
-          content={`https://connect.charmverse.io/frames/${previousComposerActionFrameId}`}
-        />
-        <meta name='fc:frame:button:2' content='View project' />
-        <meta name='fc:frame:button:2:action' content='link' />
-        <meta name='fc:frame:button:2:target' content={`https://connect.charmverse.io/p/${project.path}`} />
+        <meta name='fc:frame:button:1:target' content={`https://connect.charmverse.io/frames/${previousFrameId}`} />
       </>
     );
   }
@@ -67,19 +50,10 @@ export default async function FramesPage({
       <meta name='fc:frame:image' content={image} />
       <meta name='fc:frame:button:1' content='Previous' />
       <meta name='fc:frame:button:1:action' content='link' />
-      <meta
-        name='fc:frame:button:1:target'
-        content={`https://connect.charmverse.io/frames/${previousComposerActionFrameId}`}
-      />
-      <meta name='fc:frame:button:2' content='View project' />
+      <meta name='fc:frame:button:1:target' content={`https://connect.charmverse.io/frames/${previousFrameId}`} />
+      <meta name='fc:frame:button:2' content='Next' />
       <meta name='fc:frame:button:2:action' content='link' />
-      <meta name='fc:frame:button:2:target' content={`https://connect.charmverse.io/p/${project.path}`} />
-      <meta name='fc:frame:button:3' content='Next' />
-      <meta name='fc:frame:button:3:action' content='link' />
-      <meta
-        name='fc:frame:button:3:target'
-        content={`https://connect.charmverse.io/frames/${nextComposerActionFrameId}`}
-      />
+      <meta name='fc:frame:button:2:target' content={`https://connect.charmverse.io/frames/${nextFrameId}`} />
     </>
   );
 }
