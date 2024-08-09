@@ -118,6 +118,10 @@ test('Create a project and view details', async ({ page }) => {
   const projectName = page.locator('data-test=project-name');
   await expect(projectName).toHaveText(projectData.projectFormName);
 
+  // Check project website
+  const projectWebsite = page.locator('data-test=project-website');
+  await expect(projectWebsite).toBeVisible();
+
   // Check project Farcaster
   const projectFarcaster = page.locator('data-test=project-farcaster');
   await expect(projectFarcaster).toBeVisible();
