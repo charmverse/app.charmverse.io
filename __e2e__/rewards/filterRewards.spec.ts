@@ -1,4 +1,4 @@
-import type { ApplicationStatus, BountyStatus } from '@charmverse/core/dist/cjs/prisma-client';
+import type { ApplicationStatus, BountyStatus } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import type { E2EFixtures } from '__e2e__/testWithFixtures';
 import { expect, test } from '__e2e__/testWithFixtures';

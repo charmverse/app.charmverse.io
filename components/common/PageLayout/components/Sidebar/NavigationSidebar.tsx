@@ -11,9 +11,9 @@ import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
 import { userManualUrl } from '@root/config/constants';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
 
-import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
 import { BlockCounts } from 'components/settings/subscription/BlockCounts';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -40,6 +40,10 @@ import { SearchInWorkspaceModal } from './components/SearchInWorkspaceModal';
 import { SectionName } from './components/SectionName';
 import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
 import SidebarSubmenu from './components/SidebarSubmenu';
+
+const SpaceSettingsDialog = dynamic(() =>
+  import('components/settings/SettingsDialog').then((mod) => mod.SpaceSettingsDialog)
+);
 
 const WorkspaceLabel = styled.div`
   display: flex;

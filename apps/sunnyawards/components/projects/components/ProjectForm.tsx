@@ -28,6 +28,13 @@ export function ProjectForm({
 
   return (
     <>
+      <Stack mb={2}>
+        <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
+        <Stack direction='row' gap={1}>
+          <ProjectImageField type='avatar' name='avatar' control={control} />
+          <ProjectImageField type='cover' name='coverImage' control={control} />
+        </Stack>
+      </Stack>
       <Stack gap={2}>
         <Stack>
           <FormLabel required id='project-name'>
@@ -42,18 +49,21 @@ export function ProjectForm({
                 autoFocus
                 placeholder='Charmverse'
                 aria-labelledby='project-name'
-                error={!!fieldState.error}
                 {...field}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
               />
             )}
           />
         </Stack>
         <Stack>
-          <FormLabel id='project-description'>Description</FormLabel>
+          <FormLabel required id='project-description'>
+            Description
+          </FormLabel>
           <Controller
             control={control}
             name='description'
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <TextField
                 data-test='project-form-description'
                 multiline
@@ -61,6 +71,8 @@ export function ProjectForm({
                 aria-labelledby='project-description'
                 placeholder='A description of your project'
                 {...field}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
               />
             )}
           />
@@ -81,8 +93,8 @@ export function ProjectForm({
                 renderValue={(value) =>
                   value ? capitalize(value) : <Typography color='secondary'>Select a category</Typography>
                 }
-                error={!!fieldState.error}
                 {...field}
+                error={!!fieldState.error}
               >
                 {SUNNY_AWARD_CATEGORIES.map((category) => (
                   <MenuItem key={category} value={category}>
@@ -191,15 +203,18 @@ export function ProjectForm({
             />
           </Stack>
         )}
+        <MultiTextInputField
+          required
+          control={control}
+          name='websites'
+          label='Websites'
+          data-test='project-form-websites'
+          placeholder='https://charmverse.io'
+        />
         <Stack>
-          <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
-          <Stack direction='row' gap={1}>
-            <ProjectImageField type='avatar' name='avatar' control={control} />
-            <ProjectImageField type='cover' name='coverImage' control={control} />
-          </Stack>
-        </Stack>
-        <Stack>
-          <FormLabel id='project-category'>Category</FormLabel>
+          <FormLabel id='project-category' required>
+            Category
+          </FormLabel>
           <Controller
             control={control}
             name='category'
@@ -223,13 +238,7 @@ export function ProjectForm({
             )}
           />
         </Stack>
-        <MultiTextInputField
-          control={control}
-          name='websites'
-          label='Websites'
-          data-test='project-form-websites'
-          placeholder='https://charmverse.io'
-        />
+
         <MultiTextInputField
           control={control}
           name='farcasterValues'
@@ -237,6 +246,7 @@ export function ProjectForm({
           data-test='project-form-farcaster-values'
           placeholder='https://warpcast.com/charmverse'
         />
+
         <Stack>
           <FormLabel id='project-twitter'>X</FormLabel>
           <Stack direction='row' gap={1} alignItems='center'>
@@ -274,28 +284,6 @@ export function ProjectForm({
                   placeholder='charmverse'
                   aria-labelledby='project-github'
                   data-test='project-form-github'
-                  error={!!fieldState.error}
-                  {...field}
-                />
-              )}
-            />
-          </Stack>
-        </Stack>
-        <Stack>
-          <FormLabel id='project-mirror'>Mirror</FormLabel>
-          <Stack direction='row' gap={1} alignItems='center'>
-            <Typography color='secondary' width={250}>
-              https://mirror.xyz/
-            </Typography>
-            <Controller
-              control={control}
-              name='mirror'
-              render={({ field, fieldState }) => (
-                <TextField
-                  fullWidth
-                  placeholder='charmverse'
-                  aria-labelledby='project-mirror'
-                  data-test='project-form-mirror'
                   error={!!fieldState.error}
                   {...field}
                 />

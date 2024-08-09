@@ -17,8 +17,8 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { EasSchemaChain } from 'lib/credentials/connectors';
-import { getOnChainSchemaUrl } from 'lib/credentials/connectors';
 import type { IssuableRewardApplicationCredentialContent } from 'lib/credentials/findIssuableRewardCredentials';
+import { getOnChainSchemaUrl } from 'lib/credentials/getOnChainSchemaUrl';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 import { conditionalPlural } from 'lib/utils/strings';
 

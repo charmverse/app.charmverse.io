@@ -12,7 +12,6 @@ test('Create a project and view details', async ({ page }) => {
     projectFormCategory: 'DeFi',
     projectFormTwitter: 'https://www.twitter.com/acme-inc-twitter',
     projectFormGithub: 'https://www.github.com/acme-inc-github',
-    projectFormMirror: 'https://www.mirror.xyz/acme-inc-mirror',
     projectFormWebsites: ['https://www.acme-inc.com'],
     projectFormFarcasterValues: ['https://warpcast.com/acme-inc-warpcast']
   };
@@ -78,10 +77,9 @@ test('Create a project and view details', async ({ page }) => {
 
   await fieldGithub.fill(projectData.projectFormGithub);
 
-  await fieldMirror.fill(projectData.projectFormMirror);
+  const confirmButton = page.locator('data-test=project-form-confirm-values');
 
-  await expect(page.locator('data-test=project-form-confirm-values')).toBeEnabled();
-  await page.locator('data-test=project-form-confirm-values').click({ force: true });
+  await confirmButton.click();
 
   const publishButton = page.locator('data-test=project-form-publish');
 

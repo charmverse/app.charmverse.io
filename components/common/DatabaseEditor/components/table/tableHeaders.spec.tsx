@@ -6,8 +6,6 @@ import { wrapDNDIntl } from '../../testUtils';
 
 import TableHeaders from './tableHeaders';
 
-jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
-
 describe('components/table/TableHeaders', () => {
   const board = TestBlockFactory.createBoard();
   const card = TestBlockFactory.createCard(board);

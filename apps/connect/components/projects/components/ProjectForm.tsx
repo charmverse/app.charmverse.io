@@ -21,6 +21,13 @@ export function ProjectForm({
     <>
       <Stack gap={2}>
         <Stack>
+          <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
+          <Stack direction='row' gap={1}>
+            <ProjectImageField type='avatar' name='avatar' control={control} />
+            <ProjectImageField type='cover' name='coverImage' control={control} />
+          </Stack>
+        </Stack>
+        <Stack>
           <FormLabel required id='project-name'>
             Name
           </FormLabel>
@@ -40,7 +47,9 @@ export function ProjectForm({
           />
         </Stack>
         <Stack>
-          <FormLabel id='project-description'>Description</FormLabel>
+          <FormLabel required id='project-description'>
+            Description
+          </FormLabel>
           <Controller
             control={control}
             name='description'
@@ -56,15 +65,20 @@ export function ProjectForm({
             )}
           />
         </Stack>
+
+        <MultiTextInputField
+          control={control}
+          name='websites'
+          label='Websites'
+          data-test='project-form-websites'
+          placeholder='https://charmverse.io'
+          required
+        />
+
         <Stack>
-          <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
-          <Stack direction='row' gap={1}>
-            <ProjectImageField type='avatar' name='avatar' control={control} />
-            <ProjectImageField type='cover' name='coverImage' control={control} />
-          </Stack>
-        </Stack>
-        <Stack>
-          <FormLabel id='project-category'>Category</FormLabel>
+          <FormLabel required id='project-category'>
+            Category
+          </FormLabel>
           <Controller
             control={control}
             name='category'
@@ -87,13 +101,7 @@ export function ProjectForm({
             )}
           />
         </Stack>
-        <MultiTextInputField
-          control={control}
-          name='websites'
-          label='Websites'
-          data-test='project-form-websites'
-          placeholder='https://charmverse.io'
-        />
+
         <MultiTextInputField
           control={control}
           name='farcasterValues'
@@ -101,6 +109,7 @@ export function ProjectForm({
           data-test='project-form-farcaster-values'
           placeholder='https://warpcast.com/charmverse'
         />
+
         <Stack>
           <FormLabel id='project-twitter'>X</FormLabel>
           <Stack direction='row' gap={1} alignItems='center'>
@@ -138,28 +147,6 @@ export function ProjectForm({
                   placeholder='charmverse'
                   aria-labelledby='project-github'
                   data-test='project-form-github'
-                  error={!!fieldState.error}
-                  {...field}
-                />
-              )}
-            />
-          </Stack>
-        </Stack>
-        <Stack>
-          <FormLabel id='project-mirror'>Mirror</FormLabel>
-          <Stack direction='row' gap={1} alignItems='center'>
-            <Typography color='secondary' width={250}>
-              https://mirror.xyz/
-            </Typography>
-            <Controller
-              control={control}
-              name='mirror'
-              render={({ field, fieldState }) => (
-                <TextField
-                  fullWidth
-                  placeholder='charmverse'
-                  aria-labelledby='project-mirror'
-                  data-test='project-form-mirror'
                   error={!!fieldState.error}
                   {...field}
                 />

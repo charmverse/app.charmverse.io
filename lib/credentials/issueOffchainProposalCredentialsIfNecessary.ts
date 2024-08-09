@@ -9,7 +9,7 @@ import { optimism } from 'viem/chains';
 
 import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
 import { credentialEventLabels, disableCredentialAutopublish } from './constants';
-import type { CredentialDataInput } from './schemas';
+import type { CredentialDataInput } from './schemas/interfaces';
 
 export async function issueOffchainProposalCredentialsIfNecessary({
   proposalId,
