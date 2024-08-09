@@ -11,7 +11,8 @@ import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains'
 import { clientToProvider } from 'hooks/useWeb3Signer';
 
 import type { EasSchemaChain } from '../connectors';
-import { easConnectors, getOnChainSchemaUrl } from '../connectors';
+import { easConnectors } from '../connectors';
+import { getOnChainSchemaUrl } from '../getOnChainSchemaUrl';
 
 import { trackedSchemas, mapSchemaStringToObject } from './schemas';
 import type { TrackedSchemaParams, ExternalCredentialChain } from './schemas';

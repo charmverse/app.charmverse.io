@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 
 import charmClient from 'charmClient';
 import type { MaybeString } from 'charmClient/hooks/helpers';
-import { useGetIssuableProposalCredentials, useGetIssuedProposalCredentials } from 'charmClient/hooks/proposals';
+import { useGetIssuableProposalCredentials } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useGetGnosisSafe } from 'hooks/useGetGnosisSafe';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -15,8 +15,6 @@ import type {
   IssuableProposalCredentialContent,
   PartialIssuableProposalCredentialContent
 } from 'lib/credentials/findIssuableProposalCredentials';
-import { multiAttestOnchain, populateOnChainAttestationTransaction } from 'lib/credentials/multiAttestOnchain';
-import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 
 /**
  * @proposalId - Pass this param to get the credentials for a specific proposal
@@ -62,6 +60,11 @@ export function useMultiProposalCredentials({ proposalIds }: { proposalIds?: str
       if (!userWalletCanIssueCredentialsForSpace) {
         throw new InvalidInputError('Your wallet cannot issue credentials for this space');
       }
+      // lazy load credentials to avoid loading eas sdk everywhere
+      const { proposalCredentialSchemaId } = await import('lib/credentials/schemas/proposal');
+      const { multiAttestOnchain, populateOnChainAttestationTransaction } = await import(
+        'lib/credentials/multiAttestOnchain'
+      );
 
       if (gnosisSafeForCredentials) {
         const populatedTransaction = await populateOnChainAttestationTransaction({

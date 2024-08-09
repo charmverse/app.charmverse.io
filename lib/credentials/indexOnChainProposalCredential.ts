@@ -10,11 +10,12 @@ import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { lowerCaseEqual } from '@root/lib/utils/strings';
 import { RateLimit } from 'async-sema';
 
-import { getEasConnector, getEasInstance, type EasSchemaChain } from './connectors';
+import { getEasConnector, type EasSchemaChain } from './connectors';
 import { proposalApprovedVerb } from './constants';
+import { getEasInstance } from './getEasInstance';
 import { saveIssuedCredential } from './saveIssuedCredential';
 import type { ProposalCredential } from './schemas/proposal';
-import { decodeProposalCredential } from './schemas/proposal';
+import { decodeProposalCredential } from './schemas/proposalUtils';
 
 type IndexableCredential = {
   attestationId: string;

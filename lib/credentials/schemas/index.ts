@@ -13,27 +13,25 @@ import { charmUserIdentifierSchemaId, encodeCharmUserIdentifier } from './charmU
 import type { ExternalCredential } from './external';
 import { encodeExternalCredential, externalCredentialSchemaDefinition, externalCredentialSchemaId } from './external';
 import type { GitcoinProjectCredential } from './gitcoinProjectSchema';
-import {
-  encodeGitcoinProjectCredential,
-  gitcoinProjectCredentialSchemaDefinition,
-  gitcoinProjectCredentialSchemaId
-} from './gitcoinProjectSchema';
+import { gitcoinProjectCredentialSchemaDefinition, gitcoinProjectCredentialSchemaId } from './gitcoinProjectSchema';
+import { encodeGitcoinProjectCredential } from './gitcoinProjectUtils';
 import type {
   OptimismProjectAttestationData,
   OptimismProjectSnapshotAttestationMetaData
 } from './optimismProjectSchemas';
 import {
-  encodeOptimismProjectAttestation,
-  encodeOptimismProjectSnapshotAttestation,
   optimismProjectAttestationSchemaDefinition,
   optimismProjectAttestationSchemaId,
   optimismProjectSnapshotAttestationSchemaDefinition,
   optimismProjectSnapshotAttestationSchemaId
 } from './optimismProjectSchemas';
+import { encodeOptimismProjectAttestation, encodeOptimismProjectSnapshotAttestation } from './optimismProjectUtils';
 import type { ProposalCredential } from './proposal';
-import { encodeProposalCredential, proposalCredentialSchemaId, proposalCredentialSchemaDefinition } from './proposal';
+import { proposalCredentialSchemaDefinition, proposalCredentialSchemaId } from './proposal';
+import { encodeProposalCredential } from './proposalUtils';
 import type { RewardCredential } from './reward';
-import { encodeRewardCredential, rewardCredentialSchemaId, rewardCredentialSchemaDefinition } from './reward';
+import { rewardCredentialSchemaDefinition, rewardCredentialSchemaId } from './reward';
+import { encodeRewardCredential } from './rewardUtils';
 
 export const allSchemaDefinitions = [
   proposalCredentialSchemaDefinition,

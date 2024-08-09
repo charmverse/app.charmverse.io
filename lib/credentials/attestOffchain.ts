@@ -15,11 +15,14 @@ import { Wallet, providers } from 'ethers';
 import { v4 as uuid } from 'uuid';
 
 import type { EasSchemaChain } from './connectors';
-import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';
+import { easSchemaChains, getEasConnector } from './connectors';
+import { getEasInstance } from './getEasInstance';
 import type { PublishedSignedCredential } from './queriesAndMutations';
 import { publishSignedCredential } from './queriesAndMutations';
 import { saveIssuedCredential } from './saveIssuedCredential';
-import { encodeAttestation, attestationSchemaIds, type CredentialData } from './schemas';
+import { attestationSchemaIds } from './schemas';
+import { encodeAttestation } from './schemas/encodeAttestation';
+import type { CredentialData } from './schemas/interfaces';
 
 type AttestationInput<T extends AttestationType = AttestationType> = {
   recipient: string;

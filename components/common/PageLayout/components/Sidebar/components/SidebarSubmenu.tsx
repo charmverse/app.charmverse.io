@@ -15,10 +15,10 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import dynamic from 'next/dynamic';
 import { useCallback, useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
-import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
@@ -34,6 +34,10 @@ import { headerHeight } from '../../Header/Header';
 import { NotificationCountBox } from './NotificationsPopover';
 import SpaceListItem from './SpaceListItem';
 import WorkspaceAvatar from './WorkspaceAvatar';
+
+const CreateSpaceForm = dynamic(() =>
+  import('components/common/CreateSpaceForm/CreateSpaceForm').then((mod) => mod.StyledCreateSpaceForm)
+);
 
 const StyledButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'enableHover'
@@ -83,17 +87,6 @@ const SidebarHeader = styled(Box)(
   }
 `
 );
-
-const StyledCreateSpaceForm = styled(CreateSpaceForm)`
-  // add styling so that the container takes full height of screen
-  ${({ theme }) => theme.breakpoints.down('md')} {
-    .space-templates-container {
-      max-height: calc(100vh - 250px);
-      padding: 0;
-      margin: 0;
-    }
-  }
-`;
 
 export default function SidebarSubmenu({
   closeSidebar,
@@ -229,7 +222,7 @@ export default function SidebarSubmenu({
         onClose={closeSpaceForm}
         mobileDialog
       >
-        <StyledCreateSpaceForm onCancel={closeSpaceForm} />
+        <CreateSpaceForm onCancel={closeSpaceForm} />
       </Modal>
     </SidebarHeader>
   );
