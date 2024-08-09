@@ -80,8 +80,7 @@ test('Create a project and view details', async ({ page }) => {
 
   await fieldMirror.fill(projectData.projectFormMirror);
 
-  const confirmButton = page.locator('data-test=project-form-confirm-values');
-
+  await expect(page.locator('data-test=project-form-confirm-values')).toBeEnabled();
   await confirmButton.click({ force: true });
 
   const publishButton = page.locator('data-test=project-form-publish');
