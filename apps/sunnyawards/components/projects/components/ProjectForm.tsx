@@ -227,6 +227,7 @@ export function ProjectForm({
                 renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
                 error={!!fieldState.error}
                 {...field}
+                value={field.value || ''}
               >
                 {CATEGORIES.map((category) => (
                   <MenuItem key={category} value={category}>
@@ -291,14 +292,7 @@ export function ProjectForm({
           </Stack>
         </Stack>
       </Stack>
-      <Stack
-        justifyContent='space-between'
-        flexDirection='row'
-        display='sticky'
-        bottom='0'
-        bgcolor='background.default'
-        py={2}
-      >
+      <Stack justifyContent='space-between' flexDirection='row' display='sticky' bottom='0' py={2}>
         <Link href='/profile' passHref>
           <Button size='large' color='secondary' variant='outlined'>
             Cancel

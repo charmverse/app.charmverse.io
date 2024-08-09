@@ -3,7 +3,7 @@ import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
-import { WarpcastLogin } from './components/WarpcastLogin';
+import { WarpcastLogin } from '../common/Warpcast/WarpcastLogin';
 
 export function HomePage() {
   return (
@@ -15,6 +15,7 @@ export function HomePage() {
       border='none'
       borderRadius='0'
       textAlign='center'
+      bgcolor='transparent'
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -26,22 +27,27 @@ export function HomePage() {
       }}
     >
       <Image
-        src='/images/sunny-awards.png'
+        src='/images/sunny-awards-banner.webp'
         width={400}
         height={200}
         sizes='100vw'
         style={{
           width: '100%',
           maxWidth: '400px',
-          height: 'auto'
+          height: 'auto',
+          filter: 'drop-shadow(6px 6px 6px rgba(251, 251, 201, 0.7))'
         }}
         alt='Sunny Awards homepage'
       />
       <Typography data-test='connect-home-page' align='center' variant='h4'>
         Celebrate Onchain Summer with the Sunny Awards
       </Typography>
-      <Typography align='center'>
-        Create your project and submit it to the Sunny Awards to compete for 540K OP in total prizes.
+      <Typography align='center' data-test='homepage-description'>
+        Create your project and submit it to the{' '}
+        <MuiLink href='https://www.thesunnyawards.fun/' rel='noopener noreferrer nofollow' target='_blank'>
+          The Sunnys
+        </MuiLink>{' '}
+        to compete for 540K OP in total prizes.
       </Typography>
       <WarpcastLogin />
       <MuiLink

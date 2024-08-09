@@ -8,7 +8,7 @@ import { ProjectItemSkeleton } from 'components/projects/components/ProjectItemS
 
 export function ProfileDetailsSkeleton() {
   return (
-    <PageWrapper>
+    <PageWrapper bgcolor='transparent'>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Card sx={{ p: 2 }}>
           <Stack flexDirection='row' gap={3} alignItems='center'>

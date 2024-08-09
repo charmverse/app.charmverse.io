@@ -31,7 +31,10 @@ export function WarpcastButton({
 }) {
   const style: SxProps<Theme> = {
     px: 2,
-    backgroundColor: farcasterPurple
+    backgroundColor: farcasterPurple,
+    '&:hover': {
+      backgroundColor: farcasterPurple
+    }
   };
 
   const textStyles: SxProps<Theme> = {
