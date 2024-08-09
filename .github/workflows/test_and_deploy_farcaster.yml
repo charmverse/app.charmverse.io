@@ -242,6 +242,10 @@ jobs:
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_farcaster/00_env_vars.config
 
+      - name: Override config with Farcaster app
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_farcaster .ebextensions
+
       - name: Parse compose profile to see if we need to enable datadog
         id: get_compose_profiles
         uses: mikefarah/yq@master
@@ -272,10 +276,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
-      - name: Override config with Farcaster app
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_farcaster .ebextensions
 
       - name: Deploy to staging
         id: cdk_deploy
