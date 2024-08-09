@@ -10,7 +10,7 @@ runs:
       with:
         path: |
           apps/farcaster/.next
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts', '@connect-shared/**/*.ts[x]', 'apps/farcaster/**/*.ts', 'apps/farcaster/**/*.scss') }}
+        key: app-farcaster-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts', '@connect-shared/**/*.ts[x]', 'apps/farcaster/**/*.ts', 'apps/farcaster/**/*.scss') }}
 
     - name: Build app
       shell: bash
