@@ -1,4 +1,4 @@
-export function WeeklyUpdatesText({ text }: { text: string }) {
+export function ProductUpdatesText({ text }: { text: string }) {
   const lines = text
     .split('\n')
     .filter((line) => line.trim() !== '')
@@ -17,7 +17,7 @@ export function WeeklyUpdatesText({ text }: { text: string }) {
         wordBreak: 'break-all'
       }}
     >
-      <p style={{ fontWeight: 'bold', fontSize: 20 }}>Weekly updates: {new Date().toLocaleDateString()}</p>
+      <p style={{ fontWeight: 'bold', fontSize: 20 }}>Product updates: {new Date().toLocaleDateString()}</p>
       {lines.map((line, index) => {
         const hasNumberAtStart = /^\d+\.\s/.test(line);
         return <p key={`${index.toString()}`}>{hasNumberAtStart ? line : `${index + 1}. ${line}`}</p>;

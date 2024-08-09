@@ -13,6 +13,7 @@ on:
       - '@connect-shared/**'
       - 'adapters/**'
       - 'config/**'
+      - 'hooks/**'
       - 'lib/**'
   pull_request:
     branches: ['**']
@@ -26,6 +27,7 @@ on:
       - '@connect-shared/**'
       - 'adapters/**'
       - 'config/**'
+      - 'hooks/**'
       - 'lib/**'
   workflow_dispatch:
     inputs:

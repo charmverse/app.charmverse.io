@@ -8,14 +8,13 @@ import React from 'react';
 import sharp from 'sharp';
 import { v4 } from 'uuid';
 
+import { ProductUpdatesText } from 'components/ProductUpdatesText';
 import { actionClient } from 'lib/actionClient';
-
-import { WeeklyUpdatesText } from '../../components/WeeklyUpdatesText';
 
 import { schema } from './schema';
 
 export const createComposerActionFrameAction = actionClient.schema(schema).action(async ({ parsedInput }) => {
-  const element = React.createElement(WeeklyUpdatesText, { text: parsedInput.text });
+  const element = React.createElement(ProductUpdatesText, { text: parsedInput.text });
   const image = new ImageResponse(element, {
     width: 1000,
     height: 525

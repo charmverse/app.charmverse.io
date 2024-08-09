@@ -49,6 +49,9 @@
       "@root/lib/*": [
         "../../lib/*"
       ],
+      "@root/hooks/*": [
+        "../../hooks/*"
+      ],
       "@charmverse/core/prisma": [
         "../../node_modules/@charmverse/core/dist/cjs/prisma"
       ],

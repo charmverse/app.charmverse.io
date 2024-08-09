@@ -13,7 +13,7 @@ import { createComposerActionFrameAction } from 'lib/createComposerActionFrame/a
 import { schema, type FormValues } from 'lib/createComposerActionFrame/schema';
 import type { ConnectProjectMinimal } from 'lib/getConnectProjectsByFid';
 
-export function WeeklyUpdatesComposerAction({
+export function ProductUpdatesComposerAction({
   farcasterUser,
   connectProjects
 }: {
@@ -43,7 +43,7 @@ export function WeeklyUpdatesComposerAction({
           type: 'createCast',
           data: {
             cast: {
-              text: `Weekly updates for ${new Date().toLocaleDateString()}`,
+              text: `Product updates for ${new Date().toLocaleDateString()}`,
               embeds: data.data ? [data.data.image] : []
             }
           }
@@ -98,7 +98,7 @@ export function WeeklyUpdatesComposerAction({
         </Stack>
 
         <Stack>
-          <FormLabel id='text'>Weekly updates</FormLabel>
+          <FormLabel id='text'>Product updates</FormLabel>
           <Controller
             control={control}
             name='text'
@@ -107,9 +107,9 @@ export function WeeklyUpdatesComposerAction({
                 disabled={isExecuting}
                 multiline
                 rows={8}
-                aria-labelledby='weekly-updates'
+                aria-labelledby='product-updates'
                 placeholder='1. Updated documentation ...'
-                helperText='Provide a list of your product updates for the week on each line. Empty lines will be ignored.'
+                helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'
                 {...field}
               />
             )}
