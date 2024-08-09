@@ -164,13 +164,13 @@ export async function getGrants({ sort, cursor, limit }: GetGrantsPayload): Prom
 
   const sortedGrants = transformedGrants.sort((g1, g2) => {
     if (sort === 'new') {
-      return (g2.publishDate?.from ?? 0) - (g1.publishDate?.from ?? 0);
+      const g2PublishDate = g2.publishDate?.from ?? 0;
+      const g1PublishDate = g1.publishDate?.from ?? 0;
+      return g2PublishDate - g1PublishDate || g2.id.localeCompare(g1.id);
     } else {
-      if (!g1.launchDate || !g2.launchDate) {
-        return 0;
-      }
-
-      return g1.launchDate.from - g2.launchDate.from;
+      const g2LaunchDate = g2.launchDate?.from ?? 0;
+      const g1LaunchDate = g1.launchDate?.from ?? 0;
+      return g2LaunchDate - g1LaunchDate || g2.id.localeCompare(g1.id);
     }
   });
 
