@@ -46,8 +46,8 @@ export async function POST(req: Request) {
       return Response.json(
         {
           type: 'form',
-          title: 'Farcaster User',
-          url: `${baseUrl}?token=${token}`
+          title: 'Product updates',
+          url: `${baseUrl}/product-updates?token=${token}`
         },
         {
           status: 200,
@@ -73,7 +73,7 @@ export async function GET() {
   return Response.json(
     {
       type: 'composer',
-      name: 'Product Updates',
+      name: 'Product updates',
       icon: 'pencil',
       description: 'Create a product updates frame for your cast',
       aboutUrl: baseUrl,
