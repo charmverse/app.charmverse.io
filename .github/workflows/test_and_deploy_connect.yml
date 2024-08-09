@@ -276,10 +276,9 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build_connect
 
-      - name: Remove unused code
+      - name: Update Dockerfile
         run: |
-          rm -rf components
-          rm -rf pages
+          rm Dockerfile && mv apps/connect/Dockerfile Dockerfile
 
       - name: Build and Push Docker image
         id: docker_build_push
