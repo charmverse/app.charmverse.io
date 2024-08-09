@@ -1,4 +1,4 @@
-#syntax=docker/dockerfile:1.7
+#syntax=docker/dockerfile:1.7-labs
 
 # Use node-slim because node-alpine does not seem to supports the `sharp` npm library that gets built
 FROM node:18.19.0-slim AS base-app
