@@ -3,7 +3,7 @@ import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { credentialsWalletPrivateKey } from '@root/config/constants';
 import { getChainById } from '@root/connectors/chains';
-import { Wallet, providers } from 'ethers';
+import { Wallet } from 'ethers';
 
 import { getEthersProvider } from '../blockchain/getEthersProvider';
 

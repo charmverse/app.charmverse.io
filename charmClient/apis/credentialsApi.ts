@@ -6,10 +6,6 @@ import type {
   FindIssuableProposalCredentialsInput,
   IssuableProposalCredentialContent
 } from 'lib/credentials/findIssuableProposalCredentials';
-import type {
-  FindIssuableRewardCredentialsInput,
-  IssuableRewardApplicationCredentialContent
-} from 'lib/credentials/findIssuableRewardCredentials';
 import type { GnosisSafeTransactionToIndex } from 'lib/credentials/indexGnosisSafeCredentialTransaction';
 import type { ProposalCredentialsToIndex } from 'lib/credentials/indexOnChainProposalCredential';
 import type { RewardCredentialsToIndex } from 'lib/credentials/indexOnChainRewardCredential';
