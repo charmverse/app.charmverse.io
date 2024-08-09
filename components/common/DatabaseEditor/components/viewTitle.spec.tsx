@@ -17,8 +17,6 @@ jest.mock('next/router', () => ({
   useRouter: () => ({ query: {} })
 }));
 
-jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
-
 const mockedMutator = jest.mocked(mutator, { shallow: true });
 const mockedUtils = jest.mocked(Utils, { shallow: true });
 mockedUtils.createGuid.mockReturnValue('test-id');

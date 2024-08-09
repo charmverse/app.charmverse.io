@@ -3,13 +3,15 @@ import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { credentialsWalletPrivateKey } from '@root/config/constants';
 import { getChainById } from '@root/connectors/chains';
-import { Wallet, providers } from 'ethers';
+import { Wallet } from 'ethers';
 
 import { getEthersProvider } from '../blockchain/getEthersProvider';
 
-import { getEasInstance, type EasSchemaChain } from './connectors';
-import { attestationSchemaIds, encodeAttestation } from './schemas';
-import type { AttestationType, CredentialDataInput } from './schemas';
+import { type EasSchemaChain } from './connectors';
+import { getEasInstance } from './getEasInstance';
+import { attestationSchemaIds } from './schemas';
+import { encodeAttestation } from './schemas/encodeAttestation';
+import type { AttestationType, CredentialDataInput } from './schemas/interfaces';
 
 export type OnChainAttestationInput<T extends AttestationType = AttestationType> = {
   chainId: EasSchemaChain;

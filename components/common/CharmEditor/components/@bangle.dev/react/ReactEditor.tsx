@@ -1,10 +1,10 @@
 import { history } from '@bangle.dev/base-components';
-import { EditorState, NodeSelection } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
+import { EditorState } from 'prosemirror-state';
 import type { PluginKey } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { MouseEvent, RefObject } from 'react';
@@ -33,19 +33,17 @@ import { threadPluginKey } from '../../thread/thread.plugins';
 import { convertFileToBase64, imageFileDropEventName } from '../base-components/image';
 import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
 
+import { EditorViewContext } from './editorContext';
 import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
 import { NodeViewWrapper } from './NodeViewWrapper';
 import type { RenderNodeViewsFunction } from './NodeViewWrapper';
 
 const { undo } = history;
-
 const StyledLoadingComponent = styled(LoadingComponent)`
   position: absolute;
   width: 100%;
   align-items: flex-end;
 `;
-
-export const EditorViewContext = React.createContext<EditorView | null>(null);
 
 interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
   pageId?: string;

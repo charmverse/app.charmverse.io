@@ -2,6 +2,7 @@ import * as http from '@root/adapters/http';
 
 import type { CharmVerseCredentialInput } from 'lib/credentials/attestOffchain';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
+
 import type { GnosisSafeTransactionToIndex } from 'lib/credentials/indexGnosisSafeCredentialTransaction';
 import type { ProposalCredentialsToIndex } from 'lib/credentials/indexOnChainProposalCredential';
 import type { RewardCredentialsToIndex } from 'lib/credentials/indexOnChainRewardCredential';

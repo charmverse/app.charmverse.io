@@ -8,8 +8,8 @@ import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';
 import type { EASAttestationFromApi, EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
-import type { CredentialData } from './schemas';
 import { externalCredentialSchemaId } from './schemas/external';
+import type { CredentialData } from './schemas/interfaces';
 import { proposalCredentialSchemaId } from './schemas/proposal';
 import { rewardCredentialSchemaId } from './schemas/reward';
 

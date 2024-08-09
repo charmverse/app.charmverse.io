@@ -16,8 +16,6 @@ Object.defineProperty(Constants, 'versionString', { value: '1.0.0' });
 jest.mock('../utils');
 jest.mock('../mutator');
 
-jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
-
 jest.mock('next/router', () => ({
   useRouter: () => ({
     asPath: '/test-space',

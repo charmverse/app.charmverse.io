@@ -9,8 +9,6 @@ import CalculationRow from './calculationRow';
 
 window.fetch = jest.fn();
 
-jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
-
 describe('components/table/calculation/CalculationRow', () => {
   const board = TestBlockFactory.createBoard();
   board.fields.cardProperties.push({

@@ -19,8 +19,6 @@ jest.mock('next/router', () => ({
 
 jest.mock('../../mutator');
 
-jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
-
 const mockedMutator = jest.mocked(mutator, { shallow: true });
 
 describe('src/components/gallery/Gallery', () => {

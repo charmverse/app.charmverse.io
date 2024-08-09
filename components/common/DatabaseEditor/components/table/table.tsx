@@ -21,8 +21,6 @@ import { updateView } from '../../store/views';
 import { Utils } from '../../utils';
 
 import CalculationRow from './calculation/calculationRow';
-import { PaginatedRows } from './PaginatedRows';
-import TableGroup from './tableGroup';
 import { TableGroups } from './tableGroups';
 import TableHeaders from './tableHeaders';
 import TableRows from './tableRows';

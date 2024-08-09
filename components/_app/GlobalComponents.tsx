@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { mutate } from 'swr';
@@ -18,7 +19,11 @@ import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { ConfirmationModal } from './components/ConfirmationModal';
 import { Snackbar } from './components/Snackbar';
-import { UserOnboardingDialogGlobal } from './components/UserOnboardingDialog';
+
+const UserOnboardingDialogGlobal = dynamic(
+  () => import('./components/UserOnboardingDialog').then((mod) => mod.UserOnboardingDialogGlobal),
+  { ssr: false }
+);
 
 export function GlobalComponents() {
   const router = useRouter();

@@ -1,7 +1,5 @@
-import { EAS, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
 import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
-import { NULL_ADDRESS } from './constants';
 import type { ExternalCredentialChain } from './external/schemas';
 
 export const easSchemaMainnetChains = [optimism, arbitrum] as const;
@@ -60,22 +58,6 @@ export function getOnChainAttestationUrl({
   return `${easConnectors[chainId].attestationExplorerUrl}/attestation/view/${attestationId}`;
 }
 
-export function getOnChainSchemaUrl({
-  chainId,
-  schema
-}: {
-  chainId: EasSchemaChain | ExternalCredentialChain;
-  schema: string;
-}) {
-  return `${easConnectors[chainId].attestationExplorerUrl}/schema/view/${
-    schema.startsWith('0x') ? schema : getSchemaUID(schema, NULL_ADDRESS, true)
-  }`;
-}
-
 export function getEasConnector(chainId: EasSchemaChain) {
   return easConnectors[chainId];
-}
-
-export function getEasInstance(chainId: EasSchemaChain) {
-  return new EAS(getEasConnector(chainId).attestationContract);
 }

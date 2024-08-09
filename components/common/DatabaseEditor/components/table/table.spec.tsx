@@ -20,8 +20,6 @@ beforeEach(() => {
   FetchMock.fn.mockReset();
 });
 
-jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
-
 jest.mock('next/router', () => ({
   useRouter: () => ({
     pathname: '/[domain]/',

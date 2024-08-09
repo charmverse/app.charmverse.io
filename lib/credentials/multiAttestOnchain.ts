@@ -5,9 +5,10 @@ import type { PopulatedTransaction, Signer } from 'ethers';
 import { getAddress } from 'viem/utils';
 
 import type { OnChainAttestationInput } from './attestOnchain';
-import { getEasInstance } from './connectors';
-import type { CredentialDataInput } from './schemas';
-import { attestationSchemaIds, encodeAttestation } from './schemas';
+import { getEasInstance } from './getEasInstance';
+import { attestationSchemaIds } from './schemas';
+import { encodeAttestation } from './schemas/encodeAttestation';
+import type { CredentialDataInput } from './schemas/interfaces';
 
 export type OnChainMultiAttestationInput<T extends AttestationType = AttestationType> = Omit<
   OnChainAttestationInput<T>,

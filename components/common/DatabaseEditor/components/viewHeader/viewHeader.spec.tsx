@@ -15,8 +15,6 @@ const card = TestBlockFactory.createCard(board);
 card.id = 'card-id-1';
 activeView.id = 'view-id-1';
 
-jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
-
 jest.mock('next/router', () => ({
   useRouter: () => ({
     pathname: '/[domain]/',

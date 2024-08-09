@@ -1,13 +1,23 @@
 import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 import { Box, Stack } from '@mui/material';
+import dynamic from 'next/dynamic';
 
-import { IssueProposalCredentials } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/components/IssueProposalCredentials';
-import { IssueRewardCredentials } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/components/IssueRewardCredentials';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 
 import { CredentialRow } from './CredentialRow';
+
+const IssueRewardCredentials = dynamic(() =>
+  import(
+    'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/components/IssueRewardCredentials'
+  ).then((mod) => mod.IssueRewardCredentials)
+);
+const IssueProposalCredentials = dynamic(() =>
+  import(
+    'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/components/IssueProposalCredentials'
+  ).then((mod) => mod.IssueProposalCredentials)
+);
 
 export function CredentialReviewStep({
   selectedCredentials,
