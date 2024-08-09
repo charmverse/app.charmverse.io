@@ -198,6 +198,8 @@ services:
         '-c',
         'npx react-env --path .env --dest ./apps/farcaster/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/farcaster --keepAliveTimeout 70000'
       ]
+    profiles:
+      - prd-farcaster
 
   stg-farcaster:
     extends:
@@ -210,6 +212,8 @@ services:
         '-c',
         'npx react-env --path .env --dest ./apps/farcaster/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/farcaster --keepAliveTimeout 70000'
       ]
+    profiles:
+      - stg-farcaster
 
   devapp:
     build:
