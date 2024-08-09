@@ -1,4 +1,4 @@
-import type { ConnectProjectDetails } from '../projects/fetchProject';
+import type { ConnectProjectDetails } from '../../@connect-shared/lib/projects/fetchProject';
 
 const contributionTypes = {
   CONTRACT_ADDRESS: 'Contract address',

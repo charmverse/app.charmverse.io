@@ -1,41 +1,51 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
+import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
 import { awsS3Bucket } from '@root/config/constants';
 import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
-import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
-import { optimismProjectSnapshotAttestationSchemaId } from '@root/lib/credentials/schemas/optimismProjectSchemas';
+import { mapProjectToGitcoin } from '@root/lib/credentials/mapProjectToGitcoin';
+import { mapProjectToOptimism } from '@root/lib/credentials/mapProjectToOptimism';
 import { replaceS3Domain } from '@root/lib/utils/url';
 
-import type { ConnectProjectDetails } from '../projects/fetchProject';
-import { fetchProject } from '../projects/fetchProject';
-
 import { getAttestationS3Path } from './getAttestationS3Path';
-import { mapProjectToGitcoin } from './mapProjectToGitcoin';
+import { charmProjectMetadataSchemaId } from './schemas/charmProjectMetadata';
+import { gitcoinProjectCredentialSchemaId } from './schemas/gitcoinProjectSchema';
+import { optimismProjectSnapshotAttestationSchemaId } from './schemas/optimismProjectSchemas';
 
-const storageFormats = ['gitcoin', 'optimism'] as const;
+const storageFormats = ['gitcoin', 'optimism', 'charmverse'] as const;
 
 type ProjectStorageFormat = (typeof storageFormats)[number];
 
-export async function storeProjectInS3({
+export async function storeProjectInS3<T = any>({
   projectOrProjectId,
-  storageFormat
+  storageFormat,
+  extraData
 }: {
   projectOrProjectId: ConnectProjectDetails | string;
   storageFormat: ProjectStorageFormat;
+  extraData?: T;
 }): Promise<{ staticFilePath: string; mappedProject: any }> {
   if (!storageFormats.includes(storageFormat)) {
     throw new InvalidInputError('Invalid storage format');
   }
 
-  const project =
+  let project =
     typeof projectOrProjectId === 'string' ? await fetchProject({ id: projectOrProjectId }) : projectOrProjectId;
 
   if (!project) {
     throw new DataNotFoundError('Project not found');
   }
 
+  // Expand extra fields
+  project = { ...project, ...extraData };
+
   let filePath: string;
 
   let formattedProject: any;
+
+  const projectMembers = project.projectMembers
+    .map((m) => ({ farcasterId: m.farcasterUser.fid }))
+    .filter((m) => !!m.farcasterId) as { farcasterId: number }[];
 
   if (storageFormat === 'gitcoin') {
     formattedProject = mapProjectToGitcoin({ project });
@@ -45,9 +55,19 @@ export async function storeProjectInS3({
       charmverseIdType: 'project'
     });
   } else if (storageFormat === 'optimism') {
-    formattedProject = project;
+    formattedProject = mapProjectToOptimism({
+      ...project,
+      projectMembers
+    });
     filePath = getAttestationS3Path({
       schemaId: optimismProjectSnapshotAttestationSchemaId,
+      charmverseId: project.id,
+      charmverseIdType: 'project'
+    });
+  } else if (storageFormat === 'charmverse') {
+    formattedProject = { ...mapProjectToOptimism({ ...project, projectMembers }), ...extraData };
+    filePath = getAttestationS3Path({
+      schemaId: charmProjectMetadataSchemaId,
       charmverseId: project.id,
       charmverseIdType: 'project'
     });

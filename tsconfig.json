@@ -33,6 +33,9 @@
     "incremental": true,
     "isolatedModules": true,
     "paths": {
+      "@connect-shared/*": [
+        "./@connect-shared/*"
+      ],
       "@connect-api/*": [
         "./apps/connect-api/src/*"
       ],

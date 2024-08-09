@@ -20,8 +20,6 @@ jest.mock('next/router', () => ({
   })
 }));
 
-jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
-
 describe('src/components/gallery/GalleryCard', () => {
   const board = TestBlockFactory.createBoard();
   board.id = 'boardId';

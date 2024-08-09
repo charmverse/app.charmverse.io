@@ -5,7 +5,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createProject } from 'lib/projects/createProject';
 import { getProjectsByUserId } from 'lib/projects/getProjectsByUserId';
-import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -18,6 +18,7 @@ async function createProjectController(req: NextApiRequest, res: NextApiResponse
     userId: req.session.user.id,
     project: projectAndMembersPayload
   });
+
   trackUserAction('add_project', { userId: req.session.user.id, name: projectAndMembersPayload.name });
   return res.status(201).json(createdProjectWithMembers);
 }

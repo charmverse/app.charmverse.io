@@ -4,6 +4,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import PaidIcon from '@mui/icons-material/Paid';
 import type { SxProps } from '@mui/material';
 import { ListItemText, Stack, Tooltip, Typography } from '@mui/material';
+import dynamic from 'next/dynamic';
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
 
@@ -33,11 +34,13 @@ import mutator from '../../../mutator';
 import { ArchiveProposals } from './components/ArchiveProposals';
 import { BatchPaymentRewards } from './components/BatchPaymentRewards';
 import { IssueProposalCredentials } from './components/IssueProposalCredentials';
-import { IssueRewardCredentials } from './components/IssueRewardCredentials';
 import { StyledMenuItem } from './components/PropertyMenu';
 import type { PropertyTemplateMenuProps } from './components/PropertyTemplateMenu';
 import { PropertyTemplateMenu } from './components/PropertyTemplateMenu';
 
+const IssueRewardCredentials = dynamic(() =>
+  import('./components/IssueRewardCredentials').then((mod) => mod.IssueRewardCredentials)
+);
 const StyledStack = styled(Stack)`
   flex-direction: row;
   align-items: center;

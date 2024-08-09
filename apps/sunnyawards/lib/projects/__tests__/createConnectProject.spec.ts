@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
+import { prettyPrint } from '@root/lib/utils/strings';
 import fetchMock from 'fetch-mock-jest';
 
 const mockSandbox = fetchMock.sandbox();
@@ -17,16 +18,14 @@ afterAll(async () => {
 
 describe('createConnectProject', () => {
   it('should create a project with project members', async () => {
-    const { user } = await testUtilsUser.generateUserAndSpace({
-      isAdmin: true
-    });
-
     const farcasterConnectedUser = await testUtilsUser.generateUser();
 
     await prisma.farcasterUser.create({
       data: {
-        account: {},
-        fid: 2,
+        account: {
+          displayName: 'User 1'
+        },
+        fid: 1,
         userId: farcasterConnectedUser.id
       }
     });
@@ -41,9 +40,10 @@ describe('createConnectProject', () => {
       }
     });
 
-    mockSandbox.get('https://api.neynar.com/v2/farcaster/user/bulk?fids[]=3', {
+    mockSandbox.get('https://api.neynar.com/v2/farcaster/user/bulk?fids=2', {
       users: [
         {
+          display_name: 'User 2',
           custody_address: nonFarcasterConnectedUserWallet,
           verified_addresses: {
             eth_addresses: [nonFarcasterConnectedUserWallet]
@@ -54,18 +54,18 @@ describe('createConnectProject', () => {
 
     const walletAddress = testUtilsRandom.randomETHWalletAddress();
 
-    mockSandbox.get('https://api.neynar.com/v2/farcaster/user/bulk?fids[]=4', {
+    mockSandbox.get('https://api.neynar.com/v2/farcaster/user/bulk?fids=3', {
       users: [
         {
           custody_address: walletAddress,
           verified_addresses: {
             eth_addresses: [walletAddress]
           },
-          username: 'user-4',
-          display_name: 'User 4',
+          username: 'user-3',
+          display_name: 'User 3',
           profile: {
             bio: {
-              text: 'User 4 bio'
+              text: 'User 3 bio'
             }
           },
           pfp_url: 'https://example.com/pfp.jpg'
@@ -73,9 +73,15 @@ describe('createConnectProject', () => {
       ]
     });
 
+    mockSandbox.get('https://api.neynar.com/v2/farcaster/user/bulk?fids=4', {
+      users: []
+    });
+
     const createdProject = await createOptimismProject({
       input: {
         name: 'Project',
+        category: 'CeFi',
+        description: 'Project description',
         projectMembers: [
           {
             farcasterId: 1
@@ -92,7 +98,7 @@ describe('createConnectProject', () => {
         ]
       },
       source: 'connect',
-      userId: user.id
+      userId: farcasterConnectedUser.id
     });
 
     const project = await prisma.project.findUnique({
@@ -101,6 +107,8 @@ describe('createConnectProject', () => {
       },
       select: {
         name: true,
+        category: true,
+        description: true,
         projectMembers: {
           select: {
             userId: true,
@@ -130,30 +138,26 @@ describe('createConnectProject', () => {
 
     expect(project).toMatchObject({
       name: 'Project',
+      category: 'CeFi',
+      description: 'Project description',
       projectMembers: [
         {
           teamLead: true,
-          userId: user.id,
+          userId: farcasterConnectedUser.id,
           name: 'User 1',
           farcasterId: 1
         },
         {
           teamLead: false,
-          userId: farcasterConnectedUser.id,
+          userId: nonFarcasterConnectedUser.id,
           name: 'User 2',
           farcasterId: 2
         },
         {
           teamLead: false,
-          userId: nonFarcasterConnectedUser.id,
+          userId: expect.any(String),
           name: 'User 3',
           farcasterId: 3
-        },
-        {
-          teamLead: false,
-          userId: expect.any(String),
-          name: 'User 4',
-          farcasterId: 4
         }
       ]
     });

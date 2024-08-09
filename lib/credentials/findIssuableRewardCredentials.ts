@@ -13,7 +13,7 @@ import { lowerCaseEqual } from '@root/lib/utils/strings';
 
 import { credentialEventLabels } from './constants';
 import type { TypedPendingGnosisSafeTransaction } from './indexGnosisSafeCredentialTransaction';
-import type { CredentialDataInput } from './schemas';
+import type { CredentialDataInput } from './schemas/interfaces';
 
 export type RewardWithJoinedData = {
   id: string;

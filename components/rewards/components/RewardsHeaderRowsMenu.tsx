@@ -10,7 +10,6 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import { paidRewardStatuses } from 'lib/rewards/constants';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardTokenDetails, RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
 

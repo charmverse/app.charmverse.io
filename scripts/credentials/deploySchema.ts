@@ -1,10 +1,10 @@
-import { EAS, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
+import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
-import { optimismSepolia, sepolia } from 'viem/chains';
-import { EasSchemaChain, easConnectors, getEasInstance } from 'lib/credentials/connectors';
+import { optimismSepolia } from 'viem/chains';
+import { EasSchemaChain, easConnectors } from 'lib/credentials/connectors';
+import { getEasInstance } from 'lib/credentials/getEasInstance';
 import { NULL_ADDRESS } from 'lib/credentials/constants';
 
-import { getOnChainSchemaUrl, getOnChainAttestationUrl } from 'lib/credentials/connectors';
 import { Wallet, providers } from 'ethers';
 import { http } from 'viem';
 import { publicClientToProvider } from 'lib/utils/ethers';
@@ -49,7 +49,12 @@ async function deploy(chain: Chain, schema: string, resolverAddress: string = NU
   return transaction;
 }
 
-deploy(optimismSepolia, 'bytes32 projectRefUID,uint256 farcasterID,string name,string category,bytes32 parentProjectRefUID,uint8 metadataType,string metadataUrl').then().catch(console.error);
+deploy(
+  optimismSepolia,
+  'bytes32 projectRefUID,uint256 farcasterID,string name,string category,bytes32 parentProjectRefUID,uint8 metadataType,string metadataUrl'
+)
+  .then()
+  .catch(console.error);
 
 async function attest({
   chain,

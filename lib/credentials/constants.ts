@@ -1,5 +1,7 @@
 import type { CredentialEventType } from '@charmverse/core/prisma-client';
+import { isDevEnv, isStagingEnv, isTestEnv } from '@root/config/constants';
 import type { FeatureTitleVariation } from '@root/lib/features/getFeatureTitle';
+import { optimism, optimismSepolia } from 'viem/chains';
 
 // Labels require a mapper to rename features based on the space's settings
 type LabelFn = (getFeatureTitle: (featureWord: FeatureTitleVariation) => string) => string;
@@ -16,5 +18,7 @@ export const credentialEventLabels: Partial<Record<CredentialEventType, LabelFn>
   proposal_approved: (map) => `${map('Proposal')} ${proposalApprovedVerb}`,
   reward_submission_approved: (map) => `${map('Reward')} submission ${rewardSubmissionApprovedVerb}`
 };
+
+export const charmverseProjectDataChainId = isDevEnv || isTestEnv || isStagingEnv ? optimismSepolia.id : optimism.id;
 
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
