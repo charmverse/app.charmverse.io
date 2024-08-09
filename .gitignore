@@ -23,6 +23,11 @@ serverless/*.node
 /apps/connect/public/sw*
 /apps/connect/public/swe-worker*
 
+# farcaster app
+/apps/farcaster/.next/
+/apps/farcaster/dist/
+/apps/farcaster/node_modules/
+
 # sunnyawards
 /apps/sunnyawards/.next/
 /apps/sunnyawards/dist/
