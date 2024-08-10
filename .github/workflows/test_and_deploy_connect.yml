@@ -20,6 +20,7 @@ on:
       - 'hooks/**'
       - 'models/**'
   pull_request:
+    types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
       - '.ebextensions*/**'
@@ -81,7 +82,7 @@ jobs:
     name: Test apps
     runs-on: ubuntu-latest
     needs: build-app
-    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    if: ${{ github.event.action != 'labeled' && !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -133,7 +134,7 @@ jobs:
     name: Test Connect e2e
     runs-on: ubuntu-latest
     needs: build-app
-    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    if: ${{ github.event.action != 'labeled' && !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -196,7 +197,7 @@ jobs:
     name: Test Sunny Awards e2e
     runs-on: ubuntu-latest
     needs: build-app
-    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    if: ${{ github.event.action != 'labeled' && !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -260,7 +261,7 @@ jobs:
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: |
-      (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
+      github.ref == 'refs/heads/main' ||
       (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-connect') ||
       (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
       (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
@@ -276,10 +277,9 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build_connect
 
-      - name: Remove unused code
+      - name: Update Dockerfile
         run: |
-          rm -rf components
-          rm -rf pages
+          rm Dockerfile && mv apps/connect/Dockerfile Dockerfile
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -424,9 +424,6 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
 
-      # - name: Build app
-      #   uses: ./.github/actions/build_connect
-
       - name: Replace env_var with staging settings
         run: |
           ebextension_files=$(ls .ebextensions*/00_env_vars.config)
@@ -500,15 +497,15 @@ jobs:
         # wrap the condition in "${{}}" because the string includes a colon
         # see https://github.com/actions/runner/issues/1019
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') }}"
+        # aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
         run: |
           rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
-          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Override config with Sunny Awards
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') }}"
+        # aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
         run: |
           rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
-          aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Deploy to staging
         id: cdk_deploy
