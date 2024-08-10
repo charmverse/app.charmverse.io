@@ -82,7 +82,7 @@ jobs:
     name: Test apps
     runs-on: ubuntu-latest
     needs: build-app
-    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    if: ${{ github.event.action != 'labeled' && !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -134,7 +134,7 @@ jobs:
     name: Test Connect e2e
     runs-on: ubuntu-latest
     needs: build-app
-    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    if: ${{ github.event.action != 'labeled' && !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -197,7 +197,7 @@ jobs:
     name: Test Sunny Awards e2e
     runs-on: ubuntu-latest
     needs: build-app
-    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    if: ${{ github.event.action != 'labeled' && !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:

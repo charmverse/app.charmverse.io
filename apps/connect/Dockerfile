@@ -11,15 +11,17 @@ RUN apt install openssl -y
 WORKDIR /app
 
 # Copy dependencies
-COPY --parents @connect-shared .
-COPY --parents node_modules .
-COPY --parents apps/*/node_modules .
-COPY package.json .
-COPY --parents apps/*/package.json .
+COPY --parents @connect-shared \
+  node_modules                 \
+  apps/*/node_modules          \
+  package.json                 \
+  apps/*/package.json          \
+  .
 # Copy compiled code
-COPY --parents apps/connect-api/dist .
-COPY --parents apps/*/.next/static .
-COPY --parents apps/*/public .
+COPY --parents apps/connect-api/dist \
+  apps/*/.next                       \
+  apps/*/public                      \
+  .
 
 ENV PORT=3000
 
