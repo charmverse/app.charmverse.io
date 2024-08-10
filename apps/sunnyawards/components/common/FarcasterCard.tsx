@@ -64,6 +64,7 @@ export function FarcasterCard(props: {
   avatarSize?: AvatarSize;
   onDelete?: VoidFunction;
   enableLink?: boolean;
+  isCurrentUser?: boolean;
 }) {
   if (!props.enableLink || !props.username) {
     return (
@@ -73,9 +74,11 @@ export function FarcasterCard(props: {
     );
   }
 
+  const href = props.isCurrentUser ? '/profile' : `/u/${props.username}`;
+
   return (
     <CardMotion>
-      <CardActionArea LinkComponent={Link} href={`/u/${props.username}`} hrefLang='en'>
+      <CardActionArea LinkComponent={Link} href={href} hrefLang='en'>
         <FarcasterCardContent {...props} />
       </CardActionArea>
     </CardMotion>
