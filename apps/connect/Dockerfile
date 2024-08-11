@@ -11,13 +11,13 @@ RUN apt install openssl -y
 WORKDIR /app
 
 # Copy dependencies
-COPY --parents @connect-shared \
+COPY --parents @connect-shared        \
   # remove this line once we remove connect-api
-  lib config connectors                  \
-  node_modules                 \
-  apps/*/node_modules          \
-  package.json                 \
-  apps/*/package.json          \
+  tsconfig.json lib config connectors \
+  node_modules                        \
+  apps/*/node_modules                 \
+  package.json                        \
+  apps/*/package.json                 \
   .
 # Copy compiled code
 COPY --parents apps/connect-api/dist \
