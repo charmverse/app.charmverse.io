@@ -13,14 +13,14 @@ WORKDIR /app
 # Copy dependencies
 COPY --parents @connect-shared        \
   # remove this line once we remove connect-api
-  tsconfig.json lib config connectors \
+  tsconfig.json \
   node_modules                        \
   apps/*/node_modules                 \
   package.json                        \
   apps/*/package.json                 \
   .
 # Copy compiled code
-COPY --parents apps/connect-api/dist \
+COPY --parents apps/connect-api \
   apps/*/.next                       \
   apps/*/public                      \
   .
