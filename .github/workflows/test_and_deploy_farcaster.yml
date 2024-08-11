@@ -90,6 +90,10 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build_farcaster
 
+      - name: Update Dockerfile
+        run: |
+          rm Dockerfile && mv apps/farcaster/Dockerfile Dockerfile
+
       - name: Build and Push Docker image
         id: docker_build_push
         uses: ./.github/actions/build_docker_image
