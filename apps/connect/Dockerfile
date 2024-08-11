@@ -12,6 +12,8 @@ WORKDIR /app
 
 # Copy dependencies
 COPY --parents @connect-shared \
+  # remove this line once we remove connect-api
+  lib config connectors                  \
   node_modules                 \
   apps/*/node_modules          \
   package.json                 \

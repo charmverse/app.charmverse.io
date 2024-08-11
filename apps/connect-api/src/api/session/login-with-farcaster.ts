@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import type { RouterContext } from '@connect-api/koa';
 import { PathBasedRouter } from '@connect-api/lib/pathBasedRouter';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { loginWithFarcaster } from '@root/lib/farcaster/loginWithFarcaster';
-import type { LoggedInUser } from '@root/models';
 
 const router = new PathBasedRouter();
 
