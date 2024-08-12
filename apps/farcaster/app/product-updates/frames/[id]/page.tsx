@@ -1,6 +1,6 @@
 'use server';
 
-import { getProductUpdatesFrame } from 'lib/product-updates/getFrame';
+import { getProductUpdatesFrame } from 'lib/productUpdates/getProductUpdatesFrame';
 
 export default async function FramesPage({
   params

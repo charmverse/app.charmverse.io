@@ -1,20 +1,15 @@
 'use client';
 
-import { grey } from '@mui/material/colors';
 import { darken, experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
 
 import {
-  backgroundColor,
   backgroundColorDarkMode,
   backgroundLightColorDarkMode,
   brandColor,
-  inputBackground,
+  disabledTextColorDarkMode,
   inputBackgroundDarkMode,
-  inputBorder,
   inputBorderDarkMode,
-  primaryTextColor,
   primaryTextColorDarkMode,
-  secondaryTextColor,
   secondaryTextColorDarkMode
 } from './colors';
 
@@ -24,52 +19,15 @@ export const defaultFont =
 const extendedTheme = extendTheme({
   cssVarPrefix: 'charm',
   colorSchemes: {
-    light: {
-      // palette for light mode
-      palette: {
-        action: {
-          focus: 'rgb(29, 92, 132, 0.1)',
-          hover: 'rgba(22, 52, 71, 0.07)',
-          selected: 'rgba(22, 52, 71, 0.07)'
-        },
-        background: {
-          default: backgroundColor,
-          paper: backgroundColor
-        },
-        text: {
-          disabled: primaryTextColor,
-          primary: primaryTextColor
-        },
-        primary: {
-          main: brandColor
-        },
-        secondary: {
-          main: secondaryTextColor
-        },
-        textPrimary: {
-          main: primaryTextColor
-        },
-        inputBackground: {
-          main: inputBackground
-        },
-        footerBackground: { main: grey[200] },
-        mainBackground: { main: grey[200] }
-      }
-    },
     dark: {
       // palette for dark mode
       palette: {
-        action: {
-          focus: 'rgb(29, 92, 132)',
-          hover: 'rgba(255, 255, 255, 0.055)',
-          selected: 'rgba(255, 255, 255, 0.055)'
-        },
         background: {
           default: backgroundColorDarkMode,
           paper: backgroundLightColorDarkMode
         },
         text: {
-          disabled: primaryTextColor,
+          disabled: disabledTextColorDarkMode,
           primary: primaryTextColorDarkMode
         },
         primary: {
@@ -78,15 +36,7 @@ const extendedTheme = extendTheme({
         },
         secondary: {
           main: secondaryTextColorDarkMode
-        },
-        textPrimary: {
-          main: primaryTextColorDarkMode
-        },
-        inputBackground: {
-          main: inputBackgroundDarkMode
-        },
-        footerBackground: { main: grey[700] },
-        mainBackground: { main: backgroundColorDarkMode }
+        }
       }
     }
   },
@@ -160,25 +110,7 @@ const extendedTheme = extendTheme({
       styleOverrides: {
         root: {
           textTransform: 'none'
-        },
-        text: ({ theme, variant, color }) => ({
-          '&:hover': {
-            backgroundColor: theme.vars.palette.inputBackground.main
-          },
-          color: color || (variant === 'outlined' || variant === 'text' ? theme.vars.palette.primary.main : 'inherit')
-        })
-      }
-    },
-    MuiIconButton: {
-      styleOverrides: {
-        root: ({ theme }) => ({
-          '&:hover': {
-            backgroundColor: theme.vars.palette.inputBackground.main
-          }
-        })
-      },
-      defaultProps: {
-        color: 'inherit' // set to inherit, the default is rgba (0,0,0, .54) which makes icons half-opaque
+        }
       }
     },
     MuiMenuItem: {
@@ -250,11 +182,8 @@ const extendedTheme = extendTheme({
         size: 'small'
       },
       styleOverrides: {
-        root: ({ theme }) => ({
-          backgroundColor: theme.vars.palette.inputBackground.main,
-          '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-            borderColor: inputBorder
-          },
+        root: () => ({
+          backgroundColor: inputBackgroundDarkMode,
           '[data-mui-color-scheme="dark"] &': {
             '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
               borderColor: inputBorderDarkMode
@@ -262,7 +191,6 @@ const extendedTheme = extendTheme({
           }
         }),
         notchedOutline: () => ({
-          borderColor: inputBorder,
           '[data-mui-color-scheme="dark"] &': {
             borderColor: inputBorderDarkMode
           }

@@ -4,7 +4,7 @@ import type { ProductUpdatesFarcasterFrame } from '@charmverse/core/prisma-clien
 
 import { actionClient } from 'lib/actionClient';
 
-import { createProductUpdatesFrame } from './createFrame';
+import { createProductUpdatesFrame } from './createProductUpdatesFrame';
 import { schema } from './schema';
 
 export const createProductUpdatesFrameAction = actionClient

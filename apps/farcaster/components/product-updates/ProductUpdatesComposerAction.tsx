@@ -10,8 +10,9 @@ import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
 
 import type { ConnectProjectMinimal } from 'lib/getConnectProjectsByFid';
-import { createProductUpdatesFrameAction } from 'lib/product-updates/action';
-import { schema, type FormValues } from 'lib/product-updates/schema';
+import { postCreateCastMessage } from 'lib/postCreateCastMessage';
+import { createProductUpdatesFrameAction } from 'lib/productUpdates/createProductUpdatesFrameAction';
+import { schema, type FormValues } from 'lib/productUpdates/schema';
 
 export function ProductUpdatesComposerAction({
   farcasterUser,
@@ -20,12 +21,7 @@ export function ProductUpdatesComposerAction({
   farcasterUser: FarcasterUser;
   connectProjects: ConnectProjectMinimal[];
 }) {
-  const {
-    control,
-    formState: { isValid },
-    handleSubmit,
-    reset
-  } = useForm<FormValues>({
+  const { control, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
       projectId: '',
@@ -39,18 +35,10 @@ export function ProductUpdatesComposerAction({
   const { execute, isExecuting } = useAction(createProductUpdatesFrameAction, {
     onSuccess: (data) => {
       reset();
-      window.parent.postMessage(
-        {
-          type: 'createCast',
-          data: {
-            cast: {
-              text: `Product updates for ${new Date().toLocaleDateString()}`,
-              embeds: data.data ? [data.data.image] : []
-            }
-          }
-        },
-        '*'
-      );
+      postCreateCastMessage({
+        embeds: data.data ? [data.data.image] : [],
+        text: `Product updates for ${new Date().toLocaleDateString()}`
+      });
     },
     onError: (err) => {
       log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
@@ -103,7 +91,7 @@ export function ProductUpdatesComposerAction({
           <Controller
             control={control}
             name='text'
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <TextField
                 disabled={isExecuting}
                 multiline
@@ -111,6 +99,7 @@ export function ProductUpdatesComposerAction({
                 aria-labelledby='product-updates'
                 placeholder='1. Updated documentation ...'
                 helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'
+                error={!!fieldState.error}
                 {...field}
               />
             )}
@@ -125,7 +114,7 @@ export function ProductUpdatesComposerAction({
               width: 'fit-content'
             }}
             variant='contained'
-            disabled={isExecuting || !isValid}
+            disabled={isExecuting}
           >
             Submit
           </Button>

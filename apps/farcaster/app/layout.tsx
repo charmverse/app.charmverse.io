@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import type { Viewport } from 'next';
 import type { ReactNode } from 'react';
 
-import { Header } from 'components/common/Header';
+import { GlobalComponent } from 'components/common/GlobalComponent';
 import theme from 'theme/theme';
 
 import 'theme/cssVariables.scss';
@@ -22,8 +22,8 @@ export default async function RootLayout({
     <html lang='en' dir='ltr'>
       <body>
         <AppProviders theme={theme}>
-          <Box component='main' bgcolor='mainBackground.main' py={6} minHeight='100vh'>
-            <Header />
+          <Box component='main' bgcolor='background.default' py={6} minHeight='100vh'>
+            <GlobalComponent />
             {children}
           </Box>
         </AppProviders>
