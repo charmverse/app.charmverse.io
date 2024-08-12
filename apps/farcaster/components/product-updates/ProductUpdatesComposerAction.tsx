@@ -37,7 +37,7 @@ export function ProductUpdatesComposerAction({
     onSuccess: (data) => {
       reset();
       postCreateCastMessage({
-        embeds: data.data ? [`${baseUrl}/product-updates/frames/${data.data.id}`] : [],
+        embeds: data.data ? [`https://${window.location.hostname}/product-updates/frames/${data.data.id}`] : [],
         text: `Product updates for ${new Date().toLocaleDateString()}`
       });
     },
