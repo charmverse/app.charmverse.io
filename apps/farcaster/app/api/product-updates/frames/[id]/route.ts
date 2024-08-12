@@ -70,13 +70,7 @@ export async function POST(req: Request) {
 
       const { image, nextFrameId, previousFrameId } = productUpdatesFrame;
       const buttons: FrameButton[] = [];
-      if (nextFrameId) {
-        buttons.push({
-          action: 'post',
-          label: 'Next',
-          target: `${baseUrl}/api/product-updates/frames/${nextFrameId}`
-        });
-      }
+
       if (previousFrameId) {
         buttons.push({
           action: 'post',
@@ -84,6 +78,15 @@ export async function POST(req: Request) {
           target: `${baseUrl}/api/product-updates/frames/${previousFrameId}`
         });
       }
+
+      if (nextFrameId) {
+        buttons.push({
+          action: 'post',
+          label: 'Next',
+          target: `${baseUrl}/api/product-updates/frames/${nextFrameId}`
+        });
+      }
+
       const html = getFrameHtml({
         image,
         version: 'vNext',
