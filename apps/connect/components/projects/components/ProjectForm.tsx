@@ -91,6 +91,7 @@ export function ProjectForm({
                 renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
                 error={!!fieldState.error}
                 {...field}
+                value={field.value || ''}
               >
                 {CATEGORIES.map((category) => (
                   <MenuItem key={category} value={category}>
@@ -127,6 +128,7 @@ export function ProjectForm({
                   aria-labelledby='project-twitter'
                   error={!!fieldState.error}
                   {...field}
+                  value={field.value || ''}
                 />
               )}
             />
@@ -149,6 +151,7 @@ export function ProjectForm({
                   data-test='project-form-github'
                   error={!!fieldState.error}
                   {...field}
+                  value={field.value || ''}
                 />
               )}
             />

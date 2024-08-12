@@ -22,7 +22,7 @@ export function SearchFarcasterUser({
 
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((_searchTerm: string) => {
-      trigger({ name: _searchTerm })
+      trigger({ username: _searchTerm })
         .then((_farcasterProfiles) => {
           if (_farcasterProfiles.length) {
             setFarcasterProfiles(
@@ -70,9 +70,9 @@ export function SearchFarcasterUser({
       clearOnBlur={false}
       disableClearable
       clearOnEscape={false}
-      renderOption={(props, profile) => {
+      renderOption={({ key, ...props }, profile) => {
         return (
-          <Box {...(props as BoxProps)} display='flex' alignItems='center' gap={1} flexDirection='row'>
+          <Box key={key} {...(props as BoxProps)} display='flex' alignItems='center' gap={1} flexDirection='row'>
             <Avatar src={profile.pfpUrl} size='medium' />
             <Stack>
               <Typography variant='body1'>{profile.displayName}</Typography>
