@@ -5,6 +5,7 @@ import { FarcasterCard } from '@connect-shared/components/common/FarcasterCard';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Card, FormLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
+import { baseUrl } from '@root/config/constants';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
@@ -45,7 +46,7 @@ export function ProductUpdatesComposerAction({
           data: {
             cast: {
               text: `Product updates for ${new Date().toLocaleDateString()}`,
-              embeds: data.data ? [data.data.image] : []
+              embeds: data.data ? [`${baseUrl}/product-updates/frames/${data.data.id}`] : []
             }
           }
         },
