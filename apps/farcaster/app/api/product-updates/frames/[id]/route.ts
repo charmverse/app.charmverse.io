@@ -3,7 +3,7 @@ import { baseUrl } from '@root/config/constants';
 import type { FrameButton, FrameButtonsType } from 'frames.js';
 import { getFrameHtml } from 'frames.js';
 
-import { getProductUpdatesFrame } from 'lib/product-updates/getFrame';
+import { getProductUpdatesFrame } from 'lib/productUpdates/getProductUpdatesFrame';
 
 export async function POST(req: Request) {
   const url = new URL(req.url);
