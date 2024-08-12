@@ -6,20 +6,9 @@ import { prettyPrint } from 'lib/utils/strings';
  */
 
 async function query() {
-  const url = 'https://api.neynar.com/v2/farcaster/webhook';
-  const options = {
-    method: 'POST',
-    headers: {
-      accept: 'application/json',
-      api_key: 'NEYNAR_API_DOCS',
-      'content-type': 'application/json'
-    }
-  };
+  const productUpdatesFrames = await prisma.productUpdatesFarcasterFrame.findMany();
 
-  fetch(url, options)
-    .then((res) => res.json())
-    .then((json) => console.log(json))
-    .catch((err) => console.error('error:' + err));
+  prettyPrint(productUpdatesFrames);
 }
 
 query();

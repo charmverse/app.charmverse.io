@@ -21,6 +21,7 @@
     ],
     "paths": {
       "@connect-shared/*": ["../../@connect-shared/*"],
+      "@root/charmClient/*": ["../../charmClient/*"],
       "apiClient/*": ["./apiClient/*"],
       "components/*": ["./components/*"],
       "hooks/*": ["./hooks/*"],
@@ -29,7 +30,6 @@
       "theme/*": ["./theme/*"],
       "@root/abis/*": ["../../abis/*"],
       "@root/adapters/*": ["../../adapters/*"],
-      "@root/charmClient/*": ["../../charmClient/*"],
       "@root/config/*": ["../../config/*"],
       "@root/connectors/*": ["../../connectors/*"],
       "@root/lib/*": ["../../lib/*"],
@@ -56,7 +56,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "../../@connect-shared/components/common/NotFoundPage.tsx"
+    "../../@connect-shared/components/common/NotFoundPage.tsx",
+    "../../@connect-shared/components/common/FarcasterCard.tsx"
   ],
   "exclude": ["../../node_modules", ".next/", "public/sw.js", "sw.js"]
 }
