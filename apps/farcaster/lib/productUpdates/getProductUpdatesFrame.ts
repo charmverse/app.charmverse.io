@@ -30,6 +30,9 @@ export async function getProductUpdatesFrame(id: string) {
         },
         projectId: productUpdatesFrame.project.id
       },
+      orderBy: {
+        createdAt: 'desc'
+      },
       select: {
         id: true
       }
@@ -40,6 +43,9 @@ export async function getProductUpdatesFrame(id: string) {
           gt: productUpdatesFrame.createdAt
         },
         projectId: productUpdatesFrame.project.id
+      },
+      orderBy: {
+        createdAt: 'asc'
       },
       select: {
         id: true
