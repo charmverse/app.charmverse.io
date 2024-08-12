@@ -187,6 +187,34 @@ services:
       - stg-sockets
       - stg-webapp
 
+  prd-farcaster:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npx react-env --path .env --dest ./apps/farcaster/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/farcaster --keepAliveTimeout 70000'
+      ]
+    profiles:
+      - prd-farcaster
+
+  stg-farcaster:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npx react-env --path .env --dest ./apps/farcaster/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/farcaster --keepAliveTimeout 70000'
+      ]
+    profiles:
+      - stg-farcaster
+
   devapp:
     build:
       context: .

@@ -13,7 +13,7 @@ runs:
           apps/connect/public
           apps/connect-api/dist
           apps/sunnyawards/.next
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('@connect-shared/**/*.ts[x]', 'apps/connect-api/**/*.ts', 'apps/connect/**/*.ts[x]', 'apps/connect/**/*.scss', 'apps/sunnyawards/**/*.ts[x]', 'apps/sunnyawards/**/*.scss') }}
+        key: app-connect-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts', '@connect-shared/**/*.ts[x]', 'apps/connect-api/**/*.ts', 'apps/connect/**/*.ts[x]', 'apps/connect/**/*.scss', 'apps/sunnyawards/**/*.ts[x]', 'apps/sunnyawards/**/*.scss') }}
 
     - name: Build apps
       shell: bash
