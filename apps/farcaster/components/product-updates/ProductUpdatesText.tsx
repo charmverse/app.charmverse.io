@@ -19,16 +19,17 @@ export function ProductUpdatesText({
         height: '100%',
         backgroundColor: 'white',
         display: 'flex',
-        flexDirection: 'column',
-        gap: 10
+        width: '100%',
+        flexDirection: 'column'
       }}
     >
       <p style={{ fontSize: 20 }}>{projectName}</p>
-      <p style={{ fontSize: 18 }}>{createdAtLocal}</p>
+      <p style={{ fontSize: 18, marginTop: 4 }}>{createdAtLocal}</p>
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          marginTop: 10
         }}
       >
         {lines.map((line, index) => {
