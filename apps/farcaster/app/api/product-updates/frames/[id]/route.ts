@@ -55,7 +55,20 @@ export async function POST(req: Request) {
   if (result.valid) {
     const timestamp = Math.floor(new Date(result.action.timestamp).getTime() / 1000);
     if (timestamp > new Date().getTime() / 1000 - 60) {
-      const { image, nextFrameId, previousFrameId } = await getProductUpdatesFrame(frameId);
+      const productUpdatesFrame = await getProductUpdatesFrame(frameId);
+      if (!productUpdatesFrame) {
+        return Response.json(
+          {},
+          {
+            status: 404,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+      }
+
+      const { image, nextFrameId, previousFrameId } = productUpdatesFrame;
       const buttons: FrameButton[] = [];
       if (nextFrameId) {
         buttons.push({
