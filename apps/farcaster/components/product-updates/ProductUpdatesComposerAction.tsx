@@ -45,6 +45,7 @@ export function ProductUpdatesComposerAction({
           type: 'createCast',
           data: {
             cast: {
+              parent: undefined,
               text: `Product updates for ${new Date().toLocaleDateString()}`,
               embeds: data.data ? [`${baseUrl}/product-updates/frames/${data.data.id}`] : []
             }

@@ -69,8 +69,8 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
     fid,
     buttonIndex,
     castId,
-    url: Buffer.from(postUrl),
-    inputText: Buffer.from(inputText)
+    url: new Uint8Array(Buffer.from(postUrl)),
+    inputText: new Uint8Array(Buffer.from(inputText))
   });
 
   if (!message) {
