@@ -15,7 +15,6 @@ import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
 
-import '@farcaster/auth-kit/styles.css';
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
 
 import { WarpcastIcon } from './WarpcastIcon';

@@ -1,12 +1,11 @@
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { BoxProps } from '@mui/material';
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
-import { ConnectApiClient } from 'apiClient/apiClient';
+import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Avatar } from 'components/common/Avatar';
+import { useSearchByUsername } from 'hooks/apiClient/farcaster';
 
 type FarcasterProfile = Pick<StatusAPIResponse, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
@@ -19,10 +18,11 @@ export function SearchFarcasterUser({
 }) {
   const [farcasterProfiles, setFarcasterProfiles] = useState<FarcasterProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const { trigger } = useSearchByUsername();
+
   const debouncedGetPublicSpaces = useMemo(() => {
     return debounce((_searchTerm: string) => {
-      new ConnectApiClient()
-        .getFarcasterUsersByUsername(_searchTerm)
+      trigger({ name: _searchTerm })
         .then((_farcasterProfiles) => {
           if (_farcasterProfiles.length) {
             setFarcasterProfiles(
@@ -50,6 +50,10 @@ export function SearchFarcasterUser({
     } else {
       setFarcasterProfiles([]);
     }
+
+    return () => {
+      debouncedGetPublicSpaces.cancel();
+    };
   }, [searchTerm]);
 
   return (

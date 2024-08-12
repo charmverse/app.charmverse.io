@@ -29,6 +29,7 @@
       "theme/*": ["./theme/*"],
       "@root/abis/*": ["../../abis/*"],
       "@root/adapters/*": ["../../adapters/*"],
+      "@root/charmClient/*": ["../../charmClient/*"],
       "@root/config/*": ["../../config/*"],
       "@root/connectors/*": ["../../connectors/*"],
       "@root/lib/*": ["../../lib/*"],
@@ -50,6 +51,12 @@
       "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../@connect-shared/components/common/NotFoundPage.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../@connect-shared/components/common/NotFoundPage.tsx"
+  ],
   "exclude": ["../../node_modules", ".next/", "public/sw.js", "sw.js"]
 }

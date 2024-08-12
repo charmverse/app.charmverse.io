@@ -5,13 +5,14 @@ import { useDarkTheme } from '@connect-shared/hooks/useDarkTheme';
 import { usePageView } from '@connect-shared/hooks/usePageView';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
 import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
-import { ConnectApiClient } from 'apiClient/apiClient';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useAction } from 'next-safe-action/hooks';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
@@ -30,22 +31,22 @@ export function Header({ user }: { user: LoggedInUser | null }) {
 
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
+  const { execute: logoutUser, isExecuting: isExecutingLogout } = useAction(logoutAction, {
+    onSuccess: async () => {
+      revalidatePathAction();
+      router.push('/');
+    },
+    onError(err) {
+      log.error('Error on logout', { error: err.error.serverError });
+    }
+  });
+
   const handleOpenUserMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
-  };
-
-  const handleLogout = async () => {
-    const connectApiClient = new ConnectApiClient();
-    await connectApiClient.logout().catch((error) => {
-      log.error('There was an error while trying to signout', { error });
-    });
-    log.info('User logged out');
-    revalidatePathAction();
-    router.push('/');
   };
 
   return (
@@ -64,7 +65,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
           </Link>
           {user && (
             <Box display='flex' gap={1} alignItems='center'>
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <IconButton disabled={isExecutingLogout} onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
                   src={farcasterDetails?.pfpUrl || user?.avatar || undefined}
                   size='medium'
@@ -94,7 +95,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
                 <MenuItem>
                   <Link href='/profile'>@{farcasterDetails?.username}</Link>
                 </MenuItem>
-                <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
+                <MenuItem onClick={logoutUser}>Sign Out</MenuItem>
                 <InstallAppMenuItem>Install</InstallAppMenuItem>
               </Menu>
             </Box>
