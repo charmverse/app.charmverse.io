@@ -35,6 +35,7 @@ export async function createProductUpdatesFrame(input: FormValues) {
     createdAtLocal: input.createdAtLocal,
     projectName: project.name
   });
+  // Use a ratio of 1.9:1 for the image
   const image = new ImageResponse(element, {
     width: 1000,
     height: 525
