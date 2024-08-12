@@ -2,7 +2,7 @@ import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import { IconButton, Stack, TextField } from '@mui/material';
 import type { FieldValues, Control, FieldArrayPath, Path } from 'react-hook-form';
-import { Controller, useFieldArray } from 'react-hook-form';
+import { Controller, useFieldArray, useController } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
 
@@ -10,16 +10,18 @@ import { FieldWrapper } from './FieldWrapper';
 
 export function MultiTextInputField<T extends FieldValues>({
   control,
+  disabled,
   label,
   name,
+  onChange,
   placeholder,
-  disabled,
   'data-test': dataTest
 }: {
-  disabled?: boolean;
   control: Control<T>;
-  name: keyof T;
+  disabled?: boolean;
   label: string;
+  name: keyof T;
+  onChange?: (values: string[]) => void;
   placeholder: string;
   'data-test'?: string;
 }) {
@@ -28,6 +30,16 @@ export function MultiTextInputField<T extends FieldValues>({
     control,
     name: typedName
   });
+  const { field: formField } = useController({
+    name: name as Path<T>,
+    control
+  });
+
+  const onChangeValue = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValues = [...formField.value];
+    newValues[index] = e.target.value;
+    onChange?.(newValues);
+  };
 
   return (
     <Stack>
@@ -44,6 +56,7 @@ export function MultiTextInputField<T extends FieldValues>({
                 placeholder={placeholder}
                 error={!!fieldState.error}
                 {..._field}
+                onChange={onChangeValue(0)}
               />
             )}
           />
@@ -60,6 +73,7 @@ export function MultiTextInputField<T extends FieldValues>({
                     fullWidth
                     placeholder={placeholder}
                     error={!!fieldState.error}
+                    onChange={onChangeValue(index)}
                     {..._field}
                   />
                   <IconButton disabled={disabled} size='small' onClick={() => remove(index + 1)}>

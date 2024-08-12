@@ -47,6 +47,12 @@ function FieldAnswer({
         placeholder='https://charmverse.io'
         {...registeredField}
         name={field.name as any}
+        onChange={(values) => {
+          // field.onChange(e);
+          if (onChange) {
+            onChange({ [property.field]: values });
+          }
+        }}
       />
     );
   }
