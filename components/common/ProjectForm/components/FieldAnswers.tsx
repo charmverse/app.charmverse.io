@@ -21,7 +21,7 @@ function FieldAnswer({
   fieldConfig?: ProjectFieldConfig;
   onChange?: (payload: Record<string, any>) => void;
 }) {
-  const { control, register } = useFormContext<ProjectAndMembersPayload>();
+  const { control, register, watch } = useFormContext<ProjectAndMembersPayload>();
 
   const { field, fieldState } = useController({
     control,
@@ -42,11 +42,17 @@ function FieldAnswer({
       <MultiTextInputField
         data-test={`project-field-${name}`}
         control={control}
+        watch={watch}
         disabled={disabled}
         label={property.label}
         placeholder='https://charmverse.io'
         {...registeredField}
         name={field.name as any}
+        onChange={(e, values) => {
+          if (onChange) {
+            onChange({ [property.field]: values });
+          }
+        }}
       />
     );
   }
