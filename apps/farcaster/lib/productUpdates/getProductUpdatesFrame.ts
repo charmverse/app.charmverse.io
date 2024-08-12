@@ -41,7 +41,7 @@ export async function getProductUpdatesFrame(id: string) {
   ]);
 
   return {
-    ...productUpdatesFrame,
+    image: productUpdatesFrame.image,
     previousFrameId: previousFrame?.id ?? null,
     nextFrameId: nextFrame?.id ?? null
   };
