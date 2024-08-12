@@ -20,7 +20,8 @@ export async function middleware(request: NextRequest) {
     !isProjectPath &&
     !path.startsWith('/u/') &&
     !path.startsWith('/grants') &&
-    !path.startsWith('/feed')
+    !path.startsWith('/feed') &&
+    !path.startsWith('/waitlist')
   ) {
     return NextResponse.redirect(new URL('/', request.url));
   } else if (user && path === '/') {
