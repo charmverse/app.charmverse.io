@@ -42,7 +42,7 @@ describe('mapProjectToOptimism', () => {
         mirror: null
       },
       team: ['123', '456'],
-      github: 'https://github.com/projectx',
+      github: ['https://github.com/projectx'],
       packages: [], // Placeholder
       contracts: [], // Placeholder
       grantsAndFunding: {
