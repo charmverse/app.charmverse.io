@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function getProductUpdatesFrame(id: string) {
-  const productUpdatesFrame = await prisma.productUpdatesFarcasterFrame.findUniqueOrThrow({
+  const productUpdatesFrame = await prisma.productUpdatesFarcasterFrame.findUnique({
     where: {
       id
     },
@@ -16,6 +16,10 @@ export async function getProductUpdatesFrame(id: string) {
       }
     }
   });
+
+  if (!productUpdatesFrame) {
+    return null;
+  }
 
   const [previousFrame, nextFrame] = await prisma.$transaction([
     prisma.productUpdatesFarcasterFrame.findFirst({

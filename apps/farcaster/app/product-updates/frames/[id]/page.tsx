@@ -11,7 +11,13 @@ export default async function FramesPage({
     id: string;
   };
 }) {
-  const { nextFrameId, previousFrameId, image } = await getProductUpdatesFrame(params.id);
+  const result = await getProductUpdatesFrame(params.id);
+
+  if (!result) {
+    return <meta name='fc:frame' content='vNext' />;
+  }
+
+  const { nextFrameId, previousFrameId, image } = result;
 
   if (!previousFrameId && !nextFrameId) {
     return (
