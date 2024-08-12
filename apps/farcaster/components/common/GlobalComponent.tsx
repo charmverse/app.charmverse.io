@@ -2,7 +2,7 @@
 
 import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 
-export function Header() {
+export function GlobalComponent() {
   useDatadogLogger({ service: 'farcaster-browser' });
   return null;
 }

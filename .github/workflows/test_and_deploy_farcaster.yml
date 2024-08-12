@@ -187,7 +187,6 @@ jobs:
   deploy-staging:
     name: Deploy to staging
     if: |
-      (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
       (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-farcaster') ||
       (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-farcaster')))
 

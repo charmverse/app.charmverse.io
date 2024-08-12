@@ -1,6 +1,8 @@
 'use server';
 
-import { getProductUpdatesFrame } from 'lib/product-updates/getFrame';
+import { baseUrl } from '@root/config/constants';
+
+import { getProductUpdatesFrame } from 'lib/productUpdates/getProductUpdatesFrame';
 
 export default async function FramesPage({
   params
@@ -26,11 +28,8 @@ export default async function FramesPage({
         <meta name='og:image' content={image} />
         <meta name='fc:frame:image' content={image} />
         <meta name='fc:frame:button:1' content='Next' />
-        <meta name='fc:frame:button:1:action' content='link' />
-        <meta
-          name='fc:frame:button:1:target'
-          content={`https://farcaster.charmverse.io/product-updatesframes/${nextFrameId}`}
-        />
+        <meta name='fc:frame:button:1:action' content='post' />
+        <meta name='fc:frame:button:1:target' content={`${baseUrl}/api/product-updates/frames/${nextFrameId}`} />
       </>
     );
   } else if (previousFrameId && !nextFrameId) {
@@ -40,11 +39,8 @@ export default async function FramesPage({
         <meta name='og:image' content={image} />
         <meta name='fc:frame:image' content={image} />
         <meta name='fc:frame:button:1' content='Previous' />
-        <meta name='fc:frame:button:1:action' content='link' />
-        <meta
-          name='fc:frame:button:1:target'
-          content={`https://farcaster.charmverse.io/product-updates/frames/${previousFrameId}`}
-        />
+        <meta name='fc:frame:button:1:action' content='post' />
+        <meta name='fc:frame:button:1:target' content={`${baseUrl}/api/product-updates/frames/${previousFrameId}`} />
       </>
     );
   }
@@ -55,17 +51,11 @@ export default async function FramesPage({
       <meta name='og:image' content={image} />
       <meta name='fc:frame:image' content={image} />
       <meta name='fc:frame:button:1' content='Previous' />
-      <meta name='fc:frame:button:1:action' content='link' />
-      <meta
-        name='fc:frame:button:1:target'
-        content={`https://farcaster.charmverse.io/product-updates/frames/${previousFrameId}`}
-      />
+      <meta name='fc:frame:button:1:action' content='post' />
+      <meta name='fc:frame:button:1:target' content={`${baseUrl}/api/product-updates/frames/${previousFrameId}`} />
       <meta name='fc:frame:button:2' content='Next' />
-      <meta name='fc:frame:button:2:action' content='link' />
-      <meta
-        name='fc:frame:button:2:target'
-        content={`https://farcaster.charmverse.io/product-updates/frames/${nextFrameId}`}
-      />
+      <meta name='fc:frame:button:2:action' content='post' />
+      <meta name='fc:frame:button:2:target' content={`${baseUrl}/api/product-updates/frames/${nextFrameId}`} />
     </>
   );
 }

@@ -17,7 +17,7 @@ export async function createFrameActionMessageWithSignerKey(
     castId: CastId | undefined;
   }
 ) {
-  const signer = new NobleEd25519Signer(Buffer.from(signerKey.slice(2), 'hex'));
+  const signer = new NobleEd25519Signer(new Uint8Array(Buffer.from(signerKey.slice(2), 'hex')));
 
   const messageDataOptions = {
     fid,
