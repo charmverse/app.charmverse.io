@@ -1,6 +1,8 @@
 import { GET } from '@charmverse/core/http';
 import { uniqBy } from 'lodash';
 
+import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from './constants';
+
 export type FarcasterUser = {
   object: string;
   fid: number;
@@ -41,8 +43,6 @@ type FarcasterUsersByWalletsResponse = {
   [address: string]: FarcasterUser;
 };
 
-const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
-
 export async function getFarcasterUsers({
   wallets,
   username,
@@ -54,41 +54,41 @@ export async function getFarcasterUsers({
 }) {
   if (username) {
     const farcasterUsersResponse = await GET<FarcasterUsersResponse>(
-      `${neynarBaseUrl}/user/search`,
+      `${NEYNAR_API_BASE_URL}/user/search`,
       {
         q: username,
         limit: 5
       },
       {
         headers: {
-          Api_key: process.env.NEYNAR_API_KEY
+          Api_key: NEYNAR_API_KEY
         }
       }
     );
     return farcasterUsersResponse.result.users;
   } else if (fids && fids.length) {
     const farcasterUsersResponse = await GET<FarcasterUserBulkResponse>(
-      `${neynarBaseUrl}/user/bulk`,
+      `${NEYNAR_API_BASE_URL}/user/bulk`,
       {
         fids: fids.join(',')
       },
       {
         headers: {
-          Api_key: process.env.NEYNAR_API_KEY
+          Api_key: NEYNAR_API_KEY
         }
       }
     );
     return farcasterUsersResponse.users;
   } else if (wallets) {
     const farcasterUsersResponse = await GET<FarcasterUsersByWalletsResponse>(
-      `${neynarBaseUrl}/user/bulk-by-address`,
+      `${NEYNAR_API_BASE_URL}/user/bulk-by-address`,
       {
         addresses: wallets.join(','),
         address_types: 'custody_address,verified_address'
       },
       {
         headers: {
-          Api_key: process.env.NEYNAR_API_KEY
+          Api_key: NEYNAR_API_KEY
         }
       }
     );
