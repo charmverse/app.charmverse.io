@@ -25,8 +25,6 @@ export async function generateMarkdown({
 
   (serializer.options as any).charmOptions = generatorOptions;
 
-  serializer.marks[mentionSuggestMarkName] = mentionSuggestSpec().markdown?.toMarkdown as any;
-
   let markdown = content ? serializer.serialize(Node.fromJSON(specRegistry.schema, content)) : '';
 
   // Logic added here as the markdown serializer is synchronous
