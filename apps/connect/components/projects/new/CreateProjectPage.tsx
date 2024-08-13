@@ -52,16 +52,19 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     mode: 'onChange'
   });
 
+  const handleNext = () => {
+    // Scroll to top before changing the state. In Firefox the page flickers because of a weird scroll.
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    setShowTeamMemberForm(true);
+  };
+  const handleBack = () => {
+    setShowTeamMemberForm(false);
+  };
+
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <ProjectForm
-          control={control}
-          isValid={isValid}
-          onNext={() => {
-            setShowTeamMemberForm(true);
-          }}
-        />
+        <ProjectForm control={control} isValid={isValid} onNext={handleNext} />
       </PageWrapper>
     );
   }
@@ -84,9 +87,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
       <Box gap={2} display='flex' flexDirection='column'>
         <AddProjectMembersForm
           user={user}
-          onBack={() => {
-            setShowTeamMemberForm(false);
-          }}
+          onBack={handleBack}
           control={control}
           isValid={isValid}
           handleSubmit={handleSubmit}
