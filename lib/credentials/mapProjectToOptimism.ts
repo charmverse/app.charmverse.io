@@ -101,7 +101,7 @@ export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
       mirror: null
     },
     team: input.projectMembers.map((member) => member.farcasterId.toString()),
-    github: (Array.isArray(input.github) ? input.github?.[0] : input.github) ?? '',
+    github: (Array.isArray(input.github) ? input.github : [input.github].filter(Boolean)) as string[],
     osoSlug: '', // Placeholder: requires specific input
     packages: [], // Placeholder: requires specific input
     contracts,

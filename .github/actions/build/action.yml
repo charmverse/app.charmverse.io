@@ -26,7 +26,7 @@ runs:
           .env.test.local
           dist
           background/ceramicServer/generated
-        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}
+        key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache', '!apps') }}
 
     - name: Build
       shell: bash

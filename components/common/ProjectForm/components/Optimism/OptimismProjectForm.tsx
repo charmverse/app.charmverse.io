@@ -251,6 +251,7 @@ export function OptimismProjectForm({
 
   const {
     control,
+    watch,
     formState: { isValid },
     getValues
   } = useForm<OptimismProjectFormValues>({
@@ -331,6 +332,7 @@ export function OptimismProjectForm({
       <MultiTextInputField
         control={control}
         name='websites'
+        watch={watch}
         disabled={isMutating}
         label='Websites'
         placeholder='https://acme-inc.com'
@@ -341,6 +343,7 @@ export function OptimismProjectForm({
         name='farcasterValues'
         disabled={isMutating}
         label='Farcaster'
+        watch={watch}
         placeholder='https://warpcast.com/acme-inc'
       />
 

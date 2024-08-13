@@ -10,7 +10,6 @@ import { Controller, useController } from 'react-hook-form';
 
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import type { FormValues } from 'lib/projects/form';
-import { inputBackground } from 'theme/colors';
 
 const height = 96;
 
@@ -70,7 +69,7 @@ export function ProjectImageField({
             display='flex'
             alignItems='center'
             justifyContent='center'
-            bgcolor={inputBackground}
+            bgcolor='inputBackground.main'
             flexDirection='column'
             overflow='hidden'
             gap={0}
