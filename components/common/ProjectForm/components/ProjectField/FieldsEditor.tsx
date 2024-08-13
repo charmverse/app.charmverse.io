@@ -16,7 +16,7 @@ export function FieldsEditor({
   properties: ProjectFieldProperty[];
   isProjectMember?: boolean;
 }) {
-  const { control } = useForm();
+  const { control, watch } = useForm();
   return (
     <Stack display='flex' flexDirection='column' gap={2}>
       {properties.map((property) => {
@@ -37,6 +37,7 @@ export function FieldsEditor({
                 placeholder=''
                 control={control}
                 disabled
+                watch={watch}
                 label={property.label}
                 name='example-input'
               />

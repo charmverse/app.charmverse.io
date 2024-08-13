@@ -11,6 +11,7 @@ export async function getProductUpdatesFrame(id: string) {
       createdAt: true,
       project: {
         select: {
+          id: true,
           path: true
         }
       }
@@ -26,7 +27,11 @@ export async function getProductUpdatesFrame(id: string) {
       where: {
         createdAt: {
           lt: productUpdatesFrame.createdAt
-        }
+        },
+        projectId: productUpdatesFrame.project.id
+      },
+      orderBy: {
+        createdAt: 'desc'
       },
       select: {
         id: true
@@ -36,7 +41,11 @@ export async function getProductUpdatesFrame(id: string) {
       where: {
         createdAt: {
           gt: productUpdatesFrame.createdAt
-        }
+        },
+        projectId: productUpdatesFrame.project.id
+      },
+      orderBy: {
+        createdAt: 'asc'
       },
       select: {
         id: true
