@@ -63,7 +63,6 @@ export function MultiTextInputField<T extends FieldValues>({
             name={`${typedName}.0` as Path<T>}
             render={({ field: _field, fieldState }) => (
               <CustomTextField
-                defaultValue=''
                 disabled={disabled}
                 data-test={dataTest}
                 fullWidth
@@ -83,7 +82,6 @@ export function MultiTextInputField<T extends FieldValues>({
               render={({ field: _field, fieldState }) => (
                 <Stack width='100%' gap={1} alignItems='center' flexDirection='row'>
                   <CustomTextField
-                    defaultValue=''
                     disabled={disabled}
                     fullWidth
                     placeholder={placeholder}

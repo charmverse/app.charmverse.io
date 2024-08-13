@@ -70,7 +70,6 @@ export function CustomTextField({ error, ...props }: TextFieldProps & { error?: 
 
   return (
     <TextField
-      defaultValue=''
       disabled={props.disabled}
       fullWidth
       placeholder={props.placeholder}
