@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { Divider, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Divider, IconButton, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 import type { KeyedMutator } from 'swr';
 
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -148,14 +148,18 @@ export function ProjectForm({
             <>
               <Stack key={`project-member-${projectMember.id}`}>
                 <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
-                  <FieldLabel>Team Member</FieldLabel>
-                  <IconButton
-                    data-test='remove-project-member-button'
-                    disabled={disabled}
-                    onClick={() => removeTeamMember(projectMember.id)}
-                  >
-                    <DeleteOutlineOutlinedIcon fontSize='small' color={disabled ? 'disabled' : 'error'} />
-                  </IconButton>
+                  <FieldLabel>Team member</FieldLabel>
+                  {!disabled && (
+                    <Tooltip title='Remove team member'>
+                      <IconButton
+                        data-test='remove-project-member-button'
+                        disabled={disabled}
+                        onClick={() => removeTeamMember(projectMember.id)}
+                      >
+                        <DeleteOutlineOutlinedIcon fontSize='small' color='secondary' />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </Stack>
                 <FieldAnswers
                   disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}
