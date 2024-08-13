@@ -32,7 +32,6 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
       revalidatePathAction();
-      log.info('User logged in', { userId: data?.userId });
       router.push('/profile');
     },
     onError(err) {

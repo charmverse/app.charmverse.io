@@ -20,15 +20,19 @@ function WarpcastLoginButton() {
   const { isAuthenticated } = useProfile();
 
   const {
+    executeAsync: revalidatePath,
+    hasSucceeded: revalidatePathSuccess,
+    isExecuting: isRevalidatingPath
+  } = useAction(revalidatePathAction);
+
+  const {
     execute: loginUser,
     hasErrored,
-    hasSucceeded,
-    isExecuting,
-    result
+    hasSucceeded: loginWithFarcasterSuccess,
+    isExecuting: isLoggingIn
   } = useAction(loginWithFarcasterAction, {
-    onSuccess: async ({ data }) => {
-      revalidatePathAction();
-      log.info('User logged in', { userId: data?.userId });
+    onSuccess: async () => {
+      await revalidatePath({});
       router.push('/profile');
     },
     onError(err) {
@@ -44,7 +48,7 @@ function WarpcastLoginButton() {
     log.error('There was an error while logging in with Warpcast', { error: err });
   }, []);
 
-  if (isExecuting || (isAuthenticated && hasSucceeded)) {
+  if (isLoggingIn || isRevalidatingPath || (isAuthenticated && loginWithFarcasterSuccess && revalidatePathSuccess)) {
     return <LoadingComponent size={30} label='Logging you in...' />;
   }
 
