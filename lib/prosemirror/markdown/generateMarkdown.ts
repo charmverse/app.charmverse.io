@@ -1,6 +1,8 @@
 import type { User } from '@charmverse/core/prisma';
 import { Node } from 'prosemirror-model';
 
+import { mentionSuggestMarkName } from 'components/common/CharmEditor/components/mention';
+import { mentionSuggestSpec } from 'components/common/CharmEditor/components/mention/mention.specs';
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage/nestedPage.utils';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 
@@ -22,6 +24,8 @@ export async function generateMarkdown({
   const serializer = markdownSerializer(specRegistry);
 
   (serializer.options as any).charmOptions = generatorOptions;
+
+  serializer.marks[mentionSuggestMarkName] = mentionSuggestSpec().markdown?.toMarkdown as any;
 
   let markdown = content ? serializer.serialize(Node.fromJSON(specRegistry.schema, content)) : '';
 

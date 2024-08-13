@@ -2,7 +2,7 @@ import type { DOMOutputSpec, Node } from 'prosemirror-model';
 
 import type { Member } from 'lib/members/interfaces';
 
-import type { RawSpecs } from '../@bangle.dev/core/specRegistry';
+import type { BaseRawMarkSpec, RawSpecs } from '../@bangle.dev/core/specRegistry';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import { mentionNodeName, mentionSuggestMarkName, mentionTrigger } from './mention.constants';
@@ -15,8 +15,23 @@ export interface MentionSpecSchemaAttrs {
   createdBy: string;
 }
 
-export function mentionSpecs(): RawSpecs {
-  const spec = suggestTooltip.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger });
+// This is used in the serialiser. The spec registry imports mentionSpecs, which contains the mention node and mentionSuggest mark
+export function mentionSuggestSpec(): BaseRawMarkSpec {
+  return {
+    ...suggestTooltip.spec({ markName: mentionSuggestMarkName, trigger: mentionTrigger }),
+    type: 'mark',
+    markdown: {
+      toMarkdown: {
+        open: '',
+        close: '',
+        mixable: false,
+        expelEnclosingWhitespace: true
+      }
+    }
+  } as BaseRawMarkSpec;
+}
+
+export function mentionSpecs(): RawSpecs[] {
   return [
     {
       type: 'node',
@@ -78,11 +93,6 @@ export function mentionSpecs(): RawSpecs {
         }
       }
     },
-    {
-      ...spec,
-      options: {
-        trigger: mentionTrigger
-      }
-    }
+    mentionSuggestSpec()
   ];
 }
