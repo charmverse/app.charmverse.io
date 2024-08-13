@@ -45,7 +45,6 @@ export function MultiTextInputField<T extends FieldValues>({
               placeholder={placeholder}
               error={!!fieldState.error}
               {..._field}
-              value={_field.value || ''}
             />
           )}
         />

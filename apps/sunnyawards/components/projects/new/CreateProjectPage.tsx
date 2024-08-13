@@ -44,7 +44,13 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
+      description: '',
+      category: '' as any,
+      websites: [''],
+      farcasterValues: [''],
       sunnyAwardsProjectType: 'other',
+      twitter: '',
+      github: '',
       projectMembers: [
         {
           name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
