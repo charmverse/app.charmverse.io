@@ -1,67 +1,19 @@
-import * as adapters from '@root/adapters/http';
 import { baseUrl } from '@root/config/constants';
 
 import { encrypt } from 'lib/crypto';
+import { validateFarcasterFrame } from 'lib/validateFarcasterFrame';
 
 export async function POST(req: Request) {
-  const data = (await req.json()) as {
-    untrustedData: {
-      fid: number;
-      url: string;
-      messageHash: string;
-      timestamp: number;
-      network: number;
-      buttonIndex: number;
-      state: string;
-    };
-    trustedData: {
-      messageBytes: string;
-    };
-  };
-  const messageBytes = data.trustedData.messageBytes;
-  const result = await adapters.POST<{
-    valid: boolean;
-    action: {
-      interactor: {
-        fid: number;
-      };
-      timestamp: string;
-    };
-  }>(
-    'https://api.neynar.com/v2/farcaster/frame/validate',
+  const { fid } = await validateFarcasterFrame(await req.json());
+  const token = encrypt(fid.toString());
+  return Response.json(
     {
-      message_bytes_in_hex: messageBytes
+      type: 'form',
+      title: 'Product updates',
+      url: `${baseUrl}/product-updates?token=${token}`
     },
     {
-      headers: {
-        Api_key: process.env.NEYNAR_API_KEY
-      }
-    }
-  );
-
-  if (result.valid) {
-    const timestamp = Math.floor(new Date(result.action.timestamp).getTime() / 1000);
-    if (timestamp > new Date().getTime() / 1000 - 60) {
-      const token = encrypt(result.action.interactor.fid.toString());
-      return Response.json(
-        {
-          type: 'form',
-          title: 'Product updates',
-          url: `${baseUrl}/product-updates?token=${token}`
-        },
-        {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-    }
-  }
-  return Response.json(
-    {},
-    {
-      status: 401,
+      status: 200,
       headers: {
         'Content-Type': 'application/json'
       }
