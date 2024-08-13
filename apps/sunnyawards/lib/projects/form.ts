@@ -96,22 +96,26 @@ export const schema = yup.object({
     }),
   mintingWalletAddress: yup
     .string()
-    .test('mintingWalletAddress', 'Artwork minting wallet address or ENS is required', async (value, context) => {
-      if ((context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType) === 'creator') {
-        if (!value) {
-          return false;
+    .test(
+      'mintingWalletAddress',
+      'The wallet address or ENS you use to create onchain is required',
+      async (value, context) => {
+        if ((context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType) === 'creator') {
+          if (!value) {
+            return false;
+          }
+
+          let address: string | null = value;
+
+          if (address?.endsWith('.eth')) {
+            address = await resolveEnsAddress(value);
+          }
+
+          return !!address && !!isAddress(address);
         }
-
-        let address: string | null = value;
-
-        if (address?.endsWith('.eth')) {
-          address = await resolveEnsAddress(value);
-        }
-
-        return !!address && !!isAddress(address);
+        return true;
       }
-      return true;
-    }),
+    ),
   projectMembers: yup
     .array()
     .of(
