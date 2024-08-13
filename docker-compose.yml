@@ -278,6 +278,7 @@ services:
     profiles:
       - prd-cron
       - prd-webapp
+      - prd-sunnyawards
       - prd-sockets
       - prd-connect
       - prd-connect-api
