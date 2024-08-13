@@ -104,21 +104,22 @@ export function MultiTextInputField<T extends FieldValues>({
           </Stack>
         ))}
       </FieldWrapper>
-      <Button
-        sx={{
-          width: 'fit-content'
-        }}
-        startIcon={<AddIcon fontSize='small' />}
-        size='small'
-        disabled={disabled}
-        variant='outlined'
-        color='secondary'
-        onClick={() => {
-          append('' as any);
-        }}
-      >
-        Add
-      </Button>
+      {!disabled && (
+        <Button
+          sx={{
+            width: 'fit-content'
+          }}
+          startIcon={<AddIcon fontSize='small' />}
+          size='small'
+          variant='outlined'
+          color='secondary'
+          onClick={() => {
+            append('' as any);
+          }}
+        >
+          Add
+        </Button>
+      )}
     </Stack>
   );
 }

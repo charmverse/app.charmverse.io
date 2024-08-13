@@ -136,6 +136,7 @@ export function ProjectForm({
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
       <FieldAnswers
+        disabled={disabled}
         namePrefix='projectMembers[0]'
         fieldConfig={fieldConfig.projectMember}
         properties={projectMemberFieldProperties}
