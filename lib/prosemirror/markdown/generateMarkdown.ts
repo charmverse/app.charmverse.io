@@ -1,5 +1,4 @@
 import type { User } from '@charmverse/core/prisma';
-import { prettyPrint } from '@root/lib/utils/strings';
 import { Node } from 'prosemirror-model';
 
 import { mentionSuggestMarkName } from 'components/common/CharmEditor/components/mention';
@@ -22,8 +21,6 @@ export async function generateMarkdown({
   content: any;
   generatorOptions?: CharmMarkdownGeneratorOptions;
 }): Promise<string> {
-  prettyPrint({ title, content, generatorOptions });
-
   const serializer = markdownSerializer(specRegistry);
 
   (serializer.options as any).charmOptions = generatorOptions;
