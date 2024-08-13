@@ -3,7 +3,7 @@ import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 
 import { ProductUpdatesComposerAction } from 'components/product-updates/ProductUpdatesComposerAction';
 import { decrypt } from 'lib/crypto';
-import { getConnectProjectsByFid } from 'lib/getConnectProjectsByFid';
+import { getConnectProjectsByFid } from 'lib/projects/getConnectProjectsByFid';
 
 export default async function Home({
   searchParams

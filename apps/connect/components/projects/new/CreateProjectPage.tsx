@@ -2,11 +2,14 @@
 
 import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
+import { ProjectForm } from '@connect-shared/components/project/ProjectForm';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { schema, type FormValues } from '@connect-shared/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Typography } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import { Box } from '@mui/system';
+import { ConnectApiClient } from 'apiClient/apiClient';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -16,9 +19,8 @@ import { PageCoverHeader } from 'components/common/PageCoverHeader';
 import { actionCreateProject } from 'lib/projects/createProjectAction';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
-import type { ProjectDetailsProps } from '../components/ProjectDetails';
-import { ProjectDetails } from '../components/ProjectDetails';
-import { ProjectForm } from '../components/ProjectForm';
+
+const connectApiClient = new ConnectApiClient();
 
 export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
@@ -55,27 +57,36 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <ProjectForm
-          control={control}
-          isValid={isValid}
-          onNext={() => {
-            setShowTeamMemberForm(true);
-          }}
-        />
+        <ProjectForm uploadImageFn={connectApiClient.uploadImage} control={control} />
+        <Stack
+          justifyContent='space-between'
+          flexDirection='row'
+          position='sticky'
+          bottom='0'
+          bgcolor='background.default'
+          py={2}
+        >
+          <Link href='/profile' passHref>
+            <Button size='large' color='secondary' variant='outlined'>
+              Cancel
+            </Button>
+          </Link>
+          <Button
+            data-test='project-form-confirm-values'
+            size='large'
+            disabled={!isValid}
+            onClick={() => {
+              setShowTeamMemberForm(true);
+            }}
+          >
+            Next
+          </Button>
+        </Stack>
       </PageWrapper>
     );
   }
 
   const project = getValues();
-  const projectDetails = {
-    id: '',
-    name: project.name,
-    description: project.description,
-    farcasterValues: project.farcasterValues,
-    github: project.github,
-    twitter: project.twitter,
-    websites: project.websites
-  } as ProjectDetailsProps['project'];
 
   return (
     <PageWrapper
