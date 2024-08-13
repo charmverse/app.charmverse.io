@@ -26,19 +26,21 @@ export async function createProductUpdatesFrame(input: FormValues) {
       id: input.projectId
     },
     select: {
-      name: true
+      name: true,
+      coverImage: true
     }
   });
 
   const element = React.createElement(ProductUpdatesText, {
     text: input.text,
     createdAtLocal: input.createdAtLocal,
-    projectName: project.name
+    projectName: project.name,
+    projectCoverImage: project.coverImage
   });
-  // Use a ratio of 1.9:1 for the image
+  // Use a ratio of 1.9:1 for the image as recommended by farcaster
   const image = new ImageResponse(element, {
-    width: 1000,
-    height: 525
+    width: 500,
+    height: 265
   });
 
   const imageBlob = await image.blob();

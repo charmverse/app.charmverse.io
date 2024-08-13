@@ -1,11 +1,13 @@
 export function ProductUpdatesText({
   text,
   createdAtLocal,
-  projectName
+  projectName,
+  projectCoverImage
 }: {
   projectName: string;
   text: string;
   createdAtLocal: string;
+  projectCoverImage: string | null;
 }) {
   const lines = text
     .split('\n')
@@ -15,7 +17,10 @@ export function ProductUpdatesText({
   return (
     <div
       style={{
-        padding: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingBottom: 10,
+        paddingTop: 10,
         height: '100%',
         backgroundColor: 'white',
         display: 'flex',
@@ -23,13 +28,38 @@ export function ProductUpdatesText({
         flexDirection: 'column'
       }}
     >
-      <p style={{ fontSize: 20 }}>{projectName}</p>
-      <p style={{ fontSize: 18, marginTop: 4 }}>{createdAtLocal}</p>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start'
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
+          }}
+        >
+          {projectCoverImage && <img width={35} height={35} src={projectCoverImage} />}
+          <p>{projectName}</p>
+          <p
+            style={{
+              marginTop: -8
+            }}
+          >
+            {createdAtLocal}
+          </p>
+        </div>
+        <img width={100} height={100} src='https://cdn.pixabay.com/photo/2023/01/31/04/11/rocket-7757105_1280.png' />
+      </div>
+      <div style={{ width: '100%', height: 2, backgroundColor: 'black' }} />
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
-          marginTop: 10
+          marginTop: 15
         }}
       >
         {lines.map((line, index) => {
@@ -38,7 +68,7 @@ export function ProductUpdatesText({
             <p
               style={{
                 wordBreak: 'break-word',
-                marginTop: 10
+                marginTop: -4
               }}
               key={`${index.toString()}`}
             >

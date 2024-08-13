@@ -26,13 +26,18 @@ export function ProductUpdatesComposerAction({
   connectProjects: ConnectProjectMinimal[];
 }) {
   const [isCreatingProject, setIsCreatingProject] = useState(false);
-
+  const locale = window.navigator.language;
   const { control, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
       projectId: '',
       text: '',
-      createdAtLocal: new Date().toDateString()
+      createdAtLocal: new Date().toLocaleDateString(locale, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      })
     },
     resolver: yupResolver(schema),
     mode: 'onChange'
