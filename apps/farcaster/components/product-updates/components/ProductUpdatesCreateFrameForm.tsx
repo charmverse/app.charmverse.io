@@ -3,26 +3,15 @@
 import { log } from '@charmverse/core/log';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/Add';
-import { Button, Divider, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Stack, Button, Divider, FormLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useAction } from 'next-safe-action/hooks';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import type { ICharmEditorOutput } from 'components/common/MinimalCharmEditor';
-import MinimalCharmEditor from 'components/common/MinimalCharmEditor';
 import { postCreateCastMessage } from 'lib/postCreateCastMessage';
 import { createProductUpdatesFrameAction } from 'lib/productUpdates/createProductUpdatesFrameAction';
 import { schema, type FormValues } from 'lib/productUpdates/schema';
 import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid';
-
-const defaultCharmEditorOutput: ICharmEditorOutput = {
-  doc: {
-    type: 'doc',
-    content: [{ type: 'paragraph', content: [] }]
-  },
-  rawText: ''
-};
 
 export function ProductUpdatesCreateFrameForm({
   connectProjects,
@@ -33,12 +22,10 @@ export function ProductUpdatesCreateFrameForm({
   connectProjects: ConnectProjectMinimal[];
   onCreateProject: VoidFunction;
 }) {
-  const [editorOutput, setEditorOutput] = useState(defaultCharmEditorOutput);
   const { control, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
       projectId: connectProjects[0]?.id || '',
-      textContent: {},
       text: '',
       createdAtLocal: new Date().toLocaleDateString()
     },
@@ -65,8 +52,6 @@ export function ProductUpdatesCreateFrameForm({
         const locale = window.navigator.language;
         execute({
           ...data,
-          text: editorOutput.rawText,
-          textContent: editorOutput.doc,
           createdAtLocal: new Date().toLocaleDateString(locale, {
             weekday: 'short',
             month: 'short',
@@ -109,17 +94,21 @@ export function ProductUpdatesCreateFrameForm({
         />
         <Stack>
           <FormLabel id='text'>Product updates</FormLabel>
-          <MinimalCharmEditor
-            readOnly={isExecuting}
-            style={{
-              border: !editorOutput.rawText ? '1px solid red' : undefined,
-              minHeight: '200px'
-            }}
-            placeholderText='1. Updated documentation ...'
-            colorMode='dark'
-            focusOnInit
-            content={editorOutput.doc}
-            onContentChange={(content) => setEditorOutput(content)}
+          <Controller
+            control={control}
+            name='text'
+            render={({ field, fieldState }) => (
+              <TextField
+                disabled={isExecuting}
+                multiline
+                rows={8}
+                aria-labelledby='product-updates'
+                placeholder='1. Updated documentation ...'
+                helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'
+                error={!!fieldState.error}
+                {...field}
+              />
+            )}
           />
         </Stack>
 
