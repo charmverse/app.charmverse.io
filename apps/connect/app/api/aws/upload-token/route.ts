@@ -18,9 +18,7 @@ export async function GET(request: Request) {
     const tokenData = await uploadToken(filename, userId);
 
     return Response.json(tokenData);
-  } catch (error: any) {
-    return new Response(`Failed to generate S3 upload token. error: ${JSON.stringify(error)}`, {
-      status: error?.code || 500
-    });
+  } catch (error) {
+    return new Response(`Failed to generate S3 upload token: ${error}`, { status: 500 });
   }
 }

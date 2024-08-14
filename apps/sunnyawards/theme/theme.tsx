@@ -276,6 +276,11 @@ const extendedTheme = extendTheme({
           '[data-mui-color-scheme="dark"] &': {
             '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
               borderColor: inputBorderDarkMode
+            },
+            input: {
+              '&:-webkit-autofill': {
+                WebkitBoxShadow: `0 0 0 100px ${theme.vars.palette.background.paper} inset`
+              }
             }
           }
         }),
