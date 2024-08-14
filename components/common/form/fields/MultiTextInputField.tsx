@@ -1,12 +1,13 @@
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
-import { IconButton, Stack, TextField } from '@mui/material';
+import { IconButton, Stack, Tooltip } from '@mui/material';
 import type { FieldValues, Control, FieldArrayPath, Path, UseFormWatch } from 'react-hook-form';
-import { Controller, useFieldArray, useController } from 'react-hook-form';
+import { Controller, useFieldArray } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
 
 import { FieldWrapper } from './FieldWrapper';
+import { CustomTextField } from './TextInputField';
 
 export function MultiTextInputField<T extends FieldValues>({
   control,
@@ -61,8 +62,7 @@ export function MultiTextInputField<T extends FieldValues>({
             control={control}
             name={`${typedName}.0` as Path<T>}
             render={({ field: _field, fieldState }) => (
-              <TextField
-                defaultValue=''
+              <CustomTextField
                 disabled={disabled}
                 data-test={dataTest}
                 fullWidth
@@ -81,8 +81,7 @@ export function MultiTextInputField<T extends FieldValues>({
               name={`${typedName}.${index + 1}` as Path<T>}
               render={({ field: _field, fieldState }) => (
                 <Stack width='100%' gap={1} alignItems='center' flexDirection='row'>
-                  <TextField
-                    defaultValue=''
+                  <CustomTextField
                     disabled={disabled}
                     fullWidth
                     placeholder={placeholder}
@@ -90,30 +89,35 @@ export function MultiTextInputField<T extends FieldValues>({
                     {..._field}
                     onChange={onChangeValue(_field.onChange, index + 1)}
                   />
-                  <IconButton disabled={disabled} size='small' onClick={() => removeValue(index + 1)}>
-                    <DeleteIcon fontSize='small' color='error' />
-                  </IconButton>
+                  {!disabled && (
+                    <Tooltip title='Remove'>
+                      <IconButton size='small' onClick={() => removeValue(index + 1)}>
+                        <DeleteIcon fontSize='small' color='secondary' />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </Stack>
               )}
             />
           </Stack>
         ))}
       </FieldWrapper>
-      <Button
-        sx={{
-          width: 'fit-content'
-        }}
-        startIcon={<AddIcon fontSize='small' />}
-        size='small'
-        disabled={disabled}
-        variant='outlined'
-        color='secondary'
-        onClick={() => {
-          append('' as any);
-        }}
-      >
-        Add
-      </Button>
+      {!disabled && (
+        <Button
+          sx={{
+            width: 'fit-content'
+          }}
+          startIcon={<AddIcon fontSize='small' />}
+          size='small'
+          variant='outlined'
+          color='secondary'
+          onClick={() => {
+            append('' as any);
+          }}
+        >
+          Add
+        </Button>
+      )}
     </Stack>
   );
 }
