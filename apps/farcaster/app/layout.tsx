@@ -7,6 +7,7 @@ import { GlobalComponent } from 'components/common/GlobalComponent';
 import theme from 'theme/theme';
 
 import 'theme/cssVariables.scss';
+import 'theme/editor.scss';
 
 export const viewport: Viewport = {
   themeColor: '#fff',

@@ -1,0 +1,166 @@
+.bangle-editor li[data-bangle-is-todo] > span:first-child > input {
+  margin-top: 0.45rem;
+}
+
+.bangle-editor {
+  border: none;
+  outline: none;
+}
+
+.ProseMirror {
+  padding: 5px 0;
+}
+
+// @bangle.dev/core/style.css
+/**
+ * Prosemirror
+ * copied from https://github.com/ProseMirror/prosemirror-view/blob/master/style/prosemirror.css
+ */
+.ProseMirror {
+  position: relative;
+}
+
+.ProseMirror {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  white-space: break-spaces;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  font-feature-settings: 'liga' 0;
+  /* the above doesn't seem to work in Edge */
+}
+
+/** Prosemirror-END */
+
+.bangle-editor ul p,
+.bangle-editor ol p,
+.charm-column-row p {
+  padding-bottom: 3px;
+  padding-top: 3px;
+}
+
+.bangle-editor li {
+  position: relative;
+
+  li:first-child {
+    padding-top: 0;
+  }
+}
+
+.bangle-editor li > span {
+  display: block;
+}
+
+/* Make sure li selections wrap around markers */
+.bangle-editor li.ProseMirror-selectednode {
+  outline: none;
+}
+
+.bangle-editor li.ProseMirror-selectednode:after {
+  content: '';
+  position: absolute;
+  left: -32px;
+  right: -2px;
+  top: -2px;
+  bottom: -2px;
+  border: 2px solid #8cf;
+  pointer-events: none;
+}
+
+.bangle-editor > ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.bangle-editor > p {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.bangle-editor ul,
+.bangle-editor ol {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.bangle-editor-core {
+  width: 100%;
+  position: relative;
+}
+
+/** placeholder - do not show while content is loading **/
+.ProseMirror[data-placeholder]::before,
+  .charm-placeholder::before  {
+    display: block;
+    height: 0;
+    color: var(--secondary-text);
+    content: attr(data-placeholder);
+    opacity: 0.75;
+    pointer-events: none;
+    position: relative;
+  }
+  .ProseMirror[data-placeholder]::before  {
+    top: 3px;
+  }
+
+.readonly {
+  .charm-placeholder::before {
+    display: none;
+  }
+}
+
+.bangle-editor-core.readonly {
+  p, h1, h2, h3, ul, ol, code, .tableScrollWrapper, .charm-column-row, .bangle-nv-container {
+    &:has(div.charm-row-decoration-suggestions) {
+      // important for column row, as it uses inline-styles
+      display: none !important;
+    }
+  }
+
+  // For NodeView blocks the decoration is adjacent to it
+  .bangle-nv-container:has(+ div.charm-row-decoration-suggestions) {
+    display: none;
+  }
+
+  div.charm-row-decoration-suggestions {
+    display: none;
+  }
+}
+
+/** End columns **/
+
+/** Tab **/
+.charm-tab {
+  tab-size: var(--tab-width);  // should equal list item padding
+
+  &[data-indent='1'] {
+    tab-size: calc(2 * var(--tab-width));
+  }
+  &[data-indent='2'] {
+    tab-size: calc(3 * var(--tab-width));
+  }
+  &[data-indent='3'] {
+    tab-size: calc(4 * var(--tab-width));
+  }
+  &[data-indent='4'] {
+    tab-size: calc(5 * var(--tab-width));
+  }
+  &[data-indent='5'] {
+    tab-size: calc(6 * var(--tab-width));
+  }
+  &[data-indent='6'] {
+    tab-size: calc(7 * var(--tab-width));
+  }
+}
+
+/** hide tab when a user suggested to delete a list item - it should not exist yet **/
+li .insertion > .charm-tab {
+  display: none;
+}
+
+.bangle-editor-core > div {
+  background: rgba(255, 255, 255, 0.055);
+  color: white;
+  padding: 5px 15px;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+}

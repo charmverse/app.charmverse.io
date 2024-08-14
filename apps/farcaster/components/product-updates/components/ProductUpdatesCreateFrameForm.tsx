@@ -112,7 +112,6 @@ export function ProductUpdatesCreateFrameForm({
           <MinimalCharmEditor
             readOnly={isExecuting}
             style={{
-              border: !editorOutput.rawText ? '1px solid red' : undefined,
               minHeight: '200px'
             }}
             placeholderText='1. Updated documentation ...'
