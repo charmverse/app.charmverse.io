@@ -1,13 +1,18 @@
-import type { MixpanelEvent, MixpanelEventName, MixpanelTrackBase } from '@root/lib/metrics/mixpanel/interfaces';
 import * as yup from 'yup';
 
-export const pageViewSchema = yup.object().shape({
-  event: yup.string<MixpanelEventName>().required(),
+export type EventType =
+  | 'page_view'
+  | 'create_project'
+  | 'click_dont_have_farcaster_account'
+  | 'click_join_the_sunnys'
+  | 'click_share_on_warpcast';
+
+export const eventSchema = yup.object().shape({
+  event: yup.string<EventType>().required(),
   isAnonymous: yup.boolean(),
   currentPageTitle: yup.string(),
   currentDomain: yup.string(),
   currentUrlPath: yup.string(),
   currentUrlSearch: yup.string()
 });
-
-export type Payload = yup.InferType<typeof pageViewSchema>;
+export type Payload = yup.InferType<typeof eventSchema>;

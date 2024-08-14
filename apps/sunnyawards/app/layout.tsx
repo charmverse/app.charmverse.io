@@ -6,6 +6,7 @@ import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
+import { ClientGlobal } from 'components/common/ClientGlobal';
 import { Footer } from 'components/common/Footer';
 import { Header } from 'components/common/Header/Header';
 import theme from 'theme/theme';
@@ -47,6 +48,7 @@ export default async function RootLayout({
           }}
         >
           <AppProviders theme={theme}>
+            <ClientGlobal user={user?.data || null} />
             <Header user={user?.data || null} />
             <Box component='main' pb={2}>
               {children}

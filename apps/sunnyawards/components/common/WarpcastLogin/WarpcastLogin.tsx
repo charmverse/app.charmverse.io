@@ -3,11 +3,12 @@
 import { log } from '@charmverse/core/log';
 import { FarcasterLoginModal } from '@connect-shared/components/common/FarcasterModal';
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
+import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { loginWithFarcasterAction } from '@connect-shared/lib/session/loginAction';
 import { AuthKitProvider, useProfile } from '@farcaster/auth-kit';
 import type { AuthClientError, StatusAPIResponse } from '@farcaster/auth-kit';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
 import type { ButtonProps } from '@mui/material';
 import { warpcastConfig } from '@root/lib/farcaster/config';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -87,9 +88,25 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
 }
 
 export function WarpcastLogin() {
+  const trackEvent = useTrackEvent();
   return (
     <AuthKitProvider config={warpcastConfig}>
       <WarpcastLoginButton />
+      <Link
+        variant='body2'
+        href='https://warpcast.com/~/signup'
+        target='_blank'
+        rel='noopener'
+        color='text.primary'
+        fontWeight={500}
+        display='block'
+        onMouseDown={() => {
+          trackEvent('click_dont_have_farcaster_account');
+        }}
+      >
+        Don't have a Farcaster account?
+      </Link>
+      ;
     </AuthKitProvider>
   );
 }
