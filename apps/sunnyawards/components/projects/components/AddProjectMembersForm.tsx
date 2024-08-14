@@ -1,7 +1,7 @@
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import { Button, Stack, Typography } from '@mui/material';
+import { Alert, Button, Stack, Typography } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
@@ -23,7 +23,8 @@ export function AddProjectMembersForm({
   user,
   initialFarcasterProfiles = [],
   execute,
-  isExecuting
+  isExecuting,
+  error
 }: {
   initialFarcasterProfiles?: FarcasterProfile[];
   user: LoggedInUser;
@@ -33,6 +34,7 @@ export function AddProjectMembersForm({
   handleSubmit: UseFormHandleSubmit<FormValues>;
   execute: (data: FormValues) => void;
   isExecuting: boolean;
+  error?: string | null;
 }) {
   const { append, remove } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
@@ -112,6 +114,11 @@ export function AddProjectMembersForm({
                 label='Submitting your project onchain'
                 flexDirection='row-reverse'
               />
+            )}
+            {error && !isExecuting && (
+              <Typography alignContent='center' variant='caption' color='error'>
+                {error}
+              </Typography>
             )}
             <Button data-test='project-form-publish' disabled={!isValid || isExecuting} type='submit'>
               Publish

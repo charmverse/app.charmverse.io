@@ -26,13 +26,20 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
 
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   const { execute, isExecuting } = useAction(editProjectAction, {
+    onExecute: () => {
+      setError(null);
+    },
     onSuccess: () => {
       router.push(`/p/${project.path}`);
     },
     onError(err) {
-      log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
+      const errorMessage = err.error.serverError?.message || 'Something went wrong';
+      log.error(errorMessage || 'Something went wrong', err.error.serverError);
+
+      setError(errorMessage);
     }
   });
 
@@ -135,6 +142,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
                 username: member.farcasterUser.username
               } as any)
           )}
+          error={error}
         />
       </Box>
     </PageWrapper>

@@ -4,7 +4,6 @@ import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { useRouter } from 'next/navigation';
@@ -26,13 +25,20 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
 
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   const { execute, isExecuting } = useAction(createProjectAction, {
+    onExecute: () => {
+      setError(null);
+    },
     onSuccess: (data) => {
       router.push(`/p/${data.data?.projectPath as string}/share`);
     },
     onError(err) {
-      log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
+      const errorMessage = err.error.serverError?.message || 'Something went wrong';
+      log.error(errorMessage, err.error.serverError);
+
+      setError(errorMessage);
     }
   });
 
@@ -104,6 +110,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
           handleSubmit={handleSubmit}
           execute={execute}
           isExecuting={isExecuting}
+          error={error}
         />
       </Box>
     </PageWrapper>

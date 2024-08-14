@@ -37,9 +37,7 @@ export async function createOptimismProject({
 
   if (hasEnsName) {
     const resolvedAddress = await resolveEnsAddress(input.mintingWalletAddress as string);
-    if (resolvedAddress) {
-      input.mintingWalletAddress = resolvedAddress;
-    } else {
+    if (!resolvedAddress) {
       throw new InvalidInputError('Invalid ENS name');
     }
   }
