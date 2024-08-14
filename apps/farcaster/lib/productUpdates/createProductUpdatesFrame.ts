@@ -5,7 +5,7 @@ import React from 'react';
 import sharp from 'sharp';
 import { v4 } from 'uuid';
 
-import { ProductUpdatesText } from 'components/product-updates/ProductUpdatesText';
+import { ProductUpdatesText } from 'components/product-updates/components/ProductUpdatesText';
 
 import type { FormValues } from './schema';
 
