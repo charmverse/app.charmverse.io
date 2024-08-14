@@ -5,7 +5,12 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 import { prettyPrint } from '@root/lib/utils/strings';
 import { getFrameHtml } from 'frames.js';
 
-import { waitlistGet1000Points, waitlistGetDetails, type WaitlistFramePage } from 'lib/waitlist/actionButtons';
+import {
+  waitlistGet1000Points,
+  waitlistGetDetails,
+  waitlistShareMyFrame,
+  type WaitlistFramePage
+} from 'lib/waitlist/actionButtons';
 import { joinWaitlist } from 'lib/waitlist/joinWaitlist';
 
 export async function POST(req: Request, res: Response) {
@@ -17,11 +22,13 @@ export async function POST(req: Request, res: Response) {
     throw new InvalidInputError('Invalid frame interaction. Could not validate message');
   }
 
+  const interactorFid = parseInt(validatedMessage.action.interactor.fid.toString(), 10);
+
   const currentPage = new URL(req.url).searchParams.get('current_page') as WaitlistFramePage;
   const referrerFid = new URL(req.url).searchParams.get('referrer_fid');
 
   const joinWaitlistResult = await joinWaitlist({
-    fid: parseInt(validatedMessage.action.interactor.fid.toString(), 10),
+    fid: interactorFid,
     referredByFid: referrerFid,
     username: validatedMessage.action.interactor.username
   });
@@ -33,7 +40,7 @@ export async function POST(req: Request, res: Response) {
       html = getFrameHtml({
         image: `${baseUrl}/images/waitlist/waitlist-joined.gif`,
         version: 'vNext',
-        buttons: [waitlistGetDetails, waitlistGet1000Points],
+        buttons: [waitlistGetDetails, waitlistGet1000Points, waitlistShareMyFrame(interactorFid)],
         imageAspectRatio: '1:1'
         // ogImage: `${baseUrl}/images/waitlist/waitlist-joined.gif`
       });
@@ -41,7 +48,7 @@ export async function POST(req: Request, res: Response) {
       html = getFrameHtml({
         image: `${baseUrl}/images/waitlist/waitlist-joined.gif`,
         version: 'vNext',
-        buttons: [waitlistGetDetails],
+        buttons: [waitlistGetDetails, waitlistShareMyFrame(interactorFid)],
         imageAspectRatio: '1:1'
       });
     }
