@@ -26,18 +26,12 @@ export function ProductUpdatesComposerAction({
   connectProjects: ConnectProjectMinimal[];
 }) {
   const [isCreatingProject, setIsCreatingProject] = useState(false);
-  const locale = window.navigator.language;
   const { control, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
-      projectId: '',
+      projectId: connectProjects[0]?.id || '',
       text: '',
-      createdAtLocal: new Date().toLocaleDateString(locale, {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      })
+      createdAtLocal: new Date().toLocaleDateString()
     },
     resolver: yupResolver(schema),
     mode: 'onChange'
@@ -82,7 +76,20 @@ export function ProductUpdatesComposerAction({
             />
           </Stack>
         ) : (
-          <form onSubmit={handleSubmit(execute)}>
+          <form
+            onSubmit={handleSubmit((data) => {
+              const locale = window.navigator.language;
+              execute({
+                ...data,
+                createdAtLocal: new Date().toLocaleDateString(locale, {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric'
+                })
+              });
+            })}
+          >
             <Stack gap={2}>
               <Controller
                 control={control}
