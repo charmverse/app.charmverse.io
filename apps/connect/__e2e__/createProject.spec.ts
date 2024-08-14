@@ -67,7 +67,7 @@ test('Create a project and view details', async ({ page }) => {
   await fieldDescription.fill(projectData.projectFormDescription);
 
   await fieldCategory.focus();
-  await page.keyboard.type(projectData.projectFormCategory);
+  await fieldCategory.fill(projectData.projectFormCategory);
 
   await fieldWebsites.fill(projectData.projectFormWebsites[0]);
 

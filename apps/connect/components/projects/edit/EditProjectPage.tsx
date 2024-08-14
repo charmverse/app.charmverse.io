@@ -10,7 +10,6 @@ import { schema } from '@connect-shared/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { ConnectApiClient } from 'apiClient/apiClient';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -23,8 +22,6 @@ import { actionEditProject } from 'lib/projects/editProjectAction';
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
-
-const connectApiClient = new ConnectApiClient();
 
 export function EditProjectPage({ user, project }: { user: LoggedInUser; project: ConnectProjectDetails }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
@@ -72,7 +69,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <ProjectForm uploadImageFn={connectApiClient.uploadImage} control={control} />
+        <ProjectForm control={control} />
         <Stack
           justifyContent='space-between'
           flexDirection='row'

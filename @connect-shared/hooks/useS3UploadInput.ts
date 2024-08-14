@@ -1,10 +1,12 @@
 import { log } from '@charmverse/core/log';
 import { uploadToS3 } from '@root/lib/aws/uploadToS3Browser';
 import { DEFAULT_MAX_FILE_SIZE_MB } from '@root/lib/file/constants';
+import { encodeFilename } from '@root/lib/utils/encodeFilename';
 import { replaceS3Domain } from '@root/lib/utils/url';
 import { useState } from 'react';
 
 import { useFilePicker } from './useFilePicker';
+import { useGetUploadToken } from './useGetUploadToken';
 
 export type UploadedFileInfo = { url: string; fileName: string; size?: number };
 export type UploadedFileCallback = (info: UploadedFileInfo) => void;
@@ -18,10 +20,8 @@ export type UploadImageFn = (file: File) => Promise<{
 export const useS3UploadInput = ({
   onFileUpload,
   fileSizeLimitMB = DEFAULT_MAX_FILE_SIZE_MB,
-  onError,
-  uploadImageFn
+  onError
 }: {
-  uploadImageFn: UploadImageFn;
   onError?: (message: string) => void;
   onFileUpload: UploadedFileCallback;
   fileSizeLimitMB?: number;
@@ -29,6 +29,11 @@ export const useS3UploadInput = ({
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fileName, setFileName] = useState('');
+  const { trigger } = useGetUploadToken();
+
+  async function handleRequestUploadToken(file: File) {
+    return trigger({ filename: encodeFilename(file.name) });
+  }
 
   async function uploadFile(file: File) {
     if (file.size > fileSizeLimitMB * 1024 ** 2) {
@@ -45,7 +50,7 @@ export const useS3UploadInput = ({
     setFileName(file.name || '');
 
     try {
-      const { url } = await uploadToS3(uploadImageFn, file, { onUploadPercentageProgress: setProgress });
+      const { url } = await uploadToS3(handleRequestUploadToken, file, { onUploadPercentageProgress: setProgress });
       onFileUpload({ url: replaceS3Domain(url), fileName: file.name || '', size: file.size });
     } catch (error) {
       log.error('Error uploading image to s3', { error });

@@ -107,7 +107,6 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
   if (isProposalArchived) {
     throw new ActionNotPermittedError(`You cannot publish an archived proposal`);
   }
-
   const errors = getProposalErrors({
     page: {
       title: proposalPage.title ?? '',

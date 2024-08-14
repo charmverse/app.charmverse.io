@@ -8,20 +8,14 @@ import { Controller } from 'react-hook-form';
 
 import { ProjectImageField } from './ProjectImageField';
 
-export function ProjectForm({
-  control,
-  uploadImageFn
-}: {
-  control: Control<FormValues>;
-  uploadImageFn: UploadImageFn;
-}) {
+export function ProjectForm({ control }: { control: Control<FormValues> }) {
   return (
     <Stack gap={2}>
       <Stack>
         <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
         <Stack direction='row' gap={1}>
-          <ProjectImageField uploadImageFn={uploadImageFn} type='avatar' name='avatar' control={control} />
-          <ProjectImageField uploadImageFn={uploadImageFn} type='cover' name='coverImage' control={control} />
+          <ProjectImageField type='avatar' name='avatar' control={control} />
+          <ProjectImageField type='cover' name='coverImage' control={control} />
         </Stack>
       </Stack>
       <Stack>

@@ -2,13 +2,13 @@ import type { Space, SpaceOperation } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from '@ethersproject/wallet';
 import type { Page as BrowserPage } from '@playwright/test';
+import { baseUrl } from '@root/config/constants';
+import type { LoggedInUser } from '@root/models';
 import { v4 as uuid } from 'uuid';
 
-import { baseUrl } from '@root/config/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { LoggedInUser } from '@root/models';
 import { createPage, createUserWithWallet } from 'testing/setupDatabase';
 
 export async function loginBrowserUser({

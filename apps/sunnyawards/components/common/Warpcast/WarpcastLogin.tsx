@@ -15,7 +15,6 @@ import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
 
-import '@farcaster/auth-kit/styles.css';
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
 
 import { WarpcastIcon } from './WarpcastIcon';
@@ -33,7 +32,6 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
       revalidatePathAction();
-      log.info('User logged in', { userId: data?.userId });
       router.push('/profile');
     },
     onError(err) {

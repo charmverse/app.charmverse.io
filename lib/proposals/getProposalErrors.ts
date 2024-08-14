@@ -21,8 +21,7 @@ export function getProposalErrors({
   contentType,
   isDraft,
   project,
-  requireTemplates,
-  requireMilestone
+  requireTemplates
 }: {
   page: Pick<CreateProposalInput['pageProps'], 'title' | 'type' | 'sourceTemplateId'> & {
     hasContent?: boolean;
@@ -32,9 +31,10 @@ export function getProposalErrors({
   contentType: 'structured' | 'free_form';
   isDraft: boolean;
   requireTemplates: boolean;
-  requireMilestone?: boolean;
 }) {
   const errors: string[] = [];
+
+  const requireMilestone = !!proposal.formFields?.find((field) => field.type === 'milestone')?.required;
 
   if (isDraft) {
     return errors;

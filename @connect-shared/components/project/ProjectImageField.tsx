@@ -9,7 +9,6 @@ import Image from 'next/image';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
-import type { UploadImageFn } from '../../hooks/useS3UploadInput';
 import { useS3UploadInput } from '../../hooks/useS3UploadInput';
 
 const height = 96;
@@ -17,13 +16,11 @@ const height = 96;
 export function ProjectImageField({
   control,
   name,
-  type,
-  uploadImageFn
+  type
 }: {
   type: 'avatar' | 'cover';
   control: Control<FormValues>;
   name: keyof FormValues;
-  uploadImageFn: UploadImageFn;
 }) {
   const { field } = useController({
     name,
@@ -33,8 +30,7 @@ export function ProjectImageField({
   const { inputRef, isUploading, onFileChange } = useS3UploadInput({
     onFileUpload: ({ url }) => {
       field.onChange(url);
-    },
-    uploadImageFn
+    }
   });
 
   return (

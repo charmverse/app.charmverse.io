@@ -8,7 +8,6 @@ import { schema, type FormValues } from '@connect-shared/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Stack } from '@mui/material';
 import { Box } from '@mui/system';
-import { ConnectApiClient } from 'apiClient/apiClient';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -19,8 +18,6 @@ import { PageCoverHeader } from 'components/common/PageCoverHeader';
 import { actionCreateProject } from 'lib/projects/createProjectAction';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
-
-const connectApiClient = new ConnectApiClient();
 
 export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
@@ -44,6 +41,12 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
+      description: '',
+      category: '' as any,
+      websites: [''],
+      farcasterValues: [''],
+      twitter: '',
+      github: '',
       projectMembers: [
         {
           farcasterId: user?.farcasterUser?.fid
@@ -54,10 +57,19 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     mode: 'onChange'
   });
 
+  const handleNext = () => {
+    // Scroll to top before changing the state. In Firefox the page flickers because of a weird scroll.
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    setShowTeamMemberForm(true);
+  };
+  const handleBack = () => {
+    setShowTeamMemberForm(false);
+  };
+
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <ProjectForm uploadImageFn={connectApiClient.uploadImage} control={control} />
+        <ProjectForm control={control} />
         <Stack
           justifyContent='space-between'
           flexDirection='row'
@@ -95,9 +107,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
       <Box gap={2} display='flex' flexDirection='column'>
         <AddProjectMembersForm
           user={user}
-          onBack={() => {
-            setShowTeamMemberForm(false);
-          }}
+          onBack={handleBack}
           control={control}
           isValid={isValid}
           handleSubmit={handleSubmit}
