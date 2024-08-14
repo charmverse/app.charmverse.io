@@ -103,7 +103,7 @@ test('Create a project and view details', async ({ page }) => {
   expect(
     href?.startsWith(
       encodeURI(
-        'https://warpcast.com/~/compose?text=I just registered for the Sunny Awards to be eligible for 540K OP!&embeds[0]='
+        'https://warpcast.com/~/compose?text=I just registered for the Sunny Awards to be eligible for 540K OP!&embeds[]='
       )
     )
   ).toBe(true);
