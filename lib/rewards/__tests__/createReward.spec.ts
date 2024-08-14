@@ -283,6 +283,78 @@ describe('createReward', () => {
     );
   });
 
+  it('should add a public view permission if isPublic is true', async () => {
+    const rewardData: RewardCreationData = {
+      spaceId: space.id,
+      userId: user.id,
+      chainId: 2,
+      rewardAmount: 100,
+      rewardToken: 'BTC',
+      approveSubmitters: true,
+      maxSubmissions: 10,
+      dueDate: new Date(),
+      customReward: 'Special Badge',
+      fields: { fieldName: 'sampleField', type: 'text' },
+      pageProps: {
+        title: 'Reward Page'
+      },
+      reviewers: [{ userId: user.id }, { roleId: reviewerRole.id }],
+      allowedSubmitterRoles: [submitterRole.id],
+      isPublic: true
+    };
+
+    const { reward } = await createReward(rewardData);
+
+    const permissions = await prisma.pagePermission.findMany({
+      where: {
+        pageId: reward.id
+      }
+    });
+
+    expect(permissions).toMatchObject(
+      expect.arrayContaining<PagePermission>([
+        {
+          allowDiscovery: false,
+          id: expect.any(String),
+          inheritedFromPermission: null,
+          pageId: reward.id,
+          // This is the permission we are looking for
+          public: true,
+          permissionLevel: 'view',
+          permissions: [],
+          userId: null,
+          roleId: null,
+          spaceId: null
+        },
+        // Added other permissions to make sure they are not affected
+        {
+          allowDiscovery: false,
+          id: expect.any(String),
+          inheritedFromPermission: null,
+          pageId: reward.id,
+          permissionLevel: 'full_access',
+          permissions: [],
+          userId: user.id,
+          public: null,
+          roleId: null,
+          spaceId: null
+        },
+        {
+          allowDiscovery: false,
+          id: expect.any(String),
+          inheritedFromPermission: null,
+          pageId: reward.id,
+          permissionLevel: 'view',
+          permissions: [],
+          public: null,
+          userId: null,
+          roleId: null,
+          spaceId: space.id
+        }
+      ])
+    );
+  });
+
   it('should throw a InvalidInputError if rewardAmount is negative', async () => {
     const rewardData = {
       spaceId: space.id,

@@ -51,8 +51,13 @@ export async function upsertProposalFormAnswers({ answers, proposalId }: RubricA
     })
     .filter(isTruthy);
 
-  if (!isDraft && !validateAnswers(answersToSave, form.formFields)) {
-    throw new InvalidInputError(`All required fields must be answered`);
+  if (!isDraft) {
+    const answerFieldIds = answers.map((a) => a.fieldId);
+    // only pass in the form fields being answered
+    const formFields = form.formFields.filter((field) => answerFieldIds.includes(field.id));
+    if (!validateAnswers(answersToSave, formFields)) {
+      throw new InvalidInputError(`All required fields must be answered`);
+    }
   }
 
   const res = await prisma.$transaction([
