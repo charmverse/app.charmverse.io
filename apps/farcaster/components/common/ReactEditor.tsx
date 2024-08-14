@@ -10,13 +10,14 @@ import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 interface ReactBangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<PluginMetadata> {
   children?: React.ReactNode;
   readOnly?: boolean;
+  style?: React.CSSProperties;
   initialContent?: any;
   setCharmEditorView?: (view: EditorView | null) => void;
 }
 
 export const ReactBangleEditor = React.forwardRef<CoreBangleEditor | undefined, ReactBangleEditorProps>(
   function ReactEditor(
-    { state, children, initialContent, focusOnInit, pmViewOpts, readOnly = false, setCharmEditorView },
+    { state, children, style, initialContent, focusOnInit, pmViewOpts, readOnly = false, setCharmEditorView },
     ref
   ) {
     focusOnInit = focusOnInit ?? (!readOnly && !isTouchScreen());
@@ -54,7 +55,17 @@ export const ReactBangleEditor = React.forwardRef<CoreBangleEditor | undefined, 
     }, [ref]);
 
     return (
-      <EditorViewContext.Provider value={editor?.view as any}>{editor ? children : null}</EditorViewContext.Provider>
+      <EditorViewContext.Provider value={editor?.view as any}>
+        {editor ? children : null}
+        <div
+          className={`bangle-editor-core ${readOnly ? 'readonly' : ''}`}
+          style={{
+            minHeight: '200px'
+          }}
+        >
+          <div translate={readOnly ? 'yes' : 'no'} ref={renderRef} style={style} />
+        </div>
+      </EditorViewContext.Provider>
     );
   }
 );

@@ -1,6 +1,7 @@
 import { paragraph } from '@bangle.dev/base-components';
 import styled from '@emotion/styled';
 import { SpecRegistry } from '@root/components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import type { BaseRawNodeSpec } from '@root/components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { useEditorState } from '@root/components/common/CharmEditor/components/@bangle.dev/react/useEditorState';
 import * as tabIndent from '@root/components/common/CharmEditor/components/tabIndent';
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
@@ -17,7 +18,20 @@ export interface ICharmEditorOutput {
   rawText: string;
 }
 
-export const specRegistry = new SpecRegistry([paragraph.spec(), tabIndent.spec()]);
+const name = 'doc';
+
+function docSpec({ content = 'block+' } = {}): BaseRawNodeSpec {
+  return {
+    type: 'node',
+    topNode: true,
+    name,
+    schema: {
+      content
+    }
+  };
+}
+
+export const specRegistry = new SpecRegistry([docSpec(), paragraph.spec(), tabIndent.spec()]);
 
 function charmEditorPlugins({
   onContentChange,
@@ -93,9 +107,7 @@ export default function MinimalCharmEditor({
 }: MinimalCharmEditorProps) {
   const onContentChangeDebounced = onContentChange
     ? debounce((view: EditorView) => {
-        const doc = view.state.doc.toJSON() as PageContent;
-        const rawText = view.state.doc.textContent as string;
-        onContentChange({ doc, rawText });
+        onContentChange({ doc: view.state.doc.toJSON() as PageContent, rawText: view.state.doc.textContent as string });
       }, 100)
     : undefined;
 
@@ -136,6 +148,11 @@ export default function MinimalCharmEditor({
       focusOnInit={focusOnInit}
       readOnly={readOnly}
       noPadding={noPadding}
+      style={{
+        ...(style ?? {}),
+        width: '100%',
+        height: '100%'
+      }}
       pmViewOpts={{
         editable: () => !readOnly,
         plugins: [],

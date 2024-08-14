@@ -5,7 +5,6 @@ import type { EditorState } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
-import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type {
   ClientSubscribeMessage,
   SocketMessage,
