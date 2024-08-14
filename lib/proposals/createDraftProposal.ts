@@ -124,8 +124,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
     properties: {},
     enableRewards: true,
     ...(templateFields || {}),
-    pendingRewards: [],
-    makeRewardsPublic: !!input.makeRewardsPublic
+    pendingRewards: []
   };
 
   let formFields: FormFieldInput[] = [];

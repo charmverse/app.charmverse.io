@@ -1,4 +1,4 @@
-import { Box, Card, Stack, Typography } from '@mui/material';
+import { Box, Card, FormLabel, Stack, Switch, Tooltip, Typography } from '@mui/material';
 
 import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
@@ -6,6 +6,7 @@ import { RewardAmount } from 'components/rewards/components/RewardAmount';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
@@ -13,15 +14,25 @@ import { getRelativeTimeInThePast } from 'lib/utils/dates';
 import { isTruthy } from 'lib/utils/types';
 
 export type Props = {
-  disabled: boolean;
+  disabledPublishTooltip: string | null;
   proposalId?: string;
   pendingRewards: ProposalPendingReward[] | undefined;
   rewardIds?: string[] | null;
   onSubmit?: VoidFunction;
+  makeRewardsPublic?: boolean;
+  togglePublicRewards?: (value: boolean) => void;
 };
 
-export function RewardReviewStep({ proposalId, pendingRewards, rewardIds, disabled, onSubmit }: Props) {
-  const { trigger, isMutating } = useCreateProposalRewards(proposalId);
+export function RewardReviewStep({
+  proposalId,
+  pendingRewards,
+  rewardIds,
+  disabledPublishTooltip,
+  onSubmit,
+  makeRewardsPublic,
+  togglePublicRewards
+}: Props) {
+  const { trigger: triggerPublishRewards, isMutating } = useCreateProposalRewards(proposalId);
   const { showMessage } = useSnackbar();
   const { mappedFeatures } = useSpaceFeatures();
   const { rewards: allRewards } = useRewards();
@@ -30,9 +41,17 @@ export function RewardReviewStep({ proposalId, pendingRewards, rewardIds, disabl
   const rewardsTitle = mappedFeatures.rewards.title;
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
 
+  const isAdmin = useIsAdmin();
+
+  const disabledTogglePublicTooltip = rewards.length
+    ? 'Rewards are already published for this proposal'
+    : !isAdmin
+    ? 'Only admins can change public reward settings'
+    : null;
+
   async function createRewards() {
     try {
-      await trigger();
+      await triggerPublishRewards();
       showMessage(`${rewardsTitle} created`, 'success');
       onSubmit?.();
       // mutateRewards();
@@ -62,6 +81,24 @@ export function RewardReviewStep({ proposalId, pendingRewards, rewardIds, disabl
 
   return (
     <>
+      <Tooltip title={disabledTogglePublicTooltip || ''}>
+        <Box display='flex' alignItems='center' justifyContent='space-between' width='100%' sx={{ mb: 1 }}>
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              {rewardsTitle} will be public
+            </Typography>
+          </FormLabel>
+
+          <Switch
+            checked={!!makeRewardsPublic}
+            disabled={!!disabledTogglePublicTooltip}
+            onChange={async (ev) => {
+              togglePublicRewards?.(!!ev.target.checked);
+            }}
+          />
+        </Box>
+      </Tooltip>
+
       {mappedRewards?.map(({ reward, page, draftId }) => (
         <Box display='flex' alignItems='center' gap={1} key={draftId} mb={2}>
           <Typography component='span' variant='subtitle1' fontWeight='normal'>
@@ -82,8 +119,8 @@ export function RewardReviewStep({ proposalId, pendingRewards, rewardIds, disabl
       ) : (
         <Box display='flex' justifyContent='flex-end'>
           <Button
-            disabled={disabled}
-            disabledTooltip={`Only reviewers can publish ${rewardsTitle}`}
+            disabled={!!disabledPublishTooltip}
+            disabledTooltip={disabledPublishTooltip}
             loading={isMutating}
             onClick={handlePublish}
           >

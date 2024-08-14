@@ -80,6 +80,7 @@ export function ProposalEvaluations({
         onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         refreshProposal={refreshProposal}
         refreshPage={refreshPage}
+        onChangeRewardSettings={onChangeRewardSettings}
         templateId={templateId}
         expanded={expanded ?? true}
       />
