@@ -1,4 +1,4 @@
-import type { Page, Prisma } from '@charmverse/core/prisma';
+import type { Page, PagePermission, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { NotFoundError } from '@root/lib/middleware';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
@@ -28,6 +28,7 @@ export type RewardCreationData = UpdateableRewardFields & {
   proposalId?: string | null;
   githubIssueUrl?: string;
   isDraft?: boolean;
+  isPublic?: boolean;
 };
 /**
  * You can create a reward suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the reward to suggestion status. Your logic should account for this.
@@ -53,7 +54,8 @@ export async function createReward({
   allowMultipleApplications,
   proposalId,
   githubIssueUrl,
-  isDraft
+  isDraft,
+  isPublic
 }: RewardCreationData) {
   const errors = getRewardErrors({
     page: pageProps || null,
@@ -147,6 +149,32 @@ export async function createReward({
 
   let createdPageId: string | undefined;
 
+  const pagePermissionsInput: (Pick<PagePermission, 'permissionLevel'> &
+    Partial<Pick<PagePermission, 'userId' | 'spaceId' | 'public'>>)[] = isDraft
+    ? [
+        {
+          permissionLevel: 'full_access',
+          userId
+        }
+      ]
+    : [
+        {
+          permissionLevel: 'view',
+          spaceId
+        },
+        {
+          permissionLevel: 'full_access',
+          userId
+        }
+      ];
+
+  if (isPublic) {
+    pagePermissionsInput.push({
+      permissionLevel: 'view',
+      public: true
+    });
+  }
+
   if (!linkedPageId) {
     const galleryImage = pageProps?.content ? extractPreviewImage(pageProps.content as any) : null;
     const results = await prisma.bounty.create({
@@ -161,23 +189,7 @@ export async function createReward({
           create: {
             permissions: {
               createMany: {
-                data: isDraft
-                  ? [
-                      {
-                        permissionLevel: 'full_access',
-                        userId
-                      }
-                    ]
-                  : [
-                      {
-                        permissionLevel: 'view',
-                        spaceId
-                      },
-                      {
-                        permissionLevel: 'full_access',
-                        userId
-                      }
-                    ]
+                data: pagePermissionsInput
               }
             },
             id: rewardId,
@@ -211,21 +223,52 @@ export async function createReward({
     });
     createdPageId = results.page?.id;
   } else {
-    await prisma.$transaction([
-      prisma.bounty.create({
+    await prisma.$transaction(async (tx) => {
+      await tx.bounty.create({
         data: {
           ...rewardCreateInput
         }
-      }),
-      prisma.page.update({
+      });
+      await tx.page.update({
         where: {
           id: linkedPageId
         },
         data: {
           bountyId: rewardId
         }
-      })
-    ]);
+      });
+
+      if (isPublic) {
+        const existingPermission = await tx.pagePermission.findFirst({
+          where: {
+            public: {
+              not: null
+            },
+            pageId: linkedPageId
+          }
+        });
+
+        if (existingPermission) {
+          await tx.pagePermission.update({
+            where: {
+              id: existingPermission.id
+            },
+            data: {
+              public: true,
+              permissionLevel: 'view'
+            }
+          });
+        } else {
+          await tx.pagePermission.create({
+            data: {
+              public: true,
+              permissionLevel: 'view',
+              pageId: linkedPageId
+            }
+          });
+        }
+      }
+    });
   }
 
   if (space?.domain === 'op-grants') {

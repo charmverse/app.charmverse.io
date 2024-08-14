@@ -82,7 +82,8 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
       pageProps: page || {},
       spaceId: proposal.spaceId,
       userId,
-      proposalId
+      proposalId,
+      isPublic: true
     });
     // filter out reward from pending rewards
     rewardsToCreate = rewardsToCreate.filter(({ draftId: d }) => d !== draftId);
