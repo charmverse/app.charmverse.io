@@ -48,15 +48,11 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     projectName: project.name
   });
 
-  log.info('Project created via Agora', { projectRefUID });
-
   const { attestationMetadataUID } = await storeProjectMetadataViaAgora({
     farcasterId: farcasterUser.fid,
     projectRefUID,
     projectId
   });
-
-  log.info('Project metadata created via Agora', { attestationMetadataUID });
 
   return { projectRefUID, attestationMetadataUID };
 }
