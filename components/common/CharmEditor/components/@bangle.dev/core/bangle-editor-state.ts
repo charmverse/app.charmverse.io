@@ -8,11 +8,10 @@ import type { Selection } from 'prosemirror-state';
 import { EditorState } from 'prosemirror-state';
 import type { EditorProps } from 'prosemirror-view';
 
-import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
-import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
-import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
-
+import type { RawPlugins } from './plugin-loader';
 import { pluginLoader } from './plugin-loader';
+import { SpecRegistry } from './specRegistry';
+import type { RawSpecs } from './specRegistry';
 
 type InitialContent = string | Node | object;
 

@@ -2,7 +2,6 @@ import { paragraph } from '@bangle.dev/base-components';
 import styled from '@emotion/styled';
 import { SpecRegistry } from '@root/components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { useEditorState } from '@root/components/common/CharmEditor/components/@bangle.dev/react/useEditorState';
-import { placeholderPlugin } from '@root/components/common/CharmEditor/components/placeholder/placeholder';
 import * as tabIndent from '@root/components/common/CharmEditor/components/tabIndent';
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import debounce from 'lodash/debounce';
@@ -20,7 +19,7 @@ export interface ICharmEditorOutput {
 
 export const specRegistry = new SpecRegistry([paragraph.spec(), tabIndent.spec()]);
 
-export function charmEditorPlugins({
+function charmEditorPlugins({
   onContentChange,
   readOnly,
   placeholderText
@@ -42,9 +41,6 @@ export function charmEditorPlugins({
     paragraph.plugins(),
     tabIndent.plugins()
   ];
-  if (!readOnly) {
-    basePlugins.push(placeholderPlugin(placeholderText));
-  }
   return () => basePlugins;
 }
 
@@ -72,7 +68,7 @@ const StyledReactBangleEditor = styled(ReactBangleEditor)<{ colorMode?: 'dark'; 
 
 export type UpdatePageContent = (content: ICharmEditorOutput) => any;
 
-interface InlineCharmEditorProps {
+interface MinimalCharmEditorProps {
   colorMode?: 'dark';
   content?: PageContent | null;
   children?: ReactNode;
@@ -84,7 +80,7 @@ interface InlineCharmEditorProps {
   placeholderText?: string;
 }
 
-export default function CharmEditor({
+export default function MinimalCharmEditor({
   colorMode,
   focusOnInit,
   content,
@@ -94,7 +90,7 @@ export default function CharmEditor({
   noPadding,
   placeholderText,
   readOnly = false
-}: InlineCharmEditorProps) {
+}: MinimalCharmEditorProps) {
   const onContentChangeDebounced = onContentChange
     ? debounce((view: EditorView) => {
         const doc = view.state.doc.toJSON() as PageContent;
