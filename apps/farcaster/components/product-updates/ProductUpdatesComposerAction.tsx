@@ -2,6 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { FarcasterCard } from '@connect-shared/components/common/FarcasterCard';
+import styled from '@emotion/styled';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/Add';
 import { Button, Card, Divider, FormLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
@@ -18,6 +19,42 @@ import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid
 
 import { CreateProjectForm } from './CreateProjectForm';
 
+// overlay for text area to show colons
+const TextFieldWithBullets = styled.div`
+  position: relative;
+  width: 100%;
+
+  .MuiInputBase-root {
+    padding-left: 34px;
+  }
+
+  .text-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    padding: 8.5px 14px;
+    span {
+      color: transparent;
+      display: list-item;
+      font-size: 1rem;
+      line-height: 1.3em;
+      list-style-position: inside;
+      ::marker {
+        color: var(--charm-palette-text-primary);
+      }
+    }
+  }
+`;
+
+function SplitTextIntoBullets({ text }: { text: string }) {
+  return text.split('\n').map((line, index) => (
+    // eslint-disable-next-line react/no-array-index-key
+    <span key={index}>{line}</span>
+  ));
+}
+
 export function ProductUpdatesComposerAction({
   farcasterUser,
   connectProjects
@@ -30,7 +67,7 @@ export function ProductUpdatesComposerAction({
   const { control, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
-      projectId: '',
+      projectId: connectProjects[0]?.id || '',
       text: '',
       createdAtLocal: new Date().toLocaleDateString(locale, {
         weekday: 'short',
@@ -125,16 +162,22 @@ export function ProductUpdatesComposerAction({
                   control={control}
                   name='text'
                   render={({ field, fieldState }) => (
-                    <TextField
-                      disabled={isExecuting}
-                      multiline
-                      rows={8}
-                      aria-labelledby='product-updates'
-                      placeholder='1. Updated documentation ...'
-                      helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'
-                      error={!!fieldState.error}
-                      {...field}
-                    />
+                    <TextFieldWithBullets>
+                      <TextField
+                        disabled={isExecuting}
+                        multiline
+                        fullWidth
+                        rows={8}
+                        aria-labelledby='product-updates'
+                        placeholder='Share the good news!'
+                        // helperText='Empty lines will be ignored.'
+                        error={!!fieldState.error}
+                        {...field}
+                      />
+                      <span className='text-overlay'>
+                        <SplitTextIntoBullets text={field.value} />
+                      </span>
+                    </TextFieldWithBullets>
                   )}
                 />
               </Stack>
