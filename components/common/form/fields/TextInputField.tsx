@@ -10,6 +10,25 @@ import type { ControlFieldProps, FieldProps } from 'components/common/form/inter
 type Props = ControlFieldProps &
   FieldProps & { multiline?: boolean; inputEndAdornmentAlignItems?: string; rows?: number; maxRows?: number };
 
+export const CustomTextField = forwardRef<HTMLDivElement, TextFieldProps & { error?: boolean }>(
+  ({ error, ...props }, ref) => {
+    const showLinkIcon = typeof props.value === 'string' && props.value.startsWith('http');
+    const InputProps = showLinkIcon
+      ? {
+          endAdornment: (
+            <IconButton color='secondary' href={props.value as string} target='_blank' size='small' sx={{ p: 0 }}>
+              <LinkIcon />
+            </IconButton>
+          )
+        }
+      : undefined;
+
+    return (
+      <TextField ref={ref} fullWidth placeholder={props.placeholder} InputProps={InputProps} error={error} {...props} />
+    );
+  }
+);
+
 export const TextInputField = forwardRef<HTMLDivElement, Props>(
   (
     {
@@ -55,27 +74,3 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
     );
   }
 );
-
-export function CustomTextField({ error, ...props }: TextFieldProps & { error?: boolean }) {
-  const showLinkIcon = typeof props.value === 'string' && props.value.startsWith('http');
-  const InputProps = showLinkIcon
-    ? {
-        endAdornment: (
-          <IconButton color='secondary' href={props.value as string} target='_blank' size='small' sx={{ p: 0 }}>
-            <LinkIcon />
-          </IconButton>
-        )
-      }
-    : undefined;
-
-  return (
-    <TextField
-      disabled={props.disabled}
-      fullWidth
-      placeholder={props.placeholder}
-      InputProps={InputProps}
-      error={error}
-      {...props}
-    />
-  );
-}

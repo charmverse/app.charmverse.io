@@ -140,7 +140,7 @@ export function ProjectForm({
         namePrefix='projectMembers[0]'
         fieldConfig={fieldConfig.projectMember}
         properties={projectMemberFieldProperties}
-        onChange={(updates) => onProjectMemberUpdate(teamLeadMemberId!, updates)}
+        onChange={(updates) => onProjectMemberUpdate(teamLeadMemberId, updates)}
       />
       {showTeamMemberSection && (
         <>
