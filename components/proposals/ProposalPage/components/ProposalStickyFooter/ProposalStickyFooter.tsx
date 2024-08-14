@@ -47,11 +47,10 @@ export function ProposalStickyFooter({
     }
   }
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
-  const milestoneFormInput = proposal.form?.formFields?.find((field) => field.type === 'milestone');
   const formFields =
     page.type === 'proposal_template'
       ? proposal.form?.formFields
-      : proposal.form?.formFields?.filter((field) => field.type === 'project_profile');
+      : proposal.form?.formFields?.filter((field) => field.type === 'project_profile' || field.type === 'milestone');
   const projectProfileAnswer = projectProfileField ? answerFormValues[projectProfileField.id] : null;
   const errors = getProposalErrors({
     page: {
@@ -61,7 +60,6 @@ export function ProposalStickyFooter({
       type: page.type
     },
     project: projectProfileField ? projectFormValues : null,
-    requireMilestone: milestoneFormInput?.required,
     isDraft: false, // isDraft skips all errors
     contentType: isStructuredProposal ? 'structured' : 'free_form',
     proposal: {

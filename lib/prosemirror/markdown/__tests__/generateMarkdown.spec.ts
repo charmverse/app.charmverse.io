@@ -394,4 +394,62 @@ describe('generateMarkdown()', () => {
 Second`
     );
   });
+
+  it('should handle mentions', async () => {
+    const content = {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          attrs: {
+            track: []
+          },
+          content: [
+            {
+              text: 'Some test data',
+              type: 'text'
+            },
+            {
+              text: '@OtherMember account',
+              type: 'text',
+              marks: [
+                {
+                  type: 'mentionSuggest',
+                  attrs: {
+                    trigger: '@'
+                  }
+                }
+              ]
+            },
+            {
+              type: 'hardBreak'
+            },
+            {
+              text: 'Our team will drive increased usage',
+              type: 'text'
+            }
+          ]
+        },
+        {
+          type: 'paragraph',
+          attrs: {
+            track: []
+          },
+          content: [
+            {
+              text: 'Some extra text',
+              type: 'text'
+            }
+          ]
+        }
+      ]
+    };
+
+    const markdown = await generateMarkdown({ content, title: '' });
+
+    expect(markdown).toEqual(`Some test data@OtherMember account
+Our team will drive increased usage
+
+Some extra text`);
+  });
 });
