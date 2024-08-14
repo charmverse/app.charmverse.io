@@ -27,7 +27,7 @@ export async function createProductUpdatesFrame(input: FormValues) {
     },
     select: {
       name: true,
-      coverImage: true
+      avatar: true
     }
   });
 
@@ -35,12 +35,12 @@ export async function createProductUpdatesFrame(input: FormValues) {
     text: input.text,
     createdAtLocal: input.createdAtLocal,
     projectName: project.name,
-    projectCoverImage: project.coverImage
+    projectAvatarImage: project.avatar
   });
   // Use a ratio of 1.9:1 for the image as recommended by farcaster
   const image = new ImageResponse(element, {
     width: 500,
-    height: 265
+    height: 500 / 1.9
   });
 
   const imageBlob = await image.blob();

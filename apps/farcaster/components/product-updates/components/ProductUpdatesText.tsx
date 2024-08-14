@@ -2,12 +2,12 @@ export function ProductUpdatesText({
   text,
   createdAtLocal,
   projectName,
-  projectCoverImage
+  projectAvatarImage
 }: {
   projectName: string;
   text: string;
   createdAtLocal: string;
-  projectCoverImage: string | null;
+  projectAvatarImage: string | null;
 }) {
   const lines = text
     .split('\n')
@@ -42,7 +42,7 @@ export function ProductUpdatesText({
             justifyContent: 'center'
           }}
         >
-          {projectCoverImage && <img width={35} height={35} src={projectCoverImage} />}
+          {projectAvatarImage && <img width={35} height={35} src={projectAvatarImage} />}
           <p>{projectName}</p>
           <p
             style={{
