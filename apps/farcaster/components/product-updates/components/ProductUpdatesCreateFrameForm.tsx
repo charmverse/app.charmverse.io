@@ -44,7 +44,7 @@ export function ProductUpdatesCreateFrameForm({
 
         postCreateCastMessage({
           embeds: [`https://${window.location.hostname}/product-updates/frames/${data.data.productUpdatesFrame.id}`],
-          text: `${data.data.project.name}\n${data.data.productUpdatesFrame.createdAtLocal}\n${lines
+          text: `${data.data.project.name}\n${data.data.productUpdatesFrame.createdAtLocal}\n\n${lines
             .map((line) => `• ${line}`)
             .join('\n')}`
         });

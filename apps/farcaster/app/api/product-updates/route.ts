@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       return Response.json(
         {
           type: 'form',
-          title: 'Product updates',
+          title: 'Create an Update',
           url: `${baseUrl}/product-updates?token=${token}`
         },
         {
@@ -43,11 +43,10 @@ export async function GET() {
   return Response.json(
     {
       type: 'composer',
-      name: 'Product updates',
-      icon: 'pencil',
-      description: 'Create a product updates frame for your cast',
-      aboutUrl: baseUrl,
-      imageUrl: 'https://connect.charmverse.io/favicon.ico',
+      name: 'Create an Update',
+      icon: 'checkbox',
+      description: 'Create a project update',
+      imageUrl: 'https://connect.charmverse.io/images/cv-connect-logo.png',
       action: {
         type: 'post'
       }
