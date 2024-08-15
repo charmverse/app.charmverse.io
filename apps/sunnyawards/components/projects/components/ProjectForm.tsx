@@ -1,7 +1,10 @@
 'use client';
 
+import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
-import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
+import { FormLabel, MenuItem, Select, Stack, TextField, Typography, Button } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
@@ -10,17 +13,20 @@ import { Controller, useController } from 'react-hook-form';
 import type { FormValues } from 'lib/projects/form';
 import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
 
+import { AddProjectMembersForm } from './AddProjectMembersForm';
 import { ProjectBlockchainSelect } from './BlockchainSelect';
 import { ProjectImageField } from './ProjectImageField';
 
 export function ProjectForm({
   control,
-  isValid,
-  onNext
+  isExecuting,
+  projectMembers = [],
+  user
 }: {
   control: Control<FormValues>;
-  isValid: boolean;
-  onNext: VoidFunction;
+  projectMembers?: ConnectProjectDetails['projectMembers'];
+  isExecuting: boolean;
+  user: LoggedInUser;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
 
@@ -35,7 +41,7 @@ export function ProjectForm({
           <ProjectImageField type='cover' name='coverImage' control={control} />
         </Stack>
       </Stack>
-      <Stack gap={2}>
+      <Stack gap={2} mb={2}>
         <Stack>
           <FormLabel required id='project-name'>
             Name
@@ -291,15 +297,36 @@ export function ProjectForm({
           </Stack>
         </Stack>
       </Stack>
-      <Stack justifyContent='space-between' flexDirection='row' display='sticky' bottom='0' py={2}>
-        <Link href='/profile' passHref>
-          <Button size='large' color='secondary' variant='outlined'>
-            Cancel
-          </Button>
-        </Link>
-        <Button data-test='project-form-confirm-values' size='large' disabled={!isValid} onClick={onNext}>
-          Next
+      <AddProjectMembersForm
+        user={user}
+        control={control}
+        disabled={isExecuting}
+        initialFarcasterProfiles={projectMembers.slice(1).map((member) => ({
+          bio: member.farcasterUser.bio,
+          displayName: member.farcasterUser.displayName,
+          fid: member.farcasterUser.fid,
+          pfpUrl: member.farcasterUser.pfpUrl,
+          username: member.farcasterUser.username
+        }))}
+      />
+      <Stack direction='row' justifyContent='space-between'>
+        <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary'>
+          Cancel
         </Button>
+        <Stack direction='row' gap={1}>
+          {isExecuting && (
+            <LoadingComponent
+              height={20}
+              size={20}
+              minHeight={20}
+              label='Submitting your project onchain'
+              flexDirection='row-reverse'
+            />
+          )}
+          <Button data-test='project-form-publish' disabled={isExecuting} type='submit'>
+            Publish
+          </Button>
+        </Stack>
       </Stack>
     </>
   );

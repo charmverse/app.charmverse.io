@@ -107,7 +107,7 @@ const extendedTheme = extendTheme({
     MuiFormLabel: {
       styleOverrides: {
         root: ({ theme }) => ({
-          color: theme.vars.palette.text.primary,
+          color: theme.vars.palette.gold.light,
           marginBottom: 5
         })
       }
