@@ -53,10 +53,18 @@ export const createProjectAction = authActionClient
     if (!isTestEnv) {
       await generateOgImage(newProject.id, currentUserId);
       await trackMixpanelEvent('create_project', { projectId: newProject.id, userId: currentUserId });
-      await sendProjectConfirmationEmail({
-        projectId: newProject.id,
-        userId: currentUserId
-      });
+      try {
+        await sendProjectConfirmationEmail({
+          projectId: newProject.id,
+          userId: currentUserId
+        });
+      } catch (error) {
+        log.error('Failed trying to send confirmation email', {
+          error,
+          projectId: newProject.id,
+          userId: currentUserId
+        });
+      }
     }
 
     return { success: true, projectId: newProject.id, projectPath: newProject.path };
