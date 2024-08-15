@@ -94,7 +94,7 @@ function ViewHeader(props: Props) {
   if (activeView?.fields?.visiblePropertyIds.length) {
     activeView.fields.visiblePropertyIds.forEach((propertyId) => {
       const property = activeBoard?.fields.cardProperties.find((p) => p.id === propertyId);
-      if (property) {
+      if (property && !property.readOnly) {
         propertyTemplates.push(property);
       }
     });
