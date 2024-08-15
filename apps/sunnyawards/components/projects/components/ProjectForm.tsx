@@ -145,46 +145,6 @@ export function ProjectForm({
                 )}
               />
             </Stack>
-            <Stack>
-              <FormLabel id='project-deployer' required>
-                Project Deployer Address
-              </FormLabel>
-              <Controller
-                control={control}
-                name='primaryContractDeployer'
-                render={({ field, fieldState }) => (
-                  <TextField
-                    data-test='project-deployer'
-                    rows={3}
-                    aria-labelledby='project-deployer'
-                    placeholder='Address used to deploy the contract'
-                    {...field}
-                    error={!!fieldState.error?.message}
-                    helperText={fieldState.error?.message}
-                  />
-                )}
-              />
-            </Stack>
-            <Stack>
-              <FormLabel id='project-deploy-tx-hash' required>
-                Project Deployment Transaction Hash
-              </FormLabel>
-              <Controller
-                control={control}
-                name='primaryContractDeployTxHash'
-                render={({ field, fieldState }) => (
-                  <TextField
-                    data-test='project-deploy-tx-hash'
-                    rows={3}
-                    aria-labelledby='project-deploy-tx-hash'
-                    placeholder='Hash of the transaction used to deploy the contract'
-                    {...field}
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                  />
-                )}
-              />
-            </Stack>
           </Stack>
         )}
         {sunnyAwardsProjectType === 'creator' && (

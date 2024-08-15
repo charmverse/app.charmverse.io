@@ -64,44 +64,6 @@ export const schema = yup.object({
 
       return true;
     }),
-  primaryContractDeployTxHash: yup
-    .string<Address>()
-    .test('isContractDeployTx', 'Valid transaction is required', async (value, context) => {
-      const chain = context.parent.primaryContractChainId;
-      const sunnyAwardsProjectType = context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType;
-
-      if (sunnyAwardsProjectType === 'app') {
-        if (!value || !chain) {
-          return false;
-        }
-        const chainId = Number(chain);
-        try {
-          const result = await getTransactionReceipt(wagmiConfig, {
-            hash: value,
-            chainId
-          });
-          return !!result;
-        } catch (err) {
-          return false;
-        }
-      }
-
-      return true;
-    }),
-  primaryContractDeployer: yup
-    .string<Address>()
-    .test('isAddress', 'Must be a valid address', async (value, context) => {
-      const sunnyAwardsProjectType = context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType;
-
-      if (sunnyAwardsProjectType === 'app') {
-        if (!value) {
-          return false;
-        }
-        return !!isAddress(value);
-      }
-
-      return true;
-    }),
   mintingWalletAddress: yup
     .string()
     .test(

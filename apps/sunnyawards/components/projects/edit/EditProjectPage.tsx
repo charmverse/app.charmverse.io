@@ -42,8 +42,6 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       sunnyAwardsProjectType: project.sunnyAwardsProjectType ?? undefined,
       primaryContractChainId: project.primaryContractChainId?.toString() ?? undefined,
       primaryContractAddress: (project.primaryContractAddress as `0x${string}`) ?? undefined,
-      primaryContractDeployTxHash: (project.primaryContractDeployTxHash as `0x${string}`) ?? undefined,
-      primaryContractDeployer: (project.primaryContractDeployer as `0x${string}`) ?? undefined,
       mintingWalletAddress: (project.mintingWalletAddress as `0x${string}`) ?? undefined,
       projectMembers:
         project.projectMembers.map(
