@@ -151,7 +151,8 @@ function UserOnboardingDialog({
     } finally {
       setIsSubmitting(false);
     }
-    completeOnboarding?.();
+    await completeOnboarding?.();
+    setIsOnboardingModalOpen(false);
   }
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep || 'profile_step');
