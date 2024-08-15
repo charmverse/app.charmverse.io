@@ -69,3 +69,8 @@ export async function sendProjectConfirmationEmail({ userId, projectId }: { user
     html
   });
 }
+
+// sendProjectConfirmationEmail({
+//   projectId: '0d0f84fa-d207-4885-bba2-2b94791f0208',
+//   userId: '968cc3fb-ffe4-493b-b45b-8316865c49b0'
+// });

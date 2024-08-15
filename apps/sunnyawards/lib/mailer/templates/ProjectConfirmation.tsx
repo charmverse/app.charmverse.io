@@ -7,11 +7,10 @@ import { baseUrl } from '@root/config/constants';
 import { Link, Text } from '@root/lib/mailer/emails/templates/components';
 import React from 'react';
 
-import { lightGreyColor } from 'theme/colors';
+import { lightGreyColor, primaryTextColor, secondaryTextColor } from 'theme/colors';
 
-const sunnysColor = '#d8be7d';
-
-function ProjectField({ label, value }: { label: string; value: string | number }) {
+const baseBlue = '#0052ff';
+function ProjectField({ label, value }: { label: string; value?: string | number | null }) {
   return (
     <>
       <Text
@@ -25,10 +24,11 @@ function ProjectField({ label, value }: { label: string; value: string | number 
       <Text
         style={{
           lineHeight: 1,
-          marginBottom: 30
+          marginBottom: 30,
+          color: value ? primaryTextColor : secondaryTextColor
         }}
       >
-        {value}
+        {value || 'Not set'}
       </Text>
     </>
   );
@@ -59,7 +59,8 @@ export function ProjectConfirmation({
           }}
         >
           <Img
-            src={`${baseUrl}/images/sunnys-landscape.png`}
+            src='https://i.ibb.co/jgfrV0Z/Screenshot-2024-08-15-at-9-06-35-PM.png'
+            // src={`${baseUrl}/images/sunnys-landscape.png`}
             style={{
               maxHeight: '100px',
               width: '100%'
@@ -72,43 +73,44 @@ export function ProjectConfirmation({
           >
             <Text>
               Congratulations you just entered the Sunnys, a celebration of everything you have accomplished on the
-              Superchain. Learn more about the Sunnys{' '}
-              <Link primaryColor={sunnysColor} href='https://www.thesunnyawards.fun/'>
+              Superchain.
+            </Text>
+
+            <Text>
+              🏆 Learn more about the Sunnys{' '}
+              <Link primaryColor={baseBlue} href='https://www.thesunnyawards.fun/'>
                 here
               </Link>
               .
             </Text>
 
             <Text>
-              You can still change your entry{' '}
-              <Link primaryColor={sunnysColor} href={`${baseUrl}/p/${project.path}/edit`}>
+              🛠️ You can still change your entry{' '}
+              <Link primaryColor={baseBlue} href={`${baseUrl}/p/${project.path}/edit`}>
                 here
               </Link>
               .
             </Text>
 
-            <Text>The details of your application:</Text>
+            <Text>📋 The details of your application:</Text>
 
             <ProjectField label='Name' value={project.name} />
-            <ProjectField label='Description' value={project.description || 'N/A'} />
+            <ProjectField label='Description' value={project.description} />
             {projectType === 'creator' ? (
-              <ProjectField label='Minting wallet address' value={project.mintingWalletAddress || 'N/A'} />
+              <ProjectField label='Minting wallet address' value={project.mintingWalletAddress} />
             ) : projectType === 'app' ? (
               <>
-                <ProjectField label='Chain ID' value={project.primaryContractChainId || 'N/A'} />
-                <ProjectField label='Contract Address' value={project.primaryContractAddress || 'N/A'} />
-                <ProjectField label='Deployer Address' value={project.primaryContractDeployer || 'N/A'} />
-                <ProjectField
-                  label='Deployment Transaction Hash'
-                  value={project.primaryContractDeployTxHash || 'N/A'}
-                />
+                <ProjectField label='Chain ID' value={project.primaryContractChainId} />
+                <ProjectField label='Contract Address' value={project.primaryContractAddress} />
+                <ProjectField label='Deployer Address' value={project.primaryContractDeployer} />
+                <ProjectField label='Deployment Transaction Hash' value={project.primaryContractDeployTxHash} />
               </>
             ) : null}
-            <ProjectField label='Websites' value={project.websites.join(', ') || 'N/A'} />
-            <ProjectField label='Category' value={project.category || 'N/A'} />
-            <ProjectField label='Farcaster profiles' value={project.farcasterValues.join(', ') || 'N/A'} />
-            <ProjectField label='X' value={project.twitter || 'N/A'} />
-            <ProjectField label='Github' value={project.github || 'N/A'} />
+            <ProjectField label='Websites' value={project.websites.join(', ')} />
+            <ProjectField label='Category' value={project.category} />
+            <ProjectField label='Farcaster profiles' value={project.farcasterValues.join(', ')} />
+            <ProjectField label='X' value={project.twitter} />
+            <ProjectField label='Github' value={project.github} />
 
             <hr />
             <Text variant='h3'>Project Members</Text>
@@ -119,7 +121,7 @@ export function ProjectConfirmation({
                   lineHeight: 1
                 }}
               >
-                <Link primaryColor={sunnysColor} href={`https://warpcast.com/${username}`}>
+                <Link primaryColor={baseBlue} href={`https://warpcast.com/${username}`}>
                   {username}
                 </Link>
               </Text>
