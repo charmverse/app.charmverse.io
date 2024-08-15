@@ -115,7 +115,7 @@ export function ProjectForm({
           <Stack gap={2}>
             <Stack>
               <FormLabel id='project-chain' required>
-                Project Chain ID
+                Project Chain
               </FormLabel>
               <Controller
                 control={control}
