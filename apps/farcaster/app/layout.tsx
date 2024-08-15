@@ -3,8 +3,9 @@ import Box from '@mui/material/Box';
 import type { Viewport } from 'next';
 import type { ReactNode } from 'react';
 
-import { GlobalComponent } from 'components/common/GlobalComponent';
 import theme from 'theme/theme';
+
+import { GlobalComponent } from '../components/common/GlobalComponent';
 
 import 'theme/cssVariables.scss';
 

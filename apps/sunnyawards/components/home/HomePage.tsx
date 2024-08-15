@@ -44,7 +44,7 @@ export function HomePage() {
       </Typography>
       <Typography align='center' data-test='homepage-description'>
         Create your project and submit it to the{' '}
-        <MuiLink href='https://www.thesunnyawards.fun/' rel='noopener noreferrer nofollow' target='_blank'>
+        <MuiLink href='https://www.thesunnyawards.fun/' target='_blank'>
           The Sunnys
         </MuiLink>{' '}
         to compete for 540K OP in total prizes.

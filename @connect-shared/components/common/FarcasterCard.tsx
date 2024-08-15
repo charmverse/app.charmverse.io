@@ -1,11 +1,10 @@
-import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import { DeleteOutline } from '@mui/icons-material';
 import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 
-import type { AvatarSize } from 'components/common/Avatar';
-
+import type { AvatarSize } from './Avatar';
 import { Avatar } from './Avatar';
+import { CardMotion } from './Motions/CardMotion';
 
 function FarcasterCardContent({
   avatar,
