@@ -13,7 +13,7 @@ const StyledButton = styled(Button)`
   font-size: 18px;
 ` as typeof Button;
 
-export function TwitterShareButton({ image, projectPath }: { image?: string; projectPath: string }) {
+export function TwitterShareButton({ projectPath }: { projectPath: string }) {
   const [url, setUrl] = useState<string>();
 
   useEffect(() => {

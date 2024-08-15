@@ -81,7 +81,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
                 onClick={handleCloseUserMenu}
               >
                 <MenuItem>
-                  <Link href='/profile'>@{farcasterDetails?.username}</Link>
+                  <Link href='/profile'>My Profile</Link>
                 </MenuItem>
                 <MenuItem onClick={() => logoutUser({})}>Sign Out</MenuItem>
               </Menu>
