@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { TwitterShareButton } from './components/TwitterShareButton';
 import { WarpcastShareButton } from './components/WarpcastShareButton';
 
-const celebrationImage = '/images/sunny-celebration-cropped.png';
+const celebrationImage = '/images/sunny-celebration.png';
 
 export async function ShareProjectPage({ path }: { path: string }) {
   return (
