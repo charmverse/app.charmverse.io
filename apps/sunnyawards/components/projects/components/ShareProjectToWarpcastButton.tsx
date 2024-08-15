@@ -16,7 +16,7 @@ export function ShareProjectToWarpcastButton({ projectIdOrPath }: { projectIdOrP
         href={encodeURI(
           `https://warpcast.com/~/compose?text=I just registered for the Sunny Awards to be eligible for 540K OP!&embeds[0]=${url}`
         )}
-        text='Share'
+        text='Share on Warpcast'
       />
     </div>
   );

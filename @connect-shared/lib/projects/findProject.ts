@@ -33,13 +33,7 @@ export type ConnectProjectDetails = Pick<
   }[];
 };
 
-export async function fetchProject({
-  id,
-  path
-}: {
-  id?: string;
-  path?: string;
-}): Promise<ConnectProjectDetails | null> {
+export async function findProject({ id, path }: { id?: string; path?: string }): Promise<ConnectProjectDetails | null> {
   if (!id && !path) {
     return null;
   }

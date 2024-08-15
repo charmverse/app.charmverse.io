@@ -1,10 +1,15 @@
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import Typography from '@mui/material/Typography';
+import { findProject } from '@connect-shared/lib/projects/findProject';
+import { Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
+import { TwitterShareButton } from 'components/projects/[id]/share/components/TwitterShareButton';
 import { ShareProjectToWarpcastButton } from 'components/projects/components/ShareProjectToWarpcastButton';
 
-export default function PublishProjectPage({ params }: { params: { path: string } }) {
+export default async function PublishProjectPage({ params }: { params: { path: string } }) {
+  const project = await findProject({
+    path: params.path
+  });
   return (
     <PageWrapper
       display='flex'
@@ -40,8 +45,11 @@ export default function PublishProjectPage({ params }: { params: { path: string 
       <Typography align='center' variant='h4'>
         Congratulations your project has just entered the Sunny Awards
       </Typography>
-      <Typography align='center'>Share the good news on Warpcast!</Typography>
-      <ShareProjectToWarpcastButton projectIdOrPath={params.path} />
+      <Typography align='center'>Share the good news!</Typography>
+      <Stack flexDirection={{ md: 'row' }} gap={4}>
+        <ShareProjectToWarpcastButton projectIdOrPath={params.path} />
+        <TwitterShareButton projectPath={params.path} image='https://s0.2mdn.net/simgad/1430085343475946313' />
+      </Stack>
     </PageWrapper>
   );
 }
