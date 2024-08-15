@@ -14,12 +14,13 @@ export const trackEventAction = actionClient
   .action(async ({ parsedInput, ctx }) => {
     const { event: eventName, ...eventPayload } = parsedInput;
 
-    const sessionUserId = ctx.session.user?.id;
+    let sessionUserId = ctx.session.user?.id;
     const userId: string | undefined = sessionUserId;
 
     // TODO: Handle anonymous user ids
     if (!ctx.session.anonymousUserId) {
       ctx.session.anonymousUserId = uuid();
+      sessionUserId = ctx.session.anonymousUserId;
       await ctx.session.save();
     }
 

@@ -14,7 +14,7 @@ export function trackUserAction<T extends MixpanelEventName>(eventName: T, param
 
   const validEvent = validateMixPanelEvent(mixpanelTrackParams);
   if (!validEvent) {
-    log.warn(`Failed to send event ${eventName}`, { userId, params });
+    log.warn(`Mixpanel event is invalid: ${eventName}`, { userId, params: mixpanelTrackParams });
     return;
   }
 
@@ -34,7 +34,7 @@ export function trackUserActionSimple<T extends string = string>(eventName: T, p
 
   try {
     mixpanel?.track(humanReadableEventName, mixpanelTrackParams);
-  } catch (e) {
-    log.warn(`Failed to update mixpanel event ${eventName}`);
+  } catch (error) {
+    log.warn(`Failed to update mixpanel event ${eventName}`, { error });
   }
 }
