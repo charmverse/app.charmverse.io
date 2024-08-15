@@ -15,17 +15,22 @@ export function CreateProjectForm({
   onCancel,
   onSubmit
 }: {
-  onSubmit: VoidFunction;
+  onSubmit: (projectId: string) => void;
   fid: number;
   onCancel: VoidFunction;
 }) {
   const { execute, isExecuting } = useAction(createProjectAction, {
     onError(err) {
       log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
+    },
+    onSuccess(data) {
+      if (data.data) {
+        onSubmit(data.data.id);
+      }
     }
   });
 
-  const { control, handleSubmit } = useForm<FormValues>({
+  const { control, handleSubmit, formState } = useForm<FormValues>({
     defaultValues: {
       name: '',
       projectMembers: [
@@ -40,20 +45,7 @@ export function CreateProjectForm({
 
   return (
     <>
-      <ProjectForm
-        control={control}
-        // TODO: Implement function to get upload token
-        uploadImageFn={() =>
-          new Promise((resolve) => {
-            resolve({
-              token: 'token',
-              region: 'region',
-              bucket: 'bucket',
-              key: 'key'
-            });
-          })
-        }
-      />
+      <ProjectForm control={control} />
       <Stack
         justifyContent='space-between'
         flexDirection='row'
@@ -68,11 +60,8 @@ export function CreateProjectForm({
         <Button
           data-test='project-form-confirm-values'
           size='large'
-          disabled={isExecuting}
-          onClick={handleSubmit((values) => {
-            execute(values);
-            onSubmit();
-          })}
+          disabled={isExecuting || !formState.isValid}
+          onClick={handleSubmit(execute)}
         >
           Create
         </Button>

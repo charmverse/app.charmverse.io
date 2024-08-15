@@ -1,3 +1,5 @@
+import { baseUrl } from '@root/config/constants';
+
 export function ProductUpdatesText({
   text,
   createdAtLocal,
@@ -32,8 +34,8 @@ export function ProductUpdatesText({
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          paddingBottom: 10
+          alignItems: 'center',
+          paddingBottom: 8
         }}
       >
         <div
@@ -43,17 +45,23 @@ export function ProductUpdatesText({
             justifyContent: 'center'
           }}
         >
-          {projectAvatarImage && <img width={35} height={35} src={projectAvatarImage} />}
-          <p>{projectName}</p>
           <p
             style={{
+              fontSize: 24
+            }}
+          >
+            {projectName}
+          </p>
+          <p
+            style={{
+              fontSize: 20,
               marginTop: -8
             }}
           >
             {createdAtLocal}
           </p>
         </div>
-        <img width={100} height={100} src='https://cdn.pixabay.com/photo/2023/01/31/04/11/rocket-7757105_1280.png' />
+        <img width={100} height={100} src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.webp`} />
       </div>
       <div style={{ width: '100%', height: 2, backgroundColor: 'black' }} />
       <div
@@ -66,15 +74,26 @@ export function ProductUpdatesText({
         {lines.map((line, index) => {
           const numberReplacedLine = line.replace(/^\d+\.\s/, '');
           return (
-            <p
+            <div
               style={{
-                wordBreak: 'break-word',
-                marginTop: -4
+                gap: 4,
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'flex-start'
               }}
               key={`${index.toString()}`}
             >
-              • {numberReplacedLine}
-            </p>
+              •
+              <p
+                style={{
+                  wordBreak: 'break-word',
+                  marginTop: -2,
+                  lineHeight: 1.5
+                }}
+              >
+                {numberReplacedLine}
+              </p>
+            </div>
           );
         })}
       </div>

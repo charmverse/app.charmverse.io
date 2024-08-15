@@ -134,7 +134,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           execute={(input) => {
             execute({
               ...input,
-              id: project.id,
+              projectId: project.id,
               projectMembers: input.projectMembers.slice(1)
             });
           }}

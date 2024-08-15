@@ -37,10 +37,10 @@ export async function createProductUpdatesFrame(input: FormValues) {
     projectName: project.name,
     projectAvatarImage: project.avatar
   });
-  // Use a ratio of 1.9:1 for the image as recommended by farcaster
+  // Use a ratio of 1.91:1 for the image as recommended by farcaster
   const image = new ImageResponse(element, {
-    width: 500,
-    height: 500 / 1.9
+    width: 1000,
+    height: 1000 / 1.91
   });
 
   const imageBlob = await image.blob();
@@ -67,6 +67,8 @@ export async function createProductUpdatesFrame(input: FormValues) {
 
   return {
     productUpdatesFrame,
-    project
+    project: {
+      name: project.name
+    }
   };
 }

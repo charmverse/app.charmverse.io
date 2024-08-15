@@ -20,6 +20,7 @@ export function ProductUpdatesComposerAction({
   connectProjects: ConnectProjectMinimal[];
 }) {
   const [isCreatingProject, setIsCreatingProject] = useState(false);
+  const [defaultProjectId, setDefaultProjectId] = useState(connectProjects[0]?.id || '');
   return (
     <Stack gap={2}>
       <Card>
@@ -40,7 +41,8 @@ export function ProductUpdatesComposerAction({
               onCancel={() => {
                 setIsCreatingProject(false);
               }}
-              onSubmit={() => {
+              onSubmit={(createdProjectId) => {
+                setDefaultProjectId(createdProjectId);
                 setIsCreatingProject(false);
               }}
             />
@@ -50,6 +52,7 @@ export function ProductUpdatesComposerAction({
             onCreateProject={() => {
               setIsCreatingProject(true);
             }}
+            projectId={defaultProjectId}
             connectProjects={connectProjects}
             farcasterUser={farcasterUser}
           />

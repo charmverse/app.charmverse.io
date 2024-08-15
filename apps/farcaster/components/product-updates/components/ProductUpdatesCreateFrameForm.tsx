@@ -6,6 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Stack, Button, Divider, FormLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useAction } from 'next-safe-action/hooks';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { postCreateCastMessage } from 'lib/postCreateCastMessage';
@@ -16,22 +17,28 @@ import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid
 export function ProductUpdatesCreateFrameForm({
   connectProjects,
   farcasterUser,
-  onCreateProject
+  onCreateProject,
+  projectId
 }: {
   farcasterUser: FarcasterUser;
   connectProjects: ConnectProjectMinimal[];
   onCreateProject: VoidFunction;
+  projectId: string;
 }) {
-  const { control, handleSubmit, reset } = useForm<FormValues>({
+  const { control, handleSubmit, reset, setValue } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
-      projectId: connectProjects[0]?.id || '',
+      projectId,
       text: '',
       createdAtLocal: new Date().toLocaleDateString()
     },
     resolver: yupResolver(schema),
     mode: 'onChange'
   });
+
+  useEffect(() => {
+    setValue('projectId', projectId);
+  }, [projectId]);
 
   const { execute, isExecuting } = useAction(createProductUpdatesFrameAction, {
     onSuccess: (data) => {

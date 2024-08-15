@@ -1,5 +1,4 @@
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
-import type { UploadImageFn } from '@connect-shared/hooks/useS3UploadInput';
 import type { FormValues } from '@connect-shared/lib/projects/form';
 import { CATEGORIES } from '@connect-shared/lib/projects/form';
 import { FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
