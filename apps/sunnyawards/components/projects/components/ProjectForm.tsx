@@ -177,7 +177,7 @@ export function ProjectForm({
                     data-test='project-deploy-tx-hash'
                     rows={3}
                     aria-labelledby='project-deploy-tx-hash'
-                    placeholder='Has of the transaction used to deploy the contract'
+                    placeholder='Hash of the transaction used to deploy the contract'
                     {...field}
                     error={!!fieldState.error}
                     helperText={fieldState.error?.message}

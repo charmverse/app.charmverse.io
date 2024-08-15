@@ -6,8 +6,9 @@ import { Box } from '@mui/system';
 import { Suspense } from 'react';
 
 import { FarcasterCard } from 'components/common/FarcasterCard';
-import { ProjectItemSkeleton } from 'components/projects/components/ProjectItemSkeleton';
-import { ProjectsList } from 'components/projects/components/ProjectsList';
+
+import { ProjectItemSkeleton } from '../components/ProjectItemSkeleton';
+import { ProjectsList } from '../components/ProjectsList';
 
 export async function ProfileDetailsPage({ user }: { user: Pick<LoggedInUser, 'farcasterUser' | 'id'> }) {
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
