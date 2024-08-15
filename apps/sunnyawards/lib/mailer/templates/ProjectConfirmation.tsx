@@ -4,12 +4,17 @@ import { Html } from '@react-email/html';
 import { Img } from '@react-email/img';
 import { Section } from '@react-email/section';
 import { baseUrl } from '@root/config/constants';
-import { Link, Text } from '@root/lib/mailer/emails/templates/components';
 import React from 'react';
 
-import { lightGreyColor, primaryTextColor, secondaryTextColor } from 'theme/colors';
+import Link from './components/Link';
+import Text from './components/Text';
+
+const lightGreyColor = '#edf2f4';
+const primaryTextColor = '#37352f';
+const secondaryTextColor = '#888';
 
 const baseBlue = '#0052ff';
+
 function ProjectField({ label, value }: { label: string; value?: string | number | null }) {
   return (
     <>
@@ -59,8 +64,7 @@ export function ProjectConfirmation({
           }}
         >
           <Img
-            src='https://i.ibb.co/jgfrV0Z/Screenshot-2024-08-15-at-9-06-35-PM.png'
-            // src={`${baseUrl}/images/sunnys-landscape.png`}
+            src={`${baseUrl}/images/sunnys-landscape.png`}
             style={{
               maxHeight: '100px',
               width: '100%'
