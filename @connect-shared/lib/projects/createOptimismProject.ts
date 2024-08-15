@@ -23,12 +23,7 @@ export async function createOptimismProject({
     Partial<
       Pick<
         Project,
-        | 'primaryContractAddress'
-        | 'primaryContractChainId'
-        | 'primaryContractDeployTxHash'
-        | 'primaryContractDeployer'
-        | 'mintingWalletAddress'
-        | 'sunnyAwardsProjectType'
+        'primaryContractAddress' | 'primaryContractChainId' | 'mintingWalletAddress' | 'sunnyAwardsProjectType'
       >
     >;
   userId: string;
@@ -200,8 +195,6 @@ export async function createOptimismProject({
       coverImage: input.coverImage,
       primaryContractAddress: input.primaryContractAddress,
       primaryContractChainId: input.primaryContractChainId,
-      primaryContractDeployTxHash: input.primaryContractDeployTxHash,
-      primaryContractDeployer: input.primaryContractDeployer,
       mintingWalletAddress: input.mintingWalletAddress,
       sunnyAwardsProjectType: input.sunnyAwardsProjectType,
       source,

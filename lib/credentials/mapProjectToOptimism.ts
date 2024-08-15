@@ -2,8 +2,6 @@ import type { Project } from '@charmverse/core/prisma-client';
 
 export type Contract = {
   address: string;
-  deploymentTxHash: string;
-  deployerAddress: string;
   chainId: number; // Example chainIds: 10, 8453, 7777777
 };
 
@@ -63,8 +61,6 @@ export type ProjectDetails = Pick<
   | 'websites'
   | 'primaryContractAddress'
   | 'primaryContractChainId'
-  | 'primaryContractDeployTxHash'
-  | 'primaryContractDeployer'
   | 'mintingWalletAddress'
 > & {
   projectMembers: {
@@ -74,15 +70,10 @@ export type ProjectDetails = Pick<
 
 export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
   const contracts: Contract[] =
-    input.primaryContractAddress &&
-    input.primaryContractChainId &&
-    input.primaryContractDeployTxHash &&
-    input.primaryContractDeployer
+    input.primaryContractAddress && input.primaryContractChainId
       ? [
           {
             address: input.primaryContractAddress,
-            deploymentTxHash: input.primaryContractDeployTxHash,
-            deployerAddress: input.primaryContractDeployer,
             chainId: Number(input.primaryContractChainId)
           }
         ]

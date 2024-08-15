@@ -16,8 +16,6 @@ describe('mapProjectToOptimism', () => {
       mintingWalletAddress: null,
       primaryContractAddress: null,
       primaryContractChainId: null,
-      primaryContractDeployTxHash: null,
-      primaryContractDeployer: null,
       projectMembers: [
         {
           farcasterId: 123
