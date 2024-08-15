@@ -53,5 +53,10 @@ export async function getSpaceInviteLinks({
     }
   }
 
+  // Only return public proposals links for non admins
+  if (!isAdmin) {
+    mappedLinks = mappedLinks.filter((link) => !!link.visibleOn);
+  }
+
   return mappedLinks;
 }
