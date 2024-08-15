@@ -1,4 +1,5 @@
 import { GET } from '@root/adapters/http';
+import { NEYNAR_API_KEY } from '@root/lib/farcaster/constants';
 import { isTruthy } from '@root/lib/utils/types';
 
 import type { Cast } from './getFarcasterUserReactions';
@@ -30,7 +31,7 @@ export async function getEmbeddedCasts({ casts }: { casts: Cast[] }) {
       },
       {
         headers: {
-          Api_key: process.env.NEYNAR_API_KEY
+          Api_key: NEYNAR_API_KEY
         }
       }
     );

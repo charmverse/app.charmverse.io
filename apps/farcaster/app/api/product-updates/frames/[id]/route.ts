@@ -1,5 +1,6 @@
-import * as adapters from '@root/adapters/http';
 import { baseUrl } from '@root/config/constants';
+import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
+import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
 import type { FrameButton, FrameButtonsType } from 'frames.js';
 import { getFrameHtml } from 'frames.js';
 
@@ -20,37 +21,9 @@ export async function POST(req: Request) {
     );
   }
 
-  const data = (await req.json()) as {
-    untrustedData: {
-      fid: number;
-      url: string;
-      messageHash: string;
-      timestamp: number;
-      network: number;
-      buttonIndex: number;
-      state: string;
-    };
-    trustedData: {
-      messageBytes: string;
-    };
-  };
+  const data = (await req.json()) as FarcasterFrameInteractionToValidate;
   const messageBytes = data.trustedData.messageBytes;
-  const result = await adapters.POST<{
-    valid: boolean;
-    action: {
-      timestamp: string;
-    };
-  }>(
-    'https://api.neynar.com/v2/farcaster/frame/validate',
-    {
-      message_bytes_in_hex: messageBytes
-    },
-    {
-      headers: {
-        Api_key: process.env.NEYNAR_API_KEY
-      }
-    }
-  );
+  const result = await validateFrameInteraction(messageBytes);
 
   if (result.valid) {
     const timestamp = Math.floor(new Date(result.action.timestamp).getTime() / 1000);
