@@ -7,14 +7,15 @@ import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchPr
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { editProjectAction } from 'lib/projects/editProjectAction';
-import { schema } from 'lib/projects/form';
 import type { FormValues, ProjectCategory } from 'lib/projects/form';
+import { schema } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
@@ -36,7 +37,9 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       router.push(`/p/${project.path}`);
     },
     onError(err) {
-      const errorMessage = err.error.serverError?.message || 'Something went wrong';
+      const errorMessage = err.error.validationErrors
+        ? concatenateStringValues(err.error.validationErrors.fieldErrors)
+        : err.error.serverError?.message || 'Something went wrong';
       log.error(errorMessage || 'Something went wrong', err.error.serverError);
 
       setError(errorMessage);
@@ -73,7 +76,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
               farcasterId: member.farcasterUser.fid,
               name: member.farcasterUser.displayName
             } as FormValues['projectMembers'][0])
-        ) ?? []
+        ) || []
     },
     resolver: yupResolver(schema),
     mode: 'onChange'
@@ -127,7 +130,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
             execute({
               ...input,
               id: project.id,
-              projectMembers: input.projectMembers.slice(1)
+              projectMembers: input.projectMembers.filter((m) => m.farcasterId !== user.farcasterUser?.fid)
             });
           }}
           isExecuting={isExecuting}

@@ -36,7 +36,7 @@ export function AddProjectMembersForm({
   isExecuting: boolean;
   error?: string | null;
 }) {
-  const { append, remove } = useFieldArray({
+  const { append, remove, fields } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
     control
   });
@@ -86,7 +86,7 @@ export function AddProjectMembersForm({
               avatar={farcasterProfile.pfpUrl}
               bio=''
               onDelete={() => {
-                remove(selectedFarcasterProfiles.findIndex((profile) => profile.fid === farcasterProfile.fid));
+                remove(fields.findIndex((profile) => profile.farcasterId === farcasterProfile.fid));
                 setSelectedFarcasterProfiles(
                   selectedFarcasterProfiles.filter((profile) => profile.fid !== farcasterProfile.fid)
                 );

@@ -125,7 +125,6 @@ export const schema = yup.object({
       })
     )
     .required()
-    .min(1)
 });
 
 export type FormValues = yup.InferType<typeof schema>;

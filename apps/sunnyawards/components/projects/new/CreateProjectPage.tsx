@@ -1,11 +1,11 @@
 'use client';
 
-import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box } from '@mui/system';
 import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
+import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -35,8 +35,9 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
       router.push(`/p/${data.data?.projectPath as string}/share`);
     },
     onError(err) {
-      const errorMessage = err.error.serverError?.message || 'Something went wrong';
-      log.error(errorMessage, err.error.serverError);
+      const errorMessage = err.error.validationErrors
+        ? concatenateStringValues(err.error.validationErrors.fieldErrors)
+        : err.error.serverError?.message || 'Something went wrong';
 
       setError(errorMessage);
     }
