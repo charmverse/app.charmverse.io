@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 
 const height = '130px';
 
-const projectHeaderImage = '/images/project-header.jpg';
+// const projectHeaderImage = '/images/project-header.jpg';
 
 export function ProjectHeader({
   coverImage,
