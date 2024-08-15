@@ -28,7 +28,7 @@ function ProjectField({ label, value }: { label: string; value?: string | number
           color: value ? primaryTextColor : secondaryTextColor
         }}
       >
-        {value || 'Not set'}
+        {value || '(not set)'}
       </Text>
     </>
   );
@@ -92,7 +92,13 @@ export function ProjectConfirmation({
               .
             </Text>
 
-            <Text>📋 The details of your application:</Text>
+            <Text
+              style={{
+                marginBottom: 40
+              }}
+            >
+              📋 The details of your application:
+            </Text>
 
             <ProjectField label='Name' value={project.name} />
             <ProjectField label='Description' value={project.description} />
