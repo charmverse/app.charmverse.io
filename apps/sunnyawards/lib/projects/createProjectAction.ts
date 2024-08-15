@@ -10,7 +10,7 @@ import { isTestEnv } from '@root/config/constants';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 
-import { sendConfirmationEmail } from 'lib/mailer/sendConfirmationEmail';
+import { sendProjectConfirmationEmail } from 'lib/mailer/sendProjectConfirmationEmail';
 
 import { schema } from './form';
 
@@ -53,7 +53,7 @@ export const createProjectAction = authActionClient
     if (!isTestEnv) {
       await generateOgImage(newProject.id, currentUserId);
       await trackMixpanelEvent('create_project', { projectId: newProject.id, userId: currentUserId });
-      await sendConfirmationEmail({
+      await sendProjectConfirmationEmail({
         projectId: newProject.id,
         userId: currentUserId
       });
