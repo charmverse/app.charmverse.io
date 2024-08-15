@@ -42,6 +42,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
       websites: [''],
       farcasterValues: [''],
       sunnyAwardsProjectType: 'other',
+      primaryContractChainId: '',
       twitter: '',
       github: '',
       projectMembers: [

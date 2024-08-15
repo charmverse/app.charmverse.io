@@ -24,10 +24,15 @@ function SelectField(props: SelectProps<string> & { helperMessage?: ReactNode },
     <Select<string>
       fullWidth
       displayEmpty
-      renderValue={(selected) => chainOptions.find(({ id }) => selected === id.toString())?.name || 'Select a Chain'}
+      renderValue={(selected) =>
+        chainOptions.find(({ id }) => (selected as unknown as number) === id)?.name || 'Select a Chain'
+      }
       ref={ref}
       {...restProps}
     >
+      <MenuItem value='' disabled>
+        Select a Chain
+      </MenuItem>
       {chainOptions.map((_chain, _index) => {
         return (
           <MenuItem key={_chain.id} value={_chain.id}>
@@ -42,4 +47,4 @@ function SelectField(props: SelectProps<string> & { helperMessage?: ReactNode },
   );
 }
 
-export const ProjectBlockchainSelect = forwardRef(SelectField);
+export const BlockchainSelect = forwardRef(SelectField);

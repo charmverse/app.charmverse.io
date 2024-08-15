@@ -14,7 +14,7 @@ import type { FormValues } from 'lib/projects/form';
 import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from './AddProjectMembersForm';
-import { ProjectBlockchainSelect } from './BlockchainSelect';
+import { BlockchainSelect } from './BlockchainSelect';
 import { ProjectImageField } from './ProjectImageField';
 
 export function ProjectForm({
@@ -120,9 +120,7 @@ export function ProjectForm({
               <Controller
                 control={control}
                 name='primaryContractChainId'
-                render={({ field }) => (
-                  <ProjectBlockchainSelect {...field} value={field.value} onChange={field.onChange} />
-                )}
+                render={({ field }) => <BlockchainSelect {...field} value={field.value} onChange={field.onChange} />}
               />
             </Stack>
             <Stack>
