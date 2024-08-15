@@ -1,9 +1,6 @@
 import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
-import type { SxProps, Theme } from '@mui/material';
 import { Button, Typography } from '@mui/material';
 import Link from 'next/link';
-
-const farcasterPurple = '#8465CB';
 
 const Icon = (
   <div
@@ -33,9 +30,9 @@ export function WarpcastButton({ text, href }: { text: string; href: string }) {
       startIcon={Icon}
       sx={{
         gap: 1,
-        backgroundColor: farcasterPurple,
+        backgroundColor: 'farcaster.main',
         '&:hover': {
-          backgroundColor: farcasterPurple
+          backgroundColor: 'farcaster.main'
         }
       }}
       onMouseDown={() => trackEvent('click_share_on_warpcast')}
