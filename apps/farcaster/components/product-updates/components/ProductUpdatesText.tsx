@@ -11,7 +11,7 @@ export function ProductUpdatesText({
 }) {
   const lines = text
     .split('\n')
-    .filter((line) => line.trim() !== '')
+    .filter((line) => line.trim().length)
     .slice(0, 10);
 
   return (
@@ -32,7 +32,8 @@ export function ProductUpdatesText({
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start'
+          alignItems: 'flex-start',
+          paddingBottom: 10
         }}
       >
         <div

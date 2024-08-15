@@ -65,5 +65,8 @@ export async function createProductUpdatesFrame(input: FormValues) {
     }
   });
 
-  return productUpdatesFrame;
+  return {
+    productUpdatesFrame,
+    project
+  };
 }

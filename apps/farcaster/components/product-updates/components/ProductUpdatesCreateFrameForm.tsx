@@ -36,10 +36,19 @@ export function ProductUpdatesCreateFrameForm({
   const { execute, isExecuting } = useAction(createProductUpdatesFrameAction, {
     onSuccess: (data) => {
       reset();
-      postCreateCastMessage({
-        embeds: data.data ? [`https://${window.location.hostname}/product-updates/frames/${data.data.id}`] : [],
-        text: `Product updates for ${new Date().toLocaleDateString()}`
-      });
+      if (data.data) {
+        const lines = data.data.productUpdatesFrame.text
+          .split('\n')
+          .filter((line) => line.trim().length)
+          .slice(0, 10);
+
+        postCreateCastMessage({
+          embeds: [`https://${window.location.hostname}/product-updates/frames/${data.data.productUpdatesFrame.id}`],
+          text: `${data.data.project.name}\n${data.data.productUpdatesFrame.createdAtLocal}\n${lines
+            .map((line) => `• ${line}`)
+            .join('\n')}`
+        });
+      }
     },
     onError: (err) => {
       log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
