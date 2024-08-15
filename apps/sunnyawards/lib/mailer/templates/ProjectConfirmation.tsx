@@ -59,13 +59,12 @@ export function ProjectConfirmation({
           }}
         >
           <Img
-            src='https://i.ibb.co/jgfrV0Z/Screenshot-2024-08-15-at-9-06-35-PM.png'
+            src={`${baseUrl}/images/sunnys-landscape.png`}
             style={{
               maxHeight: '100px',
               width: '100%'
             }}
           />
-          {/* `${baseUrl}/images/sunnys-landscape.png` */}
           <Section
             style={{
               padding: 30
