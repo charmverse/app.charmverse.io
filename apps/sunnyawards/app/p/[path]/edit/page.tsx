@@ -1,5 +1,5 @@
 import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
-import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
+import { findProject } from '@connect-shared/lib/projects/findProject';
 import { notFound, redirect } from 'next/navigation';
 
 import { EditProjectPage } from 'components/projects/edit/EditProjectPage';
@@ -12,7 +12,7 @@ export default async function EditProject({
   };
 }) {
   const [project, user] = await Promise.all([
-    fetchProject({
+    findProject({
       path: params.path
     }),
     getCurrentUserAction()

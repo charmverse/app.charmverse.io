@@ -14,7 +14,7 @@ import theme from 'theme/theme';
 import 'theme/cssVariables.scss';
 
 export const metadata: Metadata = {
-  title: 'Registration - The Sunny Awards',
+  title: 'Register for The Sunny Awards',
   description: 'Onchain network for connecting web3 developers, projects, organizations'
 };
 

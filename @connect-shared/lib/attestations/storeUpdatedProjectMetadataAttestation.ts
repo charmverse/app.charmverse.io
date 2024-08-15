@@ -3,7 +3,7 @@ import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
-import { fetchProject } from '../projects/fetchProject';
+import { findProject } from '../projects/findProject';
 
 import { createProjectViaAgora, storeProjectMetadataViaAgora } from './agoraApi';
 
@@ -28,7 +28,7 @@ export async function storeUpdatedProjectMetadataAttestation({
     }
   });
 
-  const project = await fetchProject({ id: projectId });
+  const project = await findProject({ id: projectId });
 
   if (!project) {
     throw new DataNotFoundError('Project not found');
