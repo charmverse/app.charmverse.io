@@ -2,27 +2,22 @@
 
 import { log } from '@charmverse/core/log';
 import { Avatar } from '@connect-shared/components/common/Avatar';
-import { useDarkTheme } from '@connect-shared/hooks/useDarkTheme';
-import { usePageView } from '@connect-shared/hooks/usePageView';
+import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar, Link as MuiLink } from '@mui/material';
-import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
 export function Header({ user }: { user: LoggedInUser | null }) {
-  const path = usePathname();
   const router = useRouter();
-  useDatadogLogger({ service: 'sunnyawards-browser', userId: user?.id });
-  usePageView();
-  useDarkTheme();
+  const trackEvent = useTrackEvent();
   const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -97,6 +92,9 @@ export function Header({ user }: { user: LoggedInUser | null }) {
               rel='noopener noreferrer nofollow'
               target='_blank'
               sx={{ fontWeight: '500' }}
+              onMouseDown={() => {
+                trackEvent('click_join_the_sunnys');
+              }}
             >
               Join The Sunnys
             </MuiLink>

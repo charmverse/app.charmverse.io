@@ -1,8 +1,6 @@
-import type { SxProps, Theme } from '@mui/material';
+import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import { Button, Typography } from '@mui/material';
 import Link from 'next/link';
-
-const farcasterPurple = '#8465CB';
 
 const Icon = (
   <div
@@ -18,53 +16,28 @@ const Icon = (
   />
 );
 
-export function WarpcastButton({
-  text,
-  href,
-  onClick,
-  disabled
-}: {
-  text: string;
-  href?: string;
-  onClick?: VoidFunction;
-  disabled?: boolean;
-}) {
-  const style: SxProps<Theme> = {
-    px: 2,
-    backgroundColor: farcasterPurple,
-    '&:hover': {
-      backgroundColor: farcasterPurple
-    }
-  };
-
-  const textStyles: SxProps<Theme> = {
-    px: 1,
-    fontSize: '22px'
-  };
-
-  if (!href) {
-    return (
-      <Button variant='contained' onClick={onClick} startIcon={Icon} sx={style} disabled={disabled}>
-        <Typography component='span' sx={textStyles}>
-          {text}
-        </Typography>
-      </Button>
-    );
-  }
+export function WarpcastButton({ text, href }: { text: string; href: string }) {
+  const trackEvent = useTrackEvent();
 
   return (
     <Button
       LinkComponent={Link}
+      size='large'
       variant='contained'
       href={href}
-      onClick={onClick}
       rel='noopener noreferrer'
       target='_blank'
       startIcon={Icon}
-      sx={style}
-      disabled={disabled}
+      sx={{
+        gap: 1,
+        backgroundColor: 'farcaster.main',
+        '&:hover': {
+          backgroundColor: 'farcaster.dark'
+        }
+      }}
+      onMouseDown={() => trackEvent('click_share_on_warpcast')}
     >
-      <Typography component='span' sx={textStyles}>
+      <Typography component='span' sx={{ fontSize: '22px' }}>
         {text}
       </Typography>
     </Button>

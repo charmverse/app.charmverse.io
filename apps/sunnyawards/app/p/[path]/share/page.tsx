@@ -2,7 +2,7 @@ import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
-import { ShareProjectToWarpcastButton } from 'components/projects/components/ShareProjectToWarpcastButton';
+import { ShareProjectToWarpcastButton } from 'components/projects/[id]/share/components/ShareProjectToWarpcastButton';
 
 export default function PublishProjectPage({ params }: { params: { path: string } }) {
   return (

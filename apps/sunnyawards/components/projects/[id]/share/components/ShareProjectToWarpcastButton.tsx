@@ -1,7 +1,8 @@
 'use client';
 
-import { WarpcastButton } from '@connect-shared/components/WarpcastButton';
 import { useEffect, useState } from 'react';
+
+import { WarpcastButton } from './WarpcastButton';
 
 export function ShareProjectToWarpcastButton({ projectIdOrPath }: { projectIdOrPath: string }) {
   const [url, setUrl] = useState<string>();

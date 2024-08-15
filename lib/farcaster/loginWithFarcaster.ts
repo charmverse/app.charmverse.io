@@ -38,6 +38,7 @@ export type LoginWithFarcasterParams = FarcasterBody &
     signupAnalytics?: Partial<SignupAnalytics>;
     nonce: string;
     message: string;
+    newUserId?: string;
     signature: string;
   };
 
@@ -51,6 +52,7 @@ export async function loginWithFarcaster({
   signupAnalytics = {},
   nonce,
   message,
+  newUserId,
   signature
 }: LoginWithFarcasterParams): Promise<LoggedInUser> {
   if (!fid || !username) {
@@ -169,7 +171,7 @@ export async function loginWithFarcaster({
     return updatedUser;
   }
 
-  const userId = uuid();
+  const userId = newUserId || uuid();
 
   let avatar: string | null = null;
   if (pfpUrl) {
