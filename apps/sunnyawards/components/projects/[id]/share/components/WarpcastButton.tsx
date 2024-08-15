@@ -32,7 +32,7 @@ export function WarpcastButton({ text, href }: { text: string; href: string }) {
         gap: 1,
         backgroundColor: 'farcaster.main',
         '&:hover': {
-          backgroundColor: 'farcaster.main'
+          backgroundColor: 'farcaster.dark'
         }
       }}
       onMouseDown={() => trackEvent('click_share_on_warpcast')}
