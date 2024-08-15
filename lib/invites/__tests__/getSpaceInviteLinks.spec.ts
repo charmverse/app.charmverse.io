@@ -84,7 +84,7 @@ describe('getSpaceInviteLinks', () => {
     );
   });
 
-  it('should not include code for non-admin', async () => {
+  it('should not return private links for non-admin', async () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace({
       publicProposals: true
     });
@@ -109,8 +109,7 @@ describe('getSpaceInviteLinks', () => {
       spaceId: space.id
     });
 
-    expect(links.length).toBe(1);
-    expect(links[0].code).toBe('');
+    expect(links.length).toBe(0);
   });
 
   it('should not include a public proposals invite link if the space does not have public proposals enabled', async () => {
