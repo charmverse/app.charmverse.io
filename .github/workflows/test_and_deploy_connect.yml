@@ -534,7 +534,6 @@ jobs:
     # pass in all steps so we can check if any failed
     needs:
       [
-        build-app,
         test-connect,
         test-connect-e2e,
         test-sunnyawards-e2e,
