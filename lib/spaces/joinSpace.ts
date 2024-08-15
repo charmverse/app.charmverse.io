@@ -36,8 +36,8 @@ export async function joinSpace({ userId, spaceId, source }: Props): Promise<Spa
     }
   });
   // We don't need to do anything if they are already a member of the space
-  if (existingSpaceRole && (!existingSpaceRole?.isGuest || existingSpaceRole?.isAdmin)) {
-    return;
+  if (existingSpaceRole && !existingSpaceRole.isGuest) {
+    return existingSpaceRole;
     // Allow guest to become member
   }
 
