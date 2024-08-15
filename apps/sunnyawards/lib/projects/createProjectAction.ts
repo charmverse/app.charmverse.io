@@ -3,6 +3,7 @@
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
+import { trackMixpanelEvent } from '@connect-shared/lib/mixpanel/trackMixpanelEvent';
 import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { isTestEnv } from '@root/config/constants';
@@ -51,6 +52,7 @@ export const createProjectAction = authActionClient
 
     if (!isTestEnv) {
       await generateOgImage(newProject.id, currentUserId);
+      await trackMixpanelEvent('create_project', { projectId: newProject.id, userId: currentUserId });
     }
 
     await sendConfirmationEmail({

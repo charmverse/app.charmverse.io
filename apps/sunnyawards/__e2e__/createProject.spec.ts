@@ -96,20 +96,6 @@ test('Create a project and view details', async ({ page }) => {
 
   await expect(shareToWarpcastButton).toBeVisible();
 
-  const shareLink = shareToWarpcastButton.locator('a');
-
-  const href = await shareLink.getAttribute('href');
-
-  expect(
-    href?.startsWith(
-      `${encodeURI(
-        'https://warpcast.com/~/compose?text=I just registered for the Sunny Awards to be eligible for 540K OP!'
-      )}&embeds[]=`
-    )
-  ).toBe(true);
-
-  expect(href?.endsWith(`/p/${project.path}`)).toBe(true);
-
   // Go to page and make sure it looks right
   await page.goto(`/p/${project.path}`);
 

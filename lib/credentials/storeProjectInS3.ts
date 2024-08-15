@@ -1,6 +1,6 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
-import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
+import { findProject } from '@connect-shared/lib/projects/findProject';
 import { awsS3Bucket } from '@root/config/constants';
 import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
 import { mapProjectToGitcoin } from '@root/lib/credentials/mapProjectToGitcoin';
@@ -30,7 +30,7 @@ export async function storeProjectInS3<T = any>({
   }
 
   let project =
-    typeof projectOrProjectId === 'string' ? await fetchProject({ id: projectOrProjectId }) : projectOrProjectId;
+    typeof projectOrProjectId === 'string' ? await findProject({ id: projectOrProjectId }) : projectOrProjectId;
 
   if (!project) {
     throw new DataNotFoundError('Project not found');

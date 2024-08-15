@@ -3,7 +3,7 @@
 import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';

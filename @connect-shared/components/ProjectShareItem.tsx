@@ -1,4 +1,4 @@
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { stringToColor } from '@root/lib/utils/strings';
 
 export function ProjectShareItem({ project }: { project: NonNullable<ConnectProjectDetails> }) {

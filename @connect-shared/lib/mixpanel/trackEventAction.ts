@@ -1,24 +1,26 @@
 'use server';
 
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { log } from '@charmverse/core/log';
 import { v4 as uuid } from 'uuid';
 
 import { actionClient } from '../actions/actionClient';
 
-import { pageViewSchema } from './trackEventActionSchema';
+import { eventSchema } from './trackEventActionSchema';
+import { trackMixpanelEvent } from './trackMixpanelEvent';
 
 export const trackEventAction = actionClient
   .metadata({ actionName: 'mixpanel_event' })
-  .schema(pageViewSchema)
+  .schema(eventSchema)
   .action(async ({ parsedInput, ctx }) => {
     const { event: eventName, ...eventPayload } = parsedInput;
 
-    const sessionUserId = ctx.session.user?.id;
+    let sessionUserId = ctx.session.user?.id;
     const userId: string | undefined = sessionUserId;
 
     // TODO: Handle anonymous user ids
     if (!ctx.session.anonymousUserId) {
       ctx.session.anonymousUserId = uuid();
+      sessionUserId = ctx.session.anonymousUserId;
       await ctx.session.save();
     }
 
@@ -30,17 +32,9 @@ export const trackEventAction = actionClient
       event.isAnonymous = true;
     }
 
-    trackUserAction(eventName, event);
+    trackMixpanelEvent(eventName, event);
 
-    // try {
-    //   await recordDatabaseEvent({
-    //     event,
-    //     distinctUserId: event.userId,
-    //     userId: sessionUserId
-    //   });
-    // } catch (error) {
-    //   log.error('Error recording database event', { ...parsedInput, error });
-    // }
+    log.debug(`Track user event: ${eventName}`, { userId: event.userId, path: event.currentUrlPath });
 
     return { success: true };
   });
