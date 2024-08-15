@@ -23,7 +23,7 @@ export const getCurrentUserAction = authActionClient
       }
     });
 
-    if (user.avatar) {
+    if (user?.avatar) {
       user.avatar = replaceS3Domain(user.avatar);
     }
 
