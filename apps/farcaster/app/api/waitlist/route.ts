@@ -2,7 +2,6 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { baseUrl } from '@root/config/constants';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
-import { prettyPrint } from '@root/lib/utils/strings';
 import { getFrameHtml } from 'frames.js';
 
 import {
@@ -60,8 +59,6 @@ export async function POST(req: Request, res: Response) {
       }
     });
   }
-
-  prettyPrint({ validatedMessage });
 
   return new Response(`Success`, { status: 200 });
 }
