@@ -87,6 +87,7 @@ export function SearchFarcasterUser({
           placeholder='Add a team member'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          name='search-farcaster-user'
         />
       )}
       noOptionsText='Search by farcaster username'
