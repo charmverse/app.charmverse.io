@@ -61,7 +61,14 @@ export function ProductUpdatesText({
             {createdAtLocal}
           </p>
         </div>
-        <img width={150} height={150} src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.webp`} />
+        <img
+          width={150}
+          height={150}
+          style={{
+            objectFit: 'contain'
+          }}
+          src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.webp`}
+        />
       </div>
       <div style={{ width: '100%', height: 2, backgroundColor: 'black' }} />
       <div
