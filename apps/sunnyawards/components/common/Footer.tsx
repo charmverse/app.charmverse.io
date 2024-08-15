@@ -11,7 +11,6 @@ export function Footer() {
       width='100%'
       component='footer'
       textAlign='center'
-      bgcolor='footerBackground.main'
       mx='auto'
       p={1}
       display='flex'

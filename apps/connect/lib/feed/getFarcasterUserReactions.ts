@@ -1,8 +1,7 @@
 import { GET } from '@root/adapters/http';
+import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from '@root/lib/farcaster/constants';
 import { type FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import type { IframelyResponse } from '@root/lib/iframely/getIframely';
-
-const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
 
 type UserProfile = {
   object: string;
@@ -112,14 +111,14 @@ type UserReactionsResponse = {
 
 export async function getFarcasterUserReactions({ fid }: { fid: number }): Promise<Reaction[]> {
   const userReactionsResponse = await GET<UserReactionsResponse>(
-    `${neynarBaseUrl}/reactions/user`,
+    `${NEYNAR_API_BASE_URL}/reactions/user`,
     {
       fid,
       type: 'all'
     },
     {
       headers: {
-        Api_key: process.env.NEYNAR_API_KEY
+        Api_key: NEYNAR_API_KEY
       }
     }
   );

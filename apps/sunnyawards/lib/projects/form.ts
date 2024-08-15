@@ -20,7 +20,15 @@ export const schema = yup.object({
   avatar: yup.string(),
   coverImage: yup.string(),
   category: yup.string().oneOf(CATEGORIES).nullable().required(),
-  websites: yup.array(yup.string().url()).min(1),
+  websites: yup
+    .array(
+      yup.string().matches(
+        // eslint-disable-next-line max-len
+        /^((ftp|http|https):\/\/)?(www.)?(?!.*(ftp|http|https|www.))[a-zA-Z0-9_-]+(\.[a-zA-Z]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?$/gm,
+        'URL must be valid'
+      )
+    )
+    .min(1, 'At least one website must be present'),
   farcasterValues: yup.array(yup.string()),
   github: yup.string().optional(),
   twitter: yup.string().optional(),

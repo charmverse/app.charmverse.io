@@ -21,8 +21,7 @@ import {
   secondaryTextColor,
   secondaryTextColorDarkMode,
   sunnysColor,
-  sunnysColorLight,
-  footerBackground
+  sunnysColorLight
 } from './colors';
 
 export const defaultFont =
@@ -59,7 +58,6 @@ const extendedTheme = extendTheme({
         inputBackground: {
           main: inputBackground
         },
-        footerBackground: { main: footerBackground },
         mainBackground: { main: grey[200] },
         farcaster: { main: farcasterBrandColor, dark: farcasterBrandColorDark, light: farcasterBrandColorLight },
         gold: { main: sunnysColor, light: sunnysColorLight }
@@ -94,7 +92,6 @@ const extendedTheme = extendTheme({
         inputBackground: {
           main: inputBackgroundDarkMode
         },
-        footerBackground: { main: footerBackground },
         mainBackground: { main: backgroundColorDarkMode },
         farcaster: { main: farcasterBrandColor, dark: farcasterBrandColorDark, light: farcasterBrandColorLight },
         gold: { main: sunnysColor, light: sunnysColorLight }

@@ -1,20 +1,32 @@
 import type { CouponDetails } from './getCouponDetails';
 
-export const generatePriceDetails = (discount: CouponDetails | null | undefined, standardPrice: number) => {
+export const generatePriceDetails = (
+  discount: CouponDetails | null | undefined,
+  standardPrice: number // price already in dollars (monthly or yearly)
+) => {
   if (discount?.discountType === 'percent') {
+    // Apply percentage discount directly to the standard price
+    const discountAmount = (standardPrice * discount.discount) / 100;
     return {
-      discount: (standardPrice * discount.discount) / 100,
+      discount: discountAmount,
       subTotal: standardPrice,
-      total: standardPrice - (standardPrice * discount.discount) / 100
+      total: standardPrice - discountAmount
     };
   }
+
   if (discount?.discountType === 'fixed') {
+    // Convert fixed discount from cents to dollars
+    const normalisedDiscount = discount.discount / 100;
+
+    // Ensure the fixed discount doesn't exceed the standard price
     return {
-      discount: discount.discount >= standardPrice ? standardPrice : discount.discount,
+      discount: normalisedDiscount >= standardPrice ? standardPrice : normalisedDiscount,
       subTotal: standardPrice,
-      total: discount.discount >= standardPrice ? 0 : standardPrice - discount.discount
+      total: normalisedDiscount >= standardPrice ? 0 : standardPrice - normalisedDiscount
     };
   }
+
+  // No discount applied
   return {
     discount: 0,
     subTotal: standardPrice,
