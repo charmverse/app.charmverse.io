@@ -11,7 +11,7 @@ import { Footer } from 'components/common/Footer';
 import { Header } from 'components/common/Header/Header';
 import theme from 'theme/theme';
 
-import 'theme/cssVariables.scss';
+import 'theme/styles.scss';
 
 export const metadata: Metadata = {
   title: 'Register for The Sunny Awards',

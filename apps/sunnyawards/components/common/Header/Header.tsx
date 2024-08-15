@@ -89,7 +89,6 @@ export function Header({ user }: { user: LoggedInUser | null }) {
           ) : (
             <MuiLink
               href='https://www.thesunnyawards.fun/'
-              rel='noopener noreferrer nofollow'
               target='_blank'
               sx={{ fontWeight: '500' }}
               onMouseDown={() => {

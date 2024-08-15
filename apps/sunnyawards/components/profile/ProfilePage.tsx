@@ -6,11 +6,10 @@ import { Box } from '@mui/system';
 import { Suspense } from 'react';
 
 import { FarcasterCard } from 'components/common/FarcasterCard';
-import { ProjectsList } from 'components/projects/components/ProjectsList';
-
-import { ProjectItemSkeleton } from '../projects/components/ProjectItemSkeleton';
 
 import { NewProjectItem } from './components/NewProjectItem';
+import { ProjectItemSkeleton } from './components/ProjectItemSkeleton';
+import { ProjectsList } from './components/ProjectsList';
 
 export async function ProfilePage({ user }: { user: LoggedInUser }) {
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
