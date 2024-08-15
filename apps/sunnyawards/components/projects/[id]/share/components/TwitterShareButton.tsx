@@ -39,7 +39,7 @@ export function TwitterShareButton({ image, projectPath }: { image?: string; pro
       target='_blank'
       startIcon={<BsTwitterX style={{ fill: 'white', fontSize: 28 }} />}
     >
-      Share on Twitter
+      Share on X
     </StyledButton>
   );
 }
