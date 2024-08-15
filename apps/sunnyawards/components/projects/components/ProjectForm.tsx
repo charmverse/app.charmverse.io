@@ -1,18 +1,33 @@
 'use client';
 
+import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
-import { FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
+import { FormLabel, MenuItem, Select, Stack, TextField, Typography, Button } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
+import Link from 'next/link';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
 import type { FormValues } from 'lib/projects/form';
 import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
 
+import { AddProjectMembersForm } from './AddProjectMembersForm';
 import { ProjectBlockchainSelect } from './BlockchainSelect';
 import { ProjectImageField } from './ProjectImageField';
 
-export function ProjectForm({ control }: { control: Control<FormValues> }) {
+export function ProjectForm({
+  control,
+  isExecuting,
+  projectMembers = [],
+  user
+}: {
+  control: Control<FormValues>;
+  projectMembers?: ConnectProjectDetails['projectMembers'];
+  isExecuting: boolean;
+  user: LoggedInUser;
+}) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
 
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
@@ -162,7 +177,7 @@ export function ProjectForm({ control }: { control: Control<FormValues> }) {
                     data-test='project-deploy-tx-hash'
                     rows={3}
                     aria-labelledby='project-deploy-tx-hash'
-                    placeholder='Has of the transaction used to deploy the contract'
+                    placeholder='Hash of the transaction used to deploy the contract'
                     {...field}
                     error={!!fieldState.error}
                     helperText={fieldState.error?.message}
@@ -280,6 +295,37 @@ export function ProjectForm({ control }: { control: Control<FormValues> }) {
               )}
             />
           </Stack>
+        </Stack>
+      </Stack>
+      <AddProjectMembersForm
+        user={user}
+        control={control}
+        disabled={isExecuting}
+        initialFarcasterProfiles={projectMembers.slice(1).map((member) => ({
+          bio: member.farcasterUser.bio,
+          displayName: member.farcasterUser.displayName,
+          fid: member.farcasterUser.fid,
+          pfpUrl: member.farcasterUser.pfpUrl,
+          username: member.farcasterUser.username
+        }))}
+      />
+      <Stack direction='row' justifyContent='space-between'>
+        <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary'>
+          Cancel
+        </Button>
+        <Stack direction='row' gap={1}>
+          {isExecuting && (
+            <LoadingComponent
+              height={20}
+              size={20}
+              minHeight={20}
+              label='Submitting your project onchain'
+              flexDirection='row-reverse'
+            />
+          )}
+          <Button data-test='project-form-publish' disabled={isExecuting} type='submit'>
+            Publish
+          </Button>
         </Stack>
       </Stack>
     </>

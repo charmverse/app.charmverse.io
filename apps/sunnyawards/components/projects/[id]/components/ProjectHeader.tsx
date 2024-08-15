@@ -3,6 +3,8 @@ import Box from '@mui/material/Box';
 
 const height = '130px';
 
+// const projectHeaderImage = '/images/project-header.jpg';
+
 export function ProjectHeader({
   coverImage,
   avatar,
@@ -12,6 +14,7 @@ export function ProjectHeader({
   name: string;
   avatar?: string | null;
 }) {
+  // coverImage ||= projectHeaderImage;
   return (
     <Box mb={4}>
       {coverImage ? (
@@ -23,7 +26,7 @@ export function ProjectHeader({
           height={height}
         />
       ) : (
-        <Box bgcolor='grey.300' width='100%' height={height} />
+        <Box bgcolor='grey.800' width='100%' height={height} />
       )}
       <Avatar
         avatar={avatar ?? undefined}

@@ -9,6 +9,15 @@ export async function getProductUpdatesFrame(id: string) {
       text: true,
       image: true,
       createdAt: true,
+      author: {
+        select: {
+          farcasterUser: {
+            select: {
+              fid: true
+            }
+          }
+        }
+      },
       project: {
         select: {
           id: true,
@@ -54,6 +63,7 @@ export async function getProductUpdatesFrame(id: string) {
   ]);
 
   return {
+    authorFid: productUpdatesFrame.author.farcasterUser?.fid,
     image: productUpdatesFrame.image,
     previousFrameId: previousFrame?.id ?? null,
     nextFrameId: nextFrame?.id ?? null

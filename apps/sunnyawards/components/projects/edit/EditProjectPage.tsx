@@ -5,26 +5,17 @@ import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { editProjectAction } from 'lib/projects/editProjectAction';
 import { schema } from 'lib/projects/form';
 import type { FormValues, ProjectCategory } from 'lib/projects/form';
 
-import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
-import type { ProjectDetailsProps } from '../components/ProjectDetails';
-import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectForm } from '../components/ProjectForm';
-import { ProjectHeader } from '../components/ProjectHeader';
 
 export function EditProjectPage({ user, project }: { user: LoggedInUser; project: ConnectProjectDetails }) {
-  const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
-
   const router = useRouter();
 
   const { execute, isExecuting } = useAction(editProjectAction, {
@@ -36,12 +27,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     }
   });
 
-  const {
-    control,
-    formState: { isValid },
-    handleSubmit,
-    getValues
-  } = useForm<FormValues>({
+  const { control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       id: project.id,
       name: project.name,
@@ -72,71 +58,18 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     mode: 'onChange'
   });
 
-  if (!showTeamMemberForm) {
-    return (
-      <PageWrapper bgcolor='transparent'>
-        <ProjectForm
-          control={control}
-          isValid={isValid}
-          onNext={() => {
-            setShowTeamMemberForm(true);
-          }}
-        />
-      </PageWrapper>
-    );
-  }
-
-  const projectValues = getValues();
-
-  const projectDetails = {
-    id: '',
-    name: projectValues.name,
-    description: projectValues.description,
-    farcasterValues: projectValues.farcasterValues,
-    github: projectValues.github,
-    twitter: projectValues.twitter,
-    websites: projectValues.websites
-  } as ProjectDetailsProps['project'];
-
   return (
-    <PageWrapper
-      bgcolor='transparent'
-      header={
-        <ProjectHeader name={projectValues.name} avatar={projectValues.avatar} coverImage={projectValues.coverImage} />
-      }
-    >
-      <Box gap={2} display='flex' flexDirection='column'>
-        <ProjectDetails project={projectDetails} />
-        <Typography variant='h5'>Edit team members</Typography>
-        <AddProjectMembersForm
-          user={user}
-          onBack={() => {
-            setShowTeamMemberForm(false);
-          }}
-          control={control}
-          isValid={isValid}
-          handleSubmit={handleSubmit}
-          execute={(input) => {
-            execute({
-              ...input,
-              id: project.id,
-              projectMembers: input.projectMembers.slice(1)
-            });
-          }}
-          isExecuting={isExecuting}
-          // Skip the first member which is the team lead
-          initialFarcasterProfiles={project.projectMembers.slice(1).map(
-            (member) =>
-              ({
-                bio: member.farcasterUser.bio,
-                displayName: member.farcasterUser.displayName,
-                fid: member.farcasterUser.fid,
-                pfpUrl: member.farcasterUser.pfpUrl,
-                username: member.farcasterUser.username
-              } as any)
-          )}
-        />
-      </Box>
+    <PageWrapper bgcolor='transparent'>
+      <form
+        onSubmit={handleSubmit((data) => {
+          execute({
+            ...data,
+            projectMembers: data.projectMembers.filter((m) => m.farcasterId !== user.farcasterUser?.fid)
+          });
+        })}
+      >
+        <ProjectForm control={control} isExecuting={isExecuting} user={user} projectMembers={project.projectMembers} />
+      </form>
     </PageWrapper>
   );
 }
