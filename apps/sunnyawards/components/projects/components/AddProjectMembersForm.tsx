@@ -14,7 +14,7 @@ import { FarcasterCard } from '../../common/FarcasterCard';
 
 import { SearchFarcasterUser } from './SearchFarcasterUser';
 
-type FarcasterProfile = Pick<FarcasterBody, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
+export type FarcasterProfile = Pick<FarcasterBody, 'fid' | 'pfpUrl' | 'bio' | 'displayName' | 'username'>;
 
 export function AddProjectMembersForm({
   control,
@@ -27,7 +27,7 @@ export function AddProjectMembersForm({
   control: Control<FormValues>;
   disabled?: boolean;
 }) {
-  const { append, remove } = useFieldArray({
+  const { append, remove, fields } = useFieldArray({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
     control
   });
@@ -72,7 +72,7 @@ export function AddProjectMembersForm({
             avatar={farcasterProfile.pfpUrl}
             bio=''
             onDelete={() => {
-              remove(selectedFarcasterProfiles.findIndex((profile) => profile.fid === farcasterProfile.fid));
+              remove(fields.findIndex((profile) => profile.farcasterId === farcasterProfile.fid));
               setSelectedFarcasterProfiles(
                 selectedFarcasterProfiles.filter((profile) => profile.fid !== farcasterProfile.fid)
               );

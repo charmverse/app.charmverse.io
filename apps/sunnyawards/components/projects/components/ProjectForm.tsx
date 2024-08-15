@@ -3,6 +3,7 @@
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { FormLabel, MenuItem, Select, Stack, TextField, Typography, Button } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
 import Link from 'next/link';
@@ -19,9 +20,11 @@ import { ProjectImageField } from './ProjectImageField';
 export function ProjectForm({
   control,
   isExecuting,
+  projectMembers = [],
   user
 }: {
   control: Control<FormValues>;
+  projectMembers?: ConnectProjectDetails['projectMembers'];
   isExecuting: boolean;
   user: LoggedInUser;
 }) {
@@ -294,7 +297,18 @@ export function ProjectForm({
           </Stack>
         </Stack>
       </Stack>
-      <AddProjectMembersForm user={user} control={control} disabled={isExecuting} />
+      <AddProjectMembersForm
+        user={user}
+        control={control}
+        disabled={isExecuting}
+        initialFarcasterProfiles={projectMembers.slice(1).map((member) => ({
+          bio: member.farcasterUser.bio,
+          displayName: member.farcasterUser.displayName,
+          fid: member.farcasterUser.fid,
+          pfpUrl: member.farcasterUser.pfpUrl,
+          username: member.farcasterUser.username
+        }))}
+      />
       <Stack direction='row' justifyContent='space-between'>
         <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary'>
           Cancel

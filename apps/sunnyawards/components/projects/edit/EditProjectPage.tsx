@@ -27,11 +27,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     }
   });
 
-  const {
-    control,
-    formState: { isValid },
-    handleSubmit
-  } = useForm<FormValues>({
+  const { control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       id: project.id,
       name: project.name,
@@ -66,10 +62,13 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     <PageWrapper bgcolor='transparent'>
       <form
         onSubmit={handleSubmit((data) => {
-          execute(data);
+          execute({
+            ...data,
+            projectMembers: data.projectMembers.filter((m) => m.farcasterId !== user.farcasterUser?.fid)
+          });
         })}
       >
-        <ProjectForm control={control} isExecuting={isExecuting} user={user} />
+        <ProjectForm control={control} isExecuting={isExecuting} user={user} projectMembers={project.projectMembers} />
       </form>
     </PageWrapper>
   );
