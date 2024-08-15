@@ -8,7 +8,7 @@ import { blueColor, primaryTextColor, secondaryTextColor } from 'theme/colors';
 const defaultFont =
   'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
-type TextVariant = 'body1' | 'h1' | 'h2' | 'subtitle1' | 'caption';
+type TextVariant = 'body1' | 'h1' | 'h2' | 'h3' | 'subtitle1' | 'caption';
 
 const TextStyleConfig: Record<TextVariant, CSSProperties> = {
   body1: {
@@ -20,6 +20,10 @@ const TextStyleConfig: Record<TextVariant, CSSProperties> = {
   },
   h2: {
     fontSize: 24,
+    fontWeight: 'bold'
+  },
+  h3: {
+    fontSize: 20,
     fontWeight: 'bold'
   },
   subtitle1: {

@@ -1,8 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { htmlToText } from 'html-to-text';
 
-import { getPageInviteEmail } from './emails';
-import type { PageInviteEmailProps } from './emails/templates/PageInviteEmail';
 import client, { DOMAIN, SENDER_ADDRESS } from './mailgunClient';
 
 export interface EmailRecipient {
@@ -19,7 +17,7 @@ interface EmailProps {
   senderAddress?: string;
 }
 
-export async function sendEmail({ html, subject, to, attachment }: EmailProps) {
+export async function sendEmail({ html, subject, to, attachment, senderAddress }: EmailProps) {
   const recipientAddress = to.displayName ? `${to.displayName} <${to.email}>` : to.email;
 
   if (!client) {
@@ -29,16 +27,11 @@ export async function sendEmail({ html, subject, to, attachment }: EmailProps) {
   }
 
   return client?.messages.create(DOMAIN, {
-    from: SENDER_ADDRESS,
+    from: senderAddress ?? SENDER_ADDRESS,
     to: [recipientAddress],
     subject,
     text: htmlToText(html),
     html,
     attachment: attachment ? { data: attachment.data, filename: attachment.name } : undefined
   });
-}
-
-export function sendPageInviteEmail({ to, ...variables }: { to: EmailRecipient } & PageInviteEmailProps) {
-  const template = getPageInviteEmail(variables);
-  return sendEmail({ ...template, to });
 }
