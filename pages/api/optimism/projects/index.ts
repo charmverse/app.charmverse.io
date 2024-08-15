@@ -79,10 +79,15 @@ async function createProjectController(
     input: req.body
   });
 
-  const { projectRefUID } = await storeProjectMetadataAndPublishOptimismAttestation({
+  const result = await storeProjectMetadataAndPublishOptimismAttestation({
     projectId: newProject.id,
     userId
   });
+  if (!result) {
+    throw new Error('Failed to store project metadata and publish optimism attestation');
+  }
+
+  const { projectRefUID } = result;
 
   await generateOgImage(newProject.id, userId);
 
