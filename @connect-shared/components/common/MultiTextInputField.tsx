@@ -44,6 +44,7 @@ export function MultiTextInputField<T extends FieldValues>({
               fullWidth
               placeholder={placeholder}
               error={!!fieldState.error}
+              helperText={fieldState.error?.message}
               {..._field}
             />
           )}
@@ -63,7 +64,9 @@ export function MultiTextInputField<T extends FieldValues>({
                   placeholder={placeholder}
                   error={!!fieldState.error}
                   {..._field}
+                  helperText={fieldState.error?.message}
                 />
+                {fieldState.error?.message}
                 <IconButton disabled={disabled} size='small' onClick={() => remove(index + 1)}>
                   <DeleteIcon fontSize='small' color='error' />
                 </IconButton>

@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Divider, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
@@ -53,14 +53,16 @@ export function ProjectForm({ isTeamLead }: { isTeamLead: boolean }) {
               <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
                 <Typography variant='h6'>Team member</Typography>
                 {isTeamLead ? (
-                  <IconButton
-                    data-test='delete-project-member-button'
-                    onClick={() => {
-                      remove(index + 1);
-                    }}
-                  >
-                    <DeleteOutlineOutlinedIcon fontSize='small' color='error' />
-                  </IconButton>
+                  <Tooltip title='Remove team member'>
+                    <IconButton
+                      data-test='delete-project-member-button'
+                      onClick={() => {
+                        remove(index + 1);
+                      }}
+                    >
+                      <DeleteOutlineOutlinedIcon fontSize='small' color='secondary' />
+                    </IconButton>
+                  </Tooltip>
                 ) : null}
               </Stack>
               <FieldAnswers

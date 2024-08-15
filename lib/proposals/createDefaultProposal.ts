@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { Constants } from '@root/lib/databases/constants';
 import { v4 as uuid } from 'uuid';
 
 import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe/config';

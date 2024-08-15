@@ -1,19 +1,37 @@
 import { baseUrl } from '@root/config/constants';
+import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
+import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
 
 import { encrypt } from 'lib/crypto';
-import { validateFarcasterFrame } from 'lib/validateFarcasterFrame';
 
 export async function POST(req: Request) {
-  const { fid } = await validateFarcasterFrame(await req.json());
-  const token = encrypt(fid.toString());
+  const data = (await req.json()) as FarcasterFrameInteractionToValidate;
+  const messageBytes = data.trustedData.messageBytes;
+  const result = await validateFrameInteraction(messageBytes);
+
+  if (result.valid) {
+    const timestamp = Math.floor(new Date(result.action.timestamp).getTime() / 1000);
+    if (timestamp > new Date().getTime() / 1000 - 60) {
+      const token = encrypt(result.action.interactor.fid.toString());
+      return Response.json(
+        {
+          type: 'form',
+          title: 'Product updates',
+          url: `${baseUrl}/product-updates?token=${token}`
+        },
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    }
+  }
   return Response.json(
+    {},
     {
-      type: 'form',
-      title: 'Product updates',
-      url: `${baseUrl}/product-updates?token=${token}`
-    },
-    {
-      status: 200,
+      status: 401,
       headers: {
         'Content-Type': 'application/json'
       }
