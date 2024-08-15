@@ -3,7 +3,7 @@ import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
-import { WarpcastLogin } from '../common/Warpcast/WarpcastLogin';
+import { WarpcastLogin } from '../common/WarpcastLogin/WarpcastLogin';
 
 export function HomePage() {
   return (
@@ -50,17 +50,6 @@ export function HomePage() {
         to compete for 540K OP in total prizes.
       </Typography>
       <WarpcastLogin />
-      <MuiLink
-        variant='body2'
-        href='https://warpcast.com/~/signup'
-        target='_blank'
-        rel='noopener'
-        color='text.primary'
-        fontWeight={500}
-        display='block'
-      >
-        Don't have a Farcaster account?
-      </MuiLink>
     </PageWrapper>
   );
 }

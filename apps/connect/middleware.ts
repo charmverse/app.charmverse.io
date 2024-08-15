@@ -23,8 +23,6 @@ export async function middleware(request: NextRequest) {
     !path.startsWith('/feed')
   ) {
     return NextResponse.redirect(new URL('/', request.url));
-  } else if (user && path === '/') {
-    return NextResponse.redirect(new URL('/profile', request.url));
   }
 
   return NextResponse.next();

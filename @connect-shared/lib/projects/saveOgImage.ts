@@ -6,14 +6,14 @@ import sharp from 'sharp';
 
 import { ProjectShareItem } from '../../components/ProjectShareItem';
 
-import { fetchProject } from './fetchProject';
+import { findProject } from './findProject';
 
 export async function saveOgImage(projectId: string, userId: string) {
   if (!projectId) {
     throw new DataNotFoundError('No id provided');
   }
 
-  const project = await fetchProject({
+  const project = await findProject({
     id: projectId
   });
 

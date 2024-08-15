@@ -7,7 +7,7 @@ import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
 import { storeProjectInS3 } from '../../../lib/credentials/storeProjectInS3';
-import { fetchProject } from '../projects/fetchProject';
+import { findProject } from '../projects/findProject';
 
 import { projectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
@@ -31,7 +31,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     }
   });
 
-  const project = await fetchProject(
+  const project = await findProject(
     stringUtils.isUUID(projectIdOrPath) ? { id: projectIdOrPath } : { path: projectIdOrPath }
   );
 

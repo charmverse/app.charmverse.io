@@ -1,12 +1,12 @@
 import 'server-only';
 
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import { Divider, Stack, Typography } from '@mui/material';
 
 import { FarcasterCard } from 'components/common/FarcasterCard';
-import { WarpcastLogin } from 'components/common/Warpcast/WarpcastLogin';
+import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 
 import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectHeader } from '../components/ProjectHeader';
