@@ -144,10 +144,6 @@ function UserOnboardingDialog({
   usePreventReload(isFormDirty);
 
   async function saveForm() {
-    if (!isFormDirty) {
-      completeOnboarding?.();
-      return;
-    }
     setIsSubmitting(true);
     try {
       await onSubmitMemberProperties();
@@ -171,7 +167,7 @@ function UserOnboardingDialog({
       ['discord', 'google', 'wallet', 'telegram'].includes(requiredProperty)
     );
 
-  const isSaveButtonDisabled = !isFormDirty || hideCloseButton;
+  const isSaveButtonDisabled = hideCloseButton;
 
   const handleClose = () => {
     setIsOnboardingModalOpen(false);
