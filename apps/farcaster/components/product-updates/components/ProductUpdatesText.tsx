@@ -35,7 +35,7 @@ export function ProductUpdatesText({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingBottom: 8
+          paddingBottom: 12
         }}
       >
         <div
@@ -61,7 +61,7 @@ export function ProductUpdatesText({
             {createdAtLocal}
           </p>
         </div>
-        <img width={100} height={100} src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.webp`} />
+        <img width={150} height={150} src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.webp`} />
       </div>
       <div style={{ width: '100%', height: 2, backgroundColor: 'black' }} />
       <div
@@ -87,8 +87,8 @@ export function ProductUpdatesText({
               <p
                 style={{
                   wordBreak: 'break-word',
-                  marginTop: -2,
-                  lineHeight: 1.5
+                  marginTop: -4,
+                  lineHeight: 1.75
                 }}
               >
                 {numberReplacedLine}
