@@ -4,14 +4,14 @@ import { LoadingComponent } from '@connect-shared/components/common/Loading/Load
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
-import { FormLabel, MenuItem, Select, Stack, TextField, Typography, Button } from '@mui/material';
+import { Box, FormLabel, ListSubheader, MenuItem, Select, Stack, TextField, Typography, Button } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
-import type { FormValues } from 'lib/projects/form';
-import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
+import type { FormValues } from 'lib/projects/schema';
+import { PROJECT_CATEGORIES, PROJECT_TYPES } from 'lib/projects/schema';
 
 import { AddProjectMembersForm } from './AddProjectMembersForm';
 import { BlockchainSelect } from './BlockchainSelect';
@@ -105,7 +105,7 @@ export function ProjectForm({
                 {...field}
                 error={!!fieldState.error}
               >
-                {SUNNY_AWARD_CATEGORIES.map((category) => (
+                {PROJECT_TYPES.map((category) => (
                   <MenuItem key={category} value={category}>
                     {capitalize(category)}
                   </MenuItem>
@@ -184,7 +184,7 @@ export function ProjectForm({
           </FormLabel>
           <Controller
             control={control}
-            name='category'
+            name='sunnyAwardsCategory'
             render={({ field, fieldState }) => (
               <Select
                 displayEmpty
@@ -195,11 +195,14 @@ export function ProjectForm({
                 error={!!fieldState.error}
                 {...field}
               >
-                {CATEGORIES.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    {category}
-                  </MenuItem>
-                ))}
+                {PROJECT_CATEGORIES.map(({ group, items }) => [
+                  <ListSubheader key={group}>{group}</ListSubheader>,
+                  ...items.map((category) => (
+                    <MenuItem key={category} value={category} sx={{ pl: 5 }}>
+                      {category}
+                    </MenuItem>
+                  ))
+                ])}
               </Select>
             )}
           />

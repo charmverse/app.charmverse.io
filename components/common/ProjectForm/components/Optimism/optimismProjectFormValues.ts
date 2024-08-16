@@ -17,7 +17,7 @@ export const optimismProjectSchema = yup.object({
   description: yup.string(),
   avatar: yup.string(),
   coverImage: yup.string(),
-  category: yup.string().oneOf(OPTIMISM_PROJECT_CATEGORIES).nullable().optional(),
+  optimismCategory: yup.string().oneOf(OPTIMISM_PROJECT_CATEGORIES).nullable().optional(),
   websites: yup.array(yup.string().url()),
   farcasterValues: yup.array(yup.string()),
   github: yup.string(),

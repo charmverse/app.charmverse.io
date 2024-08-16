@@ -1,6 +1,6 @@
 'use server';
 
-import { schema } from '@connect-shared/lib/projects/form';
+import { schema } from '@connect-shared/lib/projects/projectSchema';
 import { revalidatePath } from 'next/cache';
 
 import { actionClient } from '../actionClient';

@@ -6,6 +6,7 @@ export type EventType =
   | 'click_dont_have_farcaster_account'
   | 'click_join_the_sunnys'
   | 'click_share_on_warpcast'
+  | 'click_share_on_twitter'
   | 'click_powered_by_charmverse';
 
 export const eventSchema = yup.object().shape({

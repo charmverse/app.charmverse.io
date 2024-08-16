@@ -1,13 +1,13 @@
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
-import type { FormValues } from '@connect-shared/lib/projects/form';
-import { CATEGORIES } from '@connect-shared/lib/projects/form';
+import type { FormValues } from '@connect-shared/lib/projects/projectSchema';
+import { CATEGORIES } from '@connect-shared/lib/projects/projectSchema';
 import { FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import type { Control } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { ProjectImageField } from './ProjectImageField';
 
-export function ProjectForm({ control }: { control: Control<FormValues> }) {
+export function ProjectForm({ control, showCategory }: { control: Control<FormValues>; showCategory?: boolean }) {
   return (
     <Stack gap={2}>
       <Stack>
@@ -65,32 +65,34 @@ export function ProjectForm({ control }: { control: Control<FormValues> }) {
         required
       />
 
-      <Stack>
-        <FormLabel required id='project-category'>
-          Category
-        </FormLabel>
-        <Controller
-          control={control}
-          name='category'
-          render={({ field, fieldState }) => (
-            <Select
-              displayEmpty
-              fullWidth
-              aria-labelledby='project-category'
-              data-test='project-form-category'
-              renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
-              error={!!fieldState.error}
-              {...field}
-            >
-              {CATEGORIES.map((category) => (
-                <MenuItem key={category} value={category}>
-                  {category}
-                </MenuItem>
-              ))}
-            </Select>
-          )}
-        />
-      </Stack>
+      {showCategory && (
+        <Stack>
+          <FormLabel required id='project-category'>
+            Category
+          </FormLabel>
+          <Controller
+            control={control}
+            name='optimismCategory'
+            render={({ field, fieldState }) => (
+              <Select
+                displayEmpty
+                fullWidth
+                aria-labelledby='project-category'
+                data-test='project-form-category'
+                renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
+                error={!!fieldState.error}
+                {...field}
+              >
+                {CATEGORIES.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
+          />
+        </Stack>
+      )}
 
       <MultiTextInputField
         control={control}

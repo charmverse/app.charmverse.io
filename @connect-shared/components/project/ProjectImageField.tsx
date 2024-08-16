@@ -1,6 +1,6 @@
 'use client';
 
-import type { FormValues } from '@connect-shared/lib/projects/form';
+import type { FormValues } from '@connect-shared/lib/projects/projectSchema';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';

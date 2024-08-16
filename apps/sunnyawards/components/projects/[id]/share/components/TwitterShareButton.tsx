@@ -1,5 +1,6 @@
 'use client';
 
+import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import styled from '@emotion/styled';
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -14,6 +15,7 @@ const StyledButton = styled(Button)`
 ` as typeof Button;
 
 export function TwitterShareButton({ projectPath }: { projectPath: string }) {
+  const trackEvent = useTrackEvent();
   const [url, setUrl] = useState<string>();
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export function TwitterShareButton({ projectPath }: { projectPath: string }) {
       rel='noopener noreferrer'
       target='_blank'
       startIcon={<BsTwitterX style={{ fill: 'white', fontSize: 24 }} />}
+      onMouseDown={() => trackEvent('click_share_on_twitter')}
     >
       Share
     </StyledButton>

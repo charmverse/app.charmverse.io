@@ -14,8 +14,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { editProjectAction } from 'lib/projects/editProjectAction';
-import type { FormValues, ProjectCategory } from 'lib/projects/form';
-import { schema } from 'lib/projects/form';
+import type { FormValues, ProjectCategory } from 'lib/projects/schema';
+import { schema } from 'lib/projects/schema';
 
 import { ProjectForm } from '../components/ProjectForm';
 
@@ -46,7 +46,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       id: project.id,
       name: project.name,
       avatar: project.avatar ?? '',
-      category: project.category as ProjectCategory,
+      sunnyAwardsCategory: project.sunnyAwardsCategory as ProjectCategory,
       coverImage: project.coverImage ?? '',
       description: project.description ?? '',
       farcasterValues: project.farcasterValues,

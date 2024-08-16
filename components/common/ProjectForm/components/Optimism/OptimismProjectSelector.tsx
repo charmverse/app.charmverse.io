@@ -26,14 +26,14 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
   const { mutate, data: projects = [] } = useGetOpProjects(hasFarcasterAccount);
 
   const selectedProject = projects.find((project) => project.projectRefUID === value?.projectRefUID);
-  const { trigger: createOptimismProject, isMutating } = useCreateOptimismProject();
+  const { trigger: createProject, isMutating } = useCreateOptimismProject();
 
   if (disabled) {
     return <OptimismProjectSelectorReadOnly value={value} {...props} />;
   }
 
   function onSubmit(values: OptimismProjectFormValues) {
-    createOptimismProject({
+    createProject({
       ...values,
       // For some reason websites and farcasterValues both are [null] need to find out why
       farcasterValues: values.farcasterValues?.filter((farcasterValue) => farcasterValue) ?? [],

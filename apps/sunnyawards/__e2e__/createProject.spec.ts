@@ -9,7 +9,7 @@ test('Create a project and view details', async ({ page }) => {
   const projectData = {
     projectFormName: 'Acme Inc',
     projectFormDescription: 'A description of your project',
-    projectFormCategory: 'DeFi',
+    projectFormCategory: 'Art Marketplace',
     projectFormTwitter: 'https://www.twitter.com/acme-inc-twitter',
     projectFormGithub: 'https://www.github.com/acme-inc-github',
     projectFormWebsites: ['https://www.acme-inc.com'],
@@ -114,6 +114,9 @@ test('Create a project and view details', async ({ page }) => {
   // Check project GitHub
   const projectGithub = page.locator('data-test=project-github');
   await expect(projectGithub).toBeVisible();
+
+  // CHeck OP property
+  await expect(project.optimismCategory).toBe('NFT');
 
   // Check project description
 
