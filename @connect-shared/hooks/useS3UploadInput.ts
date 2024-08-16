@@ -5,11 +5,17 @@ import { encodeFilename } from '@root/lib/utils/encodeFilename';
 import { replaceS3Domain } from '@root/lib/utils/url';
 import { useState } from 'react';
 
-import { useGetUploadToken } from './apiClient/aws';
 import { useFilePicker } from './useFilePicker';
+import { useGetUploadToken } from './useGetUploadToken';
 
 export type UploadedFileInfo = { url: string; fileName: string; size?: number };
 export type UploadedFileCallback = (info: UploadedFileInfo) => void;
+export type UploadImageFn = (file: File) => Promise<{
+  token: any;
+  bucket: string;
+  key: string;
+  region: string;
+}>;
 
 export const useS3UploadInput = ({
   onFileUpload,

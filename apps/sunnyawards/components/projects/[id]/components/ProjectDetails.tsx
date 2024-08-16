@@ -7,8 +7,7 @@ import { replaceUrl } from '@root/lib/utils/url';
 import Link from 'next/link';
 import { FaXTwitter } from 'react-icons/fa6';
 
-import { ProjectDescription } from '../components/ProjectDescription';
-
+import { ProjectDescription } from './ProjectDescription';
 import { ShareButton } from './ProjectShareButton';
 
 export type ProjectDetailsProps = {

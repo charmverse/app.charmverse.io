@@ -43,6 +43,9 @@
       "@root/adapters/*": [
         "../../adapters/*"
       ],
+      "@root/components/*": [
+        "../../components/*"
+      ],
       "@root/config/*": [
         "../../config/*"
       ],

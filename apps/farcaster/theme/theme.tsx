@@ -36,6 +36,9 @@ const extendedTheme = extendTheme({
         },
         secondary: {
           main: secondaryTextColorDarkMode
+        },
+        inputBackground: {
+          main: inputBackgroundDarkMode
         }
       }
     }

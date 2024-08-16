@@ -6,7 +6,7 @@ import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
 import { findProject } from '../projects/findProject';
 
-import { createProjectViaAgora, storeProjectMetadataViaAgora } from './agoraApi';
+import { createProjectViaAgora, storeProjectMetadataViaAgora, AGORA_API_KEY } from './agoraApi';
 
 // Format for metadata.json:
 // attestations/{schemaId}/project-{charmverse_uid}/metadata.json
@@ -18,7 +18,11 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
 }: {
   userId: string;
   projectId: string;
-} & OptionalPrismaTransaction): Promise<{ projectRefUID: string; attestationMetadataUID: string }> {
+} & OptionalPrismaTransaction): Promise<null | { projectRefUID: string; attestationMetadataUID: string }> {
+  if (!AGORA_API_KEY) {
+    log.debug('Skip Agora integration: no API key');
+    return null;
+  }
   const farcasterUser = await tx.farcasterUser.findUniqueOrThrow({
     where: {
       userId

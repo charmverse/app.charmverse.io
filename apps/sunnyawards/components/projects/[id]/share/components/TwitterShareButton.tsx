@@ -1,26 +1,19 @@
 'use client';
 
 import styled from '@emotion/styled';
-import { Button, Typography } from '@mui/material';
+import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { BsTwitterX } from 'react-icons/bs';
 
-const twitterColor = '#00aced';
-
 const StyledButton = styled(Button)`
-  gap: 4px;
-  background-color: ${twitterColor};
+  color: white;
   &:hover {
-    background-color: ${twitterColor};
     color: white;
   }
-  color: white;
-  font-size: 22px;
-  padding-bottom: 4px;
-  padding-top: 4px;
+  font-size: 18px;
 ` as typeof Button;
 
-export function TwitterShareButton({ image, projectPath }: { image?: string; projectPath: string }) {
+export function TwitterShareButton({ projectPath }: { projectPath: string }) {
   const [url, setUrl] = useState<string>();
 
   useEffect(() => {
@@ -33,13 +26,15 @@ export function TwitterShareButton({ image, projectPath }: { image?: string; pro
 
   return (
     <StyledButton
-      variant='contained'
+      color='secondary'
+      variant='outlined'
+      size='large'
       href={href}
       rel='noopener noreferrer'
       target='_blank'
-      startIcon={<BsTwitterX style={{ fill: 'white', fontSize: 28 }} />}
+      startIcon={<BsTwitterX style={{ fill: 'white', fontSize: 24 }} />}
     >
-      Share on X
+      Share
     </StyledButton>
   );
 }

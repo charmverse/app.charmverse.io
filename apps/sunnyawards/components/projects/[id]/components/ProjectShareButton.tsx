@@ -19,9 +19,9 @@ export function ShareButton({ projectId }: { projectId: string }) {
   return (
     <Button
       LinkComponent={Link}
-      href={encodeURI(
-        `https://warpcast.com/~/compose?text=I just registered for the Sunny Awards to be eligible for 540K OP!&embeds[]=${url}`
-      )}
+      href={`https://warpcast.com/~/compose?text=${encodeURI(
+        'I just registered for the Sunny Awards to be eligible for 540K OP!'
+      )}&embeds[]=${url}`}
       target='_blank'
       rel='noopener noreferrer'
       color='secondary'

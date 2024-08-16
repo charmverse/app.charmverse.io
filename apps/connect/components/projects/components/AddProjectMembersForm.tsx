@@ -42,11 +42,7 @@ export function AddProjectMembersForm({
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
-    <form
-      onSubmit={handleSubmit((data) => {
-        execute(data);
-      })}
-    >
+    <form onSubmit={handleSubmit(execute)}>
       <Stack gap={1}>
         <Typography variant='h6'>Team</Typography>
         <FarcasterCard

@@ -8,7 +8,7 @@ import { optimism } from 'viem/chains';
 
 import { mapProjectToOptimism } from '../../../lib/credentials/mapProjectToOptimism';
 
-const AGORA_API_KEY = process.env.AGORA_API_KEY as string;
+export const AGORA_API_KEY = process.env.AGORA_API_KEY as string;
 
 export async function createProjectViaAgora({
   farcasterId,
