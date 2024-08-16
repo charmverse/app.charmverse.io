@@ -65,6 +65,12 @@ describe('acceptInvite', () => {
       userId: spaceMember.id
     });
 
+    // This is here a second time to ensure the operation is idempotent and doesn't throw an error
+    await acceptInvite({
+      inviteLinkId: inviteLinkWithRole.id,
+      userId: spaceMember.id
+    });
+
     await acceptInvite({
       inviteLinkId: inviteLinkWithRole.id,
       userId: newSpaceAdmin.id
