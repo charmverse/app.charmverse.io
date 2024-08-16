@@ -7,32 +7,11 @@ import { isAddress } from 'viem';
 import { normalize } from 'viem/ens';
 import * as yup from 'yup';
 
-export const PROJECT_CATEGORIES = [
-  {
-    group: 'Creator',
-    items: ['Art Marketplace', 'Art NFTs', 'Other Media Marketplace', 'Other Media NFTs']
-  },
-  {
-    group: 'DeFi',
-    items: ['DEX', 'Real World Assets', 'Staking', 'Bridges']
-  },
-  {
-    group: 'Social',
-    items: ['Betting & Prediction Markets', 'Community & Curation', 'Gaming', 'Meme Community']
-  },
-  {
-    group: 'Utility',
-    items: ['Airdrop', 'Donations', 'Identity Payments']
-  },
-  {
-    group: 'Farcaster',
-    items: ['Frames', 'Channels']
-  }
-] as const;
+export const CATEGORIES = ['CeFi', 'Cross Chain', 'DeFi', 'Governance', 'NFT', 'Social', 'Utility'] as const;
 
-export const PROJECT_TYPES = typedKeys(SunnyAwardsProjectType);
+export const SUNNY_AWARD_CATEGORIES = typedKeys(SunnyAwardsProjectType);
 
-export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number]['items'][number];
+export type ProjectCategory = (typeof CATEGORIES)[number];
 
 export const schema = yup.object({
   id: yup.string(),
@@ -40,11 +19,7 @@ export const schema = yup.object({
   description: yup.string().required('Project description is required'),
   avatar: yup.string(),
   coverImage: yup.string(),
-  category: yup
-    .string()
-    .oneOf(PROJECT_CATEGORIES.map(({ items }) => items).flat())
-    .nullable()
-    .required(),
+  category: yup.string().oneOf(CATEGORIES).nullable().required(),
   websites: yup
     .array(
       yup.string().matches(
@@ -58,7 +33,7 @@ export const schema = yup.object({
   farcasterValues: yup.array(yup.string()),
   github: yup.string().optional(),
   twitter: yup.string().optional(),
-  sunnyAwardsProjectType: yup.string().oneOf(PROJECT_TYPES).required(),
+  sunnyAwardsProjectType: yup.string().oneOf(SUNNY_AWARD_CATEGORIES).required(),
   primaryContractChainId: yup.string().test('isChainId', 'Invalid chain ID', async (value, context) => {
     if ((context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType) === 'app') {
       return !!value && !Number.isNaN(parseInt(value));
