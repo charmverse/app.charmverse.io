@@ -23,6 +23,7 @@ export type ConnectProjectDetails = Pick<
   | 'mintingWalletAddress'
   | 'primaryContractAddress'
   | 'primaryContractChainId'
+  | 'ticketNo'
 > & {
   projectMembers: {
     userId: string | null;
@@ -56,6 +57,7 @@ export async function findProject({ id, path }: { id?: string; path?: string }):
       mintingWalletAddress: true,
       primaryContractAddress: true,
       primaryContractChainId: true,
+      ticketNo: true,
       projectMembers: {
         orderBy: [
           {
