@@ -12,7 +12,7 @@ import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation
 
 import { sendProjectConfirmationEmail } from 'lib/mailer/sendProjectConfirmationEmail';
 
-import { schema } from './schema';
+import { schema, getOptimismCategory } from './schema';
 
 export const createProjectAction = authActionClient
   .metadata({ actionName: 'create-project' })
@@ -25,6 +25,7 @@ export const createProjectAction = authActionClient
       userId: currentUserId,
       input: {
         ...input,
+        optimismCategory: getOptimismCategory(input.sunnyAwardsCategory),
         primaryContractChainId: input.primaryContractChainId ? parseInt(input.primaryContractChainId) : undefined
       },
       source: 'connect'

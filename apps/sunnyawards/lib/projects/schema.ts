@@ -1,31 +1,36 @@
 import { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
+import type { ProjectCategory as OptimismProjectCategory } from '@connect-shared/lib/projects/projectSchema';
 import { wagmiConfig } from '@root/connectors/config';
 import { typedKeys } from '@root/lib/utils/objects';
-import { getBytecode, getTransactionReceipt } from '@wagmi/core';
+import { getBytecode } from '@wagmi/core';
 import type { Address } from 'viem';
-import { isAddress } from 'viem';
 import { normalize } from 'viem/ens';
 import * as yup from 'yup';
 
 export const PROJECT_CATEGORIES = [
   {
     group: 'Creator',
+    optimismCategory: 'NFT',
     items: ['Art Marketplace', 'Art NFTs', 'Other Media Marketplace', 'Other Media NFTs']
   },
   {
     group: 'DeFi',
+    optimismCategory: 'DeFi',
     items: ['DEX', 'Real World Assets', 'Staking', 'Bridges']
   },
   {
     group: 'Social',
+    optimismCategory: 'Social',
     items: ['Betting & Prediction Markets', 'Community & Curation', 'Gaming', 'Meme Community']
   },
   {
     group: 'Utility',
+    optimismCategory: 'Utility',
     items: ['Airdrop', 'Donations', 'Identity Payments']
   },
   {
     group: 'Farcaster',
+    optimismCategory: 'Social',
     items: ['Frames', 'Channels']
   }
 ] as const;
@@ -33,6 +38,12 @@ export const PROJECT_CATEGORIES = [
 export const PROJECT_TYPES = typedKeys(SunnyAwardsProjectType);
 
 export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number]['items'][number];
+
+export function getOptimismCategory(category: ProjectCategory): OptimismProjectCategory | undefined {
+  // @ts-ignore TS can't infer the type of the items array properly
+  const group = PROJECT_CATEGORIES.find(({ items }) => items.includes(category));
+  return group?.optimismCategory;
+}
 
 export const schema = yup.object({
   id: yup.string(),
