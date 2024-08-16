@@ -9,7 +9,7 @@ test('Create a project and view details', async ({ page }) => {
   const projectData = {
     projectFormName: 'Acme Inc',
     projectFormDescription: 'A description of your project',
-    projectFormCategory: 'DeFi',
+    projectFormCategory: 'Art Marketplace',
     projectFormTwitter: 'https://www.twitter.com/acme-inc-twitter',
     projectFormGithub: 'https://www.github.com/acme-inc-github',
     projectFormWebsites: ['https://www.acme-inc.com'],
