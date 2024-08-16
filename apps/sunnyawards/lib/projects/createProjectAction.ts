@@ -4,7 +4,7 @@ import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { trackMixpanelEvent } from '@connect-shared/lib/mixpanel/trackMixpanelEvent';
-import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
+import { createProject } from '@connect-shared/lib/projects/createProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { isTestEnv } from '@root/config/constants';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
@@ -12,7 +12,7 @@ import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation
 
 import { sendProjectConfirmationEmail } from 'lib/mailer/sendProjectConfirmationEmail';
 
-import { schema } from './form';
+import { schema } from './schema';
 
 export const createProjectAction = authActionClient
   .metadata({ actionName: 'create-project' })
@@ -21,7 +21,7 @@ export const createProjectAction = authActionClient
     const input = parsedInput;
 
     const currentUserId = ctx.session.user.id;
-    const newProject = await createOptimismProject({
+    const newProject = await createProject({
       userId: currentUserId,
       input: {
         ...input,

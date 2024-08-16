@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
-import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
+import { createProject } from '@connect-shared/lib/projects/createProject';
 import { prettyPrint } from '@root/lib/utils/strings';
 import fetchMock from 'fetch-mock-jest';
 
@@ -77,10 +77,10 @@ describe('createConnectProject', () => {
       users: []
     });
 
-    const createdProject = await createOptimismProject({
+    const createdProject = await createProject({
       input: {
         name: 'Project',
-        category: 'CeFi',
+        sunnyAwardsCategory: 'CeFi',
         description: 'Project description',
         projectMembers: [
           {
@@ -107,7 +107,7 @@ describe('createConnectProject', () => {
       },
       select: {
         name: true,
-        category: true,
+        sunnyAwardsCategory: true,
         description: true,
         projectMembers: {
           select: {
@@ -138,7 +138,7 @@ describe('createConnectProject', () => {
 
     expect(project).toMatchObject({
       name: 'Project',
-      category: 'CeFi',
+      sunnyAwardsCategory: 'CeFi',
       description: 'Project description',
       projectMembers: [
         {

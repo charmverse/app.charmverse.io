@@ -1,7 +1,7 @@
 import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
-import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
+import { createProject } from '@connect-shared/lib/projects/createProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -73,7 +73,7 @@ async function createProjectController(
     throw new InvalidInputError('User does not have a farcaster account.');
   }
 
-  const newProject = await createOptimismProject({
+  const newProject = await createProject({
     source: 'charmverse',
     userId,
     input: req.body

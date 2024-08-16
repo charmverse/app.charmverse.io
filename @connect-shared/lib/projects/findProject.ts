@@ -12,7 +12,8 @@ export type ConnectProjectDetails = Pick<
   | 'avatar'
   | 'coverImage'
   | 'path'
-  | 'category'
+  | 'optimismCategory'
+  | 'sunnyAwardsCategory'
   | 'name'
   | 'farcasterFrameImage'
   | 'farcasterValues'
@@ -47,7 +48,8 @@ export async function findProject({ id, path }: { id?: string; path?: string }):
       avatar: true,
       coverImage: true,
       name: true,
-      category: true,
+      optimismCategory: true,
+      sunnyAwardsCategory: true,
       farcasterValues: true,
       github: true,
       path: true,

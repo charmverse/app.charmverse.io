@@ -1,7 +1,7 @@
 import { FarcasterCard } from '@connect-shared/components/common/FarcasterCard';
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import type { FormValues } from '@connect-shared/lib/projects/form';
+import type { FormValues } from '@connect-shared/lib/projects/projectSchema';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Button, Stack, Typography } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';

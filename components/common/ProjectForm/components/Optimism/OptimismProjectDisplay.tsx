@@ -99,7 +99,7 @@ export function OptimismProjectDisplay({
   const { user } = useUser();
   const { mutate } = useGetOpProjects();
   const [isEditing, setIsEditing] = useState(false);
-  const { trigger: editOptimismProject, isMutating } = useEditOptimismProject(project.projectRefUID);
+  const { trigger: editProject, isMutating } = useEditOptimismProject(project.projectRefUID);
   const {
     metadata: {
       socialLinks,
@@ -122,7 +122,7 @@ export function OptimismProjectDisplay({
   const canEdit = farcasterIds.find((farcasterId) => farcasterId === user?.farcasterUser?.fid);
 
   function onSubmit(values: OptimismProjectFormValues) {
-    editOptimismProject({
+    editProject({
       ...values,
       farcasterValues: values.farcasterValues?.filter((farcasterValue) => farcasterValue) ?? [],
       websites: values.websites?.filter((website) => website) ?? []
@@ -139,7 +139,7 @@ export function OptimismProjectDisplay({
         optimismValues={{
           name: project.name,
           avatar: projectAvatarUrl,
-          category: (category || null) as OptimismProjectCategory,
+          optimismCategory: (category || null) as OptimismProjectCategory,
           description,
           coverImage: projectCoverImageUrl,
           github: github ? github[0] : '',

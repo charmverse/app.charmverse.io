@@ -308,7 +308,7 @@ export function OptimismProjectForm({
 
       <Controller
         control={control}
-        name='category'
+        name='optimismCategory'
         render={({ field, fieldState }) => (
           <FieldWrapper label='Category'>
             <Select

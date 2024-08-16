@@ -10,8 +10,8 @@ import Link from 'next/link';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
-import type { FormValues } from 'lib/projects/form';
-import { PROJECT_CATEGORIES, PROJECT_TYPES } from 'lib/projects/form';
+import type { FormValues } from 'lib/projects/schema';
+import { PROJECT_CATEGORIES, PROJECT_TYPES } from 'lib/projects/schema';
 
 import { AddProjectMembersForm } from './AddProjectMembersForm';
 import { BlockchainSelect } from './BlockchainSelect';
@@ -224,7 +224,7 @@ export function ProjectForm({
           </FormLabel>
           <Controller
             control={control}
-            name='category'
+            name='sunnyAwardsCategory'
             render={({ field, fieldState }) => (
               <Select
                 displayEmpty

@@ -9,7 +9,7 @@ import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
-import type { FormValues } from 'lib/projects/form';
+import type { FormValues } from 'lib/projects/schema';
 
 const height = 96;
 

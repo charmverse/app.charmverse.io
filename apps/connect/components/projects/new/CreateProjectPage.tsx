@@ -4,7 +4,7 @@ import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { ProjectForm } from '@connect-shared/components/project/ProjectForm';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import { schema, type FormValues } from '@connect-shared/lib/projects/form';
+import { schema, type FormValues } from '@connect-shared/lib/projects/projectSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Stack } from '@mui/material';
 import { Box } from '@mui/system';
@@ -42,7 +42,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     defaultValues: {
       name: '',
       description: '',
-      category: '' as any,
+      optimismCategory: '' as any,
       websites: [''],
       farcasterValues: [''],
       twitter: '',
@@ -69,7 +69,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <ProjectForm control={control} />
+        <ProjectForm control={control} showCategory />
         <Stack
           justifyContent='space-between'
           flexDirection='row'
