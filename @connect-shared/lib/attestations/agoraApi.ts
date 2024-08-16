@@ -10,14 +10,14 @@ import { mapProjectToOptimism } from '../../../lib/credentials/mapProjectToOptim
 
 export const AGORA_API_KEY = process.env.AGORA_API_KEY as string;
 
-export function createProjectViaAgora({
+export async function createProjectViaAgora({
   farcasterId,
   projectName
 }: {
   farcasterId: string | number;
   projectName: string;
 }): Promise<{ attestationId: string }> {
-  return POST(
+  const result = await POST<{ attestationId: string }>(
     'https://retrofunding.optimism.io/api/v1/projects',
     {
       farcasterId: farcasterId.toString(),
@@ -30,6 +30,10 @@ export function createProjectViaAgora({
       }
     }
   );
+
+  log.info('Project created via Agora', { projectRefUID: result.attestationId });
+
+  return result;
 }
 
 export async function storeProjectMetadataViaAgora({

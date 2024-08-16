@@ -14,19 +14,22 @@ import type { FormValues } from 'lib/projects/form';
 import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from './AddProjectMembersForm';
-import { ProjectBlockchainSelect } from './BlockchainSelect';
+import { BlockchainSelect } from './BlockchainSelect';
+import { FormErrors } from './FormErrors';
 import { ProjectImageField } from './ProjectImageField';
 
 export function ProjectForm({
   control,
   isExecuting,
   projectMembers = [],
-  user
+  user,
+  errors
 }: {
   control: Control<FormValues>;
   projectMembers?: ConnectProjectDetails['projectMembers'];
   isExecuting: boolean;
   user: LoggedInUser;
+  errors: string[] | null;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
 
@@ -115,14 +118,12 @@ export function ProjectForm({
           <Stack gap={2}>
             <Stack>
               <FormLabel id='project-chain' required>
-                Project Chain ID
+                Project Chain
               </FormLabel>
               <Controller
                 control={control}
                 name='primaryContractChainId'
-                render={({ field }) => (
-                  <ProjectBlockchainSelect {...field} value={field.value} onChange={field.onChange} />
-                )}
+                render={({ field }) => <BlockchainSelect {...field} value={field.value} onChange={field.onChange} />}
               />
             </Stack>
             <Stack>
@@ -283,6 +284,7 @@ export function ProjectForm({
               flexDirection='row-reverse'
             />
           )}
+          {!isExecuting && errors?.length && <FormErrors errors={errors} />}
           <Button data-test='project-form-publish' disabled={isExecuting} type='submit'>
             Publish
           </Button>

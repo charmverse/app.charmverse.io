@@ -1,11 +1,9 @@
-import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import { Button, FormLabel, Stack, Typography } from '@mui/material';
+import { FormLabel, Stack } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
-import Link from 'next/link';
 import { useState } from 'react';
-import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
+import type { Control, FieldArrayPath } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
 
 import type { FormValues } from 'lib/projects/form';

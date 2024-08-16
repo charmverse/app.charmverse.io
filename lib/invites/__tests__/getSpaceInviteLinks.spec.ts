@@ -6,13 +6,18 @@ import { v4 } from 'uuid';
 import { getSpaceInviteLinks } from '../getSpaceInviteLinks';
 
 describe('getSpaceInviteLinks', () => {
-  it('should return all invite links for a space along with their roles', async () => {
-    const { user, space } = await testUtilsUser.generateUserAndSpace({
-      publicProposals: true
+  it('should return all invite links for a space along with their roles if the user is an admin, and no private links for normal members', async () => {
+    const { user: admin, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+
+    const member = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
     });
 
     const exampleRole = await testUtilsMembers.generateRole({
-      createdBy: user.id,
+      createdBy: admin.id,
       spaceId: space.id,
       roleName: 'example-role'
     });
@@ -20,18 +25,11 @@ describe('getSpaceInviteLinks', () => {
     const spaceLinkWithRoles = await prisma.inviteLink.create({
       data: {
         code: v4(),
-        author: { connect: { id: user.id } },
+        author: { connect: { id: admin.id } },
         space: { connect: { id: space.id } },
         inviteLinkToRoles: {
           create: {
             roleId: exampleRole.id
-          }
-        }
-      },
-      include: {
-        inviteLinkToRoles: {
-          include: {
-            role: true
           }
         }
       }
@@ -40,21 +38,11 @@ describe('getSpaceInviteLinks', () => {
     const proposalsLink = await prisma.inviteLink.create({
       data: {
         code: v4(),
-        author: { connect: { id: user.id } },
+        author: { connect: { id: admin.id } },
         space: { connect: { id: space.id } },
         visibleOn: 'proposals'
-      },
-      include: {
-        inviteLinkToRoles: {
-          include: {
-            role: true
-          }
-        }
       }
     });
-
-    // Quick test of comparison data to make sure the test makes sense
-    expect(spaceLinkWithRoles.inviteLinkToRoles.length).toBe(1);
 
     // Data we should not get back
     const { user: secondUser, space: secondSpace } = await testUtilsUser.generateUserAndSpace({});
@@ -72,97 +60,92 @@ describe('getSpaceInviteLinks', () => {
       }
     });
 
-    const links = await getSpaceInviteLinks({
-      isAdmin: true,
+    const adminVisibleLinks = await getSpaceInviteLinks({
+      userId: admin.id,
       spaceId: space.id
     });
 
-    expect(links.length).toBe(2);
+    expect(adminVisibleLinks.length).toBe(2);
 
-    expect(links).toEqual(
-      expect.arrayContaining([expect.objectContaining(spaceLinkWithRoles), expect.objectContaining(proposalsLink)])
+    expect(adminVisibleLinks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ ...spaceLinkWithRoles, roleIds: [exampleRole.id] }),
+        expect.objectContaining({ ...proposalsLink, roleIds: [] })
+      ])
     );
+
+    const memberVisibleLinks = await getSpaceInviteLinks({
+      userId: member.id,
+      spaceId: space.id
+    });
+
+    expect(memberVisibleLinks.length).toBe(0);
   });
 
-  it('should not include code for non-admin', async () => {
-    const { user, space } = await testUtilsUser.generateUserAndSpace({
+  it('should return proposal invite links to a normal member or external user if the space has activated public proposals', async () => {
+    const { user: admin, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true,
       publicProposals: true
     });
 
-    await prisma.inviteLink.create({
+    const member = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id,
+      isAdmin: false
+    });
+
+    const exampleRole = await testUtilsMembers.generateRole({
+      createdBy: admin.id,
+      spaceId: space.id,
+      roleName: 'example-role'
+    });
+
+    const inviteLink = await prisma.inviteLink.create({
       data: {
         code: v4(),
-        author: { connect: { id: user.id } },
+        author: { connect: { id: admin.id } },
         space: { connect: { id: space.id } }
-      },
-      include: {
-        inviteLinkToRoles: {
-          include: {
-            role: true
-          }
-        }
-      }
-    });
-
-    const links = await getSpaceInviteLinks({
-      isAdmin: false,
-      spaceId: space.id
-    });
-
-    expect(links.length).toBe(1);
-    expect(links[0].code).toBe('');
-  });
-
-  it('should not include a public proposals invite link if the space does not have public proposals enabled', async () => {
-    const { user, space } = await testUtilsUser.generateUserAndSpace({
-      publicProposals: false
-    });
-    const spaceLinkWithRoles = await prisma.inviteLink.create({
-      data: {
-        code: v4(),
-        author: { connect: { id: user.id } },
-        space: { connect: { id: space.id } }
-      },
-      include: {
-        inviteLinkToRoles: {
-          include: {
-            role: true
-          }
-        }
       }
     });
 
     const proposalsLink = await prisma.inviteLink.create({
       data: {
         code: v4(),
-        author: { connect: { id: user.id } },
+        author: { connect: { id: admin.id } },
         space: { connect: { id: space.id } },
-        visibleOn: 'proposals'
-      },
-      include: {
+        visibleOn: 'proposals',
         inviteLinkToRoles: {
-          include: {
-            role: true
+          create: {
+            roleId: exampleRole.id
           }
         }
       }
     });
 
-    const links = await getSpaceInviteLinks({
-      isAdmin: true,
+    // Quick test of comparison data to make sure the test makes sense
+    const memberVisibleLinks = await getSpaceInviteLinks({
+      userId: member.id,
       spaceId: space.id
     });
 
-    expect(links.length).toBe(1);
+    expect(memberVisibleLinks.length).toBe(1);
 
-    expect(links[0]).toMatchObject(expect.objectContaining(spaceLinkWithRoles));
+    expect(memberVisibleLinks).toEqual(expect.arrayContaining([{ ...proposalsLink, roleIds: [exampleRole.id] }]));
+
+    const externalUserLinks = await getSpaceInviteLinks({
+      userId: undefined,
+      spaceId: space.id
+    });
+
+    expect(externalUserLinks.length).toBe(1);
+
+    expect(externalUserLinks).toEqual(expect.arrayContaining([{ ...proposalsLink, roleIds: [exampleRole.id] }]));
   });
 
   it('should throw an error if spaceId is invalid', async () => {
-    await expect(getSpaceInviteLinks({ isAdmin: true, spaceId: undefined as any })).rejects.toBeInstanceOf(
+    await expect(getSpaceInviteLinks({ userId: undefined, spaceId: undefined as any })).rejects.toBeInstanceOf(
       InvalidInputError
     );
-    await expect(getSpaceInviteLinks({ isAdmin: true, spaceId: 'not-a-uuid' })).rejects.toBeInstanceOf(
+    await expect(getSpaceInviteLinks({ userId: undefined, spaceId: 'not-a-uuid' })).rejects.toBeInstanceOf(
       InvalidInputError
     );
   });

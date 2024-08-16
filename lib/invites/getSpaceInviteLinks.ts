@@ -1,5 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { InviteLink, Space } from '@charmverse/core/prisma-client';
+import { hasAccessToSpace } from '@charmverse/core/permissions';
+import type { InviteLink, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
@@ -8,20 +9,43 @@ export type InviteLinkWithRoles = InviteLink & {
 };
 
 export async function getSpaceInviteLinks({
-  isAdmin,
+  userId,
   spaceId
 }: {
-  isAdmin: boolean;
+  userId?: string;
   spaceId: string;
 }): Promise<InviteLinkWithRoles[]> {
   if (!stringUtils.isUUID(spaceId)) {
     throw new InvalidInputError(`Valid spaceId is required`);
   }
 
+  const { isAdmin } = await hasAccessToSpace({ userId, spaceId });
+
+  const query: Prisma.InviteLinkWhereInput = {
+    spaceId
+  };
+
+  if (!isAdmin) {
+    const space = await prisma.space.findUniqueOrThrow({
+      where: {
+        id: spaceId
+      },
+      select: {
+        publicProposals: true
+      }
+    });
+
+    // If user isn't an admin, we can at most return the public proposals invite link
+    if (space.publicProposals) {
+      query.visibleOn = 'proposals';
+    } else {
+      // User won't be entitled to see any invite links
+      return [];
+    }
+  }
+
   const links = await prisma.inviteLink.findMany({
-    where: {
-      spaceId
-    },
+    where: query,
     include: {
       inviteLinkToRoles: {
         include: {
@@ -31,27 +55,13 @@ export async function getSpaceInviteLinks({
     }
   });
 
-  let mappedLinks = links.map((link) => {
-    const code = isAdmin ? link.code : '';
+  const mappedLinks = links.map((link) => {
     return {
       ...link,
-      code,
+      inviteLinkToRoles: undefined,
       roleIds: link.inviteLinkToRoles.map((linkToRole) => linkToRole.roleId)
     };
   });
-
-  if (mappedLinks.some((link) => link.visibleOn === 'proposals')) {
-    const space = (await prisma.space.findUnique({
-      where: {
-        id: spaceId
-      }
-    })) as Space;
-
-    // Remove public links if these don't exist
-    if (!space.publicProposals) {
-      mappedLinks = mappedLinks.filter((link) => !link.visibleOn);
-    }
-  }
 
   return mappedLinks;
 }

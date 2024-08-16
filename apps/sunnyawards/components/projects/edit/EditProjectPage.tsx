@@ -5,25 +5,39 @@ import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Typography } from '@mui/material';
+import { Box } from '@mui/system';
+import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { editProjectAction } from 'lib/projects/editProjectAction';
-import { schema } from 'lib/projects/form';
 import type { FormValues, ProjectCategory } from 'lib/projects/form';
+import { schema } from 'lib/projects/form';
 
 import { ProjectForm } from '../components/ProjectForm';
 
 export function EditProjectPage({ user, project }: { user: LoggedInUser; project: ConnectProjectDetails }) {
   const router = useRouter();
+  const [errors, setErrors] = useState<string[] | null>(null);
 
   const { execute, isExecuting } = useAction(editProjectAction, {
+    onExecute: () => {
+      setErrors(null);
+    },
     onSuccess: () => {
+      setErrors(null);
       router.push(`/p/${project.path}`);
     },
     onError(err) {
-      log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
+      const hasValidationErrors = err.error.validationErrors?.fieldErrors;
+      const errorMessage = hasValidationErrors
+        ? concatenateStringValues(err.error.validationErrors!.fieldErrors)
+        : err.error.serverError?.message || 'Something went wrong';
+
+      setErrors(errorMessage instanceof Array ? errorMessage : [errorMessage]);
     }
   });
 
@@ -31,18 +45,18 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     defaultValues: {
       id: project.id,
       name: project.name,
-      avatar: project.avatar ?? undefined,
+      avatar: project.avatar ?? '',
       category: project.category as ProjectCategory,
-      coverImage: project.coverImage ?? undefined,
-      description: project.description ?? undefined,
+      coverImage: project.coverImage ?? '',
+      description: project.description ?? '',
       farcasterValues: project.farcasterValues,
-      github: project.github ?? undefined,
-      twitter: project.twitter ?? undefined,
+      github: project.github ?? '',
+      twitter: project.twitter ?? '',
       websites: project.websites,
-      sunnyAwardsProjectType: project.sunnyAwardsProjectType ?? undefined,
-      primaryContractChainId: project.primaryContractChainId?.toString() ?? undefined,
-      primaryContractAddress: (project.primaryContractAddress as `0x${string}`) ?? undefined,
-      mintingWalletAddress: (project.mintingWalletAddress as `0x${string}`) ?? undefined,
+      sunnyAwardsProjectType: project.sunnyAwardsProjectType ?? '',
+      primaryContractChainId: project.primaryContractChainId?.toString() ?? '',
+      primaryContractAddress: (project.primaryContractAddress as `0x${string}`) ?? '',
+      mintingWalletAddress: (project.mintingWalletAddress as `0x${string}`) ?? '',
       projectMembers:
         project.projectMembers.map(
           (member) =>
@@ -50,7 +64,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
               farcasterId: member.farcasterUser.fid,
               name: member.farcasterUser.displayName
             } as FormValues['projectMembers'][0])
-        ) ?? []
+        ) || []
     },
     resolver: yupResolver(schema),
     mode: 'onChange'
@@ -66,7 +80,13 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           });
         })}
       >
-        <ProjectForm control={control} isExecuting={isExecuting} user={user} projectMembers={project.projectMembers} />
+        <ProjectForm
+          control={control}
+          isExecuting={isExecuting}
+          user={user}
+          projectMembers={project.projectMembers}
+          errors={errors}
+        />
       </form>
     </PageWrapper>
   );

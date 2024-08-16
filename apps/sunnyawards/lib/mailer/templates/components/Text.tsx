@@ -2,25 +2,19 @@ import type { TextProps } from '@react-email/text';
 import { Text as ReactEmailText } from '@react-email/text';
 import type { CSSProperties, ReactNode } from 'react';
 
-import { blueColor, primaryTextColor, secondaryTextColor } from 'theme/colors';
+// Defining the primary color directly here as the following error occurs when importing from theme/colors
+// Error: Attempted to call darken() from the server but darken is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component.
+export const primaryTextColor = '#37352f';
 
 // copied from theme/fonts.ts because next/fonts doesnt play well with tsx or ts-node. TODO: maybe remove next/fonts?
 const defaultFont =
   'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
-type TextVariant = 'body1' | 'h1' | 'h2' | 'h3' | 'subtitle1' | 'caption';
+type TextVariant = 'body1' | 'h3' | 'subtitle1';
 
 const TextStyleConfig: Record<TextVariant, CSSProperties> = {
   body1: {
     fontSize: 18
-  },
-  h1: {
-    fontSize: 28,
-    fontWeight: 'bold'
-  },
-  h2: {
-    fontSize: 24,
-    fontWeight: 'bold'
   },
   h3: {
     fontSize: 20,
@@ -29,19 +23,12 @@ const TextStyleConfig: Record<TextVariant, CSSProperties> = {
   subtitle1: {
     fontSize: 16,
     opacity: 0.65
-  },
-  caption: {
-    fontSize: 14,
-    color: secondaryTextColor
   }
 };
 
 export default function Text({
-  primary = false,
-  primaryColor = blueColor,
   children,
   variant = 'body1',
-  bold = false,
   hideOverflow = false,
   style = {},
   ...props
@@ -49,8 +36,6 @@ export default function Text({
   primaryColor?: string;
   hideOverflow?: boolean;
   variant?: TextVariant;
-  bold?: boolean;
-  primary?: boolean;
   children: ReactNode;
 } & TextProps) {
   return (
@@ -58,8 +43,7 @@ export default function Text({
       {...props}
       style={{
         fontFamily: defaultFont,
-        color: primary ? primaryColor : primaryTextColor,
-        fontWeight: bold ? 'bold' : 'normal',
+        color: primaryTextColor,
         padding: 0,
         lineHeight: 1.5,
         ...TextStyleConfig[variant],

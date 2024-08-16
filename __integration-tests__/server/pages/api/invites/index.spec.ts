@@ -47,38 +47,43 @@ describe('POST /api/invites - Create an invite', () => {
 });
 describe('GET /api/invites - Get space invites', () => {
   let space: Space;
-  let user: User;
-  let outsideUser: User;
+  let admin: User;
+  let member: User;
   let invite: InviteLink;
 
   beforeAll(async () => {
-    const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
-    space = generated.space;
-    user = generated.user;
-    outsideUser = await testUtilsUser.generateUser();
-    invite = await testUtilsMembers.generateInviteLink({
-      createdBy: user.id,
+    ({ user: admin, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: true }));
+
+    member = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    const { inviteLinkToRoles, ...generatedInvite } = await testUtilsMembers.generateInviteLink({
+      createdBy: admin.id,
       spaceId: space.id
     });
+
+    invite = generatedInvite;
   });
 
-  it('should return all invites to space members, responding with 200', async () => {
-    const userCookie = await loginUser(user.id);
+  it('should return invites for space admins, responding with 200', async () => {
+    const adminCookie = await loginUser(admin.id);
     const invites = (
-      await request(baseUrl).get(`/api/invites?spaceId=${space.id}`).set('Cookie', userCookie).expect(200)
+      await request(baseUrl).get(`/api/invites?spaceId=${space.id}`).set('Cookie', adminCookie).expect(200)
     ).body as InviteLinkWithRoles[];
 
     expect(invites).toHaveLength(1);
     expect(invites[0]).toMatchObject<InviteLinkWithRoles>({
       ...invite,
-      code: '', // code will be empty for non-admins
+      code: invites[0].code,
       createdAt: new Date(invite.createdAt).toISOString() as any,
       roleIds: []
     });
   });
 
-  it('should fail if the user is not a member of the space, and respond 401', async () => {
-    const outsideUserCookie = await loginUser(outsideUser.id);
-    await request(baseUrl).get(`/api/invites?spaceId=${space.id}`).set('Cookie', outsideUserCookie).expect(401);
+  it('should not return private links to user if they are not an admin, and respond 200', async () => {
+    const memberCookie = await loginUser(member.id);
+    const invites = (
+      await request(baseUrl).get(`/api/invites?spaceId=${space.id}`).set('Cookie', memberCookie).expect(200)
+    ).body as InviteLinkWithRoles[];
+
+    expect(invites).toEqual([]);
   });
 });

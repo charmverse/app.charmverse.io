@@ -265,3 +265,22 @@ export function stringToUint8Array(str: string): Uint8Array {
 
   return uint8Array;
 }
+
+export function concatenateStringValues(obj: Record<string, any>): string[] {
+  const stringValues = Object.keys(obj).reduce((acc: string[], key) => {
+    const value = obj[key];
+
+    if (typeof value === 'string') {
+      acc.push(value);
+    } else if (Array.isArray(value)) {
+      const arrayOfStrings = value.filter((item) => typeof item === 'string');
+      if (arrayOfStrings.length > 0) {
+        acc.push(arrayOfStrings.join(', '));
+      }
+    }
+
+    return acc;
+  }, []);
+
+  return stringValues;
+}

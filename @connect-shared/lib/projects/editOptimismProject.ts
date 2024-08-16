@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
-import { resolveEnsAddress } from '@root/lib/blockchain/resolveEnsAddress';
+import { resolveENSName } from '@root/lib/blockchain';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
@@ -21,10 +21,8 @@ export async function editOptimismProject({ userId, input }: { input: EditOptimi
   const hasEnsName = !!input.mintingWalletAddress && input.mintingWalletAddress.trim().endsWith('.eth');
 
   if (hasEnsName) {
-    const resolvedAddress = await resolveEnsAddress(input.mintingWalletAddress as string);
-    if (resolvedAddress) {
-      input.mintingWalletAddress = resolvedAddress;
-    } else {
+    const resolvedAddress = await resolveENSName(input.mintingWalletAddress as string, true);
+    if (!resolvedAddress) {
       throw new InvalidInputError('Invalid ENS name');
     }
   }
@@ -196,6 +194,7 @@ export async function editOptimismProject({ userId, input }: { input: EditOptimi
         avatar: input.avatar,
         coverImage: input.coverImage,
         mintingWalletAddress: input.mintingWalletAddress,
+        sunnyAwardsProjectType: input.sunnyAwardsProjectType,
         primaryContractAddress: input.primaryContractAddress,
         primaryContractChainId: input.primaryContractChainId
           ? parseInt(input.primaryContractChainId as string)
