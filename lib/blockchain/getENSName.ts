@@ -3,6 +3,7 @@ import { isTestEnv } from '@root/config/constants';
 import { getAddress } from 'viem';
 import { normalize } from 'viem/ens';
 
+import { getAlchemyBaseUrl } from './provider/alchemy/client';
 import { getPublicClient } from './publicClient';
 
 export async function getENSName(_address: string) {
@@ -15,8 +16,15 @@ export async function getENSName(_address: string) {
   return publicClient.getEnsName({ address });
 }
 
-export function resolveENSName(ensName: string) {
+/**
+ * @param useAlchemy - This is useful on the server side to avoid rate limiting
+ */
+export function resolveENSName(ensName: string, useAlchemy?: boolean) {
   const publicClient = getPublicClient(1);
+
+  if (useAlchemy) {
+    publicClient.transport.url = getAlchemyBaseUrl(1);
+  }
 
   return publicClient.getEnsAddress({ name: normalize(ensName) });
 }

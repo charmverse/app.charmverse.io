@@ -35,6 +35,10 @@ export function handleReturnedServerError(
 
   const errorAsSystemError = isValidSystemError ? err : new UnknownError(err.stack ?? err.error ?? err);
 
+  if (err.message && !isValidSystemError) {
+    errorAsSystemError.message = err.message;
+  }
+
   const { stack, error, errorConstructor, ...withoutStack } = errorAsSystemError;
 
   return withoutStack;

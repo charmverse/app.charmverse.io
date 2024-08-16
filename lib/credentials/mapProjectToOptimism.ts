@@ -95,8 +95,8 @@ export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
     projectCoverImageUrl: input.coverImage || '',
     category: input.category || '',
     socialLinks: {
-      website: input.websites || [],
-      farcaster: input.farcasterValues || [],
+      website: input.websites?.filter((v) => !!v) || [],
+      farcaster: input.farcasterValues?.filter((v) => !!v) || [],
       twitter: input.twitter || '',
       mirror: null
     },
