@@ -115,6 +115,9 @@ test('Create a project and view details', async ({ page }) => {
   const projectGithub = page.locator('data-test=project-github');
   await expect(projectGithub).toBeVisible();
 
+  // CHeck OP property
+  await expect(project.optimismCategory).toBe('NFT');
+
   // Check project description
 
   // For some reason in CI environment, this assertion fails - Commenting out for now until we fix
