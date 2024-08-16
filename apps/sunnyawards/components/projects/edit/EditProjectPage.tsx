@@ -21,22 +21,23 @@ import { ProjectForm } from '../components/ProjectForm';
 
 export function EditProjectPage({ user, project }: { user: LoggedInUser; project: ConnectProjectDetails }) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[] | null>(null);
 
   const { execute, isExecuting } = useAction(editProjectAction, {
     onExecute: () => {
-      setError(null);
+      setErrors(null);
     },
     onSuccess: () => {
+      setErrors(null);
       router.push(`/p/${project.path}`);
     },
     onError(err) {
-      const errorMessage = err.error.validationErrors
-        ? concatenateStringValues(err.error.validationErrors.fieldErrors)
+      const hasValidationErrors = err.error.validationErrors?.fieldErrors;
+      const errorMessage = hasValidationErrors
+        ? concatenateStringValues(err.error.validationErrors!.fieldErrors)
         : err.error.serverError?.message || 'Something went wrong';
-      log.error(errorMessage || 'Something went wrong', err.error.serverError);
 
-      setError(errorMessage);
+      setErrors(errorMessage instanceof Array ? errorMessage : [errorMessage]);
     }
   });
 
@@ -81,7 +82,13 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           });
         })}
       >
-        <ProjectForm control={control} isExecuting={isExecuting} user={user} projectMembers={project.projectMembers} />
+        <ProjectForm
+          control={control}
+          isExecuting={isExecuting}
+          user={user}
+          projectMembers={project.projectMembers}
+          errors={errors}
+        />
       </form>
     </PageWrapper>
   );

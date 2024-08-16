@@ -15,18 +15,21 @@ import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from './AddProjectMembersForm';
 import { ProjectBlockchainSelect } from './BlockchainSelect';
+import { FormErrors } from './FormErrors';
 import { ProjectImageField } from './ProjectImageField';
 
 export function ProjectForm({
   control,
   isExecuting,
   projectMembers = [],
-  user
+  user,
+  errors
 }: {
   control: Control<FormValues>;
   projectMembers?: ConnectProjectDetails['projectMembers'];
   isExecuting: boolean;
   user: LoggedInUser;
+  errors: string[] | null;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
 
@@ -323,6 +326,7 @@ export function ProjectForm({
               flexDirection='row-reverse'
             />
           )}
+          {!isExecuting && errors?.length && <FormErrors errors={errors} />}
           <Button data-test='project-form-publish' disabled={isExecuting} type='submit'>
             Publish
           </Button>

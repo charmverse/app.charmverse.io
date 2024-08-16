@@ -18,24 +18,26 @@ import { ProjectForm } from '../components/ProjectForm';
 
 export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[] | null>(null);
 
   const { execute, isExecuting } = useAction(createProjectAction, {
     onExecute: () => {
-      setError(null);
+      setErrors(null);
     },
     onSuccess: (data) => {
+      setErrors(null);
       const projectPath = data.data?.projectPath;
       if (projectPath) {
         router.push(`/p/${projectPath}/share`);
       }
     },
     onError(err) {
-      const errorMessage = err.error.validationErrors
-        ? concatenateStringValues(err.error.validationErrors.fieldErrors)
+      const hasValidationErrors = err.error.validationErrors?.fieldErrors;
+      const errorMessage = hasValidationErrors
+        ? concatenateStringValues(err.error.validationErrors!.fieldErrors)
         : err.error.serverError?.message || 'Something went wrong';
 
-      setError(errorMessage);
+      setErrors(errorMessage instanceof Array ? errorMessage : [errorMessage]);
     }
   });
 
@@ -71,7 +73,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
           execute(data);
         })}
       >
-        <ProjectForm control={control} isExecuting={isExecuting} user={user} />
+        <ProjectForm control={control} isExecuting={isExecuting} user={user} errors={errors} />
       </form>
     </PageWrapper>
   );

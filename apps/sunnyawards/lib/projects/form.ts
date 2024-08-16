@@ -1,10 +1,10 @@
 import { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
 import { wagmiConfig } from '@root/connectors/config';
-import { resolveEnsAddress } from '@root/lib/blockchain/resolveEnsAddress';
 import { typedKeys } from '@root/lib/utils/objects';
 import { getBytecode, getTransactionReceipt } from '@wagmi/core';
 import type { Address } from 'viem';
 import { isAddress } from 'viem';
+import { normalize } from 'viem/ens';
 import * as yup from 'yup';
 
 export const CATEGORIES = ['CeFi', 'Cross Chain', 'DeFi', 'Governance', 'NFT', 'Social', 'Utility'] as const;
@@ -115,11 +115,11 @@ export const schema = yup.object({
 
           let address: string | null = value;
 
-          if (address?.endsWith('.eth')) {
-            address = await resolveEnsAddress(value);
+          if (address?.trim().endsWith('.eth')) {
+            address = normalize(address);
           }
 
-          return !!address && !!isAddress(address);
+          return !!address;
         }
         return true;
       }

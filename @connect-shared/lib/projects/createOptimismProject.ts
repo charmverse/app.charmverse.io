@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import type { OptionalPrismaTransaction, Project, ProjectSource } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-client';
-import { resolveEnsAddress } from '@root/lib/blockchain/resolveEnsAddress';
+import { resolveENSName } from '@root/lib/blockchain';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath, uid } from '@root/lib/utils/strings';
@@ -36,8 +36,10 @@ export async function createOptimismProject({
   const hasEnsName = !!input.mintingWalletAddress && input.mintingWalletAddress.trim().endsWith('.eth');
 
   if (hasEnsName) {
-    const resolvedAddress = await resolveEnsAddress(input.mintingWalletAddress as string);
-    if (!resolvedAddress) {
+    const resolvedAddress = await resolveENSName(input.mintingWalletAddress as string, true);
+    if (resolvedAddress) {
+      input.mintingWalletAddress = resolvedAddress;
+    } else {
       throw new InvalidInputError('Invalid ENS name');
     }
   }

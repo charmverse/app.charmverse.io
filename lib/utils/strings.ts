@@ -266,7 +266,7 @@ export function stringToUint8Array(str: string): Uint8Array {
   return uint8Array;
 }
 
-export function concatenateStringValues(obj: Record<string, any>): string {
+export function concatenateStringValues(obj: Record<string, any>): string[] {
   const stringValues = Object.keys(obj).reduce((acc: string[], key) => {
     const value = obj[key];
 
@@ -282,5 +282,5 @@ export function concatenateStringValues(obj: Record<string, any>): string {
     return acc;
   }, []);
 
-  return stringValues.join(', ');
+  return stringValues;
 }
