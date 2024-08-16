@@ -101,7 +101,7 @@ describe('stringSimilarity()', () => {
 });
 
 describe('concatenateStringValues', () => {
-  it('should concatenate all string values from the object and join them by a comma', () => {
+  it('should concatenate all string values from the object into an array', () => {
     const input = {
       key1: 'hello',
       key2: 'world',
@@ -110,10 +110,10 @@ describe('concatenateStringValues', () => {
     };
 
     const result = concatenateStringValues(input);
-    expect(result).toBe('hello, world, typescript');
+    expect(result).toEqual(['hello', 'world', 'typescript']);
   });
 
-  it('should return an empty string if no string values are present', () => {
+  it('should return an empty array if no string values are present', () => {
     const input = {
       key1: 1,
       key2: true,
@@ -122,14 +122,14 @@ describe('concatenateStringValues', () => {
     };
 
     const result = concatenateStringValues(input);
-    expect(result).toBe('');
+    expect(result).toEqual([]);
   });
 
   it('should handle an empty object', () => {
     const input = {};
 
     const result = concatenateStringValues(input);
-    expect(result).toBe('');
+    expect(result).toEqual([]);
   });
 
   it('should ignore non-string values and join the remaining strings with commas', () => {
@@ -141,7 +141,7 @@ describe('concatenateStringValues', () => {
     };
 
     const result = concatenateStringValues(input);
-    expect(result).toBe('test, jest');
+    expect(result).toEqual(['test', 'jest']);
   });
 
   it('should join array of strings and concatenate with other string values', () => {
@@ -154,7 +154,7 @@ describe('concatenateStringValues', () => {
     };
 
     const result = concatenateStringValues(input);
-    expect(result).toBe('first, apple, banana, second, grape, carrot');
+    expect(result).toEqual(['first', 'apple, banana', 'second', 'grape', 'carrot']);
   });
 
   it('should ignore arrays without strings', () => {
@@ -165,6 +165,6 @@ describe('concatenateStringValues', () => {
     };
 
     const result = concatenateStringValues(input);
-    expect(result).toBe('test, example');
+    expect(result).toEqual(['test', 'example']);
   });
 });
