@@ -195,17 +195,14 @@ export function ProjectForm({
                 error={!!fieldState.error}
                 {...field}
               >
-                {PROJECT_CATEGORIES.map(({ group, items }) => (
-                  <>
-                    <ListSubheader>{group}</ListSubheader>
-
-                    {items.map((category) => (
-                      <MenuItem key={category} value={category} sx={{ pl: 5 }}>
-                        {category}
-                      </MenuItem>
-                    ))}
-                  </>
-                ))}
+                {PROJECT_CATEGORIES.map(({ group, items }) => [
+                  <ListSubheader key={group}>{group}</ListSubheader>,
+                  ...items.map((category) => (
+                    <MenuItem key={category} value={category} sx={{ pl: 5 }}>
+                      {category}
+                    </MenuItem>
+                  ))
+                ])}
               </Select>
             )}
           />

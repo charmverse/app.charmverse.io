@@ -41,9 +41,9 @@ export const createProjectAction = authActionClient
       await storeCharmverseProjectMetadata({
         chainId: charmverseProjectDataChainId,
         projectId: newProject.id
-      }).catch((err) => {
-        log.error('Failed to store charmverse project metadata', {
-          err,
+      }).catch((error) => {
+        log.error('Failed to store charmverse project attestations', {
+          error,
           projectId: newProject.id,
           userId: newProject.createdBy
         });
