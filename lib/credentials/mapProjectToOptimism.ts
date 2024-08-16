@@ -69,16 +69,6 @@ export type ProjectDetails = Pick<
 };
 
 export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
-  const contracts: Contract[] =
-    input.primaryContractAddress && input.primaryContractChainId
-      ? [
-          {
-            address: input.primaryContractAddress,
-            chainId: Number(input.primaryContractChainId)
-          }
-        ]
-      : [];
-
   return {
     name: input.name || '',
     description: input.description || '',
@@ -95,7 +85,7 @@ export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
     github: (Array.isArray(input.github) ? input.github : [input.github].filter(Boolean)) as string[],
     osoSlug: '', // Placeholder: requires specific input
     packages: [], // Placeholder: requires specific input
-    contracts,
+    contracts: [], // Do not send contracts since we do not request all the required fields
     grantsAndFunding: {
       ventureFunding: [], // Placeholder: requires specific input
       grants: [], // Placeholder: requires specific input

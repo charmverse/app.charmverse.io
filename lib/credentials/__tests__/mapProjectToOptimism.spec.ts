@@ -14,8 +14,8 @@ describe('mapProjectToOptimism', () => {
       twitter: 'https://twitter.com/projectx',
       websites: ['https://example.com'],
       mintingWalletAddress: null,
-      primaryContractAddress: null,
-      primaryContractChainId: null,
+      primaryContractAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
+      primaryContractChainId: 1,
       projectMembers: [
         {
           farcasterId: 123
