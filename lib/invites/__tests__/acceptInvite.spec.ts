@@ -55,11 +55,17 @@ describe('acceptInvite', () => {
     expect(spaceRole?.spaceRoleToRole[0].roleId).toBe(role.id);
   });
 
-  it('should not do anything if the user is already a member or admin of the space', async () => {
+  it('should assign new roles to existing members of the space', async () => {
     const spaceMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
     const newSpaceAdmin = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: true });
 
+    await acceptInvite({
+      inviteLinkId: inviteLinkWithRole.id,
+      userId: spaceMember.id
+    });
+
+    // This is here a second time to ensure the operation is idempotent and doesn't throw an error
     await acceptInvite({
       inviteLinkId: inviteLinkWithRole.id,
       userId: spaceMember.id
@@ -92,11 +98,11 @@ describe('acceptInvite', () => {
 
     expect(memberSpaceRole).toBeDefined();
     // No roles should hae been added
-    expect(memberSpaceRole?.spaceRoleToRole.length).toBe(0);
+    expect(memberSpaceRole?.spaceRoleToRole.length).toBe(1);
 
     expect(newAdminSpaceRole).toBeDefined();
     // No roles should hae been added
-    expect(newAdminSpaceRole?.spaceRoleToRole.length).toBe(0);
+    expect(newAdminSpaceRole?.spaceRoleToRole.length).toBe(1);
   });
 
   it('should allow a guest user to become a member with attached roles the first time it is used', async () => {
@@ -153,7 +159,13 @@ describe('acceptInvite', () => {
       }
     });
 
-    expect(spaceRoleAfterSecondAccept).toMatchObject(spaceRole);
+    expect(spaceRoleAfterSecondAccept).toMatchObject({
+      ...spaceRole,
+      spaceRoleToRole: expect.arrayContaining([
+        { ...spaceRole.spaceRoleToRole[0] },
+        expect.objectContaining({ roleId: otherRole.id })
+      ])
+    });
   });
 
   it('should throw an error if the invite link has expired or exceeded its use count', async () => {
