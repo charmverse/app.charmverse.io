@@ -53,7 +53,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       github: project.github ?? '',
       twitter: project.twitter ?? '',
       websites: project.websites,
-      sunnyAwardsProjectType: project.sunnyAwardsProjectType ?? '',
+      sunnyAwardsProjectType: project.sunnyAwardsProjectType ?? ('' as any),
       primaryContractChainId: project.primaryContractChainId?.toString() ?? '',
       primaryContractAddress: (project.primaryContractAddress as `0x${string}`) ?? '',
       mintingWalletAddress: (project.mintingWalletAddress as `0x${string}`) ?? '',
