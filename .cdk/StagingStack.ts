@@ -9,7 +9,7 @@ const domain = 'charmverse.co';
 type CustomOptions = { options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] };
 
 export class StagingStack extends Stack {
-  constructor(scope: Construct, appName: string, props: StackProps, { options = [] }: CustomOptions) {
+  constructor(scope: Construct, appName: string, props: StackProps, { options = [] }: CustomOptions = {}) {
     super(scope, appName, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {

@@ -76,10 +76,6 @@ test('Create a project and view details', async ({ page }) => {
 
   await fieldGithub.fill(projectData.projectFormGithub);
 
-  const confirmButton = page.locator('data-test=project-form-confirm-values');
-
-  await confirmButton.click();
-
   const publishButton = page.locator('data-test=project-form-publish');
 
   await publishButton.click();

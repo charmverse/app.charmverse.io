@@ -15,7 +15,9 @@ export async function getConnectProjectsByFid(fid: number): Promise<ConnectProje
           }
         }
       },
-      source: 'connect'
+      source: {
+        in: ['connect', 'farcaster']
+      }
     },
     select: {
       id: true,

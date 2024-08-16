@@ -5,7 +5,7 @@ import React from 'react';
 import sharp from 'sharp';
 import { v4 } from 'uuid';
 
-import { ProductUpdatesText } from 'components/product-updates/ProductUpdatesText';
+import { ProductUpdatesText } from 'components/product-updates/components/ProductUpdatesText';
 
 import type { FormValues } from './schema';
 
@@ -26,19 +26,21 @@ export async function createProductUpdatesFrame(input: FormValues) {
       id: input.projectId
     },
     select: {
-      name: true
+      name: true,
+      avatar: true
     }
   });
 
   const element = React.createElement(ProductUpdatesText, {
     text: input.text,
     createdAtLocal: input.createdAtLocal,
-    projectName: project.name
+    projectName: project.name,
+    projectAvatarImage: project.avatar
   });
-  // Use a ratio of 1.9:1 for the image
+  // Use a ratio of 1.91:1 for the image as recommended by farcaster
   const image = new ImageResponse(element, {
     width: 1000,
-    height: 525
+    height: 1000 / 1.91
   });
 
   const imageBlob = await image.blob();
@@ -63,5 +65,10 @@ export async function createProductUpdatesFrame(input: FormValues) {
     }
   });
 
-  return productUpdatesFrame;
+  return {
+    productUpdatesFrame,
+    project: {
+      name: project.name
+    }
+  };
 }

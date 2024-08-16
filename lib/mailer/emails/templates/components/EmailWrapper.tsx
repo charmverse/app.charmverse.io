@@ -17,6 +17,7 @@ interface Props {
     artwork: string;
     color: string;
   };
+  hideFooter?: boolean;
 }
 
 export default function EmailWrapper(props: Props) {
@@ -41,7 +42,7 @@ export default function EmailWrapper(props: Props) {
           <Header image={props.emailBranding?.artwork} />
           {props.children}
         </Section>
-        <Footer />
+        {!props.hideFooter && <Footer />}
       </Section>
     </Html>
   );

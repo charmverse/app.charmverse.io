@@ -4,6 +4,7 @@ import * as cdk from 'aws-cdk-lib';
 import { WebappStagingStack } from '../WebappStagingStack';
 import { ConnectStagingStack } from '../ConnectStagingStack';
 import { ProductionStack } from '../ProductionStack';
+import { StagingStack } from '../StagingStack';
 
 /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 const deployProps: cdk.StackProps = {
@@ -33,11 +34,11 @@ else if (stackNameParam.startsWith('stg-connect')) {
 }
 // Sunny awards staging
 else if (stackNameParam.startsWith('stg-sunnyawards')) {
-  new ConnectStagingStack(app, stackNameParam, deployProps);
+  new StagingStack(app, stackNameParam, deployProps);
 }
 // farcaster staging
 else if (stackNameParam.startsWith('stg-farcaster')) {
-  new ConnectStagingStack(app, stackNameParam, deployProps);
+  new StagingStack(app, stackNameParam, deployProps);
 }
 // Webapp staging
 else if (stackNameParam.startsWith('stg-webapp')) {

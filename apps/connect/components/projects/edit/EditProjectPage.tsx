@@ -2,13 +2,15 @@
 
 import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
+import { ProjectForm } from '@connect-shared/components/project/ProjectForm';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import type { FormValues, ProjectCategory } from '@connect-shared/lib/projects/form';
 import { schema } from '@connect-shared/lib/projects/form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -20,7 +22,6 @@ import { actionEditProject } from 'lib/projects/editProjectAction';
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
-import { ProjectForm } from '../components/ProjectForm';
 
 export function EditProjectPage({ user, project }: { user: LoggedInUser; project: ConnectProjectDetails }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
@@ -68,13 +69,31 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <ProjectForm
-          control={control}
-          isValid={isValid}
-          onNext={() => {
-            setShowTeamMemberForm(true);
-          }}
-        />
+        <ProjectForm control={control} />
+        <Stack
+          justifyContent='space-between'
+          flexDirection='row'
+          position='sticky'
+          bottom='0'
+          bgcolor='background.default'
+          py={2}
+        >
+          <Link href='/profile' passHref>
+            <Button size='large' color='secondary' variant='outlined'>
+              Cancel
+            </Button>
+          </Link>
+          <Button
+            data-test='project-form-confirm-values'
+            size='large'
+            disabled={!isValid}
+            onClick={() => {
+              setShowTeamMemberForm(true);
+            }}
+          >
+            Next
+          </Button>
+        </Stack>
       </PageWrapper>
     );
   }
@@ -115,7 +134,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           execute={(input) => {
             execute({
               ...input,
-              id: project.id,
+              projectId: project.id,
               projectMembers: input.projectMembers.slice(1)
             });
           }}

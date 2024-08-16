@@ -3,13 +3,14 @@ import 'server-only';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { getSession } from '@connect-shared/lib/session/getSession';
-import { Divider, Stack, Typography } from '@mui/material';
+import { Divider, Link, Stack, Typography } from '@mui/material';
 
 import { FarcasterCard } from 'components/common/FarcasterCard';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 
-import { ProjectDetails } from '../components/ProjectDetails';
-import { ProjectHeader } from '../components/ProjectHeader';
+import { JoinTheSunnysBanner } from './components/JoinTheSunnysBanner';
+import { ProjectDetails } from './components/ProjectDetails';
+import { ProjectHeader } from './components/ProjectHeader';
 
 export async function ProjectDetailsPage({ project }: { project: ConnectProjectDetails }) {
   const session = await getSession();
@@ -19,8 +20,8 @@ export async function ProjectDetailsPage({ project }: { project: ConnectProjectD
 
   return (
     <PageWrapper
-      bgcolor='transparent'
       header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}
+      footer={!session?.user?.id && <JoinTheSunnysBanner />}
     >
       <ProjectDetails project={project} showEditButton={isCurrentUserTeamLead} />
       <Divider sx={{ my: 2 }} />
@@ -39,11 +40,6 @@ export async function ProjectDetailsPage({ project }: { project: ConnectProjectD
           />
         ))}
       </Stack>
-      {!session?.user?.id && (
-        <Stack justifyContent='center' alignItems='center'>
-          <WarpcastLogin />
-        </Stack>
-      )}
     </PageWrapper>
   );
 }
