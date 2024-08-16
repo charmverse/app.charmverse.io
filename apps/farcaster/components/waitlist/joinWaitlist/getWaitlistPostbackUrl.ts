@@ -11,3 +11,7 @@ export function getWaitlistPostbackUrl({
 }) {
   return `${baseUrl}/api/waitlist?current_page=${currentPage}&referrer_fid=${referrerFid}`;
 }
+
+export function getWaitlistLevelsPostbackUrl({ currentPage }: { currentPage: WaitlistFramePage }) {
+  return `${baseUrl}/api/waitlist/levels?current_page=${currentPage}`;
+}
