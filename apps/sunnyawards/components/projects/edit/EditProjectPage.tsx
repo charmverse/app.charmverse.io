@@ -53,11 +53,9 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       github: project.github ?? '',
       twitter: project.twitter ?? '',
       websites: project.websites,
-      sunnyAwardsProjectType: project.sunnyAwardsProjectType ?? 'other',
+      sunnyAwardsProjectType: project.sunnyAwardsProjectType ?? ('' as any),
       primaryContractChainId: project.primaryContractChainId?.toString() ?? '',
       primaryContractAddress: (project.primaryContractAddress as `0x${string}`) ?? '',
-      primaryContractDeployTxHash: (project.primaryContractDeployTxHash as `0x${string}`) ?? '',
-      primaryContractDeployer: (project.primaryContractDeployer as `0x${string}`) ?? '',
       mintingWalletAddress: (project.mintingWalletAddress as `0x${string}`) ?? '',
       projectMembers:
         project.projectMembers.map(

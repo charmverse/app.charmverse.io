@@ -2,8 +2,6 @@ import type { Project } from '@charmverse/core/prisma-client';
 
 export type Contract = {
   address: string;
-  deploymentTxHash: string;
-  deployerAddress: string;
   chainId: number; // Example chainIds: 10, 8453, 7777777
 };
 
@@ -63,8 +61,6 @@ export type ProjectDetails = Pick<
   | 'websites'
   | 'primaryContractAddress'
   | 'primaryContractChainId'
-  | 'primaryContractDeployTxHash'
-  | 'primaryContractDeployer'
   | 'mintingWalletAddress'
 > & {
   projectMembers: {
@@ -73,21 +69,6 @@ export type ProjectDetails = Pick<
 };
 
 export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
-  const contracts: Contract[] =
-    input.primaryContractAddress &&
-    input.primaryContractChainId &&
-    input.primaryContractDeployTxHash &&
-    input.primaryContractDeployer
-      ? [
-          {
-            address: input.primaryContractAddress,
-            deploymentTxHash: input.primaryContractDeployTxHash,
-            deployerAddress: input.primaryContractDeployer,
-            chainId: Number(input.primaryContractChainId)
-          }
-        ]
-      : [];
-
   return {
     name: input.name || '',
     description: input.description || '',
@@ -104,7 +85,7 @@ export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
     github: (Array.isArray(input.github) ? input.github : [input.github].filter(Boolean)) as string[],
     osoSlug: '', // Placeholder: requires specific input
     packages: [], // Placeholder: requires specific input
-    contracts,
+    contracts: [], // Do not send contracts since we do not request all the required fields
     grantsAndFunding: {
       ventureFunding: [], // Placeholder: requires specific input
       grants: [], // Placeholder: requires specific input

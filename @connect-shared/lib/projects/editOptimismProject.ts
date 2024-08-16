@@ -12,16 +12,7 @@ import { v4 } from 'uuid';
 import type { FormValues } from './form';
 
 export type EditOptimismProjectValues = FormValues &
-  Partial<
-    Pick<
-      Project,
-      | 'primaryContractAddress'
-      | 'primaryContractDeployTxHash'
-      | 'primaryContractDeployer'
-      | 'mintingWalletAddress'
-      | 'sunnyAwardsProjectType'
-    >
-  > & {
+  Partial<Pick<Project, 'primaryContractAddress' | 'mintingWalletAddress' | 'sunnyAwardsProjectType'>> & {
     projectId: string;
     primaryContractChainId?: string | number;
   };
@@ -205,8 +196,6 @@ export async function editOptimismProject({ userId, input }: { input: EditOptimi
         mintingWalletAddress: input.mintingWalletAddress,
         sunnyAwardsProjectType: input.sunnyAwardsProjectType,
         primaryContractAddress: input.primaryContractAddress,
-        primaryContractDeployTxHash: input.primaryContractDeployTxHash,
-        primaryContractDeployer: input.primaryContractDeployer,
         primaryContractChainId: input.primaryContractChainId
           ? parseInt(input.primaryContractChainId as string)
           : undefined

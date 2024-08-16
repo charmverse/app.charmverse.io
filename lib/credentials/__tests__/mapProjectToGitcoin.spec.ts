@@ -24,8 +24,6 @@ describe('mapProjectToGitcoin', () => {
       mintingWalletAddress: null,
       primaryContractAddress: null,
       primaryContractChainId: null,
-      primaryContractDeployer: null,
-      primaryContractDeployTxHash: null,
       sunnyAwardsProjectType: null,
       projectMembers: [
         {
