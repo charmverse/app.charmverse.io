@@ -1,9 +1,9 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { createProjectMetadataAttestation } from '@connect-shared/lib/attestations/agoraApi';
-import { editOptimismProject } from '@connect-shared/lib/projects/editOptimismProject';
-import type { ProjectCategory } from '@connect-shared/lib/projects/form';
+import { editProject } from '@connect-shared/lib/projects/editProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
+import type { ProjectCategory } from '@connect-shared/lib/projects/projectSchema';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
 import { decodeOptimismProjectAttestation } from '@root/lib/credentials/schemas/optimismProjectUtils';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
@@ -67,13 +67,13 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
   }
 
   if (optimismProjectAttestation.projectId) {
-    await editOptimismProject({
+    await editProject({
       userId,
       input: {
         projectId: optimismProjectAttestation.projectId,
         ...optimismProjectValues,
         description: optimismProjectValues.description || '',
-        category: optimismProjectValues.category as ProjectCategory
+        optimismCategory: optimismProjectValues.optimismCategory as ProjectCategory
       }
     });
     await generateOgImage(optimismProjectAttestation.projectId, userId);
@@ -87,7 +87,7 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
     description: optimismProjectValues.description || optimismProjectMetadata.description,
     projectAvatarUrl: optimismProjectValues.avatar || optimismProjectMetadata.projectAvatarUrl,
     projectCoverImageUrl: optimismProjectValues.coverImage || optimismProjectMetadata.projectCoverImageUrl,
-    category: optimismProjectValues.category || optimismProjectMetadata.category,
+    category: optimismProjectValues.optimismCategory || optimismProjectMetadata.category,
     socialLinks: {
       twitter: optimismProjectValues.twitter || optimismProjectMetadata.socialLinks.twitter,
       website: optimismProjectValues.websites || optimismProjectMetadata.socialLinks.website,

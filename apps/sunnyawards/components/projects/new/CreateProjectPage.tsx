@@ -11,8 +11,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { createProjectAction } from 'lib/projects/createProjectAction';
-import type { FormValues } from 'lib/projects/form';
-import { schema } from 'lib/projects/form';
+import type { FormValues } from 'lib/projects/schema';
+import { schema } from 'lib/projects/schema';
 
 import { ProjectForm } from '../components/ProjectForm';
 
@@ -49,7 +49,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     defaultValues: {
       name: '',
       description: '',
-      category: '' as any,
+      sunnyAwardsCategory: '' as any,
       websites: [''],
       farcasterValues: [''],
       sunnyAwardsProjectType: 'other',

@@ -5,8 +5,8 @@ import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { ProjectForm } from '@connect-shared/components/project/ProjectForm';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
-import type { FormValues, ProjectCategory } from '@connect-shared/lib/projects/form';
-import { schema } from '@connect-shared/lib/projects/form';
+import type { FormValues, ProjectCategory } from '@connect-shared/lib/projects/projectSchema';
+import { schema } from '@connect-shared/lib/projects/projectSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
@@ -17,7 +17,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { PageCoverHeader } from 'components/common/PageCoverHeader';
-import { actionEditProject } from 'lib/projects/editProjectAction';
+import { editProjectAction } from 'lib/projects/editProjectAction';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
@@ -28,7 +28,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
 
   const router = useRouter();
 
-  const { execute, isExecuting } = useAction(actionEditProject, {
+  const { execute, isExecuting } = useAction(editProjectAction, {
     onSuccess: () => {
       router.push(`/p/${project.path}`);
     },
@@ -46,7 +46,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     defaultValues: {
       name: project.name,
       avatar: project.avatar ?? undefined,
-      category: project.category as ProjectCategory,
+      optimismCategory: project.optimismCategory as ProjectCategory,
       coverImage: project.coverImage ?? undefined,
       description: project.description ?? undefined,
       farcasterValues: project.farcasterValues,
@@ -69,7 +69,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <ProjectForm control={control} />
+        <ProjectForm control={control} showCategory />
         <Stack
           justifyContent='space-between'
           flexDirection='row'

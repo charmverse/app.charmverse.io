@@ -10,7 +10,8 @@ export const schema = yup.object({
   description: yup.string().required('Project description is required'),
   avatar: yup.string(),
   coverImage: yup.string(),
-  category: yup.string().oneOf(CATEGORIES).required(),
+  optimismCategory: yup.string().oneOf(CATEGORIES),
+  sunnyAwardsCategory: yup.string(), // enum is defined inside sunnyawards app
   websites: yup.array(yup.string().url()).min(1),
   farcasterValues: yup.array(yup.string()),
   github: yup.string(),

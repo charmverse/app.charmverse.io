@@ -5,7 +5,7 @@ describe('mapProjectToOptimism', () => {
   it('should map the project details correctly', () => {
     const input: ProjectDetails = {
       name: 'Project X',
-      category: 'DeFi',
+      optimismCategory: 'DeFi',
       description: 'A sample project',
       avatar: 'avatar.png',
       coverImage: 'cover.jpg',

@@ -2,7 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { ProjectForm } from '@connect-shared/components/project/ProjectForm';
-import { schema, type FormValues } from '@connect-shared/lib/projects/form';
+import { schema, type FormValues } from '@connect-shared/lib/projects/projectSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Stack } from '@mui/material';
 import { useAction } from 'next-safe-action/hooks';

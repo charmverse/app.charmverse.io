@@ -53,7 +53,7 @@ export type ProjectDetails = Pick<
   | 'description'
   | 'avatar'
   | 'coverImage'
-  | 'category'
+  | 'optimismCategory'
   | 'name'
   | 'farcasterValues'
   | 'github'
@@ -74,7 +74,7 @@ export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
     description: input.description || '',
     projectAvatarUrl: input.avatar || '',
     projectCoverImageUrl: input.coverImage || '',
-    category: input.category || '',
+    category: input.optimismCategory || '',
     socialLinks: {
       website: input.websites?.filter((v) => !!v) || [],
       farcaster: input.farcasterValues?.filter((v) => !!v) || [],

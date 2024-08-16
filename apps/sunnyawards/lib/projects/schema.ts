@@ -1,17 +1,49 @@
 import { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
+import type { ProjectCategory as OptimismProjectCategory } from '@connect-shared/lib/projects/projectSchema';
 import { wagmiConfig } from '@root/connectors/config';
 import { typedKeys } from '@root/lib/utils/objects';
-import { getBytecode, getTransactionReceipt } from '@wagmi/core';
+import { getBytecode } from '@wagmi/core';
 import type { Address } from 'viem';
-import { isAddress } from 'viem';
 import { normalize } from 'viem/ens';
 import * as yup from 'yup';
 
-export const CATEGORIES = ['CeFi', 'Cross Chain', 'DeFi', 'Governance', 'NFT', 'Social', 'Utility'] as const;
+export const PROJECT_CATEGORIES = [
+  {
+    group: 'Creator',
+    optimismCategory: 'NFT',
+    items: ['Art Marketplace', 'Art NFTs', 'Other Media Marketplace', 'Other Media NFTs']
+  },
+  {
+    group: 'DeFi',
+    optimismCategory: 'DeFi',
+    items: ['DEX', 'Real World Assets', 'Staking', 'Bridges']
+  },
+  {
+    group: 'Social',
+    optimismCategory: 'Social',
+    items: ['Betting & Prediction Markets', 'Community & Curation', 'Gaming', 'Meme Community']
+  },
+  {
+    group: 'Utility',
+    optimismCategory: 'Utility',
+    items: ['Airdrop', 'Donations', 'Identity Payments']
+  },
+  {
+    group: 'Farcaster',
+    optimismCategory: 'Social',
+    items: ['Frames', 'Channels']
+  }
+] as const;
 
-export const SUNNY_AWARD_CATEGORIES = typedKeys(SunnyAwardsProjectType);
+export const PROJECT_TYPES = typedKeys(SunnyAwardsProjectType);
 
-export type ProjectCategory = (typeof CATEGORIES)[number];
+export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number]['items'][number];
+
+export function getOptimismCategory(category: ProjectCategory): OptimismProjectCategory | undefined {
+  // @ts-ignore TS can't infer the type of the items array properly
+  const group = PROJECT_CATEGORIES.find(({ items }) => items.includes(category));
+  return group?.optimismCategory;
+}
 
 export const schema = yup.object({
   id: yup.string(),
@@ -19,7 +51,11 @@ export const schema = yup.object({
   description: yup.string().required('Project description is required'),
   avatar: yup.string(),
   coverImage: yup.string(),
-  category: yup.string().oneOf(CATEGORIES).nullable().required(),
+  sunnyAwardsCategory: yup
+    .string()
+    .oneOf(PROJECT_CATEGORIES.map(({ items }) => items).flat())
+    .nullable()
+    .required(),
   websites: yup
     .array(
       yup.string().matches(
@@ -33,7 +69,7 @@ export const schema = yup.object({
   farcasterValues: yup.array(yup.string()),
   github: yup.string().optional(),
   twitter: yup.string().optional(),
-  sunnyAwardsProjectType: yup.string().oneOf(SUNNY_AWARD_CATEGORIES).required(),
+  sunnyAwardsProjectType: yup.string().oneOf(PROJECT_TYPES).required(),
   primaryContractChainId: yup.string().test('isChainId', 'Invalid chain ID', async (value, context) => {
     if ((context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType) === 'app') {
       return !!value && !Number.isNaN(parseInt(value));

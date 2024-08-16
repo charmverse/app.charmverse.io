@@ -6,9 +6,8 @@ import { useState } from 'react';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
 
-import type { FormValues } from 'lib/projects/form';
-
-import { FarcasterCard } from '../../common/FarcasterCard';
+import { FarcasterCard } from 'components/common/FarcasterCard';
+import type { FormValues } from 'lib/projects/schema';
 
 import { SearchFarcasterUser } from './SearchFarcasterUser';
 

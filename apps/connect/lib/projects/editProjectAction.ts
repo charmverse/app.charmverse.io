@@ -3,21 +3,21 @@
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeUpdatedProjectMetadataAttestation } from '@connect-shared/lib/attestations/storeUpdatedProjectMetadataAttestation';
-import { editOptimismProject } from '@connect-shared/lib/projects/editOptimismProject';
-import { schema } from '@connect-shared/lib/projects/form';
-import type { FormValues } from '@connect-shared/lib/projects/form';
+import { editProject } from '@connect-shared/lib/projects/editProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
+import { schema } from '@connect-shared/lib/projects/projectSchema';
+import type { FormValues } from '@connect-shared/lib/projects/projectSchema';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 import { revalidatePath } from 'next/cache';
 
-export const actionEditProject = authActionClient
+export const editProjectAction = authActionClient
   .metadata({ actionName: 'create-project' })
   .schema(schema)
   .action(async ({ parsedInput, ctx }) => {
     const input = parsedInput;
     const currentUserId = ctx.session.user!.id;
-    const editedProject = await editOptimismProject({
+    const editedProject = await editProject({
       userId: currentUserId,
       input: input as FormValues & {
         projectId: string;

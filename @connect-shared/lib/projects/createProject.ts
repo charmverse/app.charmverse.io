@@ -10,9 +10,9 @@ import { stringToValidPath, uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
 import { v4 } from 'uuid';
 
-import type { FormValues } from './form';
+import type { FormValues } from './projectSchema';
 
-export async function createOptimismProject({
+export async function createProject({
   source,
   userId,
   input,
@@ -186,7 +186,8 @@ export async function createOptimismProject({
       updatedBy: userId,
       createdBy: userId,
       description: input.description,
-      category: input.category,
+      optimismCategory: input.optimismCategory,
+      sunnyAwardsCategory: input.sunnyAwardsCategory,
       websites: input.websites?.filter(isTruthy),
       farcasterValues: input.farcasterValues?.filter(isTruthy),
       twitter: input.twitter,

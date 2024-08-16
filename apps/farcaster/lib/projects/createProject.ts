@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { FormValues } from '@connect-shared/lib/projects/form';
+import type { FormValues } from '@connect-shared/lib/projects/projectSchema';
 import type { StatusAPIResponse } from '@farcaster/auth-client';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath } from '@root/lib/utils/strings';
@@ -43,7 +43,6 @@ export async function createProject(input: FormValues) {
       updatedBy: userId,
       createdBy: userId,
       description: input.description,
-      category: input.category,
       websites: input.websites?.filter(isTruthy),
       farcasterValues: input.farcasterValues?.filter(isTruthy),
       twitter: input.twitter,

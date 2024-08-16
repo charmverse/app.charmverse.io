@@ -9,15 +9,15 @@ import { uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
 import { v4 } from 'uuid';
 
-import type { FormValues } from './form';
+import type { FormValues } from './projectSchema';
 
-export type EditOptimismProjectValues = FormValues &
+export type EditProjectValues = FormValues &
   Partial<Pick<Project, 'primaryContractAddress' | 'mintingWalletAddress' | 'sunnyAwardsProjectType'>> & {
     projectId: string;
     primaryContractChainId?: string | number;
   };
 
-export async function editOptimismProject({ userId, input }: { input: EditOptimismProjectValues; userId: string }) {
+export async function editProject({ userId, input }: { input: EditProjectValues; userId: string }) {
   const hasEnsName = !!input.mintingWalletAddress && input.mintingWalletAddress.trim().endsWith('.eth');
 
   if (hasEnsName) {
@@ -186,7 +186,8 @@ export async function editOptimismProject({ userId, input }: { input: EditOptimi
         name: input.name,
         updatedBy: userId,
         description: input.description,
-        category: input.category,
+        optimismCategory: input.optimismCategory,
+        sunnyAwardsCategory: input.sunnyAwardsCategory,
         websites: input.websites?.filter(isTruthy),
         farcasterValues: input.farcasterValues?.filter(isTruthy),
         twitter: input.twitter,
