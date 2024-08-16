@@ -1,10 +1,10 @@
-import { fetchProject } from '@connect-shared/lib/projects/fetchProject';
+import { findProject } from '@connect-shared/lib/projects/findProject';
 import { notFound } from 'next/navigation';
 
 import { ProjectDetailsPage } from 'components/projects/[id]/ProjectDetailsPage';
 
 export default async function ProjectPage({ params }: { params: { path: string } }) {
-  const project = await fetchProject({
+  const project = await findProject({
     path: params.path
   });
 

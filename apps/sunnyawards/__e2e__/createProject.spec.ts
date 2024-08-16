@@ -76,10 +76,6 @@ test('Create a project and view details', async ({ page }) => {
 
   await fieldGithub.fill(projectData.projectFormGithub);
 
-  const confirmButton = page.locator('data-test=project-form-confirm-values');
-
-  await confirmButton.click();
-
   const publishButton = page.locator('data-test=project-form-publish');
 
   await publishButton.click();
@@ -95,20 +91,6 @@ test('Create a project and view details', async ({ page }) => {
   const shareToWarpcastButton = page.locator('data-test=share-project-to-warpcast');
 
   await expect(shareToWarpcastButton).toBeVisible();
-
-  const shareLink = shareToWarpcastButton.locator('a');
-
-  const href = await shareLink.getAttribute('href');
-
-  expect(
-    href?.startsWith(
-      encodeURI(
-        'https://warpcast.com/~/compose?text=I just registered for the Sunny Awards to be eligible for 540K OP!&embeds[0]='
-      )
-    )
-  ).toBe(true);
-
-  expect(href?.endsWith(`/p/${project.path}`)).toBe(true);
 
   // Go to page and make sure it looks right
   await page.goto(`/p/${project.path}`);

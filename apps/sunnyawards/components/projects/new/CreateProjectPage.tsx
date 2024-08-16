@@ -1,11 +1,13 @@
 'use client';
 
+import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box } from '@mui/system';
+import { Button, Stack } from '@mui/material';
 import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { concatenateStringValues } from '@root/lib/utils/strings';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -16,14 +18,9 @@ import type { FormValues } from 'lib/projects/form';
 import { schema } from 'lib/projects/form';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
-import type { ProjectDetailsProps } from '../components/ProjectDetails';
-import { ProjectDetails } from '../components/ProjectDetails';
 import { ProjectForm } from '../components/ProjectForm';
-import { ProjectHeader } from '../components/ProjectHeader';
 
 export function CreateProjectPage({ user }: { user: LoggedInUser }) {
-  const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
-
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +29,10 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
       setError(null);
     },
     onSuccess: (data) => {
-      router.push(`/p/${data.data?.projectPath as string}/share`);
+      const projectPath = data.data?.projectPath;
+      if (projectPath) {
+        router.push(`/p/${projectPath}/share`);
+      }
     },
     onError(err) {
       const errorMessage = err.error.validationErrors
@@ -46,8 +46,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const {
     control,
     formState: { isValid },
-    handleSubmit,
-    getValues
+    handleSubmit
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
@@ -69,51 +68,39 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     mode: 'onChange'
   });
 
-  if (!showTeamMemberForm) {
-    return (
-      <PageWrapper bgcolor='transparent'>
-        <ProjectForm
-          control={control}
-          isValid={isValid}
-          onNext={() => {
-            setShowTeamMemberForm(true);
-          }}
-        />
-      </PageWrapper>
-    );
-  }
-
-  const project = getValues();
-  const projectDetails = {
-    id: '',
-    name: project.name,
-    description: project.description,
-    farcasterValues: project.farcasterValues,
-    github: project.github,
-    twitter: project.twitter,
-    websites: project.websites
-  } as ProjectDetailsProps['project'];
-
   return (
-    <PageWrapper
-      bgcolor='transparent'
-      header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}
-    >
-      <Box gap={2} display='flex' flexDirection='column'>
-        <ProjectDetails project={projectDetails} />
+    <PageWrapper bgcolor='transparent'>
+      <form
+        onSubmit={handleSubmit((data) => {
+          execute(data);
+        })}
+      >
+        <ProjectForm control={control} />
         <AddProjectMembersForm
           user={user}
-          onBack={() => {
-            setShowTeamMemberForm(false);
-          }}
           control={control}
-          isValid={isValid}
-          handleSubmit={handleSubmit}
-          execute={execute}
-          isExecuting={isExecuting}
-          error={error}
+          initialFarcasterProfiles={control._formValues.projectMembers}
         />
-      </Box>
+        <Stack direction='row' justifyContent='space-between'>
+          <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary'>
+            Cancel
+          </Button>
+          <Stack direction='row' gap={1}>
+            {isExecuting && (
+              <LoadingComponent
+                height={20}
+                size={20}
+                minHeight={20}
+                label='Submitting your project onchain'
+                flexDirection='row-reverse'
+              />
+            )}
+            <Button data-test='project-form-publish' disabled={!isValid || isExecuting} type='submit'>
+              Publish
+            </Button>
+          </Stack>
+        </Stack>
+      </form>
     </PageWrapper>
   );
 }

@@ -68,9 +68,9 @@ export function SearchFarcasterUser({
       clearOnBlur={false}
       disableClearable
       clearOnEscape={false}
-      renderOption={(props, profile) => {
+      renderOption={({ key, ...props }, profile) => {
         return (
-          <Box {...(props as BoxProps)} display='flex' alignItems='center' gap={1} flexDirection='row'>
+          <Box key={key} {...(props as BoxProps)} display='flex' alignItems='center' gap={1} flexDirection='row'>
             <Avatar src={profile.pfpUrl} size='medium' />
             <Stack>
               <Typography variant='body1'>{profile.displayName}</Typography>
@@ -87,6 +87,7 @@ export function SearchFarcasterUser({
           placeholder='Add a team member'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          name='search-farcaster-user'
         />
       )}
       noOptionsText='Search by farcaster username'

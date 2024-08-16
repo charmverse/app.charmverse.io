@@ -232,7 +232,8 @@ export async function createProposal({
           form: proposalFormId ? { connect: { id: proposalFormId } } : undefined,
           project: {
             connect: projectId ? { id: projectId } : undefined
-          }
+          },
+          publishedAt: isDraft ? undefined : new Date()
         },
         include: {
           authors: true

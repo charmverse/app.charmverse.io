@@ -1,9 +1,8 @@
 'use client';
 
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
-import { Button, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
-import Link from 'next/link';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
@@ -13,15 +12,7 @@ import { CATEGORIES, SUNNY_AWARD_CATEGORIES } from 'lib/projects/form';
 import { ProjectBlockchainSelect } from './BlockchainSelect';
 import { ProjectImageField } from './ProjectImageField';
 
-export function ProjectForm({
-  control,
-  isValid,
-  onNext
-}: {
-  control: Control<FormValues>;
-  isValid: boolean;
-  onNext: VoidFunction;
-}) {
+export function ProjectForm({ control }: { control: Control<FormValues> }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
 
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
@@ -35,7 +26,7 @@ export function ProjectForm({
           <ProjectImageField type='cover' name='coverImage' control={control} />
         </Stack>
       </Stack>
-      <Stack gap={2}>
+      <Stack gap={2} mb={2}>
         <Stack>
           <FormLabel required id='project-name'>
             Name
@@ -290,16 +281,6 @@ export function ProjectForm({
             />
           </Stack>
         </Stack>
-      </Stack>
-      <Stack justifyContent='space-between' flexDirection='row' display='sticky' bottom='0' py={2}>
-        <Link href='/profile' passHref>
-          <Button size='large' color='secondary' variant='outlined'>
-            Cancel
-          </Button>
-        </Link>
-        <Button data-test='project-form-confirm-values' size='large' disabled={!isValid} onClick={onNext}>
-          Next
-        </Button>
       </Stack>
     </>
   );

@@ -1,4 +1,5 @@
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
+import { stringToColor } from '@root/lib/utils/strings';
 
 export function ProjectShareItem({ project }: { project: NonNullable<ConnectProjectDetails> }) {
   const projectMembers = project.projectMembers;
@@ -75,11 +76,18 @@ export function ProjectShareItem({ project }: { project: NonNullable<ConnectProj
       ) : (
         <div
           style={{
-            background: 'grey',
+            ...avatarStyle,
             width: '100px',
-            height: '100px'
+            height: '100px',
+            border: '0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: stringToColor(project.name)
           }}
-        />
+        >
+          <p style={{ fontSize: '30px' }}>{project.name?.charAt(0)?.toLocaleUpperCase()}</p>
+        </div>
       )}
       <div style={memberStackStyle}>
         <h1 style={{ fontWeight: 400, fontSize: '1.5rem', margin: 0, padding: 0 }}>{projectName}</h1>

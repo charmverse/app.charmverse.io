@@ -15,8 +15,6 @@ export async function middleware(request: NextRequest) {
 
   if (!user && path !== '/' && !isProjectPath && !path.startsWith('/u/')) {
     return NextResponse.redirect(new URL('/', request.url));
-  } else if (user && path === '/') {
-    return NextResponse.redirect(new URL('/profile', request.url));
   }
 
   return NextResponse.next();
