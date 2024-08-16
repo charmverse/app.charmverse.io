@@ -1,4 +1,3 @@
-import { UnauthorisedActionError } from '@charmverse/core/errors';
 import type { InviteLink } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -9,7 +8,6 @@ import { getSpaceInviteLinks } from 'lib/invites/getSpaceInviteLinks';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -43,14 +41,8 @@ async function createInviteLinkEndpoint(req: NextApiRequest, res: NextApiRespons
 async function getInviteLinks(req: NextApiRequest, res: NextApiResponse<InviteLinkWithRoles[]>) {
   const spaceId = req.query.spaceId as string;
 
-  const { isAdmin } = await hasAccessToSpace({
-    spaceId,
-    userId: req.session.user.id,
-    adminOnly: true
-  });
-
   const invites = await getSpaceInviteLinks({
-    isAdmin: !!isAdmin,
+    userId: req.session.user?.id,
     spaceId
   });
 

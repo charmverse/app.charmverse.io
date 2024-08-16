@@ -55,10 +55,12 @@ describe('GET /api/invites - Get space invites', () => {
     ({ user: admin, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: true }));
 
     member = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
-    invite = await testUtilsMembers.generateInviteLink({
+    const { inviteLinkToRoles, ...generatedInvite } = await testUtilsMembers.generateInviteLink({
       createdBy: admin.id,
       spaceId: space.id
     });
+
+    invite = generatedInvite;
   });
 
   it('should return invites for space admins, responding with 200', async () => {
