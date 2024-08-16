@@ -67,7 +67,9 @@ export function ProjectShareItem({ project }: { project: NonNullable<ConnectProj
           </div>
         )}
         <h1 style={{ fontWeight: 400, fontSize: '1rem', margin: 0, padding: 0 }}>{projectName.substring(0, 20)}</h1>
-        <h2 style={{ fontWeight: 400, fontSize: '0.8rem', margin: 0, padding: 0 }}>Ticket No: {project.ticketNo}</h2>
+        <h2 style={{ fontWeight: 400, fontSize: '0.8rem', margin: 0, padding: 0 }}>
+          Ticket No: {project.sunnyAwardsNumber}
+        </h2>
       </div>
     </div>
   );
