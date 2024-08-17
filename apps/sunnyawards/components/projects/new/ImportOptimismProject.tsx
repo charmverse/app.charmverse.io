@@ -1,14 +1,17 @@
-'use client';
-
 import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { Divider, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Controller, type Control } from 'react-hook-form';
 
-export async function ImportOptimismProject({
+import type { FormValues } from 'lib/projects/schema';
+
+export function ImportOptimismProject({
+  control,
   optimismProjects,
-  onSelectProject
+  handleProjectSelect
 }: {
+  control: Control<FormValues>;
   optimismProjects: OptimismProjectAttestation[];
-  onSelectProject: (project: OptimismProjectAttestation) => void;
+  handleProjectSelect: (value: OptimismProjectAttestation) => void;
 }) {
   if (!optimismProjects.length) {
     return null;
@@ -17,30 +20,43 @@ export async function ImportOptimismProject({
   return (
     <Stack mb={2}>
       <FormLabel id='project-avatar-and-cover-image'>Import a project from Optimism</FormLabel>
-      <Select
-        displayEmpty
-        fullWidth
-        aria-labelledby='project-category'
-        data-test='project-form-category'
-        renderValue={(value: any) =>
-          optimismProjects.find((p) => p.projectRefUID === value)?.name || (
-            <Typography color='secondary'>Select a project to import</Typography>
-          )
-        }
-        onChange={(ev) => {
-          const value = (ev.target as HTMLSelectElement).value;
-          const project = optimismProjects.find((p) => p.projectRefUID === value);
-          if (project) {
-            onSelectProject(project);
-          }
-        }}
-      >
-        {optimismProjects.map(({ name, projectRefUID }) => (
-          <MenuItem key={projectRefUID} value={projectRefUID} sx={{ pl: 5 }}>
-            {name}
-          </MenuItem>
-        ))}
-      </Select>
+      <Controller
+        control={control}
+        name='projectRefUIDToImport'
+        render={({ field, fieldState }) => (
+          <Select
+            displayEmpty
+            fullWidth
+            aria-labelledby='project-category'
+            data-test='project-form-category'
+            renderValue={(value: any) =>
+              optimismProjects.find((p) => p.projectRefUID === value)?.name || (
+                <Typography color='secondary'>Select a project to import</Typography>
+              )
+            }
+            {...field}
+            onChange={(e) => {
+              field.onChange(e);
+              const value = e.target.value as string;
+
+              if (value) {
+                const project = optimismProjects.find((p) => p.projectRefUID === value);
+
+                if (project) {
+                  handleProjectSelect(project);
+                }
+              }
+            }}
+          >
+            {optimismProjects.map(({ name, projectRefUID }) => (
+              <MenuItem key={projectRefUID} value={projectRefUID} sx={{ pl: 5 }}>
+                {name}
+              </MenuItem>
+            ))}
+          </Select>
+        )}
+      />
+
       <Divider sx={{ my: 2 }} />
     </Stack>
   );

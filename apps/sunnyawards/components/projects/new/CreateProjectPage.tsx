@@ -56,7 +56,9 @@ export function CreateProjectPage({
     control,
     formState: { isValid },
     handleSubmit,
-    setValue
+    setValue,
+    getValues,
+    trigger
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
@@ -101,8 +103,10 @@ export function CreateProjectPage({
 
     setValue(
       'projectMembers',
-      (metadata.team ?? []).map((farcasterId) => ({ farcasterId: parseInt(farcasterId.toString()), name: '' }))
+      (metadata.team ?? []).map((farcasterId) => ({ farcasterId: parseInt(farcasterId.toString()), name: 'demo' }))
     );
+
+    trigger('name');
   }
 
   return (
@@ -112,7 +116,11 @@ export function CreateProjectPage({
           execute(data);
         })}
       >
-        <ImportOptimismProject optimismProjects={optimismProjects} onSelectProject={handleProjectSelect} />
+        <ImportOptimismProject
+          control={control}
+          optimismProjects={optimismProjects}
+          handleProjectSelect={handleProjectSelect}
+        />
         <ProjectForm control={control} isExecuting={isExecuting} user={user} errors={errors} />
       </form>
     </PageWrapper>
