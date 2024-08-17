@@ -14,10 +14,12 @@ import { createProjectViaAgora, storeProjectMetadataViaAgora, AGORA_API_KEY } fr
 export async function storeProjectMetadataAndPublishOptimismAttestation({
   userId,
   projectId,
-  tx = prisma
+  tx = prisma,
+  existingProjectRefUID
 }: {
   userId: string;
   projectId: string;
+  existingProjectRefUID?: string;
 } & OptionalPrismaTransaction): Promise<null | { projectRefUID: string; attestationMetadataUID: string }> {
   if (!AGORA_API_KEY) {
     log.debug('Skip Agora integration: no API key');
@@ -47,10 +49,16 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     throw new DataNotFoundError('Farcaster profile not found');
   }
 
-  const { attestationId: projectRefUID } = await createProjectViaAgora({
-    farcasterId: farcasterUser.fid,
-    projectName: project.name
-  });
+  // Used when importing a project from OP
+  let projectRefUID = existingProjectRefUID;
+
+  if (!projectRefUID) {
+    const { attestationId } = await createProjectViaAgora({
+      farcasterId: farcasterUser.fid,
+      projectName: project.name
+    });
+    projectRefUID = attestationId;
+  }
 
   const { attestationMetadataUID } = await storeProjectMetadataViaAgora({
     farcasterId: farcasterUser.fid,
