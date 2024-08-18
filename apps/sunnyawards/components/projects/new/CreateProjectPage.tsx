@@ -1,5 +1,6 @@
 'use client';
 
+import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { yupResolver } from '@hookform/resolvers/yup';
