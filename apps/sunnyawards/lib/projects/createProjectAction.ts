@@ -12,7 +12,7 @@ import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation
 
 import { sendProjectConfirmationEmail } from 'lib/mailer/sendProjectConfirmationEmail';
 
-import { schema, getOptimismCategory } from './schema';
+import { getOptimismCategory, schema } from './schema';
 
 export const createProjectAction = authActionClient
   .metadata({ actionName: 'create-project' })

@@ -2,6 +2,7 @@ import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client'
 import { Divider, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { Controller, type Control } from 'react-hook-form';
 
+import type { OptimismProjectWithMembers } from 'lib/projects/fetchUnimportedOptimismProjectsAction';
 import type { FormValues } from 'lib/projects/schema';
 
 export function ImportOptimismProject({
@@ -10,8 +11,8 @@ export function ImportOptimismProject({
   handleProjectSelect
 }: {
   control: Control<FormValues>;
-  optimismProjects: OptimismProjectAttestation[];
-  handleProjectSelect: (value: OptimismProjectAttestation) => void;
+  optimismProjects: OptimismProjectWithMembers[];
+  handleProjectSelect: (value: OptimismProjectWithMembers) => void;
 }) {
   if (!optimismProjects.length) {
     return null;

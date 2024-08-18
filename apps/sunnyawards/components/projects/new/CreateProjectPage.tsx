@@ -1,6 +1,5 @@
 'use client';
 
-import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -14,6 +13,7 @@ import { useForm } from 'react-hook-form';
 import type { Address } from 'viem';
 
 import { createProjectAction } from 'lib/projects/createProjectAction';
+import type { OptimismProjectWithMembers } from 'lib/projects/fetchUnimportedOptimismProjectsAction';
 import type { FormValues } from 'lib/projects/schema';
 import { schema } from 'lib/projects/schema';
 
@@ -26,7 +26,7 @@ export function CreateProjectPage({
   optimismProjects
 }: {
   user: LoggedInUser;
-  optimismProjects: OptimismProjectAttestation[];
+  optimismProjects: OptimismProjectWithMembers[];
 }) {
   const router = useRouter();
   const [errors, setErrors] = useState<string[] | null>(null);
@@ -81,7 +81,7 @@ export function CreateProjectPage({
     mode: 'onChange'
   });
 
-  function handleProjectSelect(project: OptimismProjectAttestation) {
+  function handleProjectSelect(project: OptimismProjectWithMembers) {
     // Casting as partial in case project was created before a metadata schema change
     const metadata = project.metadata as Partial<OptimismProject>;
 
@@ -101,10 +101,7 @@ export function CreateProjectPage({
       setValue('primaryContractAddress', metadata.contracts[0].address as Address);
     }
 
-    setValue(
-      'projectMembers',
-      (metadata.team ?? []).map((farcasterId) => ({ farcasterId: parseInt(farcasterId.toString()), name: 'demo' }))
-    );
+    setValue('projectMembers', project.projectMembers);
 
     trigger('name');
   }
