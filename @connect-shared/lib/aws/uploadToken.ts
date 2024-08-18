@@ -20,14 +20,15 @@ export async function uploadToken(filename: string, userId: string) {
   if (missingKeys.length > 0) {
     throw new MissingDataError(`S3 Upload: Missing ENVs ${missingKeys.join(', ')}`);
   }
+  let parsedFilename = decodeURIComponent(filename);
 
-  if (!validCharacters.test(filename)) {
-    const extension = filename.split('.').at(-1);
+  if (!validCharacters.test(parsedFilename)) {
+    const extension = parsedFilename.split('.').at(-1);
     const randomName = uuid();
-    filename = `${randomName}.${extension}`;
+    parsedFilename = `${randomName}.${extension}`;
   }
 
-  const key = getUserS3FilePath({ userId, url: decodeURIComponent(filename) });
+  const key = getUserS3FilePath({ userId, url: parsedFilename });
 
   const policy = {
     Statement: [
