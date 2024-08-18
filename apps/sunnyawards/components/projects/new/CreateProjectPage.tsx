@@ -1,14 +1,17 @@
 'use client';
 
+import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { yupResolver } from '@hookform/resolvers/yup';
+import type { OptimismProject } from '@root/lib/credentials/mapProjectToOptimism';
 import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import type { Address } from 'viem';
 
 import { createProjectAction } from 'lib/projects/createProjectAction';
 import type { FormValues } from 'lib/projects/schema';
@@ -16,7 +19,15 @@ import { schema } from 'lib/projects/schema';
 
 import { ProjectForm } from '../components/ProjectForm';
 
-export function CreateProjectPage({ user }: { user: LoggedInUser }) {
+import { ImportOptimismProject } from './ImportOptimismProject';
+
+export function CreateProjectPage({
+  user,
+  optimismProjects
+}: {
+  user: LoggedInUser;
+  optimismProjects: OptimismProjectAttestation[];
+}) {
   const router = useRouter();
   const [errors, setErrors] = useState<string[] | null>(null);
 
@@ -44,7 +55,10 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const {
     control,
     formState: { isValid },
-    handleSubmit
+    handleSubmit,
+    setValue,
+    getValues,
+    trigger
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
@@ -67,6 +81,34 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
     mode: 'onChange'
   });
 
+  function handleProjectSelect(project: OptimismProjectAttestation) {
+    // Casting as partial in case project was created before a metadata schema change
+    const metadata = project.metadata as Partial<OptimismProject>;
+
+    setValue('name', project.name);
+
+    setValue('description', metadata.description || '');
+    setValue('websites', metadata.socialLinks?.website || []);
+    setValue('twitter', metadata.socialLinks?.twitter || '');
+    setValue('github', metadata.github?.[0] || '');
+    setValue('farcasterValues', metadata.socialLinks?.farcaster || []);
+
+    setValue('avatar', metadata.projectAvatarUrl || '');
+    setValue('coverImage', metadata.projectCoverImageUrl || '');
+
+    if (metadata.contracts?.[0]) {
+      setValue('primaryContractChainId', metadata.contracts[0].chainId.toString());
+      setValue('primaryContractAddress', metadata.contracts[0].address as Address);
+    }
+
+    setValue(
+      'projectMembers',
+      (metadata.team ?? []).map((farcasterId) => ({ farcasterId: parseInt(farcasterId.toString()), name: 'demo' }))
+    );
+
+    trigger('name');
+  }
+
   return (
     <PageWrapper bgcolor='transparent'>
       <form
@@ -74,6 +116,11 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
           execute(data);
         })}
       >
+        <ImportOptimismProject
+          control={control}
+          optimismProjects={optimismProjects}
+          handleProjectSelect={handleProjectSelect}
+        />
         <ProjectForm control={control} isExecuting={isExecuting} user={user} errors={errors} />
       </form>
     </PageWrapper>

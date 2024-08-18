@@ -131,7 +131,8 @@ export const schema = yup.object({
         farcasterId: yup.number().required()
       })
     )
-    .required()
+    .required(),
+  projectRefUIDToImport: yup.string().optional()
 });
 
 export type FormValues = yup.InferType<typeof schema>;

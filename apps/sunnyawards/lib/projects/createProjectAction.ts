@@ -34,7 +34,8 @@ export const createProjectAction = authActionClient
     if (!disableCredentialAutopublish) {
       await storeProjectMetadataAndPublishOptimismAttestation({
         projectId: newProject.id,
-        userId: currentUserId
+        userId: currentUserId,
+        existingProjectRefUID: input.projectRefUIDToImport
       }).catch((err) => {
         log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
       });

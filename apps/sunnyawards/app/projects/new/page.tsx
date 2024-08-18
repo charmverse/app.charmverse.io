@@ -2,6 +2,7 @@ import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUser
 import { redirect } from 'next/navigation';
 
 import { CreateProjectPage } from 'components/projects/new/CreateProjectPage';
+import { fetchUnimportedOptimismProjectsAction } from 'lib/projects/fetchUnimportedOptimismProjectsAction';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,5 +17,7 @@ export default async function CreateProject() {
     redirect('/welcome');
   }
 
-  return <CreateProjectPage user={user.data} />;
+  const optimismProjects = await fetchUnimportedOptimismProjectsAction();
+
+  return <CreateProjectPage user={user.data} optimismProjects={optimismProjects?.data ?? []} />;
 }

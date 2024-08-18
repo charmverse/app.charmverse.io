@@ -24,7 +24,7 @@ type Revenue = {
   details: string;
 };
 
-type OptimismProject = {
+export type OptimismProject = {
   name: string;
   description: string;
   projectAvatarUrl: string;
@@ -81,7 +81,7 @@ export function mapProjectToOptimism(input: ProjectDetails): OptimismProject {
       twitter: input.twitter || '',
       mirror: null
     },
-    team: input.projectMembers.map((member) => member.farcasterId.toString()),
+    team: input.projectMembers.map((member) => member.farcasterId?.toString()),
     github: (Array.isArray(input.github) ? input.github : [input.github].filter(Boolean)) as string[],
     osoSlug: '', // Placeholder: requires specific input
     packages: [], // Placeholder: requires specific input
