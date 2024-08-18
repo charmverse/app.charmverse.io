@@ -14,7 +14,6 @@ describe('mapProjectToGitcoin', () => {
       createdBy,
       optimismCategory: null,
       sunnyAwardsCategory: null,
-      sunnyAwardsNumber: 0,
       description: 'A sample project',
       avatar: 'avatar.png',
       coverImage: 'cover.jpg',
