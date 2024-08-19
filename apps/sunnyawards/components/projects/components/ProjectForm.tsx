@@ -21,9 +21,9 @@ import { ProjectImageField } from './ProjectImageField';
 export function ProjectForm({
   control,
   isExecuting,
-  projectMembers = [],
   user,
-  errors
+  errors,
+  projectMembers
 }: {
   control: Control<FormValues>;
   projectMembers?: ConnectProjectDetails['projectMembers'];
@@ -32,8 +32,15 @@ export function ProjectForm({
   errors: string[] | null;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
-
+  const { field: projectMembersField } = useController({ name: 'projectMembers', control });
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
+  const _projectMembers =
+    projectMembers?.filter((m) =>
+      projectMembersField.value.find(
+        (projectMember) =>
+          projectMember.farcasterId === m.farcasterUser.fid && projectMember.farcasterId !== user.farcasterUser?.fid
+      )
+    ) ?? [];
 
   return (
     <>
@@ -265,15 +272,15 @@ export function ProjectForm({
         user={user}
         control={control}
         disabled={isExecuting}
-        initialFarcasterProfiles={projectMembers
-          .filter((m) => m.farcasterUser.fid !== user.farcasterUser?.fid)
-          .map((member) => ({
+        initialFarcasterProfiles={
+          _projectMembers.map((member) => ({
             bio: member.farcasterUser.bio,
             displayName: member.farcasterUser.displayName,
             fid: member.farcasterUser.fid,
             pfpUrl: member.farcasterUser.pfpUrl,
             username: member.farcasterUser.username
-          }))}
+          })) ?? []
+        }
       />
       <Stack direction='row' justifyContent='space-between'>
         <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary'>

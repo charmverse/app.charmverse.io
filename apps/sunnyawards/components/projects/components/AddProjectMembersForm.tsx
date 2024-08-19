@@ -2,7 +2,7 @@ import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAct
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { FormLabel, Stack } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
 
@@ -30,6 +30,10 @@ export function AddProjectMembersForm({
   });
   const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] =
     useState<FarcasterProfile[]>(initialFarcasterProfiles);
+
+  useEffect(() => {
+    setSelectedFarcasterProfiles(initialFarcasterProfiles);
+  }, [initialFarcasterProfiles]);
 
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 

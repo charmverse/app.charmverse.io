@@ -55,14 +55,7 @@ export function CreateProjectPage({
     }
   });
 
-  const {
-    control,
-    formState: { isValid },
-    handleSubmit,
-    setValue,
-    getValues,
-    trigger
-  } = useForm<FormValues>({
+  const { control, handleSubmit, setValue, trigger } = useForm<FormValues>({
     defaultValues: {
       name: '',
       description: '',
@@ -106,12 +99,21 @@ export function CreateProjectPage({
 
     setValue('projectMembers', project.projectMembers);
 
+    setValue(
+      'projectMembers',
+      project.projectMembers.map(
+        (member) =>
+          ({
+            farcasterId: member.farcasterUser.id,
+            name: member.farcasterUser.displayName
+          } as FormValues['projectMembers'][0])
+      ) || []
+    );
+
     setInitialProjectMembers(project.projectMembers);
 
     trigger('name');
   }
-
-  console.log('Members', { initialProjectMembers });
 
   return (
     <PageWrapper bgcolor='transparent'>
@@ -126,11 +128,11 @@ export function CreateProjectPage({
           handleProjectSelect={handleProjectSelect}
         />
         <ProjectForm
+          projectMembers={initialProjectMembers}
           control={control}
           isExecuting={isExecuting}
           user={user}
           errors={errors}
-          projectMembers={initialProjectMembers}
         />
       </form>
     </PageWrapper>
