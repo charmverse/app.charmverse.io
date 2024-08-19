@@ -69,10 +69,6 @@ function specFactory(): RawSpecs {
     name,
     schema: {
       attrs: {
-        id: {
-          // id is used for linking from table of contents
-          default: null
-        },
         level: {
           default: 1
         },
