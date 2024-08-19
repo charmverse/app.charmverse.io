@@ -107,7 +107,7 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
         <NestedPageContainer
           color='inherit'
           draggable={false}
-          key={item.id}
+          key={item.text}
           href={getHeadingLink(item.text)}
           onClick={() => highlightHeading(item)}
           external
