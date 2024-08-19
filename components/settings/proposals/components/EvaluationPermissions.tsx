@@ -4,7 +4,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
 import { capitalize } from 'lodash';
-import { p } from 'prosemirror-test-builder';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import {

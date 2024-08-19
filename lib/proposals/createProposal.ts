@@ -48,6 +48,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   appealable?: boolean | null;
   appealRequiredReviews?: WorkflowEvaluationJson['appealRequiredReviews'] | null;
   appealReviewers?: Partial<Pick<ProposalAppealReviewer, 'userId' | 'roleId'>>[] | null;
+  shareReviews?: boolean | null;
 };
 
 export type CreateProposalInput = {
