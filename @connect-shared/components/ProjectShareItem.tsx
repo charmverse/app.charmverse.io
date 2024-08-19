@@ -47,7 +47,13 @@ export function ProjectShareItem({ project }: { project: NonNullable<ConnectProj
 
   return (
     <div style={cardStyle}>
-      <img src={`${baseUrl}/images/project-share.jpg`} alt='Project Share' style={mediaStyle} />
+      <img
+        src={`${baseUrl}/images/project-share.jpg`}
+        alt='Project Share'
+        style={mediaStyle}
+        width='500px'
+        height='260px'
+      />
       <div style={memberStackStyle}>
         {project.avatar ? (
           <img style={avatarStyle} src={project.avatar || ''} alt={project.name} width='40px' height='40px' />

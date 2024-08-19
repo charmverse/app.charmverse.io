@@ -14,7 +14,7 @@ export async function ProjectDetailsPage({ project }: { project: ConnectProjectD
   const session = await getSession();
 
   const isCurrentUserTeamLead = project.projectMembers.some(
-    (member) => member.teamLead && member.userId === session.user.id
+    (member) => member.teamLead && member.userId === session.user?.id
   );
 
   return (

@@ -62,7 +62,7 @@ export function useCreateProject({ fid }: { fid?: number }) {
         setError('root.serverError', { type: 'fetchError', message: fetchError });
       }
 
-      log.error(err.error.serverError?.message || 'Something went wrong', err.error);
+      log.error(err.error.serverError?.message || 'Something went wrong', { error: err.error });
     }
   });
 
