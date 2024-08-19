@@ -2,14 +2,14 @@ import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
 import type { LoggedInUser } from '@root/models';
 import type { ReactNode } from 'react';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
 import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
-import { useENSName } from 'hooks/useENSName';
 import { useMembers } from 'hooks/useMembers';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
+import { randomName } from 'lib/utils/randomName';
 
 /**
  * @avatarIcon Pass this to override the user avatar with a custom icon
@@ -65,18 +65,6 @@ function BaseComponent({
   );
 }
 
-interface AnonUserDisplayProps extends StyleProps {
-  address: string;
-}
-
-// for when we only have a wallet address
-function AnonUserDisplayComponent({ address, ...props }: AnonUserDisplayProps) {
-  const ensName = useENSName(address);
-  return <BaseComponent username={ensName || address} {...props} />;
-}
-
-export const AnonUserDisplay = memo(AnonUserDisplayComponent);
-
 /**
  * @linkToProfile Whether we show a link to user's public profile. Defaults to false.
  */
@@ -84,12 +72,21 @@ interface UserDisplayProps extends StyleProps {
   userId?: string;
   showMiniProfile?: boolean;
   user?: LoggedInUser;
+  anonymize?: boolean; // use a fake identity to be anonymous
 }
 
-function UserDisplay({ showMiniProfile = false, user, userId, ...props }: UserDisplayProps) {
+function UserDisplay({ showMiniProfile = false, user, userId, anonymize, ...props }: UserDisplayProps) {
   const { showUserProfile } = useMemberProfileDialog();
   const { membersRecord } = useMembers();
   const member = user ?? (userId ? membersRecord[userId] : null);
+
+  const fakeName = useMemo(() => {
+    return randomName();
+  }, []);
+
+  if (anonymize) {
+    return <BaseComponent username={fakeName} avatar={null} {...props} />;
+  }
 
   if (!member) {
     // strip out invalid names

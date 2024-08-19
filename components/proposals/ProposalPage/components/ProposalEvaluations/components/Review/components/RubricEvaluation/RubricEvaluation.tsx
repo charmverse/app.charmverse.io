@@ -86,15 +86,11 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
                 )}
                 {value === 'Results' && (
                   <RubricResults
-                    archived={proposal?.archived ?? false}
                     key='results'
-                    authors={proposal?.authors?.map((author) => author.userId) || []}
                     answers={evaluation?.rubricAnswers}
+                    showReviewerIdentities={isAdmin || canAnswerRubric}
                     criteriaList={rubricCriteria || []}
-                    isCurrent={!!isCurrent}
                     evaluation={evaluation}
-                    proposalId={proposal?.id}
-                    refreshProposal={refreshProposal}
                   />
                 )}
               </>

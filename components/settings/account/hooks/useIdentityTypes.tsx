@@ -7,7 +7,7 @@ import type { IntegrationModel } from 'components/settings/profile/components/Id
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { matchWalletAddress, shortWalletAddress } from 'lib/utils/blockchain';
-import randomName from 'lib/utils/randomName';
+import { randomName } from 'lib/utils/randomName';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useLensProfile } from './useLensProfile';
