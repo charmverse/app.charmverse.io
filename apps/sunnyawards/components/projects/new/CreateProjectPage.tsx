@@ -32,6 +32,8 @@ export function CreateProjectPage({
   const router = useRouter();
   const [errors, setErrors] = useState<string[] | null>(null);
 
+  const [initialProjectMembers, setInitialProjectMembers] = useState<any[]>();
+
   const { execute, isExecuting } = useAction(createProjectAction, {
     onExecute: () => {
       setErrors(null);
@@ -104,8 +106,12 @@ export function CreateProjectPage({
 
     setValue('projectMembers', project.projectMembers);
 
+    setInitialProjectMembers(project.projectMembers);
+
     trigger('name');
   }
+
+  console.log('Members', { initialProjectMembers });
 
   return (
     <PageWrapper bgcolor='transparent'>
@@ -119,7 +125,13 @@ export function CreateProjectPage({
           optimismProjects={optimismProjects}
           handleProjectSelect={handleProjectSelect}
         />
-        <ProjectForm control={control} isExecuting={isExecuting} user={user} errors={errors} />
+        <ProjectForm
+          control={control}
+          isExecuting={isExecuting}
+          user={user}
+          errors={errors}
+          projectMembers={initialProjectMembers}
+        />
       </form>
     </PageWrapper>
   );

@@ -8,7 +8,7 @@ import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 
 export type OptimismProjectWithMembers = OptimismProjectAttestation & {
-  projectMembers: { farcasterId: number; name: string }[];
+  projectMembers: { farcasterId: number; name: string; farcasterUser: FarcasterProfile['body'] }[];
 };
 
 export const fetchUnimportedOptimismProjectsAction = authActionClient
@@ -48,9 +48,9 @@ export const fetchUnimportedOptimismProjectsAction = authActionClient
     })) as { fid: number; account: FarcasterProfile['body'] }[];
 
     const farcasterUserMap = farcasterUsers.reduce((acc, user) => {
-      acc[user.fid] = user.account.displayName;
+      acc[user.fid] = user.account;
       return acc;
-    }, {} as Record<number, string>);
+    }, {} as Record<number, FarcasterProfile['body']>);
 
     const unresolvedUsers = arrayUtils.uniqueValues(
       attestationsWithoutProject.flatMap((attestation) => {
@@ -69,13 +69,26 @@ export const fetchUnimportedOptimismProjectsAction = authActionClient
     const farcasterProfiles = unresolvedUsers.length ? await getFarcasterUsers({ fids: unresolvedUsers }) : [];
 
     for (const resolvedFarcasterUser of farcasterProfiles) {
-      farcasterUserMap[resolvedFarcasterUser.fid] = resolvedFarcasterUser.display_name;
+      farcasterUserMap[resolvedFarcasterUser.fid] = {
+        address: resolvedFarcasterUser.custody_address,
+        avatarUrl: resolvedFarcasterUser.pfp_url,
+        bio: resolvedFarcasterUser.profile.bio.text,
+        displayName: resolvedFarcasterUser.display_name,
+        followers: 0,
+        following: 0,
+        id: resolvedFarcasterUser.fid,
+        isVerifiedAvatar: true,
+        registeredAt: 0,
+        username: resolvedFarcasterUser.username
+      };
     }
 
     return attestationsWithoutProject.map((attestation) => {
-      const projectMembers = attestation.farcasterIds
-        .map((fid) => (farcasterUserMap[fid] ? { farcasterId: fid, name: farcasterUserMap[fid] } : null))
-        .filter(Boolean) as { farcasterId: number; name: string }[];
+      const projectMembers = attestation.farcasterIds.map((fid) =>
+        farcasterUserMap[fid]
+          ? { farcasterId: fid, name: farcasterUserMap[fid].displayName, farcasterUser: farcasterUserMap[fid] }
+          : null
+      );
 
       return {
         ...attestation,

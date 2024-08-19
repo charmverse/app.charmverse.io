@@ -265,13 +265,15 @@ export function ProjectForm({
         user={user}
         control={control}
         disabled={isExecuting}
-        initialFarcasterProfiles={projectMembers.slice(1).map((member) => ({
-          bio: member.farcasterUser.bio,
-          displayName: member.farcasterUser.displayName,
-          fid: member.farcasterUser.fid,
-          pfpUrl: member.farcasterUser.pfpUrl,
-          username: member.farcasterUser.username
-        }))}
+        initialFarcasterProfiles={projectMembers
+          .filter((m) => m.farcasterUser.fid !== user.farcasterUser?.fid)
+          .map((member) => ({
+            bio: member.farcasterUser.bio,
+            displayName: member.farcasterUser.displayName,
+            fid: member.farcasterUser.fid,
+            pfpUrl: member.farcasterUser.pfpUrl,
+            username: member.farcasterUser.username
+          }))}
       />
       <Stack direction='row' justifyContent='space-between'>
         <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary'>
