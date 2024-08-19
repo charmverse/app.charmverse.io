@@ -37,6 +37,8 @@ describe('mapProjectToGitcoin', () => {
             displayName: 'Alice'
           },
           teamLead: true,
+          farcasterId: 123,
+          name: 'Alice',
           userId: createdBy
         },
         {
@@ -48,7 +50,9 @@ describe('mapProjectToGitcoin', () => {
             displayName: 'Bob'
           },
           teamLead: false,
-          userId: v4()
+          farcasterId: 456,
+          name: 'Bob',
+          userId: null
         }
       ]
     };

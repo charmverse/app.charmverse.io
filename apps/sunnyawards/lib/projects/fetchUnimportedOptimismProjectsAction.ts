@@ -43,10 +43,11 @@ export const fetchUnimportedOptimismProjectsAction = authActionClient
         }
       },
       select: {
+        userId: true,
         fid: true,
         account: true
       }
-    })) as { fid: number; account: FarcasterProfile['body'] }[];
+    })) as { fid: number; account: FarcasterProfile['body']; userId: string }[];
 
     const farcasterUserMap = farcasterUsers.reduce((acc, user) => {
       acc[user.fid] = user.account;
@@ -91,7 +92,8 @@ export const fetchUnimportedOptimismProjectsAction = authActionClient
               teamLead: fid === farcasterUser.fid,
               farcasterId: fid,
               name: farcasterUserMap[fid].displayName,
-              farcasterUser: { ...farcasterUserMap[fid], fid }
+              farcasterUser: { ...farcasterUserMap[fid], fid },
+              userId: farcasterUsers.find((user) => user.fid === fid)?.userId || null
             }
           : null
       );

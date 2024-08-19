@@ -9,6 +9,7 @@ export type ConnectProjectMember = {
   name: string;
   teamLead: boolean;
   farcasterUser: FarcasterProfileInfo;
+  userId: string | null;
 };
 
 export type ConnectProjectDetails = Pick<
