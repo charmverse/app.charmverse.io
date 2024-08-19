@@ -1,11 +1,12 @@
 import type { ProposalEvaluation, ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
-import { Box, FormLabel, FormControlLabel, Stack, Switch, TextField, Typography } from '@mui/material';
+import { Box, FormLabel, Switch, TextField, Typography } from '@mui/material';
 import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
 import { useEffect } from 'react';
 
 import { useGetAllowedDocusignUsersAndRoles } from 'charmClient/hooks/docusign';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { FormControlLabel } from 'components/common/form/FormControlLabel';
 import {
   allMembersSystemRole,
   authorSystemRole,
@@ -207,7 +208,7 @@ export function EvaluationStepSettings({
         </>
       )}
       {evaluation.type === 'pass_fail' && (
-        <Box className='octo-propertyrow'>
+        <>
           <Box mb={2}>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
@@ -227,16 +228,7 @@ export function EvaluationStepSettings({
               value={requiredReviews}
             />
           </Box>
-          {!!finalStep && (
-            <FormControlLabel
-              disabled
-              componentsProps={{
-                typography: { variant: 'body2' }
-              }}
-              control={<Switch checked />}
-              label='Priority Step'
-            />
-          )}
+          {!!finalStep && <FormControlLabel disabled control={<Switch checked />} label='Priority Step' />}
           {evaluation.appealable && (
             <>
               <FormLabel required={!!evaluation.appealable}>
@@ -246,7 +238,7 @@ export function EvaluationStepSettings({
                     : 'Appeal Reviewers'}
                 </Typography>
               </FormLabel>
-              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <Box display='flex' height='fit-content' flex={1}>
                 <UserAndRoleSelect
                   emptyPlaceholderContent='Select appeal user or role'
                   value={appealReviewerOptions as SelectOption[]}
@@ -258,16 +250,13 @@ export function EvaluationStepSettings({
               </Box>
             </>
           )}
-        </Box>
+        </>
       )}
       {evaluation.type === 'rubric' && (
         <>
           <Box mb={1}>
             <FormControlLabel
               disabled={readOnlyShareReviews}
-              componentsProps={{
-                typography: { variant: 'body2' }
-              }}
               control={
                 <Switch
                   checked={!!evaluation.shareReviews}
@@ -276,7 +265,7 @@ export function EvaluationStepSettings({
                   }}
                 />
               }
-              label='Allow anyone view anonymized reviews'
+              label='Show anonymized reviews'
             />
           </Box>
           <FormLabel required>

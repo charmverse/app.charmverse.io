@@ -1,7 +1,8 @@
-import { Box, FormControlLabel, FormLabel, Switch, Typography } from '@mui/material';
+import { Box, FormLabel, Switch, Typography } from '@mui/material';
 import type { SelectOptionType } from '@root/lib/forms/interfaces';
 
 import { SelectField } from 'components/common/form/fields/SelectField';
+import { FormControlLabel } from 'components/common/form/FormControlLabel';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -43,9 +44,6 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
     <>
       <Box mb={1}>
         <FormControlLabel
-          componentsProps={{
-            typography: { variant: 'body2' }
-          }}
           control={
             <Switch
               checked={!!value?.makeRewardsPublic}
