@@ -1,61 +1,28 @@
 'use client';
 
-import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { ProjectForm } from '@connect-shared/components/project/ProjectForm';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import { schema, type FormValues } from '@connect-shared/lib/projects/projectSchema';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Stack } from '@mui/material';
+import { Button, FormHelperText, Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 
 import { PageCoverHeader } from 'components/common/PageCoverHeader';
-import { actionCreateProject } from 'lib/projects/createProjectAction';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
+import { useCreateProject } from '../hooks/useCreateProject';
 
 export function CreateProjectPage({ user }: { user: LoggedInUser }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
 
-  const router = useRouter();
-
-  const { execute, isExecuting } = useAction(actionCreateProject, {
-    onSuccess: (data) => {
-      router.push(`/p/${data.data?.projectPath as string}/publish`);
-    },
-    onError(err) {
-      log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
-    }
-  });
-
   const {
+    isExecuting,
+    formState: { isValid, errors },
     control,
-    formState: { isValid },
     handleSubmit,
     getValues
-  } = useForm<FormValues>({
-    defaultValues: {
-      name: '',
-      description: '',
-      optimismCategory: '' as any,
-      websites: [''],
-      farcasterValues: [''],
-      twitter: '',
-      github: '',
-      projectMembers: [
-        {
-          farcasterId: user?.farcasterUser?.fid
-        }
-      ]
-    },
-    resolver: yupResolver(schema),
-    mode: 'onChange'
-  });
+  } = useCreateProject({ fid: user.farcasterUser?.fid });
 
   const handleNext = () => {
     // Scroll to top before changing the state. In Firefox the page flickers because of a weird scroll.
@@ -83,14 +50,7 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
               Cancel
             </Button>
           </Link>
-          <Button
-            data-test='project-form-confirm-values'
-            size='large'
-            disabled={!isValid}
-            onClick={() => {
-              setShowTeamMemberForm(true);
-            }}
-          >
+          <Button data-test='project-form-confirm-values' size='large' disabled={!isValid} onClick={handleNext}>
             Next
           </Button>
         </Stack>
@@ -111,9 +71,11 @@ export function CreateProjectPage({ user }: { user: LoggedInUser }) {
           control={control}
           isValid={isValid}
           handleSubmit={handleSubmit}
-          execute={execute}
           isExecuting={isExecuting}
         />
+        {errors?.root?.serverError && (
+          <FormHelperText color='error'>{errors?.root?.serverError?.message}</FormHelperText>
+        )}
       </Box>
     </PageWrapper>
   );

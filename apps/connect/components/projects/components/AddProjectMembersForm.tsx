@@ -5,6 +5,7 @@ import type { FormValues } from '@connect-shared/lib/projects/projectSchema';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Button, Stack, Typography } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
+import type { BaseSyntheticEvent } from 'react';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
@@ -20,7 +21,6 @@ export function AddProjectMembersForm({
   onBack,
   user,
   initialFarcasterProfiles = [],
-  execute,
   isExecuting
 }: {
   initialFarcasterProfiles?: FarcasterProfile[];
@@ -28,8 +28,7 @@ export function AddProjectMembersForm({
   onBack: VoidFunction;
   control: Control<FormValues>;
   isValid: boolean;
-  handleSubmit: UseFormHandleSubmit<FormValues>;
-  execute: (data: FormValues) => void;
+  handleSubmit: (e?: BaseSyntheticEvent<object, any, any> | undefined) => Promise<void>;
   isExecuting: boolean;
 }) {
   const { append, remove } = useFieldArray({
@@ -42,7 +41,7 @@ export function AddProjectMembersForm({
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
-    <form onSubmit={handleSubmit(execute)}>
+    <form onSubmit={handleSubmit}>
       <Stack gap={1}>
         <Typography variant='h6'>Team</Typography>
         <FarcasterCard
