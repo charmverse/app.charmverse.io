@@ -37,15 +37,15 @@ export function HomePage() {
           height: 'auto',
           filter: 'drop-shadow(6px 6px 6px rgba(251, 251, 201, 0.7))'
         }}
-        alt='Sunny Awards homepage'
+        alt='SUNNY Awards homepage'
       />
       <Typography data-test='connect-home-page' align='center' variant='h4'>
-        Celebrate Onchain Summer with the Sunny Awards
+        Celebrate Onchain Summer with the SUNNY Awards
       </Typography>
       <Typography align='center' data-test='homepage-description'>
         Create your project and submit it to the{' '}
         <MuiLink href='https://www.thesunnyawards.fun/' target='_blank'>
-          The Sunnys
+          The SUNNYs
         </MuiLink>{' '}
         to compete for 540K OP in total prizes.
       </Typography>

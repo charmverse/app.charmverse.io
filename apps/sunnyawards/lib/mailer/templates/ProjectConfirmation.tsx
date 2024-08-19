@@ -50,7 +50,7 @@ export function ProjectConfirmation({
   return (
     <Html>
       <Head>
-        <title>Congratulations you just entered the Sunnys</title>
+        <title>Congratulations you just entered the SUNNYs</title>
       </Head>
       <Section
         style={{
@@ -76,12 +76,12 @@ export function ProjectConfirmation({
             }}
           >
             <Text>
-              Congratulations you just entered the Sunnys, a celebration of everything you have accomplished on the
+              Congratulations you just entered the SUNNYs, a celebration of everything you have accomplished on the
               Superchain.
             </Text>
 
             <Text>
-              🏆 Learn more about the Sunnys{' '}
+              🏆 Learn more about the SUNNYs{' '}
               <Link primaryColor={baseBlue} href='https://www.thesunnyawards.fun/'>
                 here
               </Link>
