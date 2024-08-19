@@ -1,3 +1,4 @@
+import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import { v4 as uuid } from 'uuid';
 
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
@@ -65,3 +66,20 @@ export function createMockProposal(input: ProposalInput = {}): OptionalNullable<
     }))
   };
 }
+
+export const mockPermissions: ProposalPermissionFlags = {
+  evaluate: true,
+  comment: true,
+  edit: true,
+  delete: true,
+  view: false,
+  view_notes: false,
+  view_private_fields: true,
+  create_vote: false,
+  make_public: false,
+  archive: false,
+  unarchive: false,
+  move: false,
+  evaluate_appeal: false,
+  complete_evaluation: false
+};
