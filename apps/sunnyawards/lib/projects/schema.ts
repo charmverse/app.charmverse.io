@@ -26,7 +26,7 @@ export const PROJECT_CATEGORIES = [
   {
     group: 'Utility',
     optimismCategory: 'Utility',
-    items: ['Airdrop', 'Donations', 'Identity Payments']
+    items: ['Airdrop', 'Donations', 'Identity', 'Payments']
   },
   {
     group: 'Farcaster',
