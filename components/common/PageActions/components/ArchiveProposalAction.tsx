@@ -4,10 +4,12 @@ import Tooltip from '@mui/material/Tooltip';
 
 import { useArchiveProposal } from 'charmClient/hooks/proposals';
 import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
   const { trigger: archiveProposal } = useArchiveProposal({ proposalId });
+  const isAdmin = useIsAdmin();
   const { proposal } = useProposal({
     proposalId
   });

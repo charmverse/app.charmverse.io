@@ -1,6 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { relay } from '@root/lib/websockets/relay';
 
+import { UnauthorisedActionError } from 'lib/utils/errors';
+
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 
 export type ArchiveProposalRequest = {
@@ -20,8 +22,19 @@ export async function archiveProposals({
     where: {
       id: proposalIds[0]
     },
-    select: { spaceId: true }
+    select: { archivedByAdmin: true, spaceId: true }
   });
+
+  const actorRole = await prisma.spaceRole.findFirst({
+    where: {
+      spaceId: proposal.spaceId,
+      userId: actorId
+    }
+  });
+
+  if (proposal.archivedByAdmin && !actorRole?.isAdmin) {
+    throw new UnauthorisedActionError('Only admins can unarchive this proposal');
+  }
 
   await prisma.proposal.updateMany({
     where: {
@@ -30,7 +43,9 @@ export async function archiveProposals({
       }
     },
     data: {
-      archived
+      archived,
+      // remember if this was set by an admin, so that authors cannot un-archive
+      archivedByAdmin: archived ? actorRole?.isAdmin : false
     }
   });
 
