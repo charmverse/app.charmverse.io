@@ -1,8 +1,8 @@
 'use client';
 
-import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { ConnectProjectMember } from '@connect-shared/lib/projects/findProject';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { OptimismProject } from '@root/lib/credentials/mapProjectToOptimism';
 import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
@@ -31,8 +31,6 @@ export function CreateProjectPage({
 }) {
   const router = useRouter();
   const [errors, setErrors] = useState<string[] | null>(null);
-
-  const [initialProjectMembers, setInitialProjectMembers] = useState<any[]>();
 
   const { execute, isExecuting } = useAction(createProjectAction, {
     onExecute: () => {
@@ -69,7 +67,8 @@ export function CreateProjectPage({
       projectMembers: [
         {
           name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
-          farcasterId: user?.farcasterUser?.fid
+          farcasterId: user?.farcasterUser?.fid,
+          farcasterUser: user?.farcasterUser as ConnectProjectMember['farcasterUser']
         }
       ]
     },
@@ -104,13 +103,12 @@ export function CreateProjectPage({
       project.projectMembers.map(
         (member) =>
           ({
-            farcasterId: member.farcasterUser.id,
-            name: member.farcasterUser.displayName
+            farcasterId: member.farcasterUser.fid,
+            name: member.farcasterUser.displayName,
+            farcasterUser: member.farcasterUser
           } as FormValues['projectMembers'][0])
       ) || []
     );
-
-    setInitialProjectMembers(project.projectMembers);
 
     trigger('name');
   }
@@ -127,13 +125,7 @@ export function CreateProjectPage({
           optimismProjects={optimismProjects}
           handleProjectSelect={handleProjectSelect}
         />
-        <ProjectForm
-          projectMembers={initialProjectMembers}
-          control={control}
-          isExecuting={isExecuting}
-          user={user}
-          errors={errors}
-        />
+        <ProjectForm control={control} isExecuting={isExecuting} user={user} errors={errors} />
       </form>
     </PageWrapper>
   );

@@ -52,6 +52,10 @@ export async function createProject({
     }
   });
 
+  const teamLeadFarcasterAccount = farcasterAccounts.find(
+    (account) => account.userId === userId
+  ) as (typeof farcasterAccounts)[0];
+
   const farcasterAccountsRecord: Record<
     number,
     {
@@ -76,7 +80,7 @@ export async function createProject({
 
   const projectMembers = (
     await Promise.all(
-      input.projectMembers.slice(1).map(async (member) => {
+      input.projectMembers.map(async (member) => {
         if (farcasterAccountsRecord[member.farcasterId]) {
           return {
             userId: farcasterAccountsRecord[member.farcasterId].userId,
@@ -180,15 +184,8 @@ export async function createProject({
   }
 
   const projectMembersToCreate: Omit<Prisma.ProjectMemberCreateManyInput, 'projectId'>[] = [
-    {
-      teamLead: true,
-      updatedBy: userId,
-      userId,
-      name: (farcasterAccountsRecord[input.projectMembers[0]?.farcasterId]?.account.displayName as string) || '',
-      farcasterId: input.projectMembers[0]?.farcasterId
-    },
     ...projectMembers.map((member) => ({
-      teamLead: false,
+      teamLead: member.farcasterId === teamLeadFarcasterAccount.fid,
       updatedBy: userId,
       userId: member.userId,
       // This is necessary because some test data fids do not have a corresponding farcaster profile

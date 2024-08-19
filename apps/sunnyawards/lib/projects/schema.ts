@@ -128,7 +128,8 @@ export const schema = yup.object({
     .of(
       yup.object({
         name: yup.string().required(),
-        farcasterId: yup.number().required()
+        farcasterId: yup.number().required(),
+        farcasterUser: yup.object()
       })
     )
     .required(),

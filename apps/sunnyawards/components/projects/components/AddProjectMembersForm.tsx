@@ -1,8 +1,8 @@
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { ConnectProjectMember } from '@connect-shared/lib/projects/findProject';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { FormLabel, Stack } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
-import { useEffect, useState } from 'react';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
 
@@ -16,10 +16,8 @@ export type FarcasterProfile = Pick<FarcasterBody, 'fid' | 'pfpUrl' | 'bio' | 'd
 export function AddProjectMembersForm({
   control,
   user,
-  initialFarcasterProfiles = [],
   disabled
 }: {
-  initialFarcasterProfiles?: FarcasterProfile[];
   user: LoggedInUser;
   control: Control<FormValues>;
   disabled?: boolean;
@@ -28,14 +26,12 @@ export function AddProjectMembersForm({
     name: 'projectMembers' as FieldArrayPath<FormValues>,
     control
   });
-  const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] =
-    useState<FarcasterProfile[]>(initialFarcasterProfiles);
-
-  useEffect(() => {
-    setSelectedFarcasterProfiles(initialFarcasterProfiles);
-  }, [initialFarcasterProfiles]);
 
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
+
+  const selectedFarcasterProfiles = (control._formValues.projectMembers as ConnectProjectMember[]).filter(
+    (u) => u.farcasterId !== user.farcasterUser?.fid
+  );
 
   return (
     <Stack gap={1}>
@@ -50,33 +46,30 @@ export function AddProjectMembersForm({
       <Stack gap={1}>
         <SearchFarcasterUser
           disabled={disabled}
-          filteredFarcasterIds={selectedFarcasterProfiles.map((profile) => profile.fid).filter(isTruthy)}
+          filteredFarcasterIds={selectedFarcasterProfiles.map((profile) => profile.farcasterId).filter(isTruthy)}
           setSelectedProfile={(farcasterProfile) => {
             if (farcasterProfile) {
               append({
                 farcasterId: farcasterProfile.fid!,
-                name: farcasterProfile.displayName!
+                name: farcasterProfile.displayName!,
+                farcasterUser: farcasterProfile
               });
-              setSelectedFarcasterProfiles([...selectedFarcasterProfiles, farcasterProfile]);
             }
           }}
         />
       </Stack>
       <Stack gap={1} mb={2}>
-        {selectedFarcasterProfiles.map((farcasterProfile) => (
+        {selectedFarcasterProfiles.map(({ farcasterUser }) => (
           <FarcasterCard
             avatarSize='large'
-            fid={farcasterProfile.fid}
-            key={farcasterProfile.fid}
-            name={farcasterProfile.displayName}
-            username={farcasterProfile.username}
-            avatar={farcasterProfile.pfpUrl}
+            fid={farcasterUser.fid}
+            key={farcasterUser.fid}
+            name={farcasterUser.displayName}
+            username={farcasterUser.username}
+            avatar={farcasterUser.pfpUrl}
             bio=''
             onDelete={() => {
-              remove(fields.findIndex((profile) => profile.farcasterId === farcasterProfile.fid));
-              setSelectedFarcasterProfiles(
-                selectedFarcasterProfiles.filter((profile) => profile.fid !== farcasterProfile.fid)
-              );
+              remove(fields.findIndex((profile) => profile.farcasterId === farcasterUser.fid));
             }}
           />
         ))}

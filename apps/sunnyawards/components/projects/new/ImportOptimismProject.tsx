@@ -50,7 +50,7 @@ export function ImportOptimismProject({
             }}
           >
             {optimismProjects.map(({ name, projectRefUID }) => (
-              <MenuItem key={projectRefUID} value={projectRefUID} sx={{ pl: 5 }}>
+              <MenuItem key={projectRefUID} value={projectRefUID}>
                 {name}
               </MenuItem>
             ))}

@@ -4,11 +4,12 @@ import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client'
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
+import type { ConnectProjectMember } from '@connect-shared/lib/projects/findProject';
 import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 
 export type OptimismProjectWithMembers = OptimismProjectAttestation & {
-  projectMembers: { farcasterId: number; name: string; farcasterUser: FarcasterProfile['body'] }[];
+  projectMembers: ConnectProjectMember[];
 };
 
 export const fetchUnimportedOptimismProjectsAction = authActionClient
@@ -86,7 +87,12 @@ export const fetchUnimportedOptimismProjectsAction = authActionClient
     return attestationsWithoutProject.map((attestation) => {
       const projectMembers = attestation.farcasterIds.map((fid) =>
         farcasterUserMap[fid]
-          ? { farcasterId: fid, name: farcasterUserMap[fid].displayName, farcasterUser: farcasterUserMap[fid] }
+          ? {
+              teamLead: fid === farcasterUser.fid,
+              farcasterId: fid,
+              name: farcasterUserMap[fid].displayName,
+              farcasterUser: { ...farcasterUserMap[fid], fid }
+            }
           : null
       );
 
