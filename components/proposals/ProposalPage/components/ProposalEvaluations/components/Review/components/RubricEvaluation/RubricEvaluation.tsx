@@ -36,7 +36,7 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
     [user?.id, !!evaluation?.draftRubricAnswers]
   );
 
-  const canViewRubricAnswers = isAdmin || canAnswerRubric;
+  const canViewRubricAnswers = isAdmin || canAnswerRubric || evaluation.shareReviews;
 
   async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
     if (proposal) {
@@ -61,7 +61,9 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
       {evaluationTabs.length > 0 && (
         <>
           <Alert severity='info'>
-            {canAnswerRubric
+            {evaluation.shareReviews
+              ? 'Evaluation results are anonymous'
+              : evaluation.isReviewer
               ? 'Evaluation results are only visible to Reviewers'
               : 'Only Reviewers can submit an evaluation'}
           </Alert>
