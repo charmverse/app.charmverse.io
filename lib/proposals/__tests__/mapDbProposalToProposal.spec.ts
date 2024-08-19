@@ -1,7 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
-import { v4 as uuid } from 'uuid';
 
 import { mockPermissions } from 'testing/mocks/proposal';
 import { generateUserAndSpace } from 'testing/setupDatabase';
@@ -24,10 +22,19 @@ describe('mapDbProposalToProposal', () => {
           rubricCriteria: [{ title: 'a question' }],
           evaluationType: 'rubric',
           title: 'Rubric',
-          permissions: [],
-          shareReviews: true
+          permissions: []
         }
       ]
+    });
+
+    // TODO: geenrator should allow passing in shareReviews
+    await prisma.proposalEvaluation.updateMany({
+      where: {
+        proposalId: id
+      },
+      data: {
+        shareReviews: true
+      }
     });
 
     const rubricCriteria = await prisma.proposalRubricCriteria.findFirstOrThrow({
