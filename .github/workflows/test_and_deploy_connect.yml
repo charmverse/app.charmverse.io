@@ -117,14 +117,6 @@ jobs:
           npm run lint -w apps/connect
           npm run typecheck -w apps/connect
 
-      - name: Validate Connect API
-        run: |
-          npm run lint -w apps/connect-api
-
-      # We need to fix jest transpilation before we can run connect API tests
-      # - name: 'Test Connect API'
-      #   run: 'npm run connect-api:test'
-
       - name: Validate Sunny Awards
         run: |
           npm run lint -w apps/sunnyawards
@@ -348,9 +340,6 @@ jobs:
           - name: Connect App
             stack: prd-connect
             ebextensions: .ebextensions_connect
-          - name: Connect API
-            stack: prd-connect-api
-            ebextensions: .ebextensions_connect_api
           - name: Sunny Awards
             stack: prd-sunnyawards
             ebextensions: .ebextensions_sunnyawards
@@ -442,9 +431,6 @@ jobs:
           done
 
           rm .ebextensions*/06_cloudwatch_alarm.config
-
-          # substituting the connect api domain name
-          sed -i 's/REACT_APP_CONNECT_API_HOST=.*/REACT_APP_CONNECT_API_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:4000/g' .ebstalk.apps.env/connect.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
