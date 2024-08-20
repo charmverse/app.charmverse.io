@@ -129,7 +129,12 @@ export const schema = yup.object({
       yup.object({
         name: yup.string().required(),
         farcasterId: yup.number().required(),
-        farcasterUser: yup.object()
+        farcasterUser: yup.object({
+          fid: yup.number().required(),
+          displayName: yup.string().required(),
+          pfpUrl: yup.string().required(),
+          username: yup.string().required()
+        })
       })
     )
     .required(),

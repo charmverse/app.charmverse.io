@@ -29,10 +29,6 @@ export function AddProjectMembersForm({
 
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
-  const selectedFarcasterProfiles = (control._formValues.projectMembers as ConnectProjectMember[]).filter(
-    (u) => u.farcasterId !== user.farcasterUser?.fid
-  );
-
   return (
     <Stack gap={1}>
       <FormLabel id='search-farcaster-user'>Team</FormLabel>
@@ -46,20 +42,20 @@ export function AddProjectMembersForm({
       <Stack gap={1}>
         <SearchFarcasterUser
           disabled={disabled}
-          filteredFarcasterIds={selectedFarcasterProfiles.map((profile) => profile.farcasterId).filter(isTruthy)}
+          filteredFarcasterIds={fields.map((profile) => profile.farcasterId).filter(isTruthy)}
           setSelectedProfile={(farcasterProfile) => {
             if (farcasterProfile) {
               append({
                 farcasterId: farcasterProfile.fid!,
                 name: farcasterProfile.displayName!,
-                farcasterUser: farcasterProfile
+                farcasterUser: farcasterProfile as Required<FarcasterProfile>
               });
             }
           }}
         />
       </Stack>
       <Stack gap={1} mb={2}>
-        {selectedFarcasterProfiles.map(({ farcasterUser }) => (
+        {fields.map(({ farcasterUser }) => (
           <FarcasterCard
             avatarSize='large'
             fid={farcasterUser.fid}
