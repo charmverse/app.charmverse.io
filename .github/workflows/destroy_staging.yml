@@ -29,7 +29,14 @@ jobs:
           short-length: 7
 
       - name: set STAGE variable in environment for next steps
-        run: echo "STAGE=${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}" >> $GITHUB_ENV
+        run: |
+          full_stage_name="${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
+
+          # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
+          stage_name=`echo "$full_stage_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
+
+          # export the stage name so that it can be used in other steps
+          echo "STAGE_SUFFIX=$stage_name" >> $GITHUB_ENV
 
       - name: checkout the files
         uses: actions/checkout@v4
@@ -40,17 +47,35 @@ jobs:
       - name: destroy the stack on AWS
         # we need to create a dummy zip file or else cdk throws an error it cannot find the asset
         run: |
-          touch stg-webapp-${{ env.STAGE }}.zip
-          touch stg-connect-${{ env.STAGE }}.zip
-          touch stg-sunnyawards-${{ env.STAGE }}.zip
+          touch stg-webapp-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-connect-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-sunnyawards-${{ env.STAGE_SUFFIX }}.zip
           npm install aws-cdk-lib --no-audit --no-fund
-          npx cdk destroy -c name=stg-webapp-${{ env.STAGE }} --force
-          npx cdk destroy -c name=stg-connect-${{ env.STAGE }} --force
-          npx cdk destroy -c name=stg-sunnyawards-${{ env.STAGE }} --force
-          npx cdk destroy -c name=stg-farcaster-${{ env.STAGE }} --force
+          npx cdk destroy -c name=stg-webapp-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-connect-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-sunnyawards-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-farcaster-${{ env.STAGE_SUFFIX }} --force
 
-      - name: delete the github deployments and the corresponding environment
+      - name: delete the webapp github deployment
         uses: strumwolf/delete-deployment-environment@v1.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: ${{ env.STAGE }}
+          environment: stg-webapp-${{ env.STAGE_SUFFIX }}
+
+      - name: delete the connect github deployment
+        uses: strumwolf/delete-deployment-environment@v1.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-connect-${{ env.STAGE_SUFFIX }}
+
+      - name: delete the sunnyawards github deployment
+        uses: strumwolf/delete-deployment-environment@v1.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-sunnyawards-${{ env.STAGE_SUFFIX }}
+
+      - name: delete the farcaster github deployment
+        uses: strumwolf/delete-deployment-environment@v1.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-farcaster-${{ env.STAGE_SUFFIX }}
