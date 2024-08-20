@@ -6,9 +6,19 @@ import { prettyPrint } from 'lib/utils/strings';
  */
 
 async function query() {
-  const productUpdatesFrames = await prisma.productUpdatesFarcasterFrame.findMany();
-
-  prettyPrint(productUpdatesFrames);
+  const result = await prisma.space.findUnique({
+    where: {
+      domain: 'playgotchi'
+    },
+    include: {
+      spaceRoles: {
+        include: {
+          user: true
+        }
+      }
+    }
+  });
+  console.log(result);
 }
 
 query();

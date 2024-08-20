@@ -6,7 +6,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { spaceTemplateCookie } from 'components/common/CreateSpaceForm/constants';
+import { magicLinkEmailCookie } from 'config/constants';
 import { registerBeehiivSubscription } from 'lib/beehiiv/registerBeehiivSubscription';
+import { sendMagicLink } from 'lib/google/sendMagicLink';
 import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
 import { sendSignupEvent as sendLoopSignupEvent } from 'lib/loopsEmail/sendSignupEvent';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -30,10 +32,12 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
 
   const updatedUser = await updateUserProfile(userId, payload);
 
+  const cookies = new Cookies(req, res);
+
   if (updatedUser.email && updatedUser.emailNewsletter && payload.spaceId) {
     try {
       // retrieve space template used via cookie
-      const spaceTemplate = new Cookies(req, res).get(spaceTemplateCookie);
+      const spaceTemplate = cookies.get(spaceTemplateCookie);
 
       const space = await prisma.space.findUniqueOrThrow({
         where: {
@@ -54,6 +58,31 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
       }
     } catch (error) {
       log.error('Could not register user with Loop', { error, userId });
+    }
+  }
+  if (updatedUser.email) {
+    const verifiedEmail = await prisma.verifiedEmail.count({
+      where: {
+        email: updatedUser.email
+      }
+    });
+    if (verifiedEmail === 0) {
+      // see if user wants to verify their email address for logging in later
+      await sendMagicLink({
+        spaceId: payload.spaceId,
+        to: { email: updatedUser.email, userId: updatedUser.id, displayName: updatedUser.username }
+      })
+        .then(() => {
+          log.info('Sent magic link to verify notification email', { userId: updatedUser.id });
+          cookies.set(magicLinkEmailCookie, updatedUser.email, {
+            httpOnly: false,
+            sameSite: 'strict',
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) // 7 days
+          });
+        })
+        .catch((error) => {
+          log.warn('Error sending magic link to verify user email', { error, userId: updatedUser.id });
+        });
     }
   }
   return res.status(200).end();
