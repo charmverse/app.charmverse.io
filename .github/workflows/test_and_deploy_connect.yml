@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.ebextensions*/**'
+      - '.ebextensions/**'
       - '.ebstalk.apps.env/**'
       - '.github/**'
       - 'package.json'
@@ -23,7 +23,7 @@ on:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
-      - '.ebextensions*/**'
+      - '.ebextensions/**'
       - '.ebstalk.apps.env/**'
       - '.github/**'
       - 'package.json'
@@ -339,10 +339,10 @@ jobs:
         include:
           - name: Connect App
             stack: prd-connect
-            ebextensions: .ebextensions_connect
+            ebextensions: connect
           - name: Sunny Awards
             stack: prd-sunnyawards
-            ebextensions: .ebextensions_sunnyawards
+            ebextensions: sunnyawards
     steps:
       - uses: actions/checkout@v4
         with:
@@ -360,11 +360,11 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: |
+            mv .ebextensions .ebextensions_tmp && mv .ebextensions_tmp/${{ matrix.ebextensions }} .ebextensions
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' ${{ matrix.ebextensions }}/00_env_vars.config
-            rm -rf .ebextensions && mv ${{ matrix.ebextensions }} .ebextensions
+              ' .ebextensions/00_env_vars.config
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -415,7 +415,7 @@ jobs:
 
       - name: Replace env_var with staging settings
         run: |
-          ebextension_files=$(ls .ebextensions*/00_env_vars.config)
+          ebextension_files=$(ls .ebextensions/*/00_env_vars.config)
           ebstalk_apps_env_files=$(ls .ebstalk.apps.env/*)
 
           for conf_file in $ebextension_files $ebstalk_apps_env_files; do
@@ -426,41 +426,11 @@ jobs:
           # modifying cloudformation alarm to send alerts to test sns topic.
           #  leaving it in even if we're deleting the config before deploying
           #  Useful to avoid accidental triggering to system-status channel.
-          for conf_file in .ebextensions*/06_cloudwatch_alarm.config; do
+          for conf_file in .ebextensions/*/06_cloudwatch_alarm.config; do
             sed -i 's/Production-Alerts/lambda-test-debug/g' $conf_file
           done
 
-          rm .ebextensions*/06_cloudwatch_alarm.config
-
-      - name: Set the docker compose env variables
-        uses: mikefarah/yq@master
-        with:
-          cmd: |
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_connect/00_env_vars.config
-
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_sunnyawards/00_env_vars.config
-
-      - name: Parse compose profile to see if we need to enable datadog
-        id: get_compose_profiles
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions/00_env_vars.config
-
-      - name: Set DDENABLED variable in environment for build and deploy steps
-        run: |
-          cat  .ebextensions/00_env_vars.config
-          COMPOSE_PROFILES=${{ steps.get_compose_profiles.outputs.result }}
-          if [[ "$COMPOSE_PROFILES" =~ ddtst ]]; then
-            echo "DDENABLED=true" >> $GITHUB_ENV
-          fi
+          rm .ebextensions/*/06_cloudwatch_alarm.config
 
       - name: Create a github deployment
         uses: bobheadxi/deployments@v1
@@ -485,13 +455,24 @@ jobs:
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') }}"
         # aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
         run: |
-          rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
+          mv .ebextensions ebextensions_tmp
+          rm -rf .ebextensions && mv .ebextensions_tmp/connect .ebextensions
 
       - name: Override config with Sunny Awards
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') }}"
         # aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
         run: |
-          rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
+          rm -rf .ebextensions && mv .ebextensions_tmp/sunnyawards .ebextensions
+
+      - name: Set the docker compose env variables
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions/00_env_vars.config
 
       - name: Deploy to staging
         id: cdk_deploy
