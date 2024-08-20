@@ -1,4 +1,3 @@
-import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { Divider, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { Controller, type Control } from 'react-hook-form';
 
@@ -24,7 +23,7 @@ export function ImportOptimismProject({
       <Controller
         control={control}
         name='projectRefUIDToImport'
-        render={({ field, fieldState }) => (
+        render={({ field }) => (
           <Select
             displayEmpty
             fullWidth
