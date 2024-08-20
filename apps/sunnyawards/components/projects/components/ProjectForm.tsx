@@ -2,6 +2,7 @@
 
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
+import { FormErrors } from '@connect-shared/components/project/FormErrors';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { Box, FormLabel, ListSubheader, MenuItem, Select, Stack, TextField, Typography, Button } from '@mui/material';
@@ -15,7 +16,6 @@ import { PROJECT_CATEGORIES, PROJECT_TYPES } from 'lib/projects/schema';
 
 import { AddProjectMembersForm } from './AddProjectMembersForm';
 import { BlockchainSelect } from './BlockchainSelect';
-import { FormErrors } from './FormErrors';
 import { ProjectImageField } from './ProjectImageField';
 
 export function ProjectForm({

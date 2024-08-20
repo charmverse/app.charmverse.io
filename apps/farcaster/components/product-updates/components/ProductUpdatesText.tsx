@@ -21,8 +21,8 @@ export function ProductUpdatesText({
       style={{
         paddingLeft: 20,
         paddingRight: 20,
-        paddingBottom: 10,
-        paddingTop: 10,
+        paddingBottom: 8,
+        paddingTop: 8,
         height: '100%',
         backgroundColor: 'white',
         display: 'flex',
@@ -35,7 +35,7 @@ export function ProductUpdatesText({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingBottom: 12
+          paddingBottom: 8
         }}
       >
         <div
@@ -62,12 +62,12 @@ export function ProductUpdatesText({
           </p>
         </div>
         <img
-          width={150}
-          height={150}
+          width={85}
+          height={85}
           style={{
             objectFit: 'contain'
           }}
-          src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.webp`}
+          src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.png`}
         />
       </div>
       <div style={{ width: '100%', height: 2, backgroundColor: 'black' }} />
@@ -75,7 +75,7 @@ export function ProductUpdatesText({
         style={{
           display: 'flex',
           flexDirection: 'column',
-          marginTop: 15
+          marginTop: 10
         }}
       >
         {lines.map((line, index) => {
@@ -94,8 +94,8 @@ export function ProductUpdatesText({
               <p
                 style={{
                   wordBreak: 'break-word',
-                  marginTop: -4,
-                  lineHeight: 1.75
+                  marginTop: -2,
+                  lineHeight: 1.25
                 }}
               >
                 {numberReplacedLine}

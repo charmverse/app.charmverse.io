@@ -7,7 +7,19 @@ import { Controller } from 'react-hook-form';
 
 import { ProjectImageField } from './ProjectImageField';
 
-export function ProjectForm({ control, showCategory }: { control: Control<FormValues>; showCategory?: boolean }) {
+export function ProjectForm({
+  control,
+  showCategory,
+  isCategoryRequired = true,
+  isDescriptionRequired = true,
+  isWebsitesRequired = true
+}: {
+  control: Control<FormValues>;
+  showCategory?: boolean;
+  isDescriptionRequired?: boolean;
+  isWebsitesRequired?: boolean;
+  isCategoryRequired?: boolean;
+}) {
   return (
     <Stack gap={2}>
       <Stack>
@@ -37,7 +49,7 @@ export function ProjectForm({ control, showCategory }: { control: Control<FormVa
         />
       </Stack>
       <Stack>
-        <FormLabel required id='project-description'>
+        <FormLabel required={isDescriptionRequired} id='project-description'>
           Description
         </FormLabel>
         <Controller
@@ -62,12 +74,12 @@ export function ProjectForm({ control, showCategory }: { control: Control<FormVa
         label='Websites'
         data-test='project-form-websites'
         placeholder='https://charmverse.io'
-        required
+        required={isWebsitesRequired}
       />
 
       {showCategory && (
         <Stack>
-          <FormLabel required id='project-category'>
+          <FormLabel required={isCategoryRequired} id='project-category'>
             Category
           </FormLabel>
           <Controller
