@@ -15,6 +15,7 @@ WORKDIR /app
 COPY --parents @connect-shared  \
   apps/connect/package.json     \
   apps/sunnyawards/package.json \
+  apps/farcaster/package.json   \
   node_modules                  \
   apps/sunnyawards/node_modules \
   apps/sunnyawards/package.json \
