@@ -10,10 +10,10 @@ describe('mapProjectToGitcoin', () => {
     const input: ConnectProjectDetails = {
       id: '1',
       name: 'Project X',
+      sunnyAwardsNumber: 12,
       createdBy,
       optimismCategory: null,
       sunnyAwardsCategory: null,
-      sunnyAwardsNumber: 0,
       description: 'A sample project',
       avatar: 'avatar.png',
       coverImage: 'cover.jpg',
@@ -37,6 +37,8 @@ describe('mapProjectToGitcoin', () => {
             displayName: 'Alice'
           },
           teamLead: true,
+          farcasterId: 123,
+          name: 'Alice',
           userId: createdBy
         },
         {
@@ -48,7 +50,9 @@ describe('mapProjectToGitcoin', () => {
             displayName: 'Bob'
           },
           teamLead: false,
-          userId: v4()
+          farcasterId: 456,
+          name: 'Bob',
+          userId: null
         }
       ]
     };
