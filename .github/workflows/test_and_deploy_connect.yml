@@ -462,6 +462,7 @@ jobs:
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') }}"
         # aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
         run: |
+          mv .ebextensions ebextensions_tmp
           rm -rf .ebextensions && mv .ebextensions_tmp/sunnyawards .ebextensions
 
       - name: Set the docker compose env variables
