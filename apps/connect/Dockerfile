@@ -11,11 +11,13 @@ RUN apt install openssl -y
 WORKDIR /app
 
 # Copy dependencies
-COPY --parents @connect-shared \
-  node_modules                 \
-  apps/*/node_modules          \
-  package.json                 \
-  apps/*/package.json          \
+COPY --parents @connect-shared  \
+  apps/farcaster/package.json   \
+  apps/sunnyawards/package.json \
+  node_modules                  \
+  package.json                  \
+  apps/connect/node_modules     \
+  apps/connect/package.json     \
   .
 
 # Copy compiled code

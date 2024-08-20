@@ -16,8 +16,8 @@ COPY --parents @connect-shared  \
   apps/connect/package.json     \
   apps/sunnyawards/package.json \
   node_modules                  \
-  apps/farcaster/node_modules   \
   package.json                  \
+  apps/farcaster/node_modules   \
   apps/farcaster/package.json   \
   .
 
