@@ -309,8 +309,8 @@ const templates = {
     });
   },
   'Email verification': () => {
-    return emails.getEmailVerification({
-      verificationUrl: 'https://apps.com'
+    return emails.getMagicLinkEmail({
+      magicLink: 'https://apps.com'
     });
   }
 };
