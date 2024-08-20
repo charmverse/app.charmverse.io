@@ -40,7 +40,7 @@ export async function ShareProjectPage({ path }: { path: string }) {
         alt='Charmverse Connect homepage'
       />
       <Typography align='center' variant='h4'>
-        Congratulations! your project has just entered the Sunny Awards
+        Congratulations! Your project has just entered the SUNNYs
       </Typography>
       <Typography align='center'>Share the good news!</Typography>
       <Stack flexDirection={{ md: 'row' }} gap={4}>

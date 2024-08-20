@@ -22,7 +22,7 @@ export default async function ProjectPage({ params }: { params: { path: string }
           <meta name='fc:frame' content='vNext' />
           <meta name='fc:frame:image' content={project.farcasterFrameImage} />
           {/* Button 1 */}
-          <meta name='fc:frame:button:1' content='Sunny Awards' />
+          <meta name='fc:frame:button:1' content='SUNNY Awards' />
           <meta name='fc:frame:button:1:action' content='link' />
           <meta name='fc:frame:button:1:target' content='https://thesunnyawards.fun' />
           {/* Button 2 */}

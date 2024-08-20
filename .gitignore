@@ -33,10 +33,6 @@ serverless/*.node
 /apps/sunnyawards/dist/
 /apps/sunnyawards/node_modules/
 
-# connect api
-/apps/connect-api/dist/
-/apps/connect/node_modules/
-
 # Tests
 /__e2e-dist__/
 

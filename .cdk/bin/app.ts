@@ -2,7 +2,6 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { WebappStagingStack } from '../WebappStagingStack';
-import { ConnectStagingStack } from '../ConnectStagingStack';
 import { ProductionStack } from '../ProductionStack';
 import { StagingStack } from '../StagingStack';
 
@@ -30,7 +29,7 @@ else if (stackNameParam.startsWith('prd')) {
 }
 // Connect staging
 else if (stackNameParam.startsWith('stg-connect')) {
-  new ConnectStagingStack(app, stackNameParam, deployProps);
+  new StagingStack(app, stackNameParam, deployProps);
 }
 // Sunny awards staging
 else if (stackNameParam.startsWith('stg-sunnyawards')) {

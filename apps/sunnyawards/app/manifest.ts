@@ -3,9 +3,9 @@ import type { MetadataRoute } from 'next';
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: 'sunnyawards',
-    name: 'Sunny Awards',
-    short_name: 'Sunny Awards',
-    description: 'Celebrate Onchain Summer with the Sunny Awards',
+    name: 'SUNNY Awards',
+    short_name: 'SUNNY Awards',
+    description: 'Celebrate Onchain Summer with the SUNNY Awards',
     start_url: '/',
     display: 'standalone',
     background_color: '#fff',

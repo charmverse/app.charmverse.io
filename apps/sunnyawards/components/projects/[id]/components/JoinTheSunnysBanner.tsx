@@ -50,7 +50,7 @@ export function JoinTheSunnysBanner() {
           alignItems: 'center'
         }}
       >
-        <TextOverlay>Join The Sunnys</TextOverlay>
+        <TextOverlay>Join The SUNNYs</TextOverlay>
         <CardMedia component='img' height='100' image='/images/sunny-banner.jpeg' />
         {/* <Image
         src='/images/sunny-banner.jpg'
