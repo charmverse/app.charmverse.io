@@ -1,7 +1,5 @@
 // playwright-dev-page.ts
-import { expect } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
-
 import { baseUrl } from '@root/config/constants';
 
 // capture actions on the pages in signup flow

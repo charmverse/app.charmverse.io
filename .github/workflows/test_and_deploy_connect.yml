@@ -9,7 +9,7 @@ on:
       - '.github/**'
       - 'package.json'
       - 'package-lock.json'
-      - 'apps/connect/**'
+      - 'apps/scoutgame/**'
       - 'apps/sunnyawards/**'
       - '@connect-shared/**'
       - 'abis/**'
@@ -28,7 +28,7 @@ on:
       - '.github/**'
       - 'package.json'
       - 'package-lock.json'
-      - 'apps/connect/**'
+      - 'apps/scoutgame/**'
       - '@connect-shared/**'
       - 'abis/**'
       - 'adapters/**'
@@ -114,8 +114,8 @@ jobs:
 
       - name: Validate Webapp
         run: |
-          npm run lint -w apps/connect
-          npm run typecheck -w apps/connect
+          npm run lint -w apps/scoutgame
+          npm run typecheck -w apps/scoutgame
 
       - name: Validate Sunny Awards
         run: |
@@ -156,9 +156,9 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build_connect
 
-      - name: Start connect app
+      - name: Start scoutgame app
         run: |
-          npm run connect:start:test:ci &> connect.log &
+          npm run scoutgame:start:test:ci &> connect.log &
           sleep_loop_ct=0
           until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -183,7 +183,7 @@ jobs:
                       --network "host"  \
                       --ipc=host \
                       mcr.microsoft.com/playwright:v1.42.1-jammy \
-                      npm run connect:test:e2e:ci
+                      npm run scoutgame:test:e2e:ci
 
   test-sunnyawards-e2e:
     name: Test Sunny Awards e2e
@@ -271,7 +271,7 @@ jobs:
 
       - name: Update Dockerfile
         run: |
-          rm Dockerfile && mv apps/connect/Dockerfile Dockerfile
+          rm Dockerfile && mv apps/scoutgame/Dockerfile Dockerfile
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -315,7 +315,7 @@ jobs:
 
       - name: Upload static assets to S3
         run: |
-          aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+          aws s3 sync apps/scoutgame/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
           aws s3 sync apps/sunnyawards/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Upload JS source maps to Datadog
@@ -323,7 +323,7 @@ jobs:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         run: |
           npm install -g @datadog/datadog-ci
-          datadog-ci sourcemaps upload apps/connect/.next/static       \
+          datadog-ci sourcemaps upload apps/scoutgame/.next/static       \
             --service=connect                              \
             --release-version=${{ steps.get_build_id.outputs.build_id }}  \
             --minified-path-prefix=https://cdn.charmverse.io/_next/static
@@ -339,7 +339,7 @@ jobs:
         include:
           - name: Connect App
             stack: prd-connect
-            ebextensions: .ebextensions_connect
+            ebextensions: .ebextensions_scoutgame
           - name: Sunny Awards
             stack: prd-sunnyawards
             ebextensions: .ebextensions_sunnyawards
@@ -440,7 +440,7 @@ jobs:
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_connect/00_env_vars.config
+              ' .ebextensions_scoutgame/00_env_vars.config
 
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
@@ -479,13 +479,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Override config with Connect app
+      - name: Override config with scoutgame app
         # wrap the condition in "${{}}" because the string includes a colon
         # see https://github.com/actions/runner/issues/1019
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') }}"
-        # aws s3 sync apps/connect/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+        # aws s3 sync apps/scoutgame/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
         run: |
-          rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
+          rm -rf .ebextensions && mv .ebextensions_scoutgame .ebextensions
 
       - name: Override config with Sunny Awards
         if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') }}"

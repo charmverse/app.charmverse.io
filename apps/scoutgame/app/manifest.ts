@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    id: 'connect',
-    name: 'Charm Connect - Onchain builder network',
-    short_name: 'Charm Connect',
+    id: 'scoutgame',
+    name: 'Scout Game - Onchain builder network',
+    short_name: 'Scout Game',
     description: 'Onchain network for connecting web3 developers, projects, organizations',
     start_url: '/',
     display: 'standalone',

@@ -17,7 +17,7 @@ export const waitlistGetDetails: FrameButtonLink = {
 export const waitlistGet1000Points: FrameButtonLink = {
   label: 'Get +1000 points',
   action: 'link',
-  target: 'https://connect.charmverse.io'
+  target: 'https://scoutgame.xyz'
 };
 
 function shareFrameUrl(fid: string | number): string {
