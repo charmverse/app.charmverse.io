@@ -24,7 +24,7 @@ export function useOnboarding({ spaceId, user }: { spaceId?: string; user: Logge
   const showOnboardingFlow =
     !isLoadingMembersForSpace && isSpacesLoaded && !spaceMember?.isGuest && spaceMember?.onboarded === false;
   // Maybe in the future we could save this as a flag, but assume if user has joined a space already then they've already seen the terms and conditions
-  const hasSeenTermsAndConditions = false; // spaces.length > 1;
+  const hasSeenTermsAndConditions = spaces.length > 1;
   const onboardingStep: OnboardingStep = hasSeenTermsAndConditions ? 'profile_step' : 'email_step';
 
   return {
