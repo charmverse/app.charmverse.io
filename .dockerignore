@@ -3,7 +3,7 @@
 .ebstalk.app.env/*
 .github
 .gitignore
-.ebextensions*
+.ebextensions/*
 .cdk
 .vscode
 __e2e__

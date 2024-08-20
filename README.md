@@ -357,7 +357,7 @@ aws secretsmanager create-secret --name /io.cv.app/shared/discord --secret-strin
 
 **_Add template mustache to pull secrets when deploying:_**
 
-In `.ebextensions/00_env_vars.config` add the mustache placeholder lines so beanstalk can pull the secret and
+In `.ebextensions/webapp/00_env_vars.config` add the mustache placeholder lines so beanstalk can pull the secret and
 set it to the right environment variable.
 
 Format of the mustache placeholder is:
@@ -392,7 +392,7 @@ Should/when Secrets Manager template variable placeholder becomes supported in E
 ## To set up datadog in staging environment
 
 Normally datadog agent is not deployed in the staging environment. To run datadog agent in staging environment edit
-`.ebextensions/00_env_vars.config` and append `,ddtst` to the `COMPOSE_PROFILES` (Note you'll want to separate the profiles with a comma)
+`.ebextensions/webapp/00_env_vars.config` and append `,ddtst` to the `COMPOSE_PROFILES` (Note you'll want to separate the profiles with a comma)
 
 ## Running storybook
 
