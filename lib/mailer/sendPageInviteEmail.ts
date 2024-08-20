@@ -1,5 +1,5 @@
 import { getPageInviteEmail } from './emails/emails';
-import type { PageInviteEmailProps } from './emails/templates/PageInviteEmail';
+import type { PageInviteEmailProps } from './emails/templates/PageInviteTemplate';
 import type { EmailRecipient } from './mailer';
 import { sendEmail } from './mailer';
 
