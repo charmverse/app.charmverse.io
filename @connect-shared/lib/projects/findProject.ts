@@ -101,7 +101,7 @@ export async function findProject({ id, path }: { id?: string; path?: string }):
         ...member.user,
         userId: member.userId,
         teamLead: member.teamLead,
-        name: farcasterUser?.displayName as string,
+        name: farcasterUser?.displayName || '',
         farcasterId: member.user?.farcasterUser?.fid as number,
         farcasterUser: {
           fid: member.user?.farcasterUser?.fid,

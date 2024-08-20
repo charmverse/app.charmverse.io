@@ -12,7 +12,7 @@ export type OptimismProjectWithMembers = OptimismProjectAttestation & {
   projectMembers: ConnectProjectMember[];
 };
 
-export const fetchUnimportedOptimismProjectsAction = authActionClient
+export const getUnimportedOptimismProjectsAction = authActionClient
   .metadata({ actionName: 'fetch-unimported-projects' })
   .action(async ({ ctx }) => {
     const currentUserId = ctx.session.user.id;

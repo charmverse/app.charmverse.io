@@ -1,7 +1,7 @@
 import { Divider, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { Controller, type Control } from 'react-hook-form';
 
-import type { OptimismProjectWithMembers } from 'lib/projects/fetchUnimportedOptimismProjectsAction';
+import type { OptimismProjectWithMembers } from 'lib/projects/getUnimportedOptimismProjectsAction';
 import type { FormValues } from 'lib/projects/schema';
 
 export function ImportOptimismProject({

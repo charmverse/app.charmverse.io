@@ -10,7 +10,7 @@ describe('mapProjectToGitcoin', () => {
     const input: ConnectProjectDetails = {
       id: '1',
       name: 'Project X',
-      sunnyAwardsNumber: null,
+      sunnyAwardsNumber: 12,
       createdBy,
       optimismCategory: null,
       sunnyAwardsCategory: null,

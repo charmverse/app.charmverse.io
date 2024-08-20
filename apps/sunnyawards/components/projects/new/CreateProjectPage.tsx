@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form';
 import type { Address } from 'viem';
 
 import { createProjectAction } from 'lib/projects/createProjectAction';
-import type { OptimismProjectWithMembers } from 'lib/projects/fetchUnimportedOptimismProjectsAction';
+import type { OptimismProjectWithMembers } from 'lib/projects/getUnimportedOptimismProjectsAction';
 import type { FormValues } from 'lib/projects/schema';
 import { schema } from 'lib/projects/schema';
 
@@ -53,7 +53,7 @@ export function CreateProjectPage({
     }
   });
 
-  const { control, handleSubmit, setValue, trigger } = useForm<FormValues>({
+  const { control, handleSubmit, setValue, trigger, reset } = useForm<FormValues>({
     defaultValues: {
       name: '',
       description: '',
@@ -80,37 +80,19 @@ export function CreateProjectPage({
     // Casting as partial in case project was created before a metadata schema change
     const metadata = project.metadata as Partial<OptimismProject>;
 
-    setValue('name', project.name);
-
-    setValue('description', metadata.description || '');
-    setValue('websites', metadata.socialLinks?.website || []);
-    setValue('twitter', metadata.socialLinks?.twitter || '');
-    setValue('github', metadata.github?.[0] || '');
-    setValue('farcasterValues', metadata.socialLinks?.farcaster || []);
-
-    setValue('avatar', metadata.projectAvatarUrl || '');
-    setValue('coverImage', metadata.projectCoverImageUrl || '');
-
-    if (metadata.contracts?.[0]) {
-      setValue('primaryContractChainId', metadata.contracts[0].chainId.toString());
-      setValue('primaryContractAddress', metadata.contracts[0].address as Address);
-    }
-
-    setValue('projectMembers', project.projectMembers);
-
-    setValue(
-      'projectMembers',
-      project.projectMembers.map(
-        (member) =>
-          ({
-            farcasterId: member.farcasterUser.fid,
-            name: member.farcasterUser.displayName,
-            farcasterUser: member.farcasterUser
-          } as FormValues['projectMembers'][0])
-      ) || []
-    );
-
-    trigger('name');
+    reset({
+      name: project.name,
+      description: metadata.description || '',
+      websites: metadata.socialLinks?.website || [],
+      twitter: metadata.socialLinks?.twitter || '',
+      github: metadata.github?.[0] || '',
+      farcasterValues: metadata.socialLinks?.farcaster || [],
+      avatar: metadata.projectAvatarUrl || '',
+      coverImage: metadata.projectCoverImageUrl || '',
+      primaryContractChainId: metadata.contracts?.[0]?.chainId.toString() || '',
+      primaryContractAddress: metadata.contracts?.[0]?.address as Address,
+      projectMembers: project.projectMembers
+    });
   }
 
   return (
