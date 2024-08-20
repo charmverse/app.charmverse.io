@@ -6,7 +6,7 @@ import { http, HttpResponse } from 'msw';
 import { useState } from 'react';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
-import { SettingsContent } from 'components/settings/SettingsContent';
+import { SettingsContent } from 'components/settings/components/SettingsContent';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { VerifyLoginOtpProvider } from 'hooks/useVerifyLoginOtp';
 

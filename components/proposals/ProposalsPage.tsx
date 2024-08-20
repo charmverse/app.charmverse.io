@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
-import CharmEditor from 'components/common/CharmEditor/CharmEditor';
+import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/specRegistry';
 import Table from 'components/common/DatabaseEditor/components/table/table';
 import { ViewFilterControl } from 'components/common/DatabaseEditor/components/ViewFilterControl';

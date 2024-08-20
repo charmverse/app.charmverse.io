@@ -1,10 +1,11 @@
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Divider, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { FieldAnswers } from 'components/common/ProjectForm/components/FieldAnswers';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectMember } from 'lib/projects/constants';
 import {
@@ -14,10 +15,7 @@ import {
 } from 'lib/projects/formField';
 import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
-import { FieldAnswers } from './FieldAnswers';
-import { ProjectMemberFieldAnswers } from './ProjectMemberFields';
-
-export function ProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean }) {
+export function ProjectForm({ isTeamLead }: { isTeamLead: boolean }) {
   const { watch, setValue, control } = useFormContext<ProjectAndMembersPayload>();
   const projectValues = watch();
   const { user } = useUser();
@@ -37,10 +35,11 @@ export function ProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean }) {
         Team Info
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
-      <ProjectMemberFieldAnswers
-        projectMemberIndex={0}
+      <FieldAnswers
         disabled={!isTeamLead}
+        namePrefix='projectMembers[0]'
         fieldConfig={fieldConfig?.projectMember}
+        properties={projectMemberFieldProperties}
       />
       {extraProjectMembers.length ? (
         <>
@@ -54,26 +53,23 @@ export function ProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean }) {
               <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
                 <Typography variant='h6'>Team member</Typography>
                 {isTeamLead ? (
-                  <IconButton
-                    data-test='delete-project-member-button'
-                    onClick={() => {
-                      remove(index + 1);
-                    }}
-                  >
-                    <DeleteOutlineOutlinedIcon fontSize='small' color='error' />
-                  </IconButton>
+                  <Tooltip title='Remove team member'>
+                    <IconButton
+                      data-test='delete-project-member-button'
+                      onClick={() => {
+                        remove(index + 1);
+                      }}
+                    >
+                      <DeleteOutlineOutlinedIcon fontSize='small' color='secondary' />
+                    </IconButton>
+                  </Tooltip>
                 ) : null}
               </Stack>
               <FieldAnswers
                 disabled={!(isTeamLead || projectMember.userId === user?.id)}
-                name={`projectMembers[${index + 1}]`}
+                namePrefix={`projectMembers[${index + 1}]`}
                 fieldConfig={fieldConfig?.projectMember}
                 properties={projectMemberFieldProperties}
-              />
-              <ProjectMemberFieldAnswers
-                projectMemberIndex={index + 1}
-                disabled={!(isTeamLead || projectMember.userId === user?.id)}
-                fieldConfig={fieldConfig?.projectMember}
               />
             </Stack>
           ))}
@@ -84,12 +80,7 @@ export function ProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean }) {
           my: 1
         }}
       />
-      <Box
-        sx={{
-          mb: 2,
-          width: 'fit-content'
-        }}
-      >
+      <Box mb={2} width='fit-content'>
         <Button
           disabled={!isTeamLead}
           disabledTooltip='Only the team lead can add team members'

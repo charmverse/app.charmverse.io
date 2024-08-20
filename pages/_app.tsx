@@ -18,6 +18,7 @@ import { SWRConfig } from 'swr';
 import charmClient from 'charmClient';
 import { BaseAuthenticateProviders } from 'components/_app/BaseAuthenticateProviders';
 import { Snackbar } from 'components/_app/components/Snackbar';
+import { WagmiProvider } from 'components/_app/components/WagmiProvider';
 import { GlobalComponents } from 'components/_app/GlobalComponents';
 import { LocalizationProvider } from 'components/_app/LocalizationProvider';
 import type { OpenGraphProps } from 'components/_app/OpenGraphData';
@@ -100,7 +101,6 @@ import 'theme/databases/databases.main.scss';
 import 'theme/print.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
-import { WagmiProvider } from '../components/_app/components/WagmiProvider';
 
 // Prosemirror tables
 import 'components/common/CharmEditor/components/table/ui/czi-table-grid-size-editor.css';

@@ -1,98 +1,59 @@
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
+import { baseUrl } from '@root/config/constants';
 
 export function ProjectShareItem({ project }: { project: NonNullable<ConnectProjectDetails> }) {
-  const projectMembers = project.projectMembers;
-  const projectName = project.name || 'Untitled';
+  const projectName = project.name?.substring(0, 30) || 'Untitled';
   const defaultFont =
     'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
-
-  const randomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
 
   const cardStyle = {
     position: 'relative',
     width: '500px',
+    height: '260px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
     padding: '0',
     fontFamily: defaultFont,
-    color: '#37352f',
-    backgroundColor: '#fff'
+    backgroundImage: `url(${baseUrl}/images/project-share.jpg)`,
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center center',
+    color: '#d8be7d'
   } as const;
 
   const mediaStyle = {
     objectFit: 'cover',
     objectPosition: 'center',
     width: '100%',
-    height: '100px'
+    height: '100%'
   } as const;
 
   const avatarStyle = {
-    position: 'absolute',
-    top: '50px',
-    left: '25px',
-    border: '1px solid #e0e0e0',
-    borderRadius: '25px',
+    borderRadius: '50%',
     objectFit: 'cover'
   } as const;
 
-  const descriptionStyle = {
-    overflow: 'hidden',
-    margin: 0,
-    padding: 0
-  } as const;
-
   const memberStackStyle = {
+    position: 'absolute',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
-    padding: '15px 24px',
-    marginTop: '45px'
+    alignItems: 'center',
+    gap: '4px',
+    top: '64px',
+    left: '165px',
+    maxWidth: '130px',
+    wordBreak: 'break-all'
   } as const;
 
   return (
     <div style={cardStyle}>
-      {project.coverImage ? (
-        <img style={mediaStyle} src={project.coverImage} alt={projectName} width='100%' />
-      ) : (
-        <div
-          style={{
-            background: `linear-gradient(to right,${randomColor()}, ${randomColor()} )`,
-            width: '100%',
-            height: '100px'
-          }}
-        />
-      )}
-      {project.avatar ? (
-        <img style={avatarStyle} src={project.avatar || ''} alt={project.name} width='100px' height='100px' />
-      ) : (
-        <div
-          style={{
-            background: 'grey',
-            width: '100px',
-            height: '100px'
-          }}
-        />
-      )}
+      <img src={`${baseUrl}/images/project-share.jpg`} alt='Project Share' style={mediaStyle} />
       <div style={memberStackStyle}>
-        <h1 style={{ fontWeight: 400, fontSize: '1.5rem', margin: 0, padding: 0 }}>{projectName}</h1>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
-          {projectMembers.map((member) => (
-            <img
-              key={member.farcasterUser.fid}
-              style={{ width: '30px', height: '30px', borderRadius: '50%', margin: '4px' }}
-              src={member.farcasterUser.pfpUrl || ''}
-              alt={member.farcasterUser.username || 'Untitled'}
-            />
-          ))}
-        </div>
+        <h1 style={{ fontWeight: 400, fontSize: '1rem', margin: 0, padding: 0 }}>{projectName}</h1>
+        <h2 style={{ fontWeight: 400, fontSize: '0.8rem', margin: 0, padding: 0 }}>
+          Ticket No: {project.sunnyAwardsNumber}
+        </h2>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
-    <PageWrapper>
+    <PageWrapper bgcolor='transparent'>
       <Box display='flex' gap={2} flexDirection='column'>
         <Typography align='center' my={2}>
           This is your profile. You can use it to create projects which can be used with Optimism's grant programs.

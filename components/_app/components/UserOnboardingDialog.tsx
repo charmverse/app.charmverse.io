@@ -18,7 +18,7 @@ import {
   useRequiredUserDetailsForm
 } from 'components/members/hooks/useRequiredMemberProperties';
 import { SetupTwoFactorAuthGlobal } from 'components/settings/account/components/otp/components/SetupTwoFactorAuthGlobal';
-import Legend from 'components/settings/Legend';
+import Legend from 'components/settings/components/Legend';
 import { UserDetailsForm } from 'components/settings/profile/components/UserDetailsForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -144,10 +144,6 @@ function UserOnboardingDialog({
   usePreventReload(isFormDirty);
 
   async function saveForm() {
-    if (!isFormDirty) {
-      completeOnboarding?.();
-      return;
-    }
     setIsSubmitting(true);
     try {
       await onSubmitMemberProperties();
@@ -155,7 +151,8 @@ function UserOnboardingDialog({
     } finally {
       setIsSubmitting(false);
     }
-    completeOnboarding?.();
+    await completeOnboarding?.();
+    setIsOnboardingModalOpen(false);
   }
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(initialStep || 'profile_step');
@@ -171,7 +168,7 @@ function UserOnboardingDialog({
       ['discord', 'google', 'wallet', 'telegram'].includes(requiredProperty)
     );
 
-  const isSaveButtonDisabled = !isFormDirty || hideCloseButton;
+  const isSaveButtonDisabled = hideCloseButton;
 
   const handleClose = () => {
     setIsOnboardingModalOpen(false);

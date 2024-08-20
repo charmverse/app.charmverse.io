@@ -39,11 +39,11 @@ export function HomePage() {
       <Typography data-test='connect-home-page' align='center' variant='h4'>
         Charm Connect: The Home for Builders
       </Typography>
-      <Typography align='center'>Endorse Builders, Connect with opportunites and get Rewarded.</Typography>
+      <Typography align='center'>Endorse Builders, Connect with opportunities and get Rewarded.</Typography>
       <WarpcastLogin />
       <MuiLink
         variant='body2'
-        href='https://warpcast.com/~/signup'
+        href='https://www.farcaster.xyz/'
         target='_blank'
         rel='noopener'
         color='text.primary'

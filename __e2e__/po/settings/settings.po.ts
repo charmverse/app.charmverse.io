@@ -1,8 +1,8 @@
 // playwright-dev-page.ts
 import type { Locator, Page } from '@playwright/test';
+import { baseUrl } from '@root/config/constants';
 
 import type { AccountSettingsSection, SpaceSettingsSection } from 'components/settings/config';
-import { baseUrl } from '@root/config/constants';
 
 import { GlobalPage } from '../global.po';
 

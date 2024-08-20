@@ -11,6 +11,7 @@ import {
   FormControlLabel,
   FormHelperText,
   FormLabel,
+  Link,
   TextField
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -59,7 +60,7 @@ export function ExtraDetails() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
-        <FormLabel id='form-email'>Email</FormLabel>
+        <FormLabel>Email</FormLabel>
         <Controller
           control={control}
           name='email'
@@ -70,7 +71,8 @@ export function ExtraDetails() {
               autoFocus
               aria-labelledby='form-email'
               type='email'
-              error={!!error?.message}
+              error={!!error}
+              helperText={error?.message}
               {...field}
               sx={{ mb: 1 }}
             />
@@ -92,7 +94,14 @@ export function ExtraDetails() {
           render={({ field: { onChange, value } }) => (
             <FormControlLabel
               control={<Checkbox data-test='onboarding-accept-terms' onChange={onChange} checked={!!value} />}
-              label='Terms and Service'
+              label={
+                <>
+                  I agree to the{' '}
+                  <Link color='white' underline='hover' target='_blank' href='https://charmverse.io/terms/'>
+                    Terms of Service
+                  </Link>
+                </>
+              }
             />
           )}
         />
@@ -102,7 +111,7 @@ export function ExtraDetails() {
         <FormHelperText error={!!hasErrored}>{result.serverError?.message || result.fetchError}</FormHelperText>
       </FormControl>
       <Box display='flex' justifyContent='flex-end'>
-        <Button data-test='finish-onboarding' size='large' type='submit' disabled={!isValid || isExecuting}>
+        <Button data-test='finish-onboarding' size='large' type='submit' disabled={isExecuting}>
           Next
         </Button>
       </Box>

@@ -31,6 +31,10 @@ export const inputBorderDarkMode = 'rgba(255, 255, 255, 0.055)';
 export const linkUnderlineColorDarkMode = 'rgba(55, 55, 55, 1)';
 
 // Farcaster specific
-export const farcasterBrandColor = '#7c65c1';
+export const farcasterBrandColor = '#8465CB';
 export const farcasterBrandColorLight = lighten(farcasterBrandColor, 0.9);
 export const farcasterBrandColorDark = '#6944ba';
+
+// The sunnys specific
+export const sunnysColor = '#d8be7d';
+export const sunnysColorLight = '#f8e8c1';

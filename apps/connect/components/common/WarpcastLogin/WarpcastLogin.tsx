@@ -3,14 +3,14 @@
 import { log } from '@charmverse/core/log';
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
+import { loginWithFarcasterAction } from '@connect-shared/lib/session/loginAction';
 import { AuthKitProvider, SignInButton, useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import { ConnectApiClient } from 'apiClient/apiClient';
 import { useRouter } from 'next/navigation';
+import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
-import useSWRMutation from 'swr/mutation';
 import '@farcaster/auth-kit/styles.css';
 
 import { warpcastConfig } from 'lib/farcaster/config';
@@ -19,29 +19,36 @@ function WarpcastLoginButton() {
   const router = useRouter();
   const { isAuthenticated } = useProfile();
 
-  const { trigger, error } = useSWRMutation('login', (_, { arg }: { arg: StatusAPIResponse }) => {
-    const connectApiClient = new ConnectApiClient();
-    return connectApiClient.loginViaFarcaster(arg);
+  const {
+    executeAsync: revalidatePath,
+    hasSucceeded: revalidatePathSuccess,
+    isExecuting: isRevalidatingPath
+  } = useAction(revalidatePathAction);
+
+  const {
+    execute: loginUser,
+    hasErrored,
+    hasSucceeded: loginWithFarcasterSuccess,
+    isExecuting: isLoggingIn
+  } = useAction(loginWithFarcasterAction, {
+    onSuccess: async () => {
+      await revalidatePath({});
+      router.push('/profile');
+    },
+    onError(err) {
+      log.error('Error on login', { error: err.error.serverError });
+    }
   });
 
   const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
-    trigger(res, {
-      onSuccess: (user) => {
-        revalidatePathAction();
-        log.info('User logged in', { userId: user.id });
-        router.push('/profile');
-      },
-      onError: (err) => {
-        log.error('Server error while logging in with Warpcast', { error: err });
-      }
-    });
+    loginUser(res);
   }, []);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
     log.error('There was an error while logging in with Warpcast', { error: err });
   }, []);
 
-  if (isAuthenticated) {
+  if (isLoggingIn || isRevalidatingPath || (isAuthenticated && loginWithFarcasterSuccess && revalidatePathSuccess)) {
     return <LoadingComponent size={30} label='Logging you in...' />;
   }
 
@@ -64,7 +71,7 @@ function WarpcastLoginButton() {
       }}
     >
       <SignInButton onSuccess={onSuccessCallback} onError={onErrorCallback} hideSignOut />
-      {error?.message && <Typography variant='body2'>There was an error while logging in</Typography>}
+      {hasErrored && <Typography variant='body2'>There was an error while logging in</Typography>}
     </Box>
   );
 }

@@ -4,11 +4,11 @@ import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 
-import { ProjectItemSkeleton } from 'components/projects/components/ProjectItemSkeleton';
+import { ProjectItemSkeleton } from './ProjectItemSkeleton';
 
 export function ProfileDetailsSkeleton() {
   return (
-    <PageWrapper>
+    <PageWrapper bgcolor='transparent'>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Card sx={{ p: 2 }}>
           <Stack flexDirection='row' gap={3} alignItems='center'>

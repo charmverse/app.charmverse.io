@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from 'react';
 import type { BangleEditorStateProps } from '../core/bangle-editor-state';
 import { BangleEditorState } from '../core/bangle-editor-state';
 
-import { EditorViewContext } from './ReactEditor';
+import { EditorViewContext } from './editorContext';
 
 export function useEditorState(props: BangleEditorStateProps) {
   if (props.plugins && typeof props.plugins !== 'function') {

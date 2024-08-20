@@ -113,7 +113,7 @@ export const RPC: Record<string, IChainDetails> = {
   ETHEREUM: {
     ...EVM_DEFAULT,
     chainId: mainnet.id,
-    viem: mainnet,
+    viem: { ...mainnet, rpcUrls: { default: { http: ['https://rpc.ankr.com/eth'] } } },
     chainName: mainnet.name,
     alchemyUrl: 'https://eth-mainnet.g.alchemy.com',
     blockExplorerUrls: [mainnet.blockExplorers.default.url],

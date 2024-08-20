@@ -1,4 +1,5 @@
 import { AvailablePagePermissions } from '@charmverse/core/permissions/flags';
+import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces';
 import { render } from '@testing-library/react';
 import { v4 as uuid, v4 } from 'uuid';
 
@@ -130,7 +131,7 @@ describe('PaidShareToWeb', () => {
     expect(toggle).toBeDisabled();
   });
 
-  it('should render a disabled unchecked public toggle if the space has activated public proposals, the page is a proposal page and proposal status is draft', async () => {
+  it('should render a disabled unchecked public toggle if the proposal has isPublic: false', async () => {
     const pageId = uuid();
 
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
@@ -138,8 +139,9 @@ describe('PaidShareToWeb', () => {
     });
     (useGetProposalDetails as jest.Mock<Partial<ReturnType<typeof useGetProposalDetails>>>).mockReturnValueOnce({
       data: {
-        status: 'draft'
-      } as any
+        status: 'draft',
+        isPublic: false
+      } as ProposalWithUsersAndRubric
     });
 
     (usePage as jest.Mock).mockReturnValueOnce({
@@ -166,7 +168,7 @@ describe('PaidShareToWeb', () => {
     expect(toggle).toBeDisabled();
   });
 
-  it('should render a disabled checked public toggle if the space has activated public proposals, the page is a proposal page and proposal status is discussion or beyond', async () => {
+  it('should render a disabled checked public toggle if the proposal is marked as isPublic', async () => {
     const pageId = uuid();
 
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
@@ -174,8 +176,9 @@ describe('PaidShareToWeb', () => {
     });
     (useGetProposalDetails as jest.Mock<Partial<ReturnType<typeof useGetProposalDetails>>>).mockReturnValueOnce({
       data: {
-        status: 'published'
-      } as any
+        status: 'published',
+        isPublic: true
+      } as ProposalWithUsersAndRubric
     });
 
     (usePage as jest.Mock).mockReturnValueOnce({
@@ -198,8 +201,9 @@ describe('PaidShareToWeb', () => {
     expect(toggle?.getAttribute('type')).toBe('button');
 
     // Important part of the test
-    expect(toggle).toHaveTextContent('Unpublish');
     expect(toggle).toBeDisabled();
+    expect(toggle).not.toBeChecked();
+    expect(toggle).toHaveTextContent('Unpublish');
   });
 
   it('should render an enabled public toggle if the space has activated public proposals, user has permissions to toggle public status, and the page is not of type proposal', async () => {

@@ -21,6 +21,7 @@
     ],
     "paths": {
       "@connect-shared/*": ["../../@connect-shared/*"],
+      "@root/charmClient/*": ["../../charmClient/*"],
       "apiClient/*": ["./apiClient/*"],
       "components/*": ["./components/*"],
       "hooks/*": ["./hooks/*"],
@@ -50,6 +51,16 @@
       "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../@connect-shared/components/common/NotFoundPage.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../@connect-shared/components/common/NotFoundPage.tsx",
+    "../../@connect-shared/components/common/FarcasterCard.tsx",
+    "../../@connect-shared/components/project/ProjectForm.tsx",
+    "../../@connect-shared/hooks/useS3UploadInput.ts",
+    "../../@connect-shared/hooks/useFilePicker.ts"
+  ],
   "exclude": ["../../node_modules", ".next/", "public/sw.js", "sw.js"]
 }

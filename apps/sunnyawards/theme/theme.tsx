@@ -9,6 +9,9 @@ import {
   backgroundLightColorDarkMode,
   blueColor,
   darkBlueColor,
+  farcasterBrandColor,
+  farcasterBrandColorDark,
+  farcasterBrandColorLight,
   inputBackground,
   inputBackgroundDarkMode,
   inputBorder,
@@ -16,7 +19,9 @@ import {
   primaryTextColor,
   primaryTextColorDarkMode,
   secondaryTextColor,
-  secondaryTextColorDarkMode
+  secondaryTextColorDarkMode,
+  sunnysColor,
+  sunnysColorLight
 } from './colors';
 
 export const defaultFont =
@@ -53,8 +58,9 @@ const extendedTheme = extendTheme({
         inputBackground: {
           main: inputBackground
         },
-        footerBackground: { main: grey[200] },
-        mainBackground: { main: grey[200] }
+        mainBackground: { main: grey[200] },
+        farcaster: { main: farcasterBrandColor, dark: farcasterBrandColorDark, light: farcasterBrandColorLight },
+        gold: { main: sunnysColor, light: sunnysColorLight }
       }
     },
     dark: {
@@ -86,8 +92,9 @@ const extendedTheme = extendTheme({
         inputBackground: {
           main: inputBackgroundDarkMode
         },
-        footerBackground: { main: grey[700] },
-        mainBackground: { main: backgroundColorDarkMode }
+        mainBackground: { main: backgroundColorDarkMode },
+        farcaster: { main: farcasterBrandColor, dark: farcasterBrandColorDark, light: farcasterBrandColorLight },
+        gold: { main: sunnysColor, light: sunnysColorLight }
       }
     }
   },
@@ -100,7 +107,7 @@ const extendedTheme = extendTheme({
     MuiFormLabel: {
       styleOverrides: {
         root: ({ theme }) => ({
-          color: theme.vars.palette.text.primary,
+          color: theme.vars.palette.gold.light,
           marginBottom: 5
         })
       }
@@ -159,13 +166,20 @@ const extendedTheme = extendTheme({
         disableElevation: true
       },
       styleOverrides: {
-        root: {
-          textTransform: 'none'
-        },
+        root: ({ ownerState, theme }) => ({
+          textTransform: 'none',
+          ...(ownerState.variant === 'contained'
+            ? {
+                color: theme.vars.palette.text.disabled,
+                backgroundColor: theme.vars.palette.gold.main,
+                '&:hover': {
+                  color: theme.vars.palette.text.disabled,
+                  backgroundColor: theme.vars.palette.gold.main
+                }
+              }
+            : {})
+        }),
         text: ({ theme, variant, color }) => ({
-          '&:hover': {
-            backgroundColor: theme.vars.palette.inputBackground.main
-          },
           color: color || (variant === 'outlined' || variant === 'text' ? theme.vars.palette.primary.main : 'inherit')
         })
       }
@@ -259,6 +273,11 @@ const extendedTheme = extendTheme({
           '[data-mui-color-scheme="dark"] &': {
             '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
               borderColor: inputBorderDarkMode
+            },
+            input: {
+              '&:-webkit-autofill': {
+                WebkitBoxShadow: `0 0 0 100px ${theme.vars.palette.background.paper} inset`
+              }
             }
           }
         }),
@@ -293,15 +312,16 @@ const extendedTheme = extendTheme({
     MuiLink: {
       styleOverrides: {
         root: ({ theme }) => ({
-          color: theme.vars.palette.primary.main,
+          color: theme.vars.palette.gold.main,
           '&:hover': {
-            color: theme.vars.palette.primary.dark
+            color: theme.vars.palette.gold.main
           },
           fontFamily: defaultFont
         })
       },
       defaultProps: {
-        underline: 'none'
+        underline: 'none',
+        color: 'gold.main'
       }
     }
   }

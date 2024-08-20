@@ -2,32 +2,33 @@
 
 import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
+import { ProjectForm } from '@connect-shared/components/project/ProjectForm';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/fetchProject';
-import type { FormValues, ProjectCategory } from '@connect-shared/lib/projects/form';
-import { schema } from '@connect-shared/lib/projects/form';
+import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
+import type { FormValues, ProjectCategory } from '@connect-shared/lib/projects/projectSchema';
+import { schema } from '@connect-shared/lib/projects/projectSchema';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { Box } from '@mui/system';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { PageCoverHeader } from 'components/common/PageCoverHeader';
-import { actionEditProject } from 'lib/projects/editProjectAction';
+import { editProjectAction } from 'lib/projects/editProjectAction';
 
 import { AddProjectMembersForm } from '../components/AddProjectMembersForm';
 import type { ProjectDetailsProps } from '../components/ProjectDetails';
 import { ProjectDetails } from '../components/ProjectDetails';
-import { ProjectForm } from '../components/ProjectForm';
 
 export function EditProjectPage({ user, project }: { user: LoggedInUser; project: ConnectProjectDetails }) {
   const [showTeamMemberForm, setShowTeamMemberForm] = useState(false);
 
   const router = useRouter();
 
-  const { execute, isExecuting } = useAction(actionEditProject, {
+  const { execute, isExecuting } = useAction(editProjectAction, {
     onSuccess: () => {
       router.push(`/p/${project.path}`);
     },
@@ -45,12 +46,11 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     defaultValues: {
       name: project.name,
       avatar: project.avatar ?? undefined,
-      category: project.category as ProjectCategory,
+      optimismCategory: project.optimismCategory as ProjectCategory,
       coverImage: project.coverImage ?? undefined,
       description: project.description ?? undefined,
       farcasterValues: project.farcasterValues,
       github: project.github ?? undefined,
-      mirror: project.mirror ?? undefined,
       twitter: project.twitter ?? undefined,
       websites: project.websites,
       projectMembers:
@@ -69,13 +69,31 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
   if (!showTeamMemberForm) {
     return (
       <PageWrapper>
-        <ProjectForm
-          control={control}
-          isValid={isValid}
-          onNext={() => {
-            setShowTeamMemberForm(true);
-          }}
-        />
+        <ProjectForm control={control} showCategory />
+        <Stack
+          justifyContent='space-between'
+          flexDirection='row'
+          position='sticky'
+          bottom='0'
+          bgcolor='background.default'
+          py={2}
+        >
+          <Link href='/profile' passHref>
+            <Button size='large' color='secondary' variant='outlined'>
+              Cancel
+            </Button>
+          </Link>
+          <Button
+            data-test='project-form-confirm-values'
+            size='large'
+            disabled={!isValid}
+            onClick={() => {
+              setShowTeamMemberForm(true);
+            }}
+          >
+            Next
+          </Button>
+        </Stack>
       </PageWrapper>
     );
   }
@@ -88,7 +106,6 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     description: projectValues.description,
     farcasterValues: projectValues.farcasterValues,
     github: projectValues.github,
-    mirror: projectValues.mirror,
     twitter: projectValues.twitter,
     websites: projectValues.websites
   } as ProjectDetailsProps['project'];
@@ -105,9 +122,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     >
       <Box gap={2} display='flex' flexDirection='column'>
         <ProjectDetails project={projectDetails} />
-        <Typography variant='h5' data-test='project-form-add-team'>
-          Edit team members
-        </Typography>
+        <Typography variant='h5'>Edit team members</Typography>
         <AddProjectMembersForm
           user={user}
           onBack={() => {
@@ -119,7 +134,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           execute={(input) => {
             execute({
               ...input,
-              id: project.id,
+              projectId: project.id,
               projectMembers: input.projectMembers.slice(1)
             });
           }}

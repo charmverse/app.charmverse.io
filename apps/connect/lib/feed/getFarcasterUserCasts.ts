@@ -1,8 +1,7 @@
 import { GET } from '@root/adapters/http';
+import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from '@root/lib/farcaster/constants';
 
 import type { Cast } from './getFarcasterUserReactions';
-
-const neynarBaseUrl = 'https://api.neynar.com/v2/farcaster';
 
 type UserCastsResponse = {
   casts: Cast[];
@@ -10,7 +9,7 @@ type UserCastsResponse = {
 
 export async function getFarcasterUserCasts({ fid }: { fid: number }) {
   const userCastsResponse = await GET<UserCastsResponse>(
-    `${neynarBaseUrl}/feed`,
+    `${NEYNAR_API_BASE_URL}/feed`,
     {
       fids: fid,
       feed_type: 'filter',
@@ -20,7 +19,7 @@ export async function getFarcasterUserCasts({ fid }: { fid: number }) {
     },
     {
       headers: {
-        Api_key: process.env.NEYNAR_API_KEY
+        Api_key: NEYNAR_API_KEY
       }
     }
   );

@@ -6,7 +6,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
-import { SettingsContent } from './SettingsContent';
+import { SettingsContent } from './components/SettingsContent';
 
 export function SpaceSettingsDialog() {
   const isMobile = useSmallScreen();

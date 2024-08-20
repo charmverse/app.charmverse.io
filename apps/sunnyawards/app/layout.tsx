@@ -6,14 +6,15 @@ import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
+import { ClientGlobal } from 'components/common/ClientGlobal';
 import { Footer } from 'components/common/Footer';
 import { Header } from 'components/common/Header/Header';
 import theme from 'theme/theme';
 
-import 'theme/cssVariables.scss';
+import 'theme/styles.scss';
 
 export const metadata: Metadata = {
-  title: 'Registration - The Sunny Awards',
+  title: 'Register for The Sunny Awards',
   description: 'Onchain network for connecting web3 developers, projects, organizations'
 };
 
@@ -35,15 +36,16 @@ export default async function RootLayout({
       <body>
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script src='/__ENV.js' strategy='beforeInteractive' />
-        <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
-          <AppProviders theme={theme}>
+        <AppProviders theme={theme}>
+          <ClientGlobal user={user?.data || null} />
+          <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh' bgcolor='mainBackground.main'>
             <Header user={user?.data || null} />
-            <Box component='main' bgcolor='mainBackground.main' pb={2}>
+            <Box component='main' pb={2}>
               {children}
             </Box>
             <Footer />
-          </AppProviders>
-        </Box>
+          </Box>
+        </AppProviders>
       </body>
     </html>
   );

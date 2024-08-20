@@ -1,23 +1,15 @@
-import type { Metadata } from 'next';
+'use client';
 
 import { GrantsList } from 'components/grants/GrantsList';
-import { getGrants } from 'lib/grants/getGrants';
 
-export const metadata: Metadata = {
-  title: 'Grants'
-};
+export const dynamic = 'force-dynamic';
 
-export default async function GrantsPage({
+export default function GrantsPage({
   searchParams
 }: {
   searchParams: {
     sort: 'new' | 'upcoming';
   };
 }) {
-  const sort = searchParams.sort ?? 'new';
-  const grants = await getGrants({
-    sort
-  });
-
-  return <GrantsList grants={grants} currentTab={sort} />;
+  return <GrantsList sort={searchParams.sort ?? 'new'} />;
 }

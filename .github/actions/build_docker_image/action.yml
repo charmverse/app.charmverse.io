@@ -26,6 +26,7 @@ outputs:
 runs:
   using: 'composite'
   steps:
+
     - name: Prune dev dependencies and calculate img tag
       id: prune_dev_dep
       shell: bash
@@ -33,10 +34,11 @@ runs:
         npm prune --omit=dev
         rm -rf .next/cache
         rm -rf apps/connect/.next/cache
-        rm -rf sunnyawards/connect/.next/cache
+        rm -rf apps/sunnyawards/.next/cache
+        rm -rf apps/farcaster/.next/cache
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -50,7 +52,7 @@ runs:
 
     - name: Docker get image tags
       id: get_img_tag
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: ${{steps.login-ecr.outputs.registry}}/${{ inputs.ecr_registry }}
         tags: |
@@ -59,7 +61,7 @@ runs:
           latest=${{ github.ref == 'refs/heads/main' }}
 
     - name: Build and push
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: .
         push: true

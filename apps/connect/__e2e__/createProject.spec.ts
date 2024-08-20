@@ -12,7 +12,6 @@ test('Create a project and view details', async ({ page }) => {
     projectFormCategory: 'DeFi',
     projectFormTwitter: 'https://www.twitter.com/acme-inc-twitter',
     projectFormGithub: 'https://www.github.com/acme-inc-github',
-    projectFormMirror: 'https://www.mirror.xyz/acme-inc-mirror',
     projectFormWebsites: ['https://www.acme-inc.com'],
     projectFormFarcasterValues: ['https://warpcast.com/acme-inc-warpcast']
   };
@@ -68,7 +67,7 @@ test('Create a project and view details', async ({ page }) => {
   await fieldDescription.fill(projectData.projectFormDescription);
 
   await fieldCategory.focus();
-  await page.keyboard.type(projectData.projectFormCategory);
+  await fieldCategory.fill(projectData.projectFormCategory);
 
   await fieldWebsites.fill(projectData.projectFormWebsites[0]);
 
@@ -78,15 +77,9 @@ test('Create a project and view details', async ({ page }) => {
 
   await fieldGithub.fill(projectData.projectFormGithub);
 
-  await fieldMirror.fill(projectData.projectFormMirror);
-
   const confirmButton = page.locator('data-test=project-form-confirm-values');
 
   await confirmButton.click();
-
-  const addTeam = page.locator('data-test=project-form-add-team');
-
-  await expect(addTeam).toBeVisible();
 
   const publishButton = page.locator('data-test=project-form-publish');
 
@@ -129,10 +122,6 @@ test('Create a project and view details', async ({ page }) => {
   // Check project GitHub
   const projectGithub = page.locator('data-test=project-details-github');
   await expect(projectGithub).toHaveText(projectData.projectFormGithub.replace(/https?:\/\/www.github.com\//, ''));
-
-  // Check project Mirror
-  const projectMirror = page.locator('data-test=project-details-mirror');
-  await expect(projectMirror).toHaveText(projectData.projectFormMirror.replace(/https?:\/\/www.mirror.xyz\//, ''));
 
   // Check project description
 

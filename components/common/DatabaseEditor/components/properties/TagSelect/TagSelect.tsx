@@ -108,7 +108,7 @@ export type TagSelectProps = {
   fluidWidth?: boolean;
   emptyMessage?: string;
   showEmpty?: boolean;
-  dataTestActive?: string;
+  'data-test-active'?: string;
 };
 
 export function TagSelect({
@@ -131,8 +131,9 @@ export function TagSelect({
   displayValueAsOptions = false,
   fluidWidth,
   showEmpty,
-  dataTestActive,
-  ...props
+  emptyMessage,
+  'data-test': dataTest,
+  'data-test-active': dataTestActive
 }: TagSelectProps) {
   const [isOpened, setIsOpened] = useState(defaultOpened);
 
@@ -190,7 +191,7 @@ export function TagSelect({
 
   const activeField = (
     <StyledSelect
-      dataTest={dataTestActive}
+      data-test={dataTestActive}
       canEditOptions={canEditOptions}
       includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'
@@ -215,7 +216,7 @@ export function TagSelect({
 
   const previewField = (
     <SelectPreviewContainer
-      data-test={props['data-test']}
+      data-test={dataTest}
       onClick={onEdit}
       displayType={displayType}
       readOnly={readOnly}
@@ -229,7 +230,7 @@ export function TagSelect({
         value={selectValue}
         options={selectOptions}
         size='small'
-        emptyMessage={props.emptyMessage}
+        emptyMessage={emptyMessage}
         showEmpty={showEmpty || displayType === 'details'}
       />
     </SelectPreviewContainer>

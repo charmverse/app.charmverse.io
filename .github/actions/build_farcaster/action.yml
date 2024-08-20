@@ -1,0 +1,19 @@
+name: 'Build Farcaster apps'
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Restore build
+      id: restore_build
+      uses: actions/cache@v4
+      with:
+        path: |
+          apps/farcaster/.next
+        key: app-farcaster-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts', '@connect-shared/**/*.ts[x]', 'apps/farcaster/**/*.ts', 'apps/farcaster/**/*.scss') }}
+
+    - name: Build app
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      run: |
+        npm run farcaster:build

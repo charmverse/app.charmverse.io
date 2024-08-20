@@ -517,7 +517,7 @@ function PropertyValueElement(props: Props) {
     propertyValueElement = (
       <TagSelect
         data-test='closed-select-input'
-        dataTestActive='active-select-autocomplete'
+        data-test-active='active-select-autocomplete'
         canEditOptions={!readOnly && !disableEditPropertyOption}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         multiselect={propertyTemplate.type === 'multiSelect'}

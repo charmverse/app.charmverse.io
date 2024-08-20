@@ -12,7 +12,7 @@ import { Provider } from 'zksync-web3';
 import { supportedNetworks, type SupportedChainId } from './config';
 
 const ZK_MAINNET_BLOCK_EXPLORER = 'https://block-explorer-api.mainnet.zksync.io';
-const ZK_TESTNET_BLOCK_EXPLORER = 'https://block-explorer-api.testnets.zksync.dev';
+const ZK_TESTNET_BLOCK_EXPLORER = 'https://block-explorer-api.sepolia.zksync.dev';
 type IpfsNft = {
   name?: string;
   description?: string;
@@ -68,11 +68,13 @@ class ZkSyncApiClient {
 
     const resultSource = result.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
-    const data = result ? await GET<IpfsNft>(resultSource).catch(() => ({})) : {};
+    const data = result ? await GET<IpfsNft>(resultSource).catch(() => ({} as IpfsNft)) : ({} as IpfsNft);
 
     return mapNFTData(
       {
-        ...data,
+        image: data.image,
+        name: data.name,
+        description: data.description,
         contractAddress,
         tokenId
       },

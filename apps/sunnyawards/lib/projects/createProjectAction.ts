@@ -3,13 +3,16 @@
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
-import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
-import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
+import { trackMixpanelEvent } from '@connect-shared/lib/mixpanel/trackMixpanelEvent';
+import { createProject } from '@connect-shared/lib/projects/createProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { isTestEnv } from '@root/config/constants';
-import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
+import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
+import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 
-import { schema } from './form';
+import { sendProjectConfirmationEmail } from 'lib/mailer/sendProjectConfirmationEmail';
+
+import { schema, getOptimismCategory } from './schema';
 
 export const createProjectAction = authActionClient
   .metadata({ actionName: 'create-project' })
@@ -18,10 +21,11 @@ export const createProjectAction = authActionClient
     const input = parsedInput;
 
     const currentUserId = ctx.session.user.id;
-    const newProject = await createOptimismProject({
+    const newProject = await createProject({
       userId: currentUserId,
       input: {
         ...input,
+        optimismCategory: getOptimismCategory(input.sunnyAwardsCategory),
         primaryContractChainId: input.primaryContractChainId ? parseInt(input.primaryContractChainId) : undefined
       },
       source: 'connect'
@@ -30,21 +34,39 @@ export const createProjectAction = authActionClient
     if (!disableCredentialAutopublish) {
       await storeProjectMetadataAndPublishOptimismAttestation({
         projectId: newProject.id,
-        userId: currentUserId
+        userId: currentUserId,
+        existingProjectRefUID: input.projectRefUIDToImport
       }).catch((err) => {
         log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
       });
 
-      await storeProjectMetadataAndPublishGitcoinAttestation({
-        projectIdOrPath: newProject.id,
-        userId: currentUserId
-      }).catch((err) => {
-        log.error('Failed to store project metadata and publish gitcoin attestation', { err, userId: currentUserId });
+      await storeCharmverseProjectMetadata({
+        chainId: charmverseProjectDataChainId,
+        projectId: newProject.id
+      }).catch((error) => {
+        log.error('Failed to store charmverse project attestations', {
+          error,
+          projectId: newProject.id,
+          userId: newProject.createdBy
+        });
       });
     }
 
     if (!isTestEnv) {
       await generateOgImage(newProject.id, currentUserId);
+      await trackMixpanelEvent('create_project', { projectId: newProject.id, userId: currentUserId });
+      try {
+        await sendProjectConfirmationEmail({
+          projectId: newProject.id,
+          userId: currentUserId
+        });
+      } catch (error) {
+        log.error('Failed trying to send confirmation email', {
+          error,
+          projectId: newProject.id,
+          userId: currentUserId
+        });
+      }
     }
 
     return { success: true, projectId: newProject.id, projectPath: newProject.path };

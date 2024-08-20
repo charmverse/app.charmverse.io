@@ -21,8 +21,6 @@ jest.mock('next/router', () => ({
   })
 }));
 
-jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
-
 describe('components/table/TableRow', () => {
   const board = TestBlockFactory.createBoard();
   const view = TestBlockFactory.createBoardView(board);

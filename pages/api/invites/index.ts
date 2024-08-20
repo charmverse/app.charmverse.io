@@ -39,12 +39,11 @@ async function createInviteLinkEndpoint(req: NextApiRequest, res: NextApiRespons
   return res.status(201).json(invite);
 }
 async function getInviteLinks(req: NextApiRequest, res: NextApiResponse<InviteLinkWithRoles[]>) {
-  if (req.isGuest) {
-    return res.status(200).json([]);
-  }
+  const spaceId = req.query.spaceId as string;
 
   const invites = await getSpaceInviteLinks({
-    spaceId: req.query.spaceId as string
+    userId: req.session.user?.id,
+    spaceId
   });
 
   return res.status(200).json(invites);

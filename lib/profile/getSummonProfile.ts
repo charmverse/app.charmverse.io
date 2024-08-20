@@ -57,6 +57,11 @@ export async function getSummonProfile({
   }
   const summonApiUrl = summonTestUrl || TENANT_URLS[spaceRole.space.xpsEngineId];
 
+  if (!summonApiUrl) {
+    log.warn('Could not find Summon API URL for tenant', { spaceId, xpsEngineId: spaceRole.space.xpsEngineId });
+    return null;
+  }
+
   const discordUserAccount = user.discordUser?.account as { username: string } | null;
   const userEmail = user.googleAccounts[0]?.email;
   const walletAddresses = user.wallets.map((wallet) => wallet.address);

@@ -1,4 +1,5 @@
 import { Collapse, Divider, Tooltip } from '@mui/material';
+import { capitalize } from '@root/lib/utils/strings';
 import { cloneDeep } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -12,7 +13,6 @@ import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/Wor
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
-import { useDocusign } from 'components/signing/hooks/useDocusign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -58,6 +58,7 @@ export type Props = {
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnlyCredentialTemplates?: boolean;
+  onChangeRewardSettings?: (value: { makeRewardsPublic: boolean }) => void;
   onChangeSelectedCredentialTemplates?: (templates: string[]) => void;
   refreshProposal?: VoidFunction;
   templateId: string | null | undefined;
@@ -76,6 +77,7 @@ export function EvaluationsReview({
   pageLensPostLink,
   onChangeEvaluation,
   onChangeSelectedCredentialTemplates,
+  onChangeRewardSettings,
   readOnlyCredentialTemplates,
   refreshProposal: _refreshProposal,
   expanded: expandedContainer,
@@ -87,7 +89,6 @@ export function EvaluationsReview({
   const { showMessage } = useSnackbar();
 
   const isAdmin = useIsAdmin();
-  const { envelopes } = useDocusign();
 
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const [showEditCredentials, setShowEditCredentials] = useState(false);
@@ -96,6 +97,8 @@ export function EvaluationsReview({
   });
 
   const rewardsTitle = mappedFeatures.rewards.title;
+  const capitalisedRewardsTitle = capitalize(rewardsTitle);
+  const lowercaseRewardsTitle = rewardsTitle.toLowerCase();
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
   const hasCredentialsStep = !!proposal?.selectedCredentialTemplates.length || !!proposal?.issuedCredentials.length;
@@ -179,6 +182,16 @@ export function EvaluationsReview({
   }, [proposal?.currentEvaluationId, isRewardsActive, isCredentialsActive, setExpandedEvaluationId]);
 
   const expandedEvaluationId = expandedContainer && _expandedEvaluationId;
+
+  const disabledPublishTooltip = !proposal?.permissions.evaluate
+    ? `Only reviewers can publish ${lowercaseRewardsTitle}`
+    : proposal?.archived
+    ? `Cannot publish ${lowercaseRewardsTitle} for an archived proposal`
+    : !isRewardsActive
+    ? `Proposal must be in ${lowercaseRewardsTitle} step to publish ${lowercaseRewardsTitle}`
+    : isRewardsComplete
+    ? `${capitalisedRewardsTitle} step is already complete`
+    : null;
 
   return (
     <LoadingComponent isLoading={!proposal}>
@@ -336,11 +349,13 @@ export function EvaluationsReview({
           title={rewardsTitle}
         >
           <RewardReviewStep
-            disabled={!(proposal?.permissions.evaluate && isRewardsActive && !isRewardsComplete) || !!proposal.archived}
+            disabledPublishTooltip={disabledPublishTooltip}
             proposalId={proposal?.id}
             pendingRewards={pendingRewards}
             rewardIds={proposal?.rewardIds}
             onSubmit={refreshProposal}
+            makeRewardsPublic={!!proposal?.fields?.makeRewardsPublic}
+            togglePublicRewards={(value) => onChangeRewardSettings?.({ makeRewardsPublic: !!value })}
           />
         </EvaluationStepRow>
       )}

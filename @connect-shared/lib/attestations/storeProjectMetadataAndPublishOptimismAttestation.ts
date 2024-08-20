@@ -4,9 +4,9 @@ import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
-import { fetchProject } from '../projects/fetchProject';
+import { findProject } from '../projects/findProject';
 
-import { createProjectViaAgora, storeProjectMetadataViaAgora } from './agoraApi';
+import { createProjectViaAgora, storeProjectMetadataViaAgora, AGORA_API_KEY } from './agoraApi';
 
 // Format for metadata.json:
 // attestations/{schemaId}/project-{charmverse_uid}/metadata.json
@@ -14,11 +14,17 @@ import { createProjectViaAgora, storeProjectMetadataViaAgora } from './agoraApi'
 export async function storeProjectMetadataAndPublishOptimismAttestation({
   userId,
   projectId,
-  tx = prisma
+  tx = prisma,
+  existingProjectRefUID
 }: {
   userId: string;
   projectId: string;
-} & OptionalPrismaTransaction): Promise<{ projectRefUID: string; attestationMetadataUID: string }> {
+  existingProjectRefUID?: string;
+} & OptionalPrismaTransaction): Promise<null | { projectRefUID: string; attestationMetadataUID: string }> {
+  if (!AGORA_API_KEY) {
+    log.debug('Skip Agora integration: no API key');
+    return null;
+  }
   const farcasterUser = await tx.farcasterUser.findUniqueOrThrow({
     where: {
       userId
@@ -29,7 +35,7 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     }
   });
 
-  const project = await fetchProject({ id: projectId });
+  const project = await findProject({ id: projectId });
 
   if (!project) {
     throw new DataNotFoundError('Project not found');
@@ -43,20 +49,22 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     throw new DataNotFoundError('Farcaster profile not found');
   }
 
-  const { attestationId: projectRefUID } = await createProjectViaAgora({
-    farcasterId: farcasterUser.fid,
-    projectName: project.name
-  });
+  // Used when importing a project from OP
+  let projectRefUID = existingProjectRefUID;
 
-  log.info('Project created via Agora', { projectRefUID });
+  if (!projectRefUID) {
+    const { attestationId } = await createProjectViaAgora({
+      farcasterId: farcasterUser.fid,
+      projectName: project.name
+    });
+    projectRefUID = attestationId;
+  }
 
   const { attestationMetadataUID } = await storeProjectMetadataViaAgora({
     farcasterId: farcasterUser.fid,
     projectRefUID,
     projectId
   });
-
-  log.info('Project metadata created via Agora', { attestationMetadataUID });
 
   return { projectRefUID, attestationMetadataUID };
 }

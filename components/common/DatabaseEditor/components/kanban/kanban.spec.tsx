@@ -25,8 +25,6 @@ jest.mock('next/router', () => ({
   })
 }));
 
-jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
-
 global.fetch = jest.fn();
 jest.mock('../../utils');
 const mockedUtils = jest.mocked(Utils, { shallow: true });

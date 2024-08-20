@@ -3,11 +3,12 @@
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
-import { createOptimismProject } from '@connect-shared/lib/projects/createOptimismProject';
-import { schema } from '@connect-shared/lib/projects/form';
+import { createProject } from '@connect-shared/lib/projects/createProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
+import { schema } from '@connect-shared/lib/projects/projectSchema';
 import { isTestEnv } from '@root/config/constants';
-import { disableCredentialAutopublish } from '@root/lib/credentials/constants';
+import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
+import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 
 export const actionCreateProject = authActionClient
   .metadata({ actionName: 'create-project' })
@@ -15,7 +16,7 @@ export const actionCreateProject = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     const input = parsedInput;
     const currentUserId = ctx.session.user!.id;
-    const newProject = await createOptimismProject({
+    const newProject = await createProject({
       userId: currentUserId,
       input,
       source: 'connect'
@@ -27,6 +28,17 @@ export const actionCreateProject = authActionClient
         userId: currentUserId
       }).catch((err) => {
         log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
+      });
+
+      await storeCharmverseProjectMetadata({
+        chainId: charmverseProjectDataChainId,
+        projectId: newProject.id
+      }).catch((err) => {
+        log.error('Failed to store charmverse project metadata', {
+          err,
+          projectId: newProject.id,
+          userId: newProject.createdBy
+        });
       });
     } else {
       log.info('Skip credential publishing');

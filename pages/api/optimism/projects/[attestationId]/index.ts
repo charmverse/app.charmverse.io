@@ -1,10 +1,11 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { createProjectMetadataAttestation } from '@connect-shared/lib/attestations/agoraApi';
-import { editOptimismProject } from '@connect-shared/lib/projects/editOptimismProject';
+import { editProject } from '@connect-shared/lib/projects/editProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
+import type { ProjectCategory } from '@connect-shared/lib/projects/projectSchema';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
-import { decodeOptimismProjectAttestation } from '@root/lib/credentials/schemas/optimismProjectSchemas';
+import { decodeOptimismProjectAttestation } from '@root/lib/credentials/schemas/optimismProjectUtils';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import type { OptimismProjectMetadata } from '@root/lib/optimism/storeOptimismProjectAttestations';
 import { withSessionRoute } from '@root/lib/session/withSession';
@@ -13,7 +14,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { optimism } from 'viem/chains';
 
-import type { OptimismProjectFormValues } from 'components/common/form/fields/Optimism/optimismProjectFormValues';
+import type { OptimismProjectFormValues } from 'components/common/ProjectForm/components/Optimism/optimismProjectFormValues';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getOpProjectsByAttestationId } from 'lib/optimism/getOpProjectsByAttestationId';
 
@@ -66,11 +67,13 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
   }
 
   if (optimismProjectAttestation.projectId) {
-    await editOptimismProject({
+    await editProject({
       userId,
       input: {
         projectId: optimismProjectAttestation.projectId,
-        ...optimismProjectValues
+        ...optimismProjectValues,
+        description: optimismProjectValues.description || '',
+        optimismCategory: optimismProjectValues.optimismCategory as ProjectCategory
       }
     });
     await generateOgImage(optimismProjectAttestation.projectId, userId);
@@ -84,7 +87,7 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
     description: optimismProjectValues.description || optimismProjectMetadata.description,
     projectAvatarUrl: optimismProjectValues.avatar || optimismProjectMetadata.projectAvatarUrl,
     projectCoverImageUrl: optimismProjectValues.coverImage || optimismProjectMetadata.projectCoverImageUrl,
-    category: optimismProjectValues.category || optimismProjectMetadata.category,
+    category: optimismProjectValues.optimismCategory || optimismProjectMetadata.category,
     socialLinks: {
       twitter: optimismProjectValues.twitter || optimismProjectMetadata.socialLinks.twitter,
       website: optimismProjectValues.websites || optimismProjectMetadata.socialLinks.website,

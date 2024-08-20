@@ -1,6 +1,6 @@
+import * as http from '@root/adapters/http';
 import useSWRInfinite from 'swr/infinite';
 
-import * as http from '@root/adapters/http';
 import { useGET, usePUT } from 'charmClient/hooks/helpers';
 import type { TransactionResult } from 'lib/charms/addTransaction';
 import { TRANSACTIONS_PAGE_SIZE } from 'lib/charms/constants';

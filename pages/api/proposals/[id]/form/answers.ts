@@ -29,7 +29,8 @@ async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiRe
   });
 
   if (!proposal.formId) {
-    throw new InvalidInputError(`Proposal ${proposalId} does not have a form`);
+    // return empty list instead of an error
+    return res.status(200).json([]);
   }
 
   const permissions = await permissionsApiClient.proposals.computeProposalPermissions({

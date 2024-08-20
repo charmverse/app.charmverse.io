@@ -271,7 +271,7 @@ jobs:
 
       - name: Start services
         run: |
-          npm run start:test:ci &
+          npm run start:test:ci &> connect.log &
           sleep_loop_ct=0
           until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -290,6 +290,7 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         # we have to run docker command ourselves to set network=host so that playwright can access the server
         run: |
+          [[ "${{ runner.debug }}" = "1" ]] && tail -f connect.log &
           docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
                       --workdir /github/workspace --rm  \
                       -e "REACT_APP_APP_ENV" -e CI=true \
@@ -376,6 +377,8 @@ jobs:
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
+        with:
+          short-length: 7
 
       - name: Install dependencies
         uses: ./.github/actions/install

@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import { updateProjectAndMembers } from 'lib/projects/updateProjectAndMembers';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -31,6 +31,7 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
     projectId,
     payload: projectUpdatePayload
   });
+
   return res.status(201).json(updatedProjectWithMembers);
 }
 

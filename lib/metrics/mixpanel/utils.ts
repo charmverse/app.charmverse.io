@@ -5,7 +5,7 @@ import type { MixpanelEventName, MixpanelTrackBase } from './interfaces';
 import type { MixpanelOpEventName } from './opEvents';
 
 // format event_name to Event name
-export function eventNameToHumanFormat(eventName: MixpanelEventName | MixpanelOpEventName) {
+export function eventNameToHumanFormat(eventName: string) {
   return capitalize(eventName.toLowerCase().replaceAll('_', ' '));
 }
 

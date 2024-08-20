@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 
 export function ProjectDetailsSkeleton() {
   return (
-    <PageWrapper>
+    <PageWrapper bgcolor='transparent'>
       <Card sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
         <CardMedia
           component={Skeleton}

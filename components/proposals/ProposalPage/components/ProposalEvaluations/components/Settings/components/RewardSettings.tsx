@@ -5,6 +5,7 @@ import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { getAbsolutePath } from 'lib/utils/browser';
 
@@ -22,6 +23,11 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
     name: template.page.title,
     color: 'default'
   }));
+
+  const { getFeatureTitle } = useSpaceFeatures();
+
+  const rewardLabel = getFeatureTitle('Rewards');
+
   // when we are ready to offer this option with a modal inside the page
   options.push({
     id: 'add_new',
@@ -39,7 +45,7 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
       <Box display='flex' alignItems='center' justifyContent='space-between' width='100%'>
         <FormLabel>
           <Typography component='span' variant='subtitle1'>
-            Rewards will be public
+            {rewardLabel} will be public
           </Typography>
         </FormLabel>
 

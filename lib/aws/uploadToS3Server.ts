@@ -63,3 +63,7 @@ export function getUserS3FilePrefix({ userId }: { userId: string }) {
 export function getUserS3FilePath({ userId, url }: { userId: string; url: string }) {
   return `${getUserS3FilePrefix({ userId })}/${uuid()}/${generateFilename(url)}`;
 }
+
+export function getFarcasterAppFilePath({ url }: { url: string }) {
+  return `farcaster-app/${uuid()}/${generateFilename(url)}`;
+}

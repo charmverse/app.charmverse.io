@@ -6,10 +6,9 @@ import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
 import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
 import { replaceS3Domain } from '@root/lib/utils/url';
 
-import type { ConnectProjectDetails } from '../projects/fetchProject';
-import { fetchProject } from '../projects/fetchProject';
-
-import { getAttestationS3Path } from './getAttestationS3Path';
+import { getAttestationS3Path } from '../../../lib/credentials/getAttestationS3Path';
+import type { ConnectProjectDetails } from '../projects/findProject';
+import { findProject } from '../projects/findProject';
 
 type GitcoinUserProfile = {
   name: string;
@@ -23,7 +22,7 @@ export async function storeGitcoinProjectProfileInS3({
   projectOrProjectId: ConnectProjectDetails | string;
 }): Promise<{ staticFilePath: string; profile: GitcoinUserProfile }> {
   const project =
-    typeof projectOrProjectId === 'string' ? await fetchProject({ id: projectOrProjectId }) : projectOrProjectId;
+    typeof projectOrProjectId === 'string' ? await findProject({ id: projectOrProjectId }) : projectOrProjectId;
 
   if (!project) {
     throw new DataNotFoundError('Project not found');

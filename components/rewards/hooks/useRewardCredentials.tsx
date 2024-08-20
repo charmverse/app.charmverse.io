@@ -13,8 +13,6 @@ import type {
   IssuableRewardApplicationCredentialContent,
   PartialIssuableRewardApplicationCredentialContent
 } from 'lib/credentials/findIssuableRewardCredentials';
-import { multiAttestOnchain, populateOnChainAttestationTransaction } from 'lib/credentials/multiAttestOnchain';
-import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 
 export function useRewardCredentials() {
   const { space } = useCurrentSpace();
@@ -47,6 +45,11 @@ export function useRewardCredentials() {
       if (!userWalletCanIssueCredentialsForSpace) {
         throw new InvalidInputError('Your wallet cannot issue credentials for this space');
       }
+      // lazy load credentials to avoid loading eas sdk everywhere
+      const { rewardCredentialSchemaId } = await import('lib/credentials/schemas/reward');
+      const { multiAttestOnchain, populateOnChainAttestationTransaction } = await import(
+        'lib/credentials/multiAttestOnchain'
+      );
 
       if (gnosisSafeForCredentials) {
         const populatedTransaction = await populateOnChainAttestationTransaction({

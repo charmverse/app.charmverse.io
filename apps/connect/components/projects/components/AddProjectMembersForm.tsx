@@ -1,14 +1,13 @@
+import { FarcasterCard } from '@connect-shared/components/common/FarcasterCard';
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import type { FormValues } from '@connect-shared/lib/projects/form';
+import type { FormValues } from '@connect-shared/lib/projects/projectSchema';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Button, Stack, Typography } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
 import { useState } from 'react';
 import type { Control, FieldArrayPath, UseFormHandleSubmit } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
-
-import { FarcasterCard } from '../../common/FarcasterCard';
 
 import { SearchFarcasterUser } from './SearchFarcasterUser';
 
@@ -43,11 +42,7 @@ export function AddProjectMembersForm({
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
-    <form
-      onSubmit={handleSubmit((data) => {
-        execute(data);
-      })}
-    >
+    <form onSubmit={handleSubmit(execute)}>
       <Stack gap={1}>
         <Typography variant='h6'>Team</Typography>
         <FarcasterCard
@@ -59,6 +54,7 @@ export function AddProjectMembersForm({
         />
         <Stack gap={1}>
           <SearchFarcasterUser
+            disabled={isExecuting}
             filteredFarcasterIds={selectedFarcasterProfiles.map((profile) => profile.fid).filter(isTruthy)}
             setSelectedProfile={(farcasterProfile) => {
               if (farcasterProfile) {
