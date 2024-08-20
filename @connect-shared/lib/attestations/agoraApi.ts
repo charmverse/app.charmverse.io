@@ -1,12 +1,12 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { POST } from '@root/adapters/http';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
+import { mapProjectToOptimism } from '@root/lib/credentials/mapProjectToOptimism';
 import { decodeOptimismProjectSnapshotAttestation } from '@root/lib/credentials/schemas/optimismProjectUtils';
 import { optimism } from 'viem/chains';
-
-import { mapProjectToOptimism } from '../../../lib/credentials/mapProjectToOptimism';
 
 export const AGORA_API_KEY = process.env.AGORA_API_KEY as string;
 
@@ -117,6 +117,19 @@ export async function createProjectMetadataAttestation({
     chainId: optimism.id
   }).then((data) => decodeOptimismProjectSnapshotAttestation(data.data));
 
+  const existingProject = await prisma.optimismProjectAttestation.findFirst({
+    where: {
+      projectRefUID
+    },
+    select: {
+      projectId: true
+    }
+  });
+
+  if (existingProject?.projectId && projectId && existingProject?.projectId !== projectId) {
+    throw new InvalidInputError('Project already imported');
+  }
+
   await prisma.optimismProjectAttestation.upsert({
     where: {
       projectRefUID
@@ -143,7 +156,8 @@ export async function createProjectMetadataAttestation({
       farcasterIds,
       name: attestationData.name,
       metadataAttestationUID: attestationMetadataUID,
-      metadataUrl: attestationData.metadataUrl
+      metadataUrl: attestationData.metadataUrl,
+      project: projectId ? { connect: { id: projectId } } : undefined
     }
   });
 

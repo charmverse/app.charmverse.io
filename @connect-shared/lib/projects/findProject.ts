@@ -4,6 +4,14 @@ import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { FarcasterProfileInfo } from '@root/lib/farcaster/loginWithFarcaster';
 import { replaceS3Domain } from '@root/lib/utils/url';
 
+export type ConnectProjectMember = {
+  farcasterId: number;
+  name: string;
+  teamLead: boolean;
+  farcasterUser: FarcasterProfileInfo;
+  userId: string | null;
+};
+
 export type ConnectProjectDetails = Pick<
   Project,
   | 'id'
@@ -26,11 +34,7 @@ export type ConnectProjectDetails = Pick<
   | 'primaryContractChainId'
   | 'sunnyAwardsNumber'
 > & {
-  projectMembers: {
-    userId: string | null;
-    teamLead: boolean;
-    farcasterUser: FarcasterProfileInfo;
-  }[];
+  projectMembers: ConnectProjectMember[];
 };
 
 export async function findProject({ id, path }: { id?: string; path?: string }): Promise<ConnectProjectDetails | null> {
@@ -97,6 +101,8 @@ export async function findProject({ id, path }: { id?: string; path?: string }):
         ...member.user,
         userId: member.userId,
         teamLead: member.teamLead,
+        name: farcasterUser?.displayName || '',
+        farcasterId: member.user?.farcasterUser?.fid as number,
         farcasterUser: {
           fid: member.user?.farcasterUser?.fid,
           pfpUrl: farcasterUser?.pfpUrl,

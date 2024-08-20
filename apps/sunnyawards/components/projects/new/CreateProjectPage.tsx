@@ -1,6 +1,5 @@
 'use client';
 
-import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -14,6 +13,7 @@ import { useForm } from 'react-hook-form';
 import type { Address } from 'viem';
 
 import { createProjectAction } from 'lib/projects/createProjectAction';
+import type { OptimismProjectWithMembers } from 'lib/projects/getUnimportedOptimismProjectsAction';
 import type { FormValues } from 'lib/projects/schema';
 import { schema } from 'lib/projects/schema';
 
@@ -26,7 +26,7 @@ export function CreateProjectPage({
   optimismProjects
 }: {
   user: LoggedInUser;
-  optimismProjects: OptimismProjectAttestation[];
+  optimismProjects: OptimismProjectWithMembers[];
 }) {
   const router = useRouter();
   const [errors, setErrors] = useState<string[] | null>(null);
@@ -52,14 +52,7 @@ export function CreateProjectPage({
     }
   });
 
-  const {
-    control,
-    formState: { isValid },
-    handleSubmit,
-    setValue,
-    getValues,
-    trigger
-  } = useForm<FormValues>({
+  const { control, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
       name: '',
       description: '',
@@ -73,7 +66,15 @@ export function CreateProjectPage({
       projectMembers: [
         {
           name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
-          farcasterId: user?.farcasterUser?.fid
+          farcasterId: user?.farcasterUser?.fid,
+          farcasterUser: {
+            fid: user?.farcasterUser?.fid,
+            displayName: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
+            pfpUrl:
+              (user?.farcasterUser?.account as FarcasterProfile['body'])?.avatarUrl ||
+              (user.farcasterUser?.account as { pfpUrl: string })?.pfpUrl,
+            username: (user?.farcasterUser?.account as FarcasterProfile['body'])?.username
+          }
         }
       ]
     },
@@ -81,32 +82,23 @@ export function CreateProjectPage({
     mode: 'onChange'
   });
 
-  function handleProjectSelect(project: OptimismProjectAttestation) {
+  function handleProjectSelect(project: OptimismProjectWithMembers) {
     // Casting as partial in case project was created before a metadata schema change
     const metadata = project.metadata as Partial<OptimismProject>;
 
-    setValue('name', project.name);
-
-    setValue('description', metadata.description || '');
-    setValue('websites', metadata.socialLinks?.website || []);
-    setValue('twitter', metadata.socialLinks?.twitter || '');
-    setValue('github', metadata.github?.[0] || '');
-    setValue('farcasterValues', metadata.socialLinks?.farcaster || []);
-
-    setValue('avatar', metadata.projectAvatarUrl || '');
-    setValue('coverImage', metadata.projectCoverImageUrl || '');
-
-    if (metadata.contracts?.[0]) {
-      setValue('primaryContractChainId', metadata.contracts[0].chainId.toString());
-      setValue('primaryContractAddress', metadata.contracts[0].address as Address);
-    }
-
-    setValue(
-      'projectMembers',
-      (metadata.team ?? []).map((farcasterId) => ({ farcasterId: parseInt(farcasterId.toString()), name: 'demo' }))
-    );
-
-    trigger('name');
+    reset({
+      name: project.name,
+      description: metadata.description || '',
+      websites: metadata.socialLinks?.website || [],
+      twitter: metadata.socialLinks?.twitter || '',
+      github: metadata.github?.[0] || '',
+      farcasterValues: metadata.socialLinks?.farcaster || [],
+      avatar: metadata.projectAvatarUrl || '',
+      coverImage: metadata.projectCoverImageUrl || '',
+      primaryContractChainId: metadata.contracts?.[0]?.chainId.toString() || '',
+      primaryContractAddress: metadata.contracts?.[0]?.address as Address,
+      projectMembers: project.projectMembers
+    });
   }
 
   return (
