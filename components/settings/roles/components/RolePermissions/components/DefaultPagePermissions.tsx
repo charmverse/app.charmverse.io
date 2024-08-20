@@ -17,12 +17,15 @@ import { useSpaces } from 'hooks/useSpaces';
 import { pagePermissionLevels } from 'lib/permissions/pages/labels';
 import { typedKeys } from 'lib/utils/objects';
 
-type PagePermissionLevelWithoutCustomAndProposalEditor = Exclude<PagePermissionLevel, 'custom' | 'proposal_editor'>;
+type PagePermissionLevelWithoutCustomAndProposalEditor =
+  | Exclude<PagePermissionLevel, 'custom' | 'proposal_editor'>
+  | 'none';
 const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProposalEditor, string> = {
   full_access: 'Space members can edit pages, share them with the public and manage permissions.',
   editor: 'Space members can edit but not share pages.',
   view_comment: 'Space members can view and comment on pages.',
-  view: 'Space members can only view pages.'
+  view: 'Space members can only view pages.',
+  none: 'Pages are private to authors by default'
 };
 export function DefaultPagePermissions() {
   const { space } = useCurrentSpace();
