@@ -95,7 +95,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
                 trackEvent('click_join_the_sunnys');
               }}
             >
-              Join The Sunnys
+              Join The SUNNYs
             </MuiLink>
           )}
         </Toolbar>
