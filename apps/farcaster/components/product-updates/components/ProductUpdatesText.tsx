@@ -50,7 +50,7 @@ export function ProductUpdatesText({
               fontSize: 24
             }}
           >
-            {projectName}
+            {projectName} Update
           </p>
           <p
             style={{
@@ -93,9 +93,10 @@ export function ProductUpdatesText({
               •
               <p
                 style={{
+                  fontSize: 18,
                   wordBreak: 'break-word',
-                  marginTop: -2,
-                  lineHeight: 1.25
+                  marginTop: -4,
+                  lineHeight: 1.5
                 }}
               >
                 {numberReplacedLine}

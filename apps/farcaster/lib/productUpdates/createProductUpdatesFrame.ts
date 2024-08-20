@@ -60,8 +60,8 @@ export async function createProductUpdatesFrame(input: FormValues) {
 
   // Use a ratio of 1.91:1 for the image as recommended by farcaster
   const image = new ImageResponse(element, {
-    width: 750,
-    height: 750 / 1.91
+    width: 500,
+    height: 500
   });
 
   const imageBlob = await image.blob();
