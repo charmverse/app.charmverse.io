@@ -106,26 +106,6 @@ services:
     profiles:
       - stg-connect
 
-  prd-connect-api:
-    extends:
-      service: defaults
-    command: ['sh', '-c', 'npm run connect-api:start:prod']
-    ports:
-      - '80:3000'
-    profiles:
-      - prd-connect-api
-
-  stg-connect-api:
-    extends:
-      service: defaults
-    command: ['sh', '-c', 'npm run connect-api:start:prod']
-    environment:
-      - REACT_APP_APP_ENV=staging
-    ports:
-      - '4000:3000'
-    profiles:
-      - stg-connect
-
   prd-sunnyawards:
     extends:
       service: defaults
@@ -281,5 +261,4 @@ services:
       - prd-sunnyawards
       - prd-sockets
       - prd-connect
-      - prd-connect-api
       - ddtst

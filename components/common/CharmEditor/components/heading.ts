@@ -69,10 +69,6 @@ function specFactory(): RawSpecs {
     name,
     schema: {
       attrs: {
-        id: {
-          // id is used for linking from table of contents
-          default: null
-        },
         level: {
           default: 1
         },
@@ -100,8 +96,12 @@ function specFactory(): RawSpecs {
           }
         };
       }),
+      // Note: toDOM is not constantly called, so this really only works when the heading is already created when we render the page
       toDOM: (node: Node) => {
-        const result: any = [`h${node.attrs.level}`, { id: node.attrs.id }, 0];
+        // @ts-ignore
+        const headingContent = node.content?.content?.[0]?.text || '';
+        const anchorName = slugify(headingContent);
+        const result: any = [`h${node.attrs.level}`, ['a', { name: anchorName }, 0]];
 
         return result;
       }

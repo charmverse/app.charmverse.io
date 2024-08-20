@@ -13,7 +13,6 @@ import type { CharmNodeViewProps } from '../nodeView/nodeView';
 // Table Of Contents inspiration: https://tiptap.dev/guide/node-views/examples#table-of-contents
 
 type HeadingItem = {
-  id: string;
   pos: number;
   text: string;
   level: number;
@@ -79,31 +78,16 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
 
   const handleUpdate = useCallback(() => {
     const headings: HeadingItem[] = [];
-    const transaction = view.state.tr;
 
     view.state.doc.descendants((node, pos) => {
       if (node.type.name === 'heading') {
-        const id = `heading-${headings.length + 1}`;
-        if (node.attrs.id !== id) {
-          transaction.setNodeMarkup(pos, undefined, {
-            ...node.attrs,
-            id
-          });
-        }
-
         headings.push({
           level: node.attrs.level,
           pos,
-          text: node.textContent,
-          id
+          text: node.textContent
         });
       }
     });
-
-    transaction.setMeta('addToHistory', false);
-    transaction.setMeta('preventUpdate', true);
-
-    view.dispatch(transaction);
 
     setItems(headings);
   }, [view.state.doc]);
@@ -123,7 +107,7 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
         <NestedPageContainer
           color='inherit'
           draggable={false}
-          key={item.id}
+          key={item.text}
           href={getHeadingLink(item.text)}
           onClick={() => highlightHeading(item)}
           external
