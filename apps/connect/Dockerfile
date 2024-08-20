@@ -18,6 +18,9 @@ COPY --parents @connect-shared \
   apps/*/package.json          \
   .
 
+# Copy compiled code
+COPY --parents apps/*/.next apps/*/public .
+
 ENV PORT=3000
 
 # Next.js collects completely anonymous telemetry data about general usage.
