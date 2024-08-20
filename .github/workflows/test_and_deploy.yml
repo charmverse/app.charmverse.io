@@ -426,18 +426,18 @@ jobs:
 
       - name: Package cron worker
         run: |
-          rm -r .ebextensions && mv .ebextensions/cron .ebextensions
+          rm -r .ebextensions && mv .ebextensions_tmp/cron .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
       - name: Package ceramic server
         run: |
-          rm -r .ebextensions && mv .ebextensions/ceramic .ebextensions
+          rm -r .ebextensions && mv .ebextensions_tmp/ceramic .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
 
       - name: Package websockets
         id: pkg_websocket
         run: |
-          rm -r .ebextensions && mv .ebextensions/websockets .ebextensions
+          rm -r .ebextensions && mv .ebextensions_tmp/websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
           changed_files=$(git diff --name-only ${{github.event.before}} ${{github.event.after}})
