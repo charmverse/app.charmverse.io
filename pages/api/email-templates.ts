@@ -14,7 +14,7 @@ import type {
 } from 'lib/notifications/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
-import randomName from 'lib/utils/randomName';
+import { randomName } from 'lib/utils/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
 import { blueColor } from 'theme/colors';
 

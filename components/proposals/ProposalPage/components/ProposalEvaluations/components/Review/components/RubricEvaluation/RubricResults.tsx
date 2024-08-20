@@ -5,7 +5,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { AccordionProps, AccordionSummaryProps } from '@mui/material';
 import {
   Box,
-  Divider,
   ListItemIcon,
   Menu,
   MenuItem,
@@ -24,17 +23,11 @@ import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import { isNumber } from 'lib/utils/numbers';
 
-import { PassFailEvaluationContainer } from '../PassFailEvaluationContainer';
-
 type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
   criteriaList: ProposalRubricCriteria[];
-  isCurrent: boolean;
-  proposalId?: string;
   evaluation?: PopulatedEvaluation;
-  refreshProposal?: VoidFunction;
-  archived?: boolean;
-  authors: string[];
+  showReviewerIdentities: boolean;
 };
 
 type CriteriaSummaryType = 'sum' | 'average';
@@ -66,11 +59,7 @@ export function RubricResults({
   criteriaList = [],
   answers: allAnswers = [],
   evaluation,
-  refreshProposal,
-  isCurrent,
-  proposalId,
-  archived,
-  authors
+  showReviewerIdentities
 }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [criteriaSummaryType, setCriteriaSummaryType] = useState<CriteriaSummaryType>('average');
@@ -170,7 +159,7 @@ export function RubricResults({
             {criteria.answers.map((answer) => (
               <>
                 <Box display='flex' justifyContent='space-between' width='100%' key={answer.userId}>
-                  <UserDisplay avatarSize='xSmall' userId={answer.userId} />
+                  <UserDisplay avatarSize='xSmall' userId={answer.userId} anonymize={!showReviewerIdentities} />
                   <span>
                     {answer.score}
                     <Typography color='secondary' component='span'>

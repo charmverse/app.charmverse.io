@@ -1,7 +1,7 @@
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import randomName from 'lib/utils/randomName';
+import { randomName } from 'lib/utils/randomName';
 import { uid } from 'lib/utils/strings';
 
 export async function addUserGoogleAccount({

@@ -1,6 +1,6 @@
 import { validate } from 'uuid';
 import { prisma } from '@charmverse/core/prisma-client';
-import randomName from 'lib/utils/randomName';
+import { randomName } from 'lib/utils/randomName';
 import { uid } from 'lib/utils/strings';
 
 export async function seedUsers({ spaceDomainOrId, amount }: { spaceDomainOrId: string; amount: number }) {

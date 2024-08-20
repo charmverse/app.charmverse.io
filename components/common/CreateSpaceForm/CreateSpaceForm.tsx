@@ -27,7 +27,7 @@ import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImport
 import { spaceTemplateIds } from 'lib/spaces/config';
 import type { SpaceTemplateType } from 'lib/spaces/config';
 import { setCookie, getSpaceUrl } from 'lib/utils/browser';
-import randomName from 'lib/utils/randomName';
+import { randomName } from 'lib/utils/randomName';
 
 import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
 import { SpaceAccessGateWithSearch } from '../SpaceAccessGate/SpaceAccessGateWithSearch';

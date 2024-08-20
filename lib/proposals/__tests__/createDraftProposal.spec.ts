@@ -1,17 +1,12 @@
-import type { ProposalWorkflow, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsProposals, testUtilsPages } from '@charmverse/core/test';
+import { testUtilsProposals } from '@charmverse/core/test';
 import type { FormFieldInput } from '@root/lib/forms/interfaces';
-import { v4 as uuid, v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateForumPost } from 'testing/utils/forums';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 import { createDraftProposal } from '../createDraftProposal';
-import { createProposal } from '../createProposal';
-import type { ProposalWithUsersAndRubric } from '../interfaces';
 
 describe('createDraftProposal', () => {
   it('Create proposal template with existing form', async () => {
