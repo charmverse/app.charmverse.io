@@ -42,7 +42,8 @@ export async function sendMagicLink({ to, redirectUrl, spaceId }: MagicLinkDispa
   if (!user) {
     await firebase.createUser({ email: to.email });
   }
-  const magicLink = await firebase.generateEmailVerificationLink(to.email, actionCodeSettings);
+  // we use SignIn link since it redirects user to our site, whereas generateEmailVerificationLink drops them at a firebase page by default.
+  const magicLink = await firebase.generateSignInWithEmailLink(to.email, actionCodeSettings);
 
   const space = spaceId
     ? await prisma.space.findUnique({
