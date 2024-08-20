@@ -64,8 +64,8 @@ export async function sendProjectConfirmationEmail({ userId, projectId }: { user
       email: user.email!,
       userId
     },
-    senderAddress: `The Sunnys <updates@mail.thesunnyawards.fun>`,
-    subject: 'Congratulations you just entered the Sunnys',
+    senderAddress: `The SUNNYs <updates@mail.thesunnyawards.fun>`,
+    subject: 'Congratulations you just entered the SUNNYs',
     html
   });
 }

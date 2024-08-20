@@ -94,7 +94,7 @@ export function WarpcastLogin() {
       <WarpcastLoginButton />
       <Link
         variant='body2'
-        href='https://warpcast.com/~/signup'
+        href='https://www.farcaster.xyz/'
         target='_blank'
         rel='noopener'
         color='text.primary'

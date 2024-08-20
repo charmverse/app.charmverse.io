@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
-import { IconButton, Stack, TextField, Button, FormLabel } from '@mui/material';
+import { Box, IconButton, Stack, TextField, Button, FormLabel } from '@mui/material';
 import type { FieldValues, Control, FieldArrayPath, Path } from 'react-hook-form';
 import { Controller, useController, useFieldArray } from 'react-hook-form';
 
@@ -67,7 +67,7 @@ export function MultiTextInputField<T extends FieldValues>({
             control={control}
             name={`${typedName}.${index + 1}` as Path<T>}
             render={({ field: _field, fieldState }) => (
-              <Stack width='100%' gap={1} alignItems='center' flexDirection='row'>
+              <Stack width='100%' gap={1} alignItems='flex-start' flexDirection='row'>
                 <TextField
                   aria-labelledby={`project-${typedName}-${index + 1}`}
                   disabled={disabled}
@@ -89,9 +89,11 @@ export function MultiTextInputField<T extends FieldValues>({
                     });
                   }}
                 />
-                <IconButton disabled={disabled} size='small' onClick={() => remove(index + 1)}>
-                  <DeleteIcon fontSize='small' color='error' />
-                </IconButton>
+                <Box mt={0.5}>
+                  <IconButton disabled={disabled} size='small' onClick={() => remove(index + 1)}>
+                    <DeleteIcon fontSize='small' color='error' />
+                  </IconButton>
+                </Box>
               </Stack>
             )}
           />

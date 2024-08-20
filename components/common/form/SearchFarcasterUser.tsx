@@ -50,7 +50,7 @@ export function SearchFarcasterUser({
   }, []);
 
   useEffect(() => {
-    if (searchTerm && searchTerm.length >= 3) {
+    if (searchTerm && searchTerm.length >= 2) {
       debouncedGetPublicSpaces(searchTerm);
     } else {
       setFarcasterProfiles([]);

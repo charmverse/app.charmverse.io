@@ -84,7 +84,7 @@ export function ProjectForm({
         </Stack>
         <Stack>
           <FormLabel id='project-sunnyaward-type' required>
-            Sunny Awards Project Type
+            SUNNY Awards Project Type
           </FormLabel>
           <Controller
             control={control}
