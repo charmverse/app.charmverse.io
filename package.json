@@ -235,7 +235,7 @@
     "diff": "^5.1.0",
     "emoji-mart": "^3.0.1",
     "ethers": "^5.7.2",
-    "firebase": "^10.12.5",
+    "firebase": "^10.13.0",
     "firebase-admin": "^12.3.0",
     "form-data": "^4.0.0",
     "formidable": "^3.5.0",
