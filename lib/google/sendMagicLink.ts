@@ -24,6 +24,7 @@ export async function sendMagicLink({ to, redirectUrl, spaceId }: MagicLinkDispa
   ) {
     throw new Error('Missing auth info for Firebase');
   }
+
   // make sure we only initialize the app once
   const alreadyCreatedApps = getApps();
   const firebaseClientApp =
@@ -35,7 +36,13 @@ export async function sendMagicLink({ to, redirectUrl, spaceId }: MagicLinkDispa
     url: `${process.env.DOMAIN}/authenticate${redirectUrl ? `?redirectUrl=${encodeURIComponent(redirectUrl)}` : ''}`,
     handleCodeInApp: true
   };
-  const magicLink = await getAuth(firebaseClientApp).generateEmailVerificationLink(to.email, actionCodeSettings);
+  const firebase = getAuth(firebaseClientApp);
+  const user = await firebase.getUserByEmail(to.email).catch(() => null); // this method throws if user does not exist
+  // create a firebase user or else generateEmailVerificationLink will fail
+  if (!user) {
+    await firebase.createUser({ email: to.email });
+  }
+  const magicLink = await firebase.generateEmailVerificationLink(to.email, actionCodeSettings);
 
   const space = spaceId
     ? await prisma.space.findUnique({

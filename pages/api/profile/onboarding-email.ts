@@ -72,9 +72,6 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
         spaceId: payload.spaceId,
         to: { email: updatedUser.email, userId: updatedUser.id, displayName: updatedUser.username }
       })
-        .catch((error) => {
-          log.warn('Error sending magic link to verify notification email', { error, userId: updatedUser.id });
-        })
         .then(() => {
           log.info('Sent magic link to verify notification email', { userId: updatedUser.id });
           cookies.set(magicLinkEmailCookie, updatedUser.email, {
@@ -82,6 +79,9 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
             sameSite: 'strict',
             expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) // 7 days
           });
+        })
+        .catch((error) => {
+          log.warn('Error sending magic link to verify user email', { error, userId: updatedUser.id });
         });
     }
   }
