@@ -1,5 +1,4 @@
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import type { ConnectProjectMember } from '@connect-shared/lib/projects/findProject';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { FormLabel, Stack } from '@mui/material';
 import { isTruthy } from '@root/lib/utils/types';
@@ -29,6 +28,8 @@ export function AddProjectMembersForm({
 
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
+  const additionalMembers = fields.filter((profile) => profile.farcasterId !== user.farcasterUser?.fid);
+
   return (
     <Stack gap={1}>
       <FormLabel id='search-farcaster-user'>Team</FormLabel>
@@ -55,7 +56,7 @@ export function AddProjectMembersForm({
         />
       </Stack>
       <Stack gap={1} mb={2}>
-        {fields.map(({ farcasterUser }) => (
+        {additionalMembers.map(({ farcasterUser }) => (
           <FarcasterCard
             avatarSize='large'
             fid={farcasterUser.fid}

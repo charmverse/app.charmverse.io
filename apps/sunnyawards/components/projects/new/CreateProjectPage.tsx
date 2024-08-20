@@ -2,7 +2,6 @@
 
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import type { ConnectProjectMember } from '@connect-shared/lib/projects/findProject';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { OptimismProject } from '@root/lib/credentials/mapProjectToOptimism';
 import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
@@ -53,7 +52,7 @@ export function CreateProjectPage({
     }
   });
 
-  const { control, handleSubmit, setValue, trigger, reset } = useForm<FormValues>({
+  const { control, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
       name: '',
       description: '',
@@ -68,7 +67,14 @@ export function CreateProjectPage({
         {
           name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
           farcasterId: user?.farcasterUser?.fid,
-          farcasterUser: user?.farcasterUser as ConnectProjectMember['farcasterUser']
+          farcasterUser: {
+            fid: user?.farcasterUser?.fid,
+            displayName: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
+            pfpUrl:
+              (user?.farcasterUser?.account as FarcasterProfile['body'])?.avatarUrl ||
+              (user.farcasterUser?.account as { pfpUrl: string })?.pfpUrl,
+            username: (user?.farcasterUser?.account as FarcasterProfile['body'])?.username
+          }
         }
       ]
     },
