@@ -265,7 +265,7 @@ export function EvaluationStepSettings({
                   }}
                 />
               }
-              label='Show anonymized reviews'
+              label='Show reviews (anonymized)'
             />
           </Box>
           <FormLabel required>
