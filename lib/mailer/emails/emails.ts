@@ -7,11 +7,8 @@ import { htmlToText } from 'html-to-text';
 import type { ReactElement } from 'react';
 import ReactDOMServer from 'react-dom/server';
 
-import type { EmailVerificationProps } from './templates/EmailVerificationTemplate';
-import {
-  emailSubject as emailVerificationSubject,
-  EmailVerificationTemplate
-} from './templates/EmailVerificationTemplate';
+import type { MagicLinkProps } from './templates/MagicLinkTemplate';
+import { emailSubject as emailVerificationSubject, MagicLinkTemplate } from './templates/MagicLinkTemplate';
 import { NotificationTemplate } from './templates/NotificationTemplate';
 import { OrangeDAOInviteTemplate } from './templates/OrangeDAOInviteTemplate';
 import type { PageInviteEmailProps } from './templates/PageInviteTemplate';
@@ -76,8 +73,8 @@ export function getPageInviteEmail(props: PageInviteEmailProps) {
   return { html, subject };
 }
 
-export function getEmailVerification(props: EmailVerificationProps) {
-  const html = render(EmailVerificationTemplate(props));
+export function getMagicLinkEmail(props: MagicLinkProps) {
+  const html = render(MagicLinkTemplate(props));
   const subject = emailVerificationSubject();
 
   return { html, subject };

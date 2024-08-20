@@ -1,21 +1,22 @@
-import { googleWebClientConfig } from '@root/config/constants';
+import { prisma } from '@charmverse/core/prisma-client';
 import admin from 'firebase-admin';
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
 import { googleFirebaseAdminConfig } from 'config/constants';
-import { getEmailVerification } from 'lib/mailer/emails';
+import { getMagicLinkEmail } from 'lib/mailer/emails';
 import type { EmailRecipient } from 'lib/mailer/mailer';
 import { sendEmail } from 'lib/mailer/mailer';
 
 type MagicLinkDispatch = {
   to: EmailRecipient;
   redirectUrl?: string;
+  spaceId?: string; // for branding
 };
 
 // manage credentials https://console.firebase.google.com/u/1/project/charmverse-dev/settings/serviceaccounts/adminsdk
 
-export async function sendMagicLink({ to, redirectUrl }: MagicLinkDispatch) {
+export async function sendMagicLink({ to, redirectUrl, spaceId }: MagicLinkDispatch) {
   if (
     !googleFirebaseAdminConfig.privateKey ||
     !googleFirebaseAdminConfig.clientEmail ||
@@ -34,14 +35,21 @@ export async function sendMagicLink({ to, redirectUrl }: MagicLinkDispatch) {
     url: `${process.env.DOMAIN}/authenticate${redirectUrl ? `?redirectUrl=${encodeURIComponent(redirectUrl)}` : ''}`,
     handleCodeInApp: true
   };
-  const verificationUrl = await getAuth(firebaseClientApp).generateEmailVerificationLink(to.email, actionCodeSettings);
+  const magicLink = await getAuth(firebaseClientApp).generateEmailVerificationLink(to.email, actionCodeSettings);
 
-  const template = getEmailVerification({
-    verificationUrl
-    // emailBranding: {
-    //   artwork: space.emailBrandArtwork || '',
-    //   color: space.emailBrandColor || blueColor
-    // }
+  const space = spaceId
+    ? await prisma.space.findUnique({
+        where: {
+          id: spaceId
+        }
+      })
+    : null;
+  const template = getMagicLinkEmail({
+    magicLink,
+    emailBranding: {
+      artwork: space?.emailBrandArtwork || '',
+      color: space?.emailBrandColor || ''
+    }
   });
   return sendEmail({
     to,

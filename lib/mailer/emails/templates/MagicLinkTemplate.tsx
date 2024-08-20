@@ -2,14 +2,18 @@ import { Row } from '@react-email/row';
 
 import { Button, EmailWrapper, Text } from './components';
 
-export type EmailVerificationProps = {
+export type MagicLinkProps = {
   // geneate URL: https://blog.logrocket.com/send-custom-email-templates-firebase-react-express/#generate-email-verification-link
-  verificationUrl: string;
+  magicLink: string;
+  emailBranding?: {
+    artwork: string;
+    color: string;
+  };
 };
 
-export function EmailVerificationTemplate({ verificationUrl }: EmailVerificationProps) {
+export function MagicLinkTemplate({ magicLink, emailBranding }: MagicLinkProps) {
   return (
-    <EmailWrapper title='Verify your email address'>
+    <EmailWrapper emailBranding={emailBranding} title='Verify your email address'>
       <Text variant='h2'>Verify your email address</Text>
       <Text>Thanks for signing up with us. Click on the button below to verify your email address.</Text>
       <Row
@@ -18,10 +22,11 @@ export function EmailVerificationTemplate({ verificationUrl }: EmailVerification
         }}
       >
         <Button
+          primaryColor={emailBranding?.color}
           style={{
             width: 'fit-content'
           }}
-          href={verificationUrl}
+          href={magicLink}
         >
           Verify your email
         </Button>

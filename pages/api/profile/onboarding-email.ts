@@ -69,6 +69,7 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
     if (verifiedEmail === 0) {
       // see if user wants to verify their email address for logging in later
       await sendMagicLink({
+        spaceId: payload.spaceId,
         to: { email: updatedUser.email, userId: updatedUser.id, displayName: updatedUser.username }
       })
         .catch((error) => {
