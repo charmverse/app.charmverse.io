@@ -23,7 +23,11 @@ export async function createProject({
     Partial<
       Pick<
         Project,
-        'primaryContractAddress' | 'primaryContractChainId' | 'mintingWalletAddress' | 'sunnyAwardsProjectType'
+        | 'primaryContractAddress'
+        | 'primaryContractChainId'
+        | 'mintingWalletAddress'
+        | 'sunnyAwardsProjectType'
+        | 'sunnyAwardsNumber'
       >
     >;
   userId: string;
@@ -213,6 +217,7 @@ export async function createProject({
       primaryContractChainId: input.primaryContractChainId,
       mintingWalletAddress: input.mintingWalletAddress,
       sunnyAwardsProjectType: input.sunnyAwardsProjectType,
+      sunnyAwardsNumber: input.sunnyAwardsNumber,
       source,
       projectMembers: {
         createMany: {

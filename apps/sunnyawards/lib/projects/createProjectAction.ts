@@ -1,6 +1,7 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { trackMixpanelEvent } from '@connect-shared/lib/mixpanel/trackMixpanelEvent';
@@ -21,14 +22,22 @@ export const createProjectAction = authActionClient
     const input = parsedInput;
 
     const currentUserId = ctx.session.user.id;
+
+    const totalProjects = await prisma.project.count({
+      where: {
+        source: 'sunny_awards'
+      }
+    });
+
     const newProject = await createProject({
       userId: currentUserId,
       input: {
         ...input,
+        sunnyAwardsNumber: totalProjects + 1,
         optimismCategory: getOptimismCategory(input.sunnyAwardsCategory),
         primaryContractChainId: input.primaryContractChainId ? parseInt(input.primaryContractChainId) : undefined
       },
-      source: 'connect'
+      source: 'sunny_awards'
     });
 
     if (!disableCredentialAutopublish) {

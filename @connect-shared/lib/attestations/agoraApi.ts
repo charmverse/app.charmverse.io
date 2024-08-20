@@ -117,7 +117,7 @@ export async function createProjectMetadataAttestation({
     chainId: optimism.id
   }).then((data) => decodeOptimismProjectSnapshotAttestation(data.data));
 
-  const existingProject = await prisma.optimismProjectAttestation.findFirstOrThrow({
+  const existingProject = await prisma.optimismProjectAttestation.findFirst({
     where: {
       projectRefUID
     },
@@ -126,7 +126,7 @@ export async function createProjectMetadataAttestation({
     }
   });
 
-  if (existingProject.projectId && projectId && existingProject.projectId !== projectId) {
+  if (existingProject?.projectId && projectId && existingProject?.projectId !== projectId) {
     throw new InvalidInputError('Project already imported');
   }
 
