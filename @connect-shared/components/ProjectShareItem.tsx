@@ -1,9 +1,8 @@
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { baseUrl } from '@root/config/constants';
-import { stringToColor } from '@root/lib/utils/strings';
 
 export function ProjectShareItem({ project }: { project: NonNullable<ConnectProjectDetails> }) {
-  const projectName = project.name || 'Untitled';
+  const projectName = project.name?.substring(0, 30) || 'Untitled';
   const defaultFont =
     'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
@@ -41,32 +40,17 @@ export function ProjectShareItem({ project }: { project: NonNullable<ConnectProj
     flexDirection: 'column',
     alignItems: 'center',
     gap: '4px',
-    top: '60px',
-    left: '165px'
+    top: '64px',
+    left: '165px',
+    maxWidth: '130px',
+    wordBreak: 'break-all'
   } as const;
 
   return (
     <div style={cardStyle}>
       <img src={`${baseUrl}/images/project-share.jpg`} alt='Project Share' style={mediaStyle} />
       <div style={memberStackStyle}>
-        {project.avatar ? (
-          <img style={avatarStyle} src={project.avatar || ''} alt={project.name} width='40px' height='40px' />
-        ) : (
-          <div
-            style={{
-              ...avatarStyle,
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: stringToColor(project.name)
-            }}
-          >
-            <p style={{ fontSize: '30px' }}>{project.name?.charAt(0)?.toLocaleUpperCase()}</p>
-          </div>
-        )}
-        <h1 style={{ fontWeight: 400, fontSize: '1rem', margin: 0, padding: 0 }}>{projectName.substring(0, 20)}</h1>
+        <h1 style={{ fontWeight: 400, fontSize: '1rem', margin: 0, padding: 0 }}>{projectName}</h1>
         <h2 style={{ fontWeight: 400, fontSize: '0.8rem', margin: 0, padding: 0 }}>
           Ticket No: {project.sunnyAwardsNumber}
         </h2>

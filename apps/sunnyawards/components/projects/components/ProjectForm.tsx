@@ -3,8 +3,7 @@
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
-import { Box, FormLabel, ListSubheader, MenuItem, Select, Stack, TextField, Typography, Button } from '@mui/material';
+import { Button, FormLabel, ListSubheader, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
@@ -21,18 +20,15 @@ import { ProjectImageField } from './ProjectImageField';
 export function ProjectForm({
   control,
   isExecuting,
-  projectMembers = [],
   user,
   errors
 }: {
   control: Control<FormValues>;
-  projectMembers?: ConnectProjectDetails['projectMembers'];
   isExecuting: boolean;
   user: LoggedInUser;
   errors: string[] | null;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
-
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
 
   return (
@@ -88,7 +84,7 @@ export function ProjectForm({
         </Stack>
         <Stack>
           <FormLabel id='project-sunnyaward-type' required>
-            Sunny Awards Project Type
+            SUNNY Awards Project Type
           </FormLabel>
           <Controller
             control={control}
@@ -261,18 +257,7 @@ export function ProjectForm({
           </Stack>
         </Stack>
       </Stack>
-      <AddProjectMembersForm
-        user={user}
-        control={control}
-        disabled={isExecuting}
-        initialFarcasterProfiles={projectMembers.slice(1).map((member) => ({
-          bio: member.farcasterUser.bio,
-          displayName: member.farcasterUser.displayName,
-          fid: member.farcasterUser.fid,
-          pfpUrl: member.farcasterUser.pfpUrl,
-          username: member.farcasterUser.username
-        }))}
-      />
+      <AddProjectMembersForm user={user} control={control} disabled={isExecuting} />
       <Stack direction='row' justifyContent='space-between'>
         <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary'>
           Cancel

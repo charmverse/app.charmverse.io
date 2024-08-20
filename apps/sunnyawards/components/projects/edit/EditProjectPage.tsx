@@ -1,12 +1,9 @@
 'use client';
 
-import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -57,14 +54,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       primaryContractChainId: project.primaryContractChainId?.toString() ?? '',
       primaryContractAddress: (project.primaryContractAddress as `0x${string}`) ?? '',
       mintingWalletAddress: (project.mintingWalletAddress as `0x${string}`) ?? '',
-      projectMembers:
-        project.projectMembers.map(
-          (member) =>
-            ({
-              farcasterId: member.farcasterUser.fid,
-              name: member.farcasterUser.displayName
-            } as FormValues['projectMembers'][0])
-        ) || []
+      projectMembers: project.projectMembers
     },
     resolver: yupResolver(schema),
     mode: 'onChange'
@@ -80,13 +70,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           });
         })}
       >
-        <ProjectForm
-          control={control}
-          isExecuting={isExecuting}
-          user={user}
-          projectMembers={project.projectMembers}
-          errors={errors}
-        />
+        <ProjectForm control={control} isExecuting={isExecuting} user={user} errors={errors} />
       </form>
     </PageWrapper>
   );

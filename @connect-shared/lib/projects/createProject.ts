@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { OptionalPrismaTransaction, Project, ProjectSource } from '@charmverse/core/prisma-client';
+import type { OptionalPrismaTransaction, Prisma, Project, ProjectSource } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-client';
 import { resolveENSName } from '@root/lib/blockchain';
@@ -23,7 +23,11 @@ export async function createProject({
     Partial<
       Pick<
         Project,
-        'primaryContractAddress' | 'primaryContractChainId' | 'mintingWalletAddress' | 'sunnyAwardsProjectType'
+        | 'primaryContractAddress'
+        | 'primaryContractChainId'
+        | 'mintingWalletAddress'
+        | 'sunnyAwardsProjectType'
+        | 'sunnyAwardsNumber'
       >
     >;
   userId: string;
@@ -52,6 +56,10 @@ export async function createProject({
     }
   });
 
+  const teamLeadFarcasterAccount = farcasterAccounts.find(
+    (account) => account.userId === userId
+  ) as (typeof farcasterAccounts)[0];
+
   const farcasterAccountsRecord: Record<
     number,
     {
@@ -76,7 +84,7 @@ export async function createProject({
 
   const projectMembers = (
     await Promise.all(
-      input.projectMembers.slice(1).map(async (member) => {
+      input.projectMembers.map(async (member) => {
         if (farcasterAccountsRecord[member.farcasterId]) {
           return {
             userId: farcasterAccountsRecord[member.farcasterId].userId,
@@ -179,6 +187,17 @@ export async function createProject({
     });
   }
 
+  const projectMembersToCreate: Omit<Prisma.ProjectMemberCreateManyInput, 'projectId'>[] = [
+    ...projectMembers.map((member) => ({
+      teamLead: member.farcasterId === teamLeadFarcasterAccount.fid,
+      updatedBy: userId,
+      userId: member.userId,
+      // This is necessary because some test data fids do not have a corresponding farcaster profile
+      name: member.name || '',
+      farcasterId: member.farcasterId
+    }))
+  ];
+
   const project = await tx.project.create({
     data: {
       name: input.name,
@@ -198,25 +217,11 @@ export async function createProject({
       primaryContractChainId: input.primaryContractChainId,
       mintingWalletAddress: input.mintingWalletAddress,
       sunnyAwardsProjectType: input.sunnyAwardsProjectType,
+      sunnyAwardsNumber: input.sunnyAwardsNumber,
       source,
       projectMembers: {
         createMany: {
-          data: [
-            {
-              teamLead: true,
-              updatedBy: userId,
-              userId,
-              name: farcasterAccountsRecord[input.projectMembers[0]?.farcasterId]?.account.displayName as string,
-              farcasterId: input.projectMembers[0]?.farcasterId
-            },
-            ...projectMembers.map((member) => ({
-              teamLead: false,
-              updatedBy: userId,
-              userId: member.userId,
-              name: member.name,
-              farcasterId: member.farcasterId
-            }))
-          ]
+          data: projectMembersToCreate
         }
       }
     }
