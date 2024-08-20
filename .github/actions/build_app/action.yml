@@ -15,12 +15,12 @@ runs:
       with:
         # include the public folder in case the build output puts something there (like sw.js)
         path: |
-          apps/${{ app_name }}/.next
-          apps/${{ app_name }}/public
-        key: app-${{ app_name }}-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts[x]', '@connect-shared/**/*.ts[x]', 'apps/${{ app_name }}/**/*.ts', 'apps/${{ app_name }}/**/*.scss') }}
+          apps/${{ inputs.app_name }}/.next
+          apps/${{ inputs.app_name }}/public
+        key: app-${{ inputs.app_name }}-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts[x]', '@connect-shared/**/*.ts[x]', 'apps/${{ inputs.app_name }}/**/*.ts', 'apps/${{ inputs.app_name }}/**/*.scss') }}
 
     - name: Build app
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
       run: |
-        npm run ${{ app_name }}:build
+        npm run ${{ inputs.app_name }}:build
