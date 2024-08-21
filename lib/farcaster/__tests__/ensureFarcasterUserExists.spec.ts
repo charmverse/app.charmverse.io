@@ -2,6 +2,7 @@ import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { shortWalletAddress } from '@root/lib/utils/blockchain';
+import { randomIntFromInterval } from '@root/lib/utils/random';
 
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { uid } from 'lib/utils/strings';
@@ -16,15 +17,10 @@ jest.mock('lib/utils/blockchain');
 jest.mock('lib/profile/isProfilePathAvailable');
 
 describe('ensureFarcasterUserExists', () => {
-  const fid = 12345;
-
-  afterEach(async () => {
-    await prisma.farcasterUser.deleteMany();
-    await prisma.user.deleteMany();
-  });
-
   it('should return existing Farcaster user if already in the database', async () => {
     const user = await testUtilsUser.generateUser();
+
+    const fid = randomIntFromInterval(1, 100000);
 
     const existingFarcasterUser = await prisma.farcasterUser.create({
       data: {
@@ -48,6 +44,7 @@ describe('ensureFarcasterUserExists', () => {
   });
 
   it('should create a Farcaster user and link it to an existing user account', async () => {
+    const fid = randomIntFromInterval(1, 100000);
     const existingUser = await prisma.user.create({
       data: {
         username: 'existinguser',
@@ -89,6 +86,7 @@ describe('ensureFarcasterUserExists', () => {
   });
 
   it('should create a new Farcaster user and a new user account if no existing user account found', async () => {
+    const fid = randomIntFromInterval(1, 100000);
     (getFarcasterUsers as jest.Mock).mockResolvedValue([
       {
         fid,
@@ -122,6 +120,7 @@ describe('ensureFarcasterUserExists', () => {
   });
 
   it('should throw DataNotFoundError if the Farcaster user is not found in the external service', async () => {
+    const fid = randomIntFromInterval(1, 100000);
     (getFarcasterUsers as jest.Mock).mockResolvedValue([]);
 
     await expect(ensureFarcasterUserExists({ fid })).rejects.toThrow(DataNotFoundError);
