@@ -36,7 +36,7 @@ on:
         required: true
 
 concurrency:
-  group: ci-farcaster-${{ github.event_name }}-${{ github.ref }}
+  group: farcaster-prd-${{ github.event_name }}-${{ github.ref }}
 
 jobs:
   build-app:
@@ -60,7 +60,6 @@ jobs:
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
-          save_cache: true
 
       - name: Build apps
         uses: ./.github/actions/build_app
@@ -196,8 +195,8 @@ jobs:
       (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-farcaster')))
 
     runs-on: ubuntu-latest
-    # prevent workflows running in parallel
-    concurrency: deploy-staging-${{ github.head_ref }}
+    # prevent staging deploys + cleanup running in parallel
+    concurrency: staging-${{ github.ref }}
     needs: [upload-docker]
     steps:
       - uses: actions/checkout@v4

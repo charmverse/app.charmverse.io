@@ -274,7 +274,7 @@ export function ProjectForm({
           )}
           {!isExecuting && errors?.length && <FormErrors errors={errors} />}
           <Button data-test='project-form-publish' disabled={isExecuting} type='submit'>
-            Publish
+            Accept Invite
           </Button>
         </Stack>
       </Stack>

@@ -67,6 +67,7 @@ export class ProposalPage extends DocumentPage {
     public passFeedbackEvaluation = page.locator('data-test=pass-feedback-evaluation'),
     public failEvaluationButton = page.locator('data-test=evaluation-fail-button'),
     public passEvaluationButton = page.locator('data-test=evaluation-pass-button'),
+    public rubricStepDecisionTab = page.locator('data-test=Decision-tab'),
     public goBackButton = page.locator('data-test=evaluation-go-back-button'),
     public rubricCriteriaScore = page.locator('data-test=rubric-criteria-score-input >> input'),
     public rubricCriteriaComment = page.locator('data-test=rubric-criteria-score-comment >> textarea').first(),

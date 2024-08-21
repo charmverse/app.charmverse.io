@@ -1,6 +1,18 @@
 import type { ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { Alert, Box, FormGroup, FormLabel, Stack, TextField, Rating, Typography } from '@mui/material';
+import { DeleteOutlined } from '@mui/icons-material';
+import {
+  Alert,
+  Box,
+  FormGroup,
+  FormLabel,
+  IconButton,
+  Stack,
+  TextField,
+  Rating,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
@@ -115,7 +127,6 @@ export function RubricAnswersForm({
   onSubmit
 }: Props) {
   const hasDraft = !!draftAnswers?.length;
-
   const { showConfirmation } = useConfirmationModal();
   const [showDraftAnswers, setShowDraftAnswers] = useState(hasDraft);
 
@@ -272,11 +283,18 @@ export function RubricAnswersForm({
       )}
       {showDraftAnswers && (
         <Alert
-          severity='info'
+          severity='warning'
           action={
-            <Button variant='outlined' size='small' onClick={() => toggleDraftView(false)}>
-              View submitted
-            </Button>
+            <Stack direction='row' gap={1}>
+              <Button color='warning' variant='outlined' size='small' onClick={() => toggleDraftView(false)}>
+                View submitted
+              </Button>
+              <Tooltip title='Delete draft'>
+                <IconButton size='small' onClick={deleteDraftAnswers}>
+                  <DeleteOutlined fontSize='small' />
+                </IconButton>
+              </Tooltip>
+            </Stack>
           }
         >
           Viewing a draft
@@ -296,7 +314,21 @@ export function RubricAnswersForm({
           />
         ))}
         <Box display='flex' gap={2}>
-          <Stack direction='row' gap={2}>
+          <Stack justifyContent='flex-end' gap={2} direction='row' width='100%'>
+            <Stack direction='row' gap={2}>
+              {!disabled && (
+                <Button
+                  sx={{ alignSelf: 'start' }}
+                  color='secondary'
+                  variant='outlined'
+                  disabled={!isDirty}
+                  loading={draftIsSaving}
+                  onClick={handleSubmit(submitDraftAnswers)}
+                >
+                  {showDraftAnswers ? 'Update' : 'Save'} draft
+                </Button>
+              )}
+            </Stack>
             <Button
               data-test='save-rubric-answers'
               sx={{ alignSelf: 'start' }}
@@ -314,23 +346,6 @@ export function RubricAnswersForm({
             >
               Submit
             </Button>
-            {!disabled && (
-              <Button
-                sx={{ alignSelf: 'start' }}
-                color='secondary'
-                variant='outlined'
-                disabled={!isDirty}
-                loading={draftIsSaving}
-                onClick={handleSubmit(submitDraftAnswers)}
-              >
-                {showDraftAnswers ? 'Update' : 'Save'} draft
-              </Button>
-            )}
-            {showDraftAnswers && (
-              <Button sx={{ alignSelf: 'start' }} color='secondary' variant='text' onClick={deleteDraftAnswers}>
-                Delete draft
-              </Button>
-            )}
           </Stack>
           {formError && (
             <Typography variant='body2' color='error'>
