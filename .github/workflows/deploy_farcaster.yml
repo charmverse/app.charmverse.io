@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.ebextensions_farcaster/**'
+      - '.ebextensions/farcaster/**'
       - '.ebstalk.apps.env/farcaster.env'
       - '.github/**'
       - 'package.json'
@@ -18,7 +18,7 @@ on:
   pull_request:
     branches: ['**']
     paths:
-      - '.ebextensions_farcaster/**'
+      - '.ebextensions/farcaster/**'
       - '.ebstalk.apps.env/farcaster.env'
       - '.github/**'
       - 'package.json'
@@ -63,7 +63,9 @@ jobs:
           save_cache: true
 
       - name: Build apps
-        uses: ./.github/actions/build_farcaster
+        uses: ./.github/actions/build_app
+        with:
+          app_name: farcaster
 
       # source https://github.com/orgs/community/discussions/28474
       - name: Print head git commit message
@@ -88,7 +90,9 @@ jobs:
         uses: ./.github/actions/install
 
       - name: Build app
-        uses: ./.github/actions/build_farcaster
+        uses: ./.github/actions/build_app
+        with:
+          app_name: farcaster
 
       - name: Update Dockerfile
         run: |
@@ -125,7 +129,9 @@ jobs:
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Build app
-        uses: ./.github/actions/build_farcaster
+        uses: ./.github/actions/build_app
+        with:
+          app_name: farcaster
 
       - name: Upload JS source maps to Datadog
         env:
@@ -138,7 +144,7 @@ jobs:
             --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
   deploy-production:
-    name: Deploy ${{ matrix.name }}
+    name: Deploy to production
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
     needs: [upload-docker, upload-static-assets]
@@ -146,9 +152,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Farcaster App
-            stack: prd-farcaster
-            ebextensions: .ebextensions_farcaster
+          - stack: prd-farcaster
+            ebextensions: farcaster
     steps:
       - uses: actions/checkout@v4
         with:
@@ -166,11 +171,11 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: |
+            mv .ebextensions .ebextensions_tmp && mv .ebextensions_tmp/${{ matrix.ebextensions }} .ebextensions
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' ${{ matrix.ebextensions }}/00_env_vars.config
-            rm -rf .ebextensions && mv ${{ matrix.ebextensions }} .ebextensions
+              ' .ebextensions/00_env_vars.config
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -218,7 +223,7 @@ jobs:
 
       - name: Replace env_var with staging settings
         run: |
-          ebextension_files=$(ls .ebextensions*/00_env_vars.config)
+          ebextension_files=$(ls .ebextensions/*/00_env_vars.config)
           ebstalk_apps_env_files=$(ls .ebstalk.apps.env/*)
 
           for conf_file in $ebextension_files $ebstalk_apps_env_files; do
@@ -229,11 +234,15 @@ jobs:
           # modifying cloudformation alarm to send alerts to test sns topic.
           #  leaving it in even if we're deleting the config before deploying
           #  Useful to avoid accidental triggering to system-status channel.
-          for conf_file in .ebextensions*/06_cloudwatch_alarm.config; do
+          for conf_file in .ebextensions/*/06_cloudwatch_alarm.config; do
             sed -i 's/Production-Alerts/lambda-test-debug/g' $conf_file
           done
 
-          rm .ebextensions*/06_cloudwatch_alarm.config
+          rm .ebextensions/*/06_cloudwatch_alarm.config
+
+      - name: Override config with Farcaster app
+        run: |
+          mv .ebextensions .ebextensions_tmp && mv .ebextensions_tmp/farcaster .ebextensions
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -243,25 +252,7 @@ jobs:
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_farcaster/00_env_vars.config
-
-      - name: Override config with Farcaster app
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_farcaster .ebextensions
-
-      - name: Parse compose profile to see if we need to enable datadog
-        id: get_compose_profiles
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions/00_env_vars.config
-
-      - name: Set DDENABLED variable in environment for build and deploy steps
-        run: |
-          cat  .ebextensions/00_env_vars.config
-          COMPOSE_PROFILES=${{ steps.get_compose_profiles.outputs.result }}
-          if [[ "$COMPOSE_PROFILES" =~ ddtst ]]; then
-            echo "DDENABLED=true" >> $GITHUB_ENV
-          fi
+              ' .ebextensions/00_env_vars.config
 
       - name: Create a github deployment
         uses: bobheadxi/deployments@v1

@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import { PendingNotification } from 'lib/mailer/emails/templates/NotificationTemplate';
+import { NotificationTemplate } from 'lib/mailer/emails/templates/NotificationTemplate';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getCurrentDate } from 'lib/utils/dates';
 
@@ -13,7 +13,7 @@ export default {
 
 export function PendingNotificationTemplate() {
   return (
-    <PendingNotification
+    <NotificationTemplate
       notification={{
         applicationCommentId: null,
         applicationId: null,

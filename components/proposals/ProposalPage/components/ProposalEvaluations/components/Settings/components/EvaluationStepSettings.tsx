@@ -1,17 +1,16 @@
 import type { ProposalEvaluation, ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
-import { Box, FormLabel, Stack, Switch, TextField, Typography } from '@mui/material';
+import { Box, FormLabel, Switch, TextField, Typography } from '@mui/material';
 import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useGetAllowedDocusignUsersAndRoles } from 'charmClient/hooks/docusign';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
-import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
+import { FormControlLabel } from 'components/common/form/FormControlLabel';
 import {
   allMembersSystemRole,
   authorSystemRole,
-  tokenHoldersSystemRole,
-  currentReviewerSystemRole
+  tokenHoldersSystemRole
 } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -41,6 +40,7 @@ type Props = {
     | 'evaluationApprovers'
     | 'appealable'
     | 'finalStep'
+    | 'shareReviews'
   >;
   onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
@@ -58,14 +58,14 @@ export function EvaluationStepSettings({
 
   const { space } = useCurrentSpace();
 
-  const [editingApprovers, setEditingApprovers] = useState(false);
-
   // reviewers are also readOnly when using a template with reviewers pre-selected
   const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
   const readOnlyAppealReviewers =
     isPublishedProposal || readOnly || (!isAdmin && !!evaluationTemplate?.appealReviewers?.length);
   // rubric criteria should also be editable by reviewers, and not if a template with rubric criteria was used
   const readOnlyRubricCriteria = readOnly || (!isAdmin && !!evaluationTemplate?.rubricCriteria.length);
+  // rubric criteria should also be editable by reviewers, and not if a template with rubric criteria was used
+  const readOnlyShareReviews = readOnly || (!isAdmin && !!evaluationTemplate);
   // vote settings are also readonly when using a template with vote settings pre-selected
   const readOnlyVoteSettings = readOnly || (!isAdmin && !!evaluationTemplate?.voteSettings);
   const readOnlyRequireReviews =
@@ -208,7 +208,7 @@ export function EvaluationStepSettings({
         </>
       )}
       {evaluation.type === 'pass_fail' && (
-        <Box className='octo-propertyrow'>
+        <>
           <Box mb={2}>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
@@ -228,16 +228,7 @@ export function EvaluationStepSettings({
               value={requiredReviews}
             />
           </Box>
-          {!!finalStep && (
-            <Stack direction='row' alignItems='center' justifyContent='space-between'>
-              <FormLabel>
-                <Typography component='span' variant='subtitle1'>
-                  Priority Step
-                </Typography>
-              </FormLabel>
-              <Switch checked disabled />
-            </Stack>
-          )}
+          {!!finalStep && <FormControlLabel disabled control={<Switch checked />} label='Priority Step' />}
           {evaluation.appealable && (
             <>
               <FormLabel required={!!evaluation.appealable}>
@@ -247,7 +238,7 @@ export function EvaluationStepSettings({
                     : 'Appeal Reviewers'}
                 </Typography>
               </FormLabel>
-              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <Box display='flex' height='fit-content' flex={1}>
                 <UserAndRoleSelect
                   emptyPlaceholderContent='Select appeal user or role'
                   value={appealReviewerOptions as SelectOption[]}
@@ -259,10 +250,24 @@ export function EvaluationStepSettings({
               </Box>
             </>
           )}
-        </Box>
+        </>
       )}
       {evaluation.type === 'rubric' && (
         <>
+          <Box mb={1}>
+            <FormControlLabel
+              disabled={readOnlyShareReviews}
+              control={
+                <Switch
+                  checked={!!evaluation.shareReviews}
+                  onChange={async (ev) => {
+                    onChange({ shareReviews: !!ev.target.checked });
+                  }}
+                />
+              }
+              label='Show reviews (anonymized)'
+            />
+          </Box>
           <FormLabel required>
             <Typography component='span' variant='subtitle1'>
               Rubric criteria

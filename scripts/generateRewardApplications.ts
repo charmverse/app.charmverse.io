@@ -3,7 +3,7 @@ import { isStagingEnv, isTestEnv } from '@root/config/constants';
 import { testUtilsUser } from '@charmverse/core/test';
 import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 import { stringUtils } from '@charmverse/core/utilities';
-import randomName from 'lib/utils/randomName';
+import { randomName } from 'lib/utils/randomName';
 
 export async function generateRewardApplications({
   rewardPagePathOrId,

@@ -30,7 +30,7 @@ function WarpcastLoginButton({
           disabled={isLoading}
           isActive={false}
           isLoading={false}
-          icon={<img src='/images/logos/warpcast.png' style={{ width: '30px', height: '30px', marginLeft: '3px' }} />}
+          icon={<img src='/images/logos/warpcast.png' style={{ width: '24px', height: '24px', marginLeft: '3px' }} />}
         />
       ) : (
         <Button size={size} color='primary' disabled={isLoading} loading={isLoading} onClick={signIn}>

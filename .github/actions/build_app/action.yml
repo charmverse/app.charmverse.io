@@ -1,0 +1,26 @@
+name: 'Build app'
+
+inputs:
+  app_name:
+    description: The name of the app'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Restore build
+      id: restore_build
+      uses: actions/cache@v4
+      with:
+        # include the public folder in case the build output puts something there (like sw.js)
+        path: |
+          apps/${{ inputs.app_name }}/.next
+          apps/${{ inputs.app_name }}/public
+        key: app-${{ inputs.app_name }}-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts[x]', '@connect-shared/**/*.ts[x]', 'apps/${{ inputs.app_name }}/**/*.ts', 'apps/${{ inputs.app_name }}/**/*.scss') }}
+
+    - name: Build app
+      shell: bash
+      if: steps.restore_build.outputs.cache-hit != 'true'
+      run: |
+        npm run ${{ inputs.app_name }}:build

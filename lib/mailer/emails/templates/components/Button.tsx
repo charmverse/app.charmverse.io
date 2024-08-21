@@ -11,7 +11,7 @@ export function Button({
   href,
   variant = 'filled',
   style,
-  primaryColor = blueColor,
+  primaryColor,
   ...props
 }: {
   primaryColor?: string;
@@ -36,7 +36,7 @@ export function Button({
                 borderRadius: '30px',
                 border: '1px solid #ccc',
                 padding: '8px 24px',
-                color: primaryColor,
+                color: primaryColor || blueColor,
                 ...style
               }
             : {
@@ -44,7 +44,7 @@ export function Button({
                 color: '#fff',
                 padding: '8px 24px',
                 borderRadius: '3px',
-                background: primaryColor,
+                background: primaryColor || blueColor,
                 ...style
               }
         }

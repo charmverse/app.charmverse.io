@@ -1,6 +1,5 @@
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import { Box, Card, FormLabel, Stack, TextField, Typography } from '@mui/material';
-import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
