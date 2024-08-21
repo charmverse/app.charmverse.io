@@ -11,7 +11,8 @@ export async function sendProposalEvaluationNotifications() {
   const proposals = await prisma.proposal.findMany({
     where: {
       page: {
-        deletedAt: null
+        deletedAt: null,
+        isTemplate: false
       },
       status: 'published',
       evaluations: {
@@ -26,7 +27,11 @@ export async function sendProposalEvaluationNotifications() {
       id: true,
       spaceId: true,
       createdBy: true,
+      authors: true,
       evaluations: {
+        orderBy: {
+          index: 'asc'
+        },
         select: {
           finalStep: true,
           appealedAt: true,
@@ -54,6 +59,7 @@ export async function sendProposalEvaluationNotifications() {
             }
           })
         : null;
+
       if (
         !existingNotification &&
         currentEvaluation &&
@@ -61,6 +67,8 @@ export async function sendProposalEvaluationNotifications() {
         dueDate <= new Date(Date.now() + 24 * 60 * 60 * 1000)
       ) {
         const reviewerIds = currentEvaluation.reviewers.map((r) => r.userId).filter(isTruthy);
+        const hasAuthorSystemRole = currentEvaluation.reviewers.some((r) => r.systemRole === 'author');
+
         const roles = await prisma.role.findMany({
           where: {
             id: {
@@ -82,7 +90,13 @@ export async function sendProposalEvaluationNotifications() {
 
         const reviewerIdsByRoles = roles.map((r) => r.spaceRolesToRole.map((s) => s.spaceRole.userId)).flat();
 
-        const uniqueReviewerIds = Array.from(new Set([...reviewerIds, ...reviewerIdsByRoles]));
+        const uniqueReviewerIds = Array.from(
+          new Set([
+            ...reviewerIds,
+            ...reviewerIdsByRoles,
+            ...(hasAuthorSystemRole ? proposal.authors.map((a) => a.userId) : [])
+          ])
+        );
 
         for (const reviewerId of uniqueReviewerIds) {
           const proposalNotification = await saveProposalNotification({
@@ -106,7 +120,7 @@ export async function sendProposalEvaluationNotifications() {
         }
       }
     } catch (error: any) {
-      log.error(`Error sending evaluation proposal notification: ${error.stack || error.message || error}`, {
+      log.error(`Error sending proposal evaluation notification: ${error.stack || error.message || error}`, {
         error,
         proposalId: proposal.id,
         userId: proposal.createdBy
@@ -115,7 +129,7 @@ export async function sendProposalEvaluationNotifications() {
   }
 
   if (notificationCount > 0) {
-    log.info(`Sent ${notificationCount} draft proposal notifications`);
+    log.info(`Sent ${notificationCount} proposal evaluation notifications`);
     count('cron.user-notifications.sent', notificationCount);
   }
 
