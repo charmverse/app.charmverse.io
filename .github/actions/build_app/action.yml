@@ -15,9 +15,12 @@ runs:
       with:
         # include the public folder in case the build output puts something there (like sw.js)
         path: |
-          apps/${{ inputs.app_name }}/.next
+          apps/${{ inputs.app_name }}/.next/cache
           apps/${{ inputs.app_name }}/public
-        key: app-${{ inputs.app_name }}-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts[x]', '@connect-shared/**/*.ts[x]', 'apps/' + inputs.app_name + '/**/*.ts', 'apps/' + inputs.app_name + '/**/*.scss') }}
+        # Generate a new cache whenever packages or source files change.
+        key: app-${{ inputs.app_name }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts', 'lib/**/*.tsx', '@connect-shared/**/*.ts', '@connect-shared/**/*.tsx', format('apps/{0}/**/*.ts', inputs.app_name), format('apps/{0}/**/*.tsx', inputs.app_name), format('apps/{0}/**/*.scss', inputs.app_name) }}
+        restore-keys: |
+          app-${{ inputs.app_name }}-${{ hashFiles('**/package-lock.json') }}-
 
     - name: Build app
       shell: bash
