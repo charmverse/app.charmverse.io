@@ -32,4 +32,4 @@ async function fixProjectMembers() {
   return fixProjectMembers();
 }
 
-fixProjectMembers();
+// fixProjectMembers();
