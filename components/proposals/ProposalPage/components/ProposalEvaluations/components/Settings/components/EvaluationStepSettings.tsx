@@ -1,11 +1,13 @@
 import type { ProposalEvaluation, ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
 import { Box, FormLabel, Switch, TextField, Typography } from '@mui/material';
 import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
+import { DateTime } from 'luxon';
 import { useEffect } from 'react';
 
 import { useGetAllowedDocusignUsersAndRoles } from 'charmClient/hooks/docusign';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { DateTimePicker } from 'components/common/DateTimePicker';
 import { FormControlLabel } from 'components/common/form/FormControlLabel';
 import {
   allMembersSystemRole,
@@ -55,7 +57,6 @@ export function EvaluationStepSettings({
   readOnly
 }: Props) {
   const isAdmin = useIsAdmin();
-
   const { space } = useCurrentSpace();
 
   // reviewers are also readOnly when using a template with reviewers pre-selected
@@ -66,6 +67,7 @@ export function EvaluationStepSettings({
   const readOnlyRubricCriteria = readOnly || (!isAdmin && !!evaluationTemplate?.rubricCriteria.length);
   // rubric criteria should also be editable by reviewers, and not if a template with rubric criteria was used
   const readOnlyShareReviews = readOnly || (!isAdmin && !!evaluationTemplate);
+  const readOnlyDueDate = readOnly || (!isAdmin && !!evaluationTemplate);
   // vote settings are also readonly when using a template with vote settings pre-selected
   const readOnlyVoteSettings = readOnly || (!isAdmin && !!evaluationTemplate?.voteSettings);
   const readOnlyRequireReviews =
@@ -268,6 +270,26 @@ export function EvaluationStepSettings({
               label='Show reviews (anonymized)'
             />
           </Box>
+          <Box mb={1}>
+            <FormControlLabel
+              disabled={readOnlyDueDate}
+              control={
+                <DateTimePicker<DateTime>
+                  onAccept={(date) => {
+                    onChange({
+                      dueDate: date?.toJSDate() ?? null
+                    });
+                  }}
+                  minDate={DateTime.fromMillis(Date.now()).plus({ hour: 1 })}
+                  value={evaluation.dueDate ? DateTime.fromISO(evaluation.dueDate.toString()) : undefined}
+                  placeholder='N/A'
+                  views={['year', 'month', 'day', 'hours']}
+                />
+              }
+              label='Due date'
+            />
+          </Box>
+
           <FormLabel required>
             <Typography component='span' variant='subtitle1'>
               Rubric criteria
