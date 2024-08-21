@@ -18,6 +18,7 @@ export async function getRecentProjectsWithMembers({
     where: userId
       ? {
           deletedAt: null,
+          source: 'sunny_awards',
           projectMembers: {
             some: {
               userId
@@ -26,6 +27,7 @@ export async function getRecentProjectsWithMembers({
         }
       : {
           deletedAt: null,
+          source: 'sunny_awards',
           projectMembers: {
             some: {}
           }

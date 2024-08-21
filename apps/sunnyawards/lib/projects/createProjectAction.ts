@@ -45,8 +45,11 @@ export const createProjectAction = authActionClient
         projectId: newProject.id,
         userId: currentUserId,
         existingProjectRefUID: input.projectRefUIDToImport
-      }).catch((err) => {
-        log.error('Failed to store project metadata and publish optimism attestation', { err, userId: currentUserId });
+      }).catch((error) => {
+        log.error('Failed to store project metadata and publish optimism attestation', {
+          error,
+          userId: currentUserId
+        });
       });
 
       await storeCharmverseProjectMetadata({
