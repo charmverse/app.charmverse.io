@@ -276,9 +276,8 @@ jobs:
     strategy:
       matrix:
         include:
-          name: connect
-          stack: prd-connect
-          ebextensions: connect
+          - stack: prd-connect
+            ebextensions: connect
     steps:
       - uses: actions/checkout@v4
         with:
