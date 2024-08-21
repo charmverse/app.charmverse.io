@@ -1,6 +1,6 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
-import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
+import { ThumbUpOutlined as ApprovedIcon, HighlightOff as RejectedIcon } from '@mui/icons-material';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -55,15 +55,12 @@ export type PassFailEvaluationProps = {
   actionLabels?: PopulatedEvaluation['actionLabels'];
 };
 
-const ResultCopyStack = styled(Stack)<{ addPaddingTop?: boolean }>`
+const ResultCopyStack = styled(Stack)`
   flex-direction: row;
   gap: ${({ theme }) => theme.spacing(1)};
   align-items: center;
   justify-content: center;
-  padding-bottom: ${({ theme }) => theme.spacing(2)};
-  padding-left: ${({ theme }) => theme.spacing(2)};
-  padding-right: ${({ theme }) => theme.spacing(2)};
-  padding-top: ${({ addPaddingTop, theme }) => (addPaddingTop ? theme.spacing(2) : 0)};
+  padding: ${({ theme }) => theme.spacing(2)};
 `;
 
 export function PassFailEvaluation({
