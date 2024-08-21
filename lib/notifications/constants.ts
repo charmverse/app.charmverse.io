@@ -24,5 +24,6 @@ export const proposalNotificationTypes = [
   'proposal_appealed',
   'credential_created',
   'proposal_published',
-  'draft_reminder'
+  'draft_reminder',
+  'evaluation_reminder'
 ] as const;

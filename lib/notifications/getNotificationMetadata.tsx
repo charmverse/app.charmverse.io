@@ -253,6 +253,9 @@ function getProposalContent({
     case 'credential_created': {
       return `You have been issued a credential for a proposal`;
     }
+    case 'evaluation_reminder': {
+      return `Your ${proposalFeatureTitle}, ${notification.pageTitle} requires your evaluation.`;
+    }
     default: {
       return '';
     }
