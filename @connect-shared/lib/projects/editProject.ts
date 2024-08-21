@@ -4,9 +4,11 @@ import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import { resolveENSName } from '@root/lib/blockchain';
+import { ensureFarcasterUserExists } from '@root/lib/farcaster/ensureFarcasterUserExists';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
+import { meanBy } from 'lodash';
 import { v4 } from 'uuid';
 
 import type { FormValues } from './projectSchema';
@@ -70,112 +72,9 @@ export async function editProject({ userId, input }: { input: EditProjectValues;
       !currentProjectMembers.some((projectMember) => member.farcasterId === projectMember.user?.farcasterUser?.fid)
   );
 
-  const farcasterAccountsRecord: Record<
-    number,
-    {
-      userId: string;
-      account: StatusAPIResponse;
-    }
-  > = inputProjectMembers.reduce<
-    Record<
-      number,
-      {
-        userId: string;
-        account: StatusAPIResponse;
-      }
-    >
-  >((acc, { fid, userId: _userId, account }) => {
-    acc[fid] = {
-      userId: _userId,
-      account: account as unknown as StatusAPIResponse
-    };
-    return acc;
-  }, {});
-
-  const projectMembers = (
-    await Promise.all(
-      newProjectMembers.map(async (member) => {
-        if (farcasterAccountsRecord[member.farcasterId]) {
-          return {
-            userId: farcasterAccountsRecord[member.farcasterId].userId,
-            name: farcasterAccountsRecord[member.farcasterId].account.displayName as string,
-            farcasterId: member.farcasterId
-          };
-        }
-        try {
-          const [farcasterProfile] = await getFarcasterUsers({
-            fids: [member.farcasterId]
-          });
-
-          if (!farcasterProfile) {
-            return null;
-          }
-
-          const farcasterWalletUser = await prisma.user.findFirst({
-            where: {
-              wallets: {
-                some: {
-                  address: {
-                    in: [
-                      farcasterProfile.custody_address,
-                      ...(farcasterProfile.verified_addresses ? farcasterProfile.verified_addresses.eth_addresses : [])
-                    ].map((address) => address.toLowerCase())
-                  }
-                }
-              }
-            }
-          });
-
-          if (farcasterWalletUser) {
-            return {
-              userId: farcasterWalletUser.id,
-              name: farcasterProfile.display_name,
-              farcasterId: member.farcasterId
-            };
-          }
-          const username = farcasterProfile.username;
-          const displayName = farcasterProfile.display_name;
-          const bio = farcasterProfile.profile.bio.text;
-          const pfpUrl = farcasterProfile.pfp_url;
-          const fid = member.farcasterId;
-
-          const newUser = await prisma.user.create({
-            data: {
-              id: v4(),
-              username,
-              identityType: 'Farcaster',
-              claimed: false,
-              avatar: farcasterProfile.pfp_url,
-              farcasterUser: {
-                create: {
-                  account: { username, displayName, bio, pfpUrl },
-                  fid
-                }
-              },
-              path: uid(),
-              profile: {
-                create: {
-                  ...(bio && { description: bio || '' })
-                }
-              }
-            }
-          });
-
-          return {
-            userId: newUser.id,
-            name: displayName,
-            farcasterId: member.farcasterId
-          };
-        } catch (err) {
-          log.error('Error creating user', {
-            fid: member.farcasterId,
-            err
-          });
-          return null;
-        }
-      })
-    )
-  ).filter(isTruthy);
+  const projectMembers = await Promise.all(
+    newProjectMembers.map(async (member) => ensureFarcasterUserExists({ fid: member.farcasterId }))
+  );
 
   const [editedProject] = await prisma.$transaction([
     prisma.project.update({
@@ -206,7 +105,7 @@ export async function editProject({ userId, input }: { input: EditProjectValues;
       data: projectMembers.map((member) => ({
         teamLead: false,
         updatedBy: userId,
-        name: member.name,
+        name: member.account.displayName || member.account.username,
         userId: member.userId,
         projectId: input.projectId
       }))

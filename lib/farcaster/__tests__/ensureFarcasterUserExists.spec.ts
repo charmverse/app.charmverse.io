@@ -44,7 +44,7 @@ describe('ensureFarcasterUserExists', () => {
     });
 
     const result = await ensureFarcasterUserExists({ fid });
-    expect(result).toEqual(expect.objectContaining({ fid }));
+    expect(result).toMatchObject(existingFarcasterUser);
   });
 
   it('should create a Farcaster user and link it to an existing user account', async () => {

@@ -1,14 +1,18 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { FarcasterUser } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { v4 as uuid } from 'uuid';
 
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { shortWalletAddress } from 'lib/utils/blockchain';
 import { uid } from 'lib/utils/strings';
 
+import { uploadUrlToS3, getUserS3FilePath } from '../aws/uploadToS3Server';
+
 import { getFarcasterUsers } from './getFarcasterUsers';
 
-export type TypedFarcasterUser = FarcasterUser & {
+export type TypedFarcasterUser = Omit<FarcasterUser, 'account'> & {
   account: {
     username: string;
     displayName: string;
@@ -46,6 +50,21 @@ export async function ensureFarcasterUserExists({ fid }: { fid: number }): Promi
     }
   });
 
+  const userId = existingUserAccount?.id || uuid();
+
+  let avatar: string | null = farcasterAccount.pfp_url || '';
+
+  if (farcasterAccount.pfp_url) {
+    try {
+      ({ url: avatar } = await uploadUrlToS3({
+        pathInS3: getUserS3FilePath({ userId, url: farcasterAccount.pfp_url }),
+        url: farcasterAccount.pfp_url
+      }));
+    } catch (error) {
+      log.warn('Error while uploading avatar to S3', error);
+    }
+  }
+
   if (existingUserAccount) {
     const createdAccount = await prisma.farcasterUser.create({
       data: {
@@ -59,7 +78,7 @@ export async function ensureFarcasterUserExists({ fid }: { fid: number }): Promi
           username: farcasterAccount.username,
           displayName: farcasterAccount.display_name,
           bio: farcasterAccount.profile.bio.text,
-          pfpUrl: farcasterAccount.pfp_url
+          pfpUrl: avatar
         }
       }
     });
@@ -84,7 +103,7 @@ export async function ensureFarcasterUserExists({ fid }: { fid: number }): Promi
             username: farcasterAccount.username,
             displayName: farcasterAccount.display_name,
             bio: farcasterAccount.profile.bio.text,
-            pfpUrl: farcasterAccount.pfp_url
+            pfpUrl: avatar
           }
         }
       }
