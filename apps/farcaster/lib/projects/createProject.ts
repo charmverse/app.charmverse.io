@@ -1,9 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { FormValues } from '@connect-shared/lib/projects/projectSchema';
 import type { StatusAPIResponse } from '@farcaster/auth-client';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
+
+import type { FormValues } from './projectSchema';
 
 export async function createProject(input: FormValues) {
   const farcasterUser = await prisma.farcasterUser.findFirstOrThrow({
