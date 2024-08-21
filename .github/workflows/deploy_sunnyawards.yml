@@ -202,6 +202,11 @@ jobs:
         with:
           app_name: sunnyawards
 
+      - name: Calculate Build ID
+        run: |
+          build_id=${{ hashFiles('apps/sunnyawards/*.ts', 'apps/sunnyawards/*.tsx') }}
+          echo "REACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/sunnyawards.env
+
       - name: Update Dockerfile
         run: |
           rm Dockerfile && mv apps/sunnyawards/Dockerfile Dockerfile
@@ -233,7 +238,7 @@ jobs:
       - name: Calculate Build ID
         id: get_build_id
         run: |
-          build_id=${{ hashFiles('package-lock.json', 'apps/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          build_id=${{ hashFiles('apps/sunnyawards/*.ts', 'apps/sunnyawards/*.tsx') }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Restore app from cache
