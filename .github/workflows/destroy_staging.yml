@@ -11,7 +11,7 @@ jobs:
   clean-up:
     if: |
       (github.event.action == 'unlabeled' && startsWith(github.event.label.name, ':rocket: deploy')) ||
-      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-farcaster')))
+      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-scoutgame') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-farcaster')))
     runs-on: ubuntu-latest
     # wait until all deploys are complete to destroy the env
     concurrency: deploy-pr-app-${{ github.head_ref }}
@@ -48,12 +48,12 @@ jobs:
         # we need to create a dummy zip file or else cdk throws an error it cannot find the asset
         run: |
           touch stg-webapp-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-connect-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-scoutgame-${{ env.STAGE_SUFFIX }}.zip
           touch stg-sunnyawards-${{ env.STAGE_SUFFIX }}.zip
           touch stg-farcaster-${{ env.STAGE_SUFFIX }}.zip
           npm install aws-cdk-lib --no-audit --no-fund
           npx cdk destroy -c name=stg-webapp-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-connect-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-scoutgame-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-sunnyawards-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-farcaster-${{ env.STAGE_SUFFIX }} --force
 
@@ -63,11 +63,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: stg-webapp-${{ env.STAGE_SUFFIX }}
 
-      - name: delete the connect github deployment
+      - name: delete the scoutgame github deployment
         uses: strumwolf/delete-deployment-environment@v1.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-connect-${{ env.STAGE_SUFFIX }}
+          environment: stg-scoutgame-${{ env.STAGE_SUFFIX }}
 
       - name: delete the sunnyawards github deployment
         uses: strumwolf/delete-deployment-environment@v1.1.0

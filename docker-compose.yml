@@ -76,7 +76,7 @@ services:
     profiles:
       - stg-ceramic
 
-  prd-connect:
+  prd-scoutgame:
     extends:
       service: defaults
     ports:
@@ -88,9 +88,9 @@ services:
         'npx react-env --path .env --dest ./apps/scoutgame/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/scoutgame --keepAliveTimeout 70000'
       ]
     profiles:
-      - prd-connect
+      - prd-scoutgame
 
-  stg-connect:
+  stg-scoutgame:
     extends:
       service: defaults
     ports:
@@ -104,7 +104,7 @@ services:
     environment:
       - REACT_APP_APP_ENV=staging
     profiles:
-      - stg-connect
+      - stg-scoutgame
 
   prd-sunnyawards:
     extends:
@@ -260,5 +260,5 @@ services:
       - prd-webapp
       - prd-sunnyawards
       - prd-sockets
-      - prd-connect
+      - prd-scoutgame
       - ddtst
