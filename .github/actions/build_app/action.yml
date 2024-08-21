@@ -17,7 +17,7 @@ runs:
         path: |
           apps/${{ inputs.app_name }}/.next
           apps/${{ inputs.app_name }}/public
-        key: app-${{ inputs.app_name }}-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts[x]', '@connect-shared/**/*.ts[x]', 'apps/${{ inputs.app_name }}/**/*.ts', 'apps/${{ inputs.app_name }}/**/*.scss') }}
+        key: app-${{ inputs.app_name }}-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts[x]', '@connect-shared/**/*.ts[x]', 'apps/' + inputs.app_name + '/**/*.ts', 'apps/' + inputs.app_name + '/**/*.scss') }}
 
     - name: Build app
       shell: bash
