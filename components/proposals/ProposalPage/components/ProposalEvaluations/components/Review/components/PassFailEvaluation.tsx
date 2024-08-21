@@ -55,7 +55,7 @@ export type PassFailEvaluationProps = {
   actionLabels?: PopulatedEvaluation['actionLabels'];
 };
 
-const ResultCopyStack = styled(Stack)`
+const ResultsContainer = styled.div`
   flex-direction: row;
   gap: ${({ theme }) => theme.spacing(1)};
   align-items: center;
@@ -271,16 +271,16 @@ export function PassFailEvaluation({
           </Stack>
         )}
         {evaluationResult === 'pass' && (
-          <ResultCopyStack addPaddingTop={totalReviews === 0}>
+          <ResultsContainer>
             <ApprovedIcon color='success' />
             <Typography variant='body2'>Approved {completedDate}</Typography>
-          </ResultCopyStack>
+          </ResultsContainer>
         )}
         {evaluationResult === 'fail' && (
-          <ResultCopyStack addPaddingTop={totalReviews === 0}>
+          <ResultsContainer>
             <RejectedIcon color='error' />
             <Typography variant='body2'>Declined {completedDate}</Typography>
-          </ResultCopyStack>
+          </ResultsContainer>
         )}
       </Card>
       <Modal open={!!declineReasonModalPopupState.isOpen} onClose={onClose} title='Reason for decline' size='small'>
