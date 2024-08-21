@@ -47,7 +47,7 @@ export function AddProjectMembersForm({
         <Typography variant='h6'>Team</Typography>
         <FarcasterCard
           fid={user.farcasterUser?.fid}
-          name={farcasterDetails?.displayName}
+          name={farcasterDetails?.displayName || farcasterDetails?.username}
           username={farcasterDetails?.username}
           avatar={farcasterDetails?.pfpUrl}
           avatarSize='large'

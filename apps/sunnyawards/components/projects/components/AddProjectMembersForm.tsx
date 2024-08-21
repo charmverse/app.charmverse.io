@@ -35,7 +35,7 @@ export function AddProjectMembersForm({
       <FormLabel id='search-farcaster-user'>Team</FormLabel>
       <FarcasterCard
         fid={user.farcasterUser?.fid}
-        name={farcasterDetails?.displayName}
+        name={farcasterDetails?.displayName || farcasterDetails?.username}
         username={farcasterDetails?.username}
         avatar={farcasterDetails?.pfpUrl}
         avatarSize='large'
