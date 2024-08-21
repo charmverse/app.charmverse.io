@@ -385,7 +385,7 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: |
-            mv .ebextensions .ebextensions_tmp && mv .ebextensions_tmp/connect .ebextensions
+            mv .ebextensions .ebextensions_tmp && mv .ebextensions_tmp/scoutgame .ebextensions
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
