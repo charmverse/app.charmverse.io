@@ -60,7 +60,6 @@ jobs:
         with:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
-          save_cache: true
 
       - name: Build apps
         uses: ./.github/actions/build_app

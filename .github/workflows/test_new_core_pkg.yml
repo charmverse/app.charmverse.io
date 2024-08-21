@@ -23,7 +23,6 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
-          save_cache: true
           core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Build app
