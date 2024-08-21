@@ -50,6 +50,7 @@ jobs:
           touch stg-webapp-${{ env.STAGE_SUFFIX }}.zip
           touch stg-connect-${{ env.STAGE_SUFFIX }}.zip
           touch stg-sunnyawards-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-farcaster-${{ env.STAGE_SUFFIX }}.zip
           npm install aws-cdk-lib --no-audit --no-fund
           npx cdk destroy -c name=stg-webapp-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-connect-${{ env.STAGE_SUFFIX }} --force
