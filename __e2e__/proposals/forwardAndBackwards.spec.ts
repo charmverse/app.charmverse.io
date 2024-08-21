@@ -83,30 +83,39 @@ test.describe('Go through full proposal flow', async () => {
     await proposalPage.rubricCriteriaComment.fill('Good job');
     // Confirm rubric results
     await proposalPage.saveRubricAnswers.click();
-    await proposalPage.confirmStatusButton.click();
+
+    await Promise.all([
+      page.waitForResponse('**/api/proposals/*/rubric-answers'),
+      proposalPage.confirmStatusButton.click()
+    ]);
+
+    // the form opens the Results tab after submit, so give it a second to show the Decision tab
+    await page.waitForTimeout(100);
 
     // Confirm rubric is completed
+
     await proposalPage.rubricStepDecisionTab.click();
     await proposalPage.passEvaluationButton.click();
-    await proposalPage.confirmStatusButton.click();
+
+    await Promise.all([
+      page.waitForResponse('**/api/proposals/*/submit-result'),
+      proposalPage.confirmStatusButton.click()
+    ]);
 
     // Check we have arrived at vote step
     await expect(proposalPage.voteContainer).toBeVisible();
 
-    // Move back
+    // Move back - instead of go-back-step wait for the proposal endpoint to resolve, meaning it was refreshed
     await proposalPage.goBackButton.click();
-    await proposalPage.confirmStatusButton.click();
-    await page.waitForTimeout(500);
-
-    await proposalPage.goBackButton.click();
-    await proposalPage.confirmStatusButton.click();
-
-    await page.waitForTimeout(500);
+    await Promise.all([page.waitForResponse('**/api/proposals/*'), proposalPage.confirmStatusButton.click()]);
 
     await proposalPage.goBackButton.click();
-    await proposalPage.confirmStatusButton.click();
 
-    await page.waitForTimeout(500);
+    await Promise.all([page.waitForResponse('**/api/proposals/*'), proposalPage.confirmStatusButton.click()]);
+
+    await proposalPage.goBackButton.click();
+
+    await Promise.all([page.waitForResponse('**/api/proposals/*'), proposalPage.confirmStatusButton.click()]);
 
     await expect(proposalPage.goBackButton).toBeDisabled();
 
