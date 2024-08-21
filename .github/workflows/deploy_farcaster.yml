@@ -152,8 +152,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Farcaster App
-            stack: prd-farcaster
+          - stack: prd-farcaster
             ebextensions: farcaster
     steps:
       - uses: actions/checkout@v4

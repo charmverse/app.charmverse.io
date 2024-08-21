@@ -260,8 +260,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: SUNNY Awards
-            stack: prd-sunnyawards
+          - stack: prd-sunnyawards
             ebextensions: sunnyawards
     steps:
       - uses: actions/checkout@v4
