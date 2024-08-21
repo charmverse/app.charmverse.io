@@ -32,7 +32,7 @@ function WarpcastLoginButton() {
     isExecuting: isLoggingIn
   } = useAction(loginWithFarcasterAction, {
     onSuccess: async () => {
-      await revalidatePath({});
+      await revalidatePath();
       router.push('/profile');
     },
     onError(err) {
