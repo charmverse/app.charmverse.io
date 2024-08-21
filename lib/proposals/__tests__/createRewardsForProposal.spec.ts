@@ -128,6 +128,7 @@ describe('Creates rewards for proposal with pending rewards', () => {
       },
       data: {
         fields: {
+          makeRewardsPublic: true,
           pendingRewards: [
             {
               draftId: '1',
