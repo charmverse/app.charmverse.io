@@ -2,11 +2,10 @@ import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { FarcasterUser } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isProfilePathAvailable } from '@root/lib/profile/isProfilePathAvailable';
+import { shortWalletAddress } from '@root/lib/utils/blockchain';
+import { uid } from '@root/lib/utils/strings';
 import { v4 as uuid } from 'uuid';
-
-import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
-import { shortWalletAddress } from 'lib/utils/blockchain';
-import { uid } from 'lib/utils/strings';
 
 import { uploadUrlToS3, getUserS3FilePath } from '../aws/uploadToS3Server';
 
