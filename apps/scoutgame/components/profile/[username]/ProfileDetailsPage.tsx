@@ -15,7 +15,7 @@ export async function ProfileDetailsPage({ user }: { user: Pick<LoggedInUser, 'f
       <Box gap={2} display='flex' flexDirection='column'>
         <FarcasterCard
           fid={user.farcasterUser?.fid}
-          name={farcasterDetails?.displayName}
+          name={farcasterDetails?.displayName || farcasterDetails?.username}
           username={farcasterDetails?.username}
           avatar={farcasterDetails?.pfpUrl}
           bio={farcasterDetails?.bio}

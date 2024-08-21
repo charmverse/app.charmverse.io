@@ -43,7 +43,7 @@ export function ProjectShareItem({ project }: { project: NonNullable<ConnectProj
     top: '64px',
     left: '165px',
     maxWidth: '130px',
-    wordBreak: 'break-all'
+    wordWrap: 'break-word'
   } as const;
 
   return (
