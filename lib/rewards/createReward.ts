@@ -20,6 +20,9 @@ export type RewardPageProps = Partial<
   >
 >;
 
+type PagePermissionsInput = Pick<PagePermission, 'permissionLevel'> &
+  Partial<Pick<PagePermission, 'userId' | 'spaceId' | 'public'>>;
+
 export type RewardCreationData = UpdateableRewardFields & {
   linkedPageId?: string;
   spaceId: string;
@@ -67,20 +70,17 @@ export async function createReward({
     throw new InvalidInputError(errors.join(', '));
   }
 
-  const space = await prisma.space.findUnique({
+  const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
     },
     select: {
       id: true,
       publicBountyBoard: true,
-      domain: true
+      domain: true,
+      defaultPagePermissionGroup: true
     }
   });
-
-  if (!space) {
-    throw new NotFoundError(`Space with id ${spaceId} not found`);
-  }
 
   const rewardId = v4();
 
@@ -149,24 +149,22 @@ export async function createReward({
 
   let createdPageId: string | undefined;
 
-  const pagePermissionsInput: (Pick<PagePermission, 'permissionLevel'> &
-    Partial<Pick<PagePermission, 'userId' | 'spaceId' | 'public'>>)[] = isDraft
-    ? [
-        {
-          permissionLevel: 'full_access',
-          userId
-        }
-      ]
-    : [
-        {
-          permissionLevel: 'view',
-          spaceId
-        },
-        {
-          permissionLevel: 'full_access',
-          userId
-        }
-      ];
+  const pagePermissionsInput: PagePermissionsInput[] = [
+    {
+      permissionLevel: 'full_access',
+      userId
+    }
+  ];
+
+  if (!isDraft) {
+    // Even if full access is granted, we don't want to grant full access to a reward, just make it visible
+    if (space.defaultPagePermissionGroup) {
+      pagePermissionsInput.push({
+        permissionLevel: 'view',
+        spaceId
+      });
+    }
+  }
 
   if (isPublic) {
     pagePermissionsInput.push({
