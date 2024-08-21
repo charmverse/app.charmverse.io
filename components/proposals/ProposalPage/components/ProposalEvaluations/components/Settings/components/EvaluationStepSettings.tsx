@@ -254,6 +254,27 @@ export function EvaluationStepSettings({
           )}
         </>
       )}
+      {evaluation.type !== 'vote' && (
+        <Box mb={1}>
+          <FormControlLabel
+            disabled={readOnlyDueDate}
+            control={
+              <DateTimePicker<DateTime>
+                onAccept={(date) => {
+                  onChange({
+                    dueDate: date?.toJSDate() ?? null
+                  });
+                }}
+                minDate={DateTime.fromMillis(Date.now()).plus({ hour: 1 })}
+                value={evaluation.dueDate ? DateTime.fromISO(evaluation.dueDate.toString()) : undefined}
+                placeholder='N/A'
+                views={['year', 'month', 'day', 'hours']}
+              />
+            }
+            label='Due date'
+          />
+        </Box>
+      )}
       {evaluation.type === 'rubric' && (
         <>
           <Box mb={1}>
@@ -270,26 +291,6 @@ export function EvaluationStepSettings({
               label='Show reviews (anonymized)'
             />
           </Box>
-          <Box mb={1}>
-            <FormControlLabel
-              disabled={readOnlyDueDate}
-              control={
-                <DateTimePicker<DateTime>
-                  onAccept={(date) => {
-                    onChange({
-                      dueDate: date?.toJSDate() ?? null
-                    });
-                  }}
-                  minDate={DateTime.fromMillis(Date.now()).plus({ hour: 1 })}
-                  value={evaluation.dueDate ? DateTime.fromISO(evaluation.dueDate.toString()) : undefined}
-                  placeholder='N/A'
-                  views={['year', 'month', 'day', 'hours']}
-                />
-              }
-              label='Due date'
-            />
-          </Box>
-
           <FormLabel required>
             <Typography component='span' variant='subtitle1'>
               Rubric criteria
