@@ -144,7 +144,7 @@ jobs:
             --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
   deploy-production:
-    name: Deploy ${{ matrix.name }}
+    name: Deploy to production
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
     needs: [upload-docker, upload-static-assets]
