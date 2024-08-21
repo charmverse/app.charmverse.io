@@ -63,7 +63,9 @@ jobs:
           save_cache: true
 
       - name: Build apps
-        uses: ./.github/actions/build_farcaster
+        uses: ./.github/actions/build_app
+        with:
+          app_name: farcaster
 
       # source https://github.com/orgs/community/discussions/28474
       - name: Print head git commit message
@@ -88,7 +90,9 @@ jobs:
         uses: ./.github/actions/install
 
       - name: Build app
-        uses: ./.github/actions/build_farcaster
+        uses: ./.github/actions/build_app
+        with:
+          app_name: farcaster
 
       - name: Update Dockerfile
         run: |
@@ -125,7 +129,9 @@ jobs:
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Build app
-        uses: ./.github/actions/build_farcaster
+        uses: ./.github/actions/build_app
+        with:
+          app_name: farcaster
 
       - name: Upload JS source maps to Datadog
         env:
@@ -138,7 +144,7 @@ jobs:
             --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
   deploy-production:
-    name: Deploy ${{ matrix.name }}
+    name: Deploy to production
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
     needs: [upload-docker, upload-static-assets]
@@ -146,8 +152,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Farcaster App
-            stack: prd-farcaster
+          - stack: prd-farcaster
             ebextensions: farcaster
     steps:
       - uses: actions/checkout@v4
