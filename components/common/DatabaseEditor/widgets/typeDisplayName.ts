@@ -49,6 +49,11 @@ export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
       });
     case 'proposalPublishedAt':
       return intl.formatMessage({ id: 'PropertyType.ProposalPublishedAt', defaultMessage: 'Proposal Published At' });
+    case 'proposalEvaluationDueDate':
+      return intl.formatMessage({
+        id: 'PropertyType.ProposalEvaluationDueDate',
+        defaultMessage: 'Proposal Evaluation Due Date'
+      });
     case 'proposalEvaluationReviewerAverage': {
       return intl.formatMessage({
         id: 'PropertyType.ProposalEvaluationReviewerAverage',

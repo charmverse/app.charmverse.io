@@ -72,6 +72,7 @@ export function getBoardProperties({
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalAuthor());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalStatus());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalPublishedAt());
+  applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationDueDate());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalUrl());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
   applyToPropertiesByType(boardProperties, {

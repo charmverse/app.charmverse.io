@@ -83,6 +83,10 @@ class OctoUtils {
         displayValue = propertyValue ? formatDateTime(new Date(propertyValue as string)) : 'N/A';
         break;
       }
+      case 'proposalEvaluationDueDate': {
+        displayValue = propertyValue ? formatDate(new Date(propertyValue as string)) : 'N/A';
+        break;
+      }
       case 'person':
       case 'proposalEvaluatedBy':
       case 'proposalAuthor':

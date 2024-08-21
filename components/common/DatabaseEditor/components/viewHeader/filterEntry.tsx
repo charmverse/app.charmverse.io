@@ -23,7 +23,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
-import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { DatePicker } from 'components/common/DatePicker';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
