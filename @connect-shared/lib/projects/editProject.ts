@@ -1,15 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import { resolveENSName } from '@root/lib/blockchain';
 import { ensureFarcasterUserExists } from '@root/lib/farcaster/ensureFarcasterUserExists';
-import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
-import { uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
-import { meanBy } from 'lodash';
-import { v4 } from 'uuid';
 
 import type { FormValues } from './projectSchema';
 
@@ -29,7 +23,7 @@ export async function editProject({ userId, input }: { input: EditProjectValues;
     }
   }
 
-  const [currentProjectMembers, inputProjectMembers] = await Promise.all([
+  const [currentProjectMembers] = await Promise.all([
     prisma.projectMember.findMany({
       where: {
         projectId: input.projectId,
@@ -47,18 +41,6 @@ export async function editProject({ userId, input }: { input: EditProjectValues;
           }
         }
       }
-    }),
-    prisma.farcasterUser.findMany({
-      where: {
-        fid: {
-          in: input.projectMembers.map(({ farcasterId }) => farcasterId)
-        }
-      },
-      select: {
-        userId: true,
-        fid: true,
-        account: true
-      }
     })
   ]);
 
@@ -73,7 +55,7 @@ export async function editProject({ userId, input }: { input: EditProjectValues;
   );
 
   const projectMembers = await Promise.all(
-    newProjectMembers.map(async (member) => ensureFarcasterUserExists({ fid: member.farcasterId }))
+    newProjectMembers.map((member) => ensureFarcasterUserExists({ fid: member.farcasterId }))
   );
 
   const [editedProject] = await prisma.$transaction([

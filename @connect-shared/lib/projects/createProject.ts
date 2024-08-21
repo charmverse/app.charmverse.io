@@ -78,7 +78,7 @@ export async function createProject({
       updatedBy: userId,
       userId: member.userId,
       // This is necessary because some test data fids do not have a corresponding farcaster profile
-      name: member.account.displayName || member.account.username,
+      name: (member.account.displayName || member.account.username)?.trim() || '',
       farcasterId: member.fid
     }))
   ];
