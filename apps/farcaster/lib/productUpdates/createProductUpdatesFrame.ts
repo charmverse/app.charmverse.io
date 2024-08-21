@@ -31,21 +31,42 @@ export async function createProductUpdatesFrame(input: FormValues) {
     }
   });
 
+  let projectAvatarImageUrl: string | null = project.avatar;
+
+  // Convert project avatar image to PNG if it's not already
+  if (project.avatar && !project.avatar.endsWith('.png')) {
+    const projectAvatarBlob = await fetch(project.avatar).then((res) => res.blob());
+    const projectAvatarData = await projectAvatarBlob.arrayBuffer().then((buffer) => Buffer.from(buffer));
+    const projectAvatarOptimizedBuffer = await sharp(projectAvatarData).png().toBuffer();
+    const filenameWithoutExtension = project.avatar.split('.').slice(0, -1).join('.');
+    const { fileUrl: projectAvatarFileUrl } = await uploadFileToS3({
+      pathInS3: getUserS3FilePath({
+        userId: user.id,
+        url: `project-${input.projectId}-${filenameWithoutExtension}.png`
+      }),
+      content: projectAvatarOptimizedBuffer,
+      contentType: 'image/png'
+    });
+
+    projectAvatarImageUrl = projectAvatarFileUrl;
+  }
+
   const element = React.createElement(ProductUpdatesText, {
     text: input.text,
     createdAtLocal: input.createdAtLocal,
     projectName: project.name,
-    projectAvatarImage: project.avatar
+    projectAvatarImage: projectAvatarImageUrl
   });
+
   // Use a ratio of 1.91:1 for the image as recommended by farcaster
   const image = new ImageResponse(element, {
-    width: 1000,
-    height: 1000 / 1.91
+    width: 500,
+    height: 500
   });
 
   const imageBlob = await image.blob();
   const imageData = await imageBlob.arrayBuffer().then((buffer) => Buffer.from(buffer));
-  const optimizedBuffer = await sharp(imageData).webp({ quality: 100 }).toBuffer();
+  const optimizedBuffer = await sharp(imageData).webp().toBuffer();
   const frameId = v4();
 
   const { fileUrl } = await uploadFileToS3({

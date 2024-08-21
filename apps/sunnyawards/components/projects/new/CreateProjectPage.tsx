@@ -103,11 +103,7 @@ export function CreateProjectPage({
 
   return (
     <PageWrapper bgcolor='transparent'>
-      <form
-        onSubmit={handleSubmit((data) => {
-          execute(data);
-        })}
-      >
+      <form onSubmit={handleSubmit(execute)}>
         <ImportOptimismProject
           control={control}
           optimismProjects={optimismProjects}
