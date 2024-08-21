@@ -38,6 +38,7 @@ function generateContributionLinks(input: ConnectProjectDetails) {
   return links;
 }
 
+// TBD - Fields
 export function mapProjectToGitcoin({ project }: { project: ConnectProjectDetails }) {
   return {
     name: project.name || '', // Direct mapping
