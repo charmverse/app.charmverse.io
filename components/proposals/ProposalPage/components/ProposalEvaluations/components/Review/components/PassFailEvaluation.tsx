@@ -56,6 +56,7 @@ export type PassFailEvaluationProps = {
 };
 
 const ResultsContainer = styled.div`
+  display: flex;
   flex-direction: row;
   gap: ${({ theme }) => theme.spacing(1)};
   align-items: center;
