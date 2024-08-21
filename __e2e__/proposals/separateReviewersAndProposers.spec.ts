@@ -122,12 +122,13 @@ test.describe.serial('Have separate approver from reviewers', async () => {
     // Confirm rubric results
     await proposalPage.saveRubricAnswers.click();
 
-    await expect(proposalPage.passEvaluationButton).not.toBeVisible();
-
     await Promise.all([
       page.waitForResponse('**/api/proposals/*/rubric-answers'),
       proposalPage.confirmStatusButton.click()
     ]);
+
+    await proposalPage.rubricStepDecisionTab.click();
+    await expect(proposalPage.passEvaluationButton).not.toBeVisible();
 
     const proposalAfterUpdate = await prisma.proposal.findFirstOrThrow({
       where: {
@@ -155,6 +156,7 @@ test.describe.serial('Have separate approver from reviewers', async () => {
     // Approver can pass, but not review the rubric
     await expect(proposalPage.rubricCriteriaScore).toBeDisabled();
 
+    await proposalPage.rubricStepDecisionTab.click();
     await expect(proposalPage.passEvaluationButton).toBeEnabled();
 
     await Promise.all([
