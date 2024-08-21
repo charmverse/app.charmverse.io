@@ -5,7 +5,9 @@
     "defaults"
   ],
   "workspaces": [
-    "apps/*",
+    "apps/scoutgame",
+    "apps/sunnyawards",
+    "apps/farcaster",
     "@connect-shared"
   ],
   "scripts": {
