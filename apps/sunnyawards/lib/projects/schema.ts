@@ -16,7 +16,7 @@ export const PROJECT_CATEGORIES = [
   {
     group: 'DeFi',
     optimismCategory: 'DeFi',
-    items: ['DEX', 'Real World Assets', 'Staking', 'Bridges']
+    items: ['DEX', 'Real World Assets', 'Staking', 'Bridges', 'Lending']
   },
   {
     group: 'Social',
