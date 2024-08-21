@@ -26,6 +26,7 @@ export type PassFailEvaluationProps = {
   isReviewer?: boolean;
   isApprover?: boolean;
   archived?: boolean;
+  label?: string;
   onSubmitEvaluationReview: (params: {
     declineReason: string | null;
     result: NonNullable<PopulatedEvaluation['result']>;
@@ -81,6 +82,7 @@ export function PassFailEvaluation({
   onResetEvaluationReview,
   declineReasonOptions,
   completedAt,
+  label = 'Submit review:',
   totalReviews,
   actionLabels: _actionLabels,
   confirmationMessage,
@@ -235,7 +237,7 @@ export function PassFailEvaluation({
           <Box display='flex' justifyContent='space-between' alignItems='center' p={2}>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
-                Submit review:
+                {label}{' '}
               </Typography>
             </FormLabel>
             <Box display='flex' justifyContent='flex-end' gap={1}>
@@ -266,7 +268,7 @@ export function PassFailEvaluation({
             </Box>
           </Box>
         )}
-        {!canPassFail && isCurrent && evaluationResult === null && totalReviews === 0 && (
+        {!canPassFail && isCurrent && evaluationResult === null && (
           <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' py={2} px={2}>
             <Typography variant='body2'>{isAppealProcess ? 'Appeal' : 'Review'} process ongoing</Typography>
           </Stack>
