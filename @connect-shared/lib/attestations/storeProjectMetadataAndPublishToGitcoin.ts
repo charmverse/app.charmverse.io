@@ -12,7 +12,7 @@ import { findProject } from '../projects/findProject';
 import { projectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
 
-const currentGitcoinRound = 'clxokl3hl000013trh6d4lhyo';
+const currentGitcoinRound = 'cm02ji8ui0000jcjtd3k2p01y';
 
 export async function storeProjectMetadataAndPublishGitcoinAttestation({
   userId,
