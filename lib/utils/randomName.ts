@@ -62,7 +62,7 @@ const nameGeneratorConfig: Config = {
   length: 3
 };
 
-export default function randomName() {
+export function randomName() {
   return uniqueNamesGenerator(nameGeneratorConfig);
 }
 

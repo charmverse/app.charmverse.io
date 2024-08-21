@@ -27,7 +27,7 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import { shortWalletAddress } from 'lib/utils/blockchain';
-import randomName from 'lib/utils/randomName';
+import { randomName } from 'lib/utils/randomName';
 import { lowerCaseEqual } from 'lib/utils/strings';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 

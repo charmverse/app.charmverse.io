@@ -178,7 +178,6 @@ export function RubricCriteriaSettings({
               )}
             </Box>
             <TextField
-              // displayType='details'
               multiline
               fullWidth
               data-test='edit-rubric-criteria-description'

@@ -1,8 +1,8 @@
 import { Box, FormLabel, Switch, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
 import type { SelectOptionType } from '@root/lib/forms/interfaces';
 
 import { SelectField } from 'components/common/form/fields/SelectField';
+import { FormControlLabel } from 'components/common/form/FormControlLabel';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -41,45 +41,40 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
   }
 
   return (
-    <Stack gap={2}>
-      <Box display='flex' alignItems='center' justifyContent='space-between' width='100%'>
-        <FormLabel>
-          <Typography component='span' variant='subtitle1'>
-            {rewardLabel} will be public
-          </Typography>
-        </FormLabel>
-
-        <Switch
-          checked={!!value?.makeRewardsPublic}
-          onChange={async (ev) => {
-            onChangeSettings({ makeRewardsPublic: !!ev.target.checked });
-          }}
+    <>
+      <Box mb={1}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={!!value?.makeRewardsPublic}
+              onChange={async (ev) => {
+                onChangeSettings({ makeRewardsPublic: !!ev.target.checked });
+              }}
+            />
+          }
+          label={`${getFeatureTitle('Rewards')} will be publicly visible`}
         />
       </Box>
-      <Stack>
-        <FormLabel>
-          <Typography component='span' variant='subtitle1'>
-            Template
-          </Typography>
-        </FormLabel>
+      <FormLabel>
+        <Typography component='span' variant='subtitle1'>
+          Template
+        </Typography>
+      </FormLabel>
 
-        <Box display='flex' flex={1} flexDirection='column'>
-          <SelectField
-            includeSelectedOptions
-            placeholder='No template required'
-            value={value?.rewardsTemplateId || ''}
-            options={options}
-            onChange={async (rewardsTemplateId: string | string[]) => {
-              if (rewardsTemplateId === 'add_new') {
-                const absolutePath = space ? getAbsolutePath('/rewards/new?type=template', space.domain) : '';
-                window.open(absolutePath, '_blank');
-              } else if (typeof rewardsTemplateId === 'string') {
-                onChangeSettings({ rewardsTemplateId: rewardsTemplateId ?? null });
-              }
-            }}
-          />
-        </Box>
-      </Stack>
-    </Stack>
+      <SelectField
+        includeSelectedOptions
+        placeholder='No template required'
+        value={value?.rewardsTemplateId || ''}
+        options={options}
+        onChange={async (rewardsTemplateId: string | string[]) => {
+          if (rewardsTemplateId === 'add_new') {
+            const absolutePath = space ? getAbsolutePath('/rewards/new?type=template', space.domain) : '';
+            window.open(absolutePath, '_blank');
+          } else if (typeof rewardsTemplateId === 'string') {
+            onChangeSettings({ rewardsTemplateId: rewardsTemplateId ?? null });
+          }
+        }}
+      />
+    </>
   );
 }
