@@ -18,7 +18,7 @@ runs:
           apps/${{ inputs.app_name }}/.next/cache
           apps/${{ inputs.app_name }}/public
         # Generate a new cache whenever packages or source files change.
-        key: app-${{ inputs.app_name }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts', 'lib/**/*.tsx', '@connect-shared/**/*.ts', '@connect-shared/**/*.tsx', format('apps/{0}/**/*.ts', inputs.app_name), format('apps/{0}/**/*.tsx', inputs.app_name), format('apps/{0}/**/*.scss', inputs.app_name) }}
+        key: app-${{ inputs.app_name }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts', 'lib/**/*.tsx', '@connect-shared/**/*.ts', '@connect-shared/**/*.tsx', format('apps/{0}/**/*.ts', inputs.app_name), format('apps/{0}/**/*.tsx', inputs.app_name), format('apps/{0}/**/*.scss', inputs.app_name)) }}
         restore-keys: |
           app-${{ inputs.app_name }}-${{ hashFiles('**/package-lock.json') }}-
 
