@@ -1,4 +1,4 @@
-name: Connect CI
+name: Scoutgame CI
 
 on:
   push:
@@ -244,7 +244,7 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build_app
         with:
-          app_name: connect
+          app_name: scoutgame
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -263,7 +263,7 @@ jobs:
         run: |
           npm install -g @datadog/datadog-ci
           datadog-ci sourcemaps upload apps/scoutgame/.next/static       \
-            --service=connect                              \
+            --service=scoutgame                              \
             --release-version=${{ steps.get_build_id.outputs.build_id }}  \
             --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
@@ -277,7 +277,7 @@ jobs:
       matrix:
         include:
           - stack: prd-connect
-            ebextensions: connect
+            ebextensions: scoutgame
     steps:
       - uses: actions/checkout@v4
         with:
@@ -426,7 +426,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
           status: 'failure'
           content: 'Hey <@&1027309276454207519>'
-          title: 'Connect deploy workflow failed'
+          title: 'Scoutgame deploy workflow failed'
           description: |
             Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
           color: '16515843'
