@@ -61,7 +61,7 @@ jobs:
 
       - name: Replace env_var with staging settings
         run: |
-          ebextension_files=$(ls .ebextensions*/00_env_vars.config)
+          ebextension_files=$(ls .ebextensions/*/00_env_vars.config)
           ebstalk_apps_env_files=$(ls .ebstalk.apps.env/*)
 
           for conf_file in $ebextension_files $ebstalk_apps_env_files; do
@@ -72,17 +72,14 @@ jobs:
           # modifying cloudformation alarm to send alerts to test sns topic.
           #  leaving it in even if we're deleting the config before deploying
           #  Useful to avoid accidental triggering to system-status channel.
-          for conf_file in .ebextensions*/06_cloudwatch_alarm.config; do
+          for conf_file in .ebextensions/*/06_cloudwatch_alarm.config; do
             sed -i 's/Production-Alerts/lambda-test-debug/g' $conf_file
           done
 
-          rm .ebextensions*/06_cloudwatch_alarm.config
+          rm .ebextensions/*/06_cloudwatch_alarm.config
 
           # substituting the websocket domain name
           sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
-
-          # substituting the connect api domain name
-          sed -i 's/REACT_APP_CONNECT_API_HOST=.*/REACT_APP_CONNECT_API_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:4000/g' .ebstalk.apps.env/connect.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -92,34 +89,22 @@ jobs:
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/00_env_vars.config
+              ' .ebextensions/webapp/00_env_vars.config
 
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_cron/00_env_vars.config
+              ' .ebextensions/cron/00_env_vars.config
 
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_ceramic/00_env_vars.config
+              ' .ebextensions/ceramic/00_env_vars.config
 
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_websockets/00_env_vars.config
-
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_connect/00_env_vars.config
-
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_sunnyawards/00_env_vars.config
+              ' .ebextensions/websockets/00_env_vars.config
 
       - name: Run specific version of permission api if SELECTED_PERMISSION_API_TAG exists
         if: env.SELECTED_PERMISSION_API_TAG && env.GITHUB_HEAD_REF_SLUG == env.SELECTED_PERMISSION_API_TAG
@@ -129,17 +114,17 @@ jobs:
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .PERMISSION_IMGTAG = "${{ env.SELECTED_PERMISSION_API_TAG }}")
-              ' .ebextensions/00_env_vars.config
+              ' .ebextensions/webapp/00_env_vars.config
 
       - name: Parse compose profile to see if we need to enable datadog
         id: get_compose_profiles
         uses: mikefarah/yq@master
         with:
-          cmd: yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions/00_env_vars.config
+          cmd: yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions/webapp/00_env_vars.config
 
       - name: Set DDENABLED variable in environment for build and deploy steps
         run: |
-          cat  .ebextensions/00_env_vars.config
+          cat  .ebextensions/webapp/00_env_vars.config
           COMPOSE_PROFILES=${{ steps.get_compose_profiles.outputs.result }}
           if [[ "$COMPOSE_PROFILES" =~ ddtst ]]; then
             echo "DDENABLED=true" >> $GITHUB_ENV
@@ -165,22 +150,9 @@ jobs:
       - name: Upload static assets to S3
         run: aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
-      - name: Override config with Connect app
-        # wrap the condition in "${{}}" because the string includes a colon
-        # see https://github.com/actions/runner/issues/1019
-        if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect') }}"
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_connect .ebextensions
-
-      - name: Override config with Sunny Awards
-        # wrap the condition in "${{}}" because the string includes a colon
-        # see https://github.com/actions/runner/issues/1019
-        if: "${{ contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') }}"
-        run: |
-          rm -rf .ebextensions && mv .ebextensions_sunnyawards .ebextensions
-
       - name: Package
         run: |
+          mv .ebextensions .ebextensions_tmp && mv .ebextensions_tmp/webapp .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ ${{env.STAGE_NAME}}.zip
 
       - name: Deploy to staging
@@ -207,7 +179,7 @@ jobs:
 
       - name: Update and Package ceramic server
         run: |
-          rm -rf .ebextensions && mv .ebextensions_ceramic .ebextensions
+          rm -r .ebextensions && mv .ebextensions_tmp/ceramic .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
 
       - name: Deploy ceramic to Beanstalk
@@ -230,7 +202,7 @@ jobs:
 
       - name: Update and Package websockets
         run: |
-          rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
+          rm -r .ebextensions && mv .ebextensions_tmp/websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
       - name: Deploy websockets to Beanstalk

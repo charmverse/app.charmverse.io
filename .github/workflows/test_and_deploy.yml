@@ -395,43 +395,49 @@ jobs:
           cmd: |
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .NODE_ENV = "production" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/00_env_vars.config
+              ' .ebextensions/websockets/00_env_vars.config
+              yq -I 4 -i '
+                with(.option_settings."aws:elasticbeanstalk:application:environment";
+                      .NODE_ENV = "production" |
+                      .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions/webapp/00_env_vars.config
 
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_cron/00_env_vars.config
+              yq -I 4 -i '
+                with(.option_settings."aws:elasticbeanstalk:application:environment";
+                      .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions/cron/00_env_vars.config
 
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_ceramic/00_env_vars.config
+              yq -I 4 -i '
+                with(.option_settings."aws:elasticbeanstalk:application:environment";
+                      .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions/ceramic/00_env_vars.config
 
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions_websockets/00_env_vars.config
+              yq -I 4 -i '
+                with(.option_settings."aws:elasticbeanstalk:application:environment";
+                      .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions/websockets/00_env_vars.config
 
       - name: Package webapp
         run: |
+          mv .ebextensions .ebextensions_tmp
+          mv .ebextensions_tmp/webapp .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
 
       - name: Package cron worker
         run: |
-          rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
+          rm -r .ebextensions && mv .ebextensions_tmp/cron .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
 
       - name: Package ceramic server
         run: |
-          rm -rf .ebextensions && mv .ebextensions_ceramic .ebextensions
+          rm -r .ebextensions && mv .ebextensions_tmp/ceramic .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
 
       - name: Package websockets
         id: pkg_websocket
         run: |
-          rm -rf .ebextensions && mv .ebextensions_websockets .ebextensions
+          rm -r .ebextensions && mv .ebextensions_tmp/websockets .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
 
           changed_files=$(git diff --name-only ${{github.event.before}} ${{github.event.after}})

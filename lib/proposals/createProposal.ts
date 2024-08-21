@@ -48,6 +48,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   appealable?: boolean | null;
   appealRequiredReviews?: WorkflowEvaluationJson['appealRequiredReviews'] | null;
   appealReviewers?: Partial<Pick<ProposalAppealReviewer, 'userId' | 'roleId'>>[] | null;
+  shareReviews?: boolean | null;
 };
 
 export type CreateProposalInput = {
@@ -217,7 +218,8 @@ export async function createProposal({
                 requiredReviews: evaluation.requiredReviews ?? 1,
                 finalStep: evaluation.finalStep,
                 appealable: evaluation.appealable,
-                appealRequiredReviews: evaluation.appealRequiredReviews
+                appealRequiredReviews: evaluation.appealRequiredReviews,
+                shareReviews: evaluation.shareReviews
               }))
             }
           },

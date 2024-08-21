@@ -68,7 +68,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
         {
           type: 'heading',
           attrs: {
-            id: null,
             level: 1,
             track: []
           },
@@ -82,7 +81,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
         {
           type: 'heading',
           attrs: {
-            id: null,
             level: 2,
             track: []
           },
@@ -124,7 +122,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
         {
           type: 'heading',
           attrs: {
-            id: null,
             level: 2,
             track: []
           },
@@ -249,7 +246,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
         {
           type: 'heading',
           attrs: {
-            id: null,
             level: 2,
             track: []
           },
@@ -263,7 +259,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
         {
           type: 'heading',
           attrs: {
-            id: null,
             level: 3,
             track: []
           },
@@ -289,7 +284,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
         {
           type: 'heading',
           attrs: {
-            id: null,
             level: 1,
             track: []
           },
@@ -303,7 +297,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
         {
           type: 'heading',
           attrs: {
-            id: null,
             level: 2,
             track: []
           },
@@ -317,7 +310,6 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
         {
           type: 'heading',
           attrs: {
-            id: null,
             level: 3,
             track: []
           },

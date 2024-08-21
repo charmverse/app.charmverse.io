@@ -42,7 +42,9 @@ export function useMagicLink({ error: ssrError }: { error?: 'error_invalid_page_
         try {
           setStatus('verifying_email');
           const data = await validateMagicLink(emailForSignIn);
-
+          if (!data) {
+            return;
+          }
           // If connect to account without otp, we need to redirect user to the page else we open the otp modal
           if ('id' in data && data.id) {
             log.info('Magic link validated, redirect user to page');

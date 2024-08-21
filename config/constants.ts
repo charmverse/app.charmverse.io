@@ -33,6 +33,14 @@ export const googleWebClientConfig = {
   appId: env('GOOGLE_APP_ID')
 };
 
+export const googleFirebaseAdminConfig = {
+  // replace `\` and `n` character pairs w/ single `\n` character
+  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  projectId: googleWebClientConfig.projectId,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL
+};
+export const magicLinkEmailCookie = 'magic-link';
+
 export const charmverseDiscordInvite = 'https://discord.gg/ACYCzBGC2M';
 export const userManualUrl = 'https://tiny.charmverse.io/user-manual';
 // Google config with sensitive scopes (to eventually replace the primary config)
@@ -67,6 +75,3 @@ export const docusignOauthBaseUri = process.env.DOCUSIGN_OAUTH_BASE_URI as strin
 // export const docusignApiKey = process.env.DOCUSIGN_API_KEY as string;
 // This is a Personal Access Token for the Github API, generated within an individual developer account
 export const githubAccessToken = process.env.GITHUB_ACCESS_TOKEN as string;
-
-// API Client
-export const connectApiHost = env('CONNECT_API_HOST');

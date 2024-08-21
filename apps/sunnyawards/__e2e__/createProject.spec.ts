@@ -88,6 +88,9 @@ test('Create a project and view details', async ({ page }) => {
     }
   });
 
+  // We want to ensure the project receives a sunnyAwardsNumber
+  expect(typeof project.sunnyAwardsNumber === 'number' && project.sunnyAwardsNumber > 0).toBe(true);
+
   const shareToWarpcastButton = page.locator('data-test=share-project-to-warpcast');
 
   await expect(shareToWarpcastButton).toBeVisible();

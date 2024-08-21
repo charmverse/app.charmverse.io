@@ -104,8 +104,10 @@ export function mapDbProposalToProposal({
 
     if (!stepPermissions?.evaluate) {
       draftRubricAnswers = [];
-      rubricAnswers = [];
-      reviews = [];
+      if (!evaluation.shareReviews) {
+        rubricAnswers = [];
+        reviews = [];
+      }
     }
 
     return {
