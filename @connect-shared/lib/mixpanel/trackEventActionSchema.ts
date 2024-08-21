@@ -7,7 +7,8 @@ export type EventType =
   | 'click_join_the_sunnys'
   | 'click_share_on_warpcast'
   | 'click_share_on_twitter'
-  | 'click_powered_by_charmverse';
+  | 'click_powered_by_charmverse'
+  | 'click_need_help';
 
 export const eventSchema = yup.object().shape({
   event: yup.string<EventType>().required(),

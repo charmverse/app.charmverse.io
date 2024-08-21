@@ -14,7 +14,13 @@ const chainOptions: { name: string; id: number; icon: string }[] = [
   { name: 'Mint', id: 185, icon: '/images/crypto/mint64.png' },
   { name: 'Fraxtal', id: 2522, icon: '/images/crypto/frax64.png' },
   { name: 'Redstone', id: 690, icon: '/images/crypto/redstone64.png' },
-  { name: 'Cyber', id: 7560, icon: '/images/crypto/cyber64.png' }
+  { name: 'Cyber', id: 7560, icon: '/images/crypto/cyber64.png' },
+  { name: 'Polynomial', id: 8008, icon: '/images/crypto/polynomial.png' },
+  { name: 'Xterio', id: 2702128, icon: '/images/crypto/xterio.png' },
+  { name: 'Kroma', id: 255, icon: '/images/crypto/kroma.png' },
+  { name: 'Swan', id: 254, icon: '/images/crypto/swan.png' },
+  { name: 'BOB', id: 6080, icon: '/images/crypto/bob.png' },
+  { name: 'Orderly Network', id: 291, icon: '/images/crypto/orderly.png' }
 ];
 
 function SelectField(props: SelectProps<string> & { helperMessage?: ReactNode }, ref: Ref<unknown>) {
