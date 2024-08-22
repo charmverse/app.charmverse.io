@@ -107,7 +107,6 @@ export function ProjectForm({
         control={control}
         name='farcasterValues'
         label='Farcaster'
-        required
         data-test='project-form-farcaster-values'
         placeholder='https://warpcast.com/charmverse'
       />
