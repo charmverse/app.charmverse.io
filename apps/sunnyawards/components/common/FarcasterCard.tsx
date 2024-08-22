@@ -49,7 +49,15 @@ function FarcasterCardContent({
         <Typography variant='subtitle1' color='secondary'>
           @{username || 'N/A'}
         </Typography>
-        <Typography>{bio}</Typography>
+        <Typography
+          sx={{
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: '2'
+          }}
+        >
+          {bio}
+        </Typography>
       </Box>
     </CardContent>
   );
