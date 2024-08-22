@@ -47,11 +47,7 @@ const config = {
       transform: 'lodash/{{member}}'
     }
   },
-  // assetPrefix: process.env.REACT_APP_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
-  assetPrefix:
-    process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'staging'
-      ? 'https://cdn.charmverse.io'
-      : undefined,
+  assetPrefix: process.env.REACT_APP_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
   productionBrowserSourceMaps: true,
   async redirects() {
     return [
