@@ -92,6 +92,7 @@ export async function createProject({
       description: input.description,
       optimismCategory: input.optimismCategory,
       sunnyAwardsCategory: input.sunnyAwardsCategory,
+      sunnyAwardsCategoryDetails: input.sunnyAwardsCategoryDetails,
       websites: input.websites?.filter(isTruthy),
       farcasterValues: input.farcasterValues?.filter(isTruthy),
       twitter: input.twitter,

@@ -59,6 +59,7 @@ export function CreateProjectPage({
       name: '',
       description: '',
       sunnyAwardsCategory: '' as any,
+      sunnyAwardsCategoryDetails: '',
       websites: [''],
       farcasterValues: [''],
       sunnyAwardsProjectType: 'other',

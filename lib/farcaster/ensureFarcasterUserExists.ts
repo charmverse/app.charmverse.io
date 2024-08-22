@@ -31,10 +31,12 @@ export async function ensureFarcasterUserExists({ fid }: { fid: number }): Promi
     return existingFarcasterUser as TypedFarcasterUser;
   }
 
-  const farcasterAccount = await getFarcasterUsers({ fids: [fid] }).then((users) => users[0]);
+  const farcasterAccount = await getFarcasterUsers({ fids: [fid] }).then((users) => {
+    return users[0];
+  });
 
   if (!farcasterAccount) {
-    throw new DataNotFoundError(`Farcaster user ${fid} not found`);
+    throw new DataNotFoundError(`Farcaster user fid: ${fid} not found`);
   }
 
   const existingUserAccount = await prisma.user.findFirst({
