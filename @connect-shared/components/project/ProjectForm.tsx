@@ -30,6 +30,9 @@ export function ProjectForm({
         </Stack>
       </Stack>
       <Stack>
+        <FormLabel required id='project-name'>
+          Name
+        </FormLabel>
         <Controller
           control={control}
           name='name'
