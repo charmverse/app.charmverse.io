@@ -1,5 +1,6 @@
 'use client';
 
+import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -9,6 +10,7 @@ import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
+import type { FieldErrors } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import type { Address } from 'viem';
 
@@ -101,9 +103,15 @@ export function CreateProjectPage({
     });
   }
 
+  function onInvalid(fieldErrors: FieldErrors) {
+    const invalidFields = Object.keys(fieldErrors);
+    setErrors([`The form is invalid. Please check the following fields: ${invalidFields.join(', ')}`]);
+    log.warn('Invalid form submission', { errors });
+  }
+
   return (
     <PageWrapper bgcolor='transparent'>
-      <form onSubmit={handleSubmit(execute)}>
+      <form onSubmit={handleSubmit(execute, onInvalid)}>
         <ImportOptimismProject
           control={control}
           optimismProjects={optimismProjects}

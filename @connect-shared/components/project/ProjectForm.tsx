@@ -30,9 +30,6 @@ export function ProjectForm({
         </Stack>
       </Stack>
       <Stack>
-        <FormLabel required id='project-name'>
-          Name
-        </FormLabel>
         <Controller
           control={control}
           name='name'
@@ -110,6 +107,7 @@ export function ProjectForm({
         control={control}
         name='farcasterValues'
         label='Farcaster'
+        required
         data-test='project-form-farcaster-values'
         placeholder='https://warpcast.com/charmverse'
       />
