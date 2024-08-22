@@ -7,9 +7,6 @@ inputs:
   commit_core_pkg_upgrade:
     description: 'Whether commit the update to core package back to branch'
     required: false
-  save_cache:
-    description: 'Whether to save the cache'
-    required: false
   use_github_core_branch:
     description: |
       Optional, core branch name to install from github.
@@ -36,7 +33,7 @@ runs:
 
     - name: Restore dependencies
       id: restore_node_modules
-      uses: actions/cache/restore@v4
+      uses: actions/cache@v4
       with:
         # include node_modules inside connect app
         path: |
@@ -82,12 +79,3 @@ runs:
         npm install github:charmverse/core#${{inputs.use_github_core_branch}}
         cd node_modules/@charmverse/core
         npm run build
-
-    - name: Cache dependencies
-      if: inputs.save_cache
-      uses: actions/cache/save@v4
-      with:
-        path: |
-          ./node_modules
-          ./apps/*/node_modules
-        key: nodemodule-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}

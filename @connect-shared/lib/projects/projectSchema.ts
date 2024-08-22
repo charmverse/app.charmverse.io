@@ -11,7 +11,8 @@ export const schema = yup.object({
   avatar: yup.string(),
   coverImage: yup.string(),
   optimismCategory: yup.string().oneOf(CATEGORIES),
-  sunnyAwardsCategory: yup.string(), // enum is defined inside sunnyawards app
+  sunnyAwardsCategory: yup.string().required(), // enum is defined inside sunnyawards app
+  sunnyAwardsCategoryDetails: yup.string(),
   websites: yup.array(yup.string().url()).min(1),
   farcasterValues: yup.array(yup.string()),
   github: yup.string(),

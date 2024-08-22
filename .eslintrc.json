@@ -76,7 +76,7 @@
       "error",
       {
         "devDependencies": true,
-        "packageDir": ["./", "./apps/connect"]
+        "packageDir": ["./", "./apps/scoutgame"]
       }
     ],
     "import/order": [

@@ -17,13 +17,22 @@ import { useSpaces } from 'hooks/useSpaces';
 import { pagePermissionLevels } from 'lib/permissions/pages/labels';
 import { typedKeys } from 'lib/utils/objects';
 
-type PagePermissionLevelWithoutCustomAndProposalEditor = Exclude<PagePermissionLevel, 'custom' | 'proposal_editor'>;
+type PagePermissionLevelWithoutCustomAndProposalEditor =
+  | Exclude<PagePermissionLevel, 'custom' | 'proposal_editor'>
+  | 'none';
 const pagePermissionDescriptions: Record<PagePermissionLevelWithoutCustomAndProposalEditor, string> = {
-  full_access: 'Space members can edit pages, share them with the public and manage permissions.',
-  editor: 'Space members can edit but not share pages.',
-  view_comment: 'Space members can view and comment on pages.',
-  view: 'Space members can only view pages.'
+  full_access: 'Space members can edit pages, share them with the public and manage permissions',
+  editor: 'Space members can edit but not share pages',
+  view_comment: 'Space members can view and comment on pages',
+  view: 'Space members can only view pages',
+  none: 'Pages are private to authors by default'
 };
+
+const pagePermissionLabelsWithNone = {
+  ...pagePermissionLevels,
+  none: 'None'
+};
+
 export function DefaultPagePermissions() {
   const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
@@ -38,7 +47,7 @@ export function DefaultPagePermissions() {
   // Permission states
   const [selectedPagePermission, setSelectedPagePermission] =
     useState<PagePermissionLevelWithoutCustomAndProposalEditor>(
-      (space?.defaultPagePermissionGroup as PagePermissionLevelWithoutCustomAndProposalEditor) ?? 'full_access'
+      space?.defaultPagePermissionGroup as PagePermissionLevelWithoutCustomAndProposalEditor
     );
   const [defaultPublicPages, setDefaultPublicPages] = useState<boolean>(space?.defaultPublicPages ?? false);
   const [requireProposalTemplate, setRequireProposalTemplate] = useState<boolean>(
@@ -55,7 +64,7 @@ export function DefaultPagePermissions() {
       setIsUpdatingPagePermission(true);
       const updatedSpace = await charmClient.permissions.spaces.setDefaultPagePermission({
         spaceId: space.id,
-        pagePermissionLevel: selectedPagePermission
+        pagePermissionLevel: selectedPagePermission === 'none' ? null : selectedPagePermission
       });
       setSpace(updatedSpace);
       setIsUpdatingPagePermission(false);
@@ -97,7 +106,7 @@ export function DefaultPagePermissions() {
         </Typography>
       </Box>
       <Box mb={2} display='flex' alignItems='center' justifyContent='space-between'>
-        <Typography>Default access level for Members</Typography>
+        <Typography>Default page permission for members</Typography>
         <UpgradeWrapper upgradeContext='page_permissions' onClick={rolesInfoPopup.open}>
           <Box display='flex' gap={1} alignItems='center'>
             <Button
@@ -108,7 +117,11 @@ export function DefaultPagePermissions() {
               endIcon={!isUpdatingPagePermission && <KeyboardArrowDownIcon fontSize='small' />}
               {...bindTrigger(popupState)}
             >
-              {isFreeSpace ? pagePermissionLevels.editor : pagePermissionLevels[selectedPagePermission]}
+              {isFreeSpace
+                ? pagePermissionLevels.editor
+                : selectedPagePermission === null
+                ? pagePermissionLabelsWithNone.none
+                : pagePermissionLabelsWithNone[selectedPagePermission]}
             </Button>
           </Box>
         </UpgradeWrapper>
@@ -160,7 +173,7 @@ export function DefaultPagePermissions() {
         }}
       >
         {typedKeys(pagePermissionDescriptions).map((permissionLevel) => {
-          const permissionLevelLabel = pagePermissionLevels[permissionLevel];
+          const permissionLevelLabel = pagePermissionLabelsWithNone[permissionLevel];
           const isSelected = selectedPagePermission === permissionLevel;
           const description = pagePermissionDescriptions[permissionLevel];
 

@@ -26,14 +26,13 @@ outputs:
 runs:
   using: 'composite'
   steps:
-
     - name: Prune dev dependencies and calculate img tag
       id: prune_dev_dep
       shell: bash
       run: |
         npm prune --omit=dev
         rm -rf .next/cache
-        rm -rf apps/connect/.next/cache
+        rm -rf apps/scoutgame/.next/cache
         rm -rf apps/sunnyawards/.next/cache
         rm -rf apps/farcaster/.next/cache
 

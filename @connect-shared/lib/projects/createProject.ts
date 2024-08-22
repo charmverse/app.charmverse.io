@@ -4,6 +4,7 @@ import type { OptionalPrismaTransaction, Prisma, Project, ProjectSource } from '
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-client';
 import { resolveENSName } from '@root/lib/blockchain';
+import { ensureFarcasterUserExists } from '@root/lib/farcaster/ensureFarcasterUserExists';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath, uid } from '@root/lib/utils/strings';
@@ -43,131 +44,15 @@ export async function createProject({
     }
   }
 
-  const farcasterAccounts = await tx.farcasterUser.findMany({
-    where: {
-      fid: {
-        in: input.projectMembers.map(({ farcasterId }) => farcasterId)
-      }
-    },
-    select: {
-      userId: true,
-      fid: true,
-      account: true
-    }
-  });
-
-  const teamLeadFarcasterAccount = farcasterAccounts.find(
-    (account) => account.userId === userId
-  ) as (typeof farcasterAccounts)[0];
-
-  const farcasterAccountsRecord: Record<
-    number,
-    {
-      userId: string;
-      account: StatusAPIResponse;
-    }
-  > = farcasterAccounts.reduce<
-    Record<
-      number,
-      {
-        userId: string;
-        account: StatusAPIResponse;
-      }
-    >
-  >((acc, { fid, userId: _userId, account }) => {
-    acc[fid] = {
-      userId: _userId,
-      account: account as unknown as StatusAPIResponse
-    };
-    return acc;
-  }, {});
-
-  const projectMembers = (
-    await Promise.all(
-      input.projectMembers.map(async (member) => {
-        if (farcasterAccountsRecord[member.farcasterId]) {
-          return {
-            userId: farcasterAccountsRecord[member.farcasterId].userId,
-            name: farcasterAccountsRecord[member.farcasterId].account.displayName as string,
-            farcasterId: member.farcasterId
-          };
-        }
-        try {
-          const [farcasterProfile] = await getFarcasterUsers({
-            fids: [member.farcasterId]
-          });
-          if (!farcasterProfile) {
-            return null;
-          }
-
-          const farcasterWalletUser = await tx.user.findFirst({
-            where: {
-              wallets: {
-                some: {
-                  address: {
-                    in: [
-                      farcasterProfile.custody_address,
-                      ...(farcasterProfile.verified_addresses ? farcasterProfile.verified_addresses.eth_addresses : [])
-                    ].map((address) => address.toLowerCase())
-                  }
-                }
-              }
-            },
-            select: {
-              id: true
-            }
-          });
-
-          if (farcasterWalletUser) {
-            return {
-              userId: farcasterWalletUser.id,
-              name: farcasterProfile.display_name,
-              farcasterId: member.farcasterId
-            };
-          }
-          const username = farcasterProfile.username;
-          const displayName = farcasterProfile.display_name;
-          const bio = farcasterProfile.profile.bio.text;
-          const pfpUrl = farcasterProfile.pfp_url;
-          const fid = member.farcasterId;
-
-          const newUser = await tx.user.create({
-            data: {
-              id: v4(),
-              username,
-              identityType: 'Farcaster',
-              claimed: false,
-              avatar: farcasterProfile.pfp_url,
-              farcasterUser: {
-                create: {
-                  account: { username, displayName, bio, pfpUrl },
-                  fid
-                }
-              },
-              path: uid(),
-              profile: {
-                create: {
-                  ...(bio && { description: bio || '' })
-                }
-              }
-            }
-          });
-
-          return {
-            userId: newUser.id,
-            name: displayName,
-            farcasterId: member.farcasterId
-          };
-        } catch (err) {
-          log.error('Error creating user', {
-            fid: member.farcasterId,
-            err
-          });
-          return null;
-        }
+  const projectMembers = await Promise.all(
+    input.projectMembers.map((member) =>
+      ensureFarcasterUserExists({
+        fid: member.farcasterId
       })
     )
-  ).filter(isTruthy);
+  );
+
+  const teamLeadFarcasterAccount = projectMembers.find((member) => member.userId === userId);
 
   let path = stringToValidPath({ input: input.name ?? '', wordSeparator: '-', autoReplaceEmpty: false });
 
@@ -189,12 +74,12 @@ export async function createProject({
 
   const projectMembersToCreate: Omit<Prisma.ProjectMemberCreateManyInput, 'projectId'>[] = [
     ...projectMembers.map((member) => ({
-      teamLead: member.farcasterId === teamLeadFarcasterAccount.fid,
+      teamLead: member.fid === teamLeadFarcasterAccount?.fid,
       updatedBy: userId,
       userId: member.userId,
       // This is necessary because some test data fids do not have a corresponding farcaster profile
-      name: member.name || '',
-      farcasterId: member.farcasterId
+      name: (member.account.displayName || member.account.username)?.trim() || '',
+      farcasterId: member.fid
     }))
   ];
 
@@ -207,6 +92,7 @@ export async function createProject({
       description: input.description,
       optimismCategory: input.optimismCategory,
       sunnyAwardsCategory: input.sunnyAwardsCategory,
+      sunnyAwardsCategoryDetails: input.sunnyAwardsCategoryDetails,
       websites: input.websites?.filter(isTruthy),
       farcasterValues: input.farcasterValues?.filter(isTruthy),
       twitter: input.twitter,

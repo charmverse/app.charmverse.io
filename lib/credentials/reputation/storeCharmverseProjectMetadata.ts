@@ -3,18 +3,14 @@ import { log } from '@charmverse/core/log';
 import type { CharmProjectCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
-import { optimism } from 'viem/chains';
 
 import { attestOnchain } from '../attestOnchain';
 import type { EasSchemaChain } from '../connectors';
-import { charmverseProjectDataChainId } from '../constants';
 import { easGraphQlClients } from '../external/easGraphQlClients';
 import { charmProjectSchemaId, decodeCharmProject } from '../schemas/charmProject';
 import { storeProjectInS3 } from '../storeProjectInS3';
 
 import { issueUserIdentifierIfNecessary } from './issueUserIdentifier';
-
-const graphQlClient = easGraphQlClients[charmverseProjectDataChainId];
 
 // Utility query for fetching last 100 credentials
 const GET_CREDENTIALS = gql`
@@ -94,7 +90,7 @@ export async function storeCharmverseProjectMetadata({
 
   let projectRefUID =
     project.charmProjectCredentials[0]?.projectRefUID ??
-    (await graphQlClient
+    (await easGraphQlClients[chainId]
       .query({
         query: GET_CREDENTIALS,
         variables: {
@@ -159,7 +155,7 @@ export async function storeCharmverseProjectMetadata({
         }
       },
       metadata: mappedProject,
-      chainId: optimism.id,
+      chainId,
       project: {
         connect: {
           id: project.id

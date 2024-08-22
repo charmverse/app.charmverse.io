@@ -39,6 +39,7 @@ export type TabConfig = [string, React.ReactNode, { sx?: SxProps }?];
 type MultiTabsProps<T extends string> = {
   tabs: TabConfig[] | T[];
   disabled?: boolean;
+  fullWidthTabs?: boolean;
   tabPanelSx?: SxProps;
   children?: (props: { index: number; value: T }) => React.ReactNode;
   // allow for controlled tab
@@ -68,6 +69,7 @@ export default function MultiTabs<T extends string>(props: MultiTabsProps<T>) {
     activeTab,
     endAdornmentComponent,
     setActiveTab,
+    fullWidthTabs,
     ...boxProps
   } = props;
 
@@ -95,14 +97,19 @@ export default function MultiTabs<T extends string>(props: MultiTabsProps<T>) {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          width: '100%'
         }}
       >
         <Tabs
           indicatorColor={disabled ? 'secondary' : 'primary'}
           value={value}
           onChange={handleChange}
-          aria-label='multi tabs'
+          variant={fullWidthTabs ? 'fullWidth' : 'standard'}
+          sx={{
+            // for some reason, variant='fullWidth' does not work on its own
+            width: fullWidthTabs ? '100%' : 'auto'
+          }}
         >
           {tabLabels.map((tabLabel) => (
             <Tab

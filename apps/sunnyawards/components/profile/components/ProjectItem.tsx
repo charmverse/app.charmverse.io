@@ -41,7 +41,7 @@ export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
           gap={0.5}
           p='0'
         >
-          <Box>
+          <Box sx={{ wordBreak: 'break-all' }}>
             <Typography
               variant='h6'
               overflow='hidden'

@@ -19,7 +19,7 @@ export async function ProfilePage({ user }: { user: LoggedInUser }) {
       <Box gap={3} display='flex' flexDirection='column' mt={{ md: 2 }}>
         <FarcasterCard
           fid={user.farcasterUser?.fid}
-          name={farcasterDetails?.displayName}
+          name={farcasterDetails?.displayName || farcasterDetails?.username}
           username={farcasterDetails?.username}
           avatar={farcasterDetails?.pfpUrl}
           bio={farcasterDetails?.bio}
