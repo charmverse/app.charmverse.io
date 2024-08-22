@@ -1,9 +1,7 @@
 import { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
 import type { ProjectCategory as OptimismProjectCategory } from '@connect-shared/lib/projects/projectSchema';
-import { wagmiConfig } from '@root/connectors/config';
 import { typedKeys } from '@root/lib/utils/objects';
-import { getBytecode } from '@wagmi/core';
-import type { Address } from 'viem';
+import { isAddress, type Address } from 'viem';
 import { normalize } from 'viem/ens';
 import * as yup from 'yup';
 
@@ -87,16 +85,7 @@ export const schema = yup.object({
         if (!value) {
           return false;
         }
-        const chainId = Number(chain);
-        try {
-          const result = await getBytecode(wagmiConfig, {
-            address: value,
-            chainId
-          });
-          return !!result;
-        } catch (err) {
-          return false;
-        }
+        return isAddress(value);
       }
 
       return true;
