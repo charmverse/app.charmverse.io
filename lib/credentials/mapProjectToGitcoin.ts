@@ -39,7 +39,13 @@ function generateContributionLinks(input: ConnectProjectDetails) {
 }
 
 // TBD - Fields
-export function mapProjectToGitcoin({ project }: { project: ConnectProjectDetails }) {
+export function mapProjectToGitcoin({
+  project,
+  agoraProjectRefUID
+}: {
+  project: ConnectProjectDetails;
+  agoraProjectRefUID?: string;
+}) {
   return {
     name: project.name || '', // Direct mapping
     bio: project.description || '', // Assuming bio comes from description
@@ -49,8 +55,22 @@ export function mapProjectToGitcoin({ project }: { project: ConnectProjectDetail
     // -------------- Missing fields
     impactCategory: [], // Assuming no direct mapping for categories
     impactDescription: '', // Placeholder: requires specific input
-    payoutAddress: '', // Placeholder: needs specific logic or input
-    impactMetrics: [], // Placeholder: requires specific input
-    fundingSources: [] // Placeholder: requires specific input
+    payoutAddress: '',
+    impactMetrics: [],
+    fundingSources: [],
+    contracts:
+      project.primaryContractChainId && project.primaryContractAddress
+        ? [
+            {
+              chainId: project.primaryContractChainId,
+              address: project.primaryContractAddress
+            }
+          ]
+        : [],
+    mintingWalletAddress: project.mintingWalletAddress || '',
+    projectReferences: {
+      charmverseId: project.id,
+      agoraProjectRefUID: agoraProjectRefUID || ''
+    }
   };
 }
