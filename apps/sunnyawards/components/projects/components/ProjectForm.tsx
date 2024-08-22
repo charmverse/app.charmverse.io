@@ -21,12 +21,14 @@ export function ProjectForm({
   control,
   isExecuting,
   user,
-  errors
+  errors,
+  submitLabel
 }: {
   control: Control<FormValues>;
   isExecuting: boolean;
   user: LoggedInUser;
   errors: string[] | null;
+  submitLabel: string;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
@@ -279,7 +281,7 @@ export function ProjectForm({
           </Box>
         )}
         <Button data-test='project-form-publish' disabled={isExecuting} type='submit' sx={{ flexShrink: 0 }}>
-          Accept Invite
+          {submitLabel}
         </Button>
       </Stack>
       {!isExecuting && errors && (

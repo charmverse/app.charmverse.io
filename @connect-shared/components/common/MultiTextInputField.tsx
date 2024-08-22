@@ -47,6 +47,7 @@ export function MultiTextInputField<T extends FieldValues>({
                 placeholder={placeholder}
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
+                required
                 {..._field}
                 value={arrayField.value[0]}
                 onChange={(e) => {

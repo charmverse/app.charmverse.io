@@ -111,13 +111,20 @@ export function CreateProjectPage({
 
   return (
     <PageWrapper bgcolor='transparent'>
-      <form onSubmit={handleSubmit(execute, onInvalid)}>
+      {/* add noValidate so that we onyl rely on react-hook-form validation */}
+      <form noValidate onSubmit={handleSubmit(execute, onInvalid)}>
         <ImportOptimismProject
           control={control}
           optimismProjects={optimismProjects}
           handleProjectSelect={handleProjectSelect}
         />
-        <ProjectForm control={control} isExecuting={isExecuting} user={user} errors={errors} />
+        <ProjectForm
+          control={control}
+          isExecuting={isExecuting}
+          user={user}
+          errors={errors}
+          submitLabel='Accept Invite'
+        />
       </form>
     </PageWrapper>
   );
