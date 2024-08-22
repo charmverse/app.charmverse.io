@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
@@ -39,10 +38,10 @@ import { useUser } from 'hooks/useUser';
 import { createBoard } from 'lib/databases/board';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import { ActionableProposalsList } from './components/ActionableProposalsList/ActionableProposalsList';
 import { NewProposalButton } from './components/NewProposalButton';
 import { useProposalsBoardMutator } from './components/ProposalsBoard/hooks/useProposalsBoardMutator';
 import { ProposalsHeaderRowsMenu } from './components/ProposalsHeaderRowsMenu';
+import { UserProposalsTables } from './components/UserProposalsTables/UserProposalsTables';
 import { useProposalsBoard } from './hooks/useProposalsBoard';
 
 const StyledButton = styled(Button)`
@@ -70,7 +69,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const [showSidebar, setShowSidebar] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const { router, updateURLQuery } = useCharmRouter();
-  const viewId = (router.query.viewId || 'all') as 'all' | 'mine';
+  const viewId = (router.query.viewId || 'all') as 'all' | 'my-work';
 
   const onShowDescription = useCallback(() => {
     const oldBlocks = [activeBoard];
@@ -258,8 +257,8 @@ export function ProposalsPage({ title }: { title: string }) {
                     label: 'All'
                   },
                   {
-                    id: 'mine',
-                    label: 'Mine'
+                    id: 'my-work',
+                    label: 'My Work'
                   }
                 ].map((view) => {
                   return (
@@ -269,7 +268,7 @@ export function ProposalsPage({ title }: { title: string }) {
                           viewId: view.id
                         });
                       }}
-                      icon={view.id === 'all' ? iconForViewType('table') : <FormatListBulletedIcon fontSize='small' />}
+                      icon={iconForViewType('table')}
                       label={view.label}
                       isActive={viewId === view.id}
                       key={view.id}
@@ -279,7 +278,7 @@ export function ProposalsPage({ title }: { title: string }) {
               </Tabs>
             )}
             <div className='octo-spacer' />
-            {viewId !== 'mine' && (
+            {viewId !== 'my-work' && (
               <Box className='view-actions'>
                 <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
                 <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
@@ -368,7 +367,7 @@ export function ProposalsPage({ title }: { title: string }) {
               />
             </Stack>
           ) : (
-            <ActionableProposalsList />
+            <UserProposalsTables />
           )}
         </Box>
       )}

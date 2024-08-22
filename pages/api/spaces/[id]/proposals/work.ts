@@ -1,5 +1,5 @@
-import type { ActionableProposal } from '@root/lib/proposals/getActionableProposals';
-import { getActionableProposals } from '@root/lib/proposals/getActionableProposals';
+import type { GetUserProposalsResponse } from '@root/lib/proposals/getUserProposals';
+import { getUserProposals } from '@root/lib/proposals/getUserProposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,10 +10,10 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getMyProposalsController);
 
-async function getMyProposalsController(req: NextApiRequest, res: NextApiResponse<ActionableProposal[]>) {
+async function getMyProposalsController(req: NextApiRequest, res: NextApiResponse<GetUserProposalsResponse>) {
   const userId = req.session.user?.id;
   const spaceId = req.query.id as string;
-  const actionableProposals = await getActionableProposals({ spaceId, userId });
+  const actionableProposals = await getUserProposals({ spaceId, userId });
 
   return res.status(200).json(actionableProposals);
 }
