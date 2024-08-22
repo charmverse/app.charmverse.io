@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { FarcasterUser } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
 import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-client';
@@ -56,6 +55,7 @@ export async function loginWithFarcaster({
   signature
 }: LoginWithFarcasterParams): Promise<LoggedInUser> {
   if (!fid || !username) {
+    log.warn('Farcaster id or username missing on login', { fid, displayName, username });
     throw new InvalidInputError('Farcaster id missing');
   }
 
