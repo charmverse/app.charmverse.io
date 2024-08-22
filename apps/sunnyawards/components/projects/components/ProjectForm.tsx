@@ -4,7 +4,7 @@ import { LoadingComponent } from '@connect-shared/components/common/Loading/Load
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
 import { FormErrors } from '@connect-shared/components/project/FormErrors';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import { Button, FormLabel, ListSubheader, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, FormLabel, ListSubheader, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
@@ -21,12 +21,14 @@ export function ProjectForm({
   control,
   isExecuting,
   user,
-  errors
+  errors,
+  submitLabel
 }: {
   control: Control<FormValues>;
   isExecuting: boolean;
   user: LoggedInUser;
   errors: string[] | null;
+  submitLabel: string;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
@@ -258,12 +260,12 @@ export function ProjectForm({
         </Stack>
       </Stack>
       <AddProjectMembersForm user={user} control={control} disabled={isExecuting} />
-      <Stack direction='row' justifyContent='space-between'>
-        <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary'>
+      <Stack direction='row' justifyContent='space-between' gap={2}>
+        <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary' sx={{ flexShrink: 0 }}>
           Cancel
         </Button>
-        <Stack direction='row' gap={1}>
-          {isExecuting && (
+        {isExecuting && (
+          <Box display='flex' justifyContent='flex-end'>
             <LoadingComponent
               height={20}
               size={20}
@@ -271,13 +273,22 @@ export function ProjectForm({
               label='Submitting your project onchain'
               flexDirection='row-reverse'
             />
-          )}
-          {!isExecuting && errors?.length && <FormErrors errors={errors} />}
-          <Button data-test='project-form-publish' disabled={isExecuting} type='submit'>
-            Accept Invite
-          </Button>
-        </Stack>
+          </Box>
+        )}
+        {!isExecuting && errors?.length && (
+          <Box display={{ xs: 'none', md: 'block' }} flexGrow={0}>
+            <FormErrors errors={errors} />
+          </Box>
+        )}
+        <Button data-test='project-form-publish' disabled={isExecuting} type='submit' sx={{ flexShrink: 0 }}>
+          {submitLabel}
+        </Button>
       </Stack>
+      {!isExecuting && errors && (
+        <Box display={{ md: 'none' }} mt={2}>
+          <FormErrors errors={errors} />
+        </Box>
+      )}
     </>
   );
 }

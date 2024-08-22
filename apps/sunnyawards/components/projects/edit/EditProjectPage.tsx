@@ -70,7 +70,13 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           });
         })}
       >
-        <ProjectForm control={control} isExecuting={isExecuting} user={user} errors={errors} />
+        <ProjectForm
+          control={control}
+          isExecuting={isExecuting}
+          user={user}
+          errors={errors}
+          submitLabel='Update Submission'
+        />
       </form>
     </PageWrapper>
   );
