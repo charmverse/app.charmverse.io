@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { findProject } from '@connect-shared/lib/projects/findProject';
 import { awsS3Bucket } from '@root/config/constants';

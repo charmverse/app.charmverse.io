@@ -23,9 +23,9 @@ describe('mapProjectToGitcoin', () => {
       twitter: 'https://twitter.com/projectx',
       websites: ['https://example.com'],
       path: null,
-      mintingWalletAddress: null,
-      primaryContractAddress: null,
-      primaryContractChainId: null,
+      mintingWalletAddress: '0x8Bc704386DCE0C4f004194684AdC44Edf6e85f07',
+      primaryContractAddress: '0x4200000000000000000000000000000000000021',
+      primaryContractChainId: 10,
       sunnyAwardsProjectType: null,
       projectMembers: [
         {
@@ -57,6 +57,8 @@ describe('mapProjectToGitcoin', () => {
       ]
     };
 
+    const agoraProjectRefUID = '0xcb23e3db5e22faab1050eacf85d3b5c119cc54afb315e3442ae36c6028bd6147';
+
     const expectedOutput = {
       name: 'Project X',
       bio: 'A sample project',
@@ -83,10 +85,16 @@ describe('mapProjectToGitcoin', () => {
         }
       ],
       impactMetrics: [], // Placeholder
-      fundingSources: [] // Placeholder
+      fundingSources: [], // Placeholder,
+      contracts: [{ chainId: 10, address: input.primaryContractAddress }],
+      mintingWalletAddress: input.mintingWalletAddress || '',
+      projectReferences: {
+        charmverseId: input.id,
+        agoraProjectRefUID
+      }
     };
 
-    const output = mapProjectToGitcoin({ project: input });
+    const output = mapProjectToGitcoin({ project: input, agoraProjectRefUID });
     expect(output).toEqual(expectedOutput);
   });
 });
