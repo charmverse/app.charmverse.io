@@ -110,7 +110,7 @@ export function CreateProjectPage({
     } else {
       setErrors([`The form is invalid. Please check the following fields: ${invalidFields.join(', ')}`]);
     }
-    log.warn('Invalid form submission', { errors });
+    log.warn('Invalid form submission', { fieldErrors });
   }
 
   return (
