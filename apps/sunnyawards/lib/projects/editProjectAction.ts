@@ -29,16 +29,16 @@ export const editProjectAction = authActionClient
       await storeUpdatedProjectMetadataAttestation({
         projectId: editedProject.id,
         userId: currentUserId
-      }).catch((err) => {
-        log.error('Failed to store and publish updated project metadata attestation', { err, userId: currentUserId });
+      }).catch((error) => {
+        log.error('Failed to store and publish updated project metadata attestation', { error, userId: currentUserId });
       });
 
       await storeCharmverseProjectMetadata({
         chainId: charmverseProjectDataChainId,
         projectId: editedProject.id
-      }).catch((err) => {
+      }).catch((error) => {
         log.error('Failed to store charmverse project metadata', {
-          err,
+          error,
           projectId: editedProject.id,
           userId: editedProject.createdBy
         });

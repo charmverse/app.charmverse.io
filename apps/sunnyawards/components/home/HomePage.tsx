@@ -43,11 +43,11 @@ export function HomePage() {
         Celebrate Onchain Summer with the SUNNY Awards
       </Typography>
       <Typography align='center' data-test='homepage-description'>
-        Create your project and submit it to the{' '}
+        Build your project and submit it to the{' '}
         <MuiLink href='https://www.thesunnyawards.fun/' target='_blank'>
           The SUNNYs
         </MuiLink>{' '}
-        to compete for 540K OP in total prizes.
+        to claim your ticket.
       </Typography>
       <WarpcastLogin />
     </PageWrapper>

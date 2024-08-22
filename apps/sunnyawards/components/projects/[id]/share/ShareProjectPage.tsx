@@ -42,7 +42,7 @@ export async function ShareProjectPage({ path }: { path: string }) {
       <Typography align='center' variant='h4'>
         Congratulations! Your project has just entered the SUNNYs
       </Typography>
-      <Typography align='center'>Share the good news!</Typography>
+      <Typography align='center'>Share the good news for VIP Seats!</Typography>
       <Stack flexDirection={{ md: 'row' }} gap={4}>
         <WarpcastShareButton projectIdOrPath={path} />
         <TwitterShareButton projectPath={path} />

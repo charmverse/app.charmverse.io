@@ -28,6 +28,7 @@ type Props = {
   hideReviewer?: boolean;
   proposalId?: string;
   authors: string[];
+  label?: string;
   evaluation: Pick<
     PopulatedEvaluation,
     | 'id'
@@ -59,11 +60,13 @@ type Props = {
   // Refers to the step that will be completed when the evaluation is completed
   actionCompletesStep?: boolean;
 };
+
 export function PassFailEvaluationContainer({
   proposalId,
   hideReviewer,
   evaluation,
   isCurrent,
+  label,
   refreshProposal,
   confirmationMessage,
   archived,
@@ -177,6 +180,7 @@ export function PassFailEvaluationContainer({
     isReviewer: evaluation.isReviewer,
     isApprover: evaluation.isApprover,
     archived,
+    label,
     actionCompletesStep,
     onSubmitEvaluationReview,
     onResetEvaluationReview: evaluation.appealedAt ? undefined : onResetEvaluationReview,

@@ -2,16 +2,15 @@ import type { CharmUserCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { attestOnchain } from '../attestOnchain';
+import type { EasSchemaChain } from '../connectors';
 import { attestationSchemaIds } from '../schemas';
-
-import { charmCredentialChainId } from './constants';
 
 export async function issueUserIdentifierIfNecessary({
   userId,
   chainId
 }: {
   userId: string;
-  chainId: number;
+  chainId: EasSchemaChain;
 }): Promise<CharmUserCredential> {
   const existingIdentifier = await prisma.charmUserCredential.findFirst({
     where: {
@@ -25,7 +24,7 @@ export async function issueUserIdentifierIfNecessary({
   }
 
   const attestationUID = await attestOnchain({
-    chainId: charmCredentialChainId,
+    chainId,
     type: 'charmUserIdentifier',
     credentialInputs: {
       recipient: null,
@@ -38,7 +37,7 @@ export async function issueUserIdentifierIfNecessary({
   return prisma.charmUserCredential.create({
     data: {
       attestationUID,
-      chainId: charmCredentialChainId,
+      chainId,
       schemaId: attestationSchemaIds.charmUserIdentifier,
       user: {
         connect: {
