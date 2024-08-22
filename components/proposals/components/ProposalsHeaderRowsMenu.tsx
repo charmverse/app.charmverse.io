@@ -15,7 +15,7 @@ import { isTruthy } from 'lib/utils/types';
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 import { useProposals } from '../hooks/useProposals';
 
-type Props = Pick<ViewHeaderRowsMenuProps, 'checkedIds' | 'setCheckedIds' | 'cards' | 'board' | 'onChange'> & {
+type Props = Pick<ViewHeaderRowsMenuProps, 'checkedIds' | 'setCheckedIds' | 'cards' | 'board' | 'onChange' | 'sx'> & {
   visiblePropertyIds?: string[];
   refreshProposals: () => Promise<any>;
 };
@@ -25,7 +25,8 @@ export function ProposalsHeaderRowsMenu({
   cards,
   checkedIds,
   setCheckedIds,
-  refreshProposals
+  refreshProposals,
+  sx
 }: Props) {
   const { showError } = useSnackbar();
   const { showConfirmation } = useConfirmationModal();
@@ -272,6 +273,7 @@ export function ProposalsHeaderRowsMenu({
       onArchiveProposals={onArchiveProposals}
       showIssueProposalCredentials
       onIssueCredentialsSuccess={refreshProposals}
+      sx={sx}
     />
   );
 }
