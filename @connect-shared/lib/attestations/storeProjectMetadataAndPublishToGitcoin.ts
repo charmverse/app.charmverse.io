@@ -4,15 +4,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { attestOnchain } from '@root/lib/credentials/attestOnchain';
 import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
+import { storeProjectInS3 } from '@root/lib/credentials/storeProjectInS3';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
-import { storeProjectInS3 } from '../../../lib/credentials/storeProjectInS3';
 import { findProject } from '../projects/findProject';
 
 import { projectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
 
-const currentGitcoinRound = 'cm02ji8ui0000jcjtd3k2p01y';
+const currentGitcoinRound = 'cm056odzs0005jncj965672o3';
 
 export async function storeProjectMetadataAndPublishGitcoinAttestation({
   userId,
@@ -65,7 +65,8 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
         metadataPtr: staticFilePath,
         metadataType: 0,
         type: 'application',
-        round: currentGitcoinRound
+        round: currentGitcoinRound,
+        uuid: project.id
       }
     }
   });
@@ -79,7 +80,8 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
         metadataPtr: profileFilePath,
         metadataType: 0,
         type: 'profile',
-        round: currentGitcoinRound
+        round: currentGitcoinRound,
+        uuid: project.id
       }
     }
   });
