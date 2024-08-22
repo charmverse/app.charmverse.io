@@ -48,19 +48,23 @@ export function ActionableProposalsList() {
                     <Stack flexDirection='row' gap={2} alignItems='center' my={1}>
                       <Stack flexDirection='row' gap={1} alignItems='center' minWidth={125}>
                         <Typography variant='caption'>Step:</Typography>
-                        <Typography variant='subtitle1'>{proposal.currentEvaluation?.title}</Typography>
+                        <Typography variant='subtitle1'>
+                          {proposal.status === 'draft' ? 'Draft' : proposal.currentEvaluation?.title}
+                        </Typography>
                       </Stack>
-                      {proposal.currentEvaluation?.dueDate && proposal.isReviewer && (
-                        <Stack flexDirection='row' gap={1} alignItems='center' minWidth={250}>
-                          <Typography variant='caption'>Due date:</Typography>
-                          <Typography
-                            variant='subtitle1'
-                            color={new Date(proposal.currentEvaluation.dueDate) < new Date() ? 'error' : 'initial'}
-                          >
-                            {new Date(proposal.currentEvaluation.dueDate).toLocaleString()}
-                          </Typography>
-                        </Stack>
-                      )}
+                      {proposal.status === 'published' &&
+                        proposal.currentEvaluation?.dueDate &&
+                        proposal.isReviewer && (
+                          <Stack flexDirection='row' gap={1} alignItems='center' minWidth={250}>
+                            <Typography variant='caption'>Due date:</Typography>
+                            <Typography
+                              variant='subtitle1'
+                              color={new Date(proposal.currentEvaluation.dueDate) < new Date() ? 'error' : 'initial'}
+                            >
+                              {new Date(proposal.currentEvaluation.dueDate).toLocaleString()}
+                            </Typography>
+                          </Stack>
+                        )}
                       <Stack flexDirection='row' gap={1} alignItems='center'>
                         <Typography variant='caption'>Last updated:</Typography>
                         <Typography variant='subtitle1'>{new Date(proposal.updatedAt).toLocaleString()}</Typography>

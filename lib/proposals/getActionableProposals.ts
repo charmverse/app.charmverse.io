@@ -1,4 +1,4 @@
-import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma-client';
 import { prisma, Proposal } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
@@ -18,6 +18,7 @@ export type ActionableProposal = {
   isAuthor: boolean;
   updatedAt: Date;
   path: string;
+  status: ProposalStatus;
 };
 
 export async function getActionableProposals({
@@ -44,6 +45,7 @@ export async function getActionableProposals({
       }
     },
     select: {
+      status: true,
       authors: {
         select: {
           userId: true
@@ -87,35 +89,52 @@ export async function getActionableProposals({
   const actionableProposals: ActionableProposal[] = [];
 
   for (const proposal of proposals) {
-    const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-    const isReviewer =
-      currentEvaluation &&
-      currentEvaluation.reviewers.some((reviewer) => {
-        return (
-          reviewer.userId === userId ||
-          (reviewer.roleId && userRoleIds.includes(reviewer.roleId)) ||
-          reviewer.systemRole === 'space_member'
-        );
-      });
     const isAuthor = proposal.authors.some((author) => author.userId === userId);
+    if (proposal.status === 'draft') {
+      if (isAuthor && proposal.page) {
+        actionableProposals.push({
+          id: proposal.page.id,
+          title: proposal.page.title,
+          currentEvaluation: undefined,
+          isReviewer: false,
+          path: proposal.page.path,
+          isAuthor,
+          updatedAt: proposal.page.updatedAt,
+          status: proposal.status
+        });
+      }
+    } else {
+      const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+      const isReviewer =
+        currentEvaluation &&
+        currentEvaluation.reviewers.some((reviewer) => {
+          return (
+            reviewer.userId === userId ||
+            (reviewer.roleId && userRoleIds.includes(reviewer.roleId)) ||
+            reviewer.systemRole === 'space_member'
+          );
+        }) &&
+        !currentEvaluation.result;
 
-    if ((isReviewer || isAuthor) && proposal.page) {
-      actionableProposals.push({
-        id: proposal.page.id,
-        title: proposal.page.title,
-        currentEvaluation: currentEvaluation
-          ? {
-              id: currentEvaluation.id,
-              type: currentEvaluation.type,
-              dueDate: currentEvaluation.dueDate || null,
-              title: currentEvaluation.title
-            }
-          : undefined,
-        isReviewer: !!isReviewer,
-        isAuthor,
-        updatedAt: proposal.page.updatedAt,
-        path: proposal.page.path
-      });
+      if ((isReviewer || isAuthor) && proposal.page) {
+        actionableProposals.push({
+          id: proposal.page.id,
+          title: proposal.page.title,
+          currentEvaluation: currentEvaluation
+            ? {
+                id: currentEvaluation.id,
+                type: currentEvaluation.type,
+                dueDate: currentEvaluation.dueDate || null,
+                title: currentEvaluation.title
+              }
+            : undefined,
+          isReviewer: !!isReviewer,
+          isAuthor,
+          updatedAt: proposal.page.updatedAt,
+          path: proposal.page.path,
+          status: proposal.status
+        });
+      }
     }
   }
   return actionableProposals.sort((a, b) => {
@@ -123,9 +142,9 @@ export async function getActionableProposals({
     const proposalBDueDate = b.currentEvaluation?.dueDate?.getTime() || 0;
 
     if (!proposalADueDate && !proposalBDueDate) {
-      return a.updatedAt.getTime() - b.updatedAt.getTime();
+      return b.updatedAt.getTime() - a.updatedAt.getTime();
     }
 
-    return proposalADueDate - proposalBDueDate;
+    return proposalBDueDate - proposalADueDate;
   });
 }
