@@ -13,7 +13,7 @@ export function FarcasterLoginModal({ url, ...props }: Omit<ModalProps, 'childre
       <Box display='flex' justifyContent='center' my={2}>
         <CanvasQRCode uri={url || ''} />
       </Box>
-      <Button href={url} variant='text' sx={{ p: 0 }}>
+      <Button href={url} external variant='text' sx={{ p: 0 }}>
         I'm using my phone →
       </Button>
     </Modal>
