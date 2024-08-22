@@ -1,3 +1,4 @@
+import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
@@ -83,10 +84,50 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
       spaceId: proposal.spaceId,
       userId,
       proposalId,
-      isPublic: true
+      isPublic: (proposal.fields as ProposalFields).makeRewardsPublic
     });
     // filter out reward from pending rewards
     rewardsToCreate = rewardsToCreate.filter(({ draftId: d }) => d !== draftId);
+
+    const createdPage = await prisma.page.findFirstOrThrow({
+      where: {
+        bountyId: createdReward.id
+      },
+      select: {
+        id: true,
+        createdBy: true,
+        permissions: true
+      }
+    });
+
+    const pagePermissionAssignees: TargetPermissionGroup[] = reviewers
+      .map((reviewer) => {
+        const assignee: TargetPermissionGroup | null = reviewer.userId
+          ? { group: 'user', id: reviewer.userId }
+          : reviewer.roleId
+          ? { group: 'role', id: reviewer.roleId }
+          : null;
+
+        return assignee;
+      })
+      .filter(isTruthy);
+
+    for (const author of proposal.authors) {
+      pagePermissionAssignees.push({ group: 'user', id: author.userId });
+    }
+
+    // Add view permissions for reviewers
+    await Promise.all(
+      pagePermissionAssignees.map(async (assignee) =>
+        permissionsApiClient.pages.upsertPagePermission({
+          pageId: createdPage.id,
+          permission: {
+            assignee,
+            permissionLevel: 'view'
+          }
+        })
+      )
+    );
 
     trackUserAction('bounty_created', {
       userId,
@@ -102,20 +143,6 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
   });
 
   const createdPageIds = (await Promise.all(rewardsPromises)).filter(isTruthy);
-
-  if ((proposal.fields as ProposalFields).makeRewardsPublic) {
-    await Promise.all(
-      createdPageIds.map((p) =>
-        permissionsApiClient.pages.upsertPagePermission({
-          pageId: p,
-          permission: {
-            assignee: { group: 'public' },
-            permissionLevel: 'view'
-          }
-        })
-      )
-    );
-  }
 
   const updatedFields = { ...fields, pendingRewards: rewardsToCreate };
 
