@@ -193,7 +193,7 @@ export function ProjectForm({
           <FormLabel>Additional Category Details</FormLabel>
           <Controller
             control={control}
-            name='description'
+            name='sunnyAwardsCategoryDetails'
             render={({ field, fieldState }) => (
               <TextField placeholder='' {...field} error={!!fieldState.error} helperText={fieldState.error?.message} />
             )}

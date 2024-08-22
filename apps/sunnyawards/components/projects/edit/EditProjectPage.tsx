@@ -44,6 +44,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       name: project.name,
       avatar: project.avatar ?? '',
       sunnyAwardsCategory: project.sunnyAwardsCategory as ProjectCategory,
+      sunnyAwardsCategoryDetails: project.sunnyAwardsCategoryDetails ?? '',
       coverImage: project.coverImage ?? '',
       description: project.description ?? '',
       farcasterValues: project.farcasterValues,
