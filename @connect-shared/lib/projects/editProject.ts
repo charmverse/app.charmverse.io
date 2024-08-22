@@ -8,12 +8,7 @@ import { isTruthy } from '@root/lib/utils/types';
 import type { FormValues } from './projectSchema';
 
 export type EditProjectValues = FormValues &
-  Partial<
-    Pick<
-      Project,
-      'primaryContractAddress' | 'mintingWalletAddress' | 'sunnyAwardsProjectType' | 'sunnyAwardsCategoryDetails'
-    >
-  > & {
+  Partial<Pick<Project, 'primaryContractAddress' | 'mintingWalletAddress' | 'sunnyAwardsProjectType'>> & {
     projectId: string;
     primaryContractChainId?: string | number;
   };
