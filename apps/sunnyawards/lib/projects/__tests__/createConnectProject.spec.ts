@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
 import { createProject } from '@connect-shared/lib/projects/createProject';
-import { prettyPrint } from '@root/lib/utils/strings';
 import fetchMock from 'fetch-mock-jest';
 
 const mockSandbox = fetchMock.sandbox();
@@ -13,7 +12,6 @@ jest.mock('undici', () => {
 
 afterAll(async () => {
   fetchMock.restore();
-  await prisma.farcasterUser.deleteMany();
 });
 
 describe('createConnectProject', () => {
@@ -81,6 +79,7 @@ describe('createConnectProject', () => {
       input: {
         name: 'Project',
         sunnyAwardsCategory: 'CeFi',
+        sunnyAwardsCategoryDetails: 'Extra info',
         description: 'Project description',
         projectMembers: [
           {
@@ -139,6 +138,7 @@ describe('createConnectProject', () => {
     expect(project).toMatchObject({
       name: 'Project',
       sunnyAwardsCategory: 'CeFi',
+      sunnyAwardsCategoryDetails: 'Extra info',
       description: 'Project description',
       projectMembers: [
         {
