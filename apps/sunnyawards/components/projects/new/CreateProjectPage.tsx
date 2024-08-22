@@ -105,7 +105,11 @@ export function CreateProjectPage({
 
   function onInvalid(fieldErrors: FieldErrors) {
     const invalidFields = Object.keys(fieldErrors);
-    setErrors([`The form is invalid. Please check the following fields: ${invalidFields.join(', ')}`]);
+    if (invalidFields.length === 0) {
+      setErrors(['The form is invalid. Please check the fields and try again.']);
+    } else {
+      setErrors([`The form is invalid. Please check the following fields: ${invalidFields.join(', ')}`]);
+    }
     log.warn('Invalid form submission', { errors });
   }
 
