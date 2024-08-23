@@ -56,25 +56,25 @@ jobs:
           npx cdk destroy -c name=stg-farcaster-${{ env.STAGE_SUFFIX }} --force
 
       - name: delete the webapp github deployment
-        uses: strumwolf/delete-deployment-environment@v1.1.0
+        uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: stg-webapp-${{ env.STAGE_SUFFIX }}
 
       - name: delete the scoutgame github deployment
-        uses: strumwolf/delete-deployment-environment@v1.1.0
+        uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: stg-scoutgame-${{ env.STAGE_SUFFIX }}
 
       - name: delete the sunnyawards github deployment
-        uses: strumwolf/delete-deployment-environment@v1.1.0
+        uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: stg-sunnyawards-${{ env.STAGE_SUFFIX }}
 
       - name: delete the farcaster github deployment
-        uses: strumwolf/delete-deployment-environment@v1.1.0
+        uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: stg-farcaster-${{ env.STAGE_SUFFIX }}
