@@ -220,7 +220,10 @@ jobs:
     name: Upload assets in production
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
-    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    if: |
+      (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
+      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
     needs: build-app
     steps:
       - uses: actions/checkout@v4
