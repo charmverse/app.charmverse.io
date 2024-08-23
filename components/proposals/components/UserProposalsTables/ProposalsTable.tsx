@@ -50,7 +50,7 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                   Last updated
                 </Typography>
               </TableCell>
-              <TableCell align='center'>
+              <TableCell align='left'>
                 <Typography variant='body2' fontWeight='bold'>
                   Current step
                 </Typography>
@@ -80,8 +80,8 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                   <TableCell align='center' width={250}>
                     <Typography>{relativeTime(proposal.updatedAt)}</Typography>
                   </TableCell>
-                  <TableCell align='center' width={150}>
-                    <Stack direction='row' alignItems='center' justifyContent='center' gap={1}>
+                  <TableCell align='left' width={250}>
+                    <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
                       {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>
                         {proposal.status === 'draft' ? 'Draft' : proposal.currentEvaluation?.title}
@@ -98,7 +98,7 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
         <Card variant='outlined'>
           <Box p={3} textAlign='center'>
             <ProposalIcon fontSize='large' color='secondary' />
-            <Typography color='secondary'>No actionable proposals. Check back later.</Typography>
+            <Typography color='secondary'>No proposals left for review. Check back later.</Typography>
           </Box>
         </Card>
       )}

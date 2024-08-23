@@ -50,7 +50,7 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                   Last updated
                 </Typography>
               </TableCell>
-              <TableCell align='center'>
+              <TableCell align='left'>
                 <Typography variant='body2' fontWeight='bold'>
                   Current step
                 </Typography>
@@ -111,8 +111,8 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                   <TableCell align='center' width={250}>
                     <Typography>{relativeTime(proposal.updatedAt)}</Typography>
                   </TableCell>
-                  <TableCell align='center' width={150}>
-                    <Stack direction='row' alignItems='center' justifyContent='center' gap={1}>
+                  <TableCell width={250}>
+                    <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
                       {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>
                         {proposal.status === 'draft' ? 'Draft' : proposal.currentEvaluation?.title || '-'}
