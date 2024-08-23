@@ -97,7 +97,8 @@ export function CreateProjectPage({
       github: metadata.github?.[0] || '',
       farcasterValues: metadata.socialLinks?.farcaster || [],
       avatar: metadata.projectAvatarUrl || '',
-      coverImage: metadata.projectCoverImageUrl || '',
+      // Some attestations were written with this typo in the metadata
+      coverImage: (metadata as any).proejctCoverImageUrl || metadata.projectCoverImageUrl || '',
       primaryContractChainId: metadata.contracts?.[0]?.chainId.toString() || '',
       primaryContractAddress: metadata.contracts?.[0]?.address as Address,
       projectMembers: project.projectMembers
