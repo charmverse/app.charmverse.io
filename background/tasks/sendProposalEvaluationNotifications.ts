@@ -7,7 +7,7 @@ import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotification
 import { saveProposalNotification } from 'lib/notifications/saveNotification';
 import { isTruthy } from 'lib/utils/types';
 
-export async function sendProposalEvaluationNotifications({ spaceId }: { spaceId: string }) {
+export async function sendProposalEvaluationNotifications(spaceId?: string) {
   const proposals = await prisma.proposal.findMany({
     where: {
       page: {

@@ -2,6 +2,7 @@ import type {
   MemberProperty,
   MemberPropertyPermission,
   ProposalBlock,
+  ProposalWorkflow,
   RewardBlock,
   Role,
   Space,
@@ -33,7 +34,6 @@ describe('importSpaceSettings', () => {
   let customRewardBlockView: RewardBlock;
 
   let proposalWorkflow: ProposalWorkflowTyped;
-  let proposalWorkflowWithConflictingNameForCurrentSpace: ProposalWorkflowTyped;
 
   beforeAll(async () => {
     ({ user, space: sourceSpace } = await testUtilsUser.generateUserAndSpace({ isAdmin: true }));
@@ -293,7 +293,7 @@ describe('importSpaceSettings', () => {
       space: {
         ...sourceSpace,
         proposalBlocks: [customProposalBlockBoard, customProposalBlockView],
-        proposalWorkflows: [proposalWorkflow],
+        proposalWorkflows: [proposalWorkflow as ProposalWorkflow],
         rewardBlocks: [customRewardBlockBoard, customRewardBlockView],
         memberProperties: [memberProperty]
       }

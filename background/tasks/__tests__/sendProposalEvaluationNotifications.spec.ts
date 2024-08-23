@@ -105,7 +105,7 @@ describe('sendProposalEvaluationNotifications', () => {
       }
     });
 
-    await sendProposalEvaluationNotifications({ spaceId: space.id });
+    await sendProposalEvaluationNotifications(space.id);
 
     const draftProposalNotification = await prisma.proposalNotification.findFirst({
       where: {
@@ -247,9 +247,7 @@ describe('sendProposalEvaluationNotifications', () => {
       ]
     });
 
-    await sendProposalEvaluationNotifications({
-      spaceId: space.id
-    });
+    await sendProposalEvaluationNotifications(space.id);
 
     const userIdReviewerProposalNotifications = await prisma.proposalNotification.count({
       where: {
