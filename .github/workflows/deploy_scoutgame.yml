@@ -4,9 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - '.ebextensions/**'
-      - '.ebstalk.apps.env/**'
-      - '.github/**'
+      - '.cdk'
+      - '.ebextensions/scoutgame/**'
+      - '.ebstalk.apps.env/scoutgame.env'
+      - '.github/actions/**'
+      - '.github/workflows/deploy_scoutgame.yml'
       - 'package.json'
       - 'package-lock.json'
       - 'apps/scoutgame/**'
@@ -22,9 +24,11 @@ on:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
-      - '.ebextensions/**'
-      - '.ebstalk.apps.env/**'
-      - '.github/**'
+      - '.cdk'
+      - '.ebextensions/scoutgame/**'
+      - '.ebstalk.apps.env/scoutgame.env'
+      - '.github/actions/**'
+      - '.github/workflows/deploy_scoutgame.yml'
       - 'package.json'
       - 'package-lock.json'
       - 'apps/scoutgame/**'
@@ -157,7 +161,7 @@ jobs:
 
       - name: Start scoutgame app
         run: |
-          npm run scoutgame:start:test:ci &> connect.log &
+          npm run scoutgame:start:test:ci &> server.log &
           sleep_loop_ct=0
           until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -170,7 +174,7 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         # we have to run docker command ourselves to set network=host so that playwright can access the server
         run: |
-          [[ "${{ runner.debug }}" = "1" ]] && tail -f connect.log &
+          [[ "${{ runner.debug }}" = "1" ]] && tail -f server.log &
           docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
                       --workdir /github/workspace --rm  \
                       -e "REACT_APP_APP_ENV" -e CI=true \
