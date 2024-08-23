@@ -123,16 +123,16 @@ export async function sendProposalEvaluationNotifications() {
         }
       }
     } catch (error: any) {
-      log.error(`Error sending proposal evaluation notification: ${error.stack || error.message || error}`, {
+      log.error(`Error sending proposal evaluation notification`, {
         error,
         proposalId: proposal.id,
-        userId: proposal.createdBy
+        spaceId: proposal.spaceId
       });
     }
   }
 
   if (notificationCount > 0) {
-    log.info(`Sent ${notificationCount} proposal evaluation notifications`);
+    log.info(`Sent ${notificationCount} proposal evaluation due date reminders`);
     count('cron.user-notifications.sent', notificationCount);
   }
 
