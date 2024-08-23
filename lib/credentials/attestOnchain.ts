@@ -46,7 +46,7 @@ export async function attestOnchain<T extends ExtendedAttestationType = Extended
     })
     .then((tx) => tx.wait());
 
-  log.info(`Issued ${type} credential on chain ${chainId}`);
+  log.info(`Issued ${type} credential on chain ${chainId} with uid: ${attestationUid}`);
 
   return attestationUid;
 }
