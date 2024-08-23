@@ -62,6 +62,8 @@ describe('mapProjectToGitcoin', () => {
 
     const expectedOutput = {
       name: 'Project X',
+      projectAvatarUrl: 'avatar.png',
+      projectCoverImageUrl: 'cover.jpg',
       bio: 'A sample project',
       websiteUrl: 'https://example.com',
       payoutAddress: '', // Placeholder

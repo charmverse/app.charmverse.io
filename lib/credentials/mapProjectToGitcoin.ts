@@ -48,6 +48,8 @@ export function mapProjectToGitcoin({
 }) {
   return {
     name: project.name || '', // Direct mapping
+    projectAvatarUrl: project.avatar || '', // Direct mapping
+    projectCoverImageUrl: project.coverImage || '', // Direct mapping
     bio: project.description || '', // Assuming bio comes from description
     websiteUrl: project.websites?.[0] || '', // Taking the first website URL
     contributionDescription: project.description,
