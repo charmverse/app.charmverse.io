@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 
-// eslint-disable-next-line no-console
-console.log('next.config env:', process.env);
 const nextConfig = {
   // types are tested separately from the build
   eslint: {
