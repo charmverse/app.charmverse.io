@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - '.cdk'
       - '.ebextensions/scoutgame/**'
       - '.ebstalk.apps.env/scoutgame.env'
       - '.github/actions/**'
@@ -23,6 +24,7 @@ on:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
+      - '.cdk'
       - '.ebextensions/scoutgame/**'
       - '.ebstalk.apps.env/scoutgame.env'
       - '.github/actions/**'
