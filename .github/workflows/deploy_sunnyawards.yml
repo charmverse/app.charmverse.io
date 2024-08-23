@@ -44,6 +44,18 @@ concurrency:
   group: sunnyawards-prd-${{ github.event_name }}-${{ github.ref }}
 
 jobs:
+  # capture reusable logic as variables for jobs
+  vars:
+    runs-on: [ubuntu-latest]
+    outputs:
+      deploy_staging: ${{ steps.deploy_staging.outputs.enabled }}
+      skip_tests: ${{ steps.skip_tests.outputs.enabled }}
+    steps:
+      - id: deploy_staging
+        run: |
+          echo "enabled=${{(github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards'))}}" >> $GITHUB_OUTPUT
+      - id: skip_tests
+        run: echo "enabled=${{ contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}" >> $GITHUB_OUTPUT
   build-app:
     name: Build app
     runs-on: ubuntu-latest
@@ -188,9 +200,8 @@ jobs:
     # run whether previous jobs were successful or skipped
     if: |
       (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
-      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
-      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
-    needs: build-app
+      (needs.vars.outputs.deploy_staging == 'true')
+    needs: [vars, build-app]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -224,9 +235,8 @@ jobs:
     # run whether previous jobs were successful or skipped
     if: |
       (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
-      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
-      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
-    needs: build-app
+      (needs.vars.outputs.deploy_staging == 'true')
+    needs: [vars, build-app]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -319,14 +329,12 @@ jobs:
 
   deploy-staging:
     name: Deploy to staging
-    if: |
-      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
-      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
+    if: needs.vars.outputs.deploy_staging == 'true'
 
     runs-on: ubuntu-latest
     # prevent staging deploys + cleanup running in parallel
     concurrency: staging-${{ github.ref }}
-    needs: [upload-docker]
+    needs: [vars, upload-docker]
     steps:
       - uses: actions/checkout@v4
 
