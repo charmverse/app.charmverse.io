@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Card, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
-import type { AuthoredUserProposal } from '@root/lib/proposals/getUserProposals';
+import type { UserProposal } from '@root/lib/proposals/getUserProposals';
 import { relativeTime } from '@root/lib/utils/dates';
 import { useRouter } from 'next/router';
 
@@ -23,7 +23,7 @@ const StyledTableRow = styled(TableRow)`
   }
 `;
 
-export function ProposalsTable({ proposals, title }: { title: string; proposals: AuthoredUserProposal[] }) {
+export function ProposalsTable({ proposals, title }: { title: string; proposals: UserProposal[] }) {
   const router = useRouter();
 
   return (

@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { permissionsApiClient } from '../permissions/api/client';
-import { getAssignedRoleIds } from '../roles/getAssignedRoleIds';
 
 type CurrentEvaluation = {
   id: string;
@@ -13,7 +12,7 @@ type CurrentEvaluation = {
   result: ProposalEvaluationResult | null;
 };
 
-type UserProposalBase = {
+export type UserProposal = {
   id: string;
   title: string;
   updatedAt: Date;
@@ -22,22 +21,10 @@ type UserProposalBase = {
   currentEvaluation?: CurrentEvaluation;
 };
 
-export type ActionableUserProposal = UserProposalBase & {
-  currentEvaluation: CurrentEvaluation;
-};
-
-export type AuthoredUserProposal = UserProposalBase & {
-  currentEvaluation?: CurrentEvaluation;
-};
-
-export type AssignedUserProposal = UserProposalBase & {
-  currentEvaluation?: CurrentEvaluation;
-};
-
 export type GetUserProposalsResponse = {
-  actionable: ActionableUserProposal[];
-  authored: AuthoredUserProposal[];
-  assigned: AssignedUserProposal[];
+  actionable: UserProposal[];
+  authored: UserProposal[];
+  assigned: UserProposal[];
 };
 
 export async function getUserProposals({
@@ -47,23 +34,73 @@ export async function getUserProposals({
   userId: string;
   spaceId: string;
 }): Promise<GetUserProposalsResponse> {
-  const ids = await permissionsApiClient.proposals.getAccessibleProposalIds({
-    onlyAssigned: true,
-    userId,
-    spaceId
+  const spaceRole = await prisma.spaceRole.findFirstOrThrow({
+    where: {
+      spaceId,
+      userId
+    }
   });
+
+  const userRoles = await prisma.spaceRoleToRole
+    .findMany({
+      where: {
+        role: {
+          spaceId
+        },
+        spaceRoleId: spaceRole.id
+      },
+      select: {
+        id: true,
+        roleId: true
+      }
+    })
+    .then((assignedRoles) => assignedRoles.map((role) => role.roleId));
 
   const proposals = await prisma.proposal.findMany({
     where: {
-      id: {
-        in: ids
-      },
+      OR: [
+        {
+          createdBy: userId
+        },
+        {
+          authors: {
+            some: {
+              userId
+            }
+          }
+        },
+        {
+          reviewers: {
+            some: {
+              systemRole: 'space_member'
+            }
+          }
+        },
+        {
+          reviewers: {
+            some: {
+              userId
+            }
+          }
+        },
+        {
+          reviewers: {
+            some: {
+              roleId: {
+                in: userRoles
+              }
+            }
+          }
+        }
+      ],
+      spaceId,
       page: {
         type: 'proposal',
         deletedAt: null
       }
     },
     select: {
+      id: true,
       status: true,
       authors: {
         select: {
@@ -90,6 +127,7 @@ export async function getUserProposals({
           },
           vote: {
             select: {
+              id: true,
               userVotes: {
                 select: {
                   userId: true
@@ -109,7 +147,6 @@ export async function getUserProposals({
       page: {
         select: {
           title: true,
-          id: true,
           updatedAt: true,
           path: true
         }
@@ -117,11 +154,14 @@ export async function getUserProposals({
     }
   });
 
-  const userRoleIds = await getAssignedRoleIds({ spaceId, userId });
+  const actionableProposals: UserProposal[] = [];
+  const authoredProposals: UserProposal[] = [];
+  const assignedProposals: UserProposal[] = [];
 
-  const actionableProposals: GetUserProposalsResponse['actionable'] = [];
-  const authoredProposals: GetUserProposalsResponse['authored'] = [];
-  const assignedProposals: GetUserProposalsResponse['assigned'] = [];
+  const computedProposalPermissions = await permissionsApiClient.proposals.bulkComputeProposalPermissions({
+    spaceId,
+    userId
+  });
 
   for (const proposal of proposals) {
     const isAuthor = proposal.authors.some((author) => author.userId === userId);
@@ -129,7 +169,7 @@ export async function getUserProposals({
       if (proposal.status === 'draft') {
         if (isAuthor) {
           authoredProposals.push({
-            id: proposal.page.id,
+            id: proposal.id,
             title: proposal.page.title,
             currentEvaluation: undefined,
             path: proposal.page.path,
@@ -139,20 +179,14 @@ export async function getUserProposals({
         }
       } else {
         const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-        const isReviewer =
-          currentEvaluation &&
-          currentEvaluation.reviewers.some((reviewer) => {
-            return (
-              reviewer.userId === userId ||
-              (reviewer.roleId && userRoleIds.includes(reviewer.roleId)) ||
-              reviewer.systemRole === 'space_member'
-            );
-          });
-
+        const canReview = computedProposalPermissions[proposal.id]?.evaluate;
         const hasReviewed = currentEvaluation?.reviews.some((review) => review.reviewerId === userId);
+        const hasVoted =
+          currentEvaluation?.type === 'vote' &&
+          currentEvaluation.vote?.userVotes.some((vote) => vote.userId === userId);
 
-        const actionableProposal = {
-          id: proposal.page.id,
+        const userProposal = {
+          id: proposal.id,
           title: proposal.page.title,
           currentEvaluation: currentEvaluation
             ? {
@@ -168,16 +202,12 @@ export async function getUserProposals({
           status: proposal.status
         };
 
-        const hasVoted =
-          currentEvaluation?.type === 'vote' &&
-          currentEvaluation.vote?.userVotes.some((vote) => vote.userId === userId);
-
-        if (isReviewer && !currentEvaluation.result && !hasVoted && !hasReviewed) {
-          actionableProposals.push(actionableProposal as ActionableUserProposal);
+        if (canReview && !currentEvaluation?.result && !hasVoted && !hasReviewed) {
+          actionableProposals.push(userProposal);
         } else if (isAuthor) {
-          authoredProposals.push(actionableProposal);
+          authoredProposals.push(userProposal);
         } else {
-          assignedProposals.push(actionableProposal);
+          assignedProposals.push(userProposal);
         }
       }
     }

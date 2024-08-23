@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Button, Card, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
-import type { ActionableUserProposal } from '@root/lib/proposals/getUserProposals';
+import type { UserProposal } from '@root/lib/proposals/getUserProposals';
 import { relativeTime } from '@root/lib/utils/dates';
 import { useRouter } from 'next/router';
 
@@ -23,7 +23,7 @@ const StyledTableRow = styled(TableRow)`
   }
 `;
 
-export function ActionableProposalsTable({ proposals }: { proposals: ActionableUserProposal[] }) {
+export function ActionableProposalsTable({ proposals }: { proposals: UserProposal[] }) {
   const router = useRouter();
 
   return (
@@ -86,9 +86,9 @@ export function ActionableProposalsTable({ proposals }: { proposals: ActionableU
                   </TableCell>
                   <TableCell align='center'>
                     <Stack direction='row' alignItems='center' justifyContent='center' gap={1}>
-                      {evaluationIcons[proposal.currentEvaluation.type]()}
+                      {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>
-                        {proposal.status === 'draft' ? 'Draft' : proposal.currentEvaluation?.title}
+                        {proposal.status === 'draft' ? 'Draft' : proposal.currentEvaluation?.title || '-'}
                       </Typography>
                     </Stack>
                   </TableCell>
