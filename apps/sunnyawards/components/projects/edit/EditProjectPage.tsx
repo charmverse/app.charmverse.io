@@ -1,5 +1,6 @@
 'use client';
 
+import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
@@ -8,6 +9,7 @@ import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
+import type { FieldErrors } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 
 import { editProjectAction } from 'lib/projects/editProjectAction';
@@ -38,12 +40,13 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     }
   });
 
-  const { control, handleSubmit } = useForm<FormValues>({
+  const { control, handleSubmit, getValues } = useForm<FormValues>({
     defaultValues: {
       id: project.id,
       name: project.name,
       avatar: project.avatar ?? '',
       sunnyAwardsCategory: project.sunnyAwardsCategory as ProjectCategory,
+      sunnyAwardsCategoryDetails: project.sunnyAwardsCategoryDetails ?? '',
       coverImage: project.coverImage ?? '',
       description: project.description ?? '',
       farcasterValues: project.farcasterValues,
@@ -60,6 +63,16 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
     mode: 'onChange'
   });
 
+  function onInvalid(fieldErrors: FieldErrors) {
+    const invalidFields = Object.keys(fieldErrors);
+    if (invalidFields.length === 0) {
+      setErrors(['The form is invalid. Please check the fields and try again.']);
+    } else {
+      setErrors([`The form is invalid. Please check the following fields: ${invalidFields.join(', ')}`]);
+    }
+    log.warn('Invalid form submission', { fieldErrors, values: getValues() });
+  }
+
   return (
     <PageWrapper bgcolor='transparent'>
       <form
@@ -68,7 +81,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
             ...data,
             projectMembers: data.projectMembers.filter((m) => m.farcasterId !== user.farcasterUser?.fid)
           });
-        })}
+        }, onInvalid)}
       >
         <ProjectForm
           control={control}

@@ -1,5 +1,4 @@
 import { DisabledAccountError, InvalidInputError } from '@charmverse/core/errors';
-import { prisma } from '@charmverse/core/prisma-client';
 import { verifySignInMessage } from '@farcaster/auth-client';
 import { InvalidStateError } from '@root/lib/middleware';
 
@@ -27,11 +26,6 @@ const defaultBody = {
 } as LoginWithFarcasterParams;
 
 describe('loginWithFarcaster', () => {
-  afterEach(async () => {
-    await prisma.userWallet.deleteMany({});
-    await prisma.farcasterUser.deleteMany({});
-  });
-
   test('should fail if the signature cannot be verified', async () => {
     mockedVerifySignInMessage.mockResolvedValueOnce({ success: false } as any);
     const body = { ...defaultBody, fid: Math.floor(Math.random() * 1000), username: '@test' };
@@ -53,7 +47,7 @@ describe('loginWithFarcaster', () => {
         deletedAt: new Date()
       }
     });
-    const farcasterUser = await generateFarcasterUser({
+    await generateFarcasterUser({
       userId: user.id,
       fid: body.fid
     });

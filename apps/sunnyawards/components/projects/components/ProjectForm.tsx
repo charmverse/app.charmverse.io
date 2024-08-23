@@ -36,7 +36,7 @@ export function ProjectForm({
   return (
     <>
       <Stack mb={2}>
-        <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
+        <FormLabel>Project avatar and cover image</FormLabel>
         <Stack direction='row' gap={1}>
           <ProjectImageField type='avatar' name='avatar' control={control} />
           <ProjectImageField type='cover' name='coverImage' control={control} />
@@ -44,9 +44,7 @@ export function ProjectForm({
       </Stack>
       <Stack gap={2} mb={2}>
         <Stack>
-          <FormLabel required id='project-name'>
-            Name
-          </FormLabel>
+          <FormLabel required>Name</FormLabel>
           <Controller
             control={control}
             name='name'
@@ -64,9 +62,7 @@ export function ProjectForm({
           />
         </Stack>
         <Stack>
-          <FormLabel required id='project-description'>
-            Description
-          </FormLabel>
+          <FormLabel required>Description</FormLabel>
           <Controller
             control={control}
             name='description'
@@ -85,9 +81,7 @@ export function ProjectForm({
           />
         </Stack>
         <Stack>
-          <FormLabel id='project-sunnyaward-type' required>
-            SUNNY Awards Project Type
-          </FormLabel>
+          <FormLabel required>SUNNY Awards Project Type</FormLabel>
           <Controller
             control={control}
             name='sunnyAwardsProjectType'
@@ -95,8 +89,6 @@ export function ProjectForm({
               <Select
                 displayEmpty
                 fullWidth
-                aria-labelledby='project-sunny-category'
-                data-test='project-sunny-category'
                 renderValue={(value) =>
                   value ? capitalize(value) : <Typography color='secondary'>Select a category</Typography>
                 }
@@ -115,9 +107,7 @@ export function ProjectForm({
         {sunnyAwardsProjectType === 'app' && (
           <Stack gap={2}>
             <Stack>
-              <FormLabel id='project-chain' required>
-                Project Chain
-              </FormLabel>
+              <FormLabel required>Project Chain</FormLabel>
               <Controller
                 control={control}
                 name='primaryContractChainId'
@@ -125,9 +115,7 @@ export function ProjectForm({
               />
             </Stack>
             <Stack>
-              <FormLabel id='project-contract' required>
-                Project Contract Address
-              </FormLabel>
+              <FormLabel required>Project Contract Address</FormLabel>
               <Controller
                 control={control}
                 name='primaryContractAddress'
@@ -148,9 +136,7 @@ export function ProjectForm({
         )}
         {sunnyAwardsProjectType === 'creator' && (
           <Stack>
-            <FormLabel id='project-minting-wallet' required>
-              Creator minting wallet address
-            </FormLabel>
+            <FormLabel required>Creator minting wallet address</FormLabel>
             <Controller
               control={control}
               name='mintingWalletAddress'
@@ -177,9 +163,7 @@ export function ProjectForm({
           placeholder='https://charmverse.io'
         />
         <Stack>
-          <FormLabel id='project-category' required>
-            Category
-          </FormLabel>
+          <FormLabel required>Category</FormLabel>
           <Controller
             control={control}
             name='sunnyAwardsCategory'
@@ -205,6 +189,16 @@ export function ProjectForm({
             )}
           />
         </Stack>
+        <Stack>
+          <FormLabel>Additional Category Details</FormLabel>
+          <Controller
+            control={control}
+            name='sunnyAwardsCategoryDetails'
+            render={({ field, fieldState }) => (
+              <TextField placeholder='' {...field} error={!!fieldState.error} helperText={fieldState.error?.message} />
+            )}
+          />
+        </Stack>
 
         <MultiTextInputField
           control={control}
@@ -215,7 +209,7 @@ export function ProjectForm({
         />
 
         <Stack>
-          <FormLabel id='project-twitter'>X</FormLabel>
+          <FormLabel>X</FormLabel>
           <Stack direction='row' gap={1} alignItems='center'>
             <Typography color='secondary' width={250}>
               https://x.com/
@@ -237,7 +231,7 @@ export function ProjectForm({
           </Stack>
         </Stack>
         <Stack>
-          <FormLabel id='project-github'>Github</FormLabel>
+          <FormLabel>Github</FormLabel>
           <Stack direction='row' gap={1} alignItems='center'>
             <Typography color='secondary' width={250}>
               https://github.com/

@@ -52,7 +52,7 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
   return (
     <FieldWrapper {...props}>
       {!disabled && !hasFarcasterAccount ? (
-        <WarpcastLogin size='small' type='connect' label='Connect your farcaster account' />
+        <WarpcastLogin size='small' type='connect' label='Connect your Farcaster account' />
       ) : (
         <>
           <Select<string>

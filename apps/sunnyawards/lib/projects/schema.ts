@@ -30,6 +30,11 @@ export const PROJECT_CATEGORIES = [
     group: 'Farcaster',
     optimismCategory: 'Social',
     items: ['Frames', 'Channels']
+  },
+  {
+    group: 'Other',
+    optimismCategory: undefined,
+    items: ['Other']
   }
 ] as const;
 
@@ -54,6 +59,7 @@ export const schema = yup.object({
     .oneOf(PROJECT_CATEGORIES.map(({ items }) => items).flat())
     .nullable()
     .required(),
+  sunnyAwardsCategoryDetails: yup.string(),
   websites: yup
     .array(
       yup.string().matches(
@@ -120,8 +126,8 @@ export const schema = yup.object({
         farcasterId: yup.number().required(),
         farcasterUser: yup.object({
           fid: yup.number().required(),
-          displayName: yup.string().required(),
-          pfpUrl: yup.string().required(),
+          displayName: yup.string(),
+          pfpUrl: yup.string(),
           username: yup.string().required()
         })
       })

@@ -8,12 +8,10 @@ on:
     branches: [main]
     paths-ignore:
       - 'apps/**'
-      - '@connect-shared/**'
   pull_request:
     branches: ['**']
     paths-ignore:
       - 'apps/**'
-      - '@connect-shared/**'
   workflow_dispatch:
     inputs:
       core_pkg_version:
