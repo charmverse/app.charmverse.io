@@ -44,11 +44,13 @@ concurrency:
   group: sunnyawards-prd-${{ github.event_name }}-${{ github.ref }}
 
 jobs:
-  build-app:
+  build:
     name: Build app
     runs-on: ubuntu-latest
     outputs:
-      head-commit-message: ${{ steps.get_head_commit_message.outputs.commit_message }}
+      head_commit_message: ${{ steps.setup_variables.outputs.commit_message }}
+      deploy_staging: ${{ steps.setup_variables.outputs.deploy_staging }}
+      skip_tests: ${{ steps.setup_variables.outputs.skip_tests }}
     steps:
       - name: Print Triggering event context payload
         env:
@@ -56,9 +58,18 @@ jobs:
         run: |
           echo "$workflow_event_context"
           echo "Workflow and code ref: ${{github.ref}}"
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup variables
+        id: setup_variables
+        # source https://github.com/orgs/community/discussions/28474
+        run: |
+          echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
+          echo "deploy_staging=${{(github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards'))}}" >> $GITHUB_OUTPUT
+          echo "skip_tests=${{ contains(env.commit_message, 'skip-tests') }}" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         uses: ./.github/actions/install
@@ -71,16 +82,11 @@ jobs:
         with:
           app_name: sunnyawards
 
-      # source https://github.com/orgs/community/discussions/28474
-      - name: Print head git commit message
-        id: get_head_commit_message
-        run: echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
-
   test:
     name: Test app
     runs-on: ubuntu-latest
-    needs: build-app
-    if: ${{ github.event.action != 'labeled' && !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    needs: build
+    if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true'}}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -120,8 +126,8 @@ jobs:
   test-e2e:
     name: Test e2e
     runs-on: ubuntu-latest
-    needs: build-app
-    if: ${{ github.event.action != 'labeled' && !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
+    needs: build
+    if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true'}}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -188,9 +194,8 @@ jobs:
     # run whether previous jobs were successful or skipped
     if: |
       (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
-      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
-      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
-    needs: build-app
+      (needs.build.outputs.deploy_staging == 'true')
+    needs: build
     steps:
       - uses: actions/checkout@v4
         with:
@@ -224,9 +229,8 @@ jobs:
     # run whether previous jobs were successful or skipped
     if: |
       (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
-      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
-      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
-    needs: build-app
+      (needs.build.outputs.deploy_staging == 'true')
+    needs: build
     steps:
       - uses: actions/checkout@v4
         with:
@@ -319,14 +323,12 @@ jobs:
 
   deploy-staging:
     name: Deploy to staging
-    if: |
-      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') ||
-      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards')))
+    if: needs.build.outputs.deploy_staging == 'true'
 
     runs-on: ubuntu-latest
     # prevent staging deploys + cleanup running in parallel
     concurrency: staging-${{ github.ref }}
-    needs: [upload-docker]
+    needs: [build, upload-docker]
     steps:
       - uses: actions/checkout@v4
 
@@ -424,7 +426,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
     # pass in all steps so we can check if any failed
-    needs: [build-app, upload-docker, deploy-production]
+    needs: [build, upload-docker, deploy-production]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
