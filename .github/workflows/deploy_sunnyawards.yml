@@ -52,6 +52,17 @@ jobs:
       deploy_staging: ${{ steps.setup_variables.outputs.deploy_staging }}
       skip_tests: ${{ steps.setup_variables.outputs.skip_tests }}
     steps:
+      - name: Print Triggering event context payload
+        env:
+          workflow_event_context: ${{ toJSON(github.event) }}
+        run: |
+          echo "$workflow_event_context"
+          echo "Workflow and code ref: ${{github.ref}}"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Setup variables
         id: setup_variables
         # source https://github.com/orgs/community/discussions/28474
@@ -59,16 +70,6 @@ jobs:
           echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
           echo "deploy_staging=${{(github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-sunnyawards') || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards'))}}" >> $GITHUB_OUTPUT
           echo "skip_tests=${{ contains(env.commit_message, 'skip-tests') }}" >> $GITHUB_OUTPUT
-
-      - name: Print Triggering event context payload
-        env:
-          workflow_event_context: ${{ toJSON(github.event) }}
-        run: |
-          echo "$workflow_event_context"
-          echo "Workflow and code ref: ${{github.ref}}"
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Install dependencies
         uses: ./.github/actions/install
