@@ -67,7 +67,7 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                     router.push(`/${router.query.domain}/${proposal.path}`);
                   }}
                 >
-                  <TableCell width={250}>
+                  <TableCell width={400}>
                     <Typography>{proposal.title || 'Untitled'}</Typography>
                   </TableCell>
                   <TableCell align='center' width={200}>

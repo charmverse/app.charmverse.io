@@ -122,7 +122,7 @@ export async function sendDraftProposalNotificationTask() {
         }
       }
     } catch (error: any) {
-      log.error(`Error sending draft proposal notification: ${error.stack || error.message || error}`, {
+      log.error(`Error sending draft proposal notification`, {
         error,
         proposalId: proposal.id,
         userId: authorId

@@ -22,7 +22,8 @@ import {
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_EVALUATION_TYPE_ID,
-  PROPOSAL_PUBLISHED_AT_ID
+  PROPOSAL_PUBLISHED_AT_ID,
+  PROPOSAL_EVALUATION_DUE_DATE_ID
 } from 'lib/proposals/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
@@ -175,7 +176,10 @@ export function mapProposalToCard({
     [PROPOSAL_REVIEWERS_BLOCK_ID]:
       proposal && 'reviewers' in proposal
         ? proposal.reviewers.map(({ userId, roleId, systemRole }) => ({ userId, roleId, systemRole }))
-        : []
+        : [],
+    [PROPOSAL_EVALUATION_DUE_DATE_ID]: proposal.currentStep?.dueDate
+      ? new Date(proposal.currentStep.dueDate).getTime()
+      : ''
   };
   const card: Card<ProposalPropertyValue> = {
     id: proposal.id,

@@ -253,6 +253,9 @@ function getProposalContent({
     case 'credential_created': {
       return `You have been issued a credential for a proposal`;
     }
+    case 'evaluation_reminder': {
+      return `A ${proposalFeatureTitle} you have been assigned to evaluate is approaching its deadline. You have 24 hours to evaluate ${notification.pageTitle}`;
+    }
     default: {
       return '';
     }

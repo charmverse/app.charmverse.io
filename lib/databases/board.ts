@@ -24,7 +24,8 @@ export const proposalPropertyTypesList = [
   'proposalStep',
   'proposalReviewerNotes',
   'proposalRubricCriteriaReviewerScore',
-  'proposalRubricCriteriaReviewerComment'
+  'proposalRubricCriteriaReviewerComment',
+  'proposalEvaluationDueDate'
 ] as const;
 
 export type ProposalPropertyType = (typeof proposalPropertyTypesList)[number];

@@ -687,7 +687,7 @@ function PropertyValueElement(props: Props) {
         centerContent={displayType !== 'table'}
       />
     );
-  } else if (propertyTemplate.type === 'proposalPublishedAt') {
+  } else if (propertyTemplate.type === 'proposalPublishedAt' || propertyTemplate.type === 'proposalEvaluationDueDate') {
     propertyValueElement = propertyValue ? (
       <CreatedAt
         createdAt={new Date(propertyValue as string).getTime()}

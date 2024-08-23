@@ -56,8 +56,8 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                 </Typography>
               </TableCell>
 
-              <TableCell align='center'>
-                <Typography variant='body2' fontWeight='bold'>
+              <TableCell align='right'>
+                <Typography variant='body2' fontWeight='bold' mr={1.5}>
                   Action
                 </Typography>
               </TableCell>
@@ -102,7 +102,7 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                     router.push(`/${router.query.domain}/${proposal.path}`);
                   }}
                 >
-                  <TableCell width={250}>
+                  <TableCell width={400}>
                     <Typography>{proposal.title || 'Untitled'}</Typography>
                   </TableCell>
                   <TableCell align='center' width={200}>
@@ -119,7 +119,7 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                       </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell align='center'>
+                  <TableCell align='right'>
                     <Button
                       color='primary'
                       size='small'
