@@ -17,6 +17,7 @@ on:
       - 'hooks/**'
       - 'lib/**'
   pull_request:
+    types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
       - '.ebextensions/sunnyawards/**'
