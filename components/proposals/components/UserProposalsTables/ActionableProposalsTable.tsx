@@ -29,17 +29,38 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
   return (
     <Stack gap={1}>
       <Typography variant='h6' fontWeight='bold'>
-        My Actions
+        Ready for review
       </Typography>
       {proposals.length ? (
         <Table>
           <TableHead>
             <TableRow sx={{ '&:first-of-type th': { borderTop: '1px solid lightgray' } }}>
-              <TableCell>Title</TableCell>
-              <TableCell align='center'>Step</TableCell>
-              <TableCell align='center'>Due date</TableCell>
-              <TableCell align='center'>Last updated</TableCell>
-              <TableCell align='center'>Action</TableCell>
+              <TableCell>
+                <Typography variant='body2' fontWeight='bold'>
+                  Title
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Due date
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Last updated
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Current step
+                </Typography>
+              </TableCell>
+
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Action
+                </Typography>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -81,22 +102,22 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                     router.push(`/${router.query.domain}/${proposal.path}`);
                   }}
                 >
-                  <TableCell>
-                    <Typography>{proposal.title}</Typography>
+                  <TableCell width={250}>
+                    <Typography>{proposal.title || 'Untitled'}</Typography>
                   </TableCell>
-                  <TableCell align='center'>
+                  <TableCell align='center' width={200}>
+                    <Typography color={isOverdue ? 'error' : 'initial'}>{dueDateText}</Typography>
+                  </TableCell>
+                  <TableCell align='center' width={250}>
+                    <Typography>{relativeTime(proposal.updatedAt)}</Typography>
+                  </TableCell>
+                  <TableCell align='center' width={150}>
                     <Stack direction='row' alignItems='center' justifyContent='center' gap={1}>
                       {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>
                         {proposal.status === 'draft' ? 'Draft' : proposal.currentEvaluation?.title || '-'}
                       </Typography>
                     </Stack>
-                  </TableCell>
-                  <TableCell align='center'>
-                    <Typography color={isOverdue ? 'error' : 'initial'}>{dueDateText}</Typography>
-                  </TableCell>
-                  <TableCell align='center'>
-                    <Typography>{relativeTime(proposal.updatedAt)}</Typography>
                   </TableCell>
                   <TableCell align='center'>
                     <Button

@@ -35,10 +35,27 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
         <Table>
           <TableHead>
             <TableRow sx={{ '&:first-of-type th': { borderTop: '1px solid lightgray' } }}>
-              <TableCell>Title</TableCell>
-              <TableCell align='center'>Step</TableCell>
-              <TableCell align='center'>Result</TableCell>
-              <TableCell align='center'>Last updated</TableCell>
+              <TableCell>
+                <Typography variant='body2' fontWeight='bold'>
+                  Title
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Status
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Last updated
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Current step
+                </Typography>
+              </TableCell>
+              <TableCell align='center'></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -51,15 +68,7 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                   }}
                 >
                   <TableCell width={250}>
-                    <Typography>{proposal.title}</Typography>
-                  </TableCell>
-                  <TableCell width={200} align='center'>
-                    <Stack direction='row' alignItems='center' justifyContent='center' gap={1}>
-                      {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
-                      <Typography>
-                        {proposal.status === 'draft' ? 'Draft' : proposal.currentEvaluation?.title}
-                      </Typography>
-                    </Stack>
+                    <Typography>{proposal.title || 'Untitled'}</Typography>
                   </TableCell>
                   <TableCell align='center' width={200}>
                     {proposal.currentEvaluation?.result ? (
@@ -68,9 +77,18 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                       <Typography>In progress</Typography>
                     )}
                   </TableCell>
-                  <TableCell align='center' width={100}>
+                  <TableCell align='center' width={250}>
                     <Typography>{relativeTime(proposal.updatedAt)}</Typography>
                   </TableCell>
+                  <TableCell align='center' width={150}>
+                    <Stack direction='row' alignItems='center' justifyContent='center' gap={1}>
+                      {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
+                      <Typography>
+                        {proposal.status === 'draft' ? 'Draft' : proposal.currentEvaluation?.title}
+                      </Typography>
+                    </Stack>
+                  </TableCell>
+                  <TableCell align='center'></TableCell>
                 </StyledTableRow>
               );
             })}
