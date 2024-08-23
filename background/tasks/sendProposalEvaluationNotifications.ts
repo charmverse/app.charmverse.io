@@ -7,12 +7,13 @@ import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotification
 import { saveProposalNotification } from 'lib/notifications/saveNotification';
 import { isTruthy } from 'lib/utils/types';
 
-export async function sendProposalEvaluationNotifications() {
+export async function sendProposalEvaluationNotifications({ spaceId }: { spaceId: string }) {
   const proposals = await prisma.proposal.findMany({
     where: {
       page: {
         deletedAt: null,
-        isTemplate: false
+        isTemplate: false,
+        type: 'proposal'
       },
       archived: false,
       status: 'published',
@@ -24,7 +25,8 @@ export async function sendProposalEvaluationNotifications() {
           },
           result: null
         }
-      }
+      },
+      spaceId
     },
     select: {
       id: true,
@@ -67,22 +69,30 @@ export async function sendProposalEvaluationNotifications() {
         !existingNotification &&
         currentEvaluation &&
         dueDate &&
-        dueDate <= new Date(Date.now() + 24 * 60 * 60 * 1000)
+        dueDate <= new Date(Date.now() + 24 * 60 * 60 * 1000) &&
+        dueDate >= new Date()
       ) {
         const reviewerUserIds: string[] = [];
         const hasAuthorSystemRole = currentEvaluation.reviewers.some((r) => r.systemRole === 'author');
         const hasSpaceMemberRole = currentEvaluation.reviewers.some((r) => r.systemRole === 'space_member');
-
+        const authorIds = proposal.authors.map((a) => a.userId);
         if (hasSpaceMemberRole) {
           const spaceMembers = await prisma.spaceRole.findMany({
             where: {
-              spaceId: proposal.spaceId
+              spaceId: proposal.spaceId,
+              id: {
+                notIn: authorIds
+              }
             },
             select: {
               userId: true
             }
           });
-          spaceMembers.forEach((m) => reviewerUserIds.push(m.userId));
+          spaceMembers.forEach((m) => {
+            if (!authorIds.includes(m.userId)) {
+              reviewerUserIds.push(m.userId);
+            }
+          });
         } else {
           const roles = await prisma.role.findMany({
             where: {
@@ -108,9 +118,13 @@ export async function sendProposalEvaluationNotifications() {
             })
           );
           if (hasAuthorSystemRole) {
-            proposal.authors.forEach((a) => reviewerUserIds.push(a.userId));
+            authorIds.forEach((a) => reviewerUserIds.push(a));
           }
-          currentEvaluation.reviewers.map((r) => r.userId).filter(isTruthy);
+          currentEvaluation.reviewers.forEach((r) => {
+            if (r.userId) {
+              reviewerUserIds.push(r.userId);
+            }
+          });
         }
 
         const reviewerIds = Array.from(new Set(reviewerUserIds));
