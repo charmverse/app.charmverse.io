@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - '.cdk'
       - '.ebextensions/farcaster/**'
       - '.ebstalk.apps.env/farcaster.env'
       - '.github/**'
@@ -19,8 +20,11 @@ on:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
+      - '.cdk'
       - '.ebextensions/farcaster/**'
       - '.ebstalk.apps.env/farcaster.env'
+      - '.github/actions/**'
+      - '.github/workflows/deploy_farcaster.yml'
       - '.github/**'
       - 'package.json'
       - 'package-lock.json'
