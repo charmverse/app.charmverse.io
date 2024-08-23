@@ -12,7 +12,11 @@ export type LoggedInUser = User & {
 export const getCurrentUserAction = authActionClient
   .metadata({ actionName: 'getCurrentUser' })
   .action<LoggedInUser | null>(async ({ ctx }) => {
-    const userId = ctx.session.user.id;
+    const userId = ctx.session.user?.id;
+
+    if (!userId) {
+      return null;
+    }
 
     const user = await prisma.user.findUniqueOrThrow({
       where: {

@@ -1,4 +1,4 @@
-import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
+import { getCurrentUser } from '@connect-shared/lib/profile/getCurrentUser';
 import { findProject } from '@connect-shared/lib/projects/findProject';
 import { notFound, redirect } from 'next/navigation';
 
@@ -15,14 +15,14 @@ export default async function EditProject({
     findProject({
       path: params.path
     }),
-    getCurrentUserAction()
+    getCurrentUser()
   ]);
 
-  if (!user?.data) {
-    redirect('/');
+  if (!user) {
+    return null;
   }
 
-  if (!user?.data?.connectOnboarded) {
+  if (!user?.connectOnboarded) {
     redirect('/welcome');
   }
 
@@ -30,5 +30,5 @@ export default async function EditProject({
     return notFound();
   }
 
-  return <EditProjectPage project={project} user={user.data} />;
+  return <EditProjectPage project={project} user={user} />;
 }
