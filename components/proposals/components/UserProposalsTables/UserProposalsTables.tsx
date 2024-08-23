@@ -17,7 +17,7 @@ export function UserProposalsTables() {
   const { getFeatureTitle } = useSpaceFeatures();
 
   return (
-    <Stack gap={2} mt={2}>
+    <Stack gap={2} mt={2} minWidth={1000}>
       {isLoading || !proposals ? (
         <Grid item xs={12} sx={{ mt: 12 }}>
           <LoadingComponent height={500} isLoading size={50} />
