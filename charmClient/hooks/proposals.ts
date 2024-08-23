@@ -1,4 +1,5 @@
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
+import type { GetUserProposalsResponse } from '@root/lib/proposals/getUserProposals';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
@@ -191,4 +192,8 @@ export function useSubmitEvaluationAppealReview({ evaluationId }: { evaluationId
 
 export function useResetEvaluationAppealReview({ evaluationId }: { evaluationId: string }) {
   return usePUT(`/api/proposals/evaluations/${evaluationId}/appeal/reset-review`);
+}
+
+export function useGetUserProposals(params: { spaceId: MaybeString }) {
+  return useGET<GetUserProposalsResponse>(params.spaceId ? `/api/spaces/${params.spaceId}/proposals/work` : null);
 }
