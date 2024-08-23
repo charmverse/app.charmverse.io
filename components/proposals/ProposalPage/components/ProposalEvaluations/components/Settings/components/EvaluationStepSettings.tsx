@@ -256,22 +256,27 @@ export function EvaluationStepSettings({
       )}
       {evaluation.type !== 'vote' && (
         <Box mb={1}>
-          <FormControlLabel
-            disabled={readOnlyDueDate}
-            control={
-              <DateTimePicker<DateTime>
-                onAccept={(date) => {
-                  onChange({
-                    dueDate: date?.toJSDate() ?? null
-                  });
-                }}
-                minDate={DateTime.fromMillis(Date.now()).plus({ hour: 1 })}
-                value={evaluation.dueDate ? DateTime.fromISO(evaluation.dueDate.toString()) : undefined}
-                placeholder='N/A'
-                views={['year', 'month', 'day', 'hours']}
-              />
-            }
-            label='Due date'
+          <Box display='flex' flexDirection='column' mb={1}>
+            <FormLabel required>
+              <Typography component='span' variant='subtitle1'>
+                Due date
+              </Typography>
+            </FormLabel>
+            <Typography variant='caption'>Send a reminder to reviewers before the Due Date</Typography>
+          </Box>
+          <DateTimePicker<DateTime>
+            onAccept={(date) => {
+              onChange({
+                dueDate: date?.toJSDate() ?? null
+              });
+            }}
+            sx={{
+              width: '100%'
+            }}
+            minDate={DateTime.fromMillis(Date.now()).plus({ hour: 1 })}
+            value={evaluation.dueDate ? DateTime.fromISO(evaluation.dueDate.toString()) : undefined}
+            placeholder='N/A'
+            views={['year', 'month', 'day', 'hours']}
           />
         </Box>
       )}
