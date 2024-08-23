@@ -24,7 +24,7 @@ export async function ProfilePage({ user }: { user: LoggedInUser }) {
           avatar={farcasterDetails?.pfpUrl}
           bio={farcasterDetails?.bio}
         />
-        <Typography variant='h6'>My Projects</Typography>
+        <Typography variant='h6'>My SUNNYs Submissions</Typography>
         <Suspense fallback={<ProjectItemSkeleton />}>
           <ProjectsList userId={user.id} />
         </Suspense>

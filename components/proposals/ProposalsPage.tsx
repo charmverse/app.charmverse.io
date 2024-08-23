@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
+import Tabs from '@mui/material/Tabs';
 import { debounce } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -13,6 +14,8 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/specRegis
 import Table from 'components/common/DatabaseEditor/components/table/table';
 import { ViewFilterControl } from 'components/common/DatabaseEditor/components/ViewFilterControl';
 import { ToggleViewSidebarButton } from 'components/common/DatabaseEditor/components/viewHeader/ToggleViewSidebarButton';
+import { StyledTab } from 'components/common/DatabaseEditor/components/viewHeader/viewTabs';
+import { iconForViewType } from 'components/common/DatabaseEditor/components/viewMenu';
 import { ViewSettingsRow } from 'components/common/DatabaseEditor/components/ViewSettingsRow';
 import ViewSidebar from 'components/common/DatabaseEditor/components/viewSidebar/viewSidebar';
 import { ViewSortControl } from 'components/common/DatabaseEditor/components/ViewSortControl';
@@ -38,6 +41,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { NewProposalButton } from './components/NewProposalButton';
 import { useProposalsBoardMutator } from './components/ProposalsBoard/hooks/useProposalsBoardMutator';
 import { ProposalsHeaderRowsMenu } from './components/ProposalsHeaderRowsMenu';
+import { UserProposalsTables } from './components/UserProposalsTables/UserProposalsTables';
 import { useProposalsBoard } from './hooks/useProposalsBoard';
 
 const StyledButton = styled(Button)`
@@ -64,6 +68,8 @@ export function ProposalsPage({ title }: { title: string }) {
   const { board: activeBoard, views, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
   const [showSidebar, setShowSidebar] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const { router, updateURLQuery } = useCharmRouter();
+  const viewId = (router.query.viewId || 'all') as 'all' | 'my-work';
 
   const onShowDescription = useCallback(() => {
     const oldBlocks = [activeBoard];
@@ -223,7 +229,7 @@ export function ProposalsPage({ title }: { title: string }) {
 
         <Stack gap={0.75}>
           <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
-            {showViewHeaderRowsMenu && (
+            {showViewHeaderRowsMenu ? (
               <ProposalsHeaderRowsMenu
                 visiblePropertyIds={activeView?.fields.visiblePropertyIds}
                 board={activeBoard}
@@ -232,22 +238,61 @@ export function ProposalsPage({ title }: { title: string }) {
                 setCheckedIds={setCheckedIds}
                 onChange={refreshProposals}
                 refreshProposals={refreshProposals}
+                sx={{
+                  mb: '3.5px'
+                }}
               />
+            ) : (
+              <Tabs
+                // assign a key so that the tabs are remounted when the page change, otherwise the indicator will animate to the new tab
+                key={viewId}
+                textColor='primary'
+                indicatorColor='secondary'
+                value={false} // use false to disable the indicator
+                sx={{ minHeight: 0, mb: '-5px' }}
+              >
+                {[
+                  {
+                    id: 'all',
+                    label: 'All'
+                  },
+                  {
+                    id: 'my-work',
+                    label: 'My Work'
+                  }
+                ].map((view) => {
+                  return (
+                    <StyledTab
+                      onClick={() => {
+                        updateURLQuery({
+                          viewId: view.id
+                        });
+                      }}
+                      icon={iconForViewType('table')}
+                      label={view.label}
+                      isActive={viewId === view.id}
+                      key={view.id}
+                    />
+                  );
+                })}
+              </Tabs>
             )}
             <div className='octo-spacer' />
-            <Box className='view-actions'>
-              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
-              <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
-              {user && (
-                <ToggleViewSidebarButton
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowSidebar(!showSidebar);
-                  }}
-                />
-              )}
-            </Box>
+            {viewId !== 'my-work' && (
+              <Box className='view-actions'>
+                <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
+                <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
+                {user && (
+                  <ToggleViewSidebarButton
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowSidebar(!showSidebar);
+                    }}
+                  />
+                )}
+              </Box>
+            )}
           </div>
           <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
         </Stack>
@@ -259,67 +304,71 @@ export function ProposalsPage({ title }: { title: string }) {
         </Grid>
       ) : (
         <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
-          <Stack>
-            {cards.length > 0 ? (
-              <Box width='100%'>
-                <Table
-                  boardType='proposals'
-                  setSelectedPropertyId={(_setSelectedPropertyId) => {
-                    setSelectedPropertyId(_setSelectedPropertyId);
-                    setShowSidebar(true);
-                  }}
-                  board={activeBoard}
-                  activeView={activeView}
-                  cards={cards}
-                  groupByProperty={groupByProperty}
-                  views={views}
-                  visibleGroups={[]}
-                  selectedCardIds={[]}
-                  readOnly={!isAdmin}
-                  disableAddingCards
-                  showCard={openPage}
-                  readOnlyTitle={!isAdmin}
-                  cardIdToFocusOnRender=''
-                  addCard={async () => {}}
-                  onCardClicked={() => {}}
-                  onDeleteCard={onDelete}
-                  setCheckedIds={setCheckedIds}
-                  checkedIds={checkedIds}
-                />
-              </Box>
-            ) : (
-              <Box sx={{ mt: 3 }}>
-                <EmptyStateVideo
-                  description='Getting started'
-                  videoTitle='Proposals | Getting started with CharmVerse'
-                  videoUrl='https://tiny.charmverse.io/proposal-builder'
-                />
-              </Box>
-            )}
+          {viewId === 'all' ? (
+            <Stack>
+              {cards.length > 0 ? (
+                <Box width='100%'>
+                  <Table
+                    boardType='proposals'
+                    setSelectedPropertyId={(_setSelectedPropertyId) => {
+                      setSelectedPropertyId(_setSelectedPropertyId);
+                      setShowSidebar(true);
+                    }}
+                    board={activeBoard}
+                    activeView={activeView}
+                    cards={cards}
+                    groupByProperty={groupByProperty}
+                    views={views}
+                    visibleGroups={[]}
+                    selectedCardIds={[]}
+                    readOnly={!isAdmin}
+                    disableAddingCards
+                    showCard={openPage}
+                    readOnlyTitle={!isAdmin}
+                    cardIdToFocusOnRender=''
+                    addCard={async () => {}}
+                    onCardClicked={() => {}}
+                    onDeleteCard={onDelete}
+                    setCheckedIds={setCheckedIds}
+                    checkedIds={checkedIds}
+                  />
+                </Box>
+              ) : (
+                <Box sx={{ mt: 3 }}>
+                  <EmptyStateVideo
+                    description='Getting started'
+                    videoTitle='Proposals | Getting started with CharmVerse'
+                    videoUrl='https://tiny.charmverse.io/proposal-builder'
+                  />
+                </Box>
+              )}
 
-            <ViewSidebar
-              selectedPropertyId={selectedPropertyId}
-              setSelectedPropertyId={setSelectedPropertyId}
-              sidebarView={selectedPropertyId && showSidebar ? 'card-property' : undefined}
-              cards={cards}
-              views={views}
-              board={activeBoard}
-              rootBoard={activeBoard}
-              view={activeView}
-              isOpen={showSidebar}
-              closeSidebar={() => {
-                setShowSidebar(false);
-              }}
-              hideLayoutOptions
-              hideSourceOptions
-              hideGroupOptions
-              hidePropertiesRow={!isAdmin}
-              groupByProperty={groupByProperty}
-              page={undefined}
-              pageId={undefined}
-              showView={() => {}}
-            />
-          </Stack>
+              <ViewSidebar
+                selectedPropertyId={selectedPropertyId}
+                setSelectedPropertyId={setSelectedPropertyId}
+                sidebarView={selectedPropertyId && showSidebar ? 'card-property' : undefined}
+                cards={cards}
+                views={views}
+                board={activeBoard}
+                rootBoard={activeBoard}
+                view={activeView}
+                isOpen={showSidebar}
+                closeSidebar={() => {
+                  setShowSidebar(false);
+                }}
+                hideLayoutOptions
+                hideSourceOptions
+                hideGroupOptions
+                hidePropertiesRow={!isAdmin}
+                groupByProperty={groupByProperty}
+                page={undefined}
+                pageId={undefined}
+                showView={() => {}}
+              />
+            </Stack>
+          ) : (
+            <UserProposalsTables />
+          )}
         </Box>
       )}
     </DatabaseContainer>

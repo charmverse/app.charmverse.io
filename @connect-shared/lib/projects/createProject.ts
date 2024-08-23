@@ -29,6 +29,7 @@ export async function createProject({
         | 'mintingWalletAddress'
         | 'sunnyAwardsProjectType'
         | 'sunnyAwardsNumber'
+        | 'sunnyAwardsCategoryDetails'
       >
     >;
   userId: string;
