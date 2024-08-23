@@ -1,5 +1,6 @@
 'use client';
 
+import { log } from '@charmverse/core/log';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -9,6 +10,7 @@ import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
+import type { FieldErrors } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import type { Address } from 'viem';
 
@@ -52,11 +54,12 @@ export function CreateProjectPage({
     }
   });
 
-  const { control, handleSubmit, reset } = useForm<FormValues>({
+  const { control, handleSubmit, getValues, reset } = useForm<FormValues>({
     defaultValues: {
       name: '',
       description: '',
       sunnyAwardsCategory: '' as any,
+      sunnyAwardsCategoryDetails: '',
       websites: [''],
       farcasterValues: [''],
       sunnyAwardsProjectType: 'other',
@@ -101,15 +104,32 @@ export function CreateProjectPage({
     });
   }
 
+  function onInvalid(fieldErrors: FieldErrors) {
+    const invalidFields = Object.keys(fieldErrors);
+    if (invalidFields.length === 0) {
+      setErrors(['The form is invalid. Please check the fields and try again.']);
+    } else {
+      setErrors([`The form is invalid. Please check the following fields: ${invalidFields.join(', ')}`]);
+    }
+    log.warn('Invalid form submission', { fieldErrors, values: getValues() });
+  }
+
   return (
     <PageWrapper bgcolor='transparent'>
-      <form onSubmit={handleSubmit(execute)}>
+      {/* add noValidate so that we onyl rely on react-hook-form validation */}
+      <form noValidate onSubmit={handleSubmit(execute, onInvalid)}>
         <ImportOptimismProject
           control={control}
           optimismProjects={optimismProjects}
           handleProjectSelect={handleProjectSelect}
         />
-        <ProjectForm control={control} isExecuting={isExecuting} user={user} errors={errors} />
+        <ProjectForm
+          control={control}
+          isExecuting={isExecuting}
+          user={user}
+          errors={errors}
+          submitLabel='Accept Invite'
+        />
       </form>
     </PageWrapper>
   );

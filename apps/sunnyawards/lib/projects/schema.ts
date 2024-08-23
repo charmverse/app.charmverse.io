@@ -1,9 +1,7 @@
 import { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
 import type { ProjectCategory as OptimismProjectCategory } from '@connect-shared/lib/projects/projectSchema';
-import { wagmiConfig } from '@root/connectors/config';
 import { typedKeys } from '@root/lib/utils/objects';
-import { getBytecode } from '@wagmi/core';
-import type { Address } from 'viem';
+import { isAddress, type Address } from 'viem';
 import { normalize } from 'viem/ens';
 import * as yup from 'yup';
 
@@ -32,6 +30,11 @@ export const PROJECT_CATEGORIES = [
     group: 'Farcaster',
     optimismCategory: 'Social',
     items: ['Frames', 'Channels']
+  },
+  {
+    group: 'Other',
+    optimismCategory: undefined,
+    items: ['Other']
   }
 ] as const;
 
@@ -56,6 +59,7 @@ export const schema = yup.object({
     .oneOf(PROJECT_CATEGORIES.map(({ items }) => items).flat())
     .nullable()
     .required(),
+  sunnyAwardsCategoryDetails: yup.string(),
   websites: yup
     .array(
       yup.string().matches(
@@ -87,16 +91,7 @@ export const schema = yup.object({
         if (!value) {
           return false;
         }
-        const chainId = Number(chain);
-        try {
-          const result = await getBytecode(wagmiConfig, {
-            address: value,
-            chainId
-          });
-          return !!result;
-        } catch (err) {
-          return false;
-        }
+        return isAddress(value);
       }
 
       return true;
@@ -131,8 +126,8 @@ export const schema = yup.object({
         farcasterId: yup.number().required(),
         farcasterUser: yup.object({
           fid: yup.number().required(),
-          displayName: yup.string().required(),
-          pfpUrl: yup.string().required(),
+          displayName: yup.string(),
+          pfpUrl: yup.string(),
           username: yup.string().required()
         })
       })

@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
-import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
+import { InvalidStateError } from '@root/lib/middleware';
 import { sessionUserRelations } from '@root/lib/session/config';
 import { getUserProfile } from '@root/lib/users/getUser';
 import { DisabledAccountError, ExternalServiceError } from '@root/lib/utils/errors';
@@ -35,19 +35,16 @@ export async function connectFarcaster({
       throw new DisabledAccountError();
     }
 
-    return farcasterUser.user;
-  }
-
-  let avatar: string | null = null;
-  if (pfpUrl) {
-    try {
-      ({ url: avatar } = await uploadUrlToS3({
-        pathInS3: getUserS3FilePath({ userId, url: pfpUrl }),
-        url: pfpUrl
-      }));
-    } catch (error) {
-      log.warn('Error while uploading avatar to S3', error);
+    if (farcasterUser.userId !== userId) {
+      log.warn('Farcaster already connected to another account', {
+        fid,
+        userId,
+        connectedUserId: farcasterUser.userId
+      });
+      throw new InvalidStateError('Farcaster already connected to another account');
     }
+
+    return farcasterUser.user;
   }
 
   await prisma.farcasterUser.create({

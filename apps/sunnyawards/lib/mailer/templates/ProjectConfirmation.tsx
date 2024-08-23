@@ -118,6 +118,7 @@ export function ProjectConfirmation({
             ) : null}
             <ProjectField label='Websites' value={project.websites.join(', ')} />
             <ProjectField label='Category' value={project.sunnyAwardsCategory} />
+            <ProjectField label='Category Details' value={project.sunnyAwardsCategoryDetails} />
             <ProjectField label='Farcaster profiles' value={project.farcasterValues.join(', ')} />
             <ProjectField label='X' value={project.twitter} />
             <ProjectField label='Github' value={project.github} />

@@ -12,7 +12,7 @@ const deployProps: cdk.StackProps = {
 
 const app = new cdk.App();
 
-// Command example: cdk deploy --context name=stg-connect
+// Command example: cdk deploy --context name=stg-scoutgame
 const stackNameParam: string = app.node.getContext('name');
 
 // Sunny awawrds production
@@ -28,7 +28,7 @@ else if (stackNameParam.startsWith('prd')) {
   });
 }
 // Connect staging
-else if (stackNameParam.startsWith('stg-connect')) {
+else if (stackNameParam.startsWith('stg-scoutgame')) {
   new StagingStack(app, stackNameParam, deployProps);
 }
 // Sunny awards staging

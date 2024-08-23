@@ -25,6 +25,16 @@ beforeAll(async () => {
     createdBy: user.id,
     spaceId: space.id
   });
+
+  await prisma.space.update({
+    where: {
+      id: space.id
+    },
+    data: {
+      // This is important so we can check that full access is converted to view permission for the space
+      defaultPagePermissionGroup: 'full_access'
+    }
+  });
 });
 
 describe('createReward', () => {
@@ -181,7 +191,7 @@ describe('createReward', () => {
     });
   });
 
-  it('should add a full acccess page permission for the creator, and a view permission for the space', async () => {
+  it('should add a full acccess page permission for the creator, and a view permission for the space (even if default level is full access)', async () => {
     const rewardData: RewardCreationData = {
       spaceId: space.id,
       userId: user.id,
@@ -238,7 +248,7 @@ describe('createReward', () => {
     );
   });
 
-  it('should add a full access page permission for the creator, and a no view permission for the space for a draft reward', async () => {
+  it('should add a full access page permission for the creator, and no view permission for the space for a draft reward', async () => {
     const rewardData: RewardCreationData = {
       spaceId: space.id,
       userId: user.id,
@@ -275,6 +285,66 @@ describe('createReward', () => {
           permissionLevel: 'full_access',
           permissions: [],
           userId: user.id,
+          public: null,
+          roleId: null,
+          spaceId: null
+        }
+      ])
+    );
+  });
+
+  it('should add a full access page permission for the creator, and no view permission for the space if the default page permission group is null', async () => {
+    const { space: spaceWithNullDefaultPermission, user: userInSpaceWithNullDefaultPermission } =
+      await testUtilsUser.generateUserAndSpace({});
+
+    await prisma.space.update({
+      where: {
+        id: spaceWithNullDefaultPermission.id
+      },
+      data: {
+        defaultPagePermissionGroup: null
+      }
+    });
+
+    const rewardData: RewardCreationData = {
+      spaceId: spaceWithNullDefaultPermission.id,
+      userId: userInSpaceWithNullDefaultPermission.id,
+      chainId: 2,
+      rewardAmount: 100,
+      rewardToken: 'BTC',
+      approveSubmitters: true,
+      maxSubmissions: 10,
+      dueDate: new Date(),
+      // Main flag that changes compared to the draft test
+      isDraft: false,
+      customReward: 'Special Badge',
+      fields: { fieldName: 'sampleField', type: 'text' },
+      pageProps: {
+        title: 'Reward Page'
+      },
+      reviewers: [{ userId: user.id }]
+    };
+
+    const { reward } = await createReward(rewardData);
+
+    const permissions = await prisma.pagePermission.findMany({
+      where: {
+        pageId: reward.id
+      }
+    });
+
+    expect(permissions).toHaveLength(1);
+
+    expect(permissions).toEqual(
+      expect.arrayContaining<PagePermission>([
+        {
+          allowDiscovery: false,
+          id: expect.any(String),
+          inheritedFromPermission: null,
+          pageId: reward.id,
+          permissionLevel: 'full_access',
+          permissions: [],
+          userId: userInSpaceWithNullDefaultPermission.id,
           public: null,
           roleId: null,
           spaceId: null

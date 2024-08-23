@@ -37,7 +37,7 @@ function FarcasterCardContent({
       >
         <Avatar size={avatarSize} name={username || 'N/A'} avatar={avatar} />
       </Stack>
-      <Box width='100%'>
+      <Box width='100%' sx={{ wordBreak: 'break-all' }}>
         <Stack direction='row' justifyContent='space-between' width='100%' alignItems='center'>
           <Typography variant='h6'>{name || 'N/A'}</Typography>
           {onDelete && (
@@ -49,7 +49,15 @@ function FarcasterCardContent({
         <Typography variant='subtitle1' color='secondary'>
           @{username || 'N/A'}
         </Typography>
-        <Typography>{bio}</Typography>
+        <Typography
+          sx={{
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: '2'
+          }}
+        >
+          {bio}
+        </Typography>
       </Box>
     </CardContent>
   );

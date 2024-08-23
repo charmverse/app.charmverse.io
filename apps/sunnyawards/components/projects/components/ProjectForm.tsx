@@ -4,7 +4,7 @@ import { LoadingComponent } from '@connect-shared/components/common/Loading/Load
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
 import { FormErrors } from '@connect-shared/components/project/FormErrors';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import { Button, FormLabel, ListSubheader, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, FormLabel, ListSubheader, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
@@ -21,12 +21,14 @@ export function ProjectForm({
   control,
   isExecuting,
   user,
-  errors
+  errors,
+  submitLabel
 }: {
   control: Control<FormValues>;
   isExecuting: boolean;
   user: LoggedInUser;
   errors: string[] | null;
+  submitLabel: string;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
@@ -34,7 +36,7 @@ export function ProjectForm({
   return (
     <>
       <Stack mb={2}>
-        <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
+        <FormLabel>Project avatar and cover image</FormLabel>
         <Stack direction='row' gap={1}>
           <ProjectImageField type='avatar' name='avatar' control={control} />
           <ProjectImageField type='cover' name='coverImage' control={control} />
@@ -42,9 +44,7 @@ export function ProjectForm({
       </Stack>
       <Stack gap={2} mb={2}>
         <Stack>
-          <FormLabel required id='project-name'>
-            Name
-          </FormLabel>
+          <FormLabel required>Name</FormLabel>
           <Controller
             control={control}
             name='name'
@@ -62,9 +62,7 @@ export function ProjectForm({
           />
         </Stack>
         <Stack>
-          <FormLabel required id='project-description'>
-            Description
-          </FormLabel>
+          <FormLabel required>Description</FormLabel>
           <Controller
             control={control}
             name='description'
@@ -83,9 +81,7 @@ export function ProjectForm({
           />
         </Stack>
         <Stack>
-          <FormLabel id='project-sunnyaward-type' required>
-            SUNNY Awards Project Type
-          </FormLabel>
+          <FormLabel required>SUNNY Awards Project Type</FormLabel>
           <Controller
             control={control}
             name='sunnyAwardsProjectType'
@@ -93,8 +89,6 @@ export function ProjectForm({
               <Select
                 displayEmpty
                 fullWidth
-                aria-labelledby='project-sunny-category'
-                data-test='project-sunny-category'
                 renderValue={(value) =>
                   value ? capitalize(value) : <Typography color='secondary'>Select a category</Typography>
                 }
@@ -113,9 +107,7 @@ export function ProjectForm({
         {sunnyAwardsProjectType === 'app' && (
           <Stack gap={2}>
             <Stack>
-              <FormLabel id='project-chain' required>
-                Project Chain
-              </FormLabel>
+              <FormLabel required>Project Chain</FormLabel>
               <Controller
                 control={control}
                 name='primaryContractChainId'
@@ -123,9 +115,7 @@ export function ProjectForm({
               />
             </Stack>
             <Stack>
-              <FormLabel id='project-contract' required>
-                Project Contract Address
-              </FormLabel>
+              <FormLabel required>Project Contract Address</FormLabel>
               <Controller
                 control={control}
                 name='primaryContractAddress'
@@ -146,9 +136,7 @@ export function ProjectForm({
         )}
         {sunnyAwardsProjectType === 'creator' && (
           <Stack>
-            <FormLabel id='project-minting-wallet' required>
-              Creator minting wallet address
-            </FormLabel>
+            <FormLabel required>Creator minting wallet address</FormLabel>
             <Controller
               control={control}
               name='mintingWalletAddress'
@@ -175,9 +163,7 @@ export function ProjectForm({
           placeholder='https://charmverse.io'
         />
         <Stack>
-          <FormLabel id='project-category' required>
-            Category
-          </FormLabel>
+          <FormLabel required>Category</FormLabel>
           <Controller
             control={control}
             name='sunnyAwardsCategory'
@@ -203,6 +189,16 @@ export function ProjectForm({
             )}
           />
         </Stack>
+        <Stack>
+          <FormLabel>Additional Category Details</FormLabel>
+          <Controller
+            control={control}
+            name='sunnyAwardsCategoryDetails'
+            render={({ field, fieldState }) => (
+              <TextField placeholder='' {...field} error={!!fieldState.error} helperText={fieldState.error?.message} />
+            )}
+          />
+        </Stack>
 
         <MultiTextInputField
           control={control}
@@ -213,7 +209,7 @@ export function ProjectForm({
         />
 
         <Stack>
-          <FormLabel id='project-twitter'>X</FormLabel>
+          <FormLabel>X</FormLabel>
           <Stack direction='row' gap={1} alignItems='center'>
             <Typography color='secondary' width={250}>
               https://x.com/
@@ -235,7 +231,7 @@ export function ProjectForm({
           </Stack>
         </Stack>
         <Stack>
-          <FormLabel id='project-github'>Github</FormLabel>
+          <FormLabel>Github</FormLabel>
           <Stack direction='row' gap={1} alignItems='center'>
             <Typography color='secondary' width={250}>
               https://github.com/
@@ -258,12 +254,12 @@ export function ProjectForm({
         </Stack>
       </Stack>
       <AddProjectMembersForm user={user} control={control} disabled={isExecuting} />
-      <Stack direction='row' justifyContent='space-between'>
-        <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary'>
+      <Stack direction='row' justifyContent='space-between' gap={2}>
+        <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary' sx={{ flexShrink: 0 }}>
           Cancel
         </Button>
-        <Stack direction='row' gap={1}>
-          {isExecuting && (
+        {isExecuting && (
+          <Box display='flex' justifyContent='flex-end'>
             <LoadingComponent
               height={20}
               size={20}
@@ -271,13 +267,22 @@ export function ProjectForm({
               label='Submitting your project onchain'
               flexDirection='row-reverse'
             />
-          )}
-          {!isExecuting && errors?.length && <FormErrors errors={errors} />}
-          <Button data-test='project-form-publish' disabled={isExecuting} type='submit'>
-            Accept Invite
-          </Button>
-        </Stack>
+          </Box>
+        )}
+        {!isExecuting && errors?.length && (
+          <Box display={{ xs: 'none', md: 'block' }} flexGrow={0}>
+            <FormErrors errors={errors} />
+          </Box>
+        )}
+        <Button data-test='project-form-publish' disabled={isExecuting} type='submit' sx={{ flexShrink: 0 }}>
+          {submitLabel}
+        </Button>
       </Stack>
+      {!isExecuting && errors && (
+        <Box display={{ md: 'none' }} mt={2}>
+          <FormErrors errors={errors} />
+        </Box>
+      )}
     </>
   );
 }
