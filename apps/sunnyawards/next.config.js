@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 
+// eslint-disable-next-line no-console
+console.log('next.config env:', process.env);
 const nextConfig = {
   // types are tested separately from the build
   eslint: {
@@ -17,7 +19,7 @@ const nextConfig = {
   //   process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'staging'
   //     ? 'https://cdn.charmverse.io'
   //     : undefined,
-  assetPrefix: 'https://cdn.charmverse.io',
+  assetPrefix: !process.env.CI ? 'https://cdn.charmverse.io' : undefined,
   webpack(_config) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     // _config.resolve.alias.canvas = false;
