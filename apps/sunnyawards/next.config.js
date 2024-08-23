@@ -13,10 +13,11 @@ const nextConfig = {
   },
   productionBrowserSourceMaps: true,
   // assetPrefix: process.env.REACT_APP_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
-  assetPrefix:
-    process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'staging'
-      ? 'https://cdn.charmverse.io'
-      : undefined,
+  // assetPrefix:
+  //   process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'staging'
+  //     ? 'https://cdn.charmverse.io'
+  //     : undefined,
+  assetPrefix: 'https://cdn.charmverse.io',
   webpack(_config) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     // _config.resolve.alias.canvas = false;
