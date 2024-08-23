@@ -126,8 +126,8 @@ export const schema = yup.object({
         farcasterId: yup.number().required(),
         farcasterUser: yup.object({
           fid: yup.number().required(),
-          displayName: yup.string().required(),
-          pfpUrl: yup.string().required(),
+          displayName: yup.string(),
+          pfpUrl: yup.string(),
           username: yup.string().required()
         })
       })
