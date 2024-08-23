@@ -158,11 +158,6 @@ export async function getUserProposals({
   const authoredProposals: UserProposal[] = [];
   const assignedProposals: UserProposal[] = [];
 
-  const computedProposalPermissions = await permissionsApiClient.proposals.bulkComputeProposalPermissions({
-    spaceId,
-    userId
-  });
-
   for (const proposal of proposals) {
     const isAuthor = proposal.authors.some((author) => author.userId === userId);
     if (proposal.page) {
@@ -179,7 +174,12 @@ export async function getUserProposals({
         }
       } else {
         const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-        const canReview = computedProposalPermissions[proposal.id]?.evaluate;
+        const canReview = currentEvaluation?.reviewers.some(
+          (reviewer) =>
+            reviewer.userId === userId ||
+            (reviewer.roleId && userRoles.includes(reviewer.roleId)) ||
+            reviewer.systemRole === 'space_member'
+        );
         const hasReviewed = currentEvaluation?.reviews.some((review) => review.reviewerId === userId);
         const hasVoted =
           currentEvaluation?.type === 'vote' &&
