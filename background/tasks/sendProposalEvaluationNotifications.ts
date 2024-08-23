@@ -69,39 +69,53 @@ export async function sendProposalEvaluationNotifications() {
         dueDate &&
         dueDate <= new Date(Date.now() + 24 * 60 * 60 * 1000)
       ) {
-        const reviewerIds = currentEvaluation.reviewers.map((r) => r.userId).filter(isTruthy);
+        const reviewerUserIds: string[] = [];
         const hasAuthorSystemRole = currentEvaluation.reviewers.some((r) => r.systemRole === 'author');
+        const hasSpaceMemberRole = currentEvaluation.reviewers.some((r) => r.systemRole === 'space_member');
 
-        const roles = await prisma.role.findMany({
-          where: {
-            id: {
-              in: currentEvaluation.reviewers.map((r) => r.roleId).filter(isTruthy)
+        if (hasSpaceMemberRole) {
+          const spaceMembers = await prisma.spaceRole.findMany({
+            where: {
+              spaceId: proposal.spaceId
+            },
+            select: {
+              userId: true
             }
-          },
-          select: {
-            spaceRolesToRole: {
-              select: {
-                spaceRole: {
-                  select: {
-                    userId: true
+          });
+          spaceMembers.forEach((m) => reviewerUserIds.push(m.userId));
+        } else {
+          const roles = await prisma.role.findMany({
+            where: {
+              id: {
+                in: currentEvaluation.reviewers.map((r) => r.roleId).filter(isTruthy)
+              }
+            },
+            select: {
+              spaceRolesToRole: {
+                select: {
+                  spaceRole: {
+                    select: {
+                      userId: true
+                    }
                   }
                 }
               }
             }
+          });
+          roles.forEach((r) =>
+            r.spaceRolesToRole.forEach((s) => {
+              reviewerUserIds.push(s.spaceRole.userId);
+            })
+          );
+          if (hasAuthorSystemRole) {
+            proposal.authors.forEach((a) => reviewerUserIds.push(a.userId));
           }
-        });
+          currentEvaluation.reviewers.map((r) => r.userId).filter(isTruthy);
+        }
 
-        const reviewerIdsByRoles = roles.map((r) => r.spaceRolesToRole.map((s) => s.spaceRole.userId)).flat();
+        const reviewerIds = Array.from(new Set(reviewerUserIds));
 
-        const uniqueReviewerIds = Array.from(
-          new Set([
-            ...reviewerIds,
-            ...reviewerIdsByRoles,
-            ...(hasAuthorSystemRole ? proposal.authors.map((a) => a.userId) : [])
-          ])
-        );
-
-        for (const reviewerId of uniqueReviewerIds) {
+        for (const reviewerId of reviewerIds) {
           const proposalNotification = await saveProposalNotification({
             createdAt: new Date().toISOString(),
             createdBy: proposal.createdBy,
