@@ -14,12 +14,15 @@ export async function sendProposalEvaluationNotifications() {
         deletedAt: null,
         isTemplate: false
       },
+      archived: false,
       status: 'published',
       evaluations: {
         some: {
           dueDate: {
-            lte: new Date(Date.now() + 24 * 60 * 60 * 1000)
-          }
+            lte: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            gte: new Date()
+          },
+          result: null
         }
       }
     },
