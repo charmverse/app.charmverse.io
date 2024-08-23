@@ -11,7 +11,7 @@ export async function ProjectsList({ userId }: { userId?: string }) {
   });
 
   if (projectsList.length === 0) {
-    return <Typography>Create a project and submit it to the SUNNYs</Typography>;
+    return <Typography>Create a submission and submit it to the SUNNYs</Typography>;
   }
 
   return projectsList.map((project) => {
