@@ -54,7 +54,7 @@ export function CreateProjectPage({
     }
   });
 
-  const { control, handleSubmit, reset } = useForm<FormValues>({
+  const { control, handleSubmit, getValues, reset } = useForm<FormValues>({
     defaultValues: {
       name: '',
       description: '',
@@ -111,7 +111,7 @@ export function CreateProjectPage({
     } else {
       setErrors([`The form is invalid. Please check the following fields: ${invalidFields.join(', ')}`]);
     }
-    log.warn('Invalid form submission', { fieldErrors });
+    log.warn('Invalid form submission', { fieldErrors, values: getValues() });
   }
 
   return (
