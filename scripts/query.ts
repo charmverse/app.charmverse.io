@@ -6,16 +6,12 @@ import { prettyPrint } from 'lib/utils/strings';
  */
 
 async function query() {
-  const result = await prisma.space.findUnique({
+  const result = await prisma.user.findFirst({
     where: {
-      domain: 'playgotchi'
+      username: 'ccarella.eth'
     },
     include: {
-      spaceRoles: {
-        include: {
-          user: true
-        }
-      }
+      farcasterUser: true
     }
   });
   console.log(result);

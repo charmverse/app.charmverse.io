@@ -6,12 +6,12 @@ import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { trackMixpanelEvent } from '@connect-shared/lib/mixpanel/trackMixpanelEvent';
 import { createProject } from '@connect-shared/lib/projects/createProject';
-import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { isTestEnv } from '@root/config/constants';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 
 import { sendProjectConfirmationEmail } from 'lib/mailer/sendProjectConfirmationEmail';
+import { generateOgImage } from 'lib/projects/generateOgImage';
 
 import { getOptimismCategory, schema } from './schema';
 

@@ -1,5 +1,5 @@
 import type { OptimismProjectFormValues } from 'components/common/ProjectForm/components/Optimism/optimismProjectFormValues';
-import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
+import type { OptimismProjectAttestationContent } from 'lib/optimism/getOpProjectsByFarcasterId';
 
 import { useGET, usePOST, usePUT } from './helpers';
 

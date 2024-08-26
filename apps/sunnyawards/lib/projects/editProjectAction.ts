@@ -5,10 +5,11 @@ import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeUpdatedProjectMetadataAttestation } from '@connect-shared/lib/attestations/storeUpdatedProjectMetadataAttestation';
 import type { EditProjectValues } from '@connect-shared/lib/projects/editProject';
 import { editProject } from '@connect-shared/lib/projects/editProject';
-import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 import { revalidatePath } from 'next/cache';
+
+import { generateOgImage } from 'lib/projects/generateOgImage';
 
 import { schema } from './schema';
 

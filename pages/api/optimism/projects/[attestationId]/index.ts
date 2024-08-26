@@ -2,8 +2,6 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { createProjectMetadataAttestation } from '@connect-shared/lib/attestations/agoraApi';
 import { editProject } from '@connect-shared/lib/projects/editProject';
-import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
-import type { ProjectCategory } from '@connect-shared/lib/projects/projectSchema';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
 import { decodeOptimismProjectAttestation } from '@root/lib/credentials/schemas/optimismProjectUtils';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
@@ -16,9 +14,10 @@ import { optimism } from 'viem/chains';
 
 import type { OptimismProjectFormValues } from 'components/common/ProjectForm/components/Optimism/optimismProjectFormValues';
 import { onError, onNoMatch } from 'lib/middleware';
+import type { ProjectCategory } from 'lib/optimism/constants';
 import { getOpProjectsByAttestationId } from 'lib/optimism/getOpProjectsByAttestationId';
-
-import type { OptimismProjectAttestationContent } from '..';
+import type { OptimismProjectAttestationContent } from 'lib/optimism/getOpProjectsByFarcasterId';
+import { generateOgImage } from 'lib/projects/generateOgImage';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

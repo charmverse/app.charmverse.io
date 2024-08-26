@@ -1,38 +1,23 @@
+import { ImageField } from '@connect-shared/components/common/ImageField';
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
-import type { FormValues } from '@connect-shared/lib/projects/projectSchema';
-import { CATEGORIES } from '@connect-shared/lib/projects/projectSchema';
-import { FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { FormLabel, Stack, TextField, Typography } from '@mui/material';
 import type { Control } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
-import { ProjectImageField } from './ProjectImageField';
+import type { FormValues } from 'lib/projects/projectSchema';
 
-export function ProjectForm({
-  control,
-  showCategory,
-  isCategoryRequired = true,
-  isDescriptionRequired = true,
-  isWebsitesRequired = true
-}: {
-  control: Control<FormValues>;
-  showCategory?: boolean;
-  isDescriptionRequired?: boolean;
-  isWebsitesRequired?: boolean;
-  isCategoryRequired?: boolean;
-}) {
+export function ProjectForm({ control }: { control: Control<FormValues> }) {
   return (
     <Stack gap={2}>
       <Stack>
-        <FormLabel id='project-avatar-and-cover-image'>Project avatar and cover image</FormLabel>
+        <FormLabel>Project avatar and cover image</FormLabel>
         <Stack direction='row' gap={1}>
-          <ProjectImageField type='avatar' name='avatar' control={control} />
-          <ProjectImageField type='cover' name='coverImage' control={control} />
+          <ImageField type='avatar' name='avatar' control={control} />
+          <ImageField type='cover' name='coverImage' control={control} />
         </Stack>
       </Stack>
       <Stack>
-        <FormLabel required id='project-name'>
-          Name
-        </FormLabel>
+        <FormLabel required>Name</FormLabel>
         <Controller
           control={control}
           name='name'
@@ -43,15 +28,14 @@ export function ProjectForm({
               placeholder='Charmverse'
               aria-labelledby='project-name'
               error={!!fieldState.error}
+              helperText={fieldState.error?.message}
               {...field}
             />
           )}
         />
       </Stack>
       <Stack>
-        <FormLabel required={isDescriptionRequired} id='project-description'>
-          Description
-        </FormLabel>
+        <FormLabel>Description</FormLabel>
         <Controller
           control={control}
           name='description'
@@ -74,37 +58,7 @@ export function ProjectForm({
         label='Websites'
         data-test='project-form-websites'
         placeholder='https://charmverse.io'
-        required={isWebsitesRequired}
       />
-
-      {showCategory && (
-        <Stack>
-          <FormLabel required={isCategoryRequired} id='project-category'>
-            Category
-          </FormLabel>
-          <Controller
-            control={control}
-            name='optimismCategory'
-            render={({ field, fieldState }) => (
-              <Select
-                displayEmpty
-                fullWidth
-                aria-labelledby='project-category'
-                data-test='project-form-category'
-                renderValue={(value) => value || <Typography color='secondary'>Select a category</Typography>}
-                error={!!fieldState.error}
-                {...field}
-              >
-                {CATEGORIES.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    {category}
-                  </MenuItem>
-                ))}
-              </Select>
-            )}
-          />
-        </Stack>
-      )}
 
       <MultiTextInputField
         control={control}
@@ -115,7 +69,7 @@ export function ProjectForm({
       />
 
       <Stack>
-        <FormLabel id='project-twitter'>X</FormLabel>
+        <FormLabel>X</FormLabel>
         <Stack direction='row' gap={1} alignItems='center'>
           <Typography color='secondary' width={250}>
             https://x.com/
@@ -137,7 +91,7 @@ export function ProjectForm({
         </Stack>
       </Stack>
       <Stack>
-        <FormLabel id='project-github'>Github</FormLabel>
+        <FormLabel>Github</FormLabel>
         <Stack direction='row' gap={1} alignItems='center'>
           <Typography color='secondary' width={250}>
             https://github.com/

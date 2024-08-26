@@ -1,8 +1,9 @@
 'use client';
 
+import { FormErrors } from '@connect-shared/components/common/FormErrors';
+import { ImageField } from '@connect-shared/components/common/ImageField';
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
-import { FormErrors } from '@connect-shared/components/project/FormErrors';
 import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { Box, Button, FormLabel, ListSubheader, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
@@ -15,7 +16,6 @@ import { PROJECT_CATEGORIES, PROJECT_TYPES } from 'lib/projects/schema';
 
 import { AddProjectMembersForm } from './AddProjectMembersForm';
 import { BlockchainSelect } from './BlockchainSelect';
-import { ProjectImageField } from './ProjectImageField';
 
 export function ProjectForm({
   control,
@@ -38,8 +38,8 @@ export function ProjectForm({
       <Stack mb={2}>
         <FormLabel>Project avatar and cover image</FormLabel>
         <Stack direction='row' gap={1}>
-          <ProjectImageField type='avatar' name='avatar' control={control} />
-          <ProjectImageField type='cover' name='coverImage' control={control} />
+          <ImageField type='avatar' name='avatar' control={control} />
+          <ImageField type='cover' name='coverImage' control={control} />
         </Stack>
       </Stack>
       <Stack gap={2} mb={2}>

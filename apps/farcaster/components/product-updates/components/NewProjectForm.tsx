@@ -1,22 +1,20 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { FormErrors } from '@connect-shared/components/project/FormErrors';
-import { ProjectForm } from '@connect-shared/components/project/ProjectForm';
-import type { FormValues as SharedFormValues } from '@connect-shared/lib/projects/projectSchema';
+import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Stack } from '@mui/material';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
-import type { Control } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 
+import { ProjectForm } from 'components/common/ProjectForm';
 import { createProjectAction } from 'lib/projects/createProjectAction';
 import type { FormValues } from 'lib/projects/projectSchema';
 import { schema } from 'lib/projects/projectSchema';
 
-export function CreateProjectForm({
+export function NewProjectForm({
   fid,
   onCancel,
   onSubmit
@@ -46,6 +44,11 @@ export function CreateProjectForm({
   const { control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       name: '',
+      description: '',
+      websites: [''],
+      farcasterValues: [''],
+      twitter: '',
+      github: '',
       projectMembers: [
         {
           farcasterId: fid
@@ -58,33 +61,26 @@ export function CreateProjectForm({
 
   return (
     <>
-      <ProjectForm
-        control={control as Control<SharedFormValues>}
-        isCategoryRequired={false}
-        isWebsitesRequired={false}
-        isDescriptionRequired={false}
-      />
-      <Stack
-        justifyContent='space-between'
-        flexDirection='row'
-        position='sticky'
-        bottom='0'
-        bgcolor='background.default'
-        py={2}
-      >
-        <Button onClick={onCancel} size='large' color='secondary' variant='outlined'>
-          Cancel
-        </Button>
-        {!isExecuting && errors?.length && <FormErrors errors={errors} />}
-        <Button
-          data-test='project-form-confirm-values'
-          size='large'
-          disabled={isExecuting}
-          onClick={handleSubmit(execute)}
+      {/* add noValidate so that we onyl rely on react-hook-form validation */}
+      <form noValidate onSubmit={handleSubmit(execute)}>
+        <ProjectForm control={control} />
+        <Stack
+          justifyContent='space-between'
+          flexDirection='row'
+          position='sticky'
+          bottom='0'
+          bgcolor='background.default'
+          py={2}
         >
-          Create
-        </Button>
-      </Stack>
+          <Button onClick={onCancel} size='large' color='secondary' variant='outlined'>
+            Cancel
+          </Button>
+          {!isExecuting && errors?.length && <FormErrors errors={errors} />}
+          <Button size='large' type='submit' disabled={isExecuting}>
+            Create
+          </Button>
+        </Stack>
+      </form>
     </>
   );
 }

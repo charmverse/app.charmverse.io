@@ -14,7 +14,7 @@ import { createProductUpdatesFrameAction } from 'lib/productUpdates/createProduc
 import { schema, type FormValues } from 'lib/productUpdates/schema';
 import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid';
 
-export function ProductUpdatesCreateFrameForm({
+export function NewProductUpdateForm({
   connectProjects,
   farcasterUser,
   onCreateProject,

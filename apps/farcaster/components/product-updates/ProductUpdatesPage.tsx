@@ -8,11 +8,10 @@ import { useState } from 'react';
 
 import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid';
 
-import { CreateProjectForm } from '../projects/CreateProjectForm';
+import { NewProductUpdateForm } from './components/NewProductUpdateForm';
+import { NewProjectForm } from './components/NewProjectForm';
 
-import { ProductUpdatesCreateFrameForm } from './components/ProductUpdatesCreateFrameForm';
-
-export function ProductUpdatesComposerAction({
+export function ProductUpdatesPage({
   farcasterUser,
   connectProjects
 }: {
@@ -36,7 +35,7 @@ export function ProductUpdatesComposerAction({
         <FormLabel id='projectId'>Project</FormLabel>
         {isCreatingProject ? (
           <Stack gap={1}>
-            <CreateProjectForm
+            <NewProjectForm
               fid={farcasterUser.fid}
               onCancel={() => {
                 setIsCreatingProject(false);
@@ -48,7 +47,7 @@ export function ProductUpdatesComposerAction({
             />
           </Stack>
         ) : (
-          <ProductUpdatesCreateFrameForm
+          <NewProductUpdateForm
             onCreateProject={() => {
               setIsCreatingProject(true);
             }}

@@ -1,5 +1,5 @@
 import { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
-import type { ProjectCategory as OptimismProjectCategory } from '@connect-shared/lib/projects/projectSchema';
+import type { ProjectCategory as OptimismProjectCategory } from '@root/lib/optimism/constants';
 import { typedKeys } from '@root/lib/utils/objects';
 import { isAddress, type Address } from 'viem';
 import { normalize } from 'viem/ens';
@@ -40,9 +40,9 @@ export const PROJECT_CATEGORIES = [
 
 export const PROJECT_TYPES = typedKeys(SunnyAwardsProjectType);
 
-export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number]['items'][number];
+export type SunnyProjectCategory = (typeof PROJECT_CATEGORIES)[number]['items'][number];
 
-export function getOptimismCategory(category: ProjectCategory): OptimismProjectCategory | undefined {
+export function getOptimismCategory(category: SunnyProjectCategory): OptimismProjectCategory | undefined {
   // @ts-ignore TS can't infer the type of the items array properly
   const group = PROJECT_CATEGORIES.find(({ items }) => items.includes(category));
   return group?.optimismCategory;

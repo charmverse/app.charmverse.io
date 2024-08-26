@@ -23,7 +23,12 @@ export const publishProjectToGitcoinAction = authActionClient
         }
       },
       select: {
-        id: true
+        id: true,
+        project: {
+          select: {
+            id: true
+          }
+        }
       }
     });
 
@@ -32,7 +37,7 @@ export const publishProjectToGitcoinAction = authActionClient
     }
 
     await storeProjectMetadataAndPublishGitcoinAttestation({
-      projectIdOrPath: projectPath,
+      projectPath,
       userId: ctx.session.user.id
     });
 
