@@ -1,6 +1,7 @@
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { v4 as uuid, v4 } from 'uuid';
 
+import type { GitcoinEasyRetroPGFProject } from '../mapProjectToGitcoin';
 import { mapProjectToGitcoin } from '../mapProjectToGitcoin';
 
 describe('mapProjectToGitcoin', () => {
@@ -60,16 +61,10 @@ describe('mapProjectToGitcoin', () => {
 
     const agoraProjectRefUID = '0xcb23e3db5e22faab1050eacf85d3b5c119cc54afb315e3442ae36c6028bd6147';
 
-    const expectedOutput = {
+    const expectedOutput: GitcoinEasyRetroPGFProject = {
       name: 'Project X',
-      projectAvatarUrl: 'avatar.png',
-      projectCoverImageUrl: 'cover.jpg',
       bio: 'A sample project',
       websiteUrl: 'https://example.com',
-      payoutAddress: '', // Placeholder
-      contributionDescription: 'A sample project',
-      impactDescription: '', // Placeholder
-      impactCategory: [], // Placeholder
       contributionLinks: [
         {
           description: 'Github Repository',
@@ -87,13 +82,18 @@ describe('mapProjectToGitcoin', () => {
           url: 'https://example.com'
         }
       ],
-      impactMetrics: [], // Placeholder
-      fundingSources: [], // Placeholder,
-      contracts: [{ chainId: 10, address: input.primaryContractAddress }],
-      mintingWalletAddress: input.mintingWalletAddress || '',
-      projectReferences: {
-        charmverseId: input.id,
-        agoraProjectRefUID
+      sunnyAwards: {
+        projectType: '', // Placeholder
+        category: '', // Placeholder
+        categoryDetails: '', // Placeholder
+        contracts: [{ chainId: 10, address: input.primaryContractAddress as string }],
+        mintingWalletAddress: input.mintingWalletAddress || '',
+        projectReferences: {
+          charmverseId: input.id,
+          agoraProjectRefUID
+        },
+        avatarUrl: 'avatar.png',
+        coverImageUrl: 'cover.jpg'
       }
     };
 

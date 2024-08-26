@@ -38,6 +38,29 @@ function generateContributionLinks(input: ConnectProjectDetails) {
   return links;
 }
 
+export type GitcoinEasyRetroPGFProject = {
+  name: string;
+  bio: string;
+  websiteUrl: string;
+  contributionLinks: { description: string; type: string; url: string }[];
+  sunnyAwards: {
+    projectType: string;
+    category: string;
+    categoryDetails: string;
+    contracts: {
+      chainId: number;
+      address: string;
+    }[];
+    mintingWalletAddress: string;
+    projectReferences: {
+      charmverseId: string;
+      agoraProjectRefUID: string;
+    };
+    avatarUrl: string;
+    coverImageUrl: string;
+  };
+};
+
 // TBD - Fields
 export function mapProjectToGitcoin({
   project,
@@ -45,7 +68,7 @@ export function mapProjectToGitcoin({
 }: {
   project: ConnectProjectDetails;
   agoraProjectRefUID?: string;
-}) {
+}): GitcoinEasyRetroPGFProject {
   return {
     name: project.name || '', // Direct mapping
     bio: project.description || '', // Assuming bio comes from description
