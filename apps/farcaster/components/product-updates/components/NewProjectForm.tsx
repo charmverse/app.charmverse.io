@@ -44,16 +44,8 @@ export function NewProjectForm({
   const { control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       name: '',
-      description: '',
-      websites: [''],
-      farcasterValues: [''],
-      twitter: '',
-      github: '',
-      projectMembers: [
-        {
-          farcasterId: fid
-        }
-      ]
+      avatar: '',
+      teamLeadFarcasterId: fid
     },
     resolver: yupResolver(schema),
     mode: 'onChange'

@@ -39,9 +39,7 @@ export function ProductUpdatesPage({
           </Stack>
         ) : (
           <NewProductUpdateForm
-            onCreateProject={() => {
-              setIsCreatingProject(true);
-            }}
+            onClickCreateProject={() => setIsCreatingProject(true)}
             projectId={defaultProjectId}
             connectProjects={connectProjects}
             farcasterUser={farcasterUser}

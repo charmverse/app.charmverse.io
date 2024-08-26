@@ -3,7 +3,17 @@
 import { log } from '@charmverse/core/log';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/Add';
-import { Stack, Button, Divider, FormLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import {
+  Stack,
+  Button,
+  Divider,
+  FormLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  ListItemIcon
+} from '@mui/material';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';
@@ -14,15 +24,17 @@ import { createProductUpdatesFrameAction } from 'lib/productUpdates/createProduc
 import { schema, type FormValues } from 'lib/productUpdates/schema';
 import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid';
 
+import { ProjectAvatar } from './ProjectAvatar';
+
 export function NewProductUpdateForm({
   connectProjects,
   farcasterUser,
-  onCreateProject,
+  onClickCreateProject,
   projectId
 }: {
   farcasterUser: FarcasterUser;
   connectProjects: ConnectProjectMinimal[];
-  onCreateProject: VoidFunction;
+  onClickCreateProject: VoidFunction;
   projectId: string;
 }) {
   const { control, handleSubmit, reset, setValue } = useForm<FormValues>({
@@ -65,7 +77,7 @@ export function NewProductUpdateForm({
   if (connectProjects.length === 0) {
     return (
       <div>
-        <Button onClick={onCreateProject} size='large'>
+        <Button onClick={onClickCreateProject} size='large'>
           Create a project to get started
         </Button>
       </div>
@@ -99,8 +111,16 @@ export function NewProductUpdateForm({
                 fullWidth
                 disabled={isExecuting}
                 renderValue={(value) => {
-                  if (value) {
-                    return connectProjects.find((project) => project.id === value)?.name;
+                  const project = connectProjects.find((p) => p.id === value);
+                  if (project) {
+                    return (
+                      <Stack direction='row'>
+                        <ListItemIcon>
+                          <ProjectAvatar src={project.avatar} />
+                        </ListItemIcon>
+                        {project.name}
+                      </Stack>
+                    );
                   }
                   return <Typography color='secondary'>Select a project</Typography>;
                 }}
@@ -109,11 +129,14 @@ export function NewProductUpdateForm({
               >
                 {connectProjects.map((connectProject) => (
                   <MenuItem key={connectProject.id} value={connectProject.id}>
+                    <ListItemIcon>
+                      <ProjectAvatar src={connectProject.avatar} />
+                    </ListItemIcon>
                     {connectProject.name}
                   </MenuItem>
                 ))}
                 <Divider />
-                <MenuItem key='create-project' onClick={onCreateProject}>
+                <MenuItem key='create-project' onClick={onClickCreateProject}>
                   <AddIcon sx={{ mr: 0.5 }} fontSize='small' />
                   Create project
                 </MenuItem>
