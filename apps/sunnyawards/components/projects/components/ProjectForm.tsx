@@ -180,7 +180,7 @@ export function ProjectForm({
                 {PROJECT_CATEGORIES.map(({ group, items }) => [
                   <ListSubheader key={group}>{group}</ListSubheader>,
                   ...items.map((category) => (
-                    <MenuItem key={category} value={category} sx={{ pl: 5 }}>
+                    <MenuItem key={category + group} value={category} sx={{ pl: 5 }}>
                       {category}
                     </MenuItem>
                   ))
