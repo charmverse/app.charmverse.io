@@ -6,10 +6,12 @@ import { lowerCaseEqual } from '@root/lib/utils/strings';
 
 export async function syncProposalPermissionsWithWorkflowPermissions({
   proposalId,
-  evaluationIds
+  evaluationIds,
+  tx
 }: {
   proposalId: string;
   evaluationIds?: string[];
+  tx?: Prisma.TransactionClient;
 }): Promise<void> {
   const proposalWithEvaluations = await prisma.proposal.findUniqueOrThrow({
     where: {
@@ -35,8 +37,9 @@ export async function syncProposalPermissionsWithWorkflowPermissions({
 
   const totalProposalEvaluations = proposalWithEvaluations.evaluations.length;
 
-  // This allows the proposal to have more evaluations than the workflow at the end, as long as all previous evaluations match the workflow
-  await prisma.$transaction(async (tx) => {
+  // Wrap the mutation in a transaction so the proposal state is consistent
+  async function txHandler(_tx: Prisma.TransactionClient) {
+    // This allows the proposal to have more evaluations than the workflow at the end, as long as all previous evaluations match the workflow
     for (let i = 0; i < totalProposalEvaluations; i++) {
       const proposalEvaluation = proposalWithEvaluations.evaluations[i];
       const workflowEvaluation = workflowEvaluations[i];
@@ -59,13 +62,13 @@ export async function syncProposalPermissionsWithWorkflowPermissions({
 
         const workflowPermissions = workflowEvaluation.permissions;
 
-        await tx.proposalEvaluationPermission.deleteMany({
+        await _tx.proposalEvaluationPermission.deleteMany({
           where: {
             evaluationId: proposalEvaluation.id
           }
         });
 
-        await tx.proposalEvaluationPermission.createMany({
+        await _tx.proposalEvaluationPermission.createMany({
           data: workflowPermissions.map(
             (permission) =>
               ({
@@ -79,5 +82,11 @@ export async function syncProposalPermissionsWithWorkflowPermissions({
         });
       }
     }
-  });
+  }
+
+  if (tx) {
+    await txHandler(tx);
+  } else {
+    await prisma.$transaction(txHandler);
+  }
 }
