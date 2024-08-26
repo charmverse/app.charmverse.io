@@ -14,10 +14,6 @@ export const getCurrentUserAction = authActionClient
   .action<LoggedInUser | null>(async ({ ctx }) => {
     const userId = ctx.session.user?.id;
 
-    if (!userId) {
-      return null;
-    }
-
     const user = await prisma.user.findUniqueOrThrow({
       where: {
         id: userId

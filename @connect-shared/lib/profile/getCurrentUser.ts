@@ -12,7 +12,7 @@ export async function getCurrentUser(userId?: string): Promise<LoggedInUser | nu
     return null;
   }
 
-  const user = await prisma.user.findFirst({
+  const user = await prisma.user.findUnique({
     where: {
       id: userId
     },

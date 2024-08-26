@@ -17,6 +17,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
+  if (user && path === '/') {
+    return NextResponse.redirect(new URL('/profile', request.url));
+  }
+
   return NextResponse.next();
 }
 

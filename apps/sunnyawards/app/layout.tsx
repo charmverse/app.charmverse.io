@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { AppProviders } from '@connect-shared/components/layout/AppProviders';
 import { getCurrentUser } from '@connect-shared/lib/profile/getCurrentUser';
 import { getSession } from '@connect-shared/lib/session/getSession';
@@ -34,13 +33,7 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const session = await getSession();
-  const userId = session.user?.id;
-  const user = await getCurrentUser(userId);
-
-  if (userId && !user?.id) {
-    session.destroy();
-    log.warn('User has a session that is not found in the db', { userId });
-  }
+  const user = await getCurrentUser(session.user?.id);
 
   return (
     <html lang='en'>
