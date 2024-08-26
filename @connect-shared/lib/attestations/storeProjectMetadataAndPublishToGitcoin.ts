@@ -1,4 +1,5 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { GitcoinProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
@@ -57,7 +58,8 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
 
   const existingAttestations = await prisma.gitcoinProjectAttestation.findMany({
     where: {
-      projectId: project.id
+      projectId: project.id,
+      chainId: projectAttestationChainId
     }
   });
 
@@ -80,6 +82,8 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
         }
       }
     });
+
+    log.info('New Gitcoin Profile attestation UID:', profileAttestationUID);
 
     await prisma.gitcoinProjectAttestation.create({
       data: {
@@ -111,6 +115,8 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
       }
     }
   });
+
+  log.info('New Gitcoin Project attestation UID:', projectAttestationUID);
 
   return prisma.gitcoinProjectAttestation.create({
     data: {
