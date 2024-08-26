@@ -7,9 +7,8 @@ import type { EditProjectValues } from '@connect-shared/lib/projects/editProject
 import { editProject } from '@connect-shared/lib/projects/editProject';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
+import { generateOgImage } from '@root/lib/projects/generateOgImage';
 import { revalidatePath } from 'next/cache';
-
-import { generateOgImage } from 'lib/projects/generateOgImage';
 
 import { schema } from './schema';
 

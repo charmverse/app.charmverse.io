@@ -9,9 +9,9 @@ import { createProject } from '@connect-shared/lib/projects/createProject';
 import { isTestEnv } from '@root/config/constants';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
+import { generateOgImage } from '@root/lib/projects/generateOgImage';
 
 import { sendProjectConfirmationEmail } from 'lib/mailer/sendProjectConfirmationEmail';
-import { generateOgImage } from 'lib/projects/generateOgImage';
 
 import { getOptimismCategory, schema } from './schema';
 
