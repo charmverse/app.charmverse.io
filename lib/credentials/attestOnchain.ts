@@ -3,10 +3,9 @@ import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { credentialsWalletPrivateKey } from '@root/config/constants';
 import { getChainById } from '@root/connectors/chains';
+import { getCurrentGasPrice } from '@root/lib/blockchain/getCurrentGasPrice';
+import { getEthersProvider } from '@root/lib/blockchain/getEthersProvider';
 import { Wallet } from 'ethers';
-
-import { getCurrentGasPrice } from '../blockchain/getCurrentGasPrice';
-import { getEthersProvider } from '../blockchain/getEthersProvider';
 
 import type { EasSchemaChain } from './connectors';
 import { getEasInstance } from './getEasInstance';
