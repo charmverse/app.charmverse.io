@@ -1,6 +1,5 @@
 import { Avatar } from '@connect-shared/components/common/Avatar';
 import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
-import type { ProjectsWithMembers } from '@connect-shared/lib/projects/getRecentProjectsWithMembers';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
@@ -9,6 +8,8 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Link from 'next/link';
+
+import type { ProjectsWithMembers } from 'lib/projects/getRecentProjectsWithMembers';
 
 export function ProjectItem({ project }: { project: ProjectsWithMembers[0] }) {
   const projectMembers = project.projectMembers;

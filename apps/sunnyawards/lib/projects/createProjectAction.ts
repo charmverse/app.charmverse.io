@@ -5,7 +5,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { trackMixpanelEvent } from '@connect-shared/lib/mixpanel/trackMixpanelEvent';
-import { createProject } from '@connect-shared/lib/projects/createProject';
 import { isTestEnv } from '@root/config/constants';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
@@ -13,6 +12,7 @@ import { generateOgImage } from '@root/lib/projects/generateOgImage';
 
 import { sendProjectConfirmationEmail } from 'lib/mailer/sendProjectConfirmationEmail';
 
+import { createProject } from './createProject';
 import { getOptimismCategory, schema } from './schema';
 
 export const createProjectAction = authActionClient
@@ -33,9 +33,7 @@ export const createProjectAction = authActionClient
       userId: currentUserId,
       input: {
         ...input,
-        sunnyAwardsNumber: totalProjects + 1,
-        optimismCategory: getOptimismCategory(input.sunnyAwardsCategory),
-        primaryContractChainId: input.primaryContractChainId ? parseInt(input.primaryContractChainId) : undefined
+        sunnyAwardsNumber: totalProjects + 1
       },
       source: 'sunny_awards'
     });

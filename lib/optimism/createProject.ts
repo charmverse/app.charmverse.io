@@ -11,7 +11,7 @@ import { stringToValidPath, uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
 import { v4 } from 'uuid';
 
-import type { FormValues } from './projectSchema';
+// import type { FormValues } from './projectSchema';
 
 export async function createProject({
   source,

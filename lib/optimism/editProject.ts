@@ -5,7 +5,7 @@ import { resolveENSName } from '@root/lib/blockchain';
 import { ensureFarcasterUserExists } from '@root/lib/farcaster/ensureFarcasterUserExists';
 import { isTruthy } from '@root/lib/utils/types';
 
-import type { FormValues } from './projectSchema';
+// import type { FormValues } from './projectSchema';
 
 export type EditProjectValues = FormValues &
   Partial<Pick<Project, 'primaryContractAddress' | 'mintingWalletAddress' | 'sunnyAwardsProjectType'>> & {

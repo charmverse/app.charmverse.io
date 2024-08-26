@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
-import { createProject } from '@connect-shared/lib/projects/createProject';
 import fetchMock from 'fetch-mock-jest';
+
+import { createProject } from 'lib/projects/createProject';
 
 const mockSandbox = fetchMock.sandbox();
 
