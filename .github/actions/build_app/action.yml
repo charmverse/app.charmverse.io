@@ -9,7 +9,7 @@ runs:
   using: 'composite'
   steps:
 
-    - name: Get last Git commit hash modifying packages/abc
+    - name: Get last Git commit hashes for cache key
       shell: bash
       # Instead of hasing files, use the latest git commit in a directory to speed up cache key https://github.com/actions/runner/issues/1840#issuecomment-2094847172
       run: |
@@ -28,7 +28,7 @@ runs:
         # key: app-${{ inputs.app_name }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts', 'lib/**/*.tsx', '@connect-shared/**/*.ts', '@connect-shared/**/*.tsx', format('apps/{0}/**/*.ts', inputs.app_name), format('apps/{0}/**/*.tsx', inputs.app_name), format('apps/{0}/**/*.scss', inputs.app_name)) }}
         key: app-${{ inputs.app_name }}-${{ env.NPM_PACKAGES_COMMIT }}-${{ env.SOURCE_CODE_COMMIT }}
         restore-keys: |
-          app-${{ inputs.app_name }}-${{ npm_packages_commit }}-
+          app-${{ inputs.app_name }}-${{ env.NPM_PACKAGES_COMMIT }}-
 
     - name: Build app
       shell: bash
