@@ -33,16 +33,16 @@ export const editProjectAction = authActionClient
         log.error('Failed to store and publish updated project metadata attestation', { error, userId: currentUserId });
       });
 
-      await storeCharmverseProjectMetadata({
-        chainId: charmverseProjectDataChainId,
-        projectId: editedProject.id
-      }).catch((error) => {
-        log.error('Failed to store charmverse project metadata', {
-          error,
-          projectId: editedProject.id,
-          userId: editedProject.createdBy
-        });
-      });
+      // await storeCharmverseProjectMetadata({
+      //   chainId: charmverseProjectDataChainId,
+      //   projectId: editedProject.id
+      // }).catch((error) => {
+      //   log.error('Failed to store charmverse project metadata', {
+      //     error,
+      //     projectId: editedProject.id,
+      //     userId: editedProject.createdBy
+      //   });
+      // });
     }
 
     revalidatePath(`/p/${editedProject.path}`);

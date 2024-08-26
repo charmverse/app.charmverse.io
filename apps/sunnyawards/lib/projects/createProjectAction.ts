@@ -52,16 +52,16 @@ export const createProjectAction = authActionClient
         });
       });
 
-      await storeCharmverseProjectMetadata({
-        chainId: charmverseProjectDataChainId,
-        projectId: newProject.id
-      }).catch((error) => {
-        log.error('Failed to store charmverse project attestations', {
-          error,
-          projectId: newProject.id,
-          userId: newProject.createdBy
-        });
-      });
+      // await storeCharmverseProjectMetadata({
+      //   chainId: charmverseProjectDataChainId,
+      //   projectId: newProject.id
+      // }).catch((error) => {
+      //   log.error('Failed to store charmverse project attestations', {
+      //     error,
+      //     projectId: newProject.id,
+      //     userId: newProject.createdBy
+      //   });
+      // });
     }
 
     if (!isTestEnv) {
