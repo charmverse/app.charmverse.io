@@ -1,4 +1,5 @@
 import { getCurrentUser } from '@connect-shared/lib/profile/getCurrentUser';
+import { getSession } from '@connect-shared/lib/session/getSession';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -14,7 +15,8 @@ export const metadata: Metadata = {
 };
 
 export default async function Welcome() {
-  const user = await getCurrentUser();
+  const session = await getSession();
+  const user = await getCurrentUser(session.user?.id);
 
   if (!user) {
     return null;
