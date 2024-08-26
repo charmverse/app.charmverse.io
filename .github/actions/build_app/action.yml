@@ -9,6 +9,13 @@ runs:
   using: 'composite'
   steps:
 
+    - name: Get last Git commit hash modifying packages/abc
+      shell: bash
+      # Instead of hasing files, use the latest git commit in a directory to speed up cache key https://github.com/actions/runner/issues/1840#issuecomment-2094847172
+      run: |
+        echo "NPM_PACKAGES_COMMIT=$(git log -1 --pretty=format:%H -- package-lock.json)" >> $GITHUB_ENV
+        echo "SOURCE_CODE_COMMIT=$(git log -1 --pretty=format:%H -- lib @connect-shared apps/${{ inputs.app_name }})" >> $GITHUB_ENV
+
     - name: Restore build
       id: restore_build
       uses: actions/cache@v4
@@ -18,9 +25,10 @@ runs:
           apps/${{ inputs.app_name }}/.next
           apps/${{ inputs.app_name }}/public
         # Generate a new cache whenever packages or source files change.
-        key: app-${{ inputs.app_name }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts', 'lib/**/*.tsx', '@connect-shared/**/*.ts', '@connect-shared/**/*.tsx', format('apps/{0}/**/*.ts', inputs.app_name), format('apps/{0}/**/*.tsx', inputs.app_name), format('apps/{0}/**/*.scss', inputs.app_name)) }}
+        # key: app-${{ inputs.app_name }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('lib/**/*.ts', 'lib/**/*.tsx', '@connect-shared/**/*.ts', '@connect-shared/**/*.tsx', format('apps/{0}/**/*.ts', inputs.app_name), format('apps/{0}/**/*.tsx', inputs.app_name), format('apps/{0}/**/*.scss', inputs.app_name)) }}
+        key: app-${{ inputs.app_name }}-${{ env.NPM_PACKAGES_COMMIT }}-${{ env.SOURCE_CODE_COMMIT }}
         restore-keys: |
-          app-${{ inputs.app_name }}-${{ hashFiles('**/package-lock.json') }}-
+          app-${{ inputs.app_name }}-${{ npm_packages_commit }}-
 
     - name: Build app
       shell: bash
