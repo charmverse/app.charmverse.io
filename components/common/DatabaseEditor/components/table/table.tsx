@@ -1,7 +1,7 @@
 import { Add } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
-import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import React, { useCallback, useEffect, memo, useRef } from 'react';
+import type { Dispatch, LegacyRef, ReactNode, SetStateAction } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
@@ -52,9 +52,10 @@ type Props = {
   hideCalculations?: boolean;
 };
 
-const TableRowsContainer = memo(({ children }: { children: ReactNode }) => {
+const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
   return (
     <div
+      ref={ref as LegacyRef<HTMLDivElement>}
       className='table-row-container'
       style={{
         // Adding 2px margin top to show the drag and drop outline, otherwise the table header blocks it,
@@ -87,6 +88,7 @@ function Table(props: Props): JSX.Element {
     boardType
   } = props;
   const dispatch = useAppDispatch();
+  const selectContainerRef = useRef<HTMLDivElement | null>(null);
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
   const areaSelection = useAreaSelection({ readOnly, innerContainer: tableContainerRef });
   const { resetState } = areaSelection;
@@ -322,7 +324,7 @@ function Table(props: Props): JSX.Element {
 
         {/* Table rows */}
         <SelectionContext.Provider value={areaSelection}>
-          <TableRowsContainer>
+          <TableRowsContainer ref={selectContainerRef}>
             {activeView.fields.groupById && (
               <TableGroups
                 groups={visibleGroups}

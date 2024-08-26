@@ -137,8 +137,8 @@ function TableRow(props: Props) {
     enabled: isDragAndDropEnabled
   });
 
-  // const { selection } = useContext(SelectionContext);
-  // const isSelected = useSelected(cardRef, selection);
+  const { selection } = useContext(SelectionContext);
+  const isSelected = useSelected(cardRef, selection);
 
   const handleDeleteCard = async () => {
     if (!card) {
@@ -169,20 +169,19 @@ function TableRow(props: Props) {
     }
   }, []);
 
-  // TODO: Detect highlighted rows from the code which manages the selection, instead of each row individually
-  // useEffect(() => {
-  //   if (setCheckedIds && selection) {
-  //     setCheckedIds((checkedIds) => {
-  //       if (isSelected && !checkedIds.includes(card.id)) {
-  //         return Array.from(new Set([...checkedIds, card.id]));
-  //       } else if (!isSelected && checkedIds.includes(card.id)) {
-  //         return checkedIds.filter((checkedId) => checkedId !== card.id);
-  //       }
+  useEffect(() => {
+    if (setCheckedIds && selection) {
+      setCheckedIds((checkedIds) => {
+        if (isSelected && !checkedIds.includes(card.id)) {
+          return Array.from(new Set([...checkedIds, card.id]));
+        } else if (!isSelected && checkedIds.includes(card.id)) {
+          return checkedIds.filter((checkedId) => checkedId !== card.id);
+        }
 
-  //       return checkedIds;
-  //     });
-  //   }
-  // }, [isSelected, !!selection]);
+        return checkedIds;
+      });
+    }
+  }, [isSelected, !!selection]);
 
   useEffect(() => {
     setTitle(pageTitle);
@@ -218,8 +217,7 @@ function TableRow(props: Props) {
       ref={mergeRefs([cardRef, preview, drop])}
       style={{
         backgroundColor:
-          // isSelected || isChecked ? 'rgba(35, 131, 226, 0.14)' : isNested ? 'var(--input-bg)' : 'transparent',
-          isChecked ? 'rgba(35, 131, 226, 0.14)' : isNested ? 'var(--input-bg)' : 'transparent',
+          isSelected || isChecked ? 'rgba(35, 131, 226, 0.14)' : isNested ? 'var(--input-bg)' : 'transparent',
         zIndex: 85,
         ...style
       }}
