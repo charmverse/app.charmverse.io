@@ -16,6 +16,7 @@ import {
   CREATED_AT_ID,
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_VIEW_BLOCK_ID,
+  PROPOSAL_EVALUATION_DUE_DATE_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID
@@ -73,6 +74,7 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
     },
     { ...defaultOptions, ...proposalDbProperties.proposalReviewer() },
     getPublishedAtProperty(),
+    getDefaultEvaluationDueDateProperty(),
     { ...defaultOptions, ...proposalDbProperties.proposalCreatedAt() },
     {
       ...defaultOptions,
@@ -118,6 +120,15 @@ export function getPublishedAtProperty() {
   };
 }
 
+export function getDefaultEvaluationDueDateProperty() {
+  return {
+    ...defaultOptions,
+    ...proposalDbProperties.proposalEvaluationDueDate({
+      name: 'Due Date'
+    })
+  };
+}
+
 export function getDefaultTableView({ board }: { board: Board }) {
   const view = createTableView({ board });
 
@@ -129,6 +140,7 @@ export function getDefaultTableView({ board }: { board: Board }) {
     [PROPOSAL_STATUS_BLOCK_ID]: 150,
     [AUTHORS_BLOCK_ID]: 150,
     [PROPOSAL_REVIEWERS_BLOCK_ID]: 150,
+    [PROPOSAL_EVALUATION_DUE_DATE_ID]: 150,
     [updatedTimeProperty!.id]: 180
   };
 

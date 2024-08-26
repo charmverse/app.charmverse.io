@@ -18,6 +18,7 @@ COPY --parents @connect-shared  \
   node_modules                  \
   apps/sunnyawards/node_modules \
   apps/sunnyawards/package.json \
+  apps/sunnyawards/next.config.js \
   package.json                  \
   .
 

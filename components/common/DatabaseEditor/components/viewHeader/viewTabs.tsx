@@ -184,7 +184,7 @@ export const StyledTab = React.forwardRef(
   }
 );
 
-function ViewTab({
+export function ViewTab({
   view,
   onClick,
   onDrop,
