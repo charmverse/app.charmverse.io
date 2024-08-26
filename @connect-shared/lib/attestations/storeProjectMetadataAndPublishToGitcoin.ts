@@ -12,7 +12,7 @@ import { findProject } from '../projects/findProject';
 import { projectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
 
-const currentGitcoinRound = 'cm056odzs0005jncj965672o3';
+const currentGitcoinRound = 'cm0ayus350005zwyb4vtureu1';
 
 export async function storeProjectMetadataAndPublishGitcoinAttestation({
   userId,
@@ -55,7 +55,48 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     projectOrProjectId: project
   });
 
-  const projectAttestationUID = await attestOnchain({
+  const existingAttestations = await prisma.gitcoinProjectAttestation.findMany({
+    where: {
+      projectId: project.id
+    }
+  });
+
+  const existingProjectAttestation = existingAttestations.find((a) => a.type === 'application');
+  const existingProfileAttestation = existingAttestations.find((a) => a.type === 'profile');
+
+  if (!existingProfileAttestation) {
+    const profileAttestationUID: string = await attestOnchain({
+      type: 'gitcoinProject',
+      chainId: projectAttestationChainId,
+      credentialInputs: {
+        recipient: fcProfile.connectedAddress ?? fcProfile.connectedAddresses[0] ?? fcProfile.body.address,
+        data: {
+          name: fcProfile.body.username,
+          metadataPtr: profileFilePath,
+          metadataType: 0,
+          type: 'profile',
+          round: currentGitcoinRound,
+          uuid: project.id
+        }
+      }
+    });
+
+    await prisma.gitcoinProjectAttestation.create({
+      data: {
+        project: { connect: { id: project.id } },
+        attestationUID: profileAttestationUID,
+        chainId: projectAttestationChainId,
+        schemaId: gitcoinProjectCredentialSchemaId,
+        type: 'profile'
+      }
+    });
+  }
+
+  if (existingProjectAttestation) {
+    return existingProjectAttestation;
+  }
+
+  const projectAttestationUID: string = await attestOnchain({
     type: 'gitcoinProject',
     chainId: projectAttestationChainId,
     credentialInputs: {
@@ -70,40 +111,14 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
       }
     }
   });
-  const profileAttestationUID = await attestOnchain({
-    type: 'gitcoinProject',
-    chainId: projectAttestationChainId,
-    credentialInputs: {
-      recipient: fcProfile.connectedAddress ?? fcProfile.connectedAddresses[0] ?? fcProfile.body.address,
-      data: {
-        name: fcProfile.body.username,
-        metadataPtr: profileFilePath,
-        metadataType: 0,
-        type: 'profile',
-        round: currentGitcoinRound,
-        uuid: project.id
-      }
+
+  return prisma.gitcoinProjectAttestation.create({
+    data: {
+      project: { connect: { id: project.id } },
+      attestationUID: projectAttestationUID,
+      chainId: projectAttestationChainId,
+      schemaId: gitcoinProjectCredentialSchemaId,
+      type: 'application'
     }
   });
-
-  const [storedProjectAttestation] = await Promise.all([
-    prisma.gitcoinProjectAttestation.create({
-      data: {
-        project: { connect: { id: project.id } },
-        attestationUID: projectAttestationUID,
-        chainId: projectAttestationChainId,
-        schemaId: gitcoinProjectCredentialSchemaId
-      }
-    }),
-    prisma.gitcoinProjectAttestation.create({
-      data: {
-        project: { connect: { id: project.id } },
-        attestationUID: profileAttestationUID,
-        chainId: projectAttestationChainId,
-        schemaId: gitcoinProjectCredentialSchemaId
-      }
-    })
-  ]);
-
-  return storedProjectAttestation;
 }

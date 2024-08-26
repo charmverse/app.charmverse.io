@@ -48,31 +48,29 @@ export function mapProjectToGitcoin({
 }) {
   return {
     name: project.name || '', // Direct mapping
-    projectAvatarUrl: project.avatar || '', // Direct mapping
-    projectCoverImageUrl: project.coverImage || '', // Direct mapping
     bio: project.description || '', // Assuming bio comes from description
     websiteUrl: project.websites?.[0] || '', // Taking the first website URL
-    contributionDescription: project.description,
     contributionLinks: generateContributionLinks(project),
-    // -------------- Missing fields
-    impactCategory: [], // Assuming no direct mapping for categories
-    impactDescription: '', // Placeholder: requires specific input
-    payoutAddress: '',
-    impactMetrics: [],
-    fundingSources: [],
-    contracts:
-      project.primaryContractChainId && project.primaryContractAddress
-        ? [
-            {
-              chainId: project.primaryContractChainId,
-              address: project.primaryContractAddress
-            }
-          ]
-        : [],
-    mintingWalletAddress: project.mintingWalletAddress || '',
-    projectReferences: {
-      charmverseId: project.id,
-      agoraProjectRefUID: agoraProjectRefUID || ''
+    sunnyAwards: {
+      projectType: project.sunnyAwardsProjectType || '',
+      category: project.sunnyAwardsCategory || '',
+      categoryDetails: project.sunnyAwardsCategoryDetails || '',
+      contracts:
+        project.primaryContractChainId && project.primaryContractAddress
+          ? [
+              {
+                chainId: project.primaryContractChainId,
+                address: project.primaryContractAddress
+              }
+            ]
+          : [],
+      mintingWalletAddress: project.mintingWalletAddress || '',
+      projectReferences: {
+        charmverseId: project.id,
+        agoraProjectRefUID: agoraProjectRefUID || ''
+      },
+      avatarUrl: project.avatar || '',
+      coverImageUrl: project.coverImage || ''
     }
   };
 }
