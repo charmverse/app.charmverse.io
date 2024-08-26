@@ -33,17 +33,16 @@ export async function syncProposalPermissionsWithWorkflowPermissions({
 
   const workflowEvaluations = workflow.evaluations;
 
-  if (proposalWithEvaluations.workflowId !== workflow.id) {
-    throw new InvalidInputError(`Proposal does not have the same workflow as the provided workflow`);
-  }
+  const totalProposalEvaluations = proposalWithEvaluations.evaluations.length;
 
+  // This allows the proposal to have more evaluations than the workflow at the end, as long as all previous evaluations match the workflow
   await prisma.$transaction(async (tx) => {
-    for (let i = 0; i < workflowEvaluations.length; i++) {
+    for (let i = 0; i < totalProposalEvaluations; i++) {
       const proposalEvaluation = proposalWithEvaluations.evaluations[i];
       const workflowEvaluation = workflowEvaluations[i];
 
-      if (!proposalEvaluation) {
-        throw new InvalidInputError(`Proposal does not have an evaluation at index ${i}`);
+      if (!workflowEvaluation) {
+        throw new InvalidInputError(`Workf;ow does not have an evaluation at index ${i}`);
       }
 
       // Only proceed if evaluationIds is empty (sync everything) or the current evaluation id is in the list

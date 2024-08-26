@@ -170,19 +170,6 @@ describe('syncProposalPermissionsWithWorkflowPermissions', () => {
 
   // Error case 1: Proposal missing an evaluation at index
   it('should throw error when proposal does not have a corresponding evaluation by title and evaluation type at the index', async () => {
-    const invalidProposalByMissingEvaluation = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: user.id,
-      evaluationInputs: [],
-      workflowId: workflow.id
-    });
-
-    await expect(
-      syncProposalPermissionsWithWorkflowPermissions({
-        proposalId: invalidProposalByMissingEvaluation.id
-      })
-    ).rejects.toThrow(InvalidInputError);
-
     const invalidProposalByNotMatchingTitle = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
