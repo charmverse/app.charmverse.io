@@ -69,7 +69,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const [showSidebar, setShowSidebar] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const { router, updateURLQuery } = useCharmRouter();
-  const viewId = 'all'; // (router.query.viewId || 'all') as 'all' | 'my-work';
+  const viewId = (router.query.viewId || 'all') as 'all' | 'my-work';
 
   const onShowDescription = useCallback(() => {
     const oldBlocks = [activeBoard];
@@ -255,11 +255,11 @@ export function ProposalsPage({ title }: { title: string }) {
                   {
                     id: 'all',
                     label: 'All'
+                  },
+                  {
+                    id: 'my-work',
+                    label: 'My Work'
                   }
-                  // {
-                  //   id: 'my-work',
-                  //   label: 'My Work'
-                  // }
                 ].map((view) => {
                   return (
                     <StyledTab
