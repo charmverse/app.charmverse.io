@@ -21,6 +21,7 @@ export type UpdateEvaluationRequest = {
   evaluationApprovers?: Partial<Pick<ProposalEvaluationApprover, 'userId' | 'roleId'>>[] | null;
   finalStep?: boolean | null;
   shareReviews?: boolean | null;
+  dueDate?: Date | null;
 };
 
 export async function updateProposalEvaluation({
@@ -35,7 +36,8 @@ export async function updateProposalEvaluation({
   requiredReviews,
   currentEvaluationType,
   finalStep,
-  shareReviews
+  shareReviews,
+  dueDate
 }: UpdateEvaluationRequest & { currentEvaluationType?: ProposalEvaluationType; actorId: string; spaceId: string }) {
   await prisma.$transaction(async (tx) => {
     // update reviewers only when it is present in request payload
@@ -99,6 +101,9 @@ export async function updateProposalEvaluation({
     }
     if (shareReviews !== undefined) {
       updateData.shareReviews = shareReviews;
+    }
+    if (dueDate !== undefined) {
+      updateData.dueDate = dueDate;
     }
 
     if (Object.keys(updateData).length > 0) {

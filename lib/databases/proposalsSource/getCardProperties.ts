@@ -46,7 +46,7 @@ export type ProposalData = {
     authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
     evaluations: (Pick<
       ProposalEvaluation,
-      'id' | 'index' | 'result' | 'title' | 'type' | 'requiredReviews' | 'finalStep' | 'appealedAt'
+      'id' | 'index' | 'result' | 'title' | 'type' | 'requiredReviews' | 'finalStep' | 'appealedAt' | 'dueDate'
     > & {
       reviewers: ProposalReviewer[];
       rubricAnswers: ProposalRubricCriteriaAnswer[];
@@ -109,7 +109,8 @@ const pageSelectObject = {
           requiredReviews: true,
           finalStep: true,
           appealedAt: true,
-          reviewers: true
+          reviewers: true,
+          dueDate: true
         },
         orderBy: {
           index: 'asc'
@@ -258,6 +259,11 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     properties[proposalProps.proposalPublishedAt.id] = proposal.publishedAt?.getTime() ?? '';
   }
 
+  if (proposalProps.proposalEvaluationDueDate) {
+    const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+    properties[proposalProps.proposalEvaluationDueDate.id] = currentEvaluation?.dueDate?.getTime() ?? '';
+  }
+
   properties = getCardPropertiesFromRubric({
     properties,
     evaluations: proposal.evaluations.filter((e) => e.type === 'rubric'),
@@ -299,6 +305,7 @@ export function getCardPropertyTemplates({ cardProperties }: { cardProperties: I
     proposalStep: cardProperties.find((prop) => prop.type === 'proposalStep'),
     proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl'),
     proposalReviewer: cardProperties.find((prop) => prop.type === 'proposalReviewer'),
-    proposalPublishedAt: cardProperties.find((prop) => prop.type === 'proposalPublishedAt')
+    proposalPublishedAt: cardProperties.find((prop) => prop.type === 'proposalPublishedAt'),
+    proposalEvaluationDueDate: cardProperties.find((prop) => prop.type === 'proposalEvaluationDueDate')
   };
 }

@@ -1,9 +1,8 @@
 import type { ProposalWorkflow, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsProposals, testUtilsPages } from '@charmverse/core/test';
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
-import { v4 as uuid, v4 } from 'uuid';
+import { testUtilsPages } from '@charmverse/core/test';
+import { v4 as uuid } from 'uuid';
 
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
@@ -22,7 +21,7 @@ beforeAll(async () => {
   const generated = await generateUserAndSpace();
   user = generated.user;
   space = generated.space;
-  workflow = await generateProposalWorkflow({ spaceId: space.id });
+  workflow = (await generateProposalWorkflow({ spaceId: space.id })) as ProposalWorkflow;
 });
 
 describe('Creates a page and proposal with relevant configuration', () => {

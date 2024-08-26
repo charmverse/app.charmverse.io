@@ -21,6 +21,12 @@ if (stackNameParam === 'prd-sunnyawards') {
     sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/4618b240-08da-4d91-98c1-ac12362be229'
   });
 }
+// Scout Game production
+else if (stackNameParam === 'prd-scoutgame') {
+  new ProductionStack(app, stackNameParam, deployProps, {
+    sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b901f27e-5a33-4dea-b4fb-39308a580423'
+  });
+}
 // Connect webapp and api production
 else if (stackNameParam.startsWith('prd')) {
   new ProductionStack(app, stackNameParam, deployProps, {

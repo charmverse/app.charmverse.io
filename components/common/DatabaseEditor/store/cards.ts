@@ -201,7 +201,8 @@ export function sortCards(
           template.type === 'proposalEvaluationTotal' ||
           template.type === 'proposalRubricCriteriaTotal' ||
           template.type === 'proposalRubricCriteriaAverage' ||
-          template.type === 'proposalPublishedAt'
+          template.type === 'proposalPublishedAt' ||
+          template.type === 'proposalEvaluationDueDate'
         ) {
           // Always put empty values at the bottom
           if (aValue && !bValue) {

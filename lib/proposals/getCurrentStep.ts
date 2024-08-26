@@ -13,6 +13,7 @@ export type ProposalStep = {
   requiredReviews: number;
   finalStep: boolean | null;
   appealedAt?: Date | null;
+  dueDate?: Date | null;
 };
 
 export function getCurrentStep({
@@ -26,7 +27,7 @@ export function getCurrentStep({
   proposalStatus: ProposalStatus;
   evaluations: Pick<
     ProposalEvaluation,
-    'index' | 'result' | 'title' | 'type' | 'id' | 'requiredReviews' | 'finalStep' | 'appealedAt'
+    'index' | 'result' | 'title' | 'type' | 'id' | 'requiredReviews' | 'finalStep' | 'appealedAt' | 'dueDate'
   >[];
   hasPublishedRewards: boolean;
   hasPendingRewards: boolean;
@@ -59,7 +60,8 @@ export function getCurrentStep({
       index: evaluations.length + 1,
       requiredReviews: 1,
       finalStep: null,
-      appealedAt: null
+      appealedAt: null,
+      dueDate: null
     };
   }
 
@@ -73,7 +75,8 @@ export function getCurrentStep({
       index: evaluations.length + (credentialsEnabled ? 2 : 1),
       requiredReviews: 1,
       finalStep: null,
-      appealedAt: null
+      appealedAt: null,
+      dueDate: null
     };
   }
 
@@ -86,7 +89,8 @@ export function getCurrentStep({
     index: currentEvaluation.index + 1,
     requiredReviews: currentEvaluation.requiredReviews,
     finalStep: currentEvaluation.finalStep,
-    appealedAt: currentEvaluation.appealedAt
+    appealedAt: currentEvaluation.appealedAt,
+    dueDate: currentEvaluation.dueDate
   };
 }
 
@@ -98,6 +102,7 @@ export function getDraftStep(): ProposalStep {
     id: 'draft',
     index: 0,
     requiredReviews: 1,
-    finalStep: null
+    finalStep: null,
+    dueDate: null
   };
 }
