@@ -106,6 +106,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
@@ -147,6 +149,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
@@ -283,8 +287,7 @@ jobs:
             ebextensions: sunnyawards
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
         with:
