@@ -3,6 +3,7 @@ import { getSession } from '@connect-shared/lib/session/getSession';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import { InvalidUser } from 'components/common/InvalidUser';
 import { ProfilePage } from 'components/profile/ProfilePage';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +20,7 @@ export default async function Profile() {
   const user = await getCurrentUser(session.user?.id);
 
   if (!user) {
-    return null;
+    return <InvalidUser />;
   }
 
   if (!user?.connectOnboarded) {
