@@ -1,5 +1,5 @@
 import { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
-import type { ProjectCategory as OptimismProjectCategory } from '@root/lib/optimism/constants';
+import type { ProjectCategory as OptimismProjectCategory } from '@root/lib/optimism/projectSchema';
 import { typedKeys } from '@root/lib/utils/objects';
 import { isAddress, type Address } from 'viem';
 import { normalize } from 'viem/ens';

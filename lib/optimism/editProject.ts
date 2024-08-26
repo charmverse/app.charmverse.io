@@ -5,10 +5,10 @@ import { resolveENSName } from '@root/lib/blockchain';
 import { ensureFarcasterUserExists } from '@root/lib/farcaster/ensureFarcasterUserExists';
 import { isTruthy } from '@root/lib/utils/types';
 
-// import type { FormValues } from './projectSchema';
+import type { FormValues } from './projectSchema';
 
 export type EditProjectValues = FormValues &
-  Partial<Pick<Project, 'primaryContractAddress' | 'mintingWalletAddress' | 'sunnyAwardsProjectType'>> & {
+  Partial<Pick<Project, 'primaryContractAddress' | 'mintingWalletAddress'>> & {
     projectId: string;
     primaryContractChainId?: string | number;
   };
@@ -68,8 +68,6 @@ export async function editProject({ userId, input }: { input: EditProjectValues;
         updatedBy: userId,
         description: input.description,
         optimismCategory: input.optimismCategory,
-        sunnyAwardsCategory: input.sunnyAwardsCategory,
-        sunnyAwardsCategoryDetails: input.sunnyAwardsCategoryDetails,
         websites: input.websites?.filter(isTruthy),
         farcasterValues: input.farcasterValues?.filter(isTruthy),
         twitter: input.twitter,
@@ -77,7 +75,6 @@ export async function editProject({ userId, input }: { input: EditProjectValues;
         avatar: input.avatar,
         coverImage: input.coverImage,
         mintingWalletAddress: input.mintingWalletAddress,
-        sunnyAwardsProjectType: input.sunnyAwardsProjectType,
         primaryContractAddress: input.primaryContractAddress,
         primaryContractChainId: input.primaryContractChainId
           ? parseInt(input.primaryContractChainId as string)

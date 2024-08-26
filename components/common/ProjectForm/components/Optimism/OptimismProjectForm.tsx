@@ -11,16 +11,14 @@ import { Controller, useController, useFieldArray, useForm } from 'react-hook-fo
 
 import { Avatar } from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
+import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
+import { MultiTextInputField } from 'components/common/form/fields/MultiTextInputField';
+import { TextInputField } from 'components/common/form/fields/TextInputField';
+import { SearchFarcasterUser } from 'components/common/form/SearchFarcasterUser';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import { useUser } from 'hooks/useUser';
-
-import { FieldWrapper } from '../../../form/fields/FieldWrapper';
-import { MultiTextInputField } from '../../../form/fields/MultiTextInputField';
-import { TextInputField } from '../../../form/fields/TextInputField';
-import { SearchFarcasterUser } from '../../../form/SearchFarcasterUser';
-
-import type { OptimismProjectFormValues } from './optimismProjectFormValues';
-import { OPTIMISM_PROJECT_CATEGORIES, optimismProjectSchema } from './optimismProjectFormValues';
+import { projectSchema, PROJECT_CATEGORIES } from 'lib/optimism/projectSchema';
+import type { FormValues } from 'lib/optimism/projectSchema';
 
 export type FarcasterProfile = {
   username: string;
@@ -71,14 +69,14 @@ function OptimismProjectMembersForm({
 }: {
   initialFarcasterProfiles?: FarcasterProfile[];
   disabled: boolean;
-  control: Control<OptimismProjectFormValues>;
+  control: Control<FormValues>;
 }) {
   const [selectedFarcasterProfiles, setSelectedFarcasterProfiles] =
     useState<FarcasterProfile[]>(initialFarcasterProfiles);
   const { user } = useUser();
   const userFarcasterAccount = user?.farcasterUser?.account as unknown as StatusAPIResponse;
   const { append, remove } = useFieldArray({
-    name: 'projectMembers' as FieldArrayPath<OptimismProjectFormValues>,
+    name: 'projectMembers' as FieldArrayPath<FormValues>,
     control
   });
 
@@ -145,8 +143,8 @@ function OptimismProjectImageField({
   disabled
 }: {
   disabled?: boolean;
-  control: Control<OptimismProjectFormValues>;
-  name: keyof OptimismProjectFormValues;
+  control: Control<FormValues>;
+  name: keyof FormValues;
   type: 'avatar' | 'cover';
 }) {
   const { field } = useController({
@@ -241,9 +239,9 @@ export function OptimismProjectForm({
   initialFarcasterProfiles
 }: {
   initialFarcasterProfiles?: FarcasterProfile[];
-  optimismValues?: OptimismProjectFormValues;
+  optimismValues?: FormValues;
   isMutating: boolean;
-  onSubmit: (projectValues: OptimismProjectFormValues) => void;
+  onSubmit: (projectValues: FormValues) => void;
   onCancel: VoidFunction;
   submitButtonText?: string;
 }) {
@@ -254,7 +252,7 @@ export function OptimismProjectForm({
     watch,
     formState: { isValid },
     getValues
-  } = useForm<OptimismProjectFormValues>({
+  } = useForm<FormValues>({
     defaultValues: optimismValues ?? {
       name: '',
       projectMembers: [
@@ -263,7 +261,7 @@ export function OptimismProjectForm({
         }
       ]
     },
-    resolver: yupResolver(optimismProjectSchema)
+    resolver: yupResolver(projectSchema)
   });
 
   return (
@@ -319,7 +317,7 @@ export function OptimismProjectForm({
               error={!!fieldState.error}
               {...field}
             >
-              {OPTIMISM_PROJECT_CATEGORIES.map((category) => (
+              {PROJECT_CATEGORIES.map((category) => (
                 <MenuItem key={category} value={category}>
                   {category}
                 </MenuItem>

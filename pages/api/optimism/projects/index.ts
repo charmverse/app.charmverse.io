@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
-import { createProject } from '@connect-shared/lib/projects/createProject';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { createProject } from 'lib/optimism/createProject';
 import type { OptimismProjectAttestationContent } from 'lib/optimism/getOpProjectsByFarcasterId';
 import { getOpProjectsByFarcasterId } from 'lib/optimism/getOpProjectsByFarcasterId';
 import { generateOgImage } from 'lib/projects/generateOgImage';

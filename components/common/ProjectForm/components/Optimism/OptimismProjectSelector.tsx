@@ -2,17 +2,16 @@ import { ListItemText, MenuItem, Select, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { useCreateOptimismProject, useGetOpProject, useGetOpProjects } from 'charmClient/hooks/optimism';
+import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
+import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 import { WarpcastLogin } from 'components/login/components/WarpcastLogin';
 import { useUser } from 'hooks/useUser';
 import type { OpProjectFieldValue } from 'lib/forms/interfaces';
+import type { FormValues } from 'lib/optimism/projectSchema';
 import { fancyTrim } from 'lib/utils/strings';
-
-import { FieldWrapper } from '../../../form/fields/FieldWrapper';
-import type { ControlFieldProps, FieldProps } from '../../../form/interfaces';
 
 import { OptimismProjectDisplay } from './OptimismProjectDisplay';
 import { OptimismProjectForm } from './OptimismProjectForm';
-import type { OptimismProjectFormValues } from './optimismProjectFormValues';
 
 type Props = Omit<ControlFieldProps, 'value'> &
   FieldProps & {
@@ -32,7 +31,7 @@ export function OptimismProjectSelector({ value, disabled, ...props }: Props) {
     return <OptimismProjectSelectorReadOnly value={value} {...props} />;
   }
 
-  function onSubmit(values: OptimismProjectFormValues) {
+  function onSubmit(values: FormValues) {
     createProject({
       ...values,
       // For some reason websites and farcasterValues both are [null] need to find out why

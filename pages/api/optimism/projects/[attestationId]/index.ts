@@ -1,7 +1,6 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { createProjectMetadataAttestation } from '@connect-shared/lib/attestations/agoraApi';
-import { editProject } from '@connect-shared/lib/projects/editProject';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
 import { decodeOptimismProjectAttestation } from '@root/lib/credentials/schemas/optimismProjectUtils';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
@@ -12,11 +11,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { optimism } from 'viem/chains';
 
-import type { OptimismProjectFormValues } from 'components/common/ProjectForm/components/Optimism/optimismProjectFormValues';
 import { onError, onNoMatch } from 'lib/middleware';
-import type { ProjectCategory } from 'lib/optimism/constants';
+import { editProject } from 'lib/optimism/editProject';
 import { getOpProjectsByAttestationId } from 'lib/optimism/getOpProjectsByAttestationId';
 import type { OptimismProjectAttestationContent } from 'lib/optimism/getOpProjectsByFarcasterId';
+import type { FormValues, ProjectCategory } from 'lib/optimism/projectSchema';
 import { generateOgImage } from 'lib/projects/generateOgImage';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -35,7 +34,7 @@ async function getProjectByAttestationIdController(
 async function updateProjectController(req: NextApiRequest, res: NextApiResponse) {
   const attestationId = req.query.attestationId as string;
   const userId = req.session.user.id;
-  const optimismProjectValues = req.body as OptimismProjectFormValues;
+  const optimismProjectValues = req.body as FormValues;
 
   const optimismProjectAttestation = await prisma.optimismProjectAttestation.findUniqueOrThrow({
     where: {
