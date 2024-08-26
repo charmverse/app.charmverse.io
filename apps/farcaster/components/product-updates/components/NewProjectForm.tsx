@@ -2,14 +2,14 @@
 
 import { log } from '@charmverse/core/log';
 import { FormErrors } from '@connect-shared/components/common/FormErrors';
+import { ImageField } from '@connect-shared/components/common/ImageField';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Stack } from '@mui/material';
+import { Button, FormLabel, Stack, TextField } from '@mui/material';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
-import { ProjectForm } from 'components/common/ProjectForm';
 import { createProjectAction } from 'lib/projects/createProjectAction';
 import type { FormValues } from 'lib/projects/projectSchema';
 import { schema } from 'lib/projects/projectSchema';
@@ -63,7 +63,32 @@ export function NewProjectForm({
     <>
       {/* add noValidate so that we onyl rely on react-hook-form validation */}
       <form noValidate onSubmit={handleSubmit(execute)}>
-        <ProjectForm control={control} />
+        <Stack gap={2}>
+          <Stack>
+            <FormLabel required>New project name</FormLabel>
+            <Controller
+              control={control}
+              name='name'
+              render={({ field, fieldState }) => (
+                <TextField
+                  data-test='project-form-name'
+                  autoFocus
+                  placeholder='Charmverse'
+                  aria-labelledby='project-name'
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  {...field}
+                />
+              )}
+            />
+          </Stack>
+          <Stack>
+            <FormLabel>Project avatar</FormLabel>
+            <Stack direction='row' gap={1}>
+              <ImageField type='avatar' name='avatar' control={control} />
+            </Stack>
+          </Stack>
+        </Stack>
         <Stack
           justifyContent='space-between'
           flexDirection='row'

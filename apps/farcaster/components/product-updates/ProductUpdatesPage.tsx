@@ -1,7 +1,7 @@
 'use client';
 
 import { FarcasterCard } from '@connect-shared/components/common/FarcasterCard';
-import { Card, FormLabel } from '@mui/material';
+import { Typography, FormLabel } from '@mui/material';
 import { Stack } from '@mui/system';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useState } from 'react';
@@ -22,17 +22,8 @@ export function ProductUpdatesPage({
   const [defaultProjectId, setDefaultProjectId] = useState(connectProjects[0]?.id || '');
   return (
     <Stack gap={2}>
-      <Card>
-        <FarcasterCard
-          fid={farcasterUser.fid}
-          name={farcasterUser.display_name}
-          username={farcasterUser.username}
-          avatar={farcasterUser.pfp_url}
-          bio={farcasterUser.profile.bio.text}
-        />
-      </Card>
+      <Typography variant='h5'>Create your project update</Typography>
       <Stack>
-        <FormLabel id='projectId'>Project</FormLabel>
         {isCreatingProject ? (
           <Stack gap={1}>
             <NewProjectForm

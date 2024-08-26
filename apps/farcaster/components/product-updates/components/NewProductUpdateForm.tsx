@@ -62,6 +62,16 @@ export function NewProductUpdateForm({
     }
   });
 
+  if (connectProjects.length === 0) {
+    return (
+      <div>
+        <Button onClick={onCreateProject} size='large'>
+          Create a project to get started
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <form
       onSubmit={handleSubmit((data) => {
@@ -78,38 +88,41 @@ export function NewProductUpdateForm({
       })}
     >
       <Stack gap={2}>
-        <Controller
-          control={control}
-          name='projectId'
-          render={({ field, fieldState }) => (
-            <Select
-              displayEmpty
-              fullWidth
-              disabled={isExecuting}
-              renderValue={(value) => {
-                if (value) {
-                  return connectProjects.find((project) => project.id === value)?.name;
-                }
-                return <Typography color='secondary'>Select a project</Typography>;
-              }}
-              error={!!fieldState.error}
-              {...field}
-            >
-              {connectProjects.map((connectProject) => (
-                <MenuItem key={connectProject.id} value={connectProject.id}>
-                  {connectProject.name}
-                </MenuItem>
-              ))}
-              <Divider />
-              <MenuItem key='create-project' onClick={onCreateProject}>
-                <AddIcon sx={{ mr: 0.5 }} fontSize='small' />
-                Create project
-              </MenuItem>
-            </Select>
-          )}
-        />
         <Stack>
-          <FormLabel id='text'>Product updates</FormLabel>
+          <FormLabel>Project</FormLabel>
+          <Controller
+            control={control}
+            name='projectId'
+            render={({ field, fieldState }) => (
+              <Select
+                displayEmpty
+                fullWidth
+                disabled={isExecuting}
+                renderValue={(value) => {
+                  if (value) {
+                    return connectProjects.find((project) => project.id === value)?.name;
+                  }
+                  return <Typography color='secondary'>Select a project</Typography>;
+                }}
+                error={!!fieldState.error}
+                {...field}
+              >
+                {connectProjects.map((connectProject) => (
+                  <MenuItem key={connectProject.id} value={connectProject.id}>
+                    {connectProject.name}
+                  </MenuItem>
+                ))}
+                <Divider />
+                <MenuItem key='create-project' onClick={onCreateProject}>
+                  <AddIcon sx={{ mr: 0.5 }} fontSize='small' />
+                  Create project
+                </MenuItem>
+              </Select>
+            )}
+          />
+        </Stack>
+        <Stack>
+          <FormLabel>Product updates</FormLabel>
           <Controller
             control={control}
             name='text'
