@@ -28,7 +28,6 @@ test.describe('Invalid user in profile page', () => {
     await page.waitForURL('**/profile');
 
     const invalidUserButton = page.locator('data-test=invalidate-user-button');
-    await page.pause();
     await invalidUserButton.click();
 
     await page.waitForURL('**/');
