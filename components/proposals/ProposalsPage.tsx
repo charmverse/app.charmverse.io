@@ -278,19 +278,21 @@ export function ProposalsPage({ title }: { title: string }) {
               </Tabs>
             )}
             <div className='octo-spacer' />
-            <Box className='view-actions'>
-              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
-              <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
-              {user && (
-                <ToggleViewSidebarButton
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowSidebar(!showSidebar);
-                  }}
-                />
-              )}
-            </Box>
+            {viewId !== 'my-work' && (
+              <Box className='view-actions'>
+                <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
+                <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
+                {user && (
+                  <ToggleViewSidebarButton
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowSidebar(!showSidebar);
+                    }}
+                  />
+                )}
+              </Box>
+            )}
           </div>
           <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
         </Stack>
