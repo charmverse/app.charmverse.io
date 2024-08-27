@@ -4,6 +4,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
+import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { trackMixpanelEvent } from '@connect-shared/lib/mixpanel/trackMixpanelEvent';
 import { createProject } from '@connect-shared/lib/projects/createProject';
 import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
@@ -52,16 +53,27 @@ export const createProjectAction = authActionClient
         });
       });
 
-      // await storeCharmverseProjectMetadata({
-      //   chainId: charmverseProjectDataChainId,
-      //   projectId: newProject.id
-      // }).catch((error) => {
-      //   log.error('Failed to store charmverse project attestations', {
-      //     error,
-      //     projectId: newProject.id,
-      //     userId: newProject.createdBy
-      //   });
-      // });
+      await storeProjectMetadataAndPublishGitcoinAttestation({
+        projectIdOrPath: newProject.id,
+        userId: ctx.session.user.id
+      }).catch((error) => {
+        log.error('Failed to store project metadata and publish Gitcoin attestation', {
+          error,
+          projectId: newProject.id,
+          userId: currentUserId
+        });
+      });
+
+      await storeCharmverseProjectMetadata({
+        chainId: charmverseProjectDataChainId,
+        projectId: newProject.id
+      }).catch((error) => {
+        log.error('Failed to store charmverse project attestations', {
+          error,
+          projectId: newProject.id,
+          userId: newProject.createdBy
+        });
+      });
     }
 
     if (!isTestEnv) {

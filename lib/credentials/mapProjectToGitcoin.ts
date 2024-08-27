@@ -38,18 +38,62 @@ function generateContributionLinks(input: ConnectProjectDetails) {
   return links;
 }
 
-export function mapProjectToGitcoin({ project }: { project: ConnectProjectDetails }) {
+export type GitcoinEasyRetroPGFProject = {
+  name: string;
+  bio: string;
+  websiteUrl: string;
+  contributionLinks: { description: string; type: string; url: string }[];
+  sunnyAwards: {
+    projectType: string;
+    category: string;
+    categoryDetails: string;
+    contracts: {
+      chainId: number;
+      address: string;
+    }[];
+    mintingWalletAddress: string;
+    projectReferences: {
+      charmverseId: string;
+      agoraProjectRefUID: string;
+    };
+    avatarUrl: string;
+    coverImageUrl: string;
+  };
+};
+
+// TBD - Fields
+export function mapProjectToGitcoin({
+  project,
+  agoraProjectRefUID
+}: {
+  project: ConnectProjectDetails;
+  agoraProjectRefUID?: string;
+}): GitcoinEasyRetroPGFProject {
   return {
     name: project.name || '', // Direct mapping
     bio: project.description || '', // Assuming bio comes from description
     websiteUrl: project.websites?.[0] || '', // Taking the first website URL
-    contributionDescription: project.description,
     contributionLinks: generateContributionLinks(project),
-    // -------------- Missing fields
-    impactCategory: [], // Assuming no direct mapping for categories
-    impactDescription: '', // Placeholder: requires specific input
-    payoutAddress: '', // Placeholder: needs specific logic or input
-    impactMetrics: [], // Placeholder: requires specific input
-    fundingSources: [] // Placeholder: requires specific input
+    sunnyAwards: {
+      projectType: project.sunnyAwardsProjectType || '',
+      category: project.sunnyAwardsCategory || '',
+      categoryDetails: project.sunnyAwardsCategoryDetails || '',
+      contracts:
+        project.primaryContractChainId && project.primaryContractAddress
+          ? [
+              {
+                chainId: project.primaryContractChainId,
+                address: project.primaryContractAddress
+              }
+            ]
+          : [],
+      mintingWalletAddress: project.mintingWalletAddress || '',
+      projectReferences: {
+        charmverseId: project.id,
+        agoraProjectRefUID: agoraProjectRefUID || ''
+      },
+      avatarUrl: project.avatar || '',
+      coverImageUrl: project.coverImage || ''
+    }
   };
 }

@@ -9,7 +9,8 @@ export function encodeGitcoinProjectCredential({
   metadataPtr,
   metadataType,
   type,
-  round
+  round,
+  uuid
 }: GitcoinProjectCredential) {
   const encoder = new SchemaEncoder(gitcoinProjectCredentialSchemaDefinition);
   const encodedData = encoder.encodeData([
@@ -17,7 +18,8 @@ export function encodeGitcoinProjectCredential({
     { name: 'metadataPtr', value: metadataPtr, type: 'string' },
     { name: 'metadataType', value: metadataType, type: 'uint256' },
     { name: 'type', value: type, type: 'bytes32' },
-    { name: 'round', value: round, type: 'bytes32' }
+    { name: 'round', value: round, type: 'bytes32' },
+    { name: 'uuid', value: uuid, type: 'string' }
   ] as TypedSchemaItem<GitcoinProjectCredential>[]);
 
   return encodedData;
