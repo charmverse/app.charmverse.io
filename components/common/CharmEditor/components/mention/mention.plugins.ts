@@ -2,6 +2,7 @@ import { Plugin, PluginKey } from 'prosemirror-state';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 
+import type { RawPlugins } from '../@bangle.dev/core/plugin-loader';
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
 import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltipPlugin';
@@ -20,7 +21,7 @@ export function mentionPlugins({
   markName?: string;
   key: PluginKey<MentionPluginState>;
   tooltipRenderOpts?: SuggestTooltipRenderOpts;
-}) {
+}): RawPlugins {
   const suggestTooltipKey = new PluginKey('suggestTooltipKey');
   // We are converting to DOM elements so that their instances
   // can be shared across plugins.

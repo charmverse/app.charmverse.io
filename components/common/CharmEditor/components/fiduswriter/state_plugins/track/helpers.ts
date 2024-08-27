@@ -1,5 +1,6 @@
-import type { EditorState, EditorView, Transaction } from '@bangle.dev/pm';
 import { Decoration, DecorationSet } from '@bangle.dev/pm';
+import type { EditorState, Transaction } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import scrollIntoView from 'scroll-into-view-if-needed';
 
 import type { TrackAttribute } from '../../track/interfaces';

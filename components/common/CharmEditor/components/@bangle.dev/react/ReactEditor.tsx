@@ -1,11 +1,10 @@
 import { history } from '@bangle.dev/base-components';
-import type { Plugin } from '@bangle.dev/pm';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { EditorState } from 'prosemirror-state';
-import type { PluginKey } from 'prosemirror-state';
+import type { Plugin, PluginKey } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { MouseEvent, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';

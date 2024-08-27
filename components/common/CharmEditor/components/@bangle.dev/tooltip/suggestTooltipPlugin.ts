@@ -19,8 +19,6 @@ import { plugins as tooltipPlacementPlugins } from './tooltipPlacement';
 import type { GetReferenceElementFunction, TooltipRenderOpts } from './tooltipPlacement';
 import { triggerInputRule } from './triggerInputRule';
 
-export const plugins = pluginsFactory;
-
 export const defaultKeys = {
   select: 'Enter',
   up: 'ArrowUp',
@@ -60,7 +58,7 @@ export interface SuggestPluginState {
   suggestTooltipKey: PluginKey<PluginState>;
 }
 
-function pluginsFactory({
+export function plugins({
   key = new PluginKey('suggest_tooltip'),
   markName,
   trigger,
