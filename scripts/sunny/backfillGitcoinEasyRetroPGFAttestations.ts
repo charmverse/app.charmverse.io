@@ -8,7 +8,6 @@ import { optimism } from 'viem/chains';
  */
 
 async function backfillGitcoinEasyRetroPGFAttestations() {
-
   if (projectAttestationChainId !== optimism.id) {
     throw new Error('Attestations must be backfilled on OP mainnet');
   }
@@ -22,7 +21,8 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
     },
     select: {
       id: true,
-      createdBy: true,
+      path: true,
+      createdBy: true
     }
   });
 
@@ -32,14 +32,15 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
 
   for (let i = 0; i < totalProjects; i++) {
     const project = projects[i];
-    await storeProjectMetadataAndPublishGitcoinAttestation({
-      userId: project.createdBy,
-      projectIdOrPath: project.id
-    });
+    if (project.path) {
+      await storeProjectMetadataAndPublishGitcoinAttestation({
+        userId: project.createdBy,
+        projectPath: project.path
+      });
+    }
 
     console.log(`Project attestation stored for project ${i} / ${totalProjects}:`, project.id);
   }
-
 }
 
 backfillGitcoinEasyRetroPGFAttestations();
