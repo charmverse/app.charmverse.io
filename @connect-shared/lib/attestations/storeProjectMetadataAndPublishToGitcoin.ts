@@ -14,10 +14,10 @@ const currentGitcoinRound = 'cm0ayus350005zwyb4vtureu1';
 
 export async function storeProjectMetadataAndPublishGitcoinAttestation({
   userId,
-  projectPath
+  projectId
 }: {
   userId: string;
-  projectPath: string;
+  projectId: string;
 }): Promise<GitcoinProjectAttestation> {
   const farcasterUser = await prisma.farcasterUser.findUniqueOrThrow({
     where: {
@@ -30,7 +30,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
   });
 
   const project = await prisma.project.findFirstOrThrow({
-    where: { path: projectPath },
+    where: { id: projectId },
     select: { id: true, name: true }
   });
 

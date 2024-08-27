@@ -52,7 +52,7 @@ export const createProjectAction = authActionClient
       });
 
       await storeProjectMetadataAndPublishGitcoinAttestation({
-        projectIdOrPath: newProject.id,
+        projectId: newProject.id,
         userId: ctx.session.user.id
       });
 

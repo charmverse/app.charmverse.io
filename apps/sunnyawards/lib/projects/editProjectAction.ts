@@ -47,7 +47,7 @@ export const editProjectAction = authActionClient
       });
 
       await storeProjectMetadataAndPublishGitcoinAttestation({
-        projectIdOrPath: editedProject.id,
+        projectId: editedProject.id,
         userId: editedProject.createdBy
       });
     }

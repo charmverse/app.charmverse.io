@@ -21,7 +21,6 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
     },
     select: {
       id: true,
-      path: true,
       createdBy: true
     }
   });
@@ -32,12 +31,10 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
 
   for (let i = 0; i < totalProjects; i++) {
     const project = projects[i];
-    if (project.path) {
-      await storeProjectMetadataAndPublishGitcoinAttestation({
-        userId: project.createdBy,
-        projectPath: project.path
-      });
-    }
+    await storeProjectMetadataAndPublishGitcoinAttestation({
+      userId: project.createdBy,
+      projectId: project.id
+    });
 
     console.log(`Project attestation stored for project ${i} / ${totalProjects}:`, project.id);
   }

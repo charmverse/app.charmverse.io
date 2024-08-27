@@ -36,8 +36,14 @@ export const publishProjectToGitcoinAction = authActionClient
       throw new WrongStateError('Project already published to Gitcoin');
     }
 
+    const project = await prisma.project.findFirstOrThrow({
+      where: {
+        path: projectPath
+      }
+    });
+
     await storeProjectMetadataAndPublishGitcoinAttestation({
-      projectPath,
+      projectId: project.id,
       userId: ctx.session.user.id
     });
 
