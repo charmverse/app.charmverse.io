@@ -164,11 +164,3 @@ export function isBigInt(value: string) {
     return false;
   }
 }
-
-export function toBigInt(value: any) {
-  try {
-    return BigInt(value);
-  } catch (e) {
-    return BigInt(1);
-  }
-}
