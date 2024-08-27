@@ -28,7 +28,9 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
 
   const totalProjects = projects.length;
 
-  for (let i = 0; i < projects.length; i++) {
+  // const totalProjects = 2;
+
+  for (let i = 0; i < totalProjects; i++) {
     const project = projects[i];
     await storeProjectMetadataAndPublishGitcoinAttestation({
       userId: project.createdBy,
