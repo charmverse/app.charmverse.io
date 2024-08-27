@@ -1,7 +1,7 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createOrUpdateFarcasterUser } from '@root/lib/farcaster/createOrUpdateFarcasterUser';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
-import { createOrUpdateFarcasterUser } from '@root/lib/farcaster/loginWithFarcaster';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath } from '@root/lib/utils/strings';
 
