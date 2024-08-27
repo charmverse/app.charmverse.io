@@ -56,6 +56,12 @@ export const createProjectAction = authActionClient
       await storeProjectMetadataAndPublishGitcoinAttestation({
         projectIdOrPath: newProject.id,
         userId: ctx.session.user.id
+      }).catch((error) => {
+        log.error('Failed to store project metadata and publish Gitcoin attestation', {
+          error,
+          projectId: newProject.id,
+          userId: currentUserId
+        });
       });
 
       await storeCharmverseProjectMetadata({

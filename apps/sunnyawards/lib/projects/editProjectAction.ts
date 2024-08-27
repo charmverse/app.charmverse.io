@@ -48,6 +48,12 @@ export const editProjectAction = authActionClient
       await storeProjectMetadataAndPublishGitcoinAttestation({
         projectIdOrPath: editedProject.id,
         userId: editedProject.createdBy
+      }).catch((error) => {
+        log.error('Failed to store project metadata and publish Gitcoin attestation', {
+          error,
+          projectId: editedProject.id,
+          userId: currentUserId
+        });
       });
     }
 
