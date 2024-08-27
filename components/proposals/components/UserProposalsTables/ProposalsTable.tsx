@@ -84,7 +84,7 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                     <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
                       {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>
-                        {proposal.status === 'draft' ? 'Draft' : proposal.currentEvaluation?.title}
+                        {proposal.status === 'draft' ? 'Draft' : proposal.currentEvaluation?.title || 'Evaluation'}
                       </Typography>
                     </Stack>
                   </TableCell>

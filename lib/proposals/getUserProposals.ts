@@ -1,8 +1,6 @@
 import type { ProposalEvaluationResult, ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
-
-import { permissionsApiClient } from '../permissions/api/client';
+import { getCurrentEvaluation, privateEvaluationSteps } from '@charmverse/core/proposals';
 
 type CurrentEvaluation = {
   id: string;
@@ -77,9 +75,27 @@ export async function getUserProposals({
           }
         },
         {
+          ProposalAppealReviewer: {
+            some: {
+              roleId: {
+                in: userRoles
+              }
+            }
+          }
+        },
+        {
           proposalEvaluationApprovers: {
             some: {
               userId
+            }
+          }
+        },
+        {
+          proposalEvaluationApprovers: {
+            some: {
+              roleId: {
+                in: userRoles
+              }
             }
           }
         },
@@ -161,12 +177,14 @@ export async function getUserProposals({
           },
           appealReviewers: {
             select: {
-              userId: true
+              userId: true,
+              roleId: true
             }
           },
           evaluationApprovers: {
             select: {
-              userId: true
+              userId: true,
+              roleId: true
             }
           },
           reviewers: {
@@ -214,34 +232,48 @@ export async function getUserProposals({
             (reviewer.roleId && userRoles.includes(reviewer.roleId)) ||
             reviewer.systemRole === 'space_member'
         );
-        const canReviewAppeal = currentEvaluation?.appealReviewers.some((reviewer) => reviewer.userId === userId);
-        const canApprove = currentEvaluation?.evaluationApprovers.some((approver) => approver.userId === userId);
+        const canReviewAppeal = currentEvaluation?.appealReviewers.some(
+          (reviewer) => reviewer.userId === userId || (reviewer.roleId && userRoles.includes(reviewer.roleId))
+        );
+        const canApprove = currentEvaluation?.evaluationApprovers.some(
+          (approver) => approver.userId === userId || (approver.roleId && userRoles.includes(approver.roleId))
+        );
         const hasReviewed = currentEvaluation?.reviews.some((review) => review.reviewerId === userId);
-        const hasAppealReviewed = currentEvaluation?.appealReviews.some((review) => review.reviewerId === userId);
+        const hasReviewedAppeal = currentEvaluation?.appealReviews.some((review) => review.reviewerId === userId);
         const hasApproved = currentEvaluation?.evaluationApprovers.some((approver) => approver.userId === userId);
         const hasVoted =
           currentEvaluation?.type === 'vote' &&
           currentEvaluation.vote?.userVotes.some((vote) => vote.userId === userId);
 
+        const isReviewer = canReview || canReviewAppeal || canApprove;
+
+        const isPrivateEvaluation =
+          proposal.workflow?.privateEvaluations &&
+          currentEvaluation &&
+          privateEvaluationSteps.includes(currentEvaluation.type);
+
         const userProposal = {
           id: proposal.id,
           title: proposal.page.title,
-          currentEvaluation: currentEvaluation
-            ? {
-                id: currentEvaluation.id,
-                type: currentEvaluation.type,
-                dueDate: currentEvaluation.dueDate || null,
-                title: currentEvaluation.title,
-                result: currentEvaluation.result || null
-              }
-            : undefined,
+          currentEvaluation:
+            isPrivateEvaluation && !isReviewer
+              ? undefined
+              : currentEvaluation
+              ? {
+                  id: currentEvaluation.id,
+                  type: currentEvaluation.type,
+                  dueDate: currentEvaluation.dueDate || null,
+                  title: currentEvaluation.title,
+                  result: currentEvaluation.result || null
+                }
+              : undefined,
           updatedAt: proposal.page.updatedAt,
           path: proposal.page.path,
           status: proposal.status
         };
 
         if (
-          ((canReview && !hasReviewed) || (canReviewAppeal && !hasAppealReviewed) || (canApprove && !hasApproved)) &&
+          ((canReview && !hasReviewed) || (canReviewAppeal && !hasReviewedAppeal) || (canApprove && !hasApproved)) &&
           !currentEvaluation?.result &&
           !hasVoted
         ) {
