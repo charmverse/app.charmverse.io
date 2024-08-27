@@ -242,19 +242,17 @@ export async function getUserProposals({
             (reviewer.roleId && userRoles.includes(reviewer.roleId)) ||
             reviewer.systemRole === 'space_member'
         );
-        const canVote = canReview;
-        const canReviewAppeal = currentEvaluation?.appealReviewers.some(
-          (reviewer) => reviewer.userId === userId || (reviewer.roleId && userRoles.includes(reviewer.roleId))
-        );
+        const canVote = currentEvaluation?.type === 'vote' && canReview;
+        const canReviewAppeal =
+          currentEvaluation?.appealReviewers.some(
+            (reviewer) => reviewer.userId === userId || (reviewer.roleId && userRoles.includes(reviewer.roleId))
+          ) && !!currentEvaluation?.appealedAt;
         const canApprove = currentEvaluation?.evaluationApprovers.some(
           (approver) => approver.userId === userId || (approver.roleId && userRoles.includes(approver.roleId))
         );
         const hasReviewed = currentEvaluation?.reviews.some((review) => review.reviewerId === userId);
         const hasReviewedAppeal = currentEvaluation?.appealReviews.some((review) => review.reviewerId === userId);
-        const hasApproved = currentEvaluation?.evaluationApprovers.some((approver) => approver.userId === userId);
-        const hasVoted =
-          currentEvaluation?.type === 'vote' &&
-          currentEvaluation.vote?.userVotes.some((vote) => vote.userId === userId);
+        const hasVoted = currentEvaluation?.vote?.userVotes.some((vote) => vote.userId === userId);
 
         const isReviewer = canReview || canReviewAppeal || canApprove;
 
@@ -265,10 +263,9 @@ export async function getUserProposals({
 
         const isActionable =
           !currentEvaluation?.result &&
-          ((canReview && !hasReviewed) ||
-            (canReviewAppeal && !hasReviewedAppeal) ||
-            (canApprove && !hasApproved) ||
-            (canVote && !hasVoted));
+          (currentEvaluation?.type === 'vote'
+            ? canVote && !hasVoted
+            : (canReview && !hasReviewed) || (canReviewAppeal && !hasReviewedAppeal) || (canApprove && !hasReviewed));
 
         const userProposal = {
           id: proposal.id,

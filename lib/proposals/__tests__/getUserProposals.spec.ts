@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
 
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 import { getUserProposals } from '../getUserProposals';
 
@@ -172,14 +173,14 @@ describe('getUserProposals()', () => {
       }
     });
 
-    const assignedProposals = await getUserProposals({
+    const proposals = await getUserProposals({
       spaceId: space.id,
       userId: proposalReviewer.id
     });
 
-    expect(assignedProposals.actionable).toStrictEqual([]);
-    expect(assignedProposals.authored).toStrictEqual([]);
-    expect(assignedProposals.assigned.map((p) => p.id).sort()).toStrictEqual(
+    expect(proposals.actionable).toStrictEqual([]);
+    expect(proposals.authored).toStrictEqual([]);
+    expect(proposals.assigned.map((p) => p.id).sort()).toStrictEqual(
       [spaceMemberReviewerProposal.id, roleReviewerProposal.id, userReviewerProposal.id].sort()
     );
   });
@@ -192,6 +193,9 @@ describe('getUserProposals()', () => {
       spaceId: space.id
     });
     const proposalReviewer = await generateSpaceUser({
+      spaceId: space.id
+    });
+    const proposalAppealReviewer = await generateSpaceUser({
       spaceId: space.id
     });
     const reviewerRole = await generateRole({
@@ -239,6 +243,7 @@ describe('getUserProposals()', () => {
         }
       ]
     });
+
     const userReviewerProposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalAuthor.id,
@@ -259,15 +264,123 @@ describe('getUserProposals()', () => {
       ]
     });
 
-    const assignedProposals = await getUserProposals({
+    const userAppealReviewerProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalAuthor.id,
+      authors: [proposalAuthor.id],
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'pass_fail',
+          title: 'Pass Fail',
+          appealReviewers: [
+            {
+              group: 'user',
+              id: proposalAppealReviewer.id
+            }
+          ],
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            }
+          ],
+          permissions: []
+        }
+      ]
+    });
+
+    await prisma.proposalEvaluation.update({
+      where: {
+        id: userAppealReviewerProposal.evaluations[0].id
+      },
+      data: {
+        appealedAt: new Date()
+      }
+    });
+
+    await prisma.proposalEvaluationReview.create({
+      data: {
+        result: 'pass',
+        evaluationId: userAppealReviewerProposal.evaluations[0].id,
+        reviewerId: proposalReviewer.id
+      }
+    });
+
+    const proposalReviewerProposals = await getUserProposals({
       spaceId: space.id,
       userId: proposalReviewer.id
     });
 
-    expect(assignedProposals.actionable.map((p) => p.id).sort()).toStrictEqual(
-      [spaceMemberReviewerProposal.id, roleReviewerProposal.id, userReviewerProposal.id].sort()
+    const proposalAppealReviewerProposals = await getUserProposals({
+      spaceId: space.id,
+      userId: proposalAppealReviewer.id
+    });
+
+    expect(proposalReviewerProposals.actionable.map((p) => p.id).sort()).toStrictEqual(
+      [userReviewerProposal.id, roleReviewerProposal.id, spaceMemberReviewerProposal.id].sort()
     );
-    expect(assignedProposals.authored).toStrictEqual([]);
-    expect(assignedProposals.assigned).toStrictEqual([]);
+    expect(proposalAppealReviewerProposals.actionable.map((p) => p.id).sort()).toStrictEqual(
+      [userAppealReviewerProposal.id, spaceMemberReviewerProposal.id].sort()
+    );
+  });
+
+  it('Should hide evaluation details for private evaluations unless the user is a reviewer', async () => {
+    const { space } = await generateUserAndSpace({
+      isAdmin: false
+    });
+    const proposalAuthor = await generateSpaceUser({
+      spaceId: space.id
+    });
+    const proposalReviewer = await generateSpaceUser({
+      spaceId: space.id
+    });
+
+    const workflow = await generateProposalWorkflow({
+      spaceId: space.id
+    });
+
+    await prisma.proposalWorkflow.update({
+      where: {
+        id: workflow.id
+      },
+      data: {
+        privateEvaluations: true
+      }
+    });
+
+    await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      workflowId: workflow.id,
+      userId: proposalAuthor.id,
+      authors: [proposalAuthor.id],
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'rubric',
+          title: 'Rubric',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            }
+          ],
+          permissions: []
+        }
+      ]
+    });
+
+    const proposalAuthorProposals = await getUserProposals({
+      spaceId: space.id,
+      userId: proposalAuthor.id
+    });
+
+    const proposalReviewerProposals = await getUserProposals({
+      spaceId: space.id,
+      userId: proposalReviewer.id
+    });
+
+    expect(proposalAuthorProposals.authored[0].currentEvaluation).toBeUndefined();
+    expect(proposalReviewerProposals.actionable[0].currentEvaluation).toBeDefined();
   });
 });
