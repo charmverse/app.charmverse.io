@@ -1,4 +1,5 @@
-import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
+import { getCurrentUser } from '@connect-shared/lib/profile/getCurrentUser';
+import { getSession } from '@connect-shared/lib/session/getSession';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -14,15 +15,16 @@ export const metadata: Metadata = {
 };
 
 export default async function Welcome() {
-  const user = await getCurrentUserAction();
+  const session = await getSession();
+  const user = await getCurrentUser(session.user?.id);
 
-  if (!user?.data) {
+  if (!user) {
     return null;
   }
 
-  if (user?.data?.connectOnboarded) {
+  if (user?.connectOnboarded) {
     redirect('/profile');
   }
 
-  return <WelcomePage user={user.data} />;
+  return <WelcomePage user={user} />;
 }

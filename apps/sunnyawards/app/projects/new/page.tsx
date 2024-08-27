@@ -1,4 +1,6 @@
-import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
+import { getCurrentUser } from '@connect-shared/lib/profile/getCurrentUser';
+import { getSession } from '@connect-shared/lib/session/getSession';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { NewProjectPage } from 'components/projects/new/NewProjectPage';
@@ -6,18 +8,26 @@ import { getUnimportedOptimismProjectsAction } from 'lib/projects/getUnimportedO
 
 export const dynamic = 'force-dynamic';
 
-export default async function CreateProject() {
-  const user = await getCurrentUserAction();
+export const metadata: Metadata = {
+  other: {
+    robots: 'noindex'
+  },
+  title: 'New Project'
+};
 
-  if (!user?.data) {
-    redirect('/');
+export default async function CreateProject() {
+  const session = await getSession();
+  const user = await getCurrentUser(session.user?.id);
+
+  if (!user) {
+    return null;
   }
 
-  if (!user?.data?.connectOnboarded) {
+  if (!user?.connectOnboarded) {
     redirect('/welcome');
   }
 
   const optimismProjects = await getUnimportedOptimismProjectsAction().catch(() => null);
 
-  return <NewProjectPage user={user.data} optimismProjects={optimismProjects?.data ?? []} />;
+  return <NewProjectPage user={user} optimismProjects={optimismProjects?.data ?? []} />;
 }

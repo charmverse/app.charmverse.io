@@ -36,16 +36,18 @@ export const actionClient = createSafeActionClient({
   });
 
 export const authActionClient = actionClient.use(async ({ next, ctx }) => {
-  const userId = ctx.session.user?.id;
+  const user = ctx.session.user;
 
-  if (!userId) {
+  if (!user?.id) {
     throw new UnauthorisedActionError('You are not logged in. Please try to login');
   }
 
   await prisma.user.findUniqueOrThrow({
-    where: { id: userId },
+    where: { id: user.id },
     select: { id: true }
   });
 
-  return next({ ctx });
+  return next({
+    ctx: { ...ctx, session: { ...ctx.session, user } }
+  });
 });
