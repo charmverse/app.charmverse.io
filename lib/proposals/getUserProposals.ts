@@ -2,6 +2,8 @@ import type { ProposalEvaluationResult, ProposalEvaluationType, ProposalStatus }
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation, privateEvaluationSteps } from '@charmverse/core/proposals';
 
+import { permissionsApiClient } from '../permissions/api/client';
+
 type CurrentEvaluation = {
   id: string;
   type: ProposalEvaluationType;
@@ -17,6 +19,7 @@ export type UserProposal = {
   path: string;
   status: ProposalStatus;
   currentEvaluation?: CurrentEvaluation;
+  viewable: boolean;
 };
 
 export type GetUserProposalsResponse = {
@@ -37,6 +40,12 @@ export async function getUserProposals({
       spaceId,
       userId
     }
+  });
+
+  const accessibleProposalIds = await permissionsApiClient.proposals.getAccessibleProposalIds({
+    userId,
+    spaceId,
+    onlyAssigned: true
   });
 
   const userRoles = await prisma.spaceRoleToRole
@@ -221,7 +230,8 @@ export async function getUserProposals({
             currentEvaluation: undefined,
             path: proposal.page.path,
             updatedAt: proposal.page.updatedAt,
-            status: proposal.status
+            status: proposal.status,
+            viewable: true
           });
         }
       } else {
@@ -232,6 +242,7 @@ export async function getUserProposals({
             (reviewer.roleId && userRoles.includes(reviewer.roleId)) ||
             reviewer.systemRole === 'space_member'
         );
+        const canVote = canReview;
         const canReviewAppeal = currentEvaluation?.appealReviewers.some(
           (reviewer) => reviewer.userId === userId || (reviewer.roleId && userRoles.includes(reviewer.roleId))
         );
@@ -252,6 +263,13 @@ export async function getUserProposals({
           currentEvaluation &&
           privateEvaluationSteps.includes(currentEvaluation.type);
 
+        const isActionable =
+          !currentEvaluation?.result &&
+          ((canReview && !hasReviewed) ||
+            (canReviewAppeal && !hasReviewedAppeal) ||
+            (canApprove && !hasApproved) ||
+            (canVote && !hasVoted));
+
         const userProposal = {
           id: proposal.id,
           title: proposal.page.title,
@@ -269,14 +287,11 @@ export async function getUserProposals({
               : undefined,
           updatedAt: proposal.page.updatedAt,
           path: proposal.page.path,
-          status: proposal.status
+          status: proposal.status,
+          viewable: accessibleProposalIds.includes(proposal.id)
         };
 
-        if (
-          ((canReview && !hasReviewed) || (canReviewAppeal && !hasReviewedAppeal) || (canApprove && !hasApproved)) &&
-          !currentEvaluation?.result &&
-          !hasVoted
-        ) {
+        if (isActionable) {
           actionableProposals.push(userProposal);
         } else if (isAuthor) {
           authoredProposals.push(userProposal);

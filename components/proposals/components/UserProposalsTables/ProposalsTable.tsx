@@ -5,8 +5,11 @@ import { Stack } from '@mui/system';
 import type { UserProposal } from '@root/lib/proposals/getUserProposals';
 import { relativeTime } from '@root/lib/utils/dates';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
+import Modal from 'components/common/Modal';
 import { evaluationIcons } from 'components/settings/proposals/constants';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 const StyledTableRow = styled(TableRow)`
   cursor: pointer;
@@ -25,6 +28,8 @@ const StyledTableRow = styled(TableRow)`
 
 export function ProposalsTable({ proposals, title }: { title: string; proposals: UserProposal[] }) {
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const { getFeatureTitle } = useSpaceFeatures();
 
   return (
     <Stack gap={1}>
@@ -64,7 +69,11 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                 <StyledTableRow
                   key={proposal.id}
                   onClick={() => {
-                    router.push(`/${router.query.domain}/${proposal.path}`);
+                    if (!proposal.viewable) {
+                      setIsOpen(true);
+                    } else {
+                      router.push(`/${router.query.domain}/${proposal.path}`);
+                    }
                   }}
                 >
                   <TableCell width={400}>
@@ -102,6 +111,15 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
           </Box>
         </Card>
       )}
+      <Modal
+        open={isOpen}
+        onClose={() => {
+          setIsOpen(false);
+        }}
+        title={`${getFeatureTitle('Proposal')} not viewable`}
+      >
+        <Typography>You currently don't have view access to this {getFeatureTitle('proposal')}</Typography>
+      </Modal>
     </Stack>
   );
 }
