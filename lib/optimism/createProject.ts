@@ -1,15 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { OptionalPrismaTransaction, Prisma, Project, ProjectSource } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { StatusAPIResponse } from '@farcaster/auth-client';
 import { resolveENSName } from '@root/lib/blockchain';
 import { ensureFarcasterUserExists } from '@root/lib/farcaster/ensureFarcasterUserExists';
-import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath, uid } from '@root/lib/utils/strings';
 import { isTruthy } from '@root/lib/utils/types';
-import { v4 } from 'uuid';
 
 import type { FormValues } from './projectSchema';
 
@@ -21,17 +17,7 @@ export async function createProject({
 }: {
   source: ProjectSource;
   input: FormValues &
-    Partial<
-      Pick<
-        Project,
-        | 'primaryContractAddress'
-        | 'primaryContractChainId'
-        | 'mintingWalletAddress'
-        | 'sunnyAwardsProjectType'
-        | 'sunnyAwardsNumber'
-        | 'sunnyAwardsCategoryDetails'
-      >
-    >;
+    Partial<Pick<Project, 'primaryContractAddress' | 'primaryContractChainId' | 'mintingWalletAddress'>>;
   userId: string;
 } & OptionalPrismaTransaction) {
   const hasEnsName = !!input.mintingWalletAddress && input.mintingWalletAddress.trim().endsWith('.eth');
@@ -92,8 +78,6 @@ export async function createProject({
       createdBy: userId,
       description: input.description,
       optimismCategory: input.optimismCategory,
-      sunnyAwardsCategory: input.sunnyAwardsCategory,
-      sunnyAwardsCategoryDetails: input.sunnyAwardsCategoryDetails,
       websites: input.websites?.filter(isTruthy),
       farcasterValues: input.farcasterValues?.filter(isTruthy),
       twitter: input.twitter,
@@ -103,8 +87,6 @@ export async function createProject({
       primaryContractAddress: input.primaryContractAddress,
       primaryContractChainId: input.primaryContractChainId,
       mintingWalletAddress: input.mintingWalletAddress,
-      sunnyAwardsProjectType: input.sunnyAwardsProjectType,
-      sunnyAwardsNumber: input.sunnyAwardsNumber,
       source,
       projectMembers: {
         createMany: {

@@ -1,6 +1,6 @@
 import { baseUrl } from '@root/config/constants';
 
-export function ProductUpdatesText({
+export function ProductUpdatesFrame({
   text,
   createdAtLocal,
   projectName,

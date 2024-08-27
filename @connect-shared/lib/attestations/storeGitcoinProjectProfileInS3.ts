@@ -7,7 +7,6 @@ import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/
 import { replaceS3Domain } from '@root/lib/utils/url';
 
 import { getAttestationS3Path } from '../../../lib/credentials/getAttestationS3Path';
-import type { ConnectProjectDetails } from '../projects/findProject';
 import { findProject } from '../projects/findProject';
 
 type GitcoinUserProfile = {
@@ -17,12 +16,11 @@ type GitcoinUserProfile = {
 };
 
 export async function storeGitcoinProjectProfileInS3({
-  projectOrProjectId
+  projectId
 }: {
-  projectOrProjectId: ConnectProjectDetails | string;
+  projectId: string;
 }): Promise<{ staticFilePath: string; profile: GitcoinUserProfile }> {
-  const project =
-    typeof projectOrProjectId === 'string' ? await findProject({ id: projectOrProjectId }) : projectOrProjectId;
+  const project = await findProject({ id: projectId });
 
   if (!project) {
     throw new DataNotFoundError('Project not found');

@@ -1,7 +1,6 @@
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { baseUrl } from '@root/config/constants';
 
-export function ProjectShareItem({ project }: { project: NonNullable<ConnectProjectDetails> }) {
+export function ProjectShareItem({ project }: { project: { name?: string | null; sunnyAwardsNumber: number | null } }) {
   const projectName = project.name?.substring(0, 30) || 'Untitled';
   const defaultFont =
     'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';

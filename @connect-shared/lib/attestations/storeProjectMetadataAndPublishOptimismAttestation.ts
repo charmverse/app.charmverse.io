@@ -4,8 +4,6 @@ import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 
-import { findProject } from '../projects/findProject';
-
 import { createProjectViaAgora, storeProjectMetadataViaAgora, AGORA_API_KEY } from './agoraApi';
 
 // Format for metadata.json:
@@ -35,11 +33,7 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     }
   });
 
-  const project = await findProject({ id: projectId });
-
-  if (!project) {
-    throw new DataNotFoundError('Project not found');
-  }
+  const project = await prisma.project.findUniqueOrThrow({ where: { id: projectId }, select: { name: true } });
 
   const fcProfile = await getFarcasterProfile({
     fid: farcasterUser.fid

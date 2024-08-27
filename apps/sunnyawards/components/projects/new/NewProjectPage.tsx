@@ -23,7 +23,7 @@ import { ProjectForm } from '../components/ProjectForm';
 
 import { ImportOptimismProject } from './ImportOptimismProject';
 
-export function CreateProjectPage({
+export function NewProjectPage({
   user,
   optimismProjects
 }: {

@@ -1,20 +1,24 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
+import { ProjectShareItem } from '@connect-shared/components/ProjectShareItem';
 import { getUserS3FilePath, uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
 import { ImageResponse } from 'next/og';
 import React from 'react';
 import sharp from 'sharp';
-
-import { ProjectShareItem } from '../../components/ProjectShareItem';
-
-import { findProject } from './findProject';
 
 export async function saveOgImage(projectId: string, userId: string) {
   if (!projectId) {
     throw new DataNotFoundError('No id provided');
   }
 
-  const project = await findProject({
-    id: projectId
+  const project = await prisma.project.findUnique({
+    where: {
+      id: projectId
+    },
+    select: {
+      name: true,
+      sunnyAwardsNumber: true
+    }
   });
 
   if (!project) {

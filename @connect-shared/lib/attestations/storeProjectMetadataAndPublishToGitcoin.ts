@@ -2,13 +2,10 @@ import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { GitcoinProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
 import { attestOnchain } from '@root/lib/credentials/attestOnchain';
 import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
 import { storeProjectInS3 } from '@root/lib/credentials/storeProjectInS3';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
-
-import { findProject } from '../projects/findProject';
 
 import { projectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
@@ -17,10 +14,10 @@ const currentGitcoinRound = 'cm0ayus350005zwyb4vtureu1';
 
 export async function storeProjectMetadataAndPublishGitcoinAttestation({
   userId,
-  projectIdOrPath
+  projectId
 }: {
   userId: string;
-  projectIdOrPath: string;
+  projectId: string;
 }): Promise<GitcoinProjectAttestation> {
   const farcasterUser = await prisma.farcasterUser.findUniqueOrThrow({
     where: {
@@ -32,13 +29,10 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     }
   });
 
-  const project = await findProject(
-    stringUtils.isUUID(projectIdOrPath) ? { id: projectIdOrPath } : { path: projectIdOrPath }
-  );
-
-  if (!project) {
-    throw new DataNotFoundError('Project not found');
-  }
+  const project = await prisma.project.findFirstOrThrow({
+    where: { id: projectId },
+    select: { id: true, name: true }
+  });
 
   const fcProfile = await getFarcasterProfile({
     fid: farcasterUser.fid
@@ -48,12 +42,12 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     throw new DataNotFoundError('Farcaster profile not found');
   }
   const { staticFilePath } = await storeProjectInS3({
-    projectOrProjectId: project,
+    projectId: project.id,
     storageFormat: 'gitcoin'
   });
 
   const { staticFilePath: profileFilePath } = await storeGitcoinProjectProfileInS3({
-    projectOrProjectId: project
+    projectId: project.id
   });
 
   const existingAttestations = await prisma.gitcoinProjectAttestation.findMany({

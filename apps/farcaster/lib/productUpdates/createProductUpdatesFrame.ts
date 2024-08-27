@@ -5,7 +5,7 @@ import React from 'react';
 import sharp from 'sharp';
 import { v4 } from 'uuid';
 
-import { ProductUpdatesText } from 'components/product-updates/components/ProductUpdatesText';
+import { ProductUpdatesFrame } from 'components/product-updates/frames/[id]/ProductUpdatesFrame';
 
 import type { FormValues } from './schema';
 
@@ -51,7 +51,7 @@ export async function createProductUpdatesFrame(input: FormValues) {
     projectAvatarImageUrl = projectAvatarFileUrl;
   }
 
-  const element = React.createElement(ProductUpdatesText, {
+  const element = React.createElement(ProductUpdatesFrame, {
     text: input.text,
     createdAtLocal: input.createdAtLocal,
     projectName: project.name,

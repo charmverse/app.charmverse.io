@@ -30,7 +30,7 @@ import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formFiel
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
-import { CreateProjectForm } from './components/CreateProjectForm';
+import { NewProjectForm } from './components/NewProjectForm';
 import { ProjectForm } from './components/ProjectForm';
 
 export function ProjectsSettings() {
@@ -38,7 +38,7 @@ export function ProjectsSettings() {
 
   const { data: projectsWithMembers, mutate } = useGetProjects();
   const [openedAccordion, setOpenedAccordion] = useState<null | string>(null);
-  const [isCreateProjectFormOpen, setIsCreateProjectFormOpen] = useState(false);
+  const [isNewProjectFormOpen, setIsNewProjectFormOpen] = useState(false);
 
   return (
     <>
@@ -53,20 +53,20 @@ export function ProjectsSettings() {
           data-test='add-project-button'
           onClick={() => {
             setOpenedAccordion(null);
-            setIsCreateProjectFormOpen(true);
+            setIsNewProjectFormOpen(true);
           }}
         >
           New
         </Button>
       </Box>
 
-      {isCreateProjectFormOpen && (
-        <CreateProjectForm
+      {isNewProjectFormOpen && (
+        <NewProjectForm
           onCancel={() => {
-            setIsCreateProjectFormOpen(false);
+            setIsNewProjectFormOpen(false);
           }}
           onSave={() => {
-            setIsCreateProjectFormOpen(false);
+            setIsNewProjectFormOpen(false);
           }}
         />
       )}
