@@ -66,7 +66,7 @@ export function pluginLoader<T = any>(
 
     flatPlugins = flatPlugins.concat(
       // TODO: deprecate the ability pass a callback to the plugins param of pluginGroup
-      flatten(defaultPluginGroups, pluginPayload)[0]
+      flatten(defaultPluginGroups as RawPlugins, pluginPayload)[0]
     );
 
     flatPlugins = processInputRules(flatPlugins);
