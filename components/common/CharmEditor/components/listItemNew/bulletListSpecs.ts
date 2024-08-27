@@ -1,4 +1,3 @@
-import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { Node, DOMOutputSpec, NodeSpec } from 'prosemirror-model';
 

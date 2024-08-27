@@ -24,6 +24,7 @@ import { createProductUpdatesFrameAction } from 'lib/productUpdates/createProduc
 import { schema, type FormValues } from 'lib/productUpdates/schema';
 import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid';
 
+import { CharmTextField } from './CharmTextField';
 import { ProjectAvatar } from './ProjectAvatar';
 
 export function NewProductUpdateForm({
@@ -150,11 +151,8 @@ export function NewProductUpdateForm({
             control={control}
             name='text'
             render={({ field, fieldState }) => (
-              <TextField
+              <CharmTextField
                 disabled={isExecuting}
-                multiline
-                rows={8}
-                aria-labelledby='product-updates'
                 placeholder='1. Updated documentation ...'
                 helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'
                 error={!!fieldState.error}

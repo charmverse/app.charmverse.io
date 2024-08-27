@@ -1,0 +1,22 @@
+{
+  "name": "@packages/charmeditor",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npx tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@packages/utils": "^1.0.0",
+    "prosemirror": "^0.11.1",
+    "prosemirror-commands": "^1.6.0",
+    "prosemirror-inputrules": "^1.4.0",
+    "prosemirror-keymap": "^1.2.2",
+    "prosemirror-markdown": "^1.13.0",
+    "prosemirror-model": "^1.22.3",
+    "prosemirror-schema-list": "^1.4.1",
+    "prosemirror-state": "^1.4.3"
+  },
+  "exports": {
+    ".": "./src/ui/index.tsx"
+  }
+}
