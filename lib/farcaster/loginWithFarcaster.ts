@@ -72,6 +72,37 @@ export async function loginWithFarcaster({
     throw new InvalidStateError('Invalid signature');
   }
 
+  return createOrUpdateFarcasterUser({
+    fid,
+    username,
+    displayName,
+    bio,
+    pfpUrl,
+    verifications,
+    signupAnalytics,
+    newUserId
+  });
+}
+
+export async function createOrUpdateFarcasterUser({
+  bio,
+  displayName,
+  fid,
+  pfpUrl,
+  signupAnalytics = {},
+  username,
+  verifications,
+  newUserId
+}: {
+  fid: number;
+  username: string;
+  displayName?: string;
+  bio?: string;
+  pfpUrl?: string;
+  verifications: string[];
+  signupAnalytics?: Partial<SignupAnalytics>;
+  newUserId?: string;
+}): Promise<LoggedInUser> {
   const farcasterUser = await prisma.farcasterUser.findUnique({
     where: {
       fid
