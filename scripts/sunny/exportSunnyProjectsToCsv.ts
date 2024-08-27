@@ -10,12 +10,14 @@ async function exportSunnyProjectsToCsv() {
 
   const projects = await prisma.project.findMany({
     where: {
-      source: 'sunny_awards'
+      source: 'sunny_awards',
+      gitcoinProjectAttestations: {
+        some: {}
+      }
     },
     orderBy: {
       createdAt: 'desc'
     },
-    take: 10,
     include: {
       user: {
         include: {
@@ -27,9 +29,19 @@ async function exportSunnyProjectsToCsv() {
           chainId: optimism.id
         }
       },
+      gitcoinProjectAttestations: {
+        where: {
+          chainId: optimism.id,
+          type: 'application'
+        }
+      },
       projectMembers: {
         select: {
-          farcasterId: true
+          user: {
+            select: {
+              farcasterUser: true
+            }
+          }
         }
       }
     }
@@ -41,7 +53,8 @@ async function exportSunnyProjectsToCsv() {
 
     const creatorAccount = project.user.farcasterUser?.account as FarcasterProfile['body'];
 
-    const attestationUid = project.pptimismProjectAttestations?.find(attestation => attestation.chainId === optimism.id)?.metadataAttestationUID;
+    const attestationUid = project.pptimismProjectAttestations[0]?.metadataAttestationUID;
+    const gitcoinAttestationUid = project.gitcoinProjectAttestations[0]?.attestationUID;
 
     return {
       Url: `${baseUrl}/p/${project.path}`,
@@ -49,7 +62,7 @@ async function exportSunnyProjectsToCsv() {
       Name: project.name,
       Type: project.sunnyAwardsProjectType || '',
       Creator: `https://warpcast.com/${creatorAccount.username}`,
-      "Team members": project.projectMembers.map(member => member.farcasterId).join(", "),
+      "Team members": project.projectMembers.map(member => (member.user?.farcasterUser?.account as FarcasterProfile['body']).username).join(", "),
       Category: project.sunnyAwardsCategory || '',
       Website: project.websites[0] || '',
       "Additional Urls": project.websites.slice(1).join(newLine)  || '',
@@ -57,6 +70,7 @@ async function exportSunnyProjectsToCsv() {
       "Twitter": project.twitter || '',
       "Description": project.description || '',
       "Agora Metadata Attestation": attestationUid ? `https://optimism.easscan.org/attestation/view/${attestationUid}` : '',
+      "EasyRetroPGF Metadata Attestation": gitcoinAttestationUid ? `https://optimism.easscan.org/attestation/view/${gitcoinAttestationUid}` : ''
     }
   })
 
@@ -66,7 +80,6 @@ async function exportSunnyProjectsToCsv() {
     columns: Object.keys(rows[0])
   });
 
-  console.log(csvString);
   writeFileSync(`./scripts/sunny/project-export.csv`, csvString);
 
 }
