@@ -13,7 +13,7 @@ export const charmParser = new MarkdownParser(specRegistry.schema, markdownit('c
   ordered_list: {
     block: 'ordered_list',
     getAttrs: (tok, tokens, i) => ({
-      order: +tok.attrGet('start') || 1,
+      order: +(tok.attrGet('start') || '1') || 1,
       tight: listIsTight(tokens, i)
     })
   },
@@ -26,7 +26,7 @@ export const charmParser = new MarkdownParser(specRegistry.schema, markdownit('c
     getAttrs: (tok) => ({
       src: tok.attrGet('src'),
       title: tok.attrGet('title') || null,
-      alt: (tok.children[0] && tok.children[0].content) || null
+      alt: (tok.children?.[0] && tok.children[0].content) || null
     })
   },
   hardbreak: { node: 'hardBreak' },

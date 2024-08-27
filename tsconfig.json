@@ -62,6 +62,6 @@
       "@charmverse/core/errors": ["node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },
-  "exclude": ["node_modules", "apps"],
+  "exclude": ["node_modules", "apps", "packages"],
   "include": ["**/*.ts", "**/*.tsx"]
 }
