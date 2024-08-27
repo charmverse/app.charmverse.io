@@ -6,13 +6,24 @@ import { writeFileSync } from "node:fs";
 
 const baseUrl = 'https://register.thesunnyawards.fun';
 
+const hideList = [
+  4339,
+  4356,
+  472,
+  290639
+]
+
 async function exportSunnyProjectsToCsv() {
 
   const projects = await prisma.project.findMany({
     where: {
       source: 'sunny_awards',
-      gitcoinProjectAttestations: {
-        some: {}
+      projectMembers: {
+        every: {
+          farcasterId: {
+            notIn: hideList
+          }
+        }
       }
     },
     orderBy: {
@@ -62,7 +73,7 @@ async function exportSunnyProjectsToCsv() {
       Name: project.name,
       Type: project.sunnyAwardsProjectType || '',
       Creator: `https://warpcast.com/${creatorAccount.username}`,
-      "Team members": project.projectMembers.map(member => (member.user?.farcasterUser?.account as FarcasterProfile['body']).username).join(", "),
+      "Team members": project.projectMembers.map(member => (member.user?.farcasterUser?.account as FarcasterProfile['body'])?.username).join(", "),
       Category: project.sunnyAwardsCategory || '',
       Website: project.websites[0] || '',
       "Additional Urls": project.websites.slice(1).join(newLine)  || '',
