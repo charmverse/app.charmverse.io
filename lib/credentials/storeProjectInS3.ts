@@ -1,4 +1,5 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { findProject } from '@connect-shared/lib/projects/findProject';
 import { awsS3Bucket } from '@root/config/constants';
@@ -36,6 +37,18 @@ export async function storeProjectInS3<T = any>({
     throw new DataNotFoundError('Project not found');
   }
 
+  const optimismAttestation = await prisma.optimismProjectAttestation.findFirst({
+    where: {
+      projectId: project.id
+    },
+    select: {
+      projectRefUID: true
+    },
+    orderBy: {
+      timeCreated: 'desc'
+    }
+  });
+
   // Expand extra fields
   project = { ...project, ...extraData };
 
@@ -48,7 +61,7 @@ export async function storeProjectInS3<T = any>({
     .filter((m) => !!m.farcasterId) as { farcasterId: number }[];
 
   if (storageFormat === 'gitcoin') {
-    formattedProject = mapProjectToGitcoin({ project });
+    formattedProject = mapProjectToGitcoin({ project, agoraProjectRefUID: optimismAttestation?.projectRefUID });
     filePath = getAttestationS3Path({
       schemaId: gitcoinProjectCredentialSchemaId,
       charmverseId: project.id,
