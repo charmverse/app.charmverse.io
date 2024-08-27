@@ -4,6 +4,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
+import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { trackMixpanelEvent } from '@connect-shared/lib/mixpanel/trackMixpanelEvent';
 import { isTestEnv } from '@root/config/constants';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
@@ -48,6 +49,11 @@ export const createProjectAction = authActionClient
           error,
           userId: currentUserId
         });
+      });
+
+      await storeProjectMetadataAndPublishGitcoinAttestation({
+        projectIdOrPath: newProject.id,
+        userId: ctx.session.user.id
       });
 
       await storeCharmverseProjectMetadata({

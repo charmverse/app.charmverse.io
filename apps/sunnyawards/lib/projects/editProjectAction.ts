@@ -2,6 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
+import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { storeUpdatedProjectMetadataAttestation } from '@connect-shared/lib/attestations/storeUpdatedProjectMetadataAttestation';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
@@ -43,6 +44,11 @@ export const editProjectAction = authActionClient
           projectId: editedProject.id,
           userId: editedProject.createdBy
         });
+      });
+
+      await storeProjectMetadataAndPublishGitcoinAttestation({
+        projectIdOrPath: editedProject.id,
+        userId: editedProject.createdBy
       });
     }
 
