@@ -5,6 +5,8 @@ import type { AccessControlCondition, TokenGate } from '@root/lib/tokenGates/int
 import { getLockMetadata } from '@root/lib/tokenGates/unlock/getLockMetadata';
 import { getTokenMetadata } from '@root/lib/tokens/getTokenMetadata';
 
+import { toBigInt } from '../utils/numbers';
+
 import { getNFT } from './getNFTs';
 import { getPoapByEventId } from './poaps';
 
@@ -29,7 +31,7 @@ async function getAccessControlMetaData(condition: AccessControlCondition) {
     case 'Hats':
     case 'ERC721':
     case 'ERC1155': {
-      const tokenId = BigInt(condition.tokenIds.at(0) || '1').toString();
+      const tokenId = toBigInt(condition.tokenIds.at(0) || '1').toString();
       const nft = await getNFT({
         address: condition.contractAddress,
         tokenId,

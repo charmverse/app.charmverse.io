@@ -156,3 +156,11 @@ export function getNumberFromString(strValue: string): number | null {
 export function roundNumber(num: number | undefined | null): string | undefined {
   return num?.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
+
+export function toBigInt(value: any) {
+  try {
+    return BigInt(value);
+  } catch (e) {
+    return BigInt(1);
+  }
+}
