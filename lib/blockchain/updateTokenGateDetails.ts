@@ -5,13 +5,14 @@ import type { AccessControlCondition, TokenGate } from '@root/lib/tokenGates/int
 import { getLockMetadata } from '@root/lib/tokenGates/unlock/getLockMetadata';
 import { getTokenMetadata } from '@root/lib/tokens/getTokenMetadata';
 
-import { toBigInt } from '../utils/numbers';
+import { handleAllSettled } from 'lib/utils/async';
+import { toBigInt } from 'lib/utils/numbers';
 
 import { getNFT } from './getNFTs';
 import { getPoapByEventId } from './poaps';
 
 export async function updateTokenGateDetails<T extends TokenGate>(tokenGates: T[] = []): Promise<T[]> {
-  const updatedTokenGates = await Promise.all(tokenGates.map(getConditionMetadata));
+  const updatedTokenGates = await Promise.allSettled(tokenGates.map(getConditionMetadata)).then(handleAllSettled);
   return updatedTokenGates;
 }
 
