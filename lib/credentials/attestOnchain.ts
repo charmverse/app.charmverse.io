@@ -3,9 +3,9 @@ import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { credentialsWalletPrivateKey } from '@root/config/constants';
 import { getChainById } from '@root/connectors/chains';
+import { getCurrentGasPrice } from '@root/lib/blockchain/getCurrentGasPrice';
+import { getEthersProvider } from '@root/lib/blockchain/getEthersProvider';
 import { Wallet } from 'ethers';
-
-import { getEthersProvider } from '../blockchain/getEthersProvider';
 
 import type { EasSchemaChain } from './connectors';
 import { getEasInstance } from './getEasInstance';
@@ -34,16 +34,21 @@ export async function attestOnchain<T extends ExtendedAttestationType = Extended
 
   const eas = getEasInstance(chainId);
 
+  const currentGasPrice = await getCurrentGasPrice({ chainId });
+
   eas.connect(wallet);
 
   const attestationUid = await eas
-    .attest({
-      schema: schemaId,
-      data: {
-        recipient: credentialInputs.recipient ?? NULL_ADDRESS,
-        data: encodeAttestation({ type, data: credentialInputs.data })
-      }
-    })
+    .attest(
+      {
+        schema: schemaId,
+        data: {
+          recipient: credentialInputs.recipient ?? NULL_ADDRESS,
+          data: encodeAttestation({ type, data: credentialInputs.data })
+        }
+      },
+      { gasPrice: currentGasPrice }
+    )
     .then((tx) => tx.wait());
 
   log.info(`Issued ${type} credential on chain ${chainId}`);
