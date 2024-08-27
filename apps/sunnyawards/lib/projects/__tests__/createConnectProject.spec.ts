@@ -79,20 +79,41 @@ describe('createConnectProject', () => {
     const createdProject = await createProject({
       input: {
         name: 'Project',
-        sunnyAwardsCategory: 'CeFi',
+        sunnyAwardsCategory: 'Art NFTs',
+        sunnyAwardsProjectType: 'app',
         sunnyAwardsCategoryDetails: 'Extra info',
         description: 'Project description',
         projectMembers: [
           {
+            farcasterUser: {
+              fid: 1,
+              username: 'user-1'
+            },
+            name: 'User 1',
             farcasterId: 1
           },
           {
+            farcasterUser: {
+              fid: 2,
+              username: 'user-2'
+            },
+            name: 'User 2',
             farcasterId: 2
           },
           {
+            farcasterUser: {
+              fid: 3,
+              username: 'user-3'
+            },
+            name: 'User 3',
             farcasterId: 3
           },
           {
+            farcasterUser: {
+              fid: 4,
+              username: 'user-4'
+            },
+            name: 'User 4',
             farcasterId: 4
           }
         ]
