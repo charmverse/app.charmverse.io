@@ -29,9 +29,6 @@
       "@connect-shared/*": [
         "../../@connect-shared/*"
       ],
-      // "@packages/charmeditor/*": [
-      //   "../../packages/charmeditor/*"
-      // ],
       "components/*": [
         "./components/*"
       ],
