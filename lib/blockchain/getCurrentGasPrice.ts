@@ -1,4 +1,4 @@
-import { redisClient } from 'adapters/redis/redisClient';
+import { redisClient } from '@root/adapters/redis/redisClient';
 
 import { getPublicClient } from './publicClient';
 
