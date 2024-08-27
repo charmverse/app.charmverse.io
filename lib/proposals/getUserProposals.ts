@@ -2,6 +2,8 @@ import type { ProposalEvaluationResult, ProposalEvaluationType, ProposalStatus }
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
+import { permissionsApiClient } from '../permissions/api/client';
+
 type CurrentEvaluation = {
   id: string;
   type: ProposalEvaluationType;
@@ -68,6 +70,20 @@ export async function getUserProposals({
           }
         },
         {
+          ProposalAppealReviewer: {
+            some: {
+              userId
+            }
+          }
+        },
+        {
+          proposalEvaluationApprovers: {
+            some: {
+              userId
+            }
+          }
+        },
+        {
           reviewers: {
             some: {
               systemRole: 'space_member'
@@ -98,6 +114,11 @@ export async function getUserProposals({
       }
     },
     select: {
+      workflow: {
+        select: {
+          privateEvaluations: true
+        }
+      },
       id: true,
       status: true,
       authors: {
@@ -118,6 +139,11 @@ export async function getUserProposals({
           type: true,
           dueDate: true,
           title: true,
+          appealReviews: {
+            select: {
+              reviewerId: true
+            }
+          },
           reviews: {
             select: {
               reviewerId: true
@@ -131,6 +157,16 @@ export async function getUserProposals({
                   userId: true
                 }
               }
+            }
+          },
+          appealReviewers: {
+            select: {
+              userId: true
+            }
+          },
+          evaluationApprovers: {
+            select: {
+              userId: true
             }
           },
           reviewers: {
@@ -178,7 +214,11 @@ export async function getUserProposals({
             (reviewer.roleId && userRoles.includes(reviewer.roleId)) ||
             reviewer.systemRole === 'space_member'
         );
+        const canReviewAppeal = currentEvaluation?.appealReviewers.some((reviewer) => reviewer.userId === userId);
+        const canApprove = currentEvaluation?.evaluationApprovers.some((approver) => approver.userId === userId);
         const hasReviewed = currentEvaluation?.reviews.some((review) => review.reviewerId === userId);
+        const hasAppealReviewed = currentEvaluation?.appealReviews.some((review) => review.reviewerId === userId);
+        const hasApproved = currentEvaluation?.evaluationApprovers.some((approver) => approver.userId === userId);
         const hasVoted =
           currentEvaluation?.type === 'vote' &&
           currentEvaluation.vote?.userVotes.some((vote) => vote.userId === userId);
@@ -200,7 +240,11 @@ export async function getUserProposals({
           status: proposal.status
         };
 
-        if (canReview && !currentEvaluation?.result && !hasVoted && !hasReviewed) {
+        if (
+          ((canReview && !hasReviewed) || (canReviewAppeal && !hasAppealReviewed) || (canApprove && !hasApproved)) &&
+          !currentEvaluation?.result &&
+          !hasVoted
+        ) {
           actionableProposals.push(userProposal);
         } else if (isAuthor) {
           authoredProposals.push(userProposal);
