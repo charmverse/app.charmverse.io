@@ -11,7 +11,7 @@ import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
 import { ProjectForm } from './ProjectForm';
 
-export function CreateProjectForm({
+export function NewProjectForm({
   onCancel,
   onSave
 }: {

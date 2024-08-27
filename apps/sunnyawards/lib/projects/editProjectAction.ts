@@ -4,12 +4,13 @@ import { log } from '@charmverse/core/log';
 import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { storeUpdatedProjectMetadataAttestation } from '@connect-shared/lib/attestations/storeUpdatedProjectMetadataAttestation';
-import type { EditProjectValues } from '@connect-shared/lib/projects/editProject';
-import { editProject } from '@connect-shared/lib/projects/editProject';
-import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
+import { generateOgImage } from '@root/lib/projects/generateOgImage';
 import { revalidatePath } from 'next/cache';
+
+import { editProject } from 'lib/projects/editProject';
+import type { EditProjectValues } from 'lib/projects/editProject';
 
 import { schema } from './schema';
 
@@ -46,7 +47,7 @@ export const editProjectAction = authActionClient
       });
 
       await storeProjectMetadataAndPublishGitcoinAttestation({
-        projectIdOrPath: editedProject.id,
+        projectId: editedProject.id,
         userId: editedProject.createdBy
       }).catch((error) => {
         log.error('Failed to store project metadata and publish Gitcoin attestation', {

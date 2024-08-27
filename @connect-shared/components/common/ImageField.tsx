@@ -1,29 +1,29 @@
 'use client';
 
-import type { FormValues } from '@connect-shared/lib/projects/projectSchema';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { shape } from '@mui/system';
 import Image from 'next/image';
-import type { Control } from 'react-hook-form';
+import type { Control, FieldValues, Path } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
 import { useS3UploadInput } from '../../hooks/useS3UploadInput';
 
 const height = 96;
 
-export function ProjectImageField({
+export function ImageField<T extends FieldValues = object>({
   control,
   name,
   type
 }: {
   type: 'avatar' | 'cover';
-  control: Control<FormValues>;
-  name: keyof FormValues;
+  control: Control<T>;
+  name: keyof T;
 }) {
+  const typedName = name as Path<T>;
   const { field } = useController({
-    name,
+    name: typedName,
     control
   });
 
@@ -35,7 +35,7 @@ export function ProjectImageField({
 
   return (
     <Controller
-      name={name}
+      name={typedName}
       control={control}
       render={() => (
         <Box
@@ -47,7 +47,6 @@ export function ProjectImageField({
           }}
         >
           <input
-            title={`Add ${type}`}
             disabled={isUploading}
             type='file'
             accept={'image/*'}

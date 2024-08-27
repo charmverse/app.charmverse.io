@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
-
 import { getFarcasterUsers } from '../farcaster/getFarcasterUsers';
+
+import type { OptimismProjectAttestationContent } from './getOpProjectsByFarcasterId';
 
 export async function getOpProjectsByAttestationId({ projectRefUID }: { projectRefUID: string }) {
   const optimismProjectAttestation = await prisma.optimismProjectAttestation.findUnique({

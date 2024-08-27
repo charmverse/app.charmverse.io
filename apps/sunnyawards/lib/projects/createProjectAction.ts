@@ -6,14 +6,14 @@ import { authActionClient } from '@connect-shared/lib/actions/actionClient';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { trackMixpanelEvent } from '@connect-shared/lib/mixpanel/trackMixpanelEvent';
-import { createProject } from '@connect-shared/lib/projects/createProject';
-import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { isTestEnv } from '@root/config/constants';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
+import { generateOgImage } from '@root/lib/projects/generateOgImage';
 
 import { sendProjectConfirmationEmail } from 'lib/mailer/sendProjectConfirmationEmail';
 
+import { createProject } from './createProject';
 import { getOptimismCategory, schema } from './schema';
 
 export const createProjectAction = authActionClient
@@ -34,9 +34,7 @@ export const createProjectAction = authActionClient
       userId: currentUserId,
       input: {
         ...input,
-        sunnyAwardsNumber: totalProjects + 1,
-        optimismCategory: getOptimismCategory(input.sunnyAwardsCategory),
-        primaryContractChainId: input.primaryContractChainId ? parseInt(input.primaryContractChainId) : undefined
+        sunnyAwardsNumber: totalProjects + 1
       },
       source: 'sunny_awards'
     });
@@ -54,7 +52,7 @@ export const createProjectAction = authActionClient
       });
 
       await storeProjectMetadataAndPublishGitcoinAttestation({
-        projectIdOrPath: newProject.id,
+        projectId: newProject.id,
         userId: ctx.session.user.id
       }).catch((error) => {
         log.error('Failed to store project metadata and publish Gitcoin attestation', {

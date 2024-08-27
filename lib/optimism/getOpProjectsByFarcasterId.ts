@@ -1,10 +1,21 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
+import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 
 import type { FarcasterUser } from '../farcaster/getFarcasterUsers';
 import { getFarcasterUsers } from '../farcaster/getFarcasterUsers';
 import { isTruthy } from '../utils/types';
+
+import type { OptimismProjectMetadata } from './storeOptimismProjectAttestations';
+
+export type OptimismProjectAttestationContent = Omit<OptimismProjectAttestation, 'metadata'> & {
+  metadata: OptimismProjectMetadata;
+  teamMembers: {
+    username: string;
+    name: string;
+    avatar: string;
+    fid: number;
+  }[];
+};
 
 export async function getOpProjectsByFarcasterId({ farcasterId }: { farcasterId: number }) {
   const optimismProjectAttestations = await prisma.optimismProjectAttestation.findMany({
