@@ -2,8 +2,6 @@ import type { ProposalEvaluationResult, ProposalEvaluationType, ProposalStatus }
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
-import { permissionsApiClient } from '../permissions/api/client';
-
 type CurrentEvaluation = {
   id: string;
   type: ProposalEvaluationType;

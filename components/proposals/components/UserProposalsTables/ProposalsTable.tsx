@@ -72,7 +72,7 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                   </TableCell>
                   <TableCell align='center' width={200}>
                     {proposal.currentEvaluation?.result ? (
-                      <Typography>{proposal.currentEvaluation.result ? 'Passed' : 'Failed'}</Typography>
+                      <Typography>{proposal.currentEvaluation.result === 'pass' ? 'Passed' : 'Failed'}</Typography>
                     ) : (
                       <Typography>In progress</Typography>
                     )}

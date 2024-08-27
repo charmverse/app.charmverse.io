@@ -9,11 +9,14 @@ import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import MultiTabs from 'components/common/MultiTabs';
 import { useUser } from 'hooks/useUser';
+import type { OptimismProjectAttestationContent } from 'lib/optimism/getOpProjectsByFarcasterId';
+import type {
+  ProjectCategory as OptimismProjectCategory,
+  FormValues as OptimismProjectFormValues
+} from 'lib/optimism/projectSchema';
 import { isValidUrl } from 'lib/utils/isValidUrl';
-import type { OptimismProjectAttestationContent } from 'pages/api/optimism/projects';
 
 import { FarcasterCard, OptimismProjectForm } from './OptimismProjectForm';
-import type { OptimismProjectCategory, OptimismProjectFormValues } from './optimismProjectFormValues';
 
 function OptimismProjectFields({
   value,

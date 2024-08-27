@@ -1,9 +1,17 @@
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
+import type { Metadata } from 'next';
 
-import { ProductUpdatesComposerAction } from 'components/product-updates/ProductUpdatesComposerAction';
-import { encrypt, decrypt } from 'lib/crypto';
+import { ProductUpdatesPage } from 'components/product-updates/ProductUpdatesPage';
+import { decrypt } from 'lib/crypto';
 import { getConnectProjectsByFid } from 'lib/projects/getConnectProjectsByFid';
+
+export const metadata: Metadata = {
+  other: {
+    robots: 'noindex'
+  },
+  title: 'Product Updates'
+};
 
 export default async function Home({
   searchParams
@@ -14,7 +22,7 @@ export default async function Home({
   };
 }) {
   const token = searchParams.token;
-  const fidParam = searchParams.fid;
+  const fidParam = process.env.NODE_ENV !== 'production' && searchParams.fid;
 
   const fidStr = token ? decrypt(token) : fidParam;
   if (!fidStr) {
@@ -32,7 +40,7 @@ export default async function Home({
 
   return (
     <PageWrapper>
-      <ProductUpdatesComposerAction farcasterUser={farcasterUser} connectProjects={connectProjects} />
+      <ProductUpdatesPage farcasterUser={farcasterUser} connectProjects={connectProjects} />
     </PageWrapper>
   );
 }

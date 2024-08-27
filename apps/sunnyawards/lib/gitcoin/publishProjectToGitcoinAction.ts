@@ -23,7 +23,12 @@ export const publishProjectToGitcoinAction = authActionClient
         }
       },
       select: {
-        id: true
+        id: true,
+        project: {
+          select: {
+            id: true
+          }
+        }
       }
     });
 
@@ -31,8 +36,14 @@ export const publishProjectToGitcoinAction = authActionClient
       throw new WrongStateError('Project already published to Gitcoin');
     }
 
+    const project = await prisma.project.findFirstOrThrow({
+      where: {
+        path: projectPath
+      }
+    });
+
     await storeProjectMetadataAndPublishGitcoinAttestation({
-      projectIdOrPath: projectPath,
+      projectId: project.id,
       userId: ctx.session.user.id
     });
 

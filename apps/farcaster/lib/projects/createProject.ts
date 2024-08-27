@@ -2,14 +2,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-client';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath } from '@root/lib/utils/strings';
-import { isTruthy } from '@root/lib/utils/types';
 
 import type { FormValues } from './projectSchema';
 
 export async function createProject(input: FormValues) {
   const farcasterUser = await prisma.farcasterUser.findFirstOrThrow({
     where: {
-      fid: input.projectMembers[0].farcasterId
+      fid: input.teamLeadFarcasterId
     },
     select: {
       userId: true,
@@ -43,13 +42,7 @@ export async function createProject(input: FormValues) {
       path,
       updatedBy: userId,
       createdBy: userId,
-      description: input.description,
-      websites: input.websites?.filter(isTruthy),
-      farcasterValues: input.farcasterValues?.filter(isTruthy),
-      twitter: input.twitter,
-      github: input.github,
       avatar: input.avatar,
-      coverImage: input.coverImage,
       source: 'farcaster',
       projectMembers: {
         createMany: {
@@ -59,7 +52,7 @@ export async function createProject(input: FormValues) {
               updatedBy: userId,
               userId,
               name: (farcasterUser.account as unknown as StatusAPIResponse).displayName as string,
-              farcasterId: input.projectMembers[0]?.farcasterId
+              farcasterId: input.teamLeadFarcasterId
             }
           ]
         }

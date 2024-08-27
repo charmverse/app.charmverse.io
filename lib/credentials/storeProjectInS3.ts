@@ -1,5 +1,5 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
+import { prisma } from '@charmverse/core/prisma-client';
 import { findProject } from '@connect-shared/lib/projects/findProject';
 import { awsS3Bucket } from '@root/config/constants';
 import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
@@ -17,11 +17,11 @@ const storageFormats = ['gitcoin', 'optimism', 'charmverse'] as const;
 type ProjectStorageFormat = (typeof storageFormats)[number];
 
 export async function storeProjectInS3<T = any>({
-  projectOrProjectId,
+  projectId,
   storageFormat,
   extraData
 }: {
-  projectOrProjectId: ConnectProjectDetails | string;
+  projectId: string;
   storageFormat: ProjectStorageFormat;
   extraData?: T;
 }): Promise<{ staticFilePath: string; mappedProject: any }> {
@@ -29,12 +29,23 @@ export async function storeProjectInS3<T = any>({
     throw new InvalidInputError('Invalid storage format');
   }
 
-  let project =
-    typeof projectOrProjectId === 'string' ? await findProject({ id: projectOrProjectId }) : projectOrProjectId;
+  let project = await findProject({ id: projectId });
 
   if (!project) {
     throw new DataNotFoundError('Project not found');
   }
+
+  const optimismAttestation = await prisma.optimismProjectAttestation.findFirst({
+    where: {
+      projectId: project.id
+    },
+    select: {
+      projectRefUID: true
+    },
+    orderBy: {
+      timeCreated: 'desc'
+    }
+  });
 
   // Expand extra fields
   project = { ...project, ...extraData };
@@ -48,7 +59,7 @@ export async function storeProjectInS3<T = any>({
     .filter((m) => !!m.farcasterId) as { farcasterId: number }[];
 
   if (storageFormat === 'gitcoin') {
-    formattedProject = mapProjectToGitcoin({ project });
+    formattedProject = mapProjectToGitcoin({ project, agoraProjectRefUID: optimismAttestation?.projectRefUID });
     filePath = getAttestationS3Path({
       schemaId: gitcoinProjectCredentialSchemaId,
       charmverseId: project.id,

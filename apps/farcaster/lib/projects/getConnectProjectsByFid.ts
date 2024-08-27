@@ -1,7 +1,7 @@
 import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-export type ConnectProjectMinimal = Pick<Project, 'id' | 'name'>;
+export type ConnectProjectMinimal = Pick<Project, 'id' | 'name' | 'avatar'>;
 
 export async function getConnectProjectsByFid(fid: number): Promise<ConnectProjectMinimal[]> {
   const projects = await prisma.project.findMany({
@@ -21,6 +21,7 @@ export async function getConnectProjectsByFid(fid: number): Promise<ConnectProje
     },
     select: {
       id: true,
+      avatar: true,
       name: true
     }
   });

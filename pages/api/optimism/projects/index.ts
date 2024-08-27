@@ -1,31 +1,20 @@
-import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
-import { createProject } from '@connect-shared/lib/projects/createProject';
-import { generateOgImage } from '@connect-shared/lib/projects/generateOgImage';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { createProject } from 'lib/optimism/createProject';
+import type { OptimismProjectAttestationContent } from 'lib/optimism/getOpProjectsByFarcasterId';
 import { getOpProjectsByFarcasterId } from 'lib/optimism/getOpProjectsByFarcasterId';
-import type { OptimismProjectMetadata } from 'lib/optimism/storeOptimismProjectAttestations';
+import { generateOgImage } from 'lib/projects/generateOgImage';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getProjectsController).post(createProjectController);
-
-export type OptimismProjectAttestationContent = Omit<OptimismProjectAttestation, 'metadata'> & {
-  metadata: OptimismProjectMetadata;
-  teamMembers: {
-    username: string;
-    name: string;
-    avatar: string;
-    fid: number;
-  }[];
-};
 
 async function getProjectsController(req: NextApiRequest, res: NextApiResponse<OptimismProjectAttestationContent[]>) {
   const userId = req.session.user.id;

@@ -82,7 +82,7 @@ export async function storeCharmverseProjectMetadata({
 
   const { staticFilePath, mappedProject } = await storeProjectInS3({
     storageFormat: 'charmverse',
-    projectOrProjectId: project.id,
+    projectId: project.id,
     extraData: {
       connectUserUIDs: allTeamMembers
     }

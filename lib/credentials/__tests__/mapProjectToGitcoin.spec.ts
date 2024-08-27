@@ -1,6 +1,7 @@
 import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { v4 as uuid, v4 } from 'uuid';
 
+import type { GitcoinEasyRetroPGFProject } from '../mapProjectToGitcoin';
 import { mapProjectToGitcoin } from '../mapProjectToGitcoin';
 
 describe('mapProjectToGitcoin', () => {
@@ -24,9 +25,9 @@ describe('mapProjectToGitcoin', () => {
       twitter: 'https://twitter.com/projectx',
       websites: ['https://example.com'],
       path: null,
-      mintingWalletAddress: null,
-      primaryContractAddress: null,
-      primaryContractChainId: null,
+      mintingWalletAddress: '0x8Bc704386DCE0C4f004194684AdC44Edf6e85f07',
+      primaryContractAddress: '0x4200000000000000000000000000000000000021',
+      primaryContractChainId: 10,
       sunnyAwardsProjectType: null,
       projectMembers: [
         {
@@ -58,14 +59,12 @@ describe('mapProjectToGitcoin', () => {
       ]
     };
 
-    const expectedOutput = {
+    const agoraProjectRefUID = '0xcb23e3db5e22faab1050eacf85d3b5c119cc54afb315e3442ae36c6028bd6147';
+
+    const expectedOutput: GitcoinEasyRetroPGFProject = {
       name: 'Project X',
       bio: 'A sample project',
       websiteUrl: 'https://example.com',
-      payoutAddress: '', // Placeholder
-      contributionDescription: 'A sample project',
-      impactDescription: '', // Placeholder
-      impactCategory: [], // Placeholder
       contributionLinks: [
         {
           description: 'Github Repository',
@@ -83,11 +82,22 @@ describe('mapProjectToGitcoin', () => {
           url: 'https://example.com'
         }
       ],
-      impactMetrics: [], // Placeholder
-      fundingSources: [] // Placeholder
+      sunnyAwards: {
+        projectType: '', // Placeholder
+        category: '', // Placeholder
+        categoryDetails: '', // Placeholder
+        contracts: [{ chainId: 10, address: input.primaryContractAddress as string }],
+        mintingWalletAddress: input.mintingWalletAddress || '',
+        projectReferences: {
+          charmverseId: input.id,
+          agoraProjectRefUID
+        },
+        avatarUrl: 'avatar.png',
+        coverImageUrl: 'cover.jpg'
+      }
     };
 
-    const output = mapProjectToGitcoin({ project: input });
+    const output = mapProjectToGitcoin({ project: input, agoraProjectRefUID });
     expect(output).toEqual(expectedOutput);
   });
 });
