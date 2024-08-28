@@ -1,4 +1,4 @@
-import { countValueOccurrences, nanofy, percent } from '../numbers';
+import { countValueOccurrences, nanofy, percent, roundNumberInRange } from '../numbers';
 
 type Fruit = 'banana' | 'watermelon' | 'mango';
 
@@ -117,5 +117,27 @@ describe('percent', () => {
     expect(percent({ value: 50, total: 100 })).toBe('50%');
     expect(percent({ value: 50, total: 100, significantDigits: 1 })).toBe('50.0%');
     expect(percent({ value: 1 / 3, total: 1, significantDigits: 3 })).toBe('33.333%');
+  });
+});
+
+describe('roundNumberInRange', () => {
+  it('should return the rounded number if it is within the range', () => {
+    expect(roundNumberInRange({ num: 5.2, min: 1, max: 10 })).toBe(5);
+  });
+
+  it('should return the minimum value if the number is below the range', () => {
+    expect(roundNumberInRange({ num: -1.5, min: 1, max: 10 })).toBe(1);
+  });
+
+  it('should return the maximum value if the number is above the range', () => {
+    expect(roundNumberInRange({ num: 15.23, min: 1, max: 10 })).toBe(10);
+  });
+
+  it('should handle edge case where num is equal to min', () => {
+    expect(roundNumberInRange({ num: 1, min: 1, max: 10 })).toBe(1);
+  });
+
+  it('should handle edge case where num is equal to max', () => {
+    expect(roundNumberInRange({ num: 10, min: 1, max: 10 })).toBe(10);
   });
 });

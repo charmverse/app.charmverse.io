@@ -156,3 +156,7 @@ export function getNumberFromString(strValue: string): number | null {
 export function roundNumber(num: number | undefined | null): string | undefined {
   return num?.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
+
+export function roundNumberInRange({ num, min, max }: { num: number; min: number; max: number }): number {
+  return Math.min(max, Math.max(min, Math.round(num)));
+}

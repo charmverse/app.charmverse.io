@@ -13,6 +13,7 @@ export function encodeGitcoinProjectCredential({
   uuid
 }: GitcoinProjectCredential) {
   const encoder = new SchemaEncoder(gitcoinProjectCredentialSchemaDefinition);
+
   const encodedData = encoder.encodeData([
     { name: 'name', value: name, type: 'string' },
     { name: 'metadataPtr', value: metadataPtr, type: 'string' },

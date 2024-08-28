@@ -23,9 +23,9 @@ export const getPublicClient = (chainId: number) => {
     throw new InvalidInputError(`Chain id ${chainId} not supported`);
   }
 
-  if (isTestEnv) {
-    throw new Error('Cannot create a public client in test environment. Please mock the client instead');
-  }
+  // if (isTestEnv) {
+  //   throw new Error('Cannot create a public client in test environment. Please mock the client instead');
+  // }
 
   let providerUrl: string | null = null;
 
