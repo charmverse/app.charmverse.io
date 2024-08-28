@@ -154,7 +154,7 @@ function generateCSV(
   };
 }
 
-function generateCsvContent(
+export function generateCsvContent(
   board: Pick<Board, 'fields'>,
   cards: Card[],
   viewToExport: BoardView,
