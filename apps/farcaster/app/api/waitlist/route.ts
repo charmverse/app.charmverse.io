@@ -1,4 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { prisma } from '@charmverse/core/prisma-client';
 import { baseUrl } from '@root/config/constants';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
@@ -10,6 +11,7 @@ import {
   waitlistShareMyFrame,
   type WaitlistFramePage
 } from 'lib/waitlist/actionButtons';
+import { calculateUserPosition } from 'lib/waitlist/calculateUserPosition';
 import { joinWaitlist } from 'lib/waitlist/joinWaitlist';
 
 export async function POST(req: Request, res: Response) {
@@ -23,8 +25,10 @@ export async function POST(req: Request, res: Response) {
 
   const interactorFid = parseInt(validatedMessage.action.interactor.fid.toString(), 10);
 
-  const currentPage = new URL(req.url).searchParams.get('current_page') as WaitlistFramePage;
-  const referrerFid = new URL(req.url).searchParams.get('referrer_fid');
+  const query = new URL(req.url).searchParams;
+
+  const currentPage = query.get('current_page') as WaitlistFramePage;
+  const referrerFid = query.get('referrer_fid');
 
   const joinWaitlistResult = await joinWaitlist({
     fid: interactorFid,
@@ -50,14 +54,22 @@ export async function POST(req: Request, res: Response) {
         // ogImage: `${baseUrl}/images/waitlist/waitlist-joined.gif`
       });
     } else {
+      const currentScore = calculateUserPosition({
+        fid: interactorFid
+      });
+
       // Dev image
-      const imgSrc = `${baseUrl}/images/waitlist/dev/waitlist-current-score.jpg`;
+      // This key is be constructed so that it overcomes farcaster's cache
+      const imgSrc = `${baseUrl}/api/waitlist/current-position?fid=${interactorFid}?percentile=${
+        currentScore.percentile
+      }&${Math.random().toString().replace('.', '')}`;
 
       // Prod image - TODO Add a joined image
       // const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
 
       html = getFrameHtml({
         image: imgSrc,
+        ogImage: imgSrc,
         version: 'vNext',
         buttons: [waitlistGetDetails, waitlistShareMyFrame(interactorFid)],
         imageAspectRatio: '1:1'
