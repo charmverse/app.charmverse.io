@@ -248,7 +248,7 @@ export async function getUserProposals({
             (reviewer.roleId && userRoles.includes(reviewer.roleId)) ||
             reviewer.systemRole === 'space_member'
         );
-        const canVote = currentEvaluation?.type === 'vote' && isReviewer;
+        const isVoter = currentEvaluation?.type === 'vote' && isReviewer;
         const isAppealReviewer = currentEvaluation?.appealReviewers.some(
           (reviewer) => reviewer.userId === userId || (reviewer.roleId && userRoles.includes(reviewer.roleId))
         );
@@ -274,7 +274,7 @@ export async function getUserProposals({
         const isActionable =
           !currentEvaluation?.result &&
           (currentEvaluation?.type === 'vote'
-            ? canVote && !hasVoted
+            ? isVoter && !hasVoted
             : (isReviewer && !hasReviewed && !isAppealActive) ||
               (isAppealReviewer && !hasReviewedAppeal && isAppealActive) ||
               (isApprover && reviewThresholdReached && !isAppealActive));
@@ -285,7 +285,7 @@ export async function getUserProposals({
         const userProposal = {
           id: proposal.id,
           title: proposal.page.title,
-          currentEvaluation: canSeeEvaluationDetails
+          currentEvaluation: !canSeeEvaluationDetails
             ? undefined
             : currentEvaluation
             ? {
