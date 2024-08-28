@@ -151,10 +151,10 @@ export function NewProductUpdateForm({
             name='content'
             render={({ field, fieldState }) => (
               <CharmTextField
-                disabled={isExecuting}
                 placeholder='1. Updated documentation ...'
                 helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'
                 error={!!fieldState.error}
+                sx={{ minHeight: '7em' }}
                 {...field}
               />
             )}

@@ -1,19 +1,16 @@
-import { InputLabel, FormHelperText, Stack, TextField } from '@mui/material';
+import { FormHelperText, Stack } from '@mui/material';
 import type { EditorProps } from '@packages/charmeditor/ui';
 import { Editor } from '@packages/charmeditor/ui';
 
 type Props = {
-  disabled?: boolean;
   // rows: number;
-  placeholder?: string;
   helperText?: string;
-  error?: boolean;
 } & EditorProps;
 
-export function CharmTextField({ error, helperText, ...props }: Props) {
+export function CharmTextField({ error, helperText, sx, ...props }: Props) {
   return (
     <Stack>
-      <Editor {...props} sx={{ minHeight: '5em' }} error={error} />
+      <Editor {...props} sx={sx} error={error} />
       {helperText && <FormHelperText error={error}>{helperText}</FormHelperText>}
     </Stack>
   );
