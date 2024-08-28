@@ -6,23 +6,13 @@ import { getAssignedRoleIds } from '@root/lib/roles/getAssignedRoleIds';
 
 import type { ProposalWithUsersAndRubric } from './interfaces';
 
-type MinimalReviewer = Pick<ProposalReviewer, 'roleId' | 'userId' | 'systemRole'>;
-type MinimalAppealReviewer = Pick<ProposalReviewer, 'roleId' | 'userId' | 'systemRole'>;
-
 export type MinimalProposal = Pick<ProposalWithUsersAndRubric, 'spaceId' | 'workflowId' | 'id'> & {
-  workflow?: { privateEvaluations: boolean | null } | null;
-  reviewers?: MinimalReviewer[];
-  appealReviewers?: MinimalAppealReviewer[];
+  workflow?: { privateEvaluations: boolean | null };
+  reviewers?: ProposalReviewer[];
+  appealReviewers?: ProposalAppealReviewer[];
 } & {
-  evaluations: (Pick<ProposalWithUsersAndRubric['evaluations'][0], 'id' | 'type' | 'result' | 'index'> &
-    Omit<
-      Partial<ProposalWithUsersAndRubric['evaluations'][0]>,
-      'reviewers' | 'appealReviewers' | 'evaluationApprovers'
-    > & {
-      reviewers: MinimalReviewer[];
-      appealReviewers: MinimalAppealReviewer[];
-      evaluationApprovers: MinimalReviewer[];
-    })[];
+  evaluations: (Pick<ProposalWithUsersAndRubric['evaluations'][0], 'id' | 'type' | 'result' | 'index' | 'reviewers'> &
+    Partial<ProposalWithUsersAndRubric['evaluations'][0]>)[];
 };
 
 export async function concealProposalSteps<T extends MinimalProposal = MinimalProposal>({
@@ -116,8 +106,6 @@ export async function concealProposalSteps<T extends MinimalProposal = MinimalPr
         proposalId: proposal.id,
         result: currentStep.result,
         reviewers: [],
-        appealReviewers: [],
-        evaluationApprovers: [],
         rubricAnswers: [],
         rubricCriteria: [],
         snapshotExpiry: null,
