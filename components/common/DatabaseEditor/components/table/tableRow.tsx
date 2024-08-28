@@ -4,13 +4,13 @@ import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Checkbox, Stack } from '@mui/material';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } from 'react';
 import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
+import Link from 'components/common/Link';
 import { DatabaseRowActionsMenu } from 'components/common/PageActions/components/DatabaseRowActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
@@ -69,7 +69,6 @@ type Props = {
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   disableDragAndDrop?: boolean;
-  href?: string;
 };
 
 export const StyledCheckbox = styled(Checkbox, {
@@ -132,13 +131,7 @@ function TableRow(props: Props) {
   const isGrouped = Boolean(activeView.fields.groupById);
   const isDragAndDropEnabled = !isTouchScreen() && !props.readOnly && !props.disableDragAndDrop;
 
-  const router = useRouter();
-  const domain = router.query.domain;
-
-  const href =
-    card.customIconType === 'applicationStatus'
-      ? `/${domain}/rewards/applications/${card.id}`
-      : `/${domain}/${card.id}`;
+  const href = card.customIconType === 'applicationStatus' ? `/rewards/applications/${card.id}` : `/${card.id}`;
 
   const { drag, drop, preview, style } = useDragDrop({
     item: card,
@@ -429,7 +422,6 @@ function ExpandableTableRow({ subPages, ...props }: Props & { isNested?: boolean
                 card={subPage}
                 indentTitle={30}
                 isNested
-                href={subPage.customIconType === 'applicationStatus' ? `` : ``}
                 // Don't allow subrows to be selected
                 setCheckedIds={undefined}
                 subRowsEmptyValueContent={props.subRowsEmptyValueContent}

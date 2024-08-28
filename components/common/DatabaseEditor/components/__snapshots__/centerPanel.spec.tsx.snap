@@ -2658,13 +2658,19 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             class="open-button"
                             data-test="database-open-button-1"
                           >
-                            <button
-                              type="button"
+                            <a
+                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                              href="/1"
+                              style="text-decoration: none;"
                             >
-                              <span>
-                                Open
-                              </span>
-                            </button>
+                              <button
+                                type="button"
+                              >
+                                <span>
+                                  Open
+                                </span>
+                              </button>
+                            </a>
                           </div>
                         </div>
                       </div>
@@ -2772,13 +2778,19 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             class="open-button"
                             data-test="database-open-button-2"
                           >
-                            <button
-                              type="button"
+                            <a
+                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                              href="/2"
+                              style="text-decoration: none;"
                             >
-                              <span>
-                                Open
-                              </span>
-                            </button>
+                              <button
+                                type="button"
+                              >
+                                <span>
+                                  Open
+                                </span>
+                              </button>
+                            </a>
                           </div>
                         </div>
                       </div>
