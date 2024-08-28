@@ -51,20 +51,20 @@ export function NewProductUpdateForm({
     },
     onSuccess: (data) => {
       log.error('success!', data);
-      // reset();
-      // if (data.data) {
-      //   const lines = data.data.productUpdatesFrame.text
-      //     .split('\n')
-      //     .filter((line) => line.trim().length)
-      //     .slice(0, 10);
+      reset();
+      if (data.data) {
+        const lines = data.data.productUpdatesFrame.text
+          .split('\n')
+          .filter((line) => line.trim().length)
+          .slice(0, 10);
 
-      //   postCreateCastMessage({
-      //     embeds: [`https://${window.location.hostname}/product-updates/frames/${data.data.productUpdatesFrame.id}`],
-      //     text: `${data.data.project.name}\n${data.data.productUpdatesFrame.createdAtLocal}\n\n${lines
-      //       .map((line) => `• ${line}`)
-      //       .join('\n')}`
-      //   });
-      // }
+        postCreateCastMessage({
+          embeds: [`https://${window.location.hostname}/product-updates/frames/${data.data.productUpdatesFrame.id}`],
+          text: `${data.data.project.name}\n${data.data.productUpdatesFrame.createdAtLocal}\n\n${lines
+            .map((line) => `• ${line}`)
+            .join('\n')}`
+        });
+      }
     },
     onError: (err) => {
       log.error('Error submitting form', { error: err.error.serverError });
