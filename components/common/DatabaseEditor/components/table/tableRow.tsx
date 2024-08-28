@@ -4,6 +4,8 @@ import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Checkbox, Stack } from '@mui/material';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } from 'react';
 import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -44,7 +46,7 @@ type Props = {
   pageTitle: string;
   isSelected: boolean;
   focusOnMount: boolean;
-  showCard: (cardId: string, parentId?: string) => void;
+  showCard: (cardId: string, parentId?: string, event?: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => void;
   readOnly: boolean;
   offset: number;
   pageUpdatedAt: string;
@@ -67,6 +69,7 @@ type Props = {
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   disableDragAndDrop?: boolean;
+  href?: string;
 };
 
 export const StyledCheckbox = styled(Checkbox, {
@@ -122,13 +125,20 @@ function TableRow(props: Props) {
     setCheckedIds
   } = props;
   const { showError } = useSnackbar();
-
   const { trigger: trashPages } = useTrashPages();
   const isMobile = useSmallScreen();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isGrouped = Boolean(activeView.fields.groupById);
   const isDragAndDropEnabled = !isTouchScreen() && !props.readOnly && !props.disableDragAndDrop;
+
+  const router = useRouter();
+  const domain = router.query.domain;
+
+  const href =
+    card.customIconType === 'applicationStatus'
+      ? `/${domain}/rewards/applications/${card.id}`
+      : `/${domain}/${card.id}`;
 
   const { drag, drop, preview, style } = useDragDrop({
     item: card,
@@ -331,9 +341,17 @@ function TableRow(props: Props) {
                 </div>
 
                 <div className='open-button' data-test={`database-open-button-${card.id}`}>
-                  <Button onClick={() => props.showCard(card.id || '', card.parentId)}>
-                    <FormattedMessage id='TableRow.open' defaultMessage='Open' />
-                  </Button>
+                  <Link
+                    href={href}
+                    style={{
+                      textDecoration: 'none',
+                      color: 'inherit'
+                    }}
+                  >
+                    <Button onClick={(e) => props.showCard(card.id || '', card.parentId, e)}>
+                      <FormattedMessage id='TableRow.open' defaultMessage='Open' />
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Box>
@@ -411,6 +429,7 @@ function ExpandableTableRow({ subPages, ...props }: Props & { isNested?: boolean
                 card={subPage}
                 indentTitle={30}
                 isNested
+                href={subPage.customIconType === 'applicationStatus' ? `` : ``}
                 // Don't allow subrows to be selected
                 setCheckedIds={undefined}
                 subRowsEmptyValueContent={props.subRowsEmptyValueContent}

@@ -61,14 +61,13 @@ export function ProposalsPage({ title }: { title: string }) {
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
-  const { navigateToSpacePath } = useCharmRouter();
   const isAdmin = useIsAdmin();
   const { showError } = useSnackbar();
   const { user } = useUser();
   const { board: activeBoard, views, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
   const [showSidebar, setShowSidebar] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
-  const { router, updateURLQuery } = useCharmRouter();
+  const { updateURLQuery } = useCharmRouter();
   const viewId = 'all'; // (router.query.viewId || 'all') as 'all' | 'my-work';
 
   const onShowDescription = useCallback(() => {
@@ -118,11 +117,6 @@ export function ProposalsPage({ title }: { title: string }) {
   }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
 
   useProposalsBoardMutator();
-
-  function openPage(pageId: string | null) {
-    if (!pageId) return;
-    navigateToSpacePath(`/${pageId}`);
-  }
 
   const onDelete = useCallback(
     async (proposalId: string) => {
@@ -321,7 +315,7 @@ export function ProposalsPage({ title }: { title: string }) {
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     disableAddingCards
-                    showCard={openPage}
+                    showCard={() => {}}
                     readOnlyTitle={!isAdmin}
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}
