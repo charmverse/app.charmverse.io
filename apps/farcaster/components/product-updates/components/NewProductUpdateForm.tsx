@@ -30,6 +30,7 @@ export function NewProductUpdateForm({
   projectId: string;
 }) {
   const [errors, setErrors] = useState<string[] | null>(null);
+  const [editorKey, setEditorKey] = useState(1); // keep track of state to clear editor
   const { control, handleSubmit, reset, setValue } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
@@ -46,12 +47,11 @@ export function NewProductUpdateForm({
 
   const { execute, isExecuting } = useAction(createProductUpdatesFrameAction, {
     onExecute: () => {
-      log.error('execute');
       setErrors(null);
     },
     onSuccess: (data) => {
-      log.error('success!', data);
       reset();
+      setEditorKey((key) => key + 1);
       if (data.data) {
         const lines = data.data.productUpdatesFrame.text
           .split('\n')
@@ -149,6 +149,7 @@ export function NewProductUpdateForm({
             name='content'
             render={({ field, fieldState }) => (
               <CharmTextField
+                key={editorKey}
                 placeholder='1. Updated documentation ...'
                 helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'
                 error={!!fieldState.error}

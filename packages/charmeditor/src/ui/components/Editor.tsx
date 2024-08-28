@@ -9,7 +9,7 @@ import {
 import { schema } from 'prosemirror-schema-basic';
 import { EditorState } from 'prosemirror-state';
 import type { ElementType } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { OutlinedTextField } from './OutlinedTextField';
 
@@ -22,12 +22,12 @@ export type EditorProps = {
   error?: boolean; // to style the component
 };
 
-// const state = EditorState.create({
-//   schema
-//   // You must add the react plugin if you use
-//   // the useNodeViews or useNodePos hook.
-//   // plugins: [react()]
-// });
+const defaultState = EditorState.create({
+  schema
+  // You must add the react plugin if you use
+  // the useNodeViews or useNodePos hook.
+  // plugins: [react()]
+});
 
 export function Editor({
   component: Component = OutlinedTextField,
@@ -38,7 +38,7 @@ export function Editor({
   defaultValue
 }: EditorProps) {
   // const { nodeViews, renderNodeViews } = useNodeViews(reactNodeViews);
-  const [state, setEditorState] = useState(EditorState.create({ schema }));
+  const [state, setEditorState] = useState(defaultState);
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
   return (
@@ -49,9 +49,12 @@ export function Editor({
         setEditorState((s) => {
           const newState = s.apply(tr);
           if (onChange) {
-            onChange({
-              json: newState.doc.toJSON(),
-              text: newState.doc.textContent
+            // setTimeout so we finish setting editor state before calling onChange
+            setTimeout(() => {
+              onChange({
+                json: newState.doc.toJSON(),
+                text: newState.doc.textContent
+              });
             });
           }
           return newState;
