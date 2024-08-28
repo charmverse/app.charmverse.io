@@ -44,25 +44,25 @@ export function linkedPagePlugins({
           }
         }
       }),
-      // suggestTooltip.plugins({
-      //   key: suggestTooltipKey,
-      //   markName,
-      //   onEnter(_, __, view) {
-      //     const selectedMenuItem = document.querySelector('.mention-selected');
-      //     const value = selectedMenuItem?.getAttribute('data-value');
-      //     const type = selectedMenuItem?.getAttribute('data-type');
-      //     const path = selectedMenuItem?.getAttribute('data-path');
+      suggestTooltip.plugins({
+        key: suggestTooltipKey,
+        markName,
+        onEnter(_, __, view) {
+          const selectedMenuItem = document.querySelector('.mention-selected');
+          const value = selectedMenuItem?.getAttribute('data-value');
+          const type = selectedMenuItem?.getAttribute('data-type');
+          const path = selectedMenuItem?.getAttribute('data-path');
 
-      //     if (view && value && type && path) {
-      //       insertLinkedPage(key, view, value, type, path);
-      //     }
-      //     return false;
-      //   },
-      //   tooltipRenderOpts: {
-      //     ...tooltipRenderOpts,
-      //     tooltipDOMSpec
-      //   }
-      // }),
+          if (view && value && type && path) {
+            insertLinkedPage(key, view, value, type, path);
+          }
+          return false;
+        },
+        tooltipRenderOpts: {
+          ...tooltipRenderOpts,
+          tooltipDOMSpec
+        }
+      }),
       NodeView.createPlugin({
         name: linkedPageNodeName,
         containerDOM: ['div', { class: 'linkedPage-container' }]

@@ -2,7 +2,6 @@ import { Plugin, PluginKey } from 'prosemirror-state';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 
-import type { RawPlugins } from '../@bangle.dev/core/plugin-loader';
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
 import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltipPlugin';
@@ -42,7 +41,7 @@ export function mentionPlugins({
           return pluginState;
         }
       }
-    }) as RawPlugins,
+    }),
     suggestTooltip.plugins({
       key: suggestTooltipKey,
       markName,
