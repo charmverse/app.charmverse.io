@@ -67,8 +67,8 @@ export function ProposalsPage({ title }: { title: string }) {
   const { board: activeBoard, views, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
   const [showSidebar, setShowSidebar] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
-  const { updateURLQuery } = useCharmRouter();
-  const viewId = 'all'; // (router.query.viewId || 'all') as 'all' | 'my-work';
+  const { router, updateURLQuery } = useCharmRouter();
+  const viewId = (router.query.viewId || 'all') as 'all' | 'my-work';
 
   const onShowDescription = useCallback(() => {
     const oldBlocks = [activeBoard];
@@ -249,11 +249,11 @@ export function ProposalsPage({ title }: { title: string }) {
                   {
                     id: 'all',
                     label: 'All'
+                  },
+                  {
+                    id: 'my-work',
+                    label: 'My Work'
                   }
-                  // {
-                  //   id: 'my-work',
-                  //   label: 'My Work'
-                  // }
                 ].map((view) => {
                   return (
                     <StyledTab
@@ -272,19 +272,21 @@ export function ProposalsPage({ title }: { title: string }) {
               </Tabs>
             )}
             <div className='octo-spacer' />
-            <Box className='view-actions'>
-              <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
-              <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
-              {user && (
-                <ToggleViewSidebarButton
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowSidebar(!showSidebar);
-                  }}
-                />
-              )}
-            </Box>
+            {viewId !== 'my-work' && (
+              <Box className='view-actions'>
+                <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
+                <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
+                {user && (
+                  <ToggleViewSidebarButton
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowSidebar(!showSidebar);
+                    }}
+                  />
+                )}
+              </Box>
+            )}
           </div>
           <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
         </Stack>
