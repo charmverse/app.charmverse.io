@@ -52,7 +52,7 @@ export async function createProductUpdatesFrame(input: FormValues) {
   }
 
   const element = React.createElement(ProductUpdatesFrame, {
-    text: input.text,
+    text: input.content.text,
     createdAtLocal: input.createdAtLocal,
     projectName: project.name,
     projectAvatarImage: projectAvatarImageUrl
@@ -79,7 +79,8 @@ export async function createProductUpdatesFrame(input: FormValues) {
     data: {
       id: frameId,
       projectId: input.projectId,
-      text: input.text,
+      text: input.content.text,
+      textContent: input.content.json,
       image: fileUrl,
       createdAtLocal: input.createdAtLocal,
       createdBy: user.id

@@ -1,22 +1,13 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/Add';
-import {
-  Stack,
-  Button,
-  Divider,
-  FormLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-  ListItemIcon
-} from '@mui/material';
+import { Box, Stack, Button, Divider, FormLabel, MenuItem, Select, Typography, ListItemIcon } from '@mui/material';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useAction } from 'next-safe-action/hooks';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { postCreateCastMessage } from 'lib/postCreateCastMessage';
@@ -38,6 +29,7 @@ export function NewProductUpdateForm({
   onClickCreateProject: VoidFunction;
   projectId: string;
 }) {
+  const [errors, setErrors] = useState<string[] | null>(null);
   const { control, handleSubmit, reset, setValue } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
@@ -53,24 +45,30 @@ export function NewProductUpdateForm({
   }, [projectId]);
 
   const { execute, isExecuting } = useAction(createProductUpdatesFrameAction, {
+    onExecute: () => {
+      log.error('execute');
+      setErrors(null);
+    },
     onSuccess: (data) => {
-      reset();
-      if (data.data) {
-        const lines = data.data.productUpdatesFrame.text
-          .split('\n')
-          .filter((line) => line.trim().length)
-          .slice(0, 10);
+      log.error('success!', data);
+      // reset();
+      // if (data.data) {
+      //   const lines = data.data.productUpdatesFrame.text
+      //     .split('\n')
+      //     .filter((line) => line.trim().length)
+      //     .slice(0, 10);
 
-        postCreateCastMessage({
-          embeds: [`https://${window.location.hostname}/product-updates/frames/${data.data.productUpdatesFrame.id}`],
-          text: `${data.data.project.name}\n${data.data.productUpdatesFrame.createdAtLocal}\n\n${lines
-            .map((line) => `• ${line}`)
-            .join('\n')}`
-        });
-      }
+      //   postCreateCastMessage({
+      //     embeds: [`https://${window.location.hostname}/product-updates/frames/${data.data.productUpdatesFrame.id}`],
+      //     text: `${data.data.project.name}\n${data.data.productUpdatesFrame.createdAtLocal}\n\n${lines
+      //       .map((line) => `• ${line}`)
+      //       .join('\n')}`
+      //   });
+      // }
     },
     onError: (err) => {
-      log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
+      log.error('Error submitting form', { error: err.error.serverError });
+      setErrors(['An error occurred. Please try again.']);
     }
   });
 
@@ -161,7 +159,10 @@ export function NewProductUpdateForm({
           />
         </Stack>
 
-        <Stack alignItems='flex-end'>
+        <Stack direction='row'>
+          <Box flexGrow={1}>
+            <FormErrors errors={errors} />
+          </Box>
           <Button
             type='submit'
             size='large'

@@ -3,7 +3,9 @@ import { Box } from '@mui/material';
 
 // this component can be used to replicate the appearance of an MUI TextFIeld
 // Check the element with class .MuiOutlinedInput-root for reference
-export const OutlinedTextField = styled(Box)<{ error?: boolean }>`
+export const OutlinedTextField = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'error'
+})<{ error?: boolean }>`
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
   font-weight: 400;
   font-size: 1rem;

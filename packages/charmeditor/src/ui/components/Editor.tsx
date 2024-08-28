@@ -46,13 +46,16 @@ export function Editor({
       mount={mount}
       defaultState={state}
       dispatchTransaction={(tr) => {
-        setEditorState((s) => s.apply(tr));
-        if (onChange) {
-          onChange({
-            json: state.doc.toJSON(),
-            text: state.doc.textContent
-          });
-        }
+        setEditorState((s) => {
+          const newState = s.apply(tr);
+          if (onChange) {
+            onChange({
+              json: newState.doc.toJSON(),
+              text: newState.doc.textContent
+            });
+          }
+          return newState;
+        });
       }}
     >
       {/** This div is where the contenteditable div is created by Prosemirror */}
