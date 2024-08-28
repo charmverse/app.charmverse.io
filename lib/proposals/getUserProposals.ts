@@ -168,6 +168,7 @@ export async function getUserProposals({
           type: true,
           dueDate: true,
           title: true,
+          requiredReviews: true,
           appealReviews: {
             select: {
               reviewerId: true
@@ -240,32 +241,30 @@ export async function getUserProposals({
           });
         }
       } else {
-        await concealProposalSteps({
-          proposal,
-          applicableRoleIds: userRoles,
-          userId
-        });
-
         const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-        const canReview = currentEvaluation?.reviewers.some(
+        const isReviewer = currentEvaluation?.reviewers.some(
           (reviewer) =>
             reviewer.userId === userId ||
             (reviewer.roleId && userRoles.includes(reviewer.roleId)) ||
             reviewer.systemRole === 'space_member'
         );
-        const canVote = currentEvaluation?.type === 'vote' && canReview;
-        const canReviewAppeal =
-          currentEvaluation?.appealReviewers.some(
-            (reviewer) => reviewer.userId === userId || (reviewer.roleId && userRoles.includes(reviewer.roleId))
-          ) && !!currentEvaluation?.appealedAt;
-        const canApprove = currentEvaluation?.evaluationApprovers.some(
+        const canVote = currentEvaluation?.type === 'vote' && isReviewer;
+        const isAppealReviewer = currentEvaluation?.appealReviewers.some(
+          (reviewer) => reviewer.userId === userId || (reviewer.roleId && userRoles.includes(reviewer.roleId))
+        );
+        const isApprover = currentEvaluation?.evaluationApprovers.some(
           (approver) => approver.userId === userId || (approver.roleId && userRoles.includes(approver.roleId))
         );
         const hasReviewed = currentEvaluation?.reviews.some((review) => review.reviewerId === userId);
         const hasReviewedAppeal = currentEvaluation?.appealReviews.some((review) => review.reviewerId === userId);
         const hasVoted = currentEvaluation?.vote?.userVotes.some((vote) => vote.userId === userId);
 
-        const isReviewer = canReview || canReviewAppeal || canApprove;
+        const isReviewerApproverOrAppealReviewer = isAppealReviewer || isReviewer || isApprover;
+
+        const reviewThresholdReached =
+          (currentEvaluation?.reviews.length ?? 0) >= (currentEvaluation?.requiredReviews ?? 1);
+
+        const isAppealActive = !!currentEvaluation?.appealedAt;
 
         const isPrivateEvaluation =
           proposal.workflow?.privateEvaluations &&
@@ -276,23 +275,27 @@ export async function getUserProposals({
           !currentEvaluation?.result &&
           (currentEvaluation?.type === 'vote'
             ? canVote && !hasVoted
-            : (canReview && !hasReviewed) || (canReviewAppeal && !hasReviewedAppeal) || (canApprove && !hasReviewed));
+            : (isReviewer && !hasReviewed && !isAppealActive) ||
+              (isAppealReviewer && !hasReviewedAppeal && isAppealActive) ||
+              (isApprover && reviewThresholdReached && !isAppealActive));
+
+        const canSeeEvaluationDetails =
+          !isPrivateEvaluation || (isPrivateEvaluation && isReviewerApproverOrAppealReviewer);
 
         const userProposal = {
           id: proposal.id,
           title: proposal.page.title,
-          currentEvaluation:
-            isPrivateEvaluation && !isReviewer
-              ? undefined
-              : currentEvaluation
-              ? {
-                  id: currentEvaluation.id,
-                  type: currentEvaluation.type,
-                  dueDate: currentEvaluation.dueDate || null,
-                  title: currentEvaluation.title,
-                  result: currentEvaluation.result || null
-                }
-              : undefined,
+          currentEvaluation: canSeeEvaluationDetails
+            ? undefined
+            : currentEvaluation
+            ? {
+                id: currentEvaluation.id,
+                type: currentEvaluation.type,
+                dueDate: currentEvaluation.dueDate || null,
+                title: currentEvaluation.title,
+                result: currentEvaluation.result || null
+              }
+            : undefined,
           updatedAt: proposal.page.updatedAt,
           path: proposal.page.path,
           status: proposal.status,
