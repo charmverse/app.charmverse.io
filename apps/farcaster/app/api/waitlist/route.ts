@@ -36,16 +36,28 @@ export async function POST(req: Request, res: Response) {
     let html: string = '';
 
     if (joinWaitlistResult.isNew) {
+      // Dev image
+      const imgSrc = `${baseUrl}/images/waitlist/dev/waitlist-joined.jpg`;
+
+      // Prod image
+      // const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
+
       html = getFrameHtml({
-        image: `${baseUrl}/images/waitlist/waitlist-joined.gif`,
+        image: imgSrc,
         version: 'vNext',
         buttons: [waitlistGetDetails, waitlistGet1000Points, waitlistShareMyFrame(interactorFid)],
         imageAspectRatio: '1:1'
         // ogImage: `${baseUrl}/images/waitlist/waitlist-joined.gif`
       });
     } else {
+      // Dev image
+      const imgSrc = `${baseUrl}/images/waitlist/dev/waitlist-current-score.jpg`;
+
+      // Prod image - TODO Add a joined image
+      // const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
+
       html = getFrameHtml({
-        image: `${baseUrl}/images/waitlist/waitlist-joined.gif`,
+        image: imgSrc,
         version: 'vNext',
         buttons: [waitlistGetDetails, waitlistShareMyFrame(interactorFid)],
         imageAspectRatio: '1:1'
