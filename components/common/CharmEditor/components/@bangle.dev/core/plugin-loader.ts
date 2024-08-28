@@ -22,9 +22,9 @@ export interface PluginPayload<T = any> {
   metadata: T;
 }
 
-type BaseRawPlugins = false | null | Plugin | InputRule | PluginGroup | BaseRawPlugins[];
+export type BaseRawPlugins = false | null | Plugin | InputRule | PluginGroup | BaseRawPlugins[];
 
-export type RawPlugins<T = any> = BaseRawPlugins | ((payLoad: PluginPayload<T>) => BaseRawPlugins);
+export type RawPlugins<T = any> = BaseRawPlugins | ((payLoad: PluginPayload<T>) => BaseRawPlugins | BaseRawPlugins[]);
 
 export function pluginLoader<T = any>(
   specRegistry: SpecRegistry,

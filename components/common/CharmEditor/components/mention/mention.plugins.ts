@@ -21,7 +21,7 @@ export function mentionPlugins({
   markName?: string;
   key: PluginKey<MentionPluginState>;
   tooltipRenderOpts?: SuggestTooltipRenderOpts;
-}): RawPlugins {
+}) {
   const suggestTooltipKey = new PluginKey('suggestTooltipKey');
   // We are converting to DOM elements so that their instances
   // can be shared across plugins.
@@ -42,7 +42,7 @@ export function mentionPlugins({
           return pluginState;
         }
       }
-    }),
+    }) as RawPlugins,
     suggestTooltip.plugins({
       key: suggestTooltipKey,
       markName,

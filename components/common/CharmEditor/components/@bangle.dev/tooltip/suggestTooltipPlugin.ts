@@ -76,7 +76,7 @@ export function plugins({
   },
   onArrowLeft,
   onArrowRight
-}: PluginsOptions): RawPlugins {
+}: PluginsOptions) {
   return ({ schema }: { schema: Schema }) => {
     const isActiveCheck = queryIsSuggestTooltipActive(key);
     return [
@@ -137,36 +137,7 @@ export function plugins({
             throw new Error('Unknown type');
           }
         }
-      }),
-      tooltipPlacementPlugins({
-        stateKey: key,
-        renderOpts: {
-          ...tooltipRenderOpts,
-          placement: 'bottom-start',
-          getReferenceElement: referenceElement(key, (state: EditorState) => {
-            const markType = schema.marks[markName];
-            const { selection } = state;
-            return findFirstMarkPosition(markType, state.doc, selection.from - 1, selection.to);
-          })
-        }
-      }),
-      trigger && triggerInputRule(schema, markName, trigger),
-      tooltipController({
-        trigger,
-        markName,
-        key
-      }),
-      keybindings &&
-        keymap(
-          createObject([
-            [keybindings.select, filter(isActiveCheck, onEnter)],
-            [keybindings.up, filter(isActiveCheck, onArrowUp)],
-            [keybindings.down, filter(isActiveCheck, onArrowDown)],
-            [keybindings.left, filter(isActiveCheck, onArrowLeft)],
-            [keybindings.right, filter(isActiveCheck, onArrowRight)],
-            [keybindings.hide, filter(isActiveCheck, onEscape)]
-          ])
-        )
+      })
     ];
   };
 }
