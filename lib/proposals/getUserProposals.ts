@@ -4,6 +4,8 @@ import { getCurrentEvaluation, privateEvaluationSteps } from '@charmverse/core/p
 
 import { permissionsApiClient } from '../permissions/api/client';
 
+import { concealProposalSteps } from './concealProposalSteps';
+
 type CurrentEvaluation = {
   id: string;
   type: ProposalEvaluationType;
@@ -145,6 +147,8 @@ export async function getUserProposals({
         }
       },
       id: true,
+      workflowId: true,
+      spaceId: true,
       status: true,
       authors: {
         select: {
@@ -200,7 +204,8 @@ export async function getUserProposals({
             select: {
               userId: true,
               roleId: true,
-              systemRole: true
+              systemRole: true,
+              evaluationId: true
             }
           }
         }
@@ -235,6 +240,12 @@ export async function getUserProposals({
           });
         }
       } else {
+        await concealProposalSteps({
+          proposal,
+          applicableRoleIds: userRoles,
+          userId
+        });
+
         const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
         const canReview = currentEvaluation?.reviewers.some(
           (reviewer) =>

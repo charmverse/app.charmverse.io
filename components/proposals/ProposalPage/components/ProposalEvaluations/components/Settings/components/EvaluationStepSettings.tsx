@@ -186,7 +186,7 @@ export function EvaluationStepSettings({
       {showApprovers && (
         <>
           <Box display='flex' flexDirection='column'>
-            <FormLabel required>
+            <FormLabel>
               <Typography component='span' variant='subtitle1'>
                 Approvers
               </Typography>
