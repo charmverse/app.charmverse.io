@@ -13,6 +13,8 @@ import { useEffect, useState } from 'react';
 
 import { OutlinedTextField } from './OutlinedTextField';
 
+import '../prosemirror.css';
+
 export type EditorProps = {
   placeholder?: string;
   defaultValue?: object | null; // json value
