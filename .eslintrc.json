@@ -76,7 +76,7 @@
       "error",
       {
         "devDependencies": true,
-        "packageDir": ["./", "./apps/scoutgame"]
+        "packageDir": ["./", "./packages/charmeditor/", "./apps/farcaster/", "./apps/scoutgame/", "./apps/sunnyawards/"]
       }
     ],
     "import/order": [

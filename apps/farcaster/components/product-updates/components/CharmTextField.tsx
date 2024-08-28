@@ -1,6 +1,6 @@
-import { InputLabel, FormHelperText, Stack } from '@mui/material';
-import type { ReactEditorProps } from '@packages/charmeditor';
-import { ReactEditor } from '@packages/charmeditor';
+import { InputLabel, FormHelperText, Stack, TextField } from '@mui/material';
+import type { EditorProps } from '@packages/charmeditor/ui';
+import { Editor } from '@packages/charmeditor/ui';
 
 type Props = {
   disabled?: boolean;
@@ -8,12 +8,12 @@ type Props = {
   placeholder?: string;
   helperText?: string;
   error?: boolean;
-} & ReactEditorProps;
+} & EditorProps;
 
 export function CharmTextField({ error, helperText, ...props }: Props) {
   return (
     <Stack>
-      <ReactEditor {...props} />
+      <Editor {...props} sx={{ minHeight: '5em' }} />
       {helperText && <FormHelperText error={error}>{helperText}</FormHelperText>}
     </Stack>
   );

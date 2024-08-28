@@ -2,8 +2,10 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "preserve",
+    // https://www.typescriptlang.org/tsconfig/#moduleResolution
+    // Use "bundler" which supports imports and exports, but does not require file extensions
+    "moduleResolution": "bundler",
     "strict": true,
     "target": "ESNext",
   },

@@ -123,11 +123,12 @@ export async function loginWithFarcaster({
       }
     },
     include: {
-      profile: true
+      profile: true,
+      farcasterUser: true
     }
   });
 
-  if (userWithWallet) {
+  if (userWithWallet && !userWithWallet.farcasterUser) {
     const updatedUser = await prisma.user.update({
       where: {
         id: userWithWallet.id

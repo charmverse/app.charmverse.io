@@ -1,3 +1,3 @@
-export type { ReactEditorProps } from './components/ReactEditor';
+export type { EditorProps } from './components/Editor';
 
-export { ReactEditor } from './components/ReactEditor';
+export { Editor } from './components/Editor';

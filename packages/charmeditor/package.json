@@ -1,6 +1,7 @@
 {
   "name": "@packages/charmeditor",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "build": "npx tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,6 +19,6 @@
     "prosemirror-state": "^1.4.3"
   },
   "exports": {
-    ".": "./src/ui/index.tsx"
+    "./ui": "./src/ui/index.tsx"
   }
 }
