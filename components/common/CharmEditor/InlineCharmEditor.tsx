@@ -11,6 +11,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+import type { RawPlugins } from './components/@bangle.dev/core/plugin-loader';
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { userDataPlugin } from './components/charm/charm.plugins';
@@ -69,8 +70,8 @@ export function charmEditorPlugins({
   pageId?: string | null;
   userId?: string | null;
   placeholderText?: string;
-} = {}) {
-  const basePlugins = [
+} = {}): RawPlugins {
+  const basePlugins: RawPlugins = [
     new Plugin({
       view: () => ({
         update: (view, prevState) => {
