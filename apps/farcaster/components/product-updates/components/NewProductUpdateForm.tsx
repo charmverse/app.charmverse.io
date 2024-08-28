@@ -42,7 +42,6 @@ export function NewProductUpdateForm({
     defaultValues: {
       authorFid: farcasterUser.fid,
       projectId,
-      text: '',
       createdAtLocal: new Date().toLocaleDateString()
     },
     resolver: yupResolver(schema),
@@ -149,7 +148,7 @@ export function NewProductUpdateForm({
           <FormLabel>Product updates</FormLabel>
           <Controller
             control={control}
-            name='text'
+            name='content'
             render={({ field, fieldState }) => (
               <CharmTextField
                 disabled={isExecuting}

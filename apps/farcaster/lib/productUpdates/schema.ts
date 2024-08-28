@@ -1,7 +1,12 @@
 import * as yup from 'yup';
 
 export const schema = yup.object({
-  text: yup.string().required(),
+  content: yup
+    .object({
+      json: yup.object().required(),
+      text: yup.string().required()
+    })
+    .required(),
   projectId: yup.string().required(),
   authorFid: yup.number().required(),
   createdAtLocal: yup.string().required()

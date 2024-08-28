@@ -15,27 +15,48 @@ import { OutlinedTextField } from './OutlinedTextField';
 
 export type EditorProps = {
   placeholder?: string;
-  value?: object | null;
-  onChange: (value: { json: object; text: string }) => void;
+  defaultValue?: object | null; // json value
+  onChange?: (value: { json: object; text: string }) => void;
   component?: ElementType;
   sx?: SxProps;
+  error?: boolean; // to style the component
 };
 
-const state = EditorState.create({
-  schema
-  // You must add the react plugin if you use
-  // the useNodeViews or useNodePos hook.
-  // plugins: [react()]
-});
+// const state = EditorState.create({
+//   schema
+//   // You must add the react plugin if you use
+//   // the useNodeViews or useNodePos hook.
+//   // plugins: [react()]
+// });
 
-export function Editor({ placeholder, value, onChange, component: Component = OutlinedTextField, sx }: EditorProps) {
+export function Editor({
+  component: Component = OutlinedTextField,
+  error,
+  onChange,
+  placeholder,
+  sx,
+  defaultValue
+}: EditorProps) {
   // const { nodeViews, renderNodeViews } = useNodeViews(reactNodeViews);
+  const [state, setEditorState] = useState(EditorState.create({ schema }));
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
   return (
-    <ProseMirror mount={mount} defaultState={state}>
+    <ProseMirror
+      mount={mount}
+      defaultState={state}
+      dispatchTransaction={(tr) => {
+        setEditorState((s) => s.apply(tr));
+        if (onChange) {
+          onChange({
+            json: state.doc.toJSON(),
+            text: state.doc.textContent
+          });
+        }
+      }}
+    >
       {/** This div is where the contenteditable div is created by Prosemirror */}
-      <Component ref={setMount} sx={sx} />
+      <Component ref={setMount} sx={sx} error={error} />
       {/* {renderNodeViews()} */}
     </ProseMirror>
   );

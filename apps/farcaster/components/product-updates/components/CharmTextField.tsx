@@ -13,7 +13,7 @@ type Props = {
 export function CharmTextField({ error, helperText, ...props }: Props) {
   return (
     <Stack>
-      <Editor {...props} sx={{ minHeight: '5em' }} />
+      <Editor {...props} sx={{ minHeight: '5em' }} error={error} />
       {helperText && <FormHelperText error={error}>{helperText}</FormHelperText>}
     </Stack>
   );
