@@ -131,7 +131,8 @@ function TableRow(props: Props) {
   const isGrouped = Boolean(activeView.fields.groupById);
   const isDragAndDropEnabled = !isTouchScreen() && !props.readOnly && !props.disableDragAndDrop;
 
-  const href = card.customIconType === 'applicationStatus' ? `/rewards/applications/${card.id}` : `/${card.id}`;
+  const href =
+    card.customIconType === 'applicationStatus' ? `/rewards/applications/${card.id}` : `/${card.pageId || card.id}`;
 
   const { drag, drop, preview, style } = useDragDrop({
     item: card,
