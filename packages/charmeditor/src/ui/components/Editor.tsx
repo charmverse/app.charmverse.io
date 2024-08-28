@@ -6,10 +6,12 @@ import {
   react,
   ProseMirror
 } from '@nytimes/react-prosemirror';
-import { schema } from 'prosemirror-schema-basic';
 import { EditorState } from 'prosemirror-state';
 import type { ElementType } from 'react';
 import { useEffect, useState } from 'react';
+
+import { plugins } from '../../plugins';
+import { schema } from '../../schema';
 
 import { OutlinedTextField } from './OutlinedTextField';
 
@@ -25,10 +27,8 @@ export type EditorProps = {
 };
 
 const defaultState = EditorState.create({
-  schema
-  // You must add the react plugin if you use
-  // the useNodeViews or useNodePos hook.
-  // plugins: [react()]
+  schema,
+  plugins: plugins(schema)
 });
 
 export function Editor({

@@ -2,6 +2,7 @@
   "compilerOptions": {
     // declarationMap seems necessary for "Go to definition" to work in VS Code
     "declarationMap": true,
+    "sourceMap": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     "module": "preserve",

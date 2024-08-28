@@ -1,8 +1,8 @@
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { Node, DOMOutputSpec, NodeSpec } from 'prosemirror-model';
 
+import type { BaseRawNodeSpec } from '../buildSchema';
 import { BULLET_LIST, LIST_ITEM } from '../nodeNames';
-import type { BaseRawNodeSpec } from '../specRegistry';
 
 import { ATTRIBUTE_LIST_STYLE_TYPE } from './listItem';
 
@@ -67,27 +67,25 @@ const BulletListNodeSpec: NodeSpec = {
   }
 };
 
-export function spec(): BaseRawNodeSpec {
-  return {
-    name: BULLET_LIST,
-    type: 'node',
-    schema: BulletListNodeSpec,
-    markdown: {
-      toMarkdown(state: MarkdownSerializerState, node: Node) {
-        const indent = node.attrs.indent || 0;
-        const firstDelim = `${convertToSpaces(indent as number)}- `;
-        node.forEach((child, _, i) => {
-          state.wrapBlock(' ', firstDelim, node, () => state.render(child, node, i));
-        });
-      },
-      parseMarkdown: {
-        bullet_list: {
-          block: BULLET_LIST
-        }
+export const bulletList: BaseRawNodeSpec = {
+  name: BULLET_LIST,
+  type: 'node',
+  schema: BulletListNodeSpec,
+  markdown: {
+    toMarkdown(state: MarkdownSerializerState, node: Node) {
+      const indent = node.attrs.indent || 0;
+      const firstDelim = `${convertToSpaces(indent as number)}- `;
+      node.forEach((child, _, i) => {
+        state.wrapBlock(' ', firstDelim, node, () => state.render(child, node, i));
+      });
+    },
+    parseMarkdown: {
+      bullet_list: {
+        block: BULLET_LIST
       }
     }
-  };
-}
+  }
+};
 
 function convertToSpaces(n: number) {
   return new Array(n + 1).join('  ');
