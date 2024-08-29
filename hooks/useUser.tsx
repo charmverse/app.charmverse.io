@@ -1,8 +1,8 @@
+import type { LoggedInUser } from '@root/models';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo } from 'react';
 
 import { useGetTriggerUser, useLogout } from 'charmClient/hooks/profile';
-import type { LoggedInUser } from '@root/models';
 
 export type IContext = {
   user: LoggedInUser | null;

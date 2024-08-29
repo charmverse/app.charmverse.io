@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    // "customConditions": ["@colinhacks/source"],
     "outDir": "../../dist/apps/farcaster",
     "rootDir": "../../",
     "lib": [
@@ -43,9 +44,6 @@
       "@root/adapters/*": [
         "../../adapters/*"
       ],
-      "@root/components/*": [
-        "../../components/*"
-      ],
       "@root/config/*": [
         "../../config/*"
       ],
@@ -61,18 +59,6 @@
       "@charmverse/core/prisma-client": [
         "../../node_modules/@charmverse/core/dist/cjs/prisma-client"
       ],
-      "@charmverse/core/shared": [
-        "../../node_modules/@charmverse/core/dist/cjs/shared"
-      ],
-      "@charmverse/core/log": [
-        "../../node_modules/@charmverse/core/dist/cjs/lib/log"
-      ],
-      "@charmverse/core/utilities": [
-        "../../node_modules/@charmverse/core/dist/cjs/utilities"
-      ],
-      "@charmverse/core/errors": [
-        "../../node_modules/@charmverse/core/dist/cjs/errors"
-      ]
     }
   },
   "include": [

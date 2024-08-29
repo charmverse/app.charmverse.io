@@ -1,6 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
 import { expect, test } from '@playwright/test';
-
 import { baseUrl } from '@root/config/constants';
 
 import { generateUserAndSpace } from './utils/mocks';

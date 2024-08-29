@@ -1,4 +1,4 @@
-import type { Plugin } from '@bangle.dev/pm';
+import type { Plugin } from 'prosemirror-state';
 
 interface DeepPluginArray extends Array<Plugin | DeepPluginArray> {}
 

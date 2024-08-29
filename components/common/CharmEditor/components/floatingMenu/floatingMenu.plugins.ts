@@ -1,5 +1,6 @@
-import type { EditorState, EditorView, Node, Plugin, ResolvedPos, Transaction } from '@bangle.dev/pm';
-import type { NodeSelection, PluginKey } from 'prosemirror-state';
+import type { Node, ResolvedPos } from 'prosemirror-model';
+import type { EditorState, NodeSelection, PluginKey, Plugin, Transaction } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { floatingMenu } from './floatingMenuPlugin';
 

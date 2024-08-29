@@ -122,7 +122,7 @@ jobs:
 
       - name: Validate Sunny Awards
         run: |
-          npm run lint -w apps/sunnyawards
+          npm run lint -- apps/scoutgame
           npm run typecheck -w apps/sunnyawards
 
   test-e2e:
