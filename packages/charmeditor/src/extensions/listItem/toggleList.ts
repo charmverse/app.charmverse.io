@@ -24,6 +24,7 @@ import type { Command, EditorState, Transaction } from 'prosemirror-state';
 import { NodeSelection, Selection, TextSelection } from 'prosemirror-state';
 import { liftTarget, ReplaceAroundStep } from 'prosemirror-transform';
 
+import { TAB_INDENT } from '../../nodeNames';
 import { filter } from '../../utils/pmHelpers';
 
 import { isNodeTodo, removeTodoCheckedAttr, setTodoCheckedAttr } from './todo';
@@ -274,9 +275,7 @@ export function liftListItems(indent?: number): Command {
     const { tr } = state;
     const { $from, $to } = state.selection;
 
-    if (typeof indent === 'number') {
-      tr.insert($from.pos, state.schema.nodes.tabIndent.create({ indent }));
-    }
+    let didLiftList = false;
 
     tr.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
       // Following condition will ensure that block types paragraph, heading, codeBlock, blockquote, panel are lifted.
@@ -295,8 +294,16 @@ export function liftListItems(indent?: number): Command {
           return false;
         }
         tr.lift(range, target);
+        didLiftList = true;
       }
     });
+
+    // replace the bullet with a whitespace indentation. Otherwise we lose the indent level
+    // but make sure that removing the list will be successful
+    if (didLiftList && typeof indent === 'number') {
+      tr.insert($from.pos, state.schema.nodes[TAB_INDENT].create({ indent }));
+    }
+
     if (dispatch) {
       dispatch(tr);
     }
