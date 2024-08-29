@@ -160,3 +160,11 @@ export function roundNumber(num: number | undefined | null): string | undefined 
 export function roundNumberInRange({ num, min, max }: { num: number; min: number; max: number }): number {
   return Math.min(max, Math.max(min, Math.round(num)));
 }
+
+export function isBigInt(value: string) {
+  try {
+    return typeof BigInt(value) === 'bigint';
+  } catch (e) {
+    return false;
+  }
+}

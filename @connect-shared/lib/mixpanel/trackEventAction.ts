@@ -15,7 +15,7 @@ export const trackEventAction = actionClient
     const { event: eventName, ...eventPayload } = parsedInput;
 
     let sessionUserId = ctx.session.user?.id;
-    const userId: string | undefined = sessionUserId;
+    const userId = sessionUserId || '';
 
     // TODO: Handle anonymous user ids
     if (!ctx.session.anonymousUserId) {
@@ -27,7 +27,7 @@ export const trackEventAction = actionClient
     const event = { userId, ...eventPayload };
 
     // Make sure to use userId from session
-    event.userId = sessionUserId;
+    event.userId = sessionUserId || '';
     if (userId === ctx.session.anonymousUserId) {
       event.isAnonymous = true;
     }

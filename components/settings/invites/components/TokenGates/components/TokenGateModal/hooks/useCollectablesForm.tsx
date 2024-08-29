@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { wagmiConfig } from '@root/connectors/config';
 import { readContract } from '@wagmi/core';
+import { wagmiConfig } from 'connectors/config';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -8,6 +8,7 @@ import { ercAbi } from 'lib/tokenGates/abis/abis';
 import { subscriptionTokenV1ABI } from 'lib/tokenGates/hypersub/abi';
 import { PublicLockV13 } from 'lib/tokenGates/unlock/abi';
 import { isValidChainAddress } from 'lib/tokens/validation';
+import { isBigInt } from 'lib/utils/numbers';
 
 import { nftCheck, collectableOptions, poapNameMatch, poapTypes } from '../utils/utils';
 
@@ -93,7 +94,11 @@ const schema = yup.object({
   tokenId: yup.string().when(['collectableOption', 'check'], {
     is: (collectableOption: CollectableOptionsId, check: NftCheck) =>
       (collectableOption === 'ERC721' && check === 'individual') || collectableOption === 'ERC1155',
-    then: () => yup.string().required('Token id is required'),
+    then: () =>
+      yup
+        .string()
+        .required('Token id is required')
+        .test('isTokenId', 'Invalid token Id', (value) => isBigInt(value)),
     otherwise: () => yup.string()
   }),
   quantity: yup
