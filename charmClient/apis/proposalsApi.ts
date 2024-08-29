@@ -1,5 +1,6 @@
 import * as http from '@root/adapters/http';
 
+import { MaybeString } from 'charmClient/hooks/helpers';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
@@ -34,5 +35,9 @@ export class ProposalsApi {
 
   goBackToStep({ proposalId, ...payload }: { proposalId: string; evaluationId?: string }) {
     return http.PUT(`/api/proposals/${proposalId}/back-to-step`, payload);
+  }
+
+  exportProposalsReviewers({ spaceId }: { spaceId: string }) {
+    return http.GET<string>(`/api/spaces/${spaceId}/proposals/reviewers/export`);
   }
 }

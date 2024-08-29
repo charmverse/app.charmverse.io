@@ -11,6 +11,13 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   // retrieve space by domain, and then last page view by spaceId
   const domainOrCustomDomain = context.query.domain as string;
+
+  if (domainOrCustomDomain === 'sw.js') {
+    return {
+      props: {}
+    };
+  }
+
   const space = await prisma.space.findFirst({
     where: {
       OR: [
