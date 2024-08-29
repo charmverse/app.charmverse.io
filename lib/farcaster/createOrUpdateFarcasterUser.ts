@@ -2,15 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import type { LoggedInUser } from 'models/User';
-
-import { uploadUrlToS3, getUserS3FilePath } from '../aws/uploadToS3Server';
-import type { SignupAnalytics } from '../metrics/mixpanel/interfaces/UserEvent';
-import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
-import { trackUserAction } from '../metrics/mixpanel/trackUserAction';
-import { sessionUserRelations } from '../session/config';
-import { getUserProfile } from '../users/getUser';
-import { postUserCreate } from '../users/postUserCreate';
+import { getUserS3FilePath, uploadUrlToS3 } from '../aws/uploadToS3Server';
 import { DisabledAccountError } from '../utils/errors';
 import { uid } from '../utils/strings';
 
@@ -19,7 +11,6 @@ export async function createOrUpdateFarcasterUser({
   displayName,
   fid,
   pfpUrl,
-  signupAnalytics = {},
   username,
   verifications,
   newUserId
@@ -30,9 +21,11 @@ export async function createOrUpdateFarcasterUser({
   bio?: string;
   pfpUrl?: string;
   verifications: string[];
-  signupAnalytics?: Partial<SignupAnalytics>;
   newUserId?: string;
-}): Promise<LoggedInUser> {
+}): Promise<{
+  userId: string;
+  created: boolean;
+}> {
   const farcasterUser = await prisma.farcasterUser.findUnique({
     where: {
       fid
@@ -64,15 +57,12 @@ export async function createOrUpdateFarcasterUser({
       });
     }
 
-    trackUserAction('sign_in', { userId: farcasterUser.user.id, identityType: 'Farcaster' });
-
-    await trackOpSpaceClickSigninEvent({
-      userId: farcasterUser.user.id,
-      identityType: 'Farcaster'
-    });
-
-    return getUserProfile('id', farcasterUser.userId);
+    return {
+      userId: farcasterUser.userId,
+      created: false
+    };
   }
+
   const userWithWallet = await prisma.user.findFirst({
     where: {
       wallets: {
@@ -81,6 +71,9 @@ export async function createOrUpdateFarcasterUser({
             in: verifications
           }
         }
+      },
+      farcasterUser: {
+        is: null
       }
     },
     include: {
@@ -89,7 +82,7 @@ export async function createOrUpdateFarcasterUser({
   });
 
   if (userWithWallet) {
-    const updatedUser = await prisma.user.update({
+    await prisma.user.update({
       where: {
         id: userWithWallet.id
       },
@@ -118,18 +111,13 @@ export async function createOrUpdateFarcasterUser({
             fid
           }
         }
-      },
-      include: sessionUserRelations
+      }
     });
 
-    trackUserAction('sign_in', { userId: userWithWallet.id, identityType: 'Farcaster' });
-
-    await trackOpSpaceClickSigninEvent({
+    return {
       userId: userWithWallet.id,
-      identityType: 'Farcaster'
-    });
-
-    return updatedUser;
+      created: false
+    };
   }
 
   const userId = newUserId || uuid();
@@ -167,11 +155,11 @@ export async function createOrUpdateFarcasterUser({
           }
         }
       }
-    },
-    include: sessionUserRelations
+    }
   });
 
-  postUserCreate({ user: newUser, identityType: 'Farcaster', signupAnalytics });
-
-  return newUser;
+  return {
+    userId: newUser.id,
+    created: true
+  };
 }

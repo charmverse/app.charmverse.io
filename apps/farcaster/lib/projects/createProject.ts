@@ -16,7 +16,7 @@ export async function createProject(input: FormValues) {
     throw new DataNotFoundError('Farcaster user not found');
   }
 
-  const user = await createOrUpdateFarcasterUser({
+  const { userId } = await createOrUpdateFarcasterUser({
     fid: input.teamLeadFarcasterId,
     username: farcasterUser.username,
     verifications: farcasterUser.verifications,
@@ -24,8 +24,6 @@ export async function createProject(input: FormValues) {
     displayName: farcasterUser.display_name,
     pfpUrl: farcasterUser.pfp_url
   });
-
-  const userId = user.id;
 
   let path = stringToValidPath({ input: input.name ?? '', wordSeparator: '-', autoReplaceEmpty: false });
   const existingProjectWithPath = await prisma.project.findFirst({
