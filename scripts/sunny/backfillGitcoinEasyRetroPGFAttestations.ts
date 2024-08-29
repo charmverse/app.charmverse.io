@@ -27,16 +27,17 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
 
   const totalProjects = projects.length;
 
-  // const totalProjects = 2;
+  // const totalProjects = 1;
 
   for (let i = 0; i < totalProjects; i++) {
     const project = projects[i];
+
     await storeProjectMetadataAndPublishGitcoinAttestation({
       userId: project.createdBy,
       projectId: project.id
     });
 
-    console.log(`Project attestation stored for project ${i} / ${totalProjects}:`, project.id);
+    console.log(`Project attestation stored for project ${i + 1} / ${totalProjects}:`, project.id);
   }
 }
 

@@ -2,10 +2,12 @@ import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { GitcoinProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { resolveENSName } from '@root/lib/blockchain/getENSName';
 import { attestOnchain } from '@root/lib/credentials/attestOnchain';
 import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
 import { storeProjectInS3 } from '@root/lib/credentials/storeProjectInS3';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
+import { isAddress } from 'viem';
 
 import { projectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
@@ -60,14 +62,47 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
   const existingProjectAttestation = existingAttestations.find((a) => a.type === 'application');
   const existingProfileAttestation = existingAttestations.find((a) => a.type === 'profile');
 
+  let attestationRecipient: string | null = fcProfile.connectedAddress;
+
+  if ((attestationRecipient && !isAddress(attestationRecipient)) || !attestationRecipient) {
+    if (attestationRecipient?.endsWith('.eth')) {
+      const resolvedAddress = await resolveENSName(attestationRecipient).catch(() => null);
+
+      if (resolvedAddress) {
+        attestationRecipient = resolvedAddress;
+      }
+    }
+
+    if (!attestationRecipient) {
+      attestationRecipient = fcProfile.connectedAddresses[0];
+    }
+  }
+  if ((attestationRecipient && !isAddress(attestationRecipient)) || !attestationRecipient) {
+    if (attestationRecipient?.endsWith('.eth')) {
+      const resolvedAddress = await resolveENSName(attestationRecipient).catch(() => null);
+
+      if (resolvedAddress) {
+        attestationRecipient = resolvedAddress;
+      }
+    }
+
+    if (!attestationRecipient) {
+      attestationRecipient = fcProfile.body.address;
+    }
+  }
+
+  if (attestationRecipient && !isAddress(attestationRecipient)) {
+    attestationRecipient = null;
+  }
+
   if (!existingProfileAttestation) {
     const profileAttestationUID: string = await attestOnchain({
       type: 'gitcoinProject',
       chainId: projectAttestationChainId,
       credentialInputs: {
-        recipient: fcProfile.connectedAddress ?? fcProfile.connectedAddresses[0] ?? fcProfile.body.address,
+        recipient: attestationRecipient,
         data: {
-          name: fcProfile.body.username,
+          name: fcProfile.body.username || `fid:${fcProfile.body.id.toString()}`,
           metadataPtr: profileFilePath,
           metadataType: 0,
           type: 'profile',
@@ -77,7 +112,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
       }
     });
 
-    log.info('New Gitcoin Profile attestation UID:', profileAttestationUID);
+    log.info(`New Gitcoin Profile attestation UID: ${profileAttestationUID}`);
 
     await prisma.gitcoinProjectAttestation.create({
       data: {
@@ -98,7 +133,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     type: 'gitcoinProject',
     chainId: projectAttestationChainId,
     credentialInputs: {
-      recipient: fcProfile.connectedAddress ?? fcProfile.connectedAddresses[0] ?? fcProfile.body.address,
+      recipient: attestationRecipient,
       data: {
         name: project.name,
         metadataPtr: staticFilePath,
@@ -110,7 +145,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     }
   });
 
-  log.info('New Gitcoin Project attestation UID:', projectAttestationUID);
+  log.info(`New Gitcoin Project attestation UID: ${projectAttestationUID}`);
 
   return prisma.gitcoinProjectAttestation.create({
     data: {

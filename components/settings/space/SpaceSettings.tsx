@@ -62,7 +62,7 @@ const schema: yup.Schema<FormValues> = yup.object({
     .string()
     .ensure()
     .trim()
-    .min(3, 'Domain must be at least 3 characters')
+    .min(2, 'Domain must be at least 2 characters')
     .matches(/^[^!?@#$%^&*+=<>(){}.'"\\[\]|~/]*$/, 'The symbols you entered are not allowed')
     .matches(/^\S*$/, 'Space is not allowed'),
   customDomain: yup

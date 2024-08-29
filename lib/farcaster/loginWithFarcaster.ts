@@ -18,8 +18,6 @@ import { optimism } from 'viem/chains';
 
 import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
 
-import { createOrUpdateFarcasterUser } from './createOrUpdateFarcasterUser';
-
 const appClient = createAppClient({
   ethereum: viemConnector({
     rpcUrl: getChainById(optimism.id)!.rpcUrls[0]
@@ -74,14 +72,146 @@ export async function loginWithFarcaster({
     throw new InvalidStateError('Invalid signature');
   }
 
-  return createOrUpdateFarcasterUser({
-    fid,
-    username,
-    displayName,
-    bio,
-    pfpUrl,
-    verifications,
-    signupAnalytics,
-    newUserId
+  const farcasterUser = await prisma.farcasterUser.findUnique({
+    where: {
+      fid
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          deletedAt: true,
+          claimed: true
+        }
+      }
+    }
   });
+
+  if (farcasterUser) {
+    if (farcasterUser.user.deletedAt) {
+      throw new DisabledAccountError();
+    }
+
+    if (!farcasterUser.user.claimed) {
+      await prisma.user.update({
+        where: {
+          id: farcasterUser.userId
+        },
+        data: {
+          claimed: true
+        }
+      });
+    }
+
+    trackUserAction('sign_in', { userId: farcasterUser.user.id, identityType: 'Farcaster' });
+
+    await trackOpSpaceClickSigninEvent({
+      userId: farcasterUser.user.id,
+      identityType: 'Farcaster'
+    });
+
+    return getUserProfile('id', farcasterUser.userId);
+  }
+  const userWithWallet = await prisma.user.findFirst({
+    where: {
+      wallets: {
+        some: {
+          address: {
+            in: verifications
+          }
+        }
+      }
+    },
+    include: {
+      profile: true,
+      farcasterUser: true
+    }
+  });
+
+  if (userWithWallet && !userWithWallet.farcasterUser?.fid) {
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userWithWallet.id
+      },
+      data: {
+        profile: {
+          upsert: {
+            create: {
+              description: bio || '',
+              social: {
+                farcasterUrl: `https://warpcast.com/${username}`
+              }
+            },
+            update: {
+              description: userWithWallet.profile?.description || bio || '',
+              locale: userWithWallet.profile?.locale,
+              timezone: userWithWallet.profile?.timezone,
+              social: {
+                farcasterUrl: `https://warpcast.com/${username}`
+              }
+            }
+          }
+        },
+        farcasterUser: {
+          create: {
+            account: { username, displayName, bio, pfpUrl, fid },
+            fid
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+
+    trackUserAction('sign_in', { userId: userWithWallet.id, identityType: 'Farcaster' });
+
+    await trackOpSpaceClickSigninEvent({
+      userId: userWithWallet.id,
+      identityType: 'Farcaster'
+    });
+
+    return updatedUser;
+  }
+
+  const userId = newUserId || uuid();
+
+  let avatar: string | null = null;
+  if (pfpUrl) {
+    try {
+      ({ url: avatar } = await uploadUrlToS3({
+        pathInS3: getUserS3FilePath({ userId, url: pfpUrl }),
+        url: pfpUrl
+      }));
+    } catch (error) {
+      log.warn('Error while uploading avatar to S3', error);
+    }
+  }
+
+  const newUser = await prisma.user.create({
+    data: {
+      id: userId,
+      username,
+      identityType: 'Farcaster',
+      avatar,
+      farcasterUser: {
+        create: {
+          account: { username, displayName, bio, pfpUrl },
+          fid
+        }
+      },
+      path: uid(),
+      profile: {
+        create: {
+          ...(bio && { description: bio || '' }),
+          social: {
+            farcasterUrl: `https://warpcast.com/${username}`
+          }
+        }
+      }
+    },
+    include: sessionUserRelations
+  });
+
+  postUserCreate({ user: newUser, identityType: 'Farcaster', signupAnalytics });
+
+  return newUser;
 }

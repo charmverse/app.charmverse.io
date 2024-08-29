@@ -73,7 +73,11 @@ type Props = WrappedComponentProps &
     pageIcon?: string | null;
     setPage: (p: Partial<Page>) => void;
     updateView: (view: BoardView) => void;
-    showCard: (cardId: string | null, isTemplate?: boolean) => void;
+    showCard: (
+      cardId: string | null,
+      isTemplate?: boolean,
+      event?: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+    ) => void;
     showView: (viewId: string) => void;
     disableUpdatingUrl?: boolean;
     maxTabsShown?: number;
@@ -250,11 +254,15 @@ function CenterPanel(props: Props) {
   }
 
   const showCard = useCallback(
-    (cardId: string | null, isTemplate?: boolean) => {
+    (
+      cardId: string | null,
+      isTemplate?: boolean,
+      event?: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+    ) => {
       if (state.selectedCardIds.length > 0) {
         setState({ ...state, selectedCardIds: [] });
       }
-      props.showCard(cardId, isTemplate);
+      props.showCard(cardId, isTemplate, event);
     },
     [props.showCard, state.selectedCardIds]
   );
@@ -672,7 +680,7 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     readOnly={props.readOnly}
                     cardIdToFocusOnRender={state.cardIdToFocusOnRender}
-                    showCard={showCard}
+                    showCard={(cardId, e) => showCard(cardId, undefined, e)}
                     addCard={kanbanAddCard}
                     onCardClicked={cardClicked}
                     disableAddingCards={disableAddingNewCards}

@@ -1,7 +1,7 @@
 import { getIronOptions as getIronOptionsRoot } from '@root/lib/session/getIronOptions';
 
 export type SessionData = {
-  user: { id: string };
+  user?: { id: string };
   anonymousUserId?: string;
 };
 
