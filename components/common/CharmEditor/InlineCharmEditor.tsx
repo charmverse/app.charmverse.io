@@ -1,5 +1,7 @@
 import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
 import styled from '@emotion/styled';
+import * as tabIndent from '@packages/charmeditor/plugins/tabIndent';
+import { tabIndentSpec } from '@packages/charmeditor/specs/tabIndent';
 import debounce from 'lodash/debounce';
 import { Node } from 'prosemirror-model';
 import { Plugin, PluginKey } from 'prosemirror-state';
@@ -30,7 +32,6 @@ import { mentionPluginKeyName } from './components/mention/mention.constants';
 import { mentionPlugins } from './components/mention/mention.plugins';
 import { mentionSpecs } from './components/mention/mention.specs';
 import { placeholderPlugin } from './components/placeholder/placeholder';
-import * as tabIndent from './components/tabIndent';
 
 export interface ICharmEditorOutput {
   doc: PageContent;
@@ -53,7 +54,7 @@ export const specRegistry = new SpecRegistry([
   emoji.specs(), // ??
   mentionSpecs(), // NO
   code.spec(), // OK
-  tabIndent.spec()
+  tabIndentSpec
 ]);
 
 export function charmEditorPlugins({

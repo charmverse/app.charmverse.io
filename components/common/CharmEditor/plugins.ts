@@ -1,4 +1,5 @@
 import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
+import * as tabIndent from '@packages/charmeditor/plugins/tabIndent';
 import type { EditorState } from 'prosemirror-state';
 import { PluginKey, Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
@@ -40,7 +41,6 @@ import { placeholderPlugin } from './components/placeholder/placeholder';
 import { plugins as quotePlugins } from './components/quote/quote';
 import * as rowActions from './components/rowActions/rowActions';
 import { plugins as trackPlugins } from './components/suggestions/suggestions.plugins';
-import * as tabIndent from './components/tabIndent';
 // import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tablePlugins } from './components/table/table.plugins';
 import { plugins as tableOfContentPlugins } from './components/tableOfContents/tableOfContents.plugins';

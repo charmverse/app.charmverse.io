@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Space } from '@charmverse/core/prisma';
+import type { LoggedInUser } from '@root/models';
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';
-import type { LoggedInUser } from '@root/models';
 import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

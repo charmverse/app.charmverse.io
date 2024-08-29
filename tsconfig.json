@@ -28,6 +28,7 @@
     "isolatedModules": true,
     "paths": {
       "@connect-shared/*": ["./@connect-shared/*"],
+      "@packages/charmeditor/*": ["./packages/charmeditor/src/*"],
       "@root/abis/*": ["./abis/*"],
       "@root/adapters/*": ["./adapters/*"],
       "@root/connectors/*": ["./connectors/*"],

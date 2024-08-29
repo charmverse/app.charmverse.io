@@ -1,11 +1,11 @@
 import type { ProfileItem } from '@charmverse/core/prisma';
-
 import * as http from '@root/adapters/http';
+import type { LoggedInUser } from '@root/models';
+
 import type { UserCommunity } from 'lib/profile';
 import type { SetForumCategoryNotificationInput } from 'lib/userNotifications/setForumCategoryNotification';
 import type { ClientUserSpaceNotifications } from 'lib/userNotifications/spaceNotifications';
 import type { UserAvatar } from 'lib/users/interfaces';
-import type { LoggedInUser } from '@root/models';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];

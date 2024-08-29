@@ -7,10 +7,10 @@ import type {
 } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
 import { testUtilsPages } from '@charmverse/core/test';
+import type { LoggedInUser } from '@root/models';
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';
-import type { LoggedInUser } from '@root/models';
 import { generatePageToCreateStub } from 'testing/generateStubs';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

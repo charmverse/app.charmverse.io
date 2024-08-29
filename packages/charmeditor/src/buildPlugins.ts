@@ -40,22 +40,7 @@ export function buildPlugins<T = any>(
   };
 
   // eslint-disable-next-line prefer-const
-  let [flatPlugins, pluginGroupNames] = flatten(plugins, pluginPayload);
-
-  const defaultPluginGroups: RawPlugins[] = [];
-
-  // if (!pluginGroupNames.has('history')) {
-  //   defaultPluginGroups.push(history.plugins());
-  // }
-
-  // if (!pluginGroupNames.has('editorStateCounter')) {
-  //   defaultPluginGroups.push(editorStateCounter.plugins());
-  // }
-
-  // flatPlugins = flatPlugins.concat(
-  //   // TODO: deprecate the ability pass a callback to the plugins param of pluginGroup
-  //   flatten(defaultPluginGroups, pluginPayload)[0]
-  // );
+  let flatPlugins = flatten(plugins, pluginPayload);
 
   flatPlugins = processInputRules(flatPlugins);
 
@@ -130,21 +115,11 @@ function validateNodeViews(plugins: Plugin[], schema: Schema) {
   }
 }
 
-function flatten<T>(rawPlugins: RawPlugins, callbackPayload: PluginPayload<T>): [Plugin[], Set<string>] {
-  const pluginGroupNames = new Set<string>();
-
+function flatten<T>(rawPlugins: RawPlugins, callbackPayload: PluginPayload<T>): Plugin[] {
   const recurse = (plugins: RawPlugins): any => {
     if (Array.isArray(plugins)) {
       return plugins.flatMap((p: any) => recurse(p)).filter(Boolean);
     }
-
-    // if (plugins instanceof PluginGroup) {
-    //   if (pluginGroupNames.has(plugins.name)) {
-    //     throw new Error(`Duplicate names of pluginGroups ${plugins.name} not allowed.`);
-    //   }
-    //   pluginGroupNames.add(plugins.name);
-    //   return recurse(plugins.plugins);
-    // }
 
     if (typeof plugins === 'function') {
       if (!callbackPayload) {
@@ -156,5 +131,5 @@ function flatten<T>(rawPlugins: RawPlugins, callbackPayload: PluginPayload<T>): 
     return plugins;
   };
 
-  return [recurse(rawPlugins), pluginGroupNames];
+  return recurse(rawPlugins);
 }

@@ -1,5 +1,4 @@
 import type { PageMeta } from '@charmverse/core/pages';
-
 import * as http from '@root/adapters/http';
 
 export class FileApi {

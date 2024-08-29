@@ -1,6 +1,6 @@
 import type { Comment } from '@charmverse/core/prisma';
-
 import * as http from '@root/adapters/http';
+
 import type { CommentCreate } from 'lib/comments/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { MultipleThreadsInput, ThreadWithComments } from 'lib/threads/interfaces';

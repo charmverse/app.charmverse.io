@@ -1,8 +1,8 @@
+import * as http from '@root/adapters/http';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import { v4 } from 'uuid';
 
-import * as http from '@root/adapters/http';
 import { useGetProposalBlocks, useUpdateProposalBlocks } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';

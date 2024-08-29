@@ -1,4 +1,5 @@
 import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
+import { tabIndentSpec } from '@packages/charmeditor/specs/tabIndent';
 
 import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -40,7 +41,6 @@ import { spec as paragraphSpec } from './components/paragraph/paragraph';
 import { spec as pdfSpec } from './components/pdf/pdf';
 import * as poll from './components/poll/pollSpec';
 import * as quote from './components/quote/quote';
-import * as tabIndent from './components/tabIndent';
 // import { spec as tableSpec } from './components/table/table.schema';
 import { spec as tableSpec } from './components/table/table.specs';
 import { spec as tableOfContentSpec } from './components/tableOfContents/tableOfContents.specs';
@@ -94,7 +94,7 @@ export const specRegistry = new SpecRegistry([
   nestedPageSpec(), // NO
   linkedPageSpec(),
   quote.spec(), // OK
-  tabIndent.spec(),
+  tabIndentSpec,
   // tableSpec(), // OK - only for text content
   tableSpec, // OK - only for text content
   disclosure.spec(),

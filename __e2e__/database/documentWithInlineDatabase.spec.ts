@@ -2,10 +2,10 @@ import type { Block, Space, User, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
+import { baseUrl } from '@root/config/constants';
 import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 
-import { baseUrl } from '@root/config/constants';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import type { CardFields } from 'lib/databases/card';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';

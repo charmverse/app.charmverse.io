@@ -1,9 +1,9 @@
 import type { MemberProperty, Role, Space } from '@charmverse/core/prisma';
+import type { LoggedInUser } from '@root/models';
 import request from 'supertest';
 
 import { createMemberPropertyPermission } from 'lib/members/createMemberPropertyPermission';
 import type { MemberPropertyPermissionWithRole } from 'lib/members/interfaces';
-import type { LoggedInUser } from '@root/models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateMemberProperty } from 'testing/utils/members';
