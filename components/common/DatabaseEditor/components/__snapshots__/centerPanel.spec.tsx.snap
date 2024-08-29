@@ -2658,19 +2658,13 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             class="open-button"
                             data-test="database-open-button-1"
                           >
-                            <a
-                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
-                              href="/1"
-                              style="text-decoration: none;"
+                            <button
+                              type="button"
                             >
-                              <button
-                                type="button"
-                              >
-                                <span>
-                                  Open
-                                </span>
-                              </button>
-                            </a>
+                              <span>
+                                Open
+                              </span>
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -2778,19 +2772,13 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             class="open-button"
                             data-test="database-open-button-2"
                           >
-                            <a
-                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
-                              href="/2"
-                              style="text-decoration: none;"
+                            <button
+                              type="button"
                             >
-                              <button
-                                type="button"
-                              >
-                                <span>
-                                  Open
-                                </span>
-                              </button>
-                            </a>
+                              <span>
+                                Open
+                              </span>
+                            </button>
                           </div>
                         </div>
                       </div>

@@ -379,7 +379,7 @@ export function RewardsPage({ title }: { title: string }) {
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     disableAddingCards
-                    showCard={() => {}}
+                    showCard={showRewardOrApplication}
                     readOnlyTitle
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}
