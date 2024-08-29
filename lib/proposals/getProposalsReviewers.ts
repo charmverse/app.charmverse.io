@@ -73,6 +73,11 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
               completedAt: true
             }
           },
+          rubricAnswers: {
+            select: {
+              userId: true
+            }
+          },
           vote: {
             select: {
               id: true,
@@ -124,7 +129,9 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
 
         if (isReviewer && !currentEvaluation.result) {
           totalReviews += 1;
-          const currentReview = currentEvaluation.reviews.find((review) => review.reviewerId === spaceRole.userId);
+          const currentReview =
+            currentEvaluation.reviews.find((review) => review.reviewerId === spaceRole.userId) ||
+            currentEvaluation.rubricAnswers.find((answer) => answer.userId === spaceRole.userId);
           const currentVote = currentEvaluation.vote?.userVotes.find((vote) => vote.userId === spaceRole.userId);
           const hasReviewed = currentReview || currentVote;
 
