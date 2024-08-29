@@ -47,7 +47,9 @@ export function ProductUpdatesFrame({
         >
           <p
             style={{
-              fontSize: 24
+              fontSize: 24,
+              maxWidth: 350,
+              wordBreak: 'break-word'
             }}
           >
             {projectName} Update
@@ -62,8 +64,8 @@ export function ProductUpdatesFrame({
           </p>
         </div>
         <img
-          width={85}
-          height={85}
+          width={100}
+          height={100}
           style={{
             objectFit: 'contain'
           }}
