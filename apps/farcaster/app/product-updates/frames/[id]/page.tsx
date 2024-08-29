@@ -23,9 +23,7 @@ export default async function FramesPage({
   if (!previousFrameId && !nextFrameId) {
     return (
       <>
-        <meta name='fc:frame' content='vNext' />
-        <meta name='og:image' content={image} />
-        <meta property='fc:frame:image:aspect_ratio' content='1:1' />
+        <Image content={image} />
         <meta name='fc:frame:image' content={image} />
         <meta name='fc:frame:button:1' content='Manage' />
         <meta name='fc:frame:button:1:action' content='post' />
@@ -35,10 +33,7 @@ export default async function FramesPage({
   } else if (!previousFrameId && nextFrameId) {
     return (
       <>
-        <meta name='fc:frame' content='vNext' />
-        <meta name='og:image' content={image} />
-        <meta name='fc:frame:image' content={image} />
-        <meta property='fc:frame:image:aspect_ratio' content='1:1' />
+        <Image content={image} />
         <meta name='fc:frame:button:1' content='Next' />
         <meta name='fc:frame:button:1:action' content='post' />
         <meta name='fc:frame:button:1:target' content={`${baseUrl}/product-updates/frames/${nextFrameId}`} />
@@ -50,10 +45,7 @@ export default async function FramesPage({
   } else if (previousFrameId && !nextFrameId) {
     return (
       <>
-        <meta name='fc:frame' content='vNext' />
-        <meta name='og:image' content={image} />
-        <meta name='fc:frame:image' content={image} />
-        <meta property='fc:frame:image:aspect_ratio' content='1:1' />
+        <Image content={image} />
         <meta name='fc:frame:button:1' content='Previous' />
         <meta name='fc:frame:button:1:action' content='post' />
         <meta name='fc:frame:button:1:target' content={`${baseUrl}/product-updates/frames/${previousFrameId}`} />
@@ -66,10 +58,7 @@ export default async function FramesPage({
 
   return (
     <>
-      <meta name='fc:frame' content='vNext' />
-      <meta name='og:image' content={image} />
-      <meta name='fc:frame:image' content={image} />
-      <meta property='fc:frame:image:aspect_ratio' content='1:1' />
+      <Image content={image} />
       <meta name='fc:frame:button:1' content='Previous' />
       <meta name='fc:frame:button:1:action' content='post' />
       <meta name='fc:frame:button:1:target' content={`${baseUrl}/product-updates/frames/${previousFrameId}`} />
@@ -79,6 +68,17 @@ export default async function FramesPage({
       <meta name='fc:frame:button:3' content='Next' />
       <meta name='fc:frame:button:3:action' content='post' />
       <meta name='fc:frame:button:3:target' content={`${baseUrl}/product-updates/frames/${nextFrameId}`} />
+    </>
+  );
+}
+
+function Image({ content }: { content: string }) {
+  return (
+    <>
+      <meta name='fc:frame' content='vNext' />
+      <meta name='og:image' content={content} />
+      <meta name='fc:frame:image' content={content} />
+      <meta property='fc:frame:image:aspect_ratio' content='1:1' />
     </>
   );
 }
