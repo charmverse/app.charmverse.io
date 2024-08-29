@@ -4,7 +4,7 @@ import type { Node, DOMOutputSpec, NodeSpec } from 'prosemirror-model';
 import type { BaseRawNodeSpec } from '../buildSchema';
 import { BULLET_LIST, LIST_ITEM } from '../nodeNames';
 
-import { ATTRIBUTE_LIST_STYLE_TYPE } from './listItem';
+import { ATTRIBUTE_LIST_STYLE_TYPE } from './listItem/listItemSpec';
 
 export const ATTRIBUTE_INDENT = 'data-indent';
 export const MIN_INDENT_LEVEL = 0;

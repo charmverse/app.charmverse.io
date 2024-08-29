@@ -1,9 +1,11 @@
+import { keymap } from 'prosemirror-keymap';
 import type { DOMOutputSpec } from 'prosemirror-model';
 
+import type { RawPlugins } from '../buildPlugins';
 import type { BaseRawNodeSpec } from '../buildSchema';
 import { TAB_INDENT } from '../nodeNames';
 
-export const tabIndentSpec: BaseRawNodeSpec = {
+export const spec: BaseRawNodeSpec = {
   type: 'node',
   name: TAB_INDENT,
   schema: {
@@ -23,3 +25,17 @@ export const tabIndentSpec: BaseRawNodeSpec = {
     toMarkdown: () => null
   }
 };
+
+export function plugins(): RawPlugins {
+  return [
+    keymap({
+      // 'Shift-Tab': undentListItem,
+      Tab: (state, dispatch) => {
+        if (dispatch) {
+          dispatch(state.tr.replaceSelectionWith(state.schema.nodes[TAB_INDENT].create()).scrollIntoView());
+        }
+        return true;
+      }
+    })
+  ];
+}

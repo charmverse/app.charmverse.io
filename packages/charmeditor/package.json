@@ -19,6 +19,8 @@
     "prosemirror-state": "^1.4.3"
   },
   "exports": {
-    "./ui": "./src/ui/index.tsx"
+    "./ui": "./src/ui/index.tsx",
+    "./extensions/history": "./src/extensions/history.ts",
+    "./extensions/tabIndent": "./src/extensions/tabIndent.ts"
   }
 }

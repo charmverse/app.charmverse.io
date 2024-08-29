@@ -16,9 +16,9 @@ import { schema } from '../../schema';
 import { OutlinedTextField } from './OutlinedTextField';
 
 import '../prosemirror.css';
-import '../../plugins/listItem/czi-vars.scss';
-import '../../plugins/listItem/czi-indent.scss';
-import '../../plugins/listItem/czi-list.scss';
+import '../../extensions/listItem/czi-vars.scss';
+import '../../extensions/listItem/czi-indent.scss';
+import '../../extensions/listItem/czi-list.scss';
 
 export type EditorProps = {
   placeholder?: string;

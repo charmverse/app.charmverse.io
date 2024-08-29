@@ -2,8 +2,8 @@ import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { DOMOutputSpec, Node, NodeSpec } from 'prosemirror-model';
 
-import type { BaseRawNodeSpec } from '../buildSchema';
-import { LIST_ITEM } from '../nodeNames';
+import type { BaseRawNodeSpec } from '../../buildSchema';
+import { LIST_ITEM } from '../../nodeNames';
 
 export const ATTRIBUTE_LIST_STYLE_TYPE = 'data-list-style-type';
 

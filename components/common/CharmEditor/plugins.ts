@@ -1,5 +1,5 @@
 import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
-import * as tabIndent from '@packages/charmeditor/plugins/tabIndent';
+import * as tabIndent from '@packages/charmeditor/extensions/tabIndent';
 import type { EditorState } from 'prosemirror-state';
 import { PluginKey, Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';

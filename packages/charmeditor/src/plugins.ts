@@ -3,9 +3,9 @@ import type { Schema } from 'prosemirror-model';
 import type { Plugin } from 'prosemirror-state';
 
 import { buildPlugins } from './buildPlugins';
-import { plugins as historyPlugins } from './plugins/history';
-import { plugins as listItemPlugins } from './plugins/listItem/listItemPlugins';
-import { plugins as tabIndentPlugins } from './plugins/tabIndent';
+import { plugins as historyPlugins } from './extensions/history';
+import { plugins as listItemPlugins } from './extensions/listItem/listItemPlugins';
+import { plugins as tabIndentPlugins } from './extensions/tabIndent';
 
 export const plugins = (schema: Schema): Plugin[] => [
   // You must add the react plugin if you use

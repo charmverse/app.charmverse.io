@@ -1,5 +1,5 @@
 import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
-import { tabIndentSpec } from '@packages/charmeditor/specs/tabIndent';
+import { spec as tabIndentSpec } from '@packages/charmeditor/extensions/tabIndent';
 
 import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import type { PageContent } from 'lib/prosemirror/interfaces';
