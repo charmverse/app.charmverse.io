@@ -186,7 +186,7 @@ export function EvaluationStepSettings({
       {showApprovers && (
         <>
           <Box display='flex' flexDirection='column'>
-            <FormLabel required>
+            <FormLabel>
               <Typography component='span' variant='subtitle1'>
                 Approvers
               </Typography>
@@ -257,12 +257,12 @@ export function EvaluationStepSettings({
       {evaluation.type !== 'vote' && (
         <Box mb={1}>
           <Box display='flex' flexDirection='column' mb={1}>
-            <FormLabel required>
+            <FormLabel>
               <Typography component='span' variant='subtitle1'>
                 Due date
               </Typography>
             </FormLabel>
-            <Typography variant='caption'>Send a reminder to reviewers before the Due Date</Typography>
+            <Typography variant='caption'>Send a reminder 24 hrs to reviewers before the date</Typography>
           </Box>
           <DateTimePicker<DateTime>
             onAccept={(date) => {

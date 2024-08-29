@@ -49,7 +49,8 @@ export function ProductUpdatesFrame({
             style={{
               fontSize: 24,
               fontFamily: 'Inter',
-              fontWeight: 700
+              fontWeight: 700,
+              maxWidth: 350
             }}
           >
             {projectName}
@@ -64,8 +65,8 @@ export function ProductUpdatesFrame({
           </p>
         </div>
         <img
-          width={85}
-          height={85}
+          width={100}
+          height={100}
           style={{
             objectFit: 'contain'
           }}

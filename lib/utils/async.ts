@@ -1,3 +1,7 @@
+import { log } from '@charmverse/core/log';
+
+import { isTruthy } from './types';
+
 // A utilitiy to recursively call and endpoint with paginated results
 export async function paginatedCall<R, Q = object | null>(
   // The first method should call an API and return the result directly
@@ -19,4 +23,18 @@ export async function delay(ms: number = 1) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+export async function handleAllSettled<T>(response: PromiseSettledResult<Awaited<T>>[]) {
+  return response
+    .map((r) => {
+      if (r.status === 'fulfilled') {
+        return r.value;
+      }
+      if (r.status === 'rejected') {
+        log.error('There was an error in one of the async functions', { error: r.reason });
+      }
+      return undefined;
+    })
+    .filter(isTruthy);
 }

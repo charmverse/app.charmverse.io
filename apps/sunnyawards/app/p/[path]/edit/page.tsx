@@ -1,5 +1,6 @@
-import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
+import { getCurrentUser } from '@connect-shared/lib/profile/getCurrentUser';
 import { findProject } from '@connect-shared/lib/projects/findProject';
+import { getSession } from '@connect-shared/lib/session/getSession';
 import { notFound, redirect } from 'next/navigation';
 
 import { EditProjectPage } from 'components/projects/edit/EditProjectPage';
@@ -11,18 +12,19 @@ export default async function EditProject({
     path: string;
   };
 }) {
+  const session = await getSession();
   const [project, user] = await Promise.all([
     findProject({
       path: params.path
     }),
-    getCurrentUserAction()
+    getCurrentUser(session?.user?.id)
   ]);
 
-  if (!user?.data) {
-    redirect('/');
+  if (!user) {
+    return null;
   }
 
-  if (!user?.data?.connectOnboarded) {
+  if (!user?.connectOnboarded) {
     redirect('/welcome');
   }
 
@@ -30,5 +32,5 @@ export default async function EditProject({
     return notFound();
   }
 
-  return <EditProjectPage project={project} user={user.data} />;
+  return <EditProjectPage project={project} user={user} />;
 }
