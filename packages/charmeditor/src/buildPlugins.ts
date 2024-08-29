@@ -74,7 +74,6 @@ export function buildPlugins<T = any>(
   }
 
   validateNodeViews(flatPlugins, schema);
-
   return flatPlugins;
 }
 

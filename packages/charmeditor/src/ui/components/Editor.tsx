@@ -16,6 +16,9 @@ import { schema } from '../../schema';
 import { OutlinedTextField } from './OutlinedTextField';
 
 import '../prosemirror.css';
+import '../../plugins/listItem/czi-vars.scss';
+import '../../plugins/listItem/czi-indent.scss';
+import '../../plugins/listItem/czi-list.scss';
 
 export type EditorProps = {
   placeholder?: string;
@@ -64,7 +67,7 @@ export function Editor({
       }}
     >
       {/** This div is where the contenteditable div is created by Prosemirror */}
-      <Component ref={setMount} sx={sx} error={error} />
+      <Component className='ProseMirror' ref={setMount} sx={sx} error={error} />
       {/* {renderNodeViews()} */}
     </ProseMirror>
   );

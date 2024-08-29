@@ -6,3 +6,4 @@ export const ORDERED_LIST = 'ordered_list';
 export const PARAGRAPH = 'paragraph';
 export const DOC = 'doc';
 export const TEXT = 'text';
+export const TAB_INDENT = 'tabIndent';

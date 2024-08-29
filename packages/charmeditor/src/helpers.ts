@@ -1,5 +1,6 @@
 import { Fragment, Slice } from 'prosemirror-model';
 import type { Node, NodeType, ResolvedPos, Schema } from 'prosemirror-model';
+import { Selection } from 'prosemirror-state';
 import type { Command, EditorState } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
