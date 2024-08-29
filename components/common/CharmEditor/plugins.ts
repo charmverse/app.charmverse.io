@@ -1,5 +1,6 @@
 import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
 import * as hardBreak from '@packages/charmeditor/extensions/hardBreak';
+import { plugins as listPlugins } from '@packages/charmeditor/extensions/listItem';
 import * as tabIndent from '@packages/charmeditor/extensions/tabIndent';
 import type { EditorState } from 'prosemirror-state';
 import { PluginKey, Plugin } from 'prosemirror-state';
@@ -30,7 +31,6 @@ import { plugins as linkPlugins } from './components/link/link.plugins';
 import { linkedPagePluginKeyName } from './components/linkedPage/linkedPage.constants';
 import { linkedPagePlugins } from './components/linkedPage/linkedPage.plugins';
 import * as listItem from './components/listItem/listItem';
-import { plugins as listPlugins } from './components/listItemNew/listItemPlugins';
 import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import { mentionPluginKeyName, mentionPlugins } from './components/mention';
 import { nestedPagePlugins, pageNodeDropPlugin } from './components/nestedPage/nestedPage.plugins';

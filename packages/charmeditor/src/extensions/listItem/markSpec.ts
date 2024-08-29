@@ -1,6 +1,5 @@
-import type { BaseRawMarkSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
-
-import { MARK_TEXT_SELECTION } from './markNames';
+import type { BaseRawMarkSpec } from '../../buildSchema';
+import { MARK_TEXT_SELECTION } from '../../markNames';
 
 export function spec(): BaseRawMarkSpec {
   return {

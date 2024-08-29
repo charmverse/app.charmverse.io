@@ -1,11 +1,11 @@
 import { blockquote } from '@bangle.dev/base-components';
+import { commands as listItemCommands } from '@packages/charmeditor/extensions/listItem';
 import { chainCommands } from 'prosemirror-commands';
 
 import * as heading from '../heading';
-import * as listItem from '../listItemNew/commands';
 import { insertEmptyParagraphAbove, insertEmptyParagraphBelow } from '../paragraph/paragraph';
 
-const { queryIsBulletListActive, queryIsOrderedListActive } = listItem;
+const { queryIsBulletListActive, queryIsOrderedListActive } = listItemCommands;
 const { insertEmptyParaAbove: headingInsertEmptyParaAbove, insertEmptyParaBelow: headingInsertEmptyParaBelow } =
   heading;
 

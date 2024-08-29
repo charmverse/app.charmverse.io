@@ -20,8 +20,11 @@
   },
   "exports": {
     "./ui": "./src/ui/index.tsx",
+    "./extensions/hardBreak": "./src/extensions/hardBreak.ts",
     "./extensions/history": "./src/extensions/history.ts",
     "./extensions/tabIndent": "./src/extensions/tabIndent.ts",
-    "./extensions/hardBreak": "./src/extensions/hardBreak.ts"
+    "./extensions/bulletList": "./src/extensions/bulletList.ts",
+    "./extensions/listItem": "./src/extensions/listItem/index.ts",
+    "./extensions/orderedList": "./src/extensions/orderedList.ts"
   }
 }

@@ -27,7 +27,7 @@ export type BaseRawMarkSpec = {
 export type BaseSpec = BaseRawNodeSpec | BaseRawMarkSpec;
 export type RawSpecs = null | false | undefined | BaseRawNodeSpec | BaseRawMarkSpec | RawSpecs[];
 
-export function buildSchema(rawSpecs: BaseSpec[]) {
+export function buildSchema(rawSpecs: (BaseSpec | BaseSpec[])[]) {
   const flattenedSpecs = flatten(rawSpecs);
 
   flattenedSpecs.forEach(validateSpec);

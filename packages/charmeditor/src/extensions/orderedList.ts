@@ -1,11 +1,11 @@
 import type Token from 'markdown-it/lib/token';
 import type { Node, NodeSpec } from 'prosemirror-model';
 
-import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import type { BaseRawNodeSpec } from '../buildSchema';
+import { LIST_ITEM, ORDERED_LIST } from '../nodeNames';
 
-import { ATTRIBUTE_INDENT, MIN_INDENT_LEVEL } from './bulletListSpecs';
-import { ATTRIBUTE_LIST_STYLE_TYPE } from './listItemSpecs';
-import { LIST_ITEM, ORDERED_LIST } from './nodeNames';
+import { ATTRIBUTE_INDENT, MIN_INDENT_LEVEL } from './bulletList';
+import { ATTRIBUTE_LIST_STYLE_TYPE } from './listItem/listItemSpec';
 
 export const ATTRIBUTE_COUNTER_RESET = 'data-counter-reset';
 export const ATTRIBUTE_FOLLOWING = 'data-following';

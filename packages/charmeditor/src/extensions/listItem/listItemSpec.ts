@@ -2,8 +2,10 @@ import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { DOMOutputSpec, Node, NodeSpec } from 'prosemirror-model';
 
-import type { BaseRawNodeSpec } from '../../buildSchema';
+import type { BaseSpec } from '../../buildSchema';
 import { LIST_ITEM } from '../../nodeNames';
+
+import { spec as markSpec } from './markSpec';
 
 export const ATTRIBUTE_LIST_STYLE_TYPE = 'data-list-style-type';
 
@@ -54,34 +56,37 @@ const ListItemNodeSpec: NodeSpec = {
   }
 };
 
-export const spec: BaseRawNodeSpec = {
-  name: LIST_ITEM,
-  type: 'node',
-  schema: ListItemNodeSpec,
-  markdown: {
-    toMarkdown(state: MarkdownSerializerState, node: Node) {
-      if (node.attrs.todoChecked != null) {
-        state.write(node.attrs.todoChecked ? '[x] ' : '[ ] ');
-      }
-      state.renderContent(node);
-    },
-    parseMarkdown: {
-      list_item: {
-        block: LIST_ITEM,
-        // copied from bangle.dev
-        getAttrs: (tok: Token) => {
-          let todoChecked = null;
-          const todoIsDone = tok.attrGet('isDone');
-          if (todoIsDone === 'yes') {
-            todoChecked = true;
-          } else if (todoIsDone === 'no') {
-            todoChecked = false;
+export const spec: BaseSpec[] = [
+  {
+    name: LIST_ITEM,
+    type: 'node',
+    schema: ListItemNodeSpec,
+    markdown: {
+      toMarkdown(state: MarkdownSerializerState, node: Node) {
+        if (node.attrs.todoChecked != null) {
+          state.write(node.attrs.todoChecked ? '[x] ' : '[ ] ');
+        }
+        state.renderContent(node);
+      },
+      parseMarkdown: {
+        list_item: {
+          block: LIST_ITEM,
+          // copied from bangle.dev
+          getAttrs: (tok: Token) => {
+            let todoChecked = null;
+            const todoIsDone = tok.attrGet('isDone');
+            if (todoIsDone === 'yes') {
+              todoChecked = true;
+            } else if (todoIsDone === 'no') {
+              todoChecked = false;
+            }
+            return {
+              todoChecked
+            };
           }
-          return {
-            todoChecked
-          };
         }
       }
     }
-  }
-};
+  },
+  markSpec()
+];

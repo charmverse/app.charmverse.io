@@ -1,5 +1,8 @@
 import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
+import { spec as bulletListItemSpec } from '@packages/charmeditor/extensions/bulletList';
 import * as hardBreak from '@packages/charmeditor/extensions/hardBreak';
+import { spec as listItemSpec } from '@packages/charmeditor/extensions/listItem';
+import { spec as orderedListItemSpec } from '@packages/charmeditor/extensions/orderedList';
 import { spec as tabIndentSpec } from '@packages/charmeditor/extensions/tabIndent';
 
 import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
@@ -29,10 +32,6 @@ import * as inlineVote from './components/inlineVote/inlineVote.specs';
 import { spec as linkSpec } from './components/link/link.specs';
 import { linkedPageSpec } from './components/linkedPage/linkedPage.specs';
 import * as listItem from './components/listItem/listItem';
-import { spec as bulletListItemSpec } from './components/listItemNew/bulletListSpecs';
-import { spec as listItemSpec } from './components/listItemNew/listItemSpecs';
-import { spec as markSpec } from './components/listItemNew/markSpec';
-import { spec as orderedListItemSpec } from './components/listItemNew/orderedListSpecs';
 import { mentionSpecs } from './components/mention/mention.specs';
 import { nestedPageSpec } from './components/nestedPage/nestedPage.specs';
 import * as nft from './components/nft/nft.specs';
@@ -70,12 +69,11 @@ export const specRegistry = new SpecRegistry([
   italic.spec(), // OK
   linkSpec(), // OK
   bulletList.spec(), // OK
-  bulletListItemSpec(), // Note that bullets should appear first, so drag/drop and copy/paste prefers bullet lists, since the type is not carried over
+  bulletListItemSpec, // Note that bullets should appear first, so drag/drop and copy/paste prefers bullet lists, since the type is not carried over
   listItem.spec(), // OK
   orderedList.spec(), // OK
   orderedListItemSpec(),
-  listItemSpec(),
-  markSpec(),
+  listItemSpec,
   strike.spec(), // OK
   underline.spec(), // OK
   emoji.specs(), // OK
