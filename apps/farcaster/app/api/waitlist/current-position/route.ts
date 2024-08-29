@@ -1,6 +1,8 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
+import { log } from '@charmverse/core/log';
+
 // Use dynamic import for sharp as it's a CommonJS module
 import sharp from 'sharp';
 
@@ -33,6 +35,7 @@ export async function GET(req: Request) {
       </style>
       <text x="50%" y="30%" text-anchor="middle" class="title">Tier:</text>
       <text x="50%" y="40%" text-anchor="middle" class="subtitle">COMMON</text>
+            <text x="50%" y="60%" text-anchor="middle" class="subtitle">Percentile: 2%</text>
     </svg>
   `;
 

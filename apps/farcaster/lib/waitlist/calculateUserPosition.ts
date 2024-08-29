@@ -7,12 +7,12 @@ export type ConnectWaitlistTier = (typeof waitlistTiers)[number];
 
 export type TierChange = 'none' | 'up' | 'down';
 
-const tierDistribution: { tier: ConnectWaitlistTier; threshold: number }[] = [
-  { tier: 'legendary', threshold: 96 },
-  { tier: 'mythic', threshold: 81 },
-  { tier: 'epic', threshold: 61 },
-  { tier: 'rare', threshold: 41 },
-  { tier: 'common', threshold: 1 }
+const tierDistribution: { tier: ConnectWaitlistTier; threshold: number; totalPercentSize: number }[] = [
+  { tier: 'legendary', threshold: 96, totalPercentSize: 5 },
+  { tier: 'mythic', threshold: 81, totalPercentSize: 15 },
+  { tier: 'epic', threshold: 61, totalPercentSize: 20 },
+  { tier: 'rare', threshold: 41, totalPercentSize: 20 },
+  { tier: 'common', threshold: 1, totalPercentSize: 40 }
 ];
 
 export function getTier(percentile: number): ConnectWaitlistTier {
