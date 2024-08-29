@@ -106,6 +106,36 @@ services:
     profiles:
       - stg-scoutgame
 
+  prd-scoutgame-waitlist:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npx react-env --path .env --dest ./apps/scoutgame-waitlist/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/scoutgame-waitlist --keepAliveTimeout 70000'
+      ]
+    profiles:
+      - prd-scoutgame-waitlist
+
+  stg-scoutgame-waitlist:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/scoutgame-waitlist/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/scoutgame-waitlist --keepAliveTimeout 70000'
+      ]
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-scoutgame-waitlist
+
   prd-sunnyawards:
     extends:
       service: defaults
