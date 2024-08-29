@@ -24,10 +24,9 @@ export default async function FramesPage({
     return (
       <>
         <Image content={image} />
-        <meta name='fc:frame:image' content={image} />
-        <meta name='fc:frame:button:1' content='Manage' />
+        {/* <meta name='fc:frame:button:1' content='Manage' />
         <meta name='fc:frame:button:1:action' content='post' />
-        <meta name='fc:frame:button:1:target' content={`${baseUrl}/api/product-updates/frames/${params.id}/manage`} />
+        <meta name='fc:frame:button:1:target' content={`${baseUrl}/api/product-updates/frames/${params.id}/manage`} /> */}
       </>
     );
   } else if (!previousFrameId && nextFrameId) {
@@ -37,9 +36,9 @@ export default async function FramesPage({
         <meta name='fc:frame:button:1' content='Next' />
         <meta name='fc:frame:button:1:action' content='post' />
         <meta name='fc:frame:button:1:target' content={`${baseUrl}/product-updates/frames/${nextFrameId}`} />
-        <meta name='fc:frame:button:2' content='Manage' />
+        {/* <meta name='fc:frame:button:2' content='Manage' />
         <meta name='fc:frame:button:2:action' content='post' />
-        <meta name='fc:frame:button:2:target' content={`${baseUrl}/api/product-updates/frames/${params.id}/manage`} />
+        <meta name='fc:frame:button:2:target' content={`${baseUrl}/api/product-updates/frames/${params.id}/manage`} /> */}
       </>
     );
   } else if (previousFrameId && !nextFrameId) {
@@ -49,9 +48,9 @@ export default async function FramesPage({
         <meta name='fc:frame:button:1' content='Previous' />
         <meta name='fc:frame:button:1:action' content='post' />
         <meta name='fc:frame:button:1:target' content={`${baseUrl}/product-updates/frames/${previousFrameId}`} />
-        <meta name='fc:frame:button:2' content='Manage' />
+        {/* <meta name='fc:frame:button:2' content='Manage' />
         <meta name='fc:frame:button:2:action' content='post' />
-        <meta name='fc:frame:button:2:target' content={`${baseUrl}/api/product-updates/frames/${params.id}/manage`} />
+        <meta name='fc:frame:button:2:target' content={`${baseUrl}/api/product-updates/frames/${params.id}/manage`} /> */}
       </>
     );
   }
@@ -62,12 +61,12 @@ export default async function FramesPage({
       <meta name='fc:frame:button:1' content='Previous' />
       <meta name='fc:frame:button:1:action' content='post' />
       <meta name='fc:frame:button:1:target' content={`${baseUrl}/product-updates/frames/${previousFrameId}`} />
-      <meta name='fc:frame:button:2' content='Manage' />
+      {/* <meta name='fc:frame:button:2' content='Manage' />
       <meta name='fc:frame:button:2:action' content='post' />
-      <meta name='fc:frame:button:2:target' content={`${baseUrl}/api/product-updates/frames/${params.id}/manage`} />
-      <meta name='fc:frame:button:3' content='Next' />
-      <meta name='fc:frame:button:3:action' content='post' />
-      <meta name='fc:frame:button:3:target' content={`${baseUrl}/product-updates/frames/${nextFrameId}`} />
+      <meta name='fc:frame:button:2:target' content={`${baseUrl}/api/product-updates/frames/${params.id}/manage`} /> */}
+      <meta name='fc:frame:button:2' content='Next' />
+      <meta name='fc:frame:button:2:action' content='post' />
+      <meta name='fc:frame:button:2:target' content={`${baseUrl}/product-updates/frames/${nextFrameId}`} />
     </>
   );
 }
