@@ -2,6 +2,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { createImage } from 'lib/productUpdates/createImageResponse';
 
+// tell next.js not to render this at build time
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const update = await prisma.productUpdatesFarcasterFrame.findFirstOrThrow({
     orderBy: {
