@@ -215,7 +215,7 @@ export function NewProductUpdateForm({
             variant='contained'
             disabled={isExecuting}
           >
-            Create Post
+            Publish
           </Button>
         </Stack>
       </Stack>
