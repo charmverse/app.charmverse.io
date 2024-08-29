@@ -108,11 +108,27 @@ describe('refreshPercentilesForEveryone', () => {
     expect(firstChangedUser.newTier).toBe<ConnectWaitlistTier>('legendary');
     expect(firstChangedUser.tierChange).toBe<TierChange>('up');
 
+    const firstUserWaitlistSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+      where: {
+        fid: firstChangedUser.fid
+      }
+    });
+
+    expect(firstUserWaitlistSlot.percentile).toBe(firstChangedUser.percentile);
+
     // We expect the last user to be in the 'common' tier after refresh
     expect(secondChangedUser.percentile).toBe(89);
     expect(secondChangedUser.score).toBe(-340);
     expect(secondChangedUser.newTier).toBe<ConnectWaitlistTier>('mythic');
     expect(secondChangedUser.tierChange).toBe<TierChange>('up');
+
+    const secondUserWaitlistSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+      where: {
+        fid: secondChangedUser.fid
+      }
+    });
+
+    expect(secondUserWaitlistSlot.percentile).toBe(secondChangedUser.percentile);
 
     // Add more checks based on expected tier changes after percentile calculation
     expect(thirdChangedUser.percentile).toBe(66);
@@ -120,9 +136,25 @@ describe('refreshPercentilesForEveryone', () => {
     expect(thirdChangedUser.newTier).toBe<ConnectWaitlistTier>('epic');
     expect(thirdChangedUser.tierChange).toBe<TierChange>('up');
 
+    const thirdUserWaitlistSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+      where: {
+        fid: thirdChangedUser.fid
+      }
+    });
+
+    expect(thirdUserWaitlistSlot.percentile).toBe(thirdChangedUser.percentile);
+
     expect(fourthChangedUser.percentile).toBe(53);
     expect(fourthChangedUser.score).toBe(210);
     expect(fourthChangedUser.newTier).toBe<ConnectWaitlistTier>('rare');
     expect(fourthChangedUser.tierChange).toBe<TierChange>('up');
+
+    const fourthUserWaitlistSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+      where: {
+        fid: fourthChangedUser.fid
+      }
+    });
+
+    expect(fourthUserWaitlistSlot.percentile).toBe(fourthChangedUser.percentile);
   });
 });

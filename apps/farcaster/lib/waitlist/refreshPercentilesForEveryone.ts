@@ -27,6 +27,10 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
       skip: offset,
       take
     });
+
+    // Group users by percentile
+    const usersByPercentile: { [percentile: number]: number[] } = {};
+
     for (let i = 0; i < users.length; i++) {
       const currentPercentile = roundNumberInRange({
         num: 100 - ((offset + i + 1) / totalUsers) * 100,
@@ -35,28 +39,43 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
       });
 
       const previousPercentile = users[i].percentile ?? 0;
-      const { currentTier, tierChange } = getTierChange({
-        previousPercentile,
-        currentPercentile
-      });
 
-      if (tierChange !== 'none') {
-        tierChangeResults.push({
-          fid: users[i].fid,
-          newTier: currentTier,
-          tierChange,
-          percentile: currentPercentile,
-          score: users[i].score
+      // Only consider users whose percentile has changed
+      if (currentPercentile !== previousPercentile) {
+        if (!usersByPercentile[currentPercentile]) {
+          usersByPercentile[currentPercentile] = [];
+        }
+        usersByPercentile[currentPercentile].push(users[i].fid);
+
+        const { currentTier, tierChange } = getTierChange({
+          previousPercentile,
+          currentPercentile
+        });
+
+        if (tierChange !== 'none') {
+          tierChangeResults.push({
+            fid: users[i].fid,
+            newTier: currentTier,
+            tierChange,
+            percentile: currentPercentile,
+            score: users[i].score
+          });
+        }
+      }
+    }
+
+    // Batch update for each percentile group, but only if there are users in that group
+    for (const [percentile, fids] of Object.entries(usersByPercentile)) {
+      if (fids.length > 0) {
+        await prisma.connectWaitlistSlot.updateMany({
+          where: { fid: { in: fids.map((fid) => Number(fid)) } },
+          data: { percentile: Number(percentile) }
         });
       }
-
-      await prisma.connectWaitlistSlot.update({
-        where: { fid: users[i].fid },
-        data: { percentile: currentPercentile }
-      });
     }
 
     offset += users.length;
   }
+
   return tierChangeResults;
 }
