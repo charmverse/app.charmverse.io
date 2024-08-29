@@ -1,4 +1,5 @@
 import { Box } from '@mui/material';
+import { useRouter } from 'next/router';
 import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import React, { useCallback } from 'react';
 
@@ -23,7 +24,11 @@ type Props = {
   selectedCardIds: string[];
   readOnly: boolean;
   cardIdToFocusOnRender: string;
-  showCard: (cardId: string, parentId?: string) => void;
+  showCard: (
+    cardId: string,
+    parentId?: string,
+    event?: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+  ) => void;
   addCard: (groupByOptionId?: string) => Promise<void> | void;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDrop: (srcCard: Card, dstCard: Card) => void;
