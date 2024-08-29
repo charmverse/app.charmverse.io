@@ -2,17 +2,21 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 import { log } from '@charmverse/core/log';
-
-// Use dynamic import for sharp as it's a CommonJS module
 import sharp from 'sharp';
+
+import { getTier } from 'lib/waitlist/calculateUserPosition';
 
 export async function GET(req: Request) {
   const query = new URL(req.url).searchParams;
 
+  const fid = query.get('fid');
+  const percentile = query.get('percentile');
   // console.log('FID', query.get('fid'));
 
   // Get the path to the public folder
   const imagePath = path.join(process.cwd(), 'public', 'images', 'waitlist', 'dev', 'waitlist-current-score.jpg');
+
+  const tier = getTier(parseInt(percentile as string, 10));
 
   try {
     // Read the image file from the public folder
@@ -34,8 +38,8 @@ export async function GET(req: Request) {
         }
       </style>
       <text x="50%" y="30%" text-anchor="middle" class="title">Tier:</text>
-      <text x="50%" y="40%" text-anchor="middle" class="subtitle">COMMON</text>
-            <text x="50%" y="60%" text-anchor="middle" class="subtitle">Percentile: 2%</text>
+      <text x="50%" y="40%" text-anchor="middle" class="subtitle">${tier.toUpperCase()}</text>
+      <text x="50%" y="50%" text-anchor="middle" class="subtitle">Percentile: ${percentile}%</text>
     </svg>
   `;
 

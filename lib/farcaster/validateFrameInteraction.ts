@@ -77,7 +77,7 @@ export async function validateFrameInteraction(messageBytes: string): Promise<Va
     },
     {
       headers: {
-        Api_key: NEYNAR_API_KEY
+        api_key: NEYNAR_API_KEY
       }
     }
   );
