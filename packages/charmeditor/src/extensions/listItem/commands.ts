@@ -5,7 +5,7 @@ import type { Command, EditorState } from 'prosemirror-state';
 import { findParentNodeOfType } from 'prosemirror-utils';
 
 import { BULLET_LIST, LIST_ITEM, ORDERED_LIST } from '../../nodeNames';
-import { filter, isEmptySelectionAtStart } from '../../utils/pmHelpers';
+import { filter, isEmptySelectionAtStart } from '../../utils';
 
 import { mergeListItemDown, mergeListItemUp } from './mergeListItems';
 import { splitListItem } from './splitListItem';
