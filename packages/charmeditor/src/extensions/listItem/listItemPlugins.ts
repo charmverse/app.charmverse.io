@@ -5,9 +5,8 @@ import type { EditorState } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 
 import type { RawPlugins } from '../../buildPlugins';
-import { parentHasDirectParentOfType } from '../../commands';
-import { filter } from '../../helpers';
 import { BULLET_LIST, LIST_ITEM, ORDERED_LIST } from '../../nodeNames';
+import { parentHasDirectParentOfType, filter } from '../../utils';
 
 import { backspaceKeyCommand, enterKeyCommand, indentCommand, listItemMergeCommand, updateNodeAttrs } from './commands';
 import { ListItemNodeView } from './listItemNodeView';

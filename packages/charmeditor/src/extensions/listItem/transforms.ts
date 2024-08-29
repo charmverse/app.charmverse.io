@@ -5,7 +5,7 @@ import { TextSelection, EditorState } from 'prosemirror-state';
 import type { Selection, Transaction } from 'prosemirror-state';
 import { liftTarget, ReplaceAroundStep } from 'prosemirror-transform';
 
-import { getListLiftTarget, mapChildren, mapSlice } from '../../helpers';
+import { getListLiftTarget, mapChildren, mapSlice } from '../../utils/pmHelpers';
 
 function liftListItem(type: NodeType, state: EditorState, selection: Selection, tr: Transaction) {
   const { $from, $to } = selection;

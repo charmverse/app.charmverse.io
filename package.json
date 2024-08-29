@@ -279,7 +279,6 @@
     "prosemirror-markdown": "^1.13.0",
     "prosemirror-menu": "^1.2.4",
     "prosemirror-model": "^1.22.3",
-    "prosemirror-schema-basic": "^1.2.3",
     "prosemirror-schema-list": "^1.4.1",
     "prosemirror-state": "^1.4.3",
     "prosemirror-tables": "^1.5.0",

@@ -67,7 +67,7 @@ const BulletListNodeSpec: NodeSpec = {
   }
 };
 
-export const bulletList: BaseRawNodeSpec = {
+export const spec: BaseRawNodeSpec = {
   name: BULLET_LIST,
   type: 'node',
   schema: BulletListNodeSpec,

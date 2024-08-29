@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getUserS3FilePath, uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
 import { ImageResponse } from 'next/og';
@@ -74,7 +75,7 @@ export async function createProductUpdatesFrame(input: FormValues) {
     content: optimizedBuffer,
     contentType: 'image/webp'
   });
-
+  log.debug('Image url for product update', { fileUrl });
   const productUpdatesFrame = await prisma.productUpdatesFarcasterFrame.create({
     data: {
       id: frameId,

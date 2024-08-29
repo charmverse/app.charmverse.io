@@ -45,13 +45,18 @@ export function NewProductUpdateForm({
     setValue('projectId', projectId);
   }, [projectId]);
 
+  // kinda hacky, find a more elegant way to clear the editor?
+  function clearEditor() {
+    setEditorKey((key) => key + 1);
+  }
+
   const { execute, isExecuting } = useAction(createProductUpdatesFrameAction, {
     onExecute: () => {
       setErrors(null);
     },
     onSuccess: (data) => {
       reset();
-      setEditorKey((key) => key + 1);
+      clearEditor();
       if (data.data) {
         const lines = data.data.productUpdatesFrame.text
           .split('\n')

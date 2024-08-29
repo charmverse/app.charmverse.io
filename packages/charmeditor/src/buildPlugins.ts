@@ -24,7 +24,6 @@ export function buildPlugins<T = any>(
   plugins: RawPlugins<T>,
   {
     metadata,
-    defaultPlugins = true,
     // dropCursorOpts,
     transformPlugins = (p) => p
   }: {

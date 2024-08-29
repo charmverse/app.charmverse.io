@@ -16,6 +16,7 @@ import { schema } from '../../schema';
 import { OutlinedTextField } from './OutlinedTextField';
 
 import '../prosemirror.css';
+import '../editor.scss';
 import '../../extensions/listItem/czi-vars.scss';
 import '../../extensions/listItem/czi-indent.scss';
 import '../../extensions/listItem/czi-list.scss';
@@ -30,6 +31,13 @@ export type EditorProps = {
 };
 
 const defaultState = EditorState.create({
+  // doc: schema.topNodeType.create(null, [
+  //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  //   schema.nodes.list_item.createAndFill(
+  //     undefined,
+  //     schema.nodes.paragraph.createChecked(undefined, schema.text('Updates'))
+  //   )!
+  // ]),
   schema,
   plugins: plugins(schema)
 });

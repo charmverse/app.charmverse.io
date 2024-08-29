@@ -2,8 +2,8 @@ import type { Node } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView, NodeView } from 'prosemirror-view';
 
-import { createElement } from '../../domUtils';
 import { LIST_ITEM } from '../../nodeNames';
+import { createElement } from '../../utils/domUtils';
 
 // This implements the `NodeView` interface
 // https://prosemirror.net/docs/ref/#view.NodeView

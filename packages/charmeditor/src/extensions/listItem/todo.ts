@@ -3,7 +3,7 @@ import type { Node, Schema } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import { canJoin, findWrapping } from 'prosemirror-transform';
 
-import { filter } from '../../helpers';
+import { filter } from '../../utils/pmHelpers';
 
 export const isNodeTodo = (node: Node, schema: Schema) => {
   return node.type === schema.nodes.list_item && typeof node.attrs.todoChecked === 'boolean';

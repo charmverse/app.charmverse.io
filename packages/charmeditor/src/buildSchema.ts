@@ -2,8 +2,6 @@ import type { UnnestObjValue } from '@packages/utils/types';
 import type { MarkdownParser, MarkdownSerializer } from 'prosemirror-markdown';
 import { Schema } from 'prosemirror-model';
 import type { MarkSpec, NodeSpec } from 'prosemirror-model';
-// TODO: Dont rely on this module for schemas
-import { marks as defaultMarks, nodes as defaultNodes } from 'prosemirror-schema-basic';
 
 export type BaseRawNodeSpec = {
   name: string;
@@ -53,17 +51,9 @@ export function buildSchema(rawSpecs: BaseSpec[]) {
       throw new Error(`Unknown type: ${r.type}`);
     }
   }
-
   return new Schema({
-    // topNode: 'doc', // default
-    nodes: {
-      ...defaultNodes,
-      ...Object.fromEntries(nodes)
-    },
-    marks: {
-      ...defaultMarks,
-      ...Object.fromEntries(marks)
-    }
+    nodes: Object.fromEntries(nodes),
+    marks: Object.fromEntries(marks)
   });
 }
 

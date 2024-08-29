@@ -1,4 +1,5 @@
 import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
+import * as hardBreak from '@packages/charmeditor/extensions/hardBreak';
 import { spec as tabIndentSpec } from '@packages/charmeditor/extensions/tabIndent';
 
 import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
@@ -17,7 +18,6 @@ import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
 import { spec as farcasterFrameSpec } from './components/farcasterFrame/farcasterFrameSpec';
 import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
 import { specs as fileSpecs } from './components/file/file.specs';
-import { hardBreakSpec } from './components/hardBreak';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe/iframeSpec';
@@ -65,7 +65,7 @@ export const specRegistry = new SpecRegistry([
   mentionSpecs(), // NO
   inlineVote.spec(),
   bold.spec(), // OK
-  hardBreakSpec(), // OK
+  hardBreak.spec, // OK
   horizontalRule.spec(), // OK
   italic.spec(), // OK
   linkSpec(), // OK

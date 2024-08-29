@@ -54,7 +54,7 @@ const ListItemNodeSpec: NodeSpec = {
   }
 };
 
-export const listItem: BaseRawNodeSpec = {
+export const spec: BaseRawNodeSpec = {
   name: LIST_ITEM,
   type: 'node',
   schema: ListItemNodeSpec,

@@ -24,7 +24,7 @@ import type { Command, EditorState, Transaction } from 'prosemirror-state';
 import { NodeSelection, Selection, TextSelection } from 'prosemirror-state';
 import { liftTarget, ReplaceAroundStep } from 'prosemirror-transform';
 
-import { filter } from '../../helpers';
+import { filter } from '../../utils/pmHelpers';
 
 import { isNodeTodo, removeTodoCheckedAttr, setTodoCheckedAttr } from './todo';
 import { liftFollowingList, liftSelectionList } from './transforms';

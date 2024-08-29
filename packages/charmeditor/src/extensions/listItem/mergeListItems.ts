@@ -4,8 +4,8 @@ import type { Transaction } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import { findParentNodeOfType } from 'prosemirror-utils';
 
-import { nodeAtSafe } from '../../helpers';
 import { HEADING, LIST_ITEM, PARAGRAPH } from '../../nodeNames';
+import { nodeAtSafe } from '../../utils/pmHelpers';
 
 export function mergeListItemUp(tr: Transaction, schema: Schema): Transaction {
   // This merge a list item to is previous list item of the selection is at the

@@ -1,0 +1,13 @@
+
+/* paragraph spacing */
+.ProseMirror {
+  > p {
+    padding-bottom: 3px;
+    padding-top: 3px;
+  }
+
+  li > span > p {
+    padding-bottom: 3px;
+    padding-top: 3px;
+  }
+}

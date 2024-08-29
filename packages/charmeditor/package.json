@@ -21,6 +21,7 @@
   "exports": {
     "./ui": "./src/ui/index.tsx",
     "./extensions/history": "./src/extensions/history.ts",
-    "./extensions/tabIndent": "./src/extensions/tabIndent.ts"
+    "./extensions/tabIndent": "./src/extensions/tabIndent.ts",
+    "./extensions/hardBreak": "./src/extensions/hardBreak.ts"
   }
 }
