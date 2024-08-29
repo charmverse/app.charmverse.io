@@ -31,13 +31,6 @@ export type EditorProps = {
 };
 
 const defaultState = EditorState.create({
-  // doc: schema.topNodeType.create(null, [
-  //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //   schema.nodes.list_item.createAndFill(
-  //     undefined,
-  //     schema.nodes.paragraph.createChecked(undefined, schema.text('Updates'))
-  //   )!
-  // ]),
   schema,
   plugins: plugins(schema)
 });
@@ -64,10 +57,14 @@ export function Editor({
           if (onChange) {
             // setTimeout so we finish setting editor state before calling onChange
             setTimeout(() => {
-              onChange({
-                json: newState.doc.toJSON(),
+              const value = {
+                // create a getter so the handler has the option to delay the cost of casting to JSON
+                get json() {
+                  return newState.doc.toJSON();
+                },
                 text: newState.doc.textContent
-              });
+              };
+              onChange(value);
             });
           }
           return newState;

@@ -1,13 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getUserS3FilePath, uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
-import { ImageResponse } from 'next/og';
-import React from 'react';
 import sharp from 'sharp';
 import { v4 } from 'uuid';
 
-import { ProductUpdatesFrame } from 'components/product-updates/frames/[id]/ProductUpdatesFrame';
-
+import { createImage } from './createImageResponse';
 import type { FormValues } from './schema';
 
 export async function createProductUpdatesFrame(input: FormValues) {
@@ -21,7 +18,6 @@ export async function createProductUpdatesFrame(input: FormValues) {
       id: true
     }
   });
-
   const project = await prisma.project.findUniqueOrThrow({
     where: {
       id: input.projectId
@@ -32,37 +28,12 @@ export async function createProductUpdatesFrame(input: FormValues) {
     }
   });
 
-  let projectAvatarImageUrl: string | null = project.avatar;
-
-  // Convert project avatar image to PNG if it's not already
-  if (project.avatar && !project.avatar.endsWith('.png')) {
-    const projectAvatarBlob = await fetch(project.avatar).then((res) => res.blob());
-    const projectAvatarData = await projectAvatarBlob.arrayBuffer().then((buffer) => Buffer.from(buffer));
-    const projectAvatarOptimizedBuffer = await sharp(projectAvatarData).png().toBuffer();
-    const filenameWithoutExtension = project.avatar.split('.').slice(0, -1).join('.');
-    const { fileUrl: projectAvatarFileUrl } = await uploadFileToS3({
-      pathInS3: getUserS3FilePath({
-        userId: user.id,
-        url: `project-${input.projectId}-${filenameWithoutExtension}.png`
-      }),
-      content: projectAvatarOptimizedBuffer,
-      contentType: 'image/png'
-    });
-
-    projectAvatarImageUrl = projectAvatarFileUrl;
-  }
-
-  const element = React.createElement(ProductUpdatesFrame, {
+  const image = await createImage({
+    avatar: project.avatar,
+    project: project.name,
+    userId: user.id,
     text: input.content.text,
-    createdAtLocal: input.createdAtLocal,
-    projectName: project.name,
-    projectAvatarImage: projectAvatarImageUrl
-  });
-
-  // Use a ratio of 1.91:1 for the image as recommended by farcaster
-  const image = new ImageResponse(element, {
-    width: 500,
-    height: 500
+    createdAtLocal: input.createdAtLocal
   });
 
   const imageBlob = await image.blob();

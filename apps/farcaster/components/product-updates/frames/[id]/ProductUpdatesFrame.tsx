@@ -12,7 +12,7 @@ export function ProductUpdatesFrame({
   projectAvatarImage: string | null;
 }) {
   const lines = text
-    .split('\n')
+    .split('__$__')
     .filter((line) => line.trim().length)
     .slice(0, 10);
 
@@ -47,18 +47,20 @@ export function ProductUpdatesFrame({
         >
           <p
             style={{
-              fontSize: 24
+              fontSize: 24,
+              fontFamily: 'Inter',
+              fontWeight: 700
             }}
           >
-            {projectName} Update
+            {projectName}
           </p>
           <p
             style={{
-              fontSize: 20,
+              fontSize: 16,
               marginTop: -8
             }}
           >
-            {createdAtLocal}
+            Product Update &ndash; {createdAtLocal}
           </p>
         </div>
         <img
@@ -70,7 +72,7 @@ export function ProductUpdatesFrame({
           src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.png`}
         />
       </div>
-      <div style={{ width: '100%', height: 2, backgroundColor: 'black' }} />
+      <div style={{ width: '100%', height: 1, backgroundColor: '#aaa' }} />
       <div
         style={{
           display: 'flex',
@@ -86,11 +88,21 @@ export function ProductUpdatesFrame({
                 gap: 4,
                 display: 'flex',
                 flexDirection: 'row',
-                alignItems: 'flex-start'
+                alignItems: 'flex-start',
+                whiteSpace: 'pre-wrap',
+                width: '100%'
               }}
               key={`${index.toString()}`}
             >
-              •
+              <span
+                style={{
+                  fontSize: '3em',
+                  lineHeight: '.4em',
+                  marginRight: 8
+                }}
+              >
+                &middot;
+              </span>
               <p
                 style={{
                   fontSize: 18,

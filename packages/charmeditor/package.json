@@ -20,6 +20,9 @@
   },
   "exports": {
     "./ui": "./src/ui/index.tsx",
+    "./schema": "./src/schema.ts",
+    "./utils": "./src/utils/index.ts",
+    "./toHTMLString": "./src/utils/toHTMLString.ts",
     "./extensions/hardBreak": "./src/extensions/hardBreak.ts",
     "./extensions/history": "./src/extensions/history.ts",
     "./extensions/tabIndent": "./src/extensions/tabIndent.ts",

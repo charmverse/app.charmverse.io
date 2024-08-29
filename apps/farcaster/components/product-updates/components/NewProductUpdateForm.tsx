@@ -7,7 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Box, Stack, Button, Divider, FormLabel, MenuItem, Select, Typography, ListItemIcon } from '@mui/material';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useAction } from 'next-safe-action/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { postCreateCastMessage } from 'lib/postCreateCastMessage';
@@ -17,6 +17,25 @@ import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid
 
 import { CharmTextField } from './CharmTextField';
 import { ProjectAvatar } from './ProjectAvatar';
+
+type JSONContent = {
+  type: 'doc';
+  content: [
+    {
+      type: 'bullet_list';
+      content: {
+        type: 'list_item';
+        content: {
+          type: 'paragraph';
+          content?: {
+            type: 'text' | 'hardBreak';
+            text?: string;
+          }[];
+        }[];
+      }[];
+    }
+  ];
+};
 
 export function NewProductUpdateForm({
   connectProjects,
@@ -31,7 +50,7 @@ export function NewProductUpdateForm({
 }) {
   const [errors, setErrors] = useState<string[] | null>(null);
   const [editorKey, setEditorKey] = useState(1); // keep track of state to clear editor
-  const { control, handleSubmit, reset, setValue } = useForm<FormValues>({
+  const { control, handleSubmit, reset, setValue, watch } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
       projectId,
@@ -72,10 +91,19 @@ export function NewProductUpdateForm({
       }
     },
     onError: (err) => {
-      log.error('Error submitting form', { error: err.error.serverError });
+      log.error('Error submitting form', { error: err });
       setErrors(['An error occurred. Please try again.']);
     }
   });
+
+  const createdAtLocal = useMemo(() => {
+    return new Date().toLocaleDateString(undefined, {
+      // weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }, []);
 
   if (connectProjects.length === 0) {
     return (
@@ -90,28 +118,39 @@ export function NewProductUpdateForm({
   return (
     <form
       onSubmit={handleSubmit((data) => {
-        const locale = window.navigator.language;
+        const json = data.content.json as JSONContent;
+        // TODO: figure out why data.content is not a plain object
+        const jsonPOJO = JSON.parse(JSON.stringify(json));
+
+        // We can't render prosemirror JSON for the image, so we need to convert it to text
+        const lines = json.content[0].content.slice(0, 10).map((content) => content.content[0].content);
+        const text = lines
+          .map((content) => `${content?.map((c) => (c.type === 'hardBreak' ? '\n' : `${c.text}`)).join('') || '\n'}`)
+          // use a separator that is unlikely to be in the text
+          .join('__$__');
+
         execute({
           ...data,
-          createdAtLocal: new Date().toLocaleDateString(locale, {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          })
+          content: {
+            json: jsonPOJO,
+            text
+          },
+          createdAtLocal
         });
       })}
     >
+      <Typography variant='h5' gutterBottom>
+        Create a Product Update for {createdAtLocal}
+      </Typography>
       <Stack gap={2}>
-        <Stack>
-          <FormLabel>Project</FormLabel>
+        <Stack direction='row' gap={2} alignItems='center' flexWrap='wrap'>
+          <Typography>Project</Typography>
           <Controller
             control={control}
             name='projectId'
             render={({ field, fieldState }) => (
               <Select
                 displayEmpty
-                fullWidth
                 disabled={isExecuting}
                 renderValue={(value) => {
                   const project = connectProjects.find((p) => p.id === value);
@@ -128,6 +167,7 @@ export function NewProductUpdateForm({
                   return <Typography color='secondary'>Select a project</Typography>;
                 }}
                 error={!!fieldState.error}
+                sx={{ flexGrow: 1, maxWidth: '100%' }}
                 {...field}
               >
                 {connectProjects.map((connectProject) => (
@@ -148,7 +188,6 @@ export function NewProductUpdateForm({
           />
         </Stack>
         <Stack>
-          <FormLabel>Product updates</FormLabel>
           <Controller
             control={control}
             name='content'
@@ -178,7 +217,7 @@ export function NewProductUpdateForm({
             variant='contained'
             disabled={isExecuting}
           >
-            Submit
+            Create Post
           </Button>
         </Stack>
       </Stack>

@@ -1,5 +1,5 @@
-import { Fragment, Slice } from 'prosemirror-model';
 import type { MarkType, Node, NodeType, ResolvedPos, Schema } from 'prosemirror-model';
+import { Fragment, Slice } from 'prosemirror-model';
 import { Selection, EditorState } from 'prosemirror-state';
 import type { Command } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
