@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { v4 } from 'uuid';
-
 import { baseUrl } from '@root/config/constants';
+import { v4 } from 'uuid';
 
 import { createUserAndSpace } from './utils/mocks';
 import { generatePageWithLinkedPage } from './utils/pages';

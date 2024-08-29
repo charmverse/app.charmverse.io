@@ -2,10 +2,10 @@
 import type { CredentialTemplate, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsUser } from '@charmverse/core/test';
+import type { LoggedInUser } from '@root/models';
 import request from 'supertest';
 
 import type { CreateCredentialTemplateInput, CredentialTemplateUpdateableFields } from 'lib/credentials/templates';
-import type { LoggedInUser } from '@root/models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateSpaceUser } from 'testing/setupDatabase';
 

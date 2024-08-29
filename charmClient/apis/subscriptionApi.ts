@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma-client';
-
 import * as http from '@root/adapters/http';
+
 import type { CreatePaymentMethodRequest, CreatePaymentMethodResponse } from 'lib/subscription/createPaymentMethod';
 import type {
   SpaceSubscriptionRequest,

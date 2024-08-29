@@ -1,4 +1,3 @@
-import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
 import { ClickAwayListener } from '@mui/material';
 import Grow from '@mui/material/Grow';
@@ -7,6 +6,8 @@ import MenuList from '@mui/material/MenuList';
 import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import type { PopupState } from 'material-ui-popup-state/hooks';
+import type { PluginKey } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import type { ReactNode } from 'react';
 import { useMemo, useCallback, useEffect, useState } from 'react';
 

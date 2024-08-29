@@ -128,7 +128,7 @@ jobs:
 
       - name: Validate Scoutgame app
         run: |
-          npm run lint -w apps/scoutgame
+          npm run lint -- apps/scoutgame
           npm run typecheck -w apps/scoutgame
 
   test-scoutgame-e2e:

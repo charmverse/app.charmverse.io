@@ -59,7 +59,9 @@ To create headers, use the # symbol followed by a space. For example:
 # This is an H1
 ## This is an H2
 ### This is an H3
+
 Links
+
 To create links, wrap the link text in square brackets [] and the URL in parentheses (). For example:
 `);
     expect(result).toEqual({
@@ -328,7 +330,19 @@ To create links, wrap the link text in square brackets [] and the URL in parenth
           content: [
             {
               type: 'text',
-              text: 'Links\nTo create links, wrap the link text in square brackets [] and the URL in parentheses (). For example:'
+              text: 'Links'
+            }
+          ]
+        },
+        {
+          type: 'paragraph',
+          attrs: {
+            track: []
+          },
+          content: [
+            {
+              type: 'text',
+              text: 'To create links, wrap the link text in square brackets [] and the URL in parentheses (). For example:'
             }
           ]
         }

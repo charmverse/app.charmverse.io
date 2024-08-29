@@ -1,5 +1,6 @@
-import type { EditorState, EditorView, PluginKey } from '@bangle.dev/pm';
+import type { EditorState, PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 import { createRoot } from 'react-dom/client';
 

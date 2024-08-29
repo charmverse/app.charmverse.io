@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { websocketsHost } from '@root/config/constants';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
@@ -6,7 +7,6 @@ import io from 'socket.io-client';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import { websocketsHost } from '@root/config/constants';
 import type { ClientMessage, ServerMessage, WebSocketMessage, WebSocketPayload } from 'lib/websockets/interfaces';
 import { PubSub } from 'lib/websockets/pubSub';
 
