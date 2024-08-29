@@ -9,9 +9,7 @@ import { getTier } from 'lib/waitlist/calculateUserPosition';
 export async function GET(req: Request) {
   const query = new URL(req.url).searchParams;
 
-  const fid = query.get('fid');
   const percentile = query.get('percentile');
-  // console.log('FID', query.get('fid'));
 
   // Get the path to the public folder
   const imagePath = path.join(process.cwd(), 'public', 'images', 'waitlist', 'dev', 'waitlist-current-score.jpg');
