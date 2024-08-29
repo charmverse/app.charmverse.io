@@ -7,7 +7,9 @@ import { v4 } from 'uuid';
 import { createImage } from './createImageResponse';
 import type { FormValues } from './schema';
 
-export async function createProductUpdatesFrame(input: FormValues) {
+export type NewProductUpdateResponse = Awaited<ReturnType<typeof createProductUpdate>>;
+
+export async function createProductUpdate(input: FormValues) {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       farcasterUser: {

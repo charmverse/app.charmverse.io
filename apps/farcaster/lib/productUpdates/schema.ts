@@ -1,5 +1,7 @@
 import * as yup from 'yup';
 
+export const DIVIDER = '__$__';
+
 export const schema = yup.object({
   content: yup
     .object({

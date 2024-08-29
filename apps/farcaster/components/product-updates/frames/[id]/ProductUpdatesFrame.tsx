@@ -1,5 +1,7 @@
 import { baseUrl } from '@root/config/constants';
 
+import { DIVIDER } from 'lib/productUpdates/schema';
+
 export function ProductUpdatesFrame({
   text,
   createdAtLocal,
@@ -12,7 +14,7 @@ export function ProductUpdatesFrame({
   projectAvatarImage: string | null;
 }) {
   const lines = text
-    .split('__$__')
+    .split(DIVIDER)
     .filter((line) => line.trim().length)
     .slice(0, 10);
 

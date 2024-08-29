@@ -11,8 +11,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { postCreateCastMessage } from 'lib/postCreateCastMessage';
-import { createProductUpdatesFrameAction } from 'lib/productUpdates/createProductUpdatesFrameAction';
+import { getCastMessage } from 'lib/productUpdates/castMessage';
+import type { NewProductUpdateResponse } from 'lib/productUpdates/createProductUpdate';
+import { createProductUpdateAction } from 'lib/productUpdates/createProductUpdateAction';
 import { schema, type FormValues } from 'lib/productUpdates/schema';
+import { DIVIDER } from 'lib/productUpdates/schema';
 import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid';
 
 import { CharmTextField } from './CharmTextField';
@@ -69,7 +72,7 @@ export function NewProductUpdateForm({
     setEditorKey((key) => key + 1);
   }
 
-  const { execute, isExecuting } = useAction(createProductUpdatesFrameAction, {
+  const { execute, isExecuting } = useAction(createProductUpdateAction, {
     onExecute: () => {
       setErrors(null);
     },
@@ -77,16 +80,11 @@ export function NewProductUpdateForm({
       reset();
       clearEditor();
       if (data.data) {
-        const lines = data.data.productUpdatesFrame.text
-          .split('\n')
-          .filter((line) => line.trim().length)
-          .slice(0, 10);
+        const castMessage = getCastMessage(data.data);
 
         postCreateCastMessage({
           embeds: [`https://${window.location.hostname}/product-updates/frames/${data.data.productUpdatesFrame.id}`],
-          text: `${data.data.project.name}\n${data.data.productUpdatesFrame.createdAtLocal}\n\n${lines
-            .map((line) => `• ${line}`)
-            .join('\n')}`
+          text: getCastMessage(data.data)
         });
       }
     },
@@ -127,7 +125,7 @@ export function NewProductUpdateForm({
         const text = lines
           .map((content) => `${content?.map((c) => (c.type === 'hardBreak' ? '\n' : `${c.text}`)).join('') || '\n'}`)
           // use a separator that is unlikely to be in the text
-          .join('__$__');
+          .join(DIVIDER);
 
         execute({
           ...data,
