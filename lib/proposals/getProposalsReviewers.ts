@@ -13,8 +13,8 @@ export type ReviewerProposal = {
   id: string;
   title: string;
   updatedAt: Date;
-  currentEvaluation?: CurrentEvaluation;
-  reviewedAt: Date | null;
+  currentEvaluation: CurrentEvaluation;
+  path: string;
 };
 
 export type GetProposalsReviewersResponse = {
@@ -122,7 +122,7 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
             (reviewer.systemRole === 'author' && isAuthor)
         );
 
-        if (isReviewer) {
+        if (isReviewer && !currentEvaluation.result) {
           totalReviews += 1;
           const currentReview = currentEvaluation.reviews.find((review) => review.reviewerId === spaceRole.userId);
           const currentVote = currentEvaluation.vote?.userVotes.find((vote) => vote.userId === spaceRole.userId);
@@ -131,18 +131,21 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
           if (hasReviewed) {
             reviewsCompleted += 1;
           }
-          reviewerProposals.push({
-            id: proposal.id,
-            reviewedAt: currentReview?.completedAt || currentVote?.updatedAt || null,
-            title: proposal.page.title,
-            updatedAt: proposal.page.updatedAt,
-            currentEvaluation: {
-              id: currentEvaluation.id,
-              type: currentEvaluation.type,
-              title: currentEvaluation.title,
-              result: currentEvaluation.result || null
-            }
-          });
+
+          if (!hasReviewed) {
+            reviewerProposals.push({
+              id: proposal.id,
+              title: proposal.page.title,
+              updatedAt: proposal.page.updatedAt,
+              currentEvaluation: {
+                id: currentEvaluation.id,
+                type: currentEvaluation.type,
+                title: currentEvaluation.title,
+                result: currentEvaluation.result || null
+              },
+              path: proposal.page.path
+            });
+          }
         }
       }
     }
@@ -152,13 +155,7 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
         userId: spaceRole.userId,
         reviewsLeft: totalReviews - reviewsCompleted,
         reviewsCompleted,
-        proposals: reviewerProposals.sort((a, b) => {
-          if (a.reviewedAt && b.reviewedAt) {
-            return b.reviewedAt.getTime() - a.reviewedAt.getTime();
-          }
-
-          return b.updatedAt.getTime() - a.updatedAt.getTime();
-        })
+        proposals: reviewerProposals
       });
     }
   }
