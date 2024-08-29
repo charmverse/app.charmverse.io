@@ -168,7 +168,7 @@ describe('components/centerPanel', () => {
       const kanbanCardElement = kanbanCardElements[0];
       userEvent.click(kanbanCardElement);
       expect(container).toMatchSnapshot();
-      expect(mockedShowCard).toBeCalledWith(card1.id, undefined, undefined);
+      expect(mockedShowCard).toBeCalledWith(card1.id, undefined);
     });
   });
 });

@@ -35,7 +35,7 @@ type Props = {
   groupByProperty?: IPropertyTemplate;
   readOnly: boolean;
   cardIdToFocusOnRender: string;
-  showCard: (cardId: string | null, event?: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => void;
+  showCard: (cardId: string | null) => void;
   addCard: (groupByOptionId?: string) => Promise<void> | void;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDeleteCard?: (cardId: string) => Promise<void>;
@@ -362,7 +362,7 @@ function Table(props: Props): JSX.Element {
                 cardIdToFocusOnRender={props.cardIdToFocusOnRender}
                 offset={offset}
                 resizingColumn={resizingColumn}
-                showCard={(cardId, _, e) => props.showCard(cardId, e)}
+                showCard={props.showCard}
                 addCard={props.addCard}
                 onCardClicked={props.onCardClicked}
                 onDrop={onDropToCard}

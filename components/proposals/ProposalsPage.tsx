@@ -61,6 +61,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
+  const { navigateToSpacePath } = useCharmRouter();
   const isAdmin = useIsAdmin();
   const { showError } = useSnackbar();
   const { user } = useUser();
@@ -117,6 +118,11 @@ export function ProposalsPage({ title }: { title: string }) {
   }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
 
   useProposalsBoardMutator();
+
+  function openPage(pageId: string | null) {
+    if (!pageId) return;
+    navigateToSpacePath(`/${pageId}`);
+  }
 
   const onDelete = useCallback(
     async (proposalId: string) => {
@@ -317,7 +323,7 @@ export function ProposalsPage({ title }: { title: string }) {
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     disableAddingCards
-                    showCard={() => {}}
+                    showCard={openPage}
                     readOnlyTitle={!isAdmin}
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}

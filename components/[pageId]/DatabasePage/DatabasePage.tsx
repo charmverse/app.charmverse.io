@@ -127,11 +127,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   });
 
   const showCard = useCallback(
-    async (
-      cardId: string | null,
-      isTemplate?: boolean,
-      event?: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-    ) => {
+    async (cardId: string | null, isTemplate?: boolean) => {
       if (cardId === null) {
         updateURLQuery({ cardId: null });
         setShownCardId(null);
@@ -139,7 +135,6 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
       }
 
       if (activeView.fields.openPageIn === 'center_peek' || isTemplate) {
-        event?.preventDefault();
         updateURLQuery({ viewId: router.query.viewId as string, cardId });
         setShownCardId(cardId);
       } else if (activeView.fields.openPageIn === 'full_page') {

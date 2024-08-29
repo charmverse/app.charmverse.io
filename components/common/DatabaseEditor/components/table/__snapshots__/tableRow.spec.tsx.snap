@@ -84,20 +84,14 @@ exports[`components/table/TableRow should match snapshot 1`] = `
             class="open-button"
             data-test="database-open-button-card-1"
           >
-            <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
-              href="/card-1"
-              style="text-decoration: none;"
+            <button
+              class="Button size--small"
+              type="button"
             >
-              <button
-                class="Button size--small"
-                type="button"
-              >
-                <span>
-                  Open
-                </span>
-              </button>
-            </a>
+              <span>
+                Open
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -194,20 +188,14 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
             class="open-button"
             data-test="database-open-button-card-1"
           >
-            <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
-              href="/card-1"
-              style="text-decoration: none;"
+            <button
+              class="Button size--small"
+              type="button"
             >
-              <button
-                class="Button size--small"
-                type="button"
-              >
-                <span>
-                  Open
-                </span>
-              </button>
-            </a>
+              <span>
+                Open
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -371,20 +359,14 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
             class="open-button"
             data-test="database-open-button-card-1"
           >
-            <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
-              href="/card-1"
-              style="text-decoration: none;"
+            <button
+              class="Button size--small"
+              type="button"
             >
-              <button
-                class="Button size--small"
-                type="button"
-              >
-                <span>
-                  Open
-                </span>
-              </button>
-            </a>
+              <span>
+                Open
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -457,20 +439,14 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
             class="open-button"
             data-test="database-open-button-card-1"
           >
-            <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
-              href="/card-1"
-              style="text-decoration: none;"
+            <button
+              class="Button size--small"
+              type="button"
             >
-              <button
-                class="Button size--small"
-                type="button"
-              >
-                <span>
-                  Open
-                </span>
-              </button>
-            </a>
+              <span>
+                Open
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -567,20 +543,14 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
             class="open-button"
             data-test="database-open-button-card-1"
           >
-            <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
-              href="/card-1"
-              style="text-decoration: none;"
+            <button
+              class="Button size--small"
+              type="button"
             >
-              <button
-                class="Button size--small"
-                type="button"
-              >
-                <span>
-                  Open
-                </span>
-              </button>
-            </a>
+              <span>
+                Open
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -726,20 +696,14 @@ exports[`components/table/TableRow should match snapshots with a nested row 1`] 
             class="open-button"
             data-test="database-open-button-card-1"
           >
-            <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
-              href="/card-1"
-              style="text-decoration: none;"
+            <button
+              class="Button size--small"
+              type="button"
             >
-              <button
-                class="Button size--small"
-                type="button"
-              >
-                <span>
-                  Open
-                </span>
-              </button>
-            </a>
+              <span>
+                Open
+              </span>
+            </button>
           </div>
         </div>
       </div>
