@@ -138,7 +138,7 @@ export function NewProductUpdateForm({
       })}
     >
       <Typography variant='h5' gutterBottom>
-        Create a Product Update for {createdAtLocal}
+        Product Update for {createdAtLocal}
       </Typography>
       <Stack gap={2}>
         <Stack direction='row' gap={2} alignItems='center' flexWrap='wrap'>
@@ -195,7 +195,7 @@ export function NewProductUpdateForm({
                 placeholder='1. Updated documentation ...'
                 helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'
                 error={!!fieldState.error}
-                sx={{ minHeight: '7em' }}
+                sx={{ minHeight: '16em' }}
                 {...field}
               />
             )}
