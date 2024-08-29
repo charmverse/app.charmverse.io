@@ -1,11 +1,9 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
 import type { BoardView } from 'lib/databases/boardView';
-import { pageStubToCreate } from 'testing/generatePageStub';
 
 import { FetchMock } from '../../test/fetchMock';
 import { TestBlockFactory } from '../../test/testBlockFactory';
