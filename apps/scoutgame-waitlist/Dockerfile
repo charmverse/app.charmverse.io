@@ -14,15 +14,12 @@ WORKDIR /app
 # TODO: run npm install in Dockerfile instead of copying node_modules, then we should be able to remove other apps
 COPY --parents @connect-shared  \
   apps/scoutgame-waitlist/package.json     \
-  apps/sunnyawards/package.json \
-  node_modules                  \
-  package.json                  \
-  apps/farcaster/node_modules   \
-  apps/farcaster/package.json   \
-  .
+  node_modules/                  \
+  package.json/                  \
+  ./
 
 # Copy compiled code
-COPY --parents apps/farcaster/.next apps/farcaster/public .
+COPY --parents apps/scoutgame-waitlist/.next apps/scoutgame-waitlist/public ./
 
 ENV PORT=3000
 
