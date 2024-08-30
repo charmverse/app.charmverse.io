@@ -1,6 +1,3 @@
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-
 import { baseUrl } from '@root/config/constants';
 import { getUserS3FilePath, uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
 import { ImageResponse } from 'next/og';

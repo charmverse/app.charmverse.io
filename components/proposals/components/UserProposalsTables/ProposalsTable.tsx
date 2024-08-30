@@ -4,11 +4,11 @@ import { Box, Card, Table, TableBody, TableCell, TableHead, TableRow, Typography
 import { Stack } from '@mui/system';
 import type { UserProposal } from '@root/lib/proposals/getUserProposals';
 import { relativeTime } from '@root/lib/utils/dates';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import Modal from 'components/common/Modal';
 import { evaluationIcons } from 'components/settings/proposals/constants';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 const StyledTableRow = styled(TableRow)`
@@ -27,7 +27,7 @@ const StyledTableRow = styled(TableRow)`
 `;
 
 export function ProposalsTable({ proposals, title }: { title: string; proposals: UserProposal[] }) {
-  const router = useRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { getFeatureTitle } = useSpaceFeatures();
 
@@ -72,7 +72,7 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                     if (!proposal.viewable) {
                       setIsOpen(true);
                     } else {
-                      router.push(`/${router.query.domain}/${proposal.path}`);
+                      navigateToSpacePath(`/${proposal.path}`);
                     }
                   }}
                 >

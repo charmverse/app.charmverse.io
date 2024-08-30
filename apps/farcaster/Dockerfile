@@ -14,7 +14,7 @@ WORKDIR /app
 # TODO: run npm install in Dockerfile instead of copying node_modules, then we should be able to remove other apps
 COPY --parents @connect-shared        \
   apps/*/package.json                 \
-  packages/*/package.json \
+  packages/*/package.json             \
   node_modules                        \
   package.json                        \
   apps/farcaster/node_modules         \

@@ -8,6 +8,7 @@ esbuild
     entryPoints: ['./background/initWebsockets.ts', './background/cron.ts'],
     // metafile: true, // uncomment to analyize build file contents
     outdir: './dist',
+    tsconfig: './tsconfig.json',
     packages: 'external',
     platform: 'node',
     sourcemap: true,
