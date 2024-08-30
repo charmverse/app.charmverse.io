@@ -5,6 +5,7 @@ import { log } from '@charmverse/core/log';
 import type { Signer } from '@neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster';
 import { GET, POST } from '@root/adapters/http';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { getWalletClient } from '@root/lib/blockchain/walletClient';
 import { sleep } from '@root/lib/utils/sleep';
 import { encodeAbiParameters } from 'viem';
 import { mnemonicToAccount } from 'viem/accounts';
@@ -20,6 +21,11 @@ import { lookupUserByCustodyAddress } from '../lookupUserByCustodyAddress';
 
 import { keyGatewayAbi } from './abi/keyGatewayAbi';
 import { SignedKeyRequestMetadataABI } from './abi/signedKeyRequestMetadataAbi';
+
+const walletClient = getWalletClient({
+  chainId: optimism.id,
+  mnemonic: WARPCAST_NOTIFICATION_ACCOUNT_SEED
+});
 
 // A constant message for greeting or logging.
 export const MESSAGE = `gm 🪐`;
@@ -207,27 +213,22 @@ export const getApprovedSignerId = async () => {
       }
     });
 
-    // Logging instructions and values for the user to perform on-chain transactions.
-    log.info('✅ Generated signer', '\n');
+    const txHash = await walletClient.writeContract({
+      address: '0x00000000fc56947c7e7183f8ca4b62398caadf0b', // KeyGateway contract address
+      abi: keyGatewayAbi, // ABI of the contract
+      functionName: 'addFor', // Function to call
+      args: [
+        farcasterDeveloper.custody_address, // fidOwner address
+        1, // keyType (uint32)
+        signerPublicKey, // key (bytes)
+        1, // metadataType (uint8)
+        metadata, // metadata (bytes)
+        BigInt(deadline), // deadline (uint256)
+        signature // sig (bytes)
+      ]
+    });
 
-    log.info(
-      'In order to get an approved signer you need to do an on-chain transaction on OP mainnet. \nGo to Farcaster KeyGateway optimism explorer\nhttps://optimistic.etherscan.io/address/0x00000000fc56947c7e7183f8ca4b62398caadf0b#writeContract \n'
-    );
-    log.info(
-      'Connect to Web3.\n\nNavigate to `addFor` function and add following values inside the respective placeholders.\n'
-    );
-
-    log.info('fidOwner (address) :=> ', farcasterDeveloper.custody_address, '\n -');
-    log.info('keyType (uint32) :=> ', 1, '\n -');
-    log.info('key (bytes) :=> ', signerPublicKey, '\n -');
-    log.info('metadataType (uint8) :=> ', 1, '\n -');
-    log.info('metadata (bytes) :=> ', metadata, '\n -');
-    log.info('deadline (uint256) :=> ', deadline, '\n -');
-    log.info('sig (bytes) :=> ', signature, '\n -\n');
-    log.info(
-      'We are polling for the signer to be approved. It will be approved once the onchain transaction is confirmed.'
-    );
-    log.info('Checking for the status of signer...');
+    await walletClient.waitForTransactionReceipt({ hash: txHash });
 
     // Polling for the signer status until it is approved.
     while (true) {
