@@ -1,3 +1,4 @@
+import { isMac } from '@packages/utils/browser';
 import { wrappingInputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
 import type { EditorState } from 'prosemirror-state';
@@ -10,17 +11,6 @@ import { parentHasDirectParentOfType, filter } from '../../utils';
 import { backspaceKeyCommand, enterKeyCommand, indentCommand, listItemMergeCommand, updateNodeAttrs } from './commands';
 import { ListItemNodeView } from './listItemNodeView';
 import { isNodeTodo, wrappingInputRuleForTodo } from './todo';
-
-function isMac() {
-  if (typeof navigator === 'undefined') {
-    return false;
-  }
-  return (
-    navigator.platform.toUpperCase().indexOf('MAC') >= 0 ||
-    navigator.platform.toUpperCase().indexOf('IPHONE') >= 0 ||
-    navigator.platform.toUpperCase().indexOf('IPAD') >= 0
-  );
-}
 
 const isValidList = (state: EditorState) => {
   const type = state.schema.nodes[LIST_ITEM];
