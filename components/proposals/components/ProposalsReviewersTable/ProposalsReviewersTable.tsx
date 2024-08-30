@@ -8,10 +8,6 @@ import {
   Card,
   Grid,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
   TableRow,
   Typography
 } from '@mui/material';
@@ -22,8 +18,6 @@ import { useGetProposalsReviewers } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
-import { evaluationIcons } from 'components/settings/proposals/constants';
-import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import { ReviewerProposalsTable } from './ReviewerProposalsTable';
@@ -107,6 +101,9 @@ export function ProposalsReviewersTable() {
                         },
                         '& .MuiAccordionDetails-root': {
                           padding: 0
+                        },
+                        '& .MuiAccordionSummary-content': {
+                          margin: 0
                         }
                       }}
                     >
