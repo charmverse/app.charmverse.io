@@ -1,17 +1,17 @@
-name: scoutgame-waitlist CI
+name: waitlist CI
 
 on:
   push:
     branches: [main]
     paths:
       - '.cdk'
-      - '.ebextensions/scoutgame-waitlist/**'
-      - '.ebstalk.apps.env/scoutgame-waitlist.env'
+      - '.ebextensions/waitlist/**'
+      - '.ebstalk.apps.env/waitlist.env'
       - '.github/actions/**'
-      - '.github/workflows/deploy_scoutgame-waitlist.yml'
+      - '.github/workflows/deploy_waitlist.yml'
       - 'package.json'
       - 'package-lock.json'
-      - 'apps/scoutgame-waitlist/**'
+      - 'apps/waitlist/**'
       - '@connect-shared/**'
       - 'abis/**'
       - 'adapters/**'
@@ -25,13 +25,13 @@ on:
     branches: ['**']
     paths:
       - '.cdk'
-      - '.ebextensions/scoutgame-waitlist/**'
-      - '.ebstalk.apps.env/scoutgame-waitlist.env'
+      - '.ebextensions/waitlist/**'
+      - '.ebstalk.apps.env/waitlist.env'
       - '.github/actions/**'
-      - '.github/workflows/deploy_scoutgame-waitlist.yml'
+      - '.github/workflows/deploy_waitlist.yml'
       - 'package.json'
       - 'package-lock.json'
-      - 'apps/scoutgame-waitlist/**'
+      - 'apps/waitlist/**'
       - '@connect-shared/**'
       - 'abis/**'
       - 'adapters/**'
@@ -47,7 +47,7 @@ on:
         required: true
 
 concurrency:
-  group: ci-scoutgame-waitlist-${{ github.event_name }}-${{ github.ref }}
+  group: ci-waitlist-${{ github.event_name }}-${{ github.ref }}
 
 jobs:
   build:
@@ -74,7 +74,7 @@ jobs:
         # source https://github.com/orgs/community/discussions/28474
         run: |
           echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
-          echo "deploy_staging=${{(github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-scoutgame-waitlist') || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-scoutgame-waitlist'))}}" >> $GITHUB_OUTPUT
+          echo "deploy_staging=${{(github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-waitlist') || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-waitlist'))}}" >> $GITHUB_OUTPUT
           echo "skip_tests=${{ contains(env.commit_message, 'skip-tests') }}" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
@@ -86,9 +86,9 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build_app
         with:
-          app_name: scoutgame-waitlist
+          app_name: waitlist
 
-  test-scoutgame-waitlist:
+  test-waitlist:
     name: Test apps
     runs-on: ubuntu-latest
     needs: build
@@ -124,15 +124,15 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build_app
         with:
-          app_name: scoutgame-waitlist
+          app_name: waitlist
 
-      - name: Validate scoutgame-waitlist app
+      - name: Validate waitlist app
         run: |
-          npm run lint -w apps/scoutgame-waitlist
-          npm run typecheck -w apps/scoutgame-waitlist
+          npm run lint -w apps/waitlist
+          npm run typecheck -w apps/waitlist
 
-  test-scoutgame-waitlist-e2e:
-    name: Test scoutgame-waitlist e2e
+  test-waitlist-e2e:
+    name: Test waitlist e2e
     runs-on: ubuntu-latest
     needs: build
 
@@ -172,11 +172,11 @@ jobs:
     #   - name: Restore app from cache
     #     uses: ./.github/actions/build_app
     #     with:
-    #       app_name: scoutgame-waitlist
+    #       app_name: waitlist
 
-    #   - name: Start scoutgame-waitlist app
+    #   - name: Start waitlist app
     #     run: |
-    #       npm run scoutgame-waitlist:start:test:ci &> server.log &
+    #       npm run waitlist:start:test:ci &> server.log &
     #       sleep_loop_ct=0
     #       until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
     #         echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -184,7 +184,7 @@ jobs:
     #         sleep 1
     #       done
 
-    #   - name: Run scoutgame-waitlist E2E tests
+    #   - name: Run waitlist E2E tests
     #     env:
     #       REACT_APP_APP_ENV: 'test'
     #     # we have to run docker command ourselves to set network=host so that playwright can access the server
@@ -201,7 +201,7 @@ jobs:
     #                   --network "host"  \
     #                   --ipc=host \
     #                   mcr.microsoft.com/playwright:v1.42.1-jammy \
-    #                   npm run scoutgame-waitlist:test:e2e:ci
+    #                   npm run waitlist:test:e2e:ci
 
   upload-docker:
     name: Upload Docker image
@@ -221,11 +221,11 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build_app
         with:
-          app_name: scoutgame-waitlist
+          app_name: waitlist
 
       - name: Update Dockerfile
         run: |
-          rm Dockerfile && mv apps/scoutgame-waitlist/Dockerfile Dockerfile
+          rm Dockerfile && mv apps/waitlist/Dockerfile Dockerfile
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -235,7 +235,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
         with:
-          ecr_registry: scoutgame-waitlist
+          ecr_registry: waitlist
 
   upload-static-assets:
     name: Upload assets in production
@@ -260,7 +260,7 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build_app
         with:
-          app_name: scoutgame-waitlist
+          app_name: waitlist
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -271,15 +271,15 @@ jobs:
 
       - name: Upload static assets to S3
         run: |
-          aws s3 sync apps/scoutgame-waitlist/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
+          aws s3 sync apps/waitlist/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Upload JS source maps to Datadog
         env:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         run: |
           npm install -g @datadog/datadog-ci
-          datadog-ci sourcemaps upload apps/scoutgame-waitlist/.next/static       \
-            --service=scoutgame-waitlist                              \
+          datadog-ci sourcemaps upload apps/waitlist/.next/static       \
+            --service=waitlist                              \
             --release-version=${{ steps.get_build_id.outputs.build_id }}  \
             --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
@@ -287,13 +287,13 @@ jobs:
     name: Deploy to production
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test-scoutgame-waitlist, test-scoutgame-waitlist-e2e, upload-docker, upload-static-assets]
+    needs: [test-waitlist, test-waitlist-e2e, upload-docker, upload-static-assets]
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - stack: prd-scoutgame-waitlist
-            ebextensions: scoutgame-waitlist
+          - stack: prd-waitlist
+            ebextensions: waitlist
     steps:
       - uses: actions/checkout@v4
         with:
@@ -347,7 +347,7 @@ jobs:
 
       - name: Calculate Stage env var
         run: |
-          full_stage_name="stg-scoutgame-waitlist-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
+          full_stage_name="stg-waitlist-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
 
           # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
           stage_name=`echo "$full_stage_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
@@ -399,7 +399,7 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: |
-            mv .ebextensions .ebextensions_tmp && mv .ebextensions_tmp/scoutgame-waitlist .ebextensions
+            mv .ebextensions .ebextensions_tmp && mv .ebextensions_tmp/waitlist .ebextensions
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
@@ -431,7 +431,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
     # pass in all steps so we can check if any failed
-    needs: [test-scoutgame-waitlist, test-scoutgame-waitlist-e2e, upload-docker, upload-static-assets, upload-docker, deploy-production]
+    needs: [test-waitlist, test-waitlist-e2e, upload-docker, upload-static-assets, upload-docker, deploy-production]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
@@ -440,7 +440,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
           status: 'failure'
           content: 'Hey <@&1027309276454207519>'
-          title: 'scoutgame-waitlist deploy workflow failed'
+          title: 'waitlist deploy workflow failed'
           description: |
             Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
           color: '16515843'

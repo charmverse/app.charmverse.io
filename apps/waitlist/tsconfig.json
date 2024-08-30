@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "../../dist/apps/scoutgame-waitlist",
+    "outDir": "../../dist/apps/waitlist",
     "rootDir": "../../",
     "lib": [
       "dom",
