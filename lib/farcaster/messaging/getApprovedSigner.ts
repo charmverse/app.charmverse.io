@@ -78,6 +78,8 @@ const SignerStatusEnum = {
 /**
  * Generates an approved signer for the user.
  *
+ * This method only needs to be run once. You can then save the signerId and signerPublicKey in your environment variables. Expiry time is set to 1 year
+ *
  * copied from https://github.com/neynarxyz/farcaster-examples/blob/main/gm-bot/src/utils.ts#L50-L204
  */
 export async function getApprovedSignerId(): Promise<{ signerId: string; signerPublicKey: string }> {
