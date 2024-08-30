@@ -286,8 +286,9 @@ export function PassFailEvaluation({
       </Card>
       <Modal open={!!declineReasonModalPopupState.isOpen} onClose={onClose} title='Reason for decline' size='small'>
         <Stack gap={1} mb={3}>
-          <Typography>Please select at least one reason for declining this proposal.</Typography>
+          <FormLabel required>Please select at least one reason for declining this proposal</FormLabel>
           <Select
+            required
             value={declineReason}
             onChange={(e) => {
               setDeclineReason(e.target.value);
@@ -303,10 +304,11 @@ export function PassFailEvaluation({
         </Stack>
 
         <Stack gap={1}>
-          <Typography>Additional comment</Typography>
+          <FormLabel required>Additional comment</FormLabel>
           <TextField
             multiline
             fullWidth
+            required
             rows={5}
             onChange={(e) => {
               setDeclineMessage(e.target.value);
@@ -330,7 +332,7 @@ export function PassFailEvaluation({
               await _onSubmitEvaluationReview('fail');
               onClose();
             }}
-            disabled={declineReason === null}
+            disabled={declineReason === null || !declineMessage}
           >
             {actionLabels.reject}
           </Button>

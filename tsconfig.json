@@ -29,6 +29,7 @@
     "paths": {
       "@connect-shared/*": ["./@connect-shared/*"],
       "@packages/charmeditor/*": ["./packages/charmeditor/src/*"],
+      "@packages/utils/*": ["./packages/utils/src/*"],
       "@root/abis/*": ["./abis/*"],
       "@root/adapters/*": ["./adapters/*"],
       "@root/connectors/*": ["./connectors/*"],

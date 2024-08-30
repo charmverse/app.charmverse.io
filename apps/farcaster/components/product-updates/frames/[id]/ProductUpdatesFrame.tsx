@@ -61,14 +61,18 @@ export function ProductUpdatesFrame({
             {createdAtLocal}
           </p>
         </div>
-        <img
-          width={85}
-          height={85}
-          style={{
-            objectFit: 'contain'
-          }}
-          src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.png`}
-        />
+        <div style={{ display: 'flex', paddingRight: 20 }}>
+          <img
+            width={100}
+            height={100}
+            style={{
+              objectFit: 'contain',
+              marginTop: 10,
+              marginBottom: 10
+            }}
+            src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.png`}
+          />
+        </div>
       </div>
       <div style={{ width: '100%', height: 2, backgroundColor: 'black' }} />
       <div
