@@ -1,44 +1,30 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Stack, Button, Divider, FormLabel, MenuItem, Select, Typography, ListItemIcon } from '@mui/material';
+import {
+  Stack,
+  Button,
+  Divider,
+  FormLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  ListItemIcon
+} from '@mui/material';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useAction } from 'next-safe-action/hooks';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { postCreateCastMessage } from 'lib/postCreateCastMessage';
-import { getCastMessage } from 'lib/productUpdates/castMessage';
-import type { NewProductUpdateResponse } from 'lib/productUpdates/createProductUpdate';
-import { createProductUpdateAction } from 'lib/productUpdates/createProductUpdateAction';
+import { createProductUpdatesFrameAction } from 'lib/productUpdates/createProductUpdatesFrameAction';
 import { schema, type FormValues } from 'lib/productUpdates/schema';
-import { DIVIDER } from 'lib/productUpdates/schema';
 import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid';
 
-import { CharmTextField } from './CharmTextField';
 import { ProjectAvatar } from './ProjectAvatar';
-
-type JSONContent = {
-  type: 'doc';
-  content: [
-    {
-      type: 'bullet_list';
-      content: {
-        type: 'list_item';
-        content: {
-          type: 'paragraph';
-          content?: {
-            type: 'text' | 'hardBreak';
-            text?: string;
-          }[];
-        }[];
-      }[];
-    }
-  ];
-};
 
 export function NewProductUpdateForm({
   connectProjects,
@@ -51,12 +37,11 @@ export function NewProductUpdateForm({
   onClickCreateProject: VoidFunction;
   projectId: string;
 }) {
-  const [errors, setErrors] = useState<string[] | null>(null);
-  const [editorKey, setEditorKey] = useState(1); // keep track of state to clear editor
-  const { control, handleSubmit, reset, setValue, watch } = useForm<FormValues>({
+  const { control, handleSubmit, reset, setValue } = useForm<FormValues>({
     defaultValues: {
       authorFid: farcasterUser.fid,
       projectId,
+      text: '',
       createdAtLocal: new Date().toLocaleDateString()
     },
     resolver: yupResolver(schema),
@@ -67,41 +52,27 @@ export function NewProductUpdateForm({
     setValue('projectId', projectId);
   }, [projectId]);
 
-  // kinda hacky, find a more elegant way to clear the editor?
-  function clearEditor() {
-    setEditorKey((key) => key + 1);
-  }
-
-  const { execute, isExecuting } = useAction(createProductUpdateAction, {
-    onExecute: () => {
-      setErrors(null);
-    },
+  const { execute, isExecuting } = useAction(createProductUpdatesFrameAction, {
     onSuccess: (data) => {
       reset();
-      clearEditor();
       if (data.data) {
-        const castMessage = getCastMessage(data.data);
+        const lines = data.data.productUpdatesFrame.text
+          .split('\n')
+          .filter((line) => line.trim().length)
+          .slice(0, 10);
 
         postCreateCastMessage({
           embeds: [`https://${window.location.hostname}/product-updates/frames/${data.data.productUpdatesFrame.id}`],
-          text: getCastMessage(data.data)
+          text: `${data.data.project.name}\n${data.data.productUpdatesFrame.createdAtLocal}\n\n${lines
+            .map((line) => `• ${line}`)
+            .join('\n')}`
         });
       }
     },
     onError: (err) => {
-      log.error('Error submitting form', { error: err });
-      setErrors(['An error occurred. Please try again.']);
+      log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
     }
   });
-
-  const createdAtLocal = useMemo(() => {
-    return new Date().toLocaleDateString(undefined, {
-      // weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  }, []);
 
   if (connectProjects.length === 0) {
     return (
@@ -116,39 +87,28 @@ export function NewProductUpdateForm({
   return (
     <form
       onSubmit={handleSubmit((data) => {
-        const json = data.content.json as JSONContent;
-        // TODO: figure out why data.content is not a plain object
-        const jsonPOJO = JSON.parse(JSON.stringify(json));
-
-        // We can't render prosemirror JSON for the image, so we need to convert it to text
-        const lines = json.content[0].content.slice(0, 10).map((content) => content.content[0].content);
-        const text = lines
-          .map((content) => `${content?.map((c) => (c.type === 'hardBreak' ? '\n' : `${c.text}`)).join('') || '\n'}`)
-          // use a separator that is unlikely to be in the text
-          .join(DIVIDER);
-
+        const locale = window.navigator.language;
         execute({
           ...data,
-          content: {
-            json: jsonPOJO,
-            text
-          },
-          createdAtLocal
+          createdAtLocal: new Date().toLocaleDateString(locale, {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          })
         });
       })}
     >
-      <Typography variant='h5' gutterBottom>
-        Product Update for {createdAtLocal}
-      </Typography>
       <Stack gap={2}>
-        <Stack direction='row' gap={2} alignItems='center' flexWrap='wrap'>
-          <Typography>Project</Typography>
+        <Stack>
+          <FormLabel>Project</FormLabel>
           <Controller
             control={control}
             name='projectId'
             render={({ field, fieldState }) => (
               <Select
                 displayEmpty
+                fullWidth
                 disabled={isExecuting}
                 renderValue={(value) => {
                   const project = connectProjects.find((p) => p.id === value);
@@ -165,7 +125,6 @@ export function NewProductUpdateForm({
                   return <Typography color='secondary'>Select a project</Typography>;
                 }}
                 error={!!fieldState.error}
-                sx={{ flexGrow: 1, maxWidth: '100%' }}
                 {...field}
               >
                 {connectProjects.map((connectProject) => (
@@ -186,26 +145,26 @@ export function NewProductUpdateForm({
           />
         </Stack>
         <Stack>
+          <FormLabel>Product updates</FormLabel>
           <Controller
             control={control}
-            name='content'
+            name='text'
             render={({ field, fieldState }) => (
-              <CharmTextField
-                key={editorKey}
+              <TextField
+                disabled={isExecuting}
+                multiline
+                rows={8}
+                aria-labelledby='product-updates'
                 placeholder='1. Updated documentation ...'
                 helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'
                 error={!!fieldState.error}
-                sx={{ minHeight: '16em' }}
                 {...field}
               />
             )}
           />
         </Stack>
 
-        <Stack direction='row'>
-          <Box flexGrow={1}>
-            <FormErrors errors={errors} />
-          </Box>
+        <Stack alignItems='flex-end'>
           <Button
             type='submit'
             size='large'
@@ -215,7 +174,7 @@ export function NewProductUpdateForm({
             variant='contained'
             disabled={isExecuting}
           >
-            Publish
+            Submit
           </Button>
         </Stack>
       </Stack>

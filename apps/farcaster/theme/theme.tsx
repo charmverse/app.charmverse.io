@@ -189,13 +189,13 @@ const extendedTheme = extendTheme({
           backgroundColor: inputBackgroundDarkMode,
           '[data-mui-color-scheme="dark"] &': {
             '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'var(--input-border)'
+              borderColor: inputBorderDarkMode
             }
           }
         }),
         notchedOutline: () => ({
           '[data-mui-color-scheme="dark"] &': {
-            borderColor: 'var(--input-border)'
+            borderColor: inputBorderDarkMode
           }
         })
       }

@@ -1,29 +1,23 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { createOrUpdateFarcasterUser } from '@root/lib/farcaster/createOrUpdateFarcasterUser';
-import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
+import type { StatusAPIResponse } from '@farcaster/auth-client';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { stringToValidPath } from '@root/lib/utils/strings';
 
 import type { FormValues } from './projectSchema';
 
 export async function createProject(input: FormValues) {
-  const [farcasterUser] = await getFarcasterUsers({
-    fids: [input.teamLeadFarcasterId]
+  const farcasterUser = await prisma.farcasterUser.findFirstOrThrow({
+    where: {
+      fid: input.teamLeadFarcasterId
+    },
+    select: {
+      userId: true,
+      fid: true,
+      account: true
+    }
   });
 
-  if (!farcasterUser) {
-    throw new DataNotFoundError('Farcaster user not found');
-  }
-
-  const { userId } = await createOrUpdateFarcasterUser({
-    fid: input.teamLeadFarcasterId,
-    username: farcasterUser.username,
-    verifications: farcasterUser.verifications,
-    bio: farcasterUser.profile?.bio?.text,
-    displayName: farcasterUser.display_name,
-    pfpUrl: farcasterUser.pfp_url
-  });
+  const userId = farcasterUser.userId;
 
   let path = stringToValidPath({ input: input.name ?? '', wordSeparator: '-', autoReplaceEmpty: false });
   const existingProjectWithPath = await prisma.project.findFirst({
@@ -57,7 +51,7 @@ export async function createProject(input: FormValues) {
               teamLead: true,
               updatedBy: userId,
               userId,
-              name: farcasterUser.display_name,
+              name: (farcasterUser.account as unknown as StatusAPIResponse).displayName as string,
               farcasterId: input.teamLeadFarcasterId
             }
           ]

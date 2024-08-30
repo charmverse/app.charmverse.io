@@ -4,7 +4,7 @@ import { log } from '@charmverse/core/log';
 import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { ImageField } from '@connect-shared/components/common/ImageField';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, FormLabel, Stack, TextField, Typography } from '@mui/material';
+import { Button, FormLabel, Stack, TextField } from '@mui/material';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -52,50 +52,52 @@ export function NewProjectForm({
   });
 
   return (
-    <form noValidate onSubmit={handleSubmit(execute)}>
-      <Typography variant='h5'>Create a project</Typography>
-      <Stack gap={2}>
-        <Stack>
-          <FormLabel required>New project name</FormLabel>
-          <Controller
-            control={control}
-            name='name'
-            render={({ field, fieldState }) => (
-              <TextField
-                data-test='project-form-name'
-                autoFocus
-                placeholder='Charmverse'
-                aria-labelledby='project-name'
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                {...field}
-              />
-            )}
-          />
-        </Stack>
-        <Stack>
-          <FormLabel>Project avatar</FormLabel>
-          <Stack direction='row' gap={1}>
-            <ImageField type='avatar' name='avatar' control={control} />
+    <>
+      {/* add noValidate so that we onyl rely on react-hook-form validation */}
+      <form noValidate onSubmit={handleSubmit(execute)}>
+        <Stack gap={2}>
+          <Stack>
+            <FormLabel required>New project name</FormLabel>
+            <Controller
+              control={control}
+              name='name'
+              render={({ field, fieldState }) => (
+                <TextField
+                  data-test='project-form-name'
+                  autoFocus
+                  placeholder='Charmverse'
+                  aria-labelledby='project-name'
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  {...field}
+                />
+              )}
+            />
+          </Stack>
+          <Stack>
+            <FormLabel>Project avatar</FormLabel>
+            <Stack direction='row' gap={1}>
+              <ImageField type='avatar' name='avatar' control={control} />
+            </Stack>
           </Stack>
         </Stack>
-      </Stack>
-      <Stack
-        justifyContent='space-between'
-        flexDirection='row'
-        position='sticky'
-        bottom='0'
-        bgcolor='background.default'
-        py={2}
-      >
-        <Button onClick={onCancel} size='large' color='secondary' variant='outlined'>
-          Cancel
-        </Button>
-        {!isExecuting && errors?.length && <FormErrors errors={errors} />}
-        <Button size='large' type='submit' disabled={isExecuting}>
-          Create
-        </Button>
-      </Stack>
-    </form>
+        <Stack
+          justifyContent='space-between'
+          flexDirection='row'
+          position='sticky'
+          bottom='0'
+          bgcolor='background.default'
+          py={2}
+        >
+          <Button onClick={onCancel} size='large' color='secondary' variant='outlined'>
+            Cancel
+          </Button>
+          {!isExecuting && errors?.length && <FormErrors errors={errors} />}
+          <Button size='large' type='submit' disabled={isExecuting}>
+            Create
+          </Button>
+        </Stack>
+      </form>
+    </>
   );
 }

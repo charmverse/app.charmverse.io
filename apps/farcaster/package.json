@@ -12,7 +12,6 @@
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
     "@neynar/nodejs-sdk": "^1.41.2",
-    "@packages/charmeditor": "^1.0.0",
     "@typeschema/yup": "^0.13.3",
     "next-safe-action": "^7.4.2"
   }

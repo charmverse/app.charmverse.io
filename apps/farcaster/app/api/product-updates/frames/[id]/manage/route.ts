@@ -25,18 +25,17 @@ export async function POST(req: Request) {
 
   const html = getFrameHtml({
     image: productUpdatesFarcasterFrame.image,
-    imageAspectRatio: '1:1',
     version: 'vNext',
     buttons: [
       {
         action: 'post',
-        label: 'Cancel',
-        target: `${baseUrl}/product-updates/frames/${frameId}`
+        label: 'Delete',
+        target: `${baseUrl}/api/product-updates/frames/${frameId}/delete`
       },
       {
         action: 'post',
-        label: 'Delete',
-        target: `${baseUrl}/api/product-updates/frames/${frameId}/delete`
+        label: 'Back',
+        target: `${baseUrl}/product-updates/frames/${frameId}`
       }
     ],
     ogImage: productUpdatesFarcasterFrame.image

@@ -1,17 +1,19 @@
-import type { ConnectWaitlistSlot } from '@charmverse/core/prisma-client';
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 const pointsPerReferral = 100;
 
-export async function refreshUserScore({ fid }: { fid: number }): Promise<ConnectWaitlistSlot> {
-  const existingSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+export async function refreshUserScore({ fid }: { fid: number }): Promise<void> {
+  const existingSlot = await prisma.connectWaitlistSlot.findUnique({
     where: {
       fid
-    },
-    select: {
-      initialPosition: true
     }
   });
+
+  if (!existingSlot) {
+    log.warn(`User with fid ${fid} not found in waitlist`);
+    return;
+  }
 
   const referrals = await prisma.connectWaitlistSlot.count({
     where: {
@@ -19,12 +21,12 @@ export async function refreshUserScore({ fid }: { fid: number }): Promise<Connec
     }
   });
 
-  return prisma.connectWaitlistSlot.update({
+  await prisma.connectWaitlistSlot.update({
     where: {
       fid
     },
     data: {
-      score: existingSlot.initialPosition - referrals * pointsPerReferral
+      score: referrals * pointsPerReferral
     }
   });
 }

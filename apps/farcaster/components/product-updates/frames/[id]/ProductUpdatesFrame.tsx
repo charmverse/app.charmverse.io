@@ -1,7 +1,5 @@
 import { baseUrl } from '@root/config/constants';
 
-import { DIVIDER } from 'lib/productUpdates/schema';
-
 export function ProductUpdatesFrame({
   text,
   createdAtLocal,
@@ -14,7 +12,7 @@ export function ProductUpdatesFrame({
   projectAvatarImage: string | null;
 }) {
   const lines = text
-    .split(DIVIDER)
+    .split('\n')
     .filter((line) => line.trim().length)
     .slice(0, 10);
 
@@ -23,19 +21,21 @@ export function ProductUpdatesFrame({
       style={{
         paddingLeft: 20,
         paddingRight: 20,
+        paddingBottom: 8,
+        paddingTop: 8,
         height: '100%',
         backgroundColor: 'white',
         display: 'flex',
         width: '100%',
-        flexDirection: 'column',
-        lineHeight: '18px'
+        flexDirection: 'column'
       }}
     >
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          paddingBottom: 8
         }}
       >
         <div
@@ -47,41 +47,35 @@ export function ProductUpdatesFrame({
         >
           <p
             style={{
-              fontSize: 24,
-              fontFamily: 'Inter',
-              fontWeight: 700,
-              maxWidth: 350,
-              marginBottom: '.5em',
-              marginTop: 0
+              fontSize: 24
             }}
           >
-            {projectName}
+            {projectName} Update
           </p>
           <p
             style={{
-              fontSize: 16,
-              marginBottom: 0,
-              marginTop: 0
+              fontSize: 20,
+              marginTop: -8
             }}
           >
-            Product Update &ndash; {createdAtLocal}
+            {createdAtLocal}
           </p>
         </div>
         <img
-          width={100}
-          height={100}
+          width={85}
+          height={85}
           style={{
             objectFit: 'contain'
           }}
           src={projectAvatarImage || `${baseUrl}/images/default-project-avatar.png`}
         />
       </div>
-      <div style={{ width: '100%', height: 1, margin: '0', backgroundColor: '#aaa' }} />
+      <div style={{ width: '100%', height: 2, backgroundColor: 'black' }} />
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
-          paddingTop: '1.5em'
+          marginTop: 10
         }}
       >
         {lines.map((line, index) => {
@@ -92,21 +86,11 @@ export function ProductUpdatesFrame({
                 gap: 4,
                 display: 'flex',
                 flexDirection: 'row',
-                alignItems: 'flex-start',
-                whiteSpace: 'pre-wrap',
-                width: '100%'
+                alignItems: 'flex-start'
               }}
               key={`${index.toString()}`}
             >
-              <span
-                style={{
-                  fontSize: '3em',
-                  lineHeight: '.4em',
-                  marginRight: 8
-                }}
-              >
-                &middot;
-              </span>
+              •
               <p
                 style={{
                   fontSize: 18,

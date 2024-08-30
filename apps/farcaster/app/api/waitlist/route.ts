@@ -1,5 +1,4 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { prisma } from '@charmverse/core/prisma-client';
 import { baseUrl } from '@root/config/constants';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
@@ -12,7 +11,6 @@ import {
   type WaitlistFramePage
 } from 'lib/waitlist/actionButtons';
 import { joinWaitlist } from 'lib/waitlist/joinWaitlist';
-import { refreshPercentilesForEveryone } from 'lib/waitlist/refreshPercentilesForEveryone';
 
 export async function POST(req: Request, res: Response) {
   const waitlistClicked = (await req.json()) as FarcasterFrameInteractionToValidate;
@@ -25,10 +23,8 @@ export async function POST(req: Request, res: Response) {
 
   const interactorFid = parseInt(validatedMessage.action.interactor.fid.toString(), 10);
 
-  const query = new URL(req.url).searchParams;
-
-  const currentPage = query.get('current_page') as WaitlistFramePage;
-  const referrerFid = query.get('referrer_fid');
+  const currentPage = new URL(req.url).searchParams.get('current_page') as WaitlistFramePage;
+  const referrerFid = new URL(req.url).searchParams.get('referrer_fid');
 
   const joinWaitlistResult = await joinWaitlist({
     fid: interactorFid,
@@ -36,47 +32,20 @@ export async function POST(req: Request, res: Response) {
     username: validatedMessage.action.interactor.username
   });
 
-  await refreshPercentilesForEveryone();
-
   if (currentPage === 'join_waitlist_home') {
     let html: string = '';
 
     if (joinWaitlistResult.isNew) {
-      // Dev image
-      const imgSrc = `${baseUrl}/images/waitlist/dev/waitlist-joined.jpg`;
-
-      // Prod image
-      // const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
-
       html = getFrameHtml({
-        image: imgSrc,
+        image: `${baseUrl}/images/waitlist/waitlist-joined.gif`,
         version: 'vNext',
         buttons: [waitlistGetDetails, waitlistGet1000Points, waitlistShareMyFrame(interactorFid)],
         imageAspectRatio: '1:1'
         // ogImage: `${baseUrl}/images/waitlist/waitlist-joined.gif`
       });
     } else {
-      const { percentile } = await prisma.connectWaitlistSlot.findFirstOrThrow({
-        where: {
-          fid: interactorFid
-        },
-        select: {
-          percentile: true
-        }
-      });
-
-      // TODO: Add a notification here if position changed
-
-      // Dev image
-      // This key is be constructed so that it overcomes farcaster's cache
-      const imgSrc = `${baseUrl}/api/waitlist/current-position?fid=${interactorFid}&percentile=${percentile}`;
-
-      // Prod image - TODO Add a joined image
-      // const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
-
       html = getFrameHtml({
-        image: imgSrc,
-        ogImage: imgSrc,
+        image: `${baseUrl}/images/waitlist/waitlist-joined.gif`,
         version: 'vNext',
         buttons: [waitlistGetDetails, waitlistShareMyFrame(interactorFid)],
         imageAspectRatio: '1:1'
