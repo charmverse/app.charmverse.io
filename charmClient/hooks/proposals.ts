@@ -1,4 +1,5 @@
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
+import type { GetProposalsReviewersResponse } from '@root/lib/proposals/getProposalsReviewers';
 import type { GetUserProposalsResponse } from '@root/lib/proposals/getUserProposals';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -196,4 +197,10 @@ export function useResetEvaluationAppealReview({ evaluationId }: { evaluationId:
 
 export function useGetUserProposals(params: { spaceId: MaybeString }) {
   return useGET<GetUserProposalsResponse>(params.spaceId ? `/api/spaces/${params.spaceId}/proposals/work` : null);
+}
+
+export function useGetProposalsReviewers(params: { spaceId: MaybeString }) {
+  return useGET<GetProposalsReviewersResponse>(
+    params.spaceId ? `/api/spaces/${params.spaceId}/proposals/reviewers` : null
+  );
 }
