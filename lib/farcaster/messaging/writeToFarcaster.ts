@@ -1,21 +1,50 @@
 // docs.neynar.com/reference/publish-message
 
+import { ExternalServiceError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
+import type { Cast } from '@neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster';
 import { POST } from '@root/adapters/http';
 
-import { NEYNAR_API_BASE_URL } from '../constants';
+import { NEYNAR_API_BASE_URL, NEYNAR_SIGNER_ID } from '../constants';
 
 // TBD - https://github.com/neynarxyz/farcaster-examples/tree/main/managed-signers
 
 // https://docs.neynar.com/reference/post-cast
 // https://github.com/neynarxyz/farcaster-examples/tree/main/gm-bot
 
-// export function writeToFarcaster({message}: {message: string}) {
+export async function writeToFarcaster({
+  neynarSignerId,
+  text,
+  channelId,
+  embedUrl
+}: {
+  neynarSignerId: string;
+  text: string;
+  channelId?: string;
+  embedUrl?: string;
+}): Promise<Cast> {
+  const baseUrl = `${NEYNAR_API_BASE_URL}/cast`;
 
-//   const baseUrl = `${NEYNAR_API_BASE_URL}/message`
+  const message = await POST<{ cast?: Cast; success: boolean }>(
+    baseUrl,
+    {
+      text,
+      channel_id: channelId,
+      signer_uuid: neynarSignerId,
+      embeds: embedUrl ? [{ url: embedUrl }] : undefined
+    },
+    {
+      headers: {
+        accept: 'application/json',
+        api_key: 'NEYNAR_API_DOCS'
+      }
+    }
+  );
 
-//   return (
-//     <div>
-//       <h1>writeToFarcaster</h1>
-//     </div>
-//   )
-// }
+  if (!message.success || !message.cast) {
+    log.error('Failed to write to Farcaster', { error: message });
+    throw new ExternalServiceError('Failed to write to Farcaster');
+  }
+
+  return message.cast;
+}
