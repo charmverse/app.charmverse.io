@@ -1,5 +1,6 @@
-import type { NFTData, NFTRequest } from 'lib/blockchain/getNFTs';
 import type { LoggedInUser } from '@root/models';
+
+import type { NFTData, NFTRequest } from 'lib/blockchain/getNFTs';
 
 import { useGETImmutable, usePOST } from './helpers';
 

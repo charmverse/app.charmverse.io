@@ -1,0 +1,13 @@
+{
+  "name": "@packages/utils",
+  "version": "1.0.0",
+  "type": "module",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "exports": {
+    "./browser": "./src/browser.ts",
+    "./types": "./src/types.ts"
+  }
+}

@@ -21,7 +21,7 @@ export type Props = {
   selectedCardIds: string[];
   cardIdToFocusOnRender: string;
   addCard: (groupByOptionId?: string) => Promise<void> | void;
-  showCard: (cardId: string) => void;
+  showCard: (cardId: string, event?: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDropToGroupHeader: (srcOption: BoardGroup, dstOption?: BoardGroup) => void;
@@ -91,7 +91,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           selectedCardIds={props.selectedCardIds}
           readOnly={props.readOnly}
           cardIdToFocusOnRender={props.cardIdToFocusOnRender}
-          showCard={props.showCard}
+          showCard={(cardId, _, e) => props.showCard(cardId, e)}
           resizingColumn=''
           offset={0}
           isExpandedGroup={props.isExpandedGroup}

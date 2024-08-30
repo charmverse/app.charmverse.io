@@ -41,6 +41,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { NewProposalButton } from './components/NewProposalButton';
 import { useProposalsBoardMutator } from './components/ProposalsBoard/hooks/useProposalsBoardMutator';
 import { ProposalsHeaderRowsMenu } from './components/ProposalsHeaderRowsMenu';
+import { ProposalsReviewersTable } from './components/ProposalsReviewersTable/ProposalsReviewersTable';
 import { UserProposalsTables } from './components/UserProposalsTables/UserProposalsTables';
 import { useProposalsBoard } from './hooks/useProposalsBoard';
 
@@ -61,7 +62,6 @@ export function ProposalsPage({ title }: { title: string }) {
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
   const canSeeProposals = hasAccess || isFreeSpace || currentSpace?.publicProposals === true;
-  const { navigateToSpacePath } = useCharmRouter();
   const isAdmin = useIsAdmin();
   const { showError } = useSnackbar();
   const { user } = useUser();
@@ -69,8 +69,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const [showSidebar, setShowSidebar] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const { router, updateURLQuery } = useCharmRouter();
-  const viewId = (router.query.viewId || 'all') as 'all' | 'my-work';
-
+  const viewId = (router.query.viewId || 'all') as 'all' | 'my-work' | 'reviewers';
   const onShowDescription = useCallback(() => {
     const oldBlocks = [activeBoard];
     const newBoard = createBoard({
@@ -118,11 +117,6 @@ export function ProposalsPage({ title }: { title: string }) {
   }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
 
   useProposalsBoardMutator();
-
-  function openPage(pageId: string | null) {
-    if (!pageId) return;
-    navigateToSpacePath(`/${pageId}`);
-  }
 
   const onDelete = useCallback(
     async (proposalId: string) => {
@@ -259,7 +253,15 @@ export function ProposalsPage({ title }: { title: string }) {
                   {
                     id: 'my-work',
                     label: 'My Work'
-                  }
+                  },
+                  ...(isAdmin
+                    ? [
+                        {
+                          id: 'reviewers',
+                          label: 'Reviewers'
+                        }
+                      ]
+                    : [])
                 ].map((view) => {
                   return (
                     <StyledTab
@@ -278,7 +280,7 @@ export function ProposalsPage({ title }: { title: string }) {
               </Tabs>
             )}
             <div className='octo-spacer' />
-            {viewId !== 'my-work' && (
+            {viewId === 'all' ? (
               <Box className='view-actions'>
                 <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
                 <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
@@ -292,7 +294,7 @@ export function ProposalsPage({ title }: { title: string }) {
                   />
                 )}
               </Box>
-            )}
+            ) : null}
           </div>
           <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
         </Stack>
@@ -323,7 +325,7 @@ export function ProposalsPage({ title }: { title: string }) {
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     disableAddingCards
-                    showCard={openPage}
+                    showCard={() => {}}
                     readOnlyTitle={!isAdmin}
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}
@@ -366,9 +368,11 @@ export function ProposalsPage({ title }: { title: string }) {
                 showView={() => {}}
               />
             </Stack>
-          ) : (
+          ) : viewId === 'my-work' ? (
             <UserProposalsTables />
-          )}
+          ) : isAdmin && viewId === 'reviewers' ? (
+            <ProposalsReviewersTable />
+          ) : null}
         </Box>
       )}
     </DatabaseContainer>

@@ -1,9 +1,9 @@
 import { prisma, type User } from '@charmverse/core/prisma-client';
 import { test as base, expect } from '@playwright/test';
+import { baseUrl } from '@root/config/constants';
 import { ProjectSettings } from '__e2e__/po/settings/projectSettings.po';
 import { v4 } from 'uuid';
 
-import { baseUrl } from '@root/config/constants';
 import { randomETHWallet } from 'lib/utils/blockchain';
 import { generateSpaceUser } from 'testing/setupDatabase';
 

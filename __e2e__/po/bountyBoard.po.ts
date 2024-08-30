@@ -1,6 +1,5 @@
 // playwright-dev-page.ts
 import type { Page } from '@playwright/test';
-
 import { baseUrl } from '@root/config/constants';
 
 import { GlobalPage } from './global.po';

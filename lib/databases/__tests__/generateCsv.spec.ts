@@ -6,10 +6,10 @@ import { v4 } from 'uuid';
 import { generateBoard } from 'testing/setupDatabase';
 import { generateProposalSourceDb } from 'testing/utils/proposals';
 
-import type { Board, IPropertyOption, IPropertyTemplate } from '../board';
+import type { IPropertyOption, IPropertyTemplate } from '../board';
 import type { BoardViewFields } from '../boardView';
 import { Constants } from '../constants';
-import { generateTableArray, loadAndGenerateCsv } from '../generateCsv';
+import { generateCsvContent, loadAndGenerateCsv } from '../generateCsv';
 
 import { generateTableArrayInput } from './cardStubs';
 
@@ -114,9 +114,9 @@ describe('loadAndGenerateCsv()', () => {
         .map((c) => c.trim())
     ).toStrictEqual([
       'Title\tText\tSelect',
-      '"Card 1"\t"Card 1 Text"\t"Blue"',
-      '"Card 2"\t"Card 2 Text"\t"Red"',
-      '"Card 3"\t"Card 3 Text"\t""'
+      'Card 1\tCard 1 Text\tBlue',
+      'Card 2\tCard 2 Text\tRed',
+      'Card 3\tCard 3 Text'
     ]);
   });
 
@@ -208,11 +208,11 @@ describe('loadAndGenerateCsv()', () => {
   });
 });
 
-describe('generateTableArray()', () => {
+describe('generateCsvContent()', () => {
   it('should return a table array with correct properties and filters applied', async () => {
     const { board, cardMap, cards, context, formatters, view } = generateTableArrayInput;
 
-    const results = generateTableArray(
+    const results = generateCsvContent(
       board as any,
       cards as any,
       view as any,
@@ -222,7 +222,12 @@ describe('generateTableArray()', () => {
     );
 
     // Tests that correct columns are provided and that all data was taken into account, even if Proposal Step is hidden as a column
-    expect(results.rows).toStrictEqual([
+    expect(
+      results.csvContent
+        .trim()
+        .split('\n')
+        .map((c) => c.trim())
+    ).toStrictEqual([
       [
         'Title',
         'Reviewer Notes',
@@ -231,16 +236,18 @@ describe('generateTableArray()', () => {
         'Publish Date',
         'Proposal Url',
         'Proposal Reviewers'
-      ],
+      ].join('\t'),
       [
-        '"Getting Started"',
-        '""',
+        'Getting Started',
+        '',
         'test',
-        '"In Progress"',
-        '"N/A"',
+        'In Progress',
+        'N/A',
         'http://127.0.0.1:3335/demo-space-domain/getting-started-8198984395372089',
         ''
       ]
+        .join('\t')
+        .trim()
     ]);
   });
 });

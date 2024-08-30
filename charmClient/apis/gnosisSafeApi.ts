@@ -1,5 +1,4 @@
 import type { UserGnosisSafe } from '@charmverse/core/prisma-client';
-
 import * as http from '@root/adapters/http';
 
 export class GnosisSafeApi {

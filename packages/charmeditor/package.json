@@ -1,0 +1,33 @@
+{
+  "name": "@packages/charmeditor",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "npx tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@nytimes/react-prosemirror": "^0.6.2",
+    "@packages/utils": "^1.0.0",
+    "prosemirror": "^0.11.1",
+    "prosemirror-commands": "^1.6.0",
+    "prosemirror-inputrules": "^1.4.0",
+    "prosemirror-keymap": "^1.2.2",
+    "prosemirror-markdown": "^1.13.0",
+    "prosemirror-model": "^1.22.3",
+    "prosemirror-schema-list": "^1.4.1",
+    "prosemirror-state": "^1.4.3"
+  },
+  "exports": {
+    "./ui": "./src/ui/index.tsx",
+    "./schema": "./src/schema.ts",
+    "./utils": "./src/utils/index.ts",
+    "./toHTMLString": "./src/utils/toHTMLString.ts",
+    "./extensions/hardBreak": "./src/extensions/hardBreak.ts",
+    "./extensions/history": "./src/extensions/history.ts",
+    "./extensions/tabIndent": "./src/extensions/tabIndent.ts",
+    "./extensions/bulletList": "./src/extensions/bulletList.ts",
+    "./extensions/listItem": "./src/extensions/listItem/index.ts",
+    "./extensions/orderedList": "./src/extensions/orderedList.ts"
+  }
+}

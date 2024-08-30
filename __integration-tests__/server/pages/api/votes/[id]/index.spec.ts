@@ -1,8 +1,8 @@
 import type { Page, Space, Vote } from '@charmverse/core/prisma';
+import type { LoggedInUser } from '@root/models';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { LoggedInUser } from '@root/models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, createVote, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

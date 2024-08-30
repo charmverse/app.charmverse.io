@@ -1,6 +1,6 @@
 import type { MemberProperty } from '@charmverse/core/prisma';
-
 import * as http from '@root/adapters/http';
+
 import type { IUser } from 'components/common/DatabaseEditor/user';
 import type {
   CreateMemberPropertyPermissionInput,

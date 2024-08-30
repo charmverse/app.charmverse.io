@@ -1,4 +1,5 @@
 import * as http from '@root/adapters/http';
+
 import type { VerificationResponse } from 'lib/summon/verifyMembership';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 

@@ -1,6 +1,8 @@
-import type { EditorView, Node, PluginKey, Schema } from '@bangle.dev/pm';
-import { Decoration, DecorationSet } from '@bangle.dev/pm';
+import type { Node, Schema } from 'prosemirror-model';
+import type { PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 import { createRoot } from 'react-dom/client';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';

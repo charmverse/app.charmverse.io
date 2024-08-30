@@ -1,8 +1,7 @@
 'use server';
 
+import { actionClient } from '@connect-shared/lib/actions/actionClient';
 import { revalidatePath } from 'next/cache';
-
-import { actionClient } from '../actionClient';
 
 import { createProject } from './createProject';
 import { schema } from './projectSchema';

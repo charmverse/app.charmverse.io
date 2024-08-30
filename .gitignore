@@ -1,6 +1,6 @@
 
 # dependencies
-/**/node_modules
+node_modules
 jspm_packages
 
 /prisma
@@ -12,26 +12,12 @@ serverless/schema.prisma
 serverless/*.node
 
 # next.js
-/.next/
-/out/
-/dist/
+.next/
+dist/
 
 # scoutgame app
-/apps/scoutgame/.next/
-/apps/scoutgame/dist/
-/apps/scoutgame/node_modules/
 /apps/scoutgame/public/sw*
 /apps/scoutgame/public/swe-worker*
-
-# farcaster app
-/apps/farcaster/.next/
-/apps/farcaster/dist/
-/apps/farcaster/node_modules/
-
-# sunnyawards
-/apps/sunnyawards/.next/
-/apps/sunnyawards/dist/
-/apps/sunnyawards/node_modules/
 
 # Tests
 /__e2e-dist__/

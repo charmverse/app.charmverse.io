@@ -1,6 +1,7 @@
 // References: https://github.com/bangle-io/bangle-editor/blob/13127cf2e4187ebaa6d5e01d80f4e9018fae02a5/lib/core/src/plugin-loader.ts
 
 import { log } from '@charmverse/core/log';
+import * as history from '@packages/charmeditor/extensions/history';
 import { baseKeymap as pmBaseKeymap } from 'prosemirror-commands';
 import { gapCursor as pmGapCursor } from 'prosemirror-gapcursor';
 import { InputRule, inputRules as pmInputRules, undoInputRule as pmUndoInputRule } from 'prosemirror-inputrules';
@@ -13,7 +14,6 @@ import type { SpecRegistry } from '../../@bangle.dev/core/specRegistry';
 import { dropCursor } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
 import * as editorStateCounter from './editor-state-counter';
-import * as history from './history';
 import { PluginGroup } from './plugin-group';
 
 export interface PluginPayload<T = any> {
@@ -22,9 +22,13 @@ export interface PluginPayload<T = any> {
   metadata: T;
 }
 
-type BaseRawPlugins = false | null | Plugin | InputRule | PluginGroup | BaseRawPlugins[];
+type BaseRawPlugins = undefined | false | null | Plugin | InputRule | PluginGroup | BaseRawPlugins[];
 
-export type RawPlugins<T = any> = BaseRawPlugins | ((payLoad: PluginPayload<T>) => BaseRawPlugins);
+export type RawPlugins<T = any> =
+  | BaseRawPlugins
+  | ((payLoad: PluginPayload<T>) => BaseRawPlugins)
+  | RawPlugins[]
+  | ((payLoad: PluginPayload<T>) => RawPlugins[]);
 
 export function pluginLoader<T = any>(
   specRegistry: SpecRegistry,
@@ -32,13 +36,11 @@ export function pluginLoader<T = any>(
   {
     metadata,
     editorProps,
-    defaultPlugins = true,
     dropCursorOpts,
     transformPlugins = (p) => p
   }: {
     metadata?: T;
     editorProps?: EditorProps;
-    defaultPlugins?: boolean;
     dropCursorOpts?: Parameters<typeof dropCursor>[0];
     transformPlugins?: (plugins: Plugin[]) => Plugin[];
   } = {}
@@ -50,29 +52,21 @@ export function pluginLoader<T = any>(
     metadata
   };
 
-  // eslint-disable-next-line prefer-const
-  let [flatPlugins, pluginGroupNames] = flatten(plugins, pluginPayload);
+  let [flatPlugins] = flatten(plugins, pluginPayload);
 
-  if (defaultPlugins) {
-    const defaultPluginGroups: RawPlugins[] = [];
+  const defaultPluginGroups: RawPlugins[] = [history.plugins()];
 
-    if (!pluginGroupNames.has('history')) {
-      defaultPluginGroups.push(history.plugins());
-    }
+  // TODO: delete this? doesn't seem to be used
+  defaultPluginGroups.push(editorStateCounter.plugins());
 
-    if (!pluginGroupNames.has('editorStateCounter')) {
-      defaultPluginGroups.push(editorStateCounter.plugins());
-    }
+  flatPlugins = flatPlugins.concat(
+    // TODO: deprecate the ability pass a callback to the plugins param of pluginGroup
+    flatten(defaultPluginGroups, pluginPayload)[0]
+  );
 
-    flatPlugins = flatPlugins.concat(
-      // TODO: deprecate the ability pass a callback to the plugins param of pluginGroup
-      flatten(defaultPluginGroups, pluginPayload)[0]
-    );
+  flatPlugins = processInputRules(flatPlugins);
 
-    flatPlugins = processInputRules(flatPlugins);
-
-    flatPlugins.push(keymap(pmBaseKeymap), dropCursor(dropCursorOpts), pmGapCursor());
-  }
+  flatPlugins.push(keymap(pmBaseKeymap), dropCursor(dropCursorOpts), pmGapCursor());
 
   if (editorProps) {
     flatPlugins.push(

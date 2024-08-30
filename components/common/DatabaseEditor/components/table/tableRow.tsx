@@ -5,14 +5,14 @@ import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Checkbox, Stack } from '@mui/material';
 import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } from 'react';
-import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
+import Link from 'components/common/Link';
 import { DatabaseRowActionsMenu } from 'components/common/PageActions/components/DatabaseRowActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
-import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
 import { useDragDrop } from 'hooks/useDragDrop';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -44,7 +44,7 @@ type Props = {
   pageTitle: string;
   isSelected: boolean;
   focusOnMount: boolean;
-  showCard: (cardId: string, parentId?: string) => void;
+  showCard: (cardId: string, parentId?: string, event?: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => void;
   readOnly: boolean;
   offset: number;
   pageUpdatedAt: string;
@@ -122,7 +122,6 @@ function TableRow(props: Props) {
     setCheckedIds
   } = props;
   const { showError } = useSnackbar();
-
   const { trigger: trashPages } = useTrashPages();
   const isMobile = useSmallScreen();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
@@ -130,15 +129,15 @@ function TableRow(props: Props) {
   const isGrouped = Boolean(activeView.fields.groupById);
   const isDragAndDropEnabled = !isTouchScreen() && !props.readOnly && !props.disableDragAndDrop;
 
+  const href =
+    card.customIconType === 'applicationStatus' ? `/rewards/applications/${card.id}` : `/${card.pageId || card.id}`;
+
   const { drag, drop, preview, style } = useDragDrop({
     item: card,
     itemType: 'card',
     onDrop: props.onDrop,
     enabled: isDragAndDropEnabled
   });
-
-  // const { selection } = useContext(SelectionContext);
-  // const isSelected = useSelected(cardRef, selection);
 
   const handleDeleteCard = async () => {
     if (!card) {
@@ -331,9 +330,17 @@ function TableRow(props: Props) {
                 </div>
 
                 <div className='open-button' data-test={`database-open-button-${card.id}`}>
-                  <Button onClick={() => props.showCard(card.id || '', card.parentId)}>
-                    <FormattedMessage id='TableRow.open' defaultMessage='Open' />
-                  </Button>
+                  <Link
+                    href={href}
+                    style={{
+                      textDecoration: 'none',
+                      color: 'inherit'
+                    }}
+                  >
+                    <Button onClick={(e) => props.showCard(card.id || '', card.parentId, e)}>
+                      <FormattedMessage id='TableRow.open' defaultMessage='Open' />
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Box>

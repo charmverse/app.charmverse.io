@@ -1,4 +1,4 @@
-import type { Node } from '@bangle.dev/pm';
+import type { Node } from 'prosemirror-model';
 
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 

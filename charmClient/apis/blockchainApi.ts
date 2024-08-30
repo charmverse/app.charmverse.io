@@ -1,4 +1,5 @@
 import * as http from '@root/adapters/http';
+
 import type { NFTData, NFTRequest } from 'lib/blockchain/getNFTs';
 
 export class BlockchainApi {

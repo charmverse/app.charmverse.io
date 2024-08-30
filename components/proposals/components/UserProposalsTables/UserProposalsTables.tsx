@@ -1,5 +1,4 @@
-import { Divider, Grid } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Grid, Stack } from '@mui/material';
 
 import { useGetUserProposals } from 'charmClient/hooks/proposals';
 import LoadingComponent from 'components/common/LoadingComponent';

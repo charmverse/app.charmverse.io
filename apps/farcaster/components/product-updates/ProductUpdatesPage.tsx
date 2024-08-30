@@ -22,7 +22,6 @@ export function ProductUpdatesPage({
   const [defaultProjectId, setDefaultProjectId] = useState(connectProjects[0]?.id || '');
   return (
     <Stack gap={2}>
-      <Typography variant='h5'>Create your project update</Typography>
       <Stack>
         {isCreatingProject ? (
           <Stack gap={1}>

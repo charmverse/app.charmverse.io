@@ -1,6 +1,6 @@
 import type { UserVote } from '@charmverse/core/prisma';
-
 import * as http from '@root/adapters/http';
+
 import type { ExtendedVote, UpdateVoteDTO, UserVoteExtendedDTO, VoteDTO } from 'lib/votes/interfaces';
 
 export class VotesApi {
