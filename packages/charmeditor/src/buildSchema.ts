@@ -1,12 +1,7 @@
+import type { UnnestObjValue } from '@packages/utils/types';
 import type { MarkdownParser, MarkdownSerializer } from 'prosemirror-markdown';
 import { Schema } from 'prosemirror-model';
 import type { MarkSpec, NodeSpec } from 'prosemirror-model';
-
-type UnnestObjValue<T> = T extends {
-  [k: string]: infer U;
-}
-  ? U
-  : never;
 
 export type BaseRawNodeSpec = {
   name: string;
