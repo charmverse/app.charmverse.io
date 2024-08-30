@@ -443,7 +443,7 @@
     "tsc-alias": "^1.8.6",
     "tslib": "^2.6.2",
     "typescript": "^5.4.2",
-    "webpack": "^5.76.0"
+    "webpack": "^5.94.0"
   },
   "overrides": {
     "react": "^18.2.0",
