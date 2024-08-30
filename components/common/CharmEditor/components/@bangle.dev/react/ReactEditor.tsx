@@ -1,11 +1,10 @@
-import { history } from '@bangle.dev/base-components';
-import type { Plugin } from '@bangle.dev/pm';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
+import { undo } from 'prosemirror-history';
 import { EditorState } from 'prosemirror-state';
-import type { PluginKey } from 'prosemirror-state';
+import type { Plugin, PluginKey } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { MouseEvent, RefObject } from 'react';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -14,7 +13,6 @@ import { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import type { BangleEditorProps as CoreBangleEditorProps } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor';
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { undoEventName, focusEventName } from 'components/common/CharmEditor/constants';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -31,6 +29,7 @@ import type { ConnectionEvent } from '../../fiduswriter/ws';
 import { scrollToHeadingNode } from '../../heading';
 import { threadPluginKey } from '../../thread/thread.plugins';
 import { convertFileToBase64, imageFileDropEventName } from '../base-components/image';
+import type { BangleEditorProps as CoreBangleEditorProps } from '../core/bangle-editor';
 import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
 
 import { EditorViewContext } from './editorContext';
@@ -38,7 +37,6 @@ import { nodeViewUpdateStore, useNodeViews } from './node-view-helpers';
 import { NodeViewWrapper } from './NodeViewWrapper';
 import type { RenderNodeViewsFunction } from './NodeViewWrapper';
 
-const { undo } = history;
 const StyledLoadingComponent = styled(LoadingComponent)`
   position: absolute;
   width: 100%;
@@ -194,7 +192,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       if (editor) {
         const detail = (event as CustomEvent).detail as { pageId: string } | null;
         if (detail && detail.pageId === pageId) {
-          undo()(editor.view.state, editor.view.dispatch);
+          undo(editor.view.state, editor.view.dispatch);
         }
       }
     }

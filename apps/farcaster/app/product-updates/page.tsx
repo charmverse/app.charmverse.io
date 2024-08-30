@@ -22,7 +22,7 @@ export default async function Home({
   };
 }) {
   const token = searchParams.token;
-  const fidParam = process.env.NODE_ENV !== 'production' && searchParams.fid;
+  const fidParam = process.env.REACT_APP_APP_ENV !== 'production' && searchParams.fid;
 
   const fidStr = token ? decrypt(token) : fidParam;
   if (!fidStr) {

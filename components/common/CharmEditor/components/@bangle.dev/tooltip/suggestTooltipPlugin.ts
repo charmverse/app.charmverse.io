@@ -1,4 +1,4 @@
-import { createObject, filter, findFirstMarkPosition } from '@bangle.dev/utils';
+import { findFirstMarkPosition, filter, createObject } from '@bangle.dev/utils';
 import { keymap } from 'prosemirror-keymap';
 import type { MarkType, Schema } from 'prosemirror-model';
 import type { Command, EditorState } from 'prosemirror-state';
@@ -18,8 +18,6 @@ import {
 import { plugins as tooltipPlacementPlugins } from './tooltipPlacement';
 import type { GetReferenceElementFunction, TooltipRenderOpts } from './tooltipPlacement';
 import { triggerInputRule } from './triggerInputRule';
-
-export const plugins = pluginsFactory;
 
 export const defaultKeys = {
   select: 'Enter',
@@ -60,7 +58,7 @@ export interface SuggestPluginState {
   suggestTooltipKey: PluginKey<PluginState>;
 }
 
-function pluginsFactory({
+export function plugins({
   key = new PluginKey('suggest_tooltip'),
   markName,
   trigger,
@@ -78,7 +76,7 @@ function pluginsFactory({
   },
   onArrowLeft,
   onArrowRight
-}: PluginsOptions): RawPlugins {
+}: PluginsOptions) {
   return ({ schema }: { schema: Schema }) => {
     const isActiveCheck = queryIsSuggestTooltipActive(key);
     return [

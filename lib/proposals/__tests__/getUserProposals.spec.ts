@@ -95,8 +95,8 @@ describe('getUserProposals() - authored', () => {
   });
 });
 
-describe('getUserProposals() - assigned', () => {
-  it('Should fetch assigned proposals for the reviewer of proposals', async () => {
+describe('getUserProposals() - actionable', () => {
+  it('Should fetch actionable proposals for the reviewer of proposals', async () => {
     const { space, user: spaceAdmin } = await generateUserAndSpace({
       isAdmin: false
     });
@@ -202,7 +202,7 @@ describe('getUserProposals() - assigned', () => {
     expect(proposals.actionable.map((p) => p.currentEvaluation).filter(isTruthy).length).toBe(3);
   });
 
-  it('Should fetch assigned proposals for the appeal reviewers of proposals', async () => {
+  it('Should fetch actionable proposals for the appeal reviewers of proposals', async () => {
     const { space, user: spaceAdmin } = await generateUserAndSpace({
       isAdmin: false
     });
@@ -326,7 +326,7 @@ describe('getUserProposals() - assigned', () => {
     expect(proposals.actionable.map((p) => p.currentEvaluation).filter(isTruthy).length).toBe(2);
   });
 
-  it('Should fetch assigned proposals for the approvers', async () => {
+  it('Should fetch actionable proposals for the approvers', async () => {
     const { space, user: spaceAdmin } = await generateUserAndSpace({
       isAdmin: false
     });
@@ -476,8 +476,8 @@ describe('getUserProposals() - assigned', () => {
   });
 });
 
-describe('getUserProposals() - actionable', () => {
-  it('Should fetch actionable proposals for the reviewer of proposals', async () => {
+describe('getUserProposals() - assigned', () => {
+  it('Should fetch assigned proposals for the reviewer of proposals', async () => {
     const { space, user: spaceAdmin } = await generateUserAndSpace({
       isAdmin: false
     });
@@ -575,24 +575,39 @@ describe('getUserProposals() - actionable', () => {
       proposalStatus: 'published',
       evaluationInputs: [
         {
-          evaluationType: 'pass_fail',
-          title: 'Pass Fail',
+          evaluationType: 'rubric',
+          title: 'Rubric',
           reviewers: [
             {
               group: 'user',
               id: proposalReviewer.id
             }
           ],
-          permissions: []
+          permissions: [],
+          rubricCriteria: [
+            {
+              parameters: { min: 1, max: 5 },
+              title: 'Rubric Criteria'
+            }
+          ]
         }
       ]
     });
+
+    const rubricCriteria = await prisma.proposalRubricCriteria.findFirstOrThrow({
+      where: {
+        proposalId: userReviewerProposal.id
+      }
+    });
+
     // Submit evaluation result to make it non-actionable
-    await prisma.proposalEvaluationReview.create({
+    await prisma.proposalRubricCriteriaAnswer.create({
       data: {
-        result: 'pass',
-        evaluationId: userReviewerProposal.evaluations[0].id,
-        reviewerId: proposalReviewer.id
+        proposalId: userReviewerProposal.id,
+        response: { score: 5 },
+        rubricCriteriaId: rubricCriteria.id,
+        userId: proposalReviewer.id,
+        evaluationId: userReviewerProposal.evaluations[0].id
       }
     });
     // Submit evaluation result (by non reviewer) to make it non-actionable

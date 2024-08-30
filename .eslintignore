@@ -1,6 +1,5 @@
 scripts/
 dist/
-
-apps/scoutgame/.next/
+.next/
 
 background/ceramicServer/generated/

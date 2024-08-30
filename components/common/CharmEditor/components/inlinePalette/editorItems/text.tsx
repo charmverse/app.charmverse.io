@@ -12,6 +12,7 @@ import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
+import { commands as listItemCommands } from '@packages/charmeditor/extensions/listItem';
 import type { EditorState, Transaction, PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 
@@ -19,7 +20,6 @@ import type { SpacePermissionFlags } from 'lib/permissions/spaces';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { linkedPageSuggestMarkName } from '../../linkedPage/linkedPage.constants';
-import * as listItemCommands from '../../listItemNew/commands';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import { convertToParagraph } from '../../paragraph/paragraph';
 import { isList } from '../commands';

@@ -2,7 +2,7 @@ import { createObject, filter, rafCommandExec } from '@bangle.dev/utils';
 import type { InputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
 import { PluginKey } from 'prosemirror-state';
-import type { Command, EditorState } from 'prosemirror-state';
+import type { Command, EditorState, Plugin } from 'prosemirror-state';
 
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
@@ -32,7 +32,7 @@ export function floatingMenu({
   keybindings = defaultKeys,
   tooltipRenderOpts = {},
   calculateType
-}: FloatingMenuPluginArgs = {}): (undefined | Plugin | (() => Plugin) | InputRule)[] {
+}: FloatingMenuPluginArgs = {}): (undefined | Plugin | (() => Plugin | Plugin[]) | InputRule)[] {
   return [
     selectionTooltipPlugins({
       key,

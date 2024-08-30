@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { LoggedInUser } from '@root/models';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
-import type { LoggedInUser } from '@root/models';
 
 /**
  * Utility to add existing user to existing space

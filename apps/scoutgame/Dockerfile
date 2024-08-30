@@ -12,12 +12,12 @@ WORKDIR /app
 
 # Copy dependencies
 COPY --parents @connect-shared  \
-  apps/farcaster/package.json   \
-  apps/sunnyawards/package.json \
+  apps/*/package.json           \
+  packages/*/package.json       \
   node_modules                  \
   package.json                  \
-  apps/scoutgame/node_modules     \
-  apps/scoutgame/package.json     \
+  apps/scoutgame/node_modules   \
+  apps/scoutgame/package.json   \
   .
 
 # Copy compiled code

@@ -4,8 +4,6 @@ import { getCurrentEvaluation, privateEvaluationSteps } from '@charmverse/core/p
 
 import { permissionsApiClient } from '../permissions/api/client';
 
-import { concealProposalSteps } from './concealProposalSteps';
-
 type CurrentEvaluation = {
   id: string;
   type: ProposalEvaluationType;
@@ -189,6 +187,11 @@ export async function getUserProposals({
               }
             }
           },
+          rubricAnswers: {
+            select: {
+              userId: true
+            }
+          },
           appealReviewers: {
             select: {
               userId: true,
@@ -255,7 +258,9 @@ export async function getUserProposals({
         const isApprover = currentEvaluation?.evaluationApprovers.some(
           (approver) => approver.userId === userId || (approver.roleId && userRoles.includes(approver.roleId))
         );
-        const hasReviewed = currentEvaluation?.reviews.some((review) => review.reviewerId === userId);
+        const hasReviewed =
+          currentEvaluation?.reviews.some((review) => review.reviewerId === userId) ||
+          currentEvaluation?.rubricAnswers.some((answer) => answer.userId === userId);
         const hasReviewedAppeal = currentEvaluation?.appealReviews.some((review) => review.reviewerId === userId);
         const hasVoted = currentEvaluation?.vote?.userVotes.some((vote) => vote.userId === userId);
 

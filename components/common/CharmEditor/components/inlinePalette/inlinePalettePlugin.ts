@@ -20,9 +20,7 @@ import {
 import { paletteMarkName } from './config';
 import { queryInlinePaletteActive } from './inlinePalette';
 
-export const plugins = pluginsFactory;
-
-function pluginsFactory({ key }: { key: PluginKey }) {
+export function plugins({ key }: { key: PluginKey }) {
   const markName = paletteMarkName;
   const tooltipRenderOpts: SuggestTooltipRenderOpts = {
     getScrollContainer,
