@@ -4,8 +4,8 @@ import type {
   PostCategoryPermissionFlags,
   PostPermissionFlags
 } from '@charmverse/core/permissions';
-
 import * as http from '@root/adapters/http';
+
 import type { PermissionCompute, PermissionResource } from 'lib/permissions/interfaces';
 
 export class ForumPermissionsApi {

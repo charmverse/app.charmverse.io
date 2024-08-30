@@ -1,5 +1,4 @@
 import type { Locator, Page } from '@playwright/test';
-
 import { baseUrl } from '@root/config/constants';
 
 import { GlobalPage } from './global.po';

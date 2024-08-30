@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@charmverse/core/prisma';
+import type { LoggedInUser } from '@root/models';
 import request from 'supertest';
 
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
-import type { LoggedInUser } from '@root/models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

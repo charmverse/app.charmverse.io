@@ -59,6 +59,7 @@ function resetPageNodeDropPluginState(view: EditorView) {
 
 function NestedPageComponent({ isLinkedPage = false, node, getPos }: NodeViewProps & { isLinkedPage?: boolean }) {
   const view = useEditorViewContext();
+
   const { getFeatureTitle, mappedFeatures } = useSpaceFeatures();
   const { categories } = useForumCategories();
 

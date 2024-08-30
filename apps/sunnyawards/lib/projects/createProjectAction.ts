@@ -14,7 +14,7 @@ import { generateOgImage } from '@root/lib/projects/generateOgImage';
 import { sendProjectConfirmationEmail } from 'lib/mailer/sendProjectConfirmationEmail';
 
 import { createProject } from './createProject';
-import { getOptimismCategory, schema } from './schema';
+import { schema } from './schema';
 
 export const createProjectAction = authActionClient
   .metadata({ actionName: 'create-project' })
@@ -76,7 +76,7 @@ export const createProjectAction = authActionClient
 
     if (!isTestEnv) {
       await generateOgImage(newProject.id, currentUserId);
-      await trackMixpanelEvent('create_project', { projectId: newProject.id, userId: currentUserId });
+      trackMixpanelEvent('create_project', { projectId: newProject.id, userId: currentUserId });
       try {
         await sendProjectConfirmationEmail({
           projectId: newProject.id,

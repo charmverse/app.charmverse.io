@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl } from '@root/config/constants';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
-import { baseUrl } from '@root/config/constants';
 import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import type { EventInput } from 'lib/metrics/recordDatabaseEvent';
 import { loginAnonymousUser } from 'testing/mockApiCall';
