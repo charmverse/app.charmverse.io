@@ -1,4 +1,4 @@
-name: waitlist CI
+name: Waitlist CI
 
 on:
   push:
