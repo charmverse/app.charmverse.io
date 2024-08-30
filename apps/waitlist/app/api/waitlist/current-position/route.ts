@@ -12,7 +12,15 @@ export async function GET(req: Request) {
   const percentile = query.get('percentile');
 
   // Get the path to the public folder
-  const imagePath = path.join(process.cwd(), 'public', 'images', 'waitlist', 'dev', 'waitlist-current-score.jpg');
+  const imagePath = path.resolve(
+    'apps',
+    'waitlist',
+    'public',
+    'images',
+    'waitlist',
+    'dev',
+    'waitlist-current-score.jpg'
+  );
 
   const tier = getTier(parseInt(percentile as string, 10));
 
