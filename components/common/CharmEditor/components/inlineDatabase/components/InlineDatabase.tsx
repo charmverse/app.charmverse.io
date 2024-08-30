@@ -67,13 +67,18 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   }, [updatePage]);
 
   const showCard = useCallback(
-    async (cardId: string | null, isTemplate?: boolean) => {
+    async (
+      cardId: string | null,
+      isTemplate?: boolean,
+      event?: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+    ) => {
       if (cardId === null) {
         setShownCardId(null);
         return;
       }
 
       if (currentView.fields.openPageIn === 'center_peek' || isTemplate) {
+        event?.preventDefault();
         setShownCardId(cardId);
       } else if (currentView.fields.openPageIn === 'full_page') {
         navigateToSpacePath(`/${cardId}`);

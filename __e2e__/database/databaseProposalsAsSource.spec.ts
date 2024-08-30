@@ -3,11 +3,10 @@ import type { Proposal, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
+import { baseUrl } from '@root/config/constants';
 import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagesSidebarPage } from '__e2e__/po/pagesSidebar.po';
-
-import { baseUrl } from '@root/config/constants';
 
 import { loginBrowserUser } from '../utils/mocks';
 

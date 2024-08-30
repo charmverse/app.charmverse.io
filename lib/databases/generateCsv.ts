@@ -8,6 +8,7 @@ import { getBlocks as getBlocksForProposalSource } from '@root/lib/databases/pro
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import { formatDate, formatDateTime } from '@root/lib/utils/dates';
 import { isTruthy } from '@root/lib/utils/types';
+import { stringify } from 'csv-stringify/sync';
 import { sortBy } from 'lodash';
 
 import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
@@ -137,13 +138,7 @@ function generateCSV(
   context: PropertyContext,
   cardMap: Record<string, { title: string }>
 ) {
-  const { rows, rowIds } = generateTableArray(board, cards, view, formatters, context, cardMap);
-  let csvContent = '';
-
-  rows.forEach((row) => {
-    const encodedRow = row.join('\t');
-    csvContent += `${encodedRow}\r\n`;
-  });
+  const { csvContent, rowIds } = generateCsvContent(board, cards, view, formatters, context, cardMap);
 
   let fileTitle = view.title;
   if (view.fields.sourceType === 'google_form') {
@@ -159,19 +154,14 @@ function generateCSV(
   };
 }
 
-function encodeText(text: string): string {
-  return text.replace(/"/g, '""');
-}
-
-export function generateTableArray(
+export function generateCsvContent(
   board: Pick<Board, 'fields'>,
   cards: Card[],
   viewToExport: BoardView,
   formatters: Formatters,
   context: PropertyContext,
   cardMap: Record<string, { title: string }>
-): { rows: string[][]; rowIds: string[] } {
-  const rows: string[][] = [];
+) {
   const visiblePropertyIds: string[] = viewToExport.fields.visiblePropertyIds;
 
   const allCardProperties = board.fields.cardProperties as IPropertyTemplate[];
@@ -198,34 +188,54 @@ export function generateTableArray(
     }
   }
 
+  const visibleProperties = [...cardProperties];
   const titleProperty = cardProperties.find((prop) => prop.id === Constants.titleColumnId);
-  // Header row
-  const row: string[] = titleProperty ? [] : ['Title'];
-  cardProperties.forEach((template: IPropertyTemplate) => {
-    row.push(template.name);
-  });
-  rows.push(row);
 
-  filteredCards.forEach((card) => {
-    const rowColumns = getCSVColumns({
+  // Header row
+  const headers = visibleProperties.map((prop: IPropertyTemplate) => prop.name);
+
+  // In case we don't have a title prop we creata it on the fly
+  if (!titleProperty) {
+    headers.unshift('Title');
+    visibleProperties.unshift({
+      id: Constants.titleColumnId,
+      name: 'Title',
+      type: 'text',
+      options: [],
+      readOnly: true,
+      readOnlyValues: true
+    });
+  }
+
+  const csvData: Record<string, string>[] = [];
+
+  for (const card of filteredCards) {
+    const csvCard = getCSVContent({
       card,
       context,
       formatters,
-      hasTitleProperty: !!titleProperty,
-      visibleProperties: cardProperties,
+      visibleProperties,
       cardMap
     });
-    rows.push(rowColumns);
+
+    csvData.push(csvCard);
+  }
+
+  const csvContent = stringify(csvData, {
+    delimiter: '\t',
+    header: true,
+    columns: headers
   });
 
-  return { rows, rowIds: filteredCards.map(({ id }) => id) };
+  const rowIds = filteredCards.map(({ id }) => id);
+
+  return { csvContent, rowIds };
 }
 
-function getCSVColumns({
+function getCSVContent({
   card,
   context,
   formatters,
-  hasTitleProperty,
   visibleProperties,
   cardMap
 }: {
@@ -233,15 +243,9 @@ function getCSVColumns({
   card: Card;
   context: PropertyContext;
   formatters: Formatters;
-  hasTitleProperty: boolean;
   visibleProperties: IPropertyTemplate<PropertyType>[];
 }) {
-  const columns: string[] = [];
-
-  if (!hasTitleProperty) {
-    columns.push(`"${encodeText(card.title)}"`);
-  }
-  visibleProperties.forEach((propertyTemplate: IPropertyTemplate) => {
+  const csvCard = visibleProperties.reduce<Record<string, string>>((acc, propertyTemplate) => {
     const propertyValue = card.fields.properties[propertyTemplate.id];
     const displayValue =
       OctoUtils.propertyDisplayValue({
@@ -253,7 +257,7 @@ function getCSVColumns({
         cardMap
       }) || '';
     if (propertyTemplate.id === Constants.titleColumnId) {
-      columns.push(`"${encodeText(card.title)}"`);
+      acc[propertyTemplate.name] = card.title;
     } else if (
       propertyTemplate.type === 'number' ||
       propertyTemplate.type === 'proposalEvaluationAverage' ||
@@ -263,7 +267,7 @@ function getCSVColumns({
       propertyTemplate.type === 'proposalRubricCriteriaAverage'
     ) {
       const numericValue = propertyValue ? Number(propertyValue).toString() : '';
-      columns.push(numericValue);
+      acc[propertyTemplate.name] = numericValue;
     } else if (
       propertyTemplate.type === 'multiSelect' ||
       propertyTemplate.type === 'person' ||
@@ -273,14 +277,19 @@ function getCSVColumns({
       propertyTemplate.type === 'relation'
     ) {
       const multiSelectValue = (((displayValue as unknown) || []) as string[]).join(',');
-      columns.push(multiSelectValue);
+      acc[propertyTemplate.name] = multiSelectValue;
     } else if (propertyTemplate.type === 'proposalUrl') {
       // proposalUrl is an array on the Rewards database of [title, url], and only a string on database-as-a-source
-      columns.push(`${baseUrl}${encodeText(Array.isArray(displayValue) ? displayValue[0] : displayValue.toString())}`);
+      acc[propertyTemplate.name] = `${baseUrl}${
+        Array.isArray(displayValue) ? displayValue[0] : displayValue.toString()
+      }`;
     } else {
       // Export as string
-      columns.push(`"${encodeText(displayValue.toString())}"`);
+      acc[propertyTemplate.name] = displayValue.toString();
     }
-  });
-  return columns;
+
+    return acc;
+  }, {});
+
+  return csvCard;
 }

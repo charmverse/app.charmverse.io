@@ -2,10 +2,10 @@
 
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
+import { googleOAuthClientIdSensitive as googleOAuthClientId } from '@root/config/constants';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { googleOAuthClientIdSensitive as googleOAuthClientId } from '@root/config/constants';
 import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';

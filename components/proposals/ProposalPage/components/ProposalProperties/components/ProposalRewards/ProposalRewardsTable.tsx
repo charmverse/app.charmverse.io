@@ -117,13 +117,14 @@ export function ProposalRewardsTable({
 
   const loadingData = isLoading || isLoadingRewards || loadingPages;
 
-  function showRewardCard(id: string | null) {
+  function showRewardCard(id: string | null, event?: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) {
     const isPublished = publishedRewards.some((r) => r.id === id);
     if (id && isPublished) {
       openPublishedReward(id);
     } else {
       const pending = pendingRewards?.find((r) => r.draftId === id);
       if (pending) {
+        event?.preventDefault();
         setRewardValues(pending.reward);
         openNewPage(pending.page);
         setCurrentPendingId(id);

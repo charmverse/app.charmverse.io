@@ -28,6 +28,7 @@
     "isolatedModules": true,
     "paths": {
       "@connect-shared/*": ["./@connect-shared/*"],
+      "@packages/charmeditor/*": ["./packages/charmeditor/src/*"],
       "@root/abis/*": ["./abis/*"],
       "@root/adapters/*": ["./adapters/*"],
       "@root/connectors/*": ["./connectors/*"],
@@ -63,6 +64,6 @@
       "@charmverse/core/errors": ["node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },
-  "exclude": ["node_modules", "apps"],
+  "exclude": ["node_modules", "apps", "packages"],
   "include": ["**/*.ts", "**/*.tsx"]
 }

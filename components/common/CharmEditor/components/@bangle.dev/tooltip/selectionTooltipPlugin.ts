@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { NodeSelection, Plugin, PluginKey } from 'prosemirror-state';
 import type { Command, EditorState, Transaction } from 'prosemirror-state';
 import type { DirectEditorProps, EditorView } from 'prosemirror-view';
@@ -8,8 +7,6 @@ import { createTooltipDOM } from './createTooltipDOM';
 import { hideSelectionTooltip, updateSelectionTooltipType } from './selectionTooltip';
 import type { TooltipRenderOpts } from './tooltipPlacement';
 import * as tooltipPlacement from './tooltipPlacement';
-
-export const plugins = selectionTooltip;
 
 type SelectionType = string | null;
 
@@ -29,7 +26,7 @@ type SelectionTooltipStateType = {
   calculateType: CalculateTypeFunction;
 };
 
-function selectionTooltip({
+export function plugins({
   key = new PluginKey('selectionTooltipPlugin'),
   calculateType = (state, _prevType) => {
     return state.selection.empty ? null : 'default';

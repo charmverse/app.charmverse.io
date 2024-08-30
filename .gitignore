@@ -1,6 +1,6 @@
 
 # dependencies
-/**/node_modules
+node_modules
 jspm_packages
 
 /prisma
@@ -12,14 +12,10 @@ serverless/schema.prisma
 serverless/*.node
 
 # next.js
-/.next/
-/out/
-/dist/
+.next/
+dist/
 
 # scoutgame app
-/apps/scoutgame/.next/
-/apps/scoutgame/dist/
-/apps/scoutgame/node_modules/
 /apps/scoutgame/public/sw*
 /apps/scoutgame/public/swe-worker*
 

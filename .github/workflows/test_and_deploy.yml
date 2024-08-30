@@ -74,7 +74,7 @@ jobs:
         uses: ./.github/actions/build
 
       - run: npm run typecheck
-      - run: npm run lint
+      - run: npm run lint -- --ignore-pattern apps,packages .
       - run: npm run verifydeps
 
   test-matrix:

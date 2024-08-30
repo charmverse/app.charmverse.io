@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, Thread, User } from '@charmverse/core/prisma';
 import { testUtilsPages } from '@charmverse/core/test';
+import type { LoggedInUser } from '@root/models';
 import request from 'supertest';
 
 import type { ThreadCreatePayload, ThreadWithComments } from 'lib/threads';
-import type { LoggedInUser } from '@root/models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
