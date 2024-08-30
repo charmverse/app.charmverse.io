@@ -77,11 +77,12 @@ export async function createOrUpdateFarcasterUser({
       }
     },
     include: {
-      profile: true
+      profile: true,
+      farcasterUser: true
     }
   });
 
-  if (userWithWallet) {
+  if (userWithWallet && !userWithWallet.farcasterUser?.fid) {
     await prisma.user.update({
       where: {
         id: userWithWallet.id
