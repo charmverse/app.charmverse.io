@@ -15,9 +15,24 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
   const projects = await prisma.project.findMany({
     where: {
       source: 'sunny_awards',
-      gitcoinProjectAttestations: {
-        none: {}
-      }
+      OR: [
+        {
+          gitcoinProjectAttestations: {
+            none: {
+              chainId: optimism.id,
+              type: 'application'
+            }
+          }
+        },
+        {
+          gitcoinProjectAttestations: {
+            none: {
+              chainId: optimism.id,
+              type: 'profile'
+            }
+          }
+        } 
+      ]
     },
     select: {
       id: true,
@@ -35,7 +50,7 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
     await storeProjectMetadataAndPublishGitcoinAttestation({
       userId: project.createdBy,
       projectId: project.id
-    });
+    }).catch((err) => console.log(`Error storing project attestation for project ${i + 1} / ${totalProjects}:`, err));
 
     console.log(`Project attestation stored for project ${i + 1} / ${totalProjects}:`, project.id);
   }

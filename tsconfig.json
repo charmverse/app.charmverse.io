@@ -36,6 +36,7 @@
       "@root/config/*": ["./config/*"],
       "@root/lib/*": ["./lib/*"],
       "@root/models": ["./models"],
+      "@root/testing/*": ["./testing/*"],
       "config/*": ["./config/*"],
       "scripts/*": ["./scripts/*"],
       "lib/*": ["./lib/*"],
