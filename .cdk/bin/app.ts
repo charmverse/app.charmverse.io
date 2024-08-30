@@ -22,7 +22,7 @@ if (stackNameParam === 'prd-sunnyawards') {
   });
 }
 // Scout Game production
-else if (stackNameParam === 'prd-scoutgame' || stackNameParam === 'prd-scoutgame-2') {
+else if (stackNameParam === 'prd-scoutgame' || stackNameParam === 'prd-scoutgame-waitlist') {
   new ProductionStack(app, stackNameParam, deployProps, {
     sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b901f27e-5a33-4dea-b4fb-39308a580423'
   });
