@@ -1,5 +1,6 @@
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import type { ReactNode } from 'react';
 

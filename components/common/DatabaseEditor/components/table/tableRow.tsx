@@ -4,9 +4,8 @@ import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Checkbox, Stack } from '@mui/material';
-import { useRouter } from 'next/router';
 import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } from 'react';
-import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
@@ -14,7 +13,6 @@ import Link from 'components/common/Link';
 import { DatabaseRowActionsMenu } from 'components/common/PageActions/components/DatabaseRowActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
-import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
 import { useDragDrop } from 'hooks/useDragDrop';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -140,9 +138,6 @@ function TableRow(props: Props) {
     onDrop: props.onDrop,
     enabled: isDragAndDropEnabled
   });
-
-  // const { selection } = useContext(SelectionContext);
-  // const isSelected = useSelected(cardRef, selection);
 
   const handleDeleteCard = async () => {
     if (!card) {
