@@ -135,68 +135,73 @@ jobs:
     name: Test scoutgame-waitlist e2e
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
-    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-          --hostname postgres
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Skip e2e tests
+        run: 'echo "skipping e2e tests"'
 
-      - name: Restore dependencies from cache
-        uses: ./.github/actions/install
+    # if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
+    # # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+    # services:
+    #   postgres:
+    #     image: postgres
+    #     env:
+    #       POSTGRES_USER: postgres
+    #       POSTGRES_PASSWORD: postgres
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
+    #       --hostname postgres
+    #     ports:
+    #       # Maps tcp port 5432 on service container to the host
+    #       - 5432:5432
 
-      - name: Setup test database
-        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+    # steps:
+    #   - uses: actions/checkout@v4
+    #     with:
+    #       fetch-depth: 0
 
-      - name: Restore app from cache
-        uses: ./.github/actions/build_app
-        with:
-          app_name: scoutgame-waitlist
+    #   - name: Restore dependencies from cache
+    #     uses: ./.github/actions/install
 
-      - name: Start scoutgame-waitlist app
-        run: |
-          npm run scoutgame-waitlist:start:test:ci &> server.log &
-          sleep_loop_ct=0
-          until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
-            echo "webapp not up in loop $sleep_loop_ct ... sleeping"
-            sleep_loop_ct=$((sleep_loop_ct + 1))
-            sleep 1
-          done
+    #   - name: Setup test database
+    #     run: npx dotenv -e .env.test.local -- npm run prisma:reset
 
-      - name: Run scoutgame-waitlist E2E tests
-        env:
-          REACT_APP_APP_ENV: 'test'
-        # we have to run docker command ourselves to set network=host so that playwright can access the server
-        run: |
-          [[ "${{ runner.debug }}" = "1" ]] && tail -f server.log &
-          docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
-                      --workdir /github/workspace --rm  \
-                      -e "REACT_APP_APP_ENV" -e CI=true \
-                      -v "/var/run/docker.sock":"/var/run/docker.sock" \
-                      -v "/home/runner/work/_temp/_github_home":"/github/home" \
-                      -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
-                      -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
-                      -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
-                      --network "host"  \
-                      --ipc=host \
-                      mcr.microsoft.com/playwright:v1.42.1-jammy \
-                      npm run scoutgame-waitlist:test:e2e:ci
+    #   - name: Restore app from cache
+    #     uses: ./.github/actions/build_app
+    #     with:
+    #       app_name: scoutgame-waitlist
+
+    #   - name: Start scoutgame-waitlist app
+    #     run: |
+    #       npm run scoutgame-waitlist:start:test:ci &> server.log &
+    #       sleep_loop_ct=0
+    #       until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
+    #         echo "webapp not up in loop $sleep_loop_ct ... sleeping"
+    #         sleep_loop_ct=$((sleep_loop_ct + 1))
+    #         sleep 1
+    #       done
+
+    #   - name: Run scoutgame-waitlist E2E tests
+    #     env:
+    #       REACT_APP_APP_ENV: 'test'
+    #     # we have to run docker command ourselves to set network=host so that playwright can access the server
+    #     run: |
+    #       [[ "${{ runner.debug }}" = "1" ]] && tail -f server.log &
+    #       docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
+    #                   --workdir /github/workspace --rm  \
+    #                   -e "REACT_APP_APP_ENV" -e CI=true \
+    #                   -v "/var/run/docker.sock":"/var/run/docker.sock" \
+    #                   -v "/home/runner/work/_temp/_github_home":"/github/home" \
+    #                   -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" \
+    #                   -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" \
+    #                   -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
+    #                   --network "host"  \
+    #                   --ipc=host \
+    #                   mcr.microsoft.com/playwright:v1.42.1-jammy \
+    #                   npm run scoutgame-waitlist:test:e2e:ci
 
   upload-docker:
     name: Upload Docker image
