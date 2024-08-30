@@ -2,7 +2,7 @@
 
 import { POST } from '@root/adapters/http';
 
-import { NEYNAR_API_BASE_URL } from './constants';
+import { NEYNAR_API_BASE_URL } from '../constants';
 
 // TBD - https://github.com/neynarxyz/farcaster-examples/tree/main/managed-signers
 

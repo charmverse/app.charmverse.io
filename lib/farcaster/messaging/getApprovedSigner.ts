@@ -15,7 +15,7 @@ import {
   NEYNAR_API_BASE_URL,
   NEYNAR_SIGNER_ID,
   NEYNAR_SIGNER_PUBLIC_KEY,
-  WARPCAST_NOTIFICATION_ACCOUNT_SEED
+  FARCASTER_NOTIFICATION_ACCOUNT_SEED
 } from '../constants';
 import { lookupUserByCustodyAddress } from '../lookupUserByCustodyAddress';
 
@@ -24,7 +24,7 @@ import { SignedKeyRequestMetadataABI } from './abi/signedKeyRequestMetadataAbi';
 
 const walletClient = getWalletClient({
   chainId: optimism.id,
-  mnemonic: WARPCAST_NOTIFICATION_ACCOUNT_SEED
+  mnemonic: FARCASTER_NOTIFICATION_ACCOUNT_SEED
 });
 
 // A constant message for greeting or logging.
@@ -80,7 +80,7 @@ const SignerStatusEnum = {
  *
  * copied from https://github.com/neynarxyz/farcaster-examples/blob/main/gm-bot/src/utils.ts#L50-L204
  */
-export const getApprovedSignerId = async () => {
+export async function getApprovedSignerId(): Promise<{ signerId: string; signerPublicKey: string }> {
   let signerPublicKey: string = NEYNAR_SIGNER_PUBLIC_KEY;
   let signerId = NEYNAR_SIGNER_ID;
 
@@ -92,7 +92,10 @@ export const getApprovedSignerId = async () => {
 
       if (signer?.status === SignerStatusEnum.Approved) {
         log.info('✅ Approved signer', NEYNAR_SIGNER_ID);
-        return NEYNAR_SIGNER_ID;
+        return {
+          signerId: NEYNAR_SIGNER_ID,
+          signerPublicKey: signer.public_key as string
+        };
       } else if (signer && !signerPublicKey) {
         signerPublicKey = signer.public_key as string;
       } else if (signer && signerPublicKey !== signer.public_key) {
@@ -130,7 +133,7 @@ export const getApprovedSignerId = async () => {
     ];
 
     // Convert mnemonic to an account object.
-    const account = mnemonicToAccount(WARPCAST_NOTIFICATION_ACCOUNT_SEED);
+    const account = mnemonicToAccount(FARCASTER_NOTIFICATION_ACCOUNT_SEED);
 
     log.info('✅ Account for publishing messages to farcaster:', account.address);
 
@@ -244,11 +247,14 @@ export const getApprovedSignerId = async () => {
     log.info('✅ Transaction confirmed\n');
     log.info('✅ Approved signer', signerId, '\n');
 
-    return signerId;
+    return {
+      signerId,
+      signerPublicKey
+    };
   } catch (error) {
     log.error(`Error fetching signer from Neynar`, { error });
     throw error;
   }
-};
+}
 
 getApprovedSignerId();
