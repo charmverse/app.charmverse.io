@@ -289,4 +289,5 @@ services:
       - prd-sunnyawards
       - prd-sockets
       - prd-scoutgame
+      - prd-waitlist
       - ddtst

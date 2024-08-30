@@ -37,22 +37,14 @@ else if (stackNameParam.startsWith('prd')) {
   new ProductionStack(app, stackNameParam, deployProps, {
     sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b960ff5c-ed3e-4e65-b2c4-ecc64e696902'
   });
-}
-// Connect staging
-else if (stackNameParam.startsWith('stg-scoutgame')) {
+} else if([
+  'stg-scoutgame',
+  'stg-waitlist',
+  'stg-sunnyawards',
+  'stg-farcaster',
+  'stg-webapp'
+].some(name => stackNameParam.startsWith(name))) {
   new StagingStack(app, stackNameParam, deployProps);
-}
-// Sunny awards staging
-else if (stackNameParam.startsWith('stg-sunnyawards')) {
-  new StagingStack(app, stackNameParam, deployProps);
-}
-// farcaster staging
-else if (stackNameParam.startsWith('stg-farcaster')) {
-  new StagingStack(app, stackNameParam, deployProps);
-}
-// Webapp staging
-else if (stackNameParam.startsWith('stg-webapp')) {
-  new WebappStagingStack(app, stackNameParam, deployProps);
 } else {
   throw new Error('Invalid stack name parameter: ' + stackNameParam);
 }
