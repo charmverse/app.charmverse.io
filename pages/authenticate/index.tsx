@@ -35,7 +35,10 @@ export default function Authenticate() {
     const userSpaces = await charmClient.spaces.getSpaces();
 
     const domainFromRedirect = redirectPath.split('/')[1];
-    if (userSpaces?.length && domainFromRedirect && userSpaces.find((s) => s.domain === domainFromRedirect)) {
+    if (
+      domainFromRedirect === 'invite' ||
+      (userSpaces?.length && domainFromRedirect && userSpaces.find((s) => s.domain === domainFromRedirect))
+    ) {
       router.push(redirectPath);
     } else if (userSpaces?.length) {
       router.push({ pathname: `/[domain]`, query: { domain: userSpaces[0].domain } });
