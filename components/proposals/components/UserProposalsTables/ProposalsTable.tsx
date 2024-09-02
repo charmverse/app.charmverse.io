@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
-import { Box, Card, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Card, Chip, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import type { UserProposal } from '@root/lib/proposals/getUserProposals';
 import { relativeTime } from '@root/lib/utils/dates';
@@ -65,6 +65,8 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
           </TableHead>
           <TableBody>
             {proposals.map((proposal) => {
+              const result = proposal.currentEvaluation?.result;
+              const statusLabel = result ? (result === 'pass' ? 'Passed' : 'Declined') : 'In progress';
               return (
                 <StyledTableRow
                   key={proposal.id}
@@ -80,11 +82,12 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                     <Typography>{proposal.title || 'Untitled'}</Typography>
                   </TableCell>
                   <TableCell align='center' width={200}>
-                    {proposal.currentEvaluation?.result ? (
-                      <Typography>{proposal.currentEvaluation.result === 'pass' ? 'Passed' : 'Failed'}</Typography>
-                    ) : (
-                      <Typography>In progress</Typography>
-                    )}
+                    <Chip
+                      sx={{ px: 0.5 }}
+                      label={statusLabel}
+                      color={result === 'fail' ? 'red' : result === 'pass' ? 'green' : 'gray'}
+                      size='small'
+                    />
                   </TableCell>
                   <TableCell align='center' width={250}>
                     <Typography>{relativeTime(proposal.updatedAt)}</Typography>
