@@ -26,7 +26,15 @@ const StyledTableRow = styled(TableRow)`
   }
 `;
 
-export function ProposalsTable({ proposals, title }: { title: string; proposals: UserProposal[] }) {
+export function ProposalsTable({
+  proposals,
+  title,
+  assigned = false
+}: {
+  title: string;
+  proposals: UserProposal[];
+  assigned?: boolean;
+}) {
   const { navigateToSpacePath } = useCharmRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { getFeatureTitle } = useSpaceFeatures();
@@ -60,7 +68,13 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                   Current step
                 </Typography>
               </TableCell>
-              <TableCell align='center'></TableCell>
+              <TableCell align='center'>
+                {assigned ? (
+                  <Typography variant='body2' fontWeight='bold'>
+                    Reviewed at
+                  </Typography>
+                ) : null}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -100,7 +114,9 @@ export function ProposalsTable({ proposals, title }: { title: string; proposals:
                       </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell align='center'></TableCell>
+                  <TableCell width={250} align='center'>
+                    {assigned ? (proposal.reviewedAt ? relativeTime(proposal.reviewedAt) : '-') : null}
+                  </TableCell>
                 </StyledTableRow>
               );
             })}
