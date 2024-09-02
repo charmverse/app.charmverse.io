@@ -230,47 +230,39 @@ export function ProjectForm({
 
         <Stack>
           <FormLabel>X</FormLabel>
-          <Stack direction='row' gap={1} alignItems='center'>
-            <Typography color='secondary' width={250}>
-              https://x.com/
-            </Typography>
-            <Controller
-              control={control}
-              name='twitter'
-              render={({ field, fieldState }) => (
-                <TextField
-                  fullWidth
-                  placeholder='charmverse'
-                  data-test='project-form-twitter'
-                  aria-labelledby='project-twitter'
-                  error={!!fieldState.error}
-                  {...field}
-                />
-              )}
-            />
-          </Stack>
+          <Controller
+            control={control}
+            name='twitter'
+            render={({ field, fieldState }) => (
+              <TextField
+                fullWidth
+                placeholder='https://x.com/charmverse'
+                data-test='project-form-twitter'
+                aria-labelledby='project-twitter'
+                error={!!fieldState.error}
+                {...field}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
         </Stack>
         <Stack>
           <FormLabel>Github</FormLabel>
-          <Stack direction='row' gap={1} alignItems='center'>
-            <Typography color='secondary' width={250}>
-              https://github.com/
-            </Typography>
-            <Controller
-              control={control}
-              name='github'
-              render={({ field, fieldState }) => (
-                <TextField
-                  fullWidth
-                  placeholder='charmverse'
-                  aria-labelledby='project-github'
-                  data-test='project-form-github'
-                  error={!!fieldState.error}
-                  {...field}
-                />
-              )}
-            />
-          </Stack>
+          <Controller
+            control={control}
+            name='github'
+            render={({ field, fieldState }) => (
+              <TextField
+                fullWidth
+                placeholder='https://github.com/charmverse/app.charmverse.io'
+                aria-labelledby='project-github'
+                data-test='project-form-github'
+                error={!!fieldState.error}
+                {...field}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
         </Stack>
       </Stack>
       <AddProjectMembersForm user={user} control={control} disabled={isExecuting} />
