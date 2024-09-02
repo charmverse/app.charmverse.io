@@ -1,5 +1,3 @@
-import { AppProviders } from '@connect-shared/components/layout/AppProviders';
-import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import Box from '@mui/material/Box';
 import type { Metadata, Viewport } from 'next';
@@ -9,8 +7,9 @@ import type { ReactNode } from 'react';
 import { StickyFooter } from 'components/common/Footer/StickyFooter';
 import { Header } from 'components/common/Header/Header';
 import { NotificationRequest } from 'components/common/NotificationRequest';
+import { AppProviders } from 'components/layout/AppProviders';
+import { getCurrentUserAction } from 'lib/user/getCurrentUserAction';
 import { appDescription, appName, appTitle, appTitleTemplate } from 'lib/utils/appDetails';
-import theme from 'theme/theme';
 
 import 'theme/cssVariables.scss';
 
@@ -71,7 +70,7 @@ export default async function RootLayout({
       <body>
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script src='/__ENV.js' />
-        <AppProviders theme={theme}>
+        <AppProviders>
           <>
             <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
               <Header user={user?.data || null} />
