@@ -38,7 +38,7 @@ test.describe('Home page', () => {
 
     await connectButton.click();
 
-    const farcasterModal = page.locator('data-test=farcaster-modal');
+    const farcasterModal = page.locator('.fc-authkit-qrcode-dialog').first();
 
     await expect(farcasterModal).toBeVisible();
   });
