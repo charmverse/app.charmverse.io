@@ -88,7 +88,7 @@ export function WalletLogin() {
   const errorWalletMessage = signMessageError?.message || connectError?.message;
 
   return (
-    <Box width='100%' data-test='connect-with-farcaster'>
+    <Box width='100%' data-test='connect-with-wallet'>
       <Button
         onClick={onOpen}
         size='large'
