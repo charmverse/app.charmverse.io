@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { projectAttestationChainId } from '@connect-shared/lib/attestations/constants';
+import { gitcoinProjectAttestationChainId } from '@connect-shared/lib/attestations/constants';
 import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { optimism } from 'viem/chains';
 
@@ -8,7 +8,7 @@ import { optimism } from 'viem/chains';
  */
 
 async function backfillGitcoinEasyRetroPGFAttestations() {
-  if (projectAttestationChainId !== optimism.id) {
+  if (gitcoinProjectAttestationChainId !== optimism.id) {
     throw new Error('Attestations must be backfilled on OP mainnet');
   }
 
@@ -19,7 +19,7 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
         {
           gitcoinProjectAttestations: {
             none: {
-              chainId: optimism.id,
+              chainId: gitcoinProjectAttestationChainId,
               type: 'application'
             }
           }
@@ -27,7 +27,7 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
         {
           gitcoinProjectAttestations: {
             none: {
-              chainId: optimism.id,
+              chainId: gitcoinProjectAttestationChainId,
               type: 'profile'
             }
           }

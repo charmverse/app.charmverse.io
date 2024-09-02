@@ -11,6 +11,8 @@ import Link from 'next/link';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
+import { ConfirmationModal } from 'components/common/Modal/ConfirmationModal';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import type { FormValues } from 'lib/projects/schema';
 import { PROJECT_CATEGORIES, PROJECT_TYPES } from 'lib/projects/schema';
 
@@ -22,16 +24,21 @@ export function ProjectForm({
   isExecuting,
   user,
   errors,
-  submitLabel
+  submitLabel,
+  onDelete
 }: {
   control: Control<FormValues>;
   isExecuting: boolean;
   user: LoggedInUser;
   errors: string[] | null;
   submitLabel: string;
+  onDelete?: () => void;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
+  const { field: nameField } = useController({ name: 'name', control });
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
+
+  const { props, showConfirmation } = useConfirmationModal();
 
   return (
     <>
@@ -255,9 +262,19 @@ export function ProjectForm({
       </Stack>
       <AddProjectMembersForm user={user} control={control} disabled={isExecuting} />
       <Stack direction='row' justifyContent='space-between' gap={2}>
-        <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary' sx={{ flexShrink: 0 }}>
-          Cancel
-        </Button>
+        <Box gap={2} display='flex'>
+          <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary' sx={{ flexShrink: 0 }}>
+            Cancel
+          </Button>
+          <Button
+            variant='outlined'
+            color='error'
+            sx={{ flexShrink: 0 }}
+            onClick={() => showConfirmation({ message: `Are you sure?`, requiredText: nameField.value })}
+          >
+            Delete
+          </Button>
+        </Box>
         {isExecuting && (
           <Box display='flex' justifyContent='flex-end'>
             <LoadingComponent
@@ -283,6 +300,8 @@ export function ProjectForm({
           <FormErrors errors={errors} />
         </Box>
       )}
+
+      {onDelete && <ConfirmationModal />}
     </>
   );
 }
