@@ -1,15 +1,8 @@
-import { write } from 'node:fs';
-import { readFile, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-
 import { gql } from '@apollo/client';
-import { arrayUtils } from '@charmverse/core/dist/cjs/utilities';
 import { log } from '@charmverse/core/log';
-import { stringify } from 'csv-stringify/sync';
 
-import { githubGrapghQLClient } from '../github/githubGraphQLClient';
-import { uniqueValues } from '../utils/array';
-import { prettyPrint } from '../utils/strings';
+import { githubGrapghQLClient } from 'lib/github/githubGraphQLClient';
+import { uniqueValues } from 'lib/utils/array';
 
 type RepositoryData = {
   url: string;
@@ -110,16 +103,6 @@ function parseUrls(input: string): string[] {
   return urls;
 }
 
-async function loadAndParseRepoUrls(fileName: string): Promise<string[]> {
-  const filePath = path.resolve('lib', 'gitcoin', 'files', fileName);
-
-  const content = await readFile(filePath, 'utf-8');
-
-  const parsedUrls = parseUrls(content);
-
-  return parsedUrls;
-}
-
 function mapToFlatObject(data: RepositoryData): FlatRepositoryData {
   const cutoffDate = new Date('2023-09-01');
 
@@ -142,9 +125,7 @@ function mapToFlatObject(data: RepositoryData): FlatRepositoryData {
   };
 }
 
-async function searchAndParseRepos({ fileName, exportToCsv }: { fileName: string; exportToCsv?: boolean }) {
-  const repos = await loadAndParseRepoUrls(fileName);
-
+export async function getRepositoryActivity({ repos }: { repos: string[] }) {
   const totalRepos = repos.length;
 
   const perQuery = 10;
@@ -178,18 +159,5 @@ async function searchAndParseRepos({ fileName, exportToCsv }: { fileName: string
 
     log.info(`Queried repos ${i + 1}-${i + Math.min(repoList.length, perQuery)} / ${maxQueriedRepos}`);
   }
-
-  const sortedData = allData.sort((a, b) => b.stargazerCount - a.stargazerCount);
-
-  if (exportToCsv) {
-    const data = await stringify(sortedData, { header: true, columns: Object.keys(allData[0]), delimiter: '\t' });
-
-    await writeFile(path.resolve(`${fileName.split('.')[0]}.tsv`), data);
-  }
-
-  return sortedData;
+  return allData;
 }
-
-// searchAndParseRepos({ fileName: 'addfilename', exportToCsv: true }).then((data) =>
-//   console.log('Completed: ', data.length)
-// );
