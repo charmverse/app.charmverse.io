@@ -35,9 +35,10 @@ test.describe('Home page', () => {
     const connectButton = page.locator('data-test=connect-with-farcaster');
 
     // We are using the modal from Farcaster SDK, so we target by expected text
-    const farcasterModal = page.getByText("Scan with your phone's camera to continue.");
 
     await connectButton.click();
+
+    const farcasterModal = page.locator('data-test=farcaster-modal');
 
     await expect(farcasterModal).toBeVisible();
   });
