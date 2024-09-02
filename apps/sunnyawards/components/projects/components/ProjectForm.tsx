@@ -25,7 +25,8 @@ export function ProjectForm({
   user,
   errors,
   submitLabel,
-  onDelete
+  onDelete,
+  isDeleting
 }: {
   control: Control<FormValues>;
   isExecuting: boolean;
@@ -33,12 +34,24 @@ export function ProjectForm({
   errors: string[] | null;
   submitLabel: string;
   onDelete?: () => void;
+  isDeleting?: boolean;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
-  const { field: nameField } = useController({ name: 'name', control });
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
 
-  const { props, showConfirmation } = useConfirmationModal();
+  const { showConfirmation } = useConfirmationModal();
+
+  async function onClickDelete() {
+    const result = await showConfirmation({
+      message: `Are you sure you want to delete this project?`,
+      requiredText: 'delete',
+      title: 'Confirm project deletion'
+    });
+
+    if (result.confirmed) {
+      onDelete?.();
+    }
+  }
 
   return (
     <>
@@ -266,12 +279,7 @@ export function ProjectForm({
           <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary' sx={{ flexShrink: 0 }}>
             Cancel
           </Button>
-          <Button
-            variant='outlined'
-            color='error'
-            sx={{ flexShrink: 0 }}
-            onClick={() => showConfirmation({ message: `Are you sure?`, requiredText: nameField.value })}
-          >
+          <Button variant='outlined' color='error' sx={{ flexShrink: 0 }} onClick={onClickDelete}>
             Delete
           </Button>
         </Box>
@@ -282,6 +290,17 @@ export function ProjectForm({
               size={20}
               minHeight={20}
               label='Submitting your project onchain'
+              flexDirection='row-reverse'
+            />
+          </Box>
+        )}
+        {isDeleting && (
+          <Box display='flex' justifyContent='flex-end'>
+            <LoadingComponent
+              height={20}
+              size={20}
+              minHeight={20}
+              label='Deleting project and revoking attestations'
               flexDirection='row-reverse'
             />
           </Box>

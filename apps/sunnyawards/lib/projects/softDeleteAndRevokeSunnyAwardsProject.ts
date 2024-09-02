@@ -12,11 +12,17 @@ export async function softDeleteAndRevokeSunnyAwardsProject({ projectId }: { pro
 
   const project = await prisma.project.findFirstOrThrow({
     where: {
-      id: projectId
+      id: projectId,
+      // Ensure we are only deleting sunny awards projects
+      source: 'sunny_awards'
     },
     select: {
       pptimismProjectAttestations: true,
-      gitcoinProjectAttestations: true,
+      gitcoinProjectAttestations: {
+        where: {
+          type: 'application'
+        }
+      },
       charmProjectCredentials: true
     }
   });

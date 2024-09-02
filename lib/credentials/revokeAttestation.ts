@@ -6,7 +6,7 @@ import { Wallet } from 'ethers';
 import { getCurrentGasPrice } from '../blockchain/getCurrentGasPrice';
 import { getEthersProvider } from '../blockchain/getEthersProvider';
 
-import { getEasConnector, type EasSchemaChain } from './connectors';
+import type { EasSchemaChain } from './connectors';
 import { getEasInstance } from './getEasInstance';
 
 export async function revokeAttestation({
@@ -16,8 +16,6 @@ export async function revokeAttestation({
   attestationUID: string;
   chainId: EasSchemaChain;
 }): Promise<void> {
-  const connector = getEasConnector(chainId);
-
   const rpcUrl = getChainById(chainId)?.rpcUrls[0] as string;
 
   const provider = getEthersProvider({ rpcUrl });
@@ -32,18 +30,34 @@ export async function revokeAttestation({
 
   const isRevoked = await eas.isAttestationRevoked(attestationUID);
 
+  if (isRevoked) {
+    log.info(`Attestation ${attestationUID} is already revoked on chain ${chainId}`);
+    return;
+  }
+
   const attestation = await eas.getAttestation(attestationUID);
 
   await eas
-    .revoke({
-      data: {
-        uid: attestationUID,
-        value: 0
+    .revoke(
+      {
+        data: {
+          uid: attestationUID,
+          value: 0
+        },
+        schema: attestation.schema
       },
-      schema: attestation.schema
+      { gasPrice: currentGasPrice }
+    )
+    .then(async (tx) => {
+      await tx.wait();
+      log.info(`Attestation ${attestationUID} revoked on chain ${chainId}`);
     })
-    .then((tx) => tx.wait())
     .catch((error) => {
-      log.error(`Failed to revoke attestation ${attestationUID} on chain ${chainId}`, { error, attestationUID });
+      log.error(`Failed to revoke attestation ${attestationUID} on chain ${chainId}`, {
+        error,
+        attestationUID,
+        chainId
+      });
+      throw error;
     });
 }

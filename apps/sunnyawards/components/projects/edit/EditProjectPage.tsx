@@ -111,6 +111,7 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
             errors={errors}
             submitLabel='Update Submission'
             onDelete={handleDelete}
+            isDeleting={isExecutingDeleteProject}
           />
         </ConfirmationModalProvider>
       </form>

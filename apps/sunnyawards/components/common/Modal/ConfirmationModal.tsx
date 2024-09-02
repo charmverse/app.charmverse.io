@@ -1,4 +1,5 @@
-import { TextField, Typography } from '@mui/material';
+import { TextField, Typography, Box } from '@mui/material';
+import { useState } from 'react';
 
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 
@@ -21,6 +22,8 @@ export type ConfirmationModalProps = {
 export function ConfirmationModal() {
   const { props } = useConfirmationModal();
 
+  const [textValue, setTextValue] = useState('');
+
   return (
     <ModalWithButtons
       open={props.isOpen}
@@ -29,18 +32,19 @@ export function ConfirmationModal() {
       onClose={props.onCancel || (() => {})}
       onConfirm={props.onConfirm || (() => {})}
       buttonText={props.confirmButton || 'Confirm'}
+      disabled={!!props.requiredText && textValue !== props.requiredText}
     >
       <Typography>{props.message}</Typography>
       {props.requiredText && (
-        <>
-          <Typography>
-            Write the following text to confirm:
-            <strong>{props.requiredText}</strong>
-          </Typography>
-          <TextField>
-            <strong>{props.requiredText}</strong>
-          </TextField>
-        </>
+        <Box sx={{ mt: 2, display: 'flex', gap: 1, flexDirection: 'column' }}>
+          <Typography sx={{ mb: 1 }}>Write the following text to confirm:</Typography>
+          <Typography fontWeight='bold'>{props.requiredText}</Typography>
+          <TextField
+            value={textValue}
+            onChange={(ev) => setTextValue(ev.target.value)}
+            placeholder={props.requiredText}
+          />
+        </Box>
       )}
     </ModalWithButtons>
   );
