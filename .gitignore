@@ -79,6 +79,7 @@ apps/farcaster/public/__ENV.js
 .vscode/vscode-chrome-debug-userdatadir/
 /depgraphs
 /scripts/*.json
+lib/gitcoin/files/
 
 # debug
 npm-debug.log*
