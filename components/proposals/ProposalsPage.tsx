@@ -260,7 +260,7 @@ export function ProposalsPage({ title }: { title: string }) {
                     ? [
                         {
                           id: 'reviewers',
-                          label: 'Reviewers'
+                          label: 'Reviewer Status'
                         }
                       ]
                     : [])

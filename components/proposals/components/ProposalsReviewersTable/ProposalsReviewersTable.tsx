@@ -84,10 +84,7 @@ export function ProposalsReviewersTable() {
                   Reviewer
                 </Typography>
                 <Typography fontWeight='bold' align='center' width={250} p={2}>
-                  Reviews Left
-                </Typography>
-                <Typography fontWeight='bold' align='center' width={250} p={2}>
-                  Reviews Completed
+                  Proposals to review
                 </Typography>
               </Stack>
               <Stack>
@@ -113,9 +110,6 @@ export function ProposalsReviewersTable() {
                         </Stack>
                         <Stack width={250} p={2}>
                           <Typography align='center'>{proposalsReviewer.reviewsLeft}</Typography>
-                        </Stack>
-                        <Stack width={250} p={2}>
-                          <Typography align='center'>{proposalsReviewer.reviewsCompleted}</Typography>
                         </Stack>
                       </AccordionSummary>
                       <AccordionDetails>
