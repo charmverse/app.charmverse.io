@@ -7,7 +7,7 @@ import { uniqBy, uniq } from 'lodash';
 import { getRepositoryActivity } from './github/getRepositoryActivity';
 import { getGithubUsers } from './github/getGithubUsers';
 
-const cutoffDate = new Date('2024-01-01');
+const cutoffDate = new Date('2024-06-01');
 async function query() {
   const repos = await prisma.cryptoEcosystemRepo.findMany({
     where: {
