@@ -76,6 +76,7 @@ apps/farcaster/public/__ENV.js
 
 # user data
 *.csv
+*.tsv
 .vscode/vscode-chrome-debug-userdatadir/
 /depgraphs
 /scripts/*.json

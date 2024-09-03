@@ -13,37 +13,6 @@ type ListCommitsResponse = Endpoints['GET /repos/{owner}/{repo}/commits']['respo
 // API Docs
 // Commits - https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28
 
-type Project = {
-  // Ecosystem Level Information
-  title: string;
-  // These are the titles of other ecosystems in different .toml files in the /data/ecosystems directory
-  sub_ecosystems: [];
-  // This is a list of links to associated GitHub organizations.
-  github_organizations: string[]; // ["https://github.com/zeroexchange"]
-  // These are structs including a url and tags for a git repository. These URLs do not necessarily have to be on GitHub.
-  repo: { url: string; missing?: boolean }[]; // { url:  "https://github.com/zeroexchange/0-charts" }
-};
-
-const fileName = resolve(process.cwd(), '../crypto-ecosystems-export/projects.json');
-
-/**
- * Use this script to perform database searches.
- */
-
-async function query() {
-  // const commits = await getRepoCommits({ owner: 'charmverse', repo: 'app.charmverse.io' });
-  // console.log('FIRST RESULT');
-
-  // const contributors = getHumanContributors(commits);
-  // console.log('contributors', contributors);
-
-  const projects = await readProjects();
-  console.log('Projects', projects.length);
-  console.log('Repos', projects.map((p) => p.repo).flat().length);
-}
-
-query();
-
 function getHumanContributors(commits: ListCommitsResponse) {
   return Object.values(
     commits.reduce((acc: any, commit: any) => {
@@ -60,12 +29,6 @@ function getHumanContributors(commits: ListCommitsResponse) {
       return acc;
     }, {})
   );
-}
-
-async function readProjects() {
-  const file = await promises.readFile(fileName);
-  const data: Project[] = JSON.parse(file.toString());
-  return data;
 }
 
 function getPullRequests({ repo, owner }: { owner: string; repo: string }) {
