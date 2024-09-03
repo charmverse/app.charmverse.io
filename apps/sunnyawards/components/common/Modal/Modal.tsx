@@ -21,10 +21,9 @@ const ModalContainer = styled.div<{ padding?: string; size: ModalSize }>`
   transform: translate(-50%, -50%);
   width: ${({ size }) =>
     size === 'large' ? '670px' : size === 'fluid' ? 'auto' : size === 'small' ? defaultSize : size};
-  background-color: ${({ theme }) => theme.palette.background.paper};
-  border-radius: ${({ theme }) => theme.spacing(1)};
-  box-shadow: ${({ theme }) => theme.shadows[15]};
-  padding: ${({ padding, theme }) => padding || theme.spacing(4)};
+  background-color: #262626;
+  border-radius: 1;
+  padding: 4;
   max-height: calc(80vh);
   max-width: 100%;
   overflow-y: auto;
@@ -38,7 +37,7 @@ const ModalContainer = styled.div<{ padding?: string; size: ModalSize }>`
 const ScrollableModalContainer = styled(ModalContainer)`
   display: flex;
   flex-direction: column;
-  padding: ${({ theme }) => theme.spacing(4, 0)};
+  padding: 4;
 `;
 
 const StyledDialogTitle = styled(MuiDialogTitle)`
