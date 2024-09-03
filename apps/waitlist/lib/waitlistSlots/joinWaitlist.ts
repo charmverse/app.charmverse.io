@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma, type ConnectWaitlistSlot } from '@charmverse/core/prisma-client';
 
-import { refreshUserScore } from './refreshUserScore';
+import { refreshUserScore } from '../scoring/refreshUserScore';
 
 type WaitlistJoinRequest = {
   fid: number | string;

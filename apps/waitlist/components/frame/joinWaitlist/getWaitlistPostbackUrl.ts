@@ -1,6 +1,6 @@
 import { baseUrl } from '@root/config/constants';
 
-import type { WaitlistFramePage } from 'lib/waitlist/actionButtons';
+import type { WaitlistFramePage } from 'lib/frame/actionButtons';
 
 export function getWaitlistPostbackUrl({
   currentPage,
@@ -9,5 +9,5 @@ export function getWaitlistPostbackUrl({
   currentPage: WaitlistFramePage;
   referrerFid: string | number;
 }) {
-  return `${baseUrl}/api/waitlist?current_page=${currentPage}&referrer_fid=${referrerFid}`;
+  return `${baseUrl}/api/frame?current_page=${currentPage}&referrer_fid=${referrerFid}`;
 }

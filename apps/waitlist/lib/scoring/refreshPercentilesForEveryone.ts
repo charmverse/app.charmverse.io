@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { roundNumberInRange } from '@root/lib/utils/numbers';
 
 import type { ConnectWaitlistTier, TierChange } from './calculateUserPosition';
-import { tierDistribution, getTierChange } from './calculateUserPosition';
+import { getTierChange, tierDistribution } from './calculateUserPosition';
 
 type TierChangeResult = {
   fid: number;
@@ -32,10 +32,11 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
     const usersByPercentile: { [percentile: number]: number[] } = {};
 
     for (let i = 0; i < users.length; i++) {
+      // We need an adjust min max as otherwise we get bad numbers for very small ranges
       const currentPercentile = roundNumberInRange({
         num: 100 - ((offset + i + 1) / totalUsers) * 100,
-        max: 100,
-        min: 0
+        max: tierInfo.threshold + tierInfo.totalPercentSize - 1,
+        min: tierInfo.threshold
       });
 
       const previousPercentile = users[i].percentile ?? 0;
