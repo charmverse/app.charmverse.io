@@ -116,7 +116,7 @@ function mapToFlatObject(data: RepositoryData, cutoffDate: Date): FlatRepository
 export async function getRepositoryActivity({ cutoffDate, repos }: { cutoffDate: Date; repos: string[] }) {
   const totalRepos = repos.length;
 
-  const perQuery = 10;
+  const perQuery = 50;
 
   const maxQueriedRepos = totalRepos;
 
@@ -143,6 +143,8 @@ export async function getRepositoryActivity({ cutoffDate, repos }: { cutoffDate:
       .then(({ data }) => {
         return data.search.edges.map((edge) => mapToFlatObject(edge.node, cutoffDate));
       });
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     allData.push(...results);
 
