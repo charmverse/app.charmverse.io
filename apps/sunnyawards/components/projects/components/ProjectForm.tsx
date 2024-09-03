@@ -271,9 +271,11 @@ export function ProjectForm({
           <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary' sx={{ flexShrink: 0 }}>
             Cancel
           </Button>
-          <Button variant='outlined' color='error' sx={{ flexShrink: 0 }} onClick={onClickDelete}>
-            Delete
-          </Button>
+          {onDelete && (
+            <Button variant='outlined' color='error' sx={{ flexShrink: 0 }} onClick={onClickDelete}>
+              Delete
+            </Button>
+          )}
         </Box>
         {isExecuting && (
           <Box display='flex' justifyContent='flex-end'>
