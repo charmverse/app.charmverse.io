@@ -122,6 +122,11 @@ function Component({ menuState }: { menuState: PluginState }) {
         const newTr = safeInsert(newNode, node.nodeEnd)(tr);
         view.dispatch(newTr.scrollIntoView());
       }
+    } else if (nodeTypeName === 'mention' && node) {
+      const mentionCopy = node.node.copy(node.node.content);
+      const newParagraph = view.state.schema.nodes.paragraph.create(null, mentionCopy);
+      const newTr = safeInsert(newParagraph, node.nodeEnd)(tr);
+      view.dispatch(newTr.scrollIntoView());
     } else if (node) {
       const copy = node.node.copy(node.node.content);
       const newTr = safeInsert(copy, nodeTypeName === 'columnLayout' ? node.nodeEnd - 1 : node.nodeEnd)(tr);
