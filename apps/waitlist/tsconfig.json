@@ -37,6 +37,9 @@
       "public/*": [
         "./public/*"
       ],
+      "hooks/*": [
+        "./hooks/*"
+      ],
       "theme/*": [
         "./theme/*"
       ],
