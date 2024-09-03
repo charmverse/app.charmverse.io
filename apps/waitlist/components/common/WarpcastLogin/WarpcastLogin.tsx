@@ -5,18 +5,19 @@ import { FarcasterLoginModal } from '@connect-shared/components/common/Farcaster
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
-import { loginWithFarcasterAction } from '@connect-shared/lib/session/loginAction';
 import { AuthKitProvider, useProfile } from '@farcaster/auth-kit';
 import type { AuthClientError, StatusAPIResponse } from '@farcaster/auth-kit';
 import { Box, Button, Link, Typography, lighten } from '@mui/material';
 import type { ButtonProps } from '@mui/material';
 import { warpcastConfig } from '@root/lib/farcaster/config';
+import { prettyPrint } from '@root/lib/utils/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
 
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
+import { loginWithFarcasterAction } from 'lib/session/loginAction';
 
 import { WarpcastIcon } from './WarpcastIcon';
 
@@ -37,8 +38,11 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     isExecuting
   } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
-      revalidatePathAction();
-      router.push('/profile');
+      if (data?.hasJoinedWaitlist) {
+        router.push('/score');
+      } else {
+        router.push('/join');
+      }
     },
     onError(err) {
       log.error('Error on login', { error: err.error.serverError });
@@ -46,7 +50,8 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   });
 
   const onSuccessCallback = useCallback(async (data: StatusAPIResponse) => {
-    await loginUser(data);
+    prettyPrint({ data });
+    await loginUser({ loginPayload: data });
     popupState.close();
   }, []);
 
