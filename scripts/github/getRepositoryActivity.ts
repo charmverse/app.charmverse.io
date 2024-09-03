@@ -14,9 +14,11 @@ type RepositoryData = {
   pullRequests: {
     edges: {
       node: {
+        id: string;
         number: number;
         createdAt: string;
         updatedAt: string;
+        title: string;
         author: {
           login: string;
           avatarUrl?: string;
@@ -39,6 +41,7 @@ type FlatRepositoryData = {
   assignableUserCount: number;
   stargazerCount: number;
   pullRequestCount: number;
+  pullRequests: RepositoryData['pullRequests']['edges'];
   recentPullRequestAuthors: number;
   watcherCount: number;
   // releaseCount: number;
@@ -64,9 +67,9 @@ const repoMetdataQuery = gql`
                   number
                   createdAt
                   updatedAt
+                  title
                   author {
                     login
-                    avatarUrl
                   }
                 }
               }
@@ -81,36 +84,6 @@ const repoMetdataQuery = gql`
     }
   }
 `;
-/*
-    releases(first: 10) {
-      totalCount
-      edges {
-        node {
-          name
-          createdAt
-          mentions(first: 50) {
-            edges {
-              node {
-                login
-              }
-            }
-          }
-        }
-      }
-    }
-*/
-function parseUrls(input: string): string[] {
-  const urlRegex = /url\s*=\s*"([^"]+)"/g;
-  const urls: string[] = [];
-  let match;
-
-  // eslint-disable-next-line no-cond-assign
-  while ((match = urlRegex.exec(input)) !== null) {
-    urls.push(match[1]);
-  }
-
-  return urls;
-}
 
 function mapToFlatObject(data: RepositoryData, cutoffDate: Date): FlatRepositoryData {
   const filteredPullRequests = data.pullRequests.edges.filter((edge) => {
@@ -130,6 +103,7 @@ function mapToFlatObject(data: RepositoryData, cutoffDate: Date): FlatRepository
     url: data.url,
     assignableUserCount: data.assignableUsers.totalCount,
     stargazerCount: data.stargazerCount,
+    pullRequests: filteredPullRequests,
     pullRequestCount: filteredPullRequests.length,
     recentPullRequestAuthors: uniqAuthors.length, // Ensures unique authors
     watcherCount: data.watchers.totalCount,
@@ -146,7 +120,7 @@ export async function getRepositoryActivity({ cutoffDate, repos }: { cutoffDate:
 
   const maxQueriedRepos = totalRepos;
 
-  log.info(`Total repos to query: ${totalRepos}`, repos);
+  log.info(`Total repos to query: ${totalRepos}`);
 
   const allData: FlatRepositoryData[] = [];
 

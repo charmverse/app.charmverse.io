@@ -2,7 +2,6 @@ import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 
 import { githubGrapghQLClient } from 'lib/github/githubGraphQLClient';
-import { uniq, uniqBy } from 'lodash';
 
 type GithubUser = {
   login: string;

@@ -23,13 +23,12 @@ async function exportPullRequests() {
     }
   });
   const rows: PullRequestRow[] = pullRequests.map((pr) => {
-    const xtra = pr.xtra as { title: string };
     return {
       Date: pr.date.toLocaleDateString(),
       Repo: pr.repo.url.replace('https://github.com/', ''),
       Ecosystem: pr.ecosystem.title,
       Builder: pr.author.login,
-      Title: xtra.title
+      Title: pr.title
     };
   });
   const data = stringify(rows, { header: true, columns: Object.keys(rows[0]), delimiter: '\t' });
