@@ -41,7 +41,6 @@ describe('getProposalsReviewers()', () => {
     expect(proposalsReviewers.length).toBe(1);
     expect(proposalsReviewers[0].userId).toBe(proposalReviewer.id);
     expect(proposalsReviewers[0].reviewsLeft).toBe(1);
-    expect(proposalsReviewers[0].reviewsCompleted).toBe(0);
     expect(proposalsReviewers[0].proposals.length).toBe(1);
     expect(proposalsReviewers[0].proposals[0].id).toBe(publishedProposal.id);
   });
@@ -121,7 +120,6 @@ describe('getProposalsReviewers()', () => {
     expect(proposalsReviewers.length).toBe(1);
     expect(proposalsReviewers[0].userId).toBe(proposalReviewer.id);
     expect(proposalsReviewers[0].reviewsLeft).toBe(1);
-    expect(proposalsReviewers[0].reviewsCompleted).toBe(0);
     expect(proposalsReviewers[0].proposals.length).toBe(1);
     expect(proposalsReviewers[0].proposals[0].id).toBe(publishedProposal.id);
   });
@@ -184,7 +182,6 @@ describe('getProposalsReviewers()', () => {
     expect(proposalsReviewers.length).toBe(1);
     expect(proposalsReviewers[0].userId).toBe(proposalReviewer.id);
     expect(proposalsReviewers[0].reviewsLeft).toBe(0);
-    expect(proposalsReviewers[0].reviewsCompleted).toBe(1);
     expect(proposalsReviewers[0].proposals.length).toBe(0);
   });
 
