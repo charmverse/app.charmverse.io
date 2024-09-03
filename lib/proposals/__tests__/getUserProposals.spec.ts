@@ -35,7 +35,7 @@ describe('getUserProposals() - authored', () => {
     expect(proposalAuthorProposals.authored.map((p) => p.id).sort()).toStrictEqual(
       [draftProposal.id, publishedProposal.id].sort()
     );
-    expect(proposalAuthorProposals.assigned).toStrictEqual([]);
+    expect(proposalAuthorProposals.review_completed).toStrictEqual([]);
   });
 
   it('Should fetch authored proposals for the user with hidden evaluation', async () => {
@@ -89,7 +89,7 @@ describe('getUserProposals() - authored', () => {
       userId: proposalAuthor.id
     });
     expect(proposalAuthorProposals.actionable).toStrictEqual([]);
-    expect(proposalAuthorProposals.assigned).toStrictEqual([]);
+    expect(proposalAuthorProposals.review_completed).toStrictEqual([]);
     expect(proposalAuthorProposals.authored.map((p) => p.id)).toStrictEqual([publishedProposal.id]);
     expect(proposalAuthorProposals.authored[0].currentEvaluation).toBeUndefined();
   });
@@ -194,7 +194,7 @@ describe('getUserProposals() - actionable', () => {
       userId: proposalReviewer.id
     });
 
-    expect(proposals.assigned).toStrictEqual([]);
+    expect(proposals.review_completed).toStrictEqual([]);
     expect(proposals.authored).toStrictEqual([]);
     expect(proposals.actionable.map((p) => p.id).sort()).toStrictEqual(
       [spaceMemberReviewerProposal.id, roleReviewerProposal.id, userReviewerProposal.id].sort()
@@ -318,7 +318,7 @@ describe('getUserProposals() - actionable', () => {
       userId: proposalAppealReviewer.id
     });
 
-    expect(proposals.assigned).toStrictEqual([]);
+    expect(proposals.review_completed).toStrictEqual([]);
     expect(proposals.authored).toStrictEqual([]);
     expect(proposals.actionable.map((p) => p.id).sort()).toStrictEqual(
       [userReviewerProposal.id, roleReviewerProposal.id].sort()
@@ -467,7 +467,7 @@ describe('getUserProposals() - actionable', () => {
       userId: proposalApprover.id
     });
 
-    expect(proposals.assigned).toStrictEqual([]);
+    expect(proposals.review_completed).toStrictEqual([]);
     expect(proposals.authored).toStrictEqual([]);
     expect(proposals.actionable.map((p) => p.id).sort()).toStrictEqual(
       [userApproverProposal.id, roleApproverProposal.id].sort()
@@ -636,7 +636,7 @@ describe('getUserProposals() - assigned', () => {
 
     expect(proposals.actionable).toStrictEqual([]);
     expect(proposals.authored).toStrictEqual([]);
-    expect(proposals.assigned.map((p) => p.id).sort()).toStrictEqual(
+    expect(proposals.review_completed.map((p) => p.id).sort()).toStrictEqual(
       [spaceMemberReviewerProposal.id, roleReviewerProposal.id, userReviewerProposal.id].sort()
     );
   });

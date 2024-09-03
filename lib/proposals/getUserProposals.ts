@@ -25,7 +25,8 @@ export type UserProposal = {
 export type GetUserProposalsResponse = {
   actionable: UserProposal[];
   authored: UserProposal[];
-  assigned: UserProposal[];
+  // assigned: UserProposal[];
+  review_completed: UserProposal[];
 };
 
 export async function getUserProposals({
@@ -287,6 +288,12 @@ export async function getUserProposals({
         const canSeeEvaluationDetails =
           !isPrivateEvaluation || (isPrivateEvaluation && isReviewerApproverOrAppealReviewer);
 
+        const hasReviewedAStep = proposal.evaluations.some(
+          (evaluation) =>
+            evaluation.reviews.some((review) => review.reviewerId === userId) ||
+            evaluation.rubricAnswers.some((answer) => answer.userId === userId)
+        );
+
         const userProposal = {
           id: proposal.id,
           title: proposal.page.title,
@@ -307,11 +314,14 @@ export async function getUserProposals({
           viewable: accessibleProposalIds.includes(proposal.id)
         };
 
+        // needs review/vote
         if (isActionable) {
           actionableProposals.push(userProposal);
         } else if (isAuthor) {
           authoredProposals.push(userProposal);
-        } else {
+        }
+        // has reviewed current or previous step
+        else if (hasReviewedAStep) {
           assignedProposals.push(userProposal);
         }
       }
@@ -330,6 +340,8 @@ export async function getUserProposals({
       return proposalBDueDate - proposalADueDate;
     }),
     authored: authoredProposals.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()),
-    assigned: assignedProposals.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+    // @ts-ignore TODO: remove this once the new field (review_completed) is completely deployed to front-end
+    assigned: [],
+    review_completed: assignedProposals.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
   };
 }
