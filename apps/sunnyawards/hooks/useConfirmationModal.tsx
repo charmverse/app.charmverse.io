@@ -1,15 +1,16 @@
-'use client';
-
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
-import type { ConfirmationModalProps } from 'components/_app/components/ConfirmationModal';
+import type { ConfirmationModalProps } from 'components/common/Modal/ConfirmationModal';
 
 type ConfirmationModalResult = { confirmed?: true; cancelled?: true };
 
 type IContext = {
   props: ConfirmationModalProps;
-  showConfirmation: (msg: string | Omit<ConfirmationModalProps, 'isOpen'>) => Promise<ConfirmationModalResult>;
+  showConfirmation: (
+    msg: string | Omit<ConfirmationModalProps, 'isOpen'>,
+    requiredText?: string
+  ) => Promise<ConfirmationModalResult>;
 };
 export const ConfirmationModalContext = createContext<Readonly<IContext>>({
   props: {
@@ -51,7 +52,8 @@ export function ConfirmationModalProvider({ children }: { children: ReactNode })
           title: msg.title,
           onCancel,
           confirmButton: msg.confirmButton,
-          onConfirm
+          onConfirm,
+          requiredText: msg.requiredText
         });
       }
     });
