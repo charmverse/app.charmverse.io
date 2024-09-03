@@ -10,9 +10,9 @@ import {
   waitlistGetDetails,
   waitlistShareMyFrame,
   type WaitlistFramePage
-} from 'lib/waitlist/actionButtons';
-import { joinWaitlist } from 'lib/waitlist/joinWaitlist';
-import { refreshPercentilesForEveryone } from 'lib/waitlist/refreshPercentilesForEveryone';
+} from 'lib/frame/actionButtons';
+import { joinWaitlist } from 'lib/frame/joinWaitlist';
+import { refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 
 export async function POST(req: Request, res: Response) {
   const waitlistClicked = (await req.json()) as FarcasterFrameInteractionToValidate;

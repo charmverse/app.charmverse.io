@@ -4,7 +4,7 @@ import path from 'path';
 import { log } from '@charmverse/core/log';
 import sharp from 'sharp';
 
-import { getTier } from 'lib/waitlist/calculateUserPosition';
+import { getTier } from 'lib/scoring/calculateUserPosition';
 
 export async function GET(req: Request) {
   const query = new URL(req.url).searchParams;

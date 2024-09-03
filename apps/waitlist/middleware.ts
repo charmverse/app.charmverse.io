@@ -1,5 +1,4 @@
 import { getSession } from '@connect-shared/lib/session/getSession';
-import { isTruthy } from '@root/lib/utils/types';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -14,7 +13,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && path === '/') {
-    return NextResponse.redirect(new URL('/profile', request.url));
+    return NextResponse.redirect(new URL('/score', request.url));
   }
 
   return NextResponse.next();

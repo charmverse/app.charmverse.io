@@ -1,6 +1,6 @@
 import { baseUrl } from '@root/config/constants';
 
-import type { WaitlistFramePage } from 'lib/waitlist/actionButtons';
+import type { WaitlistFramePage } from 'lib/frame/actionButtons';
 
 export function getWaitlistPostbackUrl({
   currentPage,
