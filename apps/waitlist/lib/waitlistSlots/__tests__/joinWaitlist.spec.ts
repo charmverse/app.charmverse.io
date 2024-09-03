@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { randomFid } from '../../../../testing/utils/farcaster';
-import { joinWaitlist } from '../waitlistSlots/joinWaitlist'; // Replace with your actual module
+import { randomFid } from '../../../../../testing/utils/farcaster';
+import { joinWaitlist } from '../joinWaitlist'; // Replace with your actual module
 
 describe('joinWaitlist', () => {
   it('should return existing waitlist slot if user already exists', async () => {

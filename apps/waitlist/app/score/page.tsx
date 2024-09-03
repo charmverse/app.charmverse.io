@@ -1,6 +1,7 @@
 import { Typography } from '@mui/material';
 import { redirect } from 'next/navigation';
 
+import { getTier } from 'lib/scoring/calculateUserPosition';
 import { getWaitlistSlotWithClicks } from 'lib/scoring/getWaitlistSlotWithClicks';
 import { getSession } from 'lib/session/getSession';
 
@@ -17,6 +18,8 @@ export default async function ScorePage() {
   return (
     <div>
       <Typography variant='h3'>Score Page</Typography>
+
+      <Typography variant='body1'>Tier: {getTier(waitlistSlot?.percentile as number)}</Typography>
 
       <Typography variant='body1'>Percentile: {waitlistSlot?.percentile}</Typography>
 

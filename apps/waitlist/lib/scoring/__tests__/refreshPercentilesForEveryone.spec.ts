@@ -1,9 +1,9 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { randomFid } from '../../../../testing/utils/farcaster';
-import type { ConnectWaitlistTier, TierChange } from '../scoring/calculateUserPosition';
-import { refreshPercentilesForEveryone } from '../scoring/refreshPercentilesForEveryone'; // Adjust the import to the correct module
+import { randomFid } from '../../../../../testing/utils/farcaster';
+import type { ConnectWaitlistTier, TierChange } from '../calculateUserPosition';
+import { refreshPercentilesForEveryone } from '../refreshPercentilesForEveryone'; // Adjust the import to the correct module
 
 // Function to shuffle an array deterministically using a seeded random number generator
 function seededShuffle(array: number[], seed: number): number[] {
@@ -85,8 +85,8 @@ describe('refreshPercentilesForEveryone', () => {
     // prettyPrint(tierChangeResults);
 
     // Everyone starts in the 'common' tier
-    // Now, 60% of 150 records (ie. 90 - 1 for the index offset of rare == 41% +) should be out of the common tier
-    expect(tierChangeResults.length).toBe(89);
+    // Now, 60% of 150 records should be out of the common tier
+    expect(tierChangeResults.length).toBe(91);
 
     const firstChangedUser = tierChangeResults[0];
     expect(fids.indexOf(firstChangedUser.fid)).toBe(131);

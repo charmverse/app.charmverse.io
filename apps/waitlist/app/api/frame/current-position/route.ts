@@ -12,15 +12,12 @@ export async function GET(req: Request) {
   const percentile = query.get('percentile');
 
   // Get the path to the public folder
-  const imagePath = path.resolve(
-    'apps',
-    'waitlist',
-    'public',
-    'images',
-    'waitlist',
-    'dev',
-    'waitlist-current-score.jpg'
-  );
+  let imagePath = path.resolve('apps', 'waitlist', 'public', 'images', 'waitlist', 'dev', 'waitlist-current-score.jpg');
+
+  // Workaround for path resolution between dev and prod environment
+  if (imagePath.match('apps/waitlist/apps/waitlist/')) {
+    imagePath = imagePath.replace('apps/waitlist/apps/waitlist/', 'apps/waitlist/');
+  }
 
   const tier = getTier(parseInt(percentile as string, 10));
 

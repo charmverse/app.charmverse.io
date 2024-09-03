@@ -1,4 +1,3 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -8,6 +7,10 @@ export async function middleware(request: NextRequest) {
   const session = await getSession();
   const farcasterUser = session.farcasterUser;
   const path = request.nextUrl.pathname;
+
+  if (path.startsWith('/frame')) {
+    return NextResponse.next();
+  }
 
   // Make all pages private
   if (!farcasterUser && path !== '/') {

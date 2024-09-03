@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { randomFid } from '../../../../testing/utils/farcaster';
-import { refreshUserScore } from '../scoring/refreshUserScore';
+import { randomFid } from '../../../../../testing/utils/farcaster';
+import { refreshUserScore } from '../refreshUserScore';
 
 describe('refreshUserScore', () => {
   it('should calculate the score correctly based on initial position and number of referrals to the fid', async () => {
