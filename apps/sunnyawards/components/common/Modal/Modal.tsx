@@ -22,8 +22,8 @@ const ModalContainer = styled.div<{ padding?: string; size: ModalSize }>`
   width: ${({ size }) =>
     size === 'large' ? '670px' : size === 'fluid' ? 'auto' : size === 'small' ? defaultSize : size};
   background-color: #262626;
-  border-radius: 1;
-  padding: 4;
+  border-radius: 10px;
+  padding: 16px;
   max-height: calc(80vh);
   max-width: 100%;
   overflow-y: auto;
