@@ -1,7 +1,9 @@
+import { Typography } from '@mui/material';
+
 export default function ScorePage() {
   return (
     <div>
-      <h1>Score Page</h1>
+      <Typography variant='h3'>Score Page</Typography>
     </div>
   );
 }

@@ -1,18 +1,19 @@
-import { getSession } from '@connect-shared/lib/session/getSession';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { getSession } from 'lib/session/getSession';
+
 export async function middleware(request: NextRequest) {
   const session = await getSession();
-  const user = session.user;
+  const farcasterUser = session.farcasterUser;
   const path = request.nextUrl.pathname;
 
   // Make all pages private
-  if (!user && path !== '/') {
+  if (!farcasterUser && path !== '/') {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  if (user && path === '/') {
+  if (farcasterUser && path === '/') {
     return NextResponse.redirect(new URL('/score', request.url));
   }
 
