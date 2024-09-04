@@ -133,6 +133,8 @@ jobs:
         uses: tj-actions/eslint-changed-files@v25
         with:
           path: 'apps/scoutgame'
+          reporter: 'local'
+          skip_annotations: 'true' # do not annotate code in the PR
 
   test-scoutgame-e2e:
     name: Test Scoutgame e2e
