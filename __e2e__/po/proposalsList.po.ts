@@ -27,7 +27,7 @@ export class ProposalsListPage extends GlobalPage {
   }
 
   waitForProposalsList() {
-    return this.page.waitForURL(/\/proposals$/);
+    return this.page.waitForURL(/\/proposals($|\?viewId=all)/);
   }
 
   getProposalRowLocator(proposalId: string): Locator {

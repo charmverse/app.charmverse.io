@@ -305,7 +305,8 @@ export async function getUserProposals({
           (evaluation) =>
             evaluation.vote?.userVotes.some((vote) => vote.userId === userId) ||
             evaluation.reviews.some((review) => review.reviewerId === userId) ||
-            evaluation.rubricAnswers.some((answer) => answer.userId === userId)
+            evaluation.rubricAnswers.some((answer) => answer.userId === userId) ||
+            evaluation.appealReviews.some((review) => review.reviewerId === userId)
         );
 
         const userProposal = {
