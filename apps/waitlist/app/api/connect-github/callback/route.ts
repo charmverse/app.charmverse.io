@@ -27,6 +27,15 @@ export async function GET(req: NextRequest) {
 
   const state = searchParams.get('state');
 
+  if (!state) {
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: `/builders?connect_error=${encodeURIComponent('Invalid connection url')}`
+      }
+    });
+  }
+
   const unsealedFid = await unsealData<{ fid: string }>(state, { password: authSecret as string }).then(
     (data) => data?.fid as string
   );
