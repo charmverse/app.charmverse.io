@@ -2,7 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 
-import { refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
+import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 
 import { authActionClient } from '../actionClient';
 
@@ -17,9 +17,11 @@ export const joinWaitlistAction = authActionClient.metadata({ actionName: 'join-
     username
   });
 
-  await refreshPercentilesForEveryone();
-
+  // If user is new, refresh everyone's percentiles and notify them of their new tier
   if (waitlistJoinResult.isNew) {
+    const percentileChangeResults = await refreshPercentilesForEveryone();
+
+    handleTierChanges(percentileChangeResults);
     log.info(`User joined waitlist`, { fid, username });
   }
 
