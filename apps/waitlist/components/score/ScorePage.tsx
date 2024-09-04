@@ -11,21 +11,6 @@ import { LearnMore } from 'components/common/LearnMore';
 import ProgressBar from './ScoresProgressBar';
 import { ScoreTier } from './ScoreTier';
 
-/*    <Typography variant='h3'>Score Page</Typography>
-
-      <Typography variant='body1'>Tier: {getTier(waitlistSlot?.percentile as number)}</Typography>
-
-      <Typography variant='body1'>Percentile: {waitlistSlot?.percentile}</Typography>
-
-      <Typography variant='body1'>Clicks: {waitlistSlot?.clicks}</Typography> */
-
-const milestones = [
-  { percent: 30, icon: '🔥' },
-  { percent: 60, icon: '🌟' },
-  { percent: 80, icon: '💎' },
-  { percent: 95, icon: '🏆' }
-];
-
 export function ScorePage({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot & { clicks: number } }) {
   return (
     <PageWrapper py={0} my={0}>

@@ -1,9 +1,5 @@
-import { Typography } from '@mui/material';
+import { BuilderPage } from 'components/builder/BuilderPage';
 
 export default function BuildersPage() {
-  return (
-    <div>
-      <Typography variant='h3'>Builders Page</Typography>
-    </div>
-  );
+  return <BuilderPage />;
 }
