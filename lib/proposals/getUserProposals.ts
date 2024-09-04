@@ -185,6 +185,9 @@ export async function getUserProposals({
             select: {
               id: true,
               userVotes: {
+                where: {
+                  userId
+                },
                 select: {
                   userId: true,
                   updatedAt: true
@@ -300,6 +303,7 @@ export async function getUserProposals({
 
         const hasReviewedAStep = proposal.evaluations.some(
           (evaluation) =>
+            evaluation.vote?.userVotes.some((vote) => vote.userId === userId) ||
             evaluation.reviews.some((review) => review.reviewerId === userId) ||
             evaluation.rubricAnswers.some((answer) => answer.userId === userId)
         );
