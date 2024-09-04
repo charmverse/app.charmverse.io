@@ -379,9 +379,6 @@ function CharmEditor({
         }, 250);
       }
     }
-    return () => {
-      // console.log('destroy charmeditor');
-    };
   }, [editorRef.current]);
 
   return (
