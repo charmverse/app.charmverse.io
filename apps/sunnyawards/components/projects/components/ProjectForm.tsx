@@ -11,6 +11,8 @@ import Link from 'next/link';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
+import { ConfirmationModal } from 'components/common/Modal/ConfirmationModal';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import type { FormValues } from 'lib/projects/schema';
 import { PROJECT_CATEGORIES, PROJECT_TYPES } from 'lib/projects/schema';
 
@@ -22,16 +24,34 @@ export function ProjectForm({
   isExecuting,
   user,
   errors,
-  submitLabel
+  submitLabel,
+  onDelete,
+  isDeleting
 }: {
   control: Control<FormValues>;
   isExecuting: boolean;
   user: LoggedInUser;
   errors: string[] | null;
   submitLabel: string;
+  onDelete?: () => void;
+  isDeleting?: boolean;
 }) {
   const { field: sunnyAwardsProjectTypeField } = useController({ name: 'sunnyAwardsProjectType', control });
   const sunnyAwardsProjectType = sunnyAwardsProjectTypeField.value;
+
+  const { showConfirmation } = useConfirmationModal();
+
+  async function onClickDelete() {
+    const result = await showConfirmation({
+      message: `Are you sure you want to delete this project?`,
+      requiredText: 'delete',
+      title: 'Confirm project deletion'
+    });
+
+    if (result.confirmed) {
+      onDelete?.();
+    }
+  }
 
   return (
     <>
@@ -210,54 +230,53 @@ export function ProjectForm({
 
         <Stack>
           <FormLabel>X</FormLabel>
-          <Stack direction='row' gap={1} alignItems='center'>
-            <Typography color='secondary' width={250}>
-              https://x.com/
-            </Typography>
-            <Controller
-              control={control}
-              name='twitter'
-              render={({ field, fieldState }) => (
-                <TextField
-                  fullWidth
-                  placeholder='charmverse'
-                  data-test='project-form-twitter'
-                  aria-labelledby='project-twitter'
-                  error={!!fieldState.error}
-                  {...field}
-                />
-              )}
-            />
-          </Stack>
+          <Controller
+            control={control}
+            name='twitter'
+            render={({ field, fieldState }) => (
+              <TextField
+                fullWidth
+                placeholder='https://x.com/charmverse'
+                data-test='project-form-twitter'
+                aria-labelledby='project-twitter'
+                error={!!fieldState.error}
+                {...field}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
         </Stack>
         <Stack>
           <FormLabel>Github</FormLabel>
-          <Stack direction='row' gap={1} alignItems='center'>
-            <Typography color='secondary' width={250}>
-              https://github.com/
-            </Typography>
-            <Controller
-              control={control}
-              name='github'
-              render={({ field, fieldState }) => (
-                <TextField
-                  fullWidth
-                  placeholder='charmverse'
-                  aria-labelledby='project-github'
-                  data-test='project-form-github'
-                  error={!!fieldState.error}
-                  {...field}
-                />
-              )}
-            />
-          </Stack>
+          <Controller
+            control={control}
+            name='github'
+            render={({ field, fieldState }) => (
+              <TextField
+                fullWidth
+                placeholder='https://github.com/charmverse/app.charmverse.io'
+                aria-labelledby='project-github'
+                data-test='project-form-github'
+                error={!!fieldState.error}
+                {...field}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
         </Stack>
       </Stack>
       <AddProjectMembersForm user={user} control={control} disabled={isExecuting} />
       <Stack direction='row' justifyContent='space-between' gap={2}>
-        <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary' sx={{ flexShrink: 0 }}>
-          Cancel
-        </Button>
+        <Box gap={2} display='flex'>
+          <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary' sx={{ flexShrink: 0 }}>
+            Cancel
+          </Button>
+          {onDelete && (
+            <Button variant='outlined' color='error' sx={{ flexShrink: 0 }} onClick={onClickDelete}>
+              Delete
+            </Button>
+          )}
+        </Box>
         {isExecuting && (
           <Box display='flex' justifyContent='flex-end'>
             <LoadingComponent
@@ -265,6 +284,17 @@ export function ProjectForm({
               size={20}
               minHeight={20}
               label='Submitting your project onchain'
+              flexDirection='row-reverse'
+            />
+          </Box>
+        )}
+        {isDeleting && (
+          <Box display='flex' justifyContent='flex-end'>
+            <LoadingComponent
+              height={20}
+              size={20}
+              minHeight={20}
+              label='Deleting project and revoking attestations'
               flexDirection='row-reverse'
             />
           </Box>
@@ -283,6 +313,8 @@ export function ProjectForm({
           <FormErrors errors={errors} />
         </Box>
       )}
+
+      {onDelete && <ConfirmationModal />}
     </>
   );
 }

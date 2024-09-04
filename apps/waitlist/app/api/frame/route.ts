@@ -10,9 +10,9 @@ import {
   waitlistGetDetails,
   waitlistShareMyFrame,
   type WaitlistFramePage
-} from 'lib/waitlist/actionButtons';
-import { joinWaitlist } from 'lib/waitlist/joinWaitlist';
-import { refreshPercentilesForEveryone } from 'lib/waitlist/refreshPercentilesForEveryone';
+} from 'lib/frame/actionButtons';
+import { refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
+import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
 export async function POST(req: Request, res: Response) {
   const waitlistClicked = (await req.json()) as FarcasterFrameInteractionToValidate;
@@ -69,7 +69,7 @@ export async function POST(req: Request, res: Response) {
 
       // Dev image
       // This key is be constructed so that it overcomes farcaster's cache
-      const imgSrc = `${baseUrl}/api/waitlist/current-position?fid=${interactorFid}&percentile=${percentile}`;
+      const imgSrc = `${baseUrl}/api/frame/current-position?fid=${interactorFid}&percentile=${percentile}`;
 
       // Prod image - TODO Add a joined image
       // const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;

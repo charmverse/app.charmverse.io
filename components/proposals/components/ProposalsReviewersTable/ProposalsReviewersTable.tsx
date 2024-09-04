@@ -8,10 +8,6 @@ import {
   Card,
   Grid,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
   TableRow,
   Typography
 } from '@mui/material';
@@ -22,8 +18,6 @@ import { useGetProposalsReviewers } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import UserDisplay from 'components/common/UserDisplay';
-import { evaluationIcons } from 'components/settings/proposals/constants';
-import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import { ReviewerProposalsTable } from './ReviewerProposalsTable';
@@ -90,10 +84,7 @@ export function ProposalsReviewersTable() {
                   Reviewer
                 </Typography>
                 <Typography fontWeight='bold' align='center' width={250} p={2}>
-                  Reviews Left
-                </Typography>
-                <Typography fontWeight='bold' align='center' width={250} p={2}>
-                  Reviews Completed
+                  Proposals to review
                 </Typography>
               </Stack>
               <Stack>
@@ -107,6 +98,9 @@ export function ProposalsReviewersTable() {
                         },
                         '& .MuiAccordionDetails-root': {
                           padding: 0
+                        },
+                        '& .MuiAccordionSummary-content': {
+                          margin: 0
                         }
                       }}
                     >
@@ -116,9 +110,6 @@ export function ProposalsReviewersTable() {
                         </Stack>
                         <Stack width={250} p={2}>
                           <Typography align='center'>{proposalsReviewer.reviewsLeft}</Typography>
-                        </Stack>
-                        <Stack width={250} p={2}>
-                          <Typography align='center'>{proposalsReviewer.reviewsCompleted}</Typography>
                         </Stack>
                       </AccordionSummary>
                       <AccordionDetails>

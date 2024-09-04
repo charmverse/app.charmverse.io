@@ -20,6 +20,7 @@ export type UserProposal = {
   status: ProposalStatus;
   currentEvaluation?: CurrentEvaluation;
   viewable: boolean;
+  reviewedAt?: Date | null;
 };
 
 export type GetUserProposalsResponse = {
@@ -170,12 +171,14 @@ export async function getUserProposals({
           requiredReviews: true,
           appealReviews: {
             select: {
-              reviewerId: true
+              reviewerId: true,
+              completedAt: true
             }
           },
           reviews: {
             select: {
-              reviewerId: true
+              reviewerId: true,
+              completedAt: true
             }
           },
           vote: {
@@ -183,7 +186,8 @@ export async function getUserProposals({
               id: true,
               userVotes: {
                 select: {
-                  userId: true
+                  userId: true,
+                  updatedAt: true
                 }
               }
             }
@@ -241,7 +245,8 @@ export async function getUserProposals({
             path: proposal.page.path,
             updatedAt: proposal.page.updatedAt,
             status: proposal.status,
-            viewable: true
+            viewable: true,
+            reviewedAt: null
           });
         }
       } else {
@@ -259,11 +264,16 @@ export async function getUserProposals({
         const isApprover = currentEvaluation?.evaluationApprovers.some(
           (approver) => approver.userId === userId || (approver.roleId && userRoles.includes(approver.roleId))
         );
-        const hasReviewed =
-          currentEvaluation?.reviews.some((review) => review.reviewerId === userId) ||
-          currentEvaluation?.rubricAnswers.some((answer) => answer.userId === userId);
-        const hasReviewedAppeal = currentEvaluation?.appealReviews.some((review) => review.reviewerId === userId);
-        const hasVoted = currentEvaluation?.vote?.userVotes.some((vote) => vote.userId === userId);
+        const existingReview = currentEvaluation?.reviews.find((review) => review.reviewerId === userId);
+        const existingAppealReview = currentEvaluation?.appealReviews.find((review) => review.reviewerId === userId);
+        const existingRubricAnswer = currentEvaluation?.rubricAnswers.find((answer) => answer.userId === userId);
+        const existingVote = currentEvaluation?.vote?.userVotes.find((vote) => vote.userId === userId);
+
+        const hasReviewed = existingReview || existingRubricAnswer;
+        const hasReviewedAppeal = existingAppealReview;
+        const hasVoted = existingVote;
+
+        const reviewedAt = existingReview?.completedAt || existingAppealReview?.completedAt || existingVote?.updatedAt;
 
         const isReviewerApproverOrAppealReviewer = isAppealReviewer || isReviewer || isApprover;
 
@@ -311,7 +321,8 @@ export async function getUserProposals({
           updatedAt: proposal.page.updatedAt,
           path: proposal.page.path,
           status: proposal.status,
-          viewable: accessibleProposalIds.includes(proposal.id)
+          viewable: accessibleProposalIds.includes(proposal.id),
+          reviewedAt
         };
 
         // needs review/vote
