@@ -26,24 +26,32 @@ export async function GET(req: Request) {
     const imageBuffer = await fs.readFile(imagePath);
 
     const svgText = `
-    <svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
-      <style>
-        .title { 
-          fill: white; 
-          font-size: 48px; 
-          font-weight: bold;
-          font-family: Arial, sans-serif;
-        }
-        .subtitle {
-          fill: #C0C0C0;
-          font-size: 36px;
-          font-family: Arial, sans-serif;
-        }
-      </style>
-      <text x="50%" y="30%" text-anchor="middle" class="title">Tier:</text>
-      <text x="50%" y="40%" text-anchor="middle" class="subtitle">${tier.toUpperCase()}</text>
-      <text x="50%" y="50%" text-anchor="middle" class="subtitle">Percentile: ${percentile}%</text>
-    </svg>
+   <svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @font-face {
+        font-family: 'Inter';
+        src: url('/inter/variable_font.ttf') format('truetype-variations');
+        font-weight: 100 900;
+        font-style: normal;
+      }
+      .title { 
+        fill: white; 
+        font-size: 48px; 
+        font-weight: bold;
+        font-family: 'Inter', sans-serif;
+      }
+      .subtitle {
+        fill: #C0C0C0;
+        font-size: 36px;
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+  </defs>
+  <text x="50%" y="30%" text-anchor="middle" class="title">Tier:</text>
+  <text x="50%" y="40%" text-anchor="middle" class="subtitle">${tier.toUpperCase()}</text>
+  <text x="50%" y="50%" text-anchor="middle" class="subtitle">Percentile: ${percentile}%</text>
+</svg>
   `;
 
     const svgBuffer = Buffer.from(svgText);
