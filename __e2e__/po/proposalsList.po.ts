@@ -7,6 +7,7 @@ export class ProposalsListPage extends GlobalPage {
   constructor(
     page: Page,
     public emptyState = page.locator('data-test=empty-state'),
+    public viewTab = (viewId: 'all') => page.locator(`data-view-id=${viewId}`),
     public proposalTemplateSelect = page.locator('data-test=proposal-template-select'),
     public addNewTemplate = page.locator('data-test=new-template-button'),
     public templateContextMenu = page.locator('data-test=template-context-menu'),
@@ -18,8 +19,9 @@ export class ProposalsListPage extends GlobalPage {
     super(page);
   }
 
-  goToProposals(domain: string) {
-    return this.page.goto(`${baseUrl}/${domain}/proposals`);
+  async goToProposals(domain: string) {
+    await this.page.goto(`${baseUrl}/${domain}/proposals`);
+    await this.viewTab('all').click();
   }
 
   goToNewProposalForm(domain: string, queryString: string = '') {
