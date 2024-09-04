@@ -23,7 +23,7 @@ export const viewport: Viewport = {
   userScalable: false
 };
 
-const ClientGlobal = dynamic(() => import('components/common/ClientGlobal').then((comp) => comp.ClientGlobal), {
+const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').then((comp) => comp.ClientGlobals), {
   ssr: false
 });
 
@@ -41,7 +41,7 @@ export default async function RootLayout({
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script src='/__ENV.js' strategy='beforeInteractive' />
         <AppProviders theme={theme}>
-          <ClientGlobal userId={user?.id} />
+          <ClientGlobals userId={user?.id} />
           <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh' bgcolor='mainBackground.main'>
             <Header user={user || null} />
             <Box component='main' pb={2}>

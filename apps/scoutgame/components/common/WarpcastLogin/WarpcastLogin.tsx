@@ -26,7 +26,7 @@ function WarpcastLoginButton() {
   } = useAction(revalidatePathAction);
 
   const {
-    execute: loginUser,
+    executeAsync: loginUser,
     hasErrored,
     hasSucceeded: loginWithFarcasterSuccess,
     isExecuting: isLoggingIn
@@ -41,7 +41,7 @@ function WarpcastLoginButton() {
   });
 
   const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
-    loginUser(res);
+    await loginUser(res);
   }, []);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
