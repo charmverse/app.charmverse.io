@@ -13,7 +13,7 @@ import { NotificationRequest } from 'components/common/NotificationRequest';
 import { appDescription, appName, appTitle, appTitleTemplate } from 'lib/utils/appDetails';
 import theme from 'theme/theme';
 
-import 'theme/cssVariables.scss';
+import 'theme/styles.scss';
 
 const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').then((comp) => comp.ClientGlobals), {
   ssr: false
@@ -78,14 +78,14 @@ export default async function RootLayout({
         <AppProviders theme={theme}>
           <ClientGlobals userId={user?.id} />
           <>
-            <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
-              <Header user={user || null} />
-              {session?.user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
-              <Box component='main' bgcolor='mainBackground.main' pb={2}>
-                {children}
-              </Box>
-            </Box>
-            <StickyFooter />
+            {/* <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'> */}
+            {/* <Header user={user || null} /> */}
+            {session?.user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
+            {/* <Box component='main' bgcolor='mainBackground.main' pb={2}> */}
+            {children}
+            {/* </Box> */}
+            {/* </Box> */}
+            {/* <StickyFooter /> */}
           </>
         </AppProviders>
       </body>
