@@ -87,7 +87,7 @@
     "scoutgame:debug:e2e": "npm run debug:e2e -w=apps/scoutgame",
     "scoutgame:test:e2e:ci": "npm run test:e2e:ci -w=apps/scoutgame",
     "scoutgame:start:test:ci": "npm run start:test:ci -w=apps/scoutgame",
-    "waitlist": "npx react-env --path .env.local --dest ./apps/scoutgame/public -- npm run start --workspace=apps/waitlist",
+    "waitlist": "npx react-env --path .env.local --dest ./apps/waitlist/public -- npm run start --workspace=apps/waitlist",
     "waitlist:start:test": "npm run start:test -w=apps/waitlist",
     "waitlist:remote": "npx react-env --path .env.production -- npm run start --workspace=apps/waitlist",
     "waitlist:build": "npm run build --w=apps/waitlist",
