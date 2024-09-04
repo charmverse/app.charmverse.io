@@ -11,7 +11,7 @@ import {
   waitlistShareMyFrame,
   type WaitlistFramePage
 } from 'lib/frame/actionButtons';
-import { refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
+import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
 export async function POST(req: Request, res: Response) {
@@ -36,7 +36,9 @@ export async function POST(req: Request, res: Response) {
     username: validatedMessage.action.interactor.username
   });
 
-  await refreshPercentilesForEveryone();
+  const percentileChangeResults = await refreshPercentilesForEveryone();
+
+  handleTierChanges(percentileChangeResults);
 
   if (currentPage === 'join_waitlist_home') {
     let html: string = '';

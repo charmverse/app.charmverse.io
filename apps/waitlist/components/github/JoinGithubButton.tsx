@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Box, Typography } from '@mui/material';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Box, Button, Typography } from '@mui/material';
+import { useSearchParams } from 'next/navigation';
 
 export function JoinGithubButton() {
   const params = useSearchParams();
@@ -13,6 +13,7 @@ export function JoinGithubButton() {
       <Button href='/api/connect-github/get-link' variant='contained' color='primary'>
         Connect & Sign up
       </Button>
+
       {connectError && (
         <Box>
           <Typography color='error'>{connectError}</Typography>

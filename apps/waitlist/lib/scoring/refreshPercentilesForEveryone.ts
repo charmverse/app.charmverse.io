@@ -1,10 +1,12 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { roundNumberInRange } from '@root/lib/utils/numbers';
 
 import type { ConnectWaitlistTier, TierChange } from './calculateUserPosition';
 import { getTierChange, tierDistribution } from './calculateUserPosition';
+import { notifyNewScore } from './notifyNewScore';
 
-type TierChangeResult = {
+export type TierChangeResult = {
   fid: number;
   newTier: ConnectWaitlistTier;
   tierChange: TierChange;
@@ -79,4 +81,16 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
   }
 
   return tierChangeResults;
+}
+
+export function handleTierChanges(tierChangeResults: TierChangeResult[]) {
+  return tierChangeResults.map((tierChangeResult) =>
+    notifyNewScore({
+      fid: tierChangeResult.fid,
+      tier: tierChangeResult.newTier,
+      tierChange: tierChangeResult.tierChange
+    }).catch((error) => {
+      log.error(`Failed to notify tier change for fid:${tierChangeResult.fid}`, { error, fid: tierChangeResult.fid });
+    })
+  );
 }
