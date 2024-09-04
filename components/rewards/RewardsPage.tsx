@@ -116,7 +116,6 @@ export function RewardsPage({ title }: { title: string }) {
   );
 
   useRewardsBoardMutator();
-  const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
 
   const { trigger: trashPages } = useTrashPages();

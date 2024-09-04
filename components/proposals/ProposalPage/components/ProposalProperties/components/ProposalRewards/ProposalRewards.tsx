@@ -4,12 +4,13 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 
 import { SelectPreviewContainer } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
+import Link from 'components/common/Link';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { RewardAmount } from 'components/rewards/components/RewardAmount';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { isTruthy } from 'lib/utils/types';
@@ -47,7 +48,6 @@ export function ProposalRewards({
   const { getRewardPage } = useRewardPage();
   const { rewards: allRewards } = useRewards();
   const { getFeatureTitle } = useSpaceFeatures();
-  const { navigateToSpacePath } = useCharmRouter();
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
   const canCreatePendingRewards = !readOnly && !rewardIds?.length && !isProposalTemplate;
 
@@ -73,41 +73,56 @@ export function ProposalRewards({
     isProposalTemplate
   });
 
-  function openReward(rewardId: string | null) {
-    if (!rewardId) return;
-    navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
-  }
+  const { showPage } = usePageDialog();
 
   if (rewards.length) {
     return (
       <Stack gap={0.5} flex={1} width='500px' maxWidth='100%'>
         {rewards.map((reward) => {
           return (
-            <Stack
-              alignItems='center'
-              gap={1}
-              direction='row'
-              sx={{
-                '&:hover .icons': {
-                  opacity: 1
-                }
-              }}
-              key={reward.id}
-              flex={1}
-            >
-              <SelectPreviewContainer displayType='details' onClick={() => openReward(reward.id)}>
-                <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                  <Typography component='span' variant='subtitle1' fontWeight='normal'>
-                    {getRewardPage(reward.id)?.title || 'Untitled'}
-                  </Typography>
-                  <Hidden mdDown>
-                    <Stack alignItems='center' direction='row' height='100%'>
-                      <RewardAmount reward={reward} />
-                    </Stack>
-                  </Hidden>
-                </Stack>
-              </SelectPreviewContainer>
-            </Stack>
+            <Link href={`/${getRewardPage(reward.id)?.path}`} key={reward.id}>
+              <Stack
+                alignItems='center'
+                gap={1}
+                direction='row'
+                sx={{
+                  '&:hover .icons': {
+                    opacity: 1
+                  }
+                }}
+                flex={1}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+              >
+                <SelectPreviewContainer
+                  displayType='details'
+                  onClick={() => {
+                    showPage({
+                      bountyId: reward.id,
+                      pageId: getRewardPage(reward.id)?.id
+                    });
+                  }}
+                >
+                  <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                    <Typography component='span' variant='subtitle1' fontWeight='normal' color='initial'>
+                      {getRewardPage(reward.id)?.title || 'Untitled'}
+                    </Typography>
+                    <Hidden mdDown>
+                      <Stack alignItems='center' direction='row' height='100%'>
+                        <RewardAmount
+                          reward={reward}
+                          typographyProps={{
+                            color: 'initial'
+                          }}
+                        />
+                      </Stack>
+                    </Hidden>
+                  </Stack>
+                </SelectPreviewContainer>
+              </Stack>
+            </Link>
           );
         })}
       </Stack>
