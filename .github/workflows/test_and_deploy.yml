@@ -78,7 +78,6 @@ jobs:
       - name: Run eslint on changed files
         uses: tj-actions/eslint-changed-files@v25
         with:
-          config_path: 'eslintrc.json'
           extra_args: '--ignore-pattern apps,packages'
 
   test-matrix:
