@@ -34,11 +34,10 @@ test.describe('Home page', () => {
 
     const connectButton = page.locator('data-test=connect-with-farcaster');
 
-    // We are using the modal from Farcaster SDK, so we target by expected text
-
+    await expect(connectButton).toBeEnabled();
     await connectButton.click();
 
-    const farcasterModal = page.locator('.fc-authkit-qrcode-dialog').first();
+    const farcasterModal = page.locator('.fc-authkit-qrcode-dialog');
 
     await expect(farcasterModal).toBeVisible();
   });
