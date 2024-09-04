@@ -70,10 +70,10 @@ export function ComingSoon() {
         </Typography>
         <Box display='flex' alignItems='center' justifyContent='space-between' mt={2}>
           <a href='https://www.thesunnyawards.fun/' target='_blank' rel='noreferrer'>
-            <Image src={sunnyLogoSrc} width={1000} height={629} style={{ height: 40, width: 'auto' }} />
+            <Image alt='' src={sunnyLogoSrc} width={1000} height={629} style={{ height: 40, width: 'auto' }} />
           </a>
           <a href='https://charmverse.io/' target='_blank' rel='noreferrer'>
-            <Image src={charmverseLogoSrc} width={100} height={20} />
+            <Image alt='' src={charmverseLogoSrc} width={100} height={20} />
           </a>
         </Box>
       </Box>
