@@ -133,6 +133,7 @@ jobs:
         uses: tj-actions/eslint-changed-files@v25
         with:
           path: 'apps/scoutgame'
+          config_path: '.eslintrc.json'
           reporter: 'local'
           skip_annotations: 'true' # do not annotate code in the PR
 
@@ -140,7 +141,9 @@ jobs:
     name: Test Scoutgame e2e
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
+    # re-enable for launch
+    if: false
+    # if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:

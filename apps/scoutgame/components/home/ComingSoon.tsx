@@ -2,16 +2,22 @@
 
 import styled from '@emotion/styled';
 import { Box, Paper, Typography } from '@mui/material';
+import Image from 'next/image';
+
+const logoSrc = '/images/coming_soon/scoutgame_logo.svg';
+const logoShineSrc = '/images/coming_soon/logo_shine.png';
 
 const Background = styled.div`
   min-height: 100vh;
   background: #111;
+  display: flex;
+  padding: 2em;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 const BackgroundGradient = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: fixed;
   top: 0;
   right: 0;
@@ -32,9 +38,20 @@ const BackgroundGradient = styled.div`
 export function ComingSoon() {
   return (
     <Background>
-      <BackgroundGradient>
-        <Typography variant='h1'>Coming Soon!</Typography>
-      </BackgroundGradient>
+      <BackgroundGradient />
+      <Box position='relative' maxWidth='100%' width={455}>
+        <Image style={{ maxWidth: '100%' }} height={256} width={455} alt='' src={logoShineSrc} />
+        <Image
+          style={{ position: 'absolute', left: 0, top: 60, width: '100%', zIndex: 1 }}
+          height={133}
+          width={455}
+          alt=''
+          src={logoSrc}
+        />
+      </Box>
+      <Typography align='center' sx={{ zIndex: 1 }} variant='h2'>
+        COMING SOON!
+      </Typography>
     </Background>
   );
 }
