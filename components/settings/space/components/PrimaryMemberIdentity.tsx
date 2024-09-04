@@ -47,7 +47,7 @@ export function PrimaryMemberIdentity({ primaryIdentity, register, disabled }: P
               <Typography variant='body2'>Member's choice</Typography>
             </Stack>
           </MenuItem>
-          {(['Discord', 'Google', 'Telegram', 'Wallet'] as IdentityType[]).map((identity) => (
+          {(['Discord', 'Google', 'Telegram', 'Wallet', 'Farcaster'] as IdentityType[]).map((identity) => (
             <MenuItem key={identity} value={identity}>
               <Stack flexDirection='row' alignItems='center' gap={1}>
                 <IdentityIcon size='xSmall' type={identity} />
