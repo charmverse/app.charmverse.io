@@ -64,6 +64,7 @@ const repoMetdataQuery = gql`
             pullRequests(first: 100, states: MERGED, orderBy: { field: UPDATED_AT, direction: DESC }) {
               edges {
                 node {
+                  id
                   number
                   createdAt
                   updatedAt

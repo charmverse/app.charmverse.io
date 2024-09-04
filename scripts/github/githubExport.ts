@@ -14,9 +14,11 @@ type PullRequestRow = {
 async function exportPullRequests() {
   const pullRequests = await prisma.cryptoEcosystemPullRequest.findMany({
     include: {
-      ecosystem: true,
-      repo: true,
-      author: true
+      repo: {
+        select: {
+          url: true
+        }
+      }
     },
     orderBy: {
       date: 'asc'
@@ -26,8 +28,8 @@ async function exportPullRequests() {
     return {
       Date: pr.date.toLocaleDateString(),
       Repo: pr.repo.url.replace('https://github.com/', ''),
-      Ecosystem: pr.ecosystem.title,
-      Builder: pr.author.login,
+      Ecosystem: pr.ecosystemTitle,
+      Builder: pr.userGithubLogin,
       Title: pr.title
     };
   });
@@ -47,24 +49,20 @@ type BuilderRow = {
   // aggregate data
   Repos: number;
   Ecosystems: number;
-  PullRequests: number;
+  'Pull Requests': number;
 };
 
 async function exportBuilders() {
   const builders = await prisma.cryptoEcosystemAuthor.findMany({
     include: {
-      pullRequests: {
-        include: {
-          ecosystem: true,
-          repo: true
-        }
-      }
+      pullRequests: true
     }
   });
+
   const rows: BuilderRow[] = builders.map((row) => {
-    const xtra = row.xtra as { isHireable?: boolean; location?: string | null };
-    const repos = uniq(row.pullRequests.map((pr) => pr.repo.url));
-    const ecosystems = uniq(row.pullRequests.map((pr) => pr.ecosystem.title));
+    const xtra = (row.xtra as { isHireable?: boolean; location?: string | null }) || {};
+    const repos = uniq(row.pullRequests.map((pr) => pr.repoGithubId));
+    const ecosystems = uniq(row.pullRequests.map((pr) => pr.ecosystemTitle));
     return {
       Login: row.login,
       Name: row.name || '',
@@ -75,7 +73,7 @@ async function exportBuilders() {
       // aggregate data
       Repos: repos.length,
       Ecosystems: ecosystems.length,
-      PullRequests: row.pullRequests.length
+      'Pull Requests': row.pullRequests.length
     };
   });
   const data = stringify(rows, { header: true, columns: Object.keys(rows[0]), delimiter: '\t' });
@@ -92,7 +90,7 @@ type RepositoryRow = {
   Forks: number;
   // based on season date
   Builders: number;
-  PullRequests: number;
+  'Pull Requests': number;
 };
 
 async function exportRepos() {
@@ -111,7 +109,7 @@ async function exportRepos() {
       Forks: row.forkCount,
       // based on season date
       Builders: builders.length,
-      PullRequests: row.pullRequests.length
+      'Pull Requests': row.pullRequests.length
     };
   });
   const data = stringify(rows, { header: true, columns: Object.keys(rows[0]), delimiter: '\t' });
@@ -130,14 +128,14 @@ type EcosystemRow = {
   Forks: number;
   // based on season date
   Builders: number;
-  PullRequests: number;
+  'Pull Requests': number;
   // include sub ecosystem counts
   'Repos (With Subs)': number;
-  'stars (With Subs)': number;
+  'Stars (With Subs)': number;
   'Watchers (With Subs)': number;
   'Forks (With Subs)': number;
   'Builders (With Subs)': number;
-  'Pull_requests (With Subs)': number;
+  'Pull Requests (With Subs)': number;
 };
 
 async function exportEcosystems() {
@@ -160,16 +158,26 @@ async function exportEcosystems() {
   });
   const rows: EcosystemRow[] = ecosystems.map((row) => {
     const builders = uniq(row.pullRequests.map((pr) => pr.userGithubLogin));
-    const childStats = row.children.reduce<Record<string, number>>((acc, child) => {
-      const childBuilders = uniq(child.child.pullRequests.map((pr) => pr.userGithubLogin));
-      acc.repos += child.child.repos.length;
-      acc.stars += child.child.repos.reduce((acc, r) => acc + r.stargazerCount, 0);
-      acc.watchers += child.child.repos.reduce((acc, r) => acc + r.watcherCount, 0);
-      acc.forks += child.child.repos.reduce((acc, r) => acc + r.forkCount, 0);
-      acc.builders += childBuilders.length;
-      acc.pullRequests += child.child.pullRequests.length;
-      return acc;
-    }, {});
+    const childStats = row.children.reduce<Record<string, number>>(
+      (acc, child) => {
+        const childBuilders = uniq(child.child.pullRequests.map((pr) => pr.userGithubLogin));
+        acc.repos += child.child.repos.length;
+        acc.stars += child.child.repos.reduce((acc, r) => acc + r.stargazerCount, 0);
+        acc.watchers += child.child.repos.reduce((acc, r) => acc + r.watcherCount, 0);
+        acc.forks += child.child.repos.reduce((acc, r) => acc + r.forkCount, 0);
+        acc.builders += childBuilders.length;
+        acc.pullRequests += child.child.pullRequests.length;
+        return acc;
+      },
+      {
+        repos: 0,
+        stars: 0,
+        watchers: 0,
+        forks: 0,
+        builders: 0,
+        pullRequests: 0
+      }
+    );
     return {
       Title: row.title,
       'Sub Ecosystems': row.children.length,
@@ -180,14 +188,14 @@ async function exportEcosystems() {
       Forks: row.repos.reduce((acc, r) => acc + r.forkCount, 0),
       // based on season date
       Builders: builders.length,
-      PullRequests: row.pullRequests.length,
+      'Pull Requests': row.pullRequests.length,
       // include sub ecosystem counts
       'Repos (With Subs)': row.repos.length + childStats.repos,
-      'stars (With Subs)': row.repos.reduce((acc, r) => acc + r.stargazerCount, 0) + childStats.stars,
+      'Stars (With Subs)': row.repos.reduce((acc, r) => acc + r.stargazerCount, 0) + childStats.stars,
       'Watchers (With Subs)': row.repos.reduce((acc, r) => acc + r.watcherCount, 0) + childStats.watchers,
       'Forks (With Subs)': row.repos.reduce((acc, r) => acc + r.forkCount, 0) + childStats.forks,
       'Builders (With Subs)': builders.length + childStats.builders,
-      'Pull_requests (With Subs)': row.pullRequests.length + childStats.pullRequests
+      'Pull Requests (With Subs)': row.pullRequests.length + childStats.pullRequests
     };
   });
   const data = stringify(rows, { header: true, columns: Object.keys(rows[0]), delimiter: '\t' });
