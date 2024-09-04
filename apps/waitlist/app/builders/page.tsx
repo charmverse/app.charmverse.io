@@ -2,7 +2,7 @@ import { Button, Typography } from '@mui/material';
 import { getGithubAppCallbackUrl } from '@root/lib/github/oauth';
 import dynamic from 'next/dynamic';
 
-const JoinGithubButton = dynamic(() => import('components/github/JoinGithubButton'), { ssr: false });
+import { JoinGithubButton } from 'components/github/JoinGithubButton';
 
 export default function BuildersPage() {
   return (

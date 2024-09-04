@@ -1,19 +1,23 @@
 'use client';
 
-import { Button } from '@mui/material';
-import { getGithubOAuthCallbackUrl } from '@root/lib/github/oauth';
+import { Button, Box, Typography } from '@mui/material';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-// Using default export so we can use dynamic import of default export
-export default function JoinGithubButton() {
+export function JoinGithubButton() {
+  const params = useSearchParams();
+
+  const connectError = params.get('connect_error');
+
   return (
-    <Button
-      href={getGithubOAuthCallbackUrl({
-        redirect: `${window?.location.origin}/api/connect/github`
-      })}
-      variant='contained'
-      color='primary'
-    >
-      Connect & Sign up
-    </Button>
+    <Box>
+      <Button href='/api/connect-github/get-link' variant='contained' color='primary'>
+        Connect & Sign up
+      </Button>
+      {connectError && (
+        <Box>
+          <Typography color='error'>{connectError}</Typography>
+        </Box>
+      )}
+    </Box>
   );
 }

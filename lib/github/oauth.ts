@@ -8,12 +8,8 @@ export function getGithubAppCallbackUrl({ redirect }: { redirect: string }) {
   )}`;
 }
 
-export function getGithubOAuthCallbackUrl({ redirect }: { redirect: string }) {
+export function getGithubOAuthCallbackUrl({ redirect, state }: { redirect: string; state?: string }) {
   return `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(
     redirect
-  )}/new?state=${encodeURIComponent(
-    JSON.stringify({
-      redirect
-    })
-  )}`;
+  )}&state=${encodeURIComponent(state || '')}`;
 }
