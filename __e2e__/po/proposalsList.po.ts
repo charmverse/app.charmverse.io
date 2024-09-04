@@ -18,8 +18,8 @@ export class ProposalsListPage extends GlobalPage {
     super(page);
   }
 
-  goToProposals(domain: string) {
-    return this.page.goto(`${baseUrl}/${domain}/proposals`);
+  async goToProposals(domain: string) {
+    await this.page.goto(`${baseUrl}/${domain}/proposals?viewId=all`);
   }
 
   goToNewProposalForm(domain: string, queryString: string = '') {
@@ -27,7 +27,7 @@ export class ProposalsListPage extends GlobalPage {
   }
 
   waitForProposalsList() {
-    return this.page.waitForURL(/\/proposals$/);
+    return this.page.waitForURL(/\/proposals($|\?viewId=all)/);
   }
 
   getProposalRowLocator(proposalId: string): Locator {

@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import { redirect } from 'next/navigation';
 
+import { ComingSoon } from 'components/home/ComingSoon';
 import { HomePage } from 'components/home/HomePage';
 
 // tell Next that this route loads dynamic data
@@ -25,5 +26,5 @@ export default async function Home() {
     }
   }
 
-  return <HomePage />;
+  return <ComingSoon />;
 }
