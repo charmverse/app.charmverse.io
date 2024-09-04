@@ -133,7 +133,7 @@ jobs:
         uses: tj-actions/eslint-changed-files@v25
         with:
           path: 'apps/scoutgame'
-          config_path: '.eslintrc.json'
+          config_path: '/.eslintrc.json'
           reporter: 'local'
           skip_annotations: 'true' # do not annotate code in the PR
 
