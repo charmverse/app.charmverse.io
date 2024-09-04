@@ -101,7 +101,7 @@ const config: PlaywrightTestConfig = {
   /* Run your local dev server before starting the tests */
   webServer: {
     // add DEBUG=pw:webserver environment variable to see server output
-    command: 'cd ../../ && dotenv -e .env.test.local -- npm run scoutgame:start:test',
+    command: 'npm run start:test',
     port: 3337,
     reuseExistingServer: true // !!process.env.CI
   }
