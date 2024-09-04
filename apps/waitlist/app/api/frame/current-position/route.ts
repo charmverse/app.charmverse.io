@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     <style>
       @font-face {
         font-family: 'Inter';
-        src: url('/Inter/variable_font.ttf') format('truetype-variations');
+        src: url('/inter/variable_font.ttf') format('truetype-variations');
         font-weight: 100 900;
         font-style: normal;
       }
