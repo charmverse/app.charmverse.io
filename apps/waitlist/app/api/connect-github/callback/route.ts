@@ -27,7 +27,9 @@ export async function GET(req: NextRequest) {
 
   const state = searchParams.get('state');
 
-  const unsealedFid = await unsealData<{ fid: string }>(state, { password: authSecret }).then((data) => data?.fid);
+  const unsealedFid = await unsealData<{ fid: string }>(state, { password: authSecret as string }).then(
+    (data) => data?.fid
+  );
 
   if (!unsealedFid) {
     return new Response(null, {

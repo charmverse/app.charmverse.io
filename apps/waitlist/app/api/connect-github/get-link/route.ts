@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     {
       fid: session.farcasterUser.fid
     },
-    { password: authSecret }
+    { password: authSecret as string }
   );
 
   const redirectUrl = getGithubOAuthCallbackUrl({
