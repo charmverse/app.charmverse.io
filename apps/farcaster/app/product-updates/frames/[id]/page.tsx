@@ -72,6 +72,7 @@ export default async function FramesPage({
 }
 
 function Image({ content }: { content: string }) {
+  console.log('boo');
   return (
     <>
       <meta name='fc:frame' content='vNext' />
