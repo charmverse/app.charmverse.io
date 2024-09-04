@@ -1,8 +1,8 @@
-import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { WelcomePage } from 'components/welcome/WelcomePage';
+import { getCurrentUserAction } from 'lib/user/getCurrentUserAction';
 
 export const dynamic = 'force-dynamic';
 

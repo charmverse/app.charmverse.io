@@ -4,7 +4,6 @@ import { log } from '@charmverse/core/log';
 import { useDarkTheme } from '@connect-shared/hooks/useDarkTheme';
 import { usePageView } from '@connect-shared/hooks/usePageView';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
-import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
@@ -17,6 +16,7 @@ import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
 import { Avatar } from 'components/common/Avatar';
+import type { LoggedInUser } from 'lib/auth/interfaces';
 
 import { InstallAppMenuItem } from './components/InstallAppMenuItem';
 
@@ -69,7 +69,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
                 <Avatar
                   src={farcasterDetails?.pfpUrl || user?.avatar || undefined}
                   size='medium'
-                  name={user?.username}
+                  name={user.username}
                 />
               </IconButton>
               <Menu
@@ -93,7 +93,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
                 onClick={handleCloseUserMenu}
               >
                 <MenuItem>
-                  <Link href='/profile'>@{farcasterDetails?.username}</Link>
+                  <Link href='/profile'>{user.username}</Link>
                 </MenuItem>
                 <MenuItem onClick={() => logoutUser()}>Sign Out</MenuItem>
                 <InstallAppMenuItem>Install</InstallAppMenuItem>

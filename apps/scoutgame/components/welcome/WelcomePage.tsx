@@ -1,8 +1,9 @@
 import { FarcasterCard } from '@connect-shared/components/common/FarcasterCard';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import Box from '@mui/material/Box';
+
+import type { LoggedInUser } from 'lib/auth/interfaces';
 
 import { ExtraDetails } from './ExtraDetails';
 
