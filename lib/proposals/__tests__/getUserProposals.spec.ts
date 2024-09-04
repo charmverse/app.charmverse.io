@@ -476,7 +476,7 @@ describe('getUserProposals() - actionable', () => {
   });
 });
 
-describe('getUserProposals() - assigned', () => {
+describe('getUserProposals() - review_completed', () => {
   it('Should fetch assigned proposals for the reviewer of proposals', async () => {
     const { space, user: spaceAdmin } = await generateUserAndSpace({
       isAdmin: false
@@ -639,5 +639,65 @@ describe('getUserProposals() - assigned', () => {
     expect(proposals.review_completed.map((p) => p.id).sort()).toStrictEqual(
       [spaceMemberReviewerProposal.id, roleReviewerProposal.id, userReviewerProposal.id].sort()
     );
+  });
+
+  it('Does not include an assigned proposal that is not yet active', async () => {
+    const { space, user: spaceAdmin } = await generateUserAndSpace({
+      isAdmin: false
+    });
+
+    const proposalAuthor = await generateSpaceUser({
+      spaceId: space.id
+    });
+
+    const proposalReviewer = await generateSpaceUser({
+      spaceId: space.id
+    });
+
+    const userReviewerProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalAuthor.id,
+      authors: [proposalAuthor.id],
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'pass_fail',
+          title: 'Feedback',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalAuthor.id
+            }
+          ],
+          permissions: [],
+          rubricCriteria: [
+            {
+              parameters: { min: 1, max: 5 },
+              title: 'Rubric Criteria'
+            }
+          ]
+        },
+        {
+          evaluationType: 'pass_fail',
+          title: 'Pass/Fail',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            }
+          ],
+          permissions: []
+        }
+      ]
+    });
+
+    const proposals = await getUserProposals({
+      spaceId: space.id,
+      userId: proposalReviewer.id
+    });
+
+    expect(proposals.actionable).toStrictEqual([]);
+    expect(proposals.authored).toStrictEqual([]);
+    expect(proposals.review_completed.map((p) => p.id).sort()).toStrictEqual([]);
   });
 });
