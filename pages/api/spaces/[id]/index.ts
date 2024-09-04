@@ -50,8 +50,8 @@ async function deleteSpace(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     await deleteProSubscription({ spaceId, userId });
-  } catch (_e) {
-    log.error(`Error deleting the pro subscription when deleting the space.`, { spaceId, userId });
+  } catch (error) {
+    log.error(`Error deleting the pro subscription when deleting the space.`, { error, spaceId, userId });
   }
 
   await prisma.space.delete({

@@ -59,23 +59,25 @@ async function exportBuilders() {
     }
   });
 
-  const rows: BuilderRow[] = builders.map((row) => {
-    const xtra = (row.xtra as { isHireable?: boolean; location?: string | null }) || {};
-    const repos = uniq(row.pullRequests.map((pr) => pr.repoGithubId));
-    const ecosystems = uniq(row.pullRequests.map((pr) => pr.ecosystemTitle));
-    return {
-      Login: row.login,
-      Name: row.name || '',
-      Email: row.email || '',
-      Twitter: row.twitter || '',
-      Location: xtra.location || '',
-      isHireable: xtra.isHireable ? 'Yes' : '',
-      // aggregate data
-      Repos: repos.length,
-      Ecosystems: ecosystems.length,
-      'Pull Requests': row.pullRequests.length
-    };
-  });
+  const rows: BuilderRow[] = builders
+    .filter((row) => row.pullRequests.length)
+    .map((row) => {
+      const xtra = (row.xtra as { isHireable?: boolean; location?: string | null }) || {};
+      const repos = uniq(row.pullRequests.map((pr) => pr.repoGithubId));
+      const ecosystems = uniq(row.pullRequests.map((pr) => pr.ecosystemTitle));
+      return {
+        Login: row.login,
+        Name: row.name || '',
+        Email: row.email || '',
+        Twitter: row.twitter || '',
+        Location: xtra.location || '',
+        isHireable: xtra.isHireable ? 'Yes' : '',
+        // aggregate data
+        Repos: repos.length,
+        Ecosystems: ecosystems.length,
+        'Pull Requests': row.pullRequests.length
+      };
+    });
   const data = stringify(rows, { header: true, columns: Object.keys(rows[0]), delimiter: '\t' });
 
   await writeFile(`builders.tsv`, data);
@@ -99,19 +101,21 @@ async function exportRepos() {
       pullRequests: true
     }
   });
-  const rows: RepositoryRow[] = builders.map((row) => {
-    const builders = uniq(row.pullRequests.map((pr) => pr.userGithubLogin));
-    return {
-      Url: row.url,
-      Ecosystem: row.ecosystemTitle,
-      Stars: row.stargazerCount,
-      Watchers: row.watcherCount,
-      Forks: row.forkCount,
-      // based on season date
-      Builders: builders.length,
-      'Pull Requests': row.pullRequests.length
-    };
-  });
+  const rows: RepositoryRow[] = builders
+    .filter((row) => row.pullRequests.length)
+    .map((row) => {
+      const builders = uniq(row.pullRequests.map((pr) => pr.userGithubLogin));
+      return {
+        Url: row.url,
+        Ecosystem: row.ecosystemTitle,
+        Stars: row.stargazerCount,
+        Watchers: row.watcherCount,
+        Forks: row.forkCount,
+        // based on season date
+        Builders: builders.length,
+        'Pull Requests': row.pullRequests.length
+      };
+    });
   const data = stringify(rows, { header: true, columns: Object.keys(rows[0]), delimiter: '\t' });
 
   await writeFile(`repos.tsv`, data);
@@ -156,48 +160,50 @@ async function exportEcosystems() {
       parents: true
     }
   });
-  const rows: EcosystemRow[] = ecosystems.map((row) => {
-    const builders = uniq(row.pullRequests.map((pr) => pr.userGithubLogin));
-    const childStats = row.children.reduce<Record<string, number>>(
-      (acc, child) => {
-        const childBuilders = uniq(child.child.pullRequests.map((pr) => pr.userGithubLogin));
-        acc.repos += child.child.repos.length;
-        acc.stars += child.child.repos.reduce((acc, r) => acc + r.stargazerCount, 0);
-        acc.watchers += child.child.repos.reduce((acc, r) => acc + r.watcherCount, 0);
-        acc.forks += child.child.repos.reduce((acc, r) => acc + r.forkCount, 0);
-        acc.builders += childBuilders.length;
-        acc.pullRequests += child.child.pullRequests.length;
-        return acc;
-      },
-      {
-        repos: 0,
-        stars: 0,
-        watchers: 0,
-        forks: 0,
-        builders: 0,
-        pullRequests: 0
-      }
-    );
-    return {
-      Title: row.title,
-      'Sub Ecosystems': row.children.length,
-      'Parent Ecosystems': row.parents.length,
-      Repos: row.repos.length,
-      Stars: row.repos.reduce((acc, r) => acc + r.stargazerCount, 0),
-      Watchers: row.repos.reduce((acc, r) => acc + r.watcherCount, 0),
-      Forks: row.repos.reduce((acc, r) => acc + r.forkCount, 0),
-      // based on season date
-      Builders: builders.length,
-      'Pull Requests': row.pullRequests.length,
-      // include sub ecosystem counts
-      'Repos (With Subs)': row.repos.length + childStats.repos,
-      'Stars (With Subs)': row.repos.reduce((acc, r) => acc + r.stargazerCount, 0) + childStats.stars,
-      'Watchers (With Subs)': row.repos.reduce((acc, r) => acc + r.watcherCount, 0) + childStats.watchers,
-      'Forks (With Subs)': row.repos.reduce((acc, r) => acc + r.forkCount, 0) + childStats.forks,
-      'Builders (With Subs)': builders.length + childStats.builders,
-      'Pull Requests (With Subs)': row.pullRequests.length + childStats.pullRequests
-    };
-  });
+  const rows: EcosystemRow[] = ecosystems
+    .filter((eco) => eco.pullRequests.length)
+    .map((row) => {
+      const builders = uniq(row.pullRequests.map((pr) => pr.userGithubLogin));
+      const childStats = row.children.reduce<Record<string, number>>(
+        (acc, child) => {
+          const childBuilders = uniq(child.child.pullRequests.map((pr) => pr.userGithubLogin));
+          acc.repos += child.child.repos.length;
+          acc.stars += child.child.repos.reduce((acc, r) => acc + r.stargazerCount, 0);
+          acc.watchers += child.child.repos.reduce((acc, r) => acc + r.watcherCount, 0);
+          acc.forks += child.child.repos.reduce((acc, r) => acc + r.forkCount, 0);
+          acc.builders += childBuilders.length;
+          acc.pullRequests += child.child.pullRequests.length;
+          return acc;
+        },
+        {
+          repos: 0,
+          stars: 0,
+          watchers: 0,
+          forks: 0,
+          builders: 0,
+          pullRequests: 0
+        }
+      );
+      return {
+        Title: row.title,
+        'Sub Ecosystems': row.children.length,
+        'Parent Ecosystems': row.parents.length,
+        Repos: row.repos.length,
+        Stars: row.repos.reduce((acc, r) => acc + r.stargazerCount, 0),
+        Watchers: row.repos.reduce((acc, r) => acc + r.watcherCount, 0),
+        Forks: row.repos.reduce((acc, r) => acc + r.forkCount, 0),
+        // based on season date
+        Builders: builders.length,
+        'Pull Requests': row.pullRequests.length,
+        // include sub ecosystem counts
+        'Repos (With Subs)': row.repos.length + childStats.repos,
+        'Stars (With Subs)': row.repos.reduce((acc, r) => acc + r.stargazerCount, 0) + childStats.stars,
+        'Watchers (With Subs)': row.repos.reduce((acc, r) => acc + r.watcherCount, 0) + childStats.watchers,
+        'Forks (With Subs)': row.repos.reduce((acc, r) => acc + r.forkCount, 0) + childStats.forks,
+        'Builders (With Subs)': builders.length + childStats.builders,
+        'Pull Requests (With Subs)': row.pullRequests.length + childStats.pullRequests
+      };
+    });
   const data = stringify(rows, { header: true, columns: Object.keys(rows[0]), delimiter: '\t' });
   await writeFile(`ecosystems.tsv`, data);
   console.log('Exported', rows.length, 'ecosystems');

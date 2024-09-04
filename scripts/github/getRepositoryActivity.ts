@@ -1,8 +1,12 @@
-import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
-
+import { githubAccessToken } from '@root/config/constants';
 import { githubGrapghQLClient } from 'lib/github/githubGraphQLClient';
 import { uniq, uniqBy } from 'lodash';
+import { Octokit } from '@octokit/core';
+import { paginateGraphQL } from '@octokit/plugin-paginate-graphql';
+
+const MyOctokit = Octokit.plugin(paginateGraphQL);
+const octokit = new MyOctokit({ auth: githubAccessToken });
 
 type RepositoryData = {
   id: string;
@@ -49,7 +53,41 @@ type FlatRepositoryData = {
   authors: { login: string; avatarUrl?: string }[];
 };
 
-const repoMetdataQuery = gql`
+// get pull requests by repo: "<owner>/<repo>"
+const queryPullRequests = (repo: string) =>
+  octokit.graphql.paginate<{
+    search: { edges: { node: RepositoryData['pullRequests']['edges'][number]['node'] }[] };
+  }>(
+    `query ($repo: String!, $cursor: String) {
+      search(query: $repo, type: ISSUE, first: 100, after: $cursor) {
+        edges {
+          node {
+            ... on PullRequest {
+              id
+              number
+              createdAt
+              updatedAt
+              title
+              author {
+                login
+              }
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }`,
+    {
+      repo: repo + ' is:pr is:merged updated:2024-06-01..2024-09-01'
+    }
+  );
+
+const queryRepos = (repos: string[]) =>
+  octokit.graphql<{ search: { edges: { node: RepositoryData }[] } }>(
+    `
   query ($repos: String!) {
     search(query: $repos, type: REPOSITORY, first: 10) {
       edges {
@@ -61,7 +99,7 @@ const repoMetdataQuery = gql`
               totalCount
             }
             stargazerCount
-            pullRequests(first: 100, states: MERGED, orderBy: { field: UPDATED_AT, direction: DESC }) {
+            pullRequests(first: 50, states: MERGED, orderBy: { field: UPDATED_AT, direction: DESC }) {
               edges {
                 node {
                   id
@@ -74,6 +112,9 @@ const repoMetdataQuery = gql`
                   }
                 }
               }
+              pageInfo {
+                hasNextPage
+              }
             }
             forkCount
             watchers {
@@ -84,7 +125,11 @@ const repoMetdataQuery = gql`
       }
     }
   }
-`;
+`,
+    {
+      repos: repos.join(' ')
+    }
+  );
 
 function mapToFlatObject(data: RepositoryData, cutoffDate: Date): FlatRepositoryData {
   const filteredPullRequests = data.pullRequests.edges.filter((edge) => {
@@ -126,24 +171,25 @@ export async function getRepositoryActivity({ cutoffDate, repos }: { cutoffDate:
   const allData: FlatRepositoryData[] = [];
 
   for (let i = 0; i <= maxQueriedRepos; i += perQuery) {
-    const repoList = repos
-      .slice(i, i + perQuery)
-      .map((repo) => `repo:${repo.replace('https://github.com/', '')}`)
-      .join(' ');
+    const repoList = repos.slice(i, i + perQuery).map((repo) => `repo:${repo.replace('https://github.com/', '')}`);
 
     if (repoList.length === 0) {
       break;
     }
-    const results = await githubGrapghQLClient
-      .query<{ search: { edges: { node: RepositoryData }[] } }>({
-        query: repoMetdataQuery,
-        variables: {
-          repos: repoList
+
+    const results = await queryRepos(repoList).then(async (data) => {
+      const repos = data.search.edges.map((edge) => edge.node);
+      const _results: FlatRepositoryData[] = [];
+      for (let repo of repos) {
+        if (repo.pullRequests.edges.length >= 50) {
+          const extra = await queryPullRequests(repo.url.replace('https://github.com/', ''));
+          repo.pullRequests.edges = extra.search.edges;
+          _results.push(mapToFlatObject(repo, cutoffDate));
+          console.log('paginated PRs', repo.pullRequests.edges.length);
         }
-      })
-      .then(({ data }) => {
-        return data.search.edges.map((edge) => mapToFlatObject(edge.node, cutoffDate));
-      });
+      }
+      return _results;
+    });
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
