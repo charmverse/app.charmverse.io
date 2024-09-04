@@ -23,7 +23,7 @@ export default async function RootLayout({
     <html lang='en' dir='ltr'>
       <body>
         <AppProviders theme={theme}>
-          <Box component='main' bgcolor='background.default' py={6} minHeight='100vh'>
+          <Box component='main' bgcolor='background.default' pb={2} minHeight='100vh'>
             <GlobalComponent />
             {children}
           </Box>

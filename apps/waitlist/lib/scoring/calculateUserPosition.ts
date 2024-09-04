@@ -7,15 +7,69 @@ export type ConnectWaitlistTier = (typeof waitlistTiers)[number];
 
 export type TierChange = 'none' | 'up' | 'down';
 
-export const tierDistribution: { tier: ConnectWaitlistTier; threshold: number; totalPercentSize: number }[] = [
-  { tier: 'legendary', threshold: 96, totalPercentSize: 5 },
-  { tier: 'mythic', threshold: 81, totalPercentSize: 15 },
-  { tier: 'epic', threshold: 61, totalPercentSize: 20 },
-  { tier: 'rare', threshold: 41, totalPercentSize: 20 },
-  { tier: 'common', threshold: 1, totalPercentSize: 40 }
-];
+type TierDistributionType = {
+  tier: ConnectWaitlistTier;
+  threshold: number;
+  totalPercentSize: number;
+  imageText: string;
+  badge: string;
+  badgeText: string;
+};
 
-export function getTier(percentile: number): ConnectWaitlistTier {
+export const tierDistribution: TierDistributionType[] = [
+  {
+    tier: 'legendary',
+    threshold: 96,
+    totalPercentSize: 5,
+    imageText: '/images/levels/legendary.png',
+    badge: '/images/levels/legendary-badge.png',
+    badgeText: '/images/levels/legendary-badge-text.png'
+  },
+  {
+    tier: 'mythic',
+    threshold: 81,
+    totalPercentSize: 15,
+    imageText: '/images/levels/mythic.png',
+    badge: '/images/levels/mythic-badge.png',
+    badgeText: '/images/levels/mythic-badge-text.png'
+  },
+  {
+    tier: 'epic',
+    threshold: 61,
+    totalPercentSize: 20,
+    imageText: '/images/levels/epic.png',
+    badge: '/images/levels/epic-badge.png',
+    badgeText: '/images/levels/epic-badge-text.png'
+  },
+  {
+    tier: 'rare',
+    threshold: 41,
+    totalPercentSize: 20,
+    imageText: '/images/levels/rare.png',
+    badge: '/images/levels/rare-badge.png',
+    badgeText: '/images/levels/rare-badge-text.png'
+  },
+  {
+    tier: 'common',
+    threshold: 1,
+    totalPercentSize: 40,
+    imageText: '/images/levels/common.png',
+    badge: '/images/levels/common-badge.png',
+    badgeText: '/images/levels/common-badge-text.png'
+  }
+];
+export const tierDistributionMap = tierDistribution.reduce<Record<ConnectWaitlistTier, TierDistributionType>>(
+  (acc, item) => {
+    acc[item.tier] = item;
+    return acc;
+  },
+  {} as Record<ConnectWaitlistTier, TierDistributionType>
+);
+
+export function getTier(percentile?: number | null): ConnectWaitlistTier {
+  if (!percentile) {
+    return 'common';
+  }
   return tierDistribution.find(({ threshold }) => percentile >= threshold)?.tier || 'common';
 }
 

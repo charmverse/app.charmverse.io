@@ -1,9 +1,11 @@
 import { lighten } from '@mui/material';
 
-export const brandColor = '#8742FF'; // purple
+export const brandColor = '#A06CD5;'; // purple
+export const purpleDisabled = 'rgba(160, 108, 213, 0.25)'; // purple dark
+export const secondaryText = '#69DDFF'; // blue
+export const secondaryLightText = '#D8E1FF'; // light blue
+export const primaryTextColorDarkMode = '#D8E1FF;';
 
-// dark mode
-export const primaryTextColorDarkMode = '#ededed';
 export const secondaryTextColorDarkMode = '#999';
 export const disabledTextColorDarkMode = '#666';
 export const backgroundColorDarkMode = '#191919';

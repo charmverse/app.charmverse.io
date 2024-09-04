@@ -81,10 +81,8 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         onClick={signIn}
         disabled={!url}
         sx={(theme) => ({
-          fontSize: '18px',
-          bgcolor: farcasterBrandColor,
-          color: theme.palette.text.primary,
-          '&:hover': { background: farcasterBrandColorDark, color: theme.palette.text.primary }
+          width: '100%'
+          // '&:hover': { background: farcasterBrandColorDark, color: theme.palette.text.primary }
         })}
         startIcon={<WarpcastIcon />}
         {...props}
@@ -103,20 +101,17 @@ export function WarpcastLogin() {
     <AuthKitProvider config={warpcastConfig}>
       <WarpcastLoginButton />
       <Link
-        variant='body2'
         href='https://www.farcaster.xyz/'
         target='_blank'
         rel='noopener'
-        color='text.primary'
         fontWeight={500}
         display='block'
         onMouseDown={() => {
           trackEvent('click_dont_have_farcaster_account');
         }}
       >
-        Don't have a Farcaster account?
+        Join Farcaster
       </Link>
-      ;
     </AuthKitProvider>
   );
 }
