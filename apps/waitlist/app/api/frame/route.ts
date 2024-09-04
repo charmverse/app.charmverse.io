@@ -71,7 +71,7 @@ export async function POST(req: Request, res: Response) {
 
       // Dev image
       // This key is be constructed so that it overcomes farcaster's cache
-      const imgSrc = `${baseUrl}/api/frame/current-position?fid=${interactorFid}&percentile=${percentile}`;
+      const imgSrc = `${baseUrl}/api/frame/current-position?fid=${interactorFid}&percentile=${percentile}&c=1`;
 
       // Prod image - TODO Add a joined image
       // const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
