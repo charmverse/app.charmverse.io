@@ -1,13 +1,10 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { useDarkTheme } from '@connect-shared/hooks/useDarkTheme';
-import { usePageView } from '@connect-shared/hooks/usePageView';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
-import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -23,9 +20,6 @@ import { InstallAppMenuItem } from './components/InstallAppMenuItem';
 export function Header({ user }: { user: LoggedInUser | null }) {
   const path = usePathname();
   const router = useRouter();
-  useDarkTheme();
-  usePageView();
-  useDatadogLogger({ service: 'connect-browser', userId: user?.id });
 
   const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
 

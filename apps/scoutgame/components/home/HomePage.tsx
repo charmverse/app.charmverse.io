@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
 import { WalletLogin } from 'components/common/WalletLogin/WalletLogin';
+import { WalletProvider } from 'components/common/WalletLogin/WalletProvider';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 
 export function HomePage() {
@@ -41,7 +42,9 @@ export function HomePage() {
         Charm Connect: The Home for Builders
       </Typography>
       <Typography align='center'>Endorse Builders, Connect with opportunities and get Rewarded.</Typography>
-      <WalletLogin />
+      <WalletProvider>
+        <WalletLogin />
+      </WalletProvider>
       <WarpcastLogin />
       <MuiLink
         variant='body2'
