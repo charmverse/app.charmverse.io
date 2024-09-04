@@ -27,8 +27,8 @@ export function UserProposalsTables() {
           {proposals.authored.length ? (
             <ProposalsTable proposals={proposals.authored} title={`My ${getFeatureTitle('Proposals')}`} />
           ) : null}
-          {proposals.assigned.length ? (
-            <ProposalsTable proposals={proposals.assigned} title='Assigned to me' assigned />
+          {proposals.review_completed.length ? (
+            <ProposalsTable proposals={proposals.review_completed} title='Review completed' />
           ) : null}
         </Stack>
       )}

@@ -31,8 +31,6 @@ let draftProposal: Proposal;
 let discussionProposal: Proposal & { page: Page };
 let hiddenProposal: Proposal;
 
-let publicLink: string;
-
 test.beforeAll(async () => {
   // Initial setup
   const generated = await testUtilsUser.generateUserAndSpace({
@@ -111,12 +109,15 @@ test.describe('View proposal', () => {
       browserPage: proposalListPage.page,
       userId: proposalAuthor.id
     });
+
     // Finish setup start interacting with the app
     await proposalListPage.goToHomePage();
 
     await proposalListPage.getSidebarLink('proposals').click();
 
     await proposalListPage.waitForProposalsList();
+
+    await proposalListPage.page.getByRole('tab', { name: 'All' }).click();
 
     const draftRow = proposalListPage.getProposalRowLocator(draftProposal.id);
     const discussionRow = proposalListPage.getProposalRowLocator(discussionProposal.id);
@@ -135,8 +136,7 @@ test.describe('View proposal', () => {
       userId: spaceMember.id
     });
 
-    await proposalListPage.goToHomePage();
-    await proposalListPage.getSidebarLink('proposals').click();
+    await proposalListPage.goToProposals(space.domain);
     await proposalListPage.waitForProposalsList();
 
     // Check the rows content
@@ -163,9 +163,7 @@ test.describe('View proposal', () => {
     });
 
     // Finish setup start interacting with the app
-    await proposalListPage.goToHomePage();
-
-    await proposalListPage.getSidebarLink('proposals').click();
+    await proposalListPage.goToProposals(space.domain);
 
     await proposalListPage.waitForProposalsList();
 
