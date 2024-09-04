@@ -1,10 +1,9 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { headers } from 'next/headers';
 import { useState } from 'react';
 import type { State } from 'wagmi';
-import { cookieToInitialState, WagmiProvider as OriginalWagmiProvider } from 'wagmi';
+import { WagmiProvider as OriginalWagmiProvider } from 'wagmi';
 
 import { getConfig } from 'lib/auth/wagmiConfig';
 

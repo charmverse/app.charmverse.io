@@ -57,7 +57,6 @@ export const metadata: Metadata = {
     description: appDescription
   }
 };
-
 export const viewport: Viewport = {
   themeColor: '#fff',
   userScalable: false
