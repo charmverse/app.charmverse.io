@@ -6,7 +6,7 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 import { getFrameHtml } from 'frames.js';
 
 import {
-  waitlistGet1000Points,
+  waitlistGet10Clicks,
   waitlistGetDetails,
   waitlistShareMyFrame,
   type WaitlistFramePage
@@ -25,10 +25,13 @@ export async function POST(req: Request, res: Response) {
 
   const interactorFid = parseInt(validatedMessage.action.interactor.fid.toString(), 10);
 
+  const interactorUsername = validatedMessage.action.interactor.username;
+
   const query = new URL(req.url).searchParams;
 
+  const referrerFid = new URL(req.url).pathname.split('/').pop();
+
   const currentPage = query.get('current_page') as WaitlistFramePage;
-  const referrerFid = query.get('referrer_fid');
 
   const joinWaitlistResult = await joinWaitlist({
     fid: interactorFid,
@@ -53,7 +56,11 @@ export async function POST(req: Request, res: Response) {
       html = getFrameHtml({
         image: imgSrc,
         version: 'vNext',
-        buttons: [waitlistGetDetails, waitlistGet1000Points, waitlistShareMyFrame(interactorFid)],
+        buttons: [
+          await waitlistGetDetails({ fid: interactorFid, username: interactorUsername }),
+          await waitlistGet10Clicks({ fid: interactorFid, username: interactorUsername }),
+          waitlistShareMyFrame(interactorFid)
+        ],
         imageAspectRatio: '1:1'
         // ogImage: `${baseUrl}/images/waitlist/waitlist-joined.gif`
       });
@@ -71,7 +78,7 @@ export async function POST(req: Request, res: Response) {
 
       // Dev image
       // This key is be constructed so that it overcomes farcaster's cache
-      const imgSrc = `${baseUrl}/api/frame/current-position?fid=${interactorFid}&percentile=${percentile}&c=1`;
+      const imgSrc = `${baseUrl}/api/frame/${referrerFid}/current-position?fid=${interactorFid}&percentile=${percentile}&c=2`;
 
       // Prod image - TODO Add a joined image
       // const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
@@ -80,7 +87,10 @@ export async function POST(req: Request, res: Response) {
         image: imgSrc,
         ogImage: imgSrc,
         version: 'vNext',
-        buttons: [waitlistGetDetails, waitlistShareMyFrame(interactorFid)],
+        buttons: [
+          await waitlistGetDetails({ fid: interactorFid, username: interactorUsername }),
+          waitlistShareMyFrame(interactorFid)
+        ],
         imageAspectRatio: '1:1'
       });
     }

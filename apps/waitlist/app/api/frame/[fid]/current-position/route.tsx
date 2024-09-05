@@ -1,10 +1,5 @@
-// My file: /my-project/src/pages/api/myimage/[code].jsx
-// !!! Important is in: .../api/...
-
-import { GET as httpGET } from '@root/adapters/http';
 import { baseUrl } from '@root/config/constants';
 import { ImageResponse } from 'next/og';
-import React from 'react';
 
 import { getTier, tierColors } from 'lib/scoring/constants';
 
@@ -12,14 +7,7 @@ export const runtime = 'edge';
 export const contentType = 'image/jpeg';
 
 export async function GET(req: Request) {
-  let data;
-
   const searchParams = new URLSearchParams(req.url);
-
-  // Font
-  // const interSemiBold = fetch(
-  //   new URL('./Inter-SemiBold.ttf', import.meta.url)
-  // ).then((res) => res.arrayBuffer());
 
   const percentile = searchParams.get('percentile');
 
@@ -74,7 +62,6 @@ export async function GET(req: Request) {
             <span style={{ fontSize: '30px', fontWeight: 'bold' }}>{percentile}%</span>
           </div>
         </div>
-        <h1>Example 3</h1>
       </div>
     ),
     // ImageResponse options
