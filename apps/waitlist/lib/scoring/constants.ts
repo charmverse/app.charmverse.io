@@ -11,8 +11,8 @@ export const tierDistribution: { tier: ConnectWaitlistTier; threshold: number; t
   { tier: 'legendary', threshold: 96, totalPercentSize: 5 },
   { tier: 'mythic', threshold: 81, totalPercentSize: 15 },
   { tier: 'epic', threshold: 61, totalPercentSize: 20 },
-  { tier: 'rare', threshold: 41, totalPercentSize: 20 },
-  { tier: 'common', threshold: 1, totalPercentSize: 40 }
+  { tier: 'rare', threshold: 31, totalPercentSize: 30 },
+  { tier: 'common', threshold: 1, totalPercentSize: 30 }
 ];
 
 export function getTier(percentile: number): ConnectWaitlistTier {
