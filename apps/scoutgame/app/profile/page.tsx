@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { ProfilePage } from 'components/profile/ProfilePage';
-import { getCurrentUserAction } from 'lib/user/getCurrentUserAction';
+import { getCurrentUserAction } from 'lib/users/getCurrentUserAction';
 
 export const dynamic = 'force-dynamic';
 

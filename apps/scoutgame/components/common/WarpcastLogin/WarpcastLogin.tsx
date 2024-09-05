@@ -13,7 +13,7 @@ import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
 import '@farcaster/auth-kit/styles.css';
 
-import { warpcastConfig } from 'lib/farcaster/config';
+import { authConfig } from 'lib/farcaster/config';
 
 function WarpcastLoginButton() {
   const router = useRouter();
@@ -78,7 +78,7 @@ function WarpcastLoginButton() {
 
 export function WarpcastLogin() {
   return (
-    <AuthKitProvider config={warpcastConfig}>
+    <AuthKitProvider config={authConfig}>
       <WarpcastLoginButton />
     </AuthKitProvider>
   );

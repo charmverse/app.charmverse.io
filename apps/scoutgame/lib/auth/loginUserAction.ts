@@ -3,8 +3,8 @@
 import { log } from '@charmverse/core/log';
 import { actionClient } from '@connect-shared/lib/actions/actionClient';
 
+import { schema } from './loginSchema';
 import { loginUser } from './loginUser';
-import { schema } from './loginUserSchema';
 
 export const loginAction = actionClient
   .metadata({ actionName: 'login' })
@@ -13,7 +13,7 @@ export const loginAction = actionClient
     if (!parsedInput.type) {
       throw new Error('Invalid login type');
     }
-    const loggedInUser = await loginUser({ ...parsedInput, anonymousUserId: ctx.session.anonymousUserId });
+    const loggedInUser = await loginUser({ ...parsedInput, newUserId: ctx.session.anonymousUserId });
 
     log.info(`User logged in`, { userId: loggedInUser.id, method: parsedInput.type });
 
