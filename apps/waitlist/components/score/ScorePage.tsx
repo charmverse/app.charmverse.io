@@ -8,11 +8,18 @@ import Link from 'next/link';
 
 import { FadeIn } from 'components/common/Animations/FadeIn';
 import { LearnMore } from 'components/common/LearnMore';
+import { shareFrameUrl } from 'lib/frame/actionButtons';
 
 import ProgressBar from './ScoresProgressBar';
 import { ScoreTier } from './ScoreTier';
 
-export function ScorePage({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot & { clicks: number } }) {
+export function ScorePage({
+  waitlistSlot,
+  fid
+}: {
+  waitlistSlot: ConnectWaitlistSlot & { clicks: number };
+  fid: string;
+}) {
   const hasRegisteredAsBuilder = !!waitlistSlot?.githubLogin;
 
   return (
@@ -66,7 +73,9 @@ export function ScorePage({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot 
           Move up the Waitlist!
         </Typography>
         <Box width='100%'>
-          <Button sx={{ width: '100%', mb: 2 }}>Share your Frame</Button>
+          <Button target='_blank' rel='noopener noreferrer' href={shareFrameUrl(fid)} sx={{ width: '100%', mb: 2 }}>
+            Share your Frame
+          </Button>
           {!hasRegisteredAsBuilder && (
             <Typography variant='body2' color='secondary.light' textAlign='left'>
               Earn 10 Frame Clicks

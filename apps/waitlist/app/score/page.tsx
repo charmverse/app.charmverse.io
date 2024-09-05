@@ -20,5 +20,5 @@ export default async function Score() {
     return null;
   }
 
-  return <ScorePage waitlistSlot={waitlistSlot} />;
+  return <ScorePage waitlistSlot={waitlistSlot} fid={session.farcasterUser.fid} />;
 }
