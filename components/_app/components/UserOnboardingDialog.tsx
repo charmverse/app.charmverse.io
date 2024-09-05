@@ -165,7 +165,7 @@ function UserOnboardingDialog({
     !isUserDetailsValid ||
     !isMemberPropertiesValid ||
     requiredPropertiesWithoutValue.some((requiredProperty) =>
-      ['discord', 'google', 'wallet', 'telegram'].includes(requiredProperty)
+      ['discord', 'google', 'wallet', 'telegram', 'farcaster'].includes(requiredProperty)
     );
 
   const isSaveButtonDisabled = hideCloseButton;
