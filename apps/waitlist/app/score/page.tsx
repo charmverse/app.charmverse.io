@@ -1,7 +1,7 @@
 import { Typography, Button, Tooltip, Box } from '@mui/material';
 import { redirect } from 'next/navigation';
 
-import { getTier } from 'lib/scoring/calculateUserPosition';
+import { getTier } from 'lib/scoring/constants';
 import { getWaitlistSlotWithClicks } from 'lib/scoring/getWaitlistSlotWithClicks';
 import { getSession } from 'lib/session/getSession';
 

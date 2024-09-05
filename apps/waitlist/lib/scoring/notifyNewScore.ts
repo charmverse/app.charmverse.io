@@ -3,7 +3,7 @@ import { baseUrl } from '@root/config/constants';
 import { NEYNAR_SIGNER_ID } from '@root/lib/farcaster/constants';
 import { writeToFarcaster } from '@root/lib/farcaster/messaging/writeToFarcaster';
 
-import type { ConnectWaitlistTier, TierChange } from './calculateUserPosition';
+import type { ConnectWaitlistTier, TierChange } from './constants';
 
 type WaitlistScoreNotification = {
   fid: number | string;

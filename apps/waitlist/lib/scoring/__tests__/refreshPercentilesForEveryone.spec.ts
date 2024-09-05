@@ -2,7 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { randomFid } from '../../../../../testing/utils/farcaster';
-import type { ConnectWaitlistTier, TierChange } from '../calculateUserPosition';
+import type { ConnectWaitlistTier, TierChange } from '../constants';
 import { refreshPercentilesForEveryone } from '../refreshPercentilesForEveryone'; // Adjust the import to the correct module
 
 // Function to shuffle an array deterministically using a seeded random number generator

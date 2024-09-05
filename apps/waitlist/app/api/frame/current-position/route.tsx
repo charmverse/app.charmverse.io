@@ -6,7 +6,7 @@ import { baseUrl } from '@root/config/constants';
 import { ImageResponse } from 'next/og';
 import React from 'react';
 
-import { getTier } from 'lib/scoring/calculateUserPosition';
+import { getTier } from 'lib/scoring/constants';
 import YourScoreImage from 'public/images/waitlist/dev/waitlist-current-score.jpg';
 
 export const runtime = 'edge';
