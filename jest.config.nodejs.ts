@@ -22,6 +22,8 @@ export const jestConfig: Omit<JestConfigWithTsJest, 'transform'> = {
   // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: false,
 
+  modulePathIgnorePatterns: ['__e2e__'],
+
   // An array of directory names to be searched recursively up from the requiring module's location
   moduleDirectories: ['node_modules', '<rootDir>'],
 
