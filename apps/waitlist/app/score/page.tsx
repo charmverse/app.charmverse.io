@@ -14,8 +14,9 @@ export default async function Score() {
 
   const waitlistSlot = await getWaitlistSlotWithClicks({ fid: parseInt(session.farcasterUser.fid) }).catch(() => null);
 
+  // Redirect is handled in the middleware
   if (!waitlistSlot) {
-    redirect('/join');
+    return null;
   }
 
   return <ScorePage waitlistSlot={waitlistSlot} />;

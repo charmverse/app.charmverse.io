@@ -20,7 +20,7 @@ export default function JoinWaitlistButton() {
   });
 
   return (
-    <Button color='primary' onClick={() => joinWaitlist()} href=''>
+    <Button color='primary' onClick={() => joinWaitlist()}>
       Join the waitlist
     </Button>
   );

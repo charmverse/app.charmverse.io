@@ -65,8 +65,8 @@ export function ScorePage({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot 
         <Typography variant='h5' mb={2} fontWeight='700' color='secondary'>
           Move up the Waitlist!
         </Typography>
-        <Button sx={{ width: '100%' }}>Share your Frame</Button>
         <Box width='100%'>
+          <Button sx={{ width: '100%', mb: 2 }}>Share your Frame</Button>
           {!hasRegisteredAsBuilder && (
             <Typography variant='body2' color='secondary.light' textAlign='left'>
               Earn 10 Frame Clicks

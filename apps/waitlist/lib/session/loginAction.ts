@@ -12,13 +12,9 @@ export const loginWithFarcasterAction = actionClient
   .metadata({ actionName: 'login' })
   .schema(yup.object({ loginPayload: yup.object<StatusAPIResponse>({}) })) // accept all body input
   .action(async ({ ctx, parsedInput }) => {
-    prettyPrint({ parsedInput });
     const { fid, username } = parsedInput.loginPayload as StatusAPIResponse;
 
     log.info('User logged in to waitlist', { fid, username });
-
-    ctx.session.farcasterUser = { fid: fid?.toString() as string, username };
-    await ctx.session.save();
 
     const currentWaitlistSlot = await prisma.connectWaitlistSlot.findUnique({
       where: {
@@ -26,5 +22,10 @@ export const loginWithFarcasterAction = actionClient
       }
     });
 
-    return { success: true, fid, hasJoinedWaitlist: !!currentWaitlistSlot };
+    const hasJoinedWaitlist = !!currentWaitlistSlot;
+
+    ctx.session.farcasterUser = { fid: fid?.toString() as string, username, hasJoinedWaitlist };
+    await ctx.session.save();
+
+    return { success: true, fid, hasJoinedWaitlist };
   });

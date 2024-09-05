@@ -10,7 +10,6 @@ import type { AuthClientError, StatusAPIResponse } from '@farcaster/auth-kit';
 import { Box, Button, Link, Typography, lighten } from '@mui/material';
 import type { ButtonProps } from '@mui/material';
 import { warpcastConfig } from '@root/lib/farcaster/config';
-import { prettyPrint } from '@root/lib/utils/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -32,17 +31,22 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const { isAuthenticated } = useProfile();
 
   const {
-    execute: loginUser,
+    executeAsync: loginUser,
     hasErrored,
     hasSucceeded,
     isExecuting
   } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
-      if (data?.hasJoinedWaitlist) {
-        router.push('/score');
-      } else {
-        router.push('/join');
+      if (!data?.success) {
+        return;
       }
+
+      if (data.hasJoinedWaitlist) {
+        router.push('/score');
+      }
+
+      revalidatePathAction();
+      popupState.close();
     },
     onError(err) {
       log.error('Error on login', { error: err.error.serverError });
@@ -50,9 +54,7 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   });
 
   const onSuccessCallback = useCallback(async (data: StatusAPIResponse) => {
-    prettyPrint({ data });
     await loginUser({ loginPayload: data });
-    popupState.close();
   }, []);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
@@ -80,10 +82,9 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         size='large'
         onClick={signIn}
         disabled={!url}
-        sx={(theme) => ({
+        sx={{
           width: '100%'
-          // '&:hover': { background: farcasterBrandColorDark, color: theme.palette.text.primary }
-        })}
+        }}
         startIcon={<WarpcastIcon />}
         {...props}
       >

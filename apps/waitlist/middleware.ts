@@ -17,8 +17,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  if (farcasterUser && path === '/') {
+  if (farcasterUser?.hasJoinedWaitlist && path === '/') {
     return NextResponse.redirect(new URL('/score', request.url));
+  }
+
+  if (!farcasterUser?.hasJoinedWaitlist && path === '/score') {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return NextResponse.next();
