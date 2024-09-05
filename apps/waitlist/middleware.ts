@@ -8,12 +8,14 @@ export async function middleware(request: NextRequest) {
   const farcasterUser = session.farcasterUser;
   const path = request.nextUrl.pathname;
 
+  const authenticatedPaths = ['/builders', '/score', '/join'];
+
   if (path.startsWith('/frame')) {
     return NextResponse.next();
   }
 
   // Make all pages private
-  if (!farcasterUser && path !== '/') {
+  if (!farcasterUser && authenticatedPaths.some((p) => path.startsWith(p))) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
