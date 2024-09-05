@@ -14,8 +14,11 @@ export async function findOrCreateUser({
   farcasterId
 }: {
   walletAddress: string;
-  farcasterId?: string;
+  farcasterId?: number;
   newUserId?: string;
+  bio?: string;
+  displayName?: string;
+  username?: string;
 }): Promise<Scout> {
   const lowercaseAddress = walletAddress.toLowerCase();
 

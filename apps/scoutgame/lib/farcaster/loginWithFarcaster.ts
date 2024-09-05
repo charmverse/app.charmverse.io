@@ -65,7 +65,10 @@ export async function loginWithFarcaster({
   }
 
   return findOrCreateUser({
-    farcasterId: fid.toString(),
+    farcasterId: fid,
+    bio,
+    displayName,
+    username,
     newUserId,
     walletAddress: verifications.sort()[0]
   });
