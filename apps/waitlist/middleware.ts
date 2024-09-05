@@ -11,11 +11,8 @@ export async function middleware(request: NextRequest) {
   const session = await getSession();
   let farcasterUser = session.farcasterUser;
 
-  const path = request.nextUrl.pathname;
-  const params = request.nextUrl.searchParams;
-
-  const sealedFarcasterUser = params.get('farcaster_user');
-
+  const url = request.nextUrl.clone(); // Clone the request URL to modify it
+  const sealedFarcasterUser = url.searchParams.get('farcaster_user');
   const response = NextResponse.next(); // Create a response object to set cookies
 
   if (sealedFarcasterUser) {
@@ -38,21 +35,24 @@ export async function middleware(request: NextRequest) {
 
       // Mutate the request by adding the cookie to the headers
       request.headers.set('cookie', `${cookieName}=${sealedFarcasterUser}`);
+
+      // Remove the `farcaster_user` param from the URL
+      url.searchParams.delete('farcaster_user');
     }
   }
 
   const authenticatedPaths = ['/builders', '/score', '/join'];
 
-  if (!farcasterUser && authenticatedPaths.some((p) => path.startsWith(p))) {
+  if (!farcasterUser && authenticatedPaths.some((p) => url.pathname.startsWith(p))) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  if (farcasterUser && path === '/') {
+  if (farcasterUser && url.pathname === '/') {
     return NextResponse.redirect(new URL('/score', request.url));
   }
 
-  // Rewrite the request to pass the mutated headers along with it
-  return NextResponse.rewrite(request.nextUrl, { request, headers: response.headers });
+  // Rewrite the request with the new URL (without the query param)
+  return NextResponse.rewrite(url, { request, headers: response.headers });
 }
 
 export const config = {
