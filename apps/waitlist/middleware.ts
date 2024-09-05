@@ -1,9 +1,10 @@
-import { authSecret, cookieName } from '@root/config/constants';
+import { authSecret } from '@root/config/constants';
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import type { SessionData } from 'lib/session/config';
+import { cookieName } from 'lib/session/config';
 import { getSession } from 'lib/session/getSession';
 
 export async function middleware(request: NextRequest) {
