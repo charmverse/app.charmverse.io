@@ -42,18 +42,20 @@ export function ScorePage({
           minHeight: 'calc(100svh - 100px)'
         }}
       >
-        <Image
-          src='/images/scout-game-logo.png'
-          width={400}
-          height={200}
-          sizes='100vw'
-          style={{
-            width: '100%',
-            maxWidth: '400px',
-            height: 'auto'
-          }}
-          alt='Scout game score'
-        />
+        <FadeIn height={200}>
+          <Image
+            src='/images/scout-game-logo.png'
+            width={400}
+            height={200}
+            sizes='100vw'
+            style={{
+              width: '100%',
+              maxWidth: '400px',
+              height: 'auto'
+            }}
+            alt='Scout game score'
+          />
+        </FadeIn>
         <Typography variant='h5' mb={2} fontWeight='700'>
           Let's race to the top!
         </Typography>
