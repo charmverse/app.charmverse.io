@@ -5,7 +5,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
 import { Counter } from 'components/common/Counter';
-import { getTier, tierDistributionMap } from 'lib/scoring/calculateUserPosition';
+import { getTier, tierDistributionMap } from 'lib/scoring/constants';
 
 export function ScoreTier({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot & { clicks: number } }) {
   const tier = getTier(waitlistSlot?.percentile);

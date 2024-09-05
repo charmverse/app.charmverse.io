@@ -5,7 +5,7 @@ import { motion, useAnimation } from 'framer-motion';
 import Image from 'next/image';
 import React from 'react';
 
-import { tierDistribution } from 'lib/scoring/calculateUserPosition';
+import { tierDistribution } from 'lib/scoring/constants';
 
 interface ProgressBarProps {
   from: number;
