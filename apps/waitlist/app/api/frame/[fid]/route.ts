@@ -47,14 +47,11 @@ export async function POST(req: Request, res: Response) {
     let html: string = '';
 
     if (joinWaitlistResult.isNew) {
-      // Dev image
-      const imgSrc = `${baseUrl}/images/waitlist/dev/waitlist-joined.jpg`;
-
-      // Prod image
-      // const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
+      const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
 
       html = getFrameHtml({
         image: imgSrc,
+        ogImage: imgSrc,
         version: 'vNext',
         buttons: [
           await waitlistGetDetails({ fid: interactorFid, username: interactorUsername }),
@@ -62,7 +59,6 @@ export async function POST(req: Request, res: Response) {
           waitlistShareMyFrame(interactorFid)
         ],
         imageAspectRatio: '1:1'
-        // ogImage: `${baseUrl}/images/waitlist/waitlist-joined.gif`
       });
     } else {
       const { percentile } = await prisma.connectWaitlistSlot.findFirstOrThrow({
@@ -74,14 +70,8 @@ export async function POST(req: Request, res: Response) {
         }
       });
 
-      // TODO: Add a notification here if position changed
-
-      // Dev image
-      // This key is be constructed so that it overcomes farcaster's cache
-      const imgSrc = `${baseUrl}/api/frame/${referrerFid}/current-position?fid=${interactorFid}&percentile=${percentile}&c=2`;
-
-      // Prod image - TODO Add a joined image
-      // const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
+      // This key is being constructed so that it overcomes farcaster's cache
+      const imgSrc = `${baseUrl}/api/frame/${referrerFid}/current-position?fid=${interactorFid}&percentile=${percentile}&c=3`;
 
       html = getFrameHtml({
         image: imgSrc,

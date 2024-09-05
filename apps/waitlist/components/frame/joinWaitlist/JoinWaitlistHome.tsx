@@ -3,11 +3,7 @@ import { baseUrl } from '@root/config/constants';
 import { getWaitlistPostbackUrl } from './getWaitlistPostbackUrl';
 
 export function JoinWaitlistHome({ referrerFid }: { referrerFid: string }) {
-  // Dev image
-  const src = `${baseUrl}/images/waitlist/dev/waitlist-intro.jpg`;
-
-  // Prod image
-  // const src = `${baseUrl}/images/waitlist/waitlist-intro.gif`;
+  const src = `${baseUrl}/images/waitlist/waitlist-intro.gif`;
 
   return (
     <>

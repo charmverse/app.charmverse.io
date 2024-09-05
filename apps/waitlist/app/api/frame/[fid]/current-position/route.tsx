@@ -25,7 +25,7 @@ export async function GET(req: Request) {
           height: '600px',
           // background: 'blue',
           fontFamily: 'Inter',
-          backgroundImage: `url(${baseUrl}/images/waitlist/dev/waitlist-current-score.gif)`,
+          backgroundImage: `url(${baseUrl}/images/waitlist/waitlist-current-score.png)`,
           backgroundSize: '600px 600px'
         }}
       >
@@ -58,7 +58,7 @@ export async function GET(req: Request) {
               width: '100%'
             }}
           >
-            <span style={{ fontSize: '30px', fontWeight: 'bold', color: tierColors[tier] }}>{tier.toUpperCase()}</span>
+            <img height='38px' src={`${baseUrl}/images/waitlist/label-${tier}.png`} />
             <span style={{ fontSize: '30px', fontWeight: 'bold' }}>{percentile}%</span>
           </div>
         </div>

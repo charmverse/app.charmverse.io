@@ -39,7 +39,7 @@ export async function notifyNewScore({ fid, tier, tierChange }: WaitlistScoreNot
 
   const message = `@${waitlistSlot.username} you moved ${tierChange} to the ${tierLabels[tier]} tier!`;
 
-  const imageUrl = `${baseUrl}/images/waitlist/dev/${tierChange}-${tier}.gif`;
+  const imageUrl = `${baseUrl}/images/waitlist/${tierChange}-${tier}.gif`;
 
   return writeToFarcaster({
     neynarSignerId: NEYNAR_SIGNER_ID,

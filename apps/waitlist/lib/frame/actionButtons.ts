@@ -40,10 +40,10 @@ export async function waitlistGet10Clicks({ fid, username }: FarcasterUserToEnco
   };
 }
 
-function shareFrameUrl(fid: string | number): string {
+export function shareFrameUrl(fid: string | number): string {
   return `https://warpcast.com/~/compose?text=${encodeURIComponent(
-    'Join me on the waitlist for Charm Connect! If you join via my frame, I earn points toward moving up in the list. No pressure, but you don’t want to miss this launch ;)'
-  )}&embeds[]=${encodeURIComponent(`${baseUrl}/waitlist/${fid}`)}`;
+    'Join me on the waitlist for Scout Game! If you join via my frame, I earn points toward moving up in the list. No pressure, but you don’t want to miss this launch ;)'
+  )}&embeds[]=${encodeURIComponent(`${baseUrl}/frame/${fid}`)}`;
 }
 
 export function waitlistShareMyFrame(fid: string | number): FrameButtonLink {
