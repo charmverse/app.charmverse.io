@@ -2,8 +2,8 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { roundNumberInRange } from '@root/lib/utils/numbers';
 
-import type { ConnectWaitlistTier, TierChange } from './calculateUserPosition';
-import { getTierChange, tierDistribution } from './calculateUserPosition';
+import type { ConnectWaitlistTier, TierChange } from './constants';
+import { tierDistribution, getTier } from './constants';
 import { notifyNewScore } from './notifyNewScore';
 
 export type TierChangeResult = {
@@ -13,6 +13,23 @@ export type TierChangeResult = {
   percentile: number;
   score: number;
 };
+
+export function getTierChange({
+  previousPercentile,
+  currentPercentile
+}: {
+  previousPercentile: number;
+  currentPercentile: number;
+}): { previousTier: ConnectWaitlistTier; currentTier: ConnectWaitlistTier; tierChange: TierChange } {
+  const previousTier = getTier(previousPercentile);
+  const currentTier = getTier(currentPercentile);
+
+  return {
+    previousTier,
+    currentTier,
+    tierChange: previousTier === currentTier ? 'none' : previousPercentile < currentPercentile ? 'up' : 'down'
+  };
+}
 
 export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[]> {
   const totalUsers = await prisma.connectWaitlistSlot.count();

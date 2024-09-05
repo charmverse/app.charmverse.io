@@ -9,5 +9,5 @@ export function getWaitlistPostbackUrl({
   currentPage: WaitlistFramePage;
   referrerFid: string | number;
 }) {
-  return `${baseUrl}/api/frame?current_page=${currentPage}&referrer_fid=${referrerFid}`;
+  return `${baseUrl}/api/frame/${referrerFid}?current_page=${currentPage}`;
 }
