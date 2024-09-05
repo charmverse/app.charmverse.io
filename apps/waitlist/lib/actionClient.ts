@@ -29,7 +29,7 @@ export const actionClient = createSafeActionClient({
     const headerList = headers();
 
     return next({
-      ctx: { session, headers: headerList }
+      ctx: { session: { farcasterUser: session.farcasterUser }, headers: headerList }
     });
   });
 
