@@ -20,7 +20,7 @@ export async function findOrCreateFarcasterUser({
     avatar: profile.body.avatarUrl,
     bio: profile.body.bio,
     walletAddress: profile.connectedAddress,
-    displayName: profile.body.displayName,
+    displayName: profile.body.displayName || profile.body.username,
     username: profile.body.username
   });
 }

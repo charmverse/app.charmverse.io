@@ -21,6 +21,8 @@ import {
 export const defaultFont =
   'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
+const contrastText = '#fff'; // mode === 'dark' ? '#fff' : '#000';
+
 const extendedTheme = extendTheme({
   cssVarPrefix: 'charm',
   colorSchemes: {
@@ -77,6 +79,7 @@ const extendedTheme = extendTheme({
           dark: darken(brandColor, 0.2)
         },
         secondary: {
+          contrastText,
           main: secondaryTextColorDarkMode
         },
         textPrimary: {

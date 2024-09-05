@@ -3,7 +3,6 @@
 import { log } from '@charmverse/core/log';
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
-import { loginWithFarcasterAction } from '@connect-shared/lib/session/loginAction';
 import { AuthKitProvider, SignInButton, useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import { Typography } from '@mui/material';
@@ -11,9 +10,10 @@ import Box from '@mui/material/Box';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
-import '@farcaster/auth-kit/styles.css';
 
+import '@farcaster/auth-kit/styles.css';
 import { authConfig } from 'lib/farcaster/config';
+import { loginAction } from 'lib/session/loginWithFarcasterAction';
 
 function WarpcastLoginButton() {
   const router = useRouter();
@@ -30,7 +30,7 @@ function WarpcastLoginButton() {
     hasErrored,
     hasSucceeded: loginWithFarcasterSuccess,
     isExecuting: isLoggingIn
-  } = useAction(loginWithFarcasterAction, {
+  } = useAction(loginAction, {
     onSuccess: async () => {
       await revalidatePath();
       router.push('/profile');
@@ -41,7 +41,11 @@ function WarpcastLoginButton() {
   });
 
   const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
-    await loginUser(res);
+    if (res.message && res.signature) {
+      await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature! });
+    } else {
+      log.error('Did not receive message or signature from farcaster', res);
+    }
   }, []);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
@@ -71,7 +75,11 @@ function WarpcastLoginButton() {
       }}
     >
       <SignInButton onSuccess={onSuccessCallback} onError={onErrorCallback} hideSignOut />
-      {hasErrored && <Typography variant='body2'>There was an error while logging in</Typography>}
+      {hasErrored && (
+        <Typography variant='body2' sx={{ mt: 2 }} color='error'>
+          There was an error while logging in
+        </Typography>
+      )}
     </Box>
   );
 }

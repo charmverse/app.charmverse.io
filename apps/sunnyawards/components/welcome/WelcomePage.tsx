@@ -8,7 +8,7 @@ import { FarcasterCard } from '../common/FarcasterCard';
 
 import { ExtraDetails } from './ExtraDetails';
 
-export function WelcomePage({ user }: { user: LoggedInUser }) {
+export function WelcomePage({ user }: { user: Scout }) {
   const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   return (
@@ -23,7 +23,6 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
             avatar={farcasterDetails.pfpUrl}
             bio={farcasterDetails.bio}
             username={farcasterDetails.username}
-            fid={user.farcasterUser?.fid}
           />
         )}
         <br />

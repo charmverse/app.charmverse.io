@@ -1,4 +1,5 @@
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
+import { Box } from '@mui/material';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
@@ -9,20 +10,17 @@ import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 
 export function HomePage() {
   return (
-    <PageWrapper
-      display='flex'
-      flexDirection='column'
-      alignItems='center'
-      maxWidth='100vw'
-      border='none'
-      borderRadius='0'
-      textAlign='center'
+    <Box
+      display='grid'
+      gridTemplateRows='auto 1fr auto'
+      minHeight='100vh'
       sx={{
         display: 'flex',
         flexDirection: 'column',
         gap: 4,
-        justifyContent: { xs: 'space-evenly', md: 'normal' },
+        justifyContent: { xs: 'space-evenly', sm: 'center' },
         alignItems: 'center',
+        textAlign: 'center',
         height: '100%',
         maxHeight: '40em'
       }}
@@ -57,6 +55,6 @@ export function HomePage() {
       >
         Don't have a Farcaster account?
       </MuiLink>
-    </PageWrapper>
+    </Box>
   );
 }

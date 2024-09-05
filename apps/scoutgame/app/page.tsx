@@ -4,6 +4,7 @@ import { getSession } from '@connect-shared/lib/session/getSession';
 import { redirect } from 'next/navigation';
 
 import { ComingSoon } from 'components/home/ComingSoon';
+import { HomePage } from 'components/home/HomePage';
 
 // tell Next that this route loads dynamic data
 export const dynamic = 'force-dynamic';
@@ -25,5 +26,5 @@ export default async function Home() {
     }
   }
 
-  return <ComingSoon />;
+  return <HomePage />;
 }
