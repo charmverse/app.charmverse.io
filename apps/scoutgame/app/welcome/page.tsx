@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 
 import { WelcomePage } from 'components/welcome/WelcomePage';
 import { getCurrentUserAction } from 'lib/user/getCurrentUserAction';
@@ -18,10 +17,6 @@ export default async function Welcome() {
 
   if (!user?.data) {
     return null;
-  }
-
-  if (user?.data?.connectOnboarded) {
-    redirect('/profile');
   }
 
   return <WelcomePage user={user.data} />;

@@ -13,7 +13,7 @@ export const loginAction = actionClient
     if (!parsedInput.type) {
       throw new Error('Invalid login type');
     }
-    const loggedInUser = await loginUser({ ...parsedInput, anonymusUserId: ctx.session.anonymousUserId });
+    const loggedInUser = await loginUser({ ...parsedInput, anonymousUserId: ctx.session.anonymousUserId });
 
     log.info(`User logged in`, { userId: loggedInUser.id, method: parsedInput.type });
 

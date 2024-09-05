@@ -1,12 +1,13 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { loginWithFarcaster } from '@root/lib/farcaster/loginWithFarcaster';
+import type { Scout } from '@charmverse/core/prisma-client';
 
-import type { LoggedInUser } from './interfaces';
+import { loginWithFarcaster } from 'lib/farcaster/loginWithFarcaster';
+
 import type { LoginSchema } from './loginUserSchema';
 import { loginWallet } from './loginWallet';
 
-export async function loginUser(props: LoginSchema & { anonymusUserId?: string }): Promise<LoggedInUser> {
-  const { type, anonymusUserId } = props;
+export async function loginUser(props: LoginSchema & { anonymousUserId?: string }): Promise<Scout> {
+  const { type, anonymousUserId } = props;
 
   switch (type) {
     case 'warpcast': {
@@ -16,7 +17,7 @@ export async function loginUser(props: LoginSchema & { anonymusUserId?: string }
 
       const loggedInUser = await loginWithFarcaster({
         ...props.warpcast,
-        newUserId: anonymusUserId
+        newUserId: anonymousUserId
       });
 
       return loggedInUser;
@@ -26,7 +27,7 @@ export async function loginUser(props: LoginSchema & { anonymusUserId?: string }
         throw new InvalidInputError('Wallet payload is required');
       }
 
-      const loggedInUser = await loginWallet({ wallet: props.wallet, newUserId: anonymusUserId });
+      const loggedInUser = await loginWallet({ wallet: props.wallet, newUserId: anonymousUserId });
 
       return loggedInUser;
     }

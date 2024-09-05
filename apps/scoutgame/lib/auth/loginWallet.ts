@@ -1,9 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import type { Scout } from '@charmverse/core/prisma-client';
 import { SiweMessage } from 'siwe';
 
-import { findOrCreateUserWallet } from '../user/findOrCreateUserWallet';
+import { findOrCreateUser } from '../user/findOrCreateUser';
 
-import type { LoggedInUser } from './interfaces';
 import type { LoginWalletSchema } from './loginUserSchema';
 
 export async function verifyWalletSignature({ message, signature }: LoginWalletSchema) {
@@ -31,14 +31,14 @@ export async function loginWallet({
 }: {
   wallet: LoginWalletSchema;
   newUserId?: string;
-}): Promise<LoggedInUser> {
+}): Promise<Scout> {
   const walletData = await verifyWalletSignature(wallet);
 
   if (!walletData) {
     throw new InvalidInputError('Invalid wallet signature');
   }
 
-  const user = await findOrCreateUserWallet({ newUserId, walletData });
+  const scout = await findOrCreateUser({ newUserId, walletAddress: walletData.address });
 
-  return user;
+  return scout;
 }
