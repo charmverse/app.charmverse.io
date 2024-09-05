@@ -1,97 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { roundNumberInRange } from '@root/lib/utils/numbers';
 
-export const waitlistTiers = ['legendary', 'mythic', 'epic', 'rare', 'common'] as const;
-
-export type ConnectWaitlistTier = (typeof waitlistTiers)[number];
-
-export type TierChange = 'none' | 'up' | 'down';
-
-type TierDistributionType = {
-  tier: ConnectWaitlistTier;
-  threshold: number;
-  totalPercentSize: number;
-  imageText: string;
-  badge: string;
-  badgeText: string;
-};
-
-export const tierDistribution: TierDistributionType[] = [
-  {
-    tier: 'common',
-    threshold: 1,
-    totalPercentSize: 40,
-    imageText: '/images/levels/common.png',
-    badge: '/images/levels/common-badge.png',
-    badgeText: '/images/levels/common-badge-text.png'
-  },
-  {
-    tier: 'rare',
-    threshold: 30,
-    totalPercentSize: 20,
-    imageText: '/images/levels/rare.png',
-    badge: '/images/levels/rare-badge.png',
-    badgeText: '/images/levels/rare-badge-text.png'
-  },
-  {
-    tier: 'epic',
-    threshold: 60,
-    totalPercentSize: 20,
-    imageText: '/images/levels/epic.png',
-    badge: '/images/levels/epic-badge.png',
-    badgeText: '/images/levels/epic-badge-text.png'
-  },
-  {
-    tier: 'mythic',
-    threshold: 80,
-    totalPercentSize: 15,
-    imageText: '/images/levels/mythic.png',
-    badge: '/images/levels/mythic-badge.png',
-    badgeText: '/images/levels/mythic-badge-text.png'
-  },
-  {
-    tier: 'legendary',
-    threshold: 95,
-    totalPercentSize: 5,
-    imageText: '/images/levels/legendary.png',
-    badge: '/images/levels/legendary-badge.png',
-    badgeText: '/images/levels/legendary-badge-text.png'
-  }
-];
-export const tierDistributionMap = tierDistribution.reduce<Record<ConnectWaitlistTier, TierDistributionType>>(
-  (acc, item) => {
-    acc[item.tier] = item;
-    return acc;
-  },
-  {} as Record<ConnectWaitlistTier, TierDistributionType>
-);
-
-export function getTier(percentile?: number | null): ConnectWaitlistTier {
-  if (!percentile) {
-    return 'common';
-  }
-
-  const tier = findHighestNumberInArray(tierDistribution, 'threshold', percentile)?.tier || 'legendary';
-
-  return tier;
-}
-
-export function getTierChange({
-  previousPercentile,
-  currentPercentile
-}: {
-  previousPercentile: number;
-  currentPercentile: number;
-}): { previousTier: ConnectWaitlistTier; currentTier: ConnectWaitlistTier; tierChange: TierChange } {
-  const previousTier = getTier(previousPercentile);
-  const currentTier = getTier(currentPercentile);
-
-  return {
-    previousTier,
-    currentTier,
-    tierChange: previousTier === currentTier ? 'none' : previousPercentile < currentPercentile ? 'up' : 'down'
-  };
-}
+import type { ConnectWaitlistTier, TierChange } from './constants';
+import { getTierChange } from './refreshPercentilesForEveryone';
 
 /** 100th percentile is best (lowest score) */
 export async function calculateUserPosition({
@@ -155,17 +66,4 @@ export async function calculateUserPosition({
     score: connectWaitlistSlot.score,
     tierChange
   };
-}
-
-// Find the highest number in an array of objects that is less than or equal to n
-export function findHighestNumberInArray<Z extends string, T extends Record<Z, number>>(array: T[], key: Z, n: number) {
-  return array.reduce<T>(
-    (acc, item) => {
-      if (n >= item[key] && item[key] >= acc[key] ? item : acc) {
-        return item;
-      }
-      return acc;
-    },
-    { [key]: 0 } as T
-  );
 }

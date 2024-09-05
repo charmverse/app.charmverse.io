@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 
 import { ScorePage } from 'components/score/ScorePage';
+import { getTier } from 'lib/scoring/constants';
 import { getWaitlistSlotWithClicks } from 'lib/scoring/getWaitlistSlotWithClicks';
 import { getSession } from 'lib/session/getSession';
 

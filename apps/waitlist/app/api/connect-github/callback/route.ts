@@ -1,11 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { POST as httpPOST, GET as httpGET } from '@root/adapters/http';
+import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
 import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constants';
-import { prettyPrint } from '@root/lib/utils/strings';
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

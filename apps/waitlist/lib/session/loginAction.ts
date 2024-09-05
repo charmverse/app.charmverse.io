@@ -19,7 +19,7 @@ export const loginWithFarcasterAction = actionClient
 
     const currentWaitlistSlot = await prisma.connectWaitlistSlot.findUnique({
       where: {
-        fid
+        fid: parseInt(fid?.toString() as string)
       }
     });
 
