@@ -2,7 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { randomFid } from '../../../../../testing/utils/farcaster';
-import type { ConnectWaitlistTier, TierChange } from '../calculateUserPosition';
+import type { ConnectWaitlistTier, TierChange } from '../constants';
 import { refreshPercentilesForEveryone } from '../refreshPercentilesForEveryone'; // Adjust the import to the correct module
 
 // Function to shuffle an array deterministically using a seeded random number generator
@@ -85,8 +85,8 @@ describe('refreshPercentilesForEveryone', () => {
     // prettyPrint(tierChangeResults);
 
     // Everyone starts in the 'common' tier
-    // Now, 60% of 150 records should be out of the common tier
-    expect(tierChangeResults.length).toBe(91);
+    // Now, 70% of 150 records should be out of the common tier
+    expect(tierChangeResults.length).toBe(106);
 
     const firstChangedUser = tierChangeResults[0];
     expect(fids.indexOf(firstChangedUser.fid)).toBe(131);
@@ -99,6 +99,9 @@ describe('refreshPercentilesForEveryone', () => {
 
     const fourthChangedUser = tierChangeResults[70];
     expect(fids.indexOf(fourthChangedUser.fid)).toBe(3);
+
+    const fifthChangedUser = tierChangeResults[104];
+    expect(fids.indexOf(fifthChangedUser.fid)).toBe(15);
 
     // Test specific cases where we know tier changes should happen
 
@@ -156,5 +159,18 @@ describe('refreshPercentilesForEveryone', () => {
     });
 
     expect(fourthUserWaitlistSlot.percentile).toBe(fourthChangedUser.percentile);
+
+    expect(fifthChangedUser.percentile).toBe(31);
+    expect(fifthChangedUser.score).toBe(550);
+    expect(fifthChangedUser.newTier).toBe<ConnectWaitlistTier>('rare');
+    expect(fifthChangedUser.tierChange).toBe<TierChange>('up');
+
+    const fifthUserWaitlistSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+      where: {
+        fid: fifthChangedUser.fid
+      }
+    });
+
+    expect(fifthUserWaitlistSlot.percentile).toBe(fifthChangedUser.percentile);
   });
 });
