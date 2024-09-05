@@ -16,13 +16,13 @@ export const metadata: Metadata = {
 export default async function Welcome() {
   const user = await getUserFromSession();
 
-  if (!user?.data) {
+  if (!user) {
     return null;
   }
 
-  if (user?.data?.onboarded) {
+  if (user?.onboarded) {
     redirect('/profile');
   }
 
-  return <WelcomePage user={user.data} />;
+  return <WelcomePage user={user} />;
 }
