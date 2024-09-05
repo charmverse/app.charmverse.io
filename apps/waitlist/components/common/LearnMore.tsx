@@ -83,7 +83,7 @@ export function LearnMore() {
               </Box>
             </Stack>
             <Stack>
-              <Typography>95% to 10%</Typography>
+              <Typography>95% to 100%</Typography>
               <DotsDivider />
               <Box>
                 <Image src='/images/levels/legendary.png' sizes='100vw' width={100} height={18} alt='legendary' />
