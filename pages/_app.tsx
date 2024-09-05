@@ -1,6 +1,5 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
-import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import type { EmotionCache } from '@emotion/utils';
 import type { LensConfig } from '@lens-protocol/react-web';
 import { development, LensProvider, production } from '@lens-protocol/react-web';
@@ -244,11 +243,7 @@ function DataProviders({ children }: { children: ReactNode }) {
                                         <LensProvider config={lensConfig}>
                                           <FarcasterUserProvider>
                                             <UserProfileProvider>
-                                              <BoxHooksContextProvider
-                                                apiKey={process.env.NEXT_PUBLIC_DECENT_API_KEY || ''}
-                                              >
-                                                <PageTitleProvider>{children}</PageTitleProvider>
-                                              </BoxHooksContextProvider>
+                                              <PageTitleProvider>{children}</PageTitleProvider>
                                             </UserProfileProvider>
                                           </FarcasterUserProvider>
                                         </LensProvider>

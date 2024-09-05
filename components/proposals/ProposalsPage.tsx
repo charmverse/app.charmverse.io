@@ -46,7 +46,6 @@ import { ProposalsHeaderRowsMenu } from './components/ProposalsHeaderRowsMenu';
 import { ProposalsReviewersTable } from './components/ProposalsReviewersTable/ProposalsReviewersTable';
 import { UserProposalsTables } from './components/UserProposalsTables/UserProposalsTables';
 import { useProposalsBoard } from './hooks/useProposalsBoard';
-import { NFTPurchase } from './NFTPurchase';
 
 const StyledButton = styled(Button)`
   position: absolute;
@@ -386,7 +385,6 @@ export function ProposalsPage({ title }: { title: string }) {
           ) : null}
         </Box>
       )}
-      <NFTPurchase />
     </DatabaseContainer>
   );
 }

@@ -14,6 +14,7 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
+    "@decent.xyz/box-hooks": "^3.2.1",
     "@hookform/resolvers": "^3.6.0",
     "@mui/material-nextjs": "^5.16.6",
     "@serwist/next": "^9.0.5",
