@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import type { SessionData } from 'lib/session/config';
-import { cookieName } from 'lib/session/config';
+import { getCookieName } from 'lib/session/config';
 import { getSession } from 'lib/session/getSession';
 
 export async function middleware(request: NextRequest) {
@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
     if (unsealedFid.farcasterUser) {
       // Set the cookie to the response
       response.cookies.set({
-        name: cookieName,
+        name: getCookieName(),
         value: sealedFarcasterUser,
         httpOnly: true,
         secure: true,
@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
       farcasterUser = unsealedFid.farcasterUser;
 
       // Mutate the request by adding the cookie to the headers
-      request.headers.set('cookie', `${cookieName}=${sealedFarcasterUser}`);
+      request.headers.set('cookie', `${getCookieName()}=${sealedFarcasterUser}`);
 
       // Remove the `farcaster_user` param from the URL
       url.searchParams.delete('farcaster_user');
