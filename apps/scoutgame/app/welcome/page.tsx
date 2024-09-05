@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { WelcomePage } from 'components/welcome/WelcomePage';
-import { getCurrentUserAction } from 'lib/users/getCurrentUserAction';
+import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Welcome() {
-  const user = await getCurrentUserAction();
+  const user = await getUserFromSession();
 
   if (!user?.data) {
     return null;
