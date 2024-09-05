@@ -34,10 +34,7 @@ export async function middleware(request: NextRequest) {
         path: '/'
       });
 
-      farcasterUser = {
-        fid: unsealedFid.farcasterUser.fid,
-        username: unsealedFid.farcasterUser.username
-      };
+      farcasterUser = unsealedFid.farcasterUser;
 
       // Mutate the request by adding the cookie to the headers
       request.headers.set('cookie', `${cookieName}=${sealedFarcasterUser}`);
@@ -55,7 +52,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Rewrite the request to pass the mutated headers along with it
-  return NextResponse.rewrite(request.nextUrl, { request });
+  return NextResponse.rewrite(request.nextUrl, { request, headers: response.headers });
 }
 
 export const config = {
