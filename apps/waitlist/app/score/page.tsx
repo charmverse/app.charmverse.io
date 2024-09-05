@@ -1,4 +1,3 @@
-import { Typography, Button, Tooltip, Box } from '@mui/material';
 import { redirect } from 'next/navigation';
 
 import { ScorePage } from 'components/score/ScorePage';
@@ -14,8 +13,6 @@ export default async function Score() {
   }
 
   const waitlistSlot = await getWaitlistSlotWithClicks({ fid: parseInt(session.farcasterUser.fid) }).catch(() => null);
-
-  const hasRegisteredAsBuilder = !!waitlistSlot?.githubLogin;
 
   if (!waitlistSlot) {
     redirect('/join');

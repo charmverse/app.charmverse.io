@@ -1,10 +1,11 @@
 import 'server-only';
 
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
 
 import { LearnMore } from 'components/common/LearnMore';
+import { JoinGithubButton } from 'components/github/JoinGithubButton';
 
 export function BuilderPage() {
   return (
@@ -52,7 +53,7 @@ export function BuilderPage() {
         <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
         <Typography mb={2}>You will also earn 10 Frame Clicks to help you move up the Waitlist!</Typography>
         <Box width='100%'>
-          <Button sx={{ width: '100%' }}>Connect and sign up</Button>
+          <JoinGithubButton />
         </Box>
       </Box>
       <Box>

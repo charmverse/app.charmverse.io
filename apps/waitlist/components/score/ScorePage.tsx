@@ -4,6 +4,7 @@ import type { ConnectWaitlistSlot } from '@charmverse/core/prisma-client';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { FadeIn } from 'components/common/Animations/FadeIn';
 import { LearnMore } from 'components/common/LearnMore';
@@ -12,6 +13,8 @@ import ProgressBar from './ScoresProgressBar';
 import { ScoreTier } from './ScoreTier';
 
 export function ScorePage({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot & { clicks: number } }) {
+  const hasRegisteredAsBuilder = !!waitlistSlot?.githubLogin;
+
   return (
     <PageWrapper py={0} my={0}>
       <Box
@@ -64,10 +67,14 @@ export function ScorePage({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot 
         </Typography>
         <Button sx={{ width: '100%' }}>Share your Frame</Button>
         <Box width='100%'>
-          <Typography variant='body2' color='secondary.light' textAlign='left'>
-            Earn 10 Frame Clicks
-          </Typography>
-          <Button sx={{ width: '100%' }}>Sign up as a Builder</Button>
+          {!hasRegisteredAsBuilder && (
+            <Typography variant='body2' color='secondary.light' textAlign='left'>
+              Earn 10 Frame Clicks
+            </Typography>
+          )}
+          <Button component={Link} href='/builders' disabled={hasRegisteredAsBuilder} sx={{ width: '100%' }}>
+            {hasRegisteredAsBuilder ? 'Builder registered!' : 'Sign up as a Builder'}
+          </Button>
         </Box>
       </Box>
       <Box>
