@@ -18,44 +18,44 @@ type TierDistributionType = {
 
 export const tierDistribution: TierDistributionType[] = [
   {
-    tier: 'legendary',
-    threshold: 96,
-    totalPercentSize: 5,
-    imageText: '/images/levels/legendary.png',
-    badge: '/images/levels/legendary-badge.png',
-    badgeText: '/images/levels/legendary-badge-text.png'
-  },
-  {
-    tier: 'mythic',
-    threshold: 81,
-    totalPercentSize: 15,
-    imageText: '/images/levels/mythic.png',
-    badge: '/images/levels/mythic-badge.png',
-    badgeText: '/images/levels/mythic-badge-text.png'
-  },
-  {
-    tier: 'epic',
-    threshold: 61,
-    totalPercentSize: 20,
-    imageText: '/images/levels/epic.png',
-    badge: '/images/levels/epic-badge.png',
-    badgeText: '/images/levels/epic-badge-text.png'
-  },
-  {
-    tier: 'rare',
-    threshold: 41,
-    totalPercentSize: 20,
-    imageText: '/images/levels/rare.png',
-    badge: '/images/levels/rare-badge.png',
-    badgeText: '/images/levels/rare-badge-text.png'
-  },
-  {
     tier: 'common',
     threshold: 1,
     totalPercentSize: 40,
     imageText: '/images/levels/common.png',
     badge: '/images/levels/common-badge.png',
     badgeText: '/images/levels/common-badge-text.png'
+  },
+  {
+    tier: 'rare',
+    threshold: 30,
+    totalPercentSize: 20,
+    imageText: '/images/levels/rare.png',
+    badge: '/images/levels/rare-badge.png',
+    badgeText: '/images/levels/rare-badge-text.png'
+  },
+  {
+    tier: 'epic',
+    threshold: 60,
+    totalPercentSize: 20,
+    imageText: '/images/levels/epic.png',
+    badge: '/images/levels/epic-badge.png',
+    badgeText: '/images/levels/epic-badge-text.png'
+  },
+  {
+    tier: 'mythic',
+    threshold: 80,
+    totalPercentSize: 15,
+    imageText: '/images/levels/mythic.png',
+    badge: '/images/levels/mythic-badge.png',
+    badgeText: '/images/levels/mythic-badge-text.png'
+  },
+  {
+    tier: 'legendary',
+    threshold: 95,
+    totalPercentSize: 5,
+    imageText: '/images/levels/legendary.png',
+    badge: '/images/levels/legendary-badge.png',
+    badgeText: '/images/levels/legendary-badge-text.png'
   }
 ];
 export const tierDistributionMap = tierDistribution.reduce<Record<ConnectWaitlistTier, TierDistributionType>>(

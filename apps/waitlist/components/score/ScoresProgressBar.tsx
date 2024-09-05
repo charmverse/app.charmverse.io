@@ -32,16 +32,20 @@ export default function ProgressBar({ from, to }: ProgressBarProps) {
           overflow='hidden'
           height='100%'
           bgcolor='secondary.main'
-          borderRadius='15px'
           component={motion.div}
           initial={{ width: `${from}%` }}
           animate={controls}
           transition={{ duration: 1, ease: 'easeInOut' }}
+          sx={{
+            borderTopLeftRadius: '15px',
+            borderTopRightRadius: '0',
+            borderBottomRightRadius: '0',
+            borderBottomLeftRadius: '15px'
+          }}
         />
       </Box>
       {tierDistribution
         .filter((item) => item.tier !== 'common')
-        .toReversed()
         .map((milestone, index) => (
           <Box
             component={motion.div}
@@ -54,11 +58,11 @@ export default function ProgressBar({ from, to }: ProgressBarProps) {
             alignItems='center'
             position='absolute'
             bottom='0'
-            left={`${milestone.threshold - 10}%`} // Move threshold to the left by 10
+            left={`${milestone.threshold - 5}%`}
           >
-            <Image src={milestone.badge} width={30} height={30} alt={milestone.tier} />
-            <Box width='4px' height='15px' bgcolor={milestone.threshold - 10 >= to ? 'white' : 'black'} />
-            <Typography component='span' fontWeight='700'>
+            <Image src={milestone.badge} width={30} height={30} alt={milestone.tier} style={{ width: 'auto' }} />
+            <Box width='4px' height='15px' bgcolor={milestone.threshold >= to ? 'white' : 'black'} />
+            <Typography variant='body2' component='span' fontWeight='700'>
               {milestone.threshold}%
             </Typography>
           </Box>
