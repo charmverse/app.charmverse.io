@@ -6,8 +6,7 @@ import { baseUrl } from '@root/config/constants';
 import { ImageResponse } from 'next/og';
 import React from 'react';
 
-import { getTier } from 'lib/scoring/constants';
-import YourScoreImage from 'public/images/waitlist/dev/waitlist-current-score.jpg';
+import { getTier, tierColors } from 'lib/scoring/constants';
 
 export const runtime = 'edge';
 export const contentType = 'image/jpeg';
@@ -38,7 +37,7 @@ export async function GET(req: Request) {
           height: '600px',
           // background: 'blue',
           fontFamily: 'Inter',
-          backgroundImage: `url(${baseUrl}/images/waitlist/dev/waitlist-current-score.jpg)`,
+          backgroundImage: `url(${baseUrl}/images/waitlist/dev/waitlist-current-score.gif)`,
           backgroundSize: '600px 600px'
         }}
       >
@@ -71,7 +70,7 @@ export async function GET(req: Request) {
               width: '100%'
             }}
           >
-            <span style={{ fontSize: '30px', fontWeight: 'bold' }}>{tier.toUpperCase()}</span>
+            <span style={{ fontSize: '30px', fontWeight: 'bold', color: tierColors[tier] }}>{tier.toUpperCase()}</span>
             <span style={{ fontSize: '30px', fontWeight: 'bold' }}>{percentile}%</span>
           </div>
         </div>

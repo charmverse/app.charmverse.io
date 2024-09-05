@@ -18,3 +18,11 @@ export const tierDistribution: { tier: ConnectWaitlistTier; threshold: number; t
 export function getTier(percentile: number): ConnectWaitlistTier {
   return tierDistribution.find(({ threshold }) => percentile >= threshold)?.tier || 'common';
 }
+
+export const tierColors: Record<ConnectWaitlistTier, string> = {
+  common: '#b2bec0',
+  rare: '#ecb366',
+  epic: '#e79b81',
+  mythic: '#dd77ea',
+  legendary: '#b293f1'
+};
