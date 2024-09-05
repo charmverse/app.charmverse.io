@@ -1,8 +1,9 @@
 import 'server-only';
 
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { LearnMore } from 'components/common/LearnMore';
@@ -52,11 +53,14 @@ export function BuilderPage() {
         </Typography>
         <Typography mb={2}>You will also earn 10 Frame Clicks to help you move up the Waitlist!</Typography>
         <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
-        <Typography mb={2}>You will also earn 10 Frame Clicks to help you move up the Waitlist!</Typography>
+        <Typography mb={2}>Connect to GitHub to sign up and verify your code contributions.</Typography>
         <Box width='100%'>
           <Suspense>
             <JoinGithubButton />
           </Suspense>
+          <Button component={Link} variant='text' href='/score' sx={{ width: '100%', mt: 1 }}>
+            Cancel
+          </Button>
         </Box>
       </Box>
       <Box>
