@@ -62,7 +62,7 @@ export function ScorePage({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot 
           <ScoreTier waitlistSlot={waitlistSlot} />
           <ProgressBar from={0} to={waitlistSlot.percentile ?? 0} />
         </Stack>
-        <Typography variant='h5' mb={2} fontWeight='700' color='secondary'>
+        <Typography variant='h5' my={2} fontWeight='700' color='secondary'>
           Move up the Waitlist!
         </Typography>
         <Box width='100%'>

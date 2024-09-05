@@ -70,7 +70,10 @@ export function getTier(percentile?: number | null): ConnectWaitlistTier {
   if (!percentile) {
     return 'common';
   }
-  return tierDistribution.find(({ threshold }) => percentile >= threshold)?.tier || 'common';
+
+  const tier = findHighestNumberInArray(tierDistribution, 'threshold', percentile)?.tier || 'legendary';
+
+  return tier;
 }
 
 export function getTierChange({
@@ -152,4 +155,17 @@ export async function calculateUserPosition({
     score: connectWaitlistSlot.score,
     tierChange
   };
+}
+
+// Find the highest number in an array of objects that is less than or equal to n
+export function findHighestNumberInArray<Z extends string, T extends Record<Z, number>>(array: T[], key: Z, n: number) {
+  return array.reduce<T>(
+    (acc, item) => {
+      if (n >= item[key] && item[key] >= acc[key] ? item : acc) {
+        return item;
+      }
+      return acc;
+    },
+    { [key]: 0 } as T
+  );
 }
