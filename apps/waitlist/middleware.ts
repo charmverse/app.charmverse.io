@@ -12,12 +12,11 @@ export async function middleware(request: NextRequest) {
   let farcasterUser = session.farcasterUser;
 
   const path = request.nextUrl.pathname;
-
   const params = request.nextUrl.searchParams;
 
   const sealedFarcasterUser = params.get('farcaster_user');
 
-  const headers = new Headers();
+  const response = NextResponse.next(); // Create a response object to set cookies
 
   if (sealedFarcasterUser) {
     const unsealedFid = await unsealData<SessionData>(sealedFarcasterUser, {
@@ -25,41 +24,40 @@ export async function middleware(request: NextRequest) {
     });
 
     if (unsealedFid.farcasterUser) {
-      await request.cookies.set(cookieName, sealedFarcasterUser);
+      // Set the cookie to the response
+      response.cookies.set({
+        name: cookieName,
+        value: sealedFarcasterUser,
+        httpOnly: true,
+        secure: true,
+        maxAge: 31536000,
+        path: '/'
+      });
 
-      farcasterUser = { fid: unsealedFid.farcasterUser.fid, username: unsealedFid.farcasterUser.username };
+      farcasterUser = {
+        fid: unsealedFid.farcasterUser.fid,
+        username: unsealedFid.farcasterUser.username
+      };
 
-      headers.append('Set-Cookie', `${cookieName}=${sealedFarcasterUser}; HttpOnly; Secure; Max-Age=31536000; Path=/`);
+      // Mutate the request by adding the cookie to the headers
+      request.headers.set('cookie', `${cookieName}=${sealedFarcasterUser}`);
     }
   }
 
   const authenticatedPaths = ['/builders', '/score', '/join'];
 
-  if (path.startsWith('/frame')) {
-    return NextResponse.next();
-  }
-
-  // Make all pages private
   if (!farcasterUser && authenticatedPaths.some((p) => path.startsWith(p))) {
-    return NextResponse.redirect(new URL('/', request.url), { headers });
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   if (farcasterUser && path === '/') {
-    return NextResponse.redirect(new URL('/score', request.url), { headers });
+    return NextResponse.redirect(new URL('/score', request.url));
   }
-  return NextResponse.next({ headers });
+
+  // Rewrite the request to pass the mutated headers along with it
+  return NextResponse.rewrite(request.nextUrl, { request });
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - images (image files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest).*)'
-  ]
+  matcher: ['/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest).*)']
 };
