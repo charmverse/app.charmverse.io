@@ -20,9 +20,7 @@ export async function findOrCreateUser({
   const lowercaseAddress = walletAddress.toLowerCase();
 
   const scout = await prisma.scout.findFirst({
-    where: {
-      OR: [{ walletAddress: lowercaseAddress }, { farcasterId }]
-    }
+    where: farcasterId ? { farcasterId } : { walletAddress: lowercaseAddress }
   });
 
   if (scout) {
@@ -56,6 +54,7 @@ export async function findOrCreateUser({
       id: userId,
       avatar: avatarUrl,
       username: ens ?? shortWalletAddress(lowercaseAddress),
+      displayName: ens ?? shortWalletAddress(lowercaseAddress),
       walletAddress: lowercaseAddress,
       walletENS: ens,
       farcasterId

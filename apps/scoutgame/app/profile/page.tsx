@@ -20,5 +20,9 @@ export default async function Profile() {
     redirect('/');
   }
 
+  if (!user?.data?.onboarded) {
+    redirect('/welcome');
+  }
+
   return <ProfilePage user={user.data} />;
 }
