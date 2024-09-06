@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.cdk'
+      - 'docker-compose.yml'
       - '.ebextensions/comingsoon/**'
       - '.ebstalk.apps.env/comingsoon.env'
       - '.github/actions/**'
@@ -17,6 +18,7 @@ on:
     branches: ['**']
     paths:
       - '.cdk'
+      - 'docker-compose.yml'
       - '.ebextensions/comingsoon/**'
       - '.ebstalk.apps.env/comingsoon.env'
       - '.github/actions/**'
