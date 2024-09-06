@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.cdk'
+      - 'docker-compose.yml'
       - '.ebextensions/scoutgame/**'
       - '.ebstalk.apps.env/scoutgame.env'
       - '.github/actions/**'
@@ -25,6 +26,7 @@ on:
     branches: ['**']
     paths:
       - '.cdk'
+      - 'docker-compose.yml'
       - '.ebextensions/scoutgame/**'
       - '.ebstalk.apps.env/scoutgame.env'
       - '.github/actions/**'
