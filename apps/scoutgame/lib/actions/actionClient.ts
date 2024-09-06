@@ -2,8 +2,6 @@ import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { actionClient } from '@connect-shared/lib/actions/actionClient';
 
-import { getSession } from '../session/getSession';
-
 export { actionClient };
 
 export const authActionClient = actionClient.use(async ({ next, ctx }) => {
