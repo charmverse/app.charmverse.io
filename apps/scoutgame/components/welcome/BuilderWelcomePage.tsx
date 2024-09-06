@@ -1,12 +1,13 @@
 import type { Scout } from '@charmverse/core/prisma';
-import { Button, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Image from 'next/image';
-import Link from 'next/link';
 
 import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 import { JoinGithubButton } from 'components/github/JoinGithubButton';
+
+import { SkipBuilderStepButton } from './components/SkipBuilderStepButton';
 
 export function BuilderWelcomePage({ user }: { user: Scout }) {
   return (
@@ -32,11 +33,7 @@ export function BuilderWelcomePage({ user }: { user: Scout }) {
           </Stack>
           <Typography mb={2}>Connect to GitHub to sign up and verify your code contributions.</Typography>
           <JoinGithubButton />
-          <Stack direction='row' justifyContent='center'>
-            <Link href='/'>
-              <Typography color='primary'>Skip for now</Typography>
-            </Link>
-          </Stack>
+          <SkipBuilderStepButton />
         </Box>
       </SinglePageWrapper>
     </SinglePageLayout>
