@@ -12,14 +12,6 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'apps/comingsoon/**'
-      - '@connect-shared/**'
-      - 'abis/**'
-      - 'adapters/**'
-      - 'config/**'
-      - 'connectors/**'
-      - 'lib/**'
-      - 'hooks/**'
-      - 'models/**'
   pull_request:
     types: [labeled, opened, synchronize]
     branches: ['**']
@@ -32,14 +24,6 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'apps/comingsoon/**'
-      - '@connect-shared/**'
-      - 'abis/**'
-      - 'adapters/**'
-      - 'config/**'
-      - 'connectors/**'
-      - 'lib/**'
-      - 'hooks/**'
-      - 'models/**'
   workflow_dispatch:
     inputs:
       core_pkg_version:
