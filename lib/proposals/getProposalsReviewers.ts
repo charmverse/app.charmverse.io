@@ -20,7 +20,6 @@ export type ReviewerProposal = {
 export type GetProposalsReviewersResponse = {
   userId: string;
   reviewsLeft: number;
-  reviewsCompleted: number;
   proposals: ReviewerProposal[];
 }[];
 
@@ -161,11 +160,10 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
       proposalsReviewers.push({
         userId: spaceRole.userId,
         reviewsLeft: totalReviews - reviewsCompleted,
-        reviewsCompleted,
         proposals: reviewerProposals
       });
     }
   }
 
-  return proposalsReviewers.sort((a, b) => b.reviewsLeft - a.reviewsLeft || b.reviewsCompleted - a.reviewsCompleted);
+  return proposalsReviewers.sort((a, b) => b.reviewsLeft - a.reviewsLeft);
 }

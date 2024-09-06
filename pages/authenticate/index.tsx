@@ -35,11 +35,18 @@ export default function Authenticate() {
     const userSpaces = await charmClient.spaces.getSpaces();
 
     const domainFromRedirect = redirectPath.split('/')[1];
-    if (userSpaces?.length && domainFromRedirect && userSpaces.find((s) => s.domain === domainFromRedirect)) {
+
+    if (domainFromRedirect === 'invite') {
+      // If the user is invited to a space, we should redirect them to that invite link
+      router.push(redirectPath);
+    } else if (userSpaces?.length && domainFromRedirect && userSpaces.find((s) => s.domain === domainFromRedirect)) {
+      // If the user is a member of the space domain, we should redirect them to that space
       router.push(redirectPath);
     } else if (userSpaces?.length) {
+      // If the user is a member of any space and not the domain above, we should redirect them to their first space where they have access
       router.push({ pathname: `/[domain]`, query: { domain: userSpaces[0].domain } });
     } else {
+      // If the user is not a member of any space, we should redirect them to create a space
       router.push('/createSpace');
     }
   }

@@ -37,17 +37,12 @@ async function exportProposalsReviewersController(req: NextApiRequest, res: Next
   }, {});
 
   let csvContent = '';
-  const rows: string[][] = [['Reviewer (email)', 'Reviewer (username)', 'Reviews Left', 'Reviews Completed']];
+  const rows: string[][] = [['Reviewer (email)', 'Reviewer (username)', 'Proposals to review']];
 
   proposalsReviewers.forEach((proposalsReviewer) => {
     const reviewer = usersRecord[proposalsReviewer.userId];
     if (reviewer) {
-      rows.push([
-        reviewer.email || 'N/A',
-        reviewer.username,
-        proposalsReviewer.reviewsLeft.toString(),
-        proposalsReviewer.reviewsCompleted.toString()
-      ]);
+      rows.push([reviewer.email || 'N/A', reviewer.username, proposalsReviewer.reviewsLeft.toString()]);
     }
   });
 

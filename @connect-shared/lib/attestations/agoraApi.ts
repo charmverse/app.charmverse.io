@@ -2,7 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { POST } from '@root/adapters/http';
+import { DELETE, POST } from '@root/adapters/http';
+import { EasSchemaChain } from '@root/lib/credentials/connectors';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
 import { mapProjectToOptimism } from '@root/lib/credentials/mapProjectToOptimism';
 import { decodeOptimismProjectSnapshotAttestation } from '@root/lib/credentials/schemas/optimismProjectUtils';
@@ -164,4 +165,21 @@ export async function createProjectMetadataAttestation({
   return {
     attestationMetadataUID
   };
+}
+
+export async function revokeAgoraProjectAttestation({ projectRefUID }: { projectRefUID: string }) {
+  const result = DELETE<{ attestationId: string }>(
+    `https://retrofunding.optimism.io/api/v1/projects/${projectRefUID}`,
+    undefined,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${AGORA_API_KEY}`
+      }
+    }
+  );
+
+  log.info('Project deleted in Agora', { projectRefUID });
+
+  return result;
 }

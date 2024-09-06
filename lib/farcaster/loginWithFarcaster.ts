@@ -29,14 +29,10 @@ export type FarcasterProfileInfo = {
   pfpUrl?: string;
 };
 
-export type LoginWithFarcasterParams = FarcasterBody &
-  Required<Pick<FarcasterBody, 'nonce' | 'message' | 'signature'>> & {
-    signupAnalytics?: Partial<SignupAnalytics>;
-    nonce: string;
-    message: string;
-    newUserId?: string;
-    signature: string;
-  };
+export type LoginWithFarcasterParams = FarcasterBody & {
+  signupAnalytics?: Partial<SignupAnalytics>;
+  newUserId?: string;
+};
 
 export async function loginWithFarcaster({
   fid,
@@ -56,15 +52,20 @@ export async function loginWithFarcaster({
     throw new InvalidInputError('Farcaster id missing');
   }
 
-  const { success, error: farcasterLoginError } = await verifySignInMessage(appClient, {
+  if (!nonce || !message || !signature) {
+    log.warn('Nonce, message or signature is missing', { fid, displayName, username });
+    throw new InvalidInputError('Missing required fields for message verification');
+  }
+
+  const { success, error: farcasterSignatureError } = await verifySignInMessage(appClient, {
     nonce,
     message,
     signature,
     domain: 'charmverse.io'
   });
 
-  if (farcasterLoginError) {
-    throw new InvalidStateError(farcasterLoginError.message || 'Invalid signature');
+  if (farcasterSignatureError) {
+    throw new InvalidStateError(farcasterSignatureError.message || 'Invalid signature');
   } else if (!success) {
     throw new InvalidStateError('Invalid signature');
   }

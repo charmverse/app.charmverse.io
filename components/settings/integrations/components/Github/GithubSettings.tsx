@@ -1,5 +1,5 @@
 import { Stack, Typography } from '@mui/material';
-import { useRouter } from 'next/router';
+import { getGithubAppCallbackUrl } from '@root/lib/github/oauth';
 import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -7,7 +7,6 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useGithubApp } from 'hooks/useGithubApp';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { GITHUB_APP_NAME } from 'lib/github/constants';
 
 import { IntegrationContainer } from '../IntegrationContainer';
 
@@ -65,11 +64,9 @@ export function GithubSettings({
                 }
                 disabled={!isAdmin}
                 external
-                href={`https://github.com/apps/${GITHUB_APP_NAME}/installations/new?state=${encodeURIComponent(
-                  JSON.stringify({
-                    redirect: `${window?.location.origin}/${spaceDomain}/members?settingTab=integrations&section=github`
-                  })
-                )}`}
+                href={getGithubAppCallbackUrl({
+                  redirect: `${window?.location.origin}/${spaceDomain}/members?settingTab=integrations&section=github`
+                })}
               >
                 Authorize
               </Button>

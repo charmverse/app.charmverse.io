@@ -1,4 +1,5 @@
 import { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
+import { isGithubRepositoryUrl } from '@root/lib/github/isGithubRepositoryUrl';
 import type { ProjectCategory as OptimismProjectCategory } from '@root/lib/optimism/projectSchema';
 import { typedKeys } from '@root/lib/utils/objects';
 import { isAddress, type Address } from 'viem';
@@ -71,8 +72,30 @@ export const schema = yup.object({
     )
     .min(1, 'At least one website must be present'),
   farcasterValues: yup.array(yup.string()),
-  github: yup.string().optional(),
-  twitter: yup.string().optional(),
+  github: yup
+    .string()
+    .optional()
+    .test('isGithub', 'Github URL must be in format https://github.com/owner/repo', (value) => {
+      if (!value) {
+        return true;
+      }
+
+      return isGithubRepositoryUrl(value);
+    }),
+  twitter: yup
+    .string()
+    .optional()
+    .test(
+      'isTwitter',
+      'Link must be a profile in format https://x.com/username or https://twitter.com/username',
+      (value) => {
+        if (!value) {
+          return true;
+        }
+
+        return !!value.match(/https:\/\/(x|twitter).com\/[a-zA-Z0-9_]+/);
+      }
+    ),
   sunnyAwardsProjectType: yup.string().oneOf(PROJECT_TYPES).required(),
   primaryContractChainId: yup.string().test('isChainId', 'Invalid chain ID', async (value, context) => {
     if ((context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType) === 'app') {

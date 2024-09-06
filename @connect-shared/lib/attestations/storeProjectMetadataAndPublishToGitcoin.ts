@@ -9,7 +9,7 @@ import { storeProjectInS3 } from '@root/lib/credentials/storeProjectInS3';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { isAddress } from 'viem';
 
-import { projectAttestationChainId } from './constants';
+import { gitcoinProjectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
 
 const currentGitcoinRound = 'cm0ayus350005zwyb4vtureu1';
@@ -55,7 +55,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
   const existingAttestations = await prisma.gitcoinProjectAttestation.findMany({
     where: {
       projectId: project.id,
-      chainId: projectAttestationChainId
+      chainId: gitcoinProjectAttestationChainId
     }
   });
 
@@ -98,7 +98,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
   if (!existingProfileAttestation) {
     const profileAttestationUID: string = await attestOnchain({
       type: 'gitcoinProject',
-      chainId: projectAttestationChainId,
+      chainId: gitcoinProjectAttestationChainId,
       credentialInputs: {
         recipient: attestationRecipient,
         data: {
@@ -118,7 +118,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
       data: {
         project: { connect: { id: project.id } },
         attestationUID: profileAttestationUID,
-        chainId: projectAttestationChainId,
+        chainId: gitcoinProjectAttestationChainId,
         schemaId: gitcoinProjectCredentialSchemaId,
         type: 'profile'
       }
@@ -131,7 +131,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
 
   const projectAttestationUID: string = await attestOnchain({
     type: 'gitcoinProject',
-    chainId: projectAttestationChainId,
+    chainId: gitcoinProjectAttestationChainId,
     credentialInputs: {
       recipient: attestationRecipient,
       data: {
@@ -151,7 +151,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     data: {
       project: { connect: { id: project.id } },
       attestationUID: projectAttestationUID,
-      chainId: projectAttestationChainId,
+      chainId: gitcoinProjectAttestationChainId,
       schemaId: gitcoinProjectCredentialSchemaId,
       type: 'application'
     }

@@ -12,9 +12,11 @@ import { useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 
+import { ConfirmationModalProvider } from 'hooks/useConfirmationModal';
 import { editProjectAction } from 'lib/projects/editProjectAction';
-import type { SunnyProjectCategory, FormValues } from 'lib/projects/schema';
+import type { FormValues, SunnyProjectCategory } from 'lib/projects/schema';
 import { schema } from 'lib/projects/schema';
+import { softDeleteProjectAction } from 'lib/projects/softDeleteProjectAction';
 
 import { ProjectForm } from '../components/ProjectForm';
 
@@ -39,6 +41,24 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
       setErrors(errorMessage instanceof Array ? errorMessage : [errorMessage]);
     }
   });
+
+  const {
+    execute: executeDeleteProject,
+    isExecuting: isExecutingDeleteProject,
+    result: deleteResult
+  } = useAction(softDeleteProjectAction, {
+    onExecute: () => {
+      setErrors(null);
+    },
+    onSuccess: () => {
+      setErrors(null);
+      router.push(`/profile`);
+    }
+  });
+
+  function handleDelete() {
+    executeDeleteProject({ projectId: project.id });
+  }
 
   const { control, handleSubmit, getValues } = useForm<FormValues>({
     defaultValues: {
@@ -83,13 +103,17 @@ export function EditProjectPage({ user, project }: { user: LoggedInUser; project
           });
         }, onInvalid)}
       >
-        <ProjectForm
-          control={control}
-          isExecuting={isExecuting}
-          user={user}
-          errors={errors}
-          submitLabel='Update Submission'
-        />
+        <ConfirmationModalProvider>
+          <ProjectForm
+            control={control}
+            isExecuting={isExecuting}
+            user={user}
+            errors={errors}
+            submitLabel='Update Submission'
+            onDelete={handleDelete}
+            isDeleting={isExecutingDeleteProject}
+          />
+        </ConfirmationModalProvider>
       </form>
     </PageWrapper>
   );

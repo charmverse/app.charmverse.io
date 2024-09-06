@@ -1,18 +1,23 @@
 import { AppProviders } from '@connect-shared/components/layout/AppProviders';
-import { getCurrentUserAction } from '@connect-shared/lib/profile/getCurrentUserAction';
-import { getSession } from '@connect-shared/lib/session/getSession';
-import Box from '@mui/material/Box';
 import type { Metadata, Viewport } from 'next';
+import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
-import { StickyFooter } from 'components/common/Footer/StickyFooter';
-import { Header } from 'components/common/Header/Header';
 import { NotificationRequest } from 'components/common/NotificationRequest';
-import { appDescription, appName, appTitle, appTitleTemplate } from 'lib/utils/appDetails';
+import { getUserFromSession } from 'lib/session/getUserFromSession';
 import theme from 'theme/theme';
 
-import 'theme/cssVariables.scss';
+import 'theme/styles.scss';
+
+const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').then((comp) => comp.ClientGlobals), {
+  ssr: false
+});
+
+const appName = 'Scout Game';
+const appTitle = 'Onchain builder network';
+const appTitleTemplate = '%s - Scout Game';
+const appDescription = 'Onchain network for connecting web3 developers, projects, organizations';
 
 export const metadata: Metadata = {
   applicationName: appName,
@@ -52,7 +57,6 @@ export const metadata: Metadata = {
     description: appDescription
   }
 };
-
 export const viewport: Viewport = {
   themeColor: '#fff',
   userScalable: false
@@ -62,8 +66,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const session = await getSession();
-  const user = session?.user?.id ? await getCurrentUserAction() : null;
+  const user = await getUserFromSession();
   const vapidPublicKey = process.env.VAPID_PUBLIC_KEY;
 
   return (
@@ -72,15 +75,16 @@ export default async function RootLayout({
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script src='/__ENV.js' />
         <AppProviders theme={theme}>
+          <ClientGlobals userId={user?.id} />
           <>
-            <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
-              <Header user={user?.data || null} />
-              {session?.user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
-              <Box component='main' bgcolor='mainBackground.main' pb={2}>
-                {children}
-              </Box>
-            </Box>
-            <StickyFooter />
+            {/* <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'> */}
+            {/* <Header user={user || null} /> */}
+            {user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
+            {/* <Box component='main' bgcolor='mainBackground.main' pb={2}> */}
+            {children}
+            {/* </Box> */}
+            {/* </Box> */}
+            {/* <StickyFooter /> */}
           </>
         </AppProviders>
       </body>

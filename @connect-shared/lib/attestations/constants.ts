@@ -1,7 +1,6 @@
 import { isDevEnv, isProdEnv, isStagingEnv, isTestEnv } from '@root/config/constants';
 import { optimism, optimismSepolia } from 'viem/chains';
 
-// export const projectAttestationChainId =
-//   isProdEnv && !isDevEnv && !isTestEnv && !isStagingEnv ? optimism.id : optimismSepolia.id;
-export const projectAttestationChainId = optimism.id;
+export const gitcoinProjectAttestationChainId =
+  isProdEnv && !isDevEnv && !isTestEnv && !isStagingEnv ? optimism.id : optimismSepolia.id;
 export const projectAttestationIssuerName = 'CharmVerse';

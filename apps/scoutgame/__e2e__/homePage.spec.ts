@@ -34,10 +34,10 @@ test.describe('Home page', () => {
 
     const connectButton = page.locator('data-test=connect-with-farcaster');
 
-    // We are using the modal from Farcaster SDK, so we target by expected text
-    const farcasterModal = page.getByText("Scan with your phone's camera to continue.");
-
+    await expect(connectButton).toBeEnabled();
     await connectButton.click();
+
+    const farcasterModal = page.locator('.fc-authkit-qrcode-dialog');
 
     await expect(farcasterModal).toBeVisible();
   });
@@ -74,16 +74,16 @@ test.describe('Home page', () => {
 
     await page.waitForURL('**/profile');
 
-    const user = await prisma.user.findFirstOrThrow({
+    const user = await prisma.scout.findFirstOrThrow({
       where: {
         id: userId
       },
       select: {
         id: true,
-        emailNewsletter: true
+        sendMarketing: true
       }
     });
 
-    await expect(user.emailNewsletter).toBe(true);
+    await expect(user.sendMarketing).toBe(true);
   });
 });

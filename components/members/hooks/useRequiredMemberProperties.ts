@@ -50,11 +50,16 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     const _isTwitterRequired = _requiredProperties.find((p) => p.type === 'twitter');
     const _isLinkedinRequired = _requiredProperties.find((p) => p.type === 'linked_in');
     const _isGithubRequired = _requiredProperties.find((p) => p.type === 'github');
-    const _isGoogleRequired = _requiredProperties.find((p) => p.type === 'google');
-    const _isDiscordRequired = _requiredProperties.find((p) => p.type === 'discord');
-    const _isWalletRequired = _requiredProperties.find((p) => p.type === 'wallet');
-    const _isTelegramRequired = _requiredProperties.find((p) => p.type === 'telegram');
-    const _isFarcasterRequired = _requiredProperties.find((p) => p.type === 'farcaster');
+    const _isGoogleRequired =
+      _requiredProperties.find((p) => p.type === 'google') || currentSpace?.primaryMemberIdentity === 'Google';
+    const _isDiscordRequired =
+      _requiredProperties.find((p) => p.type === 'discord') || currentSpace?.primaryMemberIdentity === 'Discord';
+    const _isWalletRequired =
+      _requiredProperties.find((p) => p.type === 'wallet') || currentSpace?.primaryMemberIdentity === 'Wallet';
+    const _isTelegramRequired =
+      _requiredProperties.find((p) => p.type === 'telegram') || currentSpace?.primaryMemberIdentity === 'Telegram';
+    const _isFarcasterRequired =
+      _requiredProperties.find((p) => p.type === 'farcaster') || currentSpace?.primaryMemberIdentity === 'Farcaster';
 
     const userDetailsSocial = userDetails?.social as Social;
 

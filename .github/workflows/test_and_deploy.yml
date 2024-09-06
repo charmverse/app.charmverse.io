@@ -74,8 +74,13 @@ jobs:
         uses: ./.github/actions/build
 
       - run: npm run typecheck
-      - run: npm run lint -- --ignore-pattern apps,packages .
       - run: npm run verifydeps
+      - name: Run eslint on changed files
+        uses: tj-actions/eslint-changed-files@v25
+        with:
+          skip_annotations: 'true' # do not annotate code in the PR
+          extra_args: '--ignore-pattern apps,packages'
+          file_extensions: '**/*.{ts,tsx}'
 
   test-matrix:
     name: Tests

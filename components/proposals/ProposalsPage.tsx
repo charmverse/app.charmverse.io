@@ -1,4 +1,6 @@
 import styled from '@emotion/styled';
+import InboxIcon from '@mui/icons-material/Inbox';
+import PersonIcon from '@mui/icons-material/Person';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
@@ -69,7 +71,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const [showSidebar, setShowSidebar] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const { router, updateURLQuery } = useCharmRouter();
-  const viewId = (router.query.viewId || 'all') as 'all' | 'my-work' | 'reviewers';
+  const viewId = (router.query.viewId || 'my-work') as 'all' | 'my-work' | 'reviewers';
   const onShowDescription = useCallback(() => {
     const oldBlocks = [activeBoard];
     const newBoard = createBoard({
@@ -247,18 +249,18 @@ export function ProposalsPage({ title }: { title: string }) {
               >
                 {[
                   {
-                    id: 'all',
-                    label: 'All'
-                  },
-                  {
                     id: 'my-work',
                     label: 'My Work'
+                  },
+                  {
+                    id: 'all',
+                    label: 'All'
                   },
                   ...(isAdmin
                     ? [
                         {
                           id: 'reviewers',
-                          label: 'Reviewers'
+                          label: 'Reviewer Status'
                         }
                       ]
                     : [])
@@ -270,7 +272,15 @@ export function ProposalsPage({ title }: { title: string }) {
                           viewId: view.id
                         });
                       }}
-                      icon={iconForViewType('table')}
+                      icon={
+                        view.id === 'all' ? (
+                          iconForViewType('table')
+                        ) : view.id === 'my-work' ? (
+                          <InboxIcon fontSize='small' />
+                        ) : (
+                          <PersonIcon fontSize='small' />
+                        )
+                      }
                       label={view.label}
                       isActive={viewId === view.id}
                       key={view.id}

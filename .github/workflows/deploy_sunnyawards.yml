@@ -120,10 +120,14 @@ jobs:
         with:
           app_name: sunnyawards
 
-      - name: Validate Sunny Awards
-        run: |
-          npm run lint -- apps/scoutgame
-          npm run typecheck -w apps/sunnyawards
+      - name: Typecheck Sunny Awards
+        run: npm run typecheck -w apps/sunnyawards
+
+      - name: Run eslint on changed files
+        uses: tj-actions/eslint-changed-files@v25
+        with:
+          skip_annotations: 'true' # do not annotate code in the PR
+          file_extensions: '**/*.{ts,tsx}'
 
   test-e2e:
     name: Test e2e

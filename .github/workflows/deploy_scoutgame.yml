@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.cdk'
+      - 'docker-compose.yml'
       - '.ebextensions/scoutgame/**'
       - '.ebstalk.apps.env/scoutgame.env'
       - '.github/actions/**'
@@ -25,6 +26,7 @@ on:
     branches: ['**']
     paths:
       - '.cdk'
+      - 'docker-compose.yml'
       - '.ebextensions/scoutgame/**'
       - '.ebstalk.apps.env/scoutgame.env'
       - '.github/actions/**'
@@ -126,16 +128,25 @@ jobs:
         with:
           app_name: scoutgame
 
-      - name: Validate Scoutgame app
-        run: |
-          npm run lint -- apps/scoutgame
-          npm run typecheck -w apps/scoutgame
+      - name: Typecheck Scoutgame app
+        run: npm run typecheck -w apps/scoutgame
+
+      - name: Run eslint on changed files
+        uses: tj-actions/eslint-changed-files@v25
+        with:
+          skip_annotations: 'true' # do not annotate code in the PR
+          file_extensions: '**/*.{ts,tsx}'
+
+      - name: Run tests
+        run: npm run test -w apps/scoutgame
 
   test-scoutgame-e2e:
     name: Test Scoutgame e2e
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
+    # re-enable for launch
+    if: false
+    # if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:

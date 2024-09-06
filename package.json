@@ -85,9 +85,10 @@
     "scoutgame:build": "npm run build --w=apps/scoutgame",
     "scoutgame:start:prod": "npx react-env --path .env.local --dest ./apps/scoutgame/public -- npm run start:prod --workspace=apps/scoutgame",
     "scoutgame:debug:e2e": "npm run debug:e2e -w=apps/scoutgame",
-    "scoutgame:test:e2e:ci": "npm run test:e2e:ci -w=apps/scoutgame",
+    "scoutgame:test:e2e": "npm run test:e2e -w=apps/scoutgame -- --headed",
+    "scoutgame:test:e2e:ci": "npm run test:e2e -w=apps/scoutgame",
     "scoutgame:start:test:ci": "npm run start:test:ci -w=apps/scoutgame",
-    "waitlist": "npx react-env --path .env.local --dest ./apps/scoutgame/public -- npm run start --workspace=apps/waitlist",
+    "waitlist": "npx react-env --path .env.local --dest ./apps/waitlist/public -- npm run start --workspace=apps/waitlist",
     "waitlist:start:test": "npm run start:test -w=apps/waitlist",
     "waitlist:remote": "npx react-env --path .env.production -- npm run start --workspace=apps/waitlist",
     "waitlist:build": "npm run build --w=apps/waitlist",
@@ -108,7 +109,9 @@
     "sunnyawards:start:test": "npm run start:test -w=apps/sunnyawards",
     "sunnyawards:start:test:ci": "npm run start:test:ci -w=apps/sunnyawards",
     "sunnyawards:debug:e2e": "npm run debug:e2e -w=apps/sunnyawards",
-    "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards"
+    "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards",
+    "comingsoon": "npm start -w=apps/comingsoon",
+    "comingsoon:build": "npm run build -w=apps/comingsoon"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -131,7 +134,7 @@
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
     "@ceramicnetwork/http-client": "^5.6.0",
-    "@charmverse/core": "^0.81.2-rc-crypto-ecosyste.1",
+    "@charmverse/core": "^0.81.4",
     "@column-resizer/core": "^1.0.2",
     "@composedb/devtools": "^0.7.1",
     "@composedb/devtools-node": "^0.7.1",
@@ -150,8 +153,8 @@
     "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/providers": "^5.5.3",
     "@ethersproject/wallet": "^5.7.0",
-    "@farcaster/auth-client": "^0.1.1",
-    "@farcaster/auth-kit": "^0.3.1",
+    "@farcaster/auth-client": "^0.3.0",
+    "@farcaster/auth-kit": "^0.6.0",
     "@farcaster/core": "^0.13.7",
     "@fontsource/ia-writer-mono": "^4.5.3",
     "@fullcalendar/common": "^5.11.5",

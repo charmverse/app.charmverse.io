@@ -61,13 +61,11 @@ export function EvaluationStepSettings({
 
   // reviewers are also readOnly when using a template with reviewers pre-selected
   const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
-  const readOnlyAppealReviewers =
-    isPublishedProposal || readOnly || (!isAdmin && !!evaluationTemplate?.appealReviewers?.length);
+  const readOnlyAppealReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.appealReviewers?.length);
   // rubric criteria should also be editable by reviewers, and not if a template with rubric criteria was used
   const readOnlyRubricCriteria = readOnly || (!isAdmin && !!evaluationTemplate?.rubricCriteria.length);
   // rubric criteria should also be editable by reviewers, and not if a template with rubric criteria was used
   const readOnlyShareReviews = readOnly || (!isAdmin && !!evaluationTemplate);
-  const readOnlyDueDate = readOnly || (!isAdmin && !!evaluationTemplate);
   // vote settings are also readonly when using a template with vote settings pre-selected
   const readOnlyVoteSettings = readOnly || (!isAdmin && !!evaluationTemplate?.voteSettings);
   const readOnlyRequireReviews =
@@ -232,7 +230,7 @@ export function EvaluationStepSettings({
           </Box>
           {!!finalStep && <FormControlLabel disabled control={<Switch checked />} label='Priority Step' />}
           {evaluation.appealable && (
-            <>
+            <Box mb={2}>
               <FormLabel required={!!evaluation.appealable}>
                 <Typography component='span' variant='subtitle1'>
                   {appealRequiredReviews && appealRequiredReviews !== 1
@@ -250,12 +248,12 @@ export function EvaluationStepSettings({
                   required={!!evaluation.appealable}
                 />
               </Box>
-            </>
+            </Box>
           )}
         </>
       )}
       {evaluation.type !== 'vote' && (
-        <Box mb={1}>
+        <Box mb={2}>
           <Box display='flex' flexDirection='column' mb={1}>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
@@ -282,7 +280,7 @@ export function EvaluationStepSettings({
       )}
       {evaluation.type === 'rubric' && (
         <>
-          <Box mb={1}>
+          <Box mb={2}>
             <FormControlLabel
               disabled={readOnlyShareReviews}
               control={

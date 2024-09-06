@@ -8,6 +8,7 @@ import { ContextMenu } from 'components/common/ContextMenu';
 import Table from 'components/common/DatabaseEditor/components/table/table';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
+import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
@@ -85,6 +86,7 @@ export function ProposalRewardsTable({
     requiredTemplateId,
     isProposalTemplate
   });
+  const { showPage } = usePageDialog();
 
   const tableView = useMemo(() => {
     const rewardTypesUsed = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
@@ -118,22 +120,21 @@ export function ProposalRewardsTable({
   const loadingData = isLoading || isLoadingRewards || loadingPages;
 
   function showRewardCard(id: string | null, event?: React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) {
-    const isPublished = publishedRewards.some((r) => r.id === id);
-    if (id && isPublished) {
-      openPublishedReward(id);
+    const publishedReward = publishedRewards.find((r) => r.id === id);
+    event?.preventDefault();
+
+    if (id && publishedReward) {
+      showPage({
+        pageId: id
+      });
     } else {
       const pending = pendingRewards?.find((r) => r.draftId === id);
       if (pending) {
-        event?.preventDefault();
         setRewardValues(pending.reward);
         openNewPage(pending.page);
         setCurrentPendingId(id);
       }
     }
-  }
-
-  function openPublishedReward(pageId: string) {
-    navigateToSpacePath(`/${pageId}`);
   }
 
   function deleteReward() {

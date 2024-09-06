@@ -10,8 +10,8 @@ test('Create a project and view details', async ({ page }) => {
     projectFormName: 'Acme Inc',
     projectFormDescription: 'A description of your project',
     projectFormCategory: 'Art Marketplace',
-    projectFormTwitter: 'https://www.twitter.com/acme-inc-twitter',
-    projectFormGithub: 'https://www.github.com/acme-inc-github',
+    projectFormTwitter: 'https://twitter.com/acme_inc_twitter',
+    projectFormGithub: 'https://github.com/acme-inc-github/reponame',
     projectFormWebsites: ['https://www.acme-inc.com'],
     projectFormFarcasterValues: ['https://warpcast.com/acme-inc-warpcast']
   } as const;

@@ -54,13 +54,7 @@ export async function getFarcasterProfile({
   }
 
   if (!_farcasterProfile && numericFid) {
-    [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
-      `${profileApiUrl}?fid=${numericFid}`,
-      {},
-      {
-        credentials: 'omit'
-      }
-    );
+    _farcasterProfile = await getFarcasterProfileById(numericFid);
 
     if (_farcasterProfile) {
       return _farcasterProfile;
@@ -78,4 +72,16 @@ export async function getFarcasterProfile({
   }
 
   return _farcasterProfile;
+}
+
+export function getFarcasterProfileById(fid: number) {
+  return http
+    .GET<FarcasterProfile[]>(
+      `${profileApiUrl}?fid=${fid}`,
+      {},
+      {
+        credentials: 'omit'
+      }
+    )
+    .then((profiles) => profiles[0] || null);
 }

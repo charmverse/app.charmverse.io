@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import type { GetProposalsReviewersResponse } from '@root/lib/proposals/getProposalsReviewers';
 
 import { evaluationIcons } from 'components/settings/proposals/constants';
@@ -56,13 +56,7 @@ export function ReviewerProposalsTable({
                 <Typography>{proposal.title || 'Untitled'}</Typography>
               </TableCell>
               <TableCell align='center' width={250}>
-                <Typography>
-                  {proposal.currentEvaluation.result === 'pass'
-                    ? 'Passed'
-                    : proposal.currentEvaluation.result === 'fail'
-                    ? 'Failed'
-                    : 'In progress'}
-                </Typography>
+                <Chip sx={{ px: 0.5 }} label='In progress' color='gray' size='small' />
               </TableCell>
               <TableCell width={250}>
                 <Stack direction='row' justifyContent='center' alignItems='center' gap={1}>

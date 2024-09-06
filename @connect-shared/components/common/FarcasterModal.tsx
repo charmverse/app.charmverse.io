@@ -23,7 +23,7 @@ const sx = {
 
 export function FarcasterLoginModal({ url, ...props }: Omit<ModalProps, 'children'> & { url?: string }) {
   return (
-    <Modal open={props.open && !!url} onClose={props.onClose} data-mui-color-scheme='light'>
+    <Modal open={props.open && !!url} onClose={props.onClose} data-mui-color-scheme='light' data-test='farcaster-modal'>
       <Paper sx={sx}>
         <Typography variant='h6' fontWeight='bold'>
           Sign in with Farcaster

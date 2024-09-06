@@ -55,9 +55,8 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                   Current step
                 </Typography>
               </TableCell>
-
-              <TableCell align='right'>
-                <Typography variant='body2' fontWeight='bold' mr={1.5}>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
                   Action
                 </Typography>
               </TableCell>
@@ -119,7 +118,7 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                       </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell align='right'>
+                  <TableCell align='center' width={250}>
                     <Button
                       color='primary'
                       size='small'

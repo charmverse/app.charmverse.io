@@ -8,7 +8,7 @@ import { CanvasQRCode } from 'components/settings/account/components/otp/compone
 
 export function FarcasterLoginModal({ url, ...props }: Omit<ModalProps, 'children'> & { url?: string }) {
   return (
-    <Modal open={props.open && !!url} onClose={props.onClose} title='Sign in with Warpcast'>
+    <Modal open={props.open && !!url} onClose={props.onClose} title='Sign in with Warpcast' data-test='farcaster-modal'>
       <Typography variant='body1'>Scan with your phone's camera to continue.</Typography>
       <Box display='flex' justifyContent='center' my={2}>
         <CanvasQRCode uri={url || ''} />

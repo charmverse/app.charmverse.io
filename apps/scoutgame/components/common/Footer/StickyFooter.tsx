@@ -9,6 +9,10 @@ import { usePathname } from 'next/navigation';
 export function StickyFooter() {
   const pathname = usePathname();
 
+  if (pathname === '/') {
+    return null;
+  }
+
   return (
     <>
       {/* include element to add spacing at the bottom of the page */}
