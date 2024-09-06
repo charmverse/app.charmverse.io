@@ -106,6 +106,13 @@ const extendedTheme = extendTheme({
         disableRipple: true
       }
     },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          color: brandColor
+        }
+      }
+    },
     MuiButtonGroup: {
       defaultProps: {
         disableRipple: true,
