@@ -1,7 +1,7 @@
 import { getIronOptions as getIronOptionsRoot } from '@root/lib/session/getIronOptions';
 
 export type SessionData = {
-  farcasterUser?: { fid: string; username?: string };
+  farcasterUser?: { fid: string; username?: string; hasJoinedWaitlist?: boolean };
 };
 
 // Exported as a function so it does not throw at compile time

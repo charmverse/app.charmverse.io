@@ -1,41 +1,24 @@
-import { Typography, Button, Tooltip, Box } from '@mui/material';
-import { redirect } from 'next/navigation';
-
-import { getTier } from 'lib/scoring/constants';
+import { ScorePage } from 'components/score/ScorePage';
 import { getWaitlistSlotWithClicks } from 'lib/scoring/getWaitlistSlotWithClicks';
 import { getSession } from 'lib/session/getSession';
 
-export default async function ScorePage() {
+// Dynamic data
+export const dynamic = 'force-dynamic';
+
+export default async function Score() {
   const session = await getSession();
-  const waitlistSlot = await getWaitlistSlotWithClicks({ fid: parseInt(session.farcasterUser?.fid as string) }).catch(
-    () => null
-  );
 
-  const hasRegisteredAsBuilder = !!waitlistSlot?.githubLogin;
-
-  if (!waitlistSlot) {
-    redirect('/join');
+  // Redirect is handled in the middleware
+  if (!session.farcasterUser) {
+    return null;
   }
 
-  return (
-    <div>
-      <Typography variant='h3'>Score Page</Typography>
+  const waitlistSlot = await getWaitlistSlotWithClicks({ fid: parseInt(session.farcasterUser.fid) }).catch(() => null);
 
-      <Typography variant='body1'>Tier: {getTier(waitlistSlot?.percentile as number)}</Typography>
+  // Redirect is handled in the middleware
+  if (!waitlistSlot) {
+    return null;
+  }
 
-      <Typography variant='body1'>Percentile: {waitlistSlot?.percentile}</Typography>
-
-      <Typography variant='body1'>Clicks: {waitlistSlot?.clicks}</Typography>
-
-      <Tooltip
-        title={hasRegisteredAsBuilder ? `You've already signed up as a builder with @${waitlistSlot.githubLogin}` : ''}
-      >
-        <Box width='fit-content'>
-          <Button href='/builders' disabled={!!waitlistSlot.githubLogin} variant='contained' color='primary'>
-            Sign up as a Builder
-          </Button>
-        </Box>
-      </Tooltip>
-    </div>
-  );
+  return <ScorePage waitlistSlot={waitlistSlot} fid={session.farcasterUser.fid} />;
 }

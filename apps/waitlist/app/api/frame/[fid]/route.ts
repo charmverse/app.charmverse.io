@@ -71,7 +71,7 @@ export async function POST(req: Request, res: Response) {
       });
 
       // This key is being constructed so that it overcomes farcaster's cache
-      const imgSrc = `${baseUrl}/api/frame/${referrerFid}/current-position?fid=${interactorFid}&percentile=${percentile}&c=3`;
+      const imgSrc = `${baseUrl}/api/frame/${referrerFid}/current-position?percentile=${percentile}`;
 
       html = getFrameHtml({
         image: imgSrc,
