@@ -7,7 +7,7 @@ export const runtime = 'edge';
 export const contentType = 'image/jpeg';
 
 export async function GET(req: Request) {
-  const searchParams = new URLSearchParams(req.url);
+  const searchParams = new URL(req.url).searchParams;
 
   const percentile = searchParams.get('percentile');
 
@@ -57,7 +57,7 @@ export async function GET(req: Request) {
               width: '100%'
             }}
           >
-            <img height='40px' src={`${baseUrl}/images/waitlist/label-${tier}.png`} />
+            <img height='40px' src={`${baseUrl}/images/levels/${tier}.png`} />
             <span
               style={{
                 fontSize: '30px',

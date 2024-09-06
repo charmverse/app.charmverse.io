@@ -44,15 +44,15 @@ export async function middleware(request: NextRequest) {
   const authenticatedPaths = ['/builders', '/score', '/join'];
 
   if (!farcasterUser && authenticatedPaths.some((p) => url.pathname.startsWith(p))) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/', request.url.split('?')[0]));
   }
 
   if (farcasterUser?.hasJoinedWaitlist && url.pathname === '/') {
-    return NextResponse.redirect(new URL('/score', request.url));
+    return NextResponse.redirect(new URL('/score', request.url.split('?')[0]));
   }
 
   if (farcasterUser && !farcasterUser.hasJoinedWaitlist && url.pathname === '/score') {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/', request.url.split('?')[0]));
   }
 
   // Rewrite the request with the new URL (without the query param)
