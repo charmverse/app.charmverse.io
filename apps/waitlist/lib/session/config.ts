@@ -4,7 +4,11 @@ export type SessionData = {
   farcasterUser?: { fid: string; username?: string };
 };
 
+// Exported as a function so it does not throw at compile time
+export function getCookieName() {
+  return process.env.AUTH_COOKIE || getIronOptionsRoot().cookieName;
+}
+
 export function getIronOptions() {
-  const cookieName = process.env.AUTH_COOKIE || getIronOptionsRoot().cookieName;
-  return { ...getIronOptionsRoot(), cookieName };
+  return { ...getIronOptionsRoot(), cookieName: getCookieName() };
 }

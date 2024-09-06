@@ -12,7 +12,6 @@ export const loginWithFarcasterAction = actionClient
   .metadata({ actionName: 'login' })
   .schema(yup.object({ loginPayload: yup.object<StatusAPIResponse>({}) })) // accept all body input
   .action(async ({ ctx, parsedInput }) => {
-    prettyPrint({ parsedInput });
     const { fid, username } = parsedInput.loginPayload as StatusAPIResponse;
 
     log.info('User logged in to waitlist', { fid, username });
@@ -22,7 +21,7 @@ export const loginWithFarcasterAction = actionClient
 
     const currentWaitlistSlot = await prisma.connectWaitlistSlot.findUnique({
       where: {
-        fid
+        fid: parseInt(fid?.toString() as string)
       }
     });
 

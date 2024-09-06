@@ -1,8 +1,9 @@
+import { getSession } from '@connect-shared/lib/session/getSession';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { ProfilePage } from 'components/profile/ProfilePage';
-import { getCurrentUserAction } from 'lib/user/getCurrentUserAction';
+import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,15 +15,15 @@ export const metadata: Metadata = {
 };
 
 export default async function Profile() {
-  const user = await getCurrentUserAction();
+  const user = await getUserFromSession();
 
-  if (!user?.data) {
+  if (!user) {
     redirect('/');
   }
 
-  if (!user?.data?.connectOnboarded) {
+  if (!user.onboarded) {
     redirect('/welcome');
   }
 
-  return <ProfilePage user={user.data} />;
+  return <ProfilePage user={user} />;
 }

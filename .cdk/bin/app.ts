@@ -22,12 +22,11 @@ if (stackNameParam === 'prd-sunnyawards') {
   });
 }
 // Scout Game production
-else if (stackNameParam === 'prd-scoutgame' || stackNameParam === 'prd-waitlist') {
-  new ProductionStack(app, stackNameParam, deployProps, {
-    sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b901f27e-5a33-4dea-b4fb-39308a580423'
-  });
-} // Scout Game production
-else if (stackNameParam === 'prd-scoutgame') {
+else if (
+  stackNameParam === 'prd-scoutgame' ||
+  stackNameParam === 'prd-waitlist' ||
+  stackNameParam === 'prd-comingsoon'
+) {
   new ProductionStack(app, stackNameParam, deployProps, {
     sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b901f27e-5a33-4dea-b4fb-39308a580423'
   });
@@ -37,13 +36,9 @@ else if (stackNameParam.startsWith('prd')) {
   new ProductionStack(app, stackNameParam, deployProps, {
     sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b960ff5c-ed3e-4e65-b2c4-ecc64e696902'
   });
-} else if([
-  'stg-scoutgame',
-  'stg-waitlist',
-  'stg-sunnyawards',
-  'stg-farcaster',
-  'stg-webapp'
-].some(name => stackNameParam.startsWith(name))) {
+} else if (stackNameParam.startsWith('stg-webapp')) {
+  new WebappStagingStack(app, stackNameParam, deployProps);
+} else if (stackNameParam.startsWith('stg-')) {
   new StagingStack(app, stackNameParam, deployProps);
 } else {
   throw new Error('Invalid stack name parameter: ' + stackNameParam);

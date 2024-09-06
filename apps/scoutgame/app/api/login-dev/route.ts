@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
     const randomInt = randomIntFromInterval(1, 1000000);
 
-    await prisma.user.update({
+    await prisma.scout.update({
       where: {
         id: newUserId
       },
@@ -55,9 +55,9 @@ export async function GET(request: Request) {
 
     return response;
   } else {
-    const user = await prisma.user.findFirstOrThrow({
+    const user = await prisma.scout.findFirstOrThrow({
       where: {
-        id: userId as string
+        id: userId
       },
       select: {
         id: true

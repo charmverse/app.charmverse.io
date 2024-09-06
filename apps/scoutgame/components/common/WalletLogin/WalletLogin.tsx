@@ -13,9 +13,9 @@ import type { Connector } from 'wagmi';
 import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
 
 import { BasicModal } from 'components/common/Modal';
-import { loginAction } from 'lib/auth/loginUserAction';
+import { loginAction } from 'lib/session/loginWithWalletAction';
 
-export function WalletLogin() {
+export function WalletLogin({ successPath }: { successPath: string }) {
   const [open, setOpen] = useState(false);
   const onOpen = () => setOpen(true);
   const onClose = () => setOpen(false);
@@ -81,8 +81,8 @@ export function WalletLogin() {
     }
 
     const { message, signature } = data;
-    await executeAsync({ type: 'wallet', wallet: { message, signature } });
-    router.refresh();
+    await executeAsync({ message, signature });
+    router.push(successPath);
   };
 
   const errorWalletMessage = signMessageError?.message || connectError?.message;
@@ -100,7 +100,6 @@ export function WalletLogin() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: 1,
           mx: 'auto'
         })}
       >
@@ -133,7 +132,7 @@ export function WalletLogin() {
         </Stack>
       </BasicModal>
       {errorWalletMessage && (
-        <Typography variant='body2'>
+        <Typography variant='body2' color='error' sx={{ mt: 2 }}>
           {errorWalletMessage || 'There was an error while logging in with your wallet'}
         </Typography>
       )}

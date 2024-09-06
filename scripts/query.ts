@@ -6,14 +6,7 @@ import { prettyPrint } from 'lib/utils/strings';
  */
 
 async function query() {
-  const result = await prisma.user.findFirst({
-    where: {
-      username: 'ccarella.eth'
-    },
-    include: {
-      farcasterUser: true
-    }
-  });
+  const result = await prisma.scout.deleteMany();
   console.log(result);
 }
 
