@@ -52,28 +52,16 @@ function WarpcastLoginButton() {
     log.error('There was an error while logging in with Warpcast', { error: err });
   }, []);
 
-  if (isLoggingIn || isRevalidatingPath || (isAuthenticated && loginWithFarcasterSuccess && revalidatePathSuccess)) {
-    return <LoadingComponent size={30} label='Logging you in...' />;
+  if (isRevalidatingPath || (isAuthenticated && loginWithFarcasterSuccess && revalidatePathSuccess)) {
+    return (
+      <Box height={47}>
+        <LoadingComponent size={30} label='Logging you in...' />
+      </Box>
+    );
   }
 
   return (
-    <Box
-      width='100%'
-      data-test='connect-with-farcaster'
-      sx={{
-        '.fc-authkit-signin-button': {
-          button: {
-            width: '100%',
-            maxWidth: 400,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 1,
-            mx: 'auto'
-          }
-        }
-      }}
-    >
+    <Box width='100%' data-test='connect-with-farcaster'>
       <SignInButton onSuccess={onSuccessCallback} onError={onErrorCallback} hideSignOut />
       {hasErrored && (
         <Typography variant='body2' sx={{ mt: 2 }} color='error'>
