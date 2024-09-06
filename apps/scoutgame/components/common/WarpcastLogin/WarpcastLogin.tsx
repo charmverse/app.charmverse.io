@@ -28,8 +28,7 @@ function WarpcastLoginButton({ successPath }: { successPath: string }) {
   const {
     executeAsync: loginUser,
     hasErrored,
-    hasSucceeded: loginWithFarcasterSuccess,
-    isExecuting: isLoggingIn
+    hasSucceeded: loginWithFarcasterSuccess
   } = useAction(loginAction, {
     onSuccess: async () => {
       await revalidatePath();
