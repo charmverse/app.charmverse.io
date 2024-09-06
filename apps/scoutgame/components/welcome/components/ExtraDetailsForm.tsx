@@ -30,7 +30,7 @@ export function ExtraDetailsForm() {
 
   const { execute, isExecuting } = useAction(saveTermsOfServiceAction, {
     onSuccess() {
-      router.push('/profile');
+      router.push('/welcome/builder');
     },
     onError(err) {
       const hasValidationErrors = err.error.validationErrors?.fieldErrors;

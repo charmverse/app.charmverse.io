@@ -15,7 +15,7 @@ import '@farcaster/auth-kit/styles.css';
 import { authConfig } from 'lib/farcaster/config';
 import { loginAction } from 'lib/session/loginWithFarcasterAction';
 
-function WarpcastLoginButton() {
+function WarpcastLoginButton({ successPath }: { successPath: string }) {
   const router = useRouter();
   const { isAuthenticated } = useProfile();
 
@@ -33,7 +33,7 @@ function WarpcastLoginButton() {
   } = useAction(loginAction, {
     onSuccess: async () => {
       await revalidatePath();
-      router.push('/profile');
+      router.push(successPath);
     },
     onError(err) {
       log.error('Error on login', { error: err.error.serverError });
@@ -72,10 +72,10 @@ function WarpcastLoginButton() {
   );
 }
 
-export function WarpcastLogin() {
+export function WarpcastLogin({ successPath }: { successPath: string }) {
   return (
     <AuthKitProvider config={authConfig}>
-      <WarpcastLoginButton />
+      <WarpcastLoginButton successPath={successPath} />
     </AuthKitProvider>
   );
 }

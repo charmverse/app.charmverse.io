@@ -9,7 +9,7 @@ import { WalletLogin } from 'components/common/WalletLogin/WalletLogin';
 import { WalletProvider } from 'components/common/WalletLogin/WalletProvider';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 
-export function HomePage() {
+export function LoginPage({ successPath }: { successPath: string }) {
   return (
     <SinglePageLayout>
       <Image
@@ -28,9 +28,9 @@ export function HomePage() {
       </Typography>
       <Typography align='center'>Endorse Builders, Connect with opportunities and get Rewarded.</Typography>
       <WalletProvider>
-        <WalletLogin />
+        <WalletLogin successPath={successPath} />
       </WalletProvider>
-      <WarpcastLogin />
+      <WarpcastLogin successPath={successPath} />
       <MuiLink
         variant='body2'
         href='https://www.farcaster.xyz/'

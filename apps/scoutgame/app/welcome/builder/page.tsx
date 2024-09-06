@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { WelcomePage } from 'components/welcome/WelcomePage';
+import { BuilderWelcomePage } from 'components/welcome/BuilderWelcomePage';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
@@ -14,18 +14,13 @@ export const metadata: Metadata = {
   title: 'Welcome'
 };
 
-export default async function Welcome() {
+export default async function AskAreYouABuilder() {
   const user = await getUserFromSession();
 
   if (!user) {
-    log.debug('Redirect user to log in from Welcome page');
+    log.debug('Redirect user to log in from Builder Welcome page');
     redirect('/');
   }
 
-  if (user?.agreedToTOS) {
-    log.debug('Redirect user to home page from Welcome page', { userId: user.id });
-    redirect('/');
-  }
-
-  return <WelcomePage user={user} />;
+  return <BuilderWelcomePage user={user} />;
 }
