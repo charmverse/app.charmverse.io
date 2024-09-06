@@ -1,9 +1,9 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import type { Scout } from '@charmverse/core/prisma';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
-import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,15 +13,12 @@ import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
 import { Avatar } from 'components/common/Avatar';
-import type { LoggedInUser } from 'lib/auth/interfaces';
 
 import { InstallAppMenuItem } from './components/InstallAppMenuItem';
 
-export function Header({ user }: { user: LoggedInUser | null }) {
+export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | null }) {
   const path = usePathname();
   const router = useRouter();
-
-  const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -60,11 +57,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
           {user && (
             <Box display='flex' gap={1} alignItems='center'>
               <IconButton disabled={isExecutingLogout} onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar
-                  src={farcasterDetails?.pfpUrl || user?.avatar || undefined}
-                  size='medium'
-                  name={user.username}
-                />
+                <Avatar src={user?.avatar || undefined} size='medium' name={user.username} />
               </IconButton>
               <Menu
                 sx={{ mt: 5 }}

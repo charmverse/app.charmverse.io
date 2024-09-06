@@ -3,7 +3,6 @@
 import { log } from '@charmverse/core/log';
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
-import { loginWithFarcasterAction } from '@connect-shared/lib/session/loginAction';
 import { AuthKitProvider, SignInButton, useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import { Typography } from '@mui/material';
@@ -11,11 +10,12 @@ import Box from '@mui/material/Box';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
+
 import '@farcaster/auth-kit/styles.css';
+import { authConfig } from 'lib/farcaster/config';
+import { loginAction } from 'lib/session/loginWithFarcasterAction';
 
-import { warpcastConfig } from 'lib/farcaster/config';
-
-function WarpcastLoginButton() {
+function WarpcastLoginButton({ successPath }: { successPath: string }) {
   const router = useRouter();
   const { isAuthenticated } = useProfile();
 
@@ -30,10 +30,10 @@ function WarpcastLoginButton() {
     hasErrored,
     hasSucceeded: loginWithFarcasterSuccess,
     isExecuting: isLoggingIn
-  } = useAction(loginWithFarcasterAction, {
+  } = useAction(loginAction, {
     onSuccess: async () => {
       await revalidatePath();
-      router.push('/profile');
+      router.push(successPath);
     },
     onError(err) {
       log.error('Error on login', { error: err.error.serverError });
@@ -41,45 +41,41 @@ function WarpcastLoginButton() {
   });
 
   const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
-    await loginUser(res);
+    if (res.message && res.signature) {
+      await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature! });
+    } else {
+      log.error('Did not receive message or signature from farcaster', res);
+    }
   }, []);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
     log.error('There was an error while logging in with Warpcast', { error: err });
   }, []);
 
-  if (isLoggingIn || isRevalidatingPath || (isAuthenticated && loginWithFarcasterSuccess && revalidatePathSuccess)) {
-    return <LoadingComponent size={30} label='Logging you in...' />;
+  if (isRevalidatingPath || (isAuthenticated && loginWithFarcasterSuccess && revalidatePathSuccess)) {
+    return (
+      <Box height={47}>
+        <LoadingComponent size={30} label='Logging you in...' />
+      </Box>
+    );
   }
 
   return (
-    <Box
-      width='100%'
-      data-test='connect-with-farcaster'
-      sx={{
-        '.fc-authkit-signin-button': {
-          button: {
-            width: '100%',
-            maxWidth: 400,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 1,
-            mx: 'auto'
-          }
-        }
-      }}
-    >
+    <Box width='100%' data-test='connect-with-farcaster'>
       <SignInButton onSuccess={onSuccessCallback} onError={onErrorCallback} hideSignOut />
-      {hasErrored && <Typography variant='body2'>There was an error while logging in</Typography>}
+      {hasErrored && (
+        <Typography variant='body2' sx={{ mt: 2 }} color='error'>
+          There was an error while logging in
+        </Typography>
+      )}
     </Box>
   );
 }
 
-export function WarpcastLogin() {
+export function WarpcastLogin({ successPath }: { successPath: string }) {
   return (
-    <AuthKitProvider config={warpcastConfig}>
-      <WarpcastLoginButton />
+    <AuthKitProvider config={authConfig}>
+      <WarpcastLoginButton successPath={successPath} />
     </AuthKitProvider>
   );
 }
