@@ -27,7 +27,7 @@ export const tierDistribution: TierDistributionType[] = [
   },
   {
     tier: 'rare',
-    threshold: 30,
+    threshold: 31,
     totalPercentSize: 20,
     imageText: '/images/levels/rare.png',
     badge: '/images/levels/rare-badge.png',
@@ -35,7 +35,7 @@ export const tierDistribution: TierDistributionType[] = [
   },
   {
     tier: 'epic',
-    threshold: 60,
+    threshold: 61,
     totalPercentSize: 20,
     imageText: '/images/levels/epic.png',
     badge: '/images/levels/epic-badge.png',
@@ -43,7 +43,7 @@ export const tierDistribution: TierDistributionType[] = [
   },
   {
     tier: 'mythic',
-    threshold: 80,
+    threshold: 81,
     totalPercentSize: 15,
     imageText: '/images/levels/mythic.png',
     badge: '/images/levels/mythic-badge.png',
@@ -51,7 +51,7 @@ export const tierDistribution: TierDistributionType[] = [
   },
   {
     tier: 'legendary',
-    threshold: 95,
+    threshold: 96,
     totalPercentSize: 5,
     imageText: '/images/levels/legendary.png',
     badge: '/images/levels/legendary-badge.png',

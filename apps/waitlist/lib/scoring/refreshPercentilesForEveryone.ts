@@ -114,3 +114,5 @@ export function handleTierChanges(tierChangeResults: TierChangeResult[]) {
     })
   );
 }
+
+// refreshPercentilesForEveryone().then(console.log);
