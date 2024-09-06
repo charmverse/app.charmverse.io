@@ -10,7 +10,7 @@ export function SkipBuilderStepButton() {
   const router = useRouter();
   const { executeAsync, isExecuting } = useAction(saveOnboardedAction, {
     onSuccess: () => {
-      router.push('/?show_welcome_screen=true');
+      router.push('/welcome/how-it-works');
     }
   });
 

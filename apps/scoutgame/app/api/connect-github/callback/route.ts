@@ -139,7 +139,7 @@ export async function GET(req: NextRequest) {
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${process.env.DOMAIN}?show_welcome_screen=true`
+      Location: `${process.env.DOMAIN}/welcome/how-it-works`
     }
   });
 }
