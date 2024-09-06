@@ -63,7 +63,8 @@ export default function ProgressBar({ from, to }: ProgressBarProps) {
             <Image src={milestone.badge} width={30} height={30} alt={milestone.tier} style={{ width: 'auto' }} />
             <Box width='4px' height='15px' bgcolor={milestone.threshold >= to ? 'white' : 'black'} />
             <Typography variant='body2' component='span' fontWeight='700'>
-              {milestone.threshold}%
+              {/** Example: Legendary starts from 96% but in the UI we should the previous percentile (95) as the frontier */}
+              {milestone.threshold - 1}%
             </Typography>
           </Box>
         ))}

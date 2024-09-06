@@ -7,7 +7,7 @@ export type ConnectWaitlistTier = (typeof waitlistTiers)[number];
 
 export type TierChange = 'none' | 'up' | 'down';
 
-type TierDistributionType = {
+export type TierDistributionType = {
   tier: ConnectWaitlistTier;
   threshold: number;
   totalPercentSize: number;
@@ -27,7 +27,7 @@ export const tierDistribution: TierDistributionType[] = [
   },
   {
     tier: 'rare',
-    threshold: 30,
+    threshold: 31,
     totalPercentSize: 20,
     imageText: '/images/levels/rare.png',
     badge: '/images/levels/rare-badge.png',
@@ -35,7 +35,7 @@ export const tierDistribution: TierDistributionType[] = [
   },
   {
     tier: 'epic',
-    threshold: 60,
+    threshold: 61,
     totalPercentSize: 20,
     imageText: '/images/levels/epic.png',
     badge: '/images/levels/epic-badge.png',
@@ -43,7 +43,7 @@ export const tierDistribution: TierDistributionType[] = [
   },
   {
     tier: 'mythic',
-    threshold: 80,
+    threshold: 81,
     totalPercentSize: 15,
     imageText: '/images/levels/mythic.png',
     badge: '/images/levels/mythic-badge.png',
@@ -51,7 +51,7 @@ export const tierDistribution: TierDistributionType[] = [
   },
   {
     tier: 'legendary',
-    threshold: 95,
+    threshold: 96,
     totalPercentSize: 5,
     imageText: '/images/levels/legendary.png',
     badge: '/images/levels/legendary-badge.png',
@@ -71,7 +71,17 @@ export function getTier(percentile?: number | null): ConnectWaitlistTier {
     return 'common';
   }
 
-  const tier = findHighestNumberInArray(tierDistribution, 'threshold', percentile)?.tier || 'legendary';
+  const tier = findHighestNumberInArray(tierDistribution, 'threshold', percentile)?.tier || 'common';
+
+  return tier;
+}
+
+export function getTierInfo(percentile?: number | null): ConnectWaitlistTier {
+  if (!percentile) {
+    return 'common';
+  }
+
+  const tier = findHighestNumberInArray(tierDistribution, 'threshold', percentile)?.tier || 'common';
 
   return tier;
 }
@@ -86,13 +96,10 @@ export const tierColors: Record<ConnectWaitlistTier, string> = {
 
 // Find the highest number in an array of objects that is less than or equal to n
 export function findHighestNumberInArray<Z extends string, T extends Record<Z, number>>(array: T[], key: Z, n: number) {
-  return array.reduce<T>(
-    (acc, item) => {
-      if (n >= item[key] && item[key] >= acc[key] ? item : acc) {
-        return item;
-      }
-      return acc;
-    },
-    { [key]: 0 } as T
-  );
+  return array.reduce<T | null>((acc, item) => {
+    if (n >= item[key] && (!acc || item[key] > acc[key])) {
+      return item;
+    }
+    return acc;
+  }, null as T | null);
 }

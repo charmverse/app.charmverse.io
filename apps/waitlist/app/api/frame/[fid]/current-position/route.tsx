@@ -1,13 +1,13 @@
 import { baseUrl } from '@root/config/constants';
 import { ImageResponse } from 'next/og';
 
-import { getTier, tierColors } from 'lib/scoring/constants';
+import { getTier } from 'lib/scoring/constants';
 
 export const runtime = 'edge';
 export const contentType = 'image/jpeg';
 
 export async function GET(req: Request) {
-  const searchParams = new URLSearchParams(req.url);
+  const searchParams = new URL(req.url).searchParams;
 
   const percentile = searchParams.get('percentile');
 
@@ -31,13 +31,12 @@ export async function GET(req: Request) {
       >
         <div
           style={{
-            top: '100px',
-            width: '560px',
+            top: '120px',
+            width: '520px',
             backgroundColor: '#191919',
             color: 'white',
             height: '100px',
-            marginLeft: '20px',
-            marginRight: '20px',
+            marginLeft: '40px',
             display: 'flex',
             alignItems: 'center',
             flexDirection: 'column',
@@ -58,8 +57,18 @@ export async function GET(req: Request) {
               width: '100%'
             }}
           >
-            <img height='38px' src={`${baseUrl}/images/waitlist/label-${tier}.png`} />
-            <span style={{ fontSize: '30px', fontWeight: 'bold' }}>{percentile}%</span>
+            <img height='40px' src={`${baseUrl}/images/levels/${tier}.png`} />
+            <span
+              style={{
+                fontSize: '30px',
+                fontWeight: 'bold',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center'
+              }}
+            >
+              {percentile}%
+            </span>
           </div>
         </div>
       </div>
