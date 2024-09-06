@@ -1,15 +1,7 @@
-import { Typography } from '@mui/material';
-import { Suspense } from 'react';
+import { BuilderPage } from 'components/builder/BuilderPage';
 
-import { JoinGithubButton } from 'components/github/JoinGithubButton';
+export const dynamic = 'force-dynamic';
 
 export default function BuildersPage() {
-  return (
-    <div>
-      <Typography variant='h3'>Builders Page</Typography>
-      <Suspense>
-        <JoinGithubButton />
-      </Suspense>
-    </div>
-  );
+  return <BuilderPage />;
 }

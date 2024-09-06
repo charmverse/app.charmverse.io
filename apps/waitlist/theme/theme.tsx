@@ -1,6 +1,7 @@
 'use client';
 
-import { darken, experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
+import { experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
+import { Inter } from 'next/font/google';
 
 import {
   backgroundColorDarkMode,
@@ -10,14 +11,26 @@ import {
   inputBackgroundDarkMode,
   inputBorderDarkMode,
   primaryTextColorDarkMode,
-  secondaryTextColorDarkMode
+  purpleDisabled,
+  secondaryText,
+  secondaryLightText
 } from './colors';
 
-export const defaultFont =
-  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
+export const interFont = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap'
+});
 
 const extendedTheme = extendTheme({
-  cssVarPrefix: 'charm',
+  cssVarPrefix: 'waitlist',
+  typography: {
+    fontFamily: interFont.style.fontFamily,
+    button: {
+      fontWeight: 600,
+      fontSize: '1.2rem'
+    }
+  },
   colorSchemes: {
     dark: {
       // palette for dark mode
@@ -28,14 +41,16 @@ const extendedTheme = extendTheme({
         },
         text: {
           disabled: disabledTextColorDarkMode,
-          primary: primaryTextColorDarkMode
+          primary: primaryTextColorDarkMode,
+          secondary: secondaryText
         },
         primary: {
           main: brandColor,
-          dark: darken(brandColor, 0.2)
+          dark: purpleDisabled
         },
         secondary: {
-          main: secondaryTextColorDarkMode
+          main: secondaryText,
+          light: secondaryLightText
         },
         inputBackground: {
           main: inputBackgroundDarkMode
@@ -57,7 +72,6 @@ const extendedTheme = extendTheme({
         })
       }
     },
-    MuiAppBar: {},
     MuiAvatar: {
       styleOverrides: {
         root: ({ ownerState }) => ({
@@ -112,7 +126,12 @@ const extendedTheme = extendTheme({
       },
       styleOverrides: {
         root: {
-          textTransform: 'none'
+          borderRadius: 10,
+          fontWeight: 600,
+          fontSize: '1rem',
+          textTransform: 'none',
+          paddingTop: '18px',
+          paddingBottom: '18px'
         }
       }
     },
@@ -227,7 +246,7 @@ const extendedTheme = extendTheme({
           '&:hover': {
             color: theme.vars.palette.primary.dark
           },
-          fontFamily: defaultFont
+          fontFamily: interFont.style.fontFamily
         })
       },
       defaultProps: {

@@ -1,15 +1,10 @@
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import { Typography } from '@mui/material';
+import { HomePage } from 'components/home/HomePage';
+import { getSession } from 'lib/session/getSession';
 
-import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  return (
-    <PageWrapper>
-      <Typography variant='h2'>Waitlist</Typography>
-      <Typography variant='h6'>Welcome to our app</Typography>
+  const session = await getSession();
 
-      <WarpcastLogin />
-    </PageWrapper>
-  );
+  return <HomePage farcasterUser={session?.farcasterUser} />;
 }

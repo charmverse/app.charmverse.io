@@ -10,7 +10,6 @@ import type { AuthClientError, StatusAPIResponse } from '@farcaster/auth-kit';
 import { Box, Button, Link, Typography, lighten } from '@mui/material';
 import type { ButtonProps } from '@mui/material';
 import { warpcastConfig } from '@root/lib/farcaster/config';
-import { prettyPrint } from '@root/lib/utils/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -32,16 +31,22 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const { isAuthenticated } = useProfile();
 
   const {
-    execute: loginUser,
+    executeAsync: loginUser,
     hasErrored,
     hasSucceeded,
     isExecuting
   } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
-      if (data?.hasJoinedWaitlist) {
+      popupState.close();
+
+      if (!data?.success) {
+        return;
+      }
+
+      if (data.hasJoinedWaitlist) {
         router.push('/score');
       } else {
-        router.push('/join');
+        revalidatePathAction();
       }
     },
     onError(err) {
@@ -50,9 +55,7 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   });
 
   const onSuccessCallback = useCallback(async (data: StatusAPIResponse) => {
-    prettyPrint({ data });
     await loginUser({ loginPayload: data });
-    popupState.close();
   }, []);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
@@ -80,12 +83,9 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         size='large'
         onClick={signIn}
         disabled={!url}
-        sx={(theme) => ({
-          fontSize: '18px',
-          bgcolor: farcasterBrandColor,
-          color: theme.palette.text.primary,
-          '&:hover': { background: farcasterBrandColorDark, color: theme.palette.text.primary }
-        })}
+        sx={{
+          width: '100%'
+        }}
         startIcon={<WarpcastIcon />}
         {...props}
       >
@@ -103,20 +103,17 @@ export function WarpcastLogin() {
     <AuthKitProvider config={warpcastConfig}>
       <WarpcastLoginButton />
       <Link
-        variant='body2'
         href='https://www.farcaster.xyz/'
         target='_blank'
         rel='noopener'
-        color='text.primary'
         fontWeight={500}
         display='block'
         onMouseDown={() => {
           trackEvent('click_dont_have_farcaster_account');
         }}
       >
-        Don't have a Farcaster account?
+        Join Farcaster
       </Link>
-      ;
     </AuthKitProvider>
   );
 }
