@@ -133,6 +133,7 @@ jobs:
         uses: tj-actions/eslint-changed-files@v25
         with:
           skip_annotations: 'true' # do not annotate code in the PR
+          file_extensions: '**/*.{ts,tsx}'
 
   test-waitlist-e2e:
     name: Test waitlist e2e

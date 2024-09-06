@@ -80,6 +80,7 @@ jobs:
         with:
           skip_annotations: 'true' # do not annotate code in the PR
           extra_args: '--ignore-pattern apps,packages'
+          file_extensions: '**/*.{ts,tsx}'
 
   test-matrix:
     name: Tests
