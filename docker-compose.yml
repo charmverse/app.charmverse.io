@@ -106,6 +106,17 @@ services:
     profiles:
       - stg-scoutgame
 
+  stg-comingsoon:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command: ['sh', '-c', 'node_modules/.bin/next start  apps/comingsoon --keepAliveTimeout 70000']
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-comingsoon
+
   prd-waitlist:
     extends:
       service: defaults
