@@ -1,26 +1,21 @@
+import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import { DeleteOutline } from '@mui/icons-material';
 import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 
 import type { AvatarSize } from './Avatar';
 import { Avatar } from './Avatar';
-import { CardMotion } from './Motions/CardMotion';
 
-function FarcasterCardContent({
-  avatar,
-  name,
-  bio,
-  username,
-  avatarSize = 'xLarge',
-  onDelete
-}: {
+type Props = {
   name?: string;
-  bio?: string;
+  bio?: string | null;
   username?: string;
-  avatar?: string;
+  avatar?: string | null;
   avatarSize?: AvatarSize;
   onDelete?: VoidFunction;
-}) {
+};
+
+function FarcasterCardContent({ avatar, name, bio, username, avatarSize = 'xLarge', onDelete }: Props) {
   return (
     <CardContent
       sx={{
@@ -36,7 +31,7 @@ function FarcasterCardContent({
           sm: 'flex-start'
         }}
       >
-        <Avatar size={avatarSize} name={username || 'N/A'} avatar={avatar} />
+        <Avatar size={avatarSize} name={username || 'N/A'} avatar={avatar || undefined} />
       </Stack>
       <Box width='100%'>
         <Stack direction='row' justifyContent='space-between' width='100%' alignItems='center'>
@@ -56,16 +51,11 @@ function FarcasterCardContent({
   );
 }
 
-export function FarcasterCard(props: {
-  name?: string;
-  bio?: string;
-  username?: string;
-  fid?: number;
-  avatar?: string;
-  avatarSize?: AvatarSize;
-  onDelete?: VoidFunction;
-  enableLink?: boolean;
-}) {
+export function FarcasterCard(
+  props: Props & {
+    enableLink?: boolean;
+  }
+) {
   if (!props.enableLink || !props.username) {
     return (
       <Card>

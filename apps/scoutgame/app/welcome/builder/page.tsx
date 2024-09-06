@@ -1,8 +1,8 @@
-import { getSession } from '@connect-shared/lib/session/getSession';
+import { log } from '@charmverse/core/log';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { ProfilePage } from 'components/profile/ProfilePage';
+import { BuilderWelcomePage } from 'components/welcome/BuilderWelcomePage';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
@@ -11,19 +11,16 @@ export const metadata: Metadata = {
   other: {
     robots: 'noindex'
   },
-  title: 'My Profile'
+  title: 'Welcome'
 };
 
-export default async function Profile() {
+export default async function AskAreYouABuilder() {
   const user = await getUserFromSession();
 
   if (!user) {
+    log.debug('Redirect user to log in from Builder Welcome page');
     redirect('/');
   }
 
-  if (!user.onboarded) {
-    redirect('/welcome');
-  }
-
-  return <ProfilePage user={user} />;
+  return <BuilderWelcomePage user={user} />;
 }

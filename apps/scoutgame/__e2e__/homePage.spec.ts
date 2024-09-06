@@ -74,16 +74,16 @@ test.describe('Home page', () => {
 
     await page.waitForURL('**/profile');
 
-    const user = await prisma.user.findFirstOrThrow({
+    const user = await prisma.scout.findFirstOrThrow({
       where: {
         id: userId
       },
       select: {
         id: true,
-        emailNewsletter: true
+        sendMarketing: true
       }
     });
 
-    await expect(user.emailNewsletter).toBe(true);
+    await expect(user.sendMarketing).toBe(true);
   });
 });

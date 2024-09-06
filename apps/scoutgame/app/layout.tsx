@@ -1,15 +1,11 @@
 import { AppProviders } from '@connect-shared/components/layout/AppProviders';
-import { getCurrentUser } from '@connect-shared/lib/profile/getCurrentUser';
-import { getSession } from '@connect-shared/lib/session/getSession';
-import Box from '@mui/material/Box';
 import type { Metadata, Viewport } from 'next';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
-import { StickyFooter } from 'components/common/Footer/StickyFooter';
-import { Header } from 'components/common/Header/Header';
 import { NotificationRequest } from 'components/common/NotificationRequest';
+import { getUserFromSession } from 'lib/session/getUserFromSession';
 import { appDescription, appName, appTitle, appTitleTemplate } from 'lib/utils/appDetails';
 import theme from 'theme/theme';
 
@@ -66,8 +62,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const session = await getSession();
-  const user = await getCurrentUser(session.user?.id);
+  const user = await getUserFromSession();
   const vapidPublicKey = process.env.VAPID_PUBLIC_KEY;
 
   return (
@@ -80,7 +75,7 @@ export default async function RootLayout({
           <>
             {/* <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'> */}
             {/* <Header user={user || null} /> */}
-            {session?.user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
+            {user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
             {/* <Box component='main' bgcolor='mainBackground.main' pb={2}> */}
             {children}
             {/* </Box> */}

@@ -23,7 +23,6 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
             avatar={farcasterDetails.pfpUrl}
             bio={farcasterDetails.bio}
             username={farcasterDetails.username}
-            fid={user.farcasterUser?.fid}
           />
         )}
         <br />

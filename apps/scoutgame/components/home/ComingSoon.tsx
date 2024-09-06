@@ -73,7 +73,7 @@ export function ComingSoon() {
             <Image alt='' src={sunnyLogoSrc} width={1000} height={629} style={{ height: 40, width: 'auto' }} />
           </a>
           <a href='https://charmverse.io/' target='_blank' rel='noreferrer'>
-            <Image alt='' src={charmverseLogoSrc} width={100} height={20} />
+            <Image alt='' src={charmverseLogoSrc} width={115} height={20} />
           </a>
         </Box>
       </Box>

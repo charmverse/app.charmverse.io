@@ -134,6 +134,9 @@ jobs:
         with:
           skip_annotations: 'true' # do not annotate code in the PR
 
+      - name: Run tests
+        run: npm run test -w apps/scoutgame
+
   test-scoutgame-e2e:
     name: Test Scoutgame e2e
     runs-on: ubuntu-latest

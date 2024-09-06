@@ -1,32 +1,17 @@
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
+import { Box } from '@mui/material';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
+import { SinglePageLayout } from 'components/common/Layout';
 import { WalletLogin } from 'components/common/WalletLogin/WalletLogin';
 import { WalletProvider } from 'components/common/WalletLogin/WalletProvider';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 
-export function HomePage() {
+export function LoginPage({ successPath }: { successPath: string }) {
   return (
-    <PageWrapper
-      display='flex'
-      flexDirection='column'
-      alignItems='center'
-      maxWidth='100vw'
-      border='none'
-      borderRadius='0'
-      textAlign='center'
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 4,
-        justifyContent: { xs: 'space-evenly', md: 'normal' },
-        alignItems: 'center',
-        height: '100%',
-        maxHeight: '40em'
-      }}
-    >
+    <SinglePageLayout>
       <Image
         src='/images/geral_waving.png'
         width={250}
@@ -43,9 +28,9 @@ export function HomePage() {
       </Typography>
       <Typography align='center'>Endorse Builders, Connect with opportunities and get Rewarded.</Typography>
       <WalletProvider>
-        <WalletLogin />
+        <WalletLogin successPath={successPath} />
       </WalletProvider>
-      <WarpcastLogin />
+      <WarpcastLogin successPath={successPath} />
       <MuiLink
         variant='body2'
         href='https://www.farcaster.xyz/'
@@ -57,6 +42,6 @@ export function HomePage() {
       >
         Don't have a Farcaster account?
       </MuiLink>
-    </PageWrapper>
+    </SinglePageLayout>
   );
 }
