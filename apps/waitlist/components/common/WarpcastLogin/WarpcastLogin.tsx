@@ -37,16 +37,17 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     isExecuting
   } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
+      popupState.close();
+
       if (!data?.success) {
         return;
       }
 
       if (data.hasJoinedWaitlist) {
         router.push('/score');
+      } else {
+        revalidatePathAction();
       }
-
-      revalidatePathAction();
-      popupState.close();
     },
     onError(err) {
       log.error('Error on login', { error: err.error.serverError });
