@@ -43,6 +43,20 @@ const fids = Array.from({ length: usersToGenerate }, () => randomFid());
 
 describe('refreshPercentilesForEveryone', () => {
   beforeAll(async () => {
+    await prisma.connectWaitlistSlot.deleteMany({});
+  });
+
+  afterAll(async () => {
+    await prisma.connectWaitlistSlot.deleteMany({
+      where: {
+        fid: {
+          in: fids
+        }
+      }
+    });
+  });
+
+  beforeAll(async () => {
     // Seed database with 150 waitlist slots
     const waitlistSlots: Prisma.ConnectWaitlistSlotCreateManyInput[] = Array.from(
       { length: usersToGenerate },
@@ -86,7 +100,7 @@ describe('refreshPercentilesForEveryone', () => {
 
     // Everyone starts in the 'common' tier
     // Now, 70% of 150 records should be out of the common tier
-    expect(tierChangeResults.length).toBe(106);
+    expect(tierChangeResults.length).toBe(104);
 
     const firstChangedUser = tierChangeResults[0];
     expect(fids.indexOf(firstChangedUser.fid)).toBe(131);
@@ -100,8 +114,8 @@ describe('refreshPercentilesForEveryone', () => {
     const fourthChangedUser = tierChangeResults[70];
     expect(fids.indexOf(fourthChangedUser.fid)).toBe(3);
 
-    const fifthChangedUser = tierChangeResults[104];
-    expect(fids.indexOf(fifthChangedUser.fid)).toBe(15);
+    const fifthChangedUser = tierChangeResults[103];
+    expect(fids.indexOf(fifthChangedUser.fid)).toBe(75);
 
     // Test specific cases where we know tier changes should happen
 
@@ -147,7 +161,7 @@ describe('refreshPercentilesForEveryone', () => {
 
     expect(thirdUserWaitlistSlot.percentile).toBe(thirdChangedUser.percentile);
 
-    expect(fourthChangedUser.percentile).toBe(53);
+    expect(fourthChangedUser.percentile).toBe(50);
     expect(fourthChangedUser.score).toBe(210);
     expect(fourthChangedUser.newTier).toBe<ConnectWaitlistTier>('rare');
     expect(fourthChangedUser.tierChange).toBe<TierChange>('up');
@@ -161,7 +175,7 @@ describe('refreshPercentilesForEveryone', () => {
     expect(fourthUserWaitlistSlot.percentile).toBe(fourthChangedUser.percentile);
 
     expect(fifthChangedUser.percentile).toBe(31);
-    expect(fifthChangedUser.score).toBe(550);
+    expect(fifthChangedUser.score).toBe(540);
     expect(fifthChangedUser.newTier).toBe<ConnectWaitlistTier>('rare');
     expect(fifthChangedUser.tierChange).toBe<TierChange>('up');
 
