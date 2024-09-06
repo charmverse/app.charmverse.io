@@ -4,27 +4,14 @@ import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
+import { SinglePageLayout } from 'components/common/Layout';
 import { WalletLogin } from 'components/common/WalletLogin/WalletLogin';
 import { WalletProvider } from 'components/common/WalletLogin/WalletProvider';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 
 export function HomePage() {
   return (
-    <Box
-      display='grid'
-      gridTemplateRows='auto 1fr auto'
-      minHeight='100vh'
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 4,
-        justifyContent: { xs: 'space-evenly', sm: 'center' },
-        alignItems: 'center',
-        textAlign: 'center',
-        height: '100%',
-        maxHeight: '40em'
-      }}
-    >
+    <SinglePageLayout>
       <Image
         src='/images/geral_waving.png'
         width={250}
@@ -55,6 +42,6 @@ export function HomePage() {
       >
         Don't have a Farcaster account?
       </MuiLink>
-    </Box>
+    </SinglePageLayout>
   );
 }

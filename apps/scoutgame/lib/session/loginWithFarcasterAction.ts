@@ -1,7 +1,6 @@
 'use server';
 
-import { actionClient } from '@connect-shared/lib/actions/actionClient';
-
+import { actionClient } from 'lib/actions/actionClient';
 import { findOrCreateFarcasterUser } from 'lib/farcaster/findOrCreateFarcasterUser';
 import { verifyFarcasterUser } from 'lib/farcaster/verifyFarcasterUser';
 

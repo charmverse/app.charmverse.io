@@ -1,9 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import type { FormValues } from '@connect-shared/lib/profile/form';
-import { schema } from '@connect-shared/lib/profile/form';
-import { onboardingAction } from '@connect-shared/lib/profile/onboardingAction';
+import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
@@ -15,48 +13,53 @@ import {
   FormLabel,
   TextField
 } from '@mui/material';
+import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
+import { useState } from 'react';
+import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
-const defaultValues = { email: '', terms: false, notify: true } as const;
+import { saveTermsOfServiceAction } from 'lib/users/saveTermsOfServiceAction';
+import { schema } from 'lib/users/termsOfServiceSchema';
+import type { FormValues } from 'lib/users/termsOfServiceSchema';
 
-export function ExtraDetails() {
+export function ExtraDetailsForm() {
   const router = useRouter();
+  const [errors, setErrors] = useState<string[] | null>(null);
 
-  const { execute, result, isExecuting, hasErrored } = useAction(onboardingAction, {
+  const { execute, isExecuting } = useAction(saveTermsOfServiceAction, {
     onSuccess() {
       router.push('/profile');
     },
-    onError(err: any) {
-      log.error(err.error.serverError?.message || 'Something went wrong', err.error.serverError);
+    onError(err) {
+      const hasValidationErrors = err.error.validationErrors?.fieldErrors;
+      const errorMessage = hasValidationErrors
+        ? concatenateStringValues(err.error.validationErrors!.fieldErrors)
+        : err.error.serverError?.message || 'Something went wrong';
+
+      setErrors(errorMessage instanceof Array ? errorMessage : [errorMessage]);
+      log.error('Error saving extra user details', { error: err });
     }
   });
 
-  const {
-    control,
-    formState: { isValid },
-    handleSubmit
-  } = useForm<FormValues>({
+  const { control, getValues, handleSubmit } = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: 'onChange',
-    defaultValues
+    defaultValues: { email: '', agreedToTOS: false, sendMarketing: true }
   });
-
-  const validationErrors =
-    result.validationErrors?.fieldErrors?.email ||
-    result.validationErrors?.fieldErrors.notify ||
-    result.validationErrors?.fieldErrors.terms ||
-    [];
-
-  const validationError = validationErrors.map((err) => <span key={err}>{err}</span>);
 
   const onSubmit = (data: FormValues) => {
     execute(data);
   };
 
+  function onInvalid(fieldErrors: FieldErrors) {
+    setErrors(['The form is invalid. Please check the fields and try again.']);
+    log.warn('Invalid form submission', { fieldErrors, values: getValues() });
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form noValidate onSubmit={handleSubmit(onSubmit, onInvalid)}>
       <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
         <FormLabel id='form-email'>Email</FormLabel>
         <Controller
@@ -77,7 +80,7 @@ export function ExtraDetails() {
         />
         <Controller
           control={control}
-          name='notify'
+          name='sendMarketing'
           render={({ field: { onChange, value } }) => (
             <FormControlLabel
               control={<Checkbox data-test='onboarding-notify-grants' onChange={onChange} checked={!!value} />}
@@ -87,7 +90,7 @@ export function ExtraDetails() {
         />
         <Controller
           control={control}
-          name='terms'
+          name='agreedToTOS'
           render={({ field: { onChange, value } }) => (
             <FormControlLabel
               control={<Checkbox data-test='onboarding-accept-terms' onChange={onChange} checked={!!value} />}
@@ -95,13 +98,16 @@ export function ExtraDetails() {
             />
           )}
         />
-        {hasErrored && validationErrors?.length > 0 && (
-          <FormHelperText error={hasErrored}>{validationError}</FormHelperText>
-        )}
-        <FormHelperText error={!!hasErrored}>{result.serverError?.message || result.fetchError}</FormHelperText>
       </FormControl>
-      <Box display='flex' justifyContent='flex-end'>
-        <Button data-test='finish-onboarding' size='large' type='submit' disabled={!isValid || isExecuting}>
+      <Box display='flex' alignItems='center' justifyContent='justify-between' gap={2} width='100%'>
+        {!isExecuting && errors?.length ? (
+          <Box flexGrow={1}>
+            <FormErrors errors={errors} />
+          </Box>
+        ) : (
+          <Box flexGrow={1}></Box>
+        )}
+        <Button data-test='finish-onboarding' size='large' type='submit' disabled={isExecuting} sx={{ flexShrink: 0 }}>
           Next
         </Button>
       </Box>

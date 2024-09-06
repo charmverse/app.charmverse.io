@@ -1,7 +1,6 @@
 'use server';
 
-import { actionClient } from '@connect-shared/lib/actions/actionClient';
-
+import { actionClient } from 'lib/actions/actionClient';
 import { findOrCreateWalletUser } from 'lib/blockchain/findOrCreateWalletUser';
 import { verifyWalletSignature } from 'lib/blockchain/verifyWallet';
 

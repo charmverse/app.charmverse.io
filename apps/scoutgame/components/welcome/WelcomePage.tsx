@@ -3,17 +3,21 @@ import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import Box from '@mui/material/Box';
 
 import { FarcasterCard } from 'components/common/FarcasterCard';
+import { SinglePageLayout } from 'components/common/Layout';
+import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 
-import { ExtraDetails } from './ExtraDetails';
+import { ExtraDetailsForm } from './components/ExtraDetailsForm';
 
 export function WelcomePage({ user }: { user: Scout }) {
   return (
-    <PageWrapper>
-      <Box display='flex' gap={2} flexDirection='column'>
-        {user.farcasterId && <FarcasterCard name={user.username} avatar={user.avatar} username={user.username} />}
-        <br />
-        <ExtraDetails />
-      </Box>
-    </PageWrapper>
+    <SinglePageLayout>
+      <SinglePageWrapper>
+        <Box display='flex' gap={2} flexDirection='column'>
+          {user.farcasterId && <FarcasterCard name={user.username} avatar={user.avatar} username={user.username} />}
+          <br />
+          <ExtraDetailsForm />
+        </Box>
+      </SinglePageWrapper>
+    </SinglePageLayout>
   );
 }
