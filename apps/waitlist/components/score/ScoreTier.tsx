@@ -16,7 +16,7 @@ export function ScoreTier({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot 
         <Typography mb={2} variant='h6' paragraph>
           Current Tier
         </Typography>
-        <Box>
+        <Box width={{ xs: '120px', md: '155px' }}>
           <Image
             src={badgeImage}
             width={120}
@@ -24,10 +24,10 @@ export function ScoreTier({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot 
             sizes='100vw'
             style={{
               width: '100%',
-              maxWidth: '1000px',
+              maxWidth: '155px',
               height: 'auto'
             }}
-            alt='Current tier'
+            alt={`Current tier is ${tier}`}
           />
         </Box>
       </Box>
