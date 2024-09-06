@@ -6,7 +6,6 @@ import type { ReactNode } from 'react';
 
 import { NotificationRequest } from 'components/common/NotificationRequest';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
-import { appDescription, appName, appTitle, appTitleTemplate } from 'lib/utils/appDetails';
 import theme from 'theme/theme';
 
 import 'theme/styles.scss';
@@ -14,6 +13,11 @@ import 'theme/styles.scss';
 const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').then((comp) => comp.ClientGlobals), {
   ssr: false
 });
+
+const appName = 'Scout Game';
+const appTitle = 'Onchain builder network';
+const appTitleTemplate = '%s - Scout Game';
+const appDescription = 'Onchain network for connecting web3 developers, projects, organizations';
 
 export const metadata: Metadata = {
   applicationName: appName,
