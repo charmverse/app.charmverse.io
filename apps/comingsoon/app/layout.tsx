@@ -1,6 +1,5 @@
 import { AppProviders } from '@connect-shared/components/layout/AppProviders';
 import type { Metadata, Viewport } from 'next';
-import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
