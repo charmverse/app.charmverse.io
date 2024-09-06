@@ -7,7 +7,7 @@
     "build": "npx next build",
     "start:prod": "npx next start",
     "lint": "npx next lint",
-    "test": "npx jest test --runInBand",
+    "test": "npx dotenv -e .env.test.local -- npx jest test --runInBand",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
