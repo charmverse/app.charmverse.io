@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import type { Scout } from '@charmverse/core/prisma';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
@@ -12,11 +13,10 @@ import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
 import { Avatar } from 'components/common/Avatar';
-import type { LoggedInUser } from 'lib/session/interfaces';
 
 import { InstallAppMenuItem } from './components/InstallAppMenuItem';
 
-export function Header({ user }: { user: LoggedInUser | null }) {
+export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | null }) {
   const path = usePathname();
   const router = useRouter();
 

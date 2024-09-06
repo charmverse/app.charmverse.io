@@ -1,6 +1,6 @@
 import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-client';
 import { getChainById } from '@root/connectors/chains';
-import { InvalidStateError } from '@root/lib/middleware';
+import { InvalidStateError } from '@root/lib/middleware/errors';
 import { optimism } from 'viem/chains';
 
 import type { AuthSchema } from './config';

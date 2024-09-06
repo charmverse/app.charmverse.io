@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { InvalidStateError } from '@root/lib/middleware';
+import { InvalidStateError } from '@root/lib/middleware/errors';
 import { SiweMessage } from 'siwe';
 
 import type { AuthSchema } from './config';
