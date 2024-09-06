@@ -137,8 +137,8 @@ const extendedTheme = extendTheme({
           fontWeight: 600,
           fontSize: '1rem',
           textTransform: 'none',
-          paddingTop: '18px',
-          paddingBottom: '18px'
+          paddingTop: '14px',
+          paddingBottom: '14px'
         }
       }
     },
