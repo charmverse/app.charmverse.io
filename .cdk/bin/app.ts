@@ -22,12 +22,11 @@ if (stackNameParam === 'prd-sunnyawards') {
   });
 }
 // Scout Game production
-else if (stackNameParam === 'prd-scoutgame' || stackNameParam === 'prd-waitlist') {
-  new ProductionStack(app, stackNameParam, deployProps, {
-    sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b901f27e-5a33-4dea-b4fb-39308a580423'
-  });
-} // Scout Game production
-else if (stackNameParam === 'prd-scoutgame') {
+else if (
+  stackNameParam === 'prd-scoutgame' ||
+  stackNameParam === 'prd-waitlist' ||
+  stackNameParam === 'prd-comingsoon'
+) {
   new ProductionStack(app, stackNameParam, deployProps, {
     sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b901f27e-5a33-4dea-b4fb-39308a580423'
   });
