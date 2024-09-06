@@ -2,7 +2,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { roundNumberInRange } from '@root/lib/utils/numbers';
 
 import type { ConnectWaitlistTier, TierChange } from './constants';
-import { waitlistTiers } from './constants';
 import { getTierChange } from './refreshPercentilesForEveryone';
 
 /** 100th percentile is best (lowest score) */

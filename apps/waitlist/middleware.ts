@@ -47,8 +47,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  if (farcasterUser && url.pathname === '/') {
+  if (farcasterUser?.hasJoinedWaitlist && url.pathname === '/') {
     return NextResponse.redirect(new URL('/score', request.url));
+  }
+
+  if (farcasterUser && !farcasterUser.hasJoinedWaitlist && url.pathname === '/score') {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // Rewrite the request with the new URL (without the query param)
