@@ -50,7 +50,7 @@ runs:
       shell: bash
       if: steps.restore_node_modules.outputs.cache-hit != 'true'
       # This is a temporary step while we figure out a way to ensure compatibility with lens protocol which currently needs ethers-v5
-      run: npm ci --no-audit --no-fund --force ${{ inputs.app_name && `--include-workspace-root -w apps/${inputs.app_name}` || '' }}
+      run: npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w apps/{0}`, inputs.app_name) || '' }}
 
     # If installing specific version of core via npmjs
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}
