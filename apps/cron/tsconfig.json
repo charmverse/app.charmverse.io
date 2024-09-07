@@ -9,7 +9,6 @@
       "@root/config/*": ["../../config/*"],
       "@root/abis/*": ["../../abis/*"],
       "@root/connectors/*": ["../../connectors/*"],
-      "@root/theme/*": ["../../theme/*"],
       "@root/lib/*": ["../../lib/*"],
       "@root/testing/*": ["../../testing/*"],
       "components/*": ["../../components/*"],

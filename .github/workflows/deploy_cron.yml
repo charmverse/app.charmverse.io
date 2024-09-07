@@ -1,4 +1,4 @@
-name: cron CI
+name: Cron CI
 
 on:
   push:
