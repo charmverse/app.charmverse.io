@@ -45,15 +45,21 @@ jobs:
       - name: destroy the stack on AWS
         # we need to create a dummy zip file or else cdk throws an error it cannot find the asset
         run: |
-          touch stg-webapp-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-ceramic-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-cron-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-farcaster-${{ env.STAGE_SUFFIX }}.zip
           touch stg-scoutgame-${{ env.STAGE_SUFFIX }}.zip
           touch stg-sunnyawards-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-farcaster-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-webapp-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-websockets-${{ env.STAGE_SUFFIX }}.zip
 
-          npx cdk destroy -c name=stg-webapp-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-ceramic-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-cron-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-farcaster-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-scoutgame-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-sunnyawards-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-farcaster-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-webapp-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-websockets-${{ env.STAGE_SUFFIX }} --force
 
       - name: delete the webapp github deployment
         uses: strumwolf/delete-deployment-environment@v3
