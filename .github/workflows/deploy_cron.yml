@@ -230,7 +230,7 @@ jobs:
     concurrency: staging-${{ github.ref }}
     needs: [build, upload-docker]
     steps:
-      - uses: ./github/actions/deploy_staging
+      - uses: ./.github/actions/deploy_staging
         with:
           app_name: cron
 

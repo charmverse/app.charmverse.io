@@ -1,4 +1,5 @@
 name: 'Build application'
+description: ''
 
 inputs:
   save_cache:
