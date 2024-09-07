@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "esModuleInterop": true,
     "paths": {
       "@packages/charmeditor/*": ["../../packages/charmeditor/src/*"],
       "@packages/utils/*": ["../../packages/utils/src/*"],
@@ -14,5 +15,5 @@
       "components/*": ["../../components/*"]
     }
   },
-  "exclude": ["./esbuild.config.ts", "./__tests__"]
+  "exclude": ["jest.config.ts", "esbuild.config.ts"]
 }
