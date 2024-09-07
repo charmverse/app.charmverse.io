@@ -85,6 +85,7 @@
     "scoutgame:build": "npm run build --w=apps/scoutgame",
     "scoutgame:start:prod": "npx react-env --path .env.local --dest ./apps/scoutgame/public -- npm run start:prod --workspace=apps/scoutgame",
     "scoutgame:debug:e2e": "npm run debug:e2e -w=apps/scoutgame",
+    "scoutgame:test": "dotenv -e .env.test.local -- npm test -w apps/scoutgame",
     "scoutgame:test:e2e": "npm run test:e2e -w=apps/scoutgame -- --headed",
     "scoutgame:test:e2e:ci": "npm run test:e2e -w=apps/scoutgame",
     "scoutgame:start:test:ci": "npm run start:test:ci -w=apps/scoutgame",
