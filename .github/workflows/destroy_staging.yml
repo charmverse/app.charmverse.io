@@ -11,7 +11,7 @@ jobs:
   clean-up:
     if: |
       (github.event.action == 'unlabeled' && startsWith(github.event.label.name, ':rocket: deploy')) ||
-      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-scoutgame') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-farcaster')))
+      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-scoutgame') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-farcaster') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-cron') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-websockets')))
     runs-on: ubuntu-latest
     steps:
       - name: configure AWS credentials
