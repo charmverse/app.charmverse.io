@@ -1,4 +1,4 @@
-import { updateMixpanelProfilesTask } from 'background/tasks/updateMixpanelProfilesTask';
+import { updateMixpanelProfilesTask } from 'apps/cron/src/tasks/updateMixpanelProfilesTask';
 
 export async function updateMixpanelBlockCounts() {
   await updateMixpanelProfilesTask();

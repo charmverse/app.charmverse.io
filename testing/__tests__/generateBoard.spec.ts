@@ -1,13 +1,12 @@
 import type { Block } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import type { BoardFields } from '@root/lib/databases/board';
+import type { BoardViewFields, IViewType } from '@root/lib/databases/boardView';
+import type { CardFields } from '@root/lib/databases/card';
 import { v4 as uuid } from 'uuid';
 
-import type { BoardFields } from 'lib/databases/board';
-import type { BoardViewFields, IViewType } from 'lib/databases/boardView';
-import type { CardFields } from 'lib/databases/card';
-import { generateSchema } from 'testing/publicApi/schemas';
-
+import { generateSchema } from '../publicApi/schemas';
 import { createPage, generateBoard, generateRole } from '../setupDatabase';
 
 describe('generateBoard', () => {

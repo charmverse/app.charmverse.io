@@ -1,4 +1,3 @@
-import type { ProposalEvaluationTestInput } from '@charmverse/core/dist/cjs/lib/testing/proposals';
 import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
@@ -160,7 +159,7 @@ describe('updateBoardProperties()', () => {
 
     const rootId = uuid();
 
-    const evaluationInputs: ProposalEvaluationTestInput[] = [
+    const evaluationInputs: testUtilsProposals.GenerateProposalInput['evaluationInputs'] = [
       {
         evaluationType: 'feedback',
         permissions: [],

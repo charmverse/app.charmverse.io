@@ -1,7 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma-client';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
+import { getUserProfile } from '@root/lib/profile/getUser';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,7 +10,6 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { verifyOtpToken } from 'lib/profile/otp/verifyOtpToken';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getUserProfile } from 'lib/users/getUser';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

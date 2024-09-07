@@ -6,9 +6,9 @@ import { IdentityIcon } from 'components/settings/profile/components/IdentityIco
 import type { IntegrationModel } from 'components/settings/profile/components/IdentityModal';
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
+import type { TelegramAccount } from 'lib/telegram/interfaces';
 import { matchWalletAddress, shortWalletAddress } from 'lib/utils/blockchain';
 import { randomName } from 'lib/utils/randomName';
-import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useLensProfile } from './useLensProfile';
 

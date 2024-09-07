@@ -7,7 +7,7 @@ import type {
 } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
 import { testUtilsPages } from '@charmverse/core/test';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';

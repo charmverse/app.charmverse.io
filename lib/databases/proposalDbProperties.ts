@@ -15,9 +15,8 @@ import type {
   ProposalEvaluationStatus,
   ProposalEvaluationStep
 } from '@root/lib/proposals/interfaces';
+import type { BrandColor } from '@root/theme/colors';
 import { v4 as uuid } from 'uuid';
-
-import type { BrandColor } from 'theme/colors';
 
 export const EVALUATION_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = {
   declined: 'Declined',

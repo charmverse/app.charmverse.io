@@ -1,0 +1,101 @@
+name: 'Deploy to staging'
+description: 'Deploy to staging'
+
+inputs:
+  app_name:
+    description: The name of the app'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Inject slug/short variables
+      uses: rlespinasse/github-slug-action@v4.x
+      with:
+        short-length: 7
+
+    - name: Calculate Stage env var
+      shell: bash
+      run: |
+        full_stage_name="stg-${{ inputs.app_name }}-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
+
+        # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
+        stage_name=`echo "$full_stage_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
+
+        # export the stage name so that it can be used in other steps
+        echo "STAGE_NAME=$stage_name" >> $GITHUB_ENV
+
+    # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
+    - name: Install dependencies
+      uses: ./.github/actions/install
+
+    - name: Replace env_var with staging settings
+      shell: bash
+      run: |
+        ebextension_files=$(ls .ebextensions/*/00_env_vars.config)
+        ebstalk_apps_env_files=$(ls .ebstalk.apps.env/*)
+
+        for conf_file in $ebextension_files $ebstalk_apps_env_files; do
+          sed -i 's/prd/stg/g' $conf_file
+          sed -i 's/production/staging/g' $conf_file
+        done
+
+        # modifying cloudformation alarm to send alerts to test sns topic.
+        #  leaving it in even if we're deleting the config before deploying
+        #  Useful to avoid accidental triggering to system-status channel.
+        for conf_file in .ebextensions/*/06_cloudwatch_alarm.config; do
+          sed -i 's/Production-Alerts/lambda-test-debug/g' $conf_file
+        done
+
+        rm .ebextensions/*/06_cloudwatch_alarm.config
+
+    - name: Create a github deployment
+      uses: bobheadxi/deployments@v1
+      id: deployment
+      with:
+        step: start
+        token: ${{ secrets.GITHUB_TOKEN }}
+        env: ${{ env.STAGE_NAME }}
+        ref: ${{ github.head_ref }}
+        override: true
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Set the docker compose env variables
+      uses: mikefarah/yq@master
+      with:
+        cmd: |
+          mv .ebextensions .ebextensions_tmp && mv .ebextensions_tmp/${{ inputs.app_name }} .ebextensions
+          yq -I 4 -i '
+            with(.option_settings."aws:elasticbeanstalk:application:environment";
+                  .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
+                  .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+            ' .ebextensions/00_env_vars.config
+
+    - name: Deploy to staging
+      shell: bash
+      id: cdk_deploy
+      run: |
+        cat files_to_zip.txt | zip --symlinks -r@ ${{env.STAGE_NAME}}.zip
+        npx aws-cdk deploy -c name=${{env.STAGE_NAME}} --method=direct --outputs-file cdk.out.json
+        env_url=$(jq --raw-output '.[$ENV.STAGE_NAME].DeploymentUrl' ./cdk.out.json)
+        echo "env_url=$env_url" >> $GITHUB_OUTPUT
+
+    - name: update the github deployment status
+      uses: bobheadxi/deployments@v1
+      if: always()
+      with:
+        env: ${{ steps.deployment.outputs.env }}
+        step: finish
+        override: false
+        token: ${{ secrets.GITHUB_TOKEN }}
+        status: ${{ job.status }}
+        deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+        env_url: ${{ steps.cdk_deploy.outputs.env_url }}

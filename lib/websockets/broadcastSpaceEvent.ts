@@ -1,4 +1,3 @@
-import { redisClient } from '@root/adapters/redis/redisClient';
 import { Server } from 'socket.io';
 
 import { config } from './config';

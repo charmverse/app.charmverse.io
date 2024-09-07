@@ -1,4 +1,5 @@
 import { Box, Grid, Stack, TextField, Typography } from '@mui/material';
+import { charmBlue as blueColor } from '@root/config/colors';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -10,7 +11,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { isValidEmail } from 'lib/utils/strings';
-import { blueColor } from 'theme/colors';
 
 import Avatar from '../../space/components/LargeAvatar';
 import type { FormValues } from '../NotificationSettings';

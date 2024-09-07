@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { v4 as uuid } from 'uuid';
 
 import { generateUserAndSpace } from 'testing/setupDatabase';

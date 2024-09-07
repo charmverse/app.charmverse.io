@@ -2,8 +2,8 @@ import { Divider, Stack, Typography } from '@mui/material';
 
 import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 
+import type { SelectedProposalProperties } from './interfaces';
 import { PropertySelector } from './PropertiesListSelector';
-import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 
 export function CustomPropertiesList({
   selectedProperties,

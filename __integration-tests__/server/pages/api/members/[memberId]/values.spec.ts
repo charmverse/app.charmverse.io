@@ -1,5 +1,5 @@
 import type { MemberProperty, Space } from '@charmverse/core/prisma';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import request from 'supertest';
 
 import type { PropertyValue } from 'lib/members/interfaces';

@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "paths": {
+      "@packages/charmeditor/*": ["../../packages/charmeditor/src/*"],
+      "@packages/utils/*": ["../../packages/utils/src/*"],
+      "@root/adapters/*": ["../../adapters/*"],
+      "@root/config/*": ["../../config/*"],
+      "@root/abis/*": ["../../abis/*"],
+      "@root/connectors/*": ["../../connectors/*"],
+      "@root/theme/*": ["../../theme/*"],
+      "@root/lib/*": ["../../lib/*"],
+      "@root/testing/*": ["../../testing/*"],
+      "components/*": ["../../components/*"],
+      "lib/*": ["../../lib/*"]
+    }
+  },
+  "exclude": ["jest.config.ts", "esbuild.config.ts"]
+}

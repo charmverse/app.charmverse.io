@@ -2,9 +2,8 @@ import { Head } from '@react-email/head';
 import { Html } from '@react-email/html';
 import { Preview } from '@react-email/preview';
 import { Section } from '@react-email/section';
+import { lightGreyColor } from '@root/theme/colors';
 import React from 'react';
-
-import { lightGreyColor } from 'theme/colors';
 
 import Footer from './Footer';
 import Header from './Header';

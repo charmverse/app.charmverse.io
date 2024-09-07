@@ -1,8 +1,7 @@
 import type { TextProps } from '@react-email/text';
 import { Text as ReactEmailText } from '@react-email/text';
+import { blueColor, primaryTextColor, secondaryTextColor } from '@root/theme/colors';
 import type { CSSProperties, ReactNode } from 'react';
-
-import { blueColor, primaryTextColor, secondaryTextColor } from 'theme/colors';
 
 // copied from theme/fonts.ts because next/fonts doesnt play well with tsx or ts-node. TODO: maybe remove next/fonts?
 const defaultFont =

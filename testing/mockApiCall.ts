@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma-client';
+import { getIronOptions } from '@root/lib/session/getIronOptions';
 import { serialize } from 'cookie';
 import { sealData } from 'iron-session';
 import request from 'supertest';
 
-import { getIronOptions } from 'lib/session/getIronOptions';
 import type { TestLoginRequest } from 'pages/api/session/login-testenv';
 
 export const baseUrl = process.env.DOMAIN as string;

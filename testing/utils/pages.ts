@@ -1,8 +1,8 @@
+import type { CreatePostCommentInput } from '@root/lib/forums/comments/interface';
+import { createPageComment } from '@root/lib/pages/comments/createPageComment';
 import { v4 } from 'uuid';
 
-import type { CreatePostCommentInput } from 'lib/forums/comments/interface';
-import { createPageComment } from 'lib/pages/comments/createPageComment';
-import { createPage } from 'testing/setupDatabase';
+import { createPage } from '../setupDatabase';
 
 type CommentInput = {
   content: any;

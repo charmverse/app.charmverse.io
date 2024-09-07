@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
+import type { AccessControlCondition } from '@root/lib/tokenGates/interfaces';
 
 export async function generateTokenGate({
   userId,

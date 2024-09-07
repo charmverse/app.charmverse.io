@@ -1,0 +1,24 @@
+name: 'Notify Discord on error'
+description: 'Notify Discord when a step fails'
+
+inputs:
+  app_name:
+    description: The name of the app'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: If any of prev jobs failed notify discord
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
+        status: 'failure'
+        content: 'Hey <@&1027309276454207519>'
+        title: '${{ inputs.app_name }} deploy workflow failed'
+        description: |
+          Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
+        color: '16515843'
+        url: 'https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}'
+        username: GitHub Actions
+        avatar_url: 'https://github.githubassets.com/images/modules/logos_page/Octocat.png'

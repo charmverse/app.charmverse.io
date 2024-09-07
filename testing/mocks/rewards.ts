@@ -1,6 +1,5 @@
 import type { RewardBlock, Prisma } from '@charmverse/core/prisma';
-
-import type { OptionalNullable } from 'lib/utils/types';
+import type { OptionalNullable } from '@root/lib/utils/types';
 
 export function mockRewardBlocks({
   spaceId,

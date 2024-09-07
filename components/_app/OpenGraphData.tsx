@@ -1,4 +1,4 @@
-import { blueColor } from 'theme/colors';
+import { charmBlue as blueColor } from '@root/config/colors';
 
 export type OpenGraphProps = {
   title?: string;

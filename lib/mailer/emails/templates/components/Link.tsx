@@ -1,8 +1,7 @@
 import type { LinkProps } from '@react-email/link';
 import { Link as ReactEmailLink } from '@react-email/link';
+import { charmBlue as blueColor } from '@root/config/colors';
 import type { ReactNode } from 'react';
-
-import { blueColor } from 'theme/colors';
 
 export default function Link({
   primaryColor = blueColor,

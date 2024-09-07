@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
+import type { RubricEvaluationProperty, SelectedProposalProperties } from './interfaces';
 import { PropertySelector } from './PropertiesListSelector';
-import type { RubricEvaluationProperty, SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 
 export function RubricEvaluationPropertiesList({
   selectedProperties,

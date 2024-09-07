@@ -1,6 +1,6 @@
 import { projectFieldProperties, projectMemberFieldProperties } from '@root/lib/projects/formField';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 import type { ProposalTemplateMeta } from 'lib/proposals/getProposalTemplates';
 
 import type { Board } from '../board';

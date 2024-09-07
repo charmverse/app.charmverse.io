@@ -1,4 +1,5 @@
 name: 'Install dependencies'
+description: ''
 
 inputs:
   core_pkg_version:
@@ -6,6 +7,9 @@ inputs:
     required: false
   commit_core_pkg_upgrade:
     description: 'Whether commit the update to core package back to branch'
+    required: false
+  npm_install_args:
+    description: 'Example: -w app/websockets'
     required: false
   use_github_core_branch:
     description: |
@@ -45,7 +49,7 @@ runs:
       shell: bash
       if: steps.restore_node_modules.outputs.cache-hit != 'true'
       # This is a temporary step while we figure out a way to ensure compatibility with lens protocol which currently needs ethers-v5
-      run: npm ci --no-audit --no-fund --force
+      run: npm ci --no-audit --no-fund --force ${{ inputs.npm_install_args }}
 
     # If installing specific version of core via npmjs
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}

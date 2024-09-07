@@ -2,7 +2,7 @@ import { Divider, Stack, Typography } from '@mui/material';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
-import type { RubricEvaluationProperty, SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
+import type { RubricEvaluationProperty, SelectedProposalProperties } from './interfaces';
 import { SelectedPropertiesList } from './SelectedPropertiesList';
 
 const RubricPropertyLabel: Record<RubricEvaluationProperty, string> = {
