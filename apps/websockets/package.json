@@ -6,6 +6,7 @@
     "build": "npx tsx esbuild.config.ts",
     "start": "tsx watch src/initWebsockets.ts",
     "start:prod": "node ./dist/initWebsockets.js",
+    "test": "npx jest",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
