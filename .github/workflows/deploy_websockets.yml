@@ -207,6 +207,9 @@ jobs:
     needs: [test, upload-docker, upload-static-assets]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       # - name: Package websockets
       # id: pkg_websocket
       # run: |
@@ -236,6 +239,9 @@ jobs:
     concurrency: staging-${{ github.ref }}
     needs: [build, upload-docker]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/deploy_staging
         with:
           app_name: websockets
@@ -247,6 +253,9 @@ jobs:
     # pass in all steps so we can check if any failed
     needs: [test, upload-docker, upload-static-assets, deploy-production]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Notify Discord
         uses: ./.github/actions/notify_error
         with:
