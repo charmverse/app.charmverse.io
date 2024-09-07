@@ -221,6 +221,9 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/deploy_production
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
           app_name: cron
           stack: prd-cron
@@ -237,6 +240,11 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/deploy_staging
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STAGE_NAME: ${{ env.STAGE_NAME }}
         with:
           app_name: cron
 
@@ -252,5 +260,7 @@ jobs:
           fetch-depth: 0
       - name: Notify Discord
         uses: ./.github/actions/notify_error
+        env:
+          DISCORD_WARNINGS_WEBHOOK: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
         with:
           app_name: cron

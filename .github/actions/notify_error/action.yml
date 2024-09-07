@@ -12,7 +12,7 @@ runs:
     - name: If any of prev jobs failed notify discord
       uses: sarisia/actions-status-discord@v1
       with:
-        webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
+        webhook: ${{ env.DISCORD_WARNINGS_WEBHOOK }}
         status: 'failure'
         content: 'Hey <@&1027309276454207519>'
         title: '${{ inputs.app_name }} deploy workflow failed'
