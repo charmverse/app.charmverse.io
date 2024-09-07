@@ -128,7 +128,7 @@ jobs:
         run: npm run typecheck -w apps/waitlist
 
       - name: Run Waitlist Unit tests
-        run: npm run test -w apps/waitlist
+        run: npx dotenv -e .env.test.local -- npm run test -w apps/waitlist
 
       - name: Run eslint on changed files
         uses: tj-actions/eslint-changed-files@v25

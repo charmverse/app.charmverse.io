@@ -1,4 +1,4 @@
-name: Cron CI
+name: Ceramic CI
 
 on:
   push:
@@ -6,36 +6,26 @@ on:
     paths:
       - '.cdk'
       - 'docker-compose.yml'
-      - '.ebextensions/cron/**'
-      - '.ebstalk.apps.env/cron.env'
+      - '.ebextensions/ceramic/**'
+      - '.ebstalk.apps.env/ceramic.env'
       - '.github/actions/**'
-      - '.github/workflows/deploy_cron.yml'
+      - '.github/workflows/deploy_ceramic.yml'
       - 'package.json'
       - 'package-lock.json'
-      - 'apps/cron/**'
-      - 'abis/**'
-      - 'adapters/**'
-      - 'config/**'
-      - 'connectors/**'
-      - 'lib/**'
+      - 'apps/ceramic/**'
   pull_request:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
       - '.cdk'
       - 'docker-compose.yml'
-      - '.ebextensions/cron/**'
-      - '.ebstalk.apps.env/cron.env'
+      - '.ebextensions/ceramic/**'
+      - '.ebstalk.apps.env/ceramic.env'
       - '.github/actions/**'
-      - '.github/workflows/deploy_cron.yml'
+      - '.github/workflows/deploy_ceramic.yml'
       - 'package.json'
       - 'package-lock.json'
-      - 'apps/cron/**'
-      - 'abis/**'
-      - 'adapters/**'
-      - 'config/**'
-      - 'connectors/**'
-      - 'lib/**'
+      - 'apps/ceramic/**'
   workflow_dispatch:
     inputs:
       core_pkg_version:
@@ -43,7 +33,7 @@ on:
         required: true
 
 concurrency:
-  group: ci-cron-${{ github.event_name }}-${{ github.ref }}
+  group: ci-ceramic-${{ github.event_name }}-${{ github.ref }}
 
 jobs:
   build:
@@ -70,20 +60,20 @@ jobs:
         # source https://github.com/orgs/community/discussions/28474
         run: |
           echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
-          echo "deploy_staging=${{(github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-cron') || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-cron'))}}" >> $GITHUB_OUTPUT
+          echo "deploy_staging=${{(github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-ceramic') || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic'))}}" >> $GITHUB_OUTPUT
           echo "skip_tests=${{ contains(env.commit_message, 'skip-tests') }}" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
-          npm_install_args: --include-workspace-root -w apps/cron
+          npm_install_args: -w apps/ceramic
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
       - name: Build app
         uses: ./.github/actions/build_app
         with:
-          app_name: cron
+          app_name: ceramic
 
   upload-docker:
     name: Upload Docker image
@@ -103,11 +93,11 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build_app
         with:
-          app_name: cron
+          app_name: ceramic
 
       - name: Update Dockerfile
         run: |
-          rm Dockerfile && mv apps/cron/Dockerfile Dockerfile
+          rm Dockerfile && mv apps/ceramic/Dockerfile Dockerfile
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -117,54 +107,19 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
         with:
-          ecr_registry: cron
-
-  upload-static-assets:
-    name: Upload assets in production
-    runs-on: ubuntu-latest
-    # run whether previous jobs were successful or skipped
-    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Install dependencies
-        uses: ./.github/actions/install
-
-      - name: Calculate Build ID
-        id: get_build_id
-        run: |
-          build_id=${{ hashFiles('package-lock.json', 'apps/cron/*.[jt]s') }}
-          echo "build_id=$build_id" >> $GITHUB_OUTPUT
-
-      - name: Restore app from cache
-        uses: ./.github/actions/build_app
-        with:
-          app_name: cron
-
-      - name: Upload JS source maps to Datadog
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-        run: |
-          npm install -g @datadog/datadog-ci
-          datadog-ci sourcemaps upload apps/cron/dist       \
-            --service=cron                              \
-            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
-            --minified-path-prefix=https://cdn.charmverse.io/_next/static
+          ecr_registry: ceramic
 
   deploy-production:
     name: Deploy to production
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test, upload-docker, upload-static-assets]
+    needs: [upload-docker]
     runs-on: ubuntu-latest
     steps:
       - uses: ./.github/actions/deploy_production
         with:
-          app_name: cron
-          stack: prd-cron
+          app_name: ceramic
+          stack: prd-ceramic
 
   deploy-staging:
     name: Deploy to staging
@@ -176,16 +131,16 @@ jobs:
     steps:
       - uses: ./github/actions/deploy_staging
         with:
-          app_name: cron
+          app_name: ceramic
 
   discord-alert:
     name: Notify Discord of failure
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
     # pass in all steps so we can check if any failed
-    needs: [test, upload-docker, upload-static-assets, deploy-production]
+    needs: [upload-docker, deploy-production]
     steps:
       - name: Notify Discord
         uses: ./.github/actions/notify_error
         with:
-          app_name: cron
+          app_name: ceramic

@@ -14,7 +14,7 @@ jobs:
   deploy:
     if: |
       (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy') ||
-      (github.event.action != 'labeled' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic')))
+      (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))
 
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
@@ -90,11 +90,6 @@ jobs:
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/webapp/00_env_vars.config
-
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/cron/00_env_vars.config
 
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";

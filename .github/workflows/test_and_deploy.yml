@@ -397,61 +397,20 @@ jobs:
           cmd: |
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .NODE_ENV = "production" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/websockets/00_env_vars.config
-              yq -I 4 -i '
-                with(.option_settings."aws:elasticbeanstalk:application:environment";
-                      .NODE_ENV = "production" |
-                      .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/webapp/00_env_vars.config
+            ' .ebextensions/webapp/00_env_vars.config
 
-              yq -I 4 -i '
-                with(.option_settings."aws:elasticbeanstalk:application:environment";
-                      .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/cron/00_env_vars.config
-
-              yq -I 4 -i '
-                with(.option_settings."aws:elasticbeanstalk:application:environment";
-                      .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/ceramic/00_env_vars.config
-
-              yq -I 4 -i '
-                with(.option_settings."aws:elasticbeanstalk:application:environment";
-                      .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/websockets/00_env_vars.config
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+            ' .ebextensions/websockets/00_env_vars.config
 
       - name: Package webapp
         run: |
           mv .ebextensions .ebextensions_tmp
           mv .ebextensions_tmp/webapp .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
-
-      - name: Package cron worker
-        run: |
-          rm -r .ebextensions && mv .ebextensions_tmp/cron .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
-
-      - name: Package ceramic server
-        run: |
-          rm -r .ebextensions && mv .ebextensions_tmp/ceramic .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
-
-      - name: Package websockets
-        id: pkg_websocket
-        run: |
-          rm -r .ebextensions && mv .ebextensions_tmp/websockets .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
-
-          changed_files=$(git diff --name-only ${{github.event.before}} ${{github.event.after}})
-          websocket_src_file_pattern='^(background/|config/|[dD]ocker|esbuild|lib/|package|next|tsconfig|components/common/CharmEditor/components)+'
-          for file in $changed_files; do
-            echo "evaluating $file:"
-            if [[ $file =~ $websocket_src_file_pattern ]]; then
-              echo "Requires deployment to websocket"
-              echo "deploy_websocket=true" >> $GITHUB_OUTPUT
-              break
-            fi
-          done
 
       - name: Deploy webapp to Beanstalk
         id: webapp_deploy
@@ -480,32 +439,6 @@ jobs:
           deployment_package: deploy_websockets.zip
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github
-
-      - name: Deploy cron worker to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: charmverse-worker
-          environment_name: prd-charmverse-worker
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_cron.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
-
-      - name: Deploy ceramic to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: prd-charmverse-ceramic-link
-          environment_name: prd-charmverse-ceramic-link
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_ceramic.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
 
   discord-alert:
     name: Notify Discord of failure
