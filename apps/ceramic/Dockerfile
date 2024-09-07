@@ -11,12 +11,13 @@ RUN apt install openssl -y
 WORKDIR /app
 
 # Copy dependencies
-COPY --parents apps/*/package.json \
-  packages/*/package.json          \
-  node_modules                     \
-  package.json                     \
-  apps/ceramic/node_modules     \
-  apps/ceramic/package.json     \
+COPY --parents @connect-shared/package.json \
+  apps/*/package.json                       \
+  packages/*/package.json                   \
+  node_modules                              \
+  package.json                              \
+  apps/ceramic/node_modules                 \
+  apps/ceramic/package.json                 \
   .
 
 # Copy compiled code
