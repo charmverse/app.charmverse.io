@@ -30,6 +30,8 @@ runs:
     # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
     - name: Install dependencies
       uses: ./.github/actions/install
+      with:
+        app_name: ${{ inputs.app_name }}
 
     - name: Replace env_var with staging settings
       shell: bash

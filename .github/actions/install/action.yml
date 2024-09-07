@@ -8,8 +8,8 @@ inputs:
   commit_core_pkg_upgrade:
     description: 'Whether commit the update to core package back to branch'
     required: false
-  npm_install_args:
-    description: 'Example: -w app/websockets'
+  app_name:
+    description: ''
     required: false
   use_github_core_branch:
     description: |
@@ -44,13 +44,13 @@ runs:
           ./node_modules
           ./apps/*/node_modules
           ./packages/*/node_modules
-        key: nodemodule-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
+        key: nodemodule-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{ inputs.app_name || '' }}
 
     - name: Install npm dependencies
       shell: bash
       if: steps.restore_node_modules.outputs.cache-hit != 'true'
       # This is a temporary step while we figure out a way to ensure compatibility with lens protocol which currently needs ethers-v5
-      run: npm ci --no-audit --no-fund --force ${{ inputs.npm_install_args }}
+      run: npm ci --no-audit --no-fund --force ${{ inputs.app_name && `--include-workspace-root -w apps/${inputs.app_name}` || '' }}
 
     # If installing specific version of core via npmjs
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}

@@ -72,7 +72,7 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
-          npm_install_args: --include-workspace-root -w apps/cron
+          app_name: websockets
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 

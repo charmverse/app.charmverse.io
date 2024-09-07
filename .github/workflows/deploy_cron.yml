@@ -76,7 +76,7 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
-          npm_install_args: --include-workspace-root -w apps/cron
+          app_name: cron
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
@@ -114,6 +114,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: cron
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -149,6 +151,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: cron
 
       - name: Restore app from cache
         uses: ./.github/actions/build_app
@@ -182,6 +186,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: cron
 
       - name: Calculate Build ID
         id: get_build_id
