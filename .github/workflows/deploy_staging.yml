@@ -1,4 +1,4 @@
-name: 'Deploy to staging'
+name: 'Deploy Webapp to staging'
 
 on:
   pull_request:
