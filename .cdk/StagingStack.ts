@@ -142,15 +142,15 @@ export class StagingStack extends Stack {
         value: 't3a.small,t3.small'
       },
       {
+        namespace: 'aws:elasticbeanstalk:application:environment',
+        optionName: 'PORT',
+        value: healthCheck.port?.toString() || '80'
+      },
+      {
         // ALB health check
         namespace: 'aws:elasticbeanstalk:application',
         optionName: 'Application Healthcheck URL',
         value: healthCheck.path
-      },
-      {
-        namespace: 'aws:elasticbeanstalk:application',
-        optionName: 'Application Healthcheck Port',
-        value: healthCheck.port.toString()
       },
       {
         namespace: 'aws:elasticbeanstalk:application:environment',
