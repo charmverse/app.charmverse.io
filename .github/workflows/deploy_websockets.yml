@@ -66,7 +66,7 @@ jobs:
         # source https://github.com/orgs/community/discussions/28474
         run: |
           echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
-          echo "deploy_staging=${{(github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-websockets') || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-websockets'))}}" >> $GITHUB_OUTPUT
+          echo "deploy_staging=${{(github.event.action == 'labeled' && (github.event.label.name == ':rocket: deploy-websockets' || github.event.label.name == ':rocket: deploy')) || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-websockets') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))}}" >> $GITHUB_OUTPUT
           echo "skip_tests=${{ contains(env.commit_message, 'skip-tests') }}" >> $GITHUB_OUTPUT
 
       - name: Install dependencies

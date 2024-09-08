@@ -41,6 +41,11 @@ jobs:
           # export the stage name so that it can be used in other steps
           echo "STAGE_NAME=$stage_name" >> $GITHUB_ENV
 
+          # calculate web sockets staging domain name
+          websockets_full_stage_name="stg-webapp-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
+          websockets_stage_name=`echo "$full_stage_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
+          echo "WEBSOCKETS_STAGE_NAME=$websockets_stage_name" >> $GITHUB_ENV
+
       - name: Install dependencies
         uses: ./.github/actions/install
 
@@ -79,7 +84,7 @@ jobs:
           rm .ebextensions/*/06_cloudwatch_alarm.config
 
           # substituting the websocket domain name
-          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE_NAME}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
+          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.WEBSOCKETS_STAGE_NAME}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -90,16 +95,6 @@ jobs:
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions/webapp/00_env_vars.config
-
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/ceramic/00_env_vars.config
-
-            yq -I 4 -i '
-              with(.option_settings."aws:elasticbeanstalk:application:environment";
-                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
-              ' .ebextensions/websockets/00_env_vars.config
 
       - name: Run specific version of permission api if SELECTED_PERMISSION_API_TAG exists
         if: env.SELECTED_PERMISSION_API_TAG && env.GITHUB_HEAD_REF_SLUG == env.SELECTED_PERMISSION_API_TAG
@@ -169,49 +164,6 @@ jobs:
           status: ${{ job.status }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: ${{ steps.cdk_deploy.outputs.env_url }}
-
-          # update websockets in staging
-
-      - name: Update and Package ceramic server
-        run: |
-          rm -r .ebextensions && mv .ebextensions_tmp/ceramic .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
-
-      - name: Deploy ceramic to Beanstalk
-        if: >
-          (github.event.action == 'labeled' && github.event.label.name == 'deploy-ceramic') ||
-          (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'deploy-ceramic'))
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: stg-charmverse-ceramic-link
-          environment_name: stg-charmverse-ceramic-link
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_ceramic.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
-
-      # update websockets in staging
-
-      - name: Update and Package websockets
-        run: |
-          rm -r .ebextensions && mv .ebextensions_tmp/websockets .ebextensions
-          cat files_to_zip.txt | zip --symlinks -r@ deploy_websockets.zip
-
-      - name: Deploy websockets to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: stg-charmverse-websockets
-          environment_name: stg-charmverse-websockets
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_websockets.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
 
       - name: Use datadog ci package to upload js maps
         env:
