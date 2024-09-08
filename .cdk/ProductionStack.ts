@@ -5,7 +5,7 @@ import { Construct } from 'constructs';
 
 export type Options = {
   healthCheck?: { port: number; path: string };
-  sslCert: string;
+  sslCert?: string;
 };
 
 const defaultHealthCheck = { path: '/api/health', port: 80 };
@@ -85,26 +85,30 @@ export class ProductionStack extends Stack {
         optionName: 'ConfigDocument',
         value: JSON.stringify(healthReportingSystemConfig)
       },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'Protocol',
-        value: 'HTTPS'
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'ListenerEnabled',
-        value: 'true'
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'SSLCertificateArns',
-        value: sslCert
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'SSLPolicy',
-        value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
-      },
+      ...(sslCert
+        ? [
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'Protocol',
+              value: 'HTTPS'
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'ListenerEnabled',
+              value: 'true'
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'SSLCertificateArns',
+              value: sslCert
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'SSLPolicy',
+              value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
+            }
+          ]
+        : []),
       {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',

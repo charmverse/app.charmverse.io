@@ -30,6 +30,13 @@ else if (
   new ProductionStack(app, stackNameParam, deployProps, {
     sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b901f27e-5a33-4dea-b4fb-39308a580423'
   });
+} else if (stackNameParam === 'prd-ceramic') {
+  new ProductionStack(app, stackNameParam, deployProps, {
+    healthCheck: {
+      path: '/graphql',
+      port: 5001
+    }
+  });
 }
 // Connect webapp and api production
 else if (stackNameParam.startsWith('prd')) {
