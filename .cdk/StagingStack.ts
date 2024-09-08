@@ -11,12 +11,14 @@ type CustomOptions = {
   options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[];
 };
 
+const defaultHealthCheck = { path: '/api/health', port: 80 };
+
 export class StagingStack extends Stack {
   constructor(
     scope: Construct,
     appName: string,
     props: StackProps,
-    { healthCheck = { path: '/api/health', port: 80 }, options = [] }: CustomOptions = {}
+    { healthCheck = defaultHealthCheck, options = [] }: CustomOptions = {}
   ) {
     super(scope, appName, props);
 
