@@ -138,6 +138,10 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/deploy_staging
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           app_name: ceramic
 
@@ -149,9 +153,9 @@ jobs:
     needs: [upload-docker, deploy-production]
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Notify Discord
         uses: ./.github/actions/notify_error
+        env:
+          DISCORD_WARNINGS_WEBHOOK: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
         with:
           app_name: ceramic
