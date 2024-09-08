@@ -14,7 +14,7 @@
     "getcontext": "npx tsx scripts/prompts/traverseAndTokenise.ts",
     "ceramic": "npm start -w apps/ceramic",
     "ceramic:build": "npm run build -w apps/ceramic",
-    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build",
+    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build && npm run sockets:build",
     "build:analyze": "cross-env ANALYZE=true next build --experimental-debug-memory-usage",
     "esbuild": "tsx esbuild.config.ts",
     "verifydeps": "npx depcruise --ts-config ./tsconfig.json --config .dependency-cruiser.js -- ./",
