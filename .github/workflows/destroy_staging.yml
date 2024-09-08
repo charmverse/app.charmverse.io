@@ -61,26 +61,44 @@ jobs:
           npx cdk destroy -c name=stg-webapp-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-websockets-${{ env.STAGE_SUFFIX }} --force
 
-      - name: delete the webapp github deployment
+      - name: delete ceramic github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-webapp-${{ env.STAGE_SUFFIX }}
+          environment: stg-ceramic-${{ env.STAGE_SUFFIX }}
 
-      - name: delete the scoutgame github deployment
+      - name: delete cron github deployment
+        uses: strumwolf/delete-deployment-environment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-cron-${{ env.STAGE_SUFFIX }}
+
+      - name: delete farcaster github deployment
+        uses: strumwolf/delete-deployment-environment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-farcaster-${{ env.STAGE_SUFFIX }}
+
+      - name: delete scoutgame github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: stg-scoutgame-${{ env.STAGE_SUFFIX }}
 
-      - name: delete the sunnyawards github deployment
+      - name: delete sunnyawards github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: stg-sunnyawards-${{ env.STAGE_SUFFIX }}
 
-      - name: delete the farcaster github deployment
+      - name: delete webapp github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-farcaster-${{ env.STAGE_SUFFIX }}
+          environment: stg-webapp-${{ env.STAGE_SUFFIX }}
+
+      - name: delete websockets github deployment
+        uses: strumwolf/delete-deployment-environment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-websockets-${{ env.STAGE_SUFFIX }}
