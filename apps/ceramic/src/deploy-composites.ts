@@ -1,11 +1,9 @@
-/* eslint-disable import/no-extraneous-dependencies */
-
 import { createComposite, readEncodedComposite, writeEncodedComposite } from '@composedb/devtools-node';
 import ora from 'ora';
 
 import { getCeramicClient } from './authenticate';
 
-const folder = 'apps/ceramic/src';
+const folder = 'apps/ceramic';
 
 function getCompositesFolder(filename: string) {
   return `${folder}/generated/${filename}`;
@@ -22,7 +20,7 @@ export async function writeCompositeJson() {
 
   spinner.info('creating composite for runtime usage');
 
-  const compositeGraphQLDefinition = await createComposite(ceramic, `${folder}/credentials.gql`);
+  const compositeGraphQLDefinition = await createComposite(ceramic, `${folder}/src/credentials.gql`);
   await writeEncodedComposite(compositeGraphQLDefinition, compositeDefinitionFile);
 }
 

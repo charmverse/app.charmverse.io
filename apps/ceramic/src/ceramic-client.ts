@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import { log } from '@charmverse/core/log';
 import { serveEncodedDefinition } from '@composedb/devtools-node';
 

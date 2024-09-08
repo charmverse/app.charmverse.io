@@ -21,7 +21,7 @@ COPY --parents @connect-shared/package.json \
   .
 
 # Copy compiled code
-COPY --parents apps/*/dist .
+COPY --parents apps/*/dist apps/ceramic/generated .
 
 ENV PORT=3000
 

@@ -7,7 +7,7 @@
     "ceramic:graphql:stg": "npx dotenv -e .env.staging --  tsx src/ceramic-client.ts"
   },
   "dependencies": {
-    "@ceramicnetwork/http-client": "^5.16.0",
+    "@ceramicnetwork/http-client": "5.6",
     "@ceramicnetwork/streamid": "^3.4.1",
     "@composedb/devtools-node": "^0.7.1",
     "dids": "^4.0.4",
