@@ -39,7 +39,7 @@ else if (stackNameParam.startsWith('prd')) {
 } else if (stackNameParam.startsWith('stg-webapp')) {
   new WebappStagingStack(app, stackNameParam, deployProps);
 } else if (stackNameParam.startsWith('stg-ceramic')) {
-  new StagingStack(app, stackNameParam, deployProps, { healthCheck: '/graphql' });
+  new StagingStack(app, stackNameParam, deployProps, { healthCheck: { path: '/graphql', port: 5001 } });
 } else if (stackNameParam.startsWith('stg-')) {
   new StagingStack(app, stackNameParam, deployProps);
 } else {

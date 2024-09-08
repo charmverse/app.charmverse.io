@@ -6,14 +6,17 @@ import { Construct } from 'constructs';
 
 const domain = 'charmverse.co';
 
-type CustomOptions = { healthCheck?: string; options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] };
+type CustomOptions = {
+  healthCheck?: { port: number; path: string };
+  options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[];
+};
 
 export class StagingStack extends Stack {
   constructor(
     scope: Construct,
     appName: string,
     props: StackProps,
-    { healthCheck = '/api/health', options = [] }: CustomOptions = {}
+    { healthCheck = { path: '/api/health', port: 80 }, options = [] }: CustomOptions = {}
   ) {
     super(scope, appName, props);
 
@@ -140,7 +143,12 @@ export class StagingStack extends Stack {
         // ALB health check
         namespace: 'aws:elasticbeanstalk:application',
         optionName: 'Application Healthcheck URL',
-        value: healthCheck
+        value: healthCheck.path
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:application',
+        optionName: 'Application Healthcheck Port',
+        value: healthCheck.port.toString()
       },
       {
         namespace: 'aws:elasticbeanstalk:application:environment',
