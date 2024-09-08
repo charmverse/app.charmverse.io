@@ -23,7 +23,7 @@
     "lint": "npx eslint --ext .tsx,.ts",
     "cron": "dotenv -e .env.local -- npm start -w apps/cron",
     "cron:build": "npm run build -w apps/cron",
-    "cron:staging": "npx dotenv -e .env.staging -- npm run start:prod -w apps/cron",
+    "cron:staging": "npm run start:prod -w apps/cron",
     "cron:prod": "npm run start:prod -w apps/cron",
     "cron:test": "dotenv -e .env.test.local -- npm test -w apps/cron",
     "sockets": "PORT=3336 dotenv -e .env.local -- npm run start -w apps/websockets",
