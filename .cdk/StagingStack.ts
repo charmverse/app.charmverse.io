@@ -6,10 +6,15 @@ import { Construct } from 'constructs';
 
 const domain = 'charmverse.co';
 
-type CustomOptions = { options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] };
+type CustomOptions = { healthCheck?: string; options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] };
 
 export class StagingStack extends Stack {
-  constructor(scope: Construct, appName: string, props: StackProps, { options = [] }: CustomOptions = {}) {
+  constructor(
+    scope: Construct,
+    appName: string,
+    props: StackProps,
+    { healthCheck = '/api/health', options = [] }: CustomOptions = {}
+  ) {
     super(scope, appName, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
@@ -135,7 +140,7 @@ export class StagingStack extends Stack {
         // ALB health check
         namespace: 'aws:elasticbeanstalk:application',
         optionName: 'Application Healthcheck URL',
-        value: '/api/health'
+        value: healthCheck
       },
       {
         namespace: 'aws:elasticbeanstalk:application:environment',

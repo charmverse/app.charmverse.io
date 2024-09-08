@@ -118,6 +118,9 @@ jobs:
     needs: [upload-docker]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/deploy_production
         with:
           app_name: ceramic
@@ -131,6 +134,9 @@ jobs:
     concurrency: staging-${{ github.ref }}
     needs: [build, upload-docker]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/deploy_staging
         with:
           app_name: ceramic
@@ -142,6 +148,9 @@ jobs:
     # pass in all steps so we can check if any failed
     needs: [upload-docker, deploy-production]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Notify Discord
         uses: ./.github/actions/notify_error
         with:

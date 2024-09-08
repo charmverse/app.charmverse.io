@@ -38,6 +38,8 @@ else if (stackNameParam.startsWith('prd')) {
   });
 } else if (stackNameParam.startsWith('stg-webapp')) {
   new WebappStagingStack(app, stackNameParam, deployProps);
+} else if (stackNameParam.startsWith('stg-ceramic')) {
+  new StagingStack(app, stackNameParam, deployProps, { healthCheck: '/graphql' });
 } else if (stackNameParam.startsWith('stg-')) {
   new StagingStack(app, stackNameParam, deployProps);
 } else {
