@@ -141,8 +141,18 @@ export class ProductionStack extends Stack {
         value: 't3a.small,t3.small'
       },
       {
-        namespace: 'aws:elasticbeanstalk:application:environment',
-        optionName: 'PORT',
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'HealthCheckPath',
+        value: healthCheck.path
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'MatcherHTTPCode',
+        value: '200'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'Port',
         value: healthCheck.port?.toString() || '80'
       },
       {

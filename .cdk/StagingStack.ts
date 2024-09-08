@@ -148,6 +148,11 @@ export class StagingStack extends Stack {
       },
       {
         namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'MatcherHTTPCode',
+        value: '200'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
         optionName: 'Port',
         value: healthCheck.port?.toString() || '80'
       },
