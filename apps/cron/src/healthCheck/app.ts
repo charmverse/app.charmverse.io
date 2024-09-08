@@ -7,7 +7,7 @@ const app = new Koa();
 const router = new Router();
 
 router.get('/', routes.healthCheck);
-router.get('/health_check', routes.healthCheck);
+router.get('/api/health', routes.healthCheck);
 
 app.use(routes.errorHandler).use(router.routes()).use(router.allowedMethods());
 

@@ -9,7 +9,7 @@ export class WebappStagingStack extends StagingStack {
         {
           namespace: 'aws:elasticbeanstalk:environment:process:websocket',
           optionName: 'HealthCheckPath',
-          value: '/health_check'
+          value: '/api/health'
         },
         {
           namespace: 'aws:elasticbeanstalk:environment:process:websocket',

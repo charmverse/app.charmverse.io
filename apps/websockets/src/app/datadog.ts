@@ -7,6 +7,6 @@ if (process.env.NODE_ENV === 'production') {
     service: process.env.SERVICE_NAME
   });
   tracer.use('koa', {
-    blocklist: ['/health_check']
+    blocklist: ['/api/health']
   });
 }
