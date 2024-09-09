@@ -10,18 +10,21 @@ export const apps: { [key: string]: { stg?: Options; prd?: Options } } = {
       healthCheck: {
         path: '/graphql',
         port: 5001
-      }
+      },
+      instanceType: 't2.micro'
     },
     stg: {
       healthCheck: {
         path: '/graphql',
         port: 5001
-      }
+      },
+      instanceType: 't2.micro'
     }
   },
   cron: {
     prd: {
-      environmentType: 'SingleInstance'
+      environmentType: 'SingleInstance',
+      instanceType: 'r6i.large'
     },
     stg: {
       environmentType: 'SingleInstance'
@@ -54,15 +57,14 @@ export const apps: { [key: string]: { stg?: Options; prd?: Options } } = {
   },
   webapp: {
     prd: {
-      sslCert: charmverseCert
+      sslCert: charmverseCert,
+      instanceType: 'm5.xlarge,m5a.xlarge,t3a.xlarge,t3.xlarge'
     }
   },
   websockets: {
     prd: {
-      sslCert: charmverseCert
-    },
-    stg: {
-      environmentType: 'SingleInstance'
+      sslCert: charmverseCert,
+      instanceType: 't3.medium'
     }
   }
 };
