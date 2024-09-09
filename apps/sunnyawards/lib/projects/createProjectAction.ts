@@ -40,38 +40,36 @@ export const createProjectAction = authActionClient
     });
 
     if (!disableCredentialAutopublish) {
-      await storeProjectMetadataAndPublishOptimismAttestation({
-        projectId: newProject.id,
-        userId: currentUserId,
-        existingProjectRefUID: input.projectRefUIDToImport
-      }).catch((error) => {
-        log.error('Failed to store project metadata and publish optimism attestation', {
-          error,
-          userId: currentUserId
-        });
-      });
-
-      await storeProjectMetadataAndPublishGitcoinAttestation({
-        projectId: newProject.id,
-        userId: ctx.session.user.id
-      }).catch((error) => {
-        log.error('Failed to store project metadata and publish Gitcoin attestation', {
-          error,
-          projectId: newProject.id,
-          userId: currentUserId
-        });
-      });
-
-      await storeCharmverseProjectMetadata({
-        chainId: charmverseProjectDataChainId,
-        projectId: newProject.id
-      }).catch((error) => {
-        log.error('Failed to store charmverse project attestations', {
-          error,
-          projectId: newProject.id,
-          userId: newProject.createdBy
-        });
-      });
+      // await storeProjectMetadataAndPublishOptimismAttestation({
+      //   projectId: newProject.id,
+      //   userId: currentUserId,
+      //   existingProjectRefUID: input.projectRefUIDToImport
+      // }).catch((error) => {
+      //   log.error('Failed to store project metadata and publish optimism attestation', {
+      //     error,
+      //     userId: currentUserId
+      //   });
+      // });
+      // await storeProjectMetadataAndPublishGitcoinAttestation({
+      //   projectId: newProject.id,
+      //   userId: ctx.session.user.id
+      // }).catch((error) => {
+      //   log.error('Failed to store project metadata and publish Gitcoin attestation', {
+      //     error,
+      //     projectId: newProject.id,
+      //     userId: currentUserId
+      //   });
+      // });
+      // await storeCharmverseProjectMetadata({
+      //   chainId: charmverseProjectDataChainId,
+      //   projectId: newProject.id
+      // }).catch((error) => {
+      //   log.error('Failed to store charmverse project attestations', {
+      //     error,
+      //     projectId: newProject.id,
+      //     userId: newProject.createdBy
+      //   });
+      // });
     }
 
     if (!isTestEnv) {
