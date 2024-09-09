@@ -29,7 +29,8 @@ export async function notifyNewScore({ fid, tier, tierChange }: WaitlistScoreNot
       fid: parseInt(fid.toString())
     },
     select: {
-      username: true
+      username: true,
+      percentile: true
     }
   });
 
@@ -39,12 +40,12 @@ export async function notifyNewScore({ fid, tier, tierChange }: WaitlistScoreNot
 
   const message = `@${waitlistSlot.username} you moved ${tierChange} to the ${tierLabels[tier]} tier!`;
 
-  const imageUrl = `${baseUrl}/images/waitlist/${tierChange}-${tier}.gif`;
+  const embedUrl = `${baseUrl}/api/frame/${fid}/level-changed?tierChange=${tierChange}&percentile=${waitlistSlot.percentile}`;
 
   return writeToFarcaster({
     neynarSignerId: NEYNAR_SIGNER_ID,
     text: message,
     channelId: 'cvdev',
-    embedUrl: imageUrl
+    embedUrl
   });
 }

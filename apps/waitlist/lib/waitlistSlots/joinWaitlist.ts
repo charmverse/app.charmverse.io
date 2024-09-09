@@ -28,11 +28,13 @@ export async function joinWaitlist({ fid, username, referredByFid }: WaitlistJoi
     };
   }
 
+  const parsedReferrer = referredByFid ? parseInt(referredByFid.toString(), 10) : null;
+
   let newSlot = await prisma.connectWaitlistSlot.create({
     data: {
       fid: parsedFid,
       username,
-      referredByFid: referredByFid ? parseInt(referredByFid.toString(), 10) : null,
+      referredByFid: parsedReferrer !== parsedFid ? parsedReferrer : null,
       score: 0
     }
   });
