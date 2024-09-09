@@ -43,7 +43,7 @@ jobs:
 
           # calculate web sockets staging domain name
           websockets_full_stage_name="stg-webapp-${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
-          websockets_stage_name=`echo "$full_stage_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
+          websockets_stage_name=`echo "$websockets_full_stage_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
           echo "WEBSOCKETS_STAGE_NAME=$websockets_stage_name" >> $GITHUB_ENV
 
       - name: Install dependencies
