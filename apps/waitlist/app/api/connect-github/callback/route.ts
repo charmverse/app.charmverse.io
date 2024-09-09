@@ -5,6 +5,10 @@ import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constan
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 
+function generateRedirectUrl(errorMessage: string) {
+  return `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent(errorMessage)}`;
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
@@ -14,7 +18,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `/builders?connect_error=${encodeURIComponent('Connection cancelled')}`
+        Location: generateRedirectUrl('Connection cancelled')
       }
     });
   }
@@ -29,7 +33,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `/builders?connect_error=${encodeURIComponent('Invalid connection url')}`
+        Location: generateRedirectUrl('Invalid connection url')
       }
     });
   }
@@ -42,7 +46,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent('User required')}`
+        Location: generateRedirectUrl('User required')
       }
     });
   }
@@ -57,7 +61,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent('User not found')}`
+        Location: generateRedirectUrl('User not found')
       }
     });
   }
@@ -83,9 +87,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent(
-          'Failed to authenticate Github account'
-        )}`
+        Location: generateRedirectUrl('Failed to authenticate Github account')
       }
     });
   }
@@ -103,7 +105,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent('Failed to fetch Github user')}`
+        Location: generateRedirectUrl('Failed to fetch Github user')
       }
     });
   }
@@ -118,7 +120,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent('Account is already in use')}`
+        Location: generateRedirectUrl('Account is already in use')
       }
     });
   }

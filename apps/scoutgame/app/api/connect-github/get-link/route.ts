@@ -1,10 +1,9 @@
 import { getSession } from '@connect-shared/lib/session/getSession';
 import { authSecret } from '@root/config/constants';
-import { GITHUB_CLIENT_ID } from '@root/lib/github/constants';
+import { getGithubOAuthCallbackUrl } from '@root/lib/github/oauth';
 import { sealData } from 'iron-session';
-import type { NextRequest } from 'next/server';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const session = await getSession();
 
   if (!session.user?.id) {
@@ -18,9 +17,10 @@ export async function GET(req: NextRequest) {
     { password: authSecret as string }
   );
 
-  const redirectUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(
-    `${process.env.DOMAIN}/api/connect-github/callback`
-  )}&state=${encodeURIComponent(sealedUserId)}`;
+  const redirectUrl = getGithubOAuthCallbackUrl({
+    redirect: `${process.env.DOMAIN}/api/connect-github/callback`,
+    state: sealedUserId
+  });
 
   return new Response(null, {
     status: 302,
