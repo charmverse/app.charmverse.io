@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - '.ebextensions/sunnyawards/**'
       - '.ebstalk.apps.env/sunnyawards.env'
       - 'apps/sunnyawards/**'
@@ -21,7 +21,7 @@ on:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - '.ebextensions/sunnyawards/**'
       - '.ebstalk.apps.env/sunnyawards.env'
       - 'apps/sunnyawards/**'

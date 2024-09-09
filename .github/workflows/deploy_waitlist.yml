@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - '.ebextensions/waitlist/**'
       - '.ebstalk.apps.env/waitlist.env'
       - '.github/actions/**'
@@ -23,7 +23,7 @@ on:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - '.ebextensions/waitlist/**'
       - '.ebstalk.apps.env/waitlist.env'
       - '.github/actions/**'

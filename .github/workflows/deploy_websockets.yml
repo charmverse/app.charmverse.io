@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - 'docker-compose.yml'
       - '.ebextensions/websockets/**'
       - '.ebstalk.apps.env/websockets.env'
@@ -20,7 +20,7 @@ on:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - 'docker-compose.yml'
       - '.ebextensions/websockets/**'
       - '.ebstalk.apps.env/websockets.env'

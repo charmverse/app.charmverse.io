@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - 'docker-compose.yml'
       - '.ebextensions/cron/**'
       - '.ebstalk.apps.env/cron.env'
@@ -22,7 +22,7 @@ on:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - 'docker-compose.yml'
       - '.ebextensions/cron/**'
       - '.ebstalk.apps.env/cron.env'
