@@ -109,7 +109,7 @@ export class StagingStack extends Stack {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'SecurityGroups',
-        value: 'staging-db-client'
+        value: 'default,staging-db-client'
       },
       {
         namespace: 'aws:autoscaling:launchconfiguration',

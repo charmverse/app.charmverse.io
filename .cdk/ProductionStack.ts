@@ -114,7 +114,7 @@ export class ProductionStack extends Stack {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'SecurityGroups',
-        value: 'prd-db-client'
+        value: 'default, prd-db-client'
       },
       {
         namespace: 'aws:autoscaling:launchconfiguration',
