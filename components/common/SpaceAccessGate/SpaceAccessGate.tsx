@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma-client';
-import { Alert, Box, Card, Typography } from '@mui/material';
+import { Alert, Box, Divider, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -115,25 +115,28 @@ export function SpaceAccessGate({
   );
 
   return (
-    <>
+    <Box display='flex' flexDirection='column' gap={2}>
       <SpaceBanModal
         onClose={() => {
           setIsBannedFromSpace(false);
         }}
         open={isBannedFromSpace}
       />
-      <Card sx={{ p: 3, mb: 3, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
         <Box mb={3}>
           <WorkspaceAvatar image={space.spaceImage} name={space.name} variant='rounded' />
         </Box>
         <Box display='flex' flexDirection='column' alignItems='center'>
           <Typography variant='h5'>{space.name}</Typography>
         </Box>
-      </Card>
+      </Box>
       {walletGateEnabled && (
-        <Typography variant='body2' align='center' sx={{ mb: 2 }}>
-          The following criteria must be met to join this space:
-        </Typography>
+        <>
+          <Divider />
+          <Typography variant='body2' align='center'>
+            The following criteria must be met to join:
+          </Typography>
+        </>
       )}
 
       {discordGate.isEnabled && <DiscordGate {...discordGate} />}
@@ -148,6 +151,25 @@ export function SpaceAccessGate({
 
       {tokenGate.isEnabled && <TokenGate {...tokenGate} displayAccordion={discordGate.isEnabled} />}
 
+      {walletGateEnabled &&
+        tokenGate.tokenGateResult &&
+        (!tokenGate.isVerified && !summonGate.isVerified ? (
+          <Alert severity='warning' data-test='token-gate-failure-alert'>
+            Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
+          </Alert>
+        ) : (
+          <Alert severity='success'>
+            You can join this space.{' '}
+            {hasRoles ? 'You will also receive the roles attached to each condition you passed.' : ''}
+          </Alert>
+        ))}
+
+      {noGateConditions && (
+        <Alert data-test='token-gate-empty-state' severity='info' sx={{ mt: 1, mb: 2 }}>
+          No membership conditions were found for this space.
+        </Alert>
+      )}
+
       {isVerified && (
         <Box mb={2}>
           <PrimaryButton
@@ -157,13 +179,13 @@ export function SpaceAccessGate({
             disabled={isJoiningSpace}
             onClick={joinSpace}
           >
-            Join Space
+            Join
           </PrimaryButton>
         </Box>
       )}
       {!user && (
         <Box sx={{ '.MuiButton-root': { width: '100%' } }}>
-          <LoginButton showSignup={false} />
+          <LoginButton showSignup={false} signInLabel='Connect your wallet' />
         </Box>
       )}
       {walletGateEnabled && !isVerified && !!user && (
@@ -179,24 +201,6 @@ export function SpaceAccessGate({
           </PrimaryButton>
         </Box>
       )}
-      {walletGateEnabled &&
-        tokenGate.tokenGateResult &&
-        (!tokenGate.isVerified && !summonGate.isVerified ? (
-          <Alert severity='warning' data-test='token-gate-failure-alert'>
-            Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
-          </Alert>
-        ) : (
-          <Alert severity='success'>
-            You can join this space.{' '}
-            {hasRoles ? 'You will also receive the roles attached to each condition you passed.' : ''}
-          </Alert>
-        ))}
-
-      {noGateConditions && (
-        <Alert data-test='token-gate-empty-state' severity='info' sx={{ my: 1 }}>
-          No membership conditions were found for this space.
-        </Alert>
-      )}
-    </>
+    </Box>
   );
 }

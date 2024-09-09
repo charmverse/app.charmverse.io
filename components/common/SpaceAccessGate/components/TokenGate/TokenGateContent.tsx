@@ -8,9 +8,9 @@ export type TokenGateContentProps = Pick<TokenGateState, 'tokenGates' | 'tokenGa
 
 export function TokenGateContent({ tokenGates, tokenGateResult, isVerifying }: TokenGateContentProps) {
   return (
-    <div data-test='token-gate-form'>
+    <Box data-test='token-gate-form' display='flex' flexDirection='row' gap={2}>
       {tokenGates?.map((gate, index, list) => (
-        <Box mb={2} key={gate.id}>
+        <Box key={gate.id} width='100%'>
           <TokenGateOption
             tokenGate={gate}
             isVerifying={isVerifying}
@@ -23,6 +23,6 @@ export function TokenGateContent({ tokenGates, tokenGateResult, isVerifying }: T
           )}
         </Box>
       ))}
-    </div>
+    </Box>
   );
 }
