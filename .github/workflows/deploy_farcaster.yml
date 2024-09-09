@@ -26,7 +26,6 @@ on:
       - '.ebstalk.apps.env/farcaster.env'
       - '.github/actions/**'
       - '.github/workflows/deploy_farcaster.yml'
-      - '.github/**'
       - 'package.json'
       - 'package-lock.json'
       - 'apps/farcaster/**'
