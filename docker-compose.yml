@@ -305,6 +305,7 @@ services:
       DD_DOGSTATSD_NON_LOCAL_TRAFFIC: 'true'
       DD_EC2_PREFER_IMDSV2: 'true'
     profiles:
+      - prd-cron
       - prd-webapp
       - prd-sunnyawards
       - prd-sockets
