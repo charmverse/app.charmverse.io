@@ -1,0 +1,21 @@
+import { baseUrl } from '@root/config/constants';
+import { getFrameHtml } from 'frames.js';
+
+import type { FarcasterUserToEncode } from 'lib/frame/actionButtons';
+import { waitlistGet10Clicks, waitlistGetDetails, waitlistShareMyFrame } from 'lib/frame/actionButtons';
+
+export async function WaitlistJoinedFrame({ fid, username }: FarcasterUserToEncode) {
+  const imgSrc = `${baseUrl}/images/waitlist/waitlist-joined.gif`;
+
+  return getFrameHtml({
+    image: imgSrc,
+    ogImage: imgSrc,
+    version: 'vNext',
+    buttons: [
+      await waitlistGetDetails({ fid, username }),
+      await waitlistGet10Clicks({ fid, username }),
+      waitlistShareMyFrame(fid)
+    ],
+    imageAspectRatio: '1:1'
+  });
+}

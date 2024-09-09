@@ -6,7 +6,7 @@ import type { SessionData } from 'lib/session/config';
 
 export type WaitlistFramePage = 'join_waitlist_home' | 'join_waitlist_success' | 'waitlist_score';
 
-type FarcasterUserToEncode = {
+export type FarcasterUserToEncode = {
   fid: string | number;
   username: string;
 };

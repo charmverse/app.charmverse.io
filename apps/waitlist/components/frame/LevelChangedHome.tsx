@@ -1,9 +1,11 @@
+'use client';
+
 import { baseUrl } from '@root/config/constants';
 
 import type { TierChange } from 'lib/scoring/constants';
 import { getTier } from 'lib/scoring/constants';
 
-import { getWaitlistPostbackUrl } from './getWaitlistPostbackUrl';
+export const dynamic = 'force-dynamic';
 
 export type LevelChangedFrameProps = {
   fid: string;
@@ -11,7 +13,7 @@ export type LevelChangedFrameProps = {
   tierChange: TierChange;
 };
 
-export function LevelChangedHome({ fid, percentile, tierChange }: LevelChangedFrameProps) {
+export function LevelChangedHomeFrame({ fid, percentile, tierChange }: LevelChangedFrameProps) {
   const tier = getTier(percentile);
 
   const src = `${baseUrl}/images/waitlist/${tierChange}-${tier}.gif`;
@@ -23,10 +25,9 @@ export function LevelChangedHome({ fid, percentile, tierChange }: LevelChangedFr
       <meta name='fc:frame' content='vNext' />
       <meta name='og:image' content={src} />
       <meta name='fc:frame:image' content={src} />
-      <meta property='fc:frame:button:1:post_url' content='https://frame.example.com/tx_callback' />
       {/* Redirect to main frame */}
       <meta name='fc:frame:button:1' content="What's this?" />
-      <meta name='fc:frame:button:1:action' content='post' />
+      <meta name='fc:frame:button:1:action' content='post_redirect' />
       <meta property='fc:frame:button:1:post_url' content='https://frame.example.com/tx_callback' />
       {/* Go to scoutgame */}
       <meta name='fc:frame:button:2' content='Details waitlist' />
