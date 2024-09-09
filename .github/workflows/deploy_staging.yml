@@ -84,7 +84,7 @@ jobs:
           rm .ebextensions/*/06_cloudwatch_alarm.config
 
           # substituting the websocket domain name
-          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.WEBSOCKETS_STAGE_NAME}}.charmverse.co:3002/g' .ebstalk.apps.env/webapp.env
+          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.WEBSOCKETS_STAGE_NAME}}.charmverse.co/g' .ebstalk.apps.env/webapp.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
