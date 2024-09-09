@@ -3,22 +3,17 @@ import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import { Construct } from 'constructs';
+import { Options } from './ProductionStack';
+import { defaultHealthCheck } from './ProductionStack';
 
 const domain = 'charmverse.co';
-
-type CustomOptions = {
-  healthCheck?: { port: number; path: string };
-  options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[];
-};
-
-const defaultHealthCheck = { path: '/api/health', port: 80 };
 
 export class StagingStack extends Stack {
   constructor(
     scope: Construct,
     appName: string,
     props: StackProps,
-    { healthCheck = defaultHealthCheck, options = [] }: CustomOptions = {}
+    { healthCheck = defaultHealthCheck, environmentType = 'LoadBalanced' }: Options = {}
   ) {
     super(scope, appName, props);
 
@@ -73,7 +68,7 @@ export class StagingStack extends Stack {
       {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
-        value: 'LoadBalanced'
+        value: environmentType
       },
       {
         namespace: 'aws:elasticbeanstalk:environment',
@@ -166,8 +161,7 @@ export class StagingStack extends Stack {
         namespace: 'aws:elasticbeanstalk:application:environment',
         optionName: 'DOMAIN',
         value: 'https://' + deploymentDomain
-      },
-      ...options
+      }
     ];
 
     const resourceTags: CfnTag[] = [

@@ -6,16 +6,17 @@ import { Construct } from 'constructs';
 export type Options = {
   healthCheck?: { port: number; path: string };
   sslCert?: string;
+  environmentType?: 'SingleInstance' | 'LoadBalanced';
 };
 
-const defaultHealthCheck = { path: '/api/health', port: 80 };
+export const defaultHealthCheck = { path: '/api/health', port: 80 };
 
 export class ProductionStack extends Stack {
   constructor(
     scope: Construct,
     appName: string,
     props: StackProps,
-    { sslCert, healthCheck = defaultHealthCheck }: Options
+    { sslCert, healthCheck = defaultHealthCheck, environmentType = 'LoadBalanced' }: Options
   ) {
     super(scope, appName, props);
 
@@ -68,7 +69,7 @@ export class ProductionStack extends Stack {
       {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
-        value: 'LoadBalanced'
+        value: environmentType
       },
       {
         namespace: 'aws:elasticbeanstalk:environment',
