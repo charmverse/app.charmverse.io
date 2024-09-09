@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - 'docker-compose.yml'
       - '.ebextensions/scoutgame/**'
       - '.ebstalk.apps.env/scoutgame.env'
@@ -24,7 +24,7 @@ on:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - 'docker-compose.yml'
       - '.ebextensions/scoutgame/**'
       - '.ebstalk.apps.env/scoutgame.env'

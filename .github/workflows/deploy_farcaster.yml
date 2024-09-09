@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - '.ebextensions/farcaster/**'
       - '.ebstalk.apps.env/farcaster.env'
       - '.github/actions/**'
@@ -21,7 +21,7 @@ on:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - '.ebextensions/farcaster/**'
       - '.ebstalk.apps.env/farcaster.env'
       - '.github/actions/**'
