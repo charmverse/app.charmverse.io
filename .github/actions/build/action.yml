@@ -30,4 +30,7 @@ runs:
     - name: Build
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
-      run: npm run webapp:build
+      # Build the sockets for e2e tests to run
+      run: |
+        npm run webapp:build
+        npm run sockets:build

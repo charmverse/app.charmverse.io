@@ -437,17 +437,10 @@ jobs:
     # pass in all steps so we can check if any failed
     needs: [test-scoutgame, test-scoutgame-e2e, upload-docker, upload-static-assets, upload-docker, deploy-production]
     steps:
-      - name: If any of prev jobs failed notify discord
-        if: contains(needs.*.result, 'failure')
-        uses: sarisia/actions-status-discord@v1
+      - uses: actions/checkout@v4
+      - name: Notify Discord
+        uses: ./.github/actions/notify_error
+        env:
+          DISCORD_WARNINGS_WEBHOOK: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
         with:
-          webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
-          status: 'failure'
-          content: 'Hey <@&1027309276454207519>'
-          title: 'Scoutgame deploy workflow failed'
-          description: |
-            Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
-          color: '16515843'
-          url: 'https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}'
-          username: GitHub Actions
-          avatar_url: 'https://github.githubassets.com/images/modules/logos_page/Octocat.png'
+          app_name: scoutgame

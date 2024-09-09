@@ -135,7 +135,7 @@ jobs:
           file_extensions: '**/*.{ts,tsx}'
 
       - name: Run tests
-        run: npx dotenv -e .env.test.local -- npm run test -w apps/cron
+        run: npm run cron:test
 
   upload-docker:
     name: Upload Docker image
