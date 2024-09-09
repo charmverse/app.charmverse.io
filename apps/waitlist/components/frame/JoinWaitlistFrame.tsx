@@ -5,7 +5,7 @@ export type JoinWaitlistHomeProps = {
   referrerFid: string;
 };
 
-export function JoinWaitlistHomeFrame({ referrerFid }: JoinWaitlistHomeProps) {
+export function JoinWaitlistFrame({ referrerFid }: JoinWaitlistHomeProps) {
   return getFrameHtml({
     image: `${baseUrl}/images/waitlist/waitlist-intro.gif`,
     ogImage: `${baseUrl}/images/waitlist/waitlist-intro.gif`,
