@@ -6,7 +6,7 @@ import { getSpaceMemberMetadata } from '@root/lib/members/getSpaceMemberMetadata
 import type { CommonSpacesInput, MemberPropertyValuesBySpace } from '@root/lib/members/interfaces';
 import { getPropertiesWithValues, groupPropertyValuesBySpace } from '@root/lib/members/utils';
 
-import type { TelegramAccount } from 'pages/api/telegram/connect';
+import type { TelegramAccount } from 'lib/telegram/interfaces';
 
 export async function getSpacesPropertyValues({
   memberId,

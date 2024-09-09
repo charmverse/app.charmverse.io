@@ -4,12 +4,12 @@ import type { GoogleLoginOauthParams } from '@root/lib/google/authorization/auth
 import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from '@root/lib/metrics/mixpanel/updateTrackUserProfile';
+import { getUserProfile } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { sessionUserRelations } from '@root/lib/session/config';
-import { getUserProfile } from '@root/lib/users/getUser';
 import { postUserCreate } from '@root/lib/users/postUserCreate';
 import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from '@root/lib/utils/errors';
 import { uid } from '@root/lib/utils/strings';
-import type { LoggedInUser } from '@root/models';
 
 import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
 

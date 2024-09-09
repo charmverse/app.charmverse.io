@@ -2,8 +2,8 @@ import { Stack } from '@mui/material';
 
 import { defaultProposalProperties, defaultProposalPropertyTypes } from 'lib/databases/proposalDbProperties';
 
+import type { SelectedProposalProperties } from './interfaces';
 import { PropertySelector } from './PropertiesListSelector';
-import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 import { SelectedPropertiesList } from './SelectedPropertiesList';
 
 export function ProposalDefaultPropertiesList({

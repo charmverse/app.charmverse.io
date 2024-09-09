@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 import {
   PROJECT_DESCRIPTION_ID,
   PROJECT_MEMBER_NAMES_ID,

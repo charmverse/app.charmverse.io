@@ -10,8 +10,18 @@ export async function middleware(request: NextRequest) {
   // Make /p/ project pages public, /u/ user pages public
   const projectPathChunks = path.split('/').filter(isTruthy);
   const isEditProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'edit';
-  const isNewProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'new';
-  const isProjectPath = projectPathChunks[0] === 'p' && !isEditProjectPath && !isNewProjectPath;
+  const isNewProjectPath = projectPathChunks[0] === 'projects' && projectPathChunks.at(-1) === 'new';
+  const isProjectPath = projectPathChunks[0] === 'p' && !isEditProjectPath;
+
+  // Disallow project submissions and redirect to profile
+  if (isNewProjectPath) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  // Projects are readonly due to the Sunny Awards submissions being suspended
+  if (isEditProjectPath) {
+    return NextResponse.redirect(new URL(`/p/${projectPathChunks[1]}`, request.url));
+  }
 
   if (!user && path !== '/' && !isProjectPath && !path.startsWith('/u/')) {
     return NextResponse.redirect(new URL('/', request.url));

@@ -5,6 +5,10 @@ import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constan
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 
+import { embedFarcasterUser } from 'lib/frame/actionButtons';
+import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
+import { refreshUserScore } from 'lib/scoring/refreshUserScore';
+
 function generateRedirectUrl(errorMessage: string) {
   return `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent(errorMessage)}`;
 }
@@ -116,11 +120,22 @@ export async function GET(req: NextRequest) {
     }
   });
 
+  // Account already in use by another user
   if (existingConnection?.githubLogin && existingConnection.fid !== connectWaitlistSlot.fid) {
     return new Response(null, {
       status: 302,
       headers: {
         Location: generateRedirectUrl('Account is already in use')
+      }
+    });
+  }
+
+  // Account already connected
+  if (existingConnection?.githubLogin === githubLogin) {
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: `${process.env.DOMAIN}/score`
       }
     });
   }
@@ -134,10 +149,20 @@ export async function GET(req: NextRequest) {
     }
   });
 
+  await refreshUserScore({ fid: connectWaitlistSlot.fid });
+
+  refreshPercentilesForEveryone().then(handleTierChanges);
+
+  const sealedData = await embedFarcasterUser({
+    fid: connectWaitlistSlot.fid.toString(),
+    username: connectWaitlistSlot.username,
+    hasJoinedWaitlist: true
+  });
+
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${process.env.DOMAIN}/score`
+      Location: `${process.env.DOMAIN}/score?${sealedData}`
     }
   });
 }

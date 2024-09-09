@@ -1,7 +1,6 @@
 import type { LinkProps } from '@react-email/link';
+import { charmBlue as blueColor } from '@root/config/colors';
 import type { ReactNode } from 'react';
-
-import { blueColor } from 'theme/colors';
 
 import Link from './Link';
 import Text from './Text';

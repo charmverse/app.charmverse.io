@@ -1,7 +1,7 @@
 import type { PostCategoryPermissionAssignment, AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import request from 'supertest';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';

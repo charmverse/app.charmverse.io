@@ -6,12 +6,23 @@ import type { UserProposal } from '@root/lib/proposals/getUserProposals';
 import { relativeTime } from '@root/lib/utils/dates';
 import { useState } from 'react';
 
+import Button from 'components/common/DatabaseEditor/widgets/buttons/button';
 import Modal from 'components/common/Modal';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
-const StyledTableRow = styled(TableRow)`
+export const StyledTable = styled(Table)`
+  .MuiTableCell-root {
+    padding: 10px;
+    position: relative;
+  }
+  th {
+    color: rgba(var(--center-channel-color-rgb), 0.6);
+  }
+`;
+
+export const StyledTableRow = styled(TableRow)`
   cursor: pointer;
   transition: ${({ theme }) =>
     theme.transitions.create('background-color', {
@@ -23,8 +34,26 @@ const StyledTableRow = styled(TableRow)`
       theme.transitions.create('background-color', {
         duration: theme.transitions.duration.shortest
       })};
+
+    .open-button {
+      display: block;
+    }
+  }
+  .open-button {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 13px;
   }
 `;
+
+export function OpenButton() {
+  return (
+    <div className='open-button'>
+      <Button>Open</Button>
+    </div>
+  );
+}
 
 export function ProposalsTable({
   proposals,
@@ -45,9 +74,9 @@ export function ProposalsTable({
         {title}
       </Typography>
       {proposals.length ? (
-        <Table>
+        <StyledTable>
           <TableHead>
-            <TableRow sx={{ '&:first-of-type th': { borderTop: '1px solid lightgray' } }}>
+            <TableRow>
               <TableCell>
                 <Typography variant='body2' fontWeight='bold'>
                   Title
@@ -92,8 +121,14 @@ export function ProposalsTable({
                     }
                   }}
                 >
-                  <TableCell width={400}>
+                  <TableCell
+                    width={400}
+                    sx={{
+                      pl: 0
+                    }}
+                  >
                     <Typography>{proposal.title || 'Untitled'}</Typography>
+                    <OpenButton />
                   </TableCell>
                   <TableCell align='center' width={200}>
                     <Chip
@@ -121,7 +156,7 @@ export function ProposalsTable({
               );
             })}
           </TableBody>
-        </Table>
+        </StyledTable>
       ) : (
         <Card variant='outlined'>
           <Box p={3} textAlign='center'>

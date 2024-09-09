@@ -1,13 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { syncProposalPermissionsWithWorkflowPermissions } from '@root/lib/proposals/workflows/syncProposalPermissionsWithWorkflowPermissions';
 import { prettyPrint } from 'lib/utils/strings';
 
-/**
- * Use this script to perform database searches.
- */
-
+import { redisClient } from '@root/adapters/redis/redisClient';
 async function query() {
-  const result = await prisma.scout.deleteMany();
-  console.log(result);
+  await redisClient?.connect();
 }
 
 query();

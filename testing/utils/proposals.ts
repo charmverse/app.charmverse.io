@@ -10,18 +10,19 @@ import type {
 import { ProposalSystemRole, prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson, PermissionJson } from '@charmverse/core/proposals';
 import { testUtilsProposals } from '@charmverse/core/test';
+import { prismaToBlock } from '@root/lib/databases/block';
+import type { Board } from '@root/lib/databases/board';
+import { updateBoardProperties } from '@root/lib/databases/proposalsSource/updateBoardProperties';
+import { updateViews } from '@root/lib/databases/proposalsSource/updateViews';
+import { createPage as createPageDb } from '@root/lib/pages/server/createPage';
+import type { PopulatedEvaluation, ProposalFields } from '@root/lib/proposals/interfaces';
+import { getDefaultPermissions } from '@root/lib/proposals/workflows/defaultEvaluation';
 import { sortBy } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-import { prismaToBlock } from 'lib/databases/block';
-import type { Board } from 'lib/databases/board';
-import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
-import { updateViews } from 'lib/databases/proposalsSource/updateViews';
-import { createPage as createPageDb } from 'lib/pages/server/createPage';
-import type { PopulatedEvaluation, ProposalFields } from 'lib/proposals/interfaces';
-import { getDefaultPermissions } from 'lib/proposals/workflows/defaultEvaluation';
-import { generateBoard } from 'testing/setupDatabase';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
+
+import { generateBoard } from '../setupDatabase';
 
 export type ProposalWithUsersAndPageMeta = Omit<Proposal, 'fields'> & {
   authors: ProposalAuthor[];

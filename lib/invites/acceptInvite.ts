@@ -6,7 +6,7 @@ import { joinSpace } from '@root/lib/spaces/joinSpace';
 
 import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
 import { updateTrackOpUserProfile } from '../metrics/mixpanel/updateTrackOpUserProfile';
-import { getUserProfile } from '../users/getUser';
+import { getUserProfile } from '../profile/getUser';
 
 import { validateInviteLink } from './validateInviteLink';
 

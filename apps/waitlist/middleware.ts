@@ -12,6 +12,7 @@ export async function middleware(request: NextRequest) {
   let farcasterUser = session.farcasterUser;
 
   const url = request.nextUrl.clone(); // Clone the request URL to modify it
+
   const sealedFarcasterUser = url.searchParams.get('farcaster_user');
   const response = NextResponse.next(); // Create a response object to set cookies
 
@@ -27,7 +28,8 @@ export async function middleware(request: NextRequest) {
         value: sealedFarcasterUser,
         httpOnly: true,
         secure: true,
-        maxAge: 31536000,
+        // 2 weeks
+        maxAge: 1209600,
         path: '/'
       });
 
@@ -44,19 +46,23 @@ export async function middleware(request: NextRequest) {
   const authenticatedPaths = ['/builders', '/score', '/join'];
 
   if (!farcasterUser && authenticatedPaths.some((p) => url.pathname.startsWith(p))) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/', url));
   }
 
   if (farcasterUser?.hasJoinedWaitlist && url.pathname === '/') {
-    return NextResponse.redirect(new URL('/score', request.url));
+    return NextResponse.redirect(new URL('/score', url));
   }
 
   if (farcasterUser && !farcasterUser.hasJoinedWaitlist && url.pathname === '/score') {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/', url));
   }
 
-  // Rewrite the request with the new URL (without the query param)
-  return NextResponse.rewrite(url, { request, headers: response.headers });
+  if (sealedFarcasterUser) {
+    // Rewrite the URL without patameter
+    return NextResponse.redirect(url, { headers: response.headers });
+  }
+
+  return response;
 }
 
 export const config = {

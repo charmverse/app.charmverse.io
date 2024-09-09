@@ -1,10 +1,9 @@
 import type { User, Otp } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createOtp } from '@root/lib/profile/otp/createOtp';
+import { createRecoveryCode } from '@root/lib/profile/otp/createRecoveryCode';
+import { decryptRecoveryCode } from '@root/lib/profile/otp/recoveryCodeEncryption';
 import * as OTPAuth from 'otpauth';
-
-import { createOtp } from 'lib/profile/otp/createOtp';
-import { createRecoveryCode } from 'lib/profile/otp/createRecoveryCode';
-import { decryptRecoveryCode } from 'lib/profile/otp/recoveryCodeEncryption';
 
 export async function getTestUserOtp(userId: string, withRecoveryCode?: boolean) {
   const userOtp = await prisma.otp.findUnique({

@@ -1,13 +1,10 @@
-import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import type { ComponentProps, ReactNode } from 'react';
 import { memo } from 'react';
-import twemoji from 'twemoji';
 
-import { isMac } from 'lib/utils/browser';
+import { getTwitterEmoji } from 'lib/utils/emoji';
 
 type ImgSize = 'large' | 'small';
-
 export const Emoji = styled.div<{ size?: ImgSize }>`
   font-size: ${({ size }) => (size === 'large' ? '78px' : 'inherit')};
   overflow: hidden;
@@ -42,24 +39,6 @@ export const Emoji = styled.div<{ size?: ImgSize }>`
     max-width: ${({ size }) => (size === 'large' ? '100%' : '18px')};
   }
 `;
-
-// Use system font for Mac OS, but Twitter emojis for everyone else
-export function getTwitterEmoji(emoji: string): string | null {
-  if (isMac() || !emoji) return null;
-  try {
-    const html = twemoji.parse(emoji, {
-      // the original maxCDN went down Jan 11, 2023
-      base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/',
-      folder: 'svg',
-      ext: '.svg'
-    }) as string;
-    const match = /<img.*?src="(.*?)"/.exec(html);
-    return match ? match[1] : null;
-  } catch (error) {
-    log.error('Could not parse emoji', { emoji, error });
-    return null;
-  }
-}
 
 function EmojiIcon({
   icon,

@@ -1,8 +1,7 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
+import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces';
+import type { OptionalNullable } from '@root/lib/utils/types';
 import { v4 as uuid } from 'uuid';
-
-import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
-import type { OptionalNullable } from 'lib/utils/types';
 
 type ProposalInput = Partial<Omit<ProposalWithUsersAndRubric, 'evaluations' | 'fields'>> & {
   evaluations?: Partial<ProposalWithUsersAndRubric['evaluations'][number]>[];

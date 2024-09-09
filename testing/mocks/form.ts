@@ -1,12 +1,11 @@
-import { v4 as uuid } from 'uuid';
-
-import type { FormFieldInput } from 'lib/forms/interfaces';
-import type { FieldConfig, ProjectFieldConfig } from 'lib/projects/formField';
+import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import type { FieldConfig, ProjectFieldConfig } from '@root/lib/projects/formField';
 import {
   createDefaultProjectAndMembersFieldConfig,
   projectMemberFieldProperties,
   projectFieldProperties
-} from 'lib/projects/formField';
+} from '@root/lib/projects/formField';
+import { v4 as uuid } from 'uuid';
 
 export type ProjectAndMembersFieldConfig = Record<string, ProjectFieldConfig | FieldConfig>;
 

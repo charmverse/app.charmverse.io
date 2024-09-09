@@ -19,7 +19,7 @@ import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
-import { useColorMode } from 'context/darkMode';
+import { useColorMode } from 'hooks/useDarkMode';
 import { useUser } from 'hooks/useUser';
 import { useUserPreferences } from 'hooks/useUserPreferences';
 import { formatDateTime, getCurrentDate } from 'lib/utils/dates';
