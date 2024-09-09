@@ -12,8 +12,8 @@ export async function WaitlistJoinedFrame({ fid, username }: FarcasterUserToEnco
     ogImage: imgSrc,
     version: 'vNext',
     buttons: [
-      await waitlistGetDetails({ fid, username }),
-      await waitlistGet10Clicks({ fid, username }),
+      await waitlistGetDetails({ fid, username, hasJoinedWaitlist: true }),
+      await waitlistGet10Clicks({ fid, username, hasJoinedWaitlist: true }),
       waitlistShareMyFrame(fid)
     ],
     imageAspectRatio: '1:1'

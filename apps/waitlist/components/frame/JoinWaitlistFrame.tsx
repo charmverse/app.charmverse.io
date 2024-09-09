@@ -1,6 +1,8 @@
 import { baseUrl } from '@root/config/constants';
 import { getFrameHtml } from 'frames.js';
 
+import { joinWaitlist } from 'lib/frame/actionButtons';
+
 export type JoinWaitlistHomeProps = {
   referrerFid: string;
 };
@@ -11,12 +13,6 @@ export function JoinWaitlistFrame({ referrerFid }: JoinWaitlistHomeProps) {
     ogImage: `${baseUrl}/images/waitlist/waitlist-intro.gif`,
     version: 'vNext',
     imageAspectRatio: '1:1',
-    buttons: [
-      {
-        label: 'Join waitlist',
-        action: 'post',
-        target: `${baseUrl}/api/frame/${referrerFid}/actions/join-waitlist`
-      }
-    ]
+    buttons: [joinWaitlist({ referrerFid })]
   });
 }

@@ -15,7 +15,7 @@ export async function WaitlistCurrentScoreFrame({ percentile, fid, username }: P
     image: imgSrc,
     ogImage: imgSrc,
     version: 'vNext',
-    buttons: [await waitlistGetDetails({ fid, username }), waitlistShareMyFrame(fid)],
+    buttons: [await waitlistGetDetails({ fid, username, hasJoinedWaitlist: true }), waitlistShareMyFrame(fid)],
     imageAspectRatio: '1:1'
   });
 }

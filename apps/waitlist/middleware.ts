@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
         path: '/'
       });
 
-      farcasterUser = { ...unsealedFid.farcasterUser, hasJoinedWaitlist: true };
+      farcasterUser = unsealedFid.farcasterUser;
 
       // Mutate the request by adding the cookie to the headers
       request.headers.set('cookie', `${getCookieName()}=${sealedFarcasterUser}`);

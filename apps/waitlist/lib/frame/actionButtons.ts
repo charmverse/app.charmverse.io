@@ -7,9 +7,10 @@ import type { SessionData } from 'lib/session/config';
 export type FarcasterUserToEncode = {
   fid: string | number;
   username: string;
+  hasJoinedWaitlist?: boolean;
 };
 
-async function embedFarcasterUser(data: FarcasterUserToEncode): Promise<`farcaster_user=${string}`> {
+export async function embedFarcasterUser(data: FarcasterUserToEncode): Promise<`farcaster_user=${string}`> {
   const sealedFarcasterUser = await sealData({ farcasterUser: data } as SessionData, {
     password: authSecret as string
   });
@@ -22,19 +23,27 @@ export const waitlistHomeJoinWaitlist: FrameButton = {
   action: 'post'
 };
 
-export async function waitlistGetDetails({ fid, username }: FarcasterUserToEncode): Promise<FrameButtonLink> {
+export function joinWaitlist({ referrerFid }: { referrerFid: string | number }): FrameButton {
   return {
-    label: 'Get details',
-    action: 'link',
-    target: `${baseUrl}/score?${await embedFarcasterUser({ fid, username })}`
+    label: 'Join waitlist',
+    action: 'post',
+    target: `${baseUrl}/api/frame/${referrerFid}/waitlist`
   };
 }
 
-export async function waitlistGet10Clicks({ fid, username }: FarcasterUserToEncode): Promise<FrameButtonLink> {
+export async function waitlistGetDetails(data: FarcasterUserToEncode): Promise<FrameButtonLink> {
+  return {
+    label: 'Get details',
+    action: 'link',
+    target: `${baseUrl}/score?${await embedFarcasterUser(data)}`
+  };
+}
+
+export async function waitlistGet10Clicks(data: FarcasterUserToEncode): Promise<FrameButtonLink> {
   return {
     label: 'Get +10 clicks',
     action: 'link',
-    target: `${baseUrl}/builders?${await embedFarcasterUser({ fid, username })}`
+    target: `${baseUrl}/builders?${await embedFarcasterUser(data)}`
   };
 }
 
