@@ -186,6 +186,7 @@
     "@octokit/app": "^14.1.0",
     "@octokit/auth-app": "^6.1.1",
     "@octokit/auth-oauth-app": "^8.1.0",
+    "@octokit/plugin-paginate-graphql": "^5.2.2",
     "@octokit/webhooks-types": "^7.5.0",
     "@popperjs/core": "^2.11.8",
     "@react-dnd/shallowequal": "^4.0.0",
