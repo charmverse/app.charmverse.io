@@ -58,9 +58,8 @@ export async function middleware(request: NextRequest) {
   }
 
   if (sealedFarcasterUser) {
-    console.log('Redirecting to current url');
     // Rewrite the URL without patameter
-    return NextResponse.redirect(url, 307);
+    return NextResponse.redirect(url, { headers: response.headers });
   }
 
   return response;
