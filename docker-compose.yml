@@ -212,8 +212,8 @@ services:
       - REACT_APP_APP_ENV=staging
       - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
-      #- stg-sockets
-      - stg-webapp
+      - stg-sockets
+      #- stg-webapp
 
   prd-farcaster:
     extends:
