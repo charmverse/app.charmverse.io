@@ -49,8 +49,6 @@ jobs:
 
       - name: Build app
         uses: ./.github/actions/build
-        with:
-          save_cache: true
 
       # source https://github.com/orgs/community/discussions/28474
       - name: Print head git commit message

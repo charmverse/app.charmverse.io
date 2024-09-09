@@ -2,9 +2,6 @@ name: 'Build application'
 description: ''
 
 inputs:
-  save_cache:
-    description: 'Whether to save the cache'
-    required: false
   REACT_APP_APP_ENV:
     description: '...'
     required: false
@@ -20,7 +17,7 @@ runs:
 
     - name: Restore build
       id: restore_build
-      uses: actions/cache/restore@v4
+      uses: actions/cache@v4
       with:
         path: |
           .next
@@ -33,15 +30,4 @@ runs:
     - name: Build
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
-      run: npm run build
-
-    # building cache key takes almost a minute, so we only run this if we are saving the cache
-    - name: Cache build
-      if: inputs.save_cache
-      uses: actions/cache/save@v4
-      with:
-        path: |
-          .next
-          .env.test.local
-          dist
-        key: webapp-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!apps') }}
+      run: npm run webapp:build
