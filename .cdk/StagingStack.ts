@@ -85,26 +85,30 @@ export class StagingStack extends Stack {
         optionName: 'ConfigDocument',
         value: JSON.stringify(healthReportingSystemConfig)
       },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'Protocol',
-        value: 'HTTPS'
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'ListenerEnabled',
-        value: 'true'
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'SSLCertificateArns',
-        value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'SSLPolicy',
-        value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
-      },
+      ...(environmentType === 'LoadBalanced'
+        ? [
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'Protocol',
+              value: 'HTTPS'
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'ListenerEnabled',
+              value: 'true'
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'SSLCertificateArns',
+              value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'SSLPolicy',
+              value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
+            }
+          ]
+        : []),
       {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
