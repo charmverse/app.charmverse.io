@@ -5,7 +5,11 @@ import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constan
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 
+import { getSession } from 'lib/session/getSession';
+
 export async function GET(req: NextRequest) {
+  const session = await getSession();
+
   const { searchParams } = new URL(req.url);
 
   const error = searchParams.get('error');
@@ -131,6 +135,16 @@ export async function GET(req: NextRequest) {
       githubLogin
     }
   });
+
+  if (!session.farcasterUser) {
+    session.farcasterUser = {
+      fid: connectWaitlistSlot.fid.toString(),
+      hasJoinedWaitlist: true,
+      username: connectWaitlistSlot.username
+    };
+
+    await session.save();
+  }
 
   return new Response(null, {
     status: 302,

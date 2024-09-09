@@ -1,4 +1,4 @@
-import { JoinWaitlistHome } from 'components/frame/joinWaitlist/JoinWaitlistHome';
+import { JoinWaitlistHome } from 'components/frame/JoinWaitlistHome';
 
 export const dynamic = 'force-dynamic';
 

@@ -12,6 +12,7 @@ export async function middleware(request: NextRequest) {
   let farcasterUser = session.farcasterUser;
 
   const url = request.nextUrl.clone(); // Clone the request URL to modify it
+
   const sealedFarcasterUser = url.searchParams.get('farcaster_user');
   const response = NextResponse.next(); // Create a response object to set cookies
 
