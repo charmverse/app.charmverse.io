@@ -4,8 +4,8 @@ import { getClient } from '@root/lib/google/authorization/authClient';
 import { loginWithGoogle } from '@root/lib/google/loginWithGoogle';
 import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
 import { getCallbackDomain } from '@root/lib/oauth/getCallbackDomain';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { InvalidInputError } from '@root/lib/utils/errors';
-import type { LoggedInUser } from '@root/models';
 
 export type LoginWithGoogleRequest = {
   code: string;

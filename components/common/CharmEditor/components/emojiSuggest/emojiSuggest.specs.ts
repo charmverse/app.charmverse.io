@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 
-import { getTwitterEmoji } from 'components/common/Emoji';
+import { getTwitterEmoji } from 'lib/utils/emoji';
 
 import { domSerializationHelpers } from '../@bangle.dev/core/domSerializationHelpers';
 import type { RawSpecs, BaseRawMarkSpec } from '../@bangle.dev/core/specRegistry';

@@ -1,11 +1,10 @@
 import type { PostCategory } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getPostCategoryPath } from '@root/lib/forums/categories/getPostCategoryPath';
+import { createPostComment } from '@root/lib/forums/comments/createPostComment';
+import type { CreatePostCommentInput } from '@root/lib/forums/comments/interface';
+import { upsertPostCategoryPermission } from '@root/lib/permissions/forum/upsertPostCategoryPermission';
 import { v4 } from 'uuid';
-
-import { getPostCategoryPath } from 'lib/forums/categories/getPostCategoryPath';
-import { createPostComment } from 'lib/forums/comments/createPostComment';
-import type { CreatePostCommentInput } from 'lib/forums/comments/interface';
-import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 
 export async function generatePostCategory({
   spaceId,

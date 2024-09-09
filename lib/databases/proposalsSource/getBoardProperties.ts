@@ -6,7 +6,7 @@ import { projectFieldProperties, projectMemberFieldProperties } from '@root/lib/
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { v4 as uuid } from 'uuid';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 
 import { filterBoardProperties } from './filterBoardProperties';
 

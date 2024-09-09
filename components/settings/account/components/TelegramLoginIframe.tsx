@@ -1,7 +1,7 @@
 import env from '@beam-australia/react-env';
 import * as React from 'react';
 
-import type { TelegramAccount } from 'pages/api/telegram/connect';
+import type { TelegramAccount } from 'lib/telegram/interfaces';
 
 export const TELEGRAM_BOT_ID = env('TELEGRAM_BOT_ID');
 

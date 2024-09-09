@@ -4,7 +4,7 @@ import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { getAllMemberPropertiesBySpace } from '@root/lib/members/getAccessibleMemberPropertiesBySpace';
 import { getSpaceMembers } from '@root/lib/members/getSpaceMembers';
 
-import type { TelegramAccount } from 'pages/api/telegram/connect';
+import type { TelegramAccount } from 'lib/telegram/interfaces';
 
 export async function getMembersExportData(spaceId: string) {
   const members = await getSpaceMembers({ spaceId, skipAccessCheck: true });

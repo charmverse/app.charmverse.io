@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { DiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
 import { shortenHex } from '@root/lib/utils/blockchain';
 
-import type { TelegramAccount } from 'pages/api/telegram/connect';
+import type { TelegramAccount } from 'lib/telegram/interfaces';
 
 export type UserIdentities = {
   username: string;

@@ -1,0 +1,20 @@
+{
+  "name": "cron",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "npx tsx esbuild.config.ts",
+    "start": "tsx watch src/cron.ts",
+    "start:prod": "node ./dist/cron.js",
+    "test": "npx jest",
+    "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
+  },
+  "dependencies": {
+    "@types/web-push": "^3.6.3",
+    "node-cron": "^3.0.3",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@types/node-cron": "^3.0.11"
+  }
+}

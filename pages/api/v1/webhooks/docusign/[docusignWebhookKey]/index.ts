@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { userByEmailOrGoogleAccountQuery } from '@root/lib/profile/getUser';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -8,7 +9,6 @@ import { getEnvelope, setEnvelopeInCache } from 'lib/docusign/api';
 import { onError, onNoMatch } from 'lib/middleware';
 import type { NextApiRequestWithApiPageKey } from 'lib/middleware/requireApiPageKey';
 import { passDocumentEvaluationStepIfNecessaryOrReopenEvaluation } from 'lib/proposals/documentsToSign/passDocumentEvaluationStepIfNecessaryOrReopenEvaluation';
-import { userByEmailOrGoogleAccountQuery } from 'lib/users/getUser';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

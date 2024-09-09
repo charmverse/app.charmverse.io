@@ -1,5 +1,6 @@
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { charmBlue as blueColor } from '@root/config/colors';
 import type { FeatureJson } from '@root/lib/features/constants';
 import * as mailer from '@root/lib/mailer';
 import * as emails from '@root/lib/mailer/emails';
@@ -12,8 +13,6 @@ import { getPollNotifications } from '@root/lib/notifications/polls/getPollNotif
 import { getProposalNotifications } from '@root/lib/notifications/proposals/getProposalNotifications';
 import { getBountyNotifications } from '@root/lib/notifications/rewards/getRewardNotifications';
 import type { MessagesSendResult } from 'mailgun.js';
-
-import { blueColor } from 'theme/colors';
 
 const notificationSelectFields = {
   notificationMetadata: {

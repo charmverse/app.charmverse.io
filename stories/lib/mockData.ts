@@ -1,6 +1,6 @@
 import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from '@root/lib/members/interfaces';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import type { ProposalTemplateMeta } from '@root/lib/proposals/getProposalTemplates';
-import type { LoggedInUser } from '@root/models';
 
 import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
 import { createMockSpace } from 'testing/mocks/space';

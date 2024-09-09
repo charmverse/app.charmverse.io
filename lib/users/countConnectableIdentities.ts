@@ -1,4 +1,4 @@
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 
 export function countConnectableIdentities(user: LoggedInUser): number {
   let count = 0;

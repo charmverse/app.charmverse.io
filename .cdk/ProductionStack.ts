@@ -4,11 +4,19 @@ import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import { Construct } from 'constructs';
 
 export type Options = {
-  sslCert: string;
+  healthCheck?: { port: number; path: string };
+  sslCert?: string;
 };
 
+const defaultHealthCheck = { path: '/api/health', port: 80 };
+
 export class ProductionStack extends Stack {
-  constructor(scope: Construct, appName: string, props: StackProps, options: Options) {
+  constructor(
+    scope: Construct,
+    appName: string,
+    props: StackProps,
+    { sslCert, healthCheck = defaultHealthCheck }: Options
+  ) {
     super(scope, appName, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
@@ -45,8 +53,6 @@ export class ProductionStack extends Stack {
       Version: 1
     };
 
-    const sslCert = 'arn:aws:acm:us-east-1:310849459438:certificate/4618b240-08da-4d91-98c1-ac12362be229';
-
     // list of all options: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
     const optionSettingProperties: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] = [
       {
@@ -79,26 +85,30 @@ export class ProductionStack extends Stack {
         optionName: 'ConfigDocument',
         value: JSON.stringify(healthReportingSystemConfig)
       },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'Protocol',
-        value: 'HTTPS'
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'ListenerEnabled',
-        value: 'true'
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'SSLCertificateArns',
-        value: options.sslCert
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'SSLPolicy',
-        value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
-      },
+      ...(sslCert
+        ? [
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'Protocol',
+              value: 'HTTPS'
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'ListenerEnabled',
+              value: 'true'
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'SSLCertificateArns',
+              value: sslCert
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'SSLPolicy',
+              value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
+            }
+          ]
+        : []),
       {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
@@ -131,10 +141,25 @@ export class ProductionStack extends Stack {
         value: 't3a.small,t3.small'
       },
       {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'HealthCheckPath',
+        value: healthCheck.path
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'MatcherHTTPCode',
+        value: '200'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'Port',
+        value: healthCheck.port?.toString() || '80'
+      },
+      {
         // ALB health check
         namespace: 'aws:elasticbeanstalk:application',
         optionName: 'Application Healthcheck URL',
-        value: '/api/health'
+        value: healthCheck.path
       }
     ];
 

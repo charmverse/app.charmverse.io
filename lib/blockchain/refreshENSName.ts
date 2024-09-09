@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getUserProfile } from '@root/lib/users/getUser';
+import { getUserProfile } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { matchWalletAddress, shortWalletAddress } from '@root/lib/utils/blockchain';
 import { InvalidInputError, MissingDataError } from '@root/lib/utils/errors';
-import type { LoggedInUser } from '@root/models';
 
 import { getENSName } from './getENSName';
 

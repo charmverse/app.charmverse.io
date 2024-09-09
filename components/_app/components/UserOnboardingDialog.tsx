@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
 import { Alert } from '@mui/material';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 

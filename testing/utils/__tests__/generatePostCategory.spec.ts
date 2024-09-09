@@ -1,8 +1,7 @@
 import type { PostCategory } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { generateUserAndSpace } from 'testing/setupDatabase';
-
+import { generateUserAndSpace } from '../../setupDatabase';
 import { generatePostCategory } from '../forums';
 
 describe('generatePostCategory', () => {

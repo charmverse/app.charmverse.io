@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { createSwaggerSpec } from 'next-swagger-doc';
 import { useEffect } from 'react';
 
-import { useColorMode } from 'context/darkMode';
+import { useColorMode } from 'hooks/useDarkMode';
 
 import 'swagger-ui-react/swagger-ui.css';
 

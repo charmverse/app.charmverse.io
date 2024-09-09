@@ -1,4 +1,5 @@
 import type { User } from '@charmverse/core/prisma-client';
+import { charmBlue as blueColor } from '@root/config/colors';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
@@ -16,7 +17,6 @@ import { getPagePath } from 'lib/pages/utils';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
 import { randomName } from 'lib/utils/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
-import { blueColor } from 'theme/colors';
 
 const handler = nc({
   onError,

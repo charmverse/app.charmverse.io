@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 
 import { mixpanelOp } from './mixpanel';
 
