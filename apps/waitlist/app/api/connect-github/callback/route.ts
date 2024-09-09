@@ -11,8 +11,6 @@ import { refreshUserScore } from 'lib/scoring/refreshUserScore';
 import { getSession } from 'lib/session/getSession';
 
 export async function GET(req: NextRequest) {
-  const session = await getSession();
-
   const { searchParams } = new URL(req.url);
 
   const error = searchParams.get('error');
