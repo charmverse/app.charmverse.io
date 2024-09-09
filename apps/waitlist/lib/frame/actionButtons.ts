@@ -4,8 +4,6 @@ import { sealData } from 'iron-session';
 
 import type { SessionData } from 'lib/session/config';
 
-export type WaitlistFramePage = 'join_waitlist_home' | 'join_waitlist_success' | 'waitlist_score';
-
 export type FarcasterUserToEncode = {
   fid: string | number;
   username: string;

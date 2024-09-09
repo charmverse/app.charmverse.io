@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
         path: '/'
       });
 
-      farcasterUser = unsealedFid.farcasterUser;
+      farcasterUser = { ...unsealedFid.farcasterUser, hasJoinedWaitlist: true };
 
       // Mutate the request by adding the cookie to the headers
       request.headers.set('cookie', `${getCookieName()}=${sealedFarcasterUser}`);
@@ -45,15 +45,15 @@ export async function middleware(request: NextRequest) {
   const authenticatedPaths = ['/builders', '/score', '/join'];
 
   if (!farcasterUser && authenticatedPaths.some((p) => url.pathname.startsWith(p))) {
-    return NextResponse.redirect(new URL('/', request.url.split('?')[0]));
+    return NextResponse.redirect(new URL('/', url));
   }
 
   if (farcasterUser?.hasJoinedWaitlist && url.pathname === '/') {
-    return NextResponse.redirect(new URL('/score', request.url.split('?')[0]));
+    return NextResponse.redirect(new URL('/score', url));
   }
 
   if (farcasterUser && !farcasterUser.hasJoinedWaitlist && url.pathname === '/score') {
-    return NextResponse.redirect(new URL('/', request.url.split('?')[0]));
+    return NextResponse.redirect(new URL('/', url));
   }
 
   // Rewrite the request with the new URL (without the query param)

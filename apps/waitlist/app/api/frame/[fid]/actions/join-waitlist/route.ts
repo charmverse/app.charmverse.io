@@ -3,8 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
 
-import { WaitlistCurrentScoreFrame } from 'components/frame/WaitlistCurrentScore';
-import { WaitlistJoinedFrame } from 'components/frame/WaitlistJoined';
+import { WaitlistCurrentScoreFrame } from 'components/frame/WaitlistCurrentScoreFrame';
+import { WaitlistJoinedFrame } from 'components/frame/WaitlistJoinedFrame';
 import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
