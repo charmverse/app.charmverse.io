@@ -9,9 +9,10 @@ export type WaitlistFramePage = 'join_waitlist_home' | 'join_waitlist_success' |
 type FarcasterUserToEncode = {
   fid: string | number;
   username: string;
+  hasJoinedWaitlist?: boolean;
 };
 
-async function embedFarcasterUser(data: FarcasterUserToEncode): Promise<`farcaster_user=${string}`> {
+export async function embedFarcasterUser(data: FarcasterUserToEncode): Promise<`farcaster_user=${string}`> {
   const sealedFarcasterUser = await sealData({ farcasterUser: data } as SessionData, {
     password: authSecret as string
   });
