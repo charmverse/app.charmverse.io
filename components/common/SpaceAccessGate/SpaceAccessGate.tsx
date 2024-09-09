@@ -1,8 +1,10 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { Alert, Box, Divider, Typography } from '@mui/material';
+import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
+import { InlineCharmEditor } from 'components/common/CharmEditor';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { LoginButton } from 'components/login/components/LoginButton';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
@@ -126,9 +128,10 @@ export function SpaceAccessGate({
         <Box mb={3}>
           <WorkspaceAvatar image={space.spaceImage} name={space.name} variant='rounded' />
         </Box>
-        <Box display='flex' flexDirection='column' alignItems='center'>
-          <Typography variant='h5'>{space.name}</Typography>
-        </Box>
+        <Typography variant='h5' gutterBottom>
+          {space.name}
+        </Typography>
+        {space.tokenGateMessage && <InlineCharmEditor readOnly content={space.tokenGateMessage as PageContent} />}
       </Box>
       <Divider />
       {walletGateEnabled && (
