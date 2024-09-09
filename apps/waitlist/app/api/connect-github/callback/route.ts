@@ -5,6 +5,8 @@ import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constan
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 
+import { embedFarcasterUser } from 'lib/frame/actionButtons';
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
@@ -132,10 +134,16 @@ export async function GET(req: NextRequest) {
     }
   });
 
+  const sealedData = await embedFarcasterUser({
+    fid: connectWaitlistSlot.fid.toString(),
+    username: connectWaitlistSlot.username,
+    hasJoinedWaitlist: true
+  });
+
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${process.env.DOMAIN}/score`
+      Location: `${process.env.DOMAIN}/score?${sealedData}`
     }
   });
 }
