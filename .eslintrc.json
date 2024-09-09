@@ -6,7 +6,7 @@
     "node": true
   },
   "settings": {
-    "import/internal-regex": "^(adapters|background|charmClient|components|config|context|db|hooks|lib|models|pages|public|seedData|testing|theme)",
+    "import/internal-regex": "^(adapters|charmClient|components|config|context|db|hooks|lib|models|pages|public|seedData|testing|theme)",
     "import/resolver": {
       "node": {
         "moduleDirectory": ["node_modules"]
