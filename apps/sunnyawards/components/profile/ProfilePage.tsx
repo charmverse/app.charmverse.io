@@ -28,7 +28,11 @@ export async function ProfilePage({ user }: { user: LoggedInUser }) {
         <Suspense fallback={<ProjectItemSkeleton />}>
           <ProjectsList userId={user.id} />
         </Suspense>
-        <NewProjectItem href='/projects/new'>Create a submission</NewProjectItem>
+
+        <Typography sx={{ mt: 4 }} textAlign='center' variant='h6'>
+          Submissions ended September 9th
+        </Typography>
+        {/* <NewProjectItem href='/projects/new'>Create a submission</NewProjectItem> */}
       </Box>
     </PageWrapper>
   );
