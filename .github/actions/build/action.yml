@@ -15,6 +15,13 @@ runs:
     #     GITHUB_CONTEXT: ${{ toJson(github) }}
     #   run: echo "$GITHUB_CONTEXT"
 
+    - name: Get last Git commit hashes for cache key
+      shell: bash
+      # Instead of hasing files, use the latest git commit in a directory to speed up cache key https://github.com/actions/runner/issues/1840#issuecomment-2094847172
+      run: |
+        echo "NPM_PACKAGES_COMMIT=$(git log -1 --pretty=format:%H -- package-lock.json)" >> $GITHUB_ENV
+        echo "SOURCE_CODE_COMMIT=$(git log -1 --pretty=format:%H -- lib components packages public pages hooks charmClient adapters abi config connectors)" >> $GITHUB_ENV
+
     - name: Restore build
       id: restore_build
       uses: actions/cache@v4

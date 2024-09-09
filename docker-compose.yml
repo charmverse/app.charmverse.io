@@ -267,7 +267,7 @@ services:
       - HOST=permissions-api
     profiles:
       - stg-webapp
-      - stg-websockets
+      - stg-sockets
 
   localpostgres:
     image: postgres
