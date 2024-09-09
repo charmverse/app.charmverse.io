@@ -6,10 +6,20 @@ import { Construct } from 'constructs';
 
 const domain = 'charmverse.co';
 
-type CustomOptions = { options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] };
+type CustomOptions = {
+  healthCheck?: { port: number; path: string };
+  options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[];
+};
+
+const defaultHealthCheck = { path: '/api/health', port: 80 };
 
 export class StagingStack extends Stack {
-  constructor(scope: Construct, appName: string, props: StackProps, { options = [] }: CustomOptions = {}) {
+  constructor(
+    scope: Construct,
+    appName: string,
+    props: StackProps,
+    { healthCheck = defaultHealthCheck, options = [] }: CustomOptions = {}
+  ) {
     super(scope, appName, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
@@ -132,10 +142,25 @@ export class StagingStack extends Stack {
         value: 't3a.small,t3.small'
       },
       {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'HealthCheckPath',
+        value: healthCheck.path
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'MatcherHTTPCode',
+        value: '200'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'Port',
+        value: healthCheck.port?.toString() || '80'
+      },
+      {
         // ALB health check
         namespace: 'aws:elasticbeanstalk:application',
         optionName: 'Application Healthcheck URL',
-        value: '/api/health'
+        value: healthCheck.path
       },
       {
         namespace: 'aws:elasticbeanstalk:application:environment',

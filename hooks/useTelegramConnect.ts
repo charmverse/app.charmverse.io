@@ -2,7 +2,7 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { loginWithTelegram } from 'components/settings/account/components/TelegramLoginIframe';
-import type { TelegramAccount } from 'pages/api/telegram/connect';
+import type { TelegramAccount } from 'lib/telegram/interfaces';
 
 import { useSnackbar } from './useSnackbar';
 import { useUser } from './useUser';

@@ -6,7 +6,7 @@ import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ColorModeProvider } from 'context/darkMode';
+import { ColorModeProvider } from 'hooks/useDarkMode';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { createThemeLightSensitive } from 'theme';
 import cssVariables from 'theme/cssVariables';

@@ -12,9 +12,9 @@ import type {
 import * as http from '@root/adapters/http';
 import type { FiatCurrency, IPairQuote } from '@root/connectors/chains';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockWithDetails, BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
@@ -26,11 +26,11 @@ import type { FailedImportsError } from 'lib/notion/interfaces';
 import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
+import type { TelegramAccount } from 'lib/telegram/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
-import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
 import { CommentsApi } from './apis/commentsApi';

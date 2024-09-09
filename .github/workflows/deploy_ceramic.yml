@@ -1,0 +1,161 @@
+name: Ceramic CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.cdk'
+      - 'docker-compose.yml'
+      - '.ebextensions/ceramic/**'
+      - '.ebstalk.apps.env/ceramic.env'
+      - '.github/actions/**'
+      - '.github/workflows/deploy_ceramic.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'apps/ceramic/**'
+  pull_request:
+    types: [labeled, opened, synchronize]
+    branches: ['**']
+    paths:
+      - '.cdk'
+      - 'docker-compose.yml'
+      - '.ebextensions/ceramic/**'
+      - '.ebstalk.apps.env/ceramic.env'
+      - '.github/actions/**'
+      - '.github/workflows/deploy_ceramic.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'apps/ceramic/**'
+  workflow_dispatch:
+    inputs:
+      core_pkg_version:
+        description: 'Core pkg version to update to'
+        required: true
+
+concurrency:
+  group: ci-ceramic-${{ github.event_name }}-${{ github.ref }}
+
+jobs:
+  build:
+    name: Build apps
+    runs-on: ubuntu-latest
+    outputs:
+      head_commit_message: ${{ steps.setup_variables.outputs.commit_message }}
+      deploy_staging: ${{ steps.setup_variables.outputs.deploy_staging }}
+      skip_tests: ${{ steps.setup_variables.outputs.skip_tests }}
+    steps:
+      - name: Print Triggering event context payload
+        env:
+          workflow_event_context: ${{ toJSON(github.event) }}
+        run: |
+          echo "$workflow_event_context"
+          echo "Workflow and code ref: ${{github.ref}}"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup variables
+        id: setup_variables
+        # source https://github.com/orgs/community/discussions/28474
+        run: |
+          echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
+          echo "deploy_staging=${{(github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-ceramic') || (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic'))}}" >> $GITHUB_OUTPUT
+          echo "skip_tests=${{ contains(env.commit_message, 'skip-tests') }}" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+        with:
+          app_name: ceramic
+          core_pkg_version: ${{ inputs.core_pkg_version }}
+          commit_core_pkg_upgrade: true
+
+      - name: Build app
+        uses: ./.github/actions/build_app
+        with:
+          app_name: ceramic
+
+  upload-docker:
+    name: Upload Docker image
+    runs-on: ubuntu-latest
+    # run whether previous jobs were successful or skipped
+    if: |
+      github.ref == 'refs/heads/main' || needs.build.outputs.deploy_staging == 'true'
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+        with:
+          app_name: ceramic
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build_app
+        with:
+          app_name: ceramic
+
+      - name: Update Dockerfile
+        run: |
+          rm Dockerfile && mv apps/ceramic/Dockerfile Dockerfile
+
+      - name: Build and Push Docker image
+        id: docker_build_push
+        uses: ./.github/actions/build_docker_image
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+        with:
+          ecr_registry: ceramic
+
+  deploy-production:
+    name: Deploy to production
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    needs: [upload-docker]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/deploy_production
+        with:
+          app_name: ceramic
+          stack: prd-ceramic
+
+  deploy-staging:
+    name: Deploy to staging
+    if: needs.build.outputs.deploy_staging == 'true'
+    runs-on: ubuntu-latest
+    # prevent staging deploys + cleanup running in parallel
+    concurrency: staging-${{ github.ref }}
+    needs: [build, upload-docker]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/deploy_staging
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          app_name: ceramic
+
+  discord-alert:
+    name: Notify Discord of failure
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && failure()
+    # pass in all steps so we can check if any failed
+    needs: [upload-docker, deploy-production]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Notify Discord
+        uses: ./.github/actions/notify_error
+        env:
+          DISCORD_WARNINGS_WEBHOOK: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
+        with:
+          app_name: ceramic

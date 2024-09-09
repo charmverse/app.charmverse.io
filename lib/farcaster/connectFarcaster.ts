@@ -2,10 +2,10 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
 import { InvalidStateError } from '@root/lib/middleware';
+import { getUserProfile } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { sessionUserRelations } from '@root/lib/session/config';
-import { getUserProfile } from '@root/lib/users/getUser';
 import { DisabledAccountError, ExternalServiceError } from '@root/lib/utils/errors';
-import type { LoggedInUser } from '@root/models';
 
 export async function connectFarcaster({
   fid,

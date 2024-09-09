@@ -1,4 +1,4 @@
-import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
+import { NodeView } from '../@bangle.dev/core/node-view';
 
 import { name } from './config';
 

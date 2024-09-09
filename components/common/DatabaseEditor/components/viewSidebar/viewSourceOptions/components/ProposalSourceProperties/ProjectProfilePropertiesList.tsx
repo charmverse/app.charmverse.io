@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 
+import type { SelectedProposalProperties } from './interfaces';
 import { PropertySelector } from './PropertiesListSelector';
-import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 import { SelectedPropertiesList } from './SelectedPropertiesList';
 
 const projectMemberFields = projectMemberFieldProperties.map((propertyFieldProperty) => propertyFieldProperty.field);

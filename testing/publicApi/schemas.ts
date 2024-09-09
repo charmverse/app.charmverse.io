@@ -1,9 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import type { PropertyType } from '@root/lib/databases/board';
+import type { PageProperty } from '@root/lib/public-api/interfaces';
+import type { UpdateableDatabaseFields } from '@root/lib/public-api/mapPropertiesFromApiToSystemFormat';
 import { v4 as uuid } from 'uuid';
-
-import type { PropertyType } from 'lib/databases/board';
-import type { PageProperty } from 'lib/public-api/interfaces';
-import type { UpdateableDatabaseFields } from 'lib/public-api/mapPropertiesFromApiToSystemFormat';
 
 const textSchema: PageProperty<'text'> = {
   id: uuid(),

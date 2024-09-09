@@ -7,7 +7,6 @@ import type { FailedImportsError } from '@root/lib/notion/interfaces';
 import type { ProposalWithUsersLite } from '@root/lib/proposals/getProposals';
 import type { RewardBlockWithTypedFields } from '@root/lib/rewards/blocks/interfaces';
 import type { ExtendedVote, VoteTask } from '@root/lib/votes/interfaces';
-import type { Node } from 'prosemirror-model';
 import type { Server, Socket } from 'socket.io';
 
 export type Resource<T = object> = { id: string } & T;

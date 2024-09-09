@@ -2,10 +2,10 @@
 
 import styled from '@emotion/styled';
 import { darken } from '@mui/material/styles';
+import { charmBlue as blueColor } from '@root/config/colors';
 import type { ElementType } from 'react';
 
 import { Button, StyledSpinner } from 'components/common/Button';
-import { blueColor } from 'theme/colors';
 
 import type { InputProps } from './Button';
 

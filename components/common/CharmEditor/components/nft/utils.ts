@@ -1,4 +1,4 @@
-import { openseaChainsByPath } from '@root/lib/blockchain/getNFTUrl';
+import { openseaChainsByPath } from '@root/lib/blockchain/config';
 
 import type { NodeAttrs } from './nft.specs';
 

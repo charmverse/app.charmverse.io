@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
+import type { SelectedProposalProperties } from './interfaces';
 import { PropertySelector } from './PropertiesListSelector';
-import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 
 export function FormFieldPropertiesList({
   selectedProperties,
