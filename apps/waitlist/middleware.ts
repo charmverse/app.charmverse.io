@@ -28,7 +28,8 @@ export async function middleware(request: NextRequest) {
         value: sealedFarcasterUser,
         httpOnly: true,
         secure: true,
-        maxAge: 31536000,
+        // 2 weeks
+        maxAge: 1209600,
         path: '/'
       });
 
