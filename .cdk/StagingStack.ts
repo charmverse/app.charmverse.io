@@ -13,7 +13,11 @@ export class StagingStack extends Stack {
     scope: Construct,
     appName: string,
     props: StackProps,
-    { healthCheck = defaultHealthCheck, environmentType = 'LoadBalanced' }: Options = {}
+    {
+      healthCheck = defaultHealthCheck,
+      environmentType = 'LoadBalanced',
+      instanceType = 't3a.small,t3.small'
+    }: Options = {}
   ) {
     super(scope, appName, props);
 
@@ -138,7 +142,7 @@ export class StagingStack extends Stack {
       {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
-        value: 't3a.small,t3.small'
+        value: instanceType
       },
       {
         namespace: 'aws:elasticbeanstalk:environment:process:default',

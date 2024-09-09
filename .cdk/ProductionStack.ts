@@ -7,6 +7,7 @@ export type Options = {
   healthCheck?: { port: number; path: string };
   sslCert?: string;
   environmentType?: 'SingleInstance' | 'LoadBalanced';
+  instanceType?: string;
 };
 
 export const defaultHealthCheck = { path: '/api/health', port: 80 };
@@ -16,7 +17,12 @@ export class ProductionStack extends Stack {
     scope: Construct,
     appName: string,
     props: StackProps,
-    { sslCert, healthCheck = defaultHealthCheck, environmentType = 'LoadBalanced' }: Options
+    {
+      sslCert,
+      healthCheck = defaultHealthCheck,
+      environmentType = 'LoadBalanced',
+      instanceType = 't3a.small,t3.small'
+    }: Options
   ) {
     super(scope, appName, props);
 
@@ -139,7 +145,7 @@ export class ProductionStack extends Stack {
       {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
-        value: 't3a.small,t3.small'
+        value: instanceType
       },
       {
         namespace: 'aws:elasticbeanstalk:environment:process:default',
