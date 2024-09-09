@@ -130,13 +130,11 @@ export function SpaceAccessGate({
           <Typography variant='h5'>{space.name}</Typography>
         </Box>
       </Box>
+      <Divider />
       {walletGateEnabled && (
-        <>
-          <Divider />
-          <Typography variant='body2' align='center'>
-            The following criteria must be met to join:
-          </Typography>
-        </>
+        <Typography variant='body2' align='center'>
+          The following criteria must be met to join:
+        </Typography>
       )}
 
       {discordGate.isEnabled && <DiscordGate {...discordGate} />}

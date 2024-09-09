@@ -1,5 +1,6 @@
 import NavigateNextIcon from '@mui/icons-material/ArrowRightAlt';
 import { Alert, Box, Card, Divider } from '@mui/material';
+import DialogTitle from '@mui/material/DialogTitle';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
@@ -7,7 +8,6 @@ import { useSearchByDomain } from 'charmClient/hooks/spaces';
 import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { DialogTitle } from 'components/common/Modal';
 import { SpaceAccessGate } from 'components/common/SpaceAccessGate/SpaceAccessGate';
 import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/SpaceAccessGateWithSearch';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -62,8 +62,8 @@ export default function JoinWorkspace() {
   return (
     <TokenGateContainer>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
-        <DialogTitle sx={{ justifyContent: 'center' }}>Join a Space</DialogTitle>
-        <Divider />
+        <DialogTitle sx={{ textAlign: 'center' }}>Join a space</DialogTitle>
+        <Divider sx={{ mb: 2 }} />
         {domain && isSpaceLoading && <LoadingComponent height='80px' isLoading={true} />}
         {domain && !isSpaceLoading && spaceError && <Alert severity='error'>No space found</Alert>}
         {domain && spaceFromPath && <SpaceAccessGate space={spaceFromPath} />}
