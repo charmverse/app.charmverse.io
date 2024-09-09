@@ -55,8 +55,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url.split('?')[0]));
   }
 
-  // Rewrite the request with the new URL (without the query param)
-  return NextResponse.rewrite(url, { request, headers: response.headers });
+  if (sealedFarcasterUser) {
+    // Rewrite the URL without patameter
+    return NextResponse.redirect(url, 307);
+  }
+
+  return response;
 }
 
 export const config = {
