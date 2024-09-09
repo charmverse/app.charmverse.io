@@ -134,7 +134,7 @@
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
     "@ceramicnetwork/http-client": "^5.6.0",
-    "@charmverse/core": "^0.81.4",
+    "@charmverse/core": "^0.81.5",
     "@column-resizer/core": "^1.0.2",
     "@composedb/devtools": "^0.7.1",
     "@composedb/devtools-node": "^0.7.1",
