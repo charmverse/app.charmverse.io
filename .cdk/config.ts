@@ -11,7 +11,8 @@ export const apps: { [key: string]: { stg?: Options; prd?: Options } } = {
         path: '/graphql',
         port: 5001
       },
-      instanceType: 't2.micro'
+      instanceType: 't2.micro',
+      sslCert: charmverseCert
     },
     stg: {
       healthCheck: {
