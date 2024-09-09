@@ -11,7 +11,7 @@ jobs:
   clean-up:
     if: |
       (github.event.action == 'unlabeled' && startsWith(github.event.label.name, ':rocket: deploy')) ||
-      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-scoutgame') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-farcaster')))
+      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-ceramic') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-scoutgame') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-comingsoon') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-farcaster') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-cron') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-waitlist') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-websockets')))
     runs-on: ubuntu-latest
     steps:
       - name: configure AWS credentials
@@ -45,36 +45,76 @@ jobs:
       - name: destroy the stack on AWS
         # we need to create a dummy zip file or else cdk throws an error it cannot find the asset
         run: |
-          touch stg-webapp-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-ceramic-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-comingsoon-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-cron-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-farcaster-${{ env.STAGE_SUFFIX }}.zip
           touch stg-scoutgame-${{ env.STAGE_SUFFIX }}.zip
           touch stg-sunnyawards-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-farcaster-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-waitlist-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-webapp-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-websockets-${{ env.STAGE_SUFFIX }}.zip
 
-          npx cdk destroy -c name=stg-webapp-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-ceramic-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-comingsoon-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-cron-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-farcaster-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-scoutgame-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-sunnyawards-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-farcaster-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-waitlist-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-webapp-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-websockets-${{ env.STAGE_SUFFIX }} --force
 
-      - name: delete the webapp github deployment
+      - name: delete ceramic github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-webapp-${{ env.STAGE_SUFFIX }}
+          environment: stg-ceramic-${{ env.STAGE_SUFFIX }}
 
-      - name: delete the scoutgame github deployment
+      - name: delete coming soon github deployment
+        uses: strumwolf/delete-deployment-environment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-comingsoon-${{ env.STAGE_SUFFIX }}
+
+      - name: delete cron github deployment
+        uses: strumwolf/delete-deployment-environment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-cron-${{ env.STAGE_SUFFIX }}
+
+      - name: delete farcaster github deployment
+        uses: strumwolf/delete-deployment-environment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-farcaster-${{ env.STAGE_SUFFIX }}
+
+      - name: delete scoutgame github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: stg-scoutgame-${{ env.STAGE_SUFFIX }}
 
-      - name: delete the sunnyawards github deployment
+      - name: delete sunnyawards github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: stg-sunnyawards-${{ env.STAGE_SUFFIX }}
 
-      - name: delete the farcaster github deployment
+      - name: delete waitlist github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-farcaster-${{ env.STAGE_SUFFIX }}
+          environment: stg-waitlist-${{ env.STAGE_SUFFIX }}
+
+      - name: delete webapp github deployment
+        uses: strumwolf/delete-deployment-environment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-webapp-${{ env.STAGE_SUFFIX }}
+
+      - name: delete websockets github deployment
+        uses: strumwolf/delete-deployment-environment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-websockets-${{ env.STAGE_SUFFIX }}

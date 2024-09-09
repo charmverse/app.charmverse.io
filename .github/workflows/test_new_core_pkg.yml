@@ -28,7 +28,6 @@ jobs:
       - name: Build app
         uses: ./.github/actions/build
         with:
-          save_cache: true
           REACT_APP_APP_ENV: 'test'
 
   integration-test:

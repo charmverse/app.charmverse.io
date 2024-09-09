@@ -27,7 +27,7 @@ import { DatabaseSidebarHeader } from '../databaseSidebarHeader';
 import { GoogleFormsSource } from './components/GoogleForms/GoogleFormsSource';
 import { LinkCharmVerseDatabase } from './components/LinkCharmVerseDatabase';
 import { NewCharmVerseDatabase } from './components/NewCharmVerseDatabase';
-import type { SelectedProposalProperties } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from './components/ProposalSourceProperties/interfaces';
 import { ProposalSourcePropertiesDialog } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { SourceType } from './components/viewSourceType';
 import { useSourceOptions } from './useSourceOptions';

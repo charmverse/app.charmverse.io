@@ -6,7 +6,7 @@
     "node": true
   },
   "settings": {
-    "import/internal-regex": "^(adapters|background|charmClient|components|config|context|db|hooks|lib|models|pages|public|seedData|testing|theme)",
+    "import/internal-regex": "^(adapters|charmClient|components|config|context|db|hooks|lib|models|pages|public|seedData|testing|theme)",
     "import/resolver": {
       "node": {
         "moduleDirectory": ["node_modules"]
@@ -76,7 +76,7 @@
       "error",
       {
         "devDependencies": true,
-        "packageDir": ["./", "./@connect-shared", "./packages/charmeditor/", "./apps/farcaster/", "./apps/scoutgame/", "./apps/sunnyawards/", "./apps/waitlist/"]
+        "packageDir": ["./", "./@connect-shared", "./packages/charmeditor/", "./apps/farcaster/", "./apps/scoutgame/", "./apps/sunnyawards/", "./apps/waitlist/", "./apps/websockets/", "./apps/cron/", "./apps/ceramic/"]
       }
     ],
     "import/order": [

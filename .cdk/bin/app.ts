@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { WebappStagingStack } from '../WebappStagingStack';
 import { ProductionStack } from '../ProductionStack';
 import { StagingStack } from '../StagingStack';
 
@@ -9,6 +8,8 @@ import { StagingStack } from '../StagingStack';
 const deployProps: cdk.StackProps = {
   env: { account: '310849459438', region: 'us-east-1' }
 };
+
+import { charmverseCert, scoutgameCert, sunnyCert } from '../config';
 
 const app = new cdk.App();
 
@@ -18,7 +19,7 @@ const stackNameParam: string = app.node.getContext('name');
 // Sunny awawrds production
 if (stackNameParam === 'prd-sunnyawards') {
   new ProductionStack(app, stackNameParam, deployProps, {
-    sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/4618b240-08da-4d91-98c1-ac12362be229'
+    sslCert: sunnyCert
   });
 }
 // Scout Game production
@@ -28,16 +29,37 @@ else if (
   stackNameParam === 'prd-comingsoon'
 ) {
   new ProductionStack(app, stackNameParam, deployProps, {
-    sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b901f27e-5a33-4dea-b4fb-39308a580423'
+    sslCert: scoutgameCert
+  });
+} else if (stackNameParam === 'prd-ceramic') {
+  new ProductionStack(app, stackNameParam, deployProps, {
+    healthCheck: {
+      path: '/graphql',
+      port: 5001
+    }
+  });
+} else if (stackNameParam === 'prd-cron') {
+  new ProductionStack(app, stackNameParam, deployProps, { environmentType: 'SingleInstance' });
+} else if (stackNameParam === 'prd-websockets') {
+  new ProductionStack(app, stackNameParam, deployProps, {
+    sslCert: charmverseCert,
+    environmentType: 'SingleInstance'
   });
 }
 // Connect webapp and api production
 else if (stackNameParam.startsWith('prd')) {
   new ProductionStack(app, stackNameParam, deployProps, {
-    sslCert: 'arn:aws:acm:us-east-1:310849459438:certificate/b960ff5c-ed3e-4e65-b2c4-ecc64e696902'
+    sslCert: charmverseCert
   });
-} else if (stackNameParam.startsWith('stg-webapp')) {
-  new WebappStagingStack(app, stackNameParam, deployProps);
+} else if (stackNameParam.startsWith('stg-websockets')) {
+  new StagingStack(app, stackNameParam, deployProps, {
+    healthCheck: { path: '/api/health', port: 3002 },
+    environmentType: 'SingleInstance'
+  });
+} else if (stackNameParam.startsWith('stg-ceramic')) {
+  new StagingStack(app, stackNameParam, deployProps, { healthCheck: { path: '/graphql', port: 5001 } });
+} else if (stackNameParam.startsWith('stg-cron')) {
+  new StagingStack(app, stackNameParam, deployProps, { environmentType: 'SingleInstance' });
 } else if (stackNameParam.startsWith('stg-')) {
   new StagingStack(app, stackNameParam, deployProps);
 } else {

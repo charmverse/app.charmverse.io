@@ -1,5 +1,4 @@
-import { generateUserAndSpace } from 'testing/setupDatabase';
-
+import { generateUserAndSpace } from '../../setupDatabase';
 import type { ProposalWithUsersAndPageMeta } from '../proposals';
 import { generateProposal } from '../proposals';
 

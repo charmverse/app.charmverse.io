@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, Thread, User } from '@charmverse/core/prisma';
 import { testUtilsPages } from '@charmverse/core/test';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import request from 'supertest';
 
 import type { ThreadCreatePayload, ThreadWithComments } from 'lib/threads';

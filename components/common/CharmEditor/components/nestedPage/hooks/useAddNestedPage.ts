@@ -6,7 +6,7 @@ import { useEditorViewContext } from 'components/common/CharmEditor/components/@
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { addPage } from 'lib/pages';
+import { addPage } from 'lib/pages/addPage';
 
 export function useAddNestedPage(currentPageId?: string) {
   const { space } = useCurrentSpace();

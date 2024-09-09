@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - '.ebextensions/waitlist/**'
       - '.ebstalk.apps.env/waitlist.env'
       - '.github/actions/**'
@@ -19,12 +19,11 @@ on:
       - 'connectors/**'
       - 'lib/**'
       - 'hooks/**'
-      - 'models/**'
   pull_request:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - '.ebextensions/waitlist/**'
       - '.ebstalk.apps.env/waitlist.env'
       - '.github/actions/**'
@@ -39,7 +38,6 @@ on:
       - 'connectors/**'
       - 'lib/**'
       - 'hooks/**'
-      - 'models/**'
   workflow_dispatch:
     inputs:
       core_pkg_version:
@@ -130,7 +128,7 @@ jobs:
         run: npm run typecheck -w apps/waitlist
 
       - name: Run Waitlist Unit tests
-        run: npm run test -w apps/waitlist
+        run: npx dotenv -e .env.test.local -- npm run test -w apps/waitlist
 
       - name: Run eslint on changed files
         uses: tj-actions/eslint-changed-files@v25

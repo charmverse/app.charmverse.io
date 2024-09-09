@@ -1,6 +1,6 @@
 import type { BoxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import type { ReactNode } from 'react';
 import { memo, useMemo } from 'react';
 

@@ -1,10 +1,9 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Prisma, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createPage as createPageDb } from '@root/lib/pages/server/createPage';
+import { getPagePath } from '@root/lib/pages/utils';
 import { v4 } from 'uuid';
-
-import { createPage as createPageDb } from 'lib/pages/server/createPage';
-import { getPagePath } from 'lib/pages/utils';
 
 export function createPage(
   options: Partial<Page> &

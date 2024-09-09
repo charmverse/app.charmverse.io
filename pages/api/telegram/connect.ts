@@ -6,22 +6,12 @@ import nc from 'next-connect';
 
 import { onError, InvalidStateError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
+import type { TelegramAccount } from 'lib/telegram/interfaces';
 
 const handler = nc({
   onError,
   onNoMatch
 });
-
-export interface TelegramAccount {
-  auth_date: number;
-  first_name: string;
-  hash: string;
-  id: number;
-  last_name: string;
-  photo_url: string;
-  username: string;
-}
-
 async function connectTelegram(req: NextApiRequest, res: NextApiResponse<TelegramUser | { message: string }>) {
   const telegramAccount = req.body as TelegramAccount;
 

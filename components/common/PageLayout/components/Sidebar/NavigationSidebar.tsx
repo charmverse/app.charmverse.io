@@ -27,8 +27,8 @@ import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
-import type { NewPageInput } from 'lib/pages';
-import { addPageAndRedirect } from 'lib/pages';
+import type { NewPageInput } from 'lib/pages/addPage';
+import { addPageAndRedirect } from 'lib/pages/addPage';
 
 import TrashModal from '../TrashModal';
 

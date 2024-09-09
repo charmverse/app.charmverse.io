@@ -13,36 +13,11 @@ import { defaultProposalPropertyTypes } from 'lib/databases/proposalDbProperties
 
 import { CustomPropertiesList, CustomPropertiesReadonlyList } from './CustomPropertiesList';
 import { FormFieldPropertiesList } from './FormFieldPropertiesList';
+import type { SelectedProposalProperties } from './interfaces';
 import { ProjectProfilePropertiesList, ProjectProfilePropertiesReadonlyList } from './ProjectProfilePropertiesList';
 import { ProposalDefaultPropertiesList, ProposalDefaultPropertiesReadonlyList } from './ProposalDefaultPropertiesList';
 import { RubricEvaluationPropertiesList } from './RubricEvaluationPropertiesList';
 import { TemplatePropertiesReadonlyList } from './TemplatePropertiesReadonlyList';
-
-export type RubricEvaluationProperty =
-  | 'average'
-  | 'total'
-  | 'reviewers'
-  | 'criteriaTotal'
-  | 'reviewerScore'
-  | 'reviewerComment'
-  | 'criteriaAverage'
-  | 'reviewerAverage';
-
-export type SelectedProposalProperties = {
-  projectMember: string[];
-  project: string[];
-  customProperties: string[];
-  templateProperties: {
-    templateId: string;
-    rubricEvaluations: {
-      title: string;
-      properties: RubricEvaluationProperty[];
-      evaluationId: string;
-    }[];
-    formFields: string[];
-  }[];
-  defaults: string[];
-};
 
 type SelectedGroup =
   | {

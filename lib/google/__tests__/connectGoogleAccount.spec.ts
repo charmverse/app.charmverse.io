@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getUserProfile } from '@root/lib/users/getUser';
+import { getUserProfile } from '@root/lib/profile/getUser';
 import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 

@@ -13,7 +13,7 @@ import { getPropertiesWithValues } from '@root/lib/members/utils';
 import { hasNftAvatar } from '@root/lib/users/hasNftAvatar';
 import { replaceS3Domain } from '@root/lib/utils/url';
 
-import type { TelegramAccount } from 'pages/api/telegram/connect';
+import type { TelegramAccount } from 'lib/telegram/interfaces';
 
 import type { UserIdentities } from './getMemberUsername';
 import { getMemberUsername } from './getMemberUsername';

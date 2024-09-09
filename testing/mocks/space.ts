@@ -1,8 +1,7 @@
 import type { Space } from '@charmverse/core/prisma';
+import { STATIC_PAGES } from '@root/lib/features/constants';
+import { memberProfileNames } from '@root/lib/profile/memberProfiles';
 import { v4 as uuid } from 'uuid';
-
-import { STATIC_PAGES } from 'lib/features/constants';
-import { memberProfileNames } from 'lib/profile/memberProfiles';
 
 export const createMockSpace = (space?: Partial<Space>): Space => {
   const newUserId = uuid();

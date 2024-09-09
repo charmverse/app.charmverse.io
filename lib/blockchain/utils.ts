@@ -1,8 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { arbitrum, avalanche, base, bsc, mainnet, fantom, mantle, optimism, polygon, zora } from 'viem/chains';
 
-import type { NodeAttrs } from '../../components/common/CharmEditor/components/nft/nft.specs';
-
 import type { SupportedChainId } from './getNFTs';
 
 const openseaChainsByPath: Record<string, SupportedChainId | undefined> = {
@@ -21,27 +19,6 @@ const openseaPathsByChain = Object.entries(openseaChainsByPath).reduce<Record<st
   }
   return acc;
 }, {});
-
-// a function to extract user screen name and tweet id from a tweet url
-export function extractAttrsFromUrl(url: string): NodeAttrs | null {
-  if (!url) {
-    return null;
-  }
-
-  const match = url.match(/opensea\.io\/([^/]+\/)?assets\/([^/]+)\/([^/]+)\/([^/]+)/);
-  if (!match) {
-    return null;
-  }
-  const chainId = openseaChainsByPath[match[2]];
-  if (!chainId) {
-    return null;
-  }
-  return {
-    chain: chainId,
-    contract: match[3],
-    token: match[4]
-  };
-}
 
 export function getNFTUrl({
   chain,

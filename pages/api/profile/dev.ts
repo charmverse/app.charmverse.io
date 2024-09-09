@@ -1,13 +1,13 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { isTestEnv } from '@root/config/constants';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
+import { getUserProfile } from '@root/lib/profile/getUser';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createOrGetUserFromWallet } from 'lib/users/createUser';
-import { getUserProfile } from 'lib/users/getUser';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
