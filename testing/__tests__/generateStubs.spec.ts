@@ -1,6 +1,6 @@
 import { isAddress } from 'viem';
 
-import { randomETHWalletAddress } from 'testing/generateStubs';
+import { randomETHWalletAddress } from '../generateStubs';
 
 describe('randomETHWalletAddress', () => {
   it('should return a random lowercase ETH wallet address', () => {

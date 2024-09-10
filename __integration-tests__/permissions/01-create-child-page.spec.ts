@@ -2,7 +2,7 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { PagePermission, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';

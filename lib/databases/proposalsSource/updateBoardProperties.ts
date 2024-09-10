@@ -5,7 +5,7 @@ import type { FormFieldInput } from '@root/lib/forms/interfaces';
 import { InvalidStateError } from '@root/lib/middleware/errors';
 import { DEFAULT_BOARD_BLOCK_ID } from '@root/lib/proposals/blocks/constants';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 
 import { getBoardProperties } from './getBoardProperties';
 

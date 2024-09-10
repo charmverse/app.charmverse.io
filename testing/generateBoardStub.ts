@@ -1,12 +1,11 @@
 import type { Block, Page, PagePermission, PageType, Prisma } from '@charmverse/core/prisma';
+import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } from '@root/lib/databases/board';
+import type { BoardViewFields, IViewType } from '@root/lib/databases/boardView';
+import type { CardFields } from '@root/lib/databases/card';
+import { Constants } from '@root/lib/databases/constants';
+import type { RelatedPageData } from '@root/lib/templates/exportWorkspacePages';
+import { typedKeys } from '@root/lib/utils/objects';
 import { v4 } from 'uuid';
-
-import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
-import type { BoardViewFields, IViewType } from 'lib/databases/boardView';
-import type { CardFields } from 'lib/databases/card';
-import { Constants } from 'lib/databases/constants';
-import type { RelatedPageData } from 'lib/templates/exportWorkspacePages';
-import { typedKeys } from 'lib/utils/objects';
 
 import { pageContentStub } from './generatePageStub';
 

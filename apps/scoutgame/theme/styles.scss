@@ -1,0 +1,44 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  // DO NOT ADD overflow-x: hidden here. It will break the position sticky option in other components
+}
+body > * {
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+// override our MUI config for Farcaster modal
+.fc-authkit-qrcode-dialog {
+  color: #111;
+}
+.fc-authkit-signin-button {
+  // this div is used when user is logged in
+  > div {
+    width: 100%;
+    display: block !important;
+  }
+  button {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    margin: 0 auto;
+    border: 0 none;
+    // styles for logged-in version of button
+    color: white !important;
+  }
+}

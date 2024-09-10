@@ -1,25 +1,17 @@
-import { FarcasterCard } from '@connect-shared/components/common/FarcasterCard';
+import type { Scout } from '@charmverse/core/prisma';
 import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { Suspense } from 'react';
 
-export async function ProfileDetailsPage({ user }: { user: Pick<LoggedInUser, 'farcasterUser' | 'id'> }) {
-  const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
+import { FarcasterCard } from 'components/common/FarcasterCard';
 
+export async function ProfileDetailsPage({ user }: { user: Scout }) {
   return (
     <PageWrapper>
       <Box gap={2} display='flex' flexDirection='column'>
-        <FarcasterCard
-          fid={user.farcasterUser?.fid}
-          name={farcasterDetails?.displayName || farcasterDetails?.username}
-          username={farcasterDetails?.username}
-          avatar={farcasterDetails?.pfpUrl}
-          bio={farcasterDetails?.bio}
-        />
+        <FarcasterCard name={user.displayName} username={user.username} avatar={user.avatar} bio={user.bio} />
         <Typography variant='h6'>Projects</Typography>
         <Suspense fallback={<LoadingComponent />}></Suspense>
       </Box>

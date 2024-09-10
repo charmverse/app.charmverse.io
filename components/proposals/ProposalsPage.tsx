@@ -71,7 +71,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const [showSidebar, setShowSidebar] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const { router, updateURLQuery } = useCharmRouter();
-  const viewId = (router.query.viewId || 'all') as 'all' | 'my-work' | 'reviewers';
+  const viewId = (router.query.viewId || 'my-work') as 'all' | 'my-work' | 'reviewers';
   const onShowDescription = useCallback(() => {
     const oldBlocks = [activeBoard];
     const newBoard = createBoard({
@@ -249,12 +249,12 @@ export function ProposalsPage({ title }: { title: string }) {
               >
                 {[
                   {
-                    id: 'all',
-                    label: 'All'
-                  },
-                  {
                     id: 'my-work',
                     label: 'My Work'
+                  },
+                  {
+                    id: 'all',
+                    label: 'All'
                   },
                   ...(isAdmin
                     ? [

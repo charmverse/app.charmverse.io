@@ -4,7 +4,7 @@ import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
 
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
-import { getTwitterEmoji } from 'components/common/Emoji';
+import { getTwitterEmoji } from 'lib/utils/emoji';
 
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 

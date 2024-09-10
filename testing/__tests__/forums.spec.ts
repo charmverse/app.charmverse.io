@@ -1,10 +1,9 @@
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-
 import { generateForumPosts } from '../forums';
+import { generateUserAndSpace } from '../setupDatabase';
 
 describe('generateForumPosts', () => {
   it('should generate an arbitrary number of posts in a given space, each with their own createdAt date', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace();
 
     const posts = await generateForumPosts({
       spaceId: space.id,

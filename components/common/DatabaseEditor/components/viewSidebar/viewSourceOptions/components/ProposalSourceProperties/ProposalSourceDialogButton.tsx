@@ -13,7 +13,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board } from 'lib/databases/board';
 import { createSelectedPropertiesStateFromBoardProperties } from 'lib/databases/proposalsSource/createSelectedPropertiesFromBoardProperties';
 
-import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from './interfaces';
 import { ProposalSourcePropertiesDialog } from './ProposalSourcePropertiesDialog';
 
 export function ProposalSourceDialogButton({ board }: { board: Board }) {

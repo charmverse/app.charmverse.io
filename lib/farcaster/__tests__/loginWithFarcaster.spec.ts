@@ -22,7 +22,15 @@ const defaultBody = {
   nonce: '1235',
   url: 'https://example.com',
   signature: '0x1234',
-  message: 'message'
+  message: 'message',
+  signatureParams: {
+    siweUri: '1234',
+    domain: 'localhost:3000'
+  },
+  metadata: {
+    ip: '1234',
+    userAgent: '1234'
+  }
 } as LoginWithFarcasterParams;
 
 describe('loginWithFarcaster', () => {

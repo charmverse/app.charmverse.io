@@ -1,14 +1,10 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { useDarkTheme } from '@connect-shared/hooks/useDarkTheme';
-import { usePageView } from '@connect-shared/hooks/usePageView';
+import type { Scout } from '@charmverse/core/prisma';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
-import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
-import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
-import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -20,14 +16,9 @@ import { Avatar } from 'components/common/Avatar';
 
 import { InstallAppMenuItem } from './components/InstallAppMenuItem';
 
-export function Header({ user }: { user: LoggedInUser | null }) {
+export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | null }) {
   const path = usePathname();
   const router = useRouter();
-  useDarkTheme();
-  usePageView();
-  useDatadogLogger({ service: 'connect-browser', userId: user?.id });
-
-  const farcasterDetails = user?.farcasterUser?.account as Required<FarcasterBody> | undefined;
 
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -66,11 +57,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
           {user && (
             <Box display='flex' gap={1} alignItems='center'>
               <IconButton disabled={isExecutingLogout} onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar
-                  src={farcasterDetails?.pfpUrl || user?.avatar || undefined}
-                  size='medium'
-                  name={user?.username}
-                />
+                <Avatar src={user?.avatar || undefined} size='medium' name={user.username} />
               </IconButton>
               <Menu
                 sx={{ mt: 5 }}
@@ -93,7 +80,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
                 onClick={handleCloseUserMenu}
               >
                 <MenuItem>
-                  <Link href='/profile'>@{farcasterDetails?.username}</Link>
+                  <Link href='/profile'>{user.username}</Link>
                 </MenuItem>
                 <MenuItem onClick={() => logoutUser()}>Sign Out</MenuItem>
                 <InstallAppMenuItem>Install</InstallAppMenuItem>

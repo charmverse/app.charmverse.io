@@ -1,7 +1,7 @@
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Box, Divider, Grid, IconButton, Stack, Tooltip } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { useMemo } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';

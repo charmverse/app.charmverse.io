@@ -1,9 +1,8 @@
 import { rafCommandExec } from '@bangle.dev/utils';
 import type { PageType } from '@charmverse/core/prisma';
 import DatabaseIcon from '@mui/icons-material/TableChart';
-import { TextSelection } from 'prosemirror-state';
 
-import { addPage } from 'lib/pages';
+import { addPage } from 'lib/pages/addPage';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { replaceSuggestionMarkWith } from '../inlinePalette';

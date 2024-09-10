@@ -3,14 +3,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getENSName } from '@root/lib/blockchain/getENSName';
 import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
 import { logSignupViaWallet } from '@root/lib/metrics/postToDiscord';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { isProfilePathAvailable } from '@root/lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from '@root/lib/session/config';
 import { shortWalletAddress } from '@root/lib/utils/blockchain';
 import { uid } from '@root/lib/utils/strings';
-import type { LoggedInUser } from '@root/models';
 import { v4 } from 'uuid';
 
-import { getUserProfile } from './getUser';
+import { getUserProfile } from '../profile/getUser';
+
 import { postUserCreate } from './postUserCreate';
 import { prepopulateUserProfile } from './prepopulateUserProfile';
 

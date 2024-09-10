@@ -4,10 +4,10 @@ import { Preview } from '@react-email/preview';
 import { Section } from '@react-email/section';
 import React from 'react';
 
-import { lightGreyColor } from 'theme/colors';
-
 import Footer from './Footer';
 import Header from './Header';
+
+const lightGreyColor = '#edf2f4';
 
 interface Props {
   children: React.ReactNode;

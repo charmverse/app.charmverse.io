@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - '.ebextensions/waitlist/**'
       - '.ebstalk.apps.env/waitlist.env'
       - '.github/actions/**'
@@ -19,12 +19,11 @@ on:
       - 'connectors/**'
       - 'lib/**'
       - 'hooks/**'
-      - 'models/**'
   pull_request:
     types: [labeled, opened, synchronize]
     branches: ['**']
     paths:
-      - '.cdk'
+      - '.cdk/**'
       - '.ebextensions/waitlist/**'
       - '.ebstalk.apps.env/waitlist.env'
       - '.github/actions/**'
@@ -39,7 +38,6 @@ on:
       - 'connectors/**'
       - 'lib/**'
       - 'hooks/**'
-      - 'models/**'
   workflow_dispatch:
     inputs:
       core_pkg_version:
@@ -126,10 +124,17 @@ jobs:
         with:
           app_name: waitlist
 
-      - name: Validate waitlist app
-        run: |
-          npm run lint -w apps/waitlist
-          npm run typecheck -w apps/waitlist
+      - name: Typecheck Waitlist app
+        run: npm run typecheck -w apps/waitlist
+
+      - name: Run Waitlist Unit tests
+        run: npx dotenv -e .env.test.local -- npm run test -w apps/waitlist
+
+      - name: Run eslint on changed files
+        uses: tj-actions/eslint-changed-files@v25
+        with:
+          skip_annotations: 'true' # do not annotate code in the PR
+          file_extensions: '**/*.{ts,tsx}'
 
   test-waitlist-e2e:
     name: Test waitlist e2e

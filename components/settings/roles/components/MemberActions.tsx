@@ -38,7 +38,6 @@ export function MemberActions({
   const removedMember = removedMemberId ? getMemberById(removedMemberId) : null;
   const bannedMember = bannedMemberId ? getMemberById(bannedMemberId) : null;
   const closed = deletePopupState.close;
-  const hasMultipleAdmins = members.filter((m) => m.isAdmin).length > 1;
 
   deletePopupState.close = () => {
     setRemovedMemberId(null);
@@ -118,10 +117,10 @@ export function MemberActions({
       case 'makeMember':
         return !readOnly;
       case 'removeFromSpace': {
-        return !readOnly && hasMultipleAdmins;
+        return !readOnly;
       }
       case 'banFromSpace': {
-        return !readOnly && hasMultipleAdmins;
+        return !readOnly;
       }
       default:
         return false;

@@ -1,16 +1,37 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { roundNumberInRange } from '@root/lib/utils/numbers';
 
-import type { ConnectWaitlistTier, TierChange } from './calculateUserPosition';
-import { getTierChange, tierDistribution } from './calculateUserPosition';
+import type { ConnectWaitlistTier, TierChange, TierDistributionType } from './constants';
+import { tierDistribution, getTier } from './constants';
+import { notifyNewScore } from './notifyNewScore';
 
-type TierChangeResult = {
+export type TierChangeResult = {
   fid: number;
   newTier: ConnectWaitlistTier;
   tierChange: TierChange;
   percentile: number;
   score: number;
 };
+
+const tierOrder: ConnectWaitlistTier[] = ['legendary', 'mythic', 'epic', 'rare', 'common'];
+
+export function getTierChange({
+  previousPercentile,
+  currentPercentile
+}: {
+  previousPercentile: number;
+  currentPercentile: number;
+}): { previousTier: ConnectWaitlistTier; currentTier: ConnectWaitlistTier; tierChange: TierChange } {
+  const previousTier = getTier(previousPercentile);
+  const currentTier = getTier(currentPercentile);
+
+  return {
+    previousTier,
+    currentTier,
+    tierChange: previousTier === currentTier ? 'none' : previousPercentile < currentPercentile ? 'up' : 'down'
+  };
+}
 
 export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[]> {
   const totalUsers = await prisma.connectWaitlistSlot.count();
@@ -19,7 +40,8 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
 
   let offset = 0;
 
-  for (const tierInfo of tierDistribution) {
+  for (const tier of tierOrder) {
+    const tierInfo = tierDistribution.find((t) => t.tier === tier) as TierDistributionType;
     const take = tierInfo.tier === 'common' ? undefined : Math.ceil(tierInfo.totalPercentSize * onePercentSize);
 
     const users = await prisma.connectWaitlistSlot.findMany({
@@ -80,3 +102,17 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
 
   return tierChangeResults;
 }
+
+export function handleTierChanges(tierChangeResults: TierChangeResult[]) {
+  return tierChangeResults.map((tierChangeResult) =>
+    notifyNewScore({
+      fid: tierChangeResult.fid,
+      tier: tierChangeResult.newTier,
+      tierChange: tierChangeResult.tierChange
+    }).catch((error) => {
+      log.error(`Failed to notify tier change for fid:${tierChangeResult.fid}`, { error, fid: tierChangeResult.fid });
+    })
+  );
+}
+
+// refreshPercentilesForEveryone().then(console.log);

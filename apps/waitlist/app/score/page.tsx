@@ -1,29 +1,24 @@
-import { Typography } from '@mui/material';
-import { redirect } from 'next/navigation';
-
-import { getTier } from 'lib/scoring/calculateUserPosition';
+import { ScorePage } from 'components/score/ScorePage';
 import { getWaitlistSlotWithClicks } from 'lib/scoring/getWaitlistSlotWithClicks';
 import { getSession } from 'lib/session/getSession';
 
-export default async function ScorePage() {
-  const session = await getSession();
-  const waitlistSlot = await getWaitlistSlotWithClicks({ fid: parseInt(session.farcasterUser?.fid as string) }).catch(
-    () => null
-  );
+// Dynamic data
+export const dynamic = 'force-dynamic';
 
-  if (!waitlistSlot) {
-    redirect('/join');
+export default async function Score() {
+  const session = await getSession();
+
+  // Redirect is handled in the middleware
+  if (!session.farcasterUser) {
+    return null;
   }
 
-  return (
-    <div>
-      <Typography variant='h3'>Score Page</Typography>
+  const waitlistSlot = await getWaitlistSlotWithClicks({ fid: parseInt(session.farcasterUser.fid) }).catch(() => null);
 
-      <Typography variant='body1'>Tier: {getTier(waitlistSlot?.percentile as number)}</Typography>
+  // Redirect is handled in the middleware
+  if (!waitlistSlot) {
+    return null;
+  }
 
-      <Typography variant='body1'>Percentile: {waitlistSlot?.percentile}</Typography>
-
-      <Typography variant='body1'>Clicks: {waitlistSlot?.clicks}</Typography>
-    </div>
-  );
+  return <ScorePage waitlistSlot={waitlistSlot} fid={session.farcasterUser.fid} />;
 }

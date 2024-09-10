@@ -8,20 +8,7 @@ import { useRouter } from 'next/router';
 
 import { evaluationIcons } from 'components/settings/proposals/constants';
 
-const StyledTableRow = styled(TableRow)`
-  cursor: pointer;
-  transition: ${({ theme }) =>
-    theme.transitions.create('background-color', {
-      duration: theme.transitions.duration.shortest
-    })};
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.action.hover};
-    transition: ${({ theme }) =>
-      theme.transitions.create('background-color', {
-        duration: theme.transitions.duration.shortest
-      })};
-  }
-`;
+import { StyledTable, OpenButton, StyledTableRow } from './ProposalsTable';
 
 export function ActionableProposalsTable({ proposals }: { proposals: UserProposal[] }) {
   const router = useRouter();
@@ -32,9 +19,9 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
         Ready for review
       </Typography>
       {proposals.length ? (
-        <Table>
+        <StyledTable>
           <TableHead>
-            <TableRow sx={{ '&:first-of-type th': { borderTop: '1px solid lightgray' } }}>
+            <TableRow>
               <TableCell>
                 <Typography variant='body2' fontWeight='bold'>
                   Title
@@ -55,8 +42,8 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                   Current step
                 </Typography>
               </TableCell>
-              <TableCell align='center'>
-                <Typography variant='body2' fontWeight='bold'>
+              <TableCell align='right'>
+                <Typography variant='body2' fontWeight='bold' sx={{ pr: 4 }}>
                   Action
                 </Typography>
               </TableCell>
@@ -103,6 +90,7 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                 >
                   <TableCell width={400}>
                     <Typography>{proposal.title || 'Untitled'}</Typography>
+                    <OpenButton />
                   </TableCell>
                   <TableCell align='center' width={200}>
                     <Typography color={isOverdue ? 'error' : 'initial'}>{dueDateText}</Typography>
@@ -118,10 +106,11 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                       </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell align='center' width={250}>
+                  <TableCell align='right' width={250}>
                     <Button
                       color='primary'
                       size='small'
+                      sx={{ mr: 2, width: 75 }}
                       onClick={(e) => {
                         e.stopPropagation();
                         router.push(`/${router.query.domain}/${proposal.path}`);
@@ -134,7 +123,7 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
               );
             })}
           </TableBody>
-        </Table>
+        </StyledTable>
       ) : (
         <Card variant='outlined'>
           <Box p={3} textAlign='center'>

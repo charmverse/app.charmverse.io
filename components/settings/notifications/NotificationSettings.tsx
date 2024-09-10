@@ -1,6 +1,7 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Divider, Stack } from '@mui/material';
+import { charmBlue as blueColor } from '@root/config/colors';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -12,7 +13,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
-import { blueColor } from 'theme/colors';
 
 import { SpaceEmailBrandingSettings } from './components/SpaceEmailBrandingSettings';
 import { SpaceNotificationSettings, getDefaultNotificationValues } from './components/SpaceNotificationSettings';

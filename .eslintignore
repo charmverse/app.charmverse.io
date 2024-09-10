@@ -2,4 +2,4 @@ scripts/
 dist/
 .next/
 
-background/ceramicServer/generated/
+apps/ceramic/src/generated/

@@ -1,6 +1,6 @@
 import { AuthKitProvider } from '@farcaster/auth-kit';
 import { Typography } from '@mui/material';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 
 import { FarcasterLoginModal } from 'components/login/components/FarcasterModal';
 import { useWarpcastLogin } from 'components/login/hooks/useWarpcastLogin';

@@ -1,9 +1,10 @@
 import { darken, lighten } from '@mui/material/styles';
+import { charmBlue } from '@root/config/colors';
 
 export const blackColor = '#111';
 export const yellowColor = '#EAD637';
 
-export const blueColor = '#009Fb7';
+export const blueColor = charmBlue;
 export const darkBlueColor = darken(blueColor, 0.1);
 export const whiteColor = '#fff';
 export const lightGreyColor = '#edf2f4';
