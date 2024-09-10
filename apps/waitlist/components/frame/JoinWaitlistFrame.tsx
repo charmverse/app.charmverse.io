@@ -1,7 +1,7 @@
 import { baseUrl } from '@root/config/constants';
 import { getFrameHtml } from 'frames.js';
 
-import { joinWaitlist } from 'lib/frame/actionButtons';
+import { joinWaitlist, scoutGameFrameTitle } from 'lib/frame/actionButtons';
 
 export type JoinWaitlistHomeProps = {
   referrerFid: string;
@@ -9,6 +9,7 @@ export type JoinWaitlistHomeProps = {
 
 export function JoinWaitlistFrame({ referrerFid }: JoinWaitlistHomeProps) {
   return getFrameHtml({
+    title: scoutGameFrameTitle,
     image: `${baseUrl}/images/waitlist/waitlist-intro.gif`,
     ogImage: `${baseUrl}/images/waitlist/waitlist-intro.gif`,
     version: 'vNext',
