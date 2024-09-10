@@ -9,7 +9,7 @@ const reviewerData = getCsvData<ProposalRow>('../optimism-data/sampled_badgehold
 // production
 const spaceId = 'f3ddde2e-17e9-42b1-803d-0c72880e4669';
 
-import { getProjectsFromFile, OPProjectData } from './retroData';
+import { getProjectsFromFile, OPProjectData } from './data';
 
 type ProposalRow = {
   'Project ID': string;

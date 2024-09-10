@@ -3,7 +3,7 @@ import { stringify } from 'csv-stringify/sync';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { sortBy } from 'lodash';
 import { writeFileSync } from 'fs';
-import { spaceId, templateId, getProjectsFromFile } from './retroData';
+import { spaceId, templateId, getProjectsFromFile } from './retroPGF/v4/data';
 import { uniq } from 'lodash';
 type SummaryRow = {};
 
