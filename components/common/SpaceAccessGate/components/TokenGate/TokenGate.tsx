@@ -23,9 +23,5 @@ export function TokenGate({ displayAccordion, ...props }: Props) {
     );
   }
 
-  return (
-    <Stack mt={2}>
-      <TokenGateContent {...props} />
-    </Stack>
-  );
+  return <TokenGateContent {...props} />;
 }
