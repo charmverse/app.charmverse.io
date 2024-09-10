@@ -29,13 +29,14 @@ export const groups: Record<ExtensionGroup, Schema> = {
   ]),
   tokengate_message: buildSchema([
     doc.spec(),
+    // paragraph should be high up so it is the default node
+    paragraph.spec,
     bold.spec(),
     bulletList.spec,
     hardBreak.spec,
     italic.spec(),
     link.spec(),
     listItem.spec,
-    paragraph.spec,
     text.spec,
     tabIndent.spec
   ])
