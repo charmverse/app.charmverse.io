@@ -4,7 +4,7 @@ import { log } from '@charmverse/core/log';
 import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Stack, Button, Divider, FormLabel, MenuItem, Select, Typography, ListItemIcon } from '@mui/material';
+import { Box, Stack, Button, Divider, MenuItem, Select, Typography, ListItemIcon } from '@mui/material';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useMemo, useState } from 'react';
@@ -12,7 +12,6 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { postCreateCastMessage } from 'lib/postCreateCastMessage';
 import { getCastMessage } from 'lib/productUpdates/castMessage';
-import type { NewProductUpdateResponse } from 'lib/productUpdates/createProductUpdate';
 import { createProductUpdateAction } from 'lib/productUpdates/createProductUpdateAction';
 import { schema, type FormValues } from 'lib/productUpdates/schema';
 import { DIVIDER } from 'lib/productUpdates/schema';
@@ -195,7 +194,7 @@ export function NewProductUpdateForm({
                 placeholder='1. Updated documentation ...'
                 helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'
                 error={!!fieldState.error}
-                sx={{ minHeight: '16em' }}
+                rows={7}
                 {...field}
               />
             )}

@@ -57,7 +57,7 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
                 <Typography lineHeight='30px' variant='body1' fontWeight='600'>
                   Token Gated Link
                 </Typography>
-                <TokenGateMessageButton spaceId={space?.id} />
+                <TokenGateMessageButton />
               </TableCell>
               {!isMobile && <TableCell width={150} />}
               <TableCell sx={{ width: 90 + padding }} align='center'>

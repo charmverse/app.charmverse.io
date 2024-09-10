@@ -7,44 +7,54 @@ import {
   ProseMirror
 } from '@nytimes/react-prosemirror';
 import { EditorState } from 'prosemirror-state';
-import type { ElementType } from 'react';
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
+import type { ElementType, CSSProperties, useEffect } from 'react';
 
+import indentStyles from '../../extensions/listItem/czi-indent.module.scss';
+import listStyles from '../../extensions/listItem/czi-list.module.scss';
+import varsStyles from '../../extensions/listItem/czi-vars.module.scss';
 import { plugins } from '../../plugins';
 import { schema } from '../../schema';
+import editorStyles from '../editor.module.scss';
+import pmStyles from '../prosemirror.module.scss';
 
 import { OutlinedTextField } from './OutlinedTextField';
 
-import '../prosemirror.css';
-import '../editor.scss';
-import '../../extensions/listItem/czi-vars.scss';
-import '../../extensions/listItem/czi-indent.scss';
-import '../../extensions/listItem/czi-list.scss';
+const moduleClassName = [
+  editorStyles.ProseMirror,
+  pmStyles.ProseMirror,
+  listStyles.ProseMirror,
+  indentStyles.ProseMirror,
+  varsStyles.ProseMirror
+].join(' ');
 
 export type EditorProps = {
   placeholder?: string;
   defaultValue?: object | null; // json value
   onChange?: (value: { json: object; text: string }) => void;
   component?: ElementType;
-  sx?: SxProps;
+  rows?: number;
+  style?: CSSProperties;
   error?: boolean; // to style the component
 };
-
-const defaultState = EditorState.create({
-  schema,
-  plugins: plugins(schema)
-});
 
 export function Editor({
   component: Component = OutlinedTextField,
   error,
   onChange,
   placeholder,
-  sx,
+  rows,
+  style,
   defaultValue
 }: EditorProps) {
   // const { nodeViews, renderNodeViews } = useNodeViews(reactNodeViews);
-  const [state, setEditorState] = useState(defaultState);
+  const [state, setEditorState] = useState(() =>
+    EditorState.create({
+      schema,
+      doc: defaultValue ? schema.nodeFromJSON(defaultValue) : undefined,
+      plugins: plugins(schema)
+    })
+  );
   const [mount, setMount] = useState<HTMLElement | null>(null);
 
   return (
@@ -72,7 +82,7 @@ export function Editor({
       }}
     >
       {/** This div is where the contenteditable div is created by Prosemirror */}
-      <Component className='ProseMirror' ref={setMount} sx={sx} error={error} />
+      <Component className={`ProseMirror ${moduleClassName}`} ref={setMount} rows={rows} style={style} error={error} />
       {/* {renderNodeViews()} */}
     </ProseMirror>
   );

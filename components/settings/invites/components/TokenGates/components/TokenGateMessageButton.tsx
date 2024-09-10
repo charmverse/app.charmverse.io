@@ -1,21 +1,21 @@
 import { Edit as EditIcon } from '@mui/icons-material';
 import { Box } from '@mui/material';
-import { usePopupState, bindPopper, bindTrigger } from 'material-ui-popup-state/hooks';
+import { Editor } from '@packages/charmeditor/ui';
+import { usePopupState, bindPopover, bindTrigger } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
-import { InlineCharmEditor } from 'components/common/CharmEditor';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-export function TokenGateMessageButton({ message, spaceId }: { message?: any | null; spaceId?: string }) {
-  const popupState = usePopupState({ variant: 'popover', popupId: 'evaluation-step-settings-modal' });
-  const [value, setValue] = useState(message);
-  const { trigger } = useUpdateSpace(spaceId);
+export function TokenGateMessageButton() {
+  const { space, refreshCurrentSpace } = useCurrentSpace();
+  const { trigger, isMutating } = useUpdateSpace(space?.id);
   const { showError } = useSnackbar();
-  const { refreshCurrentSpace } = useCurrentSpace();
+  const [value, setValue] = useState(space?.tokenGateMessage);
+  const popupState = usePopupState({ variant: 'popover', popupId: 'evaluation-step-settings-modal' });
 
   async function saveMessage() {
     try {
@@ -37,13 +37,14 @@ export function TokenGateMessageButton({ message, spaceId }: { message?: any | n
       >
         Include a message
       </Button>
-      <Modal {...bindPopper(popupState)} size='500px' title='Include a message'>
+      <Modal {...bindPopover(popupState)} size='500px' title='Include a message on the Token Gate'>
         <Box mb={2}>
-          <InlineCharmEditor
-            content={value}
-            placeholderText='Include a message on the Token Gate...'
-            onContentChange={({ doc }) => {
-              setValue(doc);
+          <Editor
+            defaultValue={value as object}
+            placeholder='Include a message on the Token Gate...'
+            rows={3}
+            onChange={({ json }) => {
+              setValue(json);
             }}
           />
         </Box>
@@ -51,7 +52,9 @@ export function TokenGateMessageButton({ message, spaceId }: { message?: any | n
           <Button color='secondary' variant='outlined' onClick={popupState.close}>
             Cancel
           </Button>
-          <Button onClick={saveMessage}>Save</Button>
+          <Button onClick={saveMessage} isLoading={isMutating}>
+            Save
+          </Button>
         </Box>
       </Modal>
     </>
