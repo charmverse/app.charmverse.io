@@ -30,8 +30,8 @@ export function TokenGateMessageButton({ message }: { message?: any | null }) {
           <InlineCharmEditor
             content={value}
             placeholderText='Include a message on the Token Gate...'
-            onContentChange={(v) => {
-              setValue(v);
+            onContentChange={({ doc }) => {
+              setValue(doc);
             }}
           />
         </Box>
