@@ -103,6 +103,7 @@ export function Editor({
         {/** This div is where the contenteditable div is created by Prosemirror */}
         <Component
           className={`ProseMirror ${moduleClassName}`}
+          translate={readOnly ? 'yes' : 'no'}
           ref={setMount}
           rows={rows}
           style={style}
