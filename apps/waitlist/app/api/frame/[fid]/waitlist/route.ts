@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
   const interactorUsername = validatedMessage.action.interactor.username;
 
-  const referrerFid = new URL(req.url).pathname.split('/').pop();
+  const referrerFid = new URL(req.url).pathname.split('/')[3];
 
   const joinWaitlistResult = await joinWaitlist({
     fid: interactorFid,
