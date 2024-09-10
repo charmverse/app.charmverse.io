@@ -1,5 +1,5 @@
 import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
-import { Box, Card, CardActionArea, CardContent, Stack, Typography } from '@mui/material';
+import { CardActionArea, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 
 import type { AvatarSize } from './Avatar';
