@@ -3,7 +3,6 @@
 .ProseMirror {
   position: relative;
 
-
   word-wrap: break-word;
   white-space: pre-wrap;
   white-space: break-spaces;
@@ -23,24 +22,24 @@
     position: relative;
   }
 
-  &.ProseMirror-hideselection *::selection { background: transparent; }
-  &.ProseMirror-hideselection *::-moz-selection { background: transparent; }
-  &.ProseMirror-hideselection { caret-color: transparent; }
+  :global(&.ProseMirror-hideselection) *::selection { background: transparent; }
+  :global(&.ProseMirror-hideselection) *::-moz-selection { background: transparent; }
+  :global(&.ProseMirror-hideselection) { caret-color: transparent; }
 
   /* See https://github.com/ProseMirror/prosemirror/issues/1421#issuecomment-1759320191 */
   [draggable][contenteditable=false] { user-select: text }
 
-  .ProseMirror-selectednode {
+  :global(.ProseMirror-selectednode) {
     outline: 2px solid #8cf;
   }
 
   /* Make sure li selections wrap around markers */
 
-  li.ProseMirror-selectednode {
+  :global(li.ProseMirror-selectednode) {
     outline: none;
   }
 
-  li.ProseMirror-selectednode:after {
+  :global(li.ProseMirror-selectednode):after {
     content: "";
     position: absolute;
     left: -32px;
@@ -51,10 +50,21 @@
 
   /* Protect against generic img rules */
 
-  img.ProseMirror-separator {
+  :global(img.ProseMirror-separator) {
     display: inline !important;
     border: none !important;
     margin: 0 !important;
+  }
+
+  /** Extensions **/
+
+  :global(.charm-link) {
+    color: #4299e1;
+    text-decoration: underline;
+    &:hover {
+      color: #24659b;
+      text-decoration: underline;
+    }
   }
 
 }

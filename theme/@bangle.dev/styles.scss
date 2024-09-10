@@ -37,66 +37,13 @@
   outline: none;
 }
 
-// @bangle.dev/core/style.css
 /**
- * Prosemirror
- * copied from https://github.com/ProseMirror/prosemirror-view/blob/master/style/prosemirror.css
- */
-.ProseMirror {
-  position: relative;
-}
-
-.ProseMirror {
-  word-wrap: break-word;
-  white-space: pre-wrap;
-  white-space: break-spaces;
-  -webkit-font-variant-ligatures: none;
-  font-variant-ligatures: none;
-  font-feature-settings: 'liga' 0;
-  /* the above doesn't seem to work in Edge */
-}
-
-.ProseMirror-hideselection *::selection,
-.ProseMirror-hideselection *::-moz-selection,
-.ProseMirror-hideselection .ProseMirror-selectednode {
-  background-color: transparent !important;
-}
-
-.ProseMirror-hideselection {
-  caret-color: transparent !important;
-}
-
-/* Protect against generic img rules */
-img.ProseMirror-separator {
-  display: inline !important;
-  border: none !important;
-  margin: 0 !important;
-}
-
-/** Prosemirror-END */
-
-/**
- * Bangle
+ * Bangle.div
  */
 .bangle-nv-content {
   /** So that the element takes full width, else the browser does not
     show selection cursor.*/
   width: 100%;
-}
-
-.bangle-editor p,
-.bangle-editor h1,
-.bangle-editor h2,
-.bangle-editor h3,
-.bangle-editor h4,
-.bangle-editor h5,
-.bangle-editor h6,
-.bangle-editor blockquote,
-.bangle-editor pre,
-.bangle-editor figure,
-.bangle-editor dl,
-.bangle-editor dd {
-  margin: 0;
 }
 
 /** Bangle-end*/
@@ -267,10 +214,6 @@ img.ProseMirror-separator {
   margin-bottom: 0.5rem;
 }
 
-.bangle-editor > p {
-  padding-top: 3px;
-  padding-bottom: 3px;
-}
 
 .bangle-editor p > code {
   font-family: Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
@@ -575,28 +518,6 @@ img.ProseMirror-separator {
 /** End columns **/
 
 /** Tab **/
-.charm-tab {
-  tab-size: var(--tab-width);  // should equal list item padding
-
-  &[data-indent='1'] {
-    tab-size: calc(2 * var(--tab-width));
-  }
-  &[data-indent='2'] {
-    tab-size: calc(3 * var(--tab-width));
-  }
-  &[data-indent='3'] {
-    tab-size: calc(4 * var(--tab-width));
-  }
-  &[data-indent='4'] {
-    tab-size: calc(5 * var(--tab-width));
-  }
-  &[data-indent='5'] {
-    tab-size: calc(6 * var(--tab-width));
-  }
-  &[data-indent='6'] {
-    tab-size: calc(7 * var(--tab-width));
-  }
-}
 
 /** hide tab when a user suggested to delete a list item - it should not exist yet **/
 li .insertion > .charm-tab {
