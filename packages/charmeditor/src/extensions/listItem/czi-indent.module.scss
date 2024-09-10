@@ -1,0 +1,59 @@
+/* Indent */
+
+// include div in selector so that it overrides the margin set in czi-list.scss with :not() selectors
+.ProseMirror {
+  --list-item-indent: 24px;
+
+  /* list item indents */
+
+  ol[data-indent='1'],
+  ul[data-indent='1'] {
+    margin-left: var(--list-item-indent);
+  }
+
+  ol[data-indent='2'],
+  ul[data-indent='2'] {
+    margin-left: calc(2 * var(--list-item-indent));
+  }
+
+  ol[data-indent='3'],
+  ul[data-indent='3'] {
+    margin-left: calc(3 * var(--list-item-indent));
+  }
+
+  ol[data-indent='4'],
+  ul[data-indent='4'] {
+    margin-left: calc(4 * var(--list-item-indent));
+  }
+
+  ol[data-indent='5'],
+  ul[data-indent='5'] {
+    margin-left: calc(5 * var(--list-item-indent));
+  }
+
+  ol[data-indent='6'],
+  ul[data-indent='6'] {
+    margin-left: calc(6 * var(--list-item-indent));
+  }
+
+  ol[data-indent='7'],
+  ul[data-indent='7'] {
+    margin-left: calc(7 * var(--list-item-indent));
+  }
+
+  ol[data-indent='8'],
+  ul[data-indent='8'] {
+    margin-left: calc(8 * var(--list-item-indent));
+  }
+
+  ol[data-indent='9'],
+  ul[data-indent='9'] {
+    margin-left: calc(9 * var(--list-item-indent));
+  }
+
+  ol[data-indent='10'],
+  ul[data-indent='10'] {
+    margin-left: calc(10 * var(--list-item-indent));
+  }
+
+}

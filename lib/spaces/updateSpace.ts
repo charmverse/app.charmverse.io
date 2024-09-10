@@ -34,6 +34,7 @@ export type UpdateableSpaceFields = Partial<
     | 'kycOption'
     | 'emailBrandArtwork'
     | 'emailBrandColor'
+    | 'tokenGateMessage'
   >
 >;
 
@@ -135,6 +136,7 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       credentialsWallet: updates.credentialsWallet?.toLowerCase(),
       kycOption: updates.kycOption,
       emailBrandArtwork: updates.emailBrandArtwork,
+      tokenGateMessage: updates.tokenGateMessage as any,
       emailBrandColor: updates.emailBrandColor
         ? updates.emailBrandColor.includes('#')
           ? updates.emailBrandColor

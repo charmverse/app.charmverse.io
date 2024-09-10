@@ -4,17 +4,17 @@ import { Editor } from '@packages/charmeditor/ui';
 import { forwardRef } from 'react';
 
 type Props = {
-  // rows: number;
+  rows?: number;
   helperText?: string;
 } & EditorProps;
 
 export const CharmTextField = forwardRef<HTMLDivElement | null, Props>(function CharmTextField(
-  { error, helperText, sx, ...props },
+  { error, helperText, style, ...props },
   ref
 ) {
   return (
     <Stack ref={ref}>
-      <Editor {...props} sx={sx} error={error} />
+      <Editor {...props} style={style} error={error} />
       {helperText && <FormHelperText error={error}>{helperText}</FormHelperText>}
     </Stack>
   );

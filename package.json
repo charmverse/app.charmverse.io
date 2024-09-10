@@ -48,7 +48,7 @@
     "server:staging": "NODE_OPTIONS=\"--max_old_space_size=8192\" npx react-env --path .env.staging.local -- next dev",
     "server:test": "npx react-env --path .env.test.local -- next dev",
     "server:test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx react-env --path .env.test.local -- npx next start",
-    "start": "concurrently --names \"next,sockets\" -c \"green,yellow\" \"REACT_APP_WEBSOCKETS_HOST=http://127.0.0.1:3336 npm run server:dev\" \"npm run sockets:dev\"",
+    "start": "concurrently --names \"next,sockets\" -c \"green,yellow\" \"REACT_APP_WEBSOCKETS_HOST=http://127.0.0.1:3336 npm run server:dev\" \"npm run sockets\"",
     "start:debug": "cross-env NODE_OPTIONS='--inspect' next",
     "start:ssl": "(npx local-ssl-proxy --source 3000 --target 8080) & next dev --port 8080",
     "start:ssl:prod": "(npx local-ssl-proxy --source 3000 --target 8080) & next start --port 8080",

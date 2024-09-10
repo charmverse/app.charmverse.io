@@ -26,7 +26,7 @@ export function GateOption({ children, isVerified, isVerifying }: Props) {
     <Card
       variant='outlined'
       color={isVerified === true ? 'success' : 'default'}
-      sx={{ mb: 2, ...isVerifiedBorderProps }}
+      sx={{ ...isVerifiedBorderProps, borderRadius: 3 }}
     >
       <CardContent>
         <Grid container spacing={2}>

@@ -280,6 +280,11 @@ function DocumentPageComponent({
           flexDirection='column'
           flexGrow={1}
           overflow='auto'
+          sx={{
+            '.ProseMirror': {
+              padding: '5px 0'
+            }
+          }}
           onDrop={handleImageFileDrop({
             pageId: page.id,
             readOnly,

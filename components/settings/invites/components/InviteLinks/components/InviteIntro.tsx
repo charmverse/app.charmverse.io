@@ -27,7 +27,7 @@ function InviteIntro() {
       <StyledList>
         <StyledListItemText>Private Invite Links: Anyone with this link can join your space.</StyledListItemText>
         <StyledListItemText>
-          Token Gates: Control access to your space automatically with tokens/NFTs.
+          Token Gated Link: Control access to your space automatically with tokens/NFTs.
         </StyledListItemText>
       </StyledList>
     </>
