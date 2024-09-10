@@ -136,6 +136,7 @@ export function SpaceAccessGate({
             extensionGroup='tokengate_message'
             readOnly
             component={Box}
+            style={{ width: '100%', textAlign: 'center' }}
             defaultValue={space.tokenGateMessage as PageContent}
           />
         )}
