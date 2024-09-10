@@ -1,6 +1,6 @@
 
-/* paragraph spacing */
 .ProseMirror {
+  /* paragraph spacing */
   > p {
     padding-bottom: 3px;
     padding-top: 3px;
@@ -11,7 +11,7 @@
     padding-top: 3px;
   }
   /** Tab indent **/
-  .charm-tab {
+  :global(.charm-tab) {
     tab-size: var(--tab-width);  // should equal list item padding
 
     &[data-indent='1'] {
@@ -35,7 +35,7 @@
   }
 
   /** hide tab when a user suggested to delete a list item - it should not exist yet **/
-  li .insertion > .charm-tab {
+  li :global(.insertion > .charm-tab) {
     display: none;
   }
 }
