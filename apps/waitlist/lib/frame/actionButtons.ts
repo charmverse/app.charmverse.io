@@ -4,6 +4,8 @@ import { sealData } from 'iron-session';
 
 import type { SessionData } from 'lib/session/config';
 
+export const scoutGameFrameTitle = 'Scout Game Waitlist';
+
 export type FarcasterUserToEncode = {
   fid: string | number;
   username: string;

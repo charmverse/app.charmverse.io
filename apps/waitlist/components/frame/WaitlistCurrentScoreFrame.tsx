@@ -2,7 +2,7 @@ import { baseUrl } from '@root/config/constants';
 import { getFrameHtml } from 'frames.js';
 
 import type { FarcasterUserToEncode } from 'lib/frame/actionButtons';
-import { waitlistGetDetails, waitlistShareMyFrame } from 'lib/frame/actionButtons';
+import { scoutGameFrameTitle, waitlistGetDetails, waitlistShareMyFrame } from 'lib/frame/actionButtons';
 
 type Props = {
   percentile: string | number;
@@ -12,6 +12,7 @@ export async function WaitlistCurrentScoreFrame({ percentile, fid, username }: P
   const imgSrc = `${baseUrl}/api/frame/assets/current-position?percentile=${percentile}`;
 
   return getFrameHtml({
+    title: scoutGameFrameTitle,
     image: imgSrc,
     ogImage: imgSrc,
     version: 'vNext',

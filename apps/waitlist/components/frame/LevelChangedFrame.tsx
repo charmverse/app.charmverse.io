@@ -1,7 +1,7 @@
 import { baseUrl } from '@root/config/constants';
 import { getFrameHtml } from 'frames.js';
 
-import { joinWaitlist } from 'lib/frame/actionButtons';
+import { scoutGameFrameTitle } from 'lib/frame/actionButtons';
 import type { TierChange } from 'lib/scoring/constants';
 import { getTier } from 'lib/scoring/constants';
 
@@ -23,6 +23,7 @@ export function LevelChangedFrame({ fid, percentile, tierChange }: LevelChangedF
   const imgSrc = `${baseUrl}/images/waitlist/${tierChange}-${tier}.gif`;
 
   return getFrameHtml({
+    title: scoutGameFrameTitle,
     image: imgSrc,
     ogImage: imgSrc,
     imageAspectRatio: '1:1',
