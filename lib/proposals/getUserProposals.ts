@@ -67,6 +67,9 @@ export async function getUserProposals({
 
   const proposals = await prisma.proposal.findMany({
     where: {
+      archived: {
+        not: true
+      },
       OR: [
         {
           createdBy: userId
