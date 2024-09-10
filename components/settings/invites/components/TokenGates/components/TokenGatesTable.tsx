@@ -54,7 +54,7 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
                 sx={{ display: 'flex', gap: 3, p: 2, paddingRight: isMobile ? 0 : 2 }}
                 colSpan={isMobile ? 2 : 0}
               >
-                <Typography lineHeight='30px' variant='body1' fontWeight='600'>
+                <Typography noWrap lineHeight='30px' variant='body1' fontWeight='600'>
                   Token Gated Link
                 </Typography>
                 <TokenGateMessageButton />
