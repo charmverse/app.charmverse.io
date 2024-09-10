@@ -9,59 +9,21 @@ const deployProps: cdk.StackProps = {
   env: { account: '310849459438', region: 'us-east-1' }
 };
 
-import { charmverseCert, scoutgameCert, sunnyCert } from '../config';
+import { apps } from '../config';
 
 const app = new cdk.App();
 
 // Command example: cdk deploy --context name=stg-scoutgame
 const stackNameParam: string = app.node.getContext('name');
+const env = stackNameParam.split('-')[0];
+const appName = stackNameParam.split('-')[1];
 
-// Sunny awawrds production
-if (stackNameParam === 'prd-sunnyawards') {
-  new ProductionStack(app, stackNameParam, deployProps, {
-    sslCert: sunnyCert
-  });
-}
-// Scout Game production
-else if (
-  stackNameParam === 'prd-scoutgame' ||
-  stackNameParam === 'prd-waitlist' ||
-  stackNameParam === 'prd-comingsoon'
-) {
-  new ProductionStack(app, stackNameParam, deployProps, {
-    sslCert: scoutgameCert
-  });
-} else if (stackNameParam === 'prd-ceramic') {
-  new ProductionStack(app, stackNameParam, deployProps, {
-    healthCheck: {
-      path: '/graphql',
-      port: 5001
-    }
-  });
-} else if (stackNameParam === 'prd-cron') {
-  new ProductionStack(app, stackNameParam, deployProps, { environmentType: 'SingleInstance' });
-} else if (stackNameParam === 'prd-websockets') {
-  new ProductionStack(app, stackNameParam, deployProps, {
-    sslCert: charmverseCert,
-    environmentType: 'SingleInstance'
-  });
-}
-// Connect webapp and api production
-else if (stackNameParam.startsWith('prd')) {
-  new ProductionStack(app, stackNameParam, deployProps, {
-    sslCert: charmverseCert
-  });
-} else if (stackNameParam.startsWith('stg-websockets')) {
-  new StagingStack(app, stackNameParam, deployProps, {
-    healthCheck: { path: '/api/health', port: 3002 },
-    environmentType: 'SingleInstance'
-  });
-} else if (stackNameParam.startsWith('stg-ceramic')) {
-  new StagingStack(app, stackNameParam, deployProps, { healthCheck: { path: '/graphql', port: 5001 } });
-} else if (stackNameParam.startsWith('stg-cron')) {
-  new StagingStack(app, stackNameParam, deployProps, { environmentType: 'SingleInstance' });
-} else if (stackNameParam.startsWith('stg-')) {
-  new StagingStack(app, stackNameParam, deployProps);
+const stackOptions = apps[appName]?.[env];
+
+if (env === 'prd') {
+  new ProductionStack(app, stackNameParam, deployProps, stackOptions);
+} else if (env === 'stg') {
+  new StagingStack(app, stackNameParam, deployProps, stackOptions);
 } else {
-  throw new Error('Invalid stack name parameter: ' + stackNameParam);
+  throw new Error('Invalid stack env: ' + stackNameParam);
 }
