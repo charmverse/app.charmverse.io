@@ -10,7 +10,7 @@ export const OutlinedTextField = styled('div', {
   font-size: 1rem;
   letter-spacing: 0.00938em;
   line-height: 1.4375em;
-  padding: 8.5px 14px !important; // important used to override padding from webapp
+  padding: 8.5px 14px;
   border-radius: var(--charm-shape-borderRadius);
   background: var(--charm-palette-inputBackground-main);
   color: var(--charm-palette-text-primary);
