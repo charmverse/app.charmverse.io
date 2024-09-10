@@ -62,7 +62,7 @@ export default function JoinWorkspace() {
   return (
     <TokenGateContainer>
       <Card sx={{ p: 4, mb: 3 }} variant='outlined'>
-        <DialogTitle sx={{ textAlign: 'center' }}>Join a space</DialogTitle>
+        <DialogTitle sx={{ pt: 0, textAlign: 'center' }}>Join a space</DialogTitle>
         <Divider sx={{ mb: 2 }} />
         {domain && isSpaceLoading && <LoadingComponent height='80px' isLoading={true} />}
         {domain && !isSpaceLoading && spaceError && <Alert severity='error'>No space found</Alert>}

@@ -190,6 +190,7 @@ export function NewProductUpdateForm({
             name='content'
             render={({ field, fieldState }) => (
               <CharmTextField
+                extensionGroup='product_updates'
                 key={editorKey}
                 placeholder='1. Updated documentation ...'
                 helperText='Provide a list of your product updates on each line. Empty lines will be ignored.'

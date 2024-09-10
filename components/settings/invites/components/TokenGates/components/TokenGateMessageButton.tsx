@@ -40,6 +40,7 @@ export function TokenGateMessageButton() {
       <Modal {...bindPopover(popupState)} size='500px' title='Include a message on the Token Gate'>
         <Box mb={2}>
           <Editor
+            extensionGroup='tokengate_message'
             defaultValue={value as object}
             placeholder='Include a message on the Token Gate...'
             rows={3}
@@ -52,7 +53,7 @@ export function TokenGateMessageButton() {
           <Button color='secondary' variant='outlined' onClick={popupState.close}>
             Cancel
           </Button>
-          <Button onClick={saveMessage} isLoading={isMutating}>
+          <Button onClick={saveMessage} loading={isMutating}>
             Save
           </Button>
         </Box>

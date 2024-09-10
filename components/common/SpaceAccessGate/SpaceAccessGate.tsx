@@ -1,10 +1,10 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { Alert, Box, Divider, Typography } from '@mui/material';
+import { Editor } from '@packages/charmeditor/ui';
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-import { InlineCharmEditor } from 'components/common/CharmEditor';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { LoginButton } from 'components/login/components/LoginButton';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
@@ -131,7 +131,14 @@ export function SpaceAccessGate({
         <Typography variant='h5' gutterBottom>
           {space.name}
         </Typography>
-        {space.tokenGateMessage && <InlineCharmEditor readOnly content={space.tokenGateMessage as PageContent} />}
+        {space.tokenGateMessage && (
+          <Editor
+            extensionGroup='tokengate_message'
+            readOnly
+            component={Box}
+            defaultValue={space.tokenGateMessage as PageContent}
+          />
+        )}
       </Box>
       <Divider />
       {walletGateEnabled && (
