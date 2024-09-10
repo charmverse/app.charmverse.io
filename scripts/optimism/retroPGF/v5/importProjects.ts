@@ -73,7 +73,7 @@ function _getFormAnswers({ category, project, impactStatementAnswer }: RetroAppl
       a.impactStatement.question.includes(key.replace('Impact Statement: ', ''))
     )?.answer;
     answers.push({
-      fieldId: fieldIds[key],
+      fieldId: fieldIds[key] as any,
       value: _charmValue(value)
     });
   });

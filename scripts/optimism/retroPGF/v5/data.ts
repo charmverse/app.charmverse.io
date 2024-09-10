@@ -77,7 +77,7 @@ export const fieldIds = {
   'Funding Received': 'b67d9a01-7e3b-4cb3-90b1-02ea684a7f43',
   'Attestation ID': '5ba1196b-3adf-4653-9e98-1bd566880b91',
   'Additional Links': '2c2a4640-0c6c-419a-bd2c-23130c389cde'
-};
+} as const;
 
 export function getCsvData<T>(path: string): T[] {
   return parse(readFileSync(path).toString(), { columns: true }) as T[];
