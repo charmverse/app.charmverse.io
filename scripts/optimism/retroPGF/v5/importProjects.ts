@@ -4,8 +4,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-import { createDraftProposal } from '../../lib/proposals/createDraftProposal';
-import { publishProposal } from '../../lib/proposals/publishProposal';
+import { createDraftProposal } from '../../../../lib/proposals/createDraftProposal';
+import { publishProposal } from '../../../../lib/proposals/publishProposal';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 
 import { appendFileSync } from 'fs';
@@ -16,23 +16,25 @@ import {
   spaceId,
   templateId,
   fieldIds,
-  OPProjectData,
+  RetroApplication,
   getProjectsFromFile,
   farcasterUsersFile,
-  savedFarcasterProfiles
-} from './retroData';
+  savedFarcasterProfiles,
+  applicationsFile
+} from './data';
 
 // 50 requests/minute for Public tier - https://www.ankr.com/docs/rpc-service/service-plans/#rate-limits
 const rateLimiter = RateLimit(1);
 
-function _getFormAnswers(project: OPProjectData): FieldAnswerInput[] {
-  const ventureFunding = project.funding.find((f) => f.type === 'venture');
-  const optimismFunding = project.funding.find(
-    (f) => f.type === 'foundation-grant' || f.type === 'token-house-mission' || f.type === 'foundation-mission'
-  );
-  const revenueFunding = project.funding.find((f) => f.type !== 'venture');
-  const otherGrantFunding = project.funding.find(
-    (f) => f !== ventureFunding && f !== optimismFunding && f !== revenueFunding && f !== revenueFunding
+function _getFormAnswers({ category, project, impactStatementAnswer }: RetroApplication): FieldAnswerInput[] {
+  const funding = project.funding.map(
+    (funding) =>
+      `${funding.amount || 'N/A'} - ${
+        funding.details?.trim() ||
+        (funding.fundingRound && `Funding Round ${funding.fundingRound}`) ||
+        funding.grantUrl ||
+        funding.type
+      }`
   );
   const answers = [
     {
@@ -41,56 +43,67 @@ function _getFormAnswers(project: OPProjectData): FieldAnswerInput[] {
     },
     {
       fieldId: fieldIds.Description,
-      value: {
-        content: jsonDoc(_.p(project.description)),
-        contentText: project.description || ''
-      }
+      value: _charmValue(project.description)
     },
     {
-      fieldId: fieldIds['External Link'],
-      value: project.website[0]
+      fieldId: fieldIds['Category'],
+      value: category.name
     },
     {
-      fieldId: fieldIds.Twitter,
-      value: project.twitter
+      fieldId: fieldIds['Project Website Field'],
+      value: project.website[0] || ''
     },
-    {
-      fieldId: fieldIds.Farcaster,
-      value: project.farcaster[0]
-    },
-    {
-      fieldId: fieldIds.Mirror,
-      value: project.mirror
-    },
-    {
-      fieldId: fieldIds.website,
-      value: project.website[0]
-    },
-    {
-      fieldId: fieldIds['Github Repo'],
-      value: {
-        content: project.repos.length ? jsonDoc(...project.repos.map(({ url }) => _.p(url))) : null,
-        contentText: project.repos.map(({ url }) => url).join('\n')
-      }
-    },
-    {
-      fieldId: fieldIds['Contracts Address'],
-      value: {
-        content: project.contracts.length
-          ? jsonDoc(
-              ...project.contracts.map(({ chainId, contractAddress }) => _.p(contractAddress + ' (' + chainId + ')'))
-            )
-          : null,
-        contentText: project.contracts
-          .map(({ chainId, contractAddress }) => contractAddress + ' (' + chainId + ')')
-          .join('\n')
-      }
-    }
-  ].filter((a) => !!a.value) as FieldAnswerInput[];
+    { fieldId: fieldIds['Project Pricing Model'], value: project.pricingModel },
+    { fieldId: fieldIds['Project Pricing Model Details'], value: _charmValue(project.pricingModelDetails) },
+    { fieldId: fieldIds['Attestation ID'], value: project.id },
+    { fieldId: fieldIds['Additional Links'], value: _charmLinks(project.links) },
+    { fieldId: fieldIds['Funding Received'], value: _charmValues(funding) }
+  ];
+
+  (
+    [
+      'Impact Statement: How has the infrastructure you built enabled the testing, deployment, and operation of OP chains?',
+      'Impact Statement: Who has used your tooling and how has it benefited them?',
+      'Impact Statement: How does your project support, or is a dependency of, the OP Stack?',
+      'Impact Statement: How has your project advanced the development of the OP Stack?',
+      'Impact Statement: Who has benefited the most from your work on the OP Stack and how?'
+    ] as const
+  ).forEach((key) => {
+    const value = impactStatementAnswer.find((a) =>
+      a.impactStatement.question.includes(key.replace('Impact Statement: ', ''))
+    )?.answer;
+    answers.push({
+      fieldId: fieldIds[key],
+      value: _charmValue(value)
+    });
+  });
 
   return answers;
 }
-async function populateProject(project: OPProjectData) {
+
+function _charmValue(value?: string | null) {
+  return {
+    content: jsonDoc(_.p(value || '')),
+    contentText: value || ''
+  };
+}
+
+function _charmValues(values: string[]) {
+  return {
+    content: jsonDoc(...values.map((str) => _.p(str))),
+    contentText: values.join('\n')
+  };
+}
+
+function _charmLinks(links: { url: string; name: string }[]) {
+  return {
+    content: jsonDoc(...links.map(({ url, name }) => _.p(_.link({ href: url }, name || url)))),
+    contentText: links.map((w) => w.url).join('\n')
+  };
+}
+
+async function populateProject(application: RetroApplication) {
+  const project = application.project;
   const farcasterIds = project.team.map((member) => member.user.farcasterId).filter(Boolean);
   if (farcasterIds.length !== project.team.length) {
     throw new Error('Invalid team members: ' + project.id);
@@ -109,20 +122,24 @@ async function populateProject(project: OPProjectData) {
     console.log('requesting profile', farcasterId);
     await rateLimiter();
     const farcasterProfile = await getFarcasterProfile({ fid: farcasterId });
-    console.log('retrieved profile', farcasterId);
-    appendFileSync(farcasterUsersFile, JSON.stringify(farcasterProfile) + ',\n');
-    if (!farcasterProfile) {
-      throw new Error(`Farcaster profile not found for ${farcasterId}: ` + project.id);
+    if (farcasterProfile) {
+      appendFileSync(farcasterUsersFile, JSON.stringify(farcasterProfile) + ',\n');
+      farcasterUsers.set(farcasterId, farcasterProfile);
+    } else {
+      // throw new Error(`Farcaster profile not found for ${farcasterId}: ` + project.id);
+      console.error(`Farcaster profile not found for ${farcasterId}: ` + project.id);
     }
-    farcasterUsers.set(farcasterId, farcasterProfile);
   }
-  const formAnswers = _getFormAnswers(project);
+  if (farcasterUsers.size === 0) {
+    throw new Error('Not enough [valid] team members for project: ' + project.id);
+  }
+  const formAnswers = _getFormAnswers(application);
   return { ...project, formAnswers, farcasterUsers };
 }
 
 async function importOpProjects() {
   // Note: file path is relative to CWD
-  const _projects = await getProjectsFromFile('./applicants.json');
+  const _projects = await getProjectsFromFile(applicationsFile);
   const projects = _projects;
 
   console.log('Validating', projects.length, 'projects...');
@@ -137,7 +154,8 @@ async function importOpProjects() {
     for (const farcasterId of farcasterIds) {
       const farcasterProfile = project.farcasterUsers.get(farcasterId);
       if (!farcasterProfile) {
-        throw new Error(`Farcaster profile not found for ${farcasterId}`);
+        console.error(`Farcaster profile not found for ${farcasterId}`);
+        continue;
       }
       const connectedAddresses = farcasterProfile?.connectedAddresses;
       let charmverseUserWithAddress: User | null = null;
@@ -179,7 +197,7 @@ async function importOpProjects() {
         });
       }
 
-      if (charmverseUserWithAddress) {
+      if (charmverseUserWithAddress && authorIds.indexOf(charmverseUserWithAddress.id) === -1) {
         authorIds.push(charmverseUserWithAddress.id);
       }
     }
@@ -204,7 +222,6 @@ async function importOpProjects() {
     });
 
     const { proposal, page } = await createDraftProposal({
-      contentType: 'free_form',
       createdBy: authorIds[0],
       spaceId,
       pageType: 'proposal',
@@ -212,7 +229,6 @@ async function importOpProjects() {
       templateId,
       authors: authorIds
     });
-    console.log('Created proposal', page.id, page.title);
 
     await upsertProposalFormAnswers({
       proposalId: proposal.id,
@@ -223,8 +239,9 @@ async function importOpProjects() {
       proposalId: proposal.id,
       userId: authorIds[0]
     });
+    console.log('Created proposal', page.id, page.title);
   }
   console.log('Done!');
 }
 
-// importOpProjects().catch((e) => console.error('Error crashed script', e));
+importOpProjects().catch((e) => console.error('Error crashed script', e));

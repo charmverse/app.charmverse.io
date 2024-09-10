@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { _, jsonDoc } from 'lib/prosemirror/builders';
-import { fieldIds, spaceId, getProjectsFromFile, OPProjectData, getCsvData } from './retroData';
+import { fieldIds, spaceId, getProjectsFromFile, OPProjectData, getCsvData } from './retroPGF/v4/data';
 
 const repoData = getCsvData<{ ProjectID: string; Repo: string }>('../optimism-data/repo_updates.csv');
 

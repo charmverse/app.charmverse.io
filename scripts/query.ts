@@ -4,7 +4,7 @@ import { prettyPrint } from 'lib/utils/strings';
 
 import { redisClient } from '@root/adapters/redis/redisClient';
 async function query() {
-  await redisClient?.connect();
+  console.log(await prisma.page.deleteMany({ where: { type: 'proposal' } }));
 }
 
 query();

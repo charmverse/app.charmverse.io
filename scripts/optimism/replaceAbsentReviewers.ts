@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { uniq } from 'lodash';
-import { fieldIds, spaceId, getProjectsFromFile, OPProjectData, getCsvData } from './retroData';
+import { fieldIds, spaceId, getProjectsFromFile, OPProjectData, getCsvData } from './retroPGF/v4/data';
 import path from 'path';
 
 const repoData = getCsvData<{ Project: string; Remove: string; Replace: string; Stage: string }>(

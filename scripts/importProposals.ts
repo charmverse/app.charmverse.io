@@ -358,10 +358,10 @@ async function importTemplate() {
 }
 
 // run against production
-//downloadTemplate().catch((e) => console.error(e));
+downloadTemplate().catch((e) => console.error(e));
 
 // run this on Dev
-// importTemplate().catch((e) => console.error(e));
+importTemplate().catch((e) => console.error(e));
 
 // final step!
-importCSVToSpace().catch((e) => console.error(e));
+// importCSVToSpace().catch((e) => console.error(e));

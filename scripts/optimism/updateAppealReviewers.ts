@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import fs from 'fs';
 import path from 'path';
 import { isTruthy } from 'lib/utils/types';
-import { getCsvData } from './retroData';
+import { getCsvData } from './retroPGF/v4/data';
 
 // Put the appeal-reviewers.json file in the same level as this file
 // const proposalConfigs: {
