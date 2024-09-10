@@ -1,39 +1,21 @@
 import { ProseMirror, react } from '@nytimes/react-prosemirror';
-import type { Schema } from 'prosemirror-model';
-import type { Plugin } from 'prosemirror-state';
 import { EditorState } from 'prosemirror-state';
 import { useState } from 'react';
 import type { ElementType, CSSProperties } from 'react';
 
-import type { RawPlugins } from '../../buildPlugins';
-import indentStyles from '../../extensions/listItem/czi-indent.module.scss';
-import listStyles from '../../extensions/listItem/czi-list.module.scss';
-import varsStyles from '../../extensions/listItem/czi-vars.module.scss';
-// import { plugins } from '../../plugins';
-// import { schema } from '../../schema';
 import { groups as pluginGroups } from '../../plugins';
 import type { ExtensionGroup } from '../../schema';
 import { groups as schemaGroups } from '../../schema';
-import editorStyles from '../editor.module.scss';
-import pmStyles from '../prosemirror.module.scss';
+import { className } from '../styles';
 
 import { OutlinedTextField } from './OutlinedTextField';
 import { Readonly } from './Readonly';
 
-const moduleClassName = [
-  editorStyles.ProseMirror,
-  pmStyles.ProseMirror,
-  listStyles.ProseMirror,
-  indentStyles.ProseMirror,
-  varsStyles.ProseMirror
-].join(' ');
-
 export type EditorProps = {
   extensionGroup: ExtensionGroup;
   component?: ElementType;
-  // plugins: (schema: Schema) => Plugin[];
-  // schema: Schema;
   placeholder?: string;
+  autoFocus?: boolean;
   defaultValue?: object | null; // json value
   onChange?: (value: { json: object; text: string }) => void;
   readOnly?: boolean;
@@ -47,11 +29,10 @@ export function Editor({
   extensionGroup,
   error,
   onChange,
+  autoFocus,
   placeholder,
   readOnly,
   rows,
-  // plugins = () => [],
-  // schema,
   style,
   defaultValue
 }: EditorProps) {
@@ -102,7 +83,8 @@ export function Editor({
       <Readonly readOnly={readOnly}>
         {/** This div is where the contenteditable div is created by Prosemirror */}
         <Component
-          className={`ProseMirror ${moduleClassName}`}
+          autoFocus={autoFocus}
+          className={`ProseMirror ${className}`}
           translate={readOnly ? 'yes' : 'no'}
           ref={setMount}
           rows={rows}
