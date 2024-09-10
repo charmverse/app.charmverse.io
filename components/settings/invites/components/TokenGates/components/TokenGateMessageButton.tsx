@@ -3,16 +3,28 @@ import { Box } from '@mui/material';
 import { usePopupState, bindPopper, bindTrigger } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
+import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import { InlineCharmEditor } from 'components/common/CharmEditor';
 import Modal from 'components/common/Modal';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 
-export function TokenGateMessageButton({ message }: { message?: any | null }) {
+export function TokenGateMessageButton({ message, spaceId }: { message?: any | null; spaceId?: string }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'evaluation-step-settings-modal' });
   const [value, setValue] = useState(message);
+  const { trigger } = useUpdateSpace(spaceId);
+  const { showError } = useSnackbar();
+  const { refreshCurrentSpace } = useCurrentSpace();
 
-  function saveMessage() {
-    popupState.close();
+  async function saveMessage() {
+    try {
+      await trigger({ tokenGateMessage: value });
+      popupState.close();
+      refreshCurrentSpace();
+    } catch (error) {
+      showError(error);
+    }
   }
   return (
     <>
