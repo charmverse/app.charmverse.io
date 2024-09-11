@@ -42,7 +42,12 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
         select: {
           reviews: true,
           appealReviews: true,
-          rubricAnswers: true
+          rubricAnswers: true,
+          vote: {
+            select: {
+              userVotes: true
+            }
+          }
         }
       }
     }
@@ -53,7 +58,7 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
   }
 
   const proposalHasReceivedReviews = proposal.evaluations.some(
-    (ev) => ev.reviews.length || ev.appealReviews.length || ev.rubricAnswers.length
+    (ev) => ev.reviews.length || ev.appealReviews.length || ev.rubricAnswers.length || ev.vote?.userVotes.length
   );
 
   if (proposalHasReceivedReviews) {
@@ -88,13 +93,28 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
 
   // Sync evaluations from template
   const updatedEvaluations: Prisma.ProposalEvaluationCreateInput[] = sourceProposalTemplate.evaluations.map(
-    (evaluation) => {
+    (templateEvaluation) => {
+      const {
+        decidedBy,
+        proposalId: evaluationProposalId,
+        voteId,
+        appealedBy,
+        ...cleanTemplateEvaluation
+      } = templateEvaluation;
+
       const newEvaluation: Prisma.ProposalEvaluationCreateInput = {
-        ...evaluation,
+        ...cleanTemplateEvaluation,
         id: uuid(),
-        voteSettings: evaluation.voteSettings as any,
-        actionLabels: evaluation.actionLabels as any,
-        notificationLabels: evaluation.notificationLabels as any,
+        decider: decidedBy
+          ? {
+              connect: {
+                id: decidedBy
+              }
+            }
+          : undefined,
+        voteSettings: cleanTemplateEvaluation.voteSettings as any,
+        actionLabels: cleanTemplateEvaluation.actionLabels as any,
+        notificationLabels: cleanTemplateEvaluation.notificationLabels as any,
         proposal: {
           connect: {
             id: proposalId
@@ -102,8 +122,9 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
         },
         rubricCriteria: {
           createMany: {
-            data: evaluation.rubricCriteria.map((criteria) => ({
+            data: cleanTemplateEvaluation.rubricCriteria.map((criteria) => ({
               ...criteria,
+              id: uuid(),
               proposalId,
               evaluationId: undefined
             })) as Prisma.ProposalRubricCriteriaCreateManyEvaluationInput[]
@@ -111,7 +132,7 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
         },
         reviewers: {
           createMany: {
-            data: evaluation.reviewers.map(
+            data: cleanTemplateEvaluation.reviewers.map(
               (r) =>
                 ({
                   systemRole: r.systemRole,
@@ -124,7 +145,7 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
         },
         appealReviewers: {
           createMany: {
-            data: evaluation.appealReviewers.map(
+            data: cleanTemplateEvaluation.appealReviewers.map(
               (r) =>
                 ({
                   userId: r.userId,
@@ -136,7 +157,7 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
         },
         evaluationApprovers: {
           createMany: {
-            data: evaluation.evaluationApprovers.map(
+            data: cleanTemplateEvaluation.evaluationApprovers.map(
               (r) =>
                 ({
                   userId: r.userId,
@@ -152,25 +173,30 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
     }
   );
 
-  await prisma.$transaction(async (tx) => {
-    await tx.proposalEvaluation.deleteMany({
-      where: {
-        proposalId
-      }
-    });
-
-    for (const evaluation of updatedEvaluations) {
-      await tx.proposalEvaluation.create({
-        data: evaluation
+  await prisma.$transaction(
+    async (tx) => {
+      await tx.proposalEvaluation.deleteMany({
+        where: {
+          proposalId
+        }
       });
-    }
 
-    // If the proposal template is not entirely in sync with the workflow, this will fail
-    await syncProposalPermissionsWithWorkflowPermissions({
-      proposalId,
-      tx
-    });
-  });
+      for (const evaluation of updatedEvaluations) {
+        await tx.proposalEvaluation.create({
+          data: evaluation
+        });
+      }
+
+      // If the proposal template is not entirely in sync with the workflow, this will fail
+      await syncProposalPermissionsWithWorkflowPermissions({
+        proposalId,
+        tx
+      });
+    },
+    {
+      timeout: 120000
+    }
+  );
 
   return prisma.proposal.findUniqueOrThrow({
     where: {
