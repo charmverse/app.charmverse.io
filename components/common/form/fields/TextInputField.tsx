@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { Box, Link, TextField } from '@mui/material';
+import LinkIcon from '@mui/icons-material/Link';
+import { Box, IconButton, Link, TextField } from '@mui/material';
 import type { TextFieldProps, InputProps, InputBaseComponentProps } from '@mui/material';
 import { forwardRef, useMemo } from 'react';
 
@@ -47,20 +48,21 @@ export const CustomTextField = forwardRef<HTMLDivElement, TextFieldProps & { err
           // eslint-disable-next-line react/no-unstable-nested-components
           inputComponent: (_props: InputBaseComponentProps) => <LinkifiedValue value={props.value as string} />
         };
+      } else if (typeof props.value === 'string' && props.value.startsWith('http')) {
+        // for admins, add an icon to open the link in a new tab even if the field is not disabled
+        return {
+          endAdornment: (
+            <IconButton color='secondary' href={props.value as string} target='_blank' size='small' sx={{ p: 0 }}>
+              <LinkIcon />
+            </IconButton>
+          )
+        };
       }
       return undefined;
     }, [props.disabled, props.value]);
 
     return (
-      <TextField
-        // InputProps={{ inputComponent: Box }}
-        ref={ref}
-        fullWidth
-        placeholder={props.placeholder}
-        InputProps={InputProps}
-        error={error}
-        {...props}
-      />
+      <TextField ref={ref} fullWidth placeholder={props.placeholder} InputProps={InputProps} error={error} {...props} />
     );
   }
 );
