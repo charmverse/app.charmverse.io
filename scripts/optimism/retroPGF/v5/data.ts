@@ -30,6 +30,9 @@ export type RetroApplication = {
     pricingModel: string;
     pricingModelDetails: string;
 
+    // note: url may be empty string, so filter those out
+    repos: { url: string }[];
+
     team: {
       role: 'admin' | 'member';
       userId?: string;
@@ -76,7 +79,8 @@ export const fieldIds = {
   'Project Pricing Model': '9c89cff5-37ba-4366-9ed8-78bb3f295917',
   'Funding Received': 'b67d9a01-7e3b-4cb3-90b1-02ea684a7f43',
   'Attestation ID': '5ba1196b-3adf-4653-9e98-1bd566880b91',
-  'Additional Links': '2c2a4640-0c6c-419a-bd2c-23130c389cde'
+  'Additional Links': '2c2a4640-0c6c-419a-bd2c-23130c389cde',
+  'Github Repos': '93eed6d0-7c30-46b6-a345-c230f7b5f76e'
 } as const;
 
 export function getCsvData<T>(path: string): T[] {
