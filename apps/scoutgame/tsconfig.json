@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "../../dist/apps/scoutgame",
-    "rootDir": "../../",
+    "rootDir": ".",
     "lib": ["dom", "dom.iterable", "esnext", "webworker"],
     "allowJs": true,
     "skipLibCheck": true,

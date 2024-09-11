@@ -1,6 +1,7 @@
 import { getSession } from '@connect-shared/lib/session/getSession';
+import { getGithubOAuthCallbackUrl } from '@packages/github/oauth';
 import { authSecret } from '@root/config/constants';
-import { getGithubOAuthCallbackUrl } from '@root/lib/github/oauth';
+import { GITHUB_CLIENT_ID } from '@root/lib/github/constants';
 import { sealData } from 'iron-session';
 
 export async function GET() {
@@ -18,6 +19,7 @@ export async function GET() {
   );
 
   const redirectUrl = getGithubOAuthCallbackUrl({
+    clientId: GITHUB_CLIENT_ID,
     redirect: `${process.env.DOMAIN}/api/connect-github/callback`,
     state: sealedUserId
   });
