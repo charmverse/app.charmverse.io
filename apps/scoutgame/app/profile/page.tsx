@@ -1,4 +1,3 @@
-import { getSession } from '@connect-shared/lib/session/getSession';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 

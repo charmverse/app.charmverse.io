@@ -1,5 +1,4 @@
-import { Card, Link, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Card, Link, Typography, Stack } from '@mui/material';
 import type { IframelyResponse } from '@root/lib/iframely/getIframely';
 
 import { createCastParagraphChunks } from 'lib/feed/createCastParagraphChunks';

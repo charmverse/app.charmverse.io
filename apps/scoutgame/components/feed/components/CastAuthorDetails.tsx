@@ -1,5 +1,4 @@
-import { Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Typography, Stack } from '@mui/material';
 import { relativeTime } from '@root/lib/utils/dates';
 
 import { Avatar } from 'components/common/Avatar';

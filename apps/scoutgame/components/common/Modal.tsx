@@ -1,7 +1,6 @@
 import type { ModalProps } from '@mui/material/Modal';
 import MuiModal from '@mui/material/Modal';
 import Paper from '@mui/material/Paper';
-import type { Mode } from '@mui/system/cssVars/useCurrentColorScheme';
 import type { ReactNode } from 'react';
 
 const sx = {
@@ -20,7 +19,7 @@ export function BasicModal({
   children,
   theme = 'light',
   ...props
-}: Omit<ModalProps, 'children'> & { theme?: Mode; children: ReactNode }) {
+}: Omit<ModalProps, 'children'> & { theme?: 'light' | 'dark' | 'system'; children: ReactNode }) {
   return (
     <MuiModal data-mui-color-scheme={theme} {...props}>
       <Paper sx={sx}>{children}</Paper>

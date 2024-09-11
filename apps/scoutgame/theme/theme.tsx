@@ -1,6 +1,6 @@
 'use client';
 
-import { experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
+import { createTheme, responsiveFontSizes } from '@mui/material';
 import { Inter } from 'next/font/google';
 
 import {
@@ -13,27 +13,28 @@ import {
   primaryTextColorDarkMode,
   purpleDisabled,
   secondaryText,
-  secondaryLightText
+  secondaryLightText,
+  blackText
 } from './colors';
 
-export const interFont = Inter({
+const interFont = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap'
 });
 
-const extendedTheme = extendTheme({
-  cssVarPrefix: 'waitlist',
+const themeOptions: Parameters<typeof createTheme>[0] = {
   typography: {
     fontFamily: interFont.style.fontFamily,
     button: {
       fontWeight: 600,
-      fontSize: '1.2rem'
+      fontSize: '1rem'
     }
   },
+  defaultColorScheme: 'dark',
   colorSchemes: {
-    dark: {
-      // palette for dark mode
+    light: {
+      // light mode is the same as dark mode
       palette: {
         background: {
           default: backgroundColorDarkMode,
@@ -54,6 +55,38 @@ const extendedTheme = extendTheme({
         },
         inputBackground: {
           main: inputBackgroundDarkMode
+        },
+        black: {
+          main: blackText
+        }
+      }
+    },
+    dark: {
+      // palette for dark mode
+      palette: {
+        background: {
+          default: backgroundColorDarkMode,
+          paper: backgroundLightColorDarkMode
+        },
+        text: {
+          primary: primaryTextColorDarkMode,
+          secondary: secondaryText,
+          disabled: disabledTextColorDarkMode
+          // black: blackText
+        },
+        primary: {
+          main: brandColor,
+          dark: purpleDisabled
+        },
+        secondary: {
+          main: secondaryText,
+          light: secondaryLightText
+        },
+        inputBackground: {
+          main: inputBackgroundDarkMode
+        },
+        black: {
+          main: blackText
         }
       }
     }
@@ -67,7 +100,7 @@ const extendedTheme = extendTheme({
     MuiFormLabel: {
       styleOverrides: {
         root: ({ theme }) => ({
-          color: theme.vars.palette.text.primary,
+          color: theme.palette.text.primary,
           marginBottom: 5
         })
       }
@@ -131,6 +164,25 @@ const extendedTheme = extendTheme({
         variant: 'contained',
         disableElevation: true
       },
+      variants: [
+        {
+          props: { variant: 'gradient' },
+          style: ({ theme }) => ({
+            background: 'linear-gradient(90deg, #69DDFF 0%,#A06CD5 100%)',
+            borderRadius: '20px',
+            paddingTop: 2,
+            paddingBottom: 2,
+            paddingRight: 1,
+            paddingLeft: 1,
+            fontSize: '0.9rem',
+            fontWeight: '500',
+            color: theme.palette.black.main
+            // '&:hover': {
+            //   backgroundColor: 'darkpurple'
+            // }
+          })
+        }
+      ],
       styleOverrides: {
         root: {
           borderRadius: 10,
@@ -165,7 +217,7 @@ const extendedTheme = extendTheme({
       },
       styleOverrides: {
         root: ({ theme }) => ({
-          // boxShadow: theme.shadows[2]
+          boxShadow: theme.shadows[2]
         })
       }
     },
@@ -211,18 +263,18 @@ const extendedTheme = extendTheme({
         size: 'small'
       },
       styleOverrides: {
-        root: () => ({
+        root: ({ theme }) => ({
           backgroundColor: inputBackgroundDarkMode,
-          '[data-mui-color-scheme="dark"] &': {
+          ...theme.applyStyles('dark', {
             '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
               borderColor: inputBorderDarkMode
             }
-          }
+          })
         }),
-        notchedOutline: () => ({
-          '[data-mui-color-scheme="dark"] &': {
+        notchedOutline: ({ theme }) => ({
+          ...theme.applyStyles('dark', {
             borderColor: inputBorderDarkMode
-          }
+          })
         })
       }
     },
@@ -249,9 +301,9 @@ const extendedTheme = extendTheme({
     MuiLink: {
       styleOverrides: {
         root: ({ theme }) => ({
-          color: theme.vars.palette.primary.main,
+          color: theme.palette.primary.main,
           '&:hover': {
-            color: theme.vars.palette.primary.dark
+            color: theme.palette.primary.dark
           },
           fontFamily: interFont.style.fontFamily
         })
@@ -261,6 +313,8 @@ const extendedTheme = extendTheme({
       }
     }
   }
-});
+};
 
-export default responsiveFontSizes(extendedTheme) as typeof extendedTheme;
+const createdTheme = createTheme(themeOptions);
+
+export default responsiveFontSizes(createdTheme) as typeof createdTheme;

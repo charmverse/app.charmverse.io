@@ -14,13 +14,19 @@ export async function middleware(request: NextRequest) {
   const isNewProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'new';
   const isProjectPath = projectPathChunks[0] === 'p' && !isEditProjectPath && !isNewProjectPath;
 
+  if (path === '/') {
+    return NextResponse.redirect(new URL('/home', request.url));
+  }
+
   if (
     !user &&
     path !== '/' &&
     !isProjectPath &&
     !path.startsWith('/u/') &&
     !path.startsWith('/grants') &&
-    !path.startsWith('/feed')
+    !path.startsWith('/feed') &&
+    !path.startsWith('/login') &&
+    !path.startsWith('/home')
   ) {
     return NextResponse.redirect(new URL('/', request.url));
   }
