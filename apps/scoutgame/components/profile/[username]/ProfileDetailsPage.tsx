@@ -11,7 +11,7 @@ export async function ProfileDetailsPage({ user }: { user: Scout }) {
   return (
     <PageWrapper>
       <Box gap={2} display='flex' flexDirection='column'>
-        <FarcasterCard name={user.displayName} username={user.username} avatar={user.avatar} bio={user.bio} />
+        <FarcasterCard name={user.displayName} username={user.username} avatar={user.avatar} />
         <Typography variant='h6'>Projects</Typography>
         <Suspense fallback={<LoadingComponent />}></Suspense>
       </Box>

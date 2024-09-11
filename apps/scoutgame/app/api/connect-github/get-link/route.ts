@@ -1,26 +1,25 @@
+import { getSession } from '@connect-shared/lib/session/getSession';
 import { authSecret } from '@root/config/constants';
 import { getGithubOAuthCallbackUrl } from '@root/lib/github/oauth';
 import { sealData } from 'iron-session';
 
-import { getSession } from 'lib/session/getSession';
-
 export async function GET() {
   const session = await getSession();
 
-  if (!session.farcasterUser?.fid) {
+  if (!session.user?.id) {
     return new Response('Authentication required', { status: 401 });
   }
 
-  const sealedFID = await sealData(
+  const sealedUserId = await sealData(
     {
-      fid: session.farcasterUser.fid
+      id: session.user.id
     },
     { password: authSecret as string }
   );
 
   const redirectUrl = getGithubOAuthCallbackUrl({
     redirect: `${process.env.DOMAIN}/api/connect-github/callback`,
-    state: sealedFID
+    state: sealedUserId
   });
 
   return new Response(null, {
