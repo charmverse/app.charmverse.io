@@ -50,6 +50,7 @@ jobs:
           touch stg-cron-${{ env.STAGE_SUFFIX }}.zip
           touch stg-farcaster-${{ env.STAGE_SUFFIX }}.zip
           touch stg-scoutgame-${{ env.STAGE_SUFFIX }}.zip
+          touch stg-scoutgamecron-${{ env.STAGE_SUFFIX }}.zip
           touch stg-sunnyawards-${{ env.STAGE_SUFFIX }}.zip
           touch stg-waitlist-${{ env.STAGE_SUFFIX }}.zip
           touch stg-webapp-${{ env.STAGE_SUFFIX }}.zip
@@ -60,6 +61,7 @@ jobs:
           npx cdk destroy -c name=stg-cron-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-farcaster-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-scoutgame-${{ env.STAGE_SUFFIX }} --force
+          npx cdk destroy -c name=stg-scoutgamecron-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-sunnyawards-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-waitlist-${{ env.STAGE_SUFFIX }} --force
           npx cdk destroy -c name=stg-webapp-${{ env.STAGE_SUFFIX }} --force
@@ -94,6 +96,12 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           environment: stg-scoutgame-${{ env.STAGE_SUFFIX }}
+
+      - name: delete scoutgame github deployment
+        uses: strumwolf/delete-deployment-environment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: stg-scoutgamecron-${{ env.STAGE_SUFFIX }}
 
       - name: delete sunnyawards github deployment
         uses: strumwolf/delete-deployment-environment@v3
