@@ -5,12 +5,8 @@ import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constan
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 
-import { embedFarcasterUser } from 'lib/frame/actionButtons';
-import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
-import { refreshUserScore } from 'lib/scoring/refreshUserScore';
-
 function generateRedirectUrl(errorMessage: string) {
-  return `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent(errorMessage)}`;
+  return `${process.env.DOMAIN}/welcome/builder?connect_error=${encodeURIComponent(errorMessage)}`;
 }
 
 export async function GET(req: NextRequest) {
@@ -42,11 +38,11 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const unsealedFid = await unsealData<{ fid: string }>(state, { password: authSecret as string }).then(
-    (data) => data?.fid as string
+  const unsealedUserId = await unsealData<{ id: string }>(state, { password: authSecret as string }).then(
+    (data) => data?.id as string
   );
 
-  if (!unsealedFid) {
+  if (!unsealedUserId) {
     return new Response(null, {
       status: 302,
       headers: {
@@ -55,13 +51,13 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const connectWaitlistSlot = await prisma.connectWaitlistSlot.findUnique({
+  const scout = await prisma.scout.findUnique({
     where: {
-      fid: parseInt(unsealedFid)
+      id: unsealedUserId
     }
   });
 
-  if (!connectWaitlistSlot) {
+  if (!scout) {
     return new Response(null, {
       status: 302,
       headers: {
@@ -114,55 +110,36 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const existingConnection = await prisma.connectWaitlistSlot.findFirst({
+  // Check existing github connection
+  // const existingConnection = await prisma.connectWaitlistSlot.findFirst({
+  //   where: {
+  //     githubLogin
+  //   }
+  // });
+
+  // if (existingConnection?.githubLogin && existingConnection.fid !== connectWaitlistSlot.fid) {
+  //   return new Response(null, {
+  //     status: 302,
+  //     headers: {
+  //       Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent('Account is already in use')}`
+  //     }
+  //   });
+  // }
+
+  await prisma.scout.update({
     where: {
-      githubLogin
-    }
-  });
-
-  // Account already in use by another user
-  if (existingConnection?.githubLogin && existingConnection.fid !== connectWaitlistSlot.fid) {
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: generateRedirectUrl('Account is already in use')
-      }
-    });
-  }
-
-  // Account already connected
-  if (existingConnection?.githubLogin === githubLogin) {
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: `${process.env.DOMAIN}/score`
-      }
-    });
-  }
-
-  await prisma.connectWaitlistSlot.update({
-    where: {
-      fid: connectWaitlistSlot.fid
+      id: scout.id
     },
     data: {
-      githubLogin
+      builder: true,
+      onboarded: true
     }
-  });
-
-  await refreshUserScore({ fid: connectWaitlistSlot.fid });
-
-  refreshPercentilesForEveryone().then(handleTierChanges);
-
-  const sealedData = await embedFarcasterUser({
-    fid: connectWaitlistSlot.fid.toString(),
-    username: connectWaitlistSlot.username,
-    hasJoinedWaitlist: true
   });
 
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${process.env.DOMAIN}/score?${sealedData}`
+      Location: `${process.env.DOMAIN}/welcome/how-it-works`
     }
   });
 }
