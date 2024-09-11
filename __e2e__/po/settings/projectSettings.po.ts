@@ -33,10 +33,7 @@ export class ProjectSettings extends SettingsModal {
     fieldName: string;
     content: string;
   }) {
-    return this.page
-      .locator(`data-test=project-field-${fieldName} >> ${textArea ? 'textarea' : 'input'}`)
-      .first()
-      .fill(content);
+    return this.page.locator(`data-test=project-field-${fieldName} >> .MuiInputBase-input`).first().fill(content);
   }
 
   getProjectTitle({ projectId }: { projectId: string }) {
@@ -48,6 +45,6 @@ export class ProjectSettings extends SettingsModal {
   }
 
   getProjectField({ fieldName }: { fieldName: string }) {
-    return this.page.locator(`data-test=project-field-${fieldName} >> .MuiInputBase-root`).first();
+    return this.page.locator(`data-test=project-field-${fieldName} >> .MuiInputBase-input`).first();
   }
 }

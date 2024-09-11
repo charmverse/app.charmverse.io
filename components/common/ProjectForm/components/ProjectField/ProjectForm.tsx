@@ -131,6 +131,17 @@ export function ProjectForm({
         onChange={onProjectUpdate}
         properties={projectFieldProperties}
       />
+      <Typography variant='h6' mt={2}>
+        Team Info
+      </Typography>
+      <FieldLabel>Team Lead</FieldLabel>
+      <FieldAnswers
+        disabled={disabled}
+        namePrefix='projectMembers[0]'
+        fieldConfig={fieldConfig.projectMember}
+        properties={projectMemberFieldProperties}
+        onChange={(updates) => onProjectMemberUpdate(teamLeadMemberId, updates)}
+      />
       {showTeamMemberSection && (
         <>
           <Divider sx={{ my: 1 }} />

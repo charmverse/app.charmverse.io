@@ -436,7 +436,7 @@ test.describe.serial('Structured proposal template with project', () => {
 
     await proposalPage.page.waitForURL(`**/${proposalPath}`);
 
-    await expect(projectSettings.getProjectField({ fieldName: 'name' })).toHaveValue('Updated Project Name');
+    await expect(projectSettings.getProjectField({ fieldName: 'name' })).toHaveText('Updated Project Name');
 
     await expect(
       projectSettings.getProjectField({

@@ -69,6 +69,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       onChangeDebounced: _onChangeDebounced,
       formFieldId,
       getFieldState,
+      milestoneProps,
       ...fieldProps
     }: Props,
     ref
@@ -127,8 +128,8 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'milestone': {
         return (
           <FieldWrapper description={fieldProps.description} label={fieldProps.label} required={fieldProps.required}>
-            {fieldProps.milestoneProps ? (
-              <ProposalRewardsTable {...fieldProps.milestoneProps} variant='solid_button' />
+            {milestoneProps ? (
+              <ProposalRewardsTable {...milestoneProps} variant='solid_button' />
             ) : (
               <Box>
                 <AttachRewardButton disabled createNewReward={() => {}} variant='solid_button' />
