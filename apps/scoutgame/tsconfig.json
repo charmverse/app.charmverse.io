@@ -20,7 +20,6 @@
     ],
     "paths": {
       "@connect-shared/*": ["../../@connect-shared/*"],
-      "@root/charmClient/*": ["../../charmClient/*"],
       "apiClient/*": ["./apiClient/*"],
       "components/*": ["./components/*"],
       "hooks/*": ["./hooks/*"],
