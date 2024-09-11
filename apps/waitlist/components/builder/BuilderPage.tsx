@@ -55,9 +55,7 @@ export function BuilderPage() {
         <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
         <Typography mb={2}>Connect to GitHub to sign up and verify your code contributions.</Typography>
         <Box width='100%'>
-          <Suspense>
-            <JoinGithubButton />
-          </Suspense>
+          <JoinGithubButton />
           <Button component={Link} variant='text' href='/score' sx={{ width: '100%', mt: 1 }}>
             Cancel
           </Button>
