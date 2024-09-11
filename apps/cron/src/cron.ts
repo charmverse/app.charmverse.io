@@ -85,9 +85,6 @@ cron.schedule('0 * * * *', storeOptimismProjectAttestations);
 // Send proposal evaluation notifications every hour
 cron.schedule('0 * * * *', () => sendProposalEvaluationNotifications());
 
-// Send push notifications to the Connect app every day at 10am
-// cron.schedule('0 10 * * *', sendPushNotificationsToSunyAppTask);
-
 const port = process.env.PORT || 4000;
 
 app.listen(port, () => {
