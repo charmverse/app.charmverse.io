@@ -35,10 +35,9 @@ export class FormField extends DocumentPage {
     const pendingApiCall = this.page.waitForResponse((response) => {
       return response.request().method() === 'PUT' && /\/api\/projects/.test(response.url());
     });
-    const result = await this.page
-      .locator(`data-test=project-field-${fieldName} >> ${textArea ? 'textarea' : 'input'}`)
-      .first()
-      .fill(content);
+    const inputLocator = this.page.locator(`data-test=project-field-${fieldName} >> input`).first();
+    const textareaLocator = this.page.locator(`data-test=project-field-${fieldName} >> textarea`).first();
+    const result = await inputLocator.or(textareaLocator).fill(content);
 
     await pendingApiCall;
     return result;
