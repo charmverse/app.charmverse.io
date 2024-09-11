@@ -32,6 +32,9 @@ on:
       - 'adapters/**'
       - 'config/**'
       - 'lib/**'
+      # include some paths so that we trigger deploy for web app staging
+      - 'components/**'
+      - 'pages/**'
   workflow_dispatch:
     inputs:
       core_pkg_version:

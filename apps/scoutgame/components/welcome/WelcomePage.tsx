@@ -11,9 +11,8 @@ export function WelcomePage({ user }: { user: Scout }) {
   return (
     <SinglePageLayout>
       <SinglePageWrapper>
-        <Box display='flex' gap={2} flexDirection='column'>
-          {user.farcasterId && <FarcasterCard name={user.username} avatar={user.avatar} username={user.username} />}
-          <br />
+        <Box display='flex' gap={3} flexDirection='column' alignItems='flex-start'>
+          {user.farcasterId && <FarcasterCard name={user.displayName} avatar={user.avatar} username={user.username} />}
           <ExtraDetailsForm />
         </Box>
       </SinglePageWrapper>
