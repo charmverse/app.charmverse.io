@@ -9,6 +9,7 @@ import type { ControlFieldProps, FieldProps } from 'components/common/form/inter
 // In readonly mode, use a div instead of input/textarea so that we can use anchor tags
 const ReadOnlyText = styled.div`
   cursor: text;
+  white-space: pre-wrap;
 `;
 
 // Convert a string into a React component, and wrap links with anchor tags
