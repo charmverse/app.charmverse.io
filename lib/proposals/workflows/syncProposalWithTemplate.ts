@@ -9,11 +9,7 @@ import type {
   ProposalRubricCriteria
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import { v4 as uuid } from 'uuid';
-
-import { getProposal, proposalWithUsersAndRubricInclude } from '../getProposal';
-import type { ProposalWithUsersAndRubric } from '../interfaces';
 
 import { syncProposalPermissionsWithWorkflowPermissions } from './syncProposalPermissionsWithWorkflowPermissions';
 
