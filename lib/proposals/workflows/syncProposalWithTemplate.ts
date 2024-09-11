@@ -15,6 +15,8 @@ import { v4 as uuid } from 'uuid';
 import { getProposal, proposalWithUsersAndRubricInclude } from '../getProposal';
 import type { ProposalWithUsersAndRubric } from '../interfaces';
 
+import { syncProposalPermissionsWithWorkflowPermissions } from './syncProposalPermissionsWithWorkflowPermissions';
+
 export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions({
   proposalId
 }: {
@@ -36,7 +38,8 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
     select: {
       page: {
         select: {
-          sourceTemplateId: true
+          sourceTemplateId: true,
+          type: true
         }
       },
       evaluations: {
@@ -48,6 +51,10 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
       }
     }
   });
+
+  if (proposal.page?.type !== 'proposal') {
+    throw new InvalidInputError(`This method can only be used for proposals, not proposal templates`);
+  }
 
   const proposalHasReceivedReviews = proposal.evaluations.some(
     (ev) => ev.reviews.length || ev.appealReviews.length || ev.rubricAnswers.length
@@ -161,6 +168,12 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
         data: evaluation
       });
     }
+
+    // If the proposal template is not entirely in sync with the workflow, this will fail
+    await syncProposalPermissionsWithWorkflowPermissions({
+      proposalId,
+      tx
+    });
   });
 
   return prisma.proposal.findUniqueOrThrow({
