@@ -48,6 +48,6 @@ export class ProjectSettings extends SettingsModal {
   }
 
   getProjectField({ fieldName }: { fieldName: string }) {
-    return this.page.locator(`data-test=project-field-${fieldName} >> input`).first();
+    return this.page.locator(`data-test=project-field-${fieldName} >> .MuiInputBase-root`).first();
   }
 }

@@ -14,10 +14,10 @@ const ReadOnlyText = styled.div`
 `;
 
 // Convert a string into a React component, and wrap links with anchor tags
-function LinkifiedValue({ value }: { value?: string }): JSX.Element {
+function LinkifiedValue({ value, className }: { value?: string; className?: string }): JSX.Element {
   return (
-    <ReadOnlyText>
-      {(value || '').split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
+    <ReadOnlyText className={className}>
+      {(value || ' ').split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
         part.startsWith('http') ? (
           <Link
             underline='always' // matches inline charm editor
@@ -46,7 +46,9 @@ export const CustomTextField = forwardRef<HTMLDivElement, TextFieldProps & { err
       if (props.disabled) {
         return {
           // eslint-disable-next-line react/no-unstable-nested-components
-          inputComponent: (_props: InputBaseComponentProps) => <LinkifiedValue value={props.value as string} />
+          inputComponent: (_props: InputBaseComponentProps) => (
+            <LinkifiedValue value={props.value as string} {..._props} />
+          )
         };
       } else if (typeof props.value === 'string' && props.value.startsWith('http')) {
         // for admins, add an icon to open the link in a new tab even if the field is not disabled
