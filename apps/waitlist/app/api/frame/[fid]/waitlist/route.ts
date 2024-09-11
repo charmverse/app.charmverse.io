@@ -1,4 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
@@ -6,13 +7,26 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 import { JoinWaitlistFrame } from 'components/frame/JoinWaitlistFrame';
 import { WaitlistCurrentScoreFrame } from 'components/frame/WaitlistCurrentScoreFrame';
 import { WaitlistJoinedFrame } from 'components/frame/WaitlistJoinedFrame';
+import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
 import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
+import { findOrCreateScoutGameUser } from 'lib/waitlistSlots/findOrCreateScoutGameUser';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
 export async function GET(req: Request) {
   const fid = new URL(req.url).pathname.split('/')[3];
 
   const frame = JoinWaitlistFrame({ referrerFid: fid });
+
+  const scoutgameUser = await findOrCreateScoutGameUser({
+    fid: parseInt(fid)
+  }).catch(() => {
+    log.error(`Error finding or creating ScoutGameUser with fid ${fid}`);
+  });
+
+  trackWaitlistMixpanelEvent('frame_impression', {
+    referrerUserId: scoutgameUser?.id || '',
+    frame: 'join_waitlist_info'
+  });
 
   return new Response(frame, {
     status: 200,
@@ -49,7 +63,24 @@ export async function POST(req: Request) {
 
   let html: string = '';
 
+  const scoutGameUser = await findOrCreateScoutGameUser({
+    fid: interactorFid
+  }).catch(() => {
+    log.error(`Error finding or creating ScoutGameUser with fid ${interactorFid}`);
+  });
+
+  const referrerScoutGameUser = await findOrCreateScoutGameUser({
+    fid: parseInt(referrerFid)
+  }).catch(() => {
+    log.error(`Error finding or creating ScoutGameUser with fid ${interactorFid}`);
+  });
+
   if (joinWaitlistResult.isNew) {
+    trackWaitlistMixpanelEvent('frame_impression', {
+      userId: scoutGameUser?.id,
+      referrerUserId: referrerScoutGameUser?.id || '',
+      frame: 'join_waitlist_new_join'
+    });
     html = await WaitlistJoinedFrame({ fid: interactorFid, username: interactorUsername });
   } else {
     const { percentile } = await prisma.connectWaitlistSlot.findFirstOrThrow({
@@ -59,6 +90,12 @@ export async function POST(req: Request) {
       select: {
         percentile: true
       }
+    });
+
+    trackWaitlistMixpanelEvent('frame_impression', {
+      userId: scoutGameUser?.id,
+      referrerUserId: referrerScoutGameUser?.id || '',
+      frame: 'join_waitlist_current_score'
     });
 
     html = await WaitlistCurrentScoreFrame({

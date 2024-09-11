@@ -19,7 +19,7 @@ type UserEvent = {
 type UserEventWithReferrer = ReferrerEvent & UserEvent;
 
 type FrameEventMap = {
-  frame_impression: ReferrerEvent & { frame: FrameScreen };
+  frame_impression: ReferrerEvent & Partial<UserEvent> & { frame: FrameScreen };
   frame_click: UserEventWithReferrer & { action: FrameAction; frame: FrameScreen };
 };
 

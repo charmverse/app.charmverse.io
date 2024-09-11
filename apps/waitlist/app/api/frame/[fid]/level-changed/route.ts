@@ -1,5 +1,6 @@
 /* eslint-disable no-case-declarations */
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { baseUrl } from '@root/config/constants';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
@@ -15,7 +16,7 @@ export async function GET(req: Request) {
   const reqAsURL = new URL(req.url);
 
   const fid = parseInt(reqAsURL.pathname.split('/')[3]);
-  const tierChange = reqAsURL.searchParams.get('tierChange') as TierChange;
+  const tierChange = reqAsURL.searchParams.get('tierChange') as Extract<TierChange, 'up' | 'down'>;
   const percentile = parseInt(reqAsURL.searchParams.get('percentile') as string);
 
   const frame = LevelChangedFrame({
@@ -26,12 +27,12 @@ export async function GET(req: Request) {
 
   const scoutgameUser = await findOrCreateScoutGameUser({
     fid
+  }).catch(() => {
+    log.error(`Error finding or creating ScoutGameUser with fid ${fid}`);
   });
 
   trackWaitlistMixpanelEvent('frame_impression', {
-    userId: scoutgameUser.id,
-    referrerUserId: referrerScoutgameUser.id,
-    action: 'click_share',
+    referrerUserId: scoutgameUser?.id || '',
     frame: `waitlist_level_${tierChange}`
   });
 
@@ -65,18 +66,21 @@ export async function POST(req: Request) {
   const scoutgameUser = await findOrCreateScoutGameUser({
     fid: interactorFid,
     username: interactorUsername
+  }).catch(() => {
+    log.error(`Error finding or creating ScoutGameUser with fid ${interactorFid}`);
   });
 
   const referrerScoutgameUser = await findOrCreateScoutGameUser({
-    fid: interactorFid,
-    username: interactorUsername
+    fid: parseInt(referrerFid)
+  }).catch(() => {
+    log.error(`Error finding or creating ScoutGameUser with fid ${referrerFid}`);
   });
 
   switch (button) {
     case 1:
       trackWaitlistMixpanelEvent('frame_click', {
-        userId: scoutgameUser.id,
-        referrerUserId: referrerScoutgameUser.id,
+        userId: scoutgameUser?.id || '',
+        referrerUserId: referrerScoutgameUser?.id || '',
         action: 'click_whats_this',
         frame: `waitlist_level_${tierChange}`
       });
@@ -88,8 +92,8 @@ export async function POST(req: Request) {
       });
     case 2:
       trackWaitlistMixpanelEvent('frame_click', {
-        userId: scoutgameUser.id,
-        referrerUserId: referrerScoutgameUser.id,
+        userId: scoutgameUser?.id || '',
+        referrerUserId: referrerScoutgameUser?.id || '',
         action: 'goto_app',
         frame: `waitlist_level_${tierChange}`
       });
@@ -97,8 +101,8 @@ export async function POST(req: Request) {
       return new Response(null, { status: 302, headers: { Location: baseUrl as string } });
     case 3:
       trackWaitlistMixpanelEvent('frame_click', {
-        userId: scoutgameUser.id,
-        referrerUserId: referrerScoutgameUser.id,
+        userId: scoutgameUser?.id || '',
+        referrerUserId: referrerScoutgameUser?.id || '',
         action: 'click_share',
         frame: `waitlist_level_${tierChange}`
       });

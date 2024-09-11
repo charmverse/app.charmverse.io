@@ -30,12 +30,25 @@ export async function findOrCreateScoutGameUser({
     return existingScout;
   }
 
-  const displayName: string = fid
-    ? username ??
-      (await getFarcasterProfile({
-        fid
-      }).then((profile) => profile?.body.username || `fid:${fid}`))
-    : shortWalletAddress(wallet);
+  const existingConnectWaitlistSlot = fid
+    ? await prisma.connectWaitlistSlot.findFirst({
+        where: {
+          fid
+        },
+        select: {
+          username: true
+        }
+      })
+    : null;
+
+  const fidUserName = existingConnectWaitlistSlot?.username;
+
+  const displayName: string =
+    username ?? fidUserName ?? fid
+      ? await getFarcasterProfile({
+          fid
+        }).then((profile) => profile?.body.username || `fid:${fid}`)
+      : shortWalletAddress(wallet);
 
   return prisma.scout.create({
     data: {
