@@ -1,11 +1,39 @@
-import LinkIcon from '@mui/icons-material/Link';
-import { Box, IconButton } from '@mui/material';
-import type { TextFieldProps } from '@mui/material';
-import TextField from '@mui/material/TextField';
-import { forwardRef } from 'react';
+import styled from '@emotion/styled';
+import { Box, Link, TextField } from '@mui/material';
+import type { TextFieldProps, InputProps, InputBaseComponentProps } from '@mui/material';
+import { forwardRef, useMemo } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
+
+// In readonly mode, use a div instead of input/textarea so that we can use anchor tags
+const ReadOnlyText = styled.div`
+  cursor: text;
+`;
+
+// Convert a string into a React component, and wrap links with anchor tags
+function LinkifiedValue({ value }: { value: string }): JSX.Element {
+  return (
+    <ReadOnlyText>
+      {value.split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
+        part.startsWith('http') ? (
+          <Link
+            underline='always' // matches inline charm editor
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+            href={part}
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            {part}
+          </Link>
+        ) : (
+          part
+        )
+      )}
+    </ReadOnlyText>
+  );
+}
 
 type Props = ControlFieldProps &
   FieldProps & { multiline?: boolean; inputEndAdornmentAlignItems?: string; rows?: number; maxRows?: number };
@@ -13,18 +41,26 @@ type Props = ControlFieldProps &
 export const CustomTextField = forwardRef<HTMLDivElement, TextFieldProps & { error?: boolean }>(
   ({ error, ...props }, ref) => {
     const showLinkIcon = typeof props.value === 'string' && props.value.startsWith('http');
-    const InputProps = showLinkIcon
-      ? {
-          endAdornment: (
-            <IconButton color='secondary' href={props.value as string} target='_blank' size='small' sx={{ p: 0 }}>
-              <LinkIcon />
-            </IconButton>
-          )
-        }
-      : undefined;
+    const InputProps = useMemo<Partial<InputProps> | undefined>(() => {
+      if (showLinkIcon) {
+        return {
+          // eslint-disable-next-line react/no-unstable-nested-components
+          inputComponent: (_props: InputBaseComponentProps) => <LinkifiedValue value={props.value as string} />
+        };
+      }
+      return undefined;
+    }, [showLinkIcon, props.value]);
 
     return (
-      <TextField ref={ref} fullWidth placeholder={props.placeholder} InputProps={InputProps} error={error} {...props} />
+      <TextField
+        // InputProps={{ inputComponent: Box }}
+        ref={ref}
+        fullWidth
+        placeholder={props.placeholder}
+        InputProps={InputProps}
+        error={error}
+        {...props}
+      />
     );
   }
 );
