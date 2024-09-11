@@ -3,6 +3,8 @@ import { prisma, type ConnectWaitlistSlot } from '@charmverse/core/prisma-client
 
 import { refreshUserScore } from '../scoring/refreshUserScore';
 
+import { findOrCreateScoutGameUser } from './findOrCreateScoutGameUser';
+
 type WaitlistJoinRequest = {
   fid: number | string;
   referredByFid?: number | string | null;
@@ -46,6 +48,10 @@ export async function joinWaitlist({ fid, username, referredByFid }: WaitlistJoi
   }
 
   newSlot = await refreshUserScore({ fid: parsedFid });
+
+  await findOrCreateScoutGameUser({ fid: parsedFid }).catch((error) => {
+    log.error(`Failed to create Scout with fid ${fid}`, { error, fid });
+  });
 
   return {
     waitlistSlot: newSlot,
