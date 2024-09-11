@@ -14,10 +14,10 @@ const ReadOnlyText = styled.div`
 `;
 
 // Convert a string into a React component, and wrap links with anchor tags
-function LinkifiedValue({ value }: { value: string }): JSX.Element {
+function LinkifiedValue({ value }: { value?: string }): JSX.Element {
   return (
     <ReadOnlyText>
-      {value.split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
+      {(value || '').split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
         part.startsWith('http') ? (
           <Link
             underline='always' // matches inline charm editor
