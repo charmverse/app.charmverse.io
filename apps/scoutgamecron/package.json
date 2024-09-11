@@ -18,6 +18,7 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "@types/node-cron": "^3.0.11",
     "@types/web-push": "^3.6.3"
   }
 }
