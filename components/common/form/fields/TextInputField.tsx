@@ -40,16 +40,15 @@ type Props = ControlFieldProps &
 
 export const CustomTextField = forwardRef<HTMLDivElement, TextFieldProps & { error?: boolean }>(
   ({ error, ...props }, ref) => {
-    const showLinkIcon = typeof props.value === 'string' && props.value.startsWith('http');
     const InputProps = useMemo<Partial<InputProps> | undefined>(() => {
-      if (showLinkIcon) {
+      if (props.disabled) {
         return {
           // eslint-disable-next-line react/no-unstable-nested-components
           inputComponent: (_props: InputBaseComponentProps) => <LinkifiedValue value={props.value as string} />
         };
       }
       return undefined;
-    }, [showLinkIcon, props.value]);
+    }, [props.disabled, props.value]);
 
     return (
       <TextField
