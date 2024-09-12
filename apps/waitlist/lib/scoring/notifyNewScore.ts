@@ -45,7 +45,7 @@ export async function notifyNewScore({ fid, tier, tierChange }: WaitlistScoreNot
   return writeToFarcaster({
     neynarSignerId: NEYNAR_SIGNER_ID,
     text: message,
-    channelId: 'cvdev',
+    channelId: 'scout-game',
     embedUrl
   });
 }
