@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { BuilderWelcomePage } from 'components/welcome/BuilderWelcomePage';
+import { BuilderPage } from 'components/welcome/BuilderWelcomePage';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
@@ -22,5 +22,5 @@ export default async function AskAreYouABuilder() {
     redirect('/');
   }
 
-  return <BuilderWelcomePage user={user} />;
+  return <BuilderPage />;
 }
