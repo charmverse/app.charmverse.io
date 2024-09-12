@@ -29,8 +29,6 @@
     "next": "^14.2.9",
     "next-safe-action": "^7.4.2",
     "server-only": "^0.0.1",
-    "viem": "^2.20.1",
-    "wagmi": "^2.12.7",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
