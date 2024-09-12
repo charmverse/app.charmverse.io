@@ -15,7 +15,7 @@ const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').th
 });
 
 const appName = 'Scout Game';
-const appTitle = 'Onchain builder network';
+const appTitle = 'Scout. Build. Win.';
 const appTitleTemplate = '%s - Scout Game';
 const appDescription = 'Onchain network for connecting web3 developers, projects, organizations';
 
@@ -42,6 +42,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: appName,
+    images: 'https://scoutgame.xyz/images/manifest/scoutgame-logo-256.png',
     title: {
       default: appTitle,
       template: appTitleTemplate
