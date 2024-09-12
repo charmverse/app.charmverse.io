@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { ConnectWaitlistSlot } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { roundNumberInRange } from '@root/lib/utils/numbers';
 
@@ -6,10 +7,10 @@ import type { ConnectWaitlistTier, TierChange, TierDistributionType } from './co
 import { tierDistribution, getTier } from './constants';
 import { notifyNewScore } from './notifyNewScore';
 
-export type TierChangeResult = {
-  fid: number;
+export type TierChangeResult = Pick<ConnectWaitlistSlot, 'fid' | 'username' | 'percentile' | 'score'> & {
   newTier: ConnectWaitlistTier;
   tierChange: TierChange;
+  // Narrow fields to non null
   percentile: number;
   score: number;
 };
@@ -34,7 +35,13 @@ export function getTierChange({
 }
 
 export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[]> {
-  const totalUsers = await prisma.connectWaitlistSlot.count();
+  const totalUsers = await prisma.connectWaitlistSlot.count({
+    where: {
+      isPartnerAccount: {
+        not: true
+      }
+    }
+  });
   const onePercentSize = Math.max(totalUsers / 100, 1);
   const tierChangeResults: TierChangeResult[] = [];
 
@@ -46,6 +53,11 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
 
     const users = await prisma.connectWaitlistSlot.findMany({
       orderBy: { score: 'asc' },
+      where: {
+        isPartnerAccount: {
+          not: true
+        }
+      },
       skip: offset,
       take
     });
@@ -81,7 +93,8 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
             newTier: currentTier,
             tierChange,
             percentile: currentPercentile,
-            score: users[i].score
+            score: users[i].score,
+            username: users[i].username
           });
         }
       }
@@ -100,16 +113,24 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
     offset += users.length;
   }
 
+  await prisma.connectWaitlistSlot.updateMany({
+    where: {
+      isPartnerAccount: true,
+      percentile: {
+        not: 100
+      }
+    },
+    data: {
+      percentile: 100
+    }
+  });
+
   return tierChangeResults;
 }
 
 export function handleTierChanges(tierChangeResults: TierChangeResult[]) {
   return tierChangeResults.map((tierChangeResult) =>
-    notifyNewScore({
-      fid: tierChangeResult.fid,
-      tier: tierChangeResult.newTier,
-      tierChange: tierChangeResult.tierChange
-    }).catch((error) => {
+    notifyNewScore(tierChangeResult).catch((error) => {
       log.error(`Failed to notify tier change for fid:${tierChangeResult.fid}`, { error, fid: tierChangeResult.fid });
     })
   );
