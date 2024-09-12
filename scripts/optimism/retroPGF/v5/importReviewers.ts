@@ -5,7 +5,7 @@ import { readFileSync } from 'fs';
 import { difference, uniq } from 'lodash';
 
 const reviewerData = getCsvData<CSVRow>('../__data/optimism/reviewer_allocations.csv');
-
+import { getProposals, DatabaseProposals } from './utils';
 import { getProjectsFromFile, RetroApplication, fieldIds, spaceId } from './data';
 
 type CSVRow = {
@@ -30,11 +30,7 @@ function getCsvData<T>(path: string): T[] {
   return parse(readFileSync(path).toString(), { columns: true }) as T[];
 }
 
-async function populateProject(
-  csvRow: CSVRow,
-  proposalPages: Awaited<ReturnType<typeof getProposals>>,
-  emailToUser: Record<string, string>
-) {
+async function populateProject(csvRow: CSVRow, proposalPages: DatabaseProposals, emailToUser: Record<string, string>) {
   const page = proposalPages.find(
     (r) => r.proposal?.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])?.value === csvRow['Project ID']
   );
@@ -83,46 +79,42 @@ async function populateProject(
 
 async function createUsers(userEmails: string[]) {
   for (const email of userEmails) {
-    console.log(
-      'created user',
-      await prisma.user.create({
-        data: {
-          email,
-          username: email,
-          path: email.split('@')[0] + '-' + Math.random().toString().split('.')[1].slice(0, 5),
-          spaceRoles: {
-            create: {
-              spaceId
-            }
-          },
-          verifiedEmails: {
-            create: {
-              avatarUrl: '',
-              name: '',
-              email
-            }
+    const user = await prisma.user.create({
+      data: {
+        email,
+        username: email,
+        path: email.split('@')[0] + '-' + Math.random().toString().split('.')[1].slice(0, 5),
+        spaceRoles: {
+          create: {
+            spaceId
+          }
+        },
+        verifiedEmails: {
+          create: {
+            avatarUrl: '',
+            name: '',
+            email
           }
         }
+      }
+    });
+    console.log('created user', user);
+    console.log(
+      await prisma.spaceRole.upsert({
+        where: {
+          spaceUser: {
+            userId: user.id,
+            spaceId
+          }
+        },
+        create: {
+          userId: user.id,
+          spaceId
+        },
+        update: {}
       })
     );
   }
-  // for (const email of verifiedEmails) {
-  //   console.log(
-  //     await prisma.spaceRole.upsert({
-  //       where: {
-  //         spaceUser: {
-  //           userId: email.userId,
-  //           spaceId
-  //         }
-  //       },
-  //       create: {
-  //         userId: email.userId,
-  //         spaceId
-  //       },
-  //       update: {}
-  //     })
-  //   );
-  // }
 }
 
 function getReviewerEmails(): string[] {
@@ -227,51 +219,22 @@ async function assignRole(roleId = 'ae8c0881-10cd-465a-8435-ef69a5d2d040') {
   // });
 }
 
-function getProposals() {
-  return prisma.page.findMany({
-    where: {
-      spaceId,
-      type: 'proposal',
-      createdAt: {
-        gt: new Date(2024, 8, 10)
-      }
-    },
-    include: {
-      proposal: {
-        include: {
-          evaluations: true,
-          formAnswers: true
-        }
-      }
-    }
-  });
-}
-
 async function importReviewers() {
   // Note: file path is relative to CWD
   const projects = reviewerData;
-  const spaceRoles = await prisma.spaceRole.findMany({
-    where: {
-      spaceId
-    }
-  });
   const dbProjects = await getProposals();
   const reviewerEmails = getReviewerEmails();
   const users = await prisma.user.findMany({
     where: {
       deletedAt: null,
-      OR: [
-        {
-          verifiedEmails: {
-            some: {
-              email: {
-                in: reviewerEmails
-              }
-            }
+      /// check verified Emails to guarantees the user can log in with the email
+      verifiedEmails: {
+        some: {
+          email: {
+            in: reviewerEmails
           }
-        },
-        { email: { in: reviewerEmails } }
-      ]
+        }
+      }
     },
     include: {
       spaceRoles: true,
@@ -287,6 +250,16 @@ async function importReviewers() {
   const notInSpace = users.filter((user) => !user.spaceRoles.some((role) => role.spaceId === spaceId));
   if (notInSpace.length) {
     throw new Error('Not all reviewers have been added to the space: ' + notInSpace.map((u) => u.username).join(', '));
+    // Uncomment this if you are sure we want to add the users to the space
+    // await prisma.spaceRole.createMany({
+    //   data: notInSpace.map((user) => {
+    //     return {
+    //       userId: user.id,
+    //       spaceId: spaceId
+    //     };
+    //   })
+    // });
+    // console.log('Added', notInSpace.length, 'users to the space');
   }
 
   const emailToUser = users.reduce<Record<string, string>>((acc, user) => {
@@ -304,9 +277,6 @@ async function importReviewers() {
   console.log('Processing', populatedProjects.length, 'projects...');
 
   for (const project of populatedProjects) {
-    if (['f908d29b-c563-4422-a69f-83a62feb85db', 'f6452631-4675-4d1a-bb25-95d2d1c85751'].includes(project.proposalId)) {
-      continue;
-    }
     console.log('processing', project.proposalId, project.title);
     await prisma.$transaction([
       prisma.proposal.update({

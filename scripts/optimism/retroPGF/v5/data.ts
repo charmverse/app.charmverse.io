@@ -14,10 +14,10 @@ export const templateId = '762064ff-2430-4a7c-bfa5-7e54dc51f19a';
 // Local storage for Farcaster profiles
 export const farcasterUsersFile = '../__data/optimism/archive/farcaster-profiles.json';
 export const savedFarcasterProfiles = JSON.parse(readFileSync(farcasterUsersFile).toString());
-// console.log('Loaded', savedFarcasterProfiles.length, 'pre-saved farcaster profiles');
 
 export const applicationsFile = '../__data/optimism/RPGF5 applications.json';
 
+// Schema for the JSON file provided by Optimism
 export type RetroApplication = {
   category: {
     name: string;
@@ -29,6 +29,17 @@ export type RetroApplication = {
     website: string[];
     pricingModel: string;
     pricingModelDetails: string;
+
+    organization: {
+      organization: {
+        id: string;
+        name: string;
+        description: string;
+      };
+    } | null;
+
+    // note: url may be empty string, so filter those out
+    repos: { url: string }[];
 
     team: {
       role: 'admin' | 'member';
@@ -76,7 +87,11 @@ export const fieldIds = {
   'Project Pricing Model': '9c89cff5-37ba-4366-9ed8-78bb3f295917',
   'Funding Received': 'b67d9a01-7e3b-4cb3-90b1-02ea684a7f43',
   'Attestation ID': '5ba1196b-3adf-4653-9e98-1bd566880b91',
-  'Additional Links': '2c2a4640-0c6c-419a-bd2c-23130c389cde'
+  'Additional Links': '2c2a4640-0c6c-419a-bd2c-23130c389cde',
+  'Github Repos': '93eed6d0-7c30-46b6-a345-c230f7b5f76e',
+  'Organization ID': '38c925cc-d384-4059-bc7a-9192e40bf415',
+  'Organization Name': '7d3c99fb-fcf6-4e56-9b18-a1995e7bde16',
+  'Organization Description': '5c3d7340-db22-419d-b821-3dc4459ceed1'
 } as const;
 
 export function getCsvData<T>(path: string): T[] {
