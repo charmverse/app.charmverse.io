@@ -204,7 +204,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-z0rmih-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id1"
             >
@@ -251,7 +251,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
               </div>
             </a>
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-z0rmih-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id2"
             >
@@ -328,7 +328,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-z0rmih-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id3"
             >
@@ -640,7 +640,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-z0rmih-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id1"
             >
@@ -687,7 +687,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
               </div>
             </a>
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-z0rmih-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id2"
             >
@@ -764,7 +764,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-z0rmih-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id3"
             >
