@@ -202,34 +202,24 @@ export class StagingStack extends Stack {
       domainName: domain
     });
 
-    // Create Route 53 A record for the environment
-    // Replace 'yourdomain.com' with your domain and provide the hosted zone ID
-    const hostedZone = route53.HostedZone.fromLookup(this, 'MyHostedZone', {
-      domainName: 'yourdomain.com'
-    });
-
     console.log('ebEnv.attrEndpointUrl', ebEnv.attrEndpointUrl);
 
-    if (environmentType === 'LoadBalanced') {
-      new route53.ARecord(this, 'ARecord', {
-        zone,
-        recordName: deploymentDomain + '.',
-        //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
-        target: route53.RecordTarget.fromAlias({
-          bind: (): route53.AliasRecordTargetConfig => ({
-            dnsName: ebEnv.attrEndpointUrl,
-            // get hosted zone for elbs based on region: https://docs.aws.amazon.com/general/latest/gr/elb.html
-            hostedZoneId: 'Z35SXDOTRQ7X7K'
-          })
-        })
-      });
-    } else {
-      new route53.ARecord(this, 'MyARecord', {
-        zone: hostedZone,
-        target: route53.RecordTarget.fromIpAddresses(ebEnv.attrEndpointUrl),
-        recordName: 'www' // Replace with the desired subdomain (e.g., 'www')
-      });
-    }
+    new route53.ARecord(this, 'ARecord', {
+      zone,
+      recordName: deploymentDomain + '.',
+      //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
+      target:
+        environmentType === 'LoadBalanced'
+          ? route53.RecordTarget.fromAlias({
+              bind: (): route53.AliasRecordTargetConfig => ({
+                dnsName: ebEnv.attrEndpointUrl,
+                // get hosted zone for elbs based on region: https://docs.aws.amazon.com/general/latest/gr/elb.html
+                hostedZoneId: 'Z35SXDOTRQ7X7K'
+              })
+            })
+          : // if not load balanced, then use the ip address
+            route53.RecordTarget.fromIpAddresses(ebEnv.attrEndpointUrl)
+    });
 
     /**
      * Output the distribution's url so we can pass it to external systems
