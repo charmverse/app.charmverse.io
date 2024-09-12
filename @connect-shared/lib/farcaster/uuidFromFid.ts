@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { createHash } from 'crypto';
 
 import { log } from '@charmverse/core/log';
 import { v4 as uuid } from 'uuid';

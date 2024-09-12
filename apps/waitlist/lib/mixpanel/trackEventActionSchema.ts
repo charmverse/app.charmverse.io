@@ -1,4 +1,4 @@
-export type EventType = 'page_view' | 'login' | 'logout';
+import * as yup from 'yup';
 
 type FrameScreen =
   | 'join_waitlist_info'
@@ -32,3 +32,12 @@ type WaitlistAppEventMap = {
 export type WaitlistEventMap = FrameEventMap & WaitlistAppEventMap;
 
 export type WaitlistEvent = keyof WaitlistEventMap;
+
+export const eventSchema = yup.object().shape({
+  event: yup.string<WaitlistEvent>().required(),
+  payload: yup.object(),
+  currentPageTitle: yup.string(),
+  currentDomain: yup.string(),
+  currentUrlPath: yup.string(),
+  currentUrlSearch: yup.string()
+});
