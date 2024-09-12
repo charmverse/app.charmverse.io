@@ -51,7 +51,7 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
     const tierInfo = tierDistribution.find((t) => t.tier === tier) as TierDistributionType;
     const take = tierInfo.tier === 'common' ? undefined : Math.ceil(tierInfo.totalPercentSize * onePercentSize);
 
-    const users = await prisma.connectWaitlistSlot.findMany({
+    const usersWithinTier = await prisma.connectWaitlistSlot.findMany({
       orderBy: { score: 'asc' },
       where: {
         isPartnerAccount: {
@@ -62,10 +62,14 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
       take
     });
 
+    const totalUsersInTier = usersWithinTier.length;
+
     // Group users by percentile
     const usersByPercentile: { [percentile: number]: number[] } = {};
 
-    for (let i = 0; i < users.length; i++) {
+    for (let i = 0; i < totalUsersInTier; i++) {
+      const currentUser = usersWithinTier[i];
+
       // We need an adjust min max as otherwise we get bad numbers for very small ranges
       const currentPercentile = roundNumberInRange({
         num: 100 - ((offset + i + 1) / totalUsers) * 100,
@@ -73,14 +77,14 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
         min: tierInfo.threshold
       });
 
-      const previousPercentile = users[i].percentile ?? 0;
+      const previousPercentile = currentUser.percentile ?? 0;
 
       // Only consider users whose percentile has changed
       if (currentPercentile !== previousPercentile) {
         if (!usersByPercentile[currentPercentile]) {
           usersByPercentile[currentPercentile] = [];
         }
-        usersByPercentile[currentPercentile].push(users[i].fid);
+        usersByPercentile[currentPercentile].push(currentUser.fid);
 
         const { currentTier, tierChange } = getTierChange({
           previousPercentile,
@@ -89,12 +93,12 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
 
         if (tierChange !== 'none') {
           tierChangeResults.push({
-            fid: users[i].fid,
+            fid: currentUser.fid,
             newTier: currentTier,
             tierChange,
             percentile: currentPercentile,
-            score: users[i].score,
-            username: users[i].username
+            score: currentUser.score,
+            username: currentUser.username
           });
         }
       }
@@ -110,7 +114,7 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
       }
     }
 
-    offset += users.length;
+    offset += totalUsersInTier;
   }
 
   await prisma.connectWaitlistSlot.updateMany({
