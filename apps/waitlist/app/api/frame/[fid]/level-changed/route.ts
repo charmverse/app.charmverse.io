@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
+import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 import { baseUrl } from '@root/config/constants';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
@@ -10,29 +10,22 @@ import { LevelChangedFrame } from 'components/frame/LevelChangedFrame';
 import { shareFrameUrl } from 'lib/frame/actionButtons';
 import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
 import type { TierChange } from 'lib/scoring/constants';
-import { findOrCreateScoutGameUser } from 'lib/waitlistSlots/findOrCreateScoutGameUser';
 
 export async function GET(req: Request) {
   const reqAsURL = new URL(req.url);
 
-  const fid = parseInt(reqAsURL.pathname.split('/')[3]);
+  const referrerFid = parseInt(reqAsURL.pathname.split('/')[3]);
   const tierChange = reqAsURL.searchParams.get('tierChange') as Extract<TierChange, 'up' | 'down'>;
   const percentile = parseInt(reqAsURL.searchParams.get('percentile') as string);
 
   const frame = LevelChangedFrame({
-    fid,
+    fid: referrerFid,
     percentile,
     tierChange
   });
 
-  const scoutgameUser = await findOrCreateScoutGameUser({
-    fid
-  }).catch(() => {
-    log.error(`Error finding or creating ScoutGameUser with fid ${fid}`);
-  });
-
   trackWaitlistMixpanelEvent('frame_impression', {
-    referrerUserId: scoutgameUser?.id || '',
+    referrerUserId: deterministicV4UUIDFromFid(referrerFid),
     frame: `waitlist_level_${tierChange}`
   });
 
@@ -58,29 +51,15 @@ export async function POST(req: Request) {
   }
 
   const interactorFid = parseInt(validatedMessage.action.interactor.fid.toString(), 10);
-  const interactorUsername = validatedMessage.action.interactor.username;
   const tierChange = reqAsURL.searchParams.get('tierChange') as Extract<TierChange, 'up' | 'down'>;
 
   const button = validatedMessage.action.tapped_button.index;
 
-  const scoutgameUser = await findOrCreateScoutGameUser({
-    fid: interactorFid,
-    username: interactorUsername
-  }).catch(() => {
-    log.error(`Error finding or creating ScoutGameUser with fid ${interactorFid}`);
-  });
-
-  const referrerScoutgameUser = await findOrCreateScoutGameUser({
-    fid: parseInt(referrerFid)
-  }).catch(() => {
-    log.error(`Error finding or creating ScoutGameUser with fid ${referrerFid}`);
-  });
-
   switch (button) {
     case 1:
       trackWaitlistMixpanelEvent('frame_click', {
-        userId: scoutgameUser?.id || '',
-        referrerUserId: referrerScoutgameUser?.id || '',
+        userId: deterministicV4UUIDFromFid(interactorFid),
+        referrerUserId: deterministicV4UUIDFromFid(referrerFid),
         action: 'click_whats_this',
         frame: `waitlist_level_${tierChange}`
       });
@@ -92,8 +71,8 @@ export async function POST(req: Request) {
       });
     case 2:
       trackWaitlistMixpanelEvent('frame_click', {
-        userId: scoutgameUser?.id || '',
-        referrerUserId: referrerScoutgameUser?.id || '',
+        userId: deterministicV4UUIDFromFid(interactorFid),
+        referrerUserId: deterministicV4UUIDFromFid(referrerFid),
         action: 'goto_app',
         frame: `waitlist_level_${tierChange}`
       });
@@ -101,8 +80,8 @@ export async function POST(req: Request) {
       return new Response(null, { status: 302, headers: { Location: baseUrl as string } });
     case 3:
       trackWaitlistMixpanelEvent('frame_click', {
-        userId: scoutgameUser?.id || '',
-        referrerUserId: referrerScoutgameUser?.id || '',
+        userId: deterministicV4UUIDFromFid(interactorFid),
+        referrerUserId: deterministicV4UUIDFromFid(referrerFid),
         action: 'click_share',
         frame: `waitlist_level_${tierChange}`
       });
