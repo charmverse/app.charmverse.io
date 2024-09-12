@@ -10,8 +10,8 @@ import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 
 import { appendFileSync } from 'fs';
 import { RateLimit } from 'async-sema';
-import { _, jsonDoc } from 'lib/prosemirror/builders';
 import type { FieldAnswerInput } from 'lib/forms/interfaces';
+import { charmValues, charmValue, charmLinks } from './utils';
 import {
   spaceId,
   templateId,
@@ -43,7 +43,7 @@ function _getFormAnswers({ category, project, impactStatementAnswer }: RetroAppl
     },
     {
       fieldId: fieldIds.Description,
-      value: _charmValue(project.description)
+      value: charmValue(project.description)
     },
     {
       fieldId: fieldIds['Category'],
@@ -54,10 +54,10 @@ function _getFormAnswers({ category, project, impactStatementAnswer }: RetroAppl
       value: project.website[0] || ''
     },
     { fieldId: fieldIds['Project Pricing Model'], value: project.pricingModel },
-    { fieldId: fieldIds['Project Pricing Model Details'], value: _charmValue(project.pricingModelDetails) },
+    { fieldId: fieldIds['Project Pricing Model Details'], value: charmValue(project.pricingModelDetails) },
     { fieldId: fieldIds['Attestation ID'], value: project.id },
-    { fieldId: fieldIds['Additional Links'], value: _charmLinks(project.links) },
-    { fieldId: fieldIds['Funding Received'], value: _charmValues(funding) }
+    { fieldId: fieldIds['Additional Links'], value: charmLinks(project.links) },
+    { fieldId: fieldIds['Funding Received'], value: charmValues(funding) }
   ];
 
   (
@@ -74,32 +74,11 @@ function _getFormAnswers({ category, project, impactStatementAnswer }: RetroAppl
     )?.answer;
     answers.push({
       fieldId: fieldIds[key] as any,
-      value: _charmValue(value)
+      value: charmValue(value)
     });
   });
 
   return answers;
-}
-
-function _charmValue(value?: string | null) {
-  return {
-    content: jsonDoc(_.p(value || '')),
-    contentText: value || ''
-  };
-}
-
-function _charmValues(values: string[]) {
-  return {
-    content: jsonDoc(...values.map((str) => _.p(str))),
-    contentText: values.join('\n')
-  };
-}
-
-function _charmLinks(links: { url: string; name: string }[]) {
-  return {
-    content: jsonDoc(...links.map(({ url, name }) => _.p(_.link({ href: url }, name || url)))),
-    contentText: links.map((w) => w.url).join('\n')
-  };
 }
 
 async function populateProject(application: RetroApplication) {
@@ -139,16 +118,13 @@ async function populateProject(application: RetroApplication) {
 
 async function importOpProjects() {
   // Note: file path is relative to CWD
-  const _projects = await getProjectsFromFile(applicationsFile);
-  const projects = _projects;
+  const applications = await getProjectsFromFile(applicationsFile);
 
-  console.log('Validating', projects.length, 'projects...');
+  console.log('Processing', applications.length, 'applications...');
 
-  const populatedProjects = await Promise.all(projects.map((project) => populateProject(project)));
+  const populated = await Promise.all(applications.map((project) => populateProject(project)));
 
-  console.log('Processing', projects.length, 'projects...');
-
-  for (const project of populatedProjects) {
+  for (const project of populated) {
     const authorIds: string[] = [];
     const farcasterIds = project.team.map((member) => member.user.farcasterId);
     for (const farcasterId of farcasterIds) {
