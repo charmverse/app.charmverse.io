@@ -1,8 +1,10 @@
+import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 import { authSecret } from '@root/config/constants';
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
 import type { SessionData } from 'lib/session/config';
 import { getCookieName } from 'lib/session/config';
 import { getSession } from 'lib/session/getSession';
@@ -61,6 +63,11 @@ export async function middleware(request: NextRequest) {
     // Rewrite the URL without patameter
     return NextResponse.redirect(url, { headers: response.headers });
   }
+
+  // await trackWaitlistMixpanelEvent('page_view', {
+  //   page: url.pathname,
+  //   userId: session.farcasterUser?.fid ? deterministicV4UUIDFromFid(session.farcasterUser.fid) : ''
+  // });
 
   return response;
 }
