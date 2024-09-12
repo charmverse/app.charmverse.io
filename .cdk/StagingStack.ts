@@ -16,7 +16,6 @@ export class StagingStack extends Stack {
     props: StackProps,
     {
       healthCheck = defaultHealthCheck,
-      environmentTier = 'WebServer',
       environmentType = 'LoadBalanced',
       instanceType = 't3a.small,t3.small'
     }: Options = {}
@@ -70,11 +69,6 @@ export class StagingStack extends Stack {
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'RootVolumeSize',
         value: '24' // example size in GB
-      },
-      {
-        namespace: 'aws:elasticbeanstalk:environment',
-        optionName: 'EnvironmentTier',
-        value: environmentTier
       },
       {
         namespace: 'aws:elasticbeanstalk:environment',
@@ -204,7 +198,12 @@ export class StagingStack extends Stack {
       versionLabel: appVersionProps.ref
     });
 
-    if (environmentTier === 'WebServer') {
+    if (environmentType === 'Worker') {
+      // Send users to the AWS console to view the environment
+      new CfnOutput(this, 'DeploymentUrl', {
+        value: `https://console.aws.amazon.com/elasticbeanstalk/home#/environment/dashboard?environmentId=${ebEnv.ref}`
+      });
+    } else {
       const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
         domainName: domain
       });
@@ -233,11 +232,6 @@ export class StagingStack extends Stack {
       const protocol = environmentType === 'LoadBalanced' ? 'https' : 'http';
       new CfnOutput(this, 'DeploymentUrl', {
         value: `${protocol}://${deploymentDomain}/`
-      });
-    } else {
-      // Send users to the AWS console to view the environment
-      new CfnOutput(this, 'DeploymentUrl', {
-        value: `https://console.aws.amazon.com/elasticbeanstalk/home#/environment/dashboard?environmentId=${ebEnv.ref}`
       });
     }
   }

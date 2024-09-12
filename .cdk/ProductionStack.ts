@@ -6,8 +6,7 @@ import { Construct } from 'constructs';
 export type Options = {
   healthCheck?: { port: number; path: string };
   sslCert?: string;
-  environmentTier?: 'WebServer' | 'Worker';
-  environmentType?: 'SingleInstance' | 'LoadBalanced';
+  environmentType?: 'SingleInstance' | 'LoadBalanced' | 'Worker';
   instanceType?: string;
 };
 
@@ -21,7 +20,6 @@ export class ProductionStack extends Stack {
     {
       sslCert,
       healthCheck = defaultHealthCheck,
-      environmentTier = 'WebServer',
       environmentType = 'LoadBalanced',
       instanceType = 't3a.small,t3.small'
     }: Options
@@ -73,11 +71,6 @@ export class ProductionStack extends Stack {
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'RootVolumeSize',
         value: '24' // example size in GB
-      },
-      {
-        namespace: 'aws:elasticbeanstalk:environment',
-        optionName: 'EnvironmentTier',
-        value: environmentTier
       },
       {
         namespace: 'aws:elasticbeanstalk:environment',
