@@ -51,7 +51,7 @@ jobs:
 
             # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
             stage_name=`echo "stg-${app}-${stage_name_suffix}" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
-            touch ${stage}_name.zip
+            touch ${stage_name}.zip
             npx cdk destroy -c name=$stage_name --force
             echo "${app}_env=$stage_name" >> $GITHUB_OUTPUT
 
