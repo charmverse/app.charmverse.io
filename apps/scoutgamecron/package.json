@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "build": "npx tsx esbuild.config.ts",
-    "start": "tsx watch src/cron.ts",
-    "start:prod": "node ./dist/cron.js",
+    "start": "tsx watch src/main.ts",
+    "start:prod": "node ./dist/main.js",
     "test": "npx jest",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },

@@ -7,7 +7,7 @@ import { initWebPush } from './initWebPush';
 
 initWebPush();
 
-export async function task() {
+export async function sendNotifications() {
   log.debug('Running Push Notification cron job for Connect app');
 
   try {

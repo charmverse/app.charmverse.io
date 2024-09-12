@@ -5,7 +5,7 @@ import * as esbuild from 'esbuild';
 esbuild
   .build({
     bundle: true,
-    entryPoints: ['./src/cron.ts'],
+    entryPoints: ['./src/main.ts'],
     // metafile: true, // uncomment to analyize build file contents
     outdir: './dist',
     tsconfig: './tsconfig.json',

@@ -2,7 +2,7 @@ import type { Server } from 'http';
 
 import request from 'supertest';
 
-import app from '../healthCheck/app';
+import app from '../worker';
 
 let server: Server;
 
