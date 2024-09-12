@@ -89,6 +89,7 @@
     "scoutgame:test:e2e": "npm run test:e2e -w=apps/scoutgame -- --headed",
     "scoutgame:test:e2e:ci": "npm run test:e2e -w=apps/scoutgame",
     "scoutgame:start:test:ci": "npm run start:test:ci -w=apps/scoutgame",
+    "scoutgamecron": "dotenv -e .env.test.local -- npm start -w apps/scoutgamecron",
     "scoutgamecron:test": "dotenv -e .env.test.local -- npm test -w apps/scoutgamecron",
     "scoutgamecron:staging": "npm run start:prod -w apps/scoutgamecron",
     "scoutgamecron:prod": "npm run start:prod -w apps/scoutgamecron",
