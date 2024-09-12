@@ -1,5 +1,5 @@
 {
-  "name": "scoutgame",
+  "name": "@apps/scoutgame",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -17,6 +17,8 @@
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
     "@mui/material-nextjs": "^5.16.6",
+    "@packages/github": "file:../../packages/github",
+    "@packages/scoutgame": "^0.0.0",
     "@serwist/next": "^9.0.5",
     "@tanstack/react-query": "^5.52.2",
     "@typeschema/yup": "^0.13.3",
