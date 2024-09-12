@@ -22,6 +22,8 @@ export function LevelChangedFrame({ fid, percentile, tierChange }: LevelChangedF
 
   const imgSrc = `${baseUrl}/images/waitlist/${tierChange}-${tier}.gif`;
 
+  const apiUrl = `${baseUrl}/api/frame/${fid}/level-changed?tierChange=${tierChange}`;
+
   return getFrameHtml({
     title: scoutGameFrameTitle,
     image: imgSrc,
@@ -32,17 +34,17 @@ export function LevelChangedFrame({ fid, percentile, tierChange }: LevelChangedF
       {
         action: 'post',
         label: "What's this?",
-        target: `${baseUrl}/api/frame/${fid}/level-changed`
+        target: apiUrl
       },
       {
         action: 'post_redirect',
         label: 'Details',
-        target: `${baseUrl}/api/frame/${fid}/level-changed`
+        target: apiUrl
       },
       {
         action: 'post_redirect',
         label: 'Share & Earn Pts',
-        target: `${baseUrl}/api/frame/${fid}/level-changed`
+        target: apiUrl
       }
     ]
   });
