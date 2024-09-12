@@ -28,7 +28,6 @@ jobs:
 
       - name: set STAGE variable in environment for next steps
         run: |
-          full_stage_name="${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
 
           # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
           stage_name=`echo "$full_stage_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
@@ -43,86 +42,77 @@ jobs:
         uses: ./.github/actions/install
 
       - name: destroy the stack on AWS
+        id: destroy_aws_stack
         # we need to create a dummy zip file or else cdk throws an error it cannot find the asset
         run: |
-          touch stg-ceramic-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-comingsoon-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-cron-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-farcaster-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-scoutgame-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-scoutgamecron-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-sunnyawards-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-waitlist-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-webapp-${{ env.STAGE_SUFFIX }}.zip
-          touch stg-websockets-${{ env.STAGE_SUFFIX }}.zip
+          stage_name_suffix="${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
 
-          npx cdk destroy -c name=stg-ceramic-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-comingsoon-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-cron-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-farcaster-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-scoutgame-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-scoutgamecron-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-sunnyawards-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-waitlist-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-webapp-${{ env.STAGE_SUFFIX }} --force
-          npx cdk destroy -c name=stg-websockets-${{ env.STAGE_SUFFIX }} --force
+          for app in ceramic comingsoon cron farcaster scoutgame scoutgamecron sunnyawards waitlist webapp websockets; do
+
+            # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
+            stage_name=`echo "stg-${app}-${stage_name_suffix}" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
+            touch ${stage}_name.zip
+            npx cdk destroy -c name=$stage_name --force
+            echo "${app}_env=$stage_name" >> $GITHUB_OUTPUT
+
+          done
 
       - name: delete ceramic github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-ceramic-${{ env.STAGE_SUFFIX }}
+          environment: ${{ steps.destroy_aws_stack.outputs.ceramic_env }}
 
       - name: delete coming soon github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-comingsoon-${{ env.STAGE_SUFFIX }}
+          environment: ${{ steps.destroy_aws_stack.outputs.comingsoon_env }}
 
       - name: delete cron github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-cron-${{ env.STAGE_SUFFIX }}
+          environment: ${{ steps.destroy_aws_stack.outputs.cron_env }}
 
       - name: delete farcaster github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-farcaster-${{ env.STAGE_SUFFIX }}
+          environment: ${{ steps.destroy_aws_stack.outputs.farcaster_env }}
 
       - name: delete scoutgame github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-scoutgame-${{ env.STAGE_SUFFIX }}
+          environment: ${{ steps.destroy_aws_stack.outputs.scoutgame_env }}
 
       - name: delete scoutgame github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-scoutgamecron-${{ env.STAGE_SUFFIX }}
+          environment: ${{ steps.destroy_aws_stack.outputs.scoutgamecron_env }}
 
       - name: delete sunnyawards github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-sunnyawards-${{ env.STAGE_SUFFIX }}
+          environment: ${{ steps.destroy_aws_stack.outputs.sunnyawards_env }}
 
       - name: delete waitlist github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-waitlist-${{ env.STAGE_SUFFIX }}
+          environment: ${{ steps.destroy_aws_stack.outputs.waitlist_env }}
 
       - name: delete webapp github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-webapp-${{ env.STAGE_SUFFIX }}
+          environment: ${{ steps.destroy_aws_stack.outputs.webapp_env }}
 
       - name: delete websockets github deployment
         uses: strumwolf/delete-deployment-environment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: stg-websockets-${{ env.STAGE_SUFFIX }}
+          environment: ${{ steps.destroy_aws_stack.outputs.websockets_env }}
