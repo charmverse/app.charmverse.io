@@ -1,5 +1,5 @@
 {
-  "name": "scoutgame",
+  "name": "@apps/scoutgame",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -17,14 +17,14 @@
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
     "@mui/material-nextjs": "^5.16.6",
+    "@packages/github": "file:../../packages/github",
+    "@packages/scoutgame": "^0.0.0",
     "@serwist/next": "^9.0.5",
     "@tanstack/react-query": "^5.52.2",
     "@typeschema/yup": "^0.13.3",
     "framer-motion": "^11.3.17",
     "next-safe-action": "^7.4.2",
     "server-only": "^0.0.1",
-    "viem": "^2.20.1",
-    "wagmi": "^2.12.7",
     "web-push": "^3.6.7"
   },
   "devDependencies": {

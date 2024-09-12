@@ -8,16 +8,16 @@ import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 
 // In readonly mode, use a div instead of input/textarea so that we can use anchor tags
-const ReadOnlyText = styled.div`
+const ReadOnlyText = styled(Box)`
   cursor: text;
   white-space: pre-wrap;
 `;
 
 // Convert a string into a React component, and wrap links with anchor tags
-function LinkifiedValue({ value }: { value: string }): JSX.Element {
+const LinkifiedValue = forwardRef(({ value, className }: { value?: string; className?: string }, ref) => {
   return (
-    <ReadOnlyText>
-      {value.split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
+    <ReadOnlyText className={className} ref={ref}>
+      {(value || ' ').split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
         part.startsWith('http') ? (
           <Link
             underline='always' // matches inline charm editor
@@ -35,7 +35,7 @@ function LinkifiedValue({ value }: { value: string }): JSX.Element {
       )}
     </ReadOnlyText>
   );
-}
+});
 
 type Props = ControlFieldProps &
   FieldProps & { multiline?: boolean; inputEndAdornmentAlignItems?: string; rows?: number; maxRows?: number };
@@ -46,7 +46,9 @@ export const CustomTextField = forwardRef<HTMLDivElement, TextFieldProps & { err
       if (props.disabled) {
         return {
           // eslint-disable-next-line react/no-unstable-nested-components
-          inputComponent: (_props: InputBaseComponentProps) => <LinkifiedValue value={props.value as string} />
+          inputComponent: forwardRef((_props: InputBaseComponentProps, _ref) => (
+            <LinkifiedValue value={props.value as string} {..._props} ref={_ref} />
+          ))
         };
       } else if (typeof props.value === 'string' && props.value.startsWith('http')) {
         // for admins, add an icon to open the link in a new tab even if the field is not disabled

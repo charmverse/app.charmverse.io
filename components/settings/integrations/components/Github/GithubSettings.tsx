@@ -1,5 +1,5 @@
 import { Stack, Typography } from '@mui/material';
-import { getGithubAppCallbackUrl } from '@root/lib/github/oauth';
+import { getGithubAppCallbackUrl } from '@packages/github/oauth';
 import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -7,6 +7,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useGithubApp } from 'hooks/useGithubApp';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { GITHUB_APP_NAME, GITHUB_CLIENT_ID } from 'lib/github/constants';
 
 import { IntegrationContainer } from '../IntegrationContainer';
 
@@ -65,6 +66,7 @@ export function GithubSettings({
                 disabled={!isAdmin}
                 external
                 href={getGithubAppCallbackUrl({
+                  appName: GITHUB_APP_NAME,
                   redirect: `${window?.location.origin}/${spaceDomain}/members?settingTab=integrations&section=github`
                 })}
               >

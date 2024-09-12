@@ -22,8 +22,8 @@ const appDescription = 'Onchain network for connecting web3 developers, projects
 export const metadata: Metadata = {
   applicationName: appName,
   icons: {
-    icon: ['/images/favicon.png'],
-    apple: ['/images/favicon.png']
+    icon: ['/favicon.ico'],
+    apple: ['/favicon.ico']
   },
   title: {
     default: `${appName} - ${appTitle}`,

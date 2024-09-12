@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma, type ConnectWaitlistSlot } from '@charmverse/core/prisma-client';
+import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 
 import { refreshUserScore } from '../scoring/refreshUserScore';
 
@@ -32,6 +33,7 @@ export async function joinWaitlist({ fid, username, referredByFid }: WaitlistJoi
 
   let newSlot = await prisma.connectWaitlistSlot.create({
     data: {
+      id: deterministicV4UUIDFromFid(parsedFid),
       fid: parsedFid,
       username,
       referredByFid: parsedReferrer !== parsedFid ? parsedReferrer : null,
