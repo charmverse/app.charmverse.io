@@ -16,6 +16,7 @@ export const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
   padding-right: ${theme.spacing(2)};
   align-items: center;
   color: ${theme.palette.secondary.main};
+  -webkit-text-fill-color: ${theme.palette.secondary.main};
   display: flex;
   font-size: 14px;
   font-weight: 500;
@@ -40,6 +41,7 @@ const StyledSidebarLink = styled(Link, { shouldForwardProp: (prop) => prop !== '
       ? `
     background-color: ${theme.palette.action.selected};
     color: ${theme.palette.text.primary};
+    -webkit-text-fill-color: ${theme.palette.text.primary};
   `
       : ''}
   // disable hover UX on ios which converts first click to a hover event
