@@ -31,27 +31,17 @@ jobs:
           app-id: ${{ secrets.GH_APP_ID }}
           private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
 
-      - name: inject slug/short variables
+      - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.x
         with:
           short-length: 7
 
-      - name: set STAGE variable in environment for next steps
-        run: |
-
-          # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
-          stage_name=`echo "$full_stage_name" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
-
-          # export the stage name so that it can be used in other steps
-          echo "STAGE_SUFFIX=$stage_name" >> $GITHUB_ENV
-
-      - name: checkout the files
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Install dependencies
         uses: ./.github/actions/install
 
-      - name: destroy the stack on AWS
+      - name: Delete Cloudformation stacks on AWS
         id: destroy_aws_stack
         # we need to create a dummy zip file or else cdk throws an error it cannot find the asset
         run: |
