@@ -433,9 +433,7 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             color: darkBlueColor,
-            '-webkit-text-fill-color': darkBlueColor, // override disabled color of text inputs
             '&:hover': {
-              '-webkit-text-fill-color': darken(darkBlueColor, 0.2), // override disabled color of text inputs
               color: darken(darkBlueColor, 0.2)
             }
           }
