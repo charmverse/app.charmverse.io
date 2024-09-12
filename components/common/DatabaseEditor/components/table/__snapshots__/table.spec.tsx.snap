@@ -360,7 +360,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   data-test="database-open-button-card-id-1"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1hr94m-MuiTypography-root-MuiLink-root"
                     href="/card-id-1"
                     style="text-decoration: none;"
                   >
@@ -556,7 +556,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   data-test="database-open-button-card-id-2"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1hr94m-MuiTypography-root-MuiLink-root"
                     href="/card-id-2"
                     style="text-decoration: none;"
                   >
@@ -1160,7 +1160,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   data-test="database-open-button-card-id-1"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1hr94m-MuiTypography-root-MuiLink-root"
                     href="/card-id-1"
                     style="text-decoration: none;"
                   >
@@ -1356,7 +1356,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   data-test="database-open-button-card-id-2"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1hr94m-MuiTypography-root-MuiLink-root"
                     href="/card-id-2"
                     style="text-decoration: none;"
                   >
@@ -1960,7 +1960,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   data-test="database-open-button-card-id-1"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1hr94m-MuiTypography-root-MuiLink-root"
                     href="/card-id-1"
                     style="text-decoration: none;"
                   >
@@ -2156,7 +2156,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   data-test="database-open-button-card-id-2"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1hr94m-MuiTypography-root-MuiLink-root"
                     href="/card-id-2"
                     style="text-decoration: none;"
                   >
@@ -2760,7 +2760,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   data-test="database-open-button-card-id-1"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1hr94m-MuiTypography-root-MuiLink-root"
                     href="/card-id-1"
                     style="text-decoration: none;"
                   >
@@ -2956,7 +2956,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   data-test="database-open-button-card-id-2"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1hr94m-MuiTypography-root-MuiLink-root"
                     href="/card-id-2"
                     style="text-decoration: none;"
                   >

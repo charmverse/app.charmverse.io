@@ -372,7 +372,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     class="octo-board-column"
                   >
                     <a
-                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-z0rmih-MuiTypography-root-MuiLink-root"
                       draggable="false"
                       href="/test-space/1"
                     >
@@ -419,7 +419,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       </div>
                     </a>
                     <a
-                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-z0rmih-MuiTypography-root-MuiLink-root"
                       draggable="false"
                       href="/test-space/2"
                     >
@@ -1676,7 +1676,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     class="octo-board-column"
                   >
                     <a
-                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-z0rmih-MuiTypography-root-MuiLink-root"
                       draggable="false"
                       href="/test-space/1"
                     >
@@ -1723,7 +1723,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       </div>
                     </a>
                     <a
-                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-z0rmih-MuiTypography-root-MuiLink-root"
                       draggable="false"
                       href="/test-space/2"
                     >
@@ -2659,7 +2659,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             data-test="database-open-button-1"
                           >
                             <a
-                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1hr94m-MuiTypography-root-MuiLink-root"
                               href="/1"
                               style="text-decoration: none;"
                             >
@@ -2779,7 +2779,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             data-test="database-open-button-2"
                           >
                             <a
-                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1hr94m-MuiTypography-root-MuiLink-root"
                               href="/2"
                               style="text-decoration: none;"
                             >
