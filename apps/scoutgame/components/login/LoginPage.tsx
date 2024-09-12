@@ -3,7 +3,6 @@ import Image from 'next/image';
 
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 import { InfoWrapper } from 'components/layout/InfoWrapper';
-import { LearnMore } from 'components/layout/LearnMore';
 
 export function LoginPage() {
   return (
@@ -46,9 +45,6 @@ export function LoginPage() {
         <Box display='flex' flexDirection='column' gap={3} width='100%'>
           <WarpcastLogin />
         </Box>
-      </Box>
-      <Box>
-        <LearnMore />
       </Box>
     </InfoWrapper>
   );

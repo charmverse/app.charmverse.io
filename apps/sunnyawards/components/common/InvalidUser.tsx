@@ -23,7 +23,7 @@ export function InvalidUser() {
   return (
     <PageWrapper textAlign='center'>
       <Typography mb={2}>Your user seems invalid. Please refresh and login again</Typography>
-      <Button data-test='invalidate-user-button' disabled={isExecutingLogout} onClick={() => logoutUser({})}>
+      <Button data-test='invalidate-user-button' disabled={isExecutingLogout} onClick={() => logoutUser()}>
         Refresh
       </Button>
     </PageWrapper>

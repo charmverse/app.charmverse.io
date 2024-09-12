@@ -6,8 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-import { LearnMore } from 'components/layout/LearnMore';
-
 import { JoinGithubButton } from './components/github/JoinGithubButton';
 
 export function BuilderPage() {
@@ -63,9 +61,6 @@ export function BuilderPage() {
             Cancel
           </Button>
         </Box>
-      </Box>
-      <Box>
-        <LearnMore />
       </Box>
     </PageWrapper>
   );
