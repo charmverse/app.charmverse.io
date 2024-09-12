@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
     !path.startsWith('/login') &&
     !path.startsWith('/home')
   ) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/home', request.url));
   }
 
   return NextResponse.next();
