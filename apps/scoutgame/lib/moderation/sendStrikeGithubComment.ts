@@ -35,6 +35,10 @@ export async function sendStrikeGithubComment({
   }
 
   const strikesForSeason = await getStrikesForSeason({ season: builderEvent.season });
+  if (!strikesForSeason) {
+    return;
+  }
+
   const isBanned = strikesForSeason >= 3;
   const message = isBanned
     ? 'This builder has been banned from the scoutgame'
