@@ -1,6 +1,7 @@
 import { CfnOutput, CfnTag, Stack, StackProps } from 'aws-cdk-lib';
 import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as route53 from 'aws-cdk-lib/aws-route53';
+import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import { Construct } from 'constructs';
 import { Options } from './ProductionStack';
@@ -201,18 +202,34 @@ export class StagingStack extends Stack {
       domainName: domain
     });
 
-    new route53.ARecord(this, 'ARecord', {
-      zone,
-      recordName: deploymentDomain + '.',
-      //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
-      target: route53.RecordTarget.fromAlias({
-        bind: (): route53.AliasRecordTargetConfig => ({
-          dnsName: ebEnv.attrEndpointUrl,
-          // get hosted zone for elbs based on region: https://docs.aws.amazon.com/general/latest/gr/elb.html
-          hostedZoneId: 'Z35SXDOTRQ7X7K'
-        })
-      })
+    // Create Route 53 A record for the environment
+    // Replace 'yourdomain.com' with your domain and provide the hosted zone ID
+    const hostedZone = route53.HostedZone.fromLookup(this, 'MyHostedZone', {
+      domainName: 'yourdomain.com'
     });
+
+    console.log('ebEnv.attrEndpointUrl', ebEnv.attrEndpointUrl);
+
+    if (environmentType === 'LoadBalanced') {
+      new route53.ARecord(this, 'ARecord', {
+        zone,
+        recordName: deploymentDomain + '.',
+        //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
+        target: route53.RecordTarget.fromAlias({
+          bind: (): route53.AliasRecordTargetConfig => ({
+            dnsName: ebEnv.attrEndpointUrl,
+            // get hosted zone for elbs based on region: https://docs.aws.amazon.com/general/latest/gr/elb.html
+            hostedZoneId: 'Z35SXDOTRQ7X7K'
+          })
+        })
+      });
+    } else {
+      new route53.ARecord(this, 'MyARecord', {
+        zone: hostedZone,
+        target: route53.RecordTarget.fromIpAddresses(ebEnv.attrEndpointUrl),
+        recordName: 'www' // Replace with the desired subdomain (e.g., 'www')
+      });
+    }
 
     /**
      * Output the distribution's url so we can pass it to external systems
