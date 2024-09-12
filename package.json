@@ -90,6 +90,8 @@
     "scoutgame:test:e2e:ci": "npm run test:e2e -w=apps/scoutgame",
     "scoutgame:start:test:ci": "npm run start:test:ci -w=apps/scoutgame",
     "scoutgamecron:test": "dotenv -e .env.test.local -- npm test -w apps/scoutgamecron",
+    "scoutgamecron:staging": "npm run start:prod -w apps/scoutgamecron",
+    "scoutgamecron:prod": "npm run start:prod -w apps/scoutgamecron",
     "waitlist": "npx react-env --path .env.local --dest ./apps/waitlist/public -- npm run start --workspace=apps/waitlist",
     "waitlist:start:test": "npm run start:test -w=apps/waitlist",
     "waitlist:remote": "npx react-env --path .env.production -- npm run start --workspace=apps/waitlist",
