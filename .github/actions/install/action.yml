@@ -44,7 +44,7 @@ runs:
           ./node_modules
           ./apps/*/node_modules
           ./packages/*/node_modules
-        key: nodemodule-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{ inputs.app_name || 'no-app' }}
+        key: nodemodule-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{ inputs.app_name || '' }}
 
     - name: Install npm dependencies
       shell: bash
