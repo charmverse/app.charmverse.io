@@ -11,9 +11,7 @@ const sunnyLogoSrc = '/images/coming_soon/sunnyawards_logo.png';
 
 const Background = styled.div`
   min-height: 100vh;
-  background: #000;
   display: flex;
-  padding: 2em;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -62,7 +60,7 @@ export function ComingSoon() {
         </Typography>
       </div>
 
-      <Box zIndex={1}>
+      <Box zIndex={1} mb={4}>
         <Typography align='center'>
           Brought to you by the team behind
           <br />
