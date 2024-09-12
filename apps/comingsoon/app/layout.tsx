@@ -21,12 +21,10 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    siteName: 'Scout. Build. Win.',
+    siteName: appName,
     images: 'https://scoutgame.xyz/images/manifest/scoutgame-logo-256.png',
-    title: {
-      default: 'Scout Game',
-      template: 'Scout Game'
-    }
+    title: appName,
+    description: 'Scout. Build. Win.'
   },
   twitter: {
     card: 'summary',
