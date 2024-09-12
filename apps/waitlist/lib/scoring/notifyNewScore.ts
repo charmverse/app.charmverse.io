@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { baseUrl } from '@root/config/constants';
+import { baseUrl, isProdEnv } from '@root/config/constants';
 import { NEYNAR_SIGNER_ID } from '@root/lib/farcaster/constants';
 import { writeToFarcaster } from '@root/lib/farcaster/messaging/writeToFarcaster';
 
@@ -45,7 +45,7 @@ export async function notifyNewScore({ fid, tier, tierChange }: WaitlistScoreNot
   return writeToFarcaster({
     neynarSignerId: NEYNAR_SIGNER_ID,
     text: message,
-    channelId: 'scout-game',
+    channelId: isProdEnv ? 'scout-game' : 'cvdev',
     embedUrl
   });
 }
