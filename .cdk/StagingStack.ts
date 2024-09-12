@@ -225,8 +225,9 @@ export class StagingStack extends Stack {
      * Output the distribution's url so we can pass it to external systems
      *  Note: something at the end of the path is required or the Load balancer url never resolves
      */
+    const protocol = environmentType === 'LoadBalanced' ? 'https' : 'http';
     new CfnOutput(this, 'DeploymentUrl', {
-      value: 'https://' + deploymentDomain + '/'
+      value: `${protocol}//${deploymentDomain}/`
     });
   }
 }
