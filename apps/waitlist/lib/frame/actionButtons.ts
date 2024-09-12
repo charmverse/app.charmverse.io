@@ -51,7 +51,9 @@ export async function waitlistGet10Clicks(data: FarcasterUserToEncode): Promise<
 
 export function shareFrameUrl(fid: string | number): string {
   return `https://warpcast.com/~/compose?text=${encodeURIComponent(
-    'Join me on the waitlist for Scout Game! If you join via my frame, I earn points toward moving up in the list. No pressure, but you don’t want to miss this launch ;)'
+    `Just joined the Scout Game waitlist! Ready to scout, build, and win by spotting top onchain talents!
+
+ Join me and claim your spot by sharing this frame.`
   )}&embeds[]=${encodeURIComponent(`${baseUrl}/api/frame/${fid}/waitlist`)}`;
 }
 
