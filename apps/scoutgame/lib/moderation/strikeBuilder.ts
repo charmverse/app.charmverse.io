@@ -1,5 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getStrikesForSeason } from './getStrikesForSeason';
+
 export async function strikeBuilder({ builderId, builderEventId }: { builderId: string; builderEventId: string }) {
   const builderEvent = await prisma.builderEvent.findFirstOrThrow({
     where: {
@@ -17,18 +19,11 @@ export async function strikeBuilder({ builderId, builderEventId }: { builderId: 
     }
   });
 
-  const totalStrikes = await prisma.builderStrike.count({
-    where: {
-      builderId,
-      builderEvent: {
-        season: builderEvent.season
-      }
-    }
-  });
-
   let isBanned = false;
 
-  if (totalStrikes >= 3) {
+  const strikesForSeason = await getStrikesForSeason({ season: builderEvent.season });
+
+  if (strikesForSeason >= 3) {
     await prisma.scout.update({
       where: {
         id: builderId

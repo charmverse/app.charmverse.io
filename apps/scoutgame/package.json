@@ -17,6 +17,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
     "@mui/material-nextjs": "^5.16.6",
+    "@octokit/rest": "^21.0.2",
     "@serwist/next": "^9.0.5",
     "@tanstack/react-query": "^5.52.2",
     "@typeschema/yup": "^0.13.3",
