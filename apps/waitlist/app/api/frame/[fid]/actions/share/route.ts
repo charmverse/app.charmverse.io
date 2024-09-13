@@ -7,6 +7,7 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 import { shareFrameUrl } from 'lib/frame/actionButtons';
 import { getCurrentFrameFromUrl, getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
 import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
+import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
 export async function POST(req: Request) {
   const waitlistClicked = (await req.json()) as FarcasterFrameInteractionToValidate;
@@ -20,6 +21,7 @@ export async function POST(req: Request) {
   }
 
   const interactorFid = parseInt(validatedMessage.action.interactor.fid.toString(), 10);
+  const interactorUsername = validatedMessage.action.interactor.username;
 
   trackWaitlistMixpanelEvent('frame_click', {
     userId: deterministicV4UUIDFromFid(interactorFid),
@@ -27,6 +29,9 @@ export async function POST(req: Request) {
     action: 'click_share',
     frame: getCurrentFrameFromUrl(req)
   });
+
+  await joinWaitlist({ fid: interactorFid, username: interactorUsername, referredByFid: referrerFid });
+
   const warpcastShareUrl = shareFrameUrl(interactorFid);
   return new Response(null, { status: 302, headers: { Location: warpcastShareUrl } });
 }

@@ -54,7 +54,7 @@ export function waitlistShareMyFrame({
 
 export function waitlistGotoHome({ referrerFid, currentFrame }: FrameReferrer): FrameButtonPostRedirect {
   return {
-    label: 'Get details',
+    label: 'Details',
     action: 'post_redirect',
     target: encodeCurrentFrame({ url: `${baseUrl}/api/frame/${referrerFid}/actions/goto-home`, frame: currentFrame })
   };
@@ -62,7 +62,7 @@ export function waitlistGotoHome({ referrerFid, currentFrame }: FrameReferrer): 
 
 export function waitlistGotoScore({ referrerFid, currentFrame }: FrameReferrer): FrameButtonPostRedirect {
   return {
-    label: 'Get details',
+    label: 'Details',
     action: 'post_redirect',
     target: encodeCurrentFrame({ url: `${baseUrl}/api/frame/${referrerFid}/actions/goto-score`, frame: currentFrame })
   };

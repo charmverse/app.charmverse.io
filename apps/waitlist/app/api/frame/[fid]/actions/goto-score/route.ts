@@ -31,6 +31,7 @@ export async function POST(req: Request) {
     frame: getCurrentFrameFromUrl(req)
   });
 
+  // Probably not needed, but avoids sending a user to the site without being in the waitlist
   await joinWaitlist({
     fid: interactorFid,
     referredByFid: referrerFid,
