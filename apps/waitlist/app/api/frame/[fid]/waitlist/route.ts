@@ -8,7 +8,7 @@ import { JoinWaitlistFrame } from 'components/frame/JoinWaitlistFrame';
 import { WaitlistCurrentScoreFrame } from 'components/frame/WaitlistCurrentScoreFrame';
 import { WaitlistJoinedFrame } from 'components/frame/WaitlistJoinedFrame';
 import { getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
-import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
+import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
 import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 

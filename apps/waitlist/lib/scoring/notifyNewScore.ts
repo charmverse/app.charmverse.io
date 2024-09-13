@@ -20,10 +20,6 @@ export async function notifyNewScore({
   tierChange,
   username
 }: Omit<TierChangeResult, 'score'>) {
-  if (tierChange !== 'up' && tierChange !== 'down') {
-    return;
-  }
-
   const message = `@${username} you moved ${tierChange} to the ${tierLabels[newTier]} tier!`;
 
   const embedUrl = `${baseUrl}/api/frame/${fid}/level-changed?tierChange=${tierChange}&percentile=${percentile}`;

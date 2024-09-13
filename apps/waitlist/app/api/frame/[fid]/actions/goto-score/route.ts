@@ -6,7 +6,7 @@ import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/va
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
 
 import { getCurrentFrameFromUrl, getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
-import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
+import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
 import { embedFarcasterUser } from 'lib/session/embedFarcasterUser';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 

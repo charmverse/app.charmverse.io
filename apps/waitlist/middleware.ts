@@ -62,11 +62,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url, { headers: response.headers });
   }
 
-  // await trackWaitlistMixpanelEvent('page_view', {
-  //   page: url.pathname,
-  //   userId: session.farcasterUser?.fid ? deterministicV4UUIDFromFid(session.farcasterUser.fid) : ''
-  // });
-
   return response;
 }
 

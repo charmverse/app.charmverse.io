@@ -33,6 +33,8 @@ type WaitlistAppEventMap = {
   page_view: UserEvent & { page: string };
   login: UserEvent;
   logout: UserEvent;
+  connect_github_click: UserEvent;
+  connect_github_success: UserEvent;
 };
 
 export type WaitlistEventMap = FrameEventMap & WaitlistAppEventMap;

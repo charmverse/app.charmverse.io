@@ -1,11 +1,11 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { randomIntFromInterval } from '@root/lib/utils/random';
-import { prettyPrint } from '@root/lib/utils/strings';
 
 import { randomFid } from '../../../../../testing/utils/farcaster';
 import type { ConnectWaitlistTier, TierChange } from '../constants';
 import { refreshPercentilesForEveryone } from '../refreshPercentilesForEveryone'; // Adjust the import to the correct module
+import { refreshUserScore } from '../refreshUserScore';
 
 // Function to shuffle an array deterministically using a seeded random number generator
 function seededShuffle(array: number[], seed: number): number[] {
@@ -51,13 +51,7 @@ describe('refreshPercentilesForEveryone', () => {
   });
 
   afterEach(async () => {
-    await prisma.connectWaitlistSlot.deleteMany({
-      where: {
-        fid: {
-          in: [...fids, ...additionalFids]
-        }
-      }
-    });
+    await prisma.connectWaitlistSlot.deleteMany();
   });
 
   it('should correctly refresh percentiles and detect tier changes', async () => {
@@ -78,7 +72,9 @@ describe('refreshPercentilesForEveryone', () => {
           score,
           initialPosition,
           percentile: 0, // This will be recalculated
-          username
+          username,
+          // We only want to account for users with at least 1 referral or who connected Github - for simplicity, make this a self referral.
+          referredByFid: fid
         };
       }
     );
@@ -203,7 +199,9 @@ describe('refreshPercentilesForEveryone', () => {
           score,
           initialPosition,
           percentile: 0, // This will be recalculated
-          username
+          username,
+          // We only want to account for users with at least 1 referral or who connected Github - for simplicity, make this a self referral.
+          referredByFid: fid
         };
       }
     );
@@ -226,7 +224,9 @@ describe('refreshPercentilesForEveryone', () => {
           initialPosition: 0,
           score: -10000000,
           isPartnerAccount: true,
-          percentile: 0
+          percentile: 0,
+          // We only want to account for users with at least 1 referral or who connected Github - for simplicity, make this a self referral.
+          referredByFid: randomUserFid
         } as Prisma.ConnectWaitlistSlotCreateManyInput;
 
         return input;
@@ -354,7 +354,9 @@ describe('refreshPercentilesForEveryone', () => {
         score,
         initialPosition,
         percentile: 0, // This will be recalculated
-        username
+        username,
+        // We only want to account for users with at least 1 referral or who connected Github - for simplicity, make this a self referral.
+        referredByFid: fid
       };
     });
 
@@ -456,5 +458,153 @@ describe('refreshPercentilesForEveryone', () => {
     });
 
     expect(fifthUserWaitlistSlot.percentile).toBe(fifthChangedUser.percentile);
+  });
+
+  it('should only take into account users who connected a Github Account, or have at least 1 referral', async () => {
+    const listLength = 50;
+
+    const fidsWithReferral = Array.from({ length: listLength }, () => randomFid());
+    const fidsWithGithub = Array.from({ length: listLength }, () => randomFid());
+
+    const expectedFids = [...fidsWithReferral, ...fidsWithGithub];
+
+    const fidsWithoutReferralOrGithub = Array.from({ length: listLength }, () => randomFid());
+
+    await prisma.connectWaitlistSlot.createMany({
+      data: [
+        ...fidsWithReferral.map((fid, index) => ({
+          fid,
+          initialPosition: index + 1,
+          score: 0,
+          percentile: 0,
+          username: `uname:${fid}`
+        })),
+        ...fidsWithGithub.map((fid, index) => ({
+          fid,
+          initialPosition: listLength + index + 1,
+          score: 0,
+          percentile: 0,
+          username: `uname:${fid}`,
+          githubLogin: `githubLogin:${fid}`,
+          referredByFid: fidsWithReferral[index]
+        })),
+        ...fidsWithoutReferralOrGithub.map((fid, index) => ({
+          fid,
+          initialPosition: 2 * listLength + index + 1,
+          // Purposefully high score which shouldnt be taken into account
+          score: -100000 + index,
+          percentile: 0,
+          username: `uname:${fid}`
+        }))
+      ]
+    });
+
+    // Ensure scores are correct
+    await Promise.all(expectedFids.map((fid) => refreshUserScore({ fid })));
+
+    const tierChangeResults = await refreshPercentilesForEveryone();
+
+    expect(tierChangeResults.some((tierChange) => fidsWithReferral.includes(tierChange.fid)));
+
+    // Everyone starts in the 'common' tier
+    // Now, 70% (-1) of 100 records should be out of the common tier
+    expect(tierChangeResults.length).toBe(69);
+
+    const firstChangedUser = tierChangeResults[0];
+    expect(expectedFids.indexOf(firstChangedUser.fid)).toBe(50);
+
+    const secondChangedUser = tierChangeResults[5];
+    expect(expectedFids.indexOf(secondChangedUser.fid)).toBe(55);
+
+    const thirdChangedUser = tierChangeResults[15];
+    expect(expectedFids.indexOf(thirdChangedUser.fid)).toBe(65);
+
+    const fourthChangedUser = tierChangeResults[40];
+    expect(expectedFids.indexOf(fourthChangedUser.fid)).toBe(90);
+
+    const fifthChangedUser = tierChangeResults[60];
+    expect(expectedFids.indexOf(fifthChangedUser.fid)).toBe(10);
+
+    // Test specific cases where we know tier changes should happen
+
+    // We expect the first user to be in the 'legendary' tier after refresh
+    expect(firstChangedUser.percentile).toBe(99);
+    expect(firstChangedUser.score).toBe(-949);
+    expect(firstChangedUser.newTier).toBe<ConnectWaitlistTier>('legendary');
+    expect(firstChangedUser.tierChange).toBe<TierChange>('up');
+
+    const firstUserWaitlistSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+      where: {
+        fid: firstChangedUser.fid
+      }
+    });
+
+    expect(firstUserWaitlistSlot.percentile).toBe(firstChangedUser.percentile);
+
+    // We expect the last user to be in the 'common' tier after refresh
+    expect(secondChangedUser.percentile).toBe(94);
+    expect(secondChangedUser.score).toBe(-944);
+    expect(secondChangedUser.newTier).toBe<ConnectWaitlistTier>('mythic');
+    expect(secondChangedUser.tierChange).toBe<TierChange>('up');
+
+    const secondUserWaitlistSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+      where: {
+        fid: secondChangedUser.fid
+      }
+    });
+
+    expect(secondUserWaitlistSlot.percentile).toBe(secondChangedUser.percentile);
+
+    // Add more checks based on expected tier changes after percentile calculation
+    expect(thirdChangedUser.percentile).toBe(84);
+    expect(thirdChangedUser.score).toBe(-934);
+    expect(thirdChangedUser.newTier).toBe<ConnectWaitlistTier>('mythic');
+    expect(thirdChangedUser.tierChange).toBe<TierChange>('up');
+
+    const thirdUserWaitlistSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+      where: {
+        fid: thirdChangedUser.fid
+      }
+    });
+
+    expect(thirdUserWaitlistSlot.percentile).toBe(thirdChangedUser.percentile);
+
+    expect(fourthChangedUser.percentile).toBe(50);
+    expect(fourthChangedUser.score).toBe(-909);
+    expect(fourthChangedUser.newTier).toBe<ConnectWaitlistTier>('rare');
+    expect(fourthChangedUser.tierChange).toBe<TierChange>('up');
+
+    const fourthUserWaitlistSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+      where: {
+        fid: fourthChangedUser.fid
+      }
+    });
+
+    expect(fourthUserWaitlistSlot.percentile).toBe(fourthChangedUser.percentile);
+
+    expect(fifthChangedUser.percentile).toBe(39);
+    expect(fifthChangedUser.score).toBe(-89);
+    expect(fifthChangedUser.newTier).toBe<ConnectWaitlistTier>('rare');
+    expect(fifthChangedUser.tierChange).toBe<TierChange>('up');
+
+    const fifthUserWaitlistSlot = await prisma.connectWaitlistSlot.findUniqueOrThrow({
+      where: {
+        fid: fifthChangedUser.fid
+      }
+    });
+
+    expect(fifthUserWaitlistSlot.percentile).toBe(fifthChangedUser.percentile);
+
+    const ignoredUsers = await prisma.connectWaitlistSlot.findMany({
+      where: {
+        fid: {
+          in: fidsWithoutReferralOrGithub
+        }
+      }
+    });
+
+    for (const ignoredUser of ignoredUsers) {
+      expect(ignoredUser.percentile).toBe(0);
+    }
   });
 });
