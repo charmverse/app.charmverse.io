@@ -117,7 +117,7 @@ export function stringToValidPath({
  * Leaves other characters unchanged
  * @param input
  */
-export function capitalize(input: string): string {
+export function capitalize(input?: string): string {
   if (!input) {
     return '';
   }
