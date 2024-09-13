@@ -1,7 +1,6 @@
 import { CfnOutput, CfnTag, Stack, StackProps } from 'aws-cdk-lib';
 import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as route53 from 'aws-cdk-lib/aws-route53';
-import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import { Construct } from 'constructs';
 import { Options } from './ProductionStack';
@@ -203,7 +202,7 @@ export class StagingStack extends Stack {
       tags: resourceTags,
       tier: {
         name: environmentTier,
-        type: environmentType === 'Worker' ? 'SQS/HTTP' : 'Standard'
+        type: environmentTier === 'Worker' ? 'SQS/HTTP' : 'Standard'
       },
       versionLabel: appVersionProps.ref
     });

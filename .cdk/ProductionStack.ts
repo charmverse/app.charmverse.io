@@ -7,7 +7,7 @@ export type Options = {
   healthCheck?: { port: number; path: string };
   sslCert?: string;
   environmentTier?: 'WebServer' | 'Worker';
-  environmentType?: 'SingleInstance' | 'LoadBalanced' | 'Worker';
+  environmentType?: 'SingleInstance' | 'LoadBalanced';
   instanceType?: string;
 };
 
