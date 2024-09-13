@@ -11,20 +11,17 @@ import { encodeAbiParameters } from 'viem';
 import { mnemonicToAccount } from 'viem/accounts';
 import { optimism } from 'viem/chains';
 
-import {
-  NEYNAR_API_BASE_URL,
-  NEYNAR_SIGNER_ID,
-  NEYNAR_SIGNER_PUBLIC_KEY,
-  FARCASTER_NOTIFICATION_ACCOUNT_SEED
-} from '../constants';
+import { NEYNAR_API_BASE_URL, NEYNAR_SIGNER_ID, NEYNAR_SIGNER_PUBLIC_KEY } from '../constants';
 import { lookupUserByCustodyAddress } from '../lookupUserByCustodyAddress';
 
 import { keyGatewayAbi } from './abi/keyGatewayAbi';
 import { SignedKeyRequestMetadataABI } from './abi/signedKeyRequestMetadataAbi';
 
+const FARCASTER_SEED_PHRASE = '';
+
 const walletClient = getWalletClient({
   chainId: optimism.id,
-  mnemonic: FARCASTER_NOTIFICATION_ACCOUNT_SEED
+  mnemonic: FARCASTER_SEED_PHRASE
 });
 
 // A constant message for greeting or logging.
@@ -135,7 +132,7 @@ export async function getApprovedSignerId(): Promise<{ signerId: string; signerP
     ];
 
     // Convert mnemonic to an account object.
-    const account = mnemonicToAccount(FARCASTER_NOTIFICATION_ACCOUNT_SEED);
+    const account = mnemonicToAccount(FARCASTER_SEED_PHRASE);
 
     log.info('✅ Account for publishing messages to farcaster:', account.address);
 

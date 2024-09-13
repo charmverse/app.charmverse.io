@@ -5,9 +5,9 @@ import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constan
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 
-import { embedFarcasterUser } from 'lib/frame/actionButtons';
 import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { refreshUserScore } from 'lib/scoring/refreshUserScore';
+import { embedFarcasterUser } from 'lib/session/embedFarcasterUser';
 
 function generateRedirectUrl(errorMessage: string) {
   return `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent(errorMessage)}`;

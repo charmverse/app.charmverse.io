@@ -1,12 +1,18 @@
 import * as yup from 'yup';
 
-type FrameScreen =
+export type FrameScreen =
   | 'join_waitlist_info'
   | 'join_waitlist_new_join'
   | 'join_waitlist_current_score'
   | `waitlist_level_${'up' | 'down'}`;
 
-type FrameAction = 'click_whats_this' | 'join_waitlist' | 'click_share' | 'goto_app';
+type FrameAction =
+  | 'click_whats_this'
+  | 'join_waitlist'
+  | 'click_share'
+  | 'goto_app_home'
+  | 'goto_app_score'
+  | 'goto_app_builders';
 
 type ReferrerEvent = {
   referrerUserId: string;
