@@ -13,13 +13,18 @@ const ReadOnlyText = styled(Box)`
   white-space: pre-wrap;
 `;
 
+// necssary to override color applied to disabled inputs
+const BlueLink = styled(Link)`
+  -webkit-text-fill-color: rgb(0, 143, 164);
+`;
+
 // Convert a string into a React component, and wrap links with anchor tags
 const LinkifiedValue = forwardRef(({ value, className }: { value?: string; className?: string }, ref) => {
   return (
     <ReadOnlyText className={className} ref={ref}>
       {(value || ' ').split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
         part.startsWith('http') ? (
-          <Link
+          <BlueLink
             underline='always' // matches inline charm editor
             // eslint-disable-next-line react/no-array-index-key
             key={index}
@@ -28,7 +33,7 @@ const LinkifiedValue = forwardRef(({ value, className }: { value?: string; class
             rel='noopener noreferrer'
           >
             {part}
-          </Link>
+          </BlueLink>
         ) : (
           part
         )
