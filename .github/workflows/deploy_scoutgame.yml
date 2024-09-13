@@ -138,7 +138,7 @@ jobs:
           file_extensions: '**/*.{ts,tsx}'
           # Flag necessary to avoid issues when using parentheses in the paths
           # https://github.com/tj-actions/eslint-changed-files/issues/1801#issuecomment-2083477324
-          escape_paths: false
+          escape_paths: 'false'
 
       - name: Run tests
         run: npm run scoutgame:test
