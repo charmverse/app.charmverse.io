@@ -2,4 +2,5 @@ version: 1
 cron:
  - name: "hello-world"
    url: "/hello-world"
-   schedule: "*/15 * * * *"
+   # every 5 minutes
+   schedule: "*/5 * * * *"
