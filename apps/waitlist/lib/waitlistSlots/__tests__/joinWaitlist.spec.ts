@@ -70,6 +70,8 @@ describe('joinWaitlist', () => {
     });
     expect(newUser).toBeTruthy();
     expect(result.isNew).toBe(true);
+    expect(newUser?.percentile).toBe(1);
+    expect(newUser?.score).toBe(newUser?.initialPosition);
 
     // Verify that the referred user's score was updated (you would define in refreshUserScore)
     const updatedReferrer = await prisma.connectWaitlistSlot.findUniqueOrThrow({
@@ -78,5 +80,26 @@ describe('joinWaitlist', () => {
 
     // Check if referrer score is updated (refreshUserScore should handle this)
     expect(updatedReferrer.score).not.toBe(referrer.score);
+  });
+
+  it('should initialise partner accounts to percentile 100', async () => {
+    const targetFid = randomFid();
+
+    // Call joinWaitlist with a referral
+    const result = await joinWaitlist({
+      fid: targetFid,
+      username: 'newUserWithReferral',
+      isPartnerAccount: true
+    });
+
+    // Verify that the new user was added to the waitlist
+    const newUser = await prisma.connectWaitlistSlot.findUnique({
+      where: { fid: targetFid }
+    });
+    expect(newUser).toBeTruthy();
+    expect(result.isNew).toBe(true);
+    expect(newUser?.percentile).toBe(100);
+    expect(newUser?.score).toBe(newUser?.initialPosition);
+    expect(newUser?.isPartnerAccount).toBe(true);
   });
 });

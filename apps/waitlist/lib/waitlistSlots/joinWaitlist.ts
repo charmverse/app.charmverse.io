@@ -8,9 +8,10 @@ type WaitlistJoinRequest = {
   fid: number | string;
   referredByFid?: number | string | null;
   username: string;
+  isPartnerAccount?: boolean;
 };
 
-export async function joinWaitlist({ fid, username, referredByFid }: WaitlistJoinRequest): Promise<{
+export async function joinWaitlist({ fid, username, referredByFid, isPartnerAccount }: WaitlistJoinRequest): Promise<{
   waitlistSlot: ConnectWaitlistSlot;
   isNew: boolean;
 }> {
@@ -37,7 +38,9 @@ export async function joinWaitlist({ fid, username, referredByFid }: WaitlistJoi
       fid: parsedFid,
       username,
       referredByFid: parsedReferrer !== parsedFid ? parsedReferrer : null,
-      score: 0
+      score: 0,
+      percentile: isPartnerAccount ? 100 : 1,
+      isPartnerAccount
     }
   });
 

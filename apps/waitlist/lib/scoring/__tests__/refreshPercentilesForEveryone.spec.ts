@@ -51,13 +51,7 @@ describe('refreshPercentilesForEveryone', () => {
   });
 
   afterEach(async () => {
-    await prisma.connectWaitlistSlot.deleteMany({
-      where: {
-        fid: {
-          in: [...fids, ...additionalFids]
-        }
-      }
-    });
+    await prisma.connectWaitlistSlot.deleteMany();
   });
 
   it('should correctly refresh percentiles and detect tier changes', async () => {
@@ -78,7 +72,9 @@ describe('refreshPercentilesForEveryone', () => {
           score,
           initialPosition,
           percentile: 0, // This will be recalculated
-          username
+          username,
+          // We only want to account for users with at least 1 referral or who connected Github - for simplicity, make this a self referral.
+          referredByFid: fid
         };
       }
     );
@@ -203,7 +199,9 @@ describe('refreshPercentilesForEveryone', () => {
           score,
           initialPosition,
           percentile: 0, // This will be recalculated
-          username
+          username,
+          // We only want to account for users with at least 1 referral or who connected Github - for simplicity, make this a self referral.
+          referredByFid: fid
         };
       }
     );
@@ -226,7 +224,9 @@ describe('refreshPercentilesForEveryone', () => {
           initialPosition: 0,
           score: -10000000,
           isPartnerAccount: true,
-          percentile: 0
+          percentile: 0,
+          // We only want to account for users with at least 1 referral or who connected Github - for simplicity, make this a self referral.
+          referredByFid: randomUserFid
         } as Prisma.ConnectWaitlistSlotCreateManyInput;
 
         return input;
@@ -354,7 +354,9 @@ describe('refreshPercentilesForEveryone', () => {
         score,
         initialPosition,
         percentile: 0, // This will be recalculated
-        username
+        username,
+        // We only want to account for users with at least 1 referral or who connected Github - for simplicity, make this a self referral.
+        referredByFid: fid
       };
     });
 
