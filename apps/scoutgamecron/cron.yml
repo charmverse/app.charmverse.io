@@ -3,4 +3,4 @@ cron:
  - name: "hello-world"
    url: "/hello-world"
    # every 5 minutes
-   schedule: "*/5 * * * *"
+   schedule: "*/1 * * * *"
