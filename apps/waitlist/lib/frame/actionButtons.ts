@@ -1,8 +1,9 @@
-import { authSecret, baseUrl } from '@root/config/constants';
-import type { FrameButton, FrameButtonLink } from 'frames.js';
-import { sealData } from 'iron-session';
+import { baseUrl } from '@root/config/constants';
+import type { FrameButton, FrameButtonPostRedirect } from 'frames.js';
 
-import type { SessionData } from 'lib/session/config';
+import type { FrameScreen } from 'lib/mixpanel/trackEventActionSchema';
+
+import { encodeCurrentFrame } from './getInfoFromUrl';
 
 export const scoutGameFrameTitle = 'Scout Game Waitlist';
 
@@ -12,61 +13,68 @@ export type FarcasterUserToEncode = {
   hasJoinedWaitlist?: boolean;
 };
 
-export async function embedFarcasterUser(data: FarcasterUserToEncode): Promise<`farcaster_user=${string}`> {
-  const sealedFarcasterUser = await sealData({ farcasterUser: data } as SessionData, {
-    password: authSecret as string
-  });
-
-  return `farcaster_user=${sealedFarcasterUser}`;
-}
-
-export const waitlistHomeJoinWaitlist: FrameButton = {
-  label: 'Join waitlist',
-  action: 'post'
+export type FrameInteractor = {
+  interactorFid: string | number;
 };
 
-export function joinWaitlist({ referrerFid }: { referrerFid: string | number }): FrameButton {
+export type FrameReferrer = {
+  referrerFid: string | number;
+  currentFrame: FrameScreen;
+};
+
+export type FrameFids = FrameInteractor & FrameReferrer;
+
+export function joinWaitlist({ referrerFid, currentFrame }: FrameReferrer): FrameButton {
   return {
     label: 'Join waitlist',
     action: 'post',
-    target: `${baseUrl}/api/frame/${referrerFid}/waitlist`
-  };
-}
-
-export async function waitlistGetDetails(data: FarcasterUserToEncode): Promise<FrameButtonLink> {
-  return {
-    label: 'Get details',
-    action: 'link',
-    target: `${baseUrl}/score?${await embedFarcasterUser(data)}`
-  };
-}
-
-export async function waitlistGet10Clicks(data: FarcasterUserToEncode): Promise<FrameButtonLink> {
-  return {
-    label: 'Get +10 clicks',
-    action: 'link',
-    target: `${baseUrl}/builders?${await embedFarcasterUser(data)}`
+    target: encodeCurrentFrame({ url: `${baseUrl}/api/frame/${referrerFid}/waitlist`, frame: currentFrame })
   };
 }
 
 export function shareFrameUrl(fid: string | number): string {
   return `https://warpcast.com/~/compose?text=${encodeURIComponent(
-    'Join me on the waitlist for Scout Game! If you join via my frame, I earn points toward moving up in the list. No pressure, but you don’t want to miss this launch ;)'
+    `Just joined the Scout Game waitlist! Ready to scout, build, and win by spotting top onchain talents!
+
+Join me and claim your spot by sharing this frame.`
   )}&embeds[]=${encodeURIComponent(`${baseUrl}/api/frame/${fid}/waitlist`)}`;
 }
 
-export function waitlistShareMyFrame(fid: string | number): FrameButtonLink {
+export function waitlistShareMyFrame({
+  referrerFid,
+  currentFrame,
+  label
+}: FrameReferrer & { label: string }): FrameButtonPostRedirect {
   return {
-    label: 'Share & Earn Pts',
-    action: 'link',
-    target: shareFrameUrl(fid)
+    label,
+    action: 'post_redirect',
+    target: encodeCurrentFrame({ url: `${baseUrl}/api/frame/${referrerFid}/actions/share`, frame: currentFrame })
+  } as FrameButtonPostRedirect;
+}
+
+export function waitlistGotoHome({ referrerFid, currentFrame }: FrameReferrer): FrameButtonPostRedirect {
+  return {
+    label: 'Details',
+    action: 'post_redirect',
+    target: encodeCurrentFrame({ url: `${baseUrl}/api/frame/${referrerFid}/actions/goto-home`, frame: currentFrame })
   };
 }
 
-export function waitlistShareAndLevelUp(fid: string | number): FrameButtonLink {
+export function waitlistGotoScore({ referrerFid, currentFrame }: FrameReferrer): FrameButtonPostRedirect {
   return {
-    label: 'Share & Level Up',
-    action: 'link',
-    target: shareFrameUrl(fid)
+    label: 'Details',
+    action: 'post_redirect',
+    target: encodeCurrentFrame({ url: `${baseUrl}/api/frame/${referrerFid}/actions/goto-score`, frame: currentFrame })
+  };
+}
+
+export function waitlistGotoBuilders({ referrerFid, currentFrame }: FrameReferrer): FrameButtonPostRedirect {
+  return {
+    label: "I'm a builder",
+    action: 'post_redirect',
+    target: encodeCurrentFrame({
+      url: `${baseUrl}/api/frame/${referrerFid}/actions/goto-builders`,
+      frame: currentFrame
+    })
   };
 }

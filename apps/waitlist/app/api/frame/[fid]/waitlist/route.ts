@@ -7,12 +7,13 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 import { JoinWaitlistFrame } from 'components/frame/JoinWaitlistFrame';
 import { WaitlistCurrentScoreFrame } from 'components/frame/WaitlistCurrentScoreFrame';
 import { WaitlistJoinedFrame } from 'components/frame/WaitlistJoinedFrame';
+import { getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
 import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
 import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
 export async function GET(req: Request) {
-  const referrerFid = new URL(req.url).pathname.split('/')[3];
+  const referrerFid = getReferrerFidFromUrl(req);
 
   const frame = JoinWaitlistFrame({ referrerFid });
 
@@ -42,12 +43,19 @@ export async function POST(req: Request) {
 
   const interactorUsername = validatedMessage.action.interactor.username;
 
-  const referrerFid = new URL(req.url).pathname.split('/')[3];
+  const referrerFid = getReferrerFidFromUrl(req);
 
   const joinWaitlistResult = await joinWaitlist({
     fid: interactorFid,
     referredByFid: referrerFid,
-    username: validatedMessage.action.interactor.username
+    username: interactorUsername
+  });
+
+  trackWaitlistMixpanelEvent('frame_click', {
+    userId: deterministicV4UUIDFromFid(interactorFid),
+    referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+    frame: 'join_waitlist_info',
+    action: 'join_waitlist'
   });
 
   const percentileChangeResults = await refreshPercentilesForEveryone();
@@ -62,7 +70,7 @@ export async function POST(req: Request) {
       referrerUserId: deterministicV4UUIDFromFid(referrerFid),
       frame: 'join_waitlist_new_join'
     });
-    html = await WaitlistJoinedFrame({ fid: interactorFid, username: interactorUsername });
+    html = WaitlistJoinedFrame({ referrerFid });
   } else {
     const { percentile } = await prisma.connectWaitlistSlot.findFirstOrThrow({
       where: {
@@ -80,9 +88,8 @@ export async function POST(req: Request) {
     });
 
     html = await WaitlistCurrentScoreFrame({
-      fid: interactorFid,
       percentile: percentile as number,
-      username: interactorUsername
+      referrerFid
     });
   }
 
