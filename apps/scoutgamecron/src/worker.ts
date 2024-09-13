@@ -8,7 +8,7 @@ import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
 const app = new Koa();
 const router = new Router();
 
-router.get('/hello-world', (ctx) => {
+router.post('/hello-world', (ctx) => {
   log.info('Hello World triggered', { body: ctx.body, headers: ctx.headers });
 
   ctx.body = 'hello world';
@@ -16,7 +16,7 @@ router.get('/hello-world', (ctx) => {
 
 router.get('/api/health', middleware.healthCheck);
 
-router.get('/send-push-notifications', async (ctx) => {
+router.post('/send-push-notifications', async (ctx) => {
   log.info('Send push notifications triggered', { body: ctx.body, headers: ctx.headers });
 
   await sendNotifications();

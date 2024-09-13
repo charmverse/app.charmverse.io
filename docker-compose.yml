@@ -119,7 +119,7 @@ services:
     extends:
       service: defaults
     ports:
-      - '0.0.0.0:80:3000'
+      - '80:3000'
     command: ['npm', 'run', 'scoutgamecron:prod']
     profiles:
       - prd-scoutgamecron
@@ -128,7 +128,7 @@ services:
     extends:
       service: defaults
     ports:
-      - '0.0.0.0:80:3000'
+      - '80:3000'
     command: ['npm', 'run', 'scoutgamecron:staging']
     environment:
       - REACT_APP_APP_ENV=staging
