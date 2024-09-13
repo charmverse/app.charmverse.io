@@ -235,7 +235,7 @@ export class StagingStack extends Stack {
     } else {
       // Send users to the AWS console to view the environment
       new CfnOutput(this, 'DeploymentUrl', {
-        value: `https://console.aws.amazon.com/elasticbeanstalk/home#/environment/dashboard?environmentId=${ebEnv.ref}`
+        value: `https://console.aws.amazon.com/elasticbeanstalk/home#/environment/dashboard?environmentName=${ebEnv.ref}`
       });
     }
   }
