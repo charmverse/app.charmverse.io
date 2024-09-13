@@ -1,6 +1,6 @@
 import { URL } from 'url';
 
-import * as pg from 'pg';
+import pg from 'pg';
 
 const { Pool } = pg;
 
