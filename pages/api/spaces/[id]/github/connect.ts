@@ -30,7 +30,7 @@ async function connectGithub(req: NextApiRequest, res: NextApiResponse) {
   const appOctokit = createOctokitApp(installationId);
 
   const { data: app } = await appOctokit.request('GET /app');
-  const appName = app.name;
+  const appName = app?.name;
 
   await prisma.$transaction([
     prisma.spaceGithubConnection.deleteMany({
@@ -42,7 +42,7 @@ async function connectGithub(req: NextApiRequest, res: NextApiResponse) {
       data: {
         installationId,
         spaceId,
-        name: appName,
+        name: appName || '',
         createdBy: userId
       }
     })

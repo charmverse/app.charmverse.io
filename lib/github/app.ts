@@ -1,6 +1,6 @@
 import { createAppAuth } from '@octokit/auth-app';
+import { Octokit } from '@octokit/rest';
 import { githubAppId, githubPrivateKey } from '@root/config/constants';
-import { Octokit } from 'octokit';
 
 export function createOctokitApp(installationId: string) {
   return new Octokit({

@@ -3,7 +3,7 @@ import { prettyPrint } from 'lib/utils/strings';
 import { promises } from 'node:fs';
 import { resolve } from 'path';
 
-import { Octokit } from 'octokit';
+import { Octokit } from '@octokit/rest';
 import { GetResponseDataTypeFromEndpointMethod, Endpoints } from '@octokit/types';
 
 const octokit = new Octokit();
