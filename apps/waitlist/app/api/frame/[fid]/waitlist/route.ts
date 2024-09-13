@@ -7,12 +7,13 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 import { JoinWaitlistFrame } from 'components/frame/JoinWaitlistFrame';
 import { WaitlistCurrentScoreFrame } from 'components/frame/WaitlistCurrentScoreFrame';
 import { WaitlistJoinedFrame } from 'components/frame/WaitlistJoinedFrame';
+import { getCurrentFrameFromUrl, getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
 import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
 import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
 export async function GET(req: Request) {
-  const referrerFid = new URL(req.url).pathname.split('/')[3];
+  const referrerFid = getReferrerFidFromUrl(req);
 
   const frame = JoinWaitlistFrame({ referrerFid });
 
@@ -31,6 +32,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const waitlistClicked = (await req.json()) as FarcasterFrameInteractionToValidate;
+
+  const currentFrame = getCurrentFrameFromUrl(req);
 
   const validatedMessage = await validateFrameInteraction(waitlistClicked.trustedData.messageBytes);
 
@@ -62,7 +65,7 @@ export async function POST(req: Request) {
       referrerUserId: deterministicV4UUIDFromFid(referrerFid),
       frame: 'join_waitlist_new_join'
     });
-    html = await WaitlistJoinedFrame({ fid: interactorFid, username: interactorUsername });
+    html = WaitlistJoinedFrame({ referrerFid });
   } else {
     const { percentile } = await prisma.connectWaitlistSlot.findFirstOrThrow({
       where: {
@@ -80,9 +83,8 @@ export async function POST(req: Request) {
     });
 
     html = await WaitlistCurrentScoreFrame({
-      fid: interactorFid,
       percentile: percentile as number,
-      username: interactorUsername
+      referrerFid
     });
   }
 
