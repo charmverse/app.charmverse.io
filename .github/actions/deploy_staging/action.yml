@@ -33,6 +33,12 @@ runs:
       with:
         app_name: ${{ inputs.app_name }}
 
+    - name: Setup cron config
+      shell: bash
+      # Note: "2>/dev/null || :" is a bash idiom that means "if the previous command fails, do nothing"
+      run: |
+        cp apps/${{ inputs.app_name }}/cron.yml cron.yaml 2>/dev/null || :
+
     - name: Replace env_var with staging settings
       shell: bash
       run: |
@@ -52,16 +58,6 @@ runs:
         done
 
         rm .ebextensions/*/06_cloudwatch_alarm.config
-
-    - name: Create a github deployment
-      uses: bobheadxi/deployments@v1
-      id: deployment
-      with:
-        step: start
-        token: ${{ env.GITHUB_TOKEN }}
-        env: ${{ env.STAGE_NAME }}
-        ref: ${{ github.head_ref }}
-        override: true
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -89,6 +85,16 @@ runs:
         npx aws-cdk deploy -c name=${{env.STAGE_NAME}} --method=direct --outputs-file cdk.out.json
         env_url=$(jq --raw-output '.[$ENV.STAGE_NAME].DeploymentUrl' ./cdk.out.json)
         echo "env_url=$env_url" >> $GITHUB_OUTPUT
+
+    - name: Create a github deployment
+      uses: bobheadxi/deployments@v1
+      id: deployment
+      with:
+        step: start
+        token: ${{ env.GITHUB_TOKEN }}
+        env: ${{ env.STAGE_NAME }}
+        ref: ${{ github.head_ref }}
+        override: true
 
     - name: update the github deployment status
       uses: bobheadxi/deployments@v1

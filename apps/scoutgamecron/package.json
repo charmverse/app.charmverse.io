@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "build": "npx tsx esbuild.config.ts",
-    "start": "tsx watch src/cron.ts",
-    "start:prod": "node ./dist/cron.js",
+    "start": "tsx watch src/main.ts",
+    "start:prod": "node ./dist/main.js",
     "test": "npx jest",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
@@ -14,11 +14,9 @@
   "dependencies": {
     "@packages/github": "^0.0.0",
     "@packages/scoutgame": "^0.0.0",
-    "node-cron": "^3.0.3",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
-    "@types/node-cron": "^3.0.11",
     "@types/web-push": "^3.6.3"
   }
 }
