@@ -1,4 +1,4 @@
-import { pick, omit } from 'lodash';
+import { pick, omit } from 'lodash-es';
 
 export type FilterMode = 'include' | 'exclude';
 
