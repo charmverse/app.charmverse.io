@@ -227,7 +227,7 @@ export class StagingStack extends Stack {
      */
     const protocol = environmentType === 'LoadBalanced' ? 'https' : 'http';
     new CfnOutput(this, 'DeploymentUrl', {
-      value: `${protocol}//${deploymentDomain}/`
+      value: `${protocol}://${deploymentDomain}/`
     });
   }
 }
