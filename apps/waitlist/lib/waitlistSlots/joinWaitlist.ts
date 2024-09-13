@@ -30,7 +30,23 @@ export async function joinWaitlist({ fid, username, referredByFid, isPartnerAcco
     };
   }
 
-  const parsedReferrer = referredByFid ? parseInt(referredByFid.toString(), 10) : null;
+  let parsedReferrer = referredByFid ? parseInt(referredByFid.toString(), 10) : null;
+
+  if (parsedReferrer) {
+    const referrerSlot = await prisma.connectWaitlistSlot.findUnique({
+      where: {
+        fid: parsedReferrer
+      },
+      select: {
+        fid: true
+      }
+    });
+
+    if (!referrerSlot) {
+      parsedReferrer = null;
+      log.error(`Failed to find referrer slot with fid ${referredByFid}`, { fid: referredByFid });
+    }
+  }
 
   let newSlot = await prisma.connectWaitlistSlot.create({
     data: {
