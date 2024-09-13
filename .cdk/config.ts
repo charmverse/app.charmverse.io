@@ -53,10 +53,10 @@ export const apps: { [key: string]: { stg?: Options; prd?: Options } } = {
   },
   scoutgamecron: {
     prd: {
-      environmentType: 'Worker'
+      environmentTier: 'SQS/HTTP'
     },
     stg: {
-      environmentType: 'Worker'
+      environmentTier: 'SQS/HTTP'
     }
   },
   waitlist: {
