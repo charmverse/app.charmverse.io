@@ -10,7 +10,7 @@ const charmverseLogoSrc = '/images/coming_soon/charmverse_logo.webp';
 const sunnyLogoSrc = '/images/coming_soon/sunnyawards_logo.png';
 
 const Background = styled.div`
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
