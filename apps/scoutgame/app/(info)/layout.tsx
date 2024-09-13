@@ -12,7 +12,7 @@ export default async function Layout({
   const user = await getUserFromSession();
 
   return (
-    <Box component='main' bgcolor='background.default' p={3} minHeight='100vh'>
+    <Box component='main' bgcolor='background.default' p={3} minHeight='100svh'>
       {children}
     </Box>
   );

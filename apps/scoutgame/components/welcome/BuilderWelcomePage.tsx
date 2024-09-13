@@ -1,16 +1,17 @@
 import 'server-only';
 
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { Box, Button, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
+import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
+
 import { JoinGithubButton } from './components/github/JoinGithubButton';
 
 export function BuilderPage() {
   return (
-    <PageWrapper py={0} my={0}>
+    <SinglePageWrapper>
       <Box
         display='flex'
         flexDirection='column'
@@ -62,6 +63,6 @@ export function BuilderPage() {
           </Button>
         </Box>
       </Box>
-    </PageWrapper>
+    </SinglePageWrapper>
   );
 }
