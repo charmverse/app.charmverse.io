@@ -51,6 +51,13 @@ export async function POST(req: Request) {
     username: interactorUsername
   });
 
+  trackWaitlistMixpanelEvent('frame_click', {
+    userId: deterministicV4UUIDFromFid(interactorFid),
+    referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+    frame: 'join_waitlist_info',
+    action: 'join_waitlist'
+  });
+
   const percentileChangeResults = await refreshPercentilesForEveryone();
 
   handleTierChanges(percentileChangeResults);
