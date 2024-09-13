@@ -1,7 +1,6 @@
 import { CfnOutput, CfnTag, Stack, StackProps } from 'aws-cdk-lib';
 import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as route53 from 'aws-cdk-lib/aws-route53';
-import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import { Construct } from 'constructs';
 import { Options } from './ProductionStack';
@@ -16,6 +15,7 @@ export class StagingStack extends Stack {
     props: StackProps,
     {
       healthCheck = defaultHealthCheck,
+      environmentTier = 'WebServer',
       environmentType = 'LoadBalanced',
       instanceType = 't3a.small,t3.small'
     }: Options = {}
@@ -195,39 +195,48 @@ export class StagingStack extends Stack {
       solutionStackName: '64bit Amazon Linux 2 v3.5.0 running Docker',
       optionSettings: optionSettingProperties,
       tags: resourceTags,
+      tier: {
+        name: environmentTier,
+        type: environmentTier === 'Worker' ? 'SQS/HTTP' : 'Standard'
+      },
       versionLabel: appVersionProps.ref
     });
 
-    const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
-      domainName: domain
-    });
+    if (environmentTier === 'WebServer') {
+      const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
+        domainName: domain
+      });
 
-    console.log('ebEnv.attrEndpointUrl', ebEnv.attrEndpointUrl);
-
-    new route53.ARecord(this, 'ARecord', {
-      zone,
-      recordName: deploymentDomain + '.',
-      //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
-      target:
-        environmentType === 'LoadBalanced'
-          ? route53.RecordTarget.fromAlias({
-              bind: (): route53.AliasRecordTargetConfig => ({
-                dnsName: ebEnv.attrEndpointUrl,
-                // get hosted zone for elbs based on region: https://docs.aws.amazon.com/general/latest/gr/elb.html
-                hostedZoneId: 'Z35SXDOTRQ7X7K'
+      new route53.ARecord(this, 'ARecord', {
+        zone,
+        recordName: deploymentDomain + '.',
+        //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
+        target:
+          environmentType === 'LoadBalanced'
+            ? route53.RecordTarget.fromAlias({
+                bind: (): route53.AliasRecordTargetConfig => ({
+                  dnsName: ebEnv.attrEndpointUrl,
+                  // get hosted zone for elbs based on region: https://docs.aws.amazon.com/general/latest/gr/elb.html
+                  hostedZoneId: 'Z35SXDOTRQ7X7K'
+                })
               })
-            })
-          : // if not load balanced, then use the ip address
-            route53.RecordTarget.fromIpAddresses(ebEnv.attrEndpointUrl)
-    });
+            : // if not load balanced, then use the ip address
+              route53.RecordTarget.fromIpAddresses(ebEnv.attrEndpointUrl)
+      });
 
-    /**
-     * Output the distribution's url so we can pass it to external systems
-     *  Note: something at the end of the path is required or the Load balancer url never resolves
-     */
-    const protocol = environmentType === 'LoadBalanced' ? 'https' : 'http';
-    new CfnOutput(this, 'DeploymentUrl', {
-      value: `${protocol}://${deploymentDomain}/`
-    });
+      /**
+       * Output the distribution's url so we can pass it to external systems
+       *  Note: something at the end of the path is required or the Load balancer url never resolves
+       */
+      const protocol = environmentType === 'LoadBalanced' ? 'https' : 'http';
+      new CfnOutput(this, 'DeploymentUrl', {
+        value: `${protocol}://${deploymentDomain}/`
+      });
+    } else {
+      // Send users to the AWS console to view the environment
+      new CfnOutput(this, 'DeploymentUrl', {
+        value: `https://console.aws.amazon.com/elasticbeanstalk/home#/environment/dashboard?environmentName=${ebEnv.ref}`
+      });
+    }
   }
 }

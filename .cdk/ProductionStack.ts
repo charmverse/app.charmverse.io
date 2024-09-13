@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 export type Options = {
   healthCheck?: { port: number; path: string };
   sslCert?: string;
+  environmentTier?: 'WebServer' | 'Worker';
   environmentType?: 'SingleInstance' | 'LoadBalanced';
   instanceType?: string;
 };
@@ -20,6 +21,7 @@ export class ProductionStack extends Stack {
     {
       sslCert,
       healthCheck = defaultHealthCheck,
+      environmentTier = 'WebServer',
       environmentType = 'LoadBalanced',
       instanceType = 't3a.small,t3.small'
     }: Options
@@ -140,7 +142,7 @@ export class ProductionStack extends Stack {
       {
         namespace: 'aws:autoscaling:trigger',
         optionName: 'LowerThreshold',
-        value: '0' // never hit the lower threshold, so that we dont get chaged for scaling Alarms
+        value: '0' // never hit the lower threshold, so that we dont get charged for scaling Alarms
       },
       {
         namespace: 'aws:ec2:instances',
@@ -189,10 +191,14 @@ export class ProductionStack extends Stack {
     new elasticbeanstalk.CfnEnvironment(this, 'Environment', {
       environmentName: appName,
       applicationName: ebApp.applicationName || appName,
-      solutionStackName: '64bit Amazon Linux 2 v3.5.0 running Docker',
+      solutionStackName: '64bit Amazon Linux 2 v4.3.7 running Docker',
       optionSettings: optionSettingProperties,
       tags: resourceTags,
-      versionLabel: appVersionProps.ref
+      versionLabel: appVersionProps.ref,
+      tier: {
+        name: environmentTier,
+        type: environmentTier === 'Worker' ? 'SQS/HTTP' : 'Standard'
+      }
     });
   }
 }

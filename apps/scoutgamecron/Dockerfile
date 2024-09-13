@@ -16,8 +16,9 @@ COPY --parents @connect-shared/package.json \
   packages/*/package.json                   \
   node_modules                              \
   package.json                              \
-  apps/cron/node_modules                    \
-  apps/cron/package.json                    \
+  apps/scoutgamcron/node_modules            \
+  apps/scoutgamcron/package.json            \
+  apps/scoutgamcron/cron.yml                \
   .
 
 # Copy compiled code
