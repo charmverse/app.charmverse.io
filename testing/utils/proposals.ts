@@ -71,7 +71,7 @@ export async function generateProposalV2({
   if (!workflowId) {
     const workflow = await generateProposalWorkflow({
       spaceId: input.spaceId,
-      evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({
+      evaluations: sortBy(proposal.evaluations, 'index' as any).map((e) => ({
         id: e.id,
         type: e.type,
         title: e.title,
