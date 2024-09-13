@@ -14,11 +14,9 @@
   "dependencies": {
     "@packages/github": "^0.0.0",
     "@packages/scoutgame": "^0.0.0",
-    "node-cron": "^3.0.3",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
-    "@types/node-cron": "^3.0.11",
     "@types/web-push": "^3.6.3"
   }
 }
