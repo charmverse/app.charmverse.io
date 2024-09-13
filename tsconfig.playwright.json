@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  // https://playwright.dev/docs/test-typescript#manually-compile-tests-with-typescript
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "noEmit": false,
+    "outDir": "dist",
+  },
+  "include": ["__e2e__/**/*.ts", "next-env.d.ts", "theme/index.ts"]
+}

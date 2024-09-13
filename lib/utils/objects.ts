@@ -67,7 +67,7 @@ function omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K
   return result;
 }
 
-export function sortBy<T>(array: T[], iteratees: (keyof T | ((item: T) => any))[]): T[] {
+export function sortBy<T>(array: T[], iteratees: (string | keyof T | ((item: T) => any))[]): T[] {
   return [...array].sort((a, b) => {
     for (const iteratee of iteratees) {
       let aValue: any;
@@ -79,8 +79,8 @@ export function sortBy<T>(array: T[], iteratees: (keyof T | ((item: T) => any))[
         bValue = iteratee(b);
       } else {
         // If iteratee is a key, use it to access the object's property
-        aValue = a[iteratee];
-        bValue = b[iteratee];
+        aValue = a[iteratee as keyof T];
+        bValue = b[iteratee as keyof T];
       }
 
       if (aValue > bValue) return 1;
