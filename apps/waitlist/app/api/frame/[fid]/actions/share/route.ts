@@ -6,7 +6,7 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 
 import { shareFrameUrl } from 'lib/frame/actionButtons';
 import { getCurrentFrameFromUrl, getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
-import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
+import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
 export async function POST(req: Request) {

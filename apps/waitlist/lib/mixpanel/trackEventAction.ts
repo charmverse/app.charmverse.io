@@ -6,7 +6,7 @@ import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFr
 import { actionClient } from 'lib/actionClient';
 
 import { eventSchema } from './trackEventActionSchema';
-import { trackWaitlistMixpanelEvent } from './trackMixpanelEvent';
+import { trackWaitlistMixpanelEvent } from './trackWaitlistMixpanelEvent';
 
 export const trackEventAction = actionClient
   .metadata({ actionName: 'mixpanel_event' })
