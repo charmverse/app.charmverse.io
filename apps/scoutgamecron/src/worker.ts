@@ -3,28 +3,32 @@ import Router from '@koa/router';
 import Koa from 'koa';
 
 import * as middleware from './middleware';
+import { processPullRequests } from './tasks/processPullRequests';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
 
 const app = new Koa();
 const router = new Router();
 
-router.post('/hello-world', (ctx) => {
+// add a task endpoint which will be configured in cron.yml
+function addTask(path: string, handler: (ctx: Koa.DefaultContext) => any) {
+  router.post(path, async (ctx) => {
+    log.info(`${path} triggered`, { body: ctx.body, headers: ctx.headers });
+
+    const result = await handler(ctx);
+
+    log.info(`${path} completed`);
+
+    ctx.body = result || { success: true };
+  });
+}
+
+addTask('/hello-world', (ctx) => {
   log.info('Hello World triggered', { body: ctx.body, headers: ctx.headers });
-
-  ctx.body = 'hello world';
 });
 
-router.get('/api/health', middleware.healthCheck);
+addTask('/github-pull-requests', processPullRequests);
 
-router.post('/send-push-notifications', async (ctx) => {
-  log.info('Send push notifications triggered', { body: ctx.body, headers: ctx.headers });
-
-  await sendNotifications();
-
-  log.info('Send push notifications completed');
-
-  ctx.body = 'hello world';
-});
+addTask('/send-push-notifications', sendNotifications);
 
 app.use(middleware.errorHandler).use(router.routes()).use(router.allowedMethods());
 
