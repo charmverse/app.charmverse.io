@@ -191,7 +191,7 @@ export class ProductionStack extends Stack {
     new elasticbeanstalk.CfnEnvironment(this, 'Environment', {
       environmentName: appName,
       applicationName: ebApp.applicationName || appName,
-      solutionStackName: '64bit Amazon Linux 2 v4.3.7 running Docker',
+      solutionStackName: '64bit Amazon Linux 2 v3.5.0 running Docker',
       optionSettings: optionSettingProperties,
       tags: resourceTags,
       versionLabel: appVersionProps.ref,
