@@ -240,6 +240,11 @@ jobs:
     needs: [build, upload-docker]
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup cron config
+        run: |
+          cp apps/scoutgamecron/cron.yml cron.yaml
+
       - uses: ./.github/actions/deploy_staging
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
