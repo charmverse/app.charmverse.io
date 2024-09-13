@@ -236,6 +236,16 @@ describe('refreshPercentilesForEveryone', () => {
     // Perform the refresh operation
     const tierChangeResults = await refreshPercentilesForEveryone();
 
+    const partnerAccounts = await prisma.connectWaitlistSlot.findMany({
+      where: {
+        isPartnerAccount: true
+      }
+    });
+
+    for (const partnerAccount of partnerAccounts) {
+      expect(partnerAccount.percentile).toBe(100);
+    }
+
     // prettyPrint(tierChangeResults);
 
     // Everyone starts in the 'common' tier
@@ -357,8 +367,6 @@ describe('refreshPercentilesForEveryone', () => {
 
     // Perform the refresh operation
     const tierChangeResults = await refreshPercentilesForEveryone();
-
-    // prettyPrint(tierChangeResults);
 
     // Everyone starts in the 'common' tier
     // Now, 70% of 150 records should be out of the common tier
