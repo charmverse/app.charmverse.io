@@ -6,7 +6,7 @@ import { Construct } from 'constructs';
 export type Options = {
   healthCheck?: { port: number; path: string };
   sslCert?: string;
-  environmentTier?: 'Standard' | 'SQS/HTTP';
+  environmentTier?: 'WebServer' | 'Worker';
   environmentType?: 'SingleInstance' | 'LoadBalanced' | 'Worker';
   instanceType?: string;
 };
@@ -21,7 +21,7 @@ export class ProductionStack extends Stack {
     {
       sslCert,
       healthCheck = defaultHealthCheck,
-      environmentTier = 'Standard',
+      environmentTier = 'WebServer',
       environmentType = 'LoadBalanced',
       instanceType = 't3a.small,t3.small'
     }: Options

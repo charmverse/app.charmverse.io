@@ -16,7 +16,7 @@ export class StagingStack extends Stack {
     props: StackProps,
     {
       healthCheck = defaultHealthCheck,
-      environmentTier = 'Standard',
+      environmentTier = 'WebServer',
       environmentType = 'LoadBalanced',
       instanceType = 't3a.small,t3.small'
     }: Options = {}
@@ -201,10 +201,13 @@ export class StagingStack extends Stack {
       solutionStackName: '64bit Amazon Linux 2 v3.5.0 running Docker',
       optionSettings: optionSettingProperties,
       tags: resourceTags,
+      tier: {
+        name: environmentTier
+      },
       versionLabel: appVersionProps.ref
     });
 
-    if (environmentTier === 'Standard') {
+    if (environmentTier === 'WebServer') {
       const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
         domainName: domain
       });
