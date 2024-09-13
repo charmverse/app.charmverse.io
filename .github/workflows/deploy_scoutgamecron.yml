@@ -163,6 +163,10 @@ jobs:
         run: |
           rm Dockerfile && mv apps/scoutgamecron/Dockerfile Dockerfile
 
+      - name: Setup cron
+        run: |
+          cp apps/scoutgamecron/cron.yml cron.yaml
+
       - name: Build and Push Docker image
         id: docker_build_push
         uses: ./.github/actions/build_docker_image
