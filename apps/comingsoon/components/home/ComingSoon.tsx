@@ -15,6 +15,7 @@ const Background = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 0 2em;
 
   .center-content {
     display: flex;
