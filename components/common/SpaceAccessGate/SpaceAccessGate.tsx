@@ -103,8 +103,7 @@ export function SpaceAccessGate({
   }
 
   const walletGateEnabled = summonGate.isEnabled || tokenGate.isEnabled;
-  const isWalletVerified = tokenGate.isVerified || summonGate.isVerified;
-  const isVerified = isWalletVerified || discordGate.isVerified;
+  const isVerified = summonGate.isVerified || tokenGate.isVerified || discordGate.isVerified;
   const isVerifying = summonGate.isVerifying || tokenGate.isVerifying || discordGate.isVerifying;
   const isJoiningSpace = summonGate.joiningSpace || tokenGate.joiningSpace || discordGate.joiningSpace;
 
@@ -162,19 +161,16 @@ export function SpaceAccessGate({
       {tokenGate.isEnabled && <TokenGate {...tokenGate} displayAccordion={discordGate.isEnabled} />}
 
       {walletGateEnabled &&
-        (tokenGate.tokenGateResult ? (
-          !isWalletVerified ? (
-            <Alert severity='warning' data-test='token-gate-failure-alert'>
-              Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
-            </Alert>
-          ) : (
-            <Alert severity='success'>
-              You can join this space.{' '}
-              {hasRoles ? 'You will also receive the roles attached to each condition you passed.' : ''}
-            </Alert>
-          )
+        tokenGate.tokenGateResult &&
+        (!tokenGate.isVerified && !summonGate.isVerified ? (
+          <Alert severity='warning' data-test='token-gate-failure-alert'>
+            Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
+          </Alert>
         ) : (
-          <Alert severity='info'>Verifying...</Alert>
+          <Alert severity='success'>
+            You can join this space.{' '}
+            {hasRoles ? 'You will also receive the roles attached to each condition you passed.' : ''}
+          </Alert>
         ))}
 
       {noGateConditions && (
