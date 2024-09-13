@@ -195,10 +195,13 @@ export class ProductionStack extends Stack {
       optionSettings: optionSettingProperties,
       tags: resourceTags,
       versionLabel: appVersionProps.ref,
-      tier: {
-        name: environmentTier,
-        type: environmentTier === 'Worker' ? 'SQS/HTTP' : 'Standard'
-      }
+      tier:
+        environmentTier === 'Worker'
+          ? {
+              name: environmentTier,
+              type: environmentTier === 'Worker' ? 'SQS/HTTP' : 'Standard'
+            }
+          : undefined
     });
   }
 }
