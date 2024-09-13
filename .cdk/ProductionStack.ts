@@ -76,11 +76,6 @@ export class ProductionStack extends Stack {
       },
       {
         namespace: 'aws:elasticbeanstalk:environment',
-        optionName: 'EnvironmentTier',
-        value: environmentTier
-      },
-      {
-        namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
         value: environmentType
       },
@@ -199,7 +194,11 @@ export class ProductionStack extends Stack {
       solutionStackName: '64bit Amazon Linux 2 v4.3.7 running Docker',
       optionSettings: optionSettingProperties,
       tags: resourceTags,
-      versionLabel: appVersionProps.ref
+      versionLabel: appVersionProps.ref,
+      tier: {
+        name: environmentTier,
+        type: environmentTier === 'Worker' ? 'SQS/HTTP' : 'Standard'
+      }
     });
   }
 }

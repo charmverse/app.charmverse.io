@@ -72,11 +72,6 @@ export class StagingStack extends Stack {
       },
       {
         namespace: 'aws:elasticbeanstalk:environment',
-        optionName: 'Tier',
-        value: environmentTier
-      },
-      {
-        namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
         value: environmentType
       },
