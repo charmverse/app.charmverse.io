@@ -41,14 +41,7 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | nu
   };
 
   return (
-    <AppBar
-      position='static'
-      sx={{
-        bgcolor: 'background.default',
-        boxShadow: 'none',
-        py: 1
-      }}
-    >
+    <AppBar position='static'>
       <Container maxWidth={false}>
         <Toolbar disableGutters sx={{ justifyContent: 'space-between' }} variant='dense'>
           <>

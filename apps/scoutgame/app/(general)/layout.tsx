@@ -15,7 +15,7 @@ export default async function Layout({
   return (
     <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh'>
       <Header user={user || null} />
-      <Box component='main' bgcolor='background.default' pb={2}>
+      <Box component='main' bgcolor='background.default' pb={2} minHeight='100%'>
         {children}
       </Box>
       <StickyFooter />

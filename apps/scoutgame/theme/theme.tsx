@@ -31,6 +31,7 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       fontSize: '1rem'
     }
   },
+  cssVariables: true,
   defaultColorScheme: 'dark',
   colorSchemes: {
     light: {
@@ -123,6 +124,16 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         popper: {
           zIndex: '1050'
         }
+      }
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          backgroundColor: theme.palette.background.default,
+          boxShadow: 'none',
+          paddingTop: 1,
+          paddingBottom: 1
+        })
       }
     },
     MuiPaper: {
