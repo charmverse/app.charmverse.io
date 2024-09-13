@@ -202,7 +202,8 @@ export class StagingStack extends Stack {
       optionSettings: optionSettingProperties,
       tags: resourceTags,
       tier: {
-        name: environmentTier
+        name: environmentTier,
+        type: environmentType === 'Worker' ? 'HTTP/SQS' : 'Standard'
       },
       versionLabel: appVersionProps.ref
     });
