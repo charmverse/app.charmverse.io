@@ -31,16 +31,7 @@ export async function notifyNewScore({
   return writeToFarcaster({
     neynarSignerId: NEYNAR_SIGNER_ID,
     text: message,
-    // channelId: isProdEnv && !isDevEnv && !isTestEnv && !isStagingEnv ? 'scout-game' : 'cvdev',
-    channelId: 'cvdev',
+    channelId: isProdEnv && !isDevEnv && !isTestEnv && !isStagingEnv ? 'scout-game' : 'cvdev',
     embedUrl
   });
 }
-
-// notifyNewScore({
-//   fid: 839778,
-//   newTier: 'rare',
-//   percentile: 46,
-//   tierChange: 'down',
-//   username: 'ccdev6'
-// }).then(console.log);
