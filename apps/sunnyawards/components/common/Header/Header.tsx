@@ -83,7 +83,7 @@ export function Header({ user }: { user: LoggedInUser | null }) {
                 <MenuItem>
                   <Link href='/profile'>My Profile</Link>
                 </MenuItem>
-                <MenuItem onClick={() => logoutUser()}>Sign Out</MenuItem>
+                <MenuItem onClick={() => logoutUser({})}>Sign Out</MenuItem>
               </Menu>
             </Box>
           ) : (
