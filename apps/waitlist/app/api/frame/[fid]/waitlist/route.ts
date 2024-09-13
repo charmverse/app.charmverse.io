@@ -7,7 +7,7 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 import { JoinWaitlistFrame } from 'components/frame/JoinWaitlistFrame';
 import { WaitlistCurrentScoreFrame } from 'components/frame/WaitlistCurrentScoreFrame';
 import { WaitlistJoinedFrame } from 'components/frame/WaitlistJoinedFrame';
-import { getCurrentFrameFromUrl, getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
+import { getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
 import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
 import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
@@ -33,8 +33,6 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const waitlistClicked = (await req.json()) as FarcasterFrameInteractionToValidate;
 
-  const currentFrame = getCurrentFrameFromUrl(req);
-
   const validatedMessage = await validateFrameInteraction(waitlistClicked.trustedData.messageBytes);
 
   if (!validatedMessage.valid) {
@@ -45,12 +43,12 @@ export async function POST(req: Request) {
 
   const interactorUsername = validatedMessage.action.interactor.username;
 
-  const referrerFid = new URL(req.url).pathname.split('/')[3];
+  const referrerFid = getReferrerFidFromUrl(req);
 
   const joinWaitlistResult = await joinWaitlist({
     fid: interactorFid,
     referredByFid: referrerFid,
-    username: validatedMessage.action.interactor.username
+    username: interactorUsername
   });
 
   const percentileChangeResults = await refreshPercentilesForEveryone();

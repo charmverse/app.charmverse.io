@@ -36,7 +36,7 @@ export function shareFrameUrl(fid: string | number): string {
   return `https://warpcast.com/~/compose?text=${encodeURIComponent(
     `Just joined the Scout Game waitlist! Ready to scout, build, and win by spotting top onchain talents!
 
- Join me and claim your spot by sharing this frame.`
+Join me and claim your spot by sharing this frame.`
   )}&embeds[]=${encodeURIComponent(`${baseUrl}/api/frame/${fid}/waitlist`)}`;
 }
 
@@ -56,7 +56,7 @@ export function waitlistGotoHome({ referrerFid, currentFrame }: FrameReferrer): 
   return {
     label: 'Get details',
     action: 'post_redirect',
-    target: encodeCurrentFrame({ url: `${baseUrl}/api/frame/${referrerFid}/actions/goto-score`, frame: currentFrame })
+    target: encodeCurrentFrame({ url: `${baseUrl}/api/frame/${referrerFid}/actions/goto-home`, frame: currentFrame })
   };
 }
 

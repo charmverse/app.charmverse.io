@@ -27,15 +27,21 @@ export async function POST(req: Request) {
   trackWaitlistMixpanelEvent('frame_click', {
     userId: deterministicV4UUIDFromFid(interactorFid),
     referrerUserId: deterministicV4UUIDFromFid(referrerFid),
-    action: 'goto_app_home',
+    action: 'goto_app_score',
     frame: getCurrentFrameFromUrl(req)
   });
 
   await joinWaitlist({
     fid: interactorFid,
     referredByFid: referrerFid,
-    username: interactorUsername
+    username: validatedMessage.action.interactor.username
   });
 
-  return new Response(null, { status: 302, headers: { Location: baseUrl as string } });
+  const targetUrl = `${baseUrl}/score?${await embedFarcasterUser({
+    fid: interactorFid.toString(),
+    username: interactorUsername,
+    hasJoinedWaitlist: true
+  })}`;
+
+  return new Response(null, { status: 302, headers: { Location: targetUrl as string } });
 }

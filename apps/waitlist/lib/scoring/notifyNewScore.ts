@@ -1,4 +1,4 @@
-import { baseUrl, isProdEnv } from '@root/config/constants';
+import { baseUrl, isDevEnv, isProdEnv, isStagingEnv, isTestEnv } from '@root/config/constants';
 import { NEYNAR_SIGNER_ID } from '@root/lib/farcaster/constants';
 import { writeToFarcaster } from '@root/lib/farcaster/messaging/writeToFarcaster';
 
@@ -31,7 +31,16 @@ export async function notifyNewScore({
   return writeToFarcaster({
     neynarSignerId: NEYNAR_SIGNER_ID,
     text: message,
-    channelId: isProdEnv ? 'scout-game' : 'cvdev',
+    // channelId: isProdEnv && !isDevEnv && !isTestEnv && !isStagingEnv ? 'scout-game' : 'cvdev',
+    channelId: 'cvdev',
     embedUrl
   });
 }
+
+// notifyNewScore({
+//   fid: 839778,
+//   newTier: 'rare',
+//   percentile: 46,
+//   tierChange: 'down',
+//   username: 'ccdev6'
+// }).then(console.log);

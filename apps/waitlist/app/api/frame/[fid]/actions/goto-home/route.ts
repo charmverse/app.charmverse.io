@@ -7,7 +7,6 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 
 import { getCurrentFrameFromUrl, getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
 import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
-import { embedFarcasterUser } from 'lib/session/embedFarcasterUser';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
 export async function POST(req: Request) {
@@ -27,19 +26,15 @@ export async function POST(req: Request) {
   trackWaitlistMixpanelEvent('frame_click', {
     userId: deterministicV4UUIDFromFid(interactorFid),
     referrerUserId: deterministicV4UUIDFromFid(referrerFid),
-    action: 'goto_app_score',
+    action: 'goto_app_home',
     frame: getCurrentFrameFromUrl(req)
   });
 
   await joinWaitlist({
     fid: interactorFid,
     referredByFid: referrerFid,
-    username: validatedMessage.action.interactor.username
+    username: interactorUsername
   });
 
-  const targetUrl = `${baseUrl}/score?${await embedFarcasterUser({
-    farcasterUser: { fid: interactorFid.toString(), username: interactorUsername, hasJoinedWaitlist: true }
-  })}`;
-
-  return new Response(null, { status: 302, headers: { Location: targetUrl as string } });
+  return new Response(null, { status: 302, headers: { Location: baseUrl as string } });
 }

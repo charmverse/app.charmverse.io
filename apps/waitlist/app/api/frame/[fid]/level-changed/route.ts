@@ -58,6 +58,12 @@ export async function POST(req: Request) {
     action: 'click_whats_this',
     frame: `waitlist_level_${tierChange}`
   });
+
+  trackWaitlistMixpanelEvent('frame_impression', {
+    userId: deterministicV4UUIDFromFid(interactorFid),
+    referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+    frame: `join_waitlist_info`
+  });
   return new Response(JoinWaitlistFrame({ referrerFid }), {
     status: 200,
     headers: {
