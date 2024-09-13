@@ -138,7 +138,7 @@
     "@bangle.dev/pm-commands": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "^0.81.7-rc-waitlist-optimi.0",
+    "@charmverse/core": "^0.81.7",
     "@column-resizer/core": "^1.0.2",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
