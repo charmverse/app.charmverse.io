@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 
+import ddPlugin from 'dd-trace/esbuild';
 import * as esbuild from 'esbuild';
 
 esbuild
@@ -10,8 +11,13 @@ esbuild
     outdir: './dist',
     tsconfig: './tsconfig.json',
     packages: 'external',
+    plugins: [ddPlugin],
     platform: 'node',
-    sourcemap: true
+    sourcemap: true,
+    // this makes it so that we can use require in the built file https://github.com/evanw/esbuild/issues/946
+    banner: {
+      js: "import { createRequire as topLevelCreateRequire } from 'module';\n const require = topLevelCreateRequire(import.meta.url);"
+    }
     // target: 'node18'
     // logLevel: 'verbose' // uncomment to see more build details like imported file info
   })

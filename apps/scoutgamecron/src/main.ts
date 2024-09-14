@@ -9,6 +9,16 @@ log.info('Starting Scout Game worker');
 
 const port = process.env.PORT || 4000;
 
-worker.listen(port, () => {
+const server = worker.listen(port, () => {
   log.info(`Server is up and running on port ${port} in "${process.env.NODE_ENV}" env`);
 });
+
+async function cleanup() {
+  log.info('[server] Closing server...');
+  await server.close();
+  log.info('[server] Exiting process...');
+  process.exit(0);
+}
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);
