@@ -1,6 +1,6 @@
 import { Constants } from '@root/lib/databases/constants';
 
-import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe/config';
+import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe/constants';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 
 import {
