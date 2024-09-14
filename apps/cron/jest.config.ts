@@ -1,8 +1,8 @@
-import { pathsToModuleNameMapper } from 'ts-jest';
+import { createDefaultEsmPreset, pathsToModuleNameMapper } from 'ts-jest';
 
 import { compilerOptions } from './tsconfig.json';
 
 export default {
-  preset: 'ts-jest',
+  ...createDefaultEsmPreset(),
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' })
 };

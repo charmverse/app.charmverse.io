@@ -16,7 +16,7 @@ import type {
   ProposalWithJoinedData
 } from '@root/lib/credentials/findIssuableProposalCredentials';
 import { generateCredentialInputsForProposal } from '@root/lib/credentials/findIssuableProposalCredentials';
-import { sortBy } from 'lodash';
+import { sortBy } from 'lodash-es';
 
 import type { ProposalStep } from './getCurrentStep';
 import { getCurrentStep } from './getCurrentStep';

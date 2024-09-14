@@ -7,7 +7,7 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 import { JoinWaitlistFrame } from 'components/frame/JoinWaitlistFrame';
 import { LevelChangedFrame } from 'components/frame/LevelChangedFrame';
 import { getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
-import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackMixpanelEvent';
+import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
 import type { TierChange } from 'lib/scoring/constants';
 
 export async function GET(req: Request) {

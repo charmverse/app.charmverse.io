@@ -87,6 +87,16 @@ cron.schedule('0 * * * *', () => sendProposalEvaluationNotifications());
 
 const port = process.env.PORT || 4000;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   log.info(`Server is up and running on port ${port} in "${process.env.NODE_ENV}" env`);
 });
+
+async function cleanup() {
+  log.info('[server] Closing server...');
+  await server.close();
+  log.info('[server] Exiting process...');
+  process.exit(0);
+}
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);

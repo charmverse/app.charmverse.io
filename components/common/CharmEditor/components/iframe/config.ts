@@ -5,10 +5,10 @@ import { RiGoogleFill } from 'react-icons/ri';
 import { SiLoom, SiOdysee } from 'react-icons/si';
 import { TbBrandAirtable } from 'react-icons/tb';
 
-export const MAX_EMBED_WIDTH = 700;
+export { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT } from './constants';
+
 export const MIN_EMBED_WIDTH = 100;
 export const MAX_EMBED_HEIGHT = 2500;
-export const MIN_EMBED_HEIGHT = 200;
 
 export type Embed = {
   icon?: ElementType;

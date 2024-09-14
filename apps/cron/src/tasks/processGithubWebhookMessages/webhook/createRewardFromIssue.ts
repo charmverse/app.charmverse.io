@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
+import type { components } from '@octokit/openapi-webhooks-types';
 import { baseUrl } from '@root/config/constants';
 import { createOctokitApp } from '@root/lib/github/app';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
@@ -8,6 +8,9 @@ import { getPageMetaList } from '@root/lib/pages/server/getPageMetaList';
 import { createReward } from '@root/lib/rewards/createReward';
 import type { RewardReviewer } from '@root/lib/rewards/interfaces';
 import { relay } from '@root/lib/websockets/relay';
+
+type IssuesLabeledEvent = components['schemas']['webhook-issues-labeled'];
+type IssuesOpenedEvent = components['schemas']['webhook-issues-opened'];
 
 export async function createRewardFromIssue({
   createIssueComment,

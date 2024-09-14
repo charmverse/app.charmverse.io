@@ -1,5 +1,3 @@
-import { pick, omit } from 'lodash';
-
 export type FilterMode = 'include' | 'exclude';
 
 export function filterObjectKeys<T, F extends FilterMode, K extends keyof T>(
@@ -8,7 +6,7 @@ export function filterObjectKeys<T, F extends FilterMode, K extends keyof T>(
   keys: K[]
 ): F extends 'include' ? Pick<T, K> : Omit<T, K> {
   if (mode === 'include') {
-    return pick(obj, keys) as any;
+    return pick(obj as any, keys) as any;
   } else {
     return omit(obj as any, keys) as any;
   }
@@ -41,4 +39,53 @@ export function removeFalseyFields<T extends object, U extends keyof T>(obj: T):
     }
   }
   return result;
+}
+
+// the following methods were copied from lodash to avoid dealing with es imports
+
+function pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+  const result = {} as Pick<T, K>;
+
+  keys.forEach((key) => {
+    if (key in obj) {
+      result[key] = obj[key];
+    }
+  });
+
+  return result;
+}
+
+function omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
+  const result = { ...obj } as Omit<T, K>;
+
+  keys.forEach((key) => {
+    if (key in result) {
+      delete (result as T)[key];
+    }
+  });
+
+  return result;
+}
+
+export function sortBy<T>(array: T[], iteratees: (keyof T | ((item: T) => any))[]): T[] {
+  return [...array].sort((a, b) => {
+    for (const iteratee of iteratees) {
+      let aValue: any;
+      let bValue: any;
+
+      // If iteratee is a function, invoke it to get the value
+      if (typeof iteratee === 'function') {
+        aValue = iteratee(a);
+        bValue = iteratee(b);
+      } else {
+        // If iteratee is a key, use it to access the object's property
+        aValue = a[iteratee];
+        bValue = b[iteratee];
+      }
+
+      if (aValue > bValue) return 1;
+      if (aValue < bValue) return -1;
+    }
+    return 0;
+  });
 }

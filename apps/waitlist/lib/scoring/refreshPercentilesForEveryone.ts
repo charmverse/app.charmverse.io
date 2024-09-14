@@ -1,11 +1,16 @@
 import { log } from '@charmverse/core/log';
-import type { ConnectWaitlistSlot } from '@charmverse/core/prisma-client';
-import { prisma } from '@charmverse/core/prisma-client';
+import type { ConnectWaitlistSlot, Prisma } from '@charmverse/core/prisma-client';
+import { PrismaClient, prisma } from '@charmverse/core/prisma-client';
 import { roundNumberInRange } from '@root/lib/utils/numbers';
+import { prettyPrint } from '@root/lib/utils/strings';
 
 import type { ConnectWaitlistTier, TierChange, TierDistributionType } from './constants';
 import { tierDistribution, getTier } from './constants';
 import { notifyNewScore } from './notifyNewScore';
+
+// const prisma = new PrismaClient({
+//   log: ['query']
+// });
 
 export type TierChangeResult = Pick<ConnectWaitlistSlot, 'fid' | 'username' | 'percentile' | 'score'> & {
   newTier: ConnectWaitlistTier;
@@ -35,13 +40,28 @@ export function getTierChange({
 }
 
 export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[]> {
-  const totalUsers = await prisma.connectWaitlistSlot.count({
-    where: {
-      isPartnerAccount: {
-        not: true
+  const scorableUserQuery: Prisma.ConnectWaitlistSlotWhereInput = {
+    isPartnerAccount: {
+      not: true
+    },
+    OR: [
+      {
+        githubLogin: {
+          not: null
+        }
+      },
+      {
+        referralsGenerated: {
+          some: {}
+        }
       }
-    }
+    ]
+  };
+
+  const totalUsers = await prisma.connectWaitlistSlot.count({
+    where: scorableUserQuery
   });
+
   const onePercentSize = Math.max(totalUsers / 100, 1);
   const tierChangeResults: TierChangeResult[] = [];
 
@@ -53,11 +73,7 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
 
     const usersWithinTier = await prisma.connectWaitlistSlot.findMany({
       orderBy: { score: 'asc' },
-      where: {
-        isPartnerAccount: {
-          not: true
-        }
-      },
+      where: scorableUserQuery,
       skip: offset,
       take
     });
@@ -139,5 +155,3 @@ export function handleTierChanges(tierChangeResults: TierChangeResult[]) {
     })
   );
 }
-
-// refreshPercentilesForEveryone().then(console.log);

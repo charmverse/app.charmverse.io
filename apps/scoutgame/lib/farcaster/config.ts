@@ -5,8 +5,8 @@ import * as yup from 'yup';
 export const authConfig = {
   relay: 'https://relay.farcaster.xyz',
   rpcUrl: 'https://mainnet.optimism.io',
-  domain: 'charmverse.io',
-  siweUri: 'https://app.charmverse.io/login',
+  domain: 'scoutgame.xyz',
+  siweUri: 'https://scoutgame.xyz/login',
   provider: optimism
 } as const;
 

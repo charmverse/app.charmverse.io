@@ -2,15 +2,14 @@
   "name": "scoutgamecron",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "scripts": {
     "build": "npx tsx esbuild.config.ts",
     "start": "tsx watch src/main.ts",
     "start:prod": "node ./dist/main.js",
-    "test": "npx jest",
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@packages/github": "^0.0.0",
     "@packages/scoutgame": "^0.0.0",
