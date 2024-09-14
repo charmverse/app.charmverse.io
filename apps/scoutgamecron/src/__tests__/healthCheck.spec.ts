@@ -16,6 +16,6 @@ afterAll((done) => {
 
 describe('health check', () => {
   test('should return 200', async () => {
-    await request(server).post(`/hello-world`).expect(200);
+    await request(server).get(`/api/health`).expect(200);
   });
 });

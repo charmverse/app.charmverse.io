@@ -30,6 +30,9 @@ addTask('/github-pull-requests', processPullRequests);
 
 addTask('/send-push-notifications', sendNotifications);
 
+// Standard health check used by Beanstalk
+router.get('/api/health', middleware.healthCheck);
+
 app.use(middleware.errorHandler).use(router.routes()).use(router.allowedMethods());
 
 export default app;
