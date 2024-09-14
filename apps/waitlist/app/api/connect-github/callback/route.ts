@@ -1,10 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
 import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constants';
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 
+import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
 import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { refreshUserScore } from 'lib/scoring/refreshUserScore';
 import { embedFarcasterUser } from 'lib/session/embedFarcasterUser';
@@ -140,6 +142,10 @@ export async function GET(req: NextRequest) {
     });
   }
 
+  trackWaitlistMixpanelEvent('connect_github_success', {
+    userId: deterministicV4UUIDFromFid(connectWaitlistSlot.fid)
+  });
+
   await prisma.connectWaitlistSlot.update({
     where: {
       fid: connectWaitlistSlot.fid
@@ -155,7 +161,7 @@ export async function GET(req: NextRequest) {
 
   const sealedData = await embedFarcasterUser({
     fid: connectWaitlistSlot.fid.toString(),
-    username: connectWaitlistSlot.username,
+    username: connectWaitlistSlot.username || '',
     hasJoinedWaitlist: true
   });
 
