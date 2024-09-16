@@ -13,10 +13,13 @@ import type { Connector } from 'wagmi';
 import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
 
 import { Modal } from 'components/common/Modal/Modal';
-import { loginAction } from 'lib/session/loginWithWalletAction';
+import { loginWithWalletAction } from 'lib/session/loginWithWalletAction';
 
 export function WalletLogin({ successPath }: { successPath: string }) {
   const [open, setOpen] = useState(false);
+
+  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
+
   const onOpen = () => setOpen(true);
   const onClose = () => setOpen(false);
 
@@ -41,7 +44,15 @@ export function WalletLogin({ successPath }: { successPath: string }) {
       }
     }
   });
-  const { executeAsync, result } = useAction(loginAction);
+  const { executeAsync, result, isExecuting } = useAction(loginWithWalletAction, {
+    onSuccess: async () => {
+      log.info('Successfully signed in with wallet');
+      await router.push(successPath);
+    },
+    onError: (error) => {
+      log.error('Error signing in with wallet', { error });
+    }
+  });
 
   const handleWalletConnect = async (connector: Connector) => {
     try {
@@ -68,34 +79,35 @@ export function WalletLogin({ successPath }: { successPath: string }) {
 
       const siweMessage = new SiweMessage(preparedMessage);
       const message = siweMessage.prepareMessage();
+
       const signature = await signMessageAsync({ message });
-      return { message, signature };
+      return { message, signature, address: accountAddress };
     } catch (error) {
       // handle error outside
     }
   };
   const handleWalletLogin = async (connector: Connector) => {
+    setIsConnectingWallet(true);
     const data = await handleWalletConnect(connector);
     if (!data) {
+      setIsConnectingWallet(false);
       return;
     }
-
-    const { message, signature } = data;
-    await executeAsync({ message, signature });
-    router.push(successPath);
+    await executeAsync(data);
+    setIsConnectingWallet(false);
   };
 
-  const errorWalletMessage = signMessageError?.message || connectError?.message;
+  const errorWalletMessage =
+    signMessageError?.message || connectError?.message || result.validationErrors?.fieldErrors.message;
 
   return (
-    <Box width='100%' data-test='connect-with-wallet'>
+    <Box data-test='connect-with-wallet'>
       <Button
         onClick={onOpen}
         size='large'
         color='secondary'
         sx={(theme) => ({
-          maxWidth: '400px',
-          width: '100%',
+          width: '250px',
           fontSize: theme.typography.h6.fontSize,
           display: 'flex',
           alignItems: 'center',
@@ -105,7 +117,7 @@ export function WalletLogin({ successPath }: { successPath: string }) {
       >
         Sign in with a wallet
       </Button>
-      <BasicModal open={open} onClose={onClose} aria-labelledby='modal-title'>
+      <Modal open={open} onClose={onClose} aria-labelledby='modal-title'>
         <Typography mb={2} textAlign='center' id='modal-modal-title' variant='h6' component='h2'>
           Choose your wallet
         </Typography>
@@ -116,6 +128,7 @@ export function WalletLogin({ successPath }: { successPath: string }) {
               <Button
                 key={connector.uid}
                 size='large'
+                disabled={isConnectingWallet || isExecuting}
                 onClick={() => handleWalletLogin(connector)}
                 startIcon={
                   connector.icon ? (
@@ -130,7 +143,7 @@ export function WalletLogin({ successPath }: { successPath: string }) {
               </Button>
             ))}
         </Stack>
-      </BasicModal>
+      </Modal>
       {errorWalletMessage && (
         <Typography variant='body2' color='error' sx={{ mt: 2 }}>
           {errorWalletMessage || 'There was an error while logging in with your wallet'}

@@ -52,7 +52,7 @@ export function HomePage() {
         to claim your ticket.
       </Typography>
       <WarpcastLogin />
-      <WalletLogin successPath='/join' />
+      <WalletLogin successPath='/profile' />
     </PageWrapper>
   );
 }
