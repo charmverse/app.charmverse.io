@@ -1,6 +1,6 @@
 'use client';
 
-import { experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
+import { extendTheme, responsiveFontSizes } from '@mui/material/styles';
 import { Inter } from 'next/font/google';
 
 import {
@@ -24,6 +24,7 @@ export const interFont = Inter({
 
 const extendedTheme = extendTheme({
   cssVarPrefix: 'waitlist',
+  defaultColorScheme: 'dark',
   typography: {
     fontFamily: interFont.style.fontFamily,
     button: {
