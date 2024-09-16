@@ -106,7 +106,6 @@ export function WarpcastLogin() {
       >
         Don't have a Farcaster account?
       </Link>
-      ;
     </AuthKitProvider>
   );
 }
