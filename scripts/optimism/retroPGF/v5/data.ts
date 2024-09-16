@@ -12,7 +12,7 @@ export const spaceId = 'f3ddde2e-17e9-42b1-803d-0c72880e4669';
 export const templateId = '762064ff-2430-4a7c-bfa5-7e54dc51f19a';
 
 // Local storage for Farcaster profiles
-export const farcasterUsersFile = '../__data/optimism/archive/farcaster-profiles.json';
+export const farcasterUsersFile = '../__data/optimism/farcaster-profiles.json';
 export const savedFarcasterProfiles = JSON.parse(readFileSync(farcasterUsersFile).toString());
 
 export const applicationsFile = '../__data/optimism/RPGF5 applications.json';

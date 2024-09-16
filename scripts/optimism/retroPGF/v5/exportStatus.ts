@@ -53,6 +53,7 @@ async function exportFullReviewSummary() {
         status = 'Pending';
       }
     }
+
     // const authorEmails = proposal!.authors.map((author) => author.author.verifiedEmails[0]?.email).filter(Boolean);
     const application = applications.find((application) => application.project.id === projectId);
     const applicationEmails = application?.project.team.map((member) => member.user.email).filter(Boolean) || [];
