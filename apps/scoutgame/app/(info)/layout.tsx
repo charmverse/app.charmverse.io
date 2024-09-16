@@ -13,7 +13,9 @@ export default async function Layout({
 
   return (
     <Box component='main' bgcolor='background.default' p={3} minHeight='100svh'>
-      {children}
+      <Box maxWidth='700px' margin='auto'>
+        {children}
+      </Box>
     </Box>
   );
 }
