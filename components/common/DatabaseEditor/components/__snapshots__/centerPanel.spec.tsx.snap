@@ -19,10 +19,10 @@ exports[`components/centerPanel return centerPanel and click on card to show car
             class="ViewHeader  "
           >
             <div
-              class="MuiTabs-root css-5t1ahk-MuiTabs-root"
+              class="MuiTabs-root css-3wt4y5-MuiTabs-root"
             >
               <div
-                class="MuiTabs-scroller MuiTabs-fixed css-jpln7h-MuiTabs-scroller"
+                class="MuiTabs-scroller MuiTabs-fixed css-1yalo2m-MuiTabs-scroller"
                 style="overflow: hidden; margin-bottom: 0px;"
               >
                 <div
@@ -30,7 +30,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-vvkw2v-MuiButtonBase-root-MuiTab-root"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-l5nqp2-MuiButtonBase-root-MuiTab-root"
                     data-view-id="1"
                     draggable="true"
                     role="tab"
@@ -39,7 +39,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     variant="text"
                   >
                     <p
-                      class="MuiTypography-root MuiTypography-body1 css-4d711q-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body1 css-n4hg7u-MuiTypography-root"
                     >
                       <span>
                         <svg
@@ -67,7 +67,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                   </button>
                 </div>
                 <span
-                  class="MuiTabs-indicator css-1br7sd5-MuiTabs-indicator"
+                  class="MuiTabs-indicator css-1u6txc4-MuiTabs-indicator"
                   style="left: 0px; width: 0px;"
                 />
               </div>
@@ -86,7 +86,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                     data-testid="AddIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -116,7 +116,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall css-887v1i-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall css-1ha8syo-MuiSvgIcon-root"
                     data-test="view-filter-button"
                     data-testid="FilterListIcon"
                     focusable="false"
@@ -176,7 +176,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                     data-testid="SearchIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -203,7 +203,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                       data-testid="MoreHorizOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -216,28 +216,28 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                 </span>
               </div>
               <div
-                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-jgbgc3-MuiButtonGroup-root"
+                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-horizontal MuiButtonGroup-disableElevation MuiButtonGroup-colorPrimary css-tjkvc4-MuiButtonGroup-root"
                 role="group"
               >
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-firstButton css-1pjzawa-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-firstButton css-10uqonn-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
                   <div
-                    class="MuiTypography-root MuiTypography-subtitle1 css-15znijn-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-subtitle1 css-fo8jal-MuiTypography-root"
                   >
                     New
                   </div>
                 </button>
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-lastButton css-1lvcm06-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-lastButton css-dzgl7c-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                     data-testid="KeyboardArrowDownIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -310,7 +310,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       >
                         <svg
                           aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                           data-testid="MoreHorizIcon"
                           focusable="false"
                           viewBox="0 0 24 24"
@@ -332,7 +332,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                         data-testid="AddIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -348,7 +348,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                   class="octo-board-header-cell narrow"
                 >
                   <button
-                    class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-iee9az-MuiButtonBase-root-MuiButton-root"
+                    class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-7zos53-MuiButtonBase-root-MuiButton-root"
                     tabindex="0"
                     type="button"
                   >
@@ -372,7 +372,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     class="octo-board-column"
                   >
                     <a
-                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-12nabwm-MuiTypography-root-MuiLink-root"
                       draggable="false"
                       href="/test-space/1"
                     >
@@ -386,13 +386,13 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                           data-testid="page-actions-context-menu"
                         >
                           <button
-                            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                             tabindex="0"
                             type="button"
                           >
                             <svg
                               aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                               data-testid="MoreHorizIcon"
                               focusable="false"
                               viewBox="0 0 24 24"
@@ -419,7 +419,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       </div>
                     </a>
                     <a
-                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-12nabwm-MuiTypography-root-MuiLink-root"
                       draggable="false"
                       href="/test-space/2"
                     >
@@ -433,13 +433,13 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                           data-testid="page-actions-context-menu"
                         >
                           <button
-                            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                             tabindex="0"
                             type="button"
                           >
                             <svg
                               aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                               data-testid="MoreHorizIcon"
                               focusable="false"
                               viewBox="0 0 24 24"
@@ -466,16 +466,16 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       </div>
                     </a>
                     <button
-                      class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-csouv9-MuiButtonBase-root-MuiButton-root"
+                      class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-36o0f5-MuiButtonBase-root-MuiButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <span
-                        class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-cstir9-MuiButton-startIcon"
+                        class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-h0vgxp-MuiButton-startIcon"
                       >
                         <svg
                           aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                           data-testid="AddIcon"
                           focusable="false"
                           viewBox="0 0 24 24"
@@ -486,7 +486,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         </svg>
                       </span>
                       <p
-                        class="MuiTypography-root MuiTypography-body1 css-flztjq-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body1 css-e3qfi3-MuiTypography-root"
                       >
                         New
                       </p>
@@ -527,14 +527,14 @@ exports[`components/centerPanel return centerPanel and click on card to show car
             </div>
           </div>
           <div
-            class="MuiCollapse-root MuiCollapse-horizontal MuiCollapse-hidden css-192fdwg-MuiCollapse-root"
+            class="MuiCollapse-root MuiCollapse-horizontal MuiCollapse-hidden css-ghdcve-MuiCollapse-root"
             style="min-width: 0px;"
           >
             <div
-              class="MuiCollapse-wrapper MuiCollapse-horizontal css-18w3a48-MuiCollapse-wrapper"
+              class="MuiCollapse-wrapper MuiCollapse-horizontal css-1kjcp9i-MuiCollapse-wrapper"
             >
               <div
-                class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
+                class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-hrodc9-MuiCollapse-wrapperInner"
               >
                 <div
                   class="disable-drag-selection css-1tk713d"
@@ -547,19 +547,19 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       class="MuiBox-root css-axw7ok"
                     >
                       <p
-                        class="MuiTypography-root MuiTypography-body2 css-1r3h3y7-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 css-3w5p9u-MuiTypography-root"
                       >
                         View options
                       </p>
                     </div>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                         data-testid="CloseIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -571,7 +571,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     </button>
                   </div>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -580,7 +580,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="PreviewIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -591,22 +591,22 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Layout
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Board
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -617,7 +617,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -626,7 +626,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="FormatListBulletedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -637,22 +637,22 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Properties
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       None
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -663,7 +663,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -672,7 +672,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="GroupWorkOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -698,22 +698,22 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Group
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Property 1
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -724,7 +724,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -746,22 +746,22 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Source
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Database
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -801,10 +801,10 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
             class="ViewHeader  "
           >
             <div
-              class="MuiTabs-root css-5t1ahk-MuiTabs-root"
+              class="MuiTabs-root css-3wt4y5-MuiTabs-root"
             >
               <div
-                class="MuiTabs-scroller MuiTabs-fixed css-jpln7h-MuiTabs-scroller"
+                class="MuiTabs-scroller MuiTabs-fixed css-1yalo2m-MuiTabs-scroller"
                 style="overflow: hidden; margin-bottom: 0px;"
               >
                 <div
@@ -812,7 +812,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-vvkw2v-MuiButtonBase-root-MuiTab-root"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-l5nqp2-MuiButtonBase-root-MuiTab-root"
                     data-view-id="1"
                     draggable="true"
                     role="tab"
@@ -821,7 +821,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                     variant="text"
                   >
                     <p
-                      class="MuiTypography-root MuiTypography-body1 css-4d711q-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body1 css-n4hg7u-MuiTypography-root"
                     >
                       <span>
                         <svg
@@ -849,7 +849,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                   </button>
                 </div>
                 <span
-                  class="MuiTabs-indicator css-1br7sd5-MuiTabs-indicator"
+                  class="MuiTabs-indicator css-1u6txc4-MuiTabs-indicator"
                   style="left: 0px; width: 0px;"
                 />
               </div>
@@ -868,7 +868,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                     data-testid="AddIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -898,7 +898,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall css-887v1i-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall css-1ha8syo-MuiSvgIcon-root"
                     data-test="view-filter-button"
                     data-testid="FilterListIcon"
                     focusable="false"
@@ -958,7 +958,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                     data-testid="SearchIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -985,7 +985,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                       data-testid="MoreHorizOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -998,28 +998,28 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                 </span>
               </div>
               <div
-                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-jgbgc3-MuiButtonGroup-root"
+                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-horizontal MuiButtonGroup-disableElevation MuiButtonGroup-colorPrimary css-tjkvc4-MuiButtonGroup-root"
                 role="group"
               >
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-firstButton css-1pjzawa-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-firstButton css-10uqonn-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
                   <div
-                    class="MuiTypography-root MuiTypography-subtitle1 css-15znijn-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-subtitle1 css-fo8jal-MuiTypography-root"
                   >
                     New
                   </div>
                 </button>
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-lastButton css-1lvcm06-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-lastButton css-dzgl7c-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                     data-testid="KeyboardArrowDownIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -1056,13 +1056,13 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                   data-testid="page-actions-context-menu"
                 >
                   <button
-                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                     tabindex="0"
                     type="button"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                       data-testid="MoreHorizIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1084,13 +1084,13 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                   data-testid="page-actions-context-menu"
                 >
                   <button
-                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                     tabindex="0"
                     type="button"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                       data-testid="MoreHorizIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1110,14 +1110,14 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
             </div>
           </div>
           <div
-            class="MuiCollapse-root MuiCollapse-horizontal MuiCollapse-hidden css-192fdwg-MuiCollapse-root"
+            class="MuiCollapse-root MuiCollapse-horizontal MuiCollapse-hidden css-ghdcve-MuiCollapse-root"
             style="min-width: 0px;"
           >
             <div
-              class="MuiCollapse-wrapper MuiCollapse-horizontal css-18w3a48-MuiCollapse-wrapper"
+              class="MuiCollapse-wrapper MuiCollapse-horizontal css-1kjcp9i-MuiCollapse-wrapper"
             >
               <div
-                class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
+                class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-hrodc9-MuiCollapse-wrapperInner"
               >
                 <div
                   class="disable-drag-selection css-1tk713d"
@@ -1130,19 +1130,19 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                       class="MuiBox-root css-axw7ok"
                     >
                       <p
-                        class="MuiTypography-root MuiTypography-body2 css-1r3h3y7-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 css-3w5p9u-MuiTypography-root"
                       >
                         View options
                       </p>
                     </div>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                         data-testid="CloseIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1154,7 +1154,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                     </button>
                   </div>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -1163,7 +1163,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="PreviewIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1174,22 +1174,22 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Layout
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Gallery
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1200,7 +1200,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -1209,7 +1209,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="FormatListBulletedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1220,22 +1220,22 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Properties
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       None
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1246,7 +1246,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -1268,22 +1268,22 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Source
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Database
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1323,10 +1323,10 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
             class="ViewHeader  "
           >
             <div
-              class="MuiTabs-root css-5t1ahk-MuiTabs-root"
+              class="MuiTabs-root css-3wt4y5-MuiTabs-root"
             >
               <div
-                class="MuiTabs-scroller MuiTabs-fixed css-jpln7h-MuiTabs-scroller"
+                class="MuiTabs-scroller MuiTabs-fixed css-1yalo2m-MuiTabs-scroller"
                 style="overflow: hidden; margin-bottom: 0px;"
               >
                 <div
@@ -1334,7 +1334,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-vvkw2v-MuiButtonBase-root-MuiTab-root"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-l5nqp2-MuiButtonBase-root-MuiTab-root"
                     data-view-id="1"
                     draggable="true"
                     role="tab"
@@ -1343,7 +1343,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     variant="text"
                   >
                     <p
-                      class="MuiTypography-root MuiTypography-body1 css-4d711q-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body1 css-n4hg7u-MuiTypography-root"
                     >
                       <span>
                         <svg
@@ -1371,7 +1371,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                   </button>
                 </div>
                 <span
-                  class="MuiTabs-indicator css-1br7sd5-MuiTabs-indicator"
+                  class="MuiTabs-indicator css-1u6txc4-MuiTabs-indicator"
                   style="left: 0px; width: 0px;"
                 />
               </div>
@@ -1390,7 +1390,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                     data-testid="AddIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -1420,7 +1420,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall css-887v1i-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall css-1ha8syo-MuiSvgIcon-root"
                     data-test="view-filter-button"
                     data-testid="FilterListIcon"
                     focusable="false"
@@ -1480,7 +1480,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                     data-testid="SearchIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -1507,7 +1507,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                       data-testid="MoreHorizOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1520,28 +1520,28 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                 </span>
               </div>
               <div
-                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-jgbgc3-MuiButtonGroup-root"
+                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-horizontal MuiButtonGroup-disableElevation MuiButtonGroup-colorPrimary css-tjkvc4-MuiButtonGroup-root"
                 role="group"
               >
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-firstButton css-1pjzawa-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-firstButton css-10uqonn-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
                   <div
-                    class="MuiTypography-root MuiTypography-subtitle1 css-15znijn-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-subtitle1 css-fo8jal-MuiTypography-root"
                   >
                     New
                   </div>
                 </button>
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-lastButton css-1lvcm06-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-lastButton css-dzgl7c-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                     data-testid="KeyboardArrowDownIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -1614,7 +1614,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       >
                         <svg
                           aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                           data-testid="MoreHorizIcon"
                           focusable="false"
                           viewBox="0 0 24 24"
@@ -1636,7 +1636,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                         data-testid="AddIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1652,7 +1652,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                   class="octo-board-header-cell narrow"
                 >
                   <button
-                    class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-iee9az-MuiButtonBase-root-MuiButton-root"
+                    class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-7zos53-MuiButtonBase-root-MuiButton-root"
                     tabindex="0"
                     type="button"
                   >
@@ -1676,7 +1676,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     class="octo-board-column"
                   >
                     <a
-                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-12nabwm-MuiTypography-root-MuiLink-root"
                       draggable="false"
                       href="/test-space/1"
                     >
@@ -1690,13 +1690,13 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                           data-testid="page-actions-context-menu"
                         >
                           <button
-                            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                             tabindex="0"
                             type="button"
                           >
                             <svg
                               aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                               data-testid="MoreHorizIcon"
                               focusable="false"
                               viewBox="0 0 24 24"
@@ -1723,7 +1723,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       </div>
                     </a>
                     <a
-                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-12nabwm-MuiTypography-root-MuiLink-root"
                       draggable="false"
                       href="/test-space/2"
                     >
@@ -1737,13 +1737,13 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                           data-testid="page-actions-context-menu"
                         >
                           <button
-                            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                             tabindex="0"
                             type="button"
                           >
                             <svg
                               aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                               data-testid="MoreHorizIcon"
                               focusable="false"
                               viewBox="0 0 24 24"
@@ -1770,16 +1770,16 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       </div>
                     </a>
                     <button
-                      class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-csouv9-MuiButtonBase-root-MuiButton-root"
+                      class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-36o0f5-MuiButtonBase-root-MuiButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <span
-                        class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-cstir9-MuiButton-startIcon"
+                        class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-h0vgxp-MuiButton-startIcon"
                       >
                         <svg
                           aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                           data-testid="AddIcon"
                           focusable="false"
                           viewBox="0 0 24 24"
@@ -1790,7 +1790,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                         </svg>
                       </span>
                       <p
-                        class="MuiTypography-root MuiTypography-body1 css-flztjq-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body1 css-e3qfi3-MuiTypography-root"
                       >
                         New
                       </p>
@@ -1831,14 +1831,14 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
             </div>
           </div>
           <div
-            class="MuiCollapse-root MuiCollapse-horizontal MuiCollapse-hidden css-192fdwg-MuiCollapse-root"
+            class="MuiCollapse-root MuiCollapse-horizontal MuiCollapse-hidden css-ghdcve-MuiCollapse-root"
             style="min-width: 0px;"
           >
             <div
-              class="MuiCollapse-wrapper MuiCollapse-horizontal css-18w3a48-MuiCollapse-wrapper"
+              class="MuiCollapse-wrapper MuiCollapse-horizontal css-1kjcp9i-MuiCollapse-wrapper"
             >
               <div
-                class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
+                class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-hrodc9-MuiCollapse-wrapperInner"
               >
                 <div
                   class="disable-drag-selection css-1tk713d"
@@ -1851,19 +1851,19 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       class="MuiBox-root css-axw7ok"
                     >
                       <p
-                        class="MuiTypography-root MuiTypography-body2 css-1r3h3y7-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 css-3w5p9u-MuiTypography-root"
                       >
                         View options
                       </p>
                     </div>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                         data-testid="CloseIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1875,7 +1875,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     </button>
                   </div>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -1884,7 +1884,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="PreviewIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1895,22 +1895,22 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Layout
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Board
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1921,7 +1921,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -1930,7 +1930,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="FormatListBulletedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1941,22 +1941,22 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Properties
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       None
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1967,7 +1967,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -1976,7 +1976,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="GroupWorkOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -2002,22 +2002,22 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Group
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Property 1
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -2028,7 +2028,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -2050,22 +2050,22 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Source
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Database
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -2105,10 +2105,10 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
             class="ViewHeader  "
           >
             <div
-              class="MuiTabs-root css-5t1ahk-MuiTabs-root"
+              class="MuiTabs-root css-3wt4y5-MuiTabs-root"
             >
               <div
-                class="MuiTabs-scroller MuiTabs-fixed css-jpln7h-MuiTabs-scroller"
+                class="MuiTabs-scroller MuiTabs-fixed css-1yalo2m-MuiTabs-scroller"
                 style="overflow: hidden; margin-bottom: 0px;"
               >
                 <div
@@ -2116,7 +2116,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-vvkw2v-MuiButtonBase-root-MuiTab-root"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-l5nqp2-MuiButtonBase-root-MuiTab-root"
                     data-view-id="1"
                     draggable="true"
                     role="tab"
@@ -2125,7 +2125,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     variant="text"
                   >
                     <p
-                      class="MuiTypography-root MuiTypography-body1 css-4d711q-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body1 css-n4hg7u-MuiTypography-root"
                     >
                       <span>
                         <svg
@@ -2153,7 +2153,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                   </button>
                 </div>
                 <span
-                  class="MuiTabs-indicator css-1br7sd5-MuiTabs-indicator"
+                  class="MuiTabs-indicator css-1u6txc4-MuiTabs-indicator"
                   style="left: 0px; width: 0px;"
                 />
               </div>
@@ -2172,7 +2172,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                     data-testid="AddIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -2202,7 +2202,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall css-887v1i-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall css-1ha8syo-MuiSvgIcon-root"
                     data-test="view-filter-button"
                     data-testid="FilterListIcon"
                     focusable="false"
@@ -2262,7 +2262,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                     data-testid="SearchIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -2289,7 +2289,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                       data-testid="MoreHorizOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -2302,28 +2302,28 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                 </span>
               </div>
               <div
-                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-disableElevation css-jgbgc3-MuiButtonGroup-root"
+                class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-horizontal MuiButtonGroup-disableElevation MuiButtonGroup-colorPrimary css-tjkvc4-MuiButtonGroup-root"
                 role="group"
               >
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-firstButton css-1pjzawa-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-firstButton css-10uqonn-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
                   <div
-                    class="MuiTypography-root MuiTypography-subtitle1 css-15znijn-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-subtitle1 css-fo8jal-MuiTypography-root"
                   >
                     New
                   </div>
                 </button>
                 <button
-                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-lastButton css-1lvcm06-MuiButtonBase-root-MuiButton-root"
+                  class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-lastButton css-dzgl7c-MuiButtonBase-root-MuiButton-root"
                   tabindex="0"
                   type="button"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                     data-testid="KeyboardArrowDownIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -2358,7 +2358,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                   id="mainBoardHeader"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall disable-drag-selection css-sh8a4w-MuiButtonBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall disable-drag-selection css-u5wonc-MuiButtonBase-root-MuiCheckbox-root"
                   >
                     <input
                       class="PrivateSwitchBase-input css-1m9pwf3"
@@ -2367,7 +2367,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     />
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                       data-testid="CheckBoxOutlineBlankOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -2396,7 +2396,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             >
                               <svg
                                 aria-hidden="true"
-                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-fatq9v-MuiSvgIcon-root"
+                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-1dk25s0-MuiSvgIcon-root"
                                 data-testid="SubjectIcon"
                                 focusable="false"
                                 viewBox="0 0 24 24"
@@ -2408,13 +2408,13 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             </div>
                             <span
                               aria-label="Title"
-                              class="MuiTypography-root MuiTypography-subtitle1 css-1to5392-MuiTypography-root"
+                              class="MuiTypography-root MuiTypography-subtitle1 css-11pj8uf-MuiTypography-root"
                               data-mui-internal-clone-element="true"
                             >
                               Title
                             </span>
                             <button
-                              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-10xxybu-MuiButtonBase-root-MuiIconButton-root"
+                              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-rjdjdi-MuiButtonBase-root-MuiIconButton-root"
                               tabindex="0"
                               type="button"
                             />
@@ -2440,7 +2440,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                       <span>
                         <svg
                           aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                           data-test="add-table-prop"
                           data-testid="AddIcon"
                           focusable="false"
@@ -2482,7 +2482,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             >
                               <svg
                                 aria-hidden="true"
-                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
                                 data-testid="ArrowDropDownIcon"
                                 focusable="false"
                                 viewBox="0 0 24 24"
@@ -2495,7 +2495,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           </span>
                           <span
                             aria-label="Items with an empty {propertyName} property will go here. This column cannot be removed."
-                            class="MuiTypography-root MuiTypography-subtitle1 css-159yneb-MuiTypography-root"
+                            class="MuiTypography-root MuiTypography-subtitle1 css-xi0xw7-MuiTypography-root"
                             data-mui-internal-clone-element="true"
                           >
                             No Property 1
@@ -2524,7 +2524,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             >
                               <svg
                                 aria-hidden="true"
-                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                                 data-testid="MoreHorizIcon"
                                 focusable="false"
                                 viewBox="0 0 24 24"
@@ -2546,7 +2546,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           >
                             <svg
                               aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                               data-testid="AddIcon"
                               focusable="false"
                               viewBox="0 0 24 24"
@@ -2577,7 +2577,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           >
                             <svg
                               aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                               data-testid="DragIndicatorIcon"
                               focusable="false"
                               viewBox="0 0 24 24"
@@ -2589,7 +2589,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           </div>
                         </div>
                         <span
-                          class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall table-row-checkbox disable-drag-selection css-bfzfnf-MuiButtonBase-root-MuiCheckbox-root"
+                          class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall table-row-checkbox disable-drag-selection css-ywh4e2-MuiButtonBase-root-MuiCheckbox-root"
                         >
                           <input
                             class="PrivateSwitchBase-input css-1m9pwf3"
@@ -2598,7 +2598,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           />
                           <svg
                             aria-hidden="true"
-                            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                             data-testid="CheckBoxOutlineBlankIcon"
                             focusable="false"
                             viewBox="0 0 24 24"
@@ -2624,7 +2624,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             >
                               <svg
                                 aria-hidden="true"
-                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
                                 data-testid="InsertDriveFileOutlinedIcon"
                                 focusable="false"
                                 viewBox="0 0 24 24"
@@ -2641,11 +2641,11 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                                 style="height: 100%;"
                               >
                                 <div
-                                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
+                                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1e8l9jl-MuiInputBase-root"
                                   spellcheck="true"
                                 >
                                   <input
-                                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
+                                    class="MuiInputBase-input Editable octo-propertyvalue css-f5ijlv-MuiInputBase-input"
                                     placeholder="Untitled"
                                     type="text"
                                     value="card1"
@@ -2659,7 +2659,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             data-test="database-open-button-1"
                           >
                             <a
-                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-ihfry6-MuiTypography-root-MuiLink-root"
                               href="/1"
                               style="text-decoration: none;"
                             >
@@ -2697,7 +2697,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           >
                             <svg
                               aria-hidden="true"
-                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                               data-testid="DragIndicatorIcon"
                               focusable="false"
                               viewBox="0 0 24 24"
@@ -2709,7 +2709,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           </div>
                         </div>
                         <span
-                          class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall table-row-checkbox disable-drag-selection css-bfzfnf-MuiButtonBase-root-MuiCheckbox-root"
+                          class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall table-row-checkbox disable-drag-selection css-ywh4e2-MuiButtonBase-root-MuiCheckbox-root"
                         >
                           <input
                             class="PrivateSwitchBase-input css-1m9pwf3"
@@ -2718,7 +2718,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           />
                           <svg
                             aria-hidden="true"
-                            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                             data-testid="CheckBoxOutlineBlankIcon"
                             focusable="false"
                             viewBox="0 0 24 24"
@@ -2744,7 +2744,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             >
                               <svg
                                 aria-hidden="true"
-                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
                                 data-testid="InsertDriveFileOutlinedIcon"
                                 focusable="false"
                                 viewBox="0 0 24 24"
@@ -2761,11 +2761,11 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                                 style="height: 100%;"
                               >
                                 <div
-                                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
+                                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1e8l9jl-MuiInputBase-root"
                                   spellcheck="true"
                                 >
                                   <input
-                                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
+                                    class="MuiInputBase-input Editable octo-propertyvalue css-f5ijlv-MuiInputBase-input"
                                     placeholder="Untitled"
                                     type="text"
                                     value="card2"
@@ -2779,7 +2779,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             data-test="database-open-button-2"
                           >
                             <a
-                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+                              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-ihfry6-MuiTypography-root-MuiLink-root"
                               href="/2"
                               style="text-decoration: none;"
                             >
@@ -2830,14 +2830,14 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
             </div>
           </div>
           <div
-            class="MuiCollapse-root MuiCollapse-horizontal MuiCollapse-hidden css-192fdwg-MuiCollapse-root"
+            class="MuiCollapse-root MuiCollapse-horizontal MuiCollapse-hidden css-ghdcve-MuiCollapse-root"
             style="min-width: 0px;"
           >
             <div
-              class="MuiCollapse-wrapper MuiCollapse-horizontal css-18w3a48-MuiCollapse-wrapper"
+              class="MuiCollapse-wrapper MuiCollapse-horizontal css-1kjcp9i-MuiCollapse-wrapper"
             >
               <div
-                class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
+                class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-hrodc9-MuiCollapse-wrapperInner"
               >
                 <div
                   class="disable-drag-selection css-1tk713d"
@@ -2850,19 +2850,19 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                       class="MuiBox-root css-axw7ok"
                     >
                       <p
-                        class="MuiTypography-root MuiTypography-body2 css-1r3h3y7-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 css-3w5p9u-MuiTypography-root"
                       >
                         View options
                       </p>
                     </div>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                         data-testid="CloseIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -2874,7 +2874,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     </button>
                   </div>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -2883,7 +2883,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="PreviewIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -2894,22 +2894,22 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Layout
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Table
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -2920,7 +2920,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -2929,7 +2929,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="FormatListBulletedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -2940,22 +2940,22 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Properties
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       None
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -2966,7 +2966,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -2975,7 +2975,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                         data-testid="GroupWorkOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -3001,22 +3001,22 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Group
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Property 1
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -3027,7 +3027,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     </svg>
                   </li>
                   <li
-                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-qobqql-MuiButtonBase-root-MuiMenuItem-root"
+                    class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-dense MuiMenuItem-gutters css-t16nfx-MuiButtonBase-root-MuiMenuItem-root"
                     role="menuitem"
                     tabindex="-1"
                   >
@@ -3049,22 +3049,22 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                       </svg>
                     </div>
                     <div
-                      class="MuiListItemText-root MuiListItemText-dense css-tlelie-MuiListItemText-root"
+                      class="MuiListItemText-root MuiListItemText-dense css-1y2w5y4-MuiListItemText-root"
                     >
                       <span
-                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-liojbl-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 MuiListItemText-primary css-o2pz3a-MuiTypography-root"
                       >
                         Source
                       </span>
                     </div>
                     <div
-                      class="MuiTypography-root MuiTypography-body2 css-112d779-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body2 css-1rsq4cw-MuiTypography-root"
                     >
                       Database
                     </div>
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
                       data-testid="KeyboardArrowRightIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
