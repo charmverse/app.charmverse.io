@@ -1,5 +1,6 @@
-import type { GemReceiptType } from '@charmverse/core/prisma-client';
+import type { GemsReceiptType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { checkIsBuilderBanned } from '@packages/scoutgame/src/checkIsBuilderBanned';
 
 import type { PullRequest } from './getPullRequests';
 
@@ -59,8 +60,9 @@ export async function processMergedPullRequests({
             githubEventId: githubEvent.id
           }
         });
+        const isBuilderBanned = await checkIsBuilderBanned(builderId);
         // Don't award gems for a PR that was already merged today
-        if (!existingGithubEvent) {
+        if (!existingGithubEvent && !isBuilderBanned) {
           const mergedGithubEventsInRepo = await tx.githubEvent.count({
             where: {
               createdBy: githubUserId,
@@ -83,7 +85,7 @@ export async function processMergedPullRequests({
             }
           });
 
-          const type: GemReceiptType = !mergedGithubEventsInRepo
+          const type: GemsReceiptType = !mergedGithubEventsInRepo
             ? 'first_pr'
             : (mergedGithubEventsInWeek + 1) % 3 === 0
             ? 'third_pr_in_streak'
@@ -94,6 +96,25 @@ export async function processMergedPullRequests({
               type,
               value: GemsReceiptValue[type],
               eventId: builderEvent.id
+            }
+          });
+
+          await tx.userWeeklyStats.upsert({
+            where: {
+              userId_week: {
+                userId: builderId,
+                week
+              }
+            },
+            create: {
+              gemsCollected: GemsReceiptValue[type],
+              week,
+              userId: builderId
+            },
+            update: {
+              gemsCollected: {
+                increment: GemsReceiptValue[type]
+              }
             }
           });
         }

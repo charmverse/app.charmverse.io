@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { DateTime } from 'luxon';
 
 import type { PullRequest } from './getPullRequests';
 import { getRecentClosedOrMergedPRs } from './getPullRequests';
@@ -35,7 +36,6 @@ export async function processPullRequests() {
   }
 
   for (const repo of githubRepos) {
-    // console.log('Processing pull requests');
     const recentPrs = await getRecentClosedOrMergedPRs({
       owner: repo.owner,
       repo: repo.name,
@@ -61,18 +61,21 @@ export async function processPullRequests() {
       }
     }
 
+    const dt = DateTime.now();
+    const isoWeekNumber = dt.weekNumber;
+
     for (const githubUserPr of Object.values(githubUserPrRecord)) {
       await processClosedPullRequests({
         pullRequests: githubUserPr.closed,
         githubUserId: githubUserPr.githubUserId,
         repoId: repo.id,
-        week: '1',
+        week: isoWeekNumber.toString(),
         season: 1,
         builderId: githubUserPr.builderId
       });
       await processMergedPullRequests({
         season: 1,
-        week: '1',
+        week: isoWeekNumber.toString(),
         pullRequests: githubUserPr.merged,
         githubUserId: githubUserPr.githubUserId,
         repoId: repo.id,
