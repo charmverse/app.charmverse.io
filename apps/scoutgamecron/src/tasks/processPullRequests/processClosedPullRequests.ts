@@ -8,20 +8,22 @@ export async function processClosedPullRequests({
   githubUserId,
   repoId,
   week,
-  builderId
+  builderId,
+  season
 }: {
   pullRequests: PullRequest[];
   githubUserId: number;
   repoId: string;
   week: string;
   builderId?: string;
+  season: number;
 }) {
-  for (const pr of pullRequests) {
+  for (const pullRequest of pullRequests) {
     await prisma.$transaction(async (tx) => {
       const githubEvent = await tx.githubEvent.create({
         data: {
-          pullRequestNumber: pr.number,
-          title: pr.title,
+          pullRequestNumber: pullRequest.number,
+          title: pullRequest.title,
           type: 'merged_pull_request',
           createdBy: githubUserId,
           repoId
@@ -32,7 +34,7 @@ export async function processClosedPullRequests({
         const builderEvent = await tx.builderEvent.create({
           data: {
             builderId,
-            season: 1,
+            season,
             week,
             type: 'github_event',
             githubEventId: githubEvent.id
