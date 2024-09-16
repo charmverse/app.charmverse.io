@@ -2,17 +2,19 @@
   "name": "cron",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "scripts": {
     "build": "npx tsx esbuild.config.ts",
     "start": "tsx watch src/cron.ts",
-    "start:prod": "node ./dist/cron.js",
-    "test": "npx jest",
+    "start:prod": "node --experimental-vm-modules ./dist/cron.js",
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
+    "@octokit/openapi-webhooks-types": "^8.3.0",
     "@types/node-cron": "^3.0.11"
   }
 }

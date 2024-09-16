@@ -9,7 +9,7 @@ import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import { formatDate, formatDateTime } from '@root/lib/utils/dates';
 import { isTruthy } from '@root/lib/utils/types';
 import { stringify } from 'csv-stringify/sync';
-import { sortBy } from 'lodash';
+import { sortBy } from 'lodash-es';
 
 import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
 import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';

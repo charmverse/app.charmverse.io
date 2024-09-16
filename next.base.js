@@ -28,6 +28,7 @@ const esmModules = [
   'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
+  'lodash-es',
   // '@babel/runtime',
   'formdata-polyfill',
   'jose',

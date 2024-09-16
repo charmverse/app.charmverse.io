@@ -1,4 +1,4 @@
-import { capitalize } from 'lodash';
+import { capitalize } from '@root/lib/utils/strings';
 
 import type { FeatureJson, Feature } from './constants';
 import { STATIC_PAGES } from './constants';

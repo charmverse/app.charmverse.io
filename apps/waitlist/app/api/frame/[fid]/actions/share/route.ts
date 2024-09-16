@@ -30,7 +30,17 @@ export async function POST(req: Request) {
     frame: getCurrentFrameFromUrl(req)
   });
 
-  await joinWaitlist({ fid: interactorFid, username: interactorUsername, referredByFid: referrerFid });
+  await joinWaitlist({
+    fid: interactorFid,
+    username: interactorUsername,
+    referredByFid: referrerFid,
+    waitlistAnalytics: {
+      source: 'frame',
+      frame: getCurrentFrameFromUrl(req),
+      referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+      triggered_by_action: 'click_share'
+    }
+  });
 
   const warpcastShareUrl = shareFrameUrl(interactorFid);
   return new Response(null, { status: 302, headers: { Location: warpcastShareUrl } });

@@ -206,7 +206,7 @@ jobs:
                       -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
                       --network "host"  \
                       --ipc=host \
-                      mcr.microsoft.com/playwright:v1.42.1-jammy \
+                      mcr.microsoft.com/playwright:v1.47.1-jammy \
                       npm run scoutgame:test:e2e:ci
 
   upload-docker:
