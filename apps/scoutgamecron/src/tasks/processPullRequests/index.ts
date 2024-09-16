@@ -1,4 +1,3 @@
-import type { GithubUser } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { PullRequest } from './getPullRequests';
@@ -68,9 +67,17 @@ export async function processPullRequests() {
         githubUserId: githubUserPr.githubUserId,
         repoId: repo.id,
         week: '1',
+        season: 1,
         builderId: githubUserPr.builderId
       });
-      await processMergedPullRequests(githubUserPr.merged);
+      await processMergedPullRequests({
+        season: 1,
+        week: '1',
+        pullRequests: githubUserPr.merged,
+        githubUserId: githubUserPr.githubUserId,
+        repoId: repo.id,
+        builderId: githubUserPr.builderId
+      });
     }
   }
 }
