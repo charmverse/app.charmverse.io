@@ -247,7 +247,9 @@ jobs:
     name: Upload assets in production
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
-    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    if: |
+      (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
+      (needs.build.outputs.deploy_staging == 'true')
     needs: build
     steps:
       - uses: actions/checkout@v4
