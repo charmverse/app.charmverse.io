@@ -11,7 +11,7 @@ import { encodeAbiParameters } from 'viem';
 import { mnemonicToAccount } from 'viem/accounts';
 import { optimism } from 'viem/chains';
 
-import { NEYNAR_API_BASE_URL, NEYNAR_SIGNER_ID, NEYNAR_SIGNER_PUBLIC_KEY } from '../constants';
+import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY, NEYNAR_SIGNER_ID, NEYNAR_SIGNER_PUBLIC_KEY } from '../constants';
 import { lookupUserByCustodyAddress } from '../lookupUserByCustodyAddress';
 
 import { keyGatewayAbi } from './abi/keyGatewayAbi';
@@ -43,7 +43,7 @@ async function lookupSigner(signerId: string): Promise<Signer> {
     {
       headers: {
         accept: 'application/json',
-        api_key: 'NEYNAR_API_DOCS'
+        api_key: NEYNAR_API_KEY
       }
     }
   );
@@ -57,7 +57,7 @@ async function generateSigner(): Promise<Signer> {
   const signer = await POST<Signer>(url, undefined, {
     headers: {
       accept: 'application/json',
-      api_key: 'NEYNAR_API_DOCS'
+      api_key: NEYNAR_API_KEY
     }
   });
 
@@ -256,4 +256,4 @@ export async function getApprovedSignerId(): Promise<{ signerId: string; signerP
   }
 }
 
-getApprovedSignerId();
+// getApprovedSignerId();

@@ -2,8 +2,11 @@
 
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import * as yup from 'yup';
+
+import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
 
 import { actionClient } from '../actionClient';
 
@@ -16,6 +19,8 @@ export const loginWithFarcasterAction = actionClient
     const { fid, username } = parsedInput.loginPayload as StatusAPIResponse;
 
     log.info('User logged in to waitlist', { fid, username });
+
+    trackWaitlistMixpanelEvent('login', { userId: deterministicV4UUIDFromFid(fid as number) });
 
     const currentWaitlistSlot = await prisma.connectWaitlistSlot.findUnique({
       where: {
