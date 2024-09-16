@@ -35,6 +35,12 @@ type WaitlistAppEventMap = {
   logout: UserEvent;
   connect_github_click: UserEvent;
   connect_github_success: UserEvent;
+  join_waitlist: UserEvent &
+    Partial<ReferrerEvent> & {
+      source: 'frame' | 'webapp';
+      frame?: FrameScreen;
+      triggered_by_action?: FrameAction;
+    };
 };
 
 export type WaitlistEventMap = FrameEventMap & WaitlistAppEventMap;

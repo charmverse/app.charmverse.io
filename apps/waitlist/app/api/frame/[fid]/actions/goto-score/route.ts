@@ -35,7 +35,13 @@ export async function POST(req: Request) {
   await joinWaitlist({
     fid: interactorFid,
     referredByFid: referrerFid,
-    username: validatedMessage.action.interactor.username
+    username: validatedMessage.action.interactor.username,
+    waitlistAnalytics: {
+      source: 'frame',
+      frame: getCurrentFrameFromUrl(req),
+      referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+      triggered_by_action: 'goto_app_score'
+    }
   });
 
   const targetUrl = `${baseUrl}/score?${await embedFarcasterUser({
