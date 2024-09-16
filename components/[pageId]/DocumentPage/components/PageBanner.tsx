@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { ListItem, Typography, Box } from '@mui/material';
+import { ListItemButton, Typography, Box } from '@mui/material';
 import { memo } from 'react';
 
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
@@ -94,8 +94,7 @@ function PageBanner({ focalBoard, headerImage, readOnly, setPage }: PageBannerPr
             onImageSelect={setImage}
             uploadDisclaimer='We recommend using an image at least 1500px wide, or a ratio of 1500px by 220px.'
           >
-            <ListItem
-              button
+            <ListItemButton
               disableRipple
               sx={{
                 background: theme.palette.background.dark,
@@ -107,10 +106,9 @@ function PageBanner({ focalBoard, headerImage, readOnly, setPage }: PageBannerPr
               <Typography variant='subtitle1' whiteSpace='nowrap'>
                 Change Cover
               </Typography>
-            </ListItem>
+            </ListItemButton>
           </ImageSelector>
-          <ListItem
-            button
+          <ListItemButton
             disableRipple
             sx={{
               background: theme.palette.background.dark,
@@ -122,7 +120,7 @@ function PageBanner({ focalBoard, headerImage, readOnly, setPage }: PageBannerPr
             <Typography variant='subtitle1' onClick={() => setImage(null)}>
               Remove
             </Typography>
-          </ListItem>
+          </ListItemButton>
         </Box>
       )}
     </StyledPageBanner>

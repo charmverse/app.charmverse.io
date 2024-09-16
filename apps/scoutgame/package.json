@@ -15,19 +15,12 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
-    "@emotion/cache": "^11.13.1",
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
     "@hookform/resolvers": "^3.6.0",
-    "@mui/icons-material": "^6.1.0",
-    "@mui/material": "^6.1.0",
-    "@mui/material-nextjs": "^6.1.0",
     "@packages/github": "file:../../packages/github",
     "@packages/scoutgame": "^0.0.0",
     "@serwist/next": "^9.0.5",
     "@typeschema/yup": "^0.13.3",
     "framer-motion": "^11.3.17",
-    "next": "^14.2.5",
     "next-safe-action": "~7.4.2",
     "server-only": "^0.0.1",
     "web-push": "^3.6.7"

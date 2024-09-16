@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
-import { Box, ListItem, Typography } from '@mui/material';
+import { Box, ListItemButton, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import type { HTMLAttributes } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -38,8 +38,7 @@ function EmptyImageContainer({
 
   return (
     <BlockAligner readOnly={readOnly} onDelete={onDelete}>
-      <ListItem
-        button
+      <ListItemButton
         disableTouchRipple
         sx={{
           backgroundColor: isSelected ? 'var(--charmeditor-active)' : theme.palette.background.light,
@@ -52,7 +51,7 @@ function EmptyImageContainer({
           <ImageIcon fontSize='small' />
           <Typography>Add an image</Typography>
         </StyledEmptyImageContainer>
-      </ListItem>
+      </ListItemButton>
     </BlockAligner>
   );
 }

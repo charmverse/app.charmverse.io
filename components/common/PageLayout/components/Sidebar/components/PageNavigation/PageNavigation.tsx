@@ -1,8 +1,6 @@
 import type { PageNodeWithChildren } from '@charmverse/core/pages';
 import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
-import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
-import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 
@@ -22,7 +20,7 @@ import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import type { PageMeta } from 'lib/pages/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
-import { NavIconHover } from './components/NavIconHover';
+import { NavIconHoverCollapse, NavIconHoverExpand } from './components/NavIconHover';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 import { TreeRoot } from './components/TreeRoot';
@@ -247,33 +245,12 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
   return (
     <TreeRoot
-      expanded={expanded ?? []}
+      expandedItems={expanded ?? []}
       // @ts-ignore - we use null instead of undefined to control the element
       selected={selectedNodeId}
-      onNodeToggle={onNodeToggle}
+      onExpandedItemsChange={onNodeToggle}
       aria-label='items navigator'
-      defaultCollapseIcon={
-        <NavIconHover
-          width={{ xs: 30, md: 20 }}
-          height={{ xs: 30, md: 20 }}
-          display='flex'
-          alignItems='center'
-          justifyContent='center'
-        >
-          <ExpandMoreIcon fontSize='large' />
-        </NavIconHover>
-      }
-      defaultExpandIcon={
-        <NavIconHover
-          width={{ xs: 30, md: 20 }}
-          height={{ xs: 30, md: 20 }}
-          display='flex'
-          alignItems='center'
-          justifyContent='center'
-        >
-          <ChevronRightIcon fontSize='large' />
-        </NavIconHover>
-      }
+      slots={{ expandIcon: NavIconHoverCollapse, collapseIcon: NavIconHoverExpand }}
       isFavorites={isFavorites}
     >
       {mappedItems.map((item) => (

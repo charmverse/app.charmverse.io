@@ -228,7 +228,7 @@ async function sendEmail({
       userId: user.id
     },
     subject: template.subject,
-    html: await template.html
+    html: template.html
   });
 
   return result;
