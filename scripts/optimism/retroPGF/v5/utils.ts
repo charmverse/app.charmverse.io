@@ -8,6 +8,9 @@ export function getProposals() {
     where: {
       spaceId,
       type: 'proposal',
+      proposal: {
+        archived: false
+      },
       createdAt: {
         gt: new Date(2024, 8, 10)
       }
@@ -15,7 +18,11 @@ export function getProposals() {
     include: {
       proposal: {
         include: {
-          evaluations: true,
+          evaluations: {
+            include: {
+              reviews: true
+            }
+          },
           formAnswers: true
         }
       }
