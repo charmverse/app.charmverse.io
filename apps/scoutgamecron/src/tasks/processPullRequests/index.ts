@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { DateTime } from 'luxon';
 
@@ -65,22 +66,42 @@ export async function processPullRequests() {
     const isoWeekNumber = dt.weekNumber;
 
     for (const githubUserPr of Object.values(githubUserPrRecord)) {
-      await processClosedPullRequests({
-        pullRequests: githubUserPr.closed,
-        githubUserId: githubUserPr.githubUserId,
-        repoId: repo.id,
-        week: isoWeekNumber.toString(),
-        season: 1,
-        builderId: githubUserPr.builderId
-      });
-      await processMergedPullRequests({
-        season: 1,
-        week: isoWeekNumber.toString(),
-        pullRequests: githubUserPr.merged,
-        githubUserId: githubUserPr.githubUserId,
-        repoId: repo.id,
-        builderId: githubUserPr.builderId
-      });
+      try {
+        await processClosedPullRequests({
+          pullRequests: githubUserPr.closed,
+          githubUserId: githubUserPr.githubUserId,
+          repoId: repo.id,
+          week: isoWeekNumber.toString(),
+          season: 1,
+          builderId: githubUserPr.builderId
+        });
+      } catch (error) {
+        log.error('Error processing closed pull requests', {
+          error,
+          pullRequests: githubUserPr.closed,
+          githubUserId: githubUserPr.githubUserId,
+          repoId: repo.id,
+          builderId: githubUserPr.builderId
+        });
+      }
+      try {
+        await processMergedPullRequests({
+          season: 1,
+          week: isoWeekNumber.toString(),
+          pullRequests: githubUserPr.merged,
+          githubUserId: githubUserPr.githubUserId,
+          repoId: repo.id,
+          builderId: githubUserPr.builderId
+        });
+      } catch (error) {
+        log.error('Error processing merged pull requests', {
+          error,
+          pullRequests: githubUserPr.merged,
+          githubUserId: githubUserPr.githubUserId,
+          repoId: repo.id,
+          builderId: githubUserPr.builderId
+        });
+      }
     }
   }
 }

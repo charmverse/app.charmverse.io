@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { strikeBuilder } from '@packages/scoutgame/src/moderation/strikeBuilder';
+import { strikeBuilder } from '@packages/scoutgame/src/strikeBuilder';
 
 import type { PullRequest } from './getPullRequests';
 
