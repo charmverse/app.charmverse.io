@@ -66,20 +66,22 @@ export function NewProjectPage({
       primaryContractChainId: '',
       twitter: '',
       github: '',
-      projectMembers: [
-        {
-          name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
-          farcasterId: user?.farcasterUser?.fid,
-          farcasterUser: {
-            fid: user?.farcasterUser?.fid,
-            displayName: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
-            pfpUrl:
-              (user?.farcasterUser?.account as FarcasterProfile['body'])?.avatarUrl ||
-              (user.farcasterUser?.account as { pfpUrl: string })?.pfpUrl,
-            username: (user?.farcasterUser?.account as FarcasterProfile['body'])?.username
-          }
-        }
-      ]
+      projectMembers: user.farcasterUser
+        ? [
+            {
+              name: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
+              farcasterId: user?.farcasterUser?.fid,
+              farcasterUser: {
+                fid: user?.farcasterUser?.fid,
+                displayName: (user?.farcasterUser?.account as FarcasterProfile['body'])?.displayName,
+                pfpUrl:
+                  (user?.farcasterUser?.account as FarcasterProfile['body'])?.avatarUrl ||
+                  (user.farcasterUser?.account as { pfpUrl: string })?.pfpUrl,
+                username: (user?.farcasterUser?.account as FarcasterProfile['body'])?.username
+              }
+            }
+          ]
+        : []
     },
     resolver: yupResolver(schema),
     mode: 'onChange'

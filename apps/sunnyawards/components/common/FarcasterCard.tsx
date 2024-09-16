@@ -1,9 +1,27 @@
 import { Avatar } from '@connect-shared/components/common/Avatar';
 import type { AvatarSize } from '@connect-shared/components/common/Avatar';
 import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { DeleteOutline } from '@mui/icons-material';
 import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
+
+export function getFarcasterCardDisplayDetails(user: LoggedInUser) {
+  const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
+  return user.farcasterUser
+    ? {
+        username: farcasterDetails?.username,
+        name: farcasterDetails?.displayName,
+        avatar: farcasterDetails?.pfpUrl,
+        bio: farcasterDetails?.bio
+      }
+    : {
+        username: '',
+        name: user.username,
+        avatar: user.avatar,
+        bio: ''
+      };
+}
 
 function FarcasterCardContent({
   avatar,
