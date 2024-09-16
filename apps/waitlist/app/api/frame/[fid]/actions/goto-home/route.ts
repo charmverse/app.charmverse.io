@@ -11,6 +11,10 @@ import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEv
 export async function POST(req: Request) {
   const waitlistClicked = (await req.json()) as FarcasterFrameInteractionToValidate;
 
+  if (!waitlistClicked.trustedData.messageBytes) {
+    throw new InvalidInputError('Invalid frame interaction. No message bytes');
+  }
+
   const validatedMessage = await validateFrameInteraction(waitlistClicked.trustedData.messageBytes);
 
   const referrerFid = getReferrerFidFromUrl(req);
