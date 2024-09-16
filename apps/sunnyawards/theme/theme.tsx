@@ -3,21 +3,17 @@
 import { darken, extendTheme, responsiveFontSizes } from '@mui/material/styles';
 
 import {
-  backgroundColor,
   backgroundColorDarkMode,
   backgroundLightColorDarkMode,
-  blueColor,
   darkBlueColor,
   farcasterBrandColor,
   farcasterBrandColorDark,
   farcasterBrandColorLight,
-  inputBackground,
   inputBackgroundDarkMode,
   inputBorder,
   inputBorderDarkMode,
   primaryTextColor,
   primaryTextColorDarkMode,
-  secondaryTextColor,
   secondaryTextColorDarkMode,
   sunnysColor,
   sunnysColorLight
