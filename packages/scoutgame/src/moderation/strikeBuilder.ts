@@ -1,9 +1,17 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
 
 import { getStrikesForSeason } from './getStrikesForSeason';
 
-export async function strikeBuilder({ builderId, builderEventId }: { builderId: string; builderEventId: string }) {
-  const builderEvent = await prisma.builderEvent.findFirstOrThrow({
+export async function strikeBuilder({
+  builderId,
+  builderEventId,
+  tx
+}: {
+  builderId: string;
+  builderEventId: string;
+  tx: PrismaTransactionClient;
+}) {
+  const builderEvent = await tx.builderEvent.findFirstOrThrow({
     where: {
       id: builderEventId
     },
@@ -12,7 +20,7 @@ export async function strikeBuilder({ builderId, builderEventId }: { builderId: 
     }
   });
 
-  await prisma.builderStrike.create({
+  await tx.builderStrike.create({
     data: {
       builderId,
       builderEventId
@@ -24,7 +32,7 @@ export async function strikeBuilder({ builderId, builderEventId }: { builderId: 
   const strikesForSeason = await getStrikesForSeason({ season: builderEvent.season });
 
   if (strikesForSeason >= 3) {
-    await prisma.scout.update({
+    await tx.scout.update({
       where: {
         id: builderId
       },
