@@ -48,7 +48,13 @@ export async function POST(req: Request) {
   const joinWaitlistResult = await joinWaitlist({
     fid: interactorFid,
     referredByFid: referrerFid,
-    username: interactorUsername
+    username: interactorUsername,
+    waitlistAnalytics: {
+      source: 'frame',
+      frame: 'join_waitlist_info',
+      referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+      triggered_by_action: 'join_waitlist'
+    }
   });
 
   trackWaitlistMixpanelEvent('frame_click', {
