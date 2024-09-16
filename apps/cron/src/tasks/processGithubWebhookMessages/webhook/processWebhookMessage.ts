@@ -1,10 +1,14 @@
 import { createHmac } from 'crypto';
 
 import { prisma } from '@charmverse/core/prisma-client';
-import type { InstallationDeletedEvent, IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
+import type { components } from '@octokit/openapi-webhooks-types';
 import type { WebhookMessageProcessResult } from '@root/lib/collabland/webhook/interfaces';
 
-import { createRewardFromIssue } from '../createRewardFromIssue';
+import { createRewardFromIssue } from './createRewardFromIssue';
+
+type InstallationDeletedEvent = components['schemas']['webhook-installation-deleted'];
+type IssuesLabeledEvent = components['schemas']['webhook-issues-labeled'];
+type IssuesOpenedEvent = components['schemas']['webhook-issues-opened'];
 
 type GithubWebhookPayload = {
   body: {

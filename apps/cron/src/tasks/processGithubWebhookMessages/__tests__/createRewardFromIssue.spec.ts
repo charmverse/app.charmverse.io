@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { createReward } from '@root/lib/rewards/createReward';
+import { createPage } from '@root/testing/pages';
 import { v4 } from 'uuid';
 
-import { createPage } from 'testing/pages';
-
-import { createRewardFromIssue } from '../createRewardFromIssue';
+import { createRewardFromIssue } from '../webhook/createRewardFromIssue';
 
 describe('createRewardFromIssue', () => {
   it(`Should return Missing installation ID message if the installation id is missing`, async () => {

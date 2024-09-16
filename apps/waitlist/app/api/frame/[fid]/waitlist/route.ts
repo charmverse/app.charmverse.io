@@ -1,18 +1,26 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
 
 import { JoinWaitlistFrame } from 'components/frame/JoinWaitlistFrame';
 import { WaitlistCurrentScoreFrame } from 'components/frame/WaitlistCurrentScoreFrame';
 import { WaitlistJoinedFrame } from 'components/frame/WaitlistJoinedFrame';
+import { getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
+import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
 import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
 export async function GET(req: Request) {
-  const fid = new URL(req.url).pathname.split('/')[3];
+  const referrerFid = getReferrerFidFromUrl(req);
 
-  const frame = JoinWaitlistFrame({ referrerFid: fid });
+  const frame = JoinWaitlistFrame({ referrerFid });
+
+  trackWaitlistMixpanelEvent('frame_impression', {
+    referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+    frame: 'join_waitlist_info'
+  });
 
   return new Response(frame, {
     status: 200,
@@ -35,12 +43,25 @@ export async function POST(req: Request) {
 
   const interactorUsername = validatedMessage.action.interactor.username;
 
-  const referrerFid = new URL(req.url).pathname.split('/')[3];
+  const referrerFid = getReferrerFidFromUrl(req);
 
   const joinWaitlistResult = await joinWaitlist({
     fid: interactorFid,
     referredByFid: referrerFid,
-    username: validatedMessage.action.interactor.username
+    username: interactorUsername,
+    waitlistAnalytics: {
+      source: 'frame',
+      frame: 'join_waitlist_info',
+      referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+      triggered_by_action: 'join_waitlist'
+    }
+  });
+
+  trackWaitlistMixpanelEvent('frame_click', {
+    userId: deterministicV4UUIDFromFid(interactorFid),
+    referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+    frame: 'join_waitlist_info',
+    action: 'join_waitlist'
   });
 
   const percentileChangeResults = await refreshPercentilesForEveryone();
@@ -50,7 +71,12 @@ export async function POST(req: Request) {
   let html: string = '';
 
   if (joinWaitlistResult.isNew) {
-    html = await WaitlistJoinedFrame({ fid: interactorFid, username: interactorUsername });
+    trackWaitlistMixpanelEvent('frame_impression', {
+      userId: deterministicV4UUIDFromFid(interactorFid),
+      referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+      frame: 'join_waitlist_new_join'
+    });
+    html = WaitlistJoinedFrame({ referrerFid });
   } else {
     const { percentile } = await prisma.connectWaitlistSlot.findFirstOrThrow({
       where: {
@@ -61,10 +87,15 @@ export async function POST(req: Request) {
       }
     });
 
+    trackWaitlistMixpanelEvent('frame_impression', {
+      userId: deterministicV4UUIDFromFid(interactorFid),
+      referrerUserId: deterministicV4UUIDFromFid(referrerFid),
+      frame: 'join_waitlist_current_score'
+    });
+
     html = await WaitlistCurrentScoreFrame({
-      fid: interactorFid,
       percentile: percentile as number,
-      username: interactorUsername
+      referrerFid
     });
   }
 

@@ -1,14 +1,14 @@
 import { baseUrl } from '@root/config/constants';
 import { getFrameHtml } from 'frames.js';
 
-import type { FarcasterUserToEncode } from 'lib/frame/actionButtons';
-import { scoutGameFrameTitle, waitlistGetDetails, waitlistShareMyFrame } from 'lib/frame/actionButtons';
+import { scoutGameFrameTitle, waitlistGotoScore, waitlistShareMyFrame } from 'lib/frame/actionButtons';
 
 type Props = {
   percentile: string | number;
-} & FarcasterUserToEncode;
+  referrerFid: string | number;
+};
 
-export async function WaitlistCurrentScoreFrame({ percentile, fid, username }: Props) {
+export async function WaitlistCurrentScoreFrame({ percentile, referrerFid }: Props) {
   const imgSrc = `${baseUrl}/api/frame/assets/current-position?percentile=${percentile}`;
 
   return getFrameHtml({
@@ -16,7 +16,10 @@ export async function WaitlistCurrentScoreFrame({ percentile, fid, username }: P
     image: imgSrc,
     ogImage: imgSrc,
     version: 'vNext',
-    buttons: [await waitlistGetDetails({ fid, username, hasJoinedWaitlist: true }), waitlistShareMyFrame(fid)],
+    buttons: [
+      waitlistGotoScore({ referrerFid, currentFrame: 'join_waitlist_current_score' }),
+      waitlistShareMyFrame({ referrerFid, currentFrame: 'join_waitlist_current_score', label: 'Share & Level Up' })
+    ],
     imageAspectRatio: '1:1'
   });
 }

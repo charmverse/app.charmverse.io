@@ -1,12 +1,13 @@
 import { baseUrl } from '@root/config/constants';
 import { getFrameHtml } from 'frames.js';
 
-import { scoutGameFrameTitle } from 'lib/frame/actionButtons';
+import { scoutGameFrameTitle, waitlistGotoHome, waitlistShareMyFrame } from 'lib/frame/actionButtons';
+import type { FrameScreen } from 'lib/mixpanel/trackEventActionSchema';
 import type { TierChange } from 'lib/scoring/constants';
 import { getTier } from 'lib/scoring/constants';
 
 export type LevelChangedFrameProps = {
-  fid: string | number;
+  referrerFid: number;
   percentile: number;
   tierChange: TierChange;
 };
@@ -17,10 +18,14 @@ export const levelChangedButtonIndexMap = {
   3: 'share_frame'
 };
 
-export function LevelChangedFrame({ fid, percentile, tierChange }: LevelChangedFrameProps) {
+export function LevelChangedFrame({ referrerFid, percentile, tierChange }: LevelChangedFrameProps) {
   const tier = getTier(percentile);
 
   const imgSrc = `${baseUrl}/images/waitlist/${tierChange}-${tier}.gif`;
+
+  const currentFrame = `waitlist_level_${tierChange}` as FrameScreen;
+
+  const apiUrl = `${baseUrl}/api/frame/${referrerFid}/level-changed?tierChange=${tierChange}&current_frame=${currentFrame}`;
 
   return getFrameHtml({
     title: scoutGameFrameTitle,
@@ -32,18 +37,17 @@ export function LevelChangedFrame({ fid, percentile, tierChange }: LevelChangedF
       {
         action: 'post',
         label: "What's this?",
-        target: `${baseUrl}/api/frame/${fid}/level-changed`
+        target: apiUrl
       },
-      {
-        action: 'post_redirect',
-        label: 'Details',
-        target: `${baseUrl}/api/frame/${fid}/level-changed`
-      },
-      {
-        action: 'post_redirect',
+      waitlistGotoHome({
+        referrerFid,
+        currentFrame
+      }),
+      waitlistShareMyFrame({
+        currentFrame,
         label: 'Share & Earn Pts',
-        target: `${baseUrl}/api/frame/${fid}/level-changed`
-      }
+        referrerFid
+      })
     ]
   });
 }

@@ -51,6 +51,14 @@ export const apps: { [key: string]: { stg?: Options; prd?: Options } } = {
       sslCert: scoutgameCert
     }
   },
+  scoutgamecron: {
+    prd: {
+      environmentTier: 'Worker'
+    },
+    stg: {
+      environmentTier: 'Worker'
+    }
+  },
   waitlist: {
     prd: {
       sslCert: scoutgameCert

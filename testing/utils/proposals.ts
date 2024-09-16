@@ -17,7 +17,7 @@ import { updateViews } from '@root/lib/databases/proposalsSource/updateViews';
 import { createPage as createPageDb } from '@root/lib/pages/server/createPage';
 import type { PopulatedEvaluation, ProposalFields } from '@root/lib/proposals/interfaces';
 import { getDefaultPermissions } from '@root/lib/proposals/workflows/defaultEvaluation';
-import { sortBy } from 'lodash';
+import { sortBy } from '@root/lib/utils/objects';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
@@ -71,7 +71,7 @@ export async function generateProposalV2({
   if (!workflowId) {
     const workflow = await generateProposalWorkflow({
       spaceId: input.spaceId,
-      evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({
+      evaluations: sortBy(proposal.evaluations, 'index' as any).map((e) => ({
         id: e.id,
         type: e.type,
         title: e.title,

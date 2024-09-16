@@ -9,15 +9,21 @@ export async function refreshUserScore({ fid }: { fid: number }): Promise<Connec
       fid
     },
     select: {
-      initialPosition: true
+      initialPosition: true,
+      githubLogin: true
     }
   });
 
-  const referrals = await prisma.connectWaitlistSlot.count({
+  let referrals = await prisma.connectWaitlistSlot.count({
     where: {
       referredByFid: fid
     }
   });
+
+  // Github login earns you extra 10 clicks
+  if (existingSlot.githubLogin) {
+    referrals += 10;
+  }
 
   return prisma.connectWaitlistSlot.update({
     where: {

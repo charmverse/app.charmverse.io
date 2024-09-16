@@ -34,7 +34,7 @@ export function LearnMore() {
           </Typography>
           <Typography>Step into the shoes of an onchain Scout.</Typography>
           <Typography>1. Every season, collect top Builder’s NFTs</Typography>
-          <Typography>2. Earn Charm Points as they crush open source repos and win grants</Typography>
+          <Typography>2. Earn Scout Points as they crush open source repos and win grants</Typography>
         </Box>
         <Divider sx={{ borderColor: 'secondary.main' }} />
         <Box display='flex' flexDirection='column' gap={2} my={2}>
@@ -43,7 +43,7 @@ export function LearnMore() {
           </Typography>
           <Typography>Join the Scout Game as a Builder.</Typography>
           <Typography>
-            The Scout Game runs in epic 3-month seasons, where you earn Charm Points by completing Qualified Actions! 🏆
+            The Scout Game runs in epic 3-month seasons, where you earn Scout Points by completing Qualified Actions! 🏆
           </Typography>
           <Typography>Here's how to rack up those points:</Typography>
           <Typography>1. Contribute to approved open source projects with an accepted Pull Request</Typography>

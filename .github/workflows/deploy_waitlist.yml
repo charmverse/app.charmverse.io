@@ -12,6 +12,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'apps/waitlist/**'
+      - 'packages/github/**'
       - '@connect-shared/**'
       - 'abis/**'
       - 'adapters/**'
@@ -31,6 +32,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'apps/waitlist/**'
+      - 'packages/github/**'
       - '@connect-shared/**'
       - 'abis/**'
       - 'adapters/**'
@@ -205,7 +207,7 @@ jobs:
     #                   -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
     #                   --network "host"  \
     #                   --ipc=host \
-    #                   mcr.microsoft.com/playwright:v1.42.1-jammy \
+    #                   mcr.microsoft.com/playwright:v1.47.1-jammy \
     #                   npm run waitlist:test:e2e:ci
 
   upload-docker:

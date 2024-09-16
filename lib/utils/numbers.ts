@@ -158,7 +158,9 @@ export function roundNumber(num: number | undefined | null): string | undefined 
 }
 
 export function roundNumberInRange({ num, min, max }: { num: number; min: number; max: number }): number {
-  return Math.min(max, Math.max(min, Math.round(num)));
+  const numberOrMinimum = Math.max(min, Math.round(num));
+
+  return Math.min(max, numberOrMinimum);
 }
 
 export function isBigInt(value: string) {

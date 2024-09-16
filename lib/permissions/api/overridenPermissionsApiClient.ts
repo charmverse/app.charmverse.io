@@ -32,7 +32,7 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
 
     pages.bulkComputePagePermissions = async function (args: BulkPagePermissionCompute) {
       // Large list of UUIDs will error out
-      const pagination = 350;
+      const pagination = 330;
 
       const groups = [];
 

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { POST } from '@root/adapters/http';
 
 import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from './constants';
@@ -69,16 +70,26 @@ type ValidatedFrameActionType = {
 /**
  * @messageBytes - Raw data under trustedData.messageBytes from a Frame request
  */
-export async function validateFrameInteraction(messageBytes: string): Promise<ValidatedFrameActionType> {
-  return POST<ValidatedFrameActionType>(
-    `${NEYNAR_API_BASE_URL}/frame/validate`,
-    {
-      message_bytes_in_hex: messageBytes
-    },
-    {
-      headers: {
-        api_key: NEYNAR_API_KEY
+export async function validateFrameInteraction(
+  messageBytes: string
+): Promise<(ValidatedFrameActionType & { valid: true }) | { valid: false }> {
+  try {
+    const validationResult = await POST<ValidatedFrameActionType>(
+      `${NEYNAR_API_BASE_URL}/frame/validate`,
+      {
+        message_bytes_in_hex: messageBytes
+      },
+      {
+        headers: {
+          api_key: NEYNAR_API_KEY
+        }
       }
-    }
-  );
+    );
+
+    return validationResult;
+  } catch (error) {
+    log.warn('Error validating frame interaction', { error });
+
+    return { valid: false };
+  }
 }
