@@ -16,7 +16,7 @@ export type FarcasterFrameInteractionToValidate = {
     };
   };
   trustedData: {
-    messageBytes: string;
+    messageBytes?: string;
   };
 };
 
