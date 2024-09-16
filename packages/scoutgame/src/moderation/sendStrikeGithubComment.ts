@@ -3,13 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getStrikesForSeason } from './getStrikesForSeason';
 import { octokit } from './octokitClient';
 
-export async function sendStrikeGithubComment({
-  builderId,
-  builderEventId
-}: {
-  builderId: string;
-  builderEventId: string;
-}) {
+export async function sendStrikeGithubComment({ builderEventId }: { builderEventId: string }) {
   const builderEvent = await prisma.builderEvent.findFirstOrThrow({
     where: {
       id: builderEventId

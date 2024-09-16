@@ -1,12 +1,15 @@
 import { graphql } from '@octokit/graphql';
 
-type PullRequest = {
+export type PullRequest = {
   title: string;
   url: string;
-  state: 'OPEN' | 'CLOSED' | 'MERGED';
+  state: 'CLOSED' | 'MERGED';
   mergedAt: string | null;
-  closedAt: string | null;
-  updatedAt: string;
+  createdAt: string;
+  author: {
+    login: string;
+  };
+  number: number;
 };
 
 type PullRequestEdge = {
@@ -35,15 +38,18 @@ type GetRecentClosedOrMergedPRsResponse = {
 const getRecentPrs = `
   query getRecentClosedOrMergedPRs($owner: String!, $repo: String!, $cursor: String) {
     repository(owner: $owner, name: $repo) {
-      pullRequests(first: 100, after: $cursor, states: [CLOSED, MERGED], orderBy: {field: UPDATED_AT, direction: DESC}) {
+      pullRequests(first: 100, after: $cursor, states: [CLOSED, MERGED], orderBy: {field: CREATED_AT, direction: DESC}) {
         edges {
           node {
             title
             url
             state
-            mergedAt
             closedAt
-            updatedAt
+            createdAt
+            author {
+              login
+            }
+            number
           }
           cursor
         }
@@ -87,22 +93,29 @@ export async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input):
     // Filter out PRs closed or merged in the last 24 hours
     const recentPRs = pullRequests
       .filter(({ node }) => {
-        const closedOrMergedAt = new Date(node.closedAt || node.mergedAt || '');
+        const closedOrMergedAt = new Date(node.createdAt || '');
         return closedOrMergedAt > after;
       })
       .map(({ node }) => node);
 
     allRecentPRs = allRecentPRs.concat(recentPRs);
 
-    // cancel once we have gone past the after date
-    if (recentPRs.length < pullRequests.length) {
-      break;
-    }
-
     // Update pagination info
     hasNextPage = response.repository.pullRequests.pageInfo.hasNextPage;
     cursor = response.repository.pullRequests.pageInfo.endCursor;
+
+    if (recentPRs.length === 0) {
+      hasNextPage = false;
+    }
   }
 
   return allRecentPRs;
 }
+
+// getRecentClosedOrMergedPRs({
+//   after: new Date('2024-09-16'),
+//   owner: 'charmverse',
+//   repo: 'app.charmverse.io'
+// }).then((prs) => {
+//   console.log(JSON.stringify(prs, null, 2));
+// });
