@@ -88,7 +88,7 @@ export async function validateFrameInteraction(
 
     return validationResult;
   } catch (error) {
-    log.error('Error validating frame interaction', { error });
+    log.warn('Error validating frame interaction', { error });
 
     return { valid: false };
   }
