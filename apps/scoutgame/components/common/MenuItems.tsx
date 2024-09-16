@@ -12,7 +12,7 @@ export function MenuItems({ transparent }: { transparent?: boolean }) {
   const value = getActiveButton(pathname);
 
   return (
-    <Paper elevation={3} sx={{ bgcolor: 'transparent', boxShadow: 'none' }}>
+    <Paper elevation={3} sx={{ bgcolor: 'transparent', boxShadow: 'none' }} component='footer'>
       <BottomNavigation
         showLabels
         value={value}
