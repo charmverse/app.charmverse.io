@@ -85,11 +85,18 @@ cron.schedule('0 * * * *', storeOptimismProjectAttestations);
 // Send proposal evaluation notifications every hour
 cron.schedule('0 * * * *', () => sendProposalEvaluationNotifications());
 
-// Send push notifications to the Connect app every day at 10am
-// cron.schedule('0 10 * * *', sendPushNotificationsToSunyAppTask);
-
 const port = process.env.PORT || 4000;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   log.info(`Server is up and running on port ${port} in "${process.env.NODE_ENV}" env`);
 });
+
+async function cleanup() {
+  log.info('[server] Closing server...');
+  await server.close();
+  log.info('[server] Exiting process...');
+  process.exit(0);
+}
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);

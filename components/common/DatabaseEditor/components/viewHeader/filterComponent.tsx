@@ -3,7 +3,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Divider, MenuItem, Select, Typography, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { capitalize } from 'lodash';
+import { capitalize } from '@root/lib/utils/strings';
 import React, { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { v4 } from 'uuid';

@@ -76,7 +76,21 @@
       "error",
       {
         "devDependencies": true,
-        "packageDir": ["./", "./@connect-shared", "./packages/charmeditor/", "./apps/farcaster/", "./apps/scoutgame/", "./apps/sunnyawards/", "./apps/waitlist/", "./apps/websockets/", "./apps/cron/", "./apps/ceramic/"]
+        "packageDir": [
+          "./",
+          "./@connect-shared",
+          "./apps/cron/",
+          "./apps/farcaster/",
+          "./apps/scoutgame/",
+          "./apps/scoutgamecron/",
+          "./apps/sunnyawards/",
+          "./apps/waitlist/",
+          "./apps/websockets/",
+          "./apps/ceramic/",
+          "./packages/charmeditor/",
+          "./packages/github/",
+          "./packages/scoutgame/"
+        ]
       }
     ],
     "import/order": [

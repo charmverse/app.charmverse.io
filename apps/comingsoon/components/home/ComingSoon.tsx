@@ -10,13 +10,12 @@ const charmverseLogoSrc = '/images/coming_soon/charmverse_logo.webp';
 const sunnyLogoSrc = '/images/coming_soon/sunnyawards_logo.png';
 
 const Background = styled.div`
-  min-height: 100vh;
-  background: #000;
+  min-height: 100dvh;
   display: flex;
-  padding: 2em;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 0 2em;
 
   .center-content {
     display: flex;
@@ -62,7 +61,7 @@ export function ComingSoon() {
         </Typography>
       </div>
 
-      <Box zIndex={1}>
+      <Box zIndex={1} mb={4}>
         <Typography align='center'>
           Brought to you by the team behind
           <br />

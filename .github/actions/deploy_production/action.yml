@@ -26,6 +26,12 @@ runs:
       with:
         app_name: ${{ inputs.app_name }}
 
+    - name: Setup cron config
+      shell: bash
+      # Note: "2>/dev/null || :" is a bash idiom that means "if the previous command fails, do nothing"
+      run: |
+        cp apps/${{ inputs.app_name }}/cron.yml cron.yaml 2>/dev/null || :
+
     - name: Set the docker compose env variables
       uses: mikefarah/yq@master
       with:

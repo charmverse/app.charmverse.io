@@ -16,7 +16,10 @@ export const joinWaitlistAction = authActionClient.metadata({ actionName: 'join-
 
   const waitlistJoinResult = await joinWaitlist({
     fid,
-    username
+    username,
+    waitlistAnalytics: {
+      source: 'webapp'
+    }
   });
 
   // If user is new, refresh everyone's percentiles and notify them of their new tier

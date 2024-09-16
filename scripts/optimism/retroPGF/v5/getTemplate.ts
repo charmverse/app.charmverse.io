@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 const exportFile = './retro-pgf-proposal-template.json';
 const devSpaceId = 'e9923c04-9001-429b-8e52-69293d62cf12';
 
-async function query() {
+async function query({ writeFile }: { writeFile: boolean }) {
   const page = await prisma.page.findFirstOrThrow({
     where: {
       space: {
@@ -39,7 +39,7 @@ async function query() {
   console.log('Template space id:', page.spaceId);
   console.log('Form questions:\n', fieldMap);
 
-  await writeFile(exportFile, JSON.stringify(page, null, 2));
+  //await writeFile(exportFile, JSON.stringify(page, null, 2));
 }
 
 async function importToDev() {
@@ -109,7 +109,7 @@ async function importToDev() {
 }
 
 // run with production env
-//query();
+query({ writeFile: false });
 
 // run with local env
-importToDev();
+// importToDev();

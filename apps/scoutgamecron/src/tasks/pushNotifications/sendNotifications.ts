@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { count } from '@root/lib/metrics';
+// import { count } from '@root/lib/metrics';
 import webpush from 'web-push';
 
 import { initWebPush } from './initWebPush';
 
 initWebPush();
 
-export async function task() {
+export async function sendNotifications() {
   log.debug('Running Push Notification cron job for Connect app');
 
   try {
@@ -20,7 +20,7 @@ export async function task() {
       });
       webpush.sendNotification(s.subscription as any, payload);
     });
-    count('cron.connect-push-notifications.subscriptions', subscriptions.length);
+    // count('cron.connect-push-notifications.subscriptions', subscriptions.length);
   } catch (error: any) {
     log.error(`Error while sending push notifications to the Connect app`, { error });
   }

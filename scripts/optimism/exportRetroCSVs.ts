@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringify } from 'csv-stringify/sync';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { sortBy } from 'lodash';
+import { sortBy } from 'lodash-es';
 import { writeFileSync } from 'fs';
 import { spaceId, templateId, getProjectsFromFile } from './retroPGF/v4/data';
 import { uniq } from 'lodash';
-type SummaryRow = {};
 
 const summaryFile = './op-review-summary.csv';
 const fullReviewsummaryFile = './op-full-review-june-21.csv';

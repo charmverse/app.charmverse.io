@@ -1,6 +1,8 @@
 import { URL } from 'url';
 
-import { Pool } from 'pg';
+import pg from 'pg';
+
+const { Pool } = pg;
 
 export function getClient(databaseUrl: string) {
   const params = new URL(databaseUrl);

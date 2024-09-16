@@ -15,7 +15,7 @@ export const loginAction = actionClient
     const newUserId = ctx.session.anonymousUserId;
 
     const { fid } = await verifyFarcasterUser(parsedInput);
-    const user = await findOrCreateFarcasterUser({ fid, newUserId });
+    const user = await findOrCreateFarcasterUser({ fid });
 
     await saveSession(ctx, { user });
 

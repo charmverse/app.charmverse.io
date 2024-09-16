@@ -11,5 +11,6 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
+    "@packages/github": "file:../../packages/github"
   }
 }
