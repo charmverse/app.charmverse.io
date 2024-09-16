@@ -4,7 +4,7 @@ import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-import { FarcasterCard } from '../common/FarcasterCard';
+import { FarcasterCard, getFarcasterCardDisplayDetails } from 'components/common/FarcasterCard';
 
 import { ExtraDetails } from './ExtraDetails';
 
