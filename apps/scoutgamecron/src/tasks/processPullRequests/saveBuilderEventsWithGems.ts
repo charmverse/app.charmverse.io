@@ -17,7 +17,7 @@ function deduplicateGithubEvents(githubEvents: (GithubEvent & { builderEvents: B
     const eventDay = DateTime.fromJSDate(event.createdAt).startOf('day');
     const key = `${event.createdBy}-${event.type}-${eventDay.toISO()}-${event.repoId}`;
 
-    if (!eventMap.has(key) || event.createdAt > eventMap.get(key)!.createdAt) {
+    if (!eventMap.has(key)) {
       eventMap.set(key, event);
     }
   }
@@ -123,7 +123,8 @@ function createGithubEventsPrismaArtifacts({
           builderEventId: newBuilderEventId,
           builderId: builder.id
         });
-        const builderCurrentStrikesCount = builderStrikesCount[builder.id] || 0;
+        builderStrikesCount[builder.id] = (builderStrikesCount[builder.id] || 0) + 1;
+        const builderCurrentStrikesCount = builderStrikesCount[builder.id];
         if (builderCurrentStrikesCount >= 3) {
           bannedBuilderIds.push(builder.id);
         }
@@ -152,6 +153,9 @@ export async function saveBuilderEventsWithGems({ season, week }: { season: numb
     },
     include: {
       builderEvents: true
+    },
+    orderBy: {
+      createdAt: 'desc'
     }
   });
 
