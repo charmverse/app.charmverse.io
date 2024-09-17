@@ -9,15 +9,11 @@ body {
   max-width: 100vw;
   // DO NOT ADD overflow-x: hidden here. It will break the position sticky option in other components
 }
-body > * {
-  overflow-x: hidden;
-}
 
 a {
   color: inherit;
   text-decoration: none;
 }
-
 
 // override our MUI config for Farcaster modal
 .fc-authkit-qrcode-dialog {

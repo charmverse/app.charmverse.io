@@ -6,9 +6,10 @@ import Image from 'next/image';
 import { Suspense, type ReactNode } from 'react';
 
 import { CarouselContainer } from 'components/common/Carousel/CarouselContainer';
-import { HomeTabs } from 'components/common/Tabs/HomeTabs';
+import { HomeTab } from 'components/common/Tabs/HomeTab';
+import { HomeTabsMenu } from 'components/common/Tabs/HomeTabsMenu';
 
-export async function HomePage({ user, children }: { user: Scout | null; children: ReactNode }) {
+export async function HomePage({ user, tab }: { user: Scout | null; tab: string }) {
   return (
     <Box>
       <Stack flexDirection='row' alignItems='center' justifyContent='center' px={2} py={3}>
@@ -20,8 +21,10 @@ export async function HomePage({ user, children }: { user: Scout | null; childre
       <Suspense fallback={null}>
         <CarouselContainer />
       </Suspense>
-      <HomeTabs />
-      {children}
+      <HomeTabsMenu tab={tab} />
+      <Suspense fallback={null}>
+        <HomeTab tab={tab} />
+      </Suspense>
     </Box>
   );
 }
