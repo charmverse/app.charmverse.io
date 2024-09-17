@@ -48,7 +48,7 @@ export function BuilderPage() {
           their support by minting your unique NFT.
         </Typography>
         <Typography mb={2}>
-          Sign up as a Builder now, and you will be eligible to earn Charm Points and a share of your NFT sales during
+          Sign up as a Builder now, and you will be eligible to earn Scout Points and a share of your NFT sales during
           the first season of Scout Game.
         </Typography>
         <Typography mb={2}>You will also earn 10 Frame Clicks to help you move up the Waitlist!</Typography>
