@@ -73,9 +73,9 @@ export const createProjectAction = authActionClient
     }
 
     if (!isTestEnv) {
-      await generateOgImage(newProject.id, currentUserId);
-      trackMixpanelEvent('create_project', { projectId: newProject.id, userId: currentUserId });
       try {
+        await generateOgImage(newProject.id, currentUserId);
+        trackMixpanelEvent('create_project', { projectId: newProject.id, userId: currentUserId });
         await sendProjectConfirmationEmail({
           projectId: newProject.id,
           userId: currentUserId
