@@ -20,14 +20,9 @@ export async function ProfilePage({ user }: { user: LoggedInUser }) {
     <PageWrapper bgcolor='transparent'>
       <Box gap={3} display='flex' flexDirection='column' mt={{ md: 2 }}>
         <FarcasterCard fid={user.farcasterUser?.fid} {...profile} />
-        <Typography variant='h6'>My SUNNYs Submissions</Typography>
         <Suspense fallback={<ProjectItemSkeleton />}>
           <ProjectsList userId={user.id} />
         </Suspense>
-
-        <Typography sx={{ mt: 4 }} textAlign='center' variant='h6'>
-          Submissions ended September 9th
-        </Typography>
         <NewProjectItem href='/projects/new'>Create a submission</NewProjectItem>
       </Box>
     </PageWrapper>
