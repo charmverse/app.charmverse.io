@@ -42,3 +42,8 @@ a {
     color: white !important;
   }
 }
+
+/* Make Wallet Connect modal appear about MUI modals */
+body {
+  --wcm-z-index: 1500;
+}
