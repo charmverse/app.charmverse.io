@@ -245,7 +245,7 @@ jobs:
           ecr_registry: waitlist
 
   upload-static-assets:
-    name: Upload assets in production
+    name: Upload static assets
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: |

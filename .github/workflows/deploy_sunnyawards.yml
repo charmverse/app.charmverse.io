@@ -232,7 +232,7 @@ jobs:
           ecr_registry: sunnyawards
 
   upload-static-assets:
-    name: Upload assets in production
+    name: Upload static assets
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: |
