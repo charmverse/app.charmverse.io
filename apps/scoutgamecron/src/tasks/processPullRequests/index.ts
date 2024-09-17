@@ -1,107 +1,19 @@
-import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma-client';
 import { DateTime } from 'luxon';
 
-import type { PullRequest } from './getPullRequests';
-import { getRecentClosedOrMergedPRs } from './getPullRequests';
-import { processClosedPullRequests } from './processClosedPullRequests';
-import { processMergedPullRequests } from './processMergedPullRequests';
+import { refreshUserWeeklyStats } from './refreshUserWeeklyStats';
+import { saveBuilderEventsWithGems } from './saveBuilderEventsWithGems';
+import { saveGithubEvents } from './saveGithubEvents';
 
 export async function processPullRequests() {
-  const now = new Date();
-  const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const githubRepos = await prisma.githubRepo.findMany();
-  const githubUsers = await prisma.githubUser.findMany({
-    select: {
-      id: true,
-      builder: {
-        select: {
-          id: true
-        }
-      }
-    }
+  const dt = DateTime.now();
+  const isoWeekNumber = dt.weekNumber.toString();
+  await saveGithubEvents();
+  await saveBuilderEventsWithGems({
+    season: 1,
+    week: isoWeekNumber
   });
-  const githubUsersRecord: Record<
-    string,
-    {
-      id: number;
-      builderId?: string;
-    }
-  > = {};
-
-  for (const user of githubUsers) {
-    githubUsersRecord[user.id] = {
-      id: user.id,
-      builderId: user.builder?.id
-    };
-  }
-
-  for (const repo of githubRepos) {
-    const recentPrs = await getRecentClosedOrMergedPRs({
-      owner: repo.owner,
-      repo: repo.name,
-      after: last24Hours
-    });
-
-    const githubUserPrRecord: Record<
-      string,
-      { closed: PullRequest[]; merged: PullRequest[]; githubUserId: number; builderId?: string }
-    > = {};
-    for (const pr of recentPrs) {
-      const user = githubUsersRecord[pr.author.login];
-      if (user) {
-        if (!githubUserPrRecord[user.id]) {
-          githubUserPrRecord[user.id] = { closed: [], merged: [], githubUserId: user.id, builderId: user.builderId };
-        }
-
-        if (pr.state === 'CLOSED') {
-          githubUserPrRecord[user.id].closed.push(pr);
-        } else if (pr.state === 'MERGED') {
-          githubUserPrRecord[user.id].merged.push(pr);
-        }
-      }
-    }
-
-    const dt = DateTime.now();
-    const isoWeekNumber = dt.weekNumber;
-
-    for (const githubUserPr of Object.values(githubUserPrRecord)) {
-      try {
-        await processClosedPullRequests({
-          pullRequests: githubUserPr.closed,
-          githubUserId: githubUserPr.githubUserId,
-          repoId: repo.id,
-          week: isoWeekNumber.toString(),
-          season: 1,
-          builderId: githubUserPr.builderId
-        });
-      } catch (error) {
-        log.error('Error processing closed pull requests', {
-          error,
-          pullRequests: githubUserPr.closed,
-          githubUserId: githubUserPr.githubUserId,
-          repoId: repo.id,
-          builderId: githubUserPr.builderId
-        });
-      }
-      try {
-        await processMergedPullRequests({
-          season: 1,
-          week: isoWeekNumber.toString(),
-          pullRequests: githubUserPr.merged,
-          githubUserId: githubUserPr.githubUserId,
-          repoId: repo.id,
-          builderId: githubUserPr.builderId
-        });
-      } catch (error) {
-        log.error('Error processing merged pull requests', {
-          error,
-          pullRequests: githubUserPr.merged,
-          githubUserId: githubUserPr.githubUserId,
-          repoId: repo.id,
-          builderId: githubUserPr.builderId
-        });
-      }
-    }
-  }
+  await refreshUserWeeklyStats({
+    season: 1,
+    week: isoWeekNumber
+  });
 }

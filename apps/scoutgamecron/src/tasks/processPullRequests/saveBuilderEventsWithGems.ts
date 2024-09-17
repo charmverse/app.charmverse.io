@@ -167,7 +167,11 @@ export async function saveBuilderEventsWithGems({ season, week }: { season: numb
 
   const githubUsers = await prisma.githubUser.findMany({
     include: {
-      builder: true
+      builder: {
+        where: {
+          builder: true
+        }
+      }
     }
   });
 
