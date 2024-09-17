@@ -16,8 +16,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
-    "@mui/material-nextjs": "^5.16.6",
-    "@octokit/rest": "^21.0.2",
     "@packages/github": "file:../../packages/github",
     "@packages/scoutgame": "^0.0.0",
     "@serwist/next": "^9.0.5",

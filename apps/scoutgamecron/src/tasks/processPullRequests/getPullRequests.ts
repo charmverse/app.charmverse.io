@@ -38,7 +38,7 @@ type GetRecentClosedOrMergedPRsResponse = {
 const getRecentPrs = `
   query getRecentClosedOrMergedPRs($owner: String!, $repo: String!, $cursor: String) {
     repository(owner: $owner, name: $repo) {
-      pullRequests(first: 100, after: $cursor, states: [CLOSED, MERGED], orderBy: {field: CREATED_AT, direction: DESC}) {
+      pullRequests(first: 100, after: $cursor, states: [CLOSED, MERGED], orderBy: {field: UPDATED_AT, direction: DESC}) {
         edges {
           node {
             title
