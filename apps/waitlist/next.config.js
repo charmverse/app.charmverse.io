@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 
+// Next.js requires this configured at build and run time
+const useCDN =
+  process.env.CI || process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'staging';
+
 const nextConfig = {
   // types are tested separately from the build
   eslint: {
@@ -12,7 +16,7 @@ const nextConfig = {
     unoptimized: true
   },
   productionBrowserSourceMaps: true,
-  assetPrefix: process.env.CI ? 'https://cdn.charmverse.io' : undefined,
+  assetPrefix: useCDN ? 'https://cdn.charmverse.io' : undefined,
   webpack(_config) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     // _config.resolve.alias.canvas = false;
