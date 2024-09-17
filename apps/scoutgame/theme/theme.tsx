@@ -31,6 +31,9 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       fontSize: '1rem'
     }
   },
+  shape: {
+    borderRadius: 5
+  },
   cssVariables: true,
   defaultColorScheme: 'dark',
   colorSchemes: {
@@ -228,7 +231,7 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       },
       styleOverrides: {
         root: ({ theme }) => ({
-          boxShadow: theme.shadows[2]
+          boxShadow: 'none'
         })
       }
     },
@@ -301,12 +304,29 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         size: 'small'
       }
     },
+    MuiTabs: {
+      defaultProps: {
+        TabIndicatorProps: {
+          sx: (theme) => ({
+            backgroundColor: theme.palette.text.secondary
+          })
+        }
+      },
+      styleOverrides: {
+        root: {}
+      }
+    },
     MuiTab: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           minHeight: 0,
-          textTransform: 'none'
-        }
+          textTransform: 'none',
+          color: theme.palette.text.primary,
+          fontWeight: '400',
+          '&.Mui-selected': {
+            color: theme.palette.text.secondary
+          }
+        })
       }
     },
     MuiLink: {

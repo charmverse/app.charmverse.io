@@ -14,10 +14,10 @@ export default async function Layout({
   const user = await getUserFromSession();
 
   return (
-    <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh' bgcolor='background.default'>
+    <Box display='grid' gridTemplateRows='auto auto 1fr auto' minHeight='100vh' bgcolor='background.default'>
       <Header user={user || null} />
-      <Box component='main' pb={2} minHeight='100%'>
-        <HeaderMessage />
+      <HeaderMessage />
+      <Box component='main' p={1} minHeight='100%'>
         {children}
       </Box>
       <StickyFooter />
