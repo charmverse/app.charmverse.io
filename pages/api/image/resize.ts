@@ -40,7 +40,7 @@ async function resizeImage(req: NextApiRequest, res: NextApiResponse) {
   });
 
   const [fields, files] = await form.parse(req);
-  const resizeType = fields[FORM_DATA_IMAGE_RESIZE_TYPE] as ResizeType;
+  const resizeType = fields[FORM_DATA_IMAGE_RESIZE_TYPE] as unknown as ResizeType;
   if (files && files[FORM_DATA_FILE_PART_NAME]) {
     const image = Array.isArray(files[FORM_DATA_FILE_PART_NAME])
       ? files[FORM_DATA_FILE_PART_NAME][0]

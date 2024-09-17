@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 
 import { Footer } from 'components/common/Footer';
 import { Header } from 'components/common/Header/Header';
+import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import theme from 'theme/theme';
 
 import 'theme/styles.scss';
@@ -41,14 +42,16 @@ export default async function RootLayout({
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script src='/__ENV.js' strategy='beforeInteractive' />
         <AppProviders theme={theme}>
-          <ClientGlobals userId={user?.id} />
-          <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh' bgcolor='mainBackground.main'>
-            <Header user={user || null} />
-            <Box component='main' pb={2}>
-              {children}
+          <WagmiProvider>
+            <ClientGlobals userId={user?.id} />
+            <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh' bgcolor='mainBackground.main'>
+              <Header user={user || null} />
+              <Box component='main' pb={2}>
+                {children}
+              </Box>
+              <Footer />
             </Box>
-            <Footer />
-          </Box>
+          </WagmiProvider>
         </AppProviders>
       </body>
     </html>

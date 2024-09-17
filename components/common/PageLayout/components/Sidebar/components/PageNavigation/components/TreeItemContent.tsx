@@ -1,9 +1,9 @@
 // The following was pulled from https://github.com/mui/material-ui/blob/master/packages/mui-lab/src/TreeItem/TreeItemContent.js because there's no way to import from the module
 
 import styled from '@emotion/styled';
-import type { TreeItemContentProps } from '@mui/lab/TreeItem';
-import { useTreeItem, treeItemClasses } from '@mui/lab/TreeItem';
 import { alpha } from '@mui/material/styles';
+import type { TreeItemContentProps } from '@mui/x-tree-view/TreeItem';
+import { useTreeItemState, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import clsx from 'clsx';
 import { forwardRef, useCallback, memo, useEffect, useMemo } from 'react';
 
@@ -79,19 +79,19 @@ const TreeItemContent = forwardRef<HTMLDivElement, TreeItemContentProps & { hasS
       hasSelectedChildView,
       icon: iconProp,
       label,
-      nodeId,
+      itemId,
       onClick,
       onMouseDown,
       ...other
     } = props;
 
     const { disabled, expanded, selected, focused, handleExpansion, handleSelection, preventSelection } =
-      useTreeItem(nodeId);
+      useTreeItemState(itemId);
 
     const icon = iconProp || expansionIcon || displayIcon;
 
     const handleMouseDown = useCallback(
-      (event: React.MouseEvent<HTMLElement>) => {
+      (event: React.MouseEvent<HTMLDivElement>) => {
         preventSelection(event);
 
         if (onMouseDown) {
@@ -102,7 +102,7 @@ const TreeItemContent = forwardRef<HTMLDivElement, TreeItemContentProps & { hasS
     );
 
     const handleClick = useCallback(
-      (event: React.MouseEvent<HTMLElement>) => {
+      (event: React.MouseEvent<HTMLDivElement>) => {
         handleExpansion(event);
         handleSelection(event);
 

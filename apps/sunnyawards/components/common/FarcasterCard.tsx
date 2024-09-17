@@ -1,9 +1,28 @@
 import { Avatar } from '@connect-shared/components/common/Avatar';
 import type { AvatarSize } from '@connect-shared/components/common/Avatar';
 import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
+import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
+import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { DeleteOutline } from '@mui/icons-material';
 import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
+
+export function getFarcasterCardDisplayDetails(user: LoggedInUser) {
+  const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
+  return user.farcasterUser
+    ? {
+        username: farcasterDetails?.username,
+        name: farcasterDetails?.displayName,
+        avatar: farcasterDetails?.pfpUrl,
+        bio: farcasterDetails?.bio
+      }
+    : {
+        username: '',
+        name: user.username,
+        avatar: user.avatar,
+        bio: ''
+      };
+}
 
 function FarcasterCardContent({
   avatar,
@@ -16,7 +35,7 @@ function FarcasterCardContent({
   name?: string;
   bio?: string;
   username?: string;
-  avatar?: string;
+  avatar?: string | null;
   avatarSize?: AvatarSize;
   onDelete?: VoidFunction;
 }) {
@@ -35,7 +54,7 @@ function FarcasterCardContent({
           sm: 'flex-start'
         }}
       >
-        <Avatar size={avatarSize} name={username || 'N/A'} avatar={avatar} />
+        <Avatar size={avatarSize} name={username} avatar={avatar || undefined} />
       </Stack>
       <Box width='100%' sx={{ wordBreak: 'break-all' }}>
         <Stack direction='row' justifyContent='space-between' width='100%' alignItems='center'>
@@ -46,9 +65,11 @@ function FarcasterCardContent({
             </IconButton>
           )}
         </Stack>
-        <Typography variant='subtitle1' color='secondary'>
-          @{username || 'N/A'}
-        </Typography>
+        {username && (
+          <Typography variant='subtitle1' color='secondary'>
+            @{username}
+          </Typography>
+        )}
         <Typography
           sx={{
             display: '-webkit-box',
@@ -68,7 +89,7 @@ export function FarcasterCard(props: {
   bio?: string;
   username?: string;
   fid?: number;
-  avatar?: string;
+  avatar?: string | null;
   avatarSize?: AvatarSize;
   onDelete?: VoidFunction;
   enableLink?: boolean;

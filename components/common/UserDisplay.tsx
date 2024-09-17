@@ -90,7 +90,6 @@ function UserDisplay({ showMiniProfile = false, user, userId, anonymize, ...prop
 
   if (!member) {
     // strip out invalid names
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { hideName, avatarSize, ...boxProps } = props;
     return (
       <Box display='flex' alignItems='center' gap={1} {...boxProps}>

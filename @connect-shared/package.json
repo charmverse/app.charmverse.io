@@ -12,8 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mui/material-nextjs": "^5.16.6",
+    "@mui/material-nextjs": "^6.1.0",
     "framer-motion": "^11.3.17",
-    "next-safe-action": "^7.4.2"
+    "next-safe-action": "~7.4.2"
   }
 }

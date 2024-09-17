@@ -15,7 +15,7 @@ import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
 import { BasicModal } from 'components/common/Modal';
 import { loginAction } from 'lib/session/loginWithWalletAction';
 
-export function WalletLogin({ successPath }: { successPath: string }) {
+export function WalletLogin() {
   const [open, setOpen] = useState(false);
   const onOpen = () => setOpen(true);
   const onClose = () => setOpen(false);
@@ -82,7 +82,7 @@ export function WalletLogin({ successPath }: { successPath: string }) {
 
     const { message, signature } = data;
     await executeAsync({ message, signature });
-    router.push(successPath);
+    router.push('/');
   };
 
   const errorWalletMessage = signMessageError?.message || connectError?.message;

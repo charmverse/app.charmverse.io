@@ -1,12 +1,12 @@
 'use client';
 
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import type { GetGrantsResponse, Grant } from '@connect-shared/lib/grants/getGrants';
 import { Button, CircularProgress, Stack } from '@mui/material';
 import { GET } from '@root/adapters/http';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
+import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 import { GrantsListPageSkeleton } from 'components/grants/components/GrantsListPageSkeleton';
 
 import { GrantItem } from './components/GrantCard';
@@ -58,7 +58,7 @@ export function GrantsList({ sort }: { sort: 'new' | 'upcoming' }) {
   }
 
   return (
-    <PageWrapper>
+    <SinglePageWrapper>
       <Stack direction='row' gap={1} justifyContent='center'>
         <Button
           size='small'
@@ -97,6 +97,6 @@ export function GrantsList({ sort }: { sort: 'new' | 'upcoming' }) {
           <CircularProgress />
         </Stack>
       )}
-    </PageWrapper>
+    </SinglePageWrapper>
   );
 }

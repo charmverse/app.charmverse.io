@@ -99,4 +99,4 @@ export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>,
   );
 }
 
-export const VerifyLoginOtpModal = forwardRef(CustomModal);
+export const VerifyLoginOtpModal = forwardRef<HTMLDivElement, Omit<ModalProps, 'children'>>(CustomModal);

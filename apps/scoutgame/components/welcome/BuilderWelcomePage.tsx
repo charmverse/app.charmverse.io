@@ -1,41 +1,68 @@
-import type { Scout } from '@charmverse/core/prisma';
-import { Stack, Typography } from '@mui/material';
-import Box from '@mui/material/Box';
+import 'server-only';
+
+import { Box, Button, Typography } from '@mui/material';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
-import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
-import { JoinGithubButton } from 'components/github/JoinGithubButton';
 
-import { SkipBuilderStepButton } from './components/SkipBuilderStepButton';
+import { JoinGithubButton } from './components/github/JoinGithubButton';
 
-export function BuilderWelcomePage({ user }: { user: Scout }) {
+export function BuilderPage() {
   return (
-    <SinglePageLayout>
-      <SinglePageWrapper>
-        <Stack alignItems='center' justifyContent='center'>
-          <Image src='/images/scout-game-logo.png' alt='Builder welcome' width={300} height={133.33} />
-        </Stack>
-        <Box display='flex' gap={2} flexDirection='column'>
-          <Typography variant='h5' textAlign='center' color='secondary' fontWeight='bold'>
-            Are you a builder?
-          </Typography>
-          <Typography>
-            Scout Game rewards Builders for contributing to the onchain ecosystem. You earn more rewards when scouts
-            show their support by minting your unique NFT.
-          </Typography>
-          <Typography>
-            Sign up as a Builder now, and you will be eligible to earn Scout Points and a share of your NFT sales during
-            the current season of Scout Game.
-          </Typography>
-          <Stack direction='row' justifyContent='center'>
-            <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
-          </Stack>
-          <Typography mb={2}>Connect to GitHub to sign up and verify your code contributions.</Typography>
-          <JoinGithubButton />
-          <SkipBuilderStepButton />
+    <SinglePageWrapper>
+      <Box
+        display='flex'
+        flexDirection='column'
+        alignItems='center'
+        maxWidth='100vw'
+        border='none'
+        borderRadius='0'
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          my: 0,
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
+          minHeight: 'calc(100svh - 100px)'
+        }}
+      >
+        <Image
+          src='/images/scout-game-logo.png'
+          width={400}
+          height={200}
+          sizes='100vw'
+          style={{
+            width: '100%',
+            maxWidth: '400px',
+            height: 'auto'
+          }}
+          alt='Scout game score'
+        />
+        <Typography variant='h5' mb={2} fontWeight='700' color='text.secondary'>
+          Sign up as a Builder!
+        </Typography>
+        <Typography mb={2}>
+          Scout Game rewards Builders for contributing to the onchain ecosystem. You earn more rewards when scouts show
+          their support by minting your unique NFT.
+        </Typography>
+        <Typography mb={2}>
+          Sign up as a Builder now, and you will be eligible to earn Scout Points and a share of your NFT sales during
+          the first season of Scout Game.
+        </Typography>
+        <Typography mb={2}>You will also earn 10 Frame Clicks to help you move up the Waitlist!</Typography>
+        <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
+        <Typography mb={2}>Connect to GitHub to sign up and verify your code contributions.</Typography>
+        <Box width='100%'>
+          <Suspense>
+            <JoinGithubButton />
+          </Suspense>
+          <Button component={Link} variant='text' href='/score' sx={{ width: '100%', mt: 1 }}>
+            Cancel
+          </Button>
         </Box>
-      </SinglePageWrapper>
-    </SinglePageLayout>
+      </Box>
+    </SinglePageWrapper>
   );
 }

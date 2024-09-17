@@ -1,43 +1,51 @@
-import MuiLink from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
-import { Stack } from '@mui/system';
+import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import { SinglePageLayout } from 'components/common/Layout';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
+import { InfoWrapper } from 'components/layout/InfoWrapper';
 
-export function LoginPage({ successPath }: { successPath: string }) {
+export function LoginPage() {
   return (
-    <SinglePageLayout>
-      <Image
-        src='/images/scout-game-logo-square.png'
-        width={400}
-        height={200}
-        sizes='100vw'
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          height: 'auto'
+    <InfoWrapper>
+      <Box
+        display='flex'
+        flexDirection='column'
+        alignItems='center'
+        maxWidth='100vw'
+        border='none'
+        borderRadius='0'
+        textAlign='center'
+        bgcolor='transparent'
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          my: 0,
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
+          minHeight: 'calc(100svh - 100px)'
         }}
-        alt='ScoutGame'
-      />
-      <Typography variant='h5' mb={2} fontWeight='700'>
-        Scout. Build. Win.
-      </Typography>
-      <Stack gap={2} width='100%' px={3}>
-        <WarpcastLogin successPath={successPath} />
-        <MuiLink
-          variant='body2'
-          href='https://www.farcaster.xyz/'
-          target='_blank'
-          rel='noopener'
-          color='primary'
-          fontWeight={500}
-          display='block'
-        >
-          Join Farcaster
-        </MuiLink>
-      </Stack>
-    </SinglePageLayout>
+      >
+        <Image
+          src='/images/scout-game-logo-square.png'
+          width={400}
+          height={200}
+          sizes='100vw'
+          style={{
+            width: '100%',
+            maxWidth: '400px',
+            height: 'auto'
+          }}
+          alt='ScoutGame'
+        />
+        <Box>
+          <Typography variant='h5' mb={2} fontWeight='700'>
+            Scout. Build. Win.
+          </Typography>
+        </Box>
+        <Box display='flex' flexDirection='column' gap={3} width='100%'>
+          <WarpcastLogin />
+        </Box>
+      </Box>
+    </InfoWrapper>
   );
 }

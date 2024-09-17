@@ -81,7 +81,7 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
       >
         {children || 'Sign in with Warpcast'}
       </Button>
-      <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />
+      <FarcasterLoginModal open={popupState.isOpen} onClose={() => popupState.close()} url={url} />
       {hasErrored && <Typography variant='body2'>There was an error while logging in</Typography>}
     </Box>
   );
@@ -106,7 +106,6 @@ export function WarpcastLogin() {
       >
         Don't have a Farcaster account?
       </Link>
-      ;
     </AuthKitProvider>
   );
 }

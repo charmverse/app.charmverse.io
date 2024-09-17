@@ -56,7 +56,7 @@ export function CreateLinkedView(props: Props) {
       {isSmallScreen ? (
         <MobileDialog
           title='Select data source'
-          onClose={sourcePopup.close}
+          onClose={() => sourcePopup.close()}
           open={sourcePopup.isOpen}
           contentSx={{ pr: 0, pb: 0, pl: 1 }}
         >

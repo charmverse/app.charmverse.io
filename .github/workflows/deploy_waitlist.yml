@@ -135,6 +135,7 @@ jobs:
       - name: Run eslint on changed files
         uses: tj-actions/eslint-changed-files@v25
         with:
+          escape_paths: 'false'
           skip_annotations: 'true' # do not annotate code in the PR
           file_extensions: '**/*.{ts,tsx}'
 
@@ -245,10 +246,12 @@ jobs:
           ecr_registry: waitlist
 
   upload-static-assets:
-    name: Upload assets in production
+    name: Upload static assets
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
-    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    if: |
+      (github.ref == 'refs/heads/main' && !(failure() || cancelled())) ||
+      (needs.build.outputs.deploy_staging == 'true')
     needs: build
     steps:
       - uses: actions/checkout@v4

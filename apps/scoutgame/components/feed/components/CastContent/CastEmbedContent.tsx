@@ -6,7 +6,7 @@ export function CastEmbedContent({ embeds }: { embeds: IframelyResponse[] }) {
     <Stack gap={1}>
       {embeds.map((embed) => (
         <Card sx={{ my: 1 }} key={embed.url}>
-          <CardActionArea sx={{ p: 2 }} href={embed.meta.canonical} target='_blank' component={Link} color='inherit'>
+          <CardActionArea sx={{ p: 2 }} href={embed.meta.canonical} target='_blank' color='inherit'>
             <Stack
               gap={{
                 xs: 1,

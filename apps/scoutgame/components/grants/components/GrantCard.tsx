@@ -1,6 +1,5 @@
 'use client';
 
-import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import type { Grant } from '@connect-shared/lib/grants/getGrants';
 import { Button, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -11,6 +10,7 @@ import { useState } from 'react';
 import { FaChevronUp } from 'react-icons/fa6';
 
 import { Avatar } from 'components/common/Avatar';
+import { CardMotion } from 'components/common/Motions/CardMotion';
 
 export function GrantItem({ grant }: { grant: Grant }) {
   const grantName = grant.name || 'Untitled';
