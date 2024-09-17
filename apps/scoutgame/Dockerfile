@@ -11,13 +11,14 @@ RUN apt install openssl -y
 WORKDIR /app
 
 # Copy dependencies
-COPY --parents @connect-shared  \
-  apps/*/package.json           \
-  packages/*/package.json       \
-  node_modules                  \
-  package.json                  \
-  apps/scoutgame/node_modules   \
-  apps/scoutgame/package.json   \
+COPY --parents @connect-shared   \
+  apps/*/package.json            \
+  packages/*/package.json        \
+  node_modules                   \
+  package.json                   \
+  apps/scoutgame/node_modules    \
+  apps/scoutgame/package.json    \
+  apps/scoutgame/next.config.mjs \
   .
 
 # Copy compiled code

@@ -56,5 +56,5 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["../../node_modules", ".next/", "public/sw.js", "sw.js"]
+  "exclude": ["../../node_modules", ".next/"]
 }

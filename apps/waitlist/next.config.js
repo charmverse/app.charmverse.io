@@ -12,6 +12,7 @@ const nextConfig = {
     unoptimized: true
   },
   productionBrowserSourceMaps: true,
+  assetPrefix: process.env.CI ? 'https://cdn.charmverse.io' : undefined,
   webpack(_config) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
     // _config.resolve.alias.canvas = false;
@@ -59,4 +60,4 @@ const nextConfig = {
   }
 };
 
-export default nextConfig;
+module.exports = nextConfig;
