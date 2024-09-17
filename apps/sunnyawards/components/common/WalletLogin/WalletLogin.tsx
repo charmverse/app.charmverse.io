@@ -15,6 +15,8 @@ import { useAccount, useConnect, useDisconnect, useSignMessage } from 'wagmi';
 import { Modal } from 'components/common/Modal/Modal';
 import { loginWithWalletAction } from 'lib/session/loginWithWalletAction';
 
+import { mapIcon } from './loginIcons';
+
 export function WalletLogin({ successPath }: { successPath: string }) {
   const [open, setOpen] = useState(false);
 
@@ -123,7 +125,7 @@ export function WalletLogin({ successPath }: { successPath: string }) {
         </Typography>
         <Stack gap={2}>
           {connectors
-            .filter((connector, _i, arr) => (arr.length > 1 ? connector.id !== 'injected' : true))
+            .filter((connector, _i, arr) => (arr.length > 1 ? connector.type !== 'injected' : true))
             .map((connector) => (
               <Button
                 key={connector.uid}
@@ -133,6 +135,8 @@ export function WalletLogin({ successPath }: { successPath: string }) {
                 startIcon={
                   connector.icon ? (
                     <Image src={connector.icon} alt={`${connector.icon} icon`} width={20} height={20} />
+                  ) : mapIcon[connector.type] ? (
+                    <Image src={mapIcon[connector.type]} alt={`${connector.type} icon`} width={20} height={20} />
                   ) : (
                     <WalletIcon fontSize='small' />
                   )
