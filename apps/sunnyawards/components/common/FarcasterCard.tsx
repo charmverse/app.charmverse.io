@@ -54,7 +54,7 @@ function FarcasterCardContent({
           sm: 'flex-start'
         }}
       >
-        <Avatar size={avatarSize} name={username || 'N/A'} avatar={avatar} />
+        <Avatar size={avatarSize} name={username} avatar={avatar} />
       </Stack>
       <Box width='100%' sx={{ wordBreak: 'break-all' }}>
         <Stack direction='row' justifyContent='space-between' width='100%' alignItems='center'>
@@ -65,9 +65,11 @@ function FarcasterCardContent({
             </IconButton>
           )}
         </Stack>
-        <Typography variant='subtitle1' color='secondary'>
-          @{username || 'N/A'}
-        </Typography>
+        {username && (
+          <Typography variant='subtitle1' color='secondary'>
+            @{username}
+          </Typography>
+        )}
         <Typography
           sx={{
             display: '-webkit-box',
