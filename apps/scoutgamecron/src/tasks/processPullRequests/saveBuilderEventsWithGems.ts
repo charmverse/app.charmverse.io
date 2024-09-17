@@ -43,7 +43,7 @@ function createGithubEventsPrismaArtifacts({
   const gemsReceiptCreateManyInput: Prisma.GemsReceiptCreateManyInput[] = [];
   const builderStrikeCreateManyInput: Prisma.BuilderStrikeCreateManyInput[] = [];
   const githubUsersBuilderIdRecord: Record<
-    number,
+    string,
     {
       id: string;
       banned: boolean;
@@ -65,7 +65,7 @@ function createGithubEventsPrismaArtifacts({
     builderStrikesCount[strike.builderId] = (builderStrikesCount[strike.builderId] || 0) + 1;
   }
 
-  const githubUserPullRequests: Record<number, { merged: GithubEvent[]; closed: GithubEvent[]; githubUserId: number }> =
+  const githubUserPullRequests: Record<string, { merged: GithubEvent[]; closed: GithubEvent[]; githubUserId: string }> =
     {};
   for (const githubEvent of githubEvents) {
     if (!githubUserPullRequests[githubEvent.createdBy]) {

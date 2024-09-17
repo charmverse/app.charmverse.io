@@ -32,7 +32,7 @@ describe('saveBuilderEventsWithGems', () => {
 
     const githubUser = await prisma.githubUser.create({
       data: {
-        id: 1,
+        id: v4(),
         login: 'testuser',
         builderId: builder.id
       }
@@ -186,7 +186,7 @@ describe('saveBuilderEventsWithGems', () => {
 
     const githubUser = await prisma.githubUser.create({
       data: {
-        id: 1,
+        id: v4(),
         login: 'testuser',
         builderId: builder.id
       }
@@ -273,7 +273,7 @@ describe('saveBuilderEventsWithGems', () => {
 
     const githubUser = await prisma.githubUser.create({
       data: {
-        id: 1,
+        id: v4(),
         login: 'testuser',
         builderId: builder.id
       }
@@ -337,7 +337,7 @@ describe('saveBuilderEventsWithGems', () => {
 
     const githubUser = await prisma.githubUser.create({
       data: {
-        id: 1,
+        id: v4(),
         login: 'testuser',
         builderId: builder.id
       }
@@ -429,7 +429,7 @@ describe('saveBuilderEventsWithGems', () => {
 
     const githubUser = await prisma.githubUser.create({
       data: {
-        id: 1,
+        id: v4(),
         login: 'testuser',
         builderId: builder.id
       }
