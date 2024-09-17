@@ -35,7 +35,7 @@ function FarcasterCardContent({
   name?: string;
   bio?: string;
   username?: string;
-  avatar?: string;
+  avatar?: string | null;
   avatarSize?: AvatarSize;
   onDelete?: VoidFunction;
 }) {
@@ -54,7 +54,7 @@ function FarcasterCardContent({
           sm: 'flex-start'
         }}
       >
-        <Avatar size={avatarSize} name={username} avatar={avatar} />
+        <Avatar size={avatarSize} name={username} avatar={avatar || undefined} />
       </Stack>
       <Box width='100%' sx={{ wordBreak: 'break-all' }}>
         <Stack direction='row' justifyContent='space-between' width='100%' alignItems='center'>
@@ -89,7 +89,7 @@ export function FarcasterCard(props: {
   bio?: string;
   username?: string;
   fid?: number;
-  avatar?: string;
+  avatar?: string | null;
   avatarSize?: AvatarSize;
   onDelete?: VoidFunction;
   enableLink?: boolean;
