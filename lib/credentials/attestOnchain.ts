@@ -30,6 +30,10 @@ export async function attestOnchain<T extends ExtendedAttestationType = Extended
 
   const provider = getEthersProvider({ rpcUrl });
 
+  if (!credentialsWalletPrivateKey) {
+    throw new Error('Skip creating attestation. Missing env: CREDENTIAL_WALLET_KEY');
+  }
+
   const wallet = new Wallet(credentialsWalletPrivateKey as string, provider);
 
   const eas = getEasInstance(chainId);

@@ -265,7 +265,7 @@ export function ProjectForm({
           />
         </Stack>
       </Stack>
-      <AddProjectMembersForm user={user} control={control} disabled={isExecuting} />
+      {user.farcasterUser && <AddProjectMembersForm user={user} control={control} disabled={isExecuting} />}
       <Stack direction='row' justifyContent='space-between' gap={2}>
         <Box gap={2} display='flex'>
           <Button LinkComponent={Link} href='/profile' variant='outlined' color='secondary' sx={{ flexShrink: 0 }}>

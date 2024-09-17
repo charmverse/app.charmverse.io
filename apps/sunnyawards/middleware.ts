@@ -14,14 +14,14 @@ export async function middleware(request: NextRequest) {
   const isProjectPath = projectPathChunks[0] === 'p' && !isEditProjectPath;
 
   // Disallow project submissions and redirect to profile
-  if (isNewProjectPath) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
+  // if (isNewProjectPath) {
+  //   return NextResponse.redirect(new URL('/', request.url));
+  // }
 
-  // Projects are readonly due to the Sunny Awards submissions being suspended
-  if (isEditProjectPath) {
-    return NextResponse.redirect(new URL(`/p/${projectPathChunks[1]}`, request.url));
-  }
+  // // Projects are readonly due to the Sunny Awards submissions being suspended
+  // if (isEditProjectPath) {
+  //   return NextResponse.redirect(new URL(`/p/${projectPathChunks[1]}`, request.url));
+  // }
 
   if (!user && path !== '/' && !isProjectPath && !path.startsWith('/u/')) {
     return NextResponse.redirect(new URL('/', request.url));

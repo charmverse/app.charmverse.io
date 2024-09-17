@@ -89,3 +89,34 @@ export async function verifyEIP1271Signature({
 
   return data === EIP1271_MAGIC_VALUE;
 }
+
+export async function isValidEoaOrGnosisWalletSignature({
+  message,
+  signature,
+  address,
+  domain
+}: SignatureVerificationPayloadWithAddress & {
+  domain: string;
+}): Promise<boolean> {
+  const isValidSignature = await isValidWalletSignature({
+    message,
+    signature,
+    domain
+  });
+
+  if (isValidSignature) {
+    return true;
+  }
+
+  const isValidGnosisSignature = await verifyEIP1271Signature({
+    message,
+    signature,
+    address
+  });
+
+  if (isValidGnosisSignature) {
+    return true;
+  }
+
+  return false;
+}
