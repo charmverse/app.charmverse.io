@@ -26,7 +26,7 @@ addTask('/hello-world', (ctx) => {
   log.info('Hello World triggered', { body: ctx.body, headers: ctx.headers });
 });
 
-addTask('/github-pull-requests', processPullRequests);
+addTask('/process-pull-requests', processPullRequests);
 
 addTask('/send-push-notifications', sendNotifications);
 

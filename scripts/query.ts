@@ -1,16 +1,33 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { syncProposalPermissionsWithWorkflowPermissions } from '@root/lib/proposals/workflows/syncProposalPermissionsWithWorkflowPermissions';
 import { prettyPrint } from 'lib/utils/strings';
+import { v4 } from 'uuid';
 
 async function query() {
-  const result = await prisma.page.count({
-    where: {
-      parent: {
-        path: 'tech-task-list-49366552253645923'
+  const builder = await prisma.scout.create({
+    data: {
+      displayName: "Safwan Shaheer",
+      username: "devorein",
+      agreedToTOS: true,
+      builder: true,
+      githubUser: {
+        create: {
+          id: 1,
+          login: "devorein",
+        }
       }
     }
-  });
-  console.log(result);
+  })
+
+  await prisma.githubRepo.create({
+    data: {
+      id: v4(),
+      name: "app.charmverse.io",
+      owner: "charmverse"
+    }
+  })
+
+  console.log(builder);
 }
 
 query();

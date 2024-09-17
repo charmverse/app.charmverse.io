@@ -186,8 +186,7 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
             paddingRight: 1,
             paddingLeft: 1,
             fontSize: '0.9rem',
-            fontWeight: '500',
-            color: theme.palette.black.main
+            fontWeight: '500'
             // '&:hover': {
             //   backgroundColor: 'darkpurple'
             // }
