@@ -83,9 +83,10 @@ export async function getProposal({
     throw new Error('Could not find permissions for proposal');
   }
 
-  const evaluationIds = proposal.evaluations.map((e) => e.id);
+  const proposalEvaluationReviews = proposal.evaluations.map((e) => e.reviews).flat();
+  const proposalEvaluationAppealReviews = proposal.evaluations.map((e) => e.appealReviews).flat();
 
-  const [workflow, credentials, proposalEvaluationReviews, proposalEvaluationAppealReviews] = await Promise.all([
+  const [workflow, credentials] = await Promise.all([
     proposal.workflowId
       ? await prisma.proposalWorkflow.findFirst({
           where: {
@@ -99,20 +100,6 @@ export async function getProposal({
     getProposalOrApplicationCredentials({ proposalId: id }).catch((error) => {
       log.error('Error fetching proposal credentials', { error, proposalId: id });
       return [];
-    }),
-    prisma.proposalEvaluationReview.findMany({
-      where: {
-        evaluationId: {
-          in: evaluationIds
-        }
-      }
-    }),
-    prisma.proposalEvaluationAppealReview.findMany({
-      where: {
-        evaluationId: {
-          in: evaluationIds
-        }
-      }
     })
   ]);
 

@@ -210,6 +210,20 @@ export function EvaluationStepSettings({
       {evaluation.type === 'pass_fail' && (
         <>
           <Box mb={2}>
+            <FormControlLabel
+              disabled={readOnlyShareReviews}
+              control={
+                <Switch
+                  checked={!!evaluation.shareReviews}
+                  onChange={async (ev) => {
+                    onChange({ shareReviews: !!ev.target.checked });
+                  }}
+                />
+              }
+              label='Show reviews (anonymized)'
+            />
+          </Box>
+          <Box mb={2}>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
                 Required reviews
