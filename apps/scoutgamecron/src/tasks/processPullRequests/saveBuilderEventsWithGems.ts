@@ -38,6 +38,7 @@ function createGithubEventsPrismaArtifacts({
   week: string;
   githubUsers: (GithubUser & { builder: Scout | null })[];
 }) {
+  const builderGemsRecord: Record<string, number> = {};
   const builderEventCreateManyInput: Prisma.BuilderEventCreateManyInput[] = [];
   const gemsReceiptCreateManyInput: Prisma.GemsReceiptCreateManyInput[] = [];
   const builderStrikeCreateManyInput: Prisma.BuilderStrikeCreateManyInput[] = [];
@@ -110,12 +111,13 @@ function createGithubEventsPrismaArtifacts({
         );
         // Check if the builder has a two days streak for merged pull requests
         const hasTwoDaysStreakOnRepo = mergedPullRequestsOnRepo.length % 3 === 2;
-
+        const gemsToAdd = hasTwoDaysStreakOnRepo ? 3 : 1;
         gemsReceiptCreateManyInput.push({
           type: hasTwoDaysStreakOnRepo ? 'third_pr_in_streak' : 'regular_pr',
-          value: hasTwoDaysStreakOnRepo ? 3 : 1,
+          value: gemsToAdd,
           eventId: newBuilderEventId
         });
+        builderGemsRecord[builder.id] = (builderGemsRecord[builder.id] || 0) + gemsToAdd;
       } else if (githubEvent.type === 'closed_pull_request') {
         builderStrikeCreateManyInput.push({
           builderEventId: newBuilderEventId,
@@ -133,7 +135,8 @@ function createGithubEventsPrismaArtifacts({
     builderEventCreateManyInput,
     gemsReceiptCreateManyInput,
     builderStrikeCreateManyInput,
-    bannedBuilderIds
+    bannedBuilderIds,
+    builderGemsRecord
   };
 }
 
@@ -175,14 +178,19 @@ export async function saveBuilderEventsWithGems({ season, week }: { season: numb
     }
   });
 
-  const { builderEventCreateManyInput, gemsReceiptCreateManyInput, builderStrikeCreateManyInput, bannedBuilderIds } =
-    createGithubEventsPrismaArtifacts({
-      githubEvents: deduplicatedGithubEvents,
-      strikes,
-      season,
-      week,
-      githubUsers
-    });
+  const {
+    builderEventCreateManyInput,
+    gemsReceiptCreateManyInput,
+    builderStrikeCreateManyInput,
+    bannedBuilderIds,
+    builderGemsRecord
+  } = createGithubEventsPrismaArtifacts({
+    githubEvents: deduplicatedGithubEvents,
+    strikes,
+    season,
+    week,
+    githubUsers
+  });
 
   await prisma.$transaction(async (tx) => {
     await tx.builderEvent.createMany({
@@ -204,5 +212,26 @@ export async function saveBuilderEventsWithGems({ season, week }: { season: numb
         bannedAt: new Date()
       }
     });
+
+    for (const builderId of Object.keys(builderGemsRecord)) {
+      await tx.userWeeklyStats.upsert({
+        where: {
+          userId_week: {
+            userId: builderId,
+            week
+          }
+        },
+        create: {
+          userId: builderId,
+          week,
+          gemsCollected: builderGemsRecord[builderId]
+        },
+        update: {
+          gemsCollected: {
+            increment: builderGemsRecord[builderId]
+          }
+        }
+      });
+    }
   });
 }
