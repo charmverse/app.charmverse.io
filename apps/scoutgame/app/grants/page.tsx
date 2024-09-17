@@ -1,5 +1,3 @@
-'use client';
-
 import { GrantsList } from 'components/grants/GrantsList';
 
 export const dynamic = 'force-dynamic';

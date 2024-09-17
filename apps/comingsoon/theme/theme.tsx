@@ -1,7 +1,7 @@
 'use client';
 
 import { grey } from '@mui/material/colors';
-import { darken, experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
+import { darken, extendTheme, responsiveFontSizes } from '@mui/material/styles';
 
 import {
   backgroundColor,

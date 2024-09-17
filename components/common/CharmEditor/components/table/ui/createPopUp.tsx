@@ -1,6 +1,7 @@
 /* eslint-disable no-plusplus */
 import { Menu, Popper, Popover } from '@mui/material';
 import React from 'react';
+import type { ElementType } from 'react';
 import { createRoot } from 'react-dom/client';
 import { v1 as uuid } from 'uuid';
 
@@ -15,7 +16,6 @@ export type PopUpParams = {
   placement?: 'top-end' | 'right';
   popper?: 'menu' | 'popover';
 };
-
 export type PopUpHandle<T> = {
   close: (val?: any) => void;
   update: (props: T) => void;
@@ -64,7 +64,7 @@ function getRootElement(id: string, forceCreation: boolean, popUpParams?: PopUpP
 function renderPopUp<T>(
   rootId: string,
   close: VoidFunction,
-  View: (props: T) => React.ReactNode,
+  View: ElementType,
   viewProps: T,
   popUpParams: PopUpParams
 ): void {
@@ -106,7 +106,7 @@ function renderPopUp<T>(
       ) : (
         // <ClickAwayListener onClickAway={close}>
         <Popper open anchorEl={popUpParams.anchor} placement={popUpParams.placement}>
-          <View {...viewProps} close={close} />
+          <View close={close} />
         </Popper>
         // </ClickAwayListener>
       );
@@ -128,7 +128,7 @@ function unrenderPopUp(rootId: string): void {
 }
 
 export default function createPopUp<T>(
-  View: (props: T) => React.ReactNode,
+  View: React.ComponentType<T & { close: VoidFunction }>,
   viewProps?: T | null,
   popUpParams?: PopUpParams | null
 ): PopUpHandle<T> {
@@ -168,7 +168,7 @@ export default function createPopUp<T>(
   const typedRenderPopUp = renderPopUp as (
     rootId: string,
     close: VoidFunction,
-    View: (props: T) => React.ReactNode,
+    View: ElementType,
     viewProps: T,
     popUpParams: PopUpParams
   ) => void;

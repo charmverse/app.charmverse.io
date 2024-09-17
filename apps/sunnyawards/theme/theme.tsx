@@ -1,24 +1,19 @@
 'use client';
 
-import { grey } from '@mui/material/colors';
-import { darken, experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
+import { darken, extendTheme, responsiveFontSizes } from '@mui/material/styles';
 
 import {
-  backgroundColor,
   backgroundColorDarkMode,
   backgroundLightColorDarkMode,
-  blueColor,
   darkBlueColor,
   farcasterBrandColor,
   farcasterBrandColorDark,
   farcasterBrandColorLight,
-  inputBackground,
   inputBackgroundDarkMode,
   inputBorder,
   inputBorderDarkMode,
   primaryTextColor,
   primaryTextColorDarkMode,
-  secondaryTextColor,
   secondaryTextColorDarkMode,
   sunnysColor,
   sunnysColorLight
@@ -29,36 +24,38 @@ export const defaultFont =
 
 const extendedTheme = extendTheme({
   cssVarPrefix: 'charm',
+  defaultColorScheme: 'dark',
   colorSchemes: {
     light: {
       // palette for light mode
       palette: {
         action: {
-          focus: 'rgb(29, 92, 132, 0.1)',
-          hover: 'rgba(22, 52, 71, 0.07)',
-          selected: 'rgba(22, 52, 71, 0.07)'
+          focus: 'rgb(29, 92, 132)',
+          hover: 'rgba(255, 255, 255, 0.055)',
+          selected: 'rgba(255, 255, 255, 0.055)'
         },
         background: {
-          default: backgroundColor,
-          paper: backgroundColor
+          default: backgroundColorDarkMode,
+          paper: backgroundLightColorDarkMode
         },
         text: {
           disabled: primaryTextColor,
-          primary: primaryTextColor
+          primary: primaryTextColorDarkMode
         },
         primary: {
-          main: blueColor
+          main: darkBlueColor,
+          dark: darken(darkBlueColor, 0.2)
         },
         secondary: {
-          main: secondaryTextColor
+          main: secondaryTextColorDarkMode
         },
         textPrimary: {
-          main: primaryTextColor
+          main: primaryTextColorDarkMode
         },
         inputBackground: {
-          main: inputBackground
+          main: inputBackgroundDarkMode
         },
-        mainBackground: { main: grey[200] },
+        mainBackground: { main: backgroundColorDarkMode },
         farcaster: { main: farcasterBrandColor, dark: farcasterBrandColorDark, light: farcasterBrandColorLight },
         gold: { main: sunnysColor, light: sunnysColorLight }
       }

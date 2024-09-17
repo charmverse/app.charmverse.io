@@ -35,6 +35,7 @@ const makeRouteHandler = (options: Options = {}): Handler => {
       const bucket = awsS3Bucket;
 
       let filename = decodeURIComponent(req.query.filename as string);
+      // @ts-ignore
       const validCharacters = /^[\000-\177]*$/;
 
       if (!validCharacters.test(filename)) {

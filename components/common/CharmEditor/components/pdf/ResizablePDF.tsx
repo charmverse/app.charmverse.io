@@ -3,14 +3,14 @@ import styled from '@emotion/styled';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import { Box, ListItem, Typography } from '@mui/material';
+import type { ListItemButtonProps } from '@mui/material';
+import { Box, ListItemButton, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import dynamic from 'next/dynamic';
 import type { Slice } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
-import type { HTMLAttributes } from 'react';
 import { memo, useMemo, useState } from 'react';
 
 import BlockAligner from 'components/common/CharmEditor/components/BlockAligner';
@@ -69,12 +69,11 @@ function EmptyPDFContainer({
   readOnly,
   isSelected,
   ...props
-}: HTMLAttributes<HTMLDivElement> & { readOnly: boolean; isSelected?: boolean }) {
+}: ListItemButtonProps & { readOnly: boolean; isSelected?: boolean }) {
   const theme = useTheme();
 
   return (
-    <ListItem
-      button
+    <ListItemButton
       disableRipple
       disabled={readOnly}
       sx={{
@@ -88,7 +87,7 @@ function EmptyPDFContainer({
         <PictureAsPdfIcon fontSize='small' />
         <Typography>Add a PDF</Typography>
       </StyledEmptyPDFContainer>
-    </ListItem>
+    </ListItemButton>
   );
 }
 

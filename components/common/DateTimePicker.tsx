@@ -3,10 +3,11 @@ import { TextField } from '@mui/material';
 import type { TextFieldProps } from '@mui/material';
 import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import type { DateTime } from 'luxon';
 import { useState } from 'react';
 
 // customized date picker that opens when clicking the inpu
-export function DateTimePicker<T>({
+export function DateTimePicker<T extends DateTime>({
   variant,
   placeholder,
   ...props

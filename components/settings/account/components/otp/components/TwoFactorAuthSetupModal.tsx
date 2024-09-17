@@ -38,7 +38,7 @@ function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>, ref: R
   );
 }
 
-const TwoFactorAuthSetupModalComponent = forwardRef(CustomModal);
+const TwoFactorAuthSetupModalComponent = forwardRef<HTMLDivElement, Omit<ModalProps, 'children'>>(CustomModal);
 
 function CustomModalContainer(props: Omit<ModalProps, 'children'>, ref: Ref<HTMLDivElement>) {
   return (
@@ -48,4 +48,4 @@ function CustomModalContainer(props: Omit<ModalProps, 'children'>, ref: Ref<HTML
   );
 }
 
-export const TwoFactorAuthSetupModal = forwardRef(CustomModalContainer);
+export const TwoFactorAuthSetupModal = forwardRef<HTMLDivElement, Omit<ModalProps, 'children'>>(CustomModalContainer);

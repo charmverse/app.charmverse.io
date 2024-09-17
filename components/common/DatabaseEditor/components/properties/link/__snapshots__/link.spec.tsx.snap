@@ -12,10 +12,10 @@ exports[`components/properties/link returns link properties correctly 1`] = `
         style="height: 100%;"
       >
         <div
-          class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-d4pqsu-MuiInputBase-root"
+          class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-syg0od-MuiInputBase-root"
         >
           <input
-            class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+            class="MuiInputBase-input Editable octo-propertyvalue css-1jrstcx-MuiInputBase-input"
             type="text"
             value="https://github.com/mattermost/focalboard"
           />
@@ -30,7 +30,7 @@ exports[`components/properties/link returns link properties correctly 1`] = `
     >
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-ptiqhd-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-18w7uxr-MuiSvgIcon-root"
         data-testid="LinkIcon"
         focusable="false"
         viewBox="0 0 24 24"

@@ -275,7 +275,7 @@ function TableHeaders(props: Props): JSX.Element {
               <MobileDialog
                 title={intl.formatMessage({ id: 'PropertyMenu.selectType', defaultMessage: 'Select property type' })}
                 open={addPropertyPopupState.isOpen}
-                onClose={addPropertyPopupState.close}
+                onClose={() => addPropertyPopupState.close()}
                 PaperProps={{ sx: { background: theme.palette.background.light } }}
                 contentSx={{ pr: 0, pb: 0, pl: 1 }}
               >

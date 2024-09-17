@@ -1,7 +1,6 @@
 'use client';
 
-import { Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Stack, Typography } from '@mui/material';
 import { fancyTrim } from '@root/lib/utils/strings';
 import { useState } from 'react';
 

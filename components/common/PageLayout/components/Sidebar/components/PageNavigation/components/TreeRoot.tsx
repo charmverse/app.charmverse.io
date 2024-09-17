@@ -1,16 +1,15 @@
 import { useTheme } from '@emotion/react';
-import TreeView from '@mui/lab/TreeView';
+import type { SimpleTreeViewProps } from '@mui/x-tree-view/SimpleTreeView';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { useRouter } from 'next/router';
-import type { ComponentProps, ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 
 type TreeRootProps = {
-  children: ReactNode;
   isFavorites?: boolean;
-} & ComponentProps<typeof TreeView>;
+} & SimpleTreeViewProps<true>;
 
 export function TreeRoot({ children, isFavorites, ...rest }: TreeRootProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLUListElement>(null);
   const router = useRouter();
 
   const theme = useTheme();
@@ -42,9 +41,9 @@ export function TreeRoot({ children, isFavorites, ...rest }: TreeRootProps) {
         width: '100%'
       }}
     >
-      <TreeView {...rest} ref={ref}>
+      <SimpleTreeView {...rest} ref={ref}>
         {children}
-      </TreeView>
+      </SimpleTreeView>
     </div>
   );
 }

@@ -32,7 +32,7 @@ export function KycStepSettings({ readOnly, userId }: KycStepReviewActionProps) 
             <Link
               onClick={() => openSettings('integrations')}
               sx={{ display: 'inline-block', cursor: 'pointer' }}
-              color={(theme) => theme.palette.primary?.main}
+              color='primary.main'
             >
               settings
             </Link>
