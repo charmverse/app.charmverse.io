@@ -163,7 +163,7 @@ export async function addOrangeDaoMembersAndCreateNotifications({
         })
       ]);
 
-      const template = emails.getOrangeDaoSpaceInviteEmail({
+      const template = await emails.getOrangeDaoSpaceInviteEmail({
         pagePath: page.path,
         pageTitle: page.title,
         spaceDomain: space.domain,
