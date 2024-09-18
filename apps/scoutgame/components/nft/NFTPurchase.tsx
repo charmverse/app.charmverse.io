@@ -6,7 +6,14 @@ import { ActionType, ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Button, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { encodeAbiParameters } from 'viem';
 import { useSendTransaction } from 'wagmi';
+
+import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
+import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
+import { useWallet } from 'hooks/useWallet';
+
+import { decentApiKey } from './constants';
 
 type NFT = {
   id: string;
@@ -16,35 +23,23 @@ type NFT = {
   contractAddress: string;
 };
 
-const apiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECENT_API_KEY as string);
-
-export function NFTPurchase() {
-  console.log({ apiKey });
-
-  return (
-    <BoxHooksContextProvider apiKey={apiKey}>
-      <NFTPurchaseButton walletAddress='0x4A29c8fF7D6669618580A68dc691565B07b19e25' />
-    </BoxHooksContextProvider>
-  );
-}
+const builderNFT = {
+  id: '0',
+  name: 'Demo NFT',
+  image: 'https://i.seadn.io/s/raw/files/0f99f7f286b690990ac2738d02e52f2e.png?auto=format&dpr=1&w=1000',
+  price: '0.006',
+  contractAddress: '0x7df4d9f54a5cddfef50a032451f694d6345c60af'
+};
 
 function NFTPurchaseButton({ walletAddress }: { walletAddress: string }) {
   const [nfts, setNfts] = useState<NFT[]>([]);
-  const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null);
+  const [selectedNFT, setSelectedNFT] = useState<NFT | null>(builderNFT);
   const [searchTerm, setSearchTerm] = useState('');
   const { sendTransaction } = useSendTransaction();
 
   useEffect(() => {
     const fetchNFTs = async () => {
-      const mockNFTs: NFT[] = [
-        {
-          id: '291318',
-          name: 'Neutral Cow',
-          image: 'https://i.seadn.io/s/raw/files/0f99f7f286b690990ac2738d02e52f2e.png?auto=format&dpr=1&w=1000',
-          price: '0.0001',
-          contractAddress: '0xbefd018f3864f5bbde665d6dc553e012076a5d44'
-        }
-      ];
+      const mockNFTs: NFT[] = [];
       setNfts(mockNFTs);
     };
 
@@ -64,7 +59,14 @@ function NFTPurchaseButton({ walletAddress }: { walletAddress: string }) {
     actionConfig: {
       chainId: ChainId.BASE_SEPOLIA,
       contractAddress: selectedNFT?.contractAddress || '0xbefd018f3864f5bbde665d6dc553e012076a5d44',
-      tokenId: selectedNFT?.id || '291318'
+      data: encodeAbiParameters(
+        [
+          { name: 'tokenId', type: 'uint256' },
+          { name: 'amount', type: 'uint256' },
+          { name: 'scout', type: 'string' }
+        ],
+        [BigInt(1), BigInt(1), '8681eb2c-c220-44c9-9a01-5bcfd074ab57']
+      )
     }
   });
 
@@ -107,5 +109,26 @@ function NFTPurchaseButton({ walletAddress }: { walletAddress: string }) {
 
       {error instanceof Error ? <Typography color='error'>Error: {(error as Error).message}</Typography> : null}
     </div>
+  );
+}
+
+function NFTPurchaseWithLogin() {
+  const { address } = useWallet(); // Hook to access the connected wallet details
+
+  return (
+    <WagmiProvider>
+      <BoxHooksContextProvider apiKey={decentApiKey}>
+        {address && <NFTPurchaseButton walletAddress='0x4A29c8fF7D6669618580A68dc691565B07b19e25' />}
+        {!address && <WalletConnect />}
+      </BoxHooksContextProvider>
+    </WagmiProvider>
+  );
+}
+
+export function NFTPurchase() {
+  return (
+    <WagmiProvider>
+      <NFTPurchaseWithLogin />
+    </WagmiProvider>
   );
 }

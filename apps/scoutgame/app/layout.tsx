@@ -4,10 +4,10 @@ import Script from 'next/script';
 import type { ReactNode } from 'react';
 
 import { NotificationRequest } from 'components/common/NotificationRequest';
+import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import { AppProviders } from 'components/layout/AppProviders';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 import 'theme/styles.scss';
-import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 
 const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').then((comp) => comp.ClientGlobals), {
   ssr: false
@@ -75,11 +75,9 @@ export default async function RootLayout({
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script src='/__ENV.js' />
         <AppProviders>
-          <WagmiProvider>
-            <ClientGlobals userId={user?.id} />
-            {user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
-            {children}
-          </WagmiProvider>
+          <ClientGlobals userId={user?.id} />
+          {user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
+          {children}
         </AppProviders>
       </body>
     </html>
