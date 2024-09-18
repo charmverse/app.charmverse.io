@@ -143,6 +143,9 @@ jobs:
       - name: Run tests
         run: npm run scoutgame:test
 
+      - name: Run package tests
+        run: npm run test -w packages/scoutgame
+
   test-scoutgame-e2e:
     name: Test Scoutgame e2e
     runs-on: ubuntu-latest
