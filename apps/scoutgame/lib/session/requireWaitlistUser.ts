@@ -15,6 +15,14 @@ export async function requireWaitlistUser({ fid }: { fid: number }) {
     }
   });
   if (waitlistRecord === 0) {
-    throw new UnauthorisedActionError('Scout Game is in private beta');
+    // double-check if user is already a scout user
+    const scoutUser = await prisma.scout.count({
+      where: {
+        farcasterId: fid
+      }
+    });
+    if (scoutUser === 0) {
+      throw new UnauthorisedActionError('Scout Game is in private beta');
+    }
   }
 }
