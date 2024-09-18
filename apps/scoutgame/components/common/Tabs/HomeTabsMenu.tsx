@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, Tab, Tabs, tabClasses, tabsClasses } from '@mui/material';
 import Link from 'next/link';
 
 export function HomeTabsMenu({ tab }: { tab: string }) {
@@ -12,7 +12,18 @@ export function HomeTabsMenu({ tab }: { tab: string }) {
         role='navigation'
         variant='scrollable'
         scrollButtons='auto'
-        sx={{ borderBottom: '1px solid', borderColor: 'text.primary' }}
+        sx={{
+          [`& .${tabsClasses.flexContainer}`]: {
+            justifyContent: { md: 'center' }
+          },
+          [`& .${tabsClasses.indicator}`]: {
+            bottom: 3
+          },
+          [`& .${tabClasses.root}`]: {
+            borderBottom: '1px solid',
+            borderColor: 'text.primary'
+          }
+        }}
       >
         <Tab LinkComponent={Link} label='Leaderboard' href='/home?tab=leaderboard' value='leaderboard' />
         <Tab LinkComponent={Link} label='Activity' href='/home?tab=activity' value='activity' />

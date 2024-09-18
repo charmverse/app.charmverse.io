@@ -5,11 +5,10 @@ import { Box, Button, Stack, TableHead, Typography, useMediaQuery } from '@mui/m
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Image from 'next/image';
-import * as React from 'react';
 
 import { Avatar } from '../Avatar';
 
@@ -24,27 +23,39 @@ export function LeaderboardTable({
   }[];
 }) {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+  const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
     <TableContainer component={Paper} sx={{ pt: 2 }}>
       <Table aria-label='Leaderboard table' size='small'>
         <TableHead>
-          <TableRow>
+          <TableRow
+            sx={{
+              [`& .${tableCellClasses.root}`]: {
+                borderBottom: 'none',
+                paddingLeft: 0
+              }
+            }}
+          >
             {isMobile ? (
-              <TableCell colSpan={4}>SEASON 1 WEEK 1 DAY 1</TableCell>
+              <TableCell colSpan={4} sx={{ textAlign: 'center' }}>
+                SEASON 1 WEEK 1 DAY 1
+              </TableCell>
             ) : (
               <>
-                <TableCell>RANK</TableCell>
+                <TableCell sx={{ paddingLeft: 1 }}>RANK</TableCell>
                 <TableCell>BUILDER</TableCell>
                 <TableCell>SEASON 1 WEEK 1 DAY 1</TableCell>
-                <TableCell>Gems this week</TableCell>
+                <TableCell sx={{ maxWidth: '100px', pr: 0 }} align='right'>
+                  Gems this week
+                </TableCell>
                 <TableCell />
               </>
             )}
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row, index) => (
+          {sorted.map((row, index) => (
             <TableRow
               key={row.user.username}
               sx={{
@@ -68,7 +79,7 @@ export function LeaderboardTable({
                   sx={{
                     background:
                       'linear-gradient(90deg, #A06CD5 0%, #9C74D8 7%, #908DE1 29%, #85A5EA 50%, #79BCF3 71%, #72CBF8 84.5%, #69DDFF 100%)',
-                    height: '10px',
+                    height: '20px',
                     borderTopRightRadius: '10px',
                     borderBottomRightRadius: '10px',
                     width: { xs: `${row.progress || 0}px`, md: `${row.progress || 0}%` }
@@ -83,7 +94,9 @@ export function LeaderboardTable({
               </TableCell>
               {!isMobile && (
                 <TableCell>
-                  <Button variant='buy'>${row.price || 0}</Button>
+                  <Button fullWidth variant='buy'>
+                    ${row.price || 0}
+                  </Button>
                 </TableCell>
               )}
             </TableRow>
