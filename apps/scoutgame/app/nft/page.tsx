@@ -1,16 +1,17 @@
 import { notFound } from 'next/navigation';
 
 import { NFTPurchase } from 'components/nft/NFTPurchase';
-import { getCurrentUserAction } from 'lib/user/getCurrentUserAction';
+import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Page({ params }: { params: { username: string } }) {
-  const actionResult = await getCurrentUserAction();
-  const currentUser = actionResult?.data;
-  if (!currentUser || !currentUser.wallets?.length) {
-    return notFound();
-  }
+export default async function Page() {
+  // const currentUser = await getUserFromSession();
+  // if (!currentUser) {
+  //   return notFound();
+  // }
 
-  return <NFTPurchase walletAddress={currentUser.wallets[0].address} />;
+  // return <h2>test</h2>;
+
+  return <NFTPurchase />;
 }

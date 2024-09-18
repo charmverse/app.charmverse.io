@@ -1,5 +1,6 @@
 'use client';
 
+import env from '@beam-australia/react-env';
 import type { EvmTransaction } from '@decent.xyz/box-common';
 import { ActionType, ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
@@ -15,10 +16,14 @@ type NFT = {
   contractAddress: string;
 };
 
-export function NFTPurchase({ walletAddress }: { walletAddress: string }) {
+const apiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECENT_API_KEY as string);
+
+export function NFTPurchase() {
+  console.log({ apiKey });
+
   return (
-    <BoxHooksContextProvider apiKey={process.env.DECENT_API_KEY as string}>
-      <NFTPurchaseButton walletAddress={walletAddress} />
+    <BoxHooksContextProvider apiKey={apiKey}>
+      <NFTPurchaseButton walletAddress='0x4A29c8fF7D6669618580A68dc691565B07b19e25' />
     </BoxHooksContextProvider>
   );
 }
