@@ -27,7 +27,8 @@ export async function processMergedPullRequest(pullRequest: PullRequest) {
   });
   const previousEventCount = await prisma.githubEvent.count({
     where: {
-      createdBy: pullRequest.author.login
+      createdBy: pullRequest.author.login,
+      repoId: pullRequest.repository.id
     }
   });
   // TODO: Also call Github API to find previous commits
@@ -69,7 +70,7 @@ export async function processMergedPullRequest(pullRequest: PullRequest) {
       },
       update: {}
     });
-    if (githubUser.builderId) {
+    if (githubUser.builderId && !previousEventToday) {
       const builderType = isFirstCommit ? 'first_pr' : 'regular_pr';
       const gemValue = builderType === 'first_pr' ? 10 : 1;
       await tx.builderEvent.upsert({
