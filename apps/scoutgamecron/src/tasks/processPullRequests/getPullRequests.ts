@@ -211,7 +211,7 @@ export async function getClosedPullRequest({
 }) {
   const graphqlWithAuth = getClient();
   const response = await graphqlWithAuth<GetPrCloserResponse>({
-    query: getPrsByUser,
+    query: getPrCloser,
     repo: repo.name,
     owner: repo.owner,
     prNumber: pullRequestNumber
