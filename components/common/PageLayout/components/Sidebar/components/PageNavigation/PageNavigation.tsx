@@ -72,6 +72,26 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
   const mappedItems = useMemo(() => {
     const mappedPages = pageTree.mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
+    const pageIds: string[] = []; // keep track of page ids to avoid duplicates
+    mappedPages.forEach((page, index) => {
+      pageIds.push(page.id);
+    });
+    mappedPages.forEach((page, index) => {
+      page.children = page.children.filter((child) => {
+        if (pageIds.includes(child.id)) {
+          return false;
+        }
+        pageIds.push(child.id);
+        child.children = child.children.filter((_child) => {
+          if (pageIds.includes(_child.id)) {
+            return false;
+          }
+          pageIds.push(_child.id);
+          return true;
+        });
+        return true;
+      });
+    });
     if (isFavorites) {
       return rootPageIds
         ?.map((id) => mappedPages.find((page) => page.id === id))
