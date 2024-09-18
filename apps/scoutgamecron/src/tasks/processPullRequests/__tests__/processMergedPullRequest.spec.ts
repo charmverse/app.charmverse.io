@@ -160,7 +160,6 @@ describe('processMergedPullRequest', () => {
         login: 'testuser'
       }
     };
-
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([
       {
         number: 1,
@@ -255,7 +254,6 @@ describe('processMergedPullRequest', () => {
         login: 'testuser'
       }
     };
-
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([
       {
         number: 1,
@@ -372,7 +370,6 @@ describe('processMergedPullRequest', () => {
         login: 'testuser'
       }
     };
-
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
     await processMergedPullRequest(pullRequest, githubRepo);
@@ -442,7 +439,6 @@ describe('processMergedPullRequest', () => {
         login: 'testuser'
       }
     };
-
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
     await processMergedPullRequest(pullRequest, githubRepo);
