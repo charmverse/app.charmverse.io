@@ -209,7 +209,7 @@ describe('processClosedPullRequest', () => {
       url: 'https://github.com/testuser/testrepo/pull/1'
     };
 
-    const repo = await prisma.githubRepo.create({
+    await prisma.githubRepo.create({
       data: {
         id: 1,
         defaultBranch: 'main',
@@ -225,5 +225,57 @@ describe('processClosedPullRequest', () => {
 
     const strike = await prisma.builderStrike.findFirst();
     expect(strike).toBeNull();
+  });
+
+  it('should not create a new github event if it was processed before', async () => {
+    const builder = await prisma.scout.create({
+      data: {
+        username: 'testuser',
+        displayName: 'Test User',
+        builder: true
+      }
+    });
+
+    const githubUser = await prisma.githubUser.create({
+      data: {
+        id: 1,
+        login: 'testuser',
+        builderId: builder.id
+      }
+    });
+
+    const repo = await prisma.githubRepo.create({
+      data: {
+        id: 1,
+        defaultBranch: 'main',
+        owner: 'testuser',
+        name: 'testrepo'
+      }
+    });
+
+    const pullRequest: PullRequest = {
+      number: 1,
+      baseRefName: 'main',
+      createdAt: new Date().toISOString(),
+      mergedAt: new Date().toISOString(),
+      title: 'Test PR',
+      state: 'CLOSED',
+      author: { id: githubUser.id, login: githubUser.login },
+      repository: { id: repo.id, nameWithOwner: `${repo.owner}/${repo.name}` },
+      url: 'https://github.com/testuser/testrepo/pull/1'
+    };
+
+    await processClosedPullRequest(pullRequest, repo);
+    await processClosedPullRequest(pullRequest, repo);
+    await processClosedPullRequest(pullRequest, repo);
+
+    const githubEventsCount = await prisma.githubEvent.count({
+      where: {
+        githubUser: {
+          id: githubUser.id
+        }
+      }
+    });
+    expect(githubEventsCount).toBe(1);
   });
 });

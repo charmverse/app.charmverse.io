@@ -14,7 +14,8 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
         some: {
           id: pullRequest.author.id
         }
-      }
+      },
+      builder: true
     },
     select: {
       id: true,
