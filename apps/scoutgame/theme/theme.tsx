@@ -61,7 +61,8 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
           main: inputBackgroundDarkMode
         },
         black: {
-          main: blackText
+          main: blackText,
+          dark: '#000'
         }
       }
     },
@@ -194,6 +195,23 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
             // '&:hover': {
             //   backgroundColor: 'darkpurple'
             // }
+          })
+        },
+        {
+          props: { variant: 'buy' },
+          style: ({ theme }) => ({
+            background: 'transparent',
+            borderRadius: '5px',
+            paddingTop: 2,
+            paddingBottom: 2,
+            paddingRight: 2,
+            paddingLeft: 2,
+            // fontSize: '0.9rem',
+            fontWeight: '600',
+            color: theme.palette.secondary.main,
+            borderStyle: 'solid',
+            borderWidth: '1px',
+            borderColor: theme.palette.secondary.main
           })
         }
       ],

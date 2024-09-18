@@ -15,7 +15,7 @@ export function Carousel({ items }: { items: any[] }) {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   return (
-    <Box display='flex' alignItems='center' justifyContent='center'>
+    <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
       <Box width='95svw' px={isMobile ? 0 : 4} position='relative'>
         <Swiper
           className='mySwiper'
