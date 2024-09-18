@@ -17,5 +17,8 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "exclude": ["jest.config.ts", "esbuild.config.ts"]
+  "exclude": [
+    "jest.config.ts",
+    "esbuild.config.ts"
+  ]
 }

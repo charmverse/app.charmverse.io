@@ -1,5 +1,6 @@
 import type { GithubRepo } from '@charmverse/core/prisma';
-import { graphql } from '@octokit/graphql';
+
+import { getClient } from './gqlClient';
 
 export type PullRequest = {
   baseRefName: string; // eg "main"
@@ -77,38 +78,6 @@ const getRecentPrs = `
   }
 `;
 
-type PullRequestByUser = {
-  baseRefName: string;
-  title: string;
-  number: number;
-  url: string;
-  closedAt: string;
-  createdAt: string;
-  mergedAt: string;
-  state: 'CLOSED' | 'MERGED';
-};
-
-const getPrsByUser = `
-  query ($filterQuery: String!) {
-    search(query: $filterQuery, type: ISSUE, first: 10) {
-      edges {
-        node {
-          ... on PullRequest {
-            baseRefName
-            title
-            number
-            url
-            closedAt
-            createdAt
-            mergedAt
-            state
-          }
-        }
-      }
-    }
-  }
-`;
-
 type Input = {
   after: Date;
   owner: string;
@@ -128,35 +97,6 @@ export async function getPullRequests({ repos, after }: { repos: RepoInput[]; af
     pullRequests.push(...repoPullRequests.filter((pr) => pr.baseRefName === repo.defaultBranch));
   }
   return pullRequests;
-}
-
-// Create an authenticated GraphQL client using your GitHub token
-function getClient() {
-  return graphql.defaults({
-    headers: {
-      Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`
-    }
-  });
-}
-
-// get the latest pull requests by a user
-export async function getRecentPullRequestsByUser({
-  repoNameWithOwner,
-  defaultBranch,
-  username
-}: {
-  repoNameWithOwner: string;
-  defaultBranch: string;
-  username: string;
-}): Promise<PullRequestByUser[]> {
-  const graphqlWithAuth = getClient();
-  const response = await graphqlWithAuth<{
-    search: { edges: EdgeNode<PullRequestByUser>[] };
-  }>({
-    query: getPrsByUser,
-    filterQuery: `repo:${repoNameWithOwner} is:pr author:${username}`
-  });
-  return response.search.edges.map((edge) => edge.node).filter((pr) => pr.baseRefName === defaultBranch);
 }
 
 async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promise<PullRequest[]> {

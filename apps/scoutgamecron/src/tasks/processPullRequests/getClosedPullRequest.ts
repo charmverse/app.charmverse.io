@@ -1,12 +1,6 @@
 import { graphql } from '@octokit/graphql';
 
-function getClient() {
-  return graphql.defaults({
-    headers: {
-      Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`
-    }
-  });
-}
+import { getClient } from './gqlClient';
 
 type GetPrCloserResponse = {
   repository: {
