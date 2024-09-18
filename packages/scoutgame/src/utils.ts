@@ -2,6 +2,8 @@ import { DateTime } from 'luxon';
 
 const timezone = 'America/New_York';
 
+export const currentSeason = 1;
+
 // Return the format of week
 export function getCurrentWeek() {
   return getFormattedWeek(new Date());

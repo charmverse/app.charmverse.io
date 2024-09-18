@@ -1,14 +1,13 @@
-import { DateTime } from 'luxon';
+import { getCurrentWeek, currentSeason } from '@packages/scoutgame/utils';
 
 import { saveBuilderEventsWithGems } from './saveBuilderEventsWithGems';
 import { saveGithubEvents } from './saveGithubEvents';
 
 export async function processPullRequests() {
-  const dt = DateTime.now();
-  const isoWeekNumber = dt.weekNumber.toString();
+  const week = getCurrentWeek();
   await saveGithubEvents();
   await saveBuilderEventsWithGems({
-    season: 1,
-    week: isoWeekNumber
+    season: currentSeason,
+    week
   });
 }
