@@ -1,7 +1,7 @@
 'use client';
 
-import type { Theme } from '@mui/material';
 import { Box, useMediaQuery } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
