@@ -62,7 +62,7 @@ export function ActivityTable({
               <TableCell align='right'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
                   <Stack sx={{ display: { xs: 'flex', md: 'none' } }}>{iconMap[row.notification.type]}</Stack>
-                  <Typography variant='caption' noWrap>
+                  <Typography variant='caption' noWrap maxWidth={{ xs: '150px', md: '100%' }}>
                     {row.notification.message}
                   </Typography>
                 </Stack>
