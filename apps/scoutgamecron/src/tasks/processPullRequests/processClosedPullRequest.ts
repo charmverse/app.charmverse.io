@@ -17,6 +17,12 @@ export async function processClosedPullRequest(pullRequest: PullRequest) {
     }
   });
   if (builder) {
+    const ogStrikes = await prisma.builderStrike.count({
+      where: {
+        builderId: builder.id
+      }
+    });
+
     await prisma.githubEvent.upsert({
       where: {
         unique_github_event: {
@@ -42,18 +48,20 @@ export async function processClosedPullRequest(pullRequest: PullRequest) {
       }
     });
 
-    log.info('Recorded a closed PR', { userId: builder.id, url: pullRequest.url, strikes });
+    if (ogStrikes < strikes) {
+      log.info('Recorded a closed PR', { userId: builder.id, url: pullRequest.url, strikes });
 
-    if (strikes >= 3) {
-      await prisma.scout.update({
-        where: {
-          id: builder.id
-        },
-        data: {
-          bannedAt: new Date()
-        }
-      });
-      log.info('Banned builder', { userId: builder.id, strikes });
+      if (strikes >= 3) {
+        await prisma.scout.update({
+          where: {
+            id: builder.id
+          },
+          data: {
+            bannedAt: new Date()
+          }
+        });
+        log.info('Banned builder', { userId: builder.id, strikes });
+      }
     }
   }
 }
