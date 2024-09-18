@@ -5,6 +5,8 @@ import { InvalidStateError } from '@root/lib/middleware';
 import { getUserProfile } from '@root/lib/profile/getUser';
 import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { sessionUserRelations } from '@root/lib/session/config';
+import { softDeleteUserWithoutConnectableIdentities } from '@root/lib/users/softDeleteUserWithoutConnectableIdentities';
+import { updateUsedIdentity } from '@root/lib/users/updateUsedIdentity';
 import { DisabledAccountError, ExternalServiceError } from '@root/lib/utils/errors';
 
 export async function connectFarcaster({
@@ -36,12 +38,24 @@ export async function connectFarcaster({
     }
 
     if (farcasterUser.userId !== userId) {
-      log.warn('Farcaster already connected to another account', {
-        fid,
-        userId,
-        connectedUserId: farcasterUser.userId
+      await prisma.$transaction(async (tx) => {
+        await updateUsedIdentity(farcasterUser.userId, undefined, tx);
+        await softDeleteUserWithoutConnectableIdentities({ userId: farcasterUser.userId, newUserId: userId, tx });
+        await tx.farcasterUser.update({
+          where: {
+            fid: farcasterUser.fid
+          },
+          data: {
+            userId
+          }
+        });
+        log.warn('Connecting Farcaster identity to a new account', {
+          fid,
+          userId,
+          connectedUserId: farcasterUser.userId
+        });
       });
-      throw new InvalidStateError('Farcaster already connected to another account');
+      return getUserProfile('id', userId);
     }
 
     return farcasterUser.user;
