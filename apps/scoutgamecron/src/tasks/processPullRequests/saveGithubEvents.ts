@@ -26,12 +26,6 @@ export async function saveGithubEvents() {
   }
 
   for (const repo of githubRepos) {
-    const pullRequests = await getRecentClosedOrMergedPRs({
-      owner: repo.owner,
-      repo: repo.name,
-      after: last24Hours
-    });
-
     for (const pullRequest of pullRequests) {
       const githubUser = githubUsersRecord[pullRequest.author.login];
 
