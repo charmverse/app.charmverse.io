@@ -44,7 +44,7 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
       where: {
         unique_github_event: {
           pullRequestNumber: pullRequest.number,
-          createdBy: pullRequest.author.login,
+          createdBy: pullRequest.author.id,
           type: 'closed_pull_request',
           repoId: pullRequest.repository.id
         }
@@ -53,7 +53,7 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
         pullRequestNumber: pullRequest.number,
         title: pullRequest.title,
         type: pullRequest.state === 'CLOSED' ? 'closed_pull_request' : 'merged_pull_request',
-        createdBy: pullRequest.author.login,
+        createdBy: pullRequest.author.id,
         repoId: pullRequest.repository.id,
         url: pullRequest.url,
         strike: ignoreStrike

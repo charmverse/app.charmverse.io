@@ -210,3 +210,9 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
 
   return allRecentPRs;
 }
+
+// getRecentClosedOrMergedPRs({
+//   after: new Date('2024-09-16'),
+//   owner: 'charmverse',
+//   repo: 'app.charmverse.io'
+// }).then(console.log);

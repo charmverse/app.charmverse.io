@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getFormattedWeek, getWeekStartEnd, timezone, currentSeason } from '@packages/scoutgame/utils';
+import { getFormattedWeek, getWeekStartEnd, timezone, currentSeason, isSameDay } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 
 import { getRecentPullRequestsByUser, type PullRequest } from './getPullRequests';
@@ -14,7 +14,7 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
   const week = getFormattedWeek(pullRequestDate);
   const thisWeeksEvents = await prisma.githubEvent.findMany({
     where: {
-      createdBy: pullRequest.author.login,
+      createdBy: pullRequest.author.id,
       createdAt: {
         gte: start.toJSDate(),
         lte: end.toJSDate()
@@ -30,12 +30,12 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
   });
   const previousEventCount = await prisma.githubEvent.count({
     where: {
-      createdBy: pullRequest.author.login,
+      createdBy: pullRequest.author.id,
       repoId: pullRequest.repository.id
     }
   });
-  let isFirstCommit = previousEventCount === 0;
-  if (isFirstCommit) {
+  let isFirstMergedPullRequest = previousEventCount === 0;
+  if (isFirstMergedPullRequest) {
     // double-check usign Github API in case the previous PR was not recorded by us
     const prs = await getRecentPullRequestsByUser({
       defaultBranch: repo.defaultBranch,
@@ -43,22 +43,23 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
       username: pullRequest.author.login
     });
     if (prs.filter((pr) => pr.number !== pullRequest.number).length > 0) {
-      isFirstCommit = false;
+      isFirstMergedPullRequest = false;
     }
   }
   const previousEventToday = thisWeeksEvents.some((event) => {
     if (event.repoId !== pullRequest.repository.id) {
       return false;
     }
-    const eventDay = DateTime.fromJSDate(event.createdAt, { zone: timezone }).startOf('day');
-    return eventDay.equals(DateTime.now().setZone(timezone).startOf('day'));
+
+    return isSameDay(event.createdAt);
   });
   await prisma.$transaction(async (tx) => {
     const githubUser = await tx.githubUser.upsert({
       where: {
-        login: pullRequest.author.login
+        id: pullRequest.author.id
       },
       create: {
+        id: pullRequest.author.id,
         login: pullRequest.author.login
       },
       update: {}
@@ -67,7 +68,7 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
       where: {
         unique_github_event: {
           pullRequestNumber: pullRequest.number,
-          createdBy: pullRequest.author.login,
+          createdBy: pullRequest.author.id,
           type: 'merged_pull_request',
           repoId: pullRequest.repository.id
         }
@@ -76,16 +77,16 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
         pullRequestNumber: pullRequest.number,
         title: pullRequest.title,
         type: 'merged_pull_request',
-        createdBy: pullRequest.author.login,
-        isFirstCommit,
+        createdBy: pullRequest.author.id,
+        isFirstPullRequest: isFirstMergedPullRequest,
         repoId: pullRequest.repository.id,
         url: pullRequest.url
       },
       update: {}
     });
     if (githubUser.builderId && !previousEventToday) {
-      const builderType = isFirstCommit ? 'first_pr' : 'regular_pr';
-      const gemValue = builderType === 'first_pr' ? 10 : 1;
+      const gemReceiptType = isFirstMergedPullRequest ? 'first_pr' : 'regular_pr';
+      const gemValue = gemReceiptType === 'first_pr' ? 10 : 1;
       await tx.builderEvent.upsert({
         where: {
           githubEventId: event.id
@@ -98,7 +99,7 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
           githubEventId: event.id,
           gemsReceipt: {
             create: {
-              type: builderType,
+              type: gemReceiptType,
               value: gemValue
             }
           }
