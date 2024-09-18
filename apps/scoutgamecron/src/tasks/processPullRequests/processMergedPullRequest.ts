@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFormattedWeek, getWeekStartEnd, timezone, currentSeason } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
@@ -112,6 +113,7 @@ export async function processMergedPullRequest(pullRequest: PullRequest) {
           gemsCollected
         }
       });
+      log.info('Recorded a merged PR', { userId: githubUser.builderId, url: pullRequest.url, gemsCollected });
     }
   });
 }
