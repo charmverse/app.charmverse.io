@@ -156,7 +156,7 @@ export async function getRecentPullRequestsByUser({
     query: getPrsByUser,
     filterQuery: `repo:${repoNameWithOwner} is:pr author:${username}`
   });
-  return response.search.edges.map((edge) => edge.node);
+  return response.search.edges.map((edge) => edge.node).filter((pr) => pr.baseRefName === defaultBranch);
 }
 
 async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promise<PullRequest[]> {
