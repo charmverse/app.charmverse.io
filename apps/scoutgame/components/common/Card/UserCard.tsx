@@ -61,7 +61,7 @@ export function UserCard({ withDetails, user }: { withDetails: boolean; user: an
         </CardActionArea>
       </Box>
       <Box display='flex' justifyContent='center' pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }} px={{ xs: 2, md: 0 }}>
-        <Button fullWidth LinkComponent={Link} href={`/u/${user.id}/checkout`} variant='buy'>
+        <Button fullWidth LinkComponent={Link} href={`/u/${user.username}/checkout`} variant='buy'>
           ${user.price}
         </Button>
       </Box>

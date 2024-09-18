@@ -9,6 +9,7 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { Avatar } from '../Avatar';
 
@@ -97,7 +98,7 @@ export function LeaderboardTable({
               </TableCell>
               {!isMobile && (
                 <TableCell>
-                  <Button fullWidth variant='buy'>
+                  <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${row.user.username}/checkout`}>
                     ${row.price || 0}
                   </Button>
                 </TableCell>
