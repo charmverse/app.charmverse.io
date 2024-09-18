@@ -1,3 +1,4 @@
+import type { GithubRepo } from '@charmverse/core/prisma';
 import { graphql } from '@octokit/graphql';
 
 export type PullRequest = {
@@ -10,6 +11,9 @@ export type PullRequest = {
     login: string;
   };
   number: number;
+  repository: {
+    id: string;
+  };
 };
 
 type PullRequestEdge = {
@@ -49,6 +53,9 @@ const getRecentPrs = `
             author {
               login
             }
+            repository {
+              id
+            }
             number
           }
           cursor
@@ -67,6 +74,19 @@ type Input = {
   owner: string;
   repo: string;
 };
+
+export async function getPullRequests({ repos, after }: { repos: Pick<GithubRepo, 'name' | 'owner'>[]; after: Date }) {
+  const pullRequests: PullRequest[] = [];
+  for (const repo of repos) {
+    const repoPullRequests = await getRecentClosedOrMergedPRs({
+      owner: repo.owner,
+      repo: repo.name,
+      after
+    });
+    pullRequests.push(...repoPullRequests);
+  }
+  return pullRequests;
+}
 
 export async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promise<PullRequest[]> {
   // Create an authenticated GraphQL client using your GitHub token
