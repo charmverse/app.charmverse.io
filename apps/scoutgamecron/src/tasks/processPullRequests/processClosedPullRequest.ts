@@ -37,7 +37,13 @@ export async function processClosedPullRequest(pullRequest: PullRequest) {
         title: pullRequest.title,
         type: pullRequest.state === 'CLOSED' ? 'closed_pull_request' : 'merged_pull_request',
         createdBy: pullRequest.author.login,
-        repoId: pullRequest.repository.id
+        repoId: pullRequest.repository.id,
+        url: pullRequest.url,
+        strikes: {
+          create: {
+            builderId: builder.id
+          }
+        }
       },
       update: {}
     });
