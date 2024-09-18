@@ -11,31 +11,21 @@ async function updateProjects() {
   //console.log(applications.slice(0, 3).map((p) => p.project.repos));
 
   for (let application of applications) {
-    const org = application.project.organization?.organization;
-    if (org) {
-      const match = findProposalMatch(application.project.id, proposals);
-      if (!match) {
-        throw new Error('No match for: ' + application.project.id);
-      }
-      await upsertProposalFormAnswers({
-        proposalId: match.proposal!.id,
-        answers: [
-          {
-            fieldId: fieldIds['Organization ID'],
-            value: org.id
-          },
-          {
-            fieldId: fieldIds['Organization Name'],
-            value: org.name
-          },
-          {
-            fieldId: fieldIds['Organization Description'],
-            value: charmValue(org.description)
-          }
-        ]
-      });
-      console.log('Updated proposal. Path:', '/' + match.path);
+    const attestationId = application.attestationId;
+    const match = findProposalMatch(application.project.id, proposals);
+    if (!match) {
+      throw new Error('No match for: ' + application.project.id);
     }
+    await upsertProposalFormAnswers({
+      proposalId: match.proposal!.id,
+      answers: [
+        {
+          fieldId: fieldIds['Attestation ID'],
+          value: attestationId
+        }
+      ]
+    });
+    console.log('Updated proposal. Path:', '/' + match.path);
   }
 
   console.log('Done!');
