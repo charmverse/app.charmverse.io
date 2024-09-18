@@ -9,13 +9,14 @@ import { CarouselContainer } from 'components/common/Carousel/CarouselContainer'
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { HomeTab } from 'components/common/Tabs/HomeTab';
 import { HomeTabsMenu } from 'components/common/Tabs/HomeTabsMenu';
+import { LoadingBanner } from 'components/layout/Loading/LoadinBanner';
 import { LoadingCards } from 'components/layout/Loading/LoadingCards';
 import { LoadingTable } from 'components/layout/Loading/LoadingTable';
 
 export async function HomePage({ user, tab }: { user: Scout | null; tab: string }) {
   return (
     <>
-      <Suspense fallback={null}>
+      <Suspense fallback={<LoadingBanner />}>
         <HeaderMessage />
       </Suspense>
       <Box p={1}>
