@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-const timezone = 'America/New_York';
+export const timezone = 'America/New_York';
 
 export const currentSeason = 1;
 
@@ -12,6 +12,18 @@ export function getCurrentWeek() {
 // get the number of the current week, with Sunday being the first day of the week in New York time
 export function getFormattedWeek(date: Date): string {
   return formatWeek(getWeek(date));
+}
+
+export function getWeekStartEnd(date: Date) {
+  const newYorkDate = DateTime.fromJSDate(date, { zone: timezone });
+
+  // Shift the weekday to make Sunday the first day of the week
+  const dayOfWeek = newYorkDate.weekday % 7; // Sunday = 0, Monday = 1, ..., Saturday = 6
+
+  // Find the start of the week (Sunday)
+  const startOfWeek = newYorkDate.minus({ days: dayOfWeek }).startOf('day');
+  const endOfWeek = startOfWeek.plus({ days: 7 });
+  return { start: startOfWeek, end: endOfWeek };
 }
 
 function formatWeek({ year, week }: { year: number; week: number }) {

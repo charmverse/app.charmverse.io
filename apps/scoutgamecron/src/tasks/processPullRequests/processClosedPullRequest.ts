@@ -19,7 +19,8 @@ export async function processClosedPullRequest(pullRequest: PullRequest) {
   if (builder) {
     const ogStrikes = await prisma.builderStrike.count({
       where: {
-        builderId: builder.id
+        builderId: builder.id,
+        deletedAt: null
       }
     });
 
@@ -39,7 +40,7 @@ export async function processClosedPullRequest(pullRequest: PullRequest) {
         createdBy: pullRequest.author.login,
         repoId: pullRequest.repository.id,
         url: pullRequest.url,
-        strikes: {
+        strike: {
           create: {
             builderId: builder.id
           }
@@ -50,7 +51,8 @@ export async function processClosedPullRequest(pullRequest: PullRequest) {
 
     const strikes = await prisma.builderStrike.count({
       where: {
-        builderId: builder.id
+        builderId: builder.id,
+        deletedAt: null
       }
     });
 
