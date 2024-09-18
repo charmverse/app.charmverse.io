@@ -30,7 +30,7 @@ async function getProjectsController(req: NextApiRequest, res: NextApiResponse<O
   });
 
   if (!user || !user.farcasterUser) {
-    throw new InvalidInputError('User does not have a farcaster account.');
+    return res.status(200).json([]);
   }
 
   const fid = user.farcasterUser.fid;

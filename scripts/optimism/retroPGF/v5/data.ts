@@ -19,6 +19,7 @@ export const applicationsFile = '../__data/optimism/RPGF5 applications.json';
 
 // Schema for the JSON file provided by Optimism
 export type RetroApplication = {
+  attestationId: string;
   category: {
     name: string;
   };
@@ -87,7 +88,8 @@ export const fieldIds = {
     '609eba50-1eb9-41bc-bb5b-5e68da17e485',
   'Project Pricing Model': '9c89cff5-37ba-4366-9ed8-78bb3f295917',
   'Funding Received': 'b67d9a01-7e3b-4cb3-90b1-02ea684a7f43',
-  'Attestation ID': '5ba1196b-3adf-4653-9e98-1bd566880b91', // the project id
+  'Attestation ID': '525ab299-2537-44a5-989f-d7b329844279',
+  'Project ID': '5ba1196b-3adf-4653-9e98-1bd566880b91',
   'Additional Links': '2c2a4640-0c6c-419a-bd2c-23130c389cde',
   'Github Repos': '93eed6d0-7c30-46b6-a345-c230f7b5f76e',
   'Organization ID': '38c925cc-d384-4059-bc7a-9192e40bf415',

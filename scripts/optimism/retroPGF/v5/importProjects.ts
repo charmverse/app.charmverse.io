@@ -26,7 +26,12 @@ import {
 // 50 requests/minute for Public tier - https://www.ankr.com/docs/rpc-service/service-plans/#rate-limits
 const rateLimiter = RateLimit(1);
 
-function _getFormAnswers({ category, project, impactStatementAnswer }: RetroApplication): FieldAnswerInput[] {
+function _getFormAnswers({
+  attestationId,
+  category,
+  project,
+  impactStatementAnswer
+}: RetroApplication): FieldAnswerInput[] {
   const funding = project.funding.map(
     (funding) =>
       `${funding.amount || 'N/A'} - ${
@@ -55,7 +60,8 @@ function _getFormAnswers({ category, project, impactStatementAnswer }: RetroAppl
     },
     { fieldId: fieldIds['Project Pricing Model'], value: project.pricingModel },
     { fieldId: fieldIds['Project Pricing Model Details'], value: charmValue(project.pricingModelDetails) },
-    { fieldId: fieldIds['Attestation ID'], value: project.id },
+    { fieldId: fieldIds['Attestation ID'], value: attestationId },
+    { fieldId: fieldIds['Project ID'], value: project.id },
     { fieldId: fieldIds['Additional Links'], value: charmLinks(project.links) },
     { fieldId: fieldIds['Funding Received'], value: charmValues(funding) }
   ];
@@ -133,11 +139,22 @@ async function importOpProjects() {
         console.error(`Farcaster profile not found for ${farcasterId}`);
         continue;
       }
-      const connectedAddresses = farcasterProfile?.connectedAddresses;
-      let charmverseUserWithAddress: User | null = null;
 
-      if (connectedAddresses && connectedAddresses.length) {
-        charmverseUserWithAddress = await prisma.user.findFirst({
+      let userId: string | undefined;
+
+      const connectedAddresses = farcasterProfile.connectedAddresses;
+
+      const charmverseUserWithFarcaster = await prisma.user.findFirst({
+        where: {
+          farcasterUser: {
+            fid: parseInt(farcasterId)
+          }
+        }
+      });
+      if (charmverseUserWithFarcaster) {
+        userId = charmverseUserWithFarcaster.id;
+      } else if (connectedAddresses.length) {
+        const charmverseUserWithAddress = await prisma.user.findFirst({
           where: {
             wallets: {
               some: {
@@ -148,12 +165,14 @@ async function importOpProjects() {
             }
           }
         });
+        if (charmverseUserWithAddress) {
+          userId = charmverseUserWithAddress.id;
+        }
       }
-
-      if (!charmverseUserWithAddress) {
-        charmverseUserWithAddress = await prisma.user.create({
+      if (!userId) {
+        const newUser = await prisma.user.create({
           data: {
-            username: farcasterProfile?.body.username || farcasterId,
+            username: farcasterProfile.body.username || farcasterId,
             path: uuid(),
             claimed: false,
             identityType: 'Farcaster',
@@ -161,6 +180,12 @@ async function importOpProjects() {
               create: connectedAddresses.map((address) => ({
                 address
               }))
+            },
+            farcasterUser: {
+              create: {
+                fid: parseInt(farcasterId),
+                account: farcasterProfile
+              }
             }
             // spaceRoles: {
             //   create: [
@@ -171,10 +196,11 @@ async function importOpProjects() {
             // }
           }
         });
+        userId = newUser.id;
       }
 
-      if (charmverseUserWithAddress && authorIds.indexOf(charmverseUserWithAddress.id) === -1) {
-        authorIds.push(charmverseUserWithAddress.id);
+      if (userId && authorIds.indexOf(userId) === -1) {
+        authorIds.push(userId);
       }
     }
 

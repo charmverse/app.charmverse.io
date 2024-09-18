@@ -34,7 +34,7 @@ export type DatabaseProposals = Awaited<ReturnType<typeof getProposals>>;
 
 export function findProposalMatch(opProjectId: string, proposals: DatabaseProposals) {
   return proposals.find(
-    (r) => r.proposal?.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])?.value === opProjectId
+    (r) => r.proposal?.formAnswers.find((a) => a.fieldId === fieldIds['Project ID'])?.value === opProjectId
   );
 }
 
