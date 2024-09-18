@@ -2,7 +2,7 @@ import { getSession } from '@connect-shared/lib/session/getSession';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const privateLinks = ['/profile', '/scout', '/notifications', '/u'];
+const privateLinks = ['/profile', '/scout', '/notifications'];
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();
