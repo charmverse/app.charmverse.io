@@ -26,14 +26,17 @@ export function LeaderboardTable({
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
-    <TableContainer component={Paper} sx={{ pt: 2 }}>
+    <TableContainer component={Paper} sx={{ mt: 2 }}>
       <Table aria-label='Leaderboard table' size='small'>
         <TableHead>
           <TableRow
             sx={{
               [`& .${tableCellClasses.root}`]: {
                 borderBottom: 'none',
-                paddingLeft: 0
+                paddingLeft: 0,
+                '&:first-child': {
+                  paddingLeft: 1
+                }
               }
             }}
           >
@@ -43,7 +46,7 @@ export function LeaderboardTable({
               </TableCell>
             ) : (
               <>
-                <TableCell sx={{ paddingLeft: 1 }}>RANK</TableCell>
+                <TableCell align='center'>RANK</TableCell>
                 <TableCell>BUILDER</TableCell>
                 <TableCell>SEASON 1 WEEK 1 DAY 1</TableCell>
                 <TableCell sx={{ maxWidth: '100px', pr: 0 }} align='right'>
@@ -63,10 +66,10 @@ export function LeaderboardTable({
                 '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
               }}
             >
-              <TableCell scope='row'>
+              <TableCell align='center'>
                 <Typography color={index + 1 <= 3 ? 'text.secondary' : undefined}>{index + 1}</Typography>
               </TableCell>
-              <TableCell component='th' scope='row' sx={{ maxWidth: { xs: '150px', md: '100%' } }}>
+              <TableCell component='th' sx={{ maxWidth: { xs: '150px', md: '100%' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
                   <Avatar src={row.user.avatar} name={row.user.username} size='small' />
                   <Typography variant='caption' noWrap>

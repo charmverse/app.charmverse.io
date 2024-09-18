@@ -11,11 +11,15 @@ declare module '@mui/material/styles' {
   export interface Palette extends MuiPalette {
     inputBackground: MuiPalette['primary'];
     black: MuiPalette['primary'];
+    orange: MuiPalette['primary'];
+    green: MuiPalette['primary'];
   }
 
   export interface PaletteOptions extends MuiPaletteOptions {
     inputBackground: MuiPaletteOptions['primary'];
     black: MuiPaletteOptions['primary'];
+    orange: MuiPaletteOptions['primary'];
+    green: MuiPaletteOptions['primary'];
   }
 }
 

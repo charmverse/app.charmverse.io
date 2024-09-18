@@ -22,7 +22,7 @@ export function ActivityTable({
   }[];
 }) {
   return (
-    <TableContainer component={Paper} sx={{ py: 2 }}>
+    <TableContainer component={Paper} sx={{ mt: 2 }}>
       <Table aria-label='Activity table' size='small'>
         <TableHead sx={{ display: { xs: 'none', md: 'table-header-group' } }}>
           <TableRow
@@ -54,7 +54,7 @@ export function ActivityTable({
               <TableCell component='th' scope='row'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
                   <Avatar src={row.user.avatar} name={row.user.username} size='small' />
-                  <Typography variant='caption' noWrap maxWidth='70px'>
+                  <Typography variant='caption' noWrap maxWidth={{ xs: '70px', md: '100%' }}>
                     {row.user.username}
                   </Typography>
                 </Stack>

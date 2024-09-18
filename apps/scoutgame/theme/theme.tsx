@@ -63,6 +63,12 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         black: {
           main: blackText,
           dark: '#000'
+        },
+        orange: {
+          main: '#FFAC81'
+        },
+        green: {
+          main: '#85FF9E'
         }
       }
     },
@@ -92,6 +98,12 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         },
         black: {
           main: blackText
+        },
+        orange: {
+          main: '#FFAC81'
+        },
+        green: {
+          main: '#85FF9E'
         }
       }
     }
