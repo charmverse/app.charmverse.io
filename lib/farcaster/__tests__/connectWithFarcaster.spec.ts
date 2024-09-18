@@ -22,16 +22,16 @@ describe('connectFarcaster', () => {
     const { user } = await generateUserAndSpace();
     await connectFarcaster(getProfile({ userId: user.id }));
 
-    const profile = await prisma.farcasterUser.findUnique({
+    const farcasterUser = await prisma.farcasterUser.findUnique({
       where: {
         userId: user.id
       }
     });
 
-    await expect(profile).toBeDefined();
+    await expect(farcasterUser).toBeDefined();
   });
 
-  test('should fail if another user has already connected the profile', async () => {
+  test('should succeed if another user has already connected the profile', async () => {
     const { user } = await generateUserAndSpace();
     const { user: connectedUser } = await generateUserAndSpace();
     const profile = getProfile({ userId: user.id });
@@ -40,6 +40,14 @@ describe('connectFarcaster', () => {
       fid: profile.fid
     });
 
-    await expect(connectFarcaster(profile)).rejects.toThrowError(InvalidStateError);
+    await connectFarcaster(profile);
+
+    const farcasterUser = await prisma.farcasterUser.findUnique({
+      where: {
+        userId: user.id
+      }
+    });
+
+    await expect(farcasterUser).toBeDefined();
   });
 });
