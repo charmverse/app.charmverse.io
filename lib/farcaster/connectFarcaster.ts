@@ -38,12 +38,22 @@ export async function connectFarcaster({
     }
 
     if (farcasterUser.userId !== userId) {
-      await updateUsedIdentity(farcasterUser.userId, undefined);
-      await softDeleteUserWithoutConnectableIdentities({ userId: farcasterUser.userId, newUserId: userId });
-      log.warn('Connecting Farcaster identity to a new account', {
-        fid,
-        userId,
-        connectedUserId: farcasterUser.userId
+      await prisma.$transaction(async (tx) => {
+        await updateUsedIdentity(farcasterUser.userId, undefined, tx);
+        await softDeleteUserWithoutConnectableIdentities({ userId: farcasterUser.userId, newUserId: userId, tx });
+        await tx.farcasterUser.update({
+          where: {
+            fid: farcasterUser.fid
+          },
+          data: {
+            userId
+          }
+        });
+        log.warn('Connecting Farcaster identity to a new account', {
+          fid,
+          userId,
+          connectedUserId: farcasterUser.userId
+        });
       });
       return getUserProfile('id', userId);
     }
