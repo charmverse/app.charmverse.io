@@ -7,8 +7,19 @@ jest.unstable_mockModule('../getClosedPullRequest', () => ({
   getClosedPullRequest: jest.fn()
 }));
 
-const { processClosedPullRequest } = await import('../processClosedPullRequest');
+jest.unstable_mockModule('@packages/github/client', () => ({
+  octokit: {
+    rest: {
+      issues: {
+        createComment: jest.fn()
+      }
+    }
+  }
+}));
+
 const { getClosedPullRequest } = await import('../getClosedPullRequest');
+const { processClosedPullRequest } = await import('../processClosedPullRequest');
+const { octokit } = await import('@packages/github/client');
 
 describe('processClosedPullRequest', () => {
   beforeEach(async () => {
@@ -66,8 +77,7 @@ describe('processClosedPullRequest', () => {
       url: 'https://github.com/testuser/testrepo/pull/1'
     };
 
-    (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: 'otheruser' });
-
+    (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: 'testuser-2' });
     await processClosedPullRequest(pullRequest, repo);
 
     const githubEvent = await prisma.githubEvent.findFirstOrThrow({
@@ -83,6 +93,7 @@ describe('processClosedPullRequest', () => {
       where: { builderId: builder.id }
     });
     expect(strike).toBeDefined();
+    expect(octokit.rest.issues.createComment).toHaveBeenCalled();
   });
 
   it('should not create a strike if the PR was closed by the author', async () => {
@@ -140,6 +151,7 @@ describe('processClosedPullRequest', () => {
       where: { builderId: builder.id }
     });
     expect(strike).toBeNull();
+    expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
   });
 
   it('should ban a builder after 3 strikes', async () => {
@@ -194,6 +206,7 @@ describe('processClosedPullRequest', () => {
       where: { id: builder.id }
     });
     expect(bannedBuilder.bannedAt).toBeDefined();
+    expect(octokit.rest.issues.createComment).toHaveBeenCalled();
   });
 
   it('should not process a pull request for a non-existent builder', async () => {
@@ -225,6 +238,7 @@ describe('processClosedPullRequest', () => {
 
     const strike = await prisma.builderStrike.findFirst();
     expect(strike).toBeNull();
+    expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
   });
 
   it('should not create a new github event if it was processed before', async () => {
@@ -265,6 +279,8 @@ describe('processClosedPullRequest', () => {
       url: 'https://github.com/testuser/testrepo/pull/1'
     };
 
+    (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: 'testuser-2' });
+
     await processClosedPullRequest(pullRequest, repo);
     await processClosedPullRequest(pullRequest, repo);
     await processClosedPullRequest(pullRequest, repo);
@@ -277,5 +293,6 @@ describe('processClosedPullRequest', () => {
       }
     });
     expect(githubEventsCount).toBe(1);
+    expect(octokit.rest.issues.createComment).toHaveBeenCalledTimes(1);
   });
 });

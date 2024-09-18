@@ -52,6 +52,7 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
 
     if (existingGithubEvent) {
       log.debug('Ignore CLOSED PR since it was already processed', { url: pullRequest.url });
+      return;
     }
 
     await prisma.githubEvent.create({
