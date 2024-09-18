@@ -13,7 +13,8 @@ export async function processPullRequests() {
   const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const timer = DateTime.now();
   const pullRequests = await getPullRequests({ repos, after: last24Hours });
-  log.info(`Got ${pullRequests.length} pull requests in ${timer.diff(DateTime.now(), 'minutes')} minutes`);
+
+  log.info(`Retrieved ${pullRequests.length} pull requests in ${timer.diff(DateTime.now(), 'minutes')} minutes`);
 
   for (const pullRequest of pullRequests) {
     if (pullRequest.state === 'CLOSED') {
