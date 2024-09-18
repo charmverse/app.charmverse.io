@@ -55,7 +55,7 @@ export function getPointsEarnedAsBuilder(builderId: string, receipts: (PointsRec
   return receipts.reduce<number>((acc, receipt) => {
     if (receipt.recipientId === builderId) {
       // receipt from github events by builder
-      if (receipt.event.type === 'github_event' && receipt.event.builderId === builderId) {
+      if (receipt.event.type === 'merged_pull_request' && receipt.event.builderId === builderId) {
         return acc + receipt.value;
       }
     }
@@ -68,7 +68,7 @@ export function getPointsEarnedAsScout(scoutId: string, receipts: (PointsReceipt
   return receipts.reduce<number>((acc, receipt) => {
     if (receipt.recipientId === scoutId) {
       // receipt from github events by someone else
-      if (receipt.event.type === 'github_event' && receipt.event.builderId !== scoutId) {
+      if (receipt.event.type === 'merged_pull_request' && receipt.event.builderId !== scoutId) {
         return acc + receipt.value;
       }
       // receipt for payout

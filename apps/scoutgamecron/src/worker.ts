@@ -14,11 +14,16 @@ function addTask(path: string, handler: (ctx: Koa.DefaultContext) => any) {
   router.post(path, async (ctx) => {
     log.info(`${path} triggered`, { body: ctx.body, headers: ctx.headers });
 
-    const result = await handler(ctx);
+    try {
+      const result = await handler(ctx);
 
-    log.info(`${path} completed`);
+      log.info(`${path} completed`);
 
-    ctx.body = result || { success: true };
+      ctx.body = result || { success: true };
+    } catch (error) {
+      log.error('Error processing task', { path, error });
+      throw error;
+    }
   });
 }
 
