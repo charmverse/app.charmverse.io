@@ -1,5 +1,5 @@
 import type { MemberProperty, Role, Space } from '@charmverse/core/prisma';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import request from 'supertest';
 
 import { createMemberPropertyPermission } from 'lib/members/createMemberPropertyPermission';

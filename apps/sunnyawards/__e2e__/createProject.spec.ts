@@ -5,6 +5,7 @@ import { expect, test } from 'playwright/test';
 
 import { loginBrowserUser } from './utils/loginBrowserUser';
 
+// We are skipping this test because SUNNYs aware submissions are disabled
 test('Create a project and view details', async ({ page }) => {
   const projectData = {
     projectFormName: 'Acme Inc',

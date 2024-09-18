@@ -64,7 +64,7 @@ export function TemplatesMenu<T extends TemplateItem>({
     <Menu
       {...bindMenu(popupState)}
       disablePortal
-      onClose={popupState.close}
+      onClose={() => popupState.close()}
       anchorEl={anchorEl}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       transformOrigin={{ vertical: 'top', horizontal: 'center' }}

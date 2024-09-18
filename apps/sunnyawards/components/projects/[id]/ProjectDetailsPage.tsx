@@ -15,13 +15,16 @@ export async function ProjectDetailsPage({ project }: { project: ConnectProjectD
   const session = await getSession();
   const projectMembers = project.projectMembers;
 
-  const isCurrentUserTeamLead = projectMembers.some((member) => member.teamLead && member.userId === session?.user?.id);
+  const isCurrentUserTeamLead =
+    projectMembers.some((member) => member.teamLead && member.userId === session?.user?.id) ||
+    project.createdBy === session.user?.id;
 
   return (
     <PageWrapper
       header={<ProjectHeader name={project.name} avatar={project.avatar} coverImage={project.coverImage} />}
       footer={!session?.user?.id && <JoinTheSunnysBanner />}
     >
+      {/** Edit button disabled as sunny awards submissions are suspended now */}
       <ProjectDetails project={project} showEditButton={isCurrentUserTeamLead} />
       <Divider sx={{ my: 2 }} />
       <Typography variant='h6'>Members</Typography>

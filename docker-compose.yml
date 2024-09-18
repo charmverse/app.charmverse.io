@@ -67,10 +67,19 @@ services:
     profiles:
       - stg-webapp
 
+  prd-ceramic:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'node ./apps/ceramic/dist/ceramic-client.js']
+    ports:
+      - '5001:5001'
+    profiles:
+      - prd-ceramic
+
   stg-ceramic:
     extends:
       service: defaults
-    command: ['sh', '-c', 'node ./dist/ceramic-client.js']
+    command: ['sh', '-c', 'node ./apps/ceramic/dist/ceramic-client.js']
     ports:
       - '5001:5001'
     profiles:
@@ -105,6 +114,26 @@ services:
       - REACT_APP_APP_ENV=staging
     profiles:
       - stg-scoutgame
+
+  prd-scoutgamecron:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command: ['npm', 'run', 'scoutgamecron:prod']
+    profiles:
+      - prd-scoutgamecron
+
+  stg-scoutgamecron:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command: ['npm', 'run', 'scoutgamecron:staging']
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-scoutgamecron
 
   prd-comingsoon:
     extends:
@@ -184,36 +213,27 @@ services:
     profiles:
       - stg-sunnyawards
 
-  prd-ceramic:
-    extends:
-      service: defaults
-    command: ['sh', '-c', 'node ./dist/ceramic-client.js']
-    ports:
-      - '5001:5001'
-    profiles:
-      - prd-ceramic
-
   prd-sockets:
     extends:
       service: defaults
     ports:
       - '80:3000'
-    command: ['sh', '-c', 'node ./dist/initWebsockets.js']
+    command: ['sh', '-c', 'node ./apps/websockets/dist/initWebsockets.js']
     profiles:
       - prd-sockets
 
   stg-sockets:
     extends:
       service: defaults
-    command: ['sh', '-c', 'node ./dist/initWebsockets.js']
+    command: ['sh', '-c', 'node ./apps/websockets/dist/initWebsockets.js']
     ports:
-      - '3002:3000'
+      - '80:3000'
     environment:
       - REACT_APP_APP_ENV=staging
       - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
       - stg-sockets
-      - stg-webapp
+      #- stg-webapp
 
   prd-farcaster:
     extends:
@@ -267,6 +287,7 @@ services:
       - HOST=permissions-api
     profiles:
       - stg-webapp
+      - stg-sockets
 
   localpostgres:
     image: postgres

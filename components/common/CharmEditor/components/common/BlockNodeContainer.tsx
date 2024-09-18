@@ -1,5 +1,5 @@
 import type { SxProps, Theme } from '@mui/material';
-import { ListItem } from '@mui/material';
+import { ListItemButton } from '@mui/material';
 
 import BlockAligner from '../BlockAligner';
 
@@ -22,8 +22,7 @@ export function BlockNodeContainer({
 }: EmptyContentProps) {
   return (
     <BlockAligner readOnly={readOnly} onDelete={onDelete} onDragStart={onDragStart}>
-      <ListItem
-        button
+      <ListItemButton
         sx={{
           backgroundColor: isSelected ? 'var(--charmeditor-active)' : 'background.light',
           p: 2,
@@ -34,7 +33,7 @@ export function BlockNodeContainer({
         }}
       >
         {children}
-      </ListItem>
+      </ListItemButton>
     </BlockAligner>
   );
 }

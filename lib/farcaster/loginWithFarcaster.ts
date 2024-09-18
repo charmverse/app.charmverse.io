@@ -5,10 +5,10 @@ import { getChainById } from '@root/connectors/chains';
 import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError } from '@root/lib/middleware';
-import { getUserProfile } from '@root/lib/users/getUser';
+import { getUserProfile } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { postUserCreate } from '@root/lib/users/postUserCreate';
 import { InvalidInputError } from '@root/lib/utils/errors';
-import type { LoggedInUser } from '@root/models';
 import { optimism } from 'viem/chains';
 
 import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';

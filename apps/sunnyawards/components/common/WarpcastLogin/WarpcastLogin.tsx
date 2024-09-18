@@ -8,7 +8,7 @@ import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePath
 import { loginWithFarcasterAction } from '@connect-shared/lib/session/loginAction';
 import { AuthKitProvider, useProfile } from '@farcaster/auth-kit';
 import type { AuthClientError, StatusAPIResponse } from '@farcaster/auth-kit';
-import { Box, Button, Link, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import type { ButtonProps } from '@mui/material';
 import { warpcastConfig } from '@root/lib/farcaster/config';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -81,7 +81,7 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
       >
         {children || 'Sign in with Warpcast'}
       </Button>
-      <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />
+      <FarcasterLoginModal open={popupState.isOpen} onClose={() => popupState.close()} url={url} />
       {hasErrored && <Typography variant='body2'>There was an error while logging in</Typography>}
     </Box>
   );
@@ -91,22 +91,10 @@ export function WarpcastLogin() {
   const trackEvent = useTrackEvent();
   return (
     <AuthKitProvider config={warpcastConfig}>
-      <WarpcastLoginButton />
-      <Link
-        variant='body2'
-        href='https://www.farcaster.xyz/'
-        target='_blank'
-        rel='noopener'
-        color='text.primary'
-        fontWeight={500}
-        display='block'
-        onMouseDown={() => {
-          trackEvent('click_dont_have_farcaster_account');
-        }}
-      >
-        Don't have a Farcaster account?
-      </Link>
-      ;
+      <Stack gap={1}>
+        <WarpcastLoginButton />
+        <Typography variant='caption'>seamlessly apply for retro funding with the same project</Typography>
+      </Stack>
     </AuthKitProvider>
   );
 }

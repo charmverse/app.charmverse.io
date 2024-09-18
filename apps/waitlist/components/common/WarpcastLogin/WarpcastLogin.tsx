@@ -9,16 +9,24 @@ import { AuthKitProvider, useProfile } from '@farcaster/auth-kit';
 import type { AuthClientError, StatusAPIResponse } from '@farcaster/auth-kit';
 import { Box, Button, Link, Typography, lighten } from '@mui/material';
 import type { ButtonProps } from '@mui/material';
-import { warpcastConfig } from '@root/lib/farcaster/config';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
+import { optimism } from 'viem/chains';
 
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
 import { loginWithFarcasterAction } from 'lib/session/loginAction';
 
 import { WarpcastIcon } from './WarpcastIcon';
+
+const warpcastConfig = {
+  relay: 'https://relay.farcaster.xyz',
+  rpcUrl: 'https://mainnet.optimism.io',
+  domain: 'scoutgame.xyz',
+  siweUri: 'https://waitlist.scoutgame.xyz',
+  provider: optimism
+};
 
 // Farcaster specific
 export const farcasterBrandColor = '#8465CB';
@@ -91,7 +99,7 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
       >
         {children || 'Sign in with Warpcast'}
       </Button>
-      <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />
+      <FarcasterLoginModal open={popupState.isOpen} onClose={() => popupState.close()} url={url} />
       {hasErrored && <Typography variant='body2'>There was an error while logging in</Typography>}
     </Box>
   );

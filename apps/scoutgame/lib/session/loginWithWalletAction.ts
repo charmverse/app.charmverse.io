@@ -1,10 +1,9 @@
 'use server';
 
 import { actionClient } from 'lib/actions/actionClient';
+import { authSchema } from 'lib/blockchain/config';
 import { findOrCreateWalletUser } from 'lib/blockchain/findOrCreateWalletUser';
 import { verifyWalletSignature } from 'lib/blockchain/verifyWallet';
-
-import { authSchema } from '../blockchain/config';
 
 import { saveSession } from './saveSession';
 

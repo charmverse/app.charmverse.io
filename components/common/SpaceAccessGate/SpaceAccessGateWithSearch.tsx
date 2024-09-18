@@ -74,7 +74,7 @@ export function SpaceAccessGateWithSearch({ defaultValue, goBack }: Props) {
             <ArrowBackIosNewIcon />
           </IconButton>
         )}
-        Join an existing space
+        Search by name
       </FieldLabel>
       <Autocomplete<Space>
         disablePortal

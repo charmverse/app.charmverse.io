@@ -15,7 +15,6 @@
       "@root/connectors/*": ["./connectors/*"],
       "@root/config/*": ["./config/*"],
       "@root/lib/*": ["./lib/*"],
-      "@root/models": ["./models"],
       "@charmverse/core/prisma": [
         "node_modules/@charmverse/core/dist/esm/prisma"
       ],

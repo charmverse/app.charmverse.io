@@ -16,6 +16,7 @@ import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 
 import { CopyLink } from './CopyLink';
 import { TestConnectionModal } from './TestConnectionModal';
+import { TokenGateMessageButton } from './TokenGateMessageButton';
 import { TokenGateTableRow } from './TokenGatesTableRow';
 
 interface Props {
@@ -49,10 +50,14 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
         <Table size='small' aria-label='Token gates table'>
           <TableHead>
             <StyledTableRow>
-              <TableCell sx={{ padding: isMobile ? '20px 0 20px 16px' : '20px 16px' }} colSpan={isMobile ? 2 : 0}>
-                <Typography variant='body1' fontWeight='600'>
+              <TableCell
+                sx={{ display: 'flex', gap: 3, p: 2, paddingRight: isMobile ? 0 : 2 }}
+                colSpan={isMobile ? 2 : 0}
+              >
+                <Typography noWrap lineHeight='30px' variant='body1' fontWeight='600'>
                   Token Gated Link
                 </Typography>
+                <TokenGateMessageButton />
               </TableCell>
               {!isMobile && <TableCell width={150} />}
               <TableCell sx={{ width: 90 + padding }} align='center'>

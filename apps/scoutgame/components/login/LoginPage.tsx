@@ -1,47 +1,51 @@
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import { Box } from '@mui/material';
-import MuiLink from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
+import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import { SinglePageLayout } from 'components/common/Layout';
-import { WalletLogin } from 'components/common/WalletLogin/WalletLogin';
-import { WalletProvider } from 'components/common/WalletLogin/WalletProvider';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
+import { InfoWrapper } from 'components/layout/InfoWrapper';
 
-export function LoginPage({ successPath }: { successPath: string }) {
+export function LoginPage() {
   return (
-    <SinglePageLayout>
-      <Image
-        src='/images/geral_waving.png'
-        width={250}
-        height={200}
-        sizes='100vw'
-        style={{
-          maxWidth: '400px',
-          height: 'auto'
+    <InfoWrapper>
+      <Box
+        display='flex'
+        flexDirection='column'
+        alignItems='center'
+        maxWidth='100vw'
+        border='none'
+        borderRadius='0'
+        textAlign='center'
+        bgcolor='transparent'
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          my: 0,
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
+          minHeight: 'calc(100svh - 100px)'
         }}
-        alt='Charmverse Connect homepage'
-      />
-      <Typography data-test='connect-home-page' align='center' variant='h4'>
-        Charm Connect: The Home for Builders
-      </Typography>
-      <Typography align='center'>Endorse Builders, Connect with opportunities and get Rewarded.</Typography>
-      <WalletProvider>
-        <WalletLogin successPath={successPath} />
-      </WalletProvider>
-      <WarpcastLogin successPath={successPath} />
-      <MuiLink
-        variant='body2'
-        href='https://www.farcaster.xyz/'
-        target='_blank'
-        rel='noopener'
-        color='text.primary'
-        fontWeight={500}
-        display='block'
       >
-        Don't have a Farcaster account?
-      </MuiLink>
-    </SinglePageLayout>
+        <Image
+          src='/images/scout-game-logo-square.png'
+          width={400}
+          height={200}
+          sizes='100vw'
+          style={{
+            width: '100%',
+            maxWidth: '400px',
+            height: 'auto'
+          }}
+          alt='ScoutGame'
+        />
+        <Box>
+          <Typography variant='h5' mb={2} fontWeight='700'>
+            Scout. Build. Win.
+          </Typography>
+        </Box>
+        <Box display='flex' flexDirection='column' gap={3} width='100%'>
+          <WarpcastLogin />
+        </Box>
+      </Box>
+    </InfoWrapper>
   );
 }

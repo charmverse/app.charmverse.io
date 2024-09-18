@@ -1,15 +1,21 @@
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma-client';
+import type { ConnectWaitlistSlot, Prisma } from '@charmverse/core/prisma-client';
+import { PrismaClient, prisma } from '@charmverse/core/prisma-client';
 import { roundNumberInRange } from '@root/lib/utils/numbers';
+import { prettyPrint } from '@root/lib/utils/strings';
 
 import type { ConnectWaitlistTier, TierChange, TierDistributionType } from './constants';
 import { tierDistribution, getTier } from './constants';
 import { notifyNewScore } from './notifyNewScore';
 
-export type TierChangeResult = {
-  fid: number;
+// const prisma = new PrismaClient({
+//   log: ['query']
+// });
+
+export type TierChangeResult = Pick<ConnectWaitlistSlot, 'fid' | 'username' | 'percentile' | 'score'> & {
   newTier: ConnectWaitlistTier;
   tierChange: TierChange;
+  // Narrow fields to non null
   percentile: number;
   score: number;
 };
@@ -34,7 +40,28 @@ export function getTierChange({
 }
 
 export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[]> {
-  const totalUsers = await prisma.connectWaitlistSlot.count();
+  const scorableUserQuery: Prisma.ConnectWaitlistSlotWhereInput = {
+    isPartnerAccount: {
+      not: true
+    },
+    OR: [
+      {
+        githubLogin: {
+          not: null
+        }
+      },
+      {
+        referralsGenerated: {
+          some: {}
+        }
+      }
+    ]
+  };
+
+  const totalUsers = await prisma.connectWaitlistSlot.count({
+    where: scorableUserQuery
+  });
+
   const onePercentSize = Math.max(totalUsers / 100, 1);
   const tierChangeResults: TierChangeResult[] = [];
 
@@ -44,16 +71,21 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
     const tierInfo = tierDistribution.find((t) => t.tier === tier) as TierDistributionType;
     const take = tierInfo.tier === 'common' ? undefined : Math.ceil(tierInfo.totalPercentSize * onePercentSize);
 
-    const users = await prisma.connectWaitlistSlot.findMany({
+    const usersWithinTier = await prisma.connectWaitlistSlot.findMany({
       orderBy: { score: 'asc' },
+      where: scorableUserQuery,
       skip: offset,
       take
     });
 
+    const totalUsersInTier = usersWithinTier.length;
+
     // Group users by percentile
     const usersByPercentile: { [percentile: number]: number[] } = {};
 
-    for (let i = 0; i < users.length; i++) {
+    for (let i = 0; i < totalUsersInTier; i++) {
+      const currentUser = usersWithinTier[i];
+
       // We need an adjust min max as otherwise we get bad numbers for very small ranges
       const currentPercentile = roundNumberInRange({
         num: 100 - ((offset + i + 1) / totalUsers) * 100,
@@ -61,14 +93,14 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
         min: tierInfo.threshold
       });
 
-      const previousPercentile = users[i].percentile ?? 0;
+      const previousPercentile = currentUser.percentile ?? 0;
 
       // Only consider users whose percentile has changed
       if (currentPercentile !== previousPercentile) {
         if (!usersByPercentile[currentPercentile]) {
           usersByPercentile[currentPercentile] = [];
         }
-        usersByPercentile[currentPercentile].push(users[i].fid);
+        usersByPercentile[currentPercentile].push(currentUser.fid);
 
         const { currentTier, tierChange } = getTierChange({
           previousPercentile,
@@ -77,11 +109,12 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
 
         if (tierChange !== 'none') {
           tierChangeResults.push({
-            fid: users[i].fid,
+            fid: currentUser.fid,
             newTier: currentTier,
             tierChange,
             percentile: currentPercentile,
-            score: users[i].score
+            score: currentUser.score,
+            username: currentUser.username
           });
         }
       }
@@ -97,22 +130,28 @@ export async function refreshPercentilesForEveryone(): Promise<TierChangeResult[
       }
     }
 
-    offset += users.length;
+    offset += totalUsersInTier;
   }
+
+  await prisma.connectWaitlistSlot.updateMany({
+    where: {
+      isPartnerAccount: true,
+      percentile: {
+        not: 100
+      }
+    },
+    data: {
+      percentile: 100
+    }
+  });
 
   return tierChangeResults;
 }
 
 export function handleTierChanges(tierChangeResults: TierChangeResult[]) {
   return tierChangeResults.map((tierChangeResult) =>
-    notifyNewScore({
-      fid: tierChangeResult.fid,
-      tier: tierChangeResult.newTier,
-      tierChange: tierChangeResult.tierChange
-    }).catch((error) => {
+    notifyNewScore(tierChangeResult).catch((error) => {
       log.error(`Failed to notify tier change for fid:${tierChangeResult.fid}`, { error, fid: tierChangeResult.fid });
     })
   );
 }
-
-// refreshPercentilesForEveryone().then(console.log);

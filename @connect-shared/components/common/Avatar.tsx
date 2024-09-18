@@ -115,7 +115,7 @@ export function Avatar({
   return (
     <MuiAvatar
       sx={{
-        backgroundColor: stringToColor(nameStr),
+        backgroundColor: nameStr ? stringToColor(nameStr) : undefined,
         ...hexagonStyles,
         ...getAvatarCustomStyles(variant, size),
         ...sx

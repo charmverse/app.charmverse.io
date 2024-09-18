@@ -1,8 +1,6 @@
 import type { PageNodeWithChildren } from '@charmverse/core/pages';
 import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
-import ExpandMoreIcon from '@mui/icons-material/ArrowDropDown'; // ExpandMore
-import ChevronRightIcon from '@mui/icons-material/ArrowRight'; // ChevronRight
 import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 
@@ -16,13 +14,13 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
-import type { NewPageInput } from 'lib/pages';
-import { addPageAndRedirect } from 'lib/pages';
+import type { NewPageInput } from 'lib/pages/addPage';
+import { addPageAndRedirect } from 'lib/pages/addPage';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import type { PageMeta } from 'lib/pages/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
-import { NavIconHover } from './components/NavIconHover';
+import { NavIconHoverCollapse, NavIconHoverExpand } from './components/NavIconHover';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';
 import TreeNode from './components/TreeNode';
 import { TreeRoot } from './components/TreeRoot';
@@ -74,6 +72,26 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
   const mappedItems = useMemo(() => {
     const mappedPages = pageTree.mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
+    const pageIds: string[] = []; // keep track of page ids to avoid duplicates
+    mappedPages.forEach((page, index) => {
+      pageIds.push(page.id);
+    });
+    mappedPages.forEach((page, index) => {
+      page.children = page.children.filter((child) => {
+        if (pageIds.includes(child.id)) {
+          return false;
+        }
+        pageIds.push(child.id);
+        child.children = child.children.filter((_child) => {
+          if (pageIds.includes(_child.id)) {
+            return false;
+          }
+          pageIds.push(_child.id);
+          return true;
+        });
+        return true;
+      });
+    });
     if (isFavorites) {
       return rootPageIds
         ?.map((id) => mappedPages.find((page) => page.id === id))
@@ -247,33 +265,12 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
 
   return (
     <TreeRoot
-      expanded={expanded ?? []}
+      expandedItems={expanded ?? []}
       // @ts-ignore - we use null instead of undefined to control the element
       selected={selectedNodeId}
-      onNodeToggle={onNodeToggle}
+      onExpandedItemsChange={onNodeToggle}
       aria-label='items navigator'
-      defaultCollapseIcon={
-        <NavIconHover
-          width={{ xs: 30, md: 20 }}
-          height={{ xs: 30, md: 20 }}
-          display='flex'
-          alignItems='center'
-          justifyContent='center'
-        >
-          <ExpandMoreIcon fontSize='large' />
-        </NavIconHover>
-      }
-      defaultExpandIcon={
-        <NavIconHover
-          width={{ xs: 30, md: 20 }}
-          height={{ xs: 30, md: 20 }}
-          display='flex'
-          alignItems='center'
-          justifyContent='center'
-        >
-          <ChevronRightIcon fontSize='large' />
-        </NavIconHover>
-      }
+      slots={{ expandIcon: NavIconHoverCollapse, collapseIcon: NavIconHoverExpand }}
       isFavorites={isFavorites}
     >
       {mappedItems.map((item) => (

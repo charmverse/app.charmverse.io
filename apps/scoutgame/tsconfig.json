@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "outDir": "../../dist/apps/scoutgame",
     "rootDir": "../../",
     "lib": ["dom", "dom.iterable", "esnext", "webworker"],
     "allowJs": true,
@@ -21,7 +20,6 @@
     ],
     "paths": {
       "@connect-shared/*": ["../../@connect-shared/*"],
-      "@root/charmClient/*": ["../../charmClient/*"],
       "apiClient/*": ["./apiClient/*"],
       "components/*": ["./components/*"],
       "hooks/*": ["./hooks/*"],
@@ -34,7 +32,6 @@
       "@root/connectors/*": ["../../connectors/*"],
       "@root/lib/*": ["../../lib/*"],
       "@root/hooks/*": ["../../hooks/*"],
-      "@root/models": ["../../models"],
       "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
       "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
       "@charmverse/core/shared": ["../../node_modules/@charmverse/core/dist/cjs/shared"],

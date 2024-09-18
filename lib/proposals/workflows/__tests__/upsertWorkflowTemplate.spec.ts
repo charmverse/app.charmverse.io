@@ -1,4 +1,3 @@
-import type { ProposalEvaluationTestInput } from '@charmverse/core/dist/cjs/lib/testing/proposals';
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
@@ -197,7 +196,7 @@ describe('Saving space workflows', () => {
       ]
     });
 
-    const evaluationInputs: ProposalEvaluationTestInput[] = [
+    const evaluationInputs: testUtilsProposals.GenerateProposalInput['evaluationInputs'] = [
       {
         title: 'Review',
         evaluationType: 'pass_fail',

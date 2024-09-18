@@ -28,7 +28,7 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-fatq9v-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-1dk25s0-MuiSvgIcon-root"
                     data-testid="SubjectIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -40,13 +40,13 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
                 </div>
                 <span
                   aria-label="Title"
-                  class="MuiTypography-root MuiTypography-subtitle1 css-1to5392-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-subtitle1 css-11pj8uf-MuiTypography-root"
                   data-mui-internal-clone-element="true"
                 >
                   Title
                 </span>
                 <button
-                  class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-10xxybu-MuiButtonBase-root-MuiIconButton-root"
+                  class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-rjdjdi-MuiButtonBase-root-MuiIconButton-root"
                   tabindex="0"
                   type="button"
                 />
@@ -73,7 +73,7 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
           <span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
               data-test="add-table-prop"
               data-testid="AddIcon"
               focusable="false"

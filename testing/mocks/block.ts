@@ -1,8 +1,9 @@
+import type { UIBlockWithDetails } from '@root/lib/databases/block';
+import type { Board } from '@root/lib/databases/board';
+import type { BoardView } from '@root/lib/databases/boardView';
+import type { Card } from '@root/lib/databases/card';
+
 import { TestBlockFactory } from 'components/common/DatabaseEditor/test/testBlockFactory';
-import type { UIBlockWithDetails } from 'lib/databases/block';
-import type { Board } from 'lib/databases/board';
-import type { BoardView } from 'lib/databases/boardView';
-import type { Card } from 'lib/databases/card';
 
 export function createMockBoard(): Board {
   return TestBlockFactory.createBoard();

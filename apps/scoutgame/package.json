@@ -7,7 +7,7 @@
     "start:test": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 dotenv -e ../../.env.test.local npx next dev",
     "build": "npx next build",
     "start:prod": "npx next start",
-    "test": "dotenv -e .env.test.local --override -- npx jest --maxWorkers=2 --passWithNoTests",
+    "test": "npx jest --maxWorkers=2 --passWithNoTests",
     "start:test:ci": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 npx react-env --path ../../.env.test.local --dest ./public -- npx next start",
     "lint": "npx next lint",
     "debug:e2e": "npx dotenv -e ../../.env.test.local -- npx playwright test --headed --config ./playwright.config.ts",
@@ -17,15 +17,14 @@
   "dependencies": {
     "@decent.xyz/box-hooks": "^3.2.1",
     "@hookform/resolvers": "^3.6.0",
-    "@mui/material-nextjs": "^5.16.6",
+    "@packages/github": "file:../../packages/github",
+    "@packages/scoutgame": "^0.0.0",
     "@serwist/next": "^9.0.5",
-    "@tanstack/react-query": "^5.52.2",
     "@typeschema/yup": "^0.13.3",
     "framer-motion": "^11.3.17",
-    "next-safe-action": "^7.4.2",
+    "next-safe-action": "~7.4.2",
     "server-only": "^0.0.1",
-    "viem": "^2.20.1",
-    "wagmi": "^2.12.7"
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@types/web-push": "^3.6.3",

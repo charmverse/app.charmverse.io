@@ -1,9 +1,19 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
 import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constants';
 import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
+
+import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
+import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
+import { refreshUserScore } from 'lib/scoring/refreshUserScore';
+import { embedFarcasterUser } from 'lib/session/embedFarcasterUser';
+
+function generateRedirectUrl(errorMessage: string) {
+  return `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent(errorMessage)}`;
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -14,7 +24,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `/builders?connect_error=${encodeURIComponent('Connection cancelled')}`
+        Location: generateRedirectUrl('Connection cancelled')
       }
     });
   }
@@ -29,7 +39,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `/builders?connect_error=${encodeURIComponent('Invalid connection url')}`
+        Location: generateRedirectUrl('Invalid connection url')
       }
     });
   }
@@ -42,7 +52,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent('User required')}`
+        Location: generateRedirectUrl('User required')
       }
     });
   }
@@ -57,7 +67,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent('User not found')}`
+        Location: generateRedirectUrl('User not found')
       }
     });
   }
@@ -83,9 +93,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent(
-          'Failed to authenticate Github account'
-        )}`
+        Location: generateRedirectUrl('Failed to authenticate Github account')
       }
     });
   }
@@ -103,7 +111,7 @@ export async function GET(req: NextRequest) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent('Failed to fetch Github user')}`
+        Location: generateRedirectUrl('Failed to fetch Github user')
       }
     });
   }
@@ -114,14 +122,29 @@ export async function GET(req: NextRequest) {
     }
   });
 
+  // Account already in use by another user
   if (existingConnection?.githubLogin && existingConnection.fid !== connectWaitlistSlot.fid) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${process.env.DOMAIN}/builders?connect_error=${encodeURIComponent('Account is already in use')}`
+        Location: generateRedirectUrl('Account is already in use')
       }
     });
   }
+
+  // Account already connected
+  if (existingConnection?.githubLogin === githubLogin) {
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: `${process.env.DOMAIN}/score`
+      }
+    });
+  }
+
+  trackWaitlistMixpanelEvent('connect_github_success', {
+    userId: deterministicV4UUIDFromFid(connectWaitlistSlot.fid)
+  });
 
   await prisma.connectWaitlistSlot.update({
     where: {
@@ -132,10 +155,20 @@ export async function GET(req: NextRequest) {
     }
   });
 
+  await refreshUserScore({ fid: connectWaitlistSlot.fid });
+
+  refreshPercentilesForEveryone().then(handleTierChanges);
+
+  const sealedData = await embedFarcasterUser({
+    fid: connectWaitlistSlot.fid.toString(),
+    username: connectWaitlistSlot.username || '',
+    hasJoinedWaitlist: true
+  });
+
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${process.env.DOMAIN}/score`
+      Location: `${process.env.DOMAIN}/score?${sealedData}`
     }
   });
 }

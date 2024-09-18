@@ -8,7 +8,7 @@ import { generateProposalWorkflow } from 'testing/utils/proposals';
 import { getUserProposals } from '../getUserProposals';
 
 describe('getUserProposals() - authored', () => {
-  it('Should fetch authored proposals for the user without any hidden evaluation', async () => {
+  it('Should fetch authored proposals for the user without any hidden evaluation, ignoring archived proposals', async () => {
     const { space } = await generateUserAndSpace({
       isAdmin: false
     });
@@ -26,6 +26,13 @@ describe('getUserProposals() - authored', () => {
       userId: proposalAuthor.id,
       authors: [proposalAuthor.id],
       proposalStatus: 'published'
+    });
+    const publishedArchivedProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalAuthor.id,
+      authors: [proposalAuthor.id],
+      proposalStatus: 'published',
+      archived: true
     });
     const proposalAuthorProposals = await getUserProposals({
       spaceId: space.id,
@@ -153,6 +160,27 @@ describe('getUserProposals() - actionable', () => {
       spaceId: space.id,
       userId: proposalAuthor.id,
       authors: [proposalAuthor.id],
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'rubric',
+          title: 'Rubric',
+          reviewers: [
+            {
+              group: 'role',
+              id: reviewerRole.id
+            }
+          ],
+          permissions: []
+        }
+      ]
+    });
+
+    const roleReviewerArchivedProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalAuthor.id,
+      authors: [proposalAuthor.id],
+      archived: true,
       proposalStatus: 'published',
       evaluationInputs: [
         {

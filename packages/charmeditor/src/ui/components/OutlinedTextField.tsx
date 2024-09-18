@@ -1,11 +1,10 @@
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
 
 // this component can be used to replicate the appearance of an MUI TextFIeld
 // Check the element with class .MuiOutlinedInput-root for reference
-export const OutlinedTextField = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'error'
-})<{ error?: boolean }>`
+export const OutlinedTextField = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'error' && prop !== 'rows'
+})<{ error?: boolean; rows?: number }>`
   font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
   font-weight: 400;
   font-size: 1rem;
@@ -17,6 +16,7 @@ export const OutlinedTextField = styled(Box, {
   color: var(--charm-palette-text-primary);
   border: 1px solid var(--input-border);
   ${({ error }) => (error ? 'border-color: var(--charm-palette-error-main);' : '')}
+  ${({ rows }) => (rows ? `min-height: ${2 * rows}em;` : '')}
 
   &:hover {
     border-color: var(--charm-palette-text-primary);

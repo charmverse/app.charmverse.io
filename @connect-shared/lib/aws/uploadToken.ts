@@ -14,6 +14,7 @@ if (!bucket) {
   missingKeys.push('S3_UPLOAD_BUCKET');
 }
 
+// @ts-ignore
 const validCharacters = /^[\000-\177]*$/;
 
 export async function uploadToken(filename: string, userId: string) {

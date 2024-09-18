@@ -1,0 +1,16 @@
+{
+  "name": "websockets",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "build": "npx tsx esbuild.config.ts",
+    "start": "tsx watch src/initWebsockets.ts",
+    "start:prod": "node ./dist/initWebsockets.js",
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest",
+    "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
+  },
+  "dependencies": {
+    "@packages/charmeditor": "^1.0.0"
+  }
+}

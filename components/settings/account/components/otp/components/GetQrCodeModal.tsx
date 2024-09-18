@@ -37,4 +37,4 @@ export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>,
   );
 }
 
-export const GetQrCodeModal = forwardRef(CustomModal);
+export const GetQrCodeModal = forwardRef<HTMLDivElement, Omit<ModalProps, 'children'>>(CustomModal);

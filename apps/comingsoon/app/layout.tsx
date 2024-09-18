@@ -8,46 +8,28 @@ import theme from 'theme/theme';
 import 'theme/styles.scss';
 
 const appName = 'Scout Game';
-const appTitle = 'Onchain builder network';
-const appTitleTemplate = '%s - Scout Game';
-const appDescription = 'Onchain network for connecting web3 developers, projects, organizations';
 
 export const metadata: Metadata = {
   applicationName: appName,
   icons: {
-    icon: ['/images/favicon.png'],
-    apple: ['/images/favicon.png']
+    icon: ['/favicon.ico'],
+    apple: ['/favicon.ico']
   },
-  title: {
-    default: `${appName} - ${appTitle}`,
-    template: appTitleTemplate
-  },
-  description: appDescription,
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: appTitle
-    // startUpImage: [],
-  },
+  title: appName,
   formatDetection: {
     telephone: false
   },
   openGraph: {
     type: 'website',
     siteName: appName,
-    title: {
-      default: appTitle,
-      template: appTitleTemplate
-    },
-    description: appDescription
+    images: 'https://scoutgame.xyz/images/manifest/scoutgame-logo-256.png',
+    title: appName,
+    description: 'Scout. Build. Win.'
   },
   twitter: {
     card: 'summary',
-    title: {
-      default: appTitle,
-      template: appTitleTemplate
-    },
-    description: appDescription
+    title: appName,
+    description: 'Scout. Build. Win.'
   }
 };
 export const viewport: Viewport = {

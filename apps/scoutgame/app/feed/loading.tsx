@@ -1,11 +1,10 @@
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-
+import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 import { FeedListSkeleton } from 'components/feed/components/FeedListSkeleton';
 
 export default function Loading() {
   return (
-    <PageWrapper>
+    <SinglePageWrapper>
       <FeedListSkeleton />
-    </PageWrapper>
+    </SinglePageWrapper>
   );
 }

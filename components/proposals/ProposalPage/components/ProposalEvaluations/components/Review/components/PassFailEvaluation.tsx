@@ -38,6 +38,7 @@ export type PassFailEvaluationProps = {
     group: string;
     id: string;
   }[];
+  showReviewerIdentities: boolean;
   isSubmittingReview: boolean;
   evaluationReviews?: {
     id: string;
@@ -71,6 +72,7 @@ export function PassFailEvaluation({
   archived,
   onSubmitEvaluationReview,
   hideReviewer,
+  showReviewerIdentities,
   reviewerOptions,
   isSubmittingReview,
   evaluationReviews = [],
@@ -175,7 +177,11 @@ export function PassFailEvaluation({
                 <Stack key={evaluationReview.id} gap={1.5}>
                   <Stack direction='row' justifyContent='space-between' alignItems='center'>
                     <Stack direction='row' gap={1} alignItems='center'>
-                      <UserDisplay userId={evaluationReview.reviewerId} avatarSize='xSmall' />
+                      <UserDisplay
+                        userId={evaluationReview.reviewerId}
+                        avatarSize='xSmall'
+                        anonymize={!showReviewerIdentities}
+                      />
                       <Typography variant='subtitle1'>
                         {getRelativeTimeInThePast(new Date(evaluationReview.completedAt))}
                       </Typography>

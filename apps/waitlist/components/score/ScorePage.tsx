@@ -59,8 +59,7 @@ export function ScorePage({
         <Typography variant='h5' mb={2} fontWeight='700'>
           Let's race to the top!
         </Typography>
-        <Stack
-          component={FadeIn}
+        <FadeIn
           width='100%'
           borderColor='secondary.main'
           borderRadius='5px'
@@ -70,7 +69,7 @@ export function ScorePage({
         >
           <ScoreTier waitlistSlot={waitlistSlot} />
           <ProgressBar from={0} to={waitlistSlot.percentile ?? 0} />
-        </Stack>
+        </FadeIn>
         <Typography variant='h5' my={2} fontWeight='700' color='secondary'>
           Move up the Waitlist!
         </Typography>

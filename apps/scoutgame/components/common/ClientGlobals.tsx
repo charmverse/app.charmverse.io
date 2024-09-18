@@ -1,6 +1,5 @@
 'use client';
 
-import { useDarkTheme } from '@connect-shared/hooks/useDarkTheme';
 import { usePageView } from '@connect-shared/hooks/usePageView';
 import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 
@@ -8,6 +7,5 @@ import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 export function ClientGlobals({ userId }: { userId?: string }) {
   useDatadogLogger({ service: 'scoutgame-browser', userId });
   usePageView();
-  useDarkTheme();
   return null;
 }

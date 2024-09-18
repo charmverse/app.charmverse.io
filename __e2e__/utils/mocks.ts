@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from '@ethersproject/wallet';
 import type { Page as BrowserPage } from '@playwright/test';
 import { baseUrl } from '@root/config/constants';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { v4 as uuid } from 'uuid';
 
 import { STATIC_PAGES } from 'lib/features/constants';

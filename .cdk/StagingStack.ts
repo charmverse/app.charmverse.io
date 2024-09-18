@@ -3,13 +3,23 @@ import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import { Construct } from 'constructs';
+import { Options } from './ProductionStack';
+import { defaultHealthCheck } from './ProductionStack';
 
 const domain = 'charmverse.co';
 
-type CustomOptions = { options?: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] };
-
 export class StagingStack extends Stack {
-  constructor(scope: Construct, appName: string, props: StackProps, { options = [] }: CustomOptions = {}) {
+  constructor(
+    scope: Construct,
+    appName: string,
+    props: StackProps,
+    {
+      healthCheck = defaultHealthCheck,
+      environmentTier = 'WebServer',
+      environmentType = 'LoadBalanced',
+      instanceType = 't3a.small,t3.small'
+    }: Options = {}
+  ) {
     super(scope, appName, props);
 
     const webAppZipArchive = new s3assets.Asset(this, 'WebAppZip', {
@@ -63,7 +73,7 @@ export class StagingStack extends Stack {
       {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
-        value: 'LoadBalanced'
+        value: environmentType
       },
       {
         namespace: 'aws:elasticbeanstalk:environment',
@@ -80,31 +90,35 @@ export class StagingStack extends Stack {
         optionName: 'ConfigDocument',
         value: JSON.stringify(healthReportingSystemConfig)
       },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'Protocol',
-        value: 'HTTPS'
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'ListenerEnabled',
-        value: 'true'
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'SSLCertificateArns',
-        value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
-      },
-      {
-        namespace: 'aws:elbv2:listener:443',
-        optionName: 'SSLPolicy',
-        value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
-      },
+      ...(environmentType === 'LoadBalanced'
+        ? [
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'Protocol',
+              value: 'HTTPS'
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'ListenerEnabled',
+              value: 'true'
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'SSLCertificateArns',
+              value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
+            },
+            {
+              namespace: 'aws:elbv2:listener:443',
+              optionName: 'SSLPolicy',
+              value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
+            }
+          ]
+        : []),
       {
         // add security group to access
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'SecurityGroups',
-        value: 'staging-db-client'
+        value: 'default,staging-db-client'
       },
       {
         namespace: 'aws:autoscaling:launchconfiguration',
@@ -129,20 +143,34 @@ export class StagingStack extends Stack {
       {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
-        value: 't3a.small,t3.small'
+        value: instanceType
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'HealthCheckPath',
+        value: healthCheck.path
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'MatcherHTTPCode',
+        value: '200'
+      },
+      {
+        namespace: 'aws:elasticbeanstalk:environment:process:default',
+        optionName: 'Port',
+        value: healthCheck.port?.toString() || '80'
       },
       {
         // ALB health check
         namespace: 'aws:elasticbeanstalk:application',
         optionName: 'Application Healthcheck URL',
-        value: '/api/health'
+        value: healthCheck.path
       },
       {
         namespace: 'aws:elasticbeanstalk:application:environment',
         optionName: 'DOMAIN',
         value: 'https://' + deploymentDomain
-      },
-      ...options
+      }
     ];
 
     const resourceTags: CfnTag[] = [
@@ -167,32 +195,48 @@ export class StagingStack extends Stack {
       solutionStackName: '64bit Amazon Linux 2 v3.5.0 running Docker',
       optionSettings: optionSettingProperties,
       tags: resourceTags,
+      tier: {
+        name: environmentTier,
+        type: environmentTier === 'Worker' ? 'SQS/HTTP' : 'Standard'
+      },
       versionLabel: appVersionProps.ref
     });
 
-    const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
-      domainName: domain
-    });
+    if (environmentTier === 'WebServer') {
+      const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
+        domainName: domain
+      });
 
-    new route53.ARecord(this, 'ARecord', {
-      zone,
-      recordName: deploymentDomain + '.',
-      //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
-      target: route53.RecordTarget.fromAlias({
-        bind: (): route53.AliasRecordTargetConfig => ({
-          dnsName: ebEnv.attrEndpointUrl,
-          // get hosted zone for elbs based on region: https://docs.aws.amazon.com/general/latest/gr/elb.html
-          hostedZoneId: 'Z35SXDOTRQ7X7K'
-        })
-      })
-    });
+      new route53.ARecord(this, 'ARecord', {
+        zone,
+        recordName: deploymentDomain + '.',
+        //target: route53.RecordTarget.fromAlias(new targets.ElasticBeanstalkEnvironmentEndpointTarget(ebEnv.attrEndpointUrl)),
+        target:
+          environmentType === 'LoadBalanced'
+            ? route53.RecordTarget.fromAlias({
+                bind: (): route53.AliasRecordTargetConfig => ({
+                  dnsName: ebEnv.attrEndpointUrl,
+                  // get hosted zone for elbs based on region: https://docs.aws.amazon.com/general/latest/gr/elb.html
+                  hostedZoneId: 'Z35SXDOTRQ7X7K'
+                })
+              })
+            : // if not load balanced, then use the ip address
+              route53.RecordTarget.fromIpAddresses(ebEnv.attrEndpointUrl)
+      });
 
-    /**
-     * Output the distribution's url so we can pass it to external systems
-     *  Note: something at the end of the path is required or the Load balancer url never resolves
-     */
-    new CfnOutput(this, 'DeploymentUrl', {
-      value: 'https://' + deploymentDomain + '/'
-    });
+      /**
+       * Output the distribution's url so we can pass it to external systems
+       *  Note: something at the end of the path is required or the Load balancer url never resolves
+       */
+      const protocol = environmentType === 'LoadBalanced' ? 'https' : 'http';
+      new CfnOutput(this, 'DeploymentUrl', {
+        value: `${protocol}://${deploymentDomain}/`
+      });
+    } else {
+      // Send users to the AWS console to view the environment
+      new CfnOutput(this, 'DeploymentUrl', {
+        value: `https://console.aws.amazon.com/elasticbeanstalk/home#/environment/dashboard?environmentName=${ebEnv.ref}`
+      });
+    }
   }
 }

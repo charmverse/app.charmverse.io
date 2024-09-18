@@ -1,5 +1,7 @@
-'use client';
+import 'server-only';
 
-export function HomePage() {
+import type { Scout } from '@charmverse/core/prisma-client';
+
+export async function HomePage({ user }: { user: Scout | null }) {
   return <div>Home Page!</div>;
 }

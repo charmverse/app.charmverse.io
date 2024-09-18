@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import { getWagmiConfig } from '@root/connectors/config';
-import type { LoggedInUser } from '@root/models';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { watchAccount } from '@wagmi/core';
 import type { Signer } from 'ethers';
 import { useRouter } from 'next/router';

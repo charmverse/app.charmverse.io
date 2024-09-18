@@ -1,21 +1,20 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { AuthKitProvider, SignInButton, useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
-import { Typography } from '@mui/material';
-import Box from '@mui/material/Box';
+import { Box, Link, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
 
 import '@farcaster/auth-kit/styles.css';
+import { LoadingComponent } from 'components/layout/Loading/LoadingComponent';
 import { authConfig } from 'lib/farcaster/config';
 import { loginAction } from 'lib/session/loginWithFarcasterAction';
 
-function WarpcastLoginButton({ successPath }: { successPath: string }) {
+function WarpcastLoginButton() {
   const router = useRouter();
   const { isAuthenticated } = useProfile();
 
@@ -28,12 +27,11 @@ function WarpcastLoginButton({ successPath }: { successPath: string }) {
   const {
     executeAsync: loginUser,
     hasErrored,
-    hasSucceeded: loginWithFarcasterSuccess,
-    isExecuting: isLoggingIn
+    hasSucceeded: loginWithFarcasterSuccess
   } = useAction(loginAction, {
     onSuccess: async () => {
       await revalidatePath();
-      router.push(successPath);
+      router.push('/');
     },
     onError(err) {
       log.error('Error on login', { error: err.error.serverError });
@@ -72,10 +70,13 @@ function WarpcastLoginButton({ successPath }: { successPath: string }) {
   );
 }
 
-export function WarpcastLogin({ successPath }: { successPath: string }) {
+export function WarpcastLogin() {
   return (
     <AuthKitProvider config={authConfig}>
-      <WarpcastLoginButton successPath={successPath} />
+      <WarpcastLoginButton />
+      <Link href='https://www.farcaster.xyz/' target='_blank' rel='noopener' fontWeight={500} display='block'>
+        Join Farcaster
+      </Link>
     </AuthKitProvider>
   );
 }

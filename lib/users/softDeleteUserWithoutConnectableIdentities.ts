@@ -2,8 +2,9 @@ import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getUserProfile } from '../profile/getUser';
+
 import { countConnectableIdentities } from './countConnectableIdentities';
-import { getUserProfile } from './getUser';
 
 export async function softDeleteUserWithoutConnectableIdentities({
   userId,

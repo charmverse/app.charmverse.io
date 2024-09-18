@@ -1,4 +1,3 @@
-import type { ProposalEvaluationTestInput } from '@charmverse/core/dist/cjs/lib/testing/proposals';
 import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
@@ -84,7 +83,7 @@ describe('getCardPropertiesFromProposals', () => {
       spaceId: generated.space.id
     });
 
-    const evaluationInputs: ProposalEvaluationTestInput[] = [
+    const evaluationInputs: testUtilsProposals.GenerateProposalInput['evaluationInputs'] = [
       {
         rubricCriteria: [
           {
@@ -347,7 +346,7 @@ describe('getCardPropertiesFromProposals', () => {
       spaceId: generated.space.id
     });
 
-    const evaluationInputs: ProposalEvaluationTestInput[] = [
+    const evaluationInputs: testUtilsProposals.GenerateProposalInput['evaluationInputs'] = [
       {
         evaluationType: 'feedback',
         title: 'Feedback',

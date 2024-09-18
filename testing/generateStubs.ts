@@ -1,10 +1,9 @@
 import type { PageNode } from '@charmverse/core/pages';
 import type { Application, Page } from '@charmverse/core/prisma';
+import { getPagePath } from '@root/lib/pages/utils';
+import { randomETHWalletAddress as _randomETHWalletAddress } from '@root/lib/utils/blockchain';
+import type { RequiredNotNull } from '@root/lib/utils/types';
 import { v4 } from 'uuid';
-
-import { getPagePath } from 'lib/pages/utils';
-import { randomETHWalletAddress as _randomETHWalletAddress } from 'lib/utils/blockchain';
-import type { RequiredNotNull } from 'lib/utils/types';
 
 export function generatePageToCreateStub({
   userId,

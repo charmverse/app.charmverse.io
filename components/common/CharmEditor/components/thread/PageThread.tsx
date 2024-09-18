@@ -402,7 +402,6 @@ const PageThread = forwardRef<HTMLDivElement, PageThreadProps>(
                   >
                     <UserDisplay
                       showMiniProfile
-                      component='div'
                       userId={member.id}
                       avatarSize='small'
                       sx={{

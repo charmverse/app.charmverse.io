@@ -8,13 +8,13 @@ import { StyledTreeItem, PageLink } from './PageTreeItem';
 interface BoardViewTreeItemProps {
   href: string;
   label: string;
-  nodeId: string;
+  itemId: string;
   viewType: IViewType;
   onClick?: () => void;
 }
 
-const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((props, ref) => {
-  const { href, label, viewType, nodeId, onClick } = props;
+const BoardViewTreeItem = forwardRef<HTMLLIElement, BoardViewTreeItemProps>((props, ref) => {
+  const { href, label, viewType, itemId, onClick } = props;
 
   const labelIcon = iconForViewType(viewType);
 
@@ -30,9 +30,13 @@ const BoardViewTreeItem = forwardRef<HTMLDivElement, BoardViewTreeItemProps>((pr
           onClick={onClick}
         />
       }
-      nodeId={nodeId}
+      itemId={itemId}
       ref={ref}
-      TransitionProps={{ timeout: 50 }}
+      slotProps={{
+        groupTransition: {
+          timeout: 50
+        }
+      }}
     />
   );
 });

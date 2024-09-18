@@ -1,0 +1,76 @@
+diff --git a/node_modules/@lens-protocol/react/dist/declarations/src/transactions/publications/useCreateComment.d.ts b/node_modules/@lens-protocol/react/dist/declarations/src/transactions/publications/useCreateComment.d.ts
+index ad9fe41..1901c07 100644
+--- a/node_modules/@lens-protocol/react/dist/declarations/src/transactions/publications/useCreateComment.d.ts
++++ b/node_modules/@lens-protocol/react/dist/declarations/src/transactions/publications/useCreateComment.d.ts
+@@ -4,6 +4,7 @@ import { OpenActionConfig, ReferencePolicyConfig, Referrers } from '@lens-protoc
+ import { BroadcastingError } from '@lens-protocol/domain/use-cases/transactions';
+ import { UseDeferredTask } from "../../helpers/tasks.js";
+ import { AsyncTransactionResult } from "../adapters/AsyncTransactionResult.js";
++import { Session } from '@lens-protocol/react-web';
+ /**
+  * An object representing the result of a comment creation.
+  *
+@@ -63,6 +64,8 @@ export type CreateCommentArgs = {
+      * Set it to `false` to force it to use a Self-Funded Transaction.
+      */
+     sponsored?: boolean;
++
++    session?: Session;
+ };
+ /**
+  * `useCreateComment` is React Hook that allows you to create a new Lens Comment.
+diff --git a/node_modules/@lens-protocol/react/dist/declarations/src/transactions/publications/useCreatePost.d.ts b/node_modules/@lens-protocol/react/dist/declarations/src/transactions/publications/useCreatePost.d.ts
+index 9dfaa7a..5ed924c 100644
+--- a/node_modules/@lens-protocol/react/dist/declarations/src/transactions/publications/useCreatePost.d.ts
++++ b/node_modules/@lens-protocol/react/dist/declarations/src/transactions/publications/useCreatePost.d.ts
+@@ -4,6 +4,7 @@ import { OpenActionConfig, ReferencePolicyConfig } from '@lens-protocol/domain/u
+ import { BroadcastingError } from '@lens-protocol/domain/use-cases/transactions';
+ import { UseDeferredTask } from "../../helpers/tasks.js";
+ import { AsyncTransactionResult } from "../adapters/AsyncTransactionResult.js";
++import { Session } from '@lens-protocol/react-web';
+ /**
+  * An object representing the result of a post creation.
+  *
+@@ -46,6 +47,8 @@ export type CreatePostArgs = {
+      * Set it to `false` to force it to use a Self-Funded Transaction.
+      */
+     sponsored?: boolean;
++
++    session?: Session;
+ };
+ /**
+  * `useCreatePost` is a React Hook that allows you to create a new Lens Post.
+diff --git a/node_modules/@lens-protocol/react/dist/lens-protocol-react.esm.js b/node_modules/@lens-protocol/react/dist/lens-protocol-react.esm.js
+index 80a443a..2406091 100644
+--- a/node_modules/@lens-protocol/react/dist/lens-protocol-react.esm.js
++++ b/node_modules/@lens-protocol/react/dist/lens-protocol-react.esm.js
+@@ -12528,13 +12528,12 @@ function useExecutionMode() {
+  * @group Hooks
+  */
+ function useCreateComment() {
+-  var _useSession = useSession(),
+-    session = _useSession.data;
+   var createComment = useCreateCommentController();
+   var resolveExecutionMode = useExecutionMode();
+   return useDeferredTask( /*#__PURE__*/function () {
+     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(args) {
+       var mode, request;
++      var session = args.session;
+       return _regeneratorRuntime().wrap(function _callee$(_context) {
+         while (1) switch (_context.prev = _context.next) {
+           case 0:
+@@ -13964,13 +13963,12 @@ function useCreatePostController() {
+  * @group Hooks
+  */
+ function useCreatePost() {
+-  var _useSession = useSession(),
+-    session = _useSession.data;
+   var resolveExecutionMode = useExecutionMode();
+   var createPost = useCreatePostController();
+   return useDeferredTask( /*#__PURE__*/function () {
+     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(args) {
+       var mode, request;
++      var session = args.session;
+       return _regeneratorRuntime().wrap(function _callee$(_context) {
+         while (1) switch (_context.prev = _context.next) {
+           case 0:

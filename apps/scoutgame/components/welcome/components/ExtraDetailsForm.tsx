@@ -11,6 +11,7 @@ import {
   FormControlLabel,
   FormHelperText,
   FormLabel,
+  Stack,
   TextField
 } from '@mui/material';
 import { concatenateStringValues } from '@root/lib/utils/strings';
@@ -74,7 +75,7 @@ export function ExtraDetailsForm() {
               type='email'
               error={!!error?.message}
               {...field}
-              sx={{ mb: 1 }}
+              sx={{ mb: 2.5 }}
             />
           )}
         />
@@ -85,6 +86,7 @@ export function ExtraDetailsForm() {
             <FormControlLabel
               control={<Checkbox data-test='onboarding-notify-grants' onChange={onChange} checked={!!value} />}
               label='Notify me of new opportunities (grants, accelerators, etc)'
+              sx={{ mb: 1.5 }}
             />
           )}
         />
@@ -95,11 +97,12 @@ export function ExtraDetailsForm() {
             <FormControlLabel
               control={<Checkbox data-test='onboarding-accept-terms' onChange={onChange} checked={!!value} />}
               label='Terms and Service'
+              sx={{ mb: 1.5 }}
             />
           )}
         />
       </FormControl>
-      <Box display='flex' alignItems='center' justifyContent='justify-between' gap={2} width='100%'>
+      <Stack display='flex' alignItems='center' gap={1} width='100%'>
         {!isExecuting && errors?.length ? (
           <Box flexGrow={1}>
             <FormErrors errors={errors} />
@@ -107,10 +110,17 @@ export function ExtraDetailsForm() {
         ) : (
           <Box flexGrow={1}></Box>
         )}
-        <Button data-test='finish-onboarding' size='large' type='submit' disabled={isExecuting} sx={{ flexShrink: 0 }}>
+        <Button
+          data-test='finish-onboarding'
+          size='medium'
+          type='submit'
+          disabled={isExecuting}
+          fullWidth
+          sx={{ flexShrink: 0, py: 1, px: 2 }}
+        >
           Next
         </Button>
-      </Box>
+      </Stack>
     </form>
   );
 }

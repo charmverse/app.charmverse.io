@@ -41,4 +41,4 @@ export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>,
   );
 }
 
-export const ResetRecoveryCodeModal = forwardRef(CustomModal);
+export const ResetRecoveryCodeModal = forwardRef<HTMLDivElement, Omit<ModalProps, 'children'>>(CustomModal);

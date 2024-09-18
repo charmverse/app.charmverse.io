@@ -1,5 +1,5 @@
-import type { GridProps } from '@mui/material';
 import { Box, Typography, Card, Grid, Tooltip } from '@mui/material';
+import type { GridProps } from '@mui/material/Grid';
 
 export function SourceType<C extends React.ElementType>({
   active,

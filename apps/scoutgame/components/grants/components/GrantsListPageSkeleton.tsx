@@ -1,11 +1,12 @@
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
 
+import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
+
 export function GrantsListPageSkeleton() {
   return (
-    <PageWrapper>
+    <SinglePageWrapper>
       <Stack gap={1} justifyContent='center' direction='row'>
         <Skeleton animation='wave' width='100px' height={25} />
         <Skeleton animation='wave' width='100px' height={25} />
@@ -35,6 +36,6 @@ export function GrantsListPageSkeleton() {
           </Card>
         ))}
       </Stack>
-    </PageWrapper>
+    </SinglePageWrapper>
   );
 }

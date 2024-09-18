@@ -1,11 +1,12 @@
 import { log } from '@charmverse/core/log';
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { sessionUserRelations } from '@root/lib/session/config';
 import { MissingDataError } from '@root/lib/utils/errors';
-import type { LoggedInUser } from '@root/models';
 
-import { getUserProfile } from './getUser';
+import { getUserProfile } from '../profile/getUser';
+
 import { updateUsedIdentity } from './updateUsedIdentity';
 
 export async function updateUserProfile(userId: string, update: Partial<User>): Promise<LoggedInUser> {
