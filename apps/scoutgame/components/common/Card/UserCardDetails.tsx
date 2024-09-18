@@ -14,19 +14,19 @@ export function UserCardDetails({
 }) {
   return (
     <Stack flexDirection='row' alignItems='center' justifyContent='space-between' gap={1}>
-      <Stack flexDirection='row' gap={1} alignItems='center'>
+      <Stack flexDirection='row' gap={0.2} alignItems='center'>
         <Typography variant='body2' component='span' color='text.secondary'>
           {gems}
         </Typography>
         <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
       </Stack>
-      <Stack flexDirection='row' gap={1} alignItems='center'>
+      <Stack flexDirection='row' gap={0.2} alignItems='center'>
         <Typography variant='body2' component='span' color='text.secondary'>
           {scouts}
         </Typography>
         <Image width={15} height={15} src='/images/profile/icons/scout-icon.svg' alt='Scouts' />
       </Stack>
-      <Stack flexDirection='row' gap={1} alignItems='flex-start'>
+      <Stack flexDirection='row' gap={0.2} alignItems='flex-start'>
         <Typography variant='body2' component='span' color='text.secondary'>
           {likes}
         </Typography>

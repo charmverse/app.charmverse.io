@@ -2,7 +2,6 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import type { IconButtonProps } from '@mui/material';
 import { IconButton } from '@mui/material';
-import type { CustomArrowProps } from 'react-slick';
 
 const defaultSx: IconButtonProps['sx'] = {
   display: 'flex',
@@ -19,27 +18,17 @@ const defaultSx: IconButtonProps['sx'] = {
   }
 };
 
-export function NextArrow({ className, style, currentSlide, slideCount, ...props }: CustomArrowProps) {
+export function NextArrow(props: IconButtonProps) {
   return (
-    <IconButton
-      {...props}
-      sx={{ ...defaultSx, height: '200px', right: '-40px' }}
-      aria-hidden='true'
-      aria-disabled={currentSlide === 0}
-    >
+    <IconButton {...props} sx={{ ...defaultSx, height: '200px', right: '-10px' }}>
       <ChevronRightIcon color='secondary' />
     </IconButton>
   );
 }
 
-export function PrevArrow({ className, style, currentSlide, slideCount, ...props }: CustomArrowProps) {
+export function PrevArrow(props: IconButtonProps) {
   return (
-    <IconButton
-      {...props}
-      sx={{ ...defaultSx, height: '200px', left: '-40px' }}
-      aria-hidden='true'
-      aria-disabled={currentSlide === 0}
-    >
+    <IconButton {...props} sx={{ ...defaultSx, height: '200px', left: '-10px' }}>
       <ChevronLeftIcon color='secondary' />
     </IconButton>
   );

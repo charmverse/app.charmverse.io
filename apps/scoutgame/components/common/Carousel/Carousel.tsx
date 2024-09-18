@@ -2,47 +2,44 @@
 
 import type { Theme } from '@mui/material';
 import { Box, useMediaQuery } from '@mui/material';
-import type { Settings } from 'react-slick';
-import Slider from 'react-slick';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { UserCard } from '../Card/UserCard';
 
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
 import { NextArrow, PrevArrow } from './Arrows';
 
-const settings: Settings = {
-  dots: false,
-  infinite: false,
-  speed: 500,
-  slidesToShow: 6,
-  slidesToScroll: 1,
-  initialSlide: 0,
-  arrows: true,
-  responsive: [
-    {
-      breakpoint: 600,
-      settings: {
-        slidesToShow: 2,
-        arrows: false
-      }
-    }
-  ]
-};
+import 'swiper/css';
 
 export function Carousel({ items }: { items: any[] }) {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   return (
     <Box display='flex' alignItems='center' justifyContent='center'>
-      <Box width='95svw' px={isMobile ? 0 : 4} className='slider-container'>
-        <Slider {...settings} prevArrow={<PrevArrow />} nextArrow={<NextArrow />}>
+      <Box width='95svw' px={isMobile ? 0 : 4} position='relative'>
+        <Swiper
+          className='mySwiper'
+          slidesPerView={isMobile ? 2 : 5}
+          spaceBetween={5}
+          autoHeight={true}
+          modules={[Navigation]}
+          navigation={{
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev'
+          }}
+        >
           {items.map((_user) => (
-            <div key={_user.username}>
+            <SwiperSlide key={_user.username}>
               <UserCard withDetails user={_user} />
-            </div>
+            </SwiperSlide>
           ))}
-        </Slider>
+        </Swiper>
+        {!isMobile && (
+          <>
+            <NextArrow className='swiper-button-next' />
+            <PrevArrow className='swiper-button-prev' />
+          </>
+        )}
       </Box>
     </Box>
   );
