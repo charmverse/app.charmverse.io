@@ -26,7 +26,12 @@ import {
 // 50 requests/minute for Public tier - https://www.ankr.com/docs/rpc-service/service-plans/#rate-limits
 const rateLimiter = RateLimit(1);
 
-function _getFormAnswers({ category, project, impactStatementAnswer }: RetroApplication): FieldAnswerInput[] {
+function _getFormAnswers({
+  attestationId,
+  category,
+  project,
+  impactStatementAnswer
+}: RetroApplication): FieldAnswerInput[] {
   const funding = project.funding.map(
     (funding) =>
       `${funding.amount || 'N/A'} - ${
@@ -55,7 +60,8 @@ function _getFormAnswers({ category, project, impactStatementAnswer }: RetroAppl
     },
     { fieldId: fieldIds['Project Pricing Model'], value: project.pricingModel },
     { fieldId: fieldIds['Project Pricing Model Details'], value: charmValue(project.pricingModelDetails) },
-    { fieldId: fieldIds['Attestation ID'], value: project.id },
+    { fieldId: fieldIds['Attestation ID'], value: attestationId },
+    { fieldId: fieldIds['Project ID'], value: project.id },
     { fieldId: fieldIds['Additional Links'], value: charmLinks(project.links) },
     { fieldId: fieldIds['Funding Received'], value: charmValues(funding) }
   ];
