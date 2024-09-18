@@ -38,7 +38,7 @@ export async function processMergedPullRequest(pullRequest: PullRequest) {
       repoNameWithOwner: pullRequest.repository.nameWithOwner,
       username: pullRequest.author.login
     });
-    if (prs.length > 0) {
+    if (prs.filter((pr) => pr.number !== pullRequest.number).length > 0) {
       isFirstCommit = false;
     }
   }
