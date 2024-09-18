@@ -110,6 +110,48 @@ const getPrsByUser = gql`
   }
 `;
 
+type GetPrCloserResponse = {
+  repository: {
+    pullRequest: {
+      title: string;
+      state: 'CLOSED' | 'MERGED';
+      timelineItems: {
+        edges: {
+          node: {
+            actor: {
+              login: string;
+            };
+            createdAt: string;
+          };
+        }[];
+      };
+    };
+  };
+};
+
+const getPrCloser = `
+  query ($owner: String!, $repo: String!, $prNumber: Int!) {
+    repository(owner: $owner, name: $repo) {
+      pullRequest(number: $prNumber) {
+        title
+        state
+        timelineItems(first: 10, itemTypes: [CLOSED_EVENT]) {
+          edges {
+            node {
+              ... on ClosedEvent {
+                actor {
+                  login
+                }
+                createdAt
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 type Input = {
   after: Date;
   owner: string;
@@ -160,6 +202,24 @@ export async function getRecentPullRequestsByUser({
   return response.search.edges.map((edge) => edge.node);
 }
 
+export async function getClosedPullRequest({
+  pullRequestNumber,
+  repo
+}: {
+  pullRequestNumber: number;
+  repo: { name: string; owner: string };
+}) {
+  const graphqlWithAuth = getClient();
+  const response = await graphqlWithAuth<GetPrCloserResponse>({
+    query: getPrsByUser,
+    repo: repo.name,
+    owner: repo.owner,
+    prNumber: pullRequestNumber
+  });
+  const actor = response.repository.pullRequest.timelineItems.edges.map((edge) => edge.node)[0]?.actor;
+  return { login: actor?.login };
+}
+
 async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promise<PullRequest[]> {
   const graphqlWithAuth = getClient();
 
@@ -182,7 +242,7 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
     // Filter out PRs closed or merged in the last 24 hours
     const recentPRs = pullRequests
       .filter(({ node }) => {
-        const closedOrMergedAt = new Date(node.createdAt || '');
+        const closedOrMergedAt = new Date(node.createdAt);
         return closedOrMergedAt > after;
       })
       .map(({ node }) => ({
