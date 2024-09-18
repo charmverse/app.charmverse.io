@@ -140,7 +140,7 @@ jobs:
           # https://github.com/tj-actions/eslint-changed-files/issues/1801#issuecomment-2083477324
           escape_paths: 'false'
 
-      - name: Run tests
+      - name: Run app tests
         run: npm run scoutgame:test
 
       - name: Run package tests
