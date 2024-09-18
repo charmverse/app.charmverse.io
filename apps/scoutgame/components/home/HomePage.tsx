@@ -3,11 +3,12 @@ import 'server-only';
 import type { Scout } from '@charmverse/core/prisma-client';
 import { Box, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
-import { Suspense, type ReactNode } from 'react';
+import { Suspense } from 'react';
 
 import { CarouselContainer } from 'components/common/Carousel/CarouselContainer';
 import { HomeTab } from 'components/common/Tabs/HomeTab';
 import { HomeTabsMenu } from 'components/common/Tabs/HomeTabsMenu';
+import { LoadingTable } from 'components/layout/Loading/LoadingTable';
 
 export async function HomePage({ user, tab }: { user: Scout | null; tab: string }) {
   return (
@@ -22,7 +23,7 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
         <CarouselContainer />
       </Suspense>
       <HomeTabsMenu tab={tab} />
-      <Suspense fallback={null}>
+      <Suspense fallback={<LoadingTable />} key={tab}>
         <HomeTab tab={tab} />
       </Suspense>
     </Box>

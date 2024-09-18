@@ -29,7 +29,6 @@ export function ActivityTable({
             <TableRow
               key={row.user.username}
               sx={{
-                height: '30px',
                 '&:last-child td, &:last-child th': { border: 0 },
                 '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
               }}
