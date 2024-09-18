@@ -11,10 +11,11 @@ export type PullRequest = {
   createdAt: string;
   author: {
     login: string;
+    id: number;
   };
   number: number;
   repository: {
-    id: string;
+    id: number;
     nameWithOwner: string;
   };
 };
@@ -31,6 +32,7 @@ type PageInfo = {
 
 type GetRecentClosedOrMergedPRsResponse = {
   repository: {
+    databaseId: number;
     pullRequests: {
       edges: EdgeNode<PullRequest>[];
       pageInfo: PageInfo;
@@ -41,6 +43,7 @@ type GetRecentClosedOrMergedPRsResponse = {
 const getRecentPrs = gql`
   query getRecentClosedOrMergedPRs($owner: String!, $repo: String!, $cursor: String) {
     repository(owner: $owner, name: $repo) {
+      databaseId
       pullRequests(
         first: 100
         after: $cursor
@@ -172,6 +175,8 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
       cursor
     });
 
+    const repositoryId = response.repository.databaseId;
+
     const pullRequests = response.repository.pullRequests.edges;
 
     // Filter out PRs closed or merged in the last 24 hours
@@ -180,7 +185,17 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
         const closedOrMergedAt = new Date(node.createdAt || '');
         return closedOrMergedAt > after;
       })
-      .map(({ node }) => node);
+      .map(({ node }) => ({
+        ...node,
+        author: {
+          id: parseInt(btoa(node.author.id.toString()).split(':')[1]),
+          login: node.author.login
+        },
+        repository: {
+          id: repositoryId,
+          nameWithOwner: node.repository.nameWithOwner
+        }
+      }));
 
     allRecentPRs = allRecentPRs.concat(recentPRs);
 
