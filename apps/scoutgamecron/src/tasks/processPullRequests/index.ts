@@ -19,7 +19,7 @@ export async function processPullRequests() {
   for (const pullRequest of pullRequests) {
     const repo = repos.find((r) => `${r.owner}/${r.name}` === pullRequest.repository.nameWithOwner);
     if (!repo) {
-      throw new Error('Repo not found', { repo: pullRequest.repository.nameWithOwner });
+      throw new Error(`Repo not found: ${pullRequest.repository.nameWithOwner}`);
     }
     if (pullRequest.state === 'CLOSED') {
       await processClosedPullRequest(pullRequest, repo);
