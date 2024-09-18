@@ -17,26 +17,33 @@ export async function processClosedPullRequest(pullRequest: PullRequest) {
     }
   });
   if (builder) {
-    await prisma.githubEvent.create({
-      data: {
+    await prisma.githubEvent.upsert({
+      where: {
+        unique_github_event: {
+          pullRequestNumber: pullRequest.number,
+          createdBy: pullRequest.author.login,
+          type: 'closed_pull_request',
+          repoId: pullRequest.repository.id
+        }
+      },
+      create: {
         pullRequestNumber: pullRequest.number,
         title: pullRequest.title,
-        type: 'closed_pull_request',
+        type: pullRequest.state === 'CLOSED' ? 'closed_pull_request' : 'merged_pull_request',
         createdBy: pullRequest.author.login,
-        repoId: pullRequest.repository.id,
-        strikes: {
-          create: {
-            builderId: builder.id
-          }
-        }
-      }
+        repoId: pullRequest.repository.id
+      },
+      update: {}
     });
+
     const strikes = await prisma.builderStrike.count({
       where: {
         builderId: builder.id
       }
     });
-    log.info('Marked closed PR', { userId: builder.id, strikes });
+
+    log.info('Recorded a closed PR', { userId: builder.id, url: pullRequest.url, strikes });
+
     if (strikes >= 3) {
       await prisma.scout.update({
         where: {
