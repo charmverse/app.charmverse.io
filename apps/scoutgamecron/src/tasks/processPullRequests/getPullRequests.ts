@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client';
 import type { GithubRepo } from '@charmverse/core/prisma';
 import { graphql } from '@octokit/graphql';
 
@@ -13,12 +14,13 @@ export type PullRequest = {
   number: number;
   repository: {
     id: string;
+    nameWithOwner: string;
   };
 };
 
-type PullRequestEdge = {
+type EdgeNode<T> = {
   cursor: string;
-  node: PullRequest;
+  node: T;
 };
 
 type PageInfo = {
@@ -26,23 +28,24 @@ type PageInfo = {
   hasNextPage: boolean;
 };
 
-type PullRequestConnection = {
-  edges: PullRequestEdge[];
-  pageInfo: PageInfo;
-};
-
-type Repository = {
-  pullRequests: PullRequestConnection;
-};
-
 type GetRecentClosedOrMergedPRsResponse = {
-  repository: Repository;
+  repository: {
+    pullRequests: {
+      edges: EdgeNode<PullRequest>[];
+      pageInfo: PageInfo;
+    };
+  };
 };
 
-const getRecentPrs = `
+const getRecentPrs = gql`
   query getRecentClosedOrMergedPRs($owner: String!, $repo: String!, $cursor: String) {
     repository(owner: $owner, name: $repo) {
-      pullRequests(first: 100, after: $cursor, states: [CLOSED, MERGED], orderBy: {field: UPDATED_AT, direction: DESC}) {
+      pullRequests(
+        first: 100
+        after: $cursor
+        states: [CLOSED, MERGED]
+        orderBy: { field: UPDATED_AT, direction: DESC }
+      ) {
         edges {
           node {
             title
@@ -55,6 +58,7 @@ const getRecentPrs = `
             }
             repository {
               id
+              nameWithOwner
             }
             number
           }
@@ -69,13 +73,45 @@ const getRecentPrs = `
   }
 `;
 
+type PullRequestByUser = {
+  title: string;
+  number: number;
+  url: string;
+  closedAt: string;
+  createdAt: string;
+  mergedAt: string;
+  state: 'CLOSED' | 'MERGED';
+};
+
+const getPrsByUser = gql`
+  query ($filterQuery: String!) {
+    search(query: $filterQuery, type: ISSUE, first: 10) {
+      edges {
+        node {
+          ... on PullRequest {
+            title
+            number
+            url
+            closedAt
+            createdAt
+            mergedAt
+            state
+          }
+        }
+      }
+    }
+  }
+`;
+
 type Input = {
   after: Date;
   owner: string;
   repo: string;
 };
 
-export async function getPullRequests({ repos, after }: { repos: Pick<GithubRepo, 'name' | 'owner'>[]; after: Date }) {
+type RepoInput = Pick<GithubRepo, 'name' | 'owner'>;
+
+export async function getPullRequests({ repos, after }: { repos: RepoInput[]; after: Date }) {
   const pullRequests: PullRequest[] = [];
   for (const repo of repos) {
     const repoPullRequests = await getRecentClosedOrMergedPRs({
@@ -88,13 +124,35 @@ export async function getPullRequests({ repos, after }: { repos: Pick<GithubRepo
   return pullRequests;
 }
 
-export async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promise<PullRequest[]> {
-  // Create an authenticated GraphQL client using your GitHub token
-  const graphqlWithAuth = graphql.defaults({
+// Create an authenticated GraphQL client using your GitHub token
+function getClient() {
+  return graphql.defaults({
     headers: {
       Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`
     }
   });
+}
+
+// get the latest pull requests by a user
+export async function getRecentPullRequestsByUser({
+  repoNameWithOwner,
+  username
+}: {
+  repoNameWithOwner: string;
+  username: string;
+}): Promise<PullRequestByUser[]> {
+  const graphqlWithAuth = getClient();
+  const response = await graphqlWithAuth<{
+    search: { edges: EdgeNode<PullRequestByUser>[] };
+  }>({
+    query: getPrsByUser,
+    filterQuery: `repo:${repoNameWithOwner} is:pr author:${username}`
+  });
+  return response.search.edges.map((edge) => edge.node);
+}
+
+async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promise<PullRequest[]> {
+  const graphqlWithAuth = getClient();
 
   let hasNextPage = true;
   let cursor = null;
@@ -131,11 +189,3 @@ export async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input):
 
   return allRecentPRs;
 }
-
-// getRecentClosedOrMergedPRs({
-//   after: new Date('2024-09-16'),
-//   owner: 'charmverse',
-//   repo: 'app.charmverse.io'
-// }).then((prs) => {
-//   console.log(JSON.stringify(prs, null, 2));
-// });

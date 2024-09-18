@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getFormattedWeek, getWeekStartEnd, timezone, currentSeason } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 
-import type { PullRequest } from './getPullRequests';
+import { getRecentPullRequestsByUser, type PullRequest } from './getPullRequests';
 
 export async function processMergedPullRequest(pullRequest: PullRequest) {
   const pullRequestDate = new Date(pullRequest.createdAt);
@@ -31,8 +31,17 @@ export async function processMergedPullRequest(pullRequest: PullRequest) {
       repoId: pullRequest.repository.id
     }
   });
-  // TODO: Also call Github API to find previous commits
-  const isFirstCommit = previousEventCount === 0;
+  let isFirstCommit = previousEventCount === 0;
+  if (isFirstCommit) {
+    // double-check usign Github API in case the previous PR was not recorded by us
+    const prs = await getRecentPullRequestsByUser({
+      repoNameWithOwner: pullRequest.repository.nameWithOwner,
+      username: pullRequest.author.login
+    });
+    if (prs.length > 0) {
+      isFirstCommit = false;
+    }
+  }
   const previousEventToday = thisWeeksEvents.some((event) => {
     if (event.repoId !== pullRequest.repository.id) {
       return false;
