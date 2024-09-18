@@ -64,7 +64,7 @@ const data = [
 ];
 
 export async function CarouselContainer() {
-  await delay(2000);
+  await delay(3000);
 
   return <Carousel items={data} />;
 }

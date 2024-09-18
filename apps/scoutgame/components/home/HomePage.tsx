@@ -9,6 +9,7 @@ import { CarouselContainer } from 'components/common/Carousel/CarouselContainer'
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { HomeTab } from 'components/common/Tabs/HomeTab';
 import { HomeTabsMenu } from 'components/common/Tabs/HomeTabsMenu';
+import { LoadingCards } from 'components/layout/Loading/LoadingCards';
 import { LoadingTable } from 'components/layout/Loading/LoadingTable';
 
 export async function HomePage({ user, tab }: { user: Scout | null; tab: string }) {
@@ -24,7 +25,7 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
             Scout Today's HOT Builders
           </Typography>
         </Stack>
-        <Suspense fallback={null}>
+        <Suspense fallback={<LoadingCards />}>
           <CarouselContainer />
         </Suspense>
         <HomeTabsMenu tab={tab} />
