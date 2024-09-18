@@ -1,8 +1,13 @@
 import { log } from '@charmverse/core/log';
-import type { GithubRepo } from '@charmverse/core/prisma-client';
+import type { GemsReceiptType, GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getFormattedWeek, getWeekStartEnd, timezone, currentSeason, isSameDay } from '@packages/scoutgame/utils';
-import { DateTime } from 'luxon';
+import {
+  getFormattedWeek,
+  getWeekStartEnd,
+  currentSeason,
+  isSameDay,
+  getNormalizedDate
+} from '@packages/scoutgame/utils';
 
 import { getRecentPullRequestsByUser, type PullRequest } from './getPullRequests';
 
@@ -18,41 +23,66 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
       createdAt: {
         gte: start.toJSDate(),
         lte: end.toJSDate()
-      }
+      },
+      type: 'merged_pull_request'
     },
-    include: {
+    select: {
+      id: true,
+      createdAt: true,
+      repoId: true,
+      createdBy: true,
       builderEvent: {
-        include: {
-          gemsReceipt: true
+        select: {
+          gemsReceipt: {
+            select: {
+              value: true
+            }
+          }
         }
       }
+    },
+    orderBy: {
+      createdAt: 'asc'
     }
   });
-  const previousEventCount = await prisma.githubEvent.count({
+
+  const weeklyRepoEvents = thisWeeksEvents.filter((event) => event.repoId === pullRequest.repository.id);
+  const dedupedWeeklyRepoEventIds: Set<string> = new Set();
+  weeklyRepoEvents.forEach((event) => {
+    const date = getNormalizedDate(event.createdAt);
+    const key = `${event.createdBy}-${event.repoId}-${date}`;
+    dedupedWeeklyRepoEventIds.add(key);
+  });
+
+  const totalMergedPullRequests = await prisma.githubEvent.count({
     where: {
       createdBy: pullRequest.author.id,
-      repoId: pullRequest.repository.id
+      repoId: pullRequest.repository.id,
+      type: 'merged_pull_request'
     }
   });
-  let isFirstPullRequest = previousEventCount === 0;
-  if (isFirstPullRequest) {
-    // double-check usign Github API in case the previous PR was not recorded by us
+
+  let isFirstMergedPullRequest = totalMergedPullRequests === 0;
+  if (isFirstMergedPullRequest) {
+    // double-check using Github API in case the previous PR was not recorded by us
     const prs = await getRecentPullRequestsByUser({
       defaultBranch: repo.defaultBranch,
       repoNameWithOwner: pullRequest.repository.nameWithOwner,
       username: pullRequest.author.login
     });
     if (prs.filter((pr) => pr.number !== pullRequest.number).length > 0) {
-      isFirstPullRequest = false;
+      isFirstMergedPullRequest = false;
     }
   }
-  const previousEventToday = thisWeeksEvents.some((event) => {
+
+  const existingGithubEventToday = thisWeeksEvents.some((event) => {
     if (event.repoId !== pullRequest.repository.id) {
       return false;
     }
 
     return isSameDay(event.createdAt);
   });
+
   await prisma.$transaction(async (tx) => {
     const githubUser = await tx.githubUser.upsert({
       where: {
@@ -64,29 +94,41 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
       },
       update: {}
     });
-    const event = await tx.githubEvent.upsert({
+
+    const existingGithubEvent = await tx.githubEvent.findFirst({
       where: {
-        unique_github_event: {
-          pullRequestNumber: pullRequest.number,
-          createdBy: pullRequest.author.id,
-          type: 'merged_pull_request',
-          repoId: pullRequest.repository.id
-        }
-      },
-      create: {
+        pullRequestNumber: pullRequest.number,
+        createdBy: pullRequest.author.id,
+        type: 'merged_pull_request',
+        repoId: pullRequest.repository.id
+      }
+    });
+
+    if (existingGithubEvent || existingGithubEventToday) {
+      return;
+    }
+
+    const event = await tx.githubEvent.create({
+      data: {
         pullRequestNumber: pullRequest.number,
         title: pullRequest.title,
         type: 'merged_pull_request',
         createdBy: pullRequest.author.id,
-        isFirstPullRequest,
+        isFirstPullRequest: isFirstMergedPullRequest,
         repoId: pullRequest.repository.id,
         url: pullRequest.url
-      },
-      update: {}
+      }
     });
-    if (githubUser.builderId && !previousEventToday) {
-      const gemReceiptType = isFirstPullRequest ? 'first_pr' : 'regular_pr';
-      const gemValue = gemReceiptType === 'first_pr' ? 10 : 1;
+
+    if (githubUser.builderId) {
+      const threeDayPrStreak = dedupedWeeklyRepoEventIds.size % 3 === 2;
+      const gemReceiptType: GemsReceiptType = isFirstMergedPullRequest
+        ? 'first_pr'
+        : threeDayPrStreak
+        ? 'third_pr_in_streak'
+        : 'regular_pr';
+
+      const gemValue = gemReceiptType === 'first_pr' ? 10 : gemReceiptType === 'third_pr_in_streak' ? 3 : 1;
       await tx.builderEvent.upsert({
         where: {
           githubEventId: event.id
