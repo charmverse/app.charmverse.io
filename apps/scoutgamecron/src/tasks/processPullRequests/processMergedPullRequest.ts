@@ -34,8 +34,8 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
       repoId: pullRequest.repository.id
     }
   });
-  let isFirstMergedPullRequest = previousEventCount === 0;
-  if (isFirstMergedPullRequest) {
+  let isFirstPullRequest = previousEventCount === 0;
+  if (isFirstPullRequest) {
     // double-check usign Github API in case the previous PR was not recorded by us
     const prs = await getRecentPullRequestsByUser({
       defaultBranch: repo.defaultBranch,
@@ -43,7 +43,7 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
       username: pullRequest.author.login
     });
     if (prs.filter((pr) => pr.number !== pullRequest.number).length > 0) {
-      isFirstMergedPullRequest = false;
+      isFirstPullRequest = false;
     }
   }
   const previousEventToday = thisWeeksEvents.some((event) => {
@@ -78,14 +78,14 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
         title: pullRequest.title,
         type: 'merged_pull_request',
         createdBy: pullRequest.author.id,
-        isFirstPullRequest: isFirstMergedPullRequest,
+        isFirstPullRequest,
         repoId: pullRequest.repository.id,
         url: pullRequest.url
       },
       update: {}
     });
     if (githubUser.builderId && !previousEventToday) {
-      const gemReceiptType = isFirstMergedPullRequest ? 'first_pr' : 'regular_pr';
+      const gemReceiptType = isFirstPullRequest ? 'first_pr' : 'regular_pr';
       const gemValue = gemReceiptType === 'first_pr' ? 10 : 1;
       await tx.builderEvent.upsert({
         where: {

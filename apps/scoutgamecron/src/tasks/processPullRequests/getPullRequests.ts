@@ -1,4 +1,3 @@
-import { gql } from '@apollo/client';
 import type { GithubRepo } from '@charmverse/core/prisma';
 import { graphql } from '@octokit/graphql';
 
@@ -40,7 +39,7 @@ type GetRecentClosedOrMergedPRsResponse = {
   };
 };
 
-const getRecentPrs = gql`
+const getRecentPrs = `
   query getRecentClosedOrMergedPRs($owner: String!, $repo: String!, $cursor: String) {
     repository(owner: $owner, name: $repo) {
       databaseId
@@ -89,7 +88,7 @@ type PullRequestByUser = {
   state: 'CLOSED' | 'MERGED';
 };
 
-const getPrsByUser = gql`
+const getPrsByUser = `
   query ($filterQuery: String!) {
     search(query: $filterQuery, type: ISSUE, first: 10) {
       edges {
