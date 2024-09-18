@@ -3,6 +3,7 @@ import type { GithubRepo } from '@charmverse/core/prisma';
 import { graphql } from '@octokit/graphql';
 
 export type PullRequest = {
+  baseRefName: string; // eg "main"
   title: string;
   url: string;
   state: 'CLOSED' | 'MERGED';
@@ -48,6 +49,7 @@ const getRecentPrs = gql`
       ) {
         edges {
           node {
+            baseRefName
             title
             url
             state
@@ -74,6 +76,7 @@ const getRecentPrs = gql`
 `;
 
 type PullRequestByUser = {
+  baseRefName: string;
   title: string;
   number: number;
   url: string;
@@ -89,6 +92,7 @@ const getPrsByUser = gql`
       edges {
         node {
           ... on PullRequest {
+            baseRefName
             title
             number
             url
@@ -109,7 +113,7 @@ type Input = {
   repo: string;
 };
 
-type RepoInput = Pick<GithubRepo, 'name' | 'owner'>;
+type RepoInput = Pick<GithubRepo, 'name' | 'owner' | 'defaultBranch'>;
 
 export async function getPullRequests({ repos, after }: { repos: RepoInput[]; after: Date }) {
   const pullRequests: PullRequest[] = [];
@@ -119,7 +123,7 @@ export async function getPullRequests({ repos, after }: { repos: RepoInput[]; af
       repo: repo.name,
       after
     });
-    pullRequests.push(...repoPullRequests);
+    pullRequests.push(...repoPullRequests.filter((pr) => pr.baseRefName === repo.defaultBranch));
   }
   return pullRequests;
 }
@@ -136,9 +140,11 @@ function getClient() {
 // get the latest pull requests by a user
 export async function getRecentPullRequestsByUser({
   repoNameWithOwner,
+  defaultBranch,
   username
 }: {
   repoNameWithOwner: string;
+  defaultBranch: string;
   username: string;
 }): Promise<PullRequestByUser[]> {
   const graphqlWithAuth = getClient();

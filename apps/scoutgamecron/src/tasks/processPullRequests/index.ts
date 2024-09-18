@@ -17,10 +17,14 @@ export async function processPullRequests() {
   log.info(`Retrieved ${pullRequests.length} pull requests in ${timer.diff(DateTime.now(), 'minutes')} minutes`);
 
   for (const pullRequest of pullRequests) {
+    const repo = repos.find((r) => `${r.owner}/${r.name}` === pullRequest.repository.nameWithOwner);
+    if (!repo) {
+      throw new Error('Repo not found', { repo: pullRequest.repository.nameWithOwner });
+    }
     if (pullRequest.state === 'CLOSED') {
-      await processClosedPullRequest(pullRequest);
+      await processClosedPullRequest(pullRequest, repo);
     } else {
-      await processMergedPullRequest(pullRequest);
+      await processMergedPullRequest(pullRequest, repo);
     }
   }
 }

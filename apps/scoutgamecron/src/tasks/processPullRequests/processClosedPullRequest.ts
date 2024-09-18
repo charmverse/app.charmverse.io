@@ -1,9 +1,13 @@
 import { log } from '@charmverse/core/log';
+import type { GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getRecentPullRequestsByUser } from './getPullRequests';
 import type { PullRequest } from './getPullRequests';
 
-export async function processClosedPullRequest(pullRequest: PullRequest) {
+type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
+
+export async function processClosedPullRequest(pullRequest: PullRequest, repo: RepoInput) {
   const builder = await prisma.scout.findFirst({
     where: {
       githubUser: {
@@ -24,6 +28,18 @@ export async function processClosedPullRequest(pullRequest: PullRequest) {
       }
     });
 
+    let ignoreStrike = false;
+    // Check if this PR was closed by the author, then ignore it
+    const prs = await getRecentPullRequestsByUser({
+      defaultBranch: repo.defaultBranch,
+      repoNameWithOwner: pullRequest.repository.nameWithOwner,
+      username: pullRequest.author.login
+    });
+    if (prs.some((pr) => pr.number === pullRequest.number)) {
+      log.debug('Ignore CLOSED PR since the author closed it', { url: pullRequest.url });
+      ignoreStrike = true;
+    }
+
     await prisma.githubEvent.upsert({
       where: {
         unique_github_event: {
@@ -40,11 +56,13 @@ export async function processClosedPullRequest(pullRequest: PullRequest) {
         createdBy: pullRequest.author.login,
         repoId: pullRequest.repository.id,
         url: pullRequest.url,
-        strike: {
-          create: {
-            builderId: builder.id
-          }
-        }
+        strike: ignoreStrike
+          ? undefined
+          : {
+              create: {
+                builderId: builder.id
+              }
+            }
       },
       update: {}
     });

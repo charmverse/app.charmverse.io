@@ -1,11 +1,14 @@
 import { log } from '@charmverse/core/log';
+import type { GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFormattedWeek, getWeekStartEnd, timezone, currentSeason } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 
 import { getRecentPullRequestsByUser, type PullRequest } from './getPullRequests';
 
-export async function processMergedPullRequest(pullRequest: PullRequest) {
+type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
+
+export async function processMergedPullRequest(pullRequest: PullRequest, repo: RepoInput) {
   const pullRequestDate = new Date(pullRequest.createdAt);
   const { start, end } = getWeekStartEnd(pullRequestDate);
   const week = getFormattedWeek(pullRequestDate);
@@ -35,6 +38,7 @@ export async function processMergedPullRequest(pullRequest: PullRequest) {
   if (isFirstCommit) {
     // double-check usign Github API in case the previous PR was not recorded by us
     const prs = await getRecentPullRequestsByUser({
+      defaultBranch: repo.defaultBranch,
       repoNameWithOwner: pullRequest.repository.nameWithOwner,
       username: pullRequest.author.login
     });
