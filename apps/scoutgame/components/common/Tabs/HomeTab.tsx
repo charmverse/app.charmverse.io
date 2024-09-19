@@ -2,6 +2,8 @@ import 'server-only';
 
 import { delay } from '@root/lib/utils/async';
 
+import { getLeaderboard } from 'lib/users/getLeaderboard';
+
 import { ActivityTable } from './ActivityTable';
 import { LeaderboardTable } from './LeaderboardTable';
 import { TopBuildersTable } from './TopBuildersTable';
@@ -162,7 +164,7 @@ const leaderboardData = [
   }
 ];
 
-const topscoutsData = [
+const topScoutsData = [
   {
     user: {
       avatar:
@@ -303,18 +305,19 @@ const topBuildersData = [
 export async function HomeTab({ tab }: { tab: string }) {
   await delay(3000);
   // const data = await getTabData(tab); @TODO: Implement getTabData and remove delay
-
   if (tab === 'activity') {
     return <ActivityTable data={activityData as any} />;
   }
 
   if (tab === 'topscouts') {
-    return <TopScoutsTable data={topscoutsData as any} />;
+    return <TopScoutsTable data={topScoutsData as any} />;
   }
 
   if (tab === 'topbuilders') {
     return <TopBuildersTable data={topBuildersData as any} />;
   }
 
-  return <LeaderboardTable data={leaderboardData as any} />;
+  const data = await getLeaderboard();
+
+  return <LeaderboardTable data={data as any} />;
 }
