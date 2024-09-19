@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 import type { GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { octokit } from '@packages/github/client';
 
 import { getClosedPullRequest } from './getClosedPullRequest';
 import type { PullRequest } from './getPullRequests';
-import { octokit } from './githubClient';
 
 type RepoInput = Pick<GithubRepo, 'owner' | 'name'>;
 
