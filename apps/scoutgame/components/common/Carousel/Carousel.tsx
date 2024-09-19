@@ -30,7 +30,7 @@ export function Carousel({ items }: { items: any[] }) {
         >
           {items.map((_user) => (
             <SwiperSlide key={_user.username}>
-              <UserCard withDetails user={_user} />
+              <UserCard withDetails user={_user} variant='big' />
             </SwiperSlide>
           ))}
         </Swiper>

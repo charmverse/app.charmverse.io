@@ -9,7 +9,7 @@ import { authSchema } from '../farcaster/config';
 import { saveSession } from './saveSession';
 
 export const loginAction = actionClient
-  .metadata({ actionName: 'login_with_wallet' })
+  .metadata({ actionName: 'login_with_farcaster' })
   .schema(authSchema)
   .action(async ({ ctx, parsedInput }) => {
     const newUserId = ctx.session.anonymousUserId;

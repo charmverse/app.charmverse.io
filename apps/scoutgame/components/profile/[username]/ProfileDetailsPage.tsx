@@ -1,19 +1,21 @@
+import 'server-only';
+
 import type { Scout } from '@charmverse/core/prisma';
-import { Typography, Box } from '@mui/material';
+import Box from '@mui/material/Box';
 import { Suspense } from 'react';
 
-import { FarcasterCard } from 'components/common/FarcasterCard';
-import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
+import { ProfileMenu } from 'components/common/Tabs/ProfileMenu';
 import { LoadingComponent } from 'components/layout/Loading/LoadingComponent';
 
-export async function ProfileDetailsPage({ user }: { user: Scout }) {
+import { ProfileTabs } from './Tabs/ProfileTabs';
+
+export async function ProfileDetailsPage({ user, tab }: { user: Scout; tab: string }) {
   return (
-    <SinglePageWrapper>
-      <Box gap={2} display='flex' flexDirection='column'>
-        <FarcasterCard name={user.displayName} username={user.username} avatar={user.avatar} />
-        <Typography variant='h6'>Projects</Typography>
-        <Suspense fallback={<LoadingComponent />}></Suspense>
-      </Box>
-    </SinglePageWrapper>
+    <Box p={1} gap={2} display='flex' flexDirection='column' maxWidth='1240px' margin='auto'>
+      <ProfileMenu tab={tab} username={user.username} />
+      <Suspense fallback={<LoadingComponent />} key={tab}>
+        <ProfileTabs tab={tab} user={user} />
+      </Suspense>
+    </Box>
   );
 }

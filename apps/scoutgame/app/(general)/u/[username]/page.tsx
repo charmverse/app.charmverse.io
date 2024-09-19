@@ -10,10 +10,19 @@ export const metadata: Metadata = {
   title: 'User Profile'
 };
 
-export default async function Profile({ params }: { params: { username: string } }) {
+export default async function Profile({
+  params,
+  searchParams
+}: {
+  params: { username: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const user = await getUserByPath(params.username);
-  if (!user) {
+  const tab = searchParams.tab;
+
+  if (!user || typeof tab !== 'string') {
     return notFound();
   }
-  return <ProfileDetailsPage user={user} />;
+
+  return <ProfileDetailsPage user={user} tab={tab} />;
 }
