@@ -10,9 +10,9 @@ export async function processPullRequests() {
   const repos = await prisma.githubRepo.findMany();
 
   // get Pull requests
-  const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const lastHour = new Date(Date.now() - 1 * 60 * 60 * 1000);
   const timer = DateTime.now();
-  const pullRequests = await getPullRequests({ repos, after: last24Hours });
+  const pullRequests = await getPullRequests({ repos, after: lastHour });
 
   log.info(`Retrieved ${pullRequests.length} pull requests in ${timer.diff(DateTime.now(), 'minutes')} minutes`);
 
