@@ -55,6 +55,7 @@ runs:
       run: |
         npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w @connect-shared -w apps/{0}', inputs.app_name) || '' }}
         ls node_modules/@prisma/engines
+        npx prisma -v
 
     # If installing specific version of core via npmjs
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}
