@@ -3,14 +3,48 @@ import { syncProposalPermissionsWithWorkflowPermissions } from '@root/lib/propos
 import { prettyPrint } from 'lib/utils/strings';
 
 async function query() {
-  const result = await prisma.page.count({
-    where: {
-      parent: {
-        path: 'tech-task-list-49366552253645923'
-      }
-    }
-  });
-  console.log(result);
+  // create repo
+  // const repo = await prisma.githubRepo.create({
+  //   data: {
+  //     id: 860028062,
+  //     name: 'test-repo',
+  //     owner: 'charmverse',
+  //     defaultBranch: 'main'
+  //   }
+  // });
+  // console.log(repo);
+
+  // create scout
+  // const scout = await prisma.scout.create({
+  //   data: {
+  //     username: 'mattbot',
+  //     displayName: 'Mattbot',
+  //     builder: true
+  //   }
+  // });
+  // await prisma.githubUser.update({
+  //   where: {
+  //     login: 'mattcasey'
+  //   },
+  //   data: {
+  //     builderId: scout.id
+  //   }
+  // });
+  // console.log(scout);
+
+  // update scout instead
+  // await prisma.scout.update({
+  //   where: {
+  //     username: 'mattbot'
+  //   },
+  //   data: {
+  //     builder: true
+  //   }
+  // });
+
+  console.log(await prisma.githubUser.findMany());
+  console.log(await prisma.githubEvent.findMany());
+  console.log(await prisma.builderStrike.findMany());
 }
 
 query();

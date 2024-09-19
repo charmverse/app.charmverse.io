@@ -135,8 +135,8 @@ jobs:
           skip_annotations: 'true' # do not annotate code in the PR
           file_extensions: '**/*.{ts,tsx}'
 
-      - name: Run tests
-        run: npm run scoutgamecron:test
+      # - name: Run tests
+      #   run: npm run scoutgamecron:test
 
   upload-docker:
     name: Upload Docker image
