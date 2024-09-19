@@ -82,6 +82,7 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
+          app_name: scoutgame
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
@@ -119,6 +120,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -174,6 +177,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -226,6 +231,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Restore app from cache
         uses: ./.github/actions/build_app
@@ -261,6 +268,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Calculate Build ID
         id: get_build_id
@@ -317,6 +326,8 @@ jobs:
       # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -369,6 +380,8 @@ jobs:
       # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Replace env_var with staging settings
         run: |
