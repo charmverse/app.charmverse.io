@@ -11,11 +11,13 @@ type RepoInput = Pick<GithubRepo, 'owner' | 'name'>;
 export async function processClosedPullRequest({
   pullRequest,
   repo,
-  prClosedBy
+  prClosedBy,
+  skipSendingComment
 }: {
   pullRequest: PullRequest;
   repo: RepoInput;
   prClosedBy?: string;
+  skipSendingComment?: boolean;
 }) {
   const builder = await prisma.scout.findFirst({
     where: {
@@ -106,19 +108,21 @@ export async function processClosedPullRequest({
           bannedAt: new Date()
         }
       });
-      await octokit.rest.issues.createComment({
-        issue_number: pullRequest.number,
-        body: `Scout Game Alert: ⚠️
+      if (!skipSendingComment) {
+        await octokit.rest.issues.createComment({
+          issue_number: pullRequest.number,
+          body: `Scout Game Alert: ⚠️
 
 It looks like this Pull Request was closed by the maintainer. As a result, you've received your third strike in the Scout Game. Your current strike count is 3, and your account has been suspended from further participation in the Scout Game.
 
 If you believe this was a mistake and wish to appeal, you can submit an appeal at: app.charmverse.io.
 `,
-        owner: repo.owner,
-        repo: repo.name
-      });
+          owner: repo.owner,
+          repo: repo.name
+        });
+      }
       log.info('Banned builder', { userId: builder.id, strikes });
-    } else if (!shouldBeBanned) {
+    } else if (!shouldBeBanned && !skipSendingComment) {
       await octokit.rest.issues.createComment({
         issue_number: pullRequest.number,
         body: `Scout Game Alert: ⚠️
@@ -132,6 +136,7 @@ If you believe this was a mistake and wish to appeal now or after 3 strikes, you
         owner: repo.owner,
         repo: repo.name
       });
+      log.info('Sent a comment to the builder', { userId: builder.id, strikes, url: pullRequest.url });
     }
   }
 }

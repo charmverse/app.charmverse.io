@@ -115,7 +115,8 @@ async function processPullRequest(pullRequest: PullRequest, githubRepo: GithubRe
     await processClosedPullRequest({
       pullRequest,
       repo: githubRepo,
-      prClosedBy: v4()
+      prClosedBy: v4(),
+      skipSendingComment: true
     });
   } else if (pullRequest.state === 'MERGED') {
     await processMergedPullRequest({
