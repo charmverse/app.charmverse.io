@@ -54,7 +54,6 @@ runs:
       # This is a temporary step while we figure out a way to ensure compatibility with lens protocol which currently needs ethers-v5
       run: |
         npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w @connect-shared -w apps/{0}', inputs.app_name) || '' }}
-        ls node_modules/@prisma/engines
         npx prisma -v
 
     # If installing specific version of core via npmjs
