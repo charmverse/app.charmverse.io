@@ -13,5 +13,5 @@ export default async function Page() {
 
   // return <h2>test</h2>;
 
-  return <NFTPurchase />;
+  return <NFTPurchase builderId='b9b05f89-c82e-4025-8c21-1a3c98b21ecd' />;
 }

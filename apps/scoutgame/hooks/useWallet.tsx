@@ -1,11 +1,12 @@
 import { log } from '@charmverse/core/log';
 import type { Connector } from 'wagmi';
-import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useWalletClient } from 'wagmi';
 
 export function useWallet() {
   const { isConnected, address, chainId } = useAccount();
   const { disconnectAsync } = useDisconnect();
   const { connectors, connectAsync, error: connectError } = useConnect();
+  const { data } = useWalletClient();
 
   const connectWallet = async (connector: Connector) => {
     try {
@@ -26,6 +27,7 @@ export function useWallet() {
     connectors,
     connectError,
     connectWallet,
-    disconnectAsync
+    disconnectAsync,
+    walletClient: data
   };
 }

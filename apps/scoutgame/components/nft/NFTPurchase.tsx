@@ -1,19 +1,22 @@
 'use client';
 
-import env from '@beam-australia/react-env';
+import { log } from '@charmverse/core/log';
 import type { EvmTransaction } from '@decent.xyz/box-common';
 import { ActionType, ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Button, Typography } from '@mui/material';
+import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { useEffect, useState } from 'react';
 import { encodeAbiParameters } from 'viem';
+import { base } from 'viem/chains';
 import { useSendTransaction } from 'wagmi';
 
 import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
 
-import { decentApiKey } from './constants';
+import { builderContractAddress, decentApiKey, readonlyApiClient } from './constants';
+import { ContractApiClient } from './nftContractApiClient';
 
 type NFT = {
   id: string;
@@ -31,34 +34,66 @@ const builderNFT = {
   contractAddress: '0x7df4d9f54a5cddfef50a032451f694d6345c60af'
 };
 
-function NFTPurchaseButton({ walletAddress }: { walletAddress: string }) {
-  const [nfts, setNfts] = useState<NFT[]>([]);
-  const [selectedNFT, setSelectedNFT] = useState<NFT | null>(builderNFT);
-  const [searchTerm, setSearchTerm] = useState('');
+function NFTPurchaseButton({ builderId }: { builderId: string }) {
+  const { address, walletClient } = useWallet();
+
+  // const [nftApiClient, setNftApiClient] = useState<ContractApiClient>(null);
+
+  const [isFetchingPrice, setIsFetchingPrice] = useState(false);
+
+  const [fetchError, setFetchError] = useState<any>(null);
+
+  const [tokensToBuy, setTokensToBuy] = useState(1);
+
+  // Data from onchain
+  const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
+  const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
+
   const { sendTransaction } = useSendTransaction();
 
+  async function refreshAsk(amount: number) {
+    setTokensToBuy(amount);
+    const _price = await readonlyApiClient.getTokenPurchasePrice({
+      args: { amount: BigInt(tokensToBuy), tokenId: BigInt(builderTokenId) }
+    });
+    setPurchaseCost(_price);
+  }
+
+  async function refreshTokenData() {
+    setFetchError(null);
+    try {
+      setIsFetchingPrice(true);
+      const _builderTokenId = await readonlyApiClient.getTokenIdForBuilder({ args: { builderId } });
+
+      setBuilderTokenId(_builderTokenId);
+
+      await refreshAsk(tokensToBuy);
+
+      setIsFetchingPrice(false);
+    } catch (error) {
+      setIsFetchingPrice(false);
+      setFetchError(error);
+    }
+  }
+
   useEffect(() => {
-    const fetchNFTs = async () => {
-      const mockNFTs: NFT[] = [];
-      setNfts(mockNFTs);
-    };
+    if (builderId) {
+      refreshTokenData();
+    }
+  }, [builderId]);
 
-    fetchNFTs();
-  }, []);
-
-  const filteredNFTs = nfts.filter((nft) => nft.name.toLowerCase().includes(searchTerm.toLowerCase()));
   const { error, isLoading, actionResponse } = useBoxAction({
-    enable: !!selectedNFT,
-    actionType: ActionType.NftFillAsk,
-    sender: walletAddress || '',
-    srcToken: '0x0000000000000000000000000000000000000000', // Use native token (ETH)
-    srcChainId: ChainId.BASE_SEPOLIA,
+    enable: !!purchaseCost,
+    actionType: ActionType.EvmCalldataTx,
+    sender: address || '',
+    srcToken: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', // Use native token (ETH)
+    srcChainId: ChainId.BASE,
     dstToken: '0x0000000000000000000000000000000000000000',
-    dstChainId: ChainId.BASE_SEPOLIA,
+    dstChainId: ChainId.BASE,
     slippage: 1, // 1% slippage
     actionConfig: {
-      chainId: ChainId.BASE_SEPOLIA,
-      contractAddress: selectedNFT?.contractAddress || '0xbefd018f3864f5bbde665d6dc553e012076a5d44',
+      chainId: ChainId.BASE,
+      contractAddress: builderContractAddress,
       data: encodeAbiParameters(
         [
           { name: 'tokenId', type: 'uint256' },
@@ -71,7 +106,10 @@ function NFTPurchaseButton({ walletAddress }: { walletAddress: string }) {
   });
 
   const handlePurchase = async () => {
-    if (!selectedNFT) return;
+    if (!purchaseCost) {
+      log.info('Purchase cost not available');
+      return;
+    }
     const tx = actionResponse?.tx as EvmTransaction;
 
     sendTransaction({
@@ -85,50 +123,43 @@ function NFTPurchaseButton({ walletAddress }: { walletAddress: string }) {
     <div>
       <h1>NFT Purchase on Base Testnet</h1>
 
-      <input type='text' placeholder='Search NFTs' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+      <input
+        type='number'
+        placeholder='Search NFTs'
+        value={tokensToBuy}
+        onChange={(e) => setTokensToBuy(parseInt(e.target.value))}
+      />
 
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {filteredNFTs.map((nft) => (
-          <div key={nft.id} style={{ margin: '10px', cursor: 'pointer' }} onClick={() => setSelectedNFT(nft)}>
-            <img src={nft.image} alt={nft.name} style={{ width: '100px', height: '100px' }} />
-            <p>{nft.name}</p>
-            <p>{nft.price} ETH</p>
-          </div>
-        ))}
+      <div>
+        <h2>Selected NFT: {builderTokenId}</h2>
+        <p>Price: {purchaseCost} ETH</p>
+        <Button onClick={handlePurchase} disabled={isLoading}>
+          {isLoading ? 'Purchasing...' : 'Purchase NFT'}
+        </Button>
       </div>
-
-      {selectedNFT && (
-        <div>
-          <h2>Selected NFT: {selectedNFT.name}</h2>
-          <p>Price: {selectedNFT.price} ETH</p>
-          <Button onClick={handlePurchase} disabled={isLoading}>
-            {isLoading ? 'Purchasing...' : 'Purchase NFT'}
-          </Button>
-        </div>
-      )}
 
       {error instanceof Error ? <Typography color='error'>Error: {(error as Error).message}</Typography> : null}
     </div>
   );
 }
 
-function NFTPurchaseWithLogin() {
+function NFTPurchaseWithLogin({ builderId }: { builderId: string }) {
   const { address } = useWallet(); // Hook to access the connected wallet details
 
   return (
     <WagmiProvider>
       <BoxHooksContextProvider apiKey={decentApiKey}>
-        {address && <NFTPurchaseButton walletAddress='0x4A29c8fF7D6669618580A68dc691565B07b19e25' />}
+        {address && <NFTPurchaseButton builderId={builderId} />}
         {!address && <WalletConnect />}
       </BoxHooksContextProvider>
     </WagmiProvider>
   );
 }
 
-export function NFTPurchase() {
+export function NFTPurchase({ builderId }: { builderId: string }) {
   return (
     <WagmiProvider>
-      <NFTPurchaseWithLogin />
+      <NFTPurchaseWithLogin builderId={builderId} />
     </WagmiProvider>
   );
 }
