@@ -1,33 +1,26 @@
 import { getSession } from '@connect-shared/lib/session/getSession';
-import { isTruthy } from '@root/lib/utils/types';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+
+const privateLinks = ['/profile', '/scout', '/notifications'];
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();
   const user = session.user;
   const path = request.nextUrl.pathname;
 
-  // Make /p/ project pages public, /u/ user pages public
-  const projectPathChunks = path.split('/').filter(isTruthy);
-  const isEditProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'edit';
-  const isNewProjectPath = projectPathChunks[0] === 'p' && projectPathChunks.at(-1) === 'new';
-  const isProjectPath = projectPathChunks[0] === 'p' && !isEditProjectPath && !isNewProjectPath;
-
+  // We don't have a '/' page anymore since we need to handle 2 different layouts
   if (path === '/') {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
-  if (
-    !user &&
-    path !== '/' &&
-    !isProjectPath &&
-    !path.startsWith('/u/') &&
-    !path.startsWith('/grants') &&
-    !path.startsWith('/feed') &&
-    !path.startsWith('/login') &&
-    !path.startsWith('/home')
-  ) {
+  // Redirect to login if anonymous user clicks on private links
+  if (!user && privateLinks.some((url) => path.startsWith(url))) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // In case we have the need to redirect to homepage
+  if (!user && path.startsWith('/example-page')) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 

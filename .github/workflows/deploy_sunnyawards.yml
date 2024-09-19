@@ -74,6 +74,7 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
+          app_name: sunnyawards
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
@@ -111,6 +112,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -159,6 +162,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -212,6 +217,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Restore app from cache
         uses: ./.github/actions/build_app
@@ -247,6 +254,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Restore app from cache
         uses: ./.github/actions/build_app
@@ -301,6 +310,8 @@ jobs:
       # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -358,6 +369,8 @@ jobs:
       # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Replace env_var with staging settings
         run: |
