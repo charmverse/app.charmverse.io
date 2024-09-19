@@ -25,10 +25,9 @@ describe('processClosedPullRequest', () => {
   beforeEach(async () => {
     // Clear the database before each test
     await prisma.$transaction([
-      prisma.builderStrike.deleteMany(),
+      prisma.scout.deleteMany(),
       prisma.githubEvent.deleteMany(),
       prisma.githubUser.deleteMany(),
-      prisma.scout.deleteMany(),
       prisma.githubRepo.deleteMany()
     ]);
 
