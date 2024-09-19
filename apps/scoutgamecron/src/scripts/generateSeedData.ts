@@ -1,11 +1,12 @@
 import { GithubRepo, GithubUser, prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
-import { timezone } from '@packages/scoutgame/utils';
 import { PullRequest } from '../tasks/processPullRequests/getPullRequests';
 import { processClosedPullRequest } from '../tasks/processPullRequests/processClosedPullRequest';
 import { processMergedPullRequest } from '../tasks/processPullRequests/processMergedPullRequest';
 import { v4 } from 'uuid';
+import { log } from '@charmverse/core/log';
+import { timezone } from '@packages/scoutgame/utils';
 
 async function generateScout(params: { isBuilder: boolean } = { isBuilder: false }) {
   const { isBuilder } = params;
@@ -164,4 +165,13 @@ export async function generateSeedData() {
   for (let i = 0; i < totalUsers - totalBuilders; i++) {
     await generateScout();
   }
+
+  log.info('generated seed data', {
+    totalUsers,
+    totalBuilders,
+    totalGithubRepos,
+    totalScouts: totalUsers - totalBuilders
+  });
 }
+
+generateSeedData();
