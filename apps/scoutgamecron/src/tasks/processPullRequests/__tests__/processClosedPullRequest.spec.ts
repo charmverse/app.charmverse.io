@@ -8,15 +8,15 @@ jest.unstable_mockModule('../getClosedPullRequest', () => ({
   getClosedPullRequest: jest.fn()
 }));
 
-jest.unstable_mockModule('@packages/github/client', () => ({
-  octokit: {
-    rest: {
-      issues: {
-        createComment: jest.fn()
-      }
-    }
-  }
-}));
+// jest.unstable_mockModule('@packages/github/client', () => ({
+//   octokit: {
+//     rest: {
+//       issues: {
+//         createComment: jest.fn()
+//       }
+//     }
+//   }
+// }));
 
 const { getClosedPullRequest } = await import('../getClosedPullRequest');
 const { processClosedPullRequest } = await import('../processClosedPullRequest');
