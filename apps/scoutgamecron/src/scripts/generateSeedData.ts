@@ -149,10 +149,14 @@ async function generateBuilderEvents(
 }
 
 export async function generateSeedData() {
+  // Percentage of users that are builders
   const builderPercentage = faker.number.int({ min: 20, max: 50 });
-  const totalUsers = faker.number.int({ min: 100, max: 250 });
+  // Total number of users
+  const totalUsers = faker.number.int({ min: 250, max: 500 });
+  // Total number of builders
   const totalBuilders = Math.floor(totalUsers * builderPercentage / 100);
-  const totalGithubRepos = faker.number.int({ min: 100, max: 250 });
+  // Total number of github repos
+  const totalGithubRepos = faker.number.int({ min: 100, max: 150 });
 
   const [githubRepos, repoPRCounters] = await generateGithubRepos(totalGithubRepos);
 
@@ -171,7 +175,6 @@ export async function generateSeedData() {
     totalUsers,
     totalBuilders,
     totalGithubRepos,
-    totalScouts: totalUsers - totalBuilders
   });
 }
 
