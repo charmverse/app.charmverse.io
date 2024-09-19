@@ -81,7 +81,7 @@ function UserDisplay({ showMiniProfile = false, user, userId, hideIdentity, ...p
   const member = user ?? (userId ? membersRecord[userId] : null);
 
   if (hideIdentity) {
-    return <BaseComponent username='Hidden Identity' avatar={null} {...props} />;
+    return <BaseComponent username='Hidden' avatar={null} {...props} />;
   }
 
   if (!member) {
