@@ -80,7 +80,8 @@ export async function processClosedPullRequest({
               create: {
                 builderId: builder.id
               }
-            }
+            },
+        createdAt: pullRequest.createdAt
       }
     });
 

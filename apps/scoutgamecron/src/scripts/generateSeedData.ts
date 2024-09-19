@@ -84,13 +84,22 @@ async function generateGithubRepos(totalGithubRepos: number): Promise<[GithubRep
 }
 
 function generatePullRequest(
-  githubRepo: GithubRepo,
-  githubUser: GithubUser,
-  pullRequestNumber: number,
-  day: number,
-  closedPullRequestChance: number
+  {
+    githubRepo,
+    githubUser,
+    pullRequestNumber,
+    daysAgo,
+    closedPullRequestChance
+  }: {
+    githubRepo: GithubRepo,
+    githubUser: GithubUser,
+    pullRequestNumber: number,
+    daysAgo: number,
+    closedPullRequestChance: number
+  }
 ): PullRequest {
   const nameWithOwner = `${githubRepo.owner}/${githubRepo.name}`;
+  const now = DateTime.now().setZone(timezone);
   return {
     baseRefName: 'main',
     author: {
@@ -99,8 +108,8 @@ function generatePullRequest(
     },
     title: faker.lorem.sentence(),
     url: `https://github.com/${nameWithOwner}/pull/${pullRequestNumber}`,
-    createdAt: DateTime.fromJSDate(new Date(new Date().setDate(day - 1)), {zone: timezone}).toISO(),
-    mergedAt: DateTime.fromJSDate(new Date(new Date().setDate(day)), {zone: timezone}).toISO(),
+    createdAt: now.minus({ days: daysAgo + 1 }).toISO(),
+    mergedAt: now.minus({ days: daysAgo }).toISO(),
     number: pullRequestNumber,
     repository: {
       id: githubRepo.id,
@@ -142,7 +151,13 @@ async function generateBuilderEvents(
       const pullRequestNumber = repoPRCounters.get(githubRepo.id)! + 1;
       repoPRCounters.set(githubRepo.id, pullRequestNumber);
 
-      const pullRequest = generatePullRequest(githubRepo, githubUser, pullRequestNumber, day, closedPullRequestChance);
+      const pullRequest = generatePullRequest({
+        githubRepo,
+        githubUser,
+        pullRequestNumber,
+        daysAgo: day,
+        closedPullRequestChance
+      });
       await processPullRequest(pullRequest, githubRepo);
     }
   }
