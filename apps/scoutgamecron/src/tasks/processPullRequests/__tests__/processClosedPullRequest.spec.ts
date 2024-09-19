@@ -2,10 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
 import { v4 } from 'uuid';
 
+import { randomLargeInt } from '../../../lib/testing/numbers';
 import type { PullRequest } from '../getPullRequests';
-
-// Function to generate random large integers
-const randomLargeInt = () => Math.floor(Math.random() * 1000000000) + 1000000000;
 
 jest.unstable_mockModule('../getClosedPullRequest', () => ({
   getClosedPullRequest: jest.fn()
