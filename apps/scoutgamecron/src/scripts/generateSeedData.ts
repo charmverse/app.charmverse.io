@@ -9,10 +9,10 @@ import { v4 } from 'uuid';
 
 async function generateScout(params: { isBuilder: boolean } = { isBuilder: false }) {
   const { isBuilder } = params;
-  const displayName = faker.name.fullName();
   const username = faker.internet.userName();
-  const email = faker.internet.email();
-  const avatar = faker.image.avatar();
+  const displayName = `${faker.person.firstName()} ${faker.person.lastName()}`;
+  const email = faker.datatype.boolean() ? faker.internet.email() : undefined;
+  const avatar = faker.datatype.boolean() ? faker.image.avatar() : undefined;
 
   const githubUser = isBuilder ? {
     id: faker.number.int({ min: 100000, max: 10000000 }),
@@ -55,6 +55,11 @@ async function generateBuilder() {
     builder: scout,
     githubUser: githubUser as GithubUser
   };
+}
+
+function assignReposToBuilder(githubRepos: GithubRepo[]): GithubRepo[] {
+  const repoCount = faker.number.int({ min: 3, max: 5 });
+  return faker.helpers.arrayElements(githubRepos, repoCount);
 }
 
 async function generateGithubRepos(totalGithubRepos: number): Promise<[GithubRepo[], Map<number, number>]> {
@@ -151,7 +156,9 @@ export async function generateSeedData() {
 
   for (let i = 0; i < totalBuilders; i++) {
     const {githubUser} = await generateBuilder();
-    await generateBuilderEvents(githubUser, githubRepos, repoPRCounters);
+    // Realistically a builder will only send PR to a few repos not any arbitrary ones
+    const assignedRepos = assignReposToBuilder(githubRepos);
+    await generateBuilderEvents(githubUser, assignedRepos, repoPRCounters);
   }
 
   for (let i = 0; i < totalUsers - totalBuilders; i++) {
