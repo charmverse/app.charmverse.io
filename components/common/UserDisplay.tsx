@@ -72,20 +72,16 @@ interface UserDisplayProps extends StyleProps {
   userId?: string;
   showMiniProfile?: boolean;
   user?: LoggedInUser;
-  anonymize?: boolean; // use a fake identity to be anonymous
+  hideIdentity?: boolean;
 }
 
-function UserDisplay({ showMiniProfile = false, user, userId, anonymize, ...props }: UserDisplayProps) {
+function UserDisplay({ showMiniProfile = false, user, userId, hideIdentity, ...props }: UserDisplayProps) {
   const { showUserProfile } = useMemberProfileDialog();
   const { membersRecord } = useMembers();
   const member = user ?? (userId ? membersRecord[userId] : null);
 
-  const fakeName = useMemo(() => {
-    return randomName();
-  }, []);
-
-  if (anonymize) {
-    return <BaseComponent username={fakeName} avatar={null} {...props} />;
+  if (hideIdentity) {
+    return <BaseComponent username='Hidden Identity' avatar={null} {...props} />;
   }
 
   if (!member) {
