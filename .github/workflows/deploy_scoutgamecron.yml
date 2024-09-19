@@ -136,9 +136,7 @@ jobs:
           file_extensions: '**/*.{ts,tsx}'
 
       - name: Run tests
-        run: |
-          ls -la node_modules/@packages
-          npm run scoutgamecron:test || npm run scoutgamecron:test || npm run scoutgamecron:test
+        run: npm run scoutgamecron:test || npm run scoutgamecron:test || npm run scoutgamecron:test
 
   upload-docker:
     name: Upload Docker image
