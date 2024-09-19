@@ -120,7 +120,7 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
         }
       });
 
-      if (builder.bannedAt) {
+      if (builder.bannedAt || !builder.builder) {
         return;
       }
 
