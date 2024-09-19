@@ -11,6 +11,7 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.0.1",
     "@packages/github": "^0.0.0",
     "@packages/scoutgame": "^0.0.0",
     "web-push": "^3.6.7"

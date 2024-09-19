@@ -8,7 +8,15 @@ import type { PullRequest } from './getPullRequests';
 
 type RepoInput = Pick<GithubRepo, 'owner' | 'name'>;
 
-export async function processClosedPullRequest(pullRequest: PullRequest, repo: RepoInput) {
+export async function processClosedPullRequest({
+  pullRequest,
+  repo,
+  prClosedBy
+}: {
+  pullRequest: PullRequest;
+  repo: RepoInput;
+  prClosedBy?: string;
+}) {
   const builder = await prisma.scout.findFirst({
     where: {
       githubUser: {
@@ -30,10 +38,12 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
   });
   if (builder) {
     // Check if this PR was closed by the author, then ignore it
-    const { login: prClosingAuthorUsername } = await getClosedPullRequest({
-      pullRequestNumber: pullRequest.number,
-      repo
-    });
+    const { login: prClosingAuthorUsername } = prClosedBy
+      ? { login: prClosedBy }
+      : await getClosedPullRequest({
+          pullRequestNumber: pullRequest.number,
+          repo
+        });
 
     const ignoreStrike = prClosingAuthorUsername === pullRequest.author.login;
     if (ignoreStrike) {
@@ -58,7 +68,7 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
       data: {
         pullRequestNumber: pullRequest.number,
         title: pullRequest.title,
-        type: pullRequest.state === 'CLOSED' ? 'closed_pull_request' : 'merged_pull_request',
+        type: 'closed_pull_request',
         createdBy: pullRequest.author.id,
         repoId: pullRequest.repository.id,
         url: pullRequest.url,
