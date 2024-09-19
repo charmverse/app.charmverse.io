@@ -347,6 +347,7 @@
   "devDependencies": {
     "@depay/web3-mock": "^13.18.1",
     "@graphql-codegen/typescript-react-apollo": "^4.1.0",
+    "@jest/globals": "^29.7.0",
     "@next/eslint-plugin-next": "^14.2.5",
     "@playwright/test": "^1.47.1",
     "@spruceid/siwe-parser": "^2.0.2",
