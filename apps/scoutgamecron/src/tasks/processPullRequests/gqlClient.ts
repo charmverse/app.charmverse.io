@@ -4,7 +4,7 @@ import { graphql } from '@octokit/graphql';
 export function getClient() {
   return graphql.defaults({
     headers: {
-      Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`
+      Authorization: `bearer ${process.env.SCOUTGAME_GITHUB_ACCESS_TOKEN}`
     }
   });
 }

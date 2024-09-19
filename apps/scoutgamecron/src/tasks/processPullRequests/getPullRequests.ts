@@ -60,6 +60,9 @@ const getRecentPrs = `
             createdAt
             author {
               login
+              ... on User {
+                id
+              }
             }
             repository {
               id
@@ -127,7 +130,7 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
       .map(({ node }) => ({
         ...node,
         author: {
-          id: parseInt(btoa(node.author.id.toString()).split(':')[1]),
+          id: parseInt(atob(node.author.id.toString()).split(':User')[1]),
           login: node.author.login
         },
         repository: {
@@ -149,9 +152,3 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
 
   return allRecentPRs;
 }
-
-// getRecentClosedOrMergedPRs({
-//   after: new Date('2024-09-16'),
-//   owner: 'charmverse',
-//   repo: 'app.charmverse.io'
-// }).then(console.log);
