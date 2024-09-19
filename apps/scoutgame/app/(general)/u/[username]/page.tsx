@@ -1,8 +1,10 @@
+import type { Scout } from '@charmverse/core/prisma-client';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { ProfileDetailsPage } from 'components/profile/[username]/ProfileDetailsPage';
+import { PublicProfileDetailsPage } from 'components/profile/[username]/PublicProfileDetailsPage';
 import { getUserByPath } from 'lib/users/getUserByPath';
+import { userCards } from 'lib/users/mock/userCards';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,5 +26,5 @@ export default async function Profile({
     return notFound();
   }
 
-  return <ProfileDetailsPage user={user} tab={tab} />;
+  return <PublicProfileDetailsPage user={{ ...(userCards[0] as unknown as Scout), ...user }} tab={tab} />;
 }

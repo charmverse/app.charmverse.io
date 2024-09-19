@@ -25,10 +25,10 @@ export function HomeTabsMenu({ tab }: { tab: string }) {
           }
         }}
       >
-        <Tab LinkComponent={Link} label='Leaderboard' href='/home?tab=leaderboard' value='leaderboard' />
-        <Tab LinkComponent={Link} label='Activity' href='/home?tab=activity' value='activity' />
-        <Tab LinkComponent={Link} label='Top Scouts' href='/home?tab=topscouts' value='topscouts' />
-        <Tab LinkComponent={Link} label='Top Builders' href='/home?tab=topbuilders' value='topbuilders' />
+        <Tab component={Link} label='Leaderboard' href='/home?tab=leaderboard' value='leaderboard' scroll={false} />
+        <Tab component={Link} label='Activity' href='/home?tab=activity' value='activity' scroll={false} />
+        <Tab component={Link} label='Top Scouts' href='/home?tab=topscouts' value='topscouts' scroll={false} />
+        <Tab component={Link} label='Top Builders' href='/home?tab=topbuilders' value='topbuilders' scroll={false} />
       </Tabs>
     </Box>
   );

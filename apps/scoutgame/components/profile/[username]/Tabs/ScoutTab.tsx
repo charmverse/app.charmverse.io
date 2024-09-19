@@ -5,7 +5,7 @@ import { Box, Paper, Stack } from '@mui/material';
 import { Suspense } from 'react';
 
 import { BackButton } from 'components/common/Button/BackButton';
-import { UserProfile } from 'components/common/UserProfile';
+import { UserProfile } from 'components/common/Profile/UserProfile';
 import { LoadingComponent } from 'components/layout/Loading/LoadingComponent';
 
 import { ScoutPublicDetails } from '../ScoutPublicDetails';

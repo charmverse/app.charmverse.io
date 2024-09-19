@@ -2,8 +2,8 @@ import type { Scout } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 
 import { SinglePageLayout } from 'components/common/Layout';
+import { UserProfile } from 'components/common/Profile/UserProfile';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
-import { UserProfile } from 'components/common/UserProfile';
 
 import { ExtraDetailsForm } from './components/ExtraDetailsForm';
 

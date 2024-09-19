@@ -2,8 +2,8 @@ import type { Scout } from '@charmverse/core/prisma-client';
 import { Typography, Box } from '@mui/material';
 import { Suspense } from 'react';
 
+import { UserProfile } from 'components/common/Profile/UserProfile';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
-import { UserProfile } from 'components/common/UserProfile';
 import { LoadingComponent } from 'components/layout/Loading/LoadingComponent';
 
 export async function ProfilePage({ user }: { user: Scout }) {

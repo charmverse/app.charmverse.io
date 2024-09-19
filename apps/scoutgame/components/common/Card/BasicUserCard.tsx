@@ -18,7 +18,7 @@ export function BasicUserCard({
   }
 
   return (
-    <Card>
+    <Card sx={{ border: 'none' }}>
       <Box borderRadius='5px' overflow='hidden'>
         <CardActionArea
           LinkComponent={Link}

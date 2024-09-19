@@ -236,6 +236,11 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         }
       }
     },
+    MuiIconButton: {
+      defaultProps: {
+        disableRipple: true
+      }
+    },
     MuiMenuItem: {
       defaultProps: {
         dense: true

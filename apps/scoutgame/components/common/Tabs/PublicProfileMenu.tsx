@@ -1,7 +1,7 @@
 import { Box, Tab, Tabs, tabClasses, tabsClasses } from '@mui/material';
 import Link from 'next/link';
 
-export function ProfileMenu({ tab, username }: { tab: string; username: string }) {
+export function PublicProfileMenu({ tab, username }: { tab: string; username: string }) {
   const value = ['scout', 'builder'].includes(tab) ? tab : 'scout';
 
   return (
@@ -23,8 +23,8 @@ export function ProfileMenu({ tab, username }: { tab: string; username: string }
           }
         }}
       >
-        <Tab LinkComponent={Link} label='Scout' href={`/u/${username}/?tab=scout`} value='scout' />
-        <Tab LinkComponent={Link} label='Builder' href={`/u/${username}/?tab=builder`} value='builder' />
+        <Tab component={Link} label='Scout' href={`/u/${username}/?tab=scout`} value='scout' scroll={false} />
+        <Tab component={Link} label='Builder' href={`/u/${username}/?tab=builder`} value='builder' scroll={false} />
       </Tabs>
     </Box>
   );

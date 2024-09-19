@@ -25,19 +25,23 @@ export function UserCard({
         user={user}
         chidlrenInside={withDetails && <UserCardDetails gems={user.gems} scouts={user.scouts} likes={user.likes} />}
       >
-        <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
-          <CardButton price={user.price} username={user.username} />
-        </Stack>
+        {user.price && (
+          <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
+            <CardButton price={user.price} username={user.username} />
+          </Stack>
+        )}
       </BasicUserCard>
     );
   }
 
   return (
     <BasicUserCard user={user} chidlrenInside={withDetails && <UserCardDetails gems={user.gems} />}>
-      <Stack gap={1} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }} px={{ xs: 1 }}>
-        <UserCardDetails scouts={user.scouts} nfts={user.nfts} />
-        <CardButton price={user.price} username={user.username} />
-      </Stack>
+      {(withDetails || user.price) && (
+        <Stack gap={1} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }} px={withDetails ? 1 : 0}>
+          {withDetails && <UserCardDetails scouts={user.scouts} nfts={user.nfts} />}
+          {user.price && <CardButton price={user.price} username={user.username} />}
+        </Stack>
+      )}
     </BasicUserCard>
   );
 }

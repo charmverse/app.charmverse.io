@@ -2,8 +2,8 @@ import type { Scout } from '@charmverse/core/prisma-client';
 import { IconButton, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import type { AvatarSize } from './Avatar';
-import { Avatar } from './Avatar';
+import type { AvatarSize } from '../Avatar';
+import { Avatar } from '../Avatar';
 
 type Props = {
   user: Scout & { description?: string };
@@ -16,14 +16,7 @@ const _description = 'This is my short little bio about how sigma I am. Could ad
 export function UserProfile({ user, avatarSize = 'xLarge' }: Props) {
   const { displayName, username, description = _description, avatar } = user;
   return (
-    <Stack
-      sx={{
-        display: 'flex',
-        gap: 2,
-        alignItems: 'center',
-        flexDirection: 'row'
-      }}
-    >
+    <Stack display='flex' gap={2} alignItems='center' flexDirection='row'>
       <Stack
         alignItems={{
           xs: 'center',

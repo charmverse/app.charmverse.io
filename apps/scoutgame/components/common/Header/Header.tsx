@@ -48,10 +48,17 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | nu
   return (
     <AppBar position='static'>
       <Container maxWidth={false}>
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }} variant='dense'>
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between', alignItems: 'center' }} variant='dense'>
           <>
             <Link href='/home'>
-              <Image src='/images/scout-game-logo.png' width={100} height={45} alt='Scout Game logo' priority={true} />
+              <Image
+                src='/images/scout-game-logo.png'
+                width={100}
+                height={45}
+                alt='Scout Game logo'
+                priority={true}
+                style={{ verticalAlign: 'middle' }}
+              />
             </Link>
             <Stack flexDirection='row' gap={2} alignItems='center'>
               <HeaderMenu />

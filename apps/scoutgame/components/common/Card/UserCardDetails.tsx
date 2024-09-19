@@ -24,7 +24,7 @@ export function UserCardDetails({
       )}
       {typeof scouts === 'number' && (
         <Stack flexDirection='row' gap={0.2} alignItems='center'>
-          <Typography variant='body2' component='span' color='text.secondary'>
+          <Typography variant='body2' component='span' color='green.main'>
             {scouts}
           </Typography>
           <Image width={15} height={15} src='/images/profile/icons/scout-icon.svg' alt='Scouts' />
@@ -32,7 +32,7 @@ export function UserCardDetails({
       )}
       {typeof likes === 'number' && (
         <Stack flexDirection='row' gap={0.2} alignItems='center'>
-          <Typography variant='body2' component='span' color='text.secondary'>
+          <Typography variant='body2' component='span' color='orange.main'>
             {likes}
           </Typography>
           <Image width={15} height={15} src='/images/profile/icons/like-icon.svg' alt='Likes' />

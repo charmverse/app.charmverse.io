@@ -1,8 +1,9 @@
+import 'server-only';
+
 import { Paper, Stack, Typography } from '@mui/material';
 import { delay } from '@root/lib/utils/async';
 import Image from 'next/image';
 
-import 'server-only';
 import { ScoutedBuilders } from './ScoutedBuilders';
 
 export async function ScoutPublicDetails() {
