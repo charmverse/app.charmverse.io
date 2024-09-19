@@ -3,6 +3,7 @@ import { getChainById } from '@root/connectors/chains';
 import { InvalidStateError } from '@root/lib/middleware/errors';
 import { optimism } from 'viem/chains';
 
+import { authConfig } from './config';
 import type { AuthSchema } from './config';
 
 const appClient = createAppClient({
@@ -20,7 +21,7 @@ export async function verifyFarcasterUser({ nonce, message, signature }: AuthSch
     nonce,
     message,
     signature,
-    domain: 'charmverse.io'
+    domain: authConfig.domain
   });
 
   if (farcasterSignatureError) {
