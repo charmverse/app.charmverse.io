@@ -16,14 +16,10 @@ describe('processMergedPullRequest', () => {
   beforeEach(async () => {
     // Clear the database before each test
     await prisma.$transaction([
-      prisma.gemsReceipt.deleteMany(),
-      prisma.builderStrike.deleteMany(),
-      prisma.builderEvent.deleteMany(),
+      prisma.scout.deleteMany(),
       prisma.githubEvent.deleteMany(),
       prisma.githubUser.deleteMany(),
-      prisma.scout.deleteMany(),
-      prisma.githubRepo.deleteMany(),
-      prisma.userWeeklyStats.deleteMany()
+      prisma.githubRepo.deleteMany()
     ]);
 
     jest.resetAllMocks();

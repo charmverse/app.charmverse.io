@@ -27,4 +27,6 @@ export async function processPullRequests() {
       await processMergedPullRequest(pullRequest, repo);
     }
   }
+
+  log.info(`Processed ${pullRequests.length} pull requests in ${timer.diff(DateTime.now(), 'minutes')} minutes`);
 }

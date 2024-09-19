@@ -7,7 +7,7 @@ jest.unstable_mockModule('../getClosedPullRequest', () => ({
   getClosedPullRequest: jest.fn()
 }));
 
-jest.unstable_mockModule('@packages/github/client', () => ({
+jest.unstable_mockModule('../githubClient', () => ({
   octokit: {
     rest: {
       issues: {
@@ -19,16 +19,15 @@ jest.unstable_mockModule('@packages/github/client', () => ({
 
 const { getClosedPullRequest } = await import('../getClosedPullRequest');
 const { processClosedPullRequest } = await import('../processClosedPullRequest');
-const { octokit } = await import('@packages/github/client');
+const { octokit } = await import('../githubClient');
 
 describe('processClosedPullRequest', () => {
   beforeEach(async () => {
     // Clear the database before each test
     await prisma.$transaction([
-      prisma.builderStrike.deleteMany(),
+      prisma.scout.deleteMany(),
       prisma.githubEvent.deleteMany(),
       prisma.githubUser.deleteMany(),
-      prisma.scout.deleteMany(),
       prisma.githubRepo.deleteMany()
     ]);
 

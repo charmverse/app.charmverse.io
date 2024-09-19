@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 import type { GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { octokit } from '@packages/github/client';
 
 import { getClosedPullRequest } from './getClosedPullRequest';
 import type { PullRequest } from './getPullRequests';
+import { octokit } from './githubClient';
 
 type RepoInput = Pick<GithubRepo, 'owner' | 'name'>;
 
@@ -28,17 +28,16 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
       }
     }
   });
-
   if (builder) {
-    let ignoreStrike = false;
     // Check if this PR was closed by the author, then ignore it
     const { login: prClosingAuthorUsername } = await getClosedPullRequest({
       pullRequestNumber: pullRequest.number,
       repo
     });
-    if (prClosingAuthorUsername === pullRequest.author.login) {
+
+    const ignoreStrike = prClosingAuthorUsername === pullRequest.author.login;
+    if (ignoreStrike) {
       log.debug('Ignore CLOSED PR since the author closed it', { url: pullRequest.url });
-      ignoreStrike = true;
     }
 
     const existingGithubEvent = await prisma.githubEvent.findFirst({
@@ -113,7 +112,7 @@ If you believe this was a mistake and wish to appeal, you can submit an appeal a
       await octokit.rest.issues.createComment({
         issue_number: pullRequest.number,
         body: `Scout Game Alert: ⚠️
-        
+
 It looks like this Pull Request was closed by the maintainer. As a result, you've received your first strike in the Scout Game. Your current strike count is ${strikes}.
 
 Please note that if you reach 3 strikes, your account will be suspended from the Scout Game.
