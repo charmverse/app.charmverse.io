@@ -89,15 +89,15 @@ function generatePullRequest(
     githubUser,
     pullRequestNumber,
     daysAgo,
-    closedPullRequestChance
   }: {
     githubRepo: GithubRepo,
     githubUser: GithubUser,
     pullRequestNumber: number,
     daysAgo: number,
-    closedPullRequestChance: number
   }
 ): PullRequest {
+  // 10-20% chance of a closed PR
+  const closedPullRequestChance = faker.number.int({ min: 10, max: 20 });
   const nameWithOwner = `${githubRepo.owner}/${githubRepo.name}`;
   const now = DateTime.now().setZone(timezone);
   return {
@@ -141,14 +141,13 @@ async function generateBuilderEvents(
   githubRepos: GithubRepo[],
   repoPRCounters: Map<number, number>
 ) {
-  const closedPullRequestChance = faker.number.int({ min: 10, max: 20 });
   const weekDay = DateTime.fromJSDate(new Date(), {zone: timezone}).weekday % 7;
 
   for (let day = 0; day <= weekDay; day++) {
     const dailyGithubEvents = faker.number.int({ min: 3, max: 5 });
     for (let j = 0; j < dailyGithubEvents; j++) {
       const githubRepo = faker.helpers.arrayElement(githubRepos);
-      const pullRequestNumber = repoPRCounters.get(githubRepo.id)! + 1;
+      const pullRequestNumber = repoPRCounters.get(githubRepo.id) as number + 1;
       repoPRCounters.set(githubRepo.id, pullRequestNumber);
 
       const pullRequest = generatePullRequest({
@@ -156,7 +155,6 @@ async function generateBuilderEvents(
         githubUser,
         pullRequestNumber,
         daysAgo: day,
-        closedPullRequestChance
       });
       await processPullRequest(pullRequest, githubRepo);
     }
