@@ -21,7 +21,7 @@ jest.unstable_mockModule('../githubClient', () => ({
 
 const { getClosedPullRequest } = await import('../getClosedPullRequest');
 const { processClosedPullRequest } = await import('../processClosedPullRequest');
-const { octokit } = await import('../githubClient');
+const { octokit } = await import('@packages/github/client');
 
 describe('processClosedPullRequest', () => {
   beforeEach(async () => {

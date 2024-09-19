@@ -1,5 +1,5 @@
 import { createDefaultEsmPreset } from 'ts-jest';
 
 export default {
-  ...createDefaultEsmPreset()
+  preset: 'ts-jest'
 };
