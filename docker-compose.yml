@@ -330,5 +330,6 @@ services:
       - prd-sunnyawards
       - prd-sockets
       - prd-scoutgame
+      - prd-scoutgamecron
       - prd-waitlist
       - ddtst

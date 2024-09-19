@@ -9,7 +9,7 @@ jest.unstable_mockModule('../getClosedPullRequest', () => ({
   getClosedPullRequest: jest.fn()
 }));
 
-jest.unstable_mockModule('../githubClient', () => ({
+jest.unstable_mockModule('@packages/github/client', () => ({
   octokit: {
     rest: {
       issues: {
