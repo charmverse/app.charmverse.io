@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
+import { octokit } from '@packages/github/client';
 
 import type { PullRequest } from '../getPullRequests';
 
@@ -19,7 +20,6 @@ jest.unstable_mockModule('@packages/github/client', () => ({
 
 const { getClosedPullRequest } = await import('../getClosedPullRequest');
 const { processClosedPullRequest } = await import('../processClosedPullRequest');
-const { octokit } = await import('@packages/github/client');
 
 describe('processClosedPullRequest', () => {
   beforeEach(async () => {
