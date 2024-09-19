@@ -54,7 +54,7 @@ function BaseComponent({
       {props.avatarIcon ? (
         <Box sx={{ ml: 0.5, mt: 1 }}>{props.avatarIcon}</Box>
       ) : (
-        <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
+        <Avatar size={avatarSize} name={username !== 'Hidden' ? username : ''} avatar={avatar} isNft={isNft} />
       )}
       {!hideName && (
         <Typography whiteSpace={wrapName ? 'break-spaces' : 'nowrap'} fontSize={fontSize} fontWeight={fontWeight}>
