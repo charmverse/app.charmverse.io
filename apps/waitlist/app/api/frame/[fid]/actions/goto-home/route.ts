@@ -1,7 +1,7 @@
 /* eslint-disable no-case-declarations */
-import { InvalidInputError } from '@charmverse/core/errors';
 import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 import { baseUrl } from '@root/config/constants';
+import { validateFrameInteractionViaAirstackWithErrorCatching } from '@root/lib/farcaster/moxie';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
 
@@ -10,8 +10,6 @@ import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEv
 
 export async function POST(req: Request) {
   const waitlistClicked = (await req.json()) as FarcasterFrameInteractionToValidate;
-
-  const validatedMessage = await validateFrameInteraction(waitlistClicked.trustedData.messageBytes);
 
   const referrerFid = getReferrerFidFromUrl(req);
 
