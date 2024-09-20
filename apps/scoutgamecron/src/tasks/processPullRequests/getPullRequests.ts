@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client';
 import type { GithubRepo } from '@charmverse/core/prisma';
 
 import { getClient } from './gqlClient';
@@ -40,7 +41,7 @@ type GetRecentClosedOrMergedPRsResponse = {
   };
 };
 
-const getRecentPrs = `
+const getRecentPrs = gql`
   query getRecentClosedOrMergedPRs($owner: String!, $repo: String!, $cursor: String) {
     repository(owner: $owner, name: $repo) {
       databaseId
