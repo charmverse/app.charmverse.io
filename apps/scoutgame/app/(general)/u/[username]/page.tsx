@@ -22,7 +22,7 @@ export default async function Profile({
   const user = await getUserByPath(params.username);
   const tab = searchParams.tab;
 
-  if (!user || typeof tab !== 'string') {
+  if (!user) {
     return notFound();
   }
 

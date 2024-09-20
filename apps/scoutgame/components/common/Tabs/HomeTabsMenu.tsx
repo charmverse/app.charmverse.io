@@ -6,7 +6,7 @@ export function HomeTabsMenu({ tab }: { tab: string }) {
 
   // @TODO: When clicked, the content below the tabs should dissapear and the skeleton should appear and then the new content. Somehow this behaviour stopped working.
   return (
-    <Box maxWidth={{ xs: '95vw', md: 'normal' }}>
+    <Box>
       <Tabs
         value={value}
         aria-label='scout game nav tabs'
