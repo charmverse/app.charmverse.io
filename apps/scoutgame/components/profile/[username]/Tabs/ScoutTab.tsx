@@ -2,13 +2,11 @@ import 'server-only';
 
 import type { Scout } from '@charmverse/core/prisma-client';
 import { Box, Paper, Stack } from '@mui/material';
-import { Suspense } from 'react';
 
 import { BackButton } from 'components/common/Button/BackButton';
 import { UserProfile } from 'components/common/Profile/UserProfile';
-import { LoadingComponent } from 'components/layout/Loading/LoadingComponent';
 
-import { ScoutPublicDetails } from '../ScoutPublicDetails';
+import { PublicScoutDetails } from '../PublicScoutDetails';
 
 export async function ScoutTab({ user }: { user: Scout }) {
   return (
@@ -20,9 +18,7 @@ export async function ScoutTab({ user }: { user: Scout }) {
         </Stack>
       </Paper>
       <Stack my={2}>
-        <Suspense fallback={<LoadingComponent py={2} />}>
-          <ScoutPublicDetails />
-        </Suspense>
+        <PublicScoutDetails />
       </Stack>
     </Box>
   );

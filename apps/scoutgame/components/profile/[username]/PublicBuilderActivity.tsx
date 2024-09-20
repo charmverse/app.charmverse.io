@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
 import { delay } from '@root/lib/utils/async';
 import { DateTime } from 'luxon';
@@ -22,7 +24,7 @@ export async function PublicBuilderActivity() {
         <Typography variant='subtitle1' color='secondary' fontWeight='500'>
           Recent Activity
         </Typography>
-        <Button LinkComponent={Link} variant='text' href='/notifications' sx={{ fontWeight: 400 }}>
+        <Button LinkComponent={Link} variant='text' href='/notifications' sx={{ fontWeight: 400, p: 0 }}>
           View All
         </Button>
       </Stack>

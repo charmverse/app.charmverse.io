@@ -21,7 +21,10 @@ export function BuilderProfile({ user }: Props) {
           xs: 'center',
           sm: 'flex-start'
         }}
-        maxWidth='50%'
+        maxWidth={{
+          xs: '50%',
+          md: '200px'
+        }}
       >
         <UserCard user={{ ...user, price: 123 }} withDetails={false} />
       </Stack>
