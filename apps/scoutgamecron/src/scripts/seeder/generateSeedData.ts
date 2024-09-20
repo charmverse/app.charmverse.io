@@ -21,14 +21,12 @@ function assignReposToBuilder(githubRepos: GithubRepo[]): GithubRepo[] {
 }
 
 export async function generateSeedData() {
-  // Percentage of users that are builders
-  const builderPercentage = faker.number.int({ min: 20, max: 50 });
   // Total number of users
-  const totalUsers = faker.number.int({ min: 250, max: 500 });
-  // Total number of builders
-  const totalBuilders = Math.floor((totalUsers * builderPercentage) / 100);
+  const totalUsers = 200;
+  // Total number of users that are builders (should be less than totalUsers)
+  const totalBuilders = 100;
   // Total number of github repos
-  const totalGithubRepos = faker.number.int({ min: 100, max: 150 });
+  const totalGithubRepos = 100;
 
   const [githubRepos, repoPRCounters] = await generateGithubRepos(totalGithubRepos);
 
