@@ -1,5 +1,5 @@
 import type { BoxProps } from '@mui/material';
-import { Box, Typography } from '@mui/material';
+import { Avatar as AvatarIcon, Box, Typography } from '@mui/material';
 import type { LoggedInUser } from '@root/lib/profile/getUser';
 import type { ReactNode } from 'react';
 import { memo, useMemo } from 'react';
@@ -54,7 +54,7 @@ function BaseComponent({
       {props.avatarIcon ? (
         <Box sx={{ ml: 0.5, mt: 1 }}>{props.avatarIcon}</Box>
       ) : (
-        <Avatar size={avatarSize} name={username !== 'Hidden' ? username : ''} avatar={avatar} isNft={isNft} />
+        <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
       )}
       {!hideName && (
         <Typography whiteSpace={wrapName ? 'break-spaces' : 'nowrap'} fontSize={fontSize} fontWeight={fontWeight}>
@@ -81,7 +81,7 @@ function UserDisplay({ showMiniProfile = false, user, userId, hideIdentity, ...p
   const member = user ?? (userId ? membersRecord[userId] : null);
 
   if (hideIdentity) {
-    return <BaseComponent username='Hidden' avatar={null} {...props} />;
+    return <BaseComponent username='Anonymous' avatarIcon={<AvatarIcon />} {...props} />;
   }
 
   if (!member) {
