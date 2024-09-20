@@ -20,6 +20,11 @@ const receiptTypeMessage: Record<GemsReceiptType, string> = {
 
 export async function getAllEvents(): Promise<BuilderEventRow[]> {
   const builderEvents = await prisma.builderEvent.findMany({
+    where: {
+      gemsReceipt: {
+        isNot: null
+      }
+    },
     orderBy: {
       createdAt: 'desc'
     },
