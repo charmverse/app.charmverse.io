@@ -91,40 +91,26 @@ function getAvatarCustomStyles(variant: AvatarVariant, size: AvatarSize) {
   return { ...sizeStyles, ...variantStyles };
 }
 
-export type InitialAvatarProps = AvatarProps & {
+type InitialAvatarProps = Omit<AvatarProps, 'src'> & {
   name?: string;
-  avatar?: string;
+  src?: string | null;
   size?: AvatarSize;
-  isNft?: boolean;
 };
 
-export function Avatar({
-  avatar,
-  name,
-  variant,
-  size = 'medium',
-  isNft,
-  sx = {},
-  children,
-  ...restProps
-}: InitialAvatarProps) {
+export function Avatar({ name, variant, src, size = 'medium', sx = {}, children, ...restProps }: InitialAvatarProps) {
   const nameStr = (name || '').replace('0x', ''); // ignore the universal prefix of addresses
-  const muiVariant = isNft ? 'square' : variant;
-  const hexagonStyles = isNft ? { 'clip-path': 'url(#hexagon-avatar)', overflow: 'hidden' } : undefined;
 
   return (
     <MuiAvatar
       sx={{
         backgroundColor: stringToColor(nameStr),
-        ...hexagonStyles,
         ...getAvatarCustomStyles(variant, size),
         ...sx
       }}
-      variant={muiVariant}
-      src={replaceS3Domain(avatar ?? undefined)}
+      variant={variant}
       slotProps={{ img: { referrerPolicy: 'no-referrer' } }}
-      alt={name}
       {...restProps}
+      src={replaceS3Domain(src ?? undefined)}
     >
       {children || nameStr.charAt(0).toUpperCase()}
     </MuiAvatar>

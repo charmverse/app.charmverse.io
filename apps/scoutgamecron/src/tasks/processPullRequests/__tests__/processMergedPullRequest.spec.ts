@@ -4,8 +4,9 @@ import { timezone } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
 
-import { randomLargeInt } from '../../../lib/testing/numbers';
 import type { PullRequest } from '../getPullRequests';
+
+import { randomLargeInt } from '@/testing/numbers';
 
 jest.unstable_mockModule('../getRecentPullRequestsByUser', () => ({
   getRecentPullRequestsByUser: jest.fn()
@@ -74,7 +75,7 @@ describe('processMergedPullRequest', () => {
 
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
-    await processMergedPullRequest(pullRequest, repo);
+    await processMergedPullRequest({ pullRequest, repo });
 
     const githubEvent = await prisma.githubEvent.findFirst({
       where: {
@@ -173,7 +174,7 @@ describe('processMergedPullRequest', () => {
       }
     ]);
 
-    await processMergedPullRequest(pullRequest, repo);
+    await processMergedPullRequest({ pullRequest, repo });
 
     const githubEvent = await prisma.githubEvent.findFirst({
       where: {
@@ -271,7 +272,7 @@ describe('processMergedPullRequest', () => {
       }
     ]);
 
-    await processMergedPullRequest(pullRequest2, repo);
+    await processMergedPullRequest({ pullRequest: pullRequest2, repo });
 
     const pullRequest3: PullRequest = {
       number: randomLargeInt(),
@@ -291,7 +292,7 @@ describe('processMergedPullRequest', () => {
       state: 'MERGED'
     };
 
-    await processMergedPullRequest(pullRequest3, repo);
+    await processMergedPullRequest({ pullRequest: pullRequest3, repo });
 
     const pullRequest4: PullRequest = {
       number: randomLargeInt(),
@@ -311,7 +312,7 @@ describe('processMergedPullRequest', () => {
       state: 'MERGED'
     };
 
-    await processMergedPullRequest(pullRequest4, repo);
+    await processMergedPullRequest({ pullRequest: pullRequest4, repo });
 
     const gemsReceipt = await prisma.gemsReceipt.findFirstOrThrow({
       where: {
@@ -380,11 +381,11 @@ describe('processMergedPullRequest', () => {
     };
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
-    await processMergedPullRequest(pullRequest, githubRepo);
+    await processMergedPullRequest({ pullRequest, repo: githubRepo });
 
-    await processMergedPullRequest(pullRequest, githubRepo);
+    await processMergedPullRequest({ pullRequest, repo: githubRepo });
 
-    await processMergedPullRequest(pullRequest, githubRepo);
+    await processMergedPullRequest({ pullRequest, repo: githubRepo });
 
     const builderEvents = await prisma.builderEvent.count({
       where: {
@@ -454,7 +455,7 @@ describe('processMergedPullRequest', () => {
     };
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
-    await processMergedPullRequest(pullRequest, githubRepo);
+    await processMergedPullRequest({ pullRequest, repo: githubRepo });
 
     const builderEvents = await prisma.builderEvent.findMany({
       where: {

@@ -132,7 +132,7 @@ export async function GET(req: NextRequest) {
     },
     data: {
       builder: true,
-      onboarded: true
+      onboardedAt: new Date()
     }
   });
 

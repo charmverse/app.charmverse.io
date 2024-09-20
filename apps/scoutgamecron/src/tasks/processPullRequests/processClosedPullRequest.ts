@@ -8,7 +8,17 @@ import type { PullRequest } from './getPullRequests';
 
 type RepoInput = Pick<GithubRepo, 'owner' | 'name'>;
 
-export async function processClosedPullRequest(pullRequest: PullRequest, repo: RepoInput) {
+export async function processClosedPullRequest({
+  pullRequest,
+  repo,
+  prClosedBy,
+  skipSendingComment
+}: {
+  pullRequest: PullRequest;
+  repo: RepoInput;
+  prClosedBy?: string;
+  skipSendingComment?: boolean;
+}) {
   const builder = await prisma.scout.findFirst({
     where: {
       githubUser: {
@@ -30,10 +40,12 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
   });
   if (builder) {
     // Check if this PR was closed by the author, then ignore it
-    const { login: prClosingAuthorUsername } = await getClosedPullRequest({
-      pullRequestNumber: pullRequest.number,
-      repo
-    });
+    const { login: prClosingAuthorUsername } = prClosedBy
+      ? { login: prClosedBy }
+      : await getClosedPullRequest({
+          pullRequestNumber: pullRequest.number,
+          repo
+        });
 
     const ignoreStrike = prClosingAuthorUsername === pullRequest.author.login;
     if (ignoreStrike) {
@@ -58,7 +70,7 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
       data: {
         pullRequestNumber: pullRequest.number,
         title: pullRequest.title,
-        type: pullRequest.state === 'CLOSED' ? 'closed_pull_request' : 'merged_pull_request',
+        type: 'closed_pull_request',
         createdBy: pullRequest.author.id,
         repoId: pullRequest.repository.id,
         url: pullRequest.url,
@@ -68,7 +80,8 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
               create: {
                 builderId: builder.id
               }
-            }
+            },
+        createdAt: pullRequest.createdAt
       }
     });
 
@@ -96,19 +109,21 @@ export async function processClosedPullRequest(pullRequest: PullRequest, repo: R
           bannedAt: new Date()
         }
       });
-      await octokit.rest.issues.createComment({
-        issue_number: pullRequest.number,
-        body: `Scout Game Alert: ⚠️
+      if (!skipSendingComment) {
+        await octokit.rest.issues.createComment({
+          issue_number: pullRequest.number,
+          body: `Scout Game Alert: ⚠️
 
 It looks like this Pull Request was closed by the maintainer. As a result, you've received your third strike in the Scout Game. Your current strike count is 3, and your account has been suspended from further participation in the Scout Game.
 
 If you believe this was a mistake and wish to appeal, you can submit an appeal at: app.charmverse.io.
 `,
-        owner: repo.owner,
-        repo: repo.name
-      });
+          owner: repo.owner,
+          repo: repo.name
+        });
+      }
       log.info('Banned builder', { userId: builder.id, strikes });
-    } else if (!shouldBeBanned) {
+    } else if (!shouldBeBanned && !skipSendingComment) {
       await octokit.rest.issues.createComment({
         issue_number: pullRequest.number,
         body: `Scout Game Alert: ⚠️
@@ -122,6 +137,7 @@ If you believe this was a mistake and wish to appeal now or after 3 strikes, you
         owner: repo.owner,
         repo: repo.name
       });
+      log.info('Sent a comment to the builder', { userId: builder.id, strikes, url: pullRequest.url });
     }
   }
 }

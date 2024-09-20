@@ -15,9 +15,7 @@ import {
   primaryTextColor,
   primaryTextColorDarkMode,
   secondaryTextColor,
-  secondaryTextColorDarkMode,
-  settingsHeaderBackgroundColor,
-  settingsHeaderBackgroundColorDarkMode
+  secondaryTextColorDarkMode
 } from './colors';
 import { defaultFont } from './fonts';
 
@@ -27,9 +25,6 @@ declare module '@emotion/react' {
 }
 
 interface CustomColors extends Record<BrandColor, any> {
-  settingsHeader: {
-    background: string;
-  };
   sidebar: {
     avatarHighlight: string;
     background: string;

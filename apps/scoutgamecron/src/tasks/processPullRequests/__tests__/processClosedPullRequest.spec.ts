@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
 import { v4 } from 'uuid';
 
-import { randomLargeInt } from '../../../lib/testing/numbers';
+import { randomLargeInt } from '../../../testing/numbers';
 import type { PullRequest } from '../getPullRequests';
 
 jest.unstable_mockModule('../getClosedPullRequest', () => ({
@@ -76,7 +76,7 @@ describe('processClosedPullRequest', () => {
     };
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
-    await processClosedPullRequest(pullRequest, repo);
+    await processClosedPullRequest({ pullRequest, repo });
 
     const githubEvent = await prisma.githubEvent.findFirstOrThrow({
       where: {
@@ -139,7 +139,7 @@ describe('processClosedPullRequest', () => {
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: username });
 
-    await processClosedPullRequest(pullRequest, repo);
+    await processClosedPullRequest({ pullRequest, repo });
 
     const githubEvent = await prisma.githubEvent.findFirstOrThrow({
       where: {
@@ -201,7 +201,7 @@ describe('processClosedPullRequest', () => {
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
 
     for (let i = 0; i < 3; i++) {
-      await processClosedPullRequest({ ...pullRequest, number: i + 1 }, repo);
+      await processClosedPullRequest({ pullRequest: { ...pullRequest, number: i + 1 }, repo });
     }
 
     const strikes = await prisma.builderStrike.findMany({
@@ -294,9 +294,9 @@ describe('processClosedPullRequest', () => {
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
 
-    await processClosedPullRequest(pullRequest, repo);
-    await processClosedPullRequest(pullRequest, repo);
-    await processClosedPullRequest(pullRequest, repo);
+    await processClosedPullRequest({ pullRequest, repo });
+    await processClosedPullRequest({ pullRequest, repo });
+    await processClosedPullRequest({ pullRequest, repo });
 
     const githubEventsCount = await prisma.githubEvent.count({
       where: {

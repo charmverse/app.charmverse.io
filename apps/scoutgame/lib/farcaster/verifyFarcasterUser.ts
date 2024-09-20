@@ -3,7 +3,8 @@ import { getChainById } from '@root/connectors/chains';
 import { InvalidStateError } from '@root/lib/middleware/errors';
 import { optimism } from 'viem/chains';
 
-import { authConfig, type AuthSchema } from './config';
+import { authConfig } from './config';
+import type { AuthSchema } from './config';
 
 const appClient = createAppClient({
   ethereum: viemConnector({

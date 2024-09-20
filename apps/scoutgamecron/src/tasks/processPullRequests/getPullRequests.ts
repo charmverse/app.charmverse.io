@@ -48,7 +48,7 @@ const getRecentPrs = `
         first: 100
         after: $cursor
         states: [CLOSED, MERGED]
-        orderBy: { field: UPDATED_AT, direction: DESC }
+        orderBy: { field: CREATED_AT, direction: DESC }
       ) {
         edges {
           node {

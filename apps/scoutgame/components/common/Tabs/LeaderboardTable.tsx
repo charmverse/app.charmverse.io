@@ -11,18 +11,11 @@ import TableRow from '@mui/material/TableRow';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
+
 import { Avatar } from '../Avatar';
 
-export function LeaderboardTable({
-  data
-}: {
-  data: {
-    user: { avatar: string; username: string };
-    progress: number;
-    gems: number;
-    price: number;
-  }[];
-}) {
+export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
@@ -61,7 +54,7 @@ export function LeaderboardTable({
         <TableBody>
           {sorted.map((row, index) => (
             <TableRow
-              key={row.user.username}
+              key={row.username}
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
                 '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
@@ -72,9 +65,9 @@ export function LeaderboardTable({
               </TableCell>
               <TableCell component='th' sx={{ maxWidth: { xs: '150px', md: '100%' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
-                  <Avatar src={row.user.avatar} name={row.user.username} size='small' />
+                  <Avatar src={row.avatar} name={row.username} size='small' />
                   <Typography variant='caption' noWrap>
-                    {row.user.username}
+                    {row.username}
                   </Typography>
                 </Stack>
               </TableCell>
@@ -98,7 +91,7 @@ export function LeaderboardTable({
               </TableCell>
               {!isMobile && (
                 <TableCell>
-                  <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${row.user.username}/checkout`}>
+                  <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${row.username}/checkout`}>
                     ${row.price || 0}
                   </Button>
                 </TableCell>
