@@ -22,9 +22,9 @@ export async function processPullRequests() {
       throw new Error(`Repo not found: ${pullRequest.repository.nameWithOwner}`);
     }
     if (pullRequest.state === 'CLOSED') {
-      await processClosedPullRequest(pullRequest, repo);
+      await processClosedPullRequest({ pullRequest, repo });
     } else {
-      await processMergedPullRequest(pullRequest, repo);
+      await processMergedPullRequest({ pullRequest, repo });
     }
   }
 

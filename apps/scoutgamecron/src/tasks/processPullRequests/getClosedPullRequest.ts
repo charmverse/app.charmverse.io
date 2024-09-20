@@ -1,5 +1,3 @@
-import { graphql } from '@octokit/graphql';
-
 import { getClient } from './gqlClient';
 
 type GetPrCloserResponse = {

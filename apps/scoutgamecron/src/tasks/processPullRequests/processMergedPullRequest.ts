@@ -8,7 +8,15 @@ import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
 
 type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
 
-export async function processMergedPullRequest(pullRequest: PullRequest, repo: RepoInput) {
+export async function processMergedPullRequest({
+  pullRequest,
+  repo,
+  isFirstMergedPullRequest: _isFirstMergedPullRequest
+}: {
+  pullRequest: PullRequest;
+  repo: RepoInput;
+  isFirstMergedPullRequest?: boolean;
+}) {
   const pullRequestDate = new Date(pullRequest.createdAt);
   const { start, end } = getWeekStartEnd(pullRequestDate);
   const week = getFormattedWeek(pullRequestDate);
@@ -49,7 +57,7 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
     }
   });
 
-  let isFirstMergedPullRequest = totalMergedPullRequests === 0;
+  let isFirstMergedPullRequest = _isFirstMergedPullRequest ?? totalMergedPullRequests === 0;
   if (isFirstMergedPullRequest) {
     // double-check using Github API in case the previous PR was not recorded by us
     const prs = await getRecentPullRequestsByUser({
@@ -143,10 +151,12 @@ export async function processMergedPullRequest(pullRequest: PullRequest, repo: R
           week,
           type: 'merged_pull_request',
           githubEventId: event.id,
+          createdAt: pullRequest.createdAt,
           gemsReceipt: {
             create: {
               type: gemReceiptType,
-              value: gemValue
+              value: gemValue,
+              createdAt: pullRequest.createdAt
             }
           }
         },

@@ -3,7 +3,12 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "paths": {
+      "@/testing/*": [
+        "./src/testing/*"
+      ]
+    }
   },
   "exclude": [
     "jest.config.ts",
