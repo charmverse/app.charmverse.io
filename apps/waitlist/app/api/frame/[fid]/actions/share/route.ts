@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
-import { validateFrameInteractionViaAirstackWithErrorCatching } from '@root/lib/farcaster/moxie';
+import { validateFrameInteractionViaAirstackWithErrorCatching } from '@root/lib/farcaster/airstack';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
 
