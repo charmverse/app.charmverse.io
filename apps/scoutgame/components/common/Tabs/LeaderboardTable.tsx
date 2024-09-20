@@ -11,19 +11,11 @@ import TableRow from '@mui/material/TableRow';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
+
 import { Avatar } from '../Avatar';
 
-export function LeaderboardTable({
-  data
-}: {
-  data: {
-    avatar: string;
-    username: string;
-    progress: number;
-    gems: number;
-    price: number;
-  }[];
-}) {
+export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
   const sorted = data.sort((a, b) => b.progress - a.progress);
 

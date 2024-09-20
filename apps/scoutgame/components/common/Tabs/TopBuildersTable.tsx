@@ -17,9 +17,9 @@ import Link from 'next/link';
 import { Avatar } from '../Avatar';
 
 export function TopBuildersTable({
-  data
+  rows
 }: {
-  data: {
+  rows: {
     user: { avatar: string; username: string };
     season: number;
     allTime: number;
@@ -57,7 +57,7 @@ export function TopBuildersTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row, index) => (
+          {rows.map((row, index) => (
             <TableRow
               key={row.user.username}
               sx={{

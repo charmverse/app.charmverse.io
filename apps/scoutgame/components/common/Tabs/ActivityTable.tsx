@@ -8,24 +8,13 @@ import TableRow from '@mui/material/TableRow';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
 
+import type { BuilderEventRow } from 'lib/builders/getAllEvents';
+
 import { Avatar } from '../Avatar';
 
 import { iconMap } from './iconMap';
 
-export function ActivityTable({
-  data
-}: {
-  data: {
-    avatar: string;
-    username: string;
-    gemsEarned: number;
-    bonus: number;
-    message: string;
-    type: 'contribution' | 'grant' | 'scout';
-    detail: string;
-    date: string;
-  }[];
-}) {
+export function ActivityTable({ rows }: { rows: BuilderEventRow[] }) {
   return (
     <TableContainer component={Paper} sx={{ mt: 2 }}>
       <Table aria-label='Activity table' size='small'>
@@ -48,7 +37,7 @@ export function ActivityTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row) => (
+          {rows.map((row) => (
             <TableRow
               key={row.username}
               sx={{

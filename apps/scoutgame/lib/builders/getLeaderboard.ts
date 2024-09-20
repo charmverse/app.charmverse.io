@@ -1,7 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentWeek } from '@packages/scoutgame/utils';
 
-export async function getLeaderboard() {
+export type LeaderBoardRow = {
+  avatar: string | null;
+  username: string;
+  progress: number;
+  gems: number;
+  price: number;
+};
+
+export async function getLeaderboard(): Promise<LeaderBoardRow[]> {
   const currentWeek = getCurrentWeek();
   const weeklyTopBuilders = await prisma.userWeeklyStats.findMany({
     where: {

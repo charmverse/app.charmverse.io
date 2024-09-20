@@ -2,8 +2,8 @@ import 'server-only';
 
 import { delay } from '@root/lib/utils/async';
 
-import { getActivities } from 'lib/getActivities';
-import { getLeaderboard } from 'lib/users/getLeaderboard';
+import { getAllEvents } from 'lib/builders/getAllEvents';
+import { getLeaderboard } from 'lib/builders/getLeaderboard';
 
 import { ActivityTable } from './ActivityTable';
 import { LeaderboardTable } from './LeaderboardTable';
@@ -152,16 +152,16 @@ export async function HomeTab({ tab }: { tab: string }) {
   await delay(3000);
   // const data = await getTabData(tab); @TODO: Implement getTabData and remove delay
   if (tab === 'activity') {
-    const activities = await getActivities();
-    return <ActivityTable data={activities as any} />;
+    const events = await getAllEvents();
+    return <ActivityTable rows={events} />;
   }
 
   if (tab === 'topscouts') {
-    return <TopScoutsTable data={topScoutsData as any} />;
+    return <TopScoutsTable rows={topScoutsData as any} />;
   }
 
   if (tab === 'topbuilders') {
-    return <TopBuildersTable data={topBuildersData as any} />;
+    return <TopBuildersTable rows={topBuildersData as any} />;
   }
 
   const data = await getLeaderboard();
