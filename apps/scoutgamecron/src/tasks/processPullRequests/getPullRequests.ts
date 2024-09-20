@@ -8,6 +8,7 @@ export type PullRequest = {
   url: string;
   state: 'CLOSED' | 'MERGED';
   mergedAt: string | null;
+  closedAt: string | null;
   createdAt: string;
   author: {
     login: string;
@@ -58,6 +59,7 @@ const getRecentPrs = `
             state
             closedAt
             createdAt
+            mergedAt
             author {
               login
               ... on User {

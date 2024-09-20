@@ -114,7 +114,8 @@ export async function processMergedPullRequest({
         isFirstPullRequest: isFirstMergedPullRequest,
         repoId: pullRequest.repository.id,
         url: pullRequest.url,
-        createdAt: pullRequest.createdAt
+        createdAt: pullRequest.createdAt,
+        completedAt: pullRequest.mergedAt
       }
     });
 
@@ -151,7 +152,6 @@ export async function processMergedPullRequest({
           week,
           type: 'merged_pull_request',
           githubEventId: event.id,
-          createdAt: pullRequest.createdAt,
           gemsReceipt: {
             create: {
               type: gemReceiptType,
