@@ -16,9 +16,15 @@ export async function POST(req: Request) {
 
   const referrerFid = getReferrerFidFromUrl(req);
 
+  const validatedMessage = await validateFrameInteraction(waitlistClicked.trustedData.messageBytes);
+
   if (!validatedMessage.valid) {
-    throw new InvalidInputError('Invalid frame interaction. Could not validate message');
+    return new Response('Invalid frame interaction. Could not validate message', {
+      status: 400
+    });
   }
+
+  validateFrameInteractionViaAirstackWithErrorCatching(waitlistClicked.trustedData.messageBytes);
 
   const interactorFid = parseInt(validatedMessage.action.interactor.fid.toString(), 10);
   const interactorUsername = validatedMessage.action.interactor.username;
