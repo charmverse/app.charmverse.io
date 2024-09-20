@@ -10,8 +10,17 @@ export async function generateGithubRepos(totalGithubRepos: number): Promise<[Gi
     const githubRepo = await prisma.githubRepo.create({
       data: {
         id: i + 1,
-        owner: faker.internet.userName(),
-        name: faker.internet.domainName(),
+        owner: faker.word
+          .words({
+            count: {
+              max: 3,
+              min: 1
+            }
+          })
+          .split(' ')
+          .join('-')
+          .toLowerCase(),
+        name: faker.internet.domainWord(),
         defaultBranch: 'main'
       }
     });

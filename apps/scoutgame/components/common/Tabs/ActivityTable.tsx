@@ -16,8 +16,13 @@ export function ActivityTable({
   data
 }: {
   data: {
-    user: { avatar: string; username: string; earned?: number; bonus?: number };
-    notification: { message: string; type: 'contribution' | 'grant' | 'scout'; detail: string };
+    avatar: string;
+    username: string;
+    gemsEarned: number;
+    bonus: number;
+    message: string;
+    type: 'contribution' | 'grant' | 'scout';
+    detail: string;
     date: string;
   }[];
 }) {
@@ -45,7 +50,7 @@ export function ActivityTable({
         <TableBody>
           {data.map((row) => (
             <TableRow
-              key={row.user.username}
+              key={row.username}
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
                 '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
@@ -53,41 +58,41 @@ export function ActivityTable({
             >
               <TableCell component='th' scope='row'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
-                  <Avatar src={row.user.avatar} name={row.user.username} size='small' />
+                  <Avatar src={row.avatar} name={row.username} size='small' />
                   <Typography variant='caption' noWrap maxWidth={{ xs: '70px', md: '100%' }}>
-                    {row.user.username}
+                    {row.username}
                   </Typography>
                 </Stack>
               </TableCell>
               <TableCell align='right'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
-                  <Stack sx={{ display: { xs: 'flex', md: 'none' } }}>{iconMap[row.notification.type]}</Stack>
+                  <Stack sx={{ display: { xs: 'flex', md: 'none' } }}>{iconMap[row.type]}</Stack>
                   <Typography variant='caption' noWrap maxWidth={{ xs: '150px', md: '100%' }}>
-                    {row.notification.message}
+                    {row.message}
                   </Typography>
                 </Stack>
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
-                  {iconMap[row.notification.type]}
+                  {iconMap[row.type]}
                   <Typography variant='caption' noWrap>
-                    {row.notification.detail}
+                    {row.detail}
                   </Typography>
                 </Stack>
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' noWrap>
-                    {row.user.earned || 0}
+                    {row.gemsEarned || 0}
                   </Typography>
                   <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
                 </Stack>
               </TableCell>
               <TableCell align='right'>
-                {row.user.bonus && (
+                {row.bonus && (
                   <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                     <Typography variant='caption' noWrap sx={{ display: { xs: 'none', md: 'initial' } }}>
-                      {row.user.bonus || 0}
+                      {row.bonus || 0}
                     </Typography>
                     <Image width={15} height={15} src='/images/profile/icons/optimism-icon.svg' alt='Bonus icon' />
                   </Stack>

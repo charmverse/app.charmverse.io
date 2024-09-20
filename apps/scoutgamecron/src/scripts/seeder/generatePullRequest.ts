@@ -9,12 +9,12 @@ export function generatePullRequest({
   githubRepo,
   githubUser,
   pullRequestNumber,
-  daysAgo
+  createdAt
 }: {
   githubRepo: GithubRepo;
   githubUser: GithubUser;
   pullRequestNumber: number;
-  daysAgo: number;
+  createdAt: DateTime;
 }): PullRequest {
   // 10-20% chance of a closed PR
   const closedPullRequestChance = faker.number.int({ min: 10, max: 20 });
@@ -28,8 +28,8 @@ export function generatePullRequest({
     },
     title: faker.lorem.sentence(),
     url: `https://github.com/${nameWithOwner}/pull/${pullRequestNumber}`,
-    createdAt: now.minus({ days: daysAgo + 1 }).toISO(),
-    mergedAt: now.minus({ days: daysAgo }).toISO(),
+    createdAt: createdAt.toISO(),
+    mergedAt: now.toISO(),
     number: pullRequestNumber,
     repository: {
       id: githubRepo.id,

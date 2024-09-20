@@ -1,4 +1,5 @@
-import { generateSeedData } from '../lib/seeder/generateSeedData';
+import { generateSeedData } from './seeder/generateSeedData';
+
 (async () => {
   await generateSeedData();
 })();

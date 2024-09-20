@@ -150,10 +150,12 @@ export async function processMergedPullRequest({
           week,
           type: 'merged_pull_request',
           githubEventId: event.id,
+          createdAt: pullRequest.createdAt,
           gemsReceipt: {
             create: {
               type: gemReceiptType,
-              value: gemValue
+              value: gemValue,
+              createdAt: pullRequest.createdAt
             }
           }
         },
