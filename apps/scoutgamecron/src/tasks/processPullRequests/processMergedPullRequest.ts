@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { GemsReceiptType, GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getFormattedWeek, getWeekStartEnd, currentSeason, isSameDay } from '@packages/scoutgame/utils';
+import { getFormattedWeek, getWeekStartEnd, streakWindow, currentSeason, isSameDay } from '@packages/scoutgame/utils';
 
 import type { PullRequest } from './getPullRequests';
 import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
@@ -11,31 +11,40 @@ type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
 export async function processMergedPullRequest({
   pullRequest,
   repo,
-  isFirstMergedPullRequest: _isFirstMergedPullRequest
+  isFirstMergedPullRequest: _isFirstMergedPullRequest,
+  now = new Date()
 }: {
   pullRequest: PullRequest;
   repo: RepoInput;
   isFirstMergedPullRequest?: boolean;
+  now?: Date;
 }) {
-  const pullRequestDate = new Date(pullRequest.createdAt);
-  const { start, end } = getWeekStartEnd(pullRequestDate);
-  const week = getFormattedWeek(pullRequestDate);
-  const thisWeeksEvents = await prisma.githubEvent.findMany({
+  if (!pullRequest.mergedAt) {
+    throw new Error('Pull request was not merged');
+  }
+  // this is the date the PR was merged, which should be used for gem receipts
+  const pullRequestDate = new Date(pullRequest.mergedAt);
+  const week = getFormattedWeek(now);
+  const { start, end } = getWeekStartEnd(now);
+
+  const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
       createdBy: pullRequest.author.id,
+      // streaks are based on created date
       createdAt: {
-        gte: start.toJSDate(),
-        lte: end.toJSDate()
+        gte: new Date(pullRequestDate.getTime() - streakWindow)
       },
       type: 'merged_pull_request'
     },
     select: {
       id: true,
       createdAt: true,
+      pullRequestNumber: true,
       repoId: true,
       createdBy: true,
       builderEvent: {
         select: {
+          createdAt: true,
           gemsReceipt: {
             select: {
               value: true
@@ -49,6 +58,13 @@ export async function processMergedPullRequest({
     }
   });
 
+  const existingGithubEvent = previousGitEvents.some((event) => event.pullRequestNumber === pullRequest.number);
+  if (existingGithubEvent) {
+    // already processed
+    return;
+  }
+
+  // check our data to see if this is the first merged PR, and if so, check the Github API to confirm
   const totalMergedPullRequests = await prisma.githubEvent.count({
     where: {
       createdBy: pullRequest.author.id,
@@ -70,15 +86,13 @@ export async function processMergedPullRequest({
     }
   }
 
-  const existingGithubEventToday = thisWeeksEvents.some((event) => {
+  const existingGithubEventToday = previousGitEvents.some((event) => {
     if (event.repoId !== pullRequest.repository.id) {
       return false;
     }
 
     return isSameDay(event.createdAt);
   });
-
-  const weeklyBuilderEvents = thisWeeksEvents.filter((event) => event.builderEvent).length;
 
   await prisma.$transaction(async (tx) => {
     const githubUser = await tx.githubUser.upsert({
@@ -91,19 +105,6 @@ export async function processMergedPullRequest({
       },
       update: {}
     });
-
-    const existingGithubEvent = await tx.githubEvent.findFirst({
-      where: {
-        pullRequestNumber: pullRequest.number,
-        createdBy: pullRequest.author.id,
-        type: 'merged_pull_request',
-        repoId: pullRequest.repository.id
-      }
-    });
-
-    if (existingGithubEvent) {
-      return;
-    }
 
     const event = await tx.githubEvent.create({
       data: {
@@ -134,6 +135,7 @@ export async function processMergedPullRequest({
         return;
       }
 
+      const weeklyBuilderEvents = previousGitEvents.filter((e) => e.builderEvent).length;
       const threeDayPrStreak = weeklyBuilderEvents % 3 === 2;
       const gemReceiptType: GemsReceiptType = isFirstMergedPullRequest
         ? 'first_pr'
@@ -142,49 +144,54 @@ export async function processMergedPullRequest({
         : 'regular_pr';
 
       const gemValue = gemReceiptType === 'first_pr' ? 10 : gemReceiptType === 'third_pr_in_streak' ? 3 : 1;
-      await tx.builderEvent.upsert({
-        where: {
-          githubEventId: event.id
-        },
-        create: {
-          builderId: githubUser.builderId,
-          season: currentSeason,
-          week,
-          type: 'merged_pull_request',
-          githubEventId: event.id,
-          gemsReceipt: {
-            create: {
-              type: gemReceiptType,
-              value: gemValue,
-              createdAt: pullRequest.createdAt
+      const builderEventDate = pullRequestDate;
+      if (builderEventDate < start.toJSDate()) {
+        await tx.builderEvent.upsert({
+          where: {
+            githubEventId: event.id
+          },
+          create: {
+            builderId: githubUser.builderId,
+            createdAt: builderEventDate,
+            season: currentSeason,
+            week,
+            type: 'merged_pull_request',
+            githubEventId: event.id,
+            gemsReceipt: {
+              create: {
+                type: gemReceiptType,
+                value: gemValue,
+                createdAt: builderEventDate
+              }
             }
+          },
+          update: {}
+        });
+        const thisWeekEvents = previousGitEvents.filter((e) => e.createdAt > start.toJSDate());
+        const gemsCollected = thisWeekEvents.reduce((acc, e) => {
+          if (e.builderEvent?.gemsReceipt?.value && e.builderEvent.createdAt < builderEventDate) {
+            return acc + e.builderEvent.gemsReceipt.value;
           }
-        },
-        update: {}
-      });
-      const gemsCollected = thisWeeksEvents.reduce((acc, e) => {
-        if (e.builderEvent?.gemsReceipt?.value) {
-          return acc + e.builderEvent.gemsReceipt.value;
-        }
-        return acc;
-      }, gemValue);
-      await tx.userWeeklyStats.upsert({
-        where: {
-          userId_week: {
+          return acc;
+        }, gemValue);
+        await tx.userWeeklyStats.upsert({
+          where: {
+            userId_week: {
+              userId: githubUser.builderId,
+              week
+            }
+          },
+          create: {
             userId: githubUser.builderId,
-            week
+            week,
+            gemsCollected
+          },
+          update: {
+            gemsCollected
           }
-        },
-        create: {
-          userId: githubUser.builderId,
-          week,
-          gemsCollected
-        },
-        update: {
-          gemsCollected
-        }
-      });
-      log.info('Recorded a merged PR', { userId: githubUser.builderId, url: pullRequest.url, gemsCollected });
+        });
+        log.info('Recorded a merged PR', { userId: githubUser.builderId, url: pullRequest.url, gemsCollected });
+      }
     }
   });
 }

@@ -7,8 +7,8 @@ export type PullRequest = {
   title: string;
   url: string;
   state: 'CLOSED' | 'MERGED';
-  mergedAt: string | null;
-  closedAt: string | null;
+  mergedAt?: string | null;
+  closedAt?: string | null;
   createdAt: string;
   author: {
     login: string;
