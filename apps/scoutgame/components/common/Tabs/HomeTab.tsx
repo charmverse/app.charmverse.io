@@ -150,7 +150,7 @@ const topBuildersData = [
 
 export async function HomeTab({ tab }: { tab: string }) {
   await delay(3000);
-  // const data = await getTabData(tab); @TODO: Implement getTabData and remove delay
+
   if (tab === 'activity') {
     const events = await getAllEvents();
     return <ActivityTable rows={events} />;
@@ -166,5 +166,5 @@ export async function HomeTab({ tab }: { tab: string }) {
 
   const data = await getLeaderboard();
 
-  return <LeaderboardTable data={data as any} />;
+  return <LeaderboardTable data={data} />;
 }

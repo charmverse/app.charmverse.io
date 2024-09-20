@@ -1,9 +1,14 @@
 import { Box } from '@mui/material';
+import dynamic from 'next/dynamic';
 import type { ReactNode } from 'react';
 
-import { StickyFooter } from 'components/common/Footer/StickyFooter';
 import { Header } from 'components/common/Header/Header';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
+
+// Enforce rendering on client side because the StickyFooter component is rendered based on browser width. In RSC behaviour you see an element that should not be rendered.
+const StickyFooter = dynamic(() => import('components/common/Footer/StickyFooter').then((mod) => mod.StickyFooter), {
+  ssr: false
+});
 
 export default async function Layout({
   children
