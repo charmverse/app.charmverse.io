@@ -7,7 +7,7 @@ import { UserCard } from 'components/common/Card/UserCard';
 import { userCards } from 'lib/users/mock/userCards';
 
 export async function ScoutedBuilders() {
-  await delay();
+  await delay(3000);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

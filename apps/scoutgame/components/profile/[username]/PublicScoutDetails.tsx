@@ -20,7 +20,9 @@ export async function PublicScoutDetails() {
       <Typography variant='subtitle1' my={1} color='secondary' fontWeight='500'>
         Scouted Builders
       </Typography>
-      <ScoutedBuilders />
+      <Suspense fallback={<LoadingPaperSection />}>
+        <ScoutedBuilders />
+      </Suspense>
     </Stack>
   );
 }
