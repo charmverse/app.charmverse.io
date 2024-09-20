@@ -2,6 +2,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { processPullRequests } from '../../tasks/processPullRequests';
 
+//@ts-ignore
+import {registerBuilderNFT} from '../../../../scoutgame/lib/builderNFTs/registerBuilderNFT'
+
 const devUsers = {
   mattcasey: {
     id: 305398,
@@ -95,14 +98,29 @@ export async function seedWithRealCharmverseGithubData() {
     }
   }
 
-  const githubUser = await prisma.githubUser.findMany();
+  await processPullRequests({ createdAfter: new Date('2024-08-01'), skipClosedPrProcessing:true });
+
+}
+
+async function seedBuilderNFTs() {
+  const githubUser = await prisma.githubUser.findMany({
+    where: {
+      login: {
+        in: Object.keys(devUsers)
+      }
+    }
+  });
 
   console.log('githubUser', githubUser);
 
-  await processPullRequests({ createdAfter: new Date('2024-08-01'), skipClosedPrProcessing:true });
+  for (const { builderId } of githubUser) {
+    await registerBuilderNFT({builderId: builderId as string});
+  }
 }
 
-seedWithRealCharmverseGithubData();
+// seedWithRealCharmverseGithubData();
+
+seedBuilderNFTs();
 
 
 // prisma.githubEvent.deleteMany().then(console.log)

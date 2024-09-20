@@ -2,22 +2,31 @@
 
 'use client';
 
+import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import type { Scout } from '@charmverse/core/prisma-client';
 import type { EvmTransaction } from '@decent.xyz/box-common';
 import { ActionType, ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Button, Typography } from '@mui/material';
+import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { useCallback, useEffect, useState } from 'react';
-import { encodeAbiParameters, formatUnits } from 'viem';
+import { formatUnits } from 'viem';
 import { useSendTransaction } from 'wagmi';
 
 import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
-import { builderContractAddress, decentApiKey, readonlyApiClient } from 'lib/builderNFTs/constants';
+import { builderContractAddress, builderNftChain } from 'lib/builderNFTs/constants';
+import { ContractApiClient } from 'lib/builderNFTs/nftContractApiClient';
 
-type NFTPurchaseProps = {
+const readonlyApiClient = new ContractApiClient({
+  chain: builderNftChain,
+  contractAddress: builderContractAddress,
+  publicClient: getPublicClient(builderNftChain.id)
+});
+
+export type NFTPurchaseProps = {
   builderId: string;
   scout: Scout;
 };
@@ -79,32 +88,30 @@ function NFTPurchaseButton({ builderId, scout }: NFTPurchaseProps) {
   }, [tokensToBuy, builderTokenId, refreshAsk]);
 
   const { error, isLoading, actionResponse } = useBoxAction({
-    enable: !!purchaseCost && !!address,
+    enable: !!purchaseCost && !!address && !!builderTokenId && !!tokensToBuy,
     // actionType: ActionType.EvmCalldataTx,
     actionType: ActionType.EvmFunction,
-    sender: address || '',
-    srcToken: '0x0000000000000000000000000000000000000000', // Use native token (ETH)
-    srcChainId: ChainId.OPTIMISM_SEPOLIA,
+    sender: address as string,
+    srcToken: '0x0000000000000000000000000000000000000000',
     dstToken: '0x0000000000000000000000000000000000000000',
-    dstChainId: ChainId.BASE_SEPOLIA,
-    slippage: 1, // 1% slippage
+    slippage: 1,
+    srcChainId: ChainId.OPTIMISM,
+    dstChainId: ChainId.BASE,
     actionConfig: {
       chainId: ChainId.BASE,
       contractAddress: builderContractAddress,
-      data: encodeAbiParameters(
-        [
-          { name: 'tokenId', type: 'uint256' },
-          { name: 'amount', type: 'uint256' },
-          { name: 'scout', type: 'builderId' }
-        ],
-        [BigInt(builderTokenId), BigInt(1), scout.id]
-      )
+      cost: {
+        amount: purchaseCost,
+        isNative: true,
+        tokenAddress: '0x0000000000000000000000000000000000000000'
+      },
+      signature: 'function buyToken(uint256 tokenId, uint256 amount, string scout)',
+      args: [builderTokenId, tokensToBuy, scout.username]
     }
   });
 
   const handlePurchase = async () => {
-    if (!purchaseCost) {
-      log.info('Purchase cost not available');
+    if (!actionResponse?.tx) {
       return;
     }
 
@@ -135,7 +142,7 @@ function NFTPurchaseButton({ builderId, scout }: NFTPurchaseProps) {
         {isFetchingPrice && <p>Fetching price...</p>}
         {fetchError && <p color='red'>{fetchError.shortMessage || 'Something went wrong'}</p>}
         <Button onClick={handlePurchase} disabled={!purchaseCost || isLoading || isFetchingPrice}>
-          {isLoading ? 'Purchasing...' : 'Purchase NFT'}
+          {isFetchingPrice ? 'Fetching price' : isLoading ? 'Purchasing...' : 'Purchase NFT'}
         </Button>
       </div>
 
@@ -147,8 +154,15 @@ function NFTPurchaseButton({ builderId, scout }: NFTPurchaseProps) {
 function NFTPurchaseWithLogin(props: NFTPurchaseProps) {
   const { address } = useWallet(); // Hook to access the connected wallet details
 
+  const apiKey = env('DECENT_API_KEY');
+
+  if (!apiKey) {
+    log.warn('No DECENT_API_KEY found');
+    return null;
+  }
+
   return (
-    <BoxHooksContextProvider apiKey={decentApiKey}>
+    <BoxHooksContextProvider apiKey={apiKey}>
       {address && <NFTPurchaseButton {...props} />}
       {!address && <WalletConnect />}
     </BoxHooksContextProvider>

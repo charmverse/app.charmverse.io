@@ -3,10 +3,24 @@
 import type { Scout } from '@charmverse/core/prisma-client';
 import { Box, Button, Card, CardActionArea, CardContent, CardMedia, Typography } from '@mui/material';
 import Link from 'next/link';
+import { useState } from 'react';
+
+import { NFTPurchaseDialog } from 'components/nft/NFTPurchaseDialog';
+import type { TopBuilder } from 'lib/builders/getTopBuilders';
 
 import { UserCardDetails } from './UserCardDetails';
 
-export function UserCard({ withDetails, user }: { withDetails: boolean; user: any }) {
+export function UserCard({
+  withDetails,
+  user,
+  scout
+}: {
+  withDetails: boolean;
+  user: TopBuilder;
+  scout?: Scout | null;
+}) {
+  const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
+
   if (!user?.avatar) {
     return null;
   }
@@ -61,10 +75,15 @@ export function UserCard({ withDetails, user }: { withDetails: boolean; user: an
         </CardActionArea>
       </Box>
       <Box display='flex' justifyContent='center' pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }} px={{ xs: 2, md: 0 }}>
-        <Button fullWidth LinkComponent={Link} href={`/u/${user.username}/checkout`} variant='buy'>
+        <Button fullWidth LinkComponent={Link} variant='buy' onClick={scout ? () => setIsPurchasing(true) : undefined}>
           ${user.price}
         </Button>
       </Box>
+      <NFTPurchaseDialog
+        onClose={() => setIsPurchasing(false)}
+        builderId={isPurchasing ? user.id : null}
+        scout={scout}
+      />
     </Card>
   );
 }

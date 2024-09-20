@@ -4,7 +4,7 @@ import { base, baseSepolia } from 'viem/chains';
 
 export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECENT_API_KEY as string);
 
-export const builderNftChain: Chain = baseSepolia;
+export const builderNftChain: Chain = base;
 
 export const builderContractAddress =
   builderNftChain.id === base.id

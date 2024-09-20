@@ -1,9 +1,14 @@
 'use client';
 
+import type { Scout } from '@charmverse/core/prisma-client';
 import { Box, useMediaQuery } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
+import { useState } from 'react';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
+
+import { NFTPurchaseDialog } from 'components/nft/NFTPurchaseDialog';
+import type { TopBuilder } from 'lib/builders/getTopBuilders';
 
 import { UserCard } from '../Card/UserCard';
 
@@ -11,7 +16,7 @@ import { NextArrow, PrevArrow } from './Arrows';
 
 import 'swiper/css';
 
-export function Carousel({ items }: { items: any[] }) {
+export function Carousel({ items, scout }: { items: TopBuilder[]; scout?: Scout | null }) {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
 
   return (
@@ -30,7 +35,7 @@ export function Carousel({ items }: { items: any[] }) {
         >
           {items.map((_user) => (
             <SwiperSlide key={_user.username}>
-              <UserCard withDetails user={_user} />
+              <UserCard withDetails user={_user} scout={scout} />
             </SwiperSlide>
           ))}
         </Swiper>
