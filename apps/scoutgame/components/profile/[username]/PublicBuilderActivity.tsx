@@ -13,10 +13,9 @@ export async function PublicBuilderActivity() {
   const rows = await getAllEvents();
   await delay(3000);
 
-  // @TODO: Add this back and remove dumy data
-  // if (!rows || rows.length === 0) {
-  //   return null;
-  // }
+  if (!rows || rows.length === 0) {
+    return null;
+  }
 
   return (
     <>
@@ -31,9 +30,9 @@ export async function PublicBuilderActivity() {
       <TableContainer component={Paper} sx={{ p: 1 }}>
         <Table aria-label='Recent activity table' size='small'>
           <TableBody>
-            {[{}].map((row) => (
+            {rows.map((row) => (
               <TableRow
-                key={row.username || 'valentin'}
+                key={row.username}
                 sx={{
                   '&:last-child td, &:last-child th': { border: 0 },
                   '& .MuiTableCell-root': {
@@ -46,12 +45,12 @@ export async function PublicBuilderActivity() {
                 <TableCell align='right'>
                   <Stack alignItems='flex-start' flexDirection='column' gap={1}>
                     <Typography variant='caption' component='p' noWrap maxWidth={{ xs: '150px', md: '100%' }}>
-                      {row.message || 'Contribution accepted'}
+                      {row.message}
                     </Typography>
                     <Stack alignItems='center' flexDirection='row' gap={0.5}>
-                      {iconMap[row.type || 'contribution']}
+                      {iconMap[row.type]}
                       <Typography variant='caption' component='p' noWrap sx={{ verticalAlign: 'center' }}>
-                        {row.detail || '/charmverse'}
+                        {row.detail}
                       </Typography>
                     </Stack>
                   </Stack>
@@ -74,7 +73,7 @@ export async function PublicBuilderActivity() {
                 )}
                 <TableCell align='right'>
                   <Typography variant='caption' noWrap>
-                    {DateTime.fromISO(row.date || '2023-10-10T12:00:00Z')
+                    {DateTime.fromISO(row.date)
                       .toRelative({
                         style: 'narrow',
                         locale: 'en',
