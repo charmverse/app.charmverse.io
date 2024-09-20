@@ -1,5 +1,5 @@
 import type { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
-import { createTheme, darken, lighten } from '@mui/material/styles';
+import { createTheme, darken, lighten, alpha, getContrastRatio } from '@mui/material/styles';
 
 import type { BrandColor } from './colors';
 import {
@@ -15,9 +15,7 @@ import {
   primaryTextColor,
   primaryTextColorDarkMode,
   secondaryTextColor,
-  secondaryTextColorDarkMode,
-  settingsHeaderBackgroundColor,
-  settingsHeaderBackgroundColorDarkMode
+  secondaryTextColorDarkMode
 } from './colors';
 import { defaultFont } from './fonts';
 
@@ -27,9 +25,6 @@ declare module '@emotion/react' {
 }
 
 interface CustomColors extends Record<BrandColor, any> {
-  settingsHeader: {
-    background: string;
-  };
   sidebar: {
     avatarHighlight: string;
     background: string;
@@ -231,16 +226,17 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       successPale: {
         main: colors.green.light,
+        light: alpha(colors.green.light, 0.5),
+        dark: alpha(colors.green.light, 0.9),
         contrastText: '#000'
       },
       errorPale: {
         main: colors.red.light,
+        light: alpha(colors.red.light, 0.5),
+        dark: alpha(colors.red.light, 0.9),
         contrastText: '#000'
       },
       // custom components
-      settingsHeader: {
-        background: mode === 'dark' ? settingsHeaderBackgroundColorDarkMode : settingsHeaderBackgroundColor
-      },
       sidebar: {
         avatarHighlight: mode === 'dark' ? 'rgba(255, 255, 255, .2)' : '#ccc',
         background: mode === 'dark' ? backgroundLightColorDarkMode : backgroundLightColor

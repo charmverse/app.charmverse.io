@@ -21,7 +21,7 @@ export const saveTermsOfServiceAction = authActionClient
       data: {
         email: parsedInput.email,
         sendMarketing: parsedInput.sendMarketing,
-        agreedToTOS: parsedInput.agreedToTOS
+        agreedToTermsAt: new Date()
       }
     });
 

@@ -124,11 +124,12 @@ export async function processMergedPullRequest({
           id: githubUser.builderId
         },
         select: {
-          bannedAt: true
+          bannedAt: true,
+          builder: true
         }
       });
 
-      if (builder.bannedAt) {
+      if (builder.bannedAt || !builder.builder) {
         return;
       }
 
