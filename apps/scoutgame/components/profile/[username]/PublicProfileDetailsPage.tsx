@@ -13,9 +13,7 @@ export async function PublicProfileDetailsPage({ user, tab }: { user: Scout; tab
   return (
     <Box p={1} gap={2} display='flex' flexDirection='column' maxWidth='1240px' margin='auto'>
       <PublicProfileMenu tab={tab} username={user.username} />
-      <Suspense fallback={<LoadingComponent />} key={tab}>
-        <PublicProfileTabs tab={tab} user={user} />
-      </Suspense>
+      <PublicProfileTabs tab={tab} user={user} />
     </Box>
   );
 }

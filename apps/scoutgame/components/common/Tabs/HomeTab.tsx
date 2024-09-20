@@ -166,5 +166,5 @@ export async function HomeTab({ tab }: { tab: string }) {
 
   const data = await getLeaderboard();
 
-  return <LeaderboardTable data={data as any} />;
+  return <LeaderboardTable data={data} />;
 }

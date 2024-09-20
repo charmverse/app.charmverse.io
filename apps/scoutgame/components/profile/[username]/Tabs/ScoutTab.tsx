@@ -20,7 +20,7 @@ export async function ScoutTab({ user }: { user: Scout }) {
         </Stack>
       </Paper>
       <Stack my={2}>
-        <Suspense fallback={<LoadingComponent />}>
+        <Suspense fallback={<LoadingComponent py={2} />}>
           <ScoutPublicDetails />
         </Suspense>
       </Stack>

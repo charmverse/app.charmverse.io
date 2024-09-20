@@ -4,6 +4,7 @@ import Link from 'next/link';
 export function HomeTabsMenu({ tab }: { tab: string }) {
   const value = ['leaderboard', 'activity', 'topscouts', 'topbuilders'].includes(tab) ? tab : 'leaderboard';
 
+  // @TODO: When clicked, the content below the tabs should dissapear and the skeleton should appear and then the new content. Somehow this behaviour stopped working.
   return (
     <Box maxWidth={{ xs: '95vw', md: 'normal' }}>
       <Tabs

@@ -10,8 +10,8 @@ function TableRowSkeleton() {
     >
       <TableCell component='th' scope='row'>
         <Stack flexDirection='row' gap={1} alignItems='center'>
-          <Skeleton variant='rectangular' width={20} height={20} sx={{ borderRadius: '50%' }} />
-          <Skeleton animation='wave' width='100%' height='20px' />
+          <Skeleton animation='wave' variant='circular' width={20} height={20} />
+          <Skeleton animation='wave' width='100%' height={20} />
         </Stack>
       </TableCell>
       <TableCell scope='row'>
