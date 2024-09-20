@@ -20,9 +20,9 @@ export default async function Profile({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const user = await getUserByPath(params.username);
-  const tab = searchParams.tab;
+  const tab = searchParams.tab || 'scout';
 
-  if (!user) {
+  if (!user || typeof tab !== 'string') {
     return notFound();
   }
 
