@@ -1,3 +1,6 @@
+// init app instrumentation
+import './app/datadog';
+
 import { log } from '@charmverse/core/log';
 
 import worker from './worker';
