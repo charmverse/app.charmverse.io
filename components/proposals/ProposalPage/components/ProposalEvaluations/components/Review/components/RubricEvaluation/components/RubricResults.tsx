@@ -159,7 +159,7 @@ export function RubricResults({
             {criteria.answers.map((answer) => (
               <>
                 <Box display='flex' justifyContent='space-between' width='100%' key={answer.userId}>
-                  <UserDisplay avatarSize='xSmall' userId={answer.userId} anonymize={!showReviewerIdentities} />
+                  <UserDisplay avatarSize='xSmall' userId={answer.userId} hideIdentity={!showReviewerIdentities} />
                   <span>
                     {answer.score}
                     <Typography color='secondary' component='span'>
