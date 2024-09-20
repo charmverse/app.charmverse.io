@@ -15,8 +15,7 @@ import { useSendTransaction } from 'wagmi';
 import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
-
-import { builderContractAddress, decentApiKey, readonlyApiClient } from './constants';
+import { builderContractAddress, decentApiKey, readonlyApiClient } from 'lib/builderNFTs/constants';
 
 type NFTPurchaseProps = {
   builderId: string;

@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+// import { gql } from '@apollo/client';
 import type { GithubRepo } from '@charmverse/core/prisma';
 
 import { getClient } from './gqlClient';
@@ -41,7 +41,7 @@ type GetRecentClosedOrMergedPRsResponse = {
   };
 };
 
-const getRecentPrs = gql`
+const getRecentPrs = `
   query getRecentClosedOrMergedPRs($owner: String!, $repo: String!, $cursor: String) {
     repository(owner: $owner, name: $repo) {
       databaseId
@@ -126,19 +126,25 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
     const recentPRs = pullRequests
       .filter(({ node }) => {
         const closedOrMergedAt = new Date(node.createdAt);
-        return closedOrMergedAt > after;
+        // Some bots such as dependabot do not have an author id
+        return closedOrMergedAt > after && !!node.author.id;
       })
-      .map(({ node }) => ({
-        ...node,
-        author: {
-          id: parseInt(atob(node.author.id.toString()).split(':User')[1]),
-          login: node.author.login
-        },
-        repository: {
-          id: repositoryId,
-          nameWithOwner: node.repository.nameWithOwner
-        }
-      }));
+      .map(({ node }) => {
+        return {
+          ...node,
+          author: {
+            id:
+              typeof node.author.id === 'number'
+                ? node.author.id
+                : parseInt(atob(node.author.id as string).split(':User')[1]),
+            login: node.author.login
+          },
+          repository: {
+            id: repositoryId,
+            nameWithOwner: node.repository.nameWithOwner
+          }
+        };
+      });
 
     allRecentPRs = allRecentPRs.concat(recentPRs);
 
