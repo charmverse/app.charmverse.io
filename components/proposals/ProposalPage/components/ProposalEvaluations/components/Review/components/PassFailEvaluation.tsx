@@ -180,7 +180,7 @@ export function PassFailEvaluation({
                       <UserDisplay
                         userId={evaluationReview.reviewerId}
                         avatarSize='xSmall'
-                        anonymize={!showReviewerIdentities}
+                        hideIdentity={!showReviewerIdentities}
                       />
                       <Typography variant='subtitle1'>
                         {getRelativeTimeInThePast(new Date(evaluationReview.completedAt))}

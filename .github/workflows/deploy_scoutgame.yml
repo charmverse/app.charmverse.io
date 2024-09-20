@@ -82,6 +82,7 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
+          app_name: scoutgame
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
@@ -119,6 +120,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -140,8 +143,11 @@ jobs:
           # https://github.com/tj-actions/eslint-changed-files/issues/1801#issuecomment-2083477324
           escape_paths: 'false'
 
-      - name: Run tests
+      - name: Run app tests
         run: npm run scoutgame:test
+
+      - name: Run package tests
+        run: npm run test -w packages/scoutgame
 
   test-scoutgame-e2e:
     name: Test Scoutgame e2e
@@ -174,6 +180,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -226,6 +234,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Restore app from cache
         uses: ./.github/actions/build_app
@@ -261,6 +271,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Calculate Build ID
         id: get_build_id
@@ -317,6 +329,8 @@ jobs:
       # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -369,6 +383,8 @@ jobs:
       # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: scoutgame
 
       - name: Replace env_var with staging settings
         run: |

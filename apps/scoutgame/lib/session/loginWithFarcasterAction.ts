@@ -12,8 +12,6 @@ export const loginAction = actionClient
   .metadata({ actionName: 'login_with_wallet' })
   .schema(authSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const newUserId = ctx.session.anonymousUserId;
-
     const { fid } = await verifyFarcasterUser(parsedInput);
     const user = await findOrCreateFarcasterUser({ fid });
 

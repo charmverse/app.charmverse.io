@@ -5,7 +5,7 @@ export const purpleDisabled = 'rgba(160, 108, 213, 0.25)'; // purple dark
 export const secondaryText = '#69DDFF'; // blue
 export const blackText = '#191919'; // black
 export const secondaryLightText = '#D8E1FF'; // light blue
-export const primaryTextColorDarkMode = '#D8E1FF;';
+export const primaryTextColorDarkMode = '#D8E1FF';
 
 export const secondaryTextColorDarkMode = '#999';
 export const disabledTextColorDarkMode = '#666';

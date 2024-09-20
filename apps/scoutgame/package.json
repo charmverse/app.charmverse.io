@@ -26,6 +26,7 @@
     "framer-motion": "^11.3.17",
     "next-safe-action": "~7.4.2",
     "server-only": "^0.0.1",
+    "swiper": "^11.1.14",
     "web-push": "^3.6.7"
   },
   "devDependencies": {

@@ -1,9 +1,15 @@
 import 'server-only';
 
 import { Box, Typography } from '@mui/material';
+import { delay } from '@root/lib/utils/async';
 
-export function HeaderMessage() {
+export async function HeaderMessage() {
+  const data = await delay(3000);
   const message = 'Season 1 ends in 79 d 8 h 31m ';
+
+  if (!data) {
+    // will return null;
+  }
 
   return (
     <Box width='100%' bgcolor='rgba(160, 108, 213, 0.4)' p={1}>

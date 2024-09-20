@@ -8,7 +8,7 @@ export function getConfig() {
   const projectId = env('WALLETCONNECT_PROJECTID');
   const viemChains = Object.values(chains) as unknown as [Chain, ...Chain[]];
 
-  const connectors = [coinbaseWallet(), metaMask(), injected(), ...(projectId ? [walletConnect({ projectId })] : [])];
+  const connectors = [coinbaseWallet(), metaMask(), ...(projectId ? [walletConnect({ projectId })] : [])];
 
   const transports = viemChains.reduce<Record<string, Transport>>((acc, chain) => {
     acc[chain.id] = http();
@@ -17,6 +17,7 @@ export function getConfig() {
 
   const config = createConfig({
     chains: viemChains,
+    multiInjectedProviderDiscovery: false,
     connectors,
     ssr: true,
     storage: createStorage({ storage: cookieStorage }),

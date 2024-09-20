@@ -1,5 +1,4 @@
-import { DeleteOutline } from '@mui/icons-material';
-import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
+import { CardActionArea, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 
 import type { AvatarSize } from './Avatar';
@@ -7,9 +6,9 @@ import { Avatar } from './Avatar';
 import { CardMotion } from './Motions/CardMotion';
 
 type Props = {
-  name?: string;
-  username?: string;
-  avatar?: string | null;
+  name: string;
+  username: string;
+  avatar: string | null;
   avatarSize?: AvatarSize;
 };
 
@@ -29,13 +28,13 @@ function FarcasterCardContent({ avatar, name, username, avatarSize = 'xLarge' }:
           sm: 'flex-start'
         }}
       >
-        <Avatar size={avatarSize} name={username || 'N/A'} avatar={avatar || undefined} />
+        <Avatar size={avatarSize} name={username} src={avatar} />
       </Stack>
       <Stack width='100%' gap={1}>
         <Stack direction='row' justifyContent='space-between' width='100%' alignItems='center'>
-          <Typography variant='h5'>{name || 'N/A'}</Typography>
+          <Typography variant='h5'>{name}</Typography>
         </Stack>
-        <Typography>{username || 'N/A'}</Typography>
+        <Typography>{username}</Typography>
       </Stack>
     </Stack>
   );
