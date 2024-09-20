@@ -15,7 +15,11 @@ async function exportFullReviewSummary() {
       }
     },
     include: {
-      author: true
+      author: {
+        include: {
+          farcasterUser: true
+        }
+      }
     }
   });
   const csvData: {
@@ -29,6 +33,7 @@ async function exportFullReviewSummary() {
       Title: title,
       Author: author.username,
       'Author Email': author.email || '',
+      'Author Farcaster': author.farcasterUser?.fid,
       Link: 'https://app.charmverse.io/' + spaceDomain + '/' + path,
       'Last Updated': updatedAt.toLocaleDateString('en-US')
     };
@@ -37,7 +42,7 @@ async function exportFullReviewSummary() {
   const csvString = stringify(csvData, {
     delimiter: '\t',
     header: true,
-    columns: ['Title', 'Author', 'Author Email', 'Link', 'Last Updated']
+    columns: ['Title', 'Author', 'Author Farcaster', 'Author Email', 'Link', 'Last Updated']
   });
 
   writeFileSync('./moxie-export.tsv', csvString);
