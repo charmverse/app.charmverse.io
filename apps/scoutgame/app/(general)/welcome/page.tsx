@@ -22,12 +22,12 @@ export default async function Welcome() {
     redirect('/');
   }
 
-  if (!user.onboarded) {
+  if (!user.onboardedAt) {
     log.debug('Redirect user to onboarding page from Welcome page', { userId: user.id });
     redirect('/welcome/builder');
   }
 
-  if (user?.agreedToTOS) {
+  if (user?.agreedToTermsAt) {
     log.debug('Redirect user to home page from Welcome page', { userId: user.id });
     redirect('/');
   }

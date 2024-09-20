@@ -23,7 +23,7 @@ export default async function HowItWorks() {
     redirect('/');
   }
 
-  if (!user.onboarded) {
+  if (!user.onboardedAt) {
     log.debug('Redirect user to onboarding page from Welcome page', { userId: user.id });
     redirect('/welcome/builder');
   }
