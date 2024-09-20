@@ -12,7 +12,7 @@ export const saveOnboardedAction = authActionClient
     await prisma.scout.update({
       where: { id: userId },
       data: {
-        onboarded: true
+        onboardedAt: new Date()
       }
     });
 
