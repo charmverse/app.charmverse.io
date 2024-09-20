@@ -22,9 +22,8 @@ export async function getLeaderboard() {
     }
   });
 
-  const maxGemsCollected = weeklyTopBuilders[0].gemsCollected;
-
   return weeklyTopBuilders.map((weeklyTopBuilder) => {
+    const maxGemsCollected = weeklyTopBuilders[0].gemsCollected;
     const progress = (weeklyTopBuilder.gemsCollected / maxGemsCollected) * 100;
     const price = parseInt(progress.toString());
     return {
