@@ -23,7 +23,7 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: Props) {
           sm: 'flex-start'
         }}
       >
-        <Avatar size={avatarSize} name={username || 'N/A'} avatar={avatar || undefined} />
+        <Avatar size={avatarSize} name={username || 'N/A'} src={avatar || undefined} />
       </Stack>
       <Stack width='100%' gap={1}>
         <Typography variant='h5'>{displayName || 'N/A'}</Typography>
