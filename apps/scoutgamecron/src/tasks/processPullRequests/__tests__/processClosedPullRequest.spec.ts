@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
 import { v4 } from 'uuid';
 
-import { randomLargeInt } from '../../../testing/numbers';
+import { randomLargeInt } from '../../../testing/generators';
 import type { PullRequest } from '../getPullRequests';
 
 jest.unstable_mockModule('../getClosedPullRequest', () => ({

@@ -145,7 +145,8 @@ export async function processMergedPullRequest({
 
       const gemValue = gemReceiptType === 'first_pr' ? 10 : gemReceiptType === 'third_pr_in_streak' ? 3 : 1;
       const builderEventDate = pullRequestDate;
-      if (builderEventDate < start.toJSDate()) {
+
+      if (builderEventDate >= start.toJSDate()) {
         await tx.builderEvent.upsert({
           where: {
             githubEventId: event.id
