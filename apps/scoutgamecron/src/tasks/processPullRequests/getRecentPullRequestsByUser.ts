@@ -10,9 +10,9 @@ type PullRequestByUser = {
   title: string;
   number: number;
   url: string;
-  closedAt: string;
+  closedAt?: string;
   createdAt: string;
-  mergedAt: string;
+  mergedAt?: string;
   state: 'CLOSED' | 'MERGED';
 };
 

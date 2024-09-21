@@ -4,9 +4,8 @@ import { timezone } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
 
-import type { PullRequest } from '../getPullRequests';
-
-import { randomLargeInt } from '@/testing/numbers';
+import { mockBuilder, mockRepo } from '@/testing/database';
+import { mockPullRequest, randomLargeInt } from '@/testing/generators';
 
 jest.unstable_mockModule('../getRecentPullRequestsByUser', () => ({
   getRecentPullRequestsByUser: jest.fn()
@@ -26,25 +25,9 @@ describe('processMergedPullRequest', () => {
 
   it('should create builder events, gems receipts and update weekly stats for a first merged pull request', async () => {
     const repoId = randomLargeInt();
-    const prNumber = randomLargeInt();
-    const githubUserId = randomLargeInt();
     const username = v4();
 
-    const builder = await prisma.scout.create({
-      data: {
-        username,
-        displayName: 'Test User',
-        builder: true
-      }
-    });
-
-    const githubUser = await prisma.githubUser.create({
-      data: {
-        id: githubUserId,
-        login: username,
-        builderId: builder.id
-      }
-    });
+    const builder = await mockBuilder();
 
     const repo = await prisma.githubRepo.create({
       data: {
@@ -55,23 +38,13 @@ describe('processMergedPullRequest', () => {
       }
     });
 
-    const pullRequest: PullRequest = {
-      number: prNumber,
-      baseRefName: 'main',
+    const pullRequest = mockPullRequest({
       mergedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
-      repository: {
-        id: repoId,
-        nameWithOwner: `${repo.owner}/${repo.name}`
-      },
-      title: 'Test PR 1',
-      url: `https://github.com/${username}/Test-Repo/pull/${prNumber}`,
       state: 'MERGED',
-      author: {
-        id: githubUserId,
-        login: username
-      }
-    };
+      author: builder.githubUser,
+      repo
+    });
 
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
@@ -82,7 +55,7 @@ describe('processMergedPullRequest', () => {
         repoId: repo.id,
         pullRequestNumber: pullRequest.number,
         type: 'merged_pull_request',
-        createdBy: githubUser.id
+        createdBy: builder.githubUser.id
       }
     });
 
@@ -114,64 +87,20 @@ describe('processMergedPullRequest', () => {
   });
 
   it('should create builder events, gems receipts and update weekly stats for a regular merged pull request', async () => {
-    const repoId = randomLargeInt();
-    const prNumber = randomLargeInt();
-    const githubUserId = randomLargeInt();
-    const username = v4();
+    const builder = await mockBuilder();
 
-    const builder = await prisma.scout.create({
-      data: {
-        username,
-        displayName: 'Test User',
-        builder: true
-      }
-    });
+    const repo = await mockRepo();
 
-    const githubUser = await prisma.githubUser.create({
-      data: {
-        id: githubUserId,
-        login: username,
-        builderId: builder.id
-      }
-    });
-
-    const repo = await prisma.githubRepo.create({
-      data: {
-        id: repoId,
-        owner: username,
-        name: 'Test-Repo',
-        defaultBranch: 'main'
-      }
-    });
-
-    const pullRequest: PullRequest = {
-      number: prNumber,
-      baseRefName: 'main',
+    const pullRequest = mockPullRequest({
       mergedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
-      repository: {
-        id: repoId,
-        nameWithOwner: `${repo.owner}/${repo.name}`
-      },
-      title: 'Test PR 2',
-      url: `https://github.com/${username}/Test-Repo/pull/${prNumber}`,
+      repo,
       state: 'MERGED',
-      author: {
-        id: githubUserId,
-        login: username
-      }
-    };
+      author: builder.githubUser
+    });
+
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([
-      {
-        number: randomLargeInt(),
-        baseRefName: 'main',
-        mergedAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        closedAt: new Date().toISOString(),
-        state: 'MERGED',
-        title: 'Test PR 1',
-        url: `https://github.com/${username}/Test-Repo/pull/${randomLargeInt()}`
-      }
+      mockPullRequest()
     ]);
 
     await processMergedPullRequest({ pullRequest, repo });
@@ -181,7 +110,7 @@ describe('processMergedPullRequest', () => {
         repoId: repo.id,
         pullRequestNumber: pullRequest.number,
         type: 'merged_pull_request',
-        createdBy: githubUser.id
+        createdBy: builder.githubUser.id
       }
     });
 
@@ -213,104 +142,39 @@ describe('processMergedPullRequest', () => {
   });
 
   it('should create builder events, gems receipts and update weekly stats for a 3 merged PR streak', async () => {
-    const repoId = randomLargeInt();
-    const githubUserId = randomLargeInt();
-    const username = v4();
+    const builder = await mockBuilder();
+    const repo = await mockRepo();
 
-    const builder = await prisma.scout.create({
-      data: {
-        username,
-        displayName: 'Test User',
-        builder: true
-      }
-    });
+    const latestPrDate = DateTime.fromObject({ weekday: 2 }, { zone: timezone });
 
-    const githubUser = await prisma.githubUser.create({
-      data: {
-        id: githubUserId,
-        login: username,
-        builderId: builder.id
-      }
-    });
-
-    const repo = await prisma.githubRepo.create({
-      data: {
-        id: repoId,
-        owner: username,
-        name: 'Test-Repo',
-        defaultBranch: 'main'
-      }
-    });
-
-    const pullRequest2: PullRequest = {
-      number: randomLargeInt(),
-      baseRefName: 'main',
-      mergedAt: new Date().toISOString(),
-      createdAt: DateTime.fromJSDate(new Date(), { zone: timezone }).minus({ days: 3 }).toISO(),
-      repository: {
-        id: repoId,
-        nameWithOwner: `${repo.owner}/${repo.name}`
-      },
-      title: 'Test PR 2',
-      url: `https://github.com/${username}/Test-Repo/pull/${randomLargeInt()}`,
+    const pullRequest2 = mockPullRequest({
+      createdAt: latestPrDate.minus({ days: 4 }).toISO(),
       state: 'MERGED',
-      author: {
-        id: githubUserId,
-        login: username
-      }
-    };
+      author: builder.githubUser,
+      repo
+    });
+
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([
-      {
-        number: randomLargeInt(),
-        baseRefName: 'main',
-        mergedAt: new Date().toISOString(),
-        createdAt: DateTime.fromJSDate(new Date(), { zone: timezone }).minus({ days: 2 }).toISO(),
-        closedAt: new Date().toISOString(),
-        state: 'MERGED',
-        title: 'Test PR 1',
-        url: `https://github.com/${username}/Test-Repo/pull/${randomLargeInt()}`
-      }
+      mockPullRequest()
     ]);
 
     await processMergedPullRequest({ pullRequest: pullRequest2, repo });
 
-    const pullRequest3: PullRequest = {
-      number: randomLargeInt(),
-      baseRefName: 'main',
-      mergedAt: new Date().toISOString(),
-      createdAt: DateTime.fromJSDate(new Date(), { zone: timezone }).minus({ days: 1 }).toISO(),
-      author: {
-        id: githubUserId,
-        login: username
-      },
-      repository: {
-        id: repoId,
-        nameWithOwner: `${repo.owner}/${repo.name}`
-      },
-      title: 'Test PR 3',
-      url: `https://github.com/${username}/Test-Repo/pull/${randomLargeInt()}`,
-      state: 'MERGED'
-    };
+    const pullRequest3 = mockPullRequest({
+      createdAt: latestPrDate.minus({ days: 1 }).toISO(),
+      state: 'MERGED',
+      repo,
+      author: builder.githubUser
+    });
 
     await processMergedPullRequest({ pullRequest: pullRequest3, repo });
 
-    const pullRequest4: PullRequest = {
-      number: randomLargeInt(),
-      baseRefName: 'main',
-      mergedAt: DateTime.now().startOf('day').toISO(),
-      createdAt: DateTime.fromJSDate(new Date(), { zone: timezone }).toISO(),
-      author: {
-        id: githubUserId,
-        login: username
-      },
-      repository: {
-        id: repoId,
-        nameWithOwner: `${repo.owner}/${repo.name}`
-      },
-      title: 'Test PR 4',
-      url: `https://github.com/${username}/Test-Repo/pull/${randomLargeInt()}`,
-      state: 'MERGED'
-    };
+    const pullRequest4 = mockPullRequest({
+      createdAt: latestPrDate.toISO(),
+      state: 'MERGED',
+      repo,
+      author: builder.githubUser
+    });
 
     await processMergedPullRequest({ pullRequest: pullRequest4, repo });
 
@@ -328,64 +192,28 @@ describe('processMergedPullRequest', () => {
       }
     });
 
-    expect(builderWeeklyStats.gemsCollected).toBe(5);
+    // The total is 4 because the first PR is from a previous week, but the 3rd PR counts as a streak, so 3 + 1 = 4
+    expect(builderWeeklyStats.gemsCollected).toBe(4);
   });
 
   it('should not create builder events and gems receipts for existing events', async () => {
-    const repoId = randomLargeInt();
-    const prNumber = randomLargeInt();
-    const githubUserId = randomLargeInt();
-    const username = v4();
+    const builder = await mockBuilder();
+    const repo = await mockRepo();
 
-    const builder = await prisma.scout.create({
-      data: {
-        username,
-        displayName: 'Test User',
-        builder: true
-      }
-    });
-
-    const githubUser = await prisma.githubUser.create({
-      data: {
-        id: githubUserId,
-        login: username,
-        builderId: builder.id
-      }
-    });
-
-    const githubRepo = await prisma.githubRepo.create({
-      data: {
-        id: repoId,
-        owner: username,
-        name: 'Test Repo',
-        defaultBranch: 'main'
-      }
-    });
-
-    const pullRequest: PullRequest = {
-      number: prNumber,
-      baseRefName: 'main',
+    const pullRequest = mockPullRequest({
       mergedAt: new Date().toISOString(),
       createdAt: DateTime.fromJSDate(new Date(), { zone: timezone }).minus({ days: 3 }).toISO(),
-      repository: {
-        id: repoId,
-        nameWithOwner: `${githubRepo.owner}/${githubRepo.name}`
-      },
-      title: 'Test PR 1',
-      url: `https://github.com/${username}/Test-Repo/pull/${prNumber}`,
+      repo,
       state: 'MERGED',
-      author: {
-        id: githubUserId,
-        login: username
-      }
-    };
+      author: builder.githubUser
+    });
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
-    await processMergedPullRequest({ pullRequest, repo: githubRepo });
+    await processMergedPullRequest({ pullRequest, repo });
 
-    await processMergedPullRequest({ pullRequest, repo: githubRepo });
+    await processMergedPullRequest({ pullRequest, repo });
 
-    await processMergedPullRequest({ pullRequest, repo: githubRepo });
+    await processMergedPullRequest({ pullRequest, repo });
 
     const builderEvents = await prisma.builderEvent.count({
       where: {
@@ -405,57 +233,23 @@ describe('processMergedPullRequest', () => {
   });
 
   it('should not create builder events for banned builders', async () => {
-    const repoId = randomLargeInt();
-    const prNumber = randomLargeInt();
-    const githubUserId = randomLargeInt();
-    const username = v4();
-
-    const builder = await prisma.scout.create({
-      data: {
-        username,
-        displayName: 'Test User',
-        builder: true,
-        bannedAt: new Date()
-      }
+    const builder = await mockBuilder({
+      bannedAt: new Date()
     });
 
-    const githubUser = await prisma.githubUser.create({
-      data: {
-        id: githubUserId,
-        login: username,
-        builderId: builder.id
-      }
-    });
+    const repo = await mockRepo();
 
-    const githubRepo = await prisma.githubRepo.create({
-      data: {
-        id: repoId,
-        owner: username,
-        name: 'Test Repo',
-        defaultBranch: 'main'
-      }
-    });
-
-    const pullRequest: PullRequest = {
-      number: prNumber,
-      baseRefName: 'main',
+    const pullRequest = mockPullRequest({
       mergedAt: new Date().toISOString(),
       createdAt: DateTime.fromJSDate(new Date(), { zone: timezone }).minus({ days: 3 }).toISO(),
-      repository: {
-        id: repoId,
-        nameWithOwner: `${githubRepo.owner}/${githubRepo.name}`
-      },
-      title: 'Test PR 1',
-      url: `https://github.com/${username}/Test-Repo/pull/${prNumber}`,
       state: 'MERGED',
-      author: {
-        id: githubUserId,
-        login: username
-      }
-    };
+      author: builder.githubUser,
+      repo
+    });
+
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
-    await processMergedPullRequest({ pullRequest, repo: githubRepo });
+    await processMergedPullRequest({ pullRequest, repo });
 
     const builderEvents = await prisma.builderEvent.findMany({
       where: {
