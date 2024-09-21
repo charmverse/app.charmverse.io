@@ -22,8 +22,6 @@ export async function processMergedPullRequest({
   if (!pullRequest.mergedAt) {
     throw new Error('Pull request was not merged');
   }
-  // this is the date the PR was merged, which should be used for gem receipts
-  const pullRequestDate = new Date(pullRequest.mergedAt);
   const week = getFormattedWeek(now);
   const { start, end } = getWeekStartEnd(now);
 
@@ -32,7 +30,7 @@ export async function processMergedPullRequest({
       createdBy: pullRequest.author.id,
       // streaks are based on created date
       createdAt: {
-        gte: new Date(pullRequestDate.getTime() - streakWindow)
+        gte: new Date(new Date(pullRequest.createdAt).getTime() - streakWindow)
       },
       type: 'merged_pull_request'
     },
@@ -143,8 +141,10 @@ export async function processMergedPullRequest({
         ? 'third_pr_in_streak'
         : 'regular_pr';
 
-      const gemValue = gemReceiptType === 'first_pr' ? 10 : gemReceiptType === 'third_pr_in_streak' ? 3 : 1;
+      // this is the date the PR was merged, which determines the season/week that it counts as a builder event
+      const pullRequestDate = new Date(pullRequest.mergedAt || 0);
       const builderEventDate = pullRequestDate;
+      const gemValue = gemReceiptType === 'first_pr' ? 10 : gemReceiptType === 'third_pr_in_streak' ? 3 : 1;
 
       if (builderEventDate >= start.toJSDate()) {
         await tx.builderEvent.upsert({

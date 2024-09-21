@@ -10,17 +10,19 @@ export function mockPullRequest(
 ): PullRequest {
   const owner = fields.repo?.owner ?? 'test';
   const name = fields.repo?.name ?? 'test';
+  const state = fields.state ?? 'MERGED';
   return {
     title: 'Test PR',
     url: `https://github.com/${owner}/${name}/pull/${randomLargeInt()}`,
-    state: 'MERGED',
+    state,
     author: fields.githubUser ?? {
       id: randomLargeInt(),
       login: 'testuser'
     },
     number: randomLargeInt(),
     baseRefName: 'main',
-    mergedAt: new Date().toISOString(),
+    closedAt: state === 'CLOSED' ? new Date().toISOString() : undefined,
+    mergedAt: state === 'MERGED' ? new Date().toISOString() : undefined,
     createdAt: new Date().toISOString(),
     repository: {
       id: fields.repo?.id ?? randomLargeInt(),

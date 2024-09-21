@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
 import { v4 } from 'uuid';
 
-import { randomLargeInt } from '../../../testing/generators';
-import type { PullRequest } from '../getPullRequests';
+import { mockBuilder, mockRepo } from '@/testing/database';
+import { randomLargeInt, mockPullRequest } from '@/testing/generators';
 
 jest.unstable_mockModule('../getClosedPullRequest', () => ({
   getClosedPullRequest: jest.fn()
@@ -33,47 +33,16 @@ describe('processClosedPullRequest', () => {
   });
 
   it('should process a closed pull request and create a strike', async () => {
-    const githubUserId = randomLargeInt();
-    const repoId = randomLargeInt();
-    const prNumber = randomLargeInt();
-    const username = v4();
+    const builder = await mockBuilder();
+    const repo = await mockRepo();
 
-    const builder = await prisma.scout.create({
-      data: {
-        username,
-        displayName: 'Test User',
-        builder: true
-      }
-    });
-
-    const githubUser = await prisma.githubUser.create({
-      data: {
-        id: githubUserId,
-        login: username,
-        builderId: builder.id
-      }
-    });
-
-    const repo = await prisma.githubRepo.create({
-      data: {
-        id: repoId,
-        defaultBranch: 'main',
-        owner: username,
-        name: 'testrepo'
-      }
-    });
-
-    const pullRequest: PullRequest = {
-      number: prNumber,
-      baseRefName: 'main',
+    const pullRequest = mockPullRequest({
       createdAt: new Date().toISOString(),
       mergedAt: new Date().toISOString(),
-      title: 'Test PR',
       state: 'CLOSED',
-      author: { id: githubUserId, login: username },
-      repository: { id: repoId, nameWithOwner: `${repo.owner}/${repo.name}` },
-      url: `https://github.com/${username}/testrepo/pull/${prNumber}`
-    };
+      author: builder.githubUser,
+      repo
+    });
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
     await processClosedPullRequest({ pullRequest, repo });
@@ -82,7 +51,7 @@ describe('processClosedPullRequest', () => {
       where: {
         pullRequestNumber: pullRequest.number,
         type: 'closed_pull_request',
-        createdBy: githubUserId
+        createdBy: builder.githubUser.id
       }
     });
     expect(githubEvent).toBeDefined();
@@ -95,49 +64,19 @@ describe('processClosedPullRequest', () => {
   });
 
   it('should not create a strike if the PR was closed by the author', async () => {
-    const githubUserId = randomLargeInt();
-    const repoId = randomLargeInt();
-    const prNumber = randomLargeInt();
-    const username = v4();
+    const builder = await mockBuilder();
 
-    const builder = await prisma.scout.create({
-      data: {
-        username,
-        displayName: 'Test User',
-        builder: true
-      }
-    });
+    const repo = await mockRepo();
 
-    const githubUser = await prisma.githubUser.create({
-      data: {
-        id: githubUserId,
-        login: username,
-        builderId: builder.id
-      }
-    });
-
-    const repo = await prisma.githubRepo.create({
-      data: {
-        id: repoId,
-        defaultBranch: 'main',
-        owner: username,
-        name: 'testrepo'
-      }
-    });
-
-    const pullRequest: PullRequest = {
-      number: prNumber,
-      title: 'Test PR',
+    const pullRequest = mockPullRequest({
       state: 'CLOSED',
       createdAt: new Date().toISOString(),
       mergedAt: new Date().toISOString(),
-      baseRefName: 'main',
-      author: { id: githubUserId, login: username },
-      repository: { id: repoId, nameWithOwner: `${repo.owner}/${repo.name}` },
-      url: `https://github.com/${username}/testrepo/pull/${prNumber}`
-    };
+      author: builder.githubUser,
+      repo
+    });
 
-    (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: username });
+    (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue(builder.githubUser);
 
     await processClosedPullRequest({ pullRequest, repo });
 
@@ -145,7 +84,7 @@ describe('processClosedPullRequest', () => {
       where: {
         pullRequestNumber: pullRequest.number,
         type: 'closed_pull_request',
-        createdBy: githubUserId
+        createdBy: builder.githubUser.id
       }
     });
     expect(githubEvent).toBeDefined();
@@ -158,45 +97,17 @@ describe('processClosedPullRequest', () => {
   });
 
   it('should ban a builder after 3 strikes', async () => {
-    const githubUserId = randomLargeInt();
-    const repoId = randomLargeInt();
-    const username = v4();
+    const builder = await mockBuilder();
 
-    const builder = await prisma.scout.create({
-      data: {
-        username,
-        displayName: 'Test User',
-        builder: true
-      }
-    });
+    const repo = await mockRepo();
 
-    const githubUser = await prisma.githubUser.create({
-      data: {
-        id: githubUserId,
-        login: username,
-        builderId: builder.id
-      }
-    });
-
-    const repo = await prisma.githubRepo.create({
-      data: {
-        id: repoId,
-        defaultBranch: 'main',
-        owner: username,
-        name: 'testrepo'
-      }
-    });
-
-    const pullRequest: Omit<PullRequest, 'number'> = {
-      baseRefName: 'main',
+    const pullRequest = mockPullRequest({
       createdAt: new Date().toISOString(),
       mergedAt: new Date().toISOString(),
-      title: 'Test PR',
       state: 'CLOSED',
-      author: { id: githubUserId, login: username },
-      repository: { id: repoId, nameWithOwner: `${repo.owner}/${repo.name}` },
-      url: `https://github.com/${username}/testrepo/pull/${randomLargeInt()}`
-    };
+      author: builder.githubUser,
+      repo
+    });
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
 
@@ -218,29 +129,19 @@ describe('processClosedPullRequest', () => {
 
   it('should not process a pull request for a non-existent builder', async () => {
     const repoId = randomLargeInt();
-    const prNumber = randomLargeInt();
     const username = v4();
 
-    const pullRequest: PullRequest = {
-      number: prNumber,
-      baseRefName: 'main',
+    const pullRequest = mockPullRequest({
       createdAt: new Date().toISOString(),
       mergedAt: new Date().toISOString(),
       title: 'Test PR',
       state: 'CLOSED',
       author: { id: randomLargeInt(), login: username },
       repository: { id: repoId, nameWithOwner: `${username}/testrepo` },
-      url: `https://github.com/${username}/testrepo/pull/${prNumber}`
-    };
-
-    await prisma.githubRepo.create({
-      data: {
-        id: repoId,
-        defaultBranch: 'main',
-        owner: username,
-        name: 'testrepo'
-      }
+      url: `https://github.com/${username}/testrepo/pull/${randomLargeInt()}`
     });
+
+    await mockRepo();
 
     const githubEvent = await prisma.githubEvent.findFirst({
       where: { pullRequestNumber: pullRequest.number }
@@ -250,47 +151,17 @@ describe('processClosedPullRequest', () => {
   });
 
   it('should not create a new github event if it was processed before', async () => {
-    const githubUserId = randomLargeInt();
-    const repoId = randomLargeInt();
-    const prNumber = randomLargeInt();
-    const username = v4();
+    const builder = await mockBuilder();
 
-    const builder = await prisma.scout.create({
-      data: {
-        username,
-        displayName: 'Test User',
-        builder: true
-      }
-    });
+    const repo = await mockRepo();
 
-    const githubUser = await prisma.githubUser.create({
-      data: {
-        id: githubUserId,
-        login: username,
-        builderId: builder.id
-      }
-    });
-
-    const repo = await prisma.githubRepo.create({
-      data: {
-        id: repoId,
-        defaultBranch: 'main',
-        owner: username,
-        name: 'testrepo'
-      }
-    });
-
-    const pullRequest: PullRequest = {
-      number: prNumber,
-      baseRefName: 'main',
+    const pullRequest = mockPullRequest({
       createdAt: new Date().toISOString(),
       mergedAt: new Date().toISOString(),
-      title: 'Test PR',
       state: 'CLOSED',
-      author: { id: githubUserId, login: username },
-      repository: { id: repoId, nameWithOwner: `${repo.owner}/${repo.name}` },
-      url: `https://github.com/${username}/testrepo/pull/${prNumber}`
-    };
+      author: builder.githubUser,
+      repo
+    });
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
 
@@ -301,7 +172,7 @@ describe('processClosedPullRequest', () => {
     const githubEventsCount = await prisma.githubEvent.count({
       where: {
         githubUser: {
-          id: githubUserId
+          id: builder.githubUser.id
         }
       }
     });
