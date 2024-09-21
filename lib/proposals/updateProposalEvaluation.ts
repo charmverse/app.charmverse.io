@@ -116,16 +116,16 @@ export async function updateProposalEvaluation({
     }
   });
 
-  if (requiredReviews) {
-    await updatePassFailEvaluationResultIfRequired({
-      currentEvaluationType,
-      evaluationId,
-      proposalId,
-      requiredReviews,
-      spaceId,
-      userId: actorId
-    });
-  }
+  // if (requiredReviews) {
+  //   await updatePassFailEvaluationResultIfRequired({
+  //     currentEvaluationType,
+  //     evaluationId,
+  //     proposalId,
+  //     requiredReviews,
+  //     spaceId,
+  //     userId: actorId
+  //   });
+  // }
 
   await setPageUpdatedAt({ proposalId, userId: actorId });
 }
