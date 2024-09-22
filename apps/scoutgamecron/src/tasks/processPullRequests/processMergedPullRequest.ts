@@ -43,6 +43,7 @@ export async function processMergedPullRequest({
       builderEvent: {
         select: {
           createdAt: true,
+          week: true,
           gemsReceipt: {
             select: {
               value: true
@@ -169,12 +170,14 @@ export async function processMergedPullRequest({
           update: {}
         });
         const thisWeekEvents = previousGitEvents.filter((e) => e.createdAt > start.toJSDate());
+
         const gemsCollected = thisWeekEvents.reduce((acc, e) => {
           if (e.builderEvent?.gemsReceipt?.value && e.builderEvent.createdAt < builderEventDate) {
             return acc + e.builderEvent.gemsReceipt.value;
           }
           return acc;
         }, gemValue);
+
         await tx.userWeeklyStats.upsert({
           where: {
             userId_week: {
@@ -191,7 +194,13 @@ export async function processMergedPullRequest({
             gemsCollected
           }
         });
-        log.info('Recorded a merged PR', { userId: githubUser.builderId, url: pullRequest.url, gemsCollected });
+        log.info('Recorded a merged PR', {
+          userId: githubUser.builderId,
+          week,
+          url: pullRequest.url,
+          eventCount: thisWeekEvents.length + 1,
+          gemsCollected
+        });
       }
     }
   });

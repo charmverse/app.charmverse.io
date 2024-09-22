@@ -145,10 +145,10 @@ describe('processMergedPullRequest', () => {
     const builder = await mockBuilder();
     const repo = await mockRepo();
 
-    const latestPrDate = DateTime.fromObject({ weekday: 2 }, { zone: timezone });
+    const now = DateTime.fromObject({ weekday: 2 }, { zone: timezone });
 
     const pullRequest2 = mockPullRequest({
-      createdAt: latestPrDate.minus({ days: 4 }).toISO(),
+      createdAt: now.minus({ days: 4 }).toISO(),
       state: 'MERGED',
       author: builder.githubUser,
       repo
@@ -158,25 +158,25 @@ describe('processMergedPullRequest', () => {
       mockPullRequest()
     ]);
 
-    await processMergedPullRequest({ pullRequest: pullRequest2, repo });
+    await processMergedPullRequest({ pullRequest: pullRequest2, repo, now: now.toJSDate() });
 
     const pullRequest3 = mockPullRequest({
-      createdAt: latestPrDate.minus({ days: 1 }).toISO(),
+      createdAt: now.minus({ days: 1 }).toISO(),
       state: 'MERGED',
       repo,
       author: builder.githubUser
     });
 
-    await processMergedPullRequest({ pullRequest: pullRequest3, repo });
+    await processMergedPullRequest({ pullRequest: pullRequest3, repo, now: now.toJSDate() });
 
     const pullRequest4 = mockPullRequest({
-      createdAt: latestPrDate.toISO(),
+      createdAt: now.toISO(),
       state: 'MERGED',
       repo,
       author: builder.githubUser
     });
 
-    await processMergedPullRequest({ pullRequest: pullRequest4, repo });
+    await processMergedPullRequest({ pullRequest: pullRequest4, repo, now: now.toJSDate() });
 
     const gemsReceipt = await prisma.gemsReceipt.findFirstOrThrow({
       where: {
