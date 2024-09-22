@@ -3,6 +3,7 @@ import Router from '@koa/router';
 import Koa from 'koa';
 
 import * as middleware from './middleware';
+import { processGemsPayout } from './tasks/processGemsPayout/processGemsPayout';
 import { processPullRequests } from './tasks/processPullRequests';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
 
@@ -34,6 +35,8 @@ addTask('/hello-world', (ctx) => {
 addTask('/process-pull-requests', processPullRequests);
 
 addTask('/send-push-notifications', sendNotifications);
+
+addTask('/process-gems-payout', processGemsPayout);
 
 // Standard health check used by Beanstalk
 router.get('/api/health', middleware.healthCheck);

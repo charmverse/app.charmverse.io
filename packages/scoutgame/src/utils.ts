@@ -68,3 +68,9 @@ export function isSameDay(date: Date) {
   const dateDay = DateTime.fromJSDate(date, { zone: timezone }).startOf('day');
   return dateDay.equals(DateTime.now().setZone(timezone).startOf('day'));
 }
+
+export function getCurrentWeekPoints() {
+  const week = getCurrentWeek();
+
+  return 100000;
+}

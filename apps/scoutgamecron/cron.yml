@@ -4,3 +4,8 @@ cron:
     url: "/process-pull-requests"
     # every 5 minutes
     schedule: "*/5 * * * *"
+
+  - name: "process-gems-payout"
+    url: "/process-gems-payout"
+    # End of every week
+    schedule: "0 0 * * 0"
