@@ -232,10 +232,13 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
           borderRadius: 10,
           fontWeight: 600,
           fontSize: '1rem',
-          textTransform: 'none',
-          paddingTop: '14px',
-          paddingBottom: '14px'
+          textTransform: 'none'
         }
+      }
+    },
+    MuiIconButton: {
+      defaultProps: {
+        disableRipple: true
       }
     },
     MuiMenuItem: {

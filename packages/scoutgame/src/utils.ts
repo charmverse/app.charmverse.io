@@ -4,6 +4,8 @@ export const timezone = 'America/New_York';
 
 export const currentSeason = 1;
 
+export const streakWindow = 7 * 24 * 60 * 60 * 1000;
+
 // Return the format of week
 export function getCurrentWeek() {
   return getFormattedWeek(new Date());

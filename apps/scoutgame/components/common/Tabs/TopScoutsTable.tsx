@@ -15,9 +15,9 @@ import Image from 'next/image';
 import { Avatar } from '../Avatar';
 
 export function TopScoutsTable({
-  data
+  rows
 }: {
-  data: {
+  rows: {
     user: { avatar: string; username: string };
     season: number;
     allTime: number;
@@ -53,7 +53,7 @@ export function TopScoutsTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row, index) => (
+          {rows.map((row, index) => (
             <TableRow
               key={row.user.username}
               sx={{

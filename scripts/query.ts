@@ -42,9 +42,10 @@ async function query() {
   //   }
   // });
 
-  console.log(await prisma.githubUser.findMany());
-  console.log(await prisma.githubEvent.findMany());
-  console.log(await prisma.builderStrike.findMany());
+  // console.log(await prisma.githubRepo.findMany());
+  // console.log(await prisma.githubUser.findMany());
+  // console.log(await prisma.githubEvent.findMany());
+  console.log(await prisma.builderEvent.findMany());
 }
 
 query();

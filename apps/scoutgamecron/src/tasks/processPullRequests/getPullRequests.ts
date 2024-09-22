@@ -7,7 +7,8 @@ export type PullRequest = {
   title: string;
   url: string;
   state: 'CLOSED' | 'MERGED';
-  mergedAt: string | null;
+  mergedAt?: string;
+  closedAt?: string;
   createdAt: string;
   author: {
     login: string;
@@ -48,7 +49,7 @@ const getRecentPrs = `
         first: 100
         after: $cursor
         states: [CLOSED, MERGED]
-        orderBy: { field: UPDATED_AT, direction: DESC }
+        orderBy: { field: CREATED_AT, direction: DESC }
       ) {
         edges {
           node {
@@ -58,6 +59,7 @@ const getRecentPrs = `
             state
             closedAt
             createdAt
+            mergedAt
             author {
               login
               ... on User {

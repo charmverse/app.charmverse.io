@@ -30,9 +30,7 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
           <CarouselContainer />
         </Suspense>
         <HomeTabsMenu tab={tab} />
-        <Suspense fallback={<LoadingTable />} key={tab}>
-          <HomeTab tab={tab} />
-        </Suspense>
+        <HomeTab tab={tab} />
       </Box>
     </>
   );

@@ -17,9 +17,9 @@ import Link from 'next/link';
 import { Avatar } from '../Avatar';
 
 export function TopBuildersTable({
-  data
+  rows
 }: {
-  data: {
+  rows: {
     user: { avatar: string; username: string };
     season: number;
     allTime: number;
@@ -44,20 +44,18 @@ export function TopBuildersTable({
           >
             <TableCell align='center'>RANK</TableCell>
             <TableCell align='left'>SCOUT</TableCell>
-            <TableCell align='right'>SEASON</TableCell>
+            <TableCell align='center'>SEASON</TableCell>
             <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
               ALL TIME
             </TableCell>
-            <TableCell align='center' sx={{ whiteSpace: 'nowrap' }}>
+            <TableCell align='center' sx={{ whiteSpace: 'nowrap', display: { xs: 'none', md: 'table-cell' } }}>
               SCOUTED BY
             </TableCell>
-            <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-              PRICE
-            </TableCell>
+            <TableCell align='center'>PRICE</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row, index) => (
+          {rows.map((row, index) => (
             <TableRow
               key={row.user.username}
               sx={{
@@ -76,7 +74,7 @@ export function TopBuildersTable({
                   </Typography>
                 </Stack>
               </TableCell>
-              <TableCell align='right'>
+              <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' color='green.main' noWrap>
                     {row.season || 0}
@@ -110,7 +108,7 @@ export function TopBuildersTable({
                   <Image width={15} height={15} src='/images/profile/icons/like-green-icon.svg' alt='like icon ' />
                 </Stack>
               </TableCell>
-              <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+              <TableCell align='center'>
                 <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${row.user.username}/checkout`}>
                   ${row.price || 0}
                 </Button>
