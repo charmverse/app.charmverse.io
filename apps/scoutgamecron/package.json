@@ -22,7 +22,6 @@
     "@jest/globals": "^29.7.0",
     "@swc/core": "^1.7.26",
     "@swc/jest": "^0.2.36",
-    "@types/web-push": "^3.6.3",
-    "jest": "^29.7.0"
+    "@types/web-push": "^3.6.3"
   }
 }
