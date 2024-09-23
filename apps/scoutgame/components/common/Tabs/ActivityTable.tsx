@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { Stack, TableHead, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -14,7 +16,7 @@ import { Avatar } from '../Avatar';
 
 import { iconMap } from './iconMap';
 
-export function ActivityTable({ rows }: { rows: BuilderEventRow[] }) {
+export async function ActivityTable({ rows }: { rows: BuilderEventRow[] }) {
   return (
     <TableContainer component={Paper} sx={{ mt: 2 }}>
       <Table aria-label='Activity table' size='small'>

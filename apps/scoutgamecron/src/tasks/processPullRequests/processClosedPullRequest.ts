@@ -81,7 +81,8 @@ export async function processClosedPullRequest({
                 builderId: builder.id
               }
             },
-        createdAt: pullRequest.createdAt
+        createdAt: pullRequest.createdAt,
+        completedAt: pullRequest.closedAt
       }
     });
 

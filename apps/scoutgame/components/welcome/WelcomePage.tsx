@@ -1,8 +1,8 @@
 import type { Scout } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 
-import { FarcasterCard } from 'components/common/FarcasterCard';
 import { SinglePageLayout } from 'components/common/Layout';
+import { UserProfile } from 'components/common/Profile/UserProfile';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 
 import { ExtraDetailsForm } from './components/ExtraDetailsForm';
@@ -12,7 +12,7 @@ export function WelcomePage({ user }: { user: Scout }) {
     <SinglePageLayout>
       <SinglePageWrapper>
         <Box display='flex' gap={3} flexDirection='column' alignItems='flex-start'>
-          {user.farcasterId && <FarcasterCard name={user.displayName} avatar={user.avatar} username={user.username} />}
+          {user.farcasterId && <UserProfile user={user} />}
           <ExtraDetailsForm />
         </Box>
       </SinglePageWrapper>

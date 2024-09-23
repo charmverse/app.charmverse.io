@@ -1,14 +1,14 @@
 import 'server-only';
 
-import type { Scout } from '@charmverse/core/prisma-client';
 import { pricingGetter } from '@root/lib/crypto-price/getters';
-import { delay } from '@root/lib/utils/async';
 import dynamic from 'next/dynamic';
 
 import { getTopBuilders } from 'lib/builders/getTopBuilders';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
-const Carousel = dynamic(() => import('components/common/Carousel/Carousel').then((mod) => mod.Carousel));
+const Carousel = dynamic(() => import('components/common/Carousel/Carousel').then((mod) => mod.Carousel), {
+  ssr: false
+});
 
 export async function CarouselContainer() {
   const scout = await getUserFromSession();

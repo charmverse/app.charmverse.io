@@ -9,7 +9,7 @@ export type TopBuilder = {
   price: number;
   likes: number;
   gems: number;
-  scouts: number;
+  nftsBought: number;
 };
 
 export async function getTopBuilders(): Promise<TopBuilder[]> {
@@ -63,7 +63,7 @@ export async function getTopBuilders(): Promise<TopBuilder[]> {
         price: topNft.currentPrice,
         likes: 200,
         gems: topNft.builder.gemsPayoutEvents.reduce((acc, event) => acc + event.gems, 0),
-        scouts: topNft.nftSoldEvents.reduce((acc, event) => acc + event.tokensPurchased, 0)
+        nftsBought: topNft.nftSoldEvents.reduce((acc, event) => acc + event.tokensPurchased, 0)
       } as TopBuilder)
   );
 }

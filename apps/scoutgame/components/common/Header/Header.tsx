@@ -5,6 +5,7 @@ import type { Scout } from '@charmverse/core/prisma';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar, Button, Typography, Stack } from '@mui/material';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -14,8 +15,12 @@ import { useState } from 'react';
 
 import { Avatar } from 'components/common/Avatar';
 
-import { HeaderMenu } from './components/HeaderMenu';
 import { InstallAppMenuItem } from './components/InstallAppMenuItem';
+
+// Enforce rendering on client side because the HeaderMenu component is rendered based on browser width. In RSC behaviour you see an element that should not be rendered.
+const HeaderMenu = dynamic(() => import('./components/HeaderMenu').then((mod) => mod.HeaderMenu), {
+  ssr: false
+});
 
 export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | null }) {
   const router = useRouter();
@@ -43,10 +48,17 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | nu
   return (
     <AppBar position='static'>
       <Container maxWidth={false}>
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }} variant='dense'>
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between', alignItems: 'center' }} variant='dense'>
           <>
             <Link href='/home'>
-              <Image src='/images/scout-game-logo.png' width={100} height={45} alt='Scout Game logo' priority={true} />
+              <Image
+                src='/images/scout-game-logo.png'
+                width={100}
+                height={45}
+                alt='Scout Game logo'
+                priority={true}
+                style={{ verticalAlign: 'middle' }}
+              />
             </Link>
             <Stack flexDirection='row' gap={2} alignItems='center'>
               <HeaderMenu />
