@@ -141,13 +141,13 @@ describe('processMergedPullRequest', () => {
     expect(builderWeeklyStats.gemsCollected).toBe(1);
   });
 
-  it.skip('should create builder events, gems receipts and update weekly stats for a 3 merged PR streak', async () => {
+  it('should create builder events, gems receipts and update weekly stats for a 3 merged PR streak', async () => {
     const builder = await mockBuilder();
     const repo = await mockRepo();
 
     const now = DateTime.fromObject({ weekday: 2 }, { zone: timezone });
 
-    const pullRequest2 = mockPullRequest({
+    const lastWeekPr = mockPullRequest({
       createdAt: now.minus({ days: 4 }).toISO(),
       state: 'MERGED',
       author: builder.githubUser,
@@ -158,10 +158,11 @@ describe('processMergedPullRequest', () => {
       mockPullRequest()
     ]);
 
-    await processMergedPullRequest({ pullRequest: pullRequest2, repo, now: now.toJSDate() });
+    // record a builder event for the last week PR, use a different date so that it creates a builder event for the last week
+    await processMergedPullRequest({ pullRequest: lastWeekPr, repo, now: new Date(lastWeekPr.createdAt) });
 
     const pullRequest3 = mockPullRequest({
-      createdAt: now.minus({ days: 1 }).toISO(),
+      createdAt: now.minus({ days: 2 }).toISO(),
       state: 'MERGED',
       repo,
       author: builder.githubUser
@@ -189,6 +190,9 @@ describe('processMergedPullRequest', () => {
     const builderWeeklyStats = await prisma.userWeeklyStats.findFirstOrThrow({
       where: {
         userId: builder.id
+      },
+      orderBy: {
+        week: 'desc'
       }
     });
 
