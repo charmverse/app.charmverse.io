@@ -1,6 +1,7 @@
 /* eslint-disable no-case-declarations */
 import { InvalidInputError } from '@charmverse/core/errors';
 import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
+import { validateFrameInteractionViaAirstackWithErrorCatching } from '@root/lib/farcaster/airstack';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
 
@@ -39,15 +40,19 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const waitlistClicked = (await req.json()) as FarcasterFrameInteractionToValidate;
 
-  const validatedMessage = await validateFrameInteraction(waitlistClicked.trustedData.messageBytes);
-
   const reqAsURL = new URL(req.url);
 
   const referrerFid = getReferrerFidFromUrl(req);
 
+  const validatedMessage = await validateFrameInteraction(waitlistClicked.trustedData.messageBytes);
+
   if (!validatedMessage.valid) {
-    throw new InvalidInputError('Invalid frame interaction. Could not validate message');
+    return new Response('Invalid frame interaction. Could not validate message', {
+      status: 400
+    });
   }
+
+  validateFrameInteractionViaAirstackWithErrorCatching(waitlistClicked.trustedData.messageBytes);
 
   const interactorFid = parseInt(validatedMessage.action.interactor.fid.toString(), 10);
   const tierChange = reqAsURL.searchParams.get('tierChange') as Extract<TierChange, 'up' | 'down'>;
