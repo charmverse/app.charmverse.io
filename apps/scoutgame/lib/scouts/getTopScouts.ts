@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { currentSeason } from '@packages/scoutgame/utils';
 
 export type TopScout = {
   id: string;
@@ -12,6 +13,9 @@ export type TopScout = {
 
 export async function getTopScouts({ limit }: { limit: number }): Promise<TopScout[]> {
   const topScouts = await prisma.userSeasonStats.findMany({
+    where: {
+      season: currentSeason
+    },
     orderBy: {
       pointsEarnedAsScout: 'desc'
     },
