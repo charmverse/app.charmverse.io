@@ -3,7 +3,7 @@ import Router from '@koa/router';
 import Koa from 'koa';
 
 import * as middleware from './middleware';
-import { processGemsPayout } from './tasks/processGemsPayout/processGemsPayout';
+import { processGemsPayout } from './tasks/processGemsPayout';
 import { processPullRequests } from './tasks/processPullRequests';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
 

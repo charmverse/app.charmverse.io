@@ -6,7 +6,7 @@ import {
   type PointsReceipt
 } from '@charmverse/core/prisma-client';
 
-import { getCurrentWeek, getCurrentWeekPoints } from './utils';
+import { getCurrentWeekPoints } from './utils';
 
 const gemsToPoints = 1;
 const decayRate = 0.03;

@@ -24,6 +24,11 @@ export async function processScoutPointsPayout({
   });
 
   const totalNftsPurchased = nftHolders.reduce((acc, { _count: { scoutId: count } }) => acc + count, 0);
+
+  if (totalNftsPurchased === 0) {
+    return;
+  }
+
   const calculatedPoints = calculatePointsForRank(rank);
 
   await prisma.gemsPayoutEvent.upsert({

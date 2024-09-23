@@ -15,7 +15,7 @@ const { processMergedPullRequest } = await import('../processMergedPullRequest')
 const { getRecentPullRequestsByUser } = await import('../getRecentPullRequestsByUser');
 
 describe('processMergedPullRequest', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.resetAllMocks();
   });
 
