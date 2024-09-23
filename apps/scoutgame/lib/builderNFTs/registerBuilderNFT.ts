@@ -5,14 +5,14 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { currentSeason } from '@packages/scoutgame/utils';
 import { getWalletClient } from '@root/lib/blockchain/walletClient';
 
-import { builderContractAddress, builderNftChain } from './constants';
+import { builderContractAddress, builderNftChain, builderSmartContractOwnerKey } from './constants';
 import { ContractApiClient } from './nftContractApiClient';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
 const builderNftWriteApiClient = new ContractApiClient({
   chain: builderNftChain,
   contractAddress: builderContractAddress,
-  walletClient: getWalletClient({ chainId: builderNftChain.id, privateKey: process.env.PRIVATE_KEY })
+  walletClient: getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey })
 });
 
 export async function registerBuilderNFT({ builderId }: { builderId: string }) {
@@ -30,7 +30,8 @@ export async function registerBuilderNFT({ builderId }: { builderId: string }) {
   });
 
   if (existingBuilderNft) {
-    return existingBuilderNft;
+    const updatedBuilderNft = await refreshBuilderNftPrice({ builderId });
+    return updatedBuilderNft;
   }
 
   const builder = await prisma.scout.findFirstOrThrow({

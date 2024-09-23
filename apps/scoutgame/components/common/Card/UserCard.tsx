@@ -11,9 +11,15 @@ import type { TopBuilder } from 'lib/builders/getTopBuilders';
 import { BasicUserCard } from './BasicUserCard';
 import { UserCardDetails } from './UserCardDetails';
 
-function CardButton({ price, username }: { price: number; username: string }) {
+function CardButton({ price, username, onClick }: { price: number; username: string; onClick?: () => void }) {
   return (
-    <Button fullWidth LinkComponent={Link} href={`/u/${username}/checkout`} variant='buy'>
+    // TODO - Implement pattern with page modal interception
+    // <Button fullWidth LinkComponent={Link} href={`/u/${username}/checkout`} variant='buy'>
+    //   ${price}
+    // </Button>
+
+    // For now, use an onclick pattern
+    <Button fullWidth onClick={onClick} variant='buy'>
       ${price}
     </Button>
   );
@@ -42,11 +48,14 @@ export function UserCard({
         user={user}
         chidlrenInside={withDetails && <UserCardDetails gems={user.gems} likes={user.likes} />}
       >
-        {user.price && (
+        {user.price ? (
           <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
-            <CardButton price={user.price} username={user.username} />
+            <CardButton onClick={() => setIsPurchasing(true)} price={user.price} username={user.username} />
+            {isPurchasing && (
+              <NFTPurchaseDialog onClose={() => setIsPurchasing(false)} builderId={user.id} scout={scout} />
+            )}
           </Stack>
-        )}
+        ) : null}
       </BasicUserCard>
     );
   }
@@ -56,14 +65,12 @@ export function UserCard({
       {(withDetails || user.price) && (
         <Stack gap={1} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }} px={withDetails ? 1 : 0}>
           {withDetails && <UserCardDetails nfts={user.nftsBought} />}
-          {user.price && <CardButton price={user.price} username={user.username} />}
+          {user.price && (
+            <CardButton onClick={() => setIsPurchasing(true)} price={user.price} username={user.username} />
+          )}
         </Stack>
       )}
-      <NFTPurchaseDialog
-        onClose={() => setIsPurchasing(false)}
-        builderId={isPurchasing ? user.id : undefined}
-        scout={scout}
-      />
+      {isPurchasing && <NFTPurchaseDialog onClose={() => setIsPurchasing(false)} builderId={user.id} scout={scout} />}
     </BasicUserCard>
   );
 }
