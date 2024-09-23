@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { calculatePointsForRank } from '@packages/scoutgame/calculatePoints';
+import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/calculatePoints';
 import { mockBuilder, mockNFTPurchaseEvent, mockScout } from '@packages/scoutgame/testing/database';
 import { getCurrentWeek } from '@packages/scoutgame/utils';
 
@@ -57,7 +57,7 @@ describe('processScoutPointsPayout', () => {
 
     await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout2.id, points: 0 });
 
-    const totalPoints = calculatePointsForRank(rank);
+    const totalPoints = calculateEarnableScoutPointsForRank(rank);
 
     await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week });
 
