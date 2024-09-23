@@ -12,19 +12,11 @@ import {
 } from '@mui/material';
 import Image from 'next/image';
 
+import type { TopScout } from 'lib/scouts/getTopScouts';
+
 import { Avatar } from '../Avatar';
 
-export function TopScoutsTable({
-  rows
-}: {
-  rows: {
-    user: { avatar: string; username: string };
-    season: number;
-    allTime: number;
-    scouted: number;
-    nftsHeld: number;
-  }[];
-}) {
+export function TopScoutsTable({ rows }: { rows: TopScout[] }) {
   return (
     <TableContainer component={Paper} sx={{ marginTop: 2 }}>
       <Table aria-label='Top scouts table' size='small'>
@@ -55,7 +47,7 @@ export function TopScoutsTable({
         <TableBody>
           {rows.map((row, index) => (
             <TableRow
-              key={row.user.username}
+              key={row.username}
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
                 '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
@@ -66,16 +58,16 @@ export function TopScoutsTable({
               </TableCell>
               <TableCell component='th'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
-                  <Avatar src={row.user.avatar} name={row.user.username} size='small' />
+                  <Avatar src={row.avatar} name={row.username} size='small' />
                   <Typography variant='caption' noWrap maxWidth={{ xs: '100px', md: '100%' }}>
-                    {row.user.username}
+                    {row.username}
                   </Typography>
                 </Stack>
               </TableCell>
               <TableCell align='right'>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' color='orange.main' noWrap>
-                    {row.season || 0}
+                    {row.seasonPoints || 0}
                   </Typography>
                   <Image width={15} height={15} src='/images/profile/scout-game-orange-icon.svg' alt='season icon ' />
                 </Stack>
@@ -83,14 +75,14 @@ export function TopScoutsTable({
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' color='orange.main' noWrap>
-                    {row.allTime || 0}
+                    {row.allTimePoints || 0}
                   </Typography>
                   <Image width={15} height={15} src='/images/profile/scout-game-orange-icon.svg' alt='season icon ' />
                 </Stack>
               </TableCell>
               <TableCell align='center'>
                 <Typography variant='caption' color='orange.main' noWrap>
-                  {row.scouted || 0}
+                  {row.buildersScouted || 0}
                 </Typography>
               </TableCell>
               <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>

@@ -14,19 +14,11 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 
+import type { TopBuilder } from 'lib/builders/getTopBuilders';
+
 import { Avatar } from '../Avatar';
 
-export function TopBuildersTable({
-  rows
-}: {
-  rows: {
-    user: { avatar: string; username: string };
-    season: number;
-    allTime: number;
-    scoutedBy: number;
-    price: number;
-  }[];
-}) {
+export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
   return (
     <TableContainer component={Paper} sx={{ marginTop: 2 }}>
       <Table aria-label='Top scouts table' size='small'>
@@ -57,7 +49,7 @@ export function TopBuildersTable({
         <TableBody>
           {rows.map((row, index) => (
             <TableRow
-              key={row.user.username}
+              key={row.username}
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
                 '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
@@ -68,16 +60,16 @@ export function TopBuildersTable({
               </TableCell>
               <TableCell component='th'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
-                  <Avatar src={row.user.avatar} name={row.user.username} size='small' />
+                  <Avatar src={row.avatar} name={row.username} size='small' />
                   <Typography variant='caption' noWrap maxWidth={{ xs: '100px', md: '100%' }}>
-                    {row.user.username}
+                    {row.username}
                   </Typography>
                 </Stack>
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' color='green.main' noWrap>
-                    {row.season || 0}
+                    {row.seasonPoints || 0}
                   </Typography>
                   <Image
                     width={15}
@@ -90,7 +82,7 @@ export function TopBuildersTable({
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' color='green.main' noWrap>
-                    {row.allTime || 0}
+                    {row.allTimePoints || 0}
                   </Typography>
                   <Image
                     width={15}
@@ -109,7 +101,7 @@ export function TopBuildersTable({
                 </Stack>
               </TableCell>
               <TableCell align='center'>
-                <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${row.user.username}/checkout`}>
+                <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${row.username}/checkout`}>
                   ${row.price || 0}
                 </Button>
               </TableCell>
