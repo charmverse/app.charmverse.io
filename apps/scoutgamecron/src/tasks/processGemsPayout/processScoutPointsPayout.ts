@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { calculatePointsForRank } from '@packages/scoutgame/calculatePoints';
+import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/calculatePoints';
 import { currentSeason } from '@packages/scoutgame/utils';
 
 export async function processScoutPointsPayout({
@@ -29,7 +29,7 @@ export async function processScoutPointsPayout({
     return;
   }
 
-  const calculatedPoints = calculatePointsForRank(rank);
+  const earnableScoutPoints = calculateEarnableScoutPointsForRank(rank);
 
   await prisma.gemsPayoutEvent.upsert({
     where: {
@@ -40,7 +40,7 @@ export async function processScoutPointsPayout({
     },
     create: {
       gems: gemsCollected,
-      points: calculatedPoints,
+      points: earnableScoutPoints,
       week,
       builderId,
       builderEvent: {
@@ -53,11 +53,11 @@ export async function processScoutPointsPayout({
             createMany: {
               data: [
                 ...nftHolders.map(({ scoutId, _count: { scoutId: nftsPurchased } }) => ({
-                  value: 0.8 * calculatedPoints * (nftsPurchased / totalNftsPurchased),
+                  value: 0.8 * earnableScoutPoints * (nftsPurchased / totalNftsPurchased),
                   recipientId: scoutId
                 })),
                 {
-                  value: 0.2 * calculatedPoints,
+                  value: 0.2 * earnableScoutPoints,
                   recipientId: builderId
                 }
               ]

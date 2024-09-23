@@ -89,7 +89,7 @@ export function getPointsEarnedAsScout(scoutId: string, receipts: (PointsReceipt
   }, 0);
 }
 
-export function calculatePointsForRank(rank: number) {
+export function calculateEarnableScoutPointsForRank(rank: number) {
   const weeklyAllocatedPoints = getCurrentWeekPoints();
   return weeklyAllocatedPoints * ((1 - decayRate) ** (rank - 1) - (1 - decayRate) ** rank);
 }
