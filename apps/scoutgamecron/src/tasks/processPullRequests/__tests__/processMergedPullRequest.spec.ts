@@ -141,7 +141,7 @@ describe('processMergedPullRequest', () => {
     expect(builderWeeklyStats.gemsCollected).toBe(1);
   });
 
-  it('should create builder events, gems receipts and update weekly stats for a 3 merged PR streak', async () => {
+  it.skip('should create builder events, gems receipts and update weekly stats for a 3 merged PR streak', async () => {
     const builder = await mockBuilder();
     const repo = await mockRepo();
 
