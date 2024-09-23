@@ -4,6 +4,7 @@ import { delay } from '@root/lib/utils/async';
 
 import { getAllEvents } from 'lib/builders/getAllEvents';
 import { getLeaderboard } from 'lib/builders/getLeaderboard';
+import { getTopScouts } from 'lib/scouts/getTopScouts';
 
 import { ActivityTable } from './ActivityTable';
 import { LeaderboardTable } from './LeaderboardTable';
@@ -156,11 +157,12 @@ export async function HomeTab({ tab }: { tab: string }) {
     return <ActivityTable rows={events} />;
   }
 
-  if (tab === 'topscouts') {
-    return <TopScoutsTable rows={topScoutsData as any} />;
+  if (tab === 'top-scouts') {
+    const topScouts = await getTopScouts({ limit: 10 });
+    return <TopScoutsTable rows={topScouts} />;
   }
 
-  if (tab === 'topbuilders') {
+  if (tab === 'top-builders') {
     return <TopBuildersTable rows={topBuildersData as any} />;
   }
 
