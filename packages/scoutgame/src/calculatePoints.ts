@@ -89,28 +89,50 @@ export function getPointsEarnedAsScout(scoutId: string, receipts: (PointsReceipt
   }, 0);
 }
 
-export async function getTopBuilders(quantity: number) {
+export async function getTopBuilders({ quantity, week }: { quantity: number; week: string }) {
   const userWeeklyStats = await prisma.userWeeklyStats.findMany({
     where: {
-      week: getCurrentWeek()
+      week
     },
-    orderBy: [
-      {
-        gemsCollected: 'desc'
-      }
-    ],
-    take: quantity,
+    orderBy: {
+      gemsCollected: 'desc'
+    },
     select: {
-      user: true,
+      user: {
+        include: {
+          events: {
+            where: {
+              type: 'merged_pull_request'
+            },
+            orderBy: {
+              createdAt: 'asc'
+            },
+            take: 1,
+            select: {
+              createdAt: true
+            }
+          }
+        }
+      },
       gemsCollected: true
     }
   });
 
-  return userWeeklyStats.map((userWeeklyStat, index) => ({
-    builder: userWeeklyStat.user,
-    gemsCollected: userWeeklyStat.gemsCollected,
-    rank: index + 1
-  }));
+  // Sort based on gems collected first
+  // If the gems are equal then order based on the earliest builder event created at date
+  return userWeeklyStats
+    .sort((a, b) => {
+      if (a.gemsCollected === b.gemsCollected) {
+        return a.user.events[0].createdAt.getTime() - b.user.events[0].createdAt.getTime();
+      }
+      return b.gemsCollected - a.gemsCollected;
+    })
+    .map((userWeeklyStat, index) => ({
+      builder: userWeeklyStat.user,
+      gemsCollected: userWeeklyStat.gemsCollected,
+      rank: index + 1
+    }))
+    .slice(0, quantity);
 }
 
 export function calculatePointsForRank(rank: number) {

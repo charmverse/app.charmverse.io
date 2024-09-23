@@ -70,7 +70,6 @@ export function isSameDay(date: Date) {
 }
 
 export function getCurrentWeekPoints() {
-  const week = getCurrentWeek();
-
+  // TODO: Get points allocation for the week
   return 100000;
 }
