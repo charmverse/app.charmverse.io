@@ -7,5 +7,5 @@ cron:
 
   - name: "process-gems-payout"
     url: "/process-gems-payout"
-    # End of every week
-    schedule: "0 0 * * 0"
+    # Start of every hour
+    schedule: "0 * * * *"
