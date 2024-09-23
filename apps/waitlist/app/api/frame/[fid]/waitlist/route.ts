@@ -1,6 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
+import { status } from '@farcaster/auth-client';
+import { validateFrameInteractionViaAirstackWithErrorCatching } from '@root/lib/farcaster/airstack';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
 
@@ -36,8 +38,12 @@ export async function POST(req: Request) {
   const validatedMessage = await validateFrameInteraction(waitlistClicked.trustedData.messageBytes);
 
   if (!validatedMessage.valid) {
-    throw new InvalidInputError('Invalid frame interaction. Could not validate message');
+    return new Response('Invalid frame interaction. Could not validate message', {
+      status: 400
+    });
   }
+
+  validateFrameInteractionViaAirstackWithErrorCatching(waitlistClicked.trustedData.messageBytes);
 
   const interactorFid = parseInt(validatedMessage.action.interactor.fid.toString(), 10);
 
