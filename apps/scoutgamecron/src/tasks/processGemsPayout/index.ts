@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { getTopBuilders } from '@packages/scoutgame/calculatePoints';
+import { getTopBuilders } from '@packages/scoutgame/getTopBuilders';
 import { getCurrentWeek, timezone } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 

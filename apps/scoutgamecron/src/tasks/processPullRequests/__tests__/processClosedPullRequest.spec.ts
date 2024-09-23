@@ -1,9 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
+import { mockBuilder, mockRepo } from '@packages/scoutgame/testing/database';
+import { randomLargeInt } from '@packages/scoutgame/testing/generators';
 import { v4 } from 'uuid';
 
-import { mockBuilder, mockRepo } from '@/testing/database';
-import { randomLargeInt, mockPullRequest } from '@/testing/generators';
+import { mockPullRequest } from '@/testing/generators';
 
 jest.unstable_mockModule('../getClosedPullRequest', () => ({
   getClosedPullRequest: jest.fn()

@@ -1,11 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { jest } from '@jest/globals';
 import { calculatePointsForRank } from '@packages/scoutgame/calculatePoints';
+import { mockBuilder, mockNFTPurchaseEvent, mockScout } from '@packages/scoutgame/testing/database';
 import { getCurrentWeek } from '@packages/scoutgame/utils';
 
 import { processScoutPointsPayout } from '../processScoutPointsPayout';
-
-import { mockBuilder, mockNFTPurchaseEvent, mockScout } from '@/testing/database';
 
 describe('processScoutPointsPayout', () => {
   it('should not create gems payout event, points receipt and builder event for a builder with no NFT purchases', async () => {
