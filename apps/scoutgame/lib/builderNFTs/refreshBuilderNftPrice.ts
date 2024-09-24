@@ -25,8 +25,6 @@ export async function refreshBuilderNftPrice({ builderId }: { builderId: string 
     args: { tokenId, amount: BigInt(1) }
   });
 
-  const parsedPrice = parseFloat(formatUnits(BigInt(currentPrice), 18));
-
   return prisma.builderNft.upsert({
     where: {
       builderId_season: {
@@ -40,10 +38,10 @@ export async function refreshBuilderNftPrice({ builderId }: { builderId: string 
       contractAddress: builderContractAddress,
       tokenId: Number(tokenId),
       season: currentSeason,
-      currentPrice: parsedPrice
+      currentPrice
     },
     update: {
-      currentPrice: parsedPrice
+      currentPrice
     }
   });
 }

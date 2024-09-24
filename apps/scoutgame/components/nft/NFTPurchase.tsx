@@ -10,6 +10,7 @@ import { ActionType, ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Button, Typography } from '@mui/material';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
 import { useSendTransaction } from 'wagmi';
@@ -18,6 +19,7 @@ import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
 import { builderContractAddress, builderNftChain } from 'lib/builderNFTs/constants';
+import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
 import { ContractApiClient } from 'lib/builderNFTs/nftContractApiClient';
 
 const readonlyApiClient = new ContractApiClient({
@@ -45,6 +47,15 @@ function NFTPurchaseButton({ builderId, scout }: NFTPurchaseProps) {
   // Data from onchain
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
+
+  const { isExecuting, hasSucceeded, executeAsync } = useAction(mintNftAction, {
+    onSuccess() {
+      log.info('NFT minted');
+    },
+    onError(err) {
+      log.error('Error minting NFT', { error: err });
+    }
+  });
 
   const { sendTransaction } = useSendTransaction();
 
@@ -117,11 +128,22 @@ function NFTPurchaseButton({ builderId, scout }: NFTPurchaseProps) {
 
     const tx = actionResponse?.tx as EvmTransaction;
 
-    sendTransaction({
-      to: tx.to,
-      data: tx.data,
-      value: tx.value
+    log.info('Executing purchase');
+
+    await executeAsync({
+      address: address as string,
+      tokenId: builderTokenId.toString(),
+      amount: tokensToBuy,
+      builderId
     });
+
+    log.info('Purchase complete');
+
+    // sendTransaction({
+    //   to: tx.to,
+    //   data: tx.data,
+    //   value: tx.value
+    // });
   };
 
   return (

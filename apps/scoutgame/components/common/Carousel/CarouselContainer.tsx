@@ -20,7 +20,7 @@ export async function CarouselContainer() {
   }));
 
   const accounts = await getTopBuilders().then((accs) =>
-    accs.map((a) => ({ ...a, price: Math.round(a.price * price!.amount) }))
+    accs.map((a) => ({ ...a, price: Math.round(Number(a.price) * price!.amount) }))
   );
 
   return <Carousel items={accounts} scout={scout} />;

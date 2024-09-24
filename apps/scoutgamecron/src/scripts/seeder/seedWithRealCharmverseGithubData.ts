@@ -100,6 +100,8 @@ export async function seedWithRealCharmverseGithubData() {
 
   await processPullRequests({ createdAfter: new Date('2024-08-01'), skipClosedPrProcessing:true });
 
+  await seedBuilderNFTs();
+
 }
 
 async function seedBuilderNFTs() {
@@ -120,7 +122,26 @@ async function seedBuilderNFTs() {
 
 // seedWithRealCharmverseGithubData();
 
-seedBuilderNFTs();
+
+
+async function clearNfts() {
+  await prisma.builderNft.deleteMany({
+    where: {
+      builder: {
+        githubUser: {
+          some: {
+            login: {
+              in: Object.keys(devUsers)
+            }
+          }
+        }
+      }
+    }
+  })
+}
+
+// clearNfts()
+// seedBuilderNFTs();
 
 
 // prisma.githubEvent.deleteMany().then(console.log)

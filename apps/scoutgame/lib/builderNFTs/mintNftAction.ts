@@ -9,21 +9,24 @@ import { authActionClient } from 'lib/actions/actionClient';
 
 import { builderContractAddress, builderNftChain, builderSmartContractOwnerKey } from './constants';
 import { ContractApiClient } from './nftContractApiClient';
+import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
-export const saveOnboardedAction = authActionClient
+export const mintNftAction = authActionClient
   .metadata({ actionName: 'save-onboarded' })
   .schema(
     yup.object().shape({
       address: yup
         .string()
         .required()
-        .test((v) => {
+        .test('Valid address', (v) => {
           if (!isAddress(v)) {
-            throw new Error('Address is required');
+            return false;
           }
+          return true;
         }),
       tokenId: yup.string().required(),
-      amount: yup.number().required()
+      amount: yup.number().required(),
+      builderId: yup.string().required()
     })
   )
   .action(async ({ ctx, parsedInput }) => {
@@ -33,7 +36,14 @@ export const saveOnboardedAction = authActionClient
       throw new Error('User not found');
     }
 
-    const serverClient = getWalletClient({ chainId: 1, privateKey: builderSmartContractOwnerKey });
+    const builderNft = await prisma.builderNft.findFirstOrThrow({
+      where: {
+        chainId: builderNftChain.id,
+        contractAddress: builderContractAddress
+      }
+    });
+
+    const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey });
 
     const apiClient = new ContractApiClient({
       chain: builderNftChain,
@@ -41,13 +51,33 @@ export const saveOnboardedAction = authActionClient
       walletClient: serverClient
     });
 
-    await apiClient.mint({
+    const nextPrice = await apiClient.getTokenPurchasePrice({
+      args: {
+        tokenId: BigInt(parsedInput.tokenId),
+        amount: BigInt(parsedInput.amount)
+      }
+    });
+
+    const txResult = await apiClient.mint({
       args: {
         account: parsedInput.address,
         tokenId: BigInt(parsedInput.tokenId),
         amount: BigInt(parsedInput.amount)
       }
     });
+
+    await prisma.nFTPurchaseEvent.create({
+      data: {
+        // Assuming constant conversion rate of 4:1, and 6 decimals on USDC
+        pointsValue: Number(nextPrice) / 10e6 / 4,
+        tokensPurchased: parsedInput.amount,
+        txHash: txResult.transactionHash,
+        builderNftId: builderNft.id,
+        scoutId: userId
+      }
+    });
+
+    await refreshBuilderNftPrice({ builderId: parsedInput.builderId });
 
     return { success: true };
   });

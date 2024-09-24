@@ -11,7 +11,9 @@ import type { TopBuilder } from 'lib/builders/getTopBuilders';
 import { BasicUserCard } from './BasicUserCard';
 import { UserCardDetails } from './UserCardDetails';
 
-function CardButton({ price, username, onClick }: { price: number; username: string; onClick?: () => void }) {
+const conversion = 1e18;
+
+function CardButton({ price, username, onClick }: { price: bigint; username: string; onClick?: () => void }) {
   return (
     // TODO - Implement pattern with page modal interception
     // <Button fullWidth LinkComponent={Link} href={`/u/${username}/checkout`} variant='buy'>
@@ -20,7 +22,7 @@ function CardButton({ price, username, onClick }: { price: number; username: str
 
     // For now, use an onclick pattern
     <Button fullWidth onClick={onClick} variant='buy'>
-      ${price}
+      ${(Number(price) / conversion).toFixed(2)}
     </Button>
   );
 }
