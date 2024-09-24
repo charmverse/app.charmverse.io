@@ -2,6 +2,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { Stack, Typography } from '@mui/material';
 import { currentSeason, getCurrentScoutGameWeek, getCurrentWeek } from '@packages/scoutgame/utils';
 import { isTruthy } from '@root/lib/utils/types';
+import Link from 'next/link';
+
+import type { ScoutInfo } from 'components/scout/ScoutCard';
+import { ScoutsGallery } from 'components/scout/ScoutsGallery';
 
 import { BuilderActivitiesList } from './BuilderActivitiesList';
 import { BuilderStats } from './BuilderStats';
@@ -49,6 +53,7 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
         orderBy: {
           createdAt: 'desc'
         },
+        take: 5,
         select: {
           id: true,
           createdAt: true,
@@ -74,6 +79,7 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
           },
           githubEvent: {
             where: {
+              // Skip closed pull requests
               type: 'merged_pull_request'
             },
             select: {
@@ -90,14 +96,43 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
     }
   });
 
-  const nftPurchaseEvents = builder.events.filter((event) => event.type === 'nft_purchase');
-  const totalNftsSold = nftPurchaseEvents.reduce(
-    (acc, event) => acc + (event.nftPurchaseEvent?.tokensPurchased || 0),
-    0
-  );
-  const uniqueScoutIds = Array.from(
-    new Set(nftPurchaseEvents.map((event) => event.nftPurchaseEvent?.scout.id).filter(isTruthy))
-  );
+  const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
+    where: {
+      builderEvent: {
+        builderId,
+        season: currentSeason
+      }
+    },
+    select: {
+      scout: {
+        select: {
+          username: true,
+          avatar: true,
+          displayName: true,
+          id: true
+        }
+      },
+      tokensPurchased: true
+    }
+  });
+
+  const uniqueScoutIds = Array.from(new Set(nftPurchaseEvents.map((event) => event.scout.id).filter(isTruthy)));
+  const scoutsRecord: Record<string, ScoutInfo> = {};
+
+  nftPurchaseEvents.forEach((event) => {
+    const existingScout = scoutsRecord[event.scout.id];
+    if (!existingScout) {
+      scoutsRecord[event.scout.id] = {
+        username: event.scout.username,
+        avatar: event.scout.avatar || '',
+        displayName: event.scout.displayName,
+        nfts: 0
+      };
+    }
+    scoutsRecord[event.scout.id].nfts += event.tokensPurchased;
+  });
+
+  const totalNftsSold = Object.values(scoutsRecord).reduce((acc, scout) => acc + scout.nfts, 0);
 
   return (
     <Stack gap={3}>
@@ -114,8 +149,17 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
         <BuilderWeeklyStats gemsCollected={builder.userWeeklyStats[0]?.gemsCollected || 0} rank={1} />
       </Stack>
       <Stack gap={0.5}>
-        <Typography color='secondary'>Recent Activity</Typography>
+        <Stack direction='row' alignItems='center' justifyContent='space-between'>
+          <Typography color='secondary'>Recent Activity</Typography>
+          <Link href='/notifications'>
+            <Typography color='primary'>View All</Typography>
+          </Link>
+        </Stack>
         <BuilderActivitiesList events={builder.events} />
+      </Stack>
+      <Stack gap={0.5}>
+        <Typography color='secondary'>Scouted By</Typography>
+        <ScoutsGallery scouts={Object.values(scoutsRecord)} />
       </Stack>
     </Stack>
   );

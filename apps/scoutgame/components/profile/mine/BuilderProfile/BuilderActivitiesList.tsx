@@ -31,7 +31,7 @@ export function BuilderActivitiesList({
 }) {
   return (
     <Stack gap={1}>
-      {events.slice(0, 5).map((event) => {
+      {events.map((event) => {
         return (
           <Paper key={event.id} sx={{ px: 2, py: 1 }}>
             <Stack direction='row' justifyContent='space-between'>
