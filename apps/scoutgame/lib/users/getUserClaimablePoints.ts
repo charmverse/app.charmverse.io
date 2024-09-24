@@ -45,7 +45,7 @@ export async function getUserClaimablePoints(userId: string) {
     }
   > = {};
 
-  const allWeeks = new Set<string>();
+  const allWeeks = new Set<string>(Array.from(pointsReceipts.map((receipt) => receipt.event.week)));
 
   const gemsReceipts = await prisma.gemsReceipt.findMany({
     where: {
@@ -92,7 +92,6 @@ export async function getUserClaimablePoints(userId: string) {
   for (const receipt of pointsReceipts) {
     const points = receipt.value;
     const week = receipt.event.week;
-    allWeeks.add(week);
 
     if (receipt.event.type === 'nft_purchase' && receipt.event.nftPurchaseEvent) {
       if (!soldNftRewards[week]) {

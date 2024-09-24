@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
-import { isTruthy } from '@root/lib/utils/types';
 
 import type { BuilderInfo } from 'components/builder/Card/BuilderCard';
 

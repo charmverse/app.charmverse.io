@@ -54,22 +54,26 @@ export async function PointsClaimScreen({ userId, username }: { userId: string; 
         {weeklyRewards.map((reward) => (
           <>
             <Stack key={reward.week} gap={1.5}>
-              <Typography variant='h6'>{reward.week}</Typography>
-              <Stack gap={1}>
+              <Typography variant='h6' fontWeight={600}>
+                {reward.week}
+              </Typography>
+              <Stack gap={1.5}>
                 {reward.githubContributionReward ? (
                   <Stack flexDirection='row' gap={1} justifyContent='space-between'>
-                    <Stack gap={1}>
+                    <Stack gap={0.5}>
                       <Typography>Finished within 100 rank</Typography>
                       {reward.githubContributionReward.streakCount ? (
-                        <Typography>{reward.githubContributionReward.streakCount}x contribution streak</Typography>
+                        <Typography variant='body2'>
+                          {reward.githubContributionReward.streakCount}x contribution streak
+                        </Typography>
                       ) : null}
                       {reward.githubContributionReward.firstContributionsCount ? (
-                        <Typography>
+                        <Typography variant='body2'>
                           {reward.githubContributionReward.firstContributionsCount} x first contribution
                         </Typography>
                       ) : null}
                       {reward.githubContributionReward.regularContributionsCount ? (
-                        <Typography>
+                        <Typography variant='body2'>
                           {reward.githubContributionReward.regularContributionsCount} x regular contribution
                         </Typography>
                       ) : null}
