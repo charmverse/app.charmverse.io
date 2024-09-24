@@ -16,7 +16,9 @@ export async function processScoutPointsPayout({
   const nftHolders = await prisma.nFTPurchaseEvent.groupBy({
     by: ['scoutId'],
     where: {
-      builderId
+      builderNFT: {
+        builderId
+      }
     },
     _count: {
       scoutId: true
