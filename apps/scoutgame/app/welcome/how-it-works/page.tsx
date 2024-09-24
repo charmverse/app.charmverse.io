@@ -18,13 +18,8 @@ export const metadata: Metadata = {
 export default async function HowItWorks() {
   const user = await getUserFromSession();
 
-  if (!user) {
-    log.debug('Redirect user to log in from Welcome page');
-    redirect('/');
-  }
-
-  if (!user.onboardedAt) {
-    log.debug('Redirect user to onboarding page from Welcome page', { userId: user.id });
+  if (!user?.onboardedAt) {
+    log.debug('Redirect user to onboarding page from Welcome page', { userId: user?.id });
     redirect('/welcome/builder');
   }
 

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { Scout } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getSession } from '@connect-shared/lib/session/getSession';

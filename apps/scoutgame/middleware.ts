@@ -2,7 +2,7 @@ import { getSession } from '@connect-shared/lib/session/getSession';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const privateLinks = ['/profile', '/notifications'];
+const privateLinks = ['/profile', '/notifications', '/welcome'];
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();
@@ -13,7 +13,6 @@ export async function middleware(request: NextRequest) {
   if (path === '/') {
     return NextResponse.redirect(new URL('/home', request.url));
   }
-
   // Redirect to login if anonymous user clicks on private links
   if (!user && privateLinks.some((url) => path.startsWith(url))) {
     return NextResponse.redirect(new URL('/login', request.url));
