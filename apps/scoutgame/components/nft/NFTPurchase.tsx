@@ -9,6 +9,8 @@ import type { EvmTransaction } from '@decent.xyz/box-common';
 import { ActionType, ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Button, Typography } from '@mui/material';
+import { builderContractAddress, builderNftChain } from '@packages/scoutgame/builderNfts/constants';
+import { ContractApiClient } from '@packages/scoutgame/builderNfts/nftContractApiClient';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
@@ -18,9 +20,7 @@ import { useSendTransaction } from 'wagmi';
 import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
-import { builderContractAddress, builderNftChain } from 'lib/builderNFTs/constants';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
-import { ContractApiClient } from 'lib/builderNFTs/nftContractApiClient';
 
 const readonlyApiClient = new ContractApiClient({
   chain: builderNftChain,

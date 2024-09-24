@@ -1,17 +1,20 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
+import {
+  builderContractAddress,
+  builderNftChain,
+  builderSmartContractOwnerKey,
+  currentSeason
+} from '@packages/scoutgame/builderNfts/constants';
+import { ContractApiClient } from '@packages/scoutgame/builderNfts/nftContractApiClient';
+import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { getCurrentWeek } from '@packages/scoutgame/utils';
 import { getWalletClient } from '@root/lib/blockchain/walletClient';
-import { prettyPrint } from '@root/lib/utils/strings';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
 import { authActionClient } from 'lib/actions/actionClient';
-
-import { builderContractAddress, builderNftChain, builderSmartContractOwnerKey, currentSeason } from './constants';
-import { ContractApiClient } from './nftContractApiClient';
-import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
 export const mintNftAction = authActionClient
   .metadata({ actionName: 'save-onboarded' })
