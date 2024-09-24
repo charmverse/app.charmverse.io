@@ -1,15 +1,19 @@
-import {
-  prisma,
-  type BuilderEvent,
-  type GemsReceipt,
-  type NFTPurchaseEvent,
-  type PointsReceipt
+import type {
+  BuilderNft,
+  BuilderEvent,
+  GemsReceipt,
+  NFTPurchaseEvent,
+  PointsReceipt
 } from '@charmverse/core/prisma-client';
 
 import { getCurrentWeekPoints } from './utils';
 
 const gemsToPoints = 1;
 const decayRate = 0.03;
+
+type BuilderNftMeta = Pick<BuilderNft, 'builderId' | 'contractAddress' | 'tokenId'>;
+
+type NFTPurchaseEventWithBuilderNftMeta = NFTPurchaseEvent & { builderNft: BuilderNftMeta };
 
 // calculate a builder's points based on gems
 export function getBuilderPointsFromGems(
@@ -26,8 +30,8 @@ export function getBuilderPointsFromGems(
 }
 
 // return the % of points earned by a scout from an NFT
-export function getNFTScoutSplit(contract: string, tokenId: number, nftEvents: NFTPurchaseEvent[]) {
-  const nfts = nftEvents.filter((nft) => nft.contractAddress === contract);
+export function getNFTScoutSplit(contract: string, tokenId: number, nftEvents: NFTPurchaseEventWithBuilderNftMeta[]) {
+  const nfts = nftEvents.filter((nft) => nft.builderNft.contractAddress === contract);
   // TODO: apply actual equation
   return 100 / nfts.length;
 }
@@ -35,13 +39,13 @@ export function getNFTScoutSplit(contract: string, tokenId: number, nftEvents: N
 // get the points for a user based on NFTs and gem receipts
 export function getPointsFromGems(
   userId: string,
-  nftEvents: NFTPurchaseEvent[],
+  nftEvents: NFTPurchaseEventWithBuilderNftMeta[],
   receipts: (GemsReceipt & { event: Pick<BuilderEvent, 'builderId'> })[]
 ) {
-  const nfts = nftEvents.filter((nft) => nft.builderId === userId);
+  const nfts = nftEvents.filter((nft) => nft.builderNft.builderId === userId);
   const pointsFromNFTs = nfts.reduce((acc, nft) => {
-    const builderPoints = getBuilderPointsFromGems(nft.builderId, receipts);
-    const scoutSplit = getNFTScoutSplit(nft.contractAddress, nft.tokenId, nftEvents);
+    const builderPoints = getBuilderPointsFromGems(nft.builderNft.builderId, receipts);
+    const scoutSplit = getNFTScoutSplit(nft.builderNft.contractAddress, nft.builderNft.tokenId, nftEvents);
     return acc + builderPoints * scoutSplit;
   }, 0);
   return pointsFromNFTs + getBuilderPointsFromGems(userId, receipts);

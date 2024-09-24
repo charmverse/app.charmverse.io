@@ -1,3 +1,5 @@
+// import { gql } from '@apollo/client';
+import { log } from '@charmverse/core/log';
 import type { GithubRepo } from '@charmverse/core/prisma';
 
 import { getClient } from './gqlClient';
@@ -127,19 +129,46 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
     const recentPRs = pullRequests
       .filter(({ node }) => {
         const closedOrMergedAt = new Date(node.createdAt);
-        return closedOrMergedAt > after;
-      })
-      .map(({ node }) => ({
-        ...node,
-        author: {
-          id: parseInt(atob(node.author.id.toString()).split(':User')[1]),
-          login: node.author.login
-        },
-        repository: {
-          id: repositoryId,
-          nameWithOwner: node.repository.nameWithOwner
+        // Some bots such as dependabot do not have an author id
+
+        if (closedOrMergedAt < after) {
+          return false;
         }
-      }));
+
+        if (!node.author.id) {
+          return false;
+        } else if (typeof node.author.id === 'number') {
+          return true;
+        }
+
+        try {
+          const parsedAuthorId = atob(node.author.id as string)
+            .split(':User')
+            .pop();
+
+          if (Number.isNaN(parseInt(parsedAuthorId as string))) {
+            node.author.id = parseInt(parsedAuthorId as string);
+            return true;
+          } else {
+            return false;
+          }
+        } catch (e) {
+          log.error(`Could not parse author id for user ${node.author.login} with id ${node.author.id}`);
+          return false;
+        }
+      })
+      .map(({ node }) => {
+        return {
+          ...node,
+          author: node.author,
+          repository: {
+            id: repositoryId,
+            nameWithOwner: node.repository.nameWithOwner
+          }
+        };
+      });
+
+    // console.log(JSON.stringify(recentPRs, null, 2));
 
     allRecentPRs = allRecentPRs.concat(recentPRs);
 

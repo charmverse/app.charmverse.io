@@ -14,11 +14,11 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 
-import type { TopBuilder } from 'lib/builders/getTopBuilders';
+import type { BuilderUserInfo } from 'lib/builders/interfaces';
 
 import { Avatar } from '../../common/Avatar';
 
-export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
+export function TopBuildersTable({ rows }: { rows: BuilderUserInfo[] }) {
   return (
     <TableContainer component={Paper} sx={{ marginTop: 2 }}>
       <Table aria-label='Top scouts table' size='small'>
@@ -69,7 +69,7 @@ export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' color='green.main' noWrap>
-                    {row.seasonPoints || 0}
+                    0{/* {row.seasonPoints || 0} */}
                   </Typography>
                   <Image
                     width={15}
@@ -82,7 +82,7 @@ export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' color='green.main' noWrap>
-                    {row.allTimePoints || 0}
+                    0{/* {row.allTimePoints || 0} */}
                   </Typography>
                   <Image
                     width={15}

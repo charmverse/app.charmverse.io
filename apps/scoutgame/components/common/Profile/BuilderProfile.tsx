@@ -26,7 +26,21 @@ export function BuilderProfile({ user }: Props) {
           md: '200px'
         }}
       >
-        <UserCard user={{ ...user, price: 123 }} />
+        <UserCard
+          user={{
+            ...user,
+            price: 123,
+            avatar: user.avatar as string,
+            gems: 20,
+            nftsSold: 17,
+            // seasonPoints: 500,
+            // allTimePoints: 5000,
+            scoutedBy: 4,
+            id: user.id as string,
+            username: user.username as string
+          }}
+          withDetails
+        />
       </Stack>
       <Stack width='100%' gap={0.5}>
         <Typography variant='subtitle1'>{displayName || 'N/A'}</Typography>

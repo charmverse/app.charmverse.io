@@ -1,10 +1,12 @@
 'use client';
 
+import type { Scout } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { useMdScreen, useLgScreen } from 'hooks/useMediaScreens';
+import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
+import type { BuilderUserInfo } from 'lib/builders/interfaces';
 
 import { UserCard } from '../Card/UserCard';
 
@@ -12,7 +14,7 @@ import { NextArrow, PrevArrow } from './Arrows';
 
 import 'swiper/css';
 
-export function Carousel({ items }: { items: any[] }) {
+export function Carousel({ items, scout }: { items: BuilderUserInfo[]; scout?: Scout | null }) {
   const isDesktop = useMdScreen();
   const isLarge = useLgScreen();
   const slidesPerView = isDesktop ? 5 : isLarge ? 6 : 2.2;
@@ -33,7 +35,7 @@ export function Carousel({ items }: { items: any[] }) {
         >
           {items.map((_user) => (
             <SwiperSlide key={_user.username}>
-              <UserCard withDetails user={_user} variant='big' />
+              <UserCard withDetails user={_user} scout={scout} variant='big' />
             </SwiperSlide>
           ))}
         </Swiper>

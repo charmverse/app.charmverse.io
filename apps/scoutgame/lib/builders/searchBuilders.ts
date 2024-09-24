@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { arrayUtils } from '@charmverse/core/utilities';
 import { currentSeason } from '@packages/scoutgame/utils';
 
 export type BuilderSearchResult = {
@@ -51,9 +52,14 @@ export async function searchBuilders({
           pointsEarnedAsBuilder: true
         }
       },
-      nftSoldEvents: {
+      builderNfts: {
         select: {
-          id: true
+          nftSoldEvents: {
+            select: {
+              scoutId: true,
+              builderNftId: true
+            }
+          }
         }
       }
     }
@@ -65,7 +71,8 @@ export async function searchBuilders({
     avatar: builder.avatar,
     seasonPoints: builder.userSeasonStats?.[0]?.pointsEarnedAsBuilder ?? 0,
     allTimePoints: builder.userAllTimeStats?.[0]?.pointsEarnedAsBuilder ?? 0,
-    scoutedBy: builder.nftSoldEvents?.length ?? 0,
+    scoutedBy: arrayUtils.uniqueValues(builder.builderNfts.flatMap((arr) => arr.nftSoldEvents.map((e) => e.scoutId)))
+      .length,
     price: 100 // Assuming a fixed price for now
   }));
 }
