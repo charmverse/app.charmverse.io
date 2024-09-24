@@ -4,25 +4,23 @@ import { Box, Card, CardActionArea, CardContent, CardMedia, Typography } from '@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import type { BasicUserInfo } from 'lib/builders/interfaces';
+
 export function BasicUserCard({
   user,
   children,
-  chidlrenInside
+  childrenInside
 }: {
   children: ReactNode;
-  chidlrenInside: ReactNode;
-  user: any;
+  childrenInside: ReactNode;
+  user: BasicUserInfo;
 }) {
-  if (!user?.avatar) {
-    return null;
-  }
-
   return (
     <Card sx={{ border: 'none' }}>
       <Box borderRadius='5px' overflow='hidden'>
         <CardActionArea
           LinkComponent={Link}
-          href={`/u/${user.id}`}
+          href={`/u/${user.username}`}
           sx={{
             bgcolor: 'black.dark',
             borderStyle: 'solid',
@@ -31,7 +29,7 @@ export function BasicUserCard({
           }}
         >
           <Box position='relative'>
-            <CardMedia component='img' sx={{ aspectRatio: '1 / 1' }} image={user.avatar} alt={user.username} />
+            <CardMedia component='img' sx={{ aspectRatio: '1 / 1' }} image={user.avatar ?? ''} />
             <CardMedia
               component='img'
               width='30px'
@@ -53,7 +51,7 @@ export function BasicUserCard({
             <Typography gutterBottom variant='body1' textAlign='center' noWrap>
               {user.username}
             </Typography>
-            {chidlrenInside}
+            {childrenInside}
           </CardContent>
         </CardActionArea>
       </Box>

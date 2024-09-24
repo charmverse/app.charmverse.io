@@ -11,6 +11,10 @@ export function getCurrentWeek() {
   return getFormattedWeek(new Date());
 }
 
+export function getLastWeek() {
+  return getFormattedWeek(DateTime.now().minus({ week: 1 }).toJSDate());
+}
+
 // get the number of the current week, with Sunday being the first day of the week in New York time
 export function getFormattedWeek(date: Date): string {
   return formatWeek(getWeek(date));
