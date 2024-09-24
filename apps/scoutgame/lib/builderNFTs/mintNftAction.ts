@@ -1,6 +1,7 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentWeek } from '@packages/scoutgame/utils';
 import { getWalletClient } from '@root/lib/blockchain/walletClient';
 import { prettyPrint } from '@root/lib/utils/strings';
 import { isAddress } from 'viem';
@@ -8,7 +9,7 @@ import * as yup from 'yup';
 
 import { authActionClient } from 'lib/actions/actionClient';
 
-import { builderContractAddress, builderNftChain, builderSmartContractOwnerKey } from './constants';
+import { builderContractAddress, builderNftChain, builderSmartContractOwnerKey, currentSeason } from './constants';
 import { ContractApiClient } from './nftContractApiClient';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
@@ -79,7 +80,19 @@ export const mintNftAction = authActionClient
         tokensPurchased: parsedInput.amount,
         txHash: txResult.transactionHash,
         builderNftId: builderNft.id,
-        scoutId: userId
+        scoutId: userId,
+        builderEvent: {
+          create: {
+            type: 'nft_purchase',
+            season: currentSeason,
+            week: getCurrentWeek(),
+            builder: {
+              connect: {
+                id: userId
+              }
+            }
+          }
+        }
       }
     });
 
