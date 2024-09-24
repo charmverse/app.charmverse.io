@@ -363,6 +363,7 @@
     "@storybook/theming": "^8.0.9",
     "@svgdotjs/svg.js": "^3.2.0",
     "@svgr/webpack": "^8.0.1",
+    "@swc/jest": "^0.2.36",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
