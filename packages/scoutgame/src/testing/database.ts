@@ -64,7 +64,7 @@ export function mockRepo(fields: Partial<GithubRepo> & { owner?: string } = {}) 
   });
 }
 
-export function mockNFTPurchaseEvent({
+export async function mockNFTPurchaseEvent({
   builderId,
   scoutId,
   points
@@ -73,15 +73,44 @@ export function mockNFTPurchaseEvent({
   scoutId: string;
   points?: number;
 }) {
+  let builderNft = await prisma.builderNft.findFirst({
+    where: {
+      builderId
+    }
+  });
+
+  if (!builderNft) {
+    builderNft = await mockBuilderNft({ builderId });
+  }
+
   return prisma.nFTPurchaseEvent.create({
     data: {
-      builderId,
+      builderNftId: builderNft.id,
       scoutId,
-      points: points ?? 1,
-      chain: 1,
-      contractAddress: '0x1',
-      tokenId: 1,
-      txHash: '0x1'
+      pointsValue: points ?? 0,
+      txHash: `0x${Math.random().toString(16).split('0.')}`,
+      tokensPurchased: 1
+    }
+  });
+}
+
+export async function mockBuilderNft({
+  builderId,
+  chainId = 1,
+  contractAddress = '0x1'
+}: {
+  builderId: string;
+  chainId?: number;
+  contractAddress?: string;
+}) {
+  return prisma.builderNft.create({
+    data: {
+      builderId,
+      chainId,
+      contractAddress,
+      currentPrice: 0,
+      season: 0,
+      tokenId: Math.round(Math.random() * 10000000)
     }
   });
 }
