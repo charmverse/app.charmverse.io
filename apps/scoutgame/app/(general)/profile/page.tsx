@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/utils';
+import { isTruthy } from '@root/lib/utils/types';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 

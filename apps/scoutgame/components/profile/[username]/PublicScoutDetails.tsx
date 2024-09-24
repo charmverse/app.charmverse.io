@@ -1,12 +1,10 @@
 import 'server-only';
 
 import { Stack, Typography } from '@mui/material';
-import { delay } from '@root/lib/utils/async';
 import { Suspense } from 'react';
 
+import { BuildersGallery } from 'components/builder/BuildersGallery';
 import { LoadingPaperSection } from 'components/layout/Loading/LoadingPaperSection';
-
-import { ScoutedBuilders } from '../../common/Builders/BuildersGallery';
 
 import { PublicScoutStats } from './PublicScoutStats';
 
@@ -20,7 +18,7 @@ export async function PublicScoutDetails() {
         Scouted Builders
       </Typography>
       <Suspense fallback={<LoadingPaperSection />}>
-        <ScoutedBuilders />
+        <BuildersGallery builders={[]} />
       </Suspense>
     </Stack>
   );

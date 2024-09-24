@@ -21,7 +21,7 @@ export function ProfilePointsCard({
     <Paper
       sx={{
         px: 4,
-        py: 2,
+        py: 1.5,
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -30,11 +30,11 @@ export function ProfilePointsCard({
       }}
     >
       <Stack gap={0.5}>
-        <Typography variant='subtitle1' textAlign='center' color='secondary'>
+        <Typography variant='subtitle2' textAlign='center' color='secondary'>
           BALANCE
         </Typography>
         <Stack flexDirection='row' gap={1} alignItems='center'>
-          <Typography variant='h2' fontWeight={400}>
+          <Typography variant='h3' fontWeight={400}>
             {points}
           </Typography>
           <Image src='/images/profile/scout-game-icon.svg' width='40' height='40' alt='scout game icon' />
@@ -63,24 +63,24 @@ export function ProfilePointsCard({
           <Tab label='Season' onClick={() => setSelectedDuration('season')} value='season' />
           <Tab label='All Time' onClick={() => setSelectedDuration('allTime')} value='allTime' />
         </Tabs>
-        <Stack flexDirection='row' gap={2}>
+        <Stack flexDirection='row' gap={2} justifyContent='space-between' px={1}>
           <Stack alignItems='center' gap={0.5}>
-            <Typography color='green.main' fontWeight={500}>
+            <Typography color='green.main' variant='subtitle2' fontWeight={500}>
               BUILDING
             </Typography>
             <Stack flexDirection='row' gap={1} alignItems='center'>
-              <Typography variant='h3' color='green.main' fontWeight={400}>
+              <Typography variant='h4' color='green.main' fontWeight={400}>
                 {selectedDuration === 'season' ? seasonPoints.builderPoints : allTimePoints.builderPoints}
               </Typography>
               <Image src='/images/profile/scout-game-green-icon.svg' width='25' height='25' alt='build icon' />
             </Stack>
           </Stack>
           <Stack alignItems='center' gap={0.5}>
-            <Typography color='orange.main' fontWeight={500}>
+            <Typography color='orange.main' variant='subtitle2' fontWeight={500}>
               SCOUTING
             </Typography>
             <Stack flexDirection='row' gap={1} alignItems='center'>
-              <Typography variant='h3' color='orange.main' fontWeight={400}>
+              <Typography variant='h4' color='orange.main' fontWeight={400}>
                 {selectedDuration === 'season' ? seasonPoints.scoutPoints : allTimePoints.scoutPoints}
               </Typography>
               <Image src='/images/profile/scout-game-orange-icon.svg' width='25' height='25' alt='scout icon' />

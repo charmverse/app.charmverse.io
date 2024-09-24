@@ -16,7 +16,7 @@ export type BuilderInfo = {
   gems: number;
   nfts?: number;
   isBanned?: boolean;
-  scoutedBy: number;
+  scoutedBy?: number;
 };
 
 function PriceButton({ price, username }: { price: number; username: string }) {

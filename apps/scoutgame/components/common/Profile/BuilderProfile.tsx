@@ -2,17 +2,14 @@ import type { Scout } from '@charmverse/core/prisma-client';
 import { IconButton, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import { UserCard } from '../Builders/BuilderCard';
+import { BuilderCard } from 'components/builder/Card/BuilderCard';
 
 type Props = {
-  user: Scout & { description?: string };
+  user: Scout;
 };
 
-// @TODO This should be on the user object
-const _description = 'This is my short little bio about how sigma I am. Could add this line too and still look cool.';
-
 export function BuilderProfile({ user }: Props) {
-  const { displayName, username, description = _description } = user;
+  const { displayName, username, bio } = user;
 
   return (
     <Stack display='flex' gap={2} alignItems='center' flexDirection='row'>
@@ -26,7 +23,7 @@ export function BuilderProfile({ user }: Props) {
           md: '200px'
         }}
       >
-        <UserCard user={{ ...user, price: 123 }} />
+        <BuilderCard builder={{ ...user, price: 123 }} />
       </Stack>
       <Stack width='100%' gap={0.5}>
         <Typography variant='subtitle1'>{displayName || 'N/A'}</Typography>
@@ -54,7 +51,7 @@ export function BuilderProfile({ user }: Props) {
             overflow: 'hidden'
           }}
         >
-          {description}
+          {bio}
         </Typography>
         <Typography variant='body2' color='secondary'>
           THIS SEASON (ALL TIME)
