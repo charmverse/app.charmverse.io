@@ -7,5 +7,7 @@ export default {
     '^.+\\.(t|j)sx?$': '@swc/jest'
   },
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
+
+  modulePathIgnorePatterns: ['__e2e__'],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' })
 };
