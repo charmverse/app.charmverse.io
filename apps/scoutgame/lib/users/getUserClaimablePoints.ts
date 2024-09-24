@@ -7,7 +7,6 @@ export async function getUserClaimablePoints(userId: string) {
       recipientId: userId,
       claimedAt: null,
       event: {
-        // TODO: Should consider previous seasons too
         season: currentSeason
       }
     },
@@ -23,11 +22,6 @@ export async function getUserClaimablePoints(userId: string) {
             select: {
               tokensPurchased: true
             }
-          },
-          gemsReceipt: {
-            select: {
-              type: true
-            }
           }
         }
       }
@@ -39,12 +33,11 @@ export async function getUserClaimablePoints(userId: string) {
 
   const totalClaimablePoints = pointsReceipts.reduce((acc, receipt) => acc + receipt.value, 0);
 
-  const builderRewards: Record<string, { week: string; points: number }> = {};
-  const soldNftRewards: Record<string, { week: string; points: number; quantity: number }> = {};
+  const builderRewards: Record<string, { points: number }> = {};
+  const soldNftRewards: Record<string, { points: number; quantity: number }> = {};
   const githubContributionRewards: Record<
     string,
     {
-      week: string;
       points: number;
       streakCount: number;
       firstContributionsCount: number;
@@ -52,57 +45,100 @@ export async function getUserClaimablePoints(userId: string) {
     }
   > = {};
 
+  const allWeeks = new Set<string>();
+
+  const gemsReceipts = await prisma.gemsReceipt.findMany({
+    where: {
+      event: {
+        week: {
+          in: Array.from(allWeeks)
+        },
+        builderId: userId
+      }
+    },
+    select: {
+      type: true,
+      event: {
+        select: {
+          week: true
+        }
+      }
+    }
+  });
+
+  const weeklyGithubContributionRecord: Record<
+    string,
+    { firstContributionsCount: number; regularContributionsCount: number; streakCount: number }
+  > = {};
+
+  gemsReceipts.forEach(({ type, event: { week } }) => {
+    if (!weeklyGithubContributionRecord[week]) {
+      weeklyGithubContributionRecord[week] = {
+        firstContributionsCount: 0,
+        regularContributionsCount: 0,
+        streakCount: 0
+      };
+    }
+
+    if (type === 'first_pr') {
+      weeklyGithubContributionRecord[week].firstContributionsCount += 1;
+    } else if (type === 'regular_pr') {
+      weeklyGithubContributionRecord[week].regularContributionsCount += 1;
+    } else if (type === 'third_pr_in_streak') {
+      weeklyGithubContributionRecord[week].streakCount += 1;
+    }
+  });
+
   for (const receipt of pointsReceipts) {
     const points = receipt.value;
     const week = receipt.event.week;
+    allWeeks.add(week);
+
     if (receipt.event.type === 'nft_purchase' && receipt.event.nftPurchaseEvent) {
-      const soldNftReward = soldNftRewards[week];
-      if (!soldNftReward) {
+      if (!soldNftRewards[week]) {
         soldNftRewards[week] = {
-          week,
           points: 0,
           quantity: 0
         };
       }
+      const soldNftReward = soldNftRewards[week];
       soldNftReward.points += receipt.value;
       soldNftReward.quantity += receipt.event.nftPurchaseEvent.tokensPurchased ?? 1;
     } else if (receipt.event.type === 'gems_payout') {
-      if (receipt.event.gemsReceipt) {
-        const githubContributionReward = githubContributionRewards[week];
-        if (!githubContributionReward) {
+      if (receipt.event.builderId !== receipt.recipientId) {
+        const builderReward = builderRewards[week];
+        if (!builderReward) {
+          builderRewards[week] = {
+            points: 0
+          };
+        }
+        builderReward.points += points;
+      } else {
+        const githubContribution = weeklyGithubContributionRecord[week];
+        if (!githubContributionRewards[week]) {
           githubContributionRewards[week] = {
             points: 0,
-            week,
             firstContributionsCount: 0,
             regularContributionsCount: 0,
             streakCount: 0
           };
         }
+        const githubContributionReward = githubContributionRewards[week];
         githubContributionReward.points += points;
-        if (receipt.event.gemsReceipt.type === 'first_pr') {
-          githubContributionReward.firstContributionsCount += 1;
-        } else if (receipt.event.gemsReceipt.type === 'regular_pr') {
-          githubContributionReward.regularContributionsCount += 1;
-        } else if (receipt.event.gemsReceipt.type === 'third_pr_in_streak') {
-          githubContributionReward.streakCount += 1;
-        }
-      } else if (receipt.event.builderId !== receipt.recipientId) {
-        const builderReward = builderRewards[week];
-        if (!builderReward) {
-          builderRewards[week] = {
-            points: 0,
-            week
-          };
-        }
-        builderReward.points += points;
+        githubContributionReward.firstContributionsCount += githubContribution?.firstContributionsCount ?? 0;
+        githubContributionReward.regularContributionsCount += githubContribution?.regularContributionsCount ?? 0;
+        githubContributionReward.streakCount += githubContribution?.streakCount ?? 0;
       }
     }
   }
 
   return {
     totalClaimablePoints,
-    builderRewards,
-    githubContributionRewards,
-    soldNftRewards
+    weeklyRewards: Array.from(allWeeks).map((week) => ({
+      week,
+      builderReward: builderRewards[week],
+      githubContributionReward: githubContributionRewards[week],
+      soldNftReward: soldNftRewards[week]
+    }))
   };
 }

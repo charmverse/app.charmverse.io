@@ -12,12 +12,12 @@ export function generatePullRequest({
   createdAt
 }: {
   githubRepo: GithubRepo;
-  githubUser: GithubUser;
+  githubUser: Pick<GithubUser, 'id' | 'login'>;
   pullRequestNumber: number;
   createdAt: DateTime;
 }): PullRequest {
-  // 5-10% chance of a closed PR
-  const closedPullRequestChance = faker.number.int({ min: 5, max: 10 });
+  // 0-5% chance of a closed PR
+  const closedPullRequestChance = faker.number.int({ min: 0, max: 5 });
   const nameWithOwner = `${githubRepo.owner}/${githubRepo.name}`;
   const now = DateTime.now().setZone(timezone);
   return {
