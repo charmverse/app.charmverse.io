@@ -7,13 +7,15 @@ import { Suspense } from 'react';
 
 import { CarouselContainer } from 'components/common/Carousel/CarouselContainer';
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
-import { HomeTab } from 'components/common/Tabs/HomeTab';
-import { HomeTabsMenu } from 'components/common/Tabs/HomeTabsMenu';
+import { HomeTabsMenu } from 'components/home/components/HomeTabsMenu';
 import { LoadingBanner } from 'components/layout/Loading/LoadinBanner';
 import { LoadingCards } from 'components/layout/Loading/LoadingCards';
-import { LoadingTable } from 'components/layout/Loading/LoadingTable';
+
+import { HomeTab } from './components/HomeTab';
+import { homeTabs } from './components/HomeTabsMenu';
 
 export async function HomePage({ user, tab }: { user: Scout | null; tab: string }) {
+  const currentTab = homeTabs.some((t) => t.value === tab) ? tab : 'leaderboard';
   return (
     <>
       <Suspense fallback={<LoadingBanner />}>
@@ -29,8 +31,8 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
         <Suspense fallback={<LoadingCards />}>
           <CarouselContainer />
         </Suspense>
-        <HomeTabsMenu tab={tab} />
-        <HomeTab tab={tab} />
+        <HomeTabsMenu tab={currentTab} />
+        <HomeTab tab={currentTab} />
       </Box>
     </>
   );

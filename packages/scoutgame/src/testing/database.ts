@@ -36,6 +36,22 @@ export async function mockBuilder({
 
 export type MockBuilder = Awaited<ReturnType<typeof mockBuilder>>;
 
+export async function mockScout({
+  username = uuid(),
+  displayName = 'Test Scout'
+}: {
+  username?: string;
+  displayName?: string;
+} = {}) {
+  return prisma.scout.create({
+    data: {
+      username,
+      displayName,
+      builder: false
+    }
+  });
+}
+
 export function mockRepo(fields: Partial<GithubRepo> & { owner?: string } = {}) {
   return prisma.githubRepo.create({
     data: {
@@ -44,6 +60,28 @@ export function mockRepo(fields: Partial<GithubRepo> & { owner?: string } = {}) 
       name: fields.name ?? 'test_repo',
       owner: fields.owner ?? 'test_owner',
       defaultBranch: fields.defaultBranch ?? 'main'
+    }
+  });
+}
+
+export function mockNFTPurchaseEvent({
+  builderId,
+  scoutId,
+  points
+}: {
+  builderId: string;
+  scoutId: string;
+  points?: number;
+}) {
+  return prisma.nFTPurchaseEvent.create({
+    data: {
+      builderId,
+      scoutId,
+      points: points ?? 1,
+      chain: 1,
+      contractAddress: '0x1',
+      tokenId: 1,
+      txHash: '0x1'
     }
   });
 }

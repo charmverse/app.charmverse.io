@@ -2,7 +2,6 @@
 
 import type { Scout } from '@charmverse/core/prisma-client';
 import { Button, Stack } from '@mui/material';
-import Link from 'next/link';
 import { useState } from 'react';
 
 import { NFTPurchaseDialog } from 'components/nft/NFTPurchaseDialog';
@@ -48,7 +47,7 @@ export function UserCard({
     return (
       <BasicUserCard
         user={user}
-        chidlrenInside={withDetails && <UserCardDetails gems={user.gems} likes={user.likes} />}
+        childrenInside={withDetails && <UserCardDetails gems={user.gems} scouts={user.scouts} likes={user.likes} />}
       >
         {user.price ? (
           <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
@@ -63,15 +62,15 @@ export function UserCard({
   }
 
   return (
-    <BasicUserCard user={user} chidlrenInside={withDetails && <UserCardDetails gems={user.gems} />}>
-      {(withDetails || user.price) && (
+    <BasicUserCard user={user} childrenInside={withDetails && <UserCardDetails gems={user.gems} />}>
+      {withDetails || user.price ? (
         <Stack gap={1} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }} px={withDetails ? 1 : 0}>
           {withDetails && <UserCardDetails nfts={user.nftsBought} />}
           {user.price && (
             <CardButton onClick={() => setIsPurchasing(true)} price={user.price} username={user.username} />
           )}
         </Stack>
-      )}
+      ) : null}
       {isPurchasing && <NFTPurchaseDialog onClose={() => setIsPurchasing(false)} builderId={user.id} scout={scout} />}
     </BasicUserCard>
   );

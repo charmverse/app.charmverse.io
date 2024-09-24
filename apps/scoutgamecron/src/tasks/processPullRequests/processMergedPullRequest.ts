@@ -62,6 +62,7 @@ export async function processMergedPullRequest({
   });
 
   const existingGithubEvent = previousGitEvents.some((event) => event.pullRequestNumber === pullRequest.number);
+
   if (existingGithubEvent) {
     // already processed
     return;
@@ -173,7 +174,7 @@ export async function processMergedPullRequest({
           },
           update: {}
         });
-        const thisWeekEvents = previousGitEvents.filter((e) => e.createdAt > start.toJSDate());
+        const thisWeekEvents = previousGitEvents.filter((e) => e.createdAt >= start.toJSDate());
 
         const gemsCollected = thisWeekEvents.reduce((acc, e) => {
           if (e.builderEvent?.gemsReceipt?.value && e.builderEvent.createdAt < builderEventDate) {
@@ -199,6 +200,7 @@ export async function processMergedPullRequest({
           }
         });
         log.info('Recorded a merged PR', {
+          eventId: event.id,
           userId: githubUser.builderId,
           week,
           url: pullRequest.url,

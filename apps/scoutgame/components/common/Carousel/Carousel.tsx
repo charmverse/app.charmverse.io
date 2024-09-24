@@ -1,11 +1,11 @@
 'use client';
 
 import type { Scout } from '@charmverse/core/prisma-client';
-import { Box, useMediaQuery } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
+import { Box } from '@mui/material';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
+import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
 import type { TopBuilder } from 'lib/builders/getTopBuilders';
 
 import { UserCard } from '../Card/UserCard';
@@ -15,17 +15,17 @@ import { NextArrow, PrevArrow } from './Arrows';
 import 'swiper/css';
 
 export function Carousel({ items, scout }: { items: TopBuilder[]; scout?: Scout | null }) {
-  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
-  const isLarge = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
-  const slidesPerView = isMobile ? 2.2 : isLarge ? 6 : 5;
+  const isDesktop = useMdScreen();
+  const isLarge = useLgScreen();
+  const slidesPerView = isDesktop ? 5 : isLarge ? 6 : 2.2;
 
   return (
     <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
-      <Box width='95svw' px={isMobile ? 0 : 4} position='relative'>
+      <Box width='95svw' px={isDesktop ? 4 : 0} position='relative'>
         <Swiper
           className='mySwiper'
           slidesPerView={slidesPerView}
-          spaceBetween={isMobile ? 5 : 15}
+          spaceBetween={isDesktop ? 15 : 5}
           autoHeight={true}
           modules={[Navigation]}
           navigation={{
@@ -39,7 +39,7 @@ export function Carousel({ items, scout }: { items: TopBuilder[]; scout?: Scout 
             </SwiperSlide>
           ))}
         </Swiper>
-        {!isMobile && items.length > slidesPerView && (
+        {isDesktop && items.length > slidesPerView && (
           <>
             <NextArrow className='swiper-button-next' />
             <PrevArrow className='swiper-button-prev' />

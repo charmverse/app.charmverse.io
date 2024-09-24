@@ -26,7 +26,7 @@ export function BuilderProfile({ user }: Props) {
           md: '200px'
         }}
       >
-        <UserCard user={{ ...user, price: 123 }} withDetails={false} />
+        <UserCard user={{ ...user, price: 123 }} />
       </Stack>
       <Stack width='100%' gap={0.5}>
         <Typography variant='subtitle1'>{displayName || 'N/A'}</Typography>

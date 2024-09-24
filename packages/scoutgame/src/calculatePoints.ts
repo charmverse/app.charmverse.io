@@ -1,6 +1,15 @@
-import type { BuilderEvent, GemsReceipt, NFTPurchaseEvent, PointsReceipt } from '@charmverse/core/prisma-client';
+import {
+  prisma,
+  type BuilderEvent,
+  type GemsReceipt,
+  type NFTPurchaseEvent,
+  type PointsReceipt
+} from '@charmverse/core/prisma-client';
+
+import { getCurrentWeekPoints } from './utils';
 
 const gemsToPoints = 1;
+const decayRate = 0.03;
 
 // calculate a builder's points based on gems
 export function getBuilderPointsFromGems(
@@ -78,4 +87,9 @@ export function getPointsEarnedAsScout(scoutId: string, receipts: (PointsReceipt
     }
     return acc;
   }, 0);
+}
+
+export function calculateEarnableScoutPointsForRank(rank: number) {
+  const weeklyAllocatedPoints = getCurrentWeekPoints();
+  return weeklyAllocatedPoints * ((1 - decayRate) ** (rank - 1) - (1 - decayRate) ** rank);
 }

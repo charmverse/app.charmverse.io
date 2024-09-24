@@ -13,7 +13,7 @@ import Link from 'next/link';
 
 import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
 
-import { Avatar } from '../Avatar';
+import { Avatar } from '../../common/Avatar';
 
 export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));

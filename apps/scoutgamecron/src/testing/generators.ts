@@ -1,6 +1,6 @@
-import type { PullRequest } from '../tasks/processPullRequests/getPullRequests';
+import { randomLargeInt } from '@packages/scoutgame/testing/generators';
 
-export const randomLargeInt = () => Math.floor(Math.random() * 1000000000) + 1000000000;
+import type { PullRequest } from '../tasks/processPullRequests/getPullRequests';
 
 export function mockPullRequest(
   fields: Partial<PullRequest> & {

@@ -147,7 +147,7 @@ jobs:
         run: npm run scoutgame:test
 
       - name: Run package tests
-        run: npm run test -w packages/scoutgame
+        run: npx dotenv -e .env.test.local -- npm run test -w packages/scoutgame
 
   test-scoutgame-e2e:
     name: Test Scoutgame e2e

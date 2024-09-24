@@ -11,6 +11,10 @@ export function getCurrentWeek() {
   return getFormattedWeek(new Date());
 }
 
+export function getLastWeek() {
+  return getFormattedWeek(DateTime.now().minus({ week: 1 }).toJSDate());
+}
+
 // get the number of the current week, with Sunday being the first day of the week in New York time
 export function getFormattedWeek(date: Date): string {
   return formatWeek(getWeek(date));
@@ -67,4 +71,9 @@ export function getWeek(date: Date): { week: number; year: number } {
 export function isSameDay(date: Date) {
   const dateDay = DateTime.fromJSDate(date, { zone: timezone }).startOf('day');
   return dateDay.equals(DateTime.now().setZone(timezone).startOf('day'));
+}
+
+export function getCurrentWeekPoints() {
+  // TODO: Get points allocation for the week
+  return 100000;
 }
