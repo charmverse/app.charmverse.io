@@ -1,22 +1,21 @@
 import 'server-only';
 
-import type { Scout } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
 
-import type { BuildersSort } from 'lib/builders/getSortedBuilders';
+import { BuildersGallery } from 'components/builder/BuildersGallery';
+import { getSortedBuilders, type BuildersSort } from 'lib/builders/getSortedBuilders';
 
-import { BuildersGridContainer } from './components/BuildersGridContainer';
 import { SearchBuildersInput } from './components/SearchBuildersInput';
 import { SortOptionTabs, sortOptions } from './components/SortOptionTabs';
 
-export async function ScoutPage({ user, sort }: { user: Scout | null; sort: string }) {
+export async function BuilderSearchPage({ sort }: { sort: string }) {
   const currentSort = sortOptions.some((t) => t.value === sort) ? sort : 'top';
-
+  const builders = await getSortedBuilders({ sort: currentSort as BuildersSort, limit: 10 });
   return (
     <Box p={1}>
       <SearchBuildersInput />
       <SortOptionTabs value={currentSort} />
-      <BuildersGridContainer sort={currentSort as BuildersSort} />
+      <BuildersGallery builders={builders} />
     </Box>
   );
 }

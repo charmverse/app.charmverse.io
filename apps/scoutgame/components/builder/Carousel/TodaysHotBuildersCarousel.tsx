@@ -4,8 +4,8 @@ import dynamic from 'next/dynamic';
 
 import type { CarouselProps } from 'components/common/Carousel/Carousel';
 import { getTodaysHotBuilders } from 'lib/builders/getTodaysHotBuilders';
+import type { BuilderInfo } from 'lib/builders/interfaces';
 
-import type { BuilderInfo } from '../Card/BuilderCard';
 import { BuilderCard } from '../Card/BuilderCard';
 
 const Carousel = dynamic<CarouselProps<BuilderInfo>>(

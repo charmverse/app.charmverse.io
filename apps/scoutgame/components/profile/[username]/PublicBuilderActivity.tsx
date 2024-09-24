@@ -1,7 +1,6 @@
 import 'server-only';
 
 import { Button, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
-import { delay } from '@root/lib/utils/async';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,7 +10,6 @@ import { getAllEvents } from 'lib/builders/getAllEvents';
 
 export async function PublicBuilderActivity() {
   const rows = await getAllEvents();
-  await delay(3000);
 
   if (!rows || rows.length === 0) {
     return null;

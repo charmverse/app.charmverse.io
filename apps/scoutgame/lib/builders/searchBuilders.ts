@@ -46,14 +46,20 @@ export async function searchBuilders({
           pointsEarnedAsBuilder: true
         }
       },
+      builderNfts: {
+        where: {
+          season: currentSeason
+        },
+        select: {
+          currentPrice: true,
+          nftSoldEvents: {
+            distinct: ['scoutId']
+          }
+        }
+      },
       userAllTimeStats: {
         select: {
           pointsEarnedAsBuilder: true
-        }
-      },
-      nftSoldEvents: {
-        select: {
-          id: true
         }
       }
     }
@@ -65,7 +71,7 @@ export async function searchBuilders({
     avatar: builder.avatar,
     seasonPoints: builder.userSeasonStats?.[0]?.pointsEarnedAsBuilder ?? 0,
     allTimePoints: builder.userAllTimeStats?.[0]?.pointsEarnedAsBuilder ?? 0,
-    scoutedBy: builder.nftSoldEvents?.length ?? 0,
-    price: 100 // Assuming a fixed price for now
+    scoutedBy: builder.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
+    price: Number(builder.builderNfts?.[0]?.currentPrice ?? 0)
   }));
 }

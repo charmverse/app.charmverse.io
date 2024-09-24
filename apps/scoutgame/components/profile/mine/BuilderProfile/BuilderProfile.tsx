@@ -1,14 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { Stack, Typography } from '@mui/material';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
-import { isTruthy } from '@root/lib/utils/types';
 import Link from 'next/link';
 
-import type { ScoutInfo } from 'components/scout/ScoutCard';
 import { ScoutsGallery } from 'components/scout/ScoutsGallery';
+import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
+import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
 
-import { BuilderActivitiesList } from './BuilderActivitiesList';
+import { BuilderActivitiesList } from '../../../builder/BuilderActivitiesList';
+
 import { BuilderStats } from './BuilderStats';
 import { BuilderWeeklyStats } from './BuilderWeeklyStats';
 
@@ -45,56 +46,12 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
         select: {
           gemsCollected: true
         }
-      },
-      events: {
-        where: {
-          season: currentSeason
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        take: 5,
-        select: {
-          id: true,
-          createdAt: true,
-          type: true,
-          nftPurchaseEvent: {
-            select: {
-              scout: {
-                select: {
-                  username: true,
-                  avatar: true,
-                  displayName: true,
-                  id: true
-                }
-              },
-              tokensPurchased: true
-            }
-          },
-          gemsReceipt: {
-            select: {
-              type: true,
-              value: true
-            }
-          },
-          githubEvent: {
-            where: {
-              // Skip closed pull requests
-              type: 'merged_pull_request'
-            },
-            select: {
-              repo: {
-                select: {
-                  name: true,
-                  owner: true
-                }
-              }
-            }
-          }
-        }
       }
     }
   });
+
+  const builderActivities = await getBuilderActivities(builderId);
+  const builderWeeklyStats = await getBuilderWeeklyStats(builderId);
 
   const { totalScouts, totalNftsSold, scouts } = await getBuilderScouts(builderId);
 
@@ -110,7 +67,7 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
       />
       <Stack gap={0.5}>
         <Typography color='secondary'>This Week</Typography>
-        <BuilderWeeklyStats gemsCollected={builder.userWeeklyStats[0]?.gemsCollected || 0} rank={1} />
+        <BuilderWeeklyStats gemsCollected={builderWeeklyStats.gemsCollected} rank={builderWeeklyStats.rank} />
       </Stack>
       <Stack gap={0.5}>
         <Stack direction='row' alignItems='center' justifyContent='space-between'>
@@ -119,7 +76,7 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
             <Typography color='primary'>View All</Typography>
           </Link>
         </Stack>
-        <BuilderActivitiesList events={builder.events} />
+        <BuilderActivitiesList activities={builderActivities} />
       </Stack>
       <Stack gap={0.5}>
         <Typography color='secondary'>Scouted By</Typography>

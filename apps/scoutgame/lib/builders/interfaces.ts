@@ -3,10 +3,15 @@ export type BasicUserInfo = {
   avatar: string | null;
 };
 
-export type BuilderUserInfo = BasicUserInfo & {
-  gems?: number;
-  scouts?: number;
-  likes?: number;
+export type BuilderInfo = {
+  id: string;
+  nftAvatar: string;
+  username: string;
+  displayName: string;
+  builderPoints: number;
+  price?: number;
+  gems: number;
   nfts?: number;
-  price: number;
+  isBanned?: boolean;
+  scoutedBy?: number;
 };

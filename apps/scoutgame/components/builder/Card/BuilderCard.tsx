@@ -3,21 +3,10 @@
 import { Button, Card, Stack } from '@mui/material';
 import Link from 'next/link';
 
+import type { BuilderInfo } from 'lib/builders/interfaces';
+
 import { BuilderCardNftDisplay } from './BuilderCardNftDisplay';
 import { BuilderCardStats } from './BuilderCardStats';
-
-export type BuilderInfo = {
-  id: string;
-  nftAvatar: string;
-  username: string;
-  displayName: string;
-  builderPoints: number;
-  price?: number;
-  gems: number;
-  nfts?: number;
-  isBanned?: boolean;
-  scoutedBy?: number;
-};
 
 function PriceButton({ price, username }: { price: number; username: string }) {
   return (
@@ -48,7 +37,7 @@ export function BuilderCard({
           />
         )}
       </BuilderCardNftDisplay>
-      {builder.price && showPurchaseButton && (
+      {typeof builder.price === 'number' && showPurchaseButton && (
         <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
           <PriceButton price={builder.price} username={builder.username} />
         </Stack>

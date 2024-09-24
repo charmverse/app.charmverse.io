@@ -1,12 +1,9 @@
 import 'server-only';
 
 import { Paper, Stack, Typography } from '@mui/material';
-import { delay } from '@root/lib/utils/async';
 import Image from 'next/image';
 
 export async function PublicScoutStats() {
-  await delay(3000);
-
   return (
     <Paper sx={{ p: 2 }}>
       <Typography paddingY={1} variant='subtitle1' textAlign='center' color='secondary'>

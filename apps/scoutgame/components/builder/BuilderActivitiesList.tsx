@@ -1,75 +1,55 @@
-import type { BuilderEventType, GemsReceiptType } from '@charmverse/core/prisma-client';
 import { Paper, Stack, Typography } from '@mui/material';
 import { getRelativeTime } from '@packages/scoutgame/utils';
 import Image from 'next/image';
 import { BiLike } from 'react-icons/bi';
 import { LuBookMarked } from 'react-icons/lu';
 
-export type BuilderActivity = {
-  id: string;
-  type: BuilderEventType;
-  createdAt: Date;
-  gemsReceipt?: {
-    type: GemsReceiptType;
-    value: number;
-  } | null;
-  nftPurchaseEvent?: {
-    scout: {
-      username: string;
-    };
-  } | null;
-  githubEvent?: {
-    repo: {
-      owner: string;
-      name: string;
-    };
-  } | null;
-};
+import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
-export function BuilderActivitiesList({ events }: { events: BuilderActivity[] }) {
+export function BuilderActivitiesList({ activities }: { activities: BuilderActivity[] }) {
   return (
     <Stack gap={1}>
-      {events.map((event) => {
+      {activities.map((activity) => {
         return (
-          <Paper key={event.id} sx={{ px: 2, py: 1 }}>
+          <Paper key={activity.id} sx={{ px: 2, py: 1 }}>
             <Stack direction='row' justifyContent='space-between'>
               <Stack gap={1} width='60%'>
                 <Typography>
-                  {event.type === 'merged_pull_request'
-                    ? event.gemsReceipt?.type === 'first_pr'
+                  {activity.type === 'merged_pull_request'
+                    ? activity.contributionType === 'first_pr'
                       ? 'First contribution'
-                      : event.gemsReceipt?.type === 'regular_pr'
+                      : activity.contributionType === 'regular_pr'
                       ? 'Contribution accepted'
                       : 'Contribution streak'
-                    : event.type === 'nft_purchase'
+                    : activity.type === 'nft_purchase'
                     ? 'Scouted by'
                     : null}
                 </Typography>
                 <Stack flexDirection='row' gap={0.5} alignItems='center'>
-                  {event.type === 'merged_pull_request' ? (
+                  {activity.type === 'merged_pull_request' ? (
                     <LuBookMarked size='15px' />
-                  ) : event.type === 'nft_purchase' ? (
+                  ) : activity.type === 'nft_purchase' ? (
                     <BiLike size='15px' />
                   ) : null}
-                  {event.type === 'nft_purchase' ? (
-                    <Typography>{event.nftPurchaseEvent?.scout.username}</Typography>
-                  ) : event.type === 'merged_pull_request' ? (
+                  {activity.type === 'nft_purchase' ? (
+                    <Typography>{activity.scout}</Typography>
+                  ) : activity.type === 'merged_pull_request' ? (
                     <Typography textOverflow='ellipsis' overflow='hidden' whiteSpace='nowrap'>
-                      {event.githubEvent?.repo.owner}/{event.githubEvent?.repo.name}
+                      {activity.repo}
                     </Typography>
                   ) : null}
                 </Stack>
               </Stack>
               <Stack justifyContent='flex-start'>
-                {event.gemsReceipt?.value ? (
+                {activity.type === 'merged_pull_request' ? (
                   <Stack flexDirection='row' gap={0.5} alignItems='center'>
-                    <Typography variant='h6'>+{event.gemsReceipt?.value}</Typography>
+                    <Typography variant='h6'>+{activity.gems}</Typography>
                     <Image width={20} height={20} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
                   </Stack>
                 ) : null}
                 {/** TODO: Add bonus rewards */}
               </Stack>
-              <Typography>{getRelativeTime(event.createdAt)}</Typography>
+              <Typography>{getRelativeTime(activity.createdAt)}</Typography>
             </Stack>
           </Paper>
         );

@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
 
-import type { BuilderInfo } from 'components/builder/Card/BuilderCard';
+import type { BuilderInfo } from './interfaces';
 
 export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Promise<BuilderInfo[]> {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({

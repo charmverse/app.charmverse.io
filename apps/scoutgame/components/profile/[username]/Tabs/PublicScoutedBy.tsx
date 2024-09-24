@@ -1,13 +1,10 @@
 import 'server-only';
 
 import { Grid2 as Grid, Typography } from '@mui/material';
-import { delay } from '@root/lib/utils/async';
 
 import { ScoutedByCard } from 'components/common/Card/ScoutedByCard';
 
 export async function PublicScoutedBy() {
-  await delay(3000);
-
   return (
     <>
       <Typography variant='subtitle1' color='secondary' fontWeight='500' my={1}>

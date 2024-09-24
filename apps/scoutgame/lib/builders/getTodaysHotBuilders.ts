@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
 
-import type { BuilderInfo } from 'components/builder/Card/BuilderCard';
-
+import type { BuilderInfo } from './interfaces';
 import { weeklyQualifiedBuilderWhere } from './queries';
 
 export async function getTodaysHotBuilders({ limit }: { limit: number }): Promise<BuilderInfo[]> {

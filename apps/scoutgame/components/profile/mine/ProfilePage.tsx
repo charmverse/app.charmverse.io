@@ -13,7 +13,7 @@ import { ScoutProfileLoading } from './ScoutProfile/ScoutProfileLoading';
 
 export type ProfileTab = 'build' | 'scout' | 'win';
 
-export type ScoutProfile = Scout & {
+export type UserProfile = Scout & {
   seasonPoints: {
     builderPoints: number;
     scoutPoints: number;
@@ -24,7 +24,7 @@ export type ScoutProfile = Scout & {
   };
 };
 
-export async function ProfilePage({ user, tab }: { user: ScoutProfile; tab: ProfileTab }) {
+export async function ProfilePage({ user, tab }: { user: UserProfile; tab: ProfileTab }) {
   return (
     <Box p={1} gap={2} display='flex' flexDirection='column' maxWidth='1240px' margin='auto'>
       <UserProfile user={user} />
