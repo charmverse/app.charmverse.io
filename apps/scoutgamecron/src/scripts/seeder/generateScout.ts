@@ -3,10 +3,18 @@ import { faker } from '@faker-js/faker';
 
 export async function generateScout(params: { isBuilder: boolean } = { isBuilder: false }) {
   const { isBuilder } = params;
-  const username = faker.internet.userName().toLowerCase();
-  const displayName = `${faker.person.firstName()} ${faker.person.lastName()}`;
-  const email = faker.datatype.boolean() ? faker.internet.email() : undefined;
-  const avatar = faker.datatype.boolean() ? faker.image.avatar() : undefined;
+  const firstName = faker.person.firstName();
+  const lastName = faker.person.lastName();
+  const displayName = `${firstName} ${lastName}`;
+  const username = faker.internet.userName({
+    firstName,
+    lastName
+  }).toLowerCase();
+  const email = faker.datatype.boolean() ? faker.internet.email({
+    firstName,
+    
+  }) : undefined;
+  const avatar = faker.datatype.boolean() ? faker.image.url() : undefined;
 
   const githubUser = isBuilder
     ? {

@@ -1,17 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { getIronOptions } from '@connect-shared/lib/session/config';
-import { cookieName } from '@root/config/constants';
+import { cookieName, isDevEnv, isTestEnv } from '@root/config/constants';
 import { randomIntFromInterval } from '@root/lib/utils/random';
 import { sealData } from 'iron-session';
-
-const isTestEnv = process.env.REACT_APP_APP_ENV === 'test';
 
 const demoAvatar =
   'https://wrpcd.net/cdn-cgi/image/anim=false,fit=contain,f=auto,w=168/https%3A%2F%2Fapp.charmverse.io%2Ffavicon.png';
 
 export async function GET(request: Request) {
-  if (!isTestEnv) {
+  if (!isDevEnv && !isTestEnv) {
     return new Response('This endpoint is only available in test environment', { status: 403 });
   }
 
