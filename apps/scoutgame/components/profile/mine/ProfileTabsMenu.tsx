@@ -7,9 +7,9 @@ export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
     <TabsMenu
       value={tab}
       tabs={[
-        { value: 'scout', label: 'Scout', href: '/profile/mine?tab=scout' },
-        { value: 'build', label: 'Build', href: '/profile/mine?tab=build' },
-        { value: 'win', label: 'Win', href: '/profile/mine?tab=win' }
+        { value: 'scout', label: 'Scout', href: '/profile?tab=scout' },
+        { value: 'build', label: 'Build', href: '/profile?tab=build' },
+        { value: 'win', label: 'Win', href: '/profile?tab=win' }
       ]}
     />
   );

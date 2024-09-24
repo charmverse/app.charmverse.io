@@ -21,6 +21,12 @@ declare module '@mui/material/styles' {
     orange: MuiPaletteOptions['primary'];
     green: MuiPaletteOptions['primary'];
   }
+
+  export interface TypeBackground extends MuiTypeBackground {
+    default: string;
+    paper: string;
+    dark: string;
+  }
 }
 
 declare module '@mui/material/Button' {

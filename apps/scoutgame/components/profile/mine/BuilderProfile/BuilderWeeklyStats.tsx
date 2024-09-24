@@ -4,11 +4,12 @@ import Image from 'next/image';
 
 export function BuilderWeeklyStats({ gemsCollected, rank }: { gemsCollected: number; rank: number }) {
   const scoutgameWeek = getCurrentScoutGameWeek();
+
   return (
     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'row', gap: 2, justifyContent: 'space-between' }}>
       <Stack gap={1}>
-        <Typography variant='h5'>SEASON {currentSeason}</Typography>
-        <Typography variant='h4' fontWeight={500}>
+        <Typography variant='h6'>SEASON {currentSeason}</Typography>
+        <Typography variant='h5' fontWeight={500}>
           WEEK {scoutgameWeek}
         </Typography>
       </Stack>
@@ -17,7 +18,7 @@ export function BuilderWeeklyStats({ gemsCollected, rank }: { gemsCollected: num
           COLLECTED
         </Typography>
         <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center'>
-          <Typography variant='h3'>{gemsCollected}</Typography>
+          <Typography variant='h4'>{gemsCollected}</Typography>
           <Image width={25} height={25} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
         </Stack>
       </Stack>
@@ -26,7 +27,7 @@ export function BuilderWeeklyStats({ gemsCollected, rank }: { gemsCollected: num
           RANK
         </Typography>
         {/** TODO: Get actual rank for the builder */}
-        <Typography variant='h3' align='center'>
+        <Typography variant='h4' align='center'>
           {rank}
         </Typography>
       </Stack>

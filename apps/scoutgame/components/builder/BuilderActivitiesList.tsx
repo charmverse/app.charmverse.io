@@ -61,7 +61,19 @@ export function BuilderActivitiesList({ activities }: { activities: BuilderActiv
     <Stack gap={0.5}>
       {activities.map((activity) => {
         return (
-          <Paper key={activity.id} sx={{ px: 2, py: 1 }}>
+          <Paper
+            key={activity.id}
+            sx={{
+              px: {
+                xs: 2,
+                md: 3
+              },
+              py: {
+                xs: 1,
+                md: 2
+              }
+            }}
+          >
             <Stack direction='row' justifyContent='space-between'>
               <Stack width='60%'>
                 <BuilderActivityLabel activity={activity} />
