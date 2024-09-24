@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { currentSeason } from '@packages/scoutgame/utils';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
-import { formatUnits } from 'viem';
 
 import { builderContractAddress, builderNftChain } from './constants';
 import { ContractApiClient } from './nftContractApiClient';

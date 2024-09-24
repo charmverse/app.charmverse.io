@@ -1,10 +1,7 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
-import { getWalletClient } from '@root/lib/blockchain/walletClient';
 import type { Chain } from 'viem/chains';
 import { base, baseSepolia } from 'viem/chains';
-
-import { ContractApiClient } from './nftContractApiClient';
 
 export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECENT_API_KEY as string);
 
