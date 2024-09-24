@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getLastWeek } from '@packages/scoutgame/utils';
+import { getCurrentWeek, getLastWeek } from '@packages/scoutgame/utils';
 
 import { currentSeason } from 'lib/builderNFTs/constants';
 
