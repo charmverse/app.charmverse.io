@@ -25,18 +25,18 @@ export function BuilderCardStats({
       )}
       {typeof builderPoints === 'number' && (
         <Stack flexDirection='row' gap={0.2} alignItems='center'>
-          <Typography variant='body2' component='span' color='orange.main'>
+          <Typography variant='body2' component='span' color='green.main'>
             {builderPoints}
           </Typography>
-          <Image width={15} height={15} src='/images/profile/icons/like-icon.svg' alt='Likes' />
+          <Image width={15} height={15} src='/images/profile/icons/scout-icon.svg' alt='Scouts' />
         </Stack>
       )}
       {typeof scoutedBy === 'number' && (
         <Stack flexDirection='row' gap={0.2} alignItems='center'>
-          <Typography variant='body2' component='span' color='green.main'>
+          <Typography variant='body2' component='span' color='orange.main'>
             {scoutedBy}
           </Typography>
-          <Image width={15} height={15} src='/images/profile/icons/scout-icon.svg' alt='Scouts' />
+          <Image width={15} height={15} src='/images/profile/icons/like-icon.svg' alt='Likes' />
         </Stack>
       )}
       {typeof nfts === 'number' && (
