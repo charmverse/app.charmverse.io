@@ -106,7 +106,7 @@ function renderPopUp<T>(
       ) : (
         // <ClickAwayListener onClickAway={close}>
         <Popper open anchorEl={popUpParams.anchor} placement={popUpParams.placement}>
-          <View close={close} />
+          <View {...viewProps} close={close} />
         </Popper>
         // </ClickAwayListener>
       );
