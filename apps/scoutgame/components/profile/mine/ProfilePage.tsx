@@ -2,6 +2,7 @@ import type { Scout } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
 import { Suspense } from 'react';
 
+import type { UserProfileInfo } from 'components/common/Profile/UserProfile';
 import { UserProfile } from 'components/common/Profile/UserProfile';
 
 import { BuilderProfile } from './BuilderProfile/BuilderProfile';
@@ -13,7 +14,7 @@ import { ScoutProfileLoading } from './ScoutProfile/ScoutProfileLoading';
 
 export type ProfileTab = 'build' | 'scout' | 'win';
 
-export type UserProfile = Scout & {
+export type UserProfileWithPoints = UserProfileInfo & {
   seasonPoints: {
     builderPoints: number;
     scoutPoints: number;
@@ -22,9 +23,10 @@ export type UserProfile = Scout & {
     builderPoints: number;
     scoutPoints: number;
   };
+  currentBalance: number;
 };
 
-export async function ProfilePage({ user, tab }: { user: UserProfile; tab: ProfileTab }) {
+export async function ProfilePage({ user, tab }: { user: UserProfileWithPoints; tab: ProfileTab }) {
   return (
     <Box p={1} gap={2} display='flex' flexDirection='column' maxWidth='1240px' margin='auto'>
       <UserProfile user={user} />

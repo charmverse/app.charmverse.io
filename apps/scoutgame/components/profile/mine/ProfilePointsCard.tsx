@@ -4,15 +4,15 @@ import { Paper, Stack, Tab, Tabs, Typography, tabClasses, tabsClasses } from '@m
 import Image from 'next/image';
 import { useState } from 'react';
 
-import type { UserProfile } from './ProfilePage';
+import type { UserProfileWithPoints } from './ProfilePage';
 
 export function ProfilePointsCard({
   seasonPoints,
   allTimePoints,
   points
 }: {
-  seasonPoints: UserProfile['seasonPoints'];
-  allTimePoints: UserProfile['allTimePoints'];
+  seasonPoints: UserProfileWithPoints['seasonPoints'];
+  allTimePoints: UserProfileWithPoints['allTimePoints'];
   points: number;
 }) {
   const [selectedDuration, setSelectedDuration] = useState<'season' | 'allTime'>('season');

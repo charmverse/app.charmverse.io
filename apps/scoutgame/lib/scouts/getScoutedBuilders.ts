@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
 
-import type { BuilderInfo } from './interfaces';
+import type { BuilderInfo } from '../builders/interfaces';
 
 export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Promise<BuilderInfo[]> {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
@@ -21,11 +21,11 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
     }
   });
 
-  const builderNftsHeldRecord: Record<string, number> = {};
+  const builderNftsPurchasedRecord: Record<string, number> = {};
   nftPurchaseEvents.forEach((event) => {
     const builderId = event.builderNFT.builderId;
     if (builderId) {
-      builderNftsHeldRecord[builderId] = (builderNftsHeldRecord[builderId] || 0) + event.tokensPurchased;
+      builderNftsPurchasedRecord[builderId] = (builderNftsPurchasedRecord[builderId] || 0) + event.tokensPurchased;
     }
   });
 
@@ -71,8 +71,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder ?? 0,
       gems: builder.userWeeklyStats[0]?.gemsCollected ?? 0,
       isBanned: !!builder.bannedAt,
-      nfts: builderNftsHeldRecord[builder.id] ?? 0,
-      scoutedBy: undefined
+      nfts: builderNftsPurchasedRecord[builder.id] ?? 0
     };
   });
 }

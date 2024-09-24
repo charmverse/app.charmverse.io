@@ -1,32 +1,16 @@
-import { Tab, tabClasses, Tabs, tabsClasses } from '@mui/material';
-import Link from 'next/link';
+import { TabsMenu } from 'components/common/Tabs/TabsMenu';
 
 import type { ProfileTab } from './ProfilePage';
 
 export function ProfileTabs({ tab }: { tab: ProfileTab }) {
   return (
-    <Tabs
+    <TabsMenu
       value={tab}
-      aria-label='scout game nav tabs'
-      role='navigation'
-      variant='scrollable'
-      scrollButtons='auto'
-      sx={{
-        [`& .${tabsClasses.flexContainer}`]: {
-          justifyContent: { md: 'center' }
-        },
-        [`& .${tabsClasses.indicator}`]: {
-          bottom: 3
-        },
-        [`& .${tabClasses.root}`]: {
-          borderBottom: '1px solid',
-          borderColor: 'text.primary'
-        }
-      }}
-    >
-      <Tab component={Link} label='Scout' href='/profile?tab=scout' value='scout' scroll={false} />
-      <Tab component={Link} label='Build' href='/profile?tab=build' value='build' scroll={false} />
-      <Tab component={Link} label='Win' href='/profile?tab=win' value='win' scroll={false} />
-    </Tabs>
+      tabs={[
+        { value: 'scout', label: 'Scout', href: '/profile/mine?tab=scout' },
+        { value: 'build', label: 'Build', href: '/profile/mine?tab=build' },
+        { value: 'win', label: 'Win', href: '/profile/mine?tab=win' }
+      ]}
+    />
   );
 }

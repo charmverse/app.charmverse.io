@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/utils';
-import { isTruthy } from '@root/lib/utils/types';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -60,7 +59,13 @@ export default async function Profile({
   return (
     <ProfilePage
       user={{
-        ...user,
+        id: user.id,
+        displayName: user.displayName,
+        username: user.username,
+        avatar: user.avatar || '',
+        githubLogin: user.githubUser?.login,
+        currentBalance: user.currentBalance,
+        bio: user.bio,
         seasonPoints: {
           builderPoints: seasonPoints?.pointsEarnedAsBuilder || 0,
           scoutPoints: seasonPoints?.pointsEarnedAsScout || 0

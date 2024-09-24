@@ -3,7 +3,7 @@
 import { Button } from '@mui/material';
 import { useAction } from 'next-safe-action/hooks';
 
-import { claimPointsAction } from 'lib/points/claimPoints/claimPointsAction';
+import { claimPointsAction } from 'lib/points/claimPointsAction';
 
 export function PointsClaimButton() {
   const { execute, isExecuting } = useAction(claimPointsAction);

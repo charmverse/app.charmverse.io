@@ -1,46 +1,58 @@
-import type { GithubUser, Scout } from '@charmverse/core/prisma-client';
 import { IconButton, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
 import type { AvatarSize } from '../Avatar';
 import { Avatar } from '../Avatar';
 
-type Props = {
-  user: Scout & { githubUser?: GithubUser };
+export type UserProfileInfo = {
+  id: string;
+  displayName: string;
+  username: string;
+  bio?: string | null;
+  avatar?: string;
+  githubLogin?: string;
+};
+
+type UserProfileProps = {
+  user: UserProfileInfo;
   avatarSize?: AvatarSize;
 };
 
-export function UserProfile({ user, avatarSize = 'xLarge' }: Props) {
-  const { displayName, username, bio, avatar, githubUser } = user;
+export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
+  const { displayName, username, bio, avatar, githubLogin } = user;
   return (
     <Stack display='flex' gap={2} alignItems='center' flexDirection='row'>
-      <Stack
-        alignItems={{
-          xs: 'center',
-          sm: 'flex-start'
-        }}
-      >
-        <Avatar size={avatarSize} name={username || 'N/A'} src={avatar || undefined} />
-      </Stack>
-      <Stack width='100%' gap={1}>
+      {user.avatar ? (
+        <Stack
+          alignItems={{
+            xs: 'center',
+            sm: 'flex-start'
+          }}
+        >
+          <Avatar size={avatarSize} name={username || 'N/A'} src={avatar || undefined} />
+        </Stack>
+      ) : null}
+      <Stack width='100%'>
         <Typography variant='h5'>{displayName || 'N/A'}</Typography>
         <Stack direction='row' width='100%' alignItems='center'>
           <Typography variant='h6'>{username || 'N/A'}</Typography>
           <IconButton href={`https://warpcast.com/${username}`} target='_blank' rel='noopener noreferrer'>
-            <Image src='/images/profile/icons/warpcast-circle-icon.svg' width='25' height='25' alt='warpcast icon' />
+            <Image src='/images/profile/icons/warpcast-circle-icon.svg' width='20' height='20' alt='warpcast icon' />
           </IconButton>
-          {githubUser ? (
+          {githubLogin ? (
             <IconButton
-              href={`https://github.com/${githubUser.login}`}
+              href={`https://github.com/${githubLogin}`}
               target='_blank'
               rel='noopener noreferrer'
               sx={{ px: 0 }}
             >
-              <Image src='/images/profile/icons/github-circle-icon.svg' width='25' height='25' alt='github icon' />
+              <Image src='/images/profile/icons/github-circle-icon.svg' width='20' height='20' alt='github icon' />
             </IconButton>
           ) : null}
         </Stack>
-        <Typography variant='body2'>{bio}</Typography>
+        <Typography variant='body2' overflow='hidden' textOverflow='ellipsis'>
+          {bio}
+        </Typography>
       </Stack>
     </Stack>
   );

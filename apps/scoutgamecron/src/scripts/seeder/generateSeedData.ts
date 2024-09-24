@@ -10,6 +10,7 @@ import { DateTime } from 'luxon';
 import { getTopBuilders } from '@packages/scoutgame/getTopBuilders';
 import { getFormattedWeek } from '@packages/scoutgame/utils';
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
+import { claimPoints } from '@packages/scoutgame/claimPoints';
 
 export type BuilderInfo = {
   id: string;
@@ -97,6 +98,8 @@ export async function generateSeedData() {
 
   const days = endDate.diff(startDate, 'days').days;
 
+  const userIds = Array.from(new Set([...builders.map(builder => builder.id), ...scouts.map(scout => scout.id)]));
+
   for (let i = 0; i < days; i++) {
     const date = startDate.plus({ days: i });
     const week = getFormattedWeek(date.toJSDate());
@@ -125,6 +128,17 @@ export async function generateSeedData() {
           await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week });
         } catch (error) {
           log.error(`Error processing scout points payout for builder ${builder.id}: ${error}`);
+        }
+      }
+      // Randomly pick 80-90% of users to claim their weekly points immediately
+      const usersToClaim = faker.number.int({ min: Math.floor(userIds.length * 0.8), max: Math.floor(userIds.length * 0.9) });
+      const newUserIds = faker.helpers.shuffle(userIds).slice(0, usersToClaim);
+
+      for (const user of newUserIds) {
+        try {
+          await claimPoints(user);
+        } catch (error) {
+          log.error(`Error claiming points for user ${user}: ${error}`);
         }
       }
     }

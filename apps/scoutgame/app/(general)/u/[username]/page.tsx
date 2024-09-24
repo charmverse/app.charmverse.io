@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { PublicProfileDetailsPage } from 'components/profile/[username]/PublicProfileDetailsPage';
+import { PublicProfilePage } from 'components/profile/[username]/PublicProfilePage';
 import { getUserByPath } from 'lib/users/getUserByPath';
 
 export const dynamic = 'force-dynamic';
@@ -24,5 +24,5 @@ export default async function Profile({
     return notFound();
   }
 
-  return <PublicProfileDetailsPage user={{ ...user }} tab={tab} />;
+  return <PublicProfilePage userId={user.id} username={user.username} tab={tab} />;
 }

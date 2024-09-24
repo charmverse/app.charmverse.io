@@ -8,7 +8,7 @@ import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
 export function BuilderActivitiesList({ activities }: { activities: BuilderActivity[] }) {
   return (
-    <Stack gap={1}>
+    <Stack gap={0.5}>
       {activities.map((activity) => {
         return (
           <Paper key={activity.id} sx={{ px: 2, py: 1 }}>

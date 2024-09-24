@@ -4,7 +4,7 @@ import { Stack } from '@mui/system';
 import { currentSeason } from '@packages/scoutgame/utils';
 
 import { BuildersGallery } from 'components/builder/BuildersGallery';
-import { getScoutedBuilders } from 'lib/builders/getScoutedBuilders';
+import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
 
 import { ScoutStats } from './ScoutStats';
 

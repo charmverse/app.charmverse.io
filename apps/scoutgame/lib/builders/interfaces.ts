@@ -8,9 +8,9 @@ export type BuilderInfo = {
   nftAvatar: string;
   username: string;
   displayName: string;
-  builderPoints: number;
+  builderPoints?: number;
   price?: number;
-  gems: number;
+  gems?: number;
   nfts?: number;
   isBanned?: boolean;
   scoutedBy?: number;
