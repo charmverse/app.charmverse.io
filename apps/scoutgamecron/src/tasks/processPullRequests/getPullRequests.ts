@@ -1,17 +1,29 @@
-import { graphql } from '@octokit/graphql';
+import type { GithubRepo } from '@charmverse/core/prisma';
 
-type PullRequest = {
+import { getClient } from './gqlClient';
+
+export type PullRequest = {
+  baseRefName: string; // eg "main"
   title: string;
   url: string;
-  state: 'OPEN' | 'CLOSED' | 'MERGED';
-  mergedAt: string | null;
-  closedAt: string | null;
-  updatedAt: string;
+  state: 'CLOSED' | 'MERGED';
+  mergedAt?: string;
+  closedAt?: string;
+  createdAt: string;
+  author: {
+    login: string;
+    id: number;
+  };
+  number: number;
+  repository: {
+    id: number;
+    nameWithOwner: string;
+  };
 };
 
-type PullRequestEdge = {
+type EdgeNode<T> = {
   cursor: string;
-  node: PullRequest;
+  node: T;
 };
 
 type PageInfo = {
@@ -19,31 +31,46 @@ type PageInfo = {
   hasNextPage: boolean;
 };
 
-type PullRequestConnection = {
-  edges: PullRequestEdge[];
-  pageInfo: PageInfo;
-};
-
-type Repository = {
-  pullRequests: PullRequestConnection;
-};
-
 type GetRecentClosedOrMergedPRsResponse = {
-  repository: Repository;
+  repository: {
+    databaseId: number;
+    pullRequests: {
+      edges: EdgeNode<PullRequest>[];
+      pageInfo: PageInfo;
+    };
+  };
 };
 
 const getRecentPrs = `
   query getRecentClosedOrMergedPRs($owner: String!, $repo: String!, $cursor: String) {
     repository(owner: $owner, name: $repo) {
-      pullRequests(first: 100, after: $cursor, states: [CLOSED, MERGED], orderBy: {field: UPDATED_AT, direction: DESC}) {
+      databaseId
+      pullRequests(
+        first: 100
+        after: $cursor
+        states: [CLOSED, MERGED]
+        orderBy: { field: CREATED_AT, direction: DESC }
+      ) {
         edges {
           node {
+            baseRefName
             title
             url
             state
-            mergedAt
             closedAt
-            updatedAt
+            createdAt
+            mergedAt
+            author {
+              login
+              ... on User {
+                id
+              }
+            }
+            repository {
+              id
+              nameWithOwner
+            }
+            number
           }
           cursor
         }
@@ -62,13 +89,23 @@ type Input = {
   repo: string;
 };
 
-export async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promise<PullRequest[]> {
-  // Create an authenticated GraphQL client using your GitHub token
-  const graphqlWithAuth = graphql.defaults({
-    headers: {
-      Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`
-    }
-  });
+type RepoInput = Pick<GithubRepo, 'name' | 'owner' | 'defaultBranch'>;
+
+export async function getPullRequests({ repos, after }: { repos: RepoInput[]; after: Date }) {
+  const pullRequests: PullRequest[] = [];
+  for (const repo of repos) {
+    const repoPullRequests = await getRecentClosedOrMergedPRs({
+      owner: repo.owner,
+      repo: repo.name,
+      after
+    });
+    pullRequests.push(...repoPullRequests.filter((pr) => pr.baseRefName === repo.defaultBranch));
+  }
+  return pullRequests;
+}
+
+async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promise<PullRequest[]> {
+  const graphqlWithAuth = getClient();
 
   let hasNextPage = true;
   let cursor = null;
@@ -82,26 +119,37 @@ export async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input):
       cursor
     });
 
+    const repositoryId = response.repository.databaseId;
+
     const pullRequests = response.repository.pullRequests.edges;
 
     // Filter out PRs closed or merged in the last 24 hours
     const recentPRs = pullRequests
       .filter(({ node }) => {
-        const closedOrMergedAt = new Date(node.closedAt || node.mergedAt || '');
+        const closedOrMergedAt = new Date(node.createdAt);
         return closedOrMergedAt > after;
       })
-      .map(({ node }) => node);
+      .map(({ node }) => ({
+        ...node,
+        author: {
+          id: parseInt(atob(node.author.id.toString()).split(':User')[1]),
+          login: node.author.login
+        },
+        repository: {
+          id: repositoryId,
+          nameWithOwner: node.repository.nameWithOwner
+        }
+      }));
 
     allRecentPRs = allRecentPRs.concat(recentPRs);
-
-    // cancel once we have gone past the after date
-    if (recentPRs.length < pullRequests.length) {
-      break;
-    }
 
     // Update pagination info
     hasNextPage = response.repository.pullRequests.pageInfo.hasNextPage;
     cursor = response.repository.pullRequests.pageInfo.endCursor;
+
+    if (recentPRs.length === 0) {
+      hasNextPage = false;
+    }
   }
 
   return allRecentPRs;

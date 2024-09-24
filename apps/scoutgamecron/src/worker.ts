@@ -3,6 +3,7 @@ import Router from '@koa/router';
 import Koa from 'koa';
 
 import * as middleware from './middleware';
+import { processGemsPayout } from './tasks/processGemsPayout';
 import { processPullRequests } from './tasks/processPullRequests';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
 
@@ -14,11 +15,16 @@ function addTask(path: string, handler: (ctx: Koa.DefaultContext) => any) {
   router.post(path, async (ctx) => {
     log.info(`${path} triggered`, { body: ctx.body, headers: ctx.headers });
 
-    const result = await handler(ctx);
+    try {
+      const result = await handler(ctx);
 
-    log.info(`${path} completed`);
+      log.info(`${path} completed`);
 
-    ctx.body = result || { success: true };
+      ctx.body = result || { success: true };
+    } catch (error) {
+      log.error('Error processing task', { path, error });
+      throw error;
+    }
   });
 }
 
@@ -26,9 +32,11 @@ addTask('/hello-world', (ctx) => {
   log.info('Hello World triggered', { body: ctx.body, headers: ctx.headers });
 });
 
-addTask('/github-pull-requests', processPullRequests);
+addTask('/process-pull-requests', processPullRequests);
 
 addTask('/send-push-notifications', sendNotifications);
+
+addTask('/process-gems-payout', processGemsPayout);
 
 // Standard health check used by Beanstalk
 router.get('/api/health', middleware.healthCheck);

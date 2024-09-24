@@ -20,7 +20,7 @@ export default async function Profile() {
     redirect('/');
   }
 
-  if (!user.onboarded) {
+  if (!user.onboardedAt) {
     redirect('/welcome');
   }
 

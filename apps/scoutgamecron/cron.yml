@@ -1,6 +1,11 @@
 version: 1
 cron:
- - name: "hello-world"
-   url: "/hello-world"
-   # every 5 minutes
-   schedule: "*/5 * * * *"
+  - name: "process-pull-requests"
+    url: "/process-pull-requests"
+    # every 5 minutes
+    schedule: "*/5 * * * *"
+
+  - name: "process-gems-payout"
+    url: "/process-gems-payout"
+    # Start of every hour
+    schedule: "0 * * * *"

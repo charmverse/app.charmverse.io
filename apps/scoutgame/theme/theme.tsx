@@ -31,6 +31,9 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       fontSize: '1rem'
     }
   },
+  shape: {
+    borderRadius: 5
+  },
   cssVariables: true,
   defaultColorScheme: 'dark',
   colorSchemes: {
@@ -58,7 +61,14 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
           main: inputBackgroundDarkMode
         },
         black: {
-          main: blackText
+          main: blackText,
+          dark: '#000'
+        },
+        orange: {
+          main: '#FFAC81'
+        },
+        green: {
+          main: '#85FF9E'
         }
       }
     },
@@ -88,6 +98,12 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         },
         black: {
           main: blackText
+        },
+        orange: {
+          main: '#FFAC81'
+        },
+        green: {
+          main: '#85FF9E'
         }
       }
     }
@@ -192,6 +208,23 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
             //   backgroundColor: 'darkpurple'
             // }
           })
+        },
+        {
+          props: { variant: 'buy' },
+          style: ({ theme }) => ({
+            background: 'transparent',
+            borderRadius: '5px',
+            paddingTop: 2,
+            paddingBottom: 2,
+            paddingRight: 2,
+            paddingLeft: 2,
+            // fontSize: '0.9rem',
+            fontWeight: '600',
+            color: theme.palette.secondary.main,
+            borderStyle: 'solid',
+            borderWidth: '1px',
+            borderColor: theme.palette.secondary.main
+          })
         }
       ],
       styleOverrides: {
@@ -199,10 +232,13 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
           borderRadius: 10,
           fontWeight: 600,
           fontSize: '1rem',
-          textTransform: 'none',
-          paddingTop: '14px',
-          paddingBottom: '14px'
+          textTransform: 'none'
         }
+      }
+    },
+    MuiIconButton: {
+      defaultProps: {
+        disableRipple: true
       }
     },
     MuiMenuItem: {
@@ -228,7 +264,7 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       },
       styleOverrides: {
         root: ({ theme }) => ({
-          boxShadow: theme.shadows[2]
+          boxShadow: 'none'
         })
       }
     },
@@ -301,12 +337,29 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         size: 'small'
       }
     },
+    MuiTabs: {
+      defaultProps: {
+        TabIndicatorProps: {
+          sx: (theme) => ({
+            backgroundColor: theme.palette.text.secondary
+          })
+        }
+      },
+      styleOverrides: {
+        root: {}
+      }
+    },
     MuiTab: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           minHeight: 0,
-          textTransform: 'none'
-        }
+          textTransform: 'none',
+          color: theme.palette.text.primary,
+          fontWeight: '400',
+          '&.Mui-selected': {
+            color: theme.palette.text.secondary
+          }
+        })
       }
     },
     MuiLink: {
