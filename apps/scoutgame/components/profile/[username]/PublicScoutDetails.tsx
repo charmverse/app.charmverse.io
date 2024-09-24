@@ -6,12 +6,11 @@ import { Suspense } from 'react';
 
 import { LoadingPaperSection } from 'components/layout/Loading/LoadingPaperSection';
 
+import { ScoutedBuilders } from '../../common/Builders/BuildersGallery';
+
 import { PublicScoutStats } from './PublicScoutStats';
-import { ScoutedBuilders } from './ScoutedBuilders';
 
 export async function PublicScoutDetails() {
-  await delay(3000);
-
   return (
     <Stack>
       <Suspense fallback={<LoadingPaperSection />}>

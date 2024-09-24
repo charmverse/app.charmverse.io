@@ -2,7 +2,7 @@ import type { Scout } from '@charmverse/core/prisma-client';
 import { IconButton, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import { UserCard } from '../Card/UserCard';
+import { UserCard } from '../Builders/BuilderCard';
 
 type Props = {
   user: Scout & { description?: string };

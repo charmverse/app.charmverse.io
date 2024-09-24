@@ -1,9 +1,10 @@
 import type { Scout } from '@charmverse/core/prisma-client';
-import { Box } from '@mui/material';
+import { Box, Tabs } from '@mui/material';
 
 import { UserProfile } from 'components/common/Profile/UserProfile';
 
 import { ProfilePointsCard } from './ProfilePointsCard';
+import { ProfileTabs } from './ProfileTabs';
 
 export type ProfileTab = 'build' | 'scout' | 'win';
 
@@ -27,6 +28,9 @@ export async function ProfilePage({ user, tab }: { user: ScoutProfile; tab: Prof
         allTimePoints={user.allTimePoints}
         points={user.seasonPoints.scoutPoints}
       />
+      <Box my={2} margin='0 auto'>
+        <ProfileTabs tab={tab} />
+      </Box>
     </Box>
   );
 }

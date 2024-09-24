@@ -1,0 +1,52 @@
+import { Typography } from '@mui/material';
+import { Stack } from '@mui/system';
+import Image from 'next/image';
+
+export function BuilderCardStats({
+  gemsCollected,
+  builderPoints,
+  scoutedBy,
+  nfts
+}: {
+  gemsCollected?: number;
+  builderPoints?: number;
+  scoutedBy?: number;
+  nfts?: number;
+}) {
+  return (
+    <Stack flexDirection='row' alignItems='center' justifyContent='space-between' gap={1}>
+      {typeof gemsCollected === 'number' && (
+        <Stack flexDirection='row' gap={0.2} alignItems='center'>
+          <Typography variant='body2' component='span' color='text.secondary'>
+            {gemsCollected}
+          </Typography>
+          <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
+        </Stack>
+      )}
+      {typeof builderPoints === 'number' && (
+        <Stack flexDirection='row' gap={0.2} alignItems='center'>
+          <Typography variant='body2' component='span' color='orange.main'>
+            {builderPoints}
+          </Typography>
+          <Image width={15} height={15} src='/images/profile/icons/like-icon.svg' alt='Likes' />
+        </Stack>
+      )}
+      {typeof scoutedBy === 'number' && (
+        <Stack flexDirection='row' gap={0.2} alignItems='center'>
+          <Typography variant='body2' component='span' color='green.main'>
+            {scoutedBy}
+          </Typography>
+          <Image width={15} height={15} src='/images/profile/icons/scout-icon.svg' alt='Scouts' />
+        </Stack>
+      )}
+      {typeof nfts === 'number' && (
+        <Stack flexDirection='row' gap={0.2} alignItems='center'>
+          <Typography variant='body2' component='span' color='orange.main'>
+            {nfts}
+          </Typography>
+          <Image width={12} height={12} src='/images/profile/icons/nft-orange-icon.svg' alt='Nfts' />
+        </Stack>
+      )}
+    </Stack>
+  );
+}

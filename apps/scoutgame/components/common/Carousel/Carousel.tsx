@@ -5,13 +5,16 @@ import type { Theme } from '@mui/material/styles';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { UserCard } from '../Card/UserCard';
-
 import { NextArrow, PrevArrow } from './Arrows';
 
 import 'swiper/css';
 
-export function Carousel({ items }: { items: any[] }) {
+export type CarouselProps<Item extends { id: string }> = {
+  items: Item[];
+  children: (item: Item) => React.ReactNode;
+};
+
+export function Carousel<Item extends { id: string }>({ items, children }: CarouselProps<Item>) {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
   const isLarge = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
   const slidesPerView = isMobile ? 2.2 : isLarge ? 6 : 5;
@@ -20,7 +23,7 @@ export function Carousel({ items }: { items: any[] }) {
     <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
       <Box width='95svw' px={isMobile ? 0 : 4} position='relative'>
         <Swiper
-          className='mySwiper'
+          className='swiper'
           slidesPerView={slidesPerView}
           spaceBetween={isMobile ? 5 : 15}
           autoHeight={true}
@@ -30,10 +33,8 @@ export function Carousel({ items }: { items: any[] }) {
             prevEl: '.swiper-button-prev'
           }}
         >
-          {items.map((_user) => (
-            <SwiperSlide key={_user.username}>
-              <UserCard withDetails user={_user} variant='big' />
-            </SwiperSlide>
+          {items.map((item) => (
+            <SwiperSlide key={item.id}>{children(item)}</SwiperSlide>
           ))}
         </Swiper>
         {!isMobile && items.length > slidesPerView && (

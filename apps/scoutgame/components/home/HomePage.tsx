@@ -1,19 +1,17 @@
 import 'server-only';
 
-import type { Scout } from '@charmverse/core/prisma-client';
 import { Box, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
-import { CarouselContainer } from 'components/common/Carousel/CarouselContainer';
+import { TodaysHotBuildersCarousel } from 'components/builder/Carousel/TodaysHotBuildersCarousel';
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { HomeTab } from 'components/common/Tabs/HomeTab';
 import { HomeTabsMenu } from 'components/common/Tabs/HomeTabsMenu';
-import { LoadingBanner } from 'components/layout/Loading/LoadinBanner';
+import { LoadingBanner } from 'components/layout/Loading/LoadingBanner';
 import { LoadingCards } from 'components/layout/Loading/LoadingCards';
-import { LoadingTable } from 'components/layout/Loading/LoadingTable';
 
-export async function HomePage({ user, tab }: { user: Scout | null; tab: string }) {
+export async function HomePage({ tab }: { tab: string }) {
   return (
     <>
       <Suspense fallback={<LoadingBanner />}>
@@ -27,7 +25,7 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
           </Typography>
         </Stack>
         <Suspense fallback={<LoadingCards />}>
-          <CarouselContainer />
+          <TodaysHotBuildersCarousel />
         </Suspense>
         <HomeTabsMenu tab={tab} />
         <HomeTab tab={tab} />

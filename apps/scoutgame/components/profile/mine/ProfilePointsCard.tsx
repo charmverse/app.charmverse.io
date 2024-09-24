@@ -1,6 +1,6 @@
 'use client';
 
-import { Paper, Stack, Typography, Box, Tab, Tabs, tabClasses, tabsClasses } from '@mui/material';
+import { Paper, Stack, Tab, Tabs, Typography, tabClasses, tabsClasses } from '@mui/material';
 import Image from 'next/image';
 import { useState } from 'react';
 
