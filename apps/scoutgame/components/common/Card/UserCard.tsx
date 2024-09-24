@@ -51,7 +51,7 @@ export function UserCard({
       >
         {user.price ? (
           <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
-            <CardButton onClick={() => setIsPurchasing(true)} price={user.price} username={user.username} />
+            <CardButton onClick={() => setIsPurchasing(true)} price={BigInt(user.price)} username={user.username} />
             {isPurchasing && (
               <NFTPurchaseDialog onClose={() => setIsPurchasing(false)} builderId={user.id} scout={scout} />
             )}
@@ -67,7 +67,7 @@ export function UserCard({
         <Stack gap={1} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }} px={withDetails ? 1 : 0}>
           {withDetails && <UserCardDetails nfts={user.nftsBought} />}
           {user.price && (
-            <CardButton onClick={() => setIsPurchasing(true)} price={user.price} username={user.username} />
+            <CardButton onClick={() => setIsPurchasing(true)} price={BigInt(user.price)} username={user.username} />
           )}
         </Stack>
       ) : null}

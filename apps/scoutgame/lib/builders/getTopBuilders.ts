@@ -9,11 +9,14 @@ export type TopBuilder = {
   price: number;
   likes: number;
   scouts: number;
+  scoutedBy: number;
   gems: number;
-  nftsBought: number;
+  seasonPoints: number;
+  allTimePoints: number;
+  nftsBought?: number;
 };
 
-export async function getTopBuilders(): Promise<TopBuilder[]> {
+export async function getTopBuilders({ limit = 10 }: { limit?: number } = { limit: 10 }): Promise<TopBuilder[]> {
   const topNfts = await prisma.builderNft.findMany({
     where: {
       season: currentSeason,
@@ -26,7 +29,7 @@ export async function getTopBuilders(): Promise<TopBuilder[]> {
         _count: 'desc'
       }
     },
-    take: 10,
+    take: limit,
     select: {
       id: true,
       currentPrice: true,
@@ -63,6 +66,7 @@ export async function getTopBuilders(): Promise<TopBuilder[]> {
         username: topNft.builder.username,
         price: Number(topNft.currentPrice),
         likes: 200,
+        seasonPoints: 100,
         scouts: topNft.nftSoldEvents.reduce((acc, event) => acc + event.tokensPurchased, 0),
         gems: topNft.builder.gemsPayoutEvents.reduce((acc, event) => acc + event.gems, 0),
         nftsBought: 0

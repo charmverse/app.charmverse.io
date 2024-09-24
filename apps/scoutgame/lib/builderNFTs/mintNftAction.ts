@@ -2,6 +2,7 @@
 
 import { prisma } from '@charmverse/core/prisma-client';
 import { getWalletClient } from '@root/lib/blockchain/walletClient';
+import { prettyPrint } from '@root/lib/utils/strings';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
@@ -35,6 +36,11 @@ export const mintNftAction = authActionClient
     if (!userId) {
       throw new Error('User not found');
     }
+
+    prettyPrint({
+      builderNftChain: builderNftChain.id,
+      contractAddress: builderContractAddress
+    });
 
     const builderNft = await prisma.builderNft.findFirstOrThrow({
       where: {

@@ -141,7 +141,7 @@ async function clearNfts() {
 }
 
 // clearNfts()
-// seedBuilderNFTs();
+seedBuilderNFTs();
 
 
 // prisma.githubEvent.deleteMany().then(console.log)
