@@ -96,7 +96,7 @@ export function SearchBuildersInput() {
             {...params}
             fullWidth
             variant='outlined'
-            placeholder='Search...'
+            placeholder='Search for builders'
             // onChange={(e) => setSearchTerm(e.target.value)}
             slotProps={{
               input: {
