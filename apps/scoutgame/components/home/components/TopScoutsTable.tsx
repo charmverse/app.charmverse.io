@@ -1,5 +1,4 @@
 import {
-  Button,
   Paper,
   Stack,
   Table,
@@ -12,13 +11,12 @@ import {
   tableCellClasses
 } from '@mui/material';
 import Image from 'next/image';
-import Link from 'next/link';
 
-import type { TopBuilder } from 'lib/builders/getTopBuilders';
+import type { TopScout } from 'lib/scouts/getTopScouts';
 
-import { Avatar } from '../Avatar';
+import { Avatar } from '../../common/Avatar';
 
-export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
+export function TopScoutsTable({ rows }: { rows: TopScout[] }) {
   return (
     <TableContainer component={Paper} sx={{ marginTop: 2 }}>
       <Table aria-label='Top scouts table' size='small'>
@@ -36,14 +34,14 @@ export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
           >
             <TableCell align='center'>RANK</TableCell>
             <TableCell align='left'>SCOUT</TableCell>
-            <TableCell align='center'>SEASON</TableCell>
+            <TableCell align='right'>SEASON</TableCell>
             <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
               ALL TIME
             </TableCell>
-            <TableCell align='center' sx={{ whiteSpace: 'nowrap', display: { xs: 'none', md: 'table-cell' } }}>
-              SCOUTED BY
+            <TableCell align='center'>SCOUTED</TableCell>
+            <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+              NFT's HELD
             </TableCell>
-            <TableCell align='center'>PRICE</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -66,44 +64,31 @@ export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
                   </Typography>
                 </Stack>
               </TableCell>
-              <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+              <TableCell align='right'>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                  <Typography variant='caption' color='green.main' noWrap>
+                  <Typography variant='caption' color='orange.main' noWrap>
                     {row.seasonPoints || 0}
                   </Typography>
-                  <Image
-                    width={15}
-                    height={15}
-                    src='/images/profile/scout-game-green-icon.svg'
-                    alt='scout game icon '
-                  />
+                  <Image width={15} height={15} src='/images/profile/scout-game-orange-icon.svg' alt='season icon ' />
                 </Stack>
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                  <Typography variant='caption' color='green.main' noWrap>
+                  <Typography variant='caption' color='orange.main' noWrap>
                     {row.allTimePoints || 0}
                   </Typography>
-                  <Image
-                    width={15}
-                    height={15}
-                    src='/images/profile/scout-game-green-icon.svg'
-                    alt='scout game icon '
-                  />
+                  <Image width={15} height={15} src='/images/profile/scout-game-orange-icon.svg' alt='season icon ' />
                 </Stack>
               </TableCell>
               <TableCell align='center'>
-                <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='center'>
-                  <Typography variant='caption' color='green.main' noWrap>
-                    {row.scoutedBy || 0}
-                  </Typography>
-                  <Image width={15} height={15} src='/images/profile/icons/like-green-icon.svg' alt='like icon ' />
-                </Stack>
+                <Typography variant='caption' color='orange.main' noWrap>
+                  {row.buildersScouted || 0}
+                </Typography>
               </TableCell>
-              <TableCell align='center'>
-                <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${row.username}/checkout`}>
-                  ${row.price || 0}
-                </Button>
+              <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                <Typography variant='caption' color='orange.main' noWrap>
+                  {row.nftsHeld || 0}
+                </Typography>
               </TableCell>
             </TableRow>
           ))}
