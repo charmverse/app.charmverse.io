@@ -6,7 +6,7 @@ const privateLinks = ['/profile', '/notifications', '/welcome'];
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();
-  const user = session.scoutId;
+  const isLoggedIn = !!session.scoutId;
   const path = request.nextUrl.pathname;
 
   // We don't have a '/' page anymore since we need to handle 2 different layouts
@@ -14,13 +14,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
   // Redirect to login if anonymous user clicks on private links
-  if (!user && privateLinks.some((url) => path.startsWith(url))) {
+  if (!isLoggedIn && privateLinks.some((url) => path.startsWith(url))) {
     return NextResponse.redirect(new URL('/login', request.url));
-  }
-
-  // In case we have the need to redirect to homepage
-  if (!user && path.startsWith('/example-page')) {
-    return NextResponse.redirect(new URL('/home', request.url));
   }
 
   return NextResponse.next();
