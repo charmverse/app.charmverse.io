@@ -38,6 +38,7 @@ export async function getSortedBuilders({
         .then((scouts) =>
           scouts.map((scout) => ({
             ...scout,
+            gems: 0,
             scoutedBy: 0,
             nftsSold: 0,
             price: 0
