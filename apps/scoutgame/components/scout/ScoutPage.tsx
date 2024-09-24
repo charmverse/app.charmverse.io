@@ -12,7 +12,7 @@ import { LoadingBanner } from 'components/layout/Loading/LoadinBanner';
 import { LoadingCards } from 'components/layout/Loading/LoadingCards';
 import { LoadingTable } from 'components/layout/Loading/LoadingTable';
 
-import { SearchInput } from './components/SearchInput';
+import { SearchBuildersInput } from './components/SearchBuildersInput';
 import { SortOptionTabs, sortOptions } from './components/SortOptionTabs';
 
 export async function ScoutPage({ user, sort }: { user: Scout | null; sort: string }) {
@@ -20,7 +20,7 @@ export async function ScoutPage({ user, sort }: { user: Scout | null; sort: stri
 
   return (
     <Box p={1}>
-      <SearchInput />
+      <SearchBuildersInput />
       <SortOptionTabs value={currentSort} />
       {/* <Suspense fallback={<LoadingCards />}>
         <CarouselContainer />
