@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getLastWeek } from '@packages/scoutgame/utils';
+import { getCurrentWeek, getLastWeek } from '@packages/scoutgame/utils';
 
 import type { BuilderUserInfo } from './interfaces';
 
@@ -43,6 +43,9 @@ export async function getSortedBuilders({
     case 'top':
       builders = await prisma.userWeeklyStats
         .findMany({
+          where: {
+            week: getCurrentWeek()
+          },
           orderBy: {
             gemsCollected: 'desc'
           },
