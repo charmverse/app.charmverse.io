@@ -68,6 +68,8 @@ export const mintNftAction = authActionClient
       }
     });
 
+    // TODO - Add the points TX && refresh the points stats for the builder
+
     await prisma.nFTPurchaseEvent.create({
       data: {
         // Assuming constant conversion rate of 4:1, and 6 decimals on USDC

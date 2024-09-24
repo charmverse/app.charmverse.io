@@ -3,7 +3,7 @@ import 'server-only';
 import { pricingGetter } from '@root/lib/crypto-price/getters';
 import dynamic from 'next/dynamic';
 
-import { getTopBuilders } from 'lib/builders/getTopBuilders';
+import { getSortedBuilders } from 'lib/builders/getSortedBuilders';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 const Carousel = dynamic(() => import('components/common/Carousel/Carousel').then((mod) => mod.Carousel), {
@@ -19,7 +19,7 @@ export async function CarouselContainer() {
     receivedOn: 1726868673193
   }));
 
-  const accounts = await getTopBuilders().then((accs) =>
+  const accounts = await getSortedBuilders({ limit: 10, sort: 'hot' }).then((accs) =>
     accs.map((a) => ({ ...a, price: Math.round((Number(a.price) / 18) * price!.amount) }))
   );
 

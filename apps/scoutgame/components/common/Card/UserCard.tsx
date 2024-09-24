@@ -5,7 +5,7 @@ import { Button, Stack } from '@mui/material';
 import { useState } from 'react';
 
 import { NFTPurchaseDialog } from 'components/nft/NFTPurchaseDialog';
-import type { TopBuilder } from 'lib/builders/getTopBuilders';
+import type { BuilderUserInfo } from 'lib/builders/interfaces';
 
 import { BasicUserCard } from './BasicUserCard';
 import { UserCardDetails } from './UserCardDetails';
@@ -33,7 +33,7 @@ export function UserCard({
   variant = 'small'
 }: {
   withDetails: boolean;
-  user: TopBuilder;
+  user: BuilderUserInfo;
   scout?: Scout | null;
   variant?: 'big' | 'small';
 }) {
@@ -47,7 +47,9 @@ export function UserCard({
     return (
       <BasicUserCard
         user={user}
-        childrenInside={withDetails && <UserCardDetails gems={user.gems} scouts={user.scouts} likes={user.likes} />}
+        childrenInside={
+          withDetails && <UserCardDetails gems={user.gems} scoutedBy={user.scoutedBy} price={user.price} />
+        }
       >
         {user.price ? (
           <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
@@ -65,7 +67,7 @@ export function UserCard({
     <BasicUserCard user={user} childrenInside={withDetails && <UserCardDetails gems={user.gems} />}>
       {withDetails || user.price ? (
         <Stack gap={1} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }} px={withDetails ? 1 : 0}>
-          {withDetails && <UserCardDetails nfts={user.nftsBought} />}
+          {withDetails && <UserCardDetails nftsSold={user.nftsSold} />}
           {user.price && (
             <CardButton onClick={() => setIsPurchasing(true)} price={BigInt(user.price)} username={user.username} />
           )}

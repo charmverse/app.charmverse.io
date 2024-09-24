@@ -6,7 +6,7 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
-import type { TopBuilder } from 'lib/builders/getTopBuilders';
+import type { BuilderUserInfo } from 'lib/builders/interfaces';
 
 import { UserCard } from '../Card/UserCard';
 
@@ -14,7 +14,7 @@ import { NextArrow, PrevArrow } from './Arrows';
 
 import 'swiper/css';
 
-export function Carousel({ items, scout }: { items: TopBuilder[]; scout?: Scout | null }) {
+export function Carousel({ items, scout }: { items: BuilderUserInfo[]; scout?: Scout | null }) {
   const isDesktop = useMdScreen();
   const isLarge = useLgScreen();
   const slidesPerView = isDesktop ? 5 : isLarge ? 6 : 2.2;

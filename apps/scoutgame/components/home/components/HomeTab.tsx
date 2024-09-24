@@ -2,7 +2,7 @@ import 'server-only';
 
 import { getAllEvents } from 'lib/builders/getAllEvents';
 import { getLeaderboard } from 'lib/builders/getLeaderboard';
-import { getTopBuilders } from 'lib/builders/getTopBuilders';
+import { getSortedBuilders } from 'lib/builders/getSortedBuilders';
 import { getTopScouts } from 'lib/scouts/getTopScouts';
 
 import { ActivityTable } from './ActivityTable';
@@ -22,7 +22,7 @@ export async function HomeTab({ tab }: { tab: string }) {
   }
 
   if (tab === 'top-builders') {
-    const topBuilders = await getTopBuilders({ limit: 10 });
+    const topBuilders = await getSortedBuilders({ limit: 10, sort: 'top' });
     return <TopBuildersTable rows={topBuilders} />;
   }
 
