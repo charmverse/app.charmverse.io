@@ -4,11 +4,10 @@ import dynamic from 'next/dynamic';
 
 import type { CarouselProps } from 'components/common/Carousel/Carousel';
 import { getTodaysHotBuilders } from 'lib/builders/getTodaysHotBuilders';
-import type { BuilderInfo } from 'lib/builders/interfaces';
 
 import { BuilderCard } from '../Card/BuilderCard';
 
-const Carousel = dynamic<CarouselProps<BuilderInfo>>(
+const Carousel = dynamic<CarouselProps>(
   () => import('components/common/Carousel/Carousel').then((mod) => mod.Carousel),
   {
     ssr: false
@@ -18,5 +17,11 @@ const Carousel = dynamic<CarouselProps<BuilderInfo>>(
 export async function TodaysHotBuildersCarousel() {
   const builders = await getTodaysHotBuilders({ limit: 10 });
 
-  return <Carousel items={builders}>{(builder) => <BuilderCard builder={builder} showPurchaseButton />}</Carousel>;
+  return (
+    <Carousel>
+      {builders.map((builder) => (
+        <BuilderCard key={builder.id} builder={builder} showPurchaseButton />
+      ))}
+    </Carousel>
+  );
 }

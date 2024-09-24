@@ -1,6 +1,6 @@
 import { TabsMenu } from 'components/common/Tabs/TabsMenu';
 
-export function PublicProfileTabs({ tab, username }: { tab: string; username: string }) {
+export function PublicProfileTabsMenu({ tab, username }: { tab: string; username: string }) {
   const value = ['scout', 'builder'].includes(tab) ? tab : 'scout';
 
   return (

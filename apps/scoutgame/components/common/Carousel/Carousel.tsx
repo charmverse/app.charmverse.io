@@ -10,12 +10,11 @@ import { NextArrow, PrevArrow } from './Arrows';
 
 import 'swiper/css';
 
-export type CarouselProps<Item> = {
-  items: Item[];
-  children: (item: Item) => React.ReactNode;
+export type CarouselProps = {
+  children: React.ReactNode[];
 };
 
-export function Carousel<Item extends { id: string }>({ items, children }: CarouselProps<Item>) {
+export function Carousel({ children }: CarouselProps) {
   const isDesktop = useMdScreen();
   const isLarge = useLgScreen();
   const slidesPerView = isDesktop ? 5 : isLarge ? 6 : 2.2;
@@ -34,11 +33,11 @@ export function Carousel<Item extends { id: string }>({ items, children }: Carou
             prevEl: '.swiper-button-prev'
           }}
         >
-          {items.map((item) => (
-            <SwiperSlide key={item.id}>{children(item)}</SwiperSlide>
+          {children.map((child, index) => (
+            <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>
           ))}
         </Swiper>
-        {isDesktop && items.length > slidesPerView && (
+        {isDesktop && children.length > slidesPerView && (
           <>
             <NextArrow className='swiper-button-next' />
             <PrevArrow className='swiper-button-prev' />

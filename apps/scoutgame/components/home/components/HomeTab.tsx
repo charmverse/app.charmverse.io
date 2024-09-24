@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { getAllEvents } from 'lib/builders/getAllEvents';
+import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getLeaderboard } from 'lib/builders/getLeaderboard';
 import { getTopBuilders } from 'lib/builders/getTopBuilders';
 import { getTopScouts } from 'lib/scouts/getTopScouts';
@@ -12,8 +12,8 @@ import { TopScoutsTable } from './TopScoutsTable';
 
 export async function HomeTab({ tab }: { tab: string }) {
   if (tab === 'activity') {
-    const events = await getAllEvents();
-    return <ActivityTable rows={events} />;
+    const activities = await getBuilderActivities({ take: 10 });
+    return <ActivityTable activities={activities} />;
   }
 
   if (tab === 'top-scouts') {

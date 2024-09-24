@@ -20,9 +20,18 @@ type MergedPullRequestActivity = {
 export type BuilderActivity = {
   id: string;
   createdAt: Date;
+  username: string;
+  avatar: string;
+  displayName: string;
 } & (NftPurchaseActivity | MergedPullRequestActivity);
 
-export async function getBuilderActivities(builderId: string): Promise<BuilderActivity[]> {
+export async function getBuilderActivities({
+  builderId,
+  take = 5
+}: {
+  builderId?: string;
+  take: number;
+}): Promise<BuilderActivity[]> {
   const builderEvents = await prisma.builderEvent.findMany({
     where: {
       builderId,
@@ -31,8 +40,16 @@ export async function getBuilderActivities(builderId: string): Promise<BuilderAc
     orderBy: {
       createdAt: 'desc'
     },
-    take: 5,
+    take,
     select: {
+      builder: {
+        select: {
+          username: true,
+          avatar: true,
+          displayName: true,
+          id: true
+        }
+      },
       id: true,
       createdAt: true,
       type: true,
@@ -79,7 +96,10 @@ export async function getBuilderActivities(builderId: string): Promise<BuilderAc
           id: event.id,
           createdAt: event.createdAt,
           type: 'nft_purchase' as const,
-          scout: event.nftPurchaseEvent.scout.username
+          scout: event.nftPurchaseEvent.scout.username,
+          username: event.builder.username,
+          avatar: event.builder.avatar || '',
+          displayName: event.builder.displayName
         };
       } else if (event.type === 'merged_pull_request' && event.githubEvent && event.gemsReceipt) {
         return {
@@ -88,7 +108,10 @@ export async function getBuilderActivities(builderId: string): Promise<BuilderAc
           type: 'merged_pull_request' as const,
           contributionType: event.gemsReceipt.type,
           gems: event.gemsReceipt.value,
-          repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`
+          repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`,
+          username: event.builder.username,
+          avatar: event.builder.avatar || '',
+          displayName: event.builder.displayName
         };
       } else {
         return null;

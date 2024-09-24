@@ -20,7 +20,7 @@ import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
 export async function PublicBuilderProfile({ builderId }: { builderId: string }) {
   const builderWeeklyStats = await getBuilderWeeklyStats(builderId);
   const { allTimePoints, seasonPoints } = await getBuilderStats(builderId);
-  const builderActivities = await getBuilderActivities(builderId);
+  const builderActivities = await getBuilderActivities({ builderId, take: 5 });
   const { scouts, totalNftsSold, totalScouts } = await getBuilderScouts(builderId);
   const builder = await prisma.scout.findUniqueOrThrow({
     where: {

@@ -65,10 +65,10 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       id: user.id,
       username: user.username,
       displayName: user.displayName,
-      builderPoints: user.userSeasonStats[0].pointsEarnedAsBuilder,
-      price: Number(user.builderNfts[0].currentPrice),
+      builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
+      price: Number(user.builderNfts[0]?.currentPrice || 0),
       nfts: user.nftPurchaseEvents.length,
-      gems: user.userWeeklyStats[0].gemsCollected,
+      gems: user.userWeeklyStats[0]?.gemsCollected || 0,
       // TODO: get nft avatar which is guaranteed to exist
       nftAvatar: user.avatar || '',
       scoutedBy: user.nftPurchaseEvents.length,

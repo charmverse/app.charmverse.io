@@ -1,4 +1,3 @@
-import type { Scout } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
 import { Suspense } from 'react';
 
@@ -8,7 +7,7 @@ import { UserProfile } from 'components/common/Profile/UserProfile';
 import { BuilderProfile } from './BuilderProfile/BuilderProfile';
 import { PointsClaimScreen } from './PointsClaimScreen/PointsClaimScreen';
 import { ProfilePointsCard } from './ProfilePointsCard';
-import { ProfileTabs } from './ProfileTabs';
+import { ProfileTabsMenu } from './ProfileTabsMenu';
 import { ScoutProfile } from './ScoutProfile/ScoutProfile';
 import { ScoutProfileLoading } from './ScoutProfile/ScoutProfileLoading';
 
@@ -36,7 +35,7 @@ export async function ProfilePage({ user, tab }: { user: UserProfileWithPoints; 
         points={user.currentBalance}
       />
       <Box my={2} margin='0 auto'>
-        <ProfileTabs tab={tab} />
+        <ProfileTabsMenu tab={tab} />
       </Box>
       <Suspense fallback={tab === 'scout' ? <ScoutProfileLoading /> : null}>
         {tab === 'scout' ? (

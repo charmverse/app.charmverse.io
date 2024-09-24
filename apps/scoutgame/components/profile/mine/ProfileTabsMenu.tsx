@@ -2,7 +2,7 @@ import { TabsMenu } from 'components/common/Tabs/TabsMenu';
 
 import type { ProfileTab } from './ProfilePage';
 
-export function ProfileTabs({ tab }: { tab: ProfileTab }) {
+export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
   return (
     <TabsMenu
       value={tab}

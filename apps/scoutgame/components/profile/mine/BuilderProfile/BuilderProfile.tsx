@@ -50,7 +50,7 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
     }
   });
 
-  const builderActivities = await getBuilderActivities(builderId);
+  const builderActivities = await getBuilderActivities({ builderId, take: 5 });
   const builderWeeklyStats = await getBuilderWeeklyStats(builderId);
 
   const { totalScouts, totalNftsSold, scouts } = await getBuilderScouts(builderId);
