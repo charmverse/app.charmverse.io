@@ -1,12 +1,10 @@
 'use client';
 
-import type { Theme } from '@mui/material';
-import { useMediaQuery } from '@mui/material';
-
-import { MenuItems } from 'components/common/MenuItems';
+import { SiteNavigation } from 'components/common/SiteNavigation';
+import { useMdScreen } from 'hooks/useMediaScreens';
 
 export function HeaderMenu() {
-  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+  const isDesktop = useMdScreen();
 
-  return isMobile ? null : <MenuItems transparent={true} />;
+  return isDesktop ? <SiteNavigation transparent={true} /> : null;
 }

@@ -27,11 +27,12 @@ export function TabsMenu({ value, tabs }: TabsMenuProps) {
             justifyContent: 'center'
           },
           [`& .${tabsClasses.indicator}`]: {
-            bottom: 3
+            bottom: 3,
+            height: '1px'
           },
           [`& .${tabClasses.root}`]: {
             borderBottom: '1px solid',
-            borderColor: 'text.primary'
+            borderColor: 'var(--mui-palette-divider)'
           }
         }}
       >

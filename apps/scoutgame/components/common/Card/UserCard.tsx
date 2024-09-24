@@ -3,45 +3,43 @@
 import { Button, Stack } from '@mui/material';
 import Link from 'next/link';
 
+import type { BuilderUserInfo } from 'lib/builders/interfaces';
+
 import { BasicUserCard } from './BasicUserCard';
 import { UserCardDetails } from './UserCardDetails';
 
 export function UserCard({
-  withDetails = true,
+  withDetails,
   user,
   variant = 'small'
 }: {
   withDetails?: boolean;
-  user: any;
+  user: BuilderUserInfo;
   variant?: 'big' | 'small';
 }) {
-  if (!user?.avatar) {
-    return null;
-  }
-
   if (variant === 'big') {
     return (
       <BasicUserCard
         user={user}
-        chidlrenInside={withDetails && <UserCardDetails gems={user.gems} scouts={user.scouts} likes={user.likes} />}
+        childrenInside={withDetails && <UserCardDetails gems={user.gems} scouts={user.scouts} likes={user.likes} />}
       >
-        {user.price && (
+        {user.price ? (
           <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
             <CardButton price={user.price} username={user.username} />
           </Stack>
-        )}
+        ) : null}
       </BasicUserCard>
     );
   }
 
   return (
-    <BasicUserCard user={user} chidlrenInside={withDetails && <UserCardDetails gems={user.gems} />}>
-      {(withDetails || user.price) && (
+    <BasicUserCard user={user} childrenInside={withDetails && <UserCardDetails gems={user.gems} />}>
+      {withDetails || user.price ? (
         <Stack gap={1} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }} px={withDetails ? 1 : 0}>
           {withDetails && <UserCardDetails scouts={user.scouts} nfts={user.nfts} />}
-          {user.price && <CardButton price={user.price} username={user.username} />}
+          {user.price ? <CardButton price={user.price} username={user.username} /> : null}
         </Stack>
-      )}
+      ) : null}
     </BasicUserCard>
   );
 }
