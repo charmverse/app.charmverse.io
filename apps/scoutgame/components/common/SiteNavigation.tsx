@@ -7,7 +7,7 @@ import { GoHome } from 'react-icons/go';
 import { MdPersonOutline } from 'react-icons/md';
 import { PiBinoculars } from 'react-icons/pi';
 
-export function MenuItems({ transparent }: { transparent?: boolean }) {
+export function SiteNavigation({ transparent }: { transparent?: boolean }) {
   const pathname = usePathname();
   const value = getActiveButton(pathname);
 
@@ -54,13 +54,13 @@ export function MenuItems({ transparent }: { transparent?: boolean }) {
 }
 
 function getActiveButton(pathname: string) {
-  if (pathname.includes('home')) {
+  if (pathname.startsWith('/home')) {
     return 'home';
-  } else if (pathname.includes('scout')) {
+  } else if (pathname.startsWith('/scout') || pathname.startsWith('/u/')) {
     return 'scout';
-  } else if (pathname.includes('notifications')) {
+  } else if (pathname.startsWith('/notifications')) {
     return 'notifications';
-  } else if (pathname.includes('profile')) {
+  } else if (pathname.startsWith('/profile')) {
     return 'profile';
   }
   return 'home';

@@ -1,7 +1,5 @@
 import 'server-only';
 
-import { delay } from '@root/lib/utils/async';
-
 import { getAllEvents } from 'lib/builders/getAllEvents';
 import { getLeaderboard } from 'lib/builders/getLeaderboard';
 import { getTopBuilders } from 'lib/builders/getTopBuilders';
@@ -13,8 +11,6 @@ import { TopBuildersTable } from './TopBuildersTable';
 import { TopScoutsTable } from './TopScoutsTable';
 
 export async function HomeTab({ tab }: { tab: string }) {
-  await delay(3000);
-
   if (tab === 'activity') {
     const events = await getAllEvents();
     return <ActivityTable rows={events} />;
@@ -30,7 +26,10 @@ export async function HomeTab({ tab }: { tab: string }) {
     return <TopBuildersTable rows={topBuilders} />;
   }
 
-  const data = await getLeaderboard();
+  if (tab === 'leaderboard') {
+    const data = await getLeaderboard();
 
-  return <LeaderboardTable data={data} />;
+    return <LeaderboardTable data={data} />;
+  }
+  return null;
 }

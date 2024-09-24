@@ -44,7 +44,6 @@ class TableCellTooltipView {
       editorState: state,
       editorView: view
     };
-
     if (cellEl && !isElementFullyVisible(cellEl)) {
       cellEl = null;
     }

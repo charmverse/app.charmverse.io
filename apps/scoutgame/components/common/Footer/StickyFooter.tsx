@@ -1,16 +1,17 @@
 'use client';
 
-import type { Theme } from '@mui/material';
-import { Box, useMediaQuery } from '@mui/material';
+import { Box } from '@mui/material';
 
-import { MenuItems } from '../MenuItems';
+import { useMdScreen } from 'hooks/useMediaScreens';
+
+import { SiteNavigation } from '../SiteNavigation';
 
 export function StickyFooter() {
-  const isBigScreen = useMediaQuery((theme: Theme) => theme.breakpoints.up('sm'));
+  const isBigScreen = useMdScreen();
 
   if (isBigScreen) {
     return <Box component='footer' />;
   }
 
-  return <MenuItems />;
+  return <SiteNavigation />;
 }
