@@ -1,12 +1,15 @@
-import { prisma, Scout } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
+import { currentSeason, getCurrentWeek, getWeekStartEnd } from '@packages/scoutgame/utils';
 
-export async function generateNftPurchaseEvents(scout: Scout, assignedBuilders: {id: string, builderNftId: string}[]) {
-  const totalNftsHeld = faker.number.int({ min: 10, max: 50 });
+export async function generateNftPurchaseEvents(scoutId: string, assignedBuilders: {id: string, builderNftId: string}[]) {
+  const totalNftsHeld = faker.number.int({ min: 0, max: 25 });
   let nftsLeftToPurchase = totalNftsHeld;
+  const { start } = getWeekStartEnd(new Date());
 
   for (let i = 0; i < assignedBuilders.length; i++) {
+    const createdAt = faker.date.between({ from: start.toJSDate(), to: new Date() });
+
     const builder = assignedBuilders[i];
     const nftsToPurchase = Math.min(faker.number.int({ min: 1, max: nftsLeftToPurchase }), Math.floor(nftsLeftToPurchase / assignedBuilders.length));
     nftsLeftToPurchase -= nftsToPurchase;
@@ -20,7 +23,7 @@ export async function generateNftPurchaseEvents(scout: Scout, assignedBuilders: 
     await prisma.nFTPurchaseEvent.createMany({
       data: nftPurchaseEventIds.map((id) => ({
         id,
-        scoutId: scout.id,
+        scoutId,
         tokensPurchased: 1,
         txHash: faker.finance.ethereumAddress(),
         pointsValue: 0,
@@ -35,7 +38,8 @@ export async function generateNftPurchaseEvents(scout: Scout, assignedBuilders: 
         season: currentSeason,
         week: getCurrentWeek(),
         type: "nft_purchase",
-        nftPurchaseEventId: id
+        nftPurchaseEventId: id,
+        createdAt
       }))
     });
   }

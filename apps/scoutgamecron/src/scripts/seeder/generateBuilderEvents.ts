@@ -40,7 +40,6 @@ export async function generateBuilderEvents(
     const dailyGithubEvents = faker.number.int({ min: 0, max: 5 });
     for (let j = 0; j < dailyGithubEvents; j++) {
       const createdAt = now.minus({ days: faker.number.int({ min: 0, max: 1 }) });
-
       const githubRepo = faker.helpers.arrayElement(githubRepos);
       const pullRequestNumber = (repoPRCounters.get(githubRepo.id) as number) + 1;
       repoPRCounters.set(githubRepo.id, pullRequestNumber);

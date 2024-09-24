@@ -7,7 +7,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import { DateTime } from 'luxon';
+import { getRelativeTime } from '@packages/scoutgame/utils';
 import Image from 'next/image';
 
 import type { BuilderEventRow } from 'lib/builders/getAllEvents';
@@ -90,13 +90,7 @@ export async function ActivityTable({ rows }: { rows: BuilderEventRow[] }) {
               </TableCell>
               <TableCell align='right'>
                 <Typography variant='caption' noWrap>
-                  {DateTime.fromISO(row.date)
-                    .toRelative({
-                      style: 'narrow',
-                      locale: 'en',
-                      round: true
-                    })
-                    ?.replace(' ago', '')}
+                  {getRelativeTime(row.date)}
                 </Typography>
               </TableCell>
             </TableRow>

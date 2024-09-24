@@ -25,7 +25,7 @@ export default async function Profile({
   };
 }) {
   const user = await getUserFromSession();
-  const tab = searchParams.tab || 'scout';
+  const tab = (user?.githubUser ? 'build' : searchParams.tab) || 'scout';
   if (!user) {
     redirect('/');
   }

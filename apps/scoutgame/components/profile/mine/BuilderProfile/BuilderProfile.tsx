@@ -1,14 +1,16 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { Box, Paper, Stack, Typography } from '@mui/material';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
+import { Stack, Typography } from '@mui/material';
+import { currentSeason, getCurrentScoutGameWeek, getCurrentWeek } from '@packages/scoutgame/utils';
 import { isTruthy } from '@root/lib/utils/types';
 
-import { BuilderCard } from 'components/builder/Card/BuilderCard';
-import { BuilderCardNftDisplay } from 'components/builder/Card/BuilderCardNftDisplay';
-
+import { BuilderActivitiesList } from './BuilderActivitiesList';
 import { BuilderStats } from './BuilderStats';
+import { BuilderWeeklyStats } from './BuilderWeeklyStats';
 
 export async function BuilderProfile({ builderId }: { builderId: string }) {
+  const currentWeek = getCurrentWeek();
+  const scoutgameWeek = getCurrentScoutGameWeek();
+
   const builder = await prisma.scout.findUniqueOrThrow({
     where: {
       id: builderId
@@ -34,7 +36,7 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
       },
       userWeeklyStats: {
         where: {
-          week: getCurrentWeek()
+          week: currentWeek
         },
         select: {
           gemsCollected: true
@@ -48,6 +50,8 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
           createdAt: 'desc'
         },
         select: {
+          id: true,
+          createdAt: true,
           type: true,
           nftPurchaseEvent: {
             select: {
@@ -59,20 +63,26 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
                   id: true
                 }
               },
-              tokensPurchased: true,
-              createdAt: true
+              tokensPurchased: true
+            }
+          },
+          gemsReceipt: {
+            select: {
+              type: true,
+              value: true
             }
           },
           githubEvent: {
+            where: {
+              type: 'merged_pull_request'
+            },
             select: {
-              type: true,
               repo: {
                 select: {
                   name: true,
                   owner: true
                 }
-              },
-              createdAt: true
+              }
             }
           }
         }
@@ -90,7 +100,7 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
   );
 
   return (
-    <Stack gap={2}>
+    <Stack gap={3}>
       <BuilderStats
         avatar={builder.avatar || ''}
         username={builder.username}
@@ -99,6 +109,14 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
         totalNftsSold={totalNftsSold}
         currentNftPrice={Number(builder.builderNfts[0]?.currentPrice || 0)}
       />
+      <Stack gap={0.5}>
+        <Typography color='secondary'>This Week</Typography>
+        <BuilderWeeklyStats gemsCollected={builder.userWeeklyStats[0]?.gemsCollected || 0} rank={1} />
+      </Stack>
+      <Stack gap={0.5}>
+        <Typography color='secondary'>Recent Activity</Typography>
+        <BuilderActivitiesList events={builder.events} />
+      </Stack>
     </Stack>
   );
 }

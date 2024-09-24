@@ -77,3 +77,19 @@ export function getCurrentWeekPoints() {
   // TODO: Get points allocation for the week
   return 100000;
 }
+
+export function getCurrentScoutGameWeek() {
+  const currentWeek = getCurrentWeek();
+  const currentWeekNumber = parseInt(currentWeek.split('W')[1]);
+  return currentWeekNumber;
+}
+
+export function getRelativeTime(date: Date | string) {
+  return DateTime.fromISO(typeof date === 'string' ? date : date.toISOString())
+    .toRelative({
+      style: 'narrow',
+      locale: 'en',
+      round: true
+    })
+    ?.replace(' ago', '');
+}
