@@ -24,7 +24,7 @@ export function TabsMenu({ value, tabs }: TabsMenuProps) {
         scrollButtons='auto'
         sx={{
           [`& .${tabsClasses.flexContainer}`]: {
-            justifyContent: { md: 'center' }
+            justifyContent: 'center'
           },
           [`& .${tabsClasses.indicator}`]: {
             bottom: 3
