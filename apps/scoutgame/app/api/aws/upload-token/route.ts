@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const filename = searchParams.get('filename');
   const session = await getSession();
-  const userId = session.user?.id;
+  const userId = session.scoutId;
 
   if (!userId) {
     return new Response(`Unauthorized`, { status: 401 });

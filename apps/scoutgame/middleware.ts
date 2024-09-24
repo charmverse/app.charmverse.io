@@ -6,7 +6,7 @@ const privateLinks = ['/profile', '/notifications', '/welcome'];
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();
-  const user = session.user;
+  const user = session.scoutId;
   const path = request.nextUrl.pathname;
 
   // We don't have a '/' page anymore since we need to handle 2 different layouts

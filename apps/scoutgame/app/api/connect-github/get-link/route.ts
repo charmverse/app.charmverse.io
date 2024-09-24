@@ -7,13 +7,13 @@ import { sealData } from 'iron-session';
 export async function GET() {
   const session = await getSession();
 
-  if (!session.user?.id) {
+  if (!session.scoutId) {
     return new Response('Authentication required', { status: 401 });
   }
 
   const sealedUserId = await sealData(
     {
-      id: session.user.id
+      id: session.scoutId
     },
     { password: authSecret as string }
   );

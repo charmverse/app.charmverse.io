@@ -10,7 +10,7 @@ export const saveTermsOfServiceAction = authActionClient
   .metadata({ actionName: 'terms-of-service' })
   .schema(schema)
   .action(async ({ parsedInput, ctx }) => {
-    const userId = ctx.session.user?.id;
+    const userId = ctx.session.scoutId;
 
     if (!parsedInput.agreedToTOS) {
       throw new Error('You need to accept the terms and conditions.');
