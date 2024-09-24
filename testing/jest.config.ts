@@ -1,1 +1,3 @@
-export { default } from 'jest.config.nodejs';
+import makeConfig from 'jest.config.nodejs';
+
+export default makeConfig(__dirname);
