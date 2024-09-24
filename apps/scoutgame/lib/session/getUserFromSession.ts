@@ -11,6 +11,9 @@ export async function getUserFromSession(): Promise<Scout | null> {
     const user = await prisma.scout.findFirst({
       where: {
         id: session.user.id
+      },
+      include: {
+        githubUser: true
       }
     });
 

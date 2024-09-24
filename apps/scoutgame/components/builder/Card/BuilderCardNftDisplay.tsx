@@ -8,7 +8,7 @@ export function BuilderCardNftDisplay({
 }: {
   nftAvatar: string;
   username: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   return (
     <Box borderRadius='5px' overflow='hidden'>

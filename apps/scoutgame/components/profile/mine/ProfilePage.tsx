@@ -1,14 +1,14 @@
 import type { Scout } from '@charmverse/core/prisma-client';
-import { Box, Tabs } from '@mui/material';
+import { Box } from '@mui/material';
 import { Suspense } from 'react';
 
 import { UserProfile } from 'components/common/Profile/UserProfile';
-import { LoadingCard } from 'components/layout/Loading/LoadingCard';
-import { LoadingCards } from 'components/layout/Loading/LoadingCards';
 
+import { BuilderProfile } from './BuilderProfile/BuilderProfile';
 import { ProfilePointsCard } from './ProfilePointsCard';
 import { ProfileTabs } from './ProfileTabs';
 import { ScoutProfile } from './ScoutProfile/ScoutProfile';
+import { ScoutProfileLoading } from './ScoutProfile/ScoutProfileLoading';
 
 export type ProfileTab = 'build' | 'scout' | 'win';
 
@@ -35,15 +35,12 @@ export async function ProfilePage({ user, tab }: { user: ScoutProfile; tab: Prof
       <Box my={2} margin='0 auto'>
         <ProfileTabs tab={tab} />
       </Box>
-      <Suspense
-        fallback={
-          <>
-            <LoadingCard />
-            <LoadingCards />
-          </>
-        }
-      >
-        {tab === 'scout' ? <ScoutProfile userId={user.id} /> : null}
+      <Suspense fallback={tab === 'scout' ? <ScoutProfileLoading /> : null}>
+        {tab === 'scout' ? (
+          <ScoutProfile userId={user.id} />
+        ) : tab === 'build' ? (
+          <BuilderProfile builderId={user.id} />
+        ) : null}
       </Suspense>
     </Box>
   );

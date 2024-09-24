@@ -29,20 +29,24 @@ function PriceButton({ price, username }: { price: number; username: string }) {
 
 export function BuilderCard({
   builder,
-  showPurchaseButton = false
+  showPurchaseButton = false,
+  hideDetails = false
 }: {
   builder: BuilderInfo;
+  hideDetails?: boolean;
   showPurchaseButton?: boolean;
 }) {
   return (
     <Card sx={{ border: 'none' }}>
       <BuilderCardNftDisplay nftAvatar={builder.nftAvatar} username={builder.username}>
-        <BuilderCardStats
-          gemsCollected={builder.gems}
-          builderPoints={builder.builderPoints}
-          scoutedBy={builder.scoutedBy}
-          nfts={builder.nfts}
-        />
+        {hideDetails ? null : (
+          <BuilderCardStats
+            gemsCollected={builder.gems}
+            builderPoints={builder.builderPoints}
+            scoutedBy={builder.scoutedBy}
+            nfts={builder.nfts}
+          />
+        )}
       </BuilderCardNftDisplay>
       {builder.price && showPurchaseButton && (
         <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>

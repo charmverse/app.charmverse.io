@@ -13,6 +13,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       scoutId
     },
     select: {
+      tokensPurchased: true,
       builderNFT: {
         select: {
           builderId: true
@@ -25,7 +26,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
   nftPurchaseEvents.forEach((event) => {
     const builderId = event.builderNFT.builderId;
     if (builderId) {
-      builderNftsHeldRecord[builderId] = (builderNftsHeldRecord[builderId] || 0) + 1;
+      builderNftsHeldRecord[builderId] = (builderNftsHeldRecord[builderId] || 0) + event.tokensPurchased;
     }
   });
 
