@@ -1,6 +1,6 @@
 import createJestConfig from 'testing/createJestConfig';
 
-import { jestConfig } from './jest.config.nodejs';
+import jestConfig from './jest.config.nodejs';
 
 const integrationConfig = {
   ...jestConfig,
