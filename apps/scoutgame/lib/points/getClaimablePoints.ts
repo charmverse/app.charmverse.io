@@ -1,7 +1,24 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/utils';
 
-export async function getUserClaimablePoints(userId: string) {
+export type WeeklyReward = {
+  week: string;
+  builderReward: {
+    points: number;
+  };
+  githubContributionReward: {
+    points: number;
+    streakCount: number;
+    firstContributionsCount: number;
+    regularContributionsCount: number;
+  };
+  soldNftReward: {
+    points: number;
+    quantity: number;
+  };
+};
+
+export async function getClaimablePoints(userId: string) {
   const pointsReceipts = await prisma.pointsReceipt.findMany({
     where: {
       recipientId: userId,

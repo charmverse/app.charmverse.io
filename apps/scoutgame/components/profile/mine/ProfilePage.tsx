@@ -31,7 +31,7 @@ export async function ProfilePage({ user, tab }: { user: ScoutProfile; tab: Prof
       <ProfilePointsCard
         seasonPoints={user.seasonPoints}
         allTimePoints={user.allTimePoints}
-        points={user.seasonPoints.scoutPoints}
+        points={user.currentBalance}
       />
       <Box my={2} margin='0 auto'>
         <ProfileTabs tab={tab} />
