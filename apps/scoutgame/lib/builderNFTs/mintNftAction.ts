@@ -38,11 +38,6 @@ export const mintNftAction = authActionClient
       throw new Error('User not found');
     }
 
-    prettyPrint({
-      builderNftChain: builderNftChain.id,
-      contractAddress: builderContractAddress
-    });
-
     const builderNft = await prisma.builderNft.findFirstOrThrow({
       where: {
         chainId: builderNftChain.id,
