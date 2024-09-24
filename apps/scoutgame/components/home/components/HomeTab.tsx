@@ -18,12 +18,12 @@ export async function HomeTab({ tab }: { tab: string }) {
 
   if (tab === 'top-scouts') {
     const topScouts = await getTopScouts({ limit: 10 });
-    return <TopScoutsTable rows={topScouts} />;
+    return <TopScoutsTable scouts={topScouts} />;
   }
 
   if (tab === 'top-builders') {
     const topBuilders = await getTopBuilders({ limit: 10 });
-    return <TopBuildersTable rows={topBuilders} />;
+    return <TopBuildersTable builders={topBuilders} />;
   }
 
   if (tab === 'leaderboard') {

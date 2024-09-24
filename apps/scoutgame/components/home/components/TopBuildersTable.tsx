@@ -14,11 +14,11 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 
-import type { TopBuilder } from 'lib/builders/getTopBuilders';
+import type { TopBuilderInfo } from 'lib/builders/getTopBuilders';
 
 import { Avatar } from '../../common/Avatar';
 
-export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
+export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
   return (
     <TableContainer component={Paper} sx={{ marginTop: 2 }}>
       <Table aria-label='Top scouts table' size='small'>
@@ -36,7 +36,7 @@ export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
           >
             <TableCell align='center'>RANK</TableCell>
             <TableCell align='left'>SCOUT</TableCell>
-            <TableCell align='center'>SEASON</TableCell>
+            <TableCell align='right'>SEASON</TableCell>
             <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
               ALL TIME
             </TableCell>
@@ -47,9 +47,9 @@ export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row, index) => (
+          {builders.map((builder, index) => (
             <TableRow
-              key={row.username}
+              key={builder.username}
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
                 '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
@@ -60,16 +60,16 @@ export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
               </TableCell>
               <TableCell component='th'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
-                  <Avatar src={row.avatar} name={row.username} size='small' />
+                  <Avatar src={builder.avatar} name={builder.username} size='small' />
                   <Typography variant='caption' noWrap maxWidth={{ xs: '100px', md: '100%' }}>
-                    {row.username}
+                    {builder.username}
                   </Typography>
                 </Stack>
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' color='green.main' noWrap>
-                    {row.seasonPoints || 0}
+                    {builder.seasonPoints || 0}
                   </Typography>
                   <Image
                     width={15}
@@ -82,7 +82,7 @@ export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' color='green.main' noWrap>
-                    {row.allTimePoints || 0}
+                    {builder.allTimePoints || 0}
                   </Typography>
                   <Image
                     width={15}
@@ -95,14 +95,14 @@ export function TopBuildersTable({ rows }: { rows: TopBuilder[] }) {
               <TableCell align='center'>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='center'>
                   <Typography variant='caption' color='green.main' noWrap>
-                    {row.scoutedBy || 0}
+                    {builder.scoutedBy || 0}
                   </Typography>
                   <Image width={15} height={15} src='/images/profile/icons/like-green-icon.svg' alt='like icon ' />
                 </Stack>
               </TableCell>
               <TableCell align='center'>
-                <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${row.username}/checkout`}>
-                  ${row.price || 0}
+                <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${builder.username}/checkout`}>
+                  ${builder.price || 0}
                 </Button>
               </TableCell>
             </TableRow>

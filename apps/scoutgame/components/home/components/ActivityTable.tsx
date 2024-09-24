@@ -66,9 +66,11 @@ export async function ActivityTable({ activities }: { activities: BuilderActivit
                 <BuilderActivityDetail activity={activity} />
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <BuilderActivityGems activity={activity} />
+                <Stack justifyContent='flex-end' flexDirection='row' gap={1}>
+                  <BuilderActivityGems activity={activity} />
+                </Stack>
               </TableCell>
-              <TableCell align='right'>{null}</TableCell>
+              <TableCell align='right'>-</TableCell>
               <TableCell align='right'>
                 <Typography variant='caption' noWrap>
                   {getRelativeTime(activity.createdAt)}

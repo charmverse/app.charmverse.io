@@ -4,7 +4,7 @@ import { isTruthy } from '@root/lib/utils/types';
 
 import { seasonQualifiedBuilderWhere } from './queries';
 
-export type TopBuilder = {
+export type TopBuilderInfo = {
   id: string;
   username: string;
   avatar: string | null;
@@ -14,7 +14,7 @@ export type TopBuilder = {
   price: number;
 };
 
-export async function getTopBuilders({ limit }: { limit: number }): Promise<TopBuilder[]> {
+export async function getTopBuilders({ limit }: { limit: number }): Promise<TopBuilderInfo[]> {
   const topBuilders = await prisma.userSeasonStats.findMany({
     where: seasonQualifiedBuilderWhere,
     orderBy: {

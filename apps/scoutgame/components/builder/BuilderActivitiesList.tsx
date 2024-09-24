@@ -43,13 +43,15 @@ export function BuilderActivityDetail({ activity }: { activity: BuilderActivity 
 
 export function BuilderActivityGems({ activity }: { activity: BuilderActivity }) {
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='center'>
+    <Stack flexDirection='row' gap={1} alignItems='center'>
       {activity.type === 'merged_pull_request' ? (
         <>
-          <Typography variant='h6'>+{activity.gems}</Typography>
+          <Typography>+{activity.gems}</Typography>
           <Image width={20} height={20} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
         </>
-      ) : null}
+      ) : (
+        '-'
+      )}
     </Stack>
   );
 }

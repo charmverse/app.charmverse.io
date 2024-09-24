@@ -1,6 +1,5 @@
 import type { GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
-import { timezone } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 
 import type { PullRequest } from '../../tasks/processPullRequests/getPullRequests';
@@ -19,7 +18,6 @@ export function generatePullRequest({
   // 0-5% chance of a closed PR
   const closedPullRequestChance = faker.number.int({ min: 0, max: 5 });
   const nameWithOwner = `${githubRepo.owner}/${githubRepo.name}`;
-  const now = DateTime.now().setZone(timezone);
   return {
     baseRefName: 'main',
     author: {
@@ -29,7 +27,7 @@ export function generatePullRequest({
     title: faker.lorem.sentence(),
     url: `https://github.com/${nameWithOwner}/pull/${pullRequestNumber}`,
     createdAt: createdAt.toISO(),
-    mergedAt: now.toISO(),
+    mergedAt: createdAt.toISO(),
     number: pullRequestNumber,
     repository: {
       id: githubRepo.id,
