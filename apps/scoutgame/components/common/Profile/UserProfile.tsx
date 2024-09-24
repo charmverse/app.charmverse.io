@@ -36,19 +36,21 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
         <Typography variant='h5'>{displayName || 'N/A'}</Typography>
         <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap'>
           <Typography variant='h6'>{username || 'N/A'}</Typography>
-          <IconButton href={`https://warpcast.com/${username}`} target='_blank' rel='noopener noreferrer'>
-            <Image src='/images/profile/icons/warpcast-circle-icon.svg' width='20' height='20' alt='warpcast icon' />
-          </IconButton>
-          {githubLogin ? (
-            <IconButton
-              href={`https://github.com/${githubLogin}`}
-              target='_blank'
-              rel='noopener noreferrer'
-              sx={{ px: 0 }}
-            >
-              <Image src='/images/profile/icons/github-circle-icon.svg' width='20' height='20' alt='github icon' />
+          <Stack direction='row' gap={0.5} alignItems='center'>
+            <IconButton href={`https://warpcast.com/${username}`} target='_blank' rel='noopener noreferrer'>
+              <Image src='/images/profile/icons/warpcast-circle-icon.svg' width='20' height='20' alt='warpcast icon' />
             </IconButton>
-          ) : null}
+            {githubLogin ? (
+              <IconButton
+                href={`https://github.com/${githubLogin}`}
+                target='_blank'
+                rel='noopener noreferrer'
+                sx={{ px: 0 }}
+              >
+                <Image src='/images/profile/icons/github-circle-icon.svg' width='20' height='20' alt='github icon' />
+              </IconButton>
+            ) : null}
+          </Stack>
         </Stack>
         <Typography variant='body2' overflow='hidden' textOverflow='ellipsis'>
           {bio}

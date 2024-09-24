@@ -44,16 +44,18 @@ export async function PublicScoutProfile({ scoutId }: { scoutId: string }) {
       <Paper sx={{ py: 1 }}>
         <Stack flexDirection='row'>
           <BackButton />
-          <UserProfile
-            user={{
-              id: scout.id,
-              displayName: scout.displayName,
-              username: scout.username,
-              avatar: scout.avatar || '',
-              bio: scout.bio,
-              githubLogin: scout.githubUser[0]?.login
-            }}
-          />
+          <Box width='calc(100% - 50px)'>
+            <UserProfile
+              user={{
+                id: scout.id,
+                displayName: scout.displayName,
+                username: scout.username,
+                avatar: scout.avatar || '',
+                bio: scout.bio,
+                githubLogin: scout.githubUser[0]?.login
+              }}
+            />
+          </Box>
         </Stack>
       </Paper>
       <Stack my={2}>
