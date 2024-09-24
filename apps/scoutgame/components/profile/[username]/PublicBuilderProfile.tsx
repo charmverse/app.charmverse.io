@@ -3,11 +3,11 @@ import 'server-only';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { currentSeason } from '@packages/scoutgame/utils';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 import { BuilderActivitiesList } from 'components/builder/BuilderActivitiesList';
 import { BuilderCard } from 'components/builder/Card/BuilderCard';
-import { BuilderCardNftDisplay } from 'components/builder/Card/BuilderCardNftDisplay';
 import { BackButton } from 'components/common/Button/BackButton';
 import { UserProfile } from 'components/common/Profile/UserProfile';
 import { BuilderWeeklyStats } from 'components/profile/mine/BuilderProfile/BuilderWeeklyStats';
@@ -21,7 +21,7 @@ export async function PublicBuilderProfile({ builderId }: { builderId: string })
   const builderWeeklyStats = await getBuilderWeeklyStats(builderId);
   const { allTimePoints, seasonPoints } = await getBuilderStats(builderId);
   const builderActivities = await getBuilderActivities(builderId);
-  const { scouts, totalNftsSold } = await getBuilderScouts(builderId);
+  const { scouts, totalNftsSold, totalScouts } = await getBuilderScouts(builderId);
   const builder = await prisma.scout.findUniqueOrThrow({
     where: {
       id: builderId
@@ -53,11 +53,11 @@ export async function PublicBuilderProfile({ builderId }: { builderId: string })
 
   return (
     <Stack gap={2}>
-      <Paper sx={{ py: { xs: 1, md: 2 }, pr: { xs: 1, md: 2 } }}>
+      <Paper sx={{ py: 2, pr: { xs: 1, md: 2 } }}>
         <Stack flexDirection='row'>
           <BackButton />
           <Stack flexDirection='row' alignItems='center' gap={4}>
-            <Box width={{ xs: 100, md: 150 }}>
+            <Box width={{ xs: 125, md: 150 }}>
               <BuilderCard
                 builder={{
                   id: builderId,
@@ -70,7 +70,7 @@ export async function PublicBuilderProfile({ builderId }: { builderId: string })
                 showPurchaseButton
               />
             </Box>
-            <Stack>
+            <Stack width='calc(100% - 150px)' gap={1}>
               <UserProfile
                 user={{
                   username: builder.username,
@@ -80,6 +80,32 @@ export async function PublicBuilderProfile({ builderId }: { builderId: string })
                   bio: builder.bio
                 }}
               />
+              <Stack gap={0.5}>
+                <Typography fontWeight={500} color='secondary' variant='subtitle1'>
+                  THIS SEASON (ALL TIME)
+                </Typography>
+                <Stack flexDirection='row' gap={1} alignItems='center'>
+                  <Typography fontWeight={500} variant='h4' color='green.main'>
+                    {seasonPoints}
+                  </Typography>
+                  <Image src='/images/profile/scout-game-green-icon.svg' width='25' height='25' alt='scout game icon' />
+                  <Typography fontWeight={500} variant='h5' color='green.main'>
+                    ({allTimePoints})
+                  </Typography>
+                </Stack>
+                <Typography fontWeight={500} variant='h4' color='green.main'>
+                  {totalScouts} Scouts
+                </Typography>
+                <Stack flexDirection='row' gap={1} alignItems='center'>
+                  <Typography fontWeight={500} variant='h4' color='green.main'>
+                    {totalNftsSold}
+                  </Typography>
+                  <Image src='/images/profile/icons/nft-green-icon.svg' width='25' height='25' alt='nft icon' />
+                  <Typography fontWeight={500} variant='h4' color='green.main'>
+                    Sold
+                  </Typography>
+                </Stack>
+              </Stack>
             </Stack>
           </Stack>
         </Stack>

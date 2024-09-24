@@ -34,7 +34,7 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
       ) : null}
       <Stack width='100%'>
         <Typography variant='h5'>{displayName || 'N/A'}</Typography>
-        <Stack direction='row' width='100%' alignItems='center'>
+        <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap'>
           <Typography variant='h6'>{username || 'N/A'}</Typography>
           <IconButton href={`https://warpcast.com/${username}`} target='_blank' rel='noopener noreferrer'>
             <Image src='/images/profile/icons/warpcast-circle-icon.svg' width='20' height='20' alt='warpcast icon' />
