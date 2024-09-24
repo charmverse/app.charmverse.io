@@ -12,9 +12,8 @@ import Image from 'next/image';
 
 import type { BuilderEventRow } from 'lib/builders/getAllEvents';
 
-import { Avatar } from '../Avatar';
-
-import { iconMap } from './iconMap';
+import { Avatar } from '../../common/Avatar';
+import { iconMap } from '../../common/Tabs/iconMap';
 
 export async function ActivityTable({ rows }: { rows: BuilderEventRow[] }) {
   return (

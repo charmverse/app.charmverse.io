@@ -1,31 +1,32 @@
 'use client';
 
-import { Box, useMediaQuery } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
+import { Box } from '@mui/material';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
+
+import { useMdScreen, useLgScreen } from 'hooks/useMediaScreens';
 
 import { NextArrow, PrevArrow } from './Arrows';
 
 import 'swiper/css';
 
-export type CarouselProps<Item extends { id: string }> = {
+export type CarouselProps<Item> = {
   items: Item[];
   children: (item: Item) => React.ReactNode;
 };
 
 export function Carousel<Item extends { id: string }>({ items, children }: CarouselProps<Item>) {
-  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
-  const isLarge = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'));
-  const slidesPerView = isMobile ? 2.2 : isLarge ? 6 : 5;
+  const isDesktop = useMdScreen();
+  const isLarge = useLgScreen();
+  const slidesPerView = isDesktop ? 5 : isLarge ? 6 : 2.2;
 
   return (
     <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
-      <Box width='95svw' px={isMobile ? 0 : 4} position='relative'>
+      <Box width='95svw' px={isDesktop ? 4 : 0} position='relative'>
         <Swiper
           className='swiper'
           slidesPerView={slidesPerView}
-          spaceBetween={isMobile ? 5 : 15}
+          spaceBetween={isDesktop ? 15 : 5}
           autoHeight={true}
           modules={[Navigation]}
           navigation={{
@@ -37,7 +38,7 @@ export function Carousel<Item extends { id: string }>({ items, children }: Carou
             <SwiperSlide key={item.id}>{children(item)}</SwiperSlide>
           ))}
         </Swiper>
-        {!isMobile && items.length > slidesPerView && (
+        {isDesktop && items.length > slidesPerView && (
           <>
             <NextArrow className='swiper-button-next' />
             <PrevArrow className='swiper-button-prev' />
