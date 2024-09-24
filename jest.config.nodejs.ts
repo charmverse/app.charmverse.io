@@ -44,10 +44,13 @@ export const jestConfig: Omit<JestConfigWithTsJest, 'transform'> = {
   // roots: ['<rootDir>', './testing/jest/']
 };
 
-export default function makeConfig(testDir: string) {
+export default async function makeConfig(testDir: string) {
   return createJestConfig({
     ...jestConfig,
     rootDir: __dirname,
+    moduleNameMapper: {
+      'lodash-es': 'lodash'
+    },
     testMatch: [`${testDir}/**/*.spec.ts`]
   });
 }
