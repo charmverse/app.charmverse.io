@@ -16,8 +16,8 @@ export function generatePullRequest({
   pullRequestNumber: number;
   createdAt: DateTime;
 }): PullRequest {
-  // 10-20% chance of a closed PR
-  const closedPullRequestChance = faker.number.int({ min: 10, max: 20 });
+  // 5-10% chance of a closed PR
+  const closedPullRequestChance = faker.number.int({ min: 5, max: 10 });
   const nameWithOwner = `${githubRepo.owner}/${githubRepo.name}`;
   const now = DateTime.now().setZone(timezone);
   return {

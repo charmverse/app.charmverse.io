@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import { UserProfile } from 'components/common/Profile/UserProfile';
 
 import { BuilderProfile } from './BuilderProfile/BuilderProfile';
+import { PointsClaimScreen } from './PointsClaimScreen/PointsClaimScreen';
 import { ProfilePointsCard } from './ProfilePointsCard';
 import { ProfileTabs } from './ProfileTabs';
 import { ScoutProfile } from './ScoutProfile/ScoutProfile';
@@ -40,7 +41,9 @@ export async function ProfilePage({ user, tab }: { user: ScoutProfile; tab: Prof
           <ScoutProfile userId={user.id} />
         ) : tab === 'build' ? (
           <BuilderProfile builderId={user.id} />
-        ) : null}
+        ) : (
+          <PointsClaimScreen userId={user.id} username={user.username} />
+        )}
       </Suspense>
     </Box>
   );

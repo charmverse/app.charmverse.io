@@ -13,8 +13,16 @@ async function generateBuilder() {
   return {
     builder: scout,
     githubUser: githubUser as GithubUser,
-    builderNft: builderNft as Omit<BuilderNft, 'builderId' | 'createdAt' | 'currentPrice'>
+    builderNft: builderNft as Omit<BuilderNft, 'builderId' | 'createdAt' | 'currentPrice'> & {
+      currentPrice: number
+    }
   };
+}
+
+type BuilderInfo = {
+  id: string;
+  builderNftId: string;
+  nftPrice: number;
 }
 
 function assignReposToBuilder(githubRepos: GithubRepo[]): GithubRepo[] {
@@ -22,7 +30,7 @@ function assignReposToBuilder(githubRepos: GithubRepo[]): GithubRepo[] {
   return faker.helpers.arrayElements(githubRepos, repoCount);
 }
 
-function assignBuildersToScout(builders: {id: string, builderNftId: string}[]) {
+function assignBuildersToScout(builders: BuilderInfo[]) {
   const builderCount = faker.number.int({ min: 3, max: 5 });
   return faker.helpers.arrayElements(builders, builderCount);
 }
@@ -41,8 +49,8 @@ export async function generateSeedData() {
 
   const [githubRepos, repoPRCounters] = await generateGithubRepos(totalGithubRepos);
 
-  const builders: {id: string, builderNftId: string}[] = [];
-  const scoutBuilders: {id: string, builderNftId: string}[] = [];
+  const builders: BuilderInfo[] = [];
+  const scoutBuilders: BuilderInfo[] = [];
 
   for (let i = 0; i < totalBuilders; i++) {
     const { githubUser, builder, builderNft } = await generateBuilder();
@@ -51,7 +59,8 @@ export async function generateSeedData() {
     await generateBuilderEvents(githubUser, assignedRepos, repoPRCounters);
     builders.push({
       id: builder.id,
-      builderNftId: builderNft.id
+      builderNftId: builderNft.id,
+      nftPrice: builderNft.currentPrice
     });
   }
 
@@ -61,7 +70,8 @@ export async function generateSeedData() {
     await generateBuilderEvents(githubUser, assignedRepos, repoPRCounters);
     scoutBuilders.push({
       id: builder.id,
-      builderNftId: builderNft.id
+      builderNftId: builderNft.id,
+      nftPrice: builderNft.currentPrice
     });
   }
 
@@ -71,7 +81,8 @@ export async function generateSeedData() {
     const assignedBuilders = assignBuildersToScout(builders);
     await generateNftPurchaseEvents(scout.id, assignedBuilders.map(builder => ({
       id: builder.id,
-      builderNftId: builder.builderNftId
+      builderNftId: builder.builderNftId,
+      nftPrice: builder.nftPrice
     })));
   }
 
@@ -81,7 +92,8 @@ export async function generateSeedData() {
     // Do not purchase your own nft
     await generateNftPurchaseEvents(scoutBuilder.id, assignedBuilders.map(builder => ({
       id: builder.id,
-      builderNftId: builder.builderNftId
+      builderNftId: builder.builderNftId,
+      nftPrice: builder.nftPrice
     })).filter(builder => builder.id !== scoutBuilder.id));
   }
 

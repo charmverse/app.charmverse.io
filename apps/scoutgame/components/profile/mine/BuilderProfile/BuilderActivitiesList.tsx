@@ -5,30 +5,28 @@ import Image from 'next/image';
 import { BiLike } from 'react-icons/bi';
 import { LuBookMarked } from 'react-icons/lu';
 
-export function BuilderActivitiesList({
-  events
-}: {
-  events: {
-    id: string;
-    type: BuilderEventType;
-    createdAt: Date;
-    gemsReceipt?: {
-      type: GemsReceiptType;
-      value: number;
-    } | null;
-    nftPurchaseEvent?: {
-      scout: {
-        username: string;
-      };
-    } | null;
-    githubEvent?: {
-      repo: {
-        owner: string;
-        name: string;
-      };
-    } | null;
-  }[];
-}) {
+export type BuilderActivity = {
+  id: string;
+  type: BuilderEventType;
+  createdAt: Date;
+  gemsReceipt?: {
+    type: GemsReceiptType;
+    value: number;
+  } | null;
+  nftPurchaseEvent?: {
+    scout: {
+      username: string;
+    };
+  } | null;
+  githubEvent?: {
+    repo: {
+      owner: string;
+      name: string;
+    };
+  } | null;
+};
+
+export function BuilderActivitiesList({ events }: { events: BuilderActivity[] }) {
   return (
     <Stack gap={1}>
       {events.map((event) => {
