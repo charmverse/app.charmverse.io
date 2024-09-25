@@ -223,8 +223,10 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: apps/scoutgame/playwright-report/
-          retention-days: 30
+          path: |
+            apps/scoutgame/playwright-report/
+            apps/scoutgame/test-results/
+          retention-days: 5
 
   upload-docker:
     name: Upload Docker image
