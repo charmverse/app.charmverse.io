@@ -1,4 +1,4 @@
-import { Box, Paper, Stack } from '@mui/material';
+import { Box, Paper, Stack, Typography } from '@mui/material';
 import { Suspense } from 'react';
 
 import { UserProfile } from 'components/common/Profile/UserProfile';
@@ -69,12 +69,16 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
           }}
           elevation={0}
         >
-          <UserProfile user={user} />
-          <ProfilePointsCard
-            seasonPoints={user.seasonPoints}
-            allTimePoints={user.allTimePoints}
-            points={user.currentBalance}
-          />
+          <Box flex={1}>
+            <UserProfile user={user} />
+          </Box>
+          <Box flex={1}>
+            <ProfilePointsCard
+              seasonPoints={user.seasonPoints}
+              allTimePoints={user.allTimePoints}
+              points={user.currentBalance}
+            />
+          </Box>
         </Paper>
       </Stack>
 
@@ -86,10 +90,32 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
         ) : tab === 'build' ? (
           <BuilderProfile builderId={user.id} />
         ) : (
-          <>
-            <ScoutProfile userId={user.id} />
-            <BuilderProfile builderId={user.id} />
-          </>
+          <Stack flexDirection='row' gap={2}>
+            <Paper
+              sx={{
+                flex: 1,
+                p: 2,
+                backgroundColor: 'background.dark'
+              }}
+            >
+              <Typography variant='h6' color='text.secondary'>
+                Scout
+              </Typography>
+              <ScoutProfile userId={user.id} />
+            </Paper>
+            <Paper
+              sx={{
+                flex: 1,
+                p: 2,
+                backgroundColor: 'background.dark'
+              }}
+            >
+              <Typography variant='h6' color='text.secondary'>
+                Build
+              </Typography>
+              <BuilderProfile builderId={user.id} />
+            </Paper>
+          </Stack>
         )}
       </Suspense>
     </Box>
