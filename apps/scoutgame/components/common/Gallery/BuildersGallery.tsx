@@ -9,7 +9,7 @@ export function BuildersGallery({ builders }: { builders: BuilderInfo[] }) {
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={{ xs: 1, sm: 2 }} columns={{ xs: 3, sm: 6 }}>
         {builders.map((builder) => (
-          <Grid key={builder.username} size={{ xs: 1, sm: 2, md: 3, lg: 2 }}>
+          <Grid key={builder.username} size={{ xs: 1 }}>
             <BuilderCard builder={builder} showPurchaseButton />
           </Grid>
         ))}

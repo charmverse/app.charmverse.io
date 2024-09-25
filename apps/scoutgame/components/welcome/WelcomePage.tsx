@@ -16,7 +16,7 @@ export function WelcomePage({ user }: { user: Scout }) {
             <UserProfile
               user={{
                 ...user,
-                avatar: user.avatar ?? ''
+                avatar: user.avatar
               }}
             />
           )}

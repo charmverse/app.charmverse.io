@@ -35,39 +35,43 @@ export default async function Profile({
     redirect('/welcome');
   }
 
-  const seasonPoints = await prisma.userSeasonStats.findUnique({
-    where: {
-      userId_season: {
-        userId: user.id,
-        season: currentSeason
+  const [githubUser, seasonPoints, allTimePoints] = await Promise.all([
+    prisma.githubUser.findFirst({
+      where: {
+        builderId: user.id
+      },
+      select: {
+        login: true
       }
-    },
-    select: {
-      pointsEarnedAsBuilder: true,
-      pointsEarnedAsScout: true
-    }
-  });
-
-  const allTimePoints = await prisma.userAllTimeStats.findUnique({
-    where: {
-      userId: user.id
-    },
-    select: {
-      pointsEarnedAsBuilder: true,
-      pointsEarnedAsScout: true
-    }
-  });
+    }),
+    prisma.userSeasonStats.findUnique({
+      where: {
+        userId_season: {
+          userId: user.id,
+          season: currentSeason
+        }
+      },
+      select: {
+        pointsEarnedAsBuilder: true,
+        pointsEarnedAsScout: true
+      }
+    }),
+    prisma.userAllTimeStats.findUnique({
+      where: {
+        userId: user.id
+      },
+      select: {
+        pointsEarnedAsBuilder: true,
+        pointsEarnedAsScout: true
+      }
+    })
+  ]);
 
   return (
     <ProfilePage
       user={{
-        id: user.id,
-        displayName: user.displayName,
-        username: user.username,
-        avatar: user.avatar,
-        githubLogin: user.githubUser?.login,
-        currentBalance: user.currentBalance,
-        bio: user.bio,
+        ...user,
+        githubLogin: githubUser?.login,
         seasonPoints: {
           builderPoints: seasonPoints?.pointsEarnedAsBuilder,
           scoutPoints: seasonPoints?.pointsEarnedAsScout

@@ -11,7 +11,7 @@ import { BuilderCardStats } from './BuilderCardStats';
 
 const conversion = 1e18;
 
-function PriceButton({ price, username, onClick }: { price: number; username: string; onClick?: VoidFunction }) {
+function PriceButton({ price, username, onClick }: { price: bigint; username: string; onClick?: VoidFunction }) {
   return (
     <Button fullWidth onClick={onClick} variant='buy'>
       ${(Number(price) / conversion).toFixed(2)}
@@ -35,7 +35,7 @@ export function BuilderCard({
         <BuilderCardNftDisplay avatar={builder.avatar} username={builder.username}>
           {hideDetails ? null : <BuilderCardStats {...builder} />}
         </BuilderCardNftDisplay>
-        {typeof builder.price === 'number' && showPurchaseButton && (
+        {typeof builder.price !== 'undefined' && showPurchaseButton && (
           <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
             <PriceButton price={builder.price} username={builder.username} />
           </Stack>

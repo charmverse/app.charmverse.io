@@ -3,6 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/utils';
 import { isTruthy } from '@root/lib/utils/types';
 
+import type { BasicUserInfo } from './interfaces';
+
 export type BuilderActivityType = 'nft_purchase' | 'merged_pull_request';
 
 type NftPurchaseActivity = {
@@ -17,12 +19,9 @@ type MergedPullRequestActivity = {
   repo: string;
 };
 
-export type BuilderActivity = {
+export type BuilderActivity = BasicUserInfo & {
   id: string;
   createdAt: Date;
-  username: string;
-  avatar: string;
-  displayName: string;
 } & (NftPurchaseActivity | MergedPullRequestActivity);
 
 export async function getBuilderActivities({

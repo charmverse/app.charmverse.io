@@ -2,11 +2,9 @@ import { Paper, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
 import { Avatar } from 'components/common/Avatar';
+import type { BasicUserInfo } from 'lib/builders/interfaces';
 
-export type ScoutInfo = {
-  username: string;
-  avatar: string;
-  displayName: string;
+export type ScoutInfo = BasicUserInfo & {
   nfts: number;
 };
 

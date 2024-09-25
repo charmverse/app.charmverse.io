@@ -32,6 +32,7 @@ export async function getBuilderScouts(builderId: string) {
     const existingScout = scoutsRecord[event.scout.id];
     if (!existingScout) {
       scoutsRecord[event.scout.id] = {
+        id: event.scout.id,
         username: event.scout.username,
         avatar: event.scout.avatar,
         displayName: event.scout.displayName,

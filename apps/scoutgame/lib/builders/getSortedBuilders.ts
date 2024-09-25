@@ -67,7 +67,7 @@ export async function getSortedBuilders({
             username: scout.username,
             displayName: scout.username,
             builderPoints: scout.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
-            price: Number(scout.builderNfts?.[0]?.currentPrice ?? 0),
+            price: scout.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             gems: scout.userWeeklyStats[0]?.gemsCollected ?? 0
           }))
@@ -122,7 +122,7 @@ export async function getSortedBuilders({
             username: stat.user.username,
             displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
-            price: Number(stat.user.builderNfts?.[0]?.currentPrice ?? 0),
+            price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             gems: stat.gemsCollected
           }))
@@ -177,7 +177,7 @@ export async function getSortedBuilders({
             username: stat.user.username,
             displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
-            price: Number(stat.user.builderNfts?.[0]?.currentPrice ?? 0),
+            price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             gems: stat.gemsCollected
           }))

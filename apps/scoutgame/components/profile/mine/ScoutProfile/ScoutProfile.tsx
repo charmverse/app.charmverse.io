@@ -23,9 +23,8 @@ export async function ScoutProfile({ userId }: { userId: string }) {
   });
 
   const scoutedBuilders = await getScoutedBuilders({ scoutId: userId });
-
   const buildersScouted = scoutedBuilders.length;
-  const nftsPurchasedThisSeason = scoutedBuilders.reduce((acc, builder) => acc + (builder.nfts || 0), 0);
+  const nftsPurchasedThisSeason = scoutedBuilders.reduce((acc, builder) => acc + (builder.nftsSold || 0), 0);
 
   return (
     <Stack gap={1}>
