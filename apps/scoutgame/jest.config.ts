@@ -1,12 +1,14 @@
-import { pathsToModuleNameMapper } from 'ts-jest';
-
 import { compilerOptions } from './tsconfig.json';
 
 export default {
   transform: {
-    '^.+\\.(t|j)sx?$': '@swc/jest'
+    '^.+\\.(t|j)sx?$': [
+      '@swc/jest',
+      {
+        jsc: { baseUrl: '.', paths: compilerOptions.paths }
+      }
+    ]
   },
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
-  modulePathIgnorePatterns: ['__e2e__'],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' })
+  modulePathIgnorePatterns: ['__e2e__']
 };

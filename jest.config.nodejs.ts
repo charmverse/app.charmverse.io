@@ -1,5 +1,5 @@
+import type { Config } from '@jest/types';
 import nextJest from 'next/jest';
-import type { JestConfigWithTsJest } from 'ts-jest';
 
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
@@ -15,7 +15,7 @@ const createJestConfig = nextJest({
  * Configuration copied from
  * https://nextjs.org/docs/testing
  * */
-export const jestConfig: Omit<JestConfigWithTsJest, 'transform'> = {
+export const jestConfig: Omit<Config.InitialOptions, 'transform'> = {
   // Automatically clear mock calls, instances and results before every test
   clearMocks: true,
 
