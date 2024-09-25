@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
@@ -16,11 +17,8 @@ export const metadata: Metadata = {
 export default async function Profile() {
   const user = await getUserFromSession();
 
-  if (!user) {
-    redirect('/');
-  }
-
-  if (!user.onboardedAt) {
+  if (!user?.onboardedAt) {
+    log.info('Redirect user to welcome page', { userId: user?.id });
     redirect('/welcome');
   }
 

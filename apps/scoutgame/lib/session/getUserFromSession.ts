@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { Scout } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getSession } from '@connect-shared/lib/session/getSession';
@@ -7,10 +8,10 @@ export type SessionUser = Pick<Scout, 'id' | 'username' | 'displayName' | 'avata
 
 export async function getUserFromSession(): Promise<Scout | null> {
   const session = await getSession();
-  if (session?.user?.id) {
+  if (session?.scoutId) {
     const user = await prisma.scout.findFirst({
       where: {
-        id: session.user.id
+        id: session.scoutId
       }
     });
 

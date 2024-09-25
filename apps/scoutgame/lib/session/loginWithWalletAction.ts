@@ -16,7 +16,7 @@ export const loginAction = actionClient
     const { walletAddress } = await verifyWalletSignature(parsedInput);
     const user = await findOrCreateWalletUser({ wallet: walletAddress, newUserId });
 
-    await saveSession(ctx, { user });
+    await saveSession(ctx, { scoutId: user.id });
 
     return { success: true, userId: user.id };
   });
