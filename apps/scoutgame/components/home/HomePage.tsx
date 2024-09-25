@@ -21,7 +21,7 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
       <Suspense fallback={<LoadingBanner />}>
         <HeaderMessage />
       </Suspense>
-      <Box p={1}>
+      <Box p={1} data-test='home-page'>
         <Stack flexDirection='row' alignItems='center' justifyContent='center' px={2} py={3}>
           <Image src='/images/profile/icons/blue-fire-icon.svg' width='30' height='30' alt='title icon' />
           <Typography variant='h5' textAlign='center'>

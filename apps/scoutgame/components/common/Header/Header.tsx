@@ -110,7 +110,7 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | nu
                   </Menu>
                 </Box>
               ) : (
-                <Button variant='gradient' LinkComponent={Link} href='/login'>
+                <Button variant='gradient' LinkComponent={Link} href='/login' data-test='sign-in-button'>
                   Sign in
                 </Button>
               )}

@@ -29,9 +29,10 @@ function WarpcastLoginButton() {
     hasErrored,
     hasSucceeded: loginWithFarcasterSuccess
   } = useAction(loginAction, {
-    onSuccess: async () => {
+    onSuccess: async ({ data }) => {
+      const nextPage = data?.onboarded ? '/' : '/welcome';
       await revalidatePath();
-      router.push('/');
+      router.push(nextPage);
     },
     onError(err) {
       log.error('Error on login', { error: err.error.serverError });

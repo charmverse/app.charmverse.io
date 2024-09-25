@@ -111,7 +111,7 @@ export function ExtraDetailsForm() {
           <Box flexGrow={1}></Box>
         )}
         <Button
-          data-test='finish-onboarding'
+          data-test='submit-extra-details'
           size='medium'
           type='submit'
           disabled={isExecuting}

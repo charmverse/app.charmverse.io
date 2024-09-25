@@ -17,5 +17,5 @@ export const loginAction = actionClient
 
     await saveSession(ctx, { scoutId: user.id });
 
-    return { success: true, userId: user.id };
+    return { success: true, userId: user.id, onboarded: !!user.onboardedAt };
   });

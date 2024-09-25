@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     }
   });
 
-  const sealedSession = await sealData({ user: { id: user.id } }, getIronOptions());
+  const sealedSession = await sealData({ scoutId: user.id }, getIronOptions());
 
   const response = new Response();
 

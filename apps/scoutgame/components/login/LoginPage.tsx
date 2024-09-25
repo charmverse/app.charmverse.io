@@ -16,6 +16,7 @@ export function LoginPage() {
         borderRadius='0'
         textAlign='center'
         bgcolor='transparent'
+        data-test='login-page'
         sx={{
           display: 'flex',
           flexDirection: 'column',

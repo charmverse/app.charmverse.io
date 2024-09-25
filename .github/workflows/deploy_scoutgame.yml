@@ -153,8 +153,6 @@ jobs:
     name: Test Scoutgame e2e
     runs-on: ubuntu-latest
     needs: build
-    # re-enable for launch
-    if: false
     # if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
@@ -218,7 +216,7 @@ jobs:
                       --network "host"  \
                       --ipc=host \
                       mcr.microsoft.com/playwright:v1.47.1-jammy \
-                      npm run scoutgame:test:e2e:ci
+                      npm run scoutgame:e2e:ci
 
   upload-docker:
     name: Upload Docker image
