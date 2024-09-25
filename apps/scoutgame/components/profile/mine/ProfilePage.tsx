@@ -32,7 +32,6 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
         gap: 2,
         display: 'flex',
         flexDirection: 'column',
-        maxWidth: '1240px',
         margin: 'auto'
       }}
       data-test='profile-page'
@@ -63,9 +62,9 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
           }}
           elevation={0}
         >
-          <Box flex={1}>
+          <Stack justifyContent='center' flex={1}>
             <UserProfile user={user} />
-          </Box>
+          </Stack>
           <Box flex={1}>
             <ProfileStats
               seasonPoints={user.seasonPoints}

@@ -164,7 +164,7 @@ export function PublicBuilderProfileContainer({
               </Stack>
               <Stack gap={1}>
                 <Typography color='secondary'>Scouted By</Typography>
-                <ScoutsGallery scouts={scouts} />
+                {scouts.length > 0 ? <ScoutsGallery scouts={scouts} /> : <Typography>No scouts yet</Typography>}
               </Stack>
             </PaperContainer>
             <PaperContainer>

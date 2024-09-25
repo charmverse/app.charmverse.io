@@ -72,7 +72,7 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
       </Stack>
       <Stack gap={0.5}>
         <Typography color='secondary'>Scouted By</Typography>
-        <ScoutsGallery scouts={scouts} />
+        {scouts.length > 0 ? <ScoutsGallery scouts={scouts} /> : <Typography>No scouts yet</Typography>}
       </Stack>
     </Stack>
   );

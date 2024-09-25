@@ -38,7 +38,11 @@ export async function ScoutProfile({ userId }: { userId: string }) {
         <Typography variant='subtitle1' my={1} color='secondary' fontWeight='500'>
           Scouted Builders
         </Typography>
-        <BuildersGallery builders={scoutedBuilders} />
+        {scoutedBuilders.length > 0 ? (
+          <BuildersGallery builders={scoutedBuilders} />
+        ) : (
+          <Typography>No builders scouted yet</Typography>
+        )}
       </Stack>
     </Stack>
   );
