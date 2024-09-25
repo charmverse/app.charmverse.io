@@ -23,7 +23,7 @@ type RelatedEvent = Partial<
 
 type ActivityToRecord = {
   sourceEvent: RelatedEvent;
-  activity: Required<Pick<ScoutGameActivity, CommonActivityKeys>>;
+  activity: Omit<Required<Pick<ScoutGameActivity, CommonActivityKeys>>, 'type'>;
 };
 
 export async function recordGameActivity({ activity, sourceEvent }: ActivityToRecord) {
@@ -45,7 +45,7 @@ export async function recordGameActivity({ activity, sourceEvent }: ActivityToRe
     throw new InvalidInputError('onchainTxHash is required when onchainChainId is provided');
   }
 
-  if (activity.userId) {
+  if (!activity.userId) {
     throw new InvalidInputError('User id is required');
   }
 
@@ -77,7 +77,7 @@ export async function recordGameActivity({ activity, sourceEvent }: ActivityToRe
     userId: activity.userId,
     amount: activity.amount,
     pointsDirection: activity.pointsDirection,
-    type: activity.type,
+    type: parsedType,
     // Join
     ...sourceEvent
   };

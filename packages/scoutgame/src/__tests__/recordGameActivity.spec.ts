@@ -1,9 +1,17 @@
 // recordGameActivity.test.ts
 
+import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma, ScoutGameActivityType, PointsDirection } from '@charmverse/core/prisma-client';
 
 import { recordGameActivity } from '../recordGameActivity';
-import { mockBuilder, mockBuilderStrike, mockNFTPurchaseEvent, ensureGithubUserExists } from '../testing/database';
+import {
+  mockBuilder,
+  mockBuilderStrike,
+  mockNFTPurchaseEvent,
+  ensureGithubUserExists,
+  mockScout,
+  ensureMergedGithubPullRequestExists
+} from '../testing/database';
 import { randomLargeInt } from '../testing/generators';
 
 describe('recordGameActivity', () => {
@@ -29,17 +37,18 @@ describe('recordGameActivity', () => {
   });
 
   it('should throw an error if no source event is provided', async () => {
+    const mockUser = await mockScout();
+
     await expect(
       recordGameActivity({
         activity: {
-          userId: 'some-user-id',
+          userId: mockUser.id,
           amount: 10,
-          type: ScoutGameActivityType.strike,
           pointsDirection: PointsDirection.in
         },
         sourceEvent: {}
       })
-    ).rejects.toThrow('At least one source event must be provided');
+    ).rejects.toThrow(InvalidInputError);
   });
 
   it('should throw an error if more than one source event is provided without onchain event', async () => {
@@ -55,7 +64,6 @@ describe('recordGameActivity', () => {
         activity: {
           userId: builder.id,
           amount: 10,
-          type: ScoutGameActivityType.strike,
           pointsDirection: PointsDirection.in
         },
         sourceEvent: {
@@ -63,7 +71,7 @@ describe('recordGameActivity', () => {
           nftPurchaseEventId: nftPurchaseEvent.id
         }
       })
-    ).rejects.toThrow('Only one relation must be added');
+    ).rejects.toThrow(InvalidInputError);
   });
 
   it('should throw an error if onchainTxHash is provided without onchainChainId', async () => {
@@ -72,7 +80,6 @@ describe('recordGameActivity', () => {
         activity: {
           userId: 'some-user-id',
           amount: 10,
-          type: ScoutGameActivityType.mint,
           pointsDirection: PointsDirection.out
         },
         sourceEvent: {
@@ -83,19 +90,20 @@ describe('recordGameActivity', () => {
   });
 
   it('should throw an error if onchainChainId is provided without onchainTxHash', async () => {
+    const user = await mockBuilder();
+
     await expect(
       recordGameActivity({
         activity: {
-          userId: 'some-user-id',
+          userId: user.id,
           amount: 10,
-          type: ScoutGameActivityType.mint,
           pointsDirection: PointsDirection.out
         },
         sourceEvent: {
           onchainChainId: 1
         }
       })
-    ).rejects.toThrow('onchainTxHash is required when onchainChainId is provided');
+    ).rejects.toThrow(InvalidInputError);
   });
 
   it('should throw an error if userId is not provided', async () => {
@@ -104,7 +112,6 @@ describe('recordGameActivity', () => {
         activity: {
           userId: undefined as any,
           amount: 10,
-          type: ScoutGameActivityType.mint,
           pointsDirection: PointsDirection.out
         },
         sourceEvent: {
@@ -112,16 +119,16 @@ describe('recordGameActivity', () => {
           onchainChainId: 1
         }
       })
-    ).rejects.toThrow('User id is required');
+    ).rejects.toThrow(InvalidInputError);
   });
 
   it('should throw an error if pointsDirection is invalid', async () => {
+    const user = await mockBuilder();
     await expect(
       recordGameActivity({
         activity: {
-          userId: 'some-user-id',
+          userId: user.id,
           amount: 10,
-          type: ScoutGameActivityType.mint,
           pointsDirection: 'invalid' as PointsDirection
         },
         sourceEvent: {
@@ -129,15 +136,11 @@ describe('recordGameActivity', () => {
           onchainChainId: 1
         }
       })
-    ).rejects.toThrow('Invalid pointsDirection: invalid');
+    ).rejects.toThrow(InvalidInputError);
   });
 
   it('should create a new activity when given valid inputs and chain data correctly', async () => {
     const builder = await mockBuilder();
-
-    // Specify GitHub user ID for consistent data
-    const githubUserId = randomLargeInt();
-    await ensureGithubUserExists({ builderId: builder.id });
 
     // Create a builder strike with specific IDs
     const pullRequestNumber = 123;
@@ -150,7 +153,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 10,
-        type: ScoutGameActivityType.strike,
         pointsDirection: PointsDirection.in
       },
       sourceEvent: {
@@ -173,7 +175,7 @@ describe('recordGameActivity', () => {
       }
     });
 
-    expect(linkedStrike!.githubEvent!.createdBy).toBe(githubUserId);
+    expect(linkedStrike!.githubEvent!.createdBy).toBe(builder.githubUser.id);
     expect(linkedStrike!.githubEvent!.pullRequestNumber).toBe(pullRequestNumber);
   });
 
@@ -186,7 +188,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 10,
-        type: ScoutGameActivityType.strike,
         pointsDirection: PointsDirection.in
       },
       sourceEvent: {
@@ -199,7 +200,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 10,
-        type: ScoutGameActivityType.strike,
         pointsDirection: PointsDirection.in
       },
       sourceEvent: {
@@ -213,6 +213,12 @@ describe('recordGameActivity', () => {
   it('should correctly determine activity type from source event', async () => {
     const builder = await mockBuilder();
     const builderStrike = await mockBuilderStrike({ builderId: builder.id });
+
+    const prEvent = await ensureMergedGithubPullRequestExists({
+      builderId: builder.id,
+      githubUserId: builder.githubUser.id
+    });
+
     const nftPurchaseEvent = await mockNFTPurchaseEvent({
       builderId: builder.id,
       scoutId: builder.id
@@ -228,7 +234,7 @@ describe('recordGameActivity', () => {
     const pointsReceipt = await prisma.pointsReceipt.create({
       data: {
         value: 50,
-        eventId: 'some-event-id',
+        eventId: prEvent.id,
         recipientId: builder.id
       }
     });
@@ -238,7 +244,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 10,
-        type: ScoutGameActivityType.strike,
         pointsDirection: PointsDirection.in
       },
       sourceEvent: {
@@ -252,7 +257,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 20,
-        type: ScoutGameActivityType.builder_registered,
         pointsDirection: PointsDirection.out
       },
       sourceEvent: {
@@ -266,7 +270,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 30,
-        type: ScoutGameActivityType.gems,
         pointsDirection: PointsDirection.in
       },
       sourceEvent: {
@@ -280,7 +283,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 40,
-        type: ScoutGameActivityType.points,
         pointsDirection: PointsDirection.in
       },
       sourceEvent: {
@@ -294,7 +296,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 50,
-        type: ScoutGameActivityType.mint,
         pointsDirection: PointsDirection.out
       },
       sourceEvent: {
@@ -314,7 +315,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 10,
-        type: ScoutGameActivityType.strike,
         pointsDirection: PointsDirection.in
       },
       sourceEvent: {
@@ -330,7 +330,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 10,
-        type: ScoutGameActivityType.strike,
         pointsDirection: PointsDirection.in
       },
       sourceEvent: {
@@ -354,7 +353,6 @@ describe('recordGameActivity', () => {
       activity: {
         userId: builder.id,
         amount: 50,
-        type: ScoutGameActivityType.mint,
         pointsDirection: PointsDirection.out
       },
       sourceEvent: {

@@ -187,7 +187,7 @@ export async function mockNFTPurchaseEvent({
       builderNftId: builderNft.id,
       scoutId,
       pointsValue: points ?? 0,
-      txHash: `0x${Math.random().toString(16).split('0.')}`,
+      txHash: `0x${Math.random().toString(16).substring(2)}`,
       tokensPurchased: 1
     }
   });
