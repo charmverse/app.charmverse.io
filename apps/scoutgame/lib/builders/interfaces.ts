@@ -20,7 +20,7 @@ export type BuilderMetrics = {
   scoutedBy?: number;
   nftsSold?: number;
   gemsCollected?: number;
-  price?: bigint;
+  price?: bigint | number;
   builderPoints?: number;
   isBanned?: boolean;
 };

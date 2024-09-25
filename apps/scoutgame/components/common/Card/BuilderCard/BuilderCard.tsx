@@ -11,7 +11,15 @@ import { BuilderCardStats } from './BuilderCardStats';
 
 const conversion = 1e18;
 
-function PriceButton({ price, username, onClick }: { price: bigint; username: string; onClick?: VoidFunction }) {
+function PriceButton({
+  price,
+  username,
+  onClick
+}: {
+  price: bigint | number;
+  username: string;
+  onClick?: VoidFunction;
+}) {
   return (
     <Button fullWidth onClick={onClick} variant='buy'>
       ${(Number(price) / conversion).toFixed(2)}
@@ -21,9 +29,13 @@ function PriceButton({ price, username, onClick }: { price: bigint; username: st
 
 export function BuilderCard({
   builder,
+  user,
   showPurchaseButton = false,
   hideDetails = false
 }: {
+  user?: {
+    username: string;
+  } | null;
   builder: BuilderInfo;
   hideDetails?: boolean;
   showPurchaseButton?: boolean;
@@ -42,8 +54,7 @@ export function BuilderCard({
         )}
       </Card>
       {isPurchasing && typeof builder.price === 'number' && showPurchaseButton && (
-        // TODO: Pass current scout
-        <NFTPurchaseDialog onClose={() => setIsPurchasing(false)} builderId={builder.id} scout={builder.scoutedBy} />
+        <NFTPurchaseDialog onClose={() => setIsPurchasing(false)} builderId={builder.id} user={user} />
       )}
     </>
   );

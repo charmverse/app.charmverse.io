@@ -9,7 +9,15 @@ import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
 
 import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
 
-export async function PublicBuilderProfile({ builderId, tab }: { builderId: string; tab: string }) {
+export async function PublicBuilderProfile({
+  builderId,
+  tab,
+  user
+}: {
+  builderId: string;
+  tab: string;
+  user?: { username: string } | null;
+}) {
   const builder = await prisma.scout.findUniqueOrThrow({
     where: {
       id: builderId
@@ -68,6 +76,7 @@ export async function PublicBuilderProfile({ builderId, tab }: { builderId: stri
   return (
     <PublicBuilderProfileContainer
       tab={tab}
+      user={user}
       scouts={scouts}
       builder={{
         ...builder,

@@ -9,7 +9,7 @@ export async function PublicProfilePage({ userId, username, tab }: { userId: str
   return (
     <Box p={1} gap={2} display='flex' flexDirection='column' maxWidth='1240px' margin='auto'>
       {tab === 'build' ? (
-        <PublicBuilderProfile builderId={userId} tab={tab} />
+        <PublicBuilderProfile builderId={userId} tab={tab} user={{ username }} />
       ) : (
         <PublicScoutProfile scoutId={userId} tab={tab} />
       )}

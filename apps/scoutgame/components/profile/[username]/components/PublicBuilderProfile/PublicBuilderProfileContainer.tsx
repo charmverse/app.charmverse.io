@@ -8,7 +8,7 @@ import type { ScoutInfo } from 'components/common/Card/ScoutCard';
 import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
 import { UserProfile } from 'components/common/Profile/UserProfile';
 import { BuilderActivitiesList } from 'components/profile/components/BuilderActivitiesList';
-import { BuilderWeeklyStats } from 'components/profile/mine/BuilderProfile/BuilderWeeklyStats';
+import { BuilderWeeklyStats } from 'components/profile/mine/components/BuilderProfile/BuilderWeeklyStats';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 import type { BasicUserInfo } from 'lib/builders/interfaces';
@@ -32,6 +32,9 @@ export type BuilderProfileProps = {
   builderActivities: BuilderActivity[];
   gemsCollected?: number;
   rank: number;
+  user?: {
+    username: string;
+  } | null;
 };
 
 export function PublicBuilderProfileContainer({
@@ -45,7 +48,8 @@ export function PublicBuilderProfileContainer({
   totalNftsSold,
   builderActivities,
   gemsCollected,
-  rank
+  rank,
+  user
 }: BuilderProfileProps) {
   const isDesktop = useMdScreen();
 
@@ -80,6 +84,7 @@ export function PublicBuilderProfileContainer({
                 <Stack flexDirection='row' alignItems='center' gap={2}>
                   <Box width={{ xs: 145, md: 150 }}>
                     <BuilderCard
+                      user={user}
                       builder={{
                         id: builderId,
                         avatar: builder.avatar,
@@ -155,6 +160,7 @@ export function PublicBuilderProfileContainer({
                         }}
                         hideDetails
                         showPurchaseButton
+                        user={user}
                       />
                     </Box>
                     <PublicBuilderStats

@@ -15,7 +15,7 @@ const Carousel = dynamic<CarouselProps>(
   }
 );
 
-export async function TodaysHotBuildersCarousel() {
+export async function TodaysHotBuildersCarousel({ user }: { user?: { username: string } | null }) {
   const builders = await getTodaysHotBuilders({ limit: 10 });
 
   const price = await pricingGetter.getQuote('ETH', 'USD').catch(() => ({
@@ -32,6 +32,7 @@ export async function TodaysHotBuildersCarousel() {
           key={builder.id}
           builder={{ ...builder, price: Math.round((Number(builder.price) / 18) * price!.amount) }}
           showPurchaseButton
+          user={user}
         />
       ))}
     </Carousel>

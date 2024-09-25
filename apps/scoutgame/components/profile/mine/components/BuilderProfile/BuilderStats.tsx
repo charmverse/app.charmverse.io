@@ -14,12 +14,12 @@ export function BuilderStats({
   totalNftsSold,
   currentNftPrice
 }: {
-  avatar: string;
+  avatar?: string | null;
   username: string;
   builderPoints: number;
   totalScouts: number;
   totalNftsSold: number;
-  currentNftPrice: number;
+  currentNftPrice?: number | null | bigint;
 }) {
   const isDesktop = useMdScreen();
   return (
@@ -65,7 +65,7 @@ export function BuilderStats({
             CURRENT NFT PRICE
           </Typography>
           <Typography fontWeight={500} variant='h4' color='green.main' align='center'>
-            ${currentNftPrice}
+            ${currentNftPrice || 0}
           </Typography>
         </Stack>
       </Stack>
