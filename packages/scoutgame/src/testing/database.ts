@@ -1,8 +1,13 @@
-import type { GithubRepo } from '@charmverse/core/prisma';
+import type { GithubRepo, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid, v4 } from 'uuid';
 
 import { randomLargeInt } from './generators';
+
+type RepoAddress = {
+  repoOwner?: string;
+  repoName?: string;
+};
 
 export async function mockBuilder({
   bannedAt,
@@ -48,6 +53,100 @@ export async function mockScout({
       username,
       displayName,
       builder: false
+    }
+  });
+}
+
+export async function ensureGithubUserExists(
+  { login, builderId }: { login?: string; builderId?: string } = { login: `github:${randomLargeInt()}` }
+) {
+  const githubUser = await prisma.githubUser.findFirst({ where: { login } });
+
+  if (githubUser) {
+    return githubUser;
+  }
+
+  const id = randomLargeInt();
+
+  const name = `github_user:${id}`;
+  return prisma.githubUser.create({
+    data: {
+      login: name,
+      builderId,
+      displayName: name,
+      id
+    }
+  });
+}
+
+export async function ensureGithubRepoExists({
+  repoOwner = `acme-${randomLargeInt()}`,
+  repoName = `acme-repo-${randomLargeInt()}`,
+  id
+}: Partial<RepoAddress> & { id?: number }) {
+  const repo = await prisma.githubRepo.findFirst({
+    where: {
+      owner: repoOwner,
+      name: repoName
+    }
+  });
+
+  if (repo) {
+    return repo;
+  }
+
+  return prisma.githubRepo.create({
+    data: {
+      id: id ?? randomLargeInt(),
+      owner: repoOwner,
+      name: repoName,
+      defaultBranch: 'main'
+    }
+  });
+}
+
+export async function ensureMergedGithubPullRequestExists({
+  repoOwner,
+  repoName,
+  pullRequestNumber = randomLargeInt(),
+  githubUserId,
+  builderId
+}: {
+  pullRequestNumber?: number;
+  githubUserId: number;
+  builderId?: string;
+  id?: number;
+} & RepoAddress) {
+  builderId = builderId ?? (await mockScout().then((scout) => scout.id));
+
+  const builderGithubUser = await ensureGithubUserExists({ builderId });
+
+  // Ensure the repository exists
+  const repo = await ensureGithubRepoExists({ repoOwner, repoName });
+
+  const pullRequest = await prisma.githubEvent.findFirst({
+    where: {
+      repoId: repo.id,
+      pullRequestNumber,
+      githubUser: {
+        id: builderGithubUser.id
+      },
+      type: 'merged_pull_request'
+    }
+  });
+
+  if (pullRequest) {
+    return pullRequest;
+  }
+
+  return prisma.githubEvent.create({
+    data: {
+      repoId: repo.id,
+      pullRequestNumber,
+      title: `Mock Pull Request ${pullRequestNumber}`,
+      type: 'merged_pull_request',
+      createdBy: builderGithubUser.id,
+      url: ``
     }
   });
 }
@@ -111,6 +210,35 @@ export async function mockBuilderNft({
       currentPrice: 0,
       season: 0,
       tokenId: Math.round(Math.random() * 10000000)
+    }
+  });
+}
+
+export async function mockBuilderStrike({
+  builderId,
+  pullRequestNumber,
+  repoOwner = 'test_owner',
+  repoName = 'test_repo'
+}: {
+  builderId: string;
+  pullRequestNumber?: number;
+} & Partial<RepoAddress>) {
+  builderId = builderId ?? (await mockScout().then((scout) => scout.id));
+
+  const githubUser = await ensureGithubUserExists({ builderId });
+
+  const prNumber = await ensureMergedGithubPullRequestExists({
+    githubUserId: githubUser.id,
+    pullRequestNumber,
+    repoName,
+    repoOwner,
+    builderId
+  });
+
+  return prisma.builderStrike.create({
+    data: {
+      builderId,
+      githubEventId: prNumber.id
     }
   });
 }
