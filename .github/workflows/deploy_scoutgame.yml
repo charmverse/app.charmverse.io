@@ -204,7 +204,6 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         # we have to run docker command ourselves to set network=host so that playwright can access the server
         run: |
-          [[ "${{ runner.debug }}" = "1" ]] && tail -f server.log &
           docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
                       --workdir /github/workspace --rm  \
                       -e "REACT_APP_APP_ENV" -e CI=true \
@@ -216,7 +215,7 @@ jobs:
                       --network "host"  \
                       --ipc=host \
                       mcr.microsoft.com/playwright:v1.47.1-jammy \
-                      npm run scoutgame:e2e:ci
+                      npm run scoutgame:e2e:ci -- -- --workers=2 || echo "\nServer logs for debugging:\n" && tail -f server.log &
 
   upload-docker:
     name: Upload Docker image
