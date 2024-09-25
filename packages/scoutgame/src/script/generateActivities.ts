@@ -1,8 +1,11 @@
+import { log } from '@charmverse/core/log';
 import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
+import { prettyPrint } from '@root/lib/utils/strings';
 
 import { builderContractAddress, builderNftChain } from '../builderNfts/constants';
 import type { ActivityToRecord } from '../recordGameActivity';
 import { recordGameActivity } from '../recordGameActivity';
+import { createMockEvents, ensureGithubUserExists } from '../testing/database';
 
 function getRandomDateWithinLast30Days() {
   const now = new Date();
@@ -184,3 +187,60 @@ export async function generateActivities({ userId }: { userId: string }) {
     await recordGameActivity(event);
   }
 }
+
+const githubLogin = 'motechFR';
+
+async function script() {
+  const githubAccount = await ensureGithubUserExists({
+    login: githubLogin
+  });
+
+  let user = await prisma.scout.findFirst({
+    where: {
+      githubUser: {
+        some: {
+          login: githubLogin
+        }
+      }
+    }
+  });
+
+  if (!user) {
+    user = await prisma.scout.create({
+      data: {
+        displayName: githubAccount.login as string,
+        username: githubAccount.login as string,
+        builder: true,
+        githubUser: {
+          connect: {
+            id: githubAccount.id
+          }
+        }
+      }
+    });
+  }
+
+  const userId = user.id;
+
+  const current = await prisma.scoutGameActivity.count({
+    where: {
+      userId
+    }
+  });
+
+  prettyPrint({ user });
+
+  await createMockEvents({ userId, amount: 7 });
+
+  await generateActivities({ userId });
+
+  const newCount = await prisma.scoutGameActivity.count({
+    where: {
+      userId
+    }
+  });
+
+  log.info(`Created ${newCount - current}`);
+}
+
+script();

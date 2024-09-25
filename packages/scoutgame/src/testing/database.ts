@@ -1,5 +1,5 @@
 import type { BuilderEventType, GemsPayoutEvent, GithubRepo, Prisma, BuilderEvent } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
+import { GithubEventType, prisma } from '@charmverse/core/prisma-client';
 import { connect } from 'cookies';
 import { v4 as uuid, v4 } from 'uuid';
 
@@ -81,12 +81,20 @@ export async function ensureGithubUserExists(
     }
   });
 }
-export async function mockGemPayoutEvent({ builderId, amount = 10 }: { builderId: string; amount?: number }) {
+export async function mockGemPayoutEvent({
+  builderId,
+  amount = 10,
+  week = getCurrentWeek()
+}: {
+  builderId: string;
+  amount?: number;
+  week?: string;
+}) {
   return prisma.gemsPayoutEvent.create({
     data: {
       gems: amount,
       points: 0,
-      week: getCurrentWeek(),
+      week,
       builder: {
         connect: {
           id: builderId
@@ -197,7 +205,8 @@ export async function ensureMergedGithubPullRequestExists({
       type: 'merged_pull_request'
     },
     select: {
-      builderEvent: true
+      builderEvent: true,
+      repoId: true
     }
   });
 
@@ -205,20 +214,31 @@ export async function ensureMergedGithubPullRequestExists({
     return pullRequest.builderEvent as BuilderEvent;
   }
 
-  const githubEvent = await prisma.githubEvent.create({
-    data: {
-      repoId: repo.id,
-      pullRequestNumber,
-      title: `Mock Pull Request ${pullRequestNumber}`,
-      type: 'merged_pull_request',
-      createdBy: builderGithubUser.id,
-      url: ``
-    }
-  });
+  const githubEvent = await prisma.githubEvent
+    .findFirstOrThrow({
+      where: {
+        repoId: repo.id,
+        pullRequestNumber,
+        createdBy: githubUserId,
+        type: GithubEventType.merged_pull_request
+      }
+    })
+    .catch((err) => {
+      return prisma.githubEvent.create({
+        data: {
+          repoId: repo.id,
+          pullRequestNumber,
+          title: `Mock Pull Request ${pullRequestNumber}`,
+          type: 'merged_pull_request',
+          createdBy: builderGithubUser.id,
+          url: ``
+        }
+      });
+    });
 
   const builderEvent = await prisma.builderEvent.create({
     data: {
-      builderId: builderGithubUser.builderId as string,
+      builderId: builderId as string,
       season: currentSeason,
       type: 'merged_pull_request',
       githubEventId: githubEvent.id,
@@ -319,4 +339,48 @@ export async function mockBuilderStrike({
       githubEventId: githubBuilderEvent.githubEventId as string
     }
   });
+}
+
+interface MockEventParams {
+  userId: string;
+  amount?: number;
+}
+
+export async function createMockEvents({ userId, amount = 5 }: MockEventParams) {
+  const scout = await prisma.scout.findFirstOrThrow();
+  const week = new Date().getUTCDate();
+
+  for (let i = 0; i < amount; i++) {
+    // Frequent NFT Purchase events (occur in every loop)
+    await mockNFTPurchaseEvent({
+      builderId: userId,
+      scoutId: scout.id,
+      points: Math.floor(Math.random() * 100) + 1 // Random points between 1 and 100
+    });
+
+    // Rare Builder Strike events (10% chance of occurrence)
+    if (Math.random() < 0.1) {
+      await mockBuilderStrike({
+        builderId: userId,
+        pullRequestNumber: i + 1,
+        repoOwner: 'test_owner',
+        repoName: 'test_repo'
+      });
+    }
+
+    // Point Receipt events
+    await mockPointReceipt({
+      builderId: userId,
+      amount: Math.floor(Math.random() * 50) + 1, // Random points between 1 and 50
+      senderId: scout.id,
+      recipientId: undefined
+    });
+
+    // Gems Payout events
+    await mockGemPayoutEvent({
+      builderId: userId,
+      week: `W-${week}-${i}`,
+      amount: Math.floor(Math.random() * 10) + 1 // Random points between 1 and 10
+    });
+  }
 }
