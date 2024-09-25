@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 import { useMdScreen } from 'hooks/useMediaScreens';
 
-import type { UserProfileWithPoints } from './ProfilePage/ProfilePage';
+import type { UserProfileWithPoints } from './components/ProfilePage';
 
 export function ProfilePointsCard({
   seasonPoints,

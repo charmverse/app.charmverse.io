@@ -26,9 +26,9 @@ export async function GET(request: Request) {
     }
   });
 
-  const sealedSession = await sealData({ user: { id: user.id } }, getIronOptions());
+  const sealedSession = await sealData({ scoutId: user.id }, getIronOptions());
 
-  const response = new Response();
+  const response = new Response(JSON.stringify({ user }));
 
   response.headers.set('Set-Cookie', `${cookieName}=${sealedSession}; HttpOnly; Secure; SameSite=Strict; Path=/`);
 

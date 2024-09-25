@@ -13,7 +13,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 import type { BasicUserInfo } from 'lib/builders/interfaces';
 
-import { PublicProfileTabsMenu } from '../PublicProfileTabsMenu';
+import { PublicProfileTabsMenu } from '../../PublicProfileTabsMenu';
 
 import { PublicBuilderStats } from './PublicBuilderStats';
 
@@ -30,7 +30,7 @@ export type BuilderProfileProps = {
   scouts: ScoutInfo[];
   totalNftsSold: number;
   builderActivities: BuilderActivity[];
-  gemsCollected: number;
+  gemsCollected?: number;
   rank: number;
 };
 
@@ -53,7 +53,13 @@ export function PublicBuilderProfileContainer({
     <>
       {!isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
       {builder.isBuilder ? (
-        <Stack gap={2}>
+        <Stack
+          gap={2}
+          mt={{
+            xs: 0,
+            md: 4
+          }}
+        >
           <Paper sx={{ py: 2, pr: { xs: 1, md: 2 } }}>
             <Stack flexDirection='row'>
               <BackButton />

@@ -8,12 +8,11 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
+import { BuilderActivitiesList } from 'components/profile/components/BuilderActivitiesList';
 import { JoinGithubButton } from 'components/welcome/components/github/JoinGithubButton';
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
-
-import { BuilderActivitiesList } from '../../components/BuilderActivitiesList';
 
 import { BuilderStats } from './BuilderStats';
 import { BuilderWeeklyStats } from './BuilderWeeklyStats';

@@ -8,7 +8,7 @@ import { UserProfile } from 'components/common/Profile/UserProfile';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BasicUserInfo, BuilderInfo } from 'lib/builders/interfaces';
 
-import { PublicProfileTabsMenu } from '../PublicProfileTabsMenu';
+import { PublicProfileTabsMenu } from '../../PublicProfileTabsMenu';
 
 import { PublicScoutProfileStats } from './PublicScoutProfileStats';
 
