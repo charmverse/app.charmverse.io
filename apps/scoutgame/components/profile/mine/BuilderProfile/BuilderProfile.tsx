@@ -3,9 +3,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { Stack, Typography } from '@mui/material';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
+import Image from 'next/image';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { ScoutsGallery } from 'components/scout/ScoutsGallery';
+import { JoinGithubButton } from 'components/welcome/components/github/JoinGithubButton';
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
@@ -23,6 +26,7 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
       id: builderId
     },
     select: {
+      builder: true,
       username: true,
       avatar: true,
       userSeasonStats: {
@@ -52,10 +56,33 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
     }
   });
 
-  const builderActivities = await getBuilderActivities({ builderId, take: 5 });
-  const builderWeeklyStats = await getBuilderWeeklyStats(builderId);
+  const builderActivities = builder.builder ? await getBuilderActivities({ builderId, take: 5 }) : [];
+  const builderWeeklyStats = builder.builder
+    ? await getBuilderWeeklyStats(builderId)
+    : {
+        gemsCollected: 0,
+        rank: 0
+      };
 
-  const { totalScouts, totalNftsSold, scouts } = await getBuilderScouts(builderId);
+  const { totalScouts, totalNftsSold, scouts } = builder.builder
+    ? await getBuilderScouts(builderId)
+    : {
+        totalScouts: 0,
+        totalNftsSold: 0,
+        scouts: []
+      };
+
+  if (!builder.builder) {
+    return (
+      <Stack gap={2} alignItems='center'>
+        <Typography>Connect to GitHub to sign up and verify your code contributions.</Typography>
+        <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
+        <Suspense>
+          <JoinGithubButton />
+        </Suspense>
+      </Stack>
+    );
+  }
 
   return (
     <Stack gap={3}>

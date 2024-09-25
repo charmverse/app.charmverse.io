@@ -1,3 +1,5 @@
+'use client';
+
 import type { UserProfileInfo } from 'components/common/Profile/UserProfile';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
@@ -24,5 +26,7 @@ export type ProfilePageProps = {
 };
 
 export async function ProfilePage({ user, tab }: ProfilePageProps) {
-  return <DesktopProfilePage user={user} tab={tab} />;
+  const isDesktop = useMdScreen();
+
+  return isDesktop ? <DesktopProfilePage user={user} tab={tab} /> : <MobileProfilePage user={user} tab={tab} />;
 }
