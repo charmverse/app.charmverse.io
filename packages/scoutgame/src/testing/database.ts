@@ -347,14 +347,18 @@ interface MockEventParams {
 }
 
 export async function createMockEvents({ userId, amount = 5 }: MockEventParams) {
-  const scout = await prisma.scout.findFirstOrThrow();
+  const scout = await prisma.scout.findFirstOrThrow({
+    where: {
+      id: userId
+    }
+  });
   const week = new Date().getUTCDate();
 
   for (let i = 0; i < amount; i++) {
     // Frequent NFT Purchase events (occur in every loop)
     await mockNFTPurchaseEvent({
       builderId: userId,
-      scoutId: scout.id,
+      scoutId: userId,
       points: Math.floor(Math.random() * 100) + 1 // Random points between 1 and 100
     });
 
