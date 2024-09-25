@@ -1,3 +1,5 @@
+'use server';
+
 import { prisma } from '@charmverse/core/prisma-client';
 import { Stack, Typography } from '@mui/material';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';

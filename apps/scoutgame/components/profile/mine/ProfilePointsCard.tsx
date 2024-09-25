@@ -4,7 +4,9 @@ import { Paper, Stack, Tab, Tabs, Typography, tabClasses, tabsClasses } from '@m
 import Image from 'next/image';
 import { useState } from 'react';
 
-import type { UserProfileWithPoints } from './ProfilePage';
+import { useMdScreen } from 'hooks/useMediaScreens';
+
+import type { UserProfileWithPoints } from './ProfilePage/ProfilePage';
 
 export function ProfilePointsCard({
   seasonPoints,
@@ -16,6 +18,7 @@ export function ProfilePointsCard({
   points: number;
 }) {
   const [selectedDuration, setSelectedDuration] = useState<'season' | 'allTime'>('season');
+  const isDesktop = useMdScreen();
 
   return (
     <Paper
@@ -34,7 +37,7 @@ export function ProfilePointsCard({
           BALANCE
         </Typography>
         <Stack flexDirection='row' gap={1} alignItems='center'>
-          <Typography variant='h3' fontWeight={400}>
+          <Typography variant={isDesktop ? 'h3' : 'h4'} fontWeight={400}>
             {points}
           </Typography>
           <Image src='/images/profile/scout-game-icon.svg' width='40' height='40' alt='scout game icon' />

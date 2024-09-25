@@ -1,5 +1,6 @@
-import { Paper, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+'use server';
+
+import { Paper, Typography, Stack } from '@mui/material';
 import Image from 'next/image';
 
 import { getClaimablePoints } from 'lib/points/getClaimablePoints';
@@ -7,7 +8,7 @@ import { getClaimablePoints } from 'lib/points/getClaimablePoints';
 import { PointsClaimButton } from './PointsClaimButton';
 import { QualifiedActionsTable } from './QualifiedActionsTable';
 
-export async function PointsClaimScreen({ userId, username }: { userId: string; username: string }) {
+export async function MobilePointsClaimScreen({ userId, username }: { userId: string; username: string }) {
   const { totalClaimablePoints, weeklyRewards } = await getClaimablePoints(userId);
 
   if (!totalClaimablePoints) {

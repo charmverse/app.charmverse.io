@@ -1,6 +1,7 @@
+'use server';
+
 import { prisma } from '@charmverse/core/prisma-client';
-import { Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Typography, Stack } from '@mui/material';
 import { currentSeason } from '@packages/scoutgame/utils';
 
 import { BuildersGallery } from 'components/builder/BuildersGallery';

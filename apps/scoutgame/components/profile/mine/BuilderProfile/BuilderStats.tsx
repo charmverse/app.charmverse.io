@@ -1,7 +1,10 @@
+'use client';
+
 import { Paper, Typography, Box, Stack } from '@mui/material';
 import Image from 'next/image';
 
 import { BuilderCardNftDisplay } from 'components/builder/Card/BuilderCardNftDisplay';
+import { useMdScreen } from 'hooks/useMediaScreens';
 
 export function BuilderStats({
   avatar,
@@ -18,6 +21,7 @@ export function BuilderStats({
   totalNftsSold: number;
   currentNftPrice: number;
 }) {
+  const isDesktop = useMdScreen();
   return (
     <Paper
       sx={{
@@ -29,7 +33,7 @@ export function BuilderStats({
         justifyContent: 'center'
       }}
     >
-      <Box width={150}>
+      <Box width={isDesktop ? 200 : 150}>
         <BuilderCardNftDisplay nftAvatar={avatar || ''} username={username} />
       </Box>
       <Stack justifyContent='space-between' gap={2}>
