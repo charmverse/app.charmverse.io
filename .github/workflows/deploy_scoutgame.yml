@@ -215,7 +215,7 @@ jobs:
                       --network "host"  \
                       --ipc=host \
                       mcr.microsoft.com/playwright:v1.47.1-jammy \
-                      npm run scoutgame:e2e:ci -- -- --workers=2 || echo "\nServer logs for debugging:\n" && tail -f server.log &
+                      npm run scoutgame:e2e:ci -- -- --workers=2 || { echo "\nServer logs for debugging:\n" && tail -f server.log & exit 1; }
 
   upload-docker:
     name: Upload Docker image
