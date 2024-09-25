@@ -1,12 +1,33 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 import { TabsMenu } from 'components/common/Tabs/TabsMenu';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
-import type { ProfileTab } from './ProfilePage';
+import type { ProfileTab } from '../ProfilePage';
+
+const desktopTabs = ['scout-build', 'win'];
+const mobileTabs = ['scout', 'build', 'win'];
 
 export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
   const isDesktop = useMdScreen();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isDesktop) {
+      const isValidTab = desktopTabs.includes(tab);
+      if (!isValidTab) {
+        router.push('/profile?tab=scout-build');
+      }
+    } else {
+      const isValidTab = mobileTabs.includes(tab);
+      if (!isValidTab) {
+        router.push('/profile?tab=scout');
+      }
+    }
+  }, [tab, isDesktop]);
 
   if (isDesktop) {
     return (

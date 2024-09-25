@@ -2,29 +2,22 @@ import { Box, Paper, Stack, Typography } from '@mui/material';
 import { Suspense } from 'react';
 
 import { UserProfile } from 'components/common/Profile/UserProfile';
+import type { UserStats } from 'lib/users/getUserStats';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 
-import { ProfilePointsCard } from '../ProfilePointsCard';
-
-import { BuilderProfile } from './BuilderProfile/BuilderProfile';
-import { PointsClaimScreen } from './PointsClaimScreen/PointsClaimScreen';
-import { ProfileTabsMenu } from './ProfileTabsMenu';
-import { ScoutProfile } from './ScoutProfile/ScoutProfile';
-import { ScoutProfileLoading } from './ScoutProfile/ScoutProfileLoading';
+import { BuilderProfile } from './components/BuilderProfile/BuilderProfile';
+import { PointsClaimScreen } from './components/PointsClaimScreen/PointsClaimScreen';
+import { ProfileStats } from './components/ProfileStats';
+import { ProfileTabsMenu } from './components/ProfileTabsMenu';
+import { ScoutProfile } from './components/ScoutProfile/ScoutProfile';
+import { ScoutProfileLoading } from './components/ScoutProfile/ScoutProfileLoading';
 
 export type ProfileTab = 'build' | 'scout' | 'win' | 'scout-build';
 
-export type UserProfileWithPoints = BasicUserInfo & {
-  seasonPoints: {
-    builderPoints?: number;
-    scoutPoints?: number;
+export type UserProfileWithPoints = BasicUserInfo &
+  UserStats & {
+    currentBalance: number;
   };
-  allTimePoints: {
-    builderPoints?: number;
-    scoutPoints?: number;
-  };
-  currentBalance: number;
-};
 
 export type ProfilePageProps = {
   user: UserProfileWithPoints;
@@ -74,7 +67,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
             <UserProfile user={user} />
           </Box>
           <Box flex={1}>
-            <ProfilePointsCard
+            <ProfileStats
               seasonPoints={user.seasonPoints}
               allTimePoints={user.allTimePoints}
               points={user.currentBalance}
