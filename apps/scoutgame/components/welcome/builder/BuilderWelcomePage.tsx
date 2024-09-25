@@ -5,9 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
+import { JoinGithubButton } from 'components/common/JoinGithubButton';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 
-import { JoinGithubButton } from './components/JoinGithubButton';
 import { SkipBuilderStepButton } from './components/SkipBuilderStepButton';
 
 export function BuilderPage() {
