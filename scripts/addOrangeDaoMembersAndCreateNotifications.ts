@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import _ from 'lodash';
+import { sampleSize } from 'lodash-es';
 import * as emails from 'lib/mailer/emails';
 import * as mailer from 'lib/mailer';
 import { v4 } from 'uuid';
@@ -123,7 +123,7 @@ export async function addOrangeDaoMembersAndCreateNotifications({
   Object.values(spaceUsersRecord).forEach((spaceUsers) => {
     const spaceProportion = spaceUsers.length / totalMembers;
     const spaceSampleSize = Math.round(sample * spaceProportion);
-    const spaceSampledUsers = _.sampleSize(
+    const spaceSampledUsers = sampleSize(
       spaceUsers.filter((spaceUser) => !sampledUsers[spaceUser.userId]),
       spaceSampleSize
     );
