@@ -1,17 +1,10 @@
 export type BasicUserInfo = {
   id: string;
   username: string;
-  avatar: string | null;
+  avatar?: string | null;
   displayName: string;
-};
-
-export type BuilderInfo = {
-  builderPoints?: number;
-  price?: number;
-  gems?: number;
-  nfts?: number;
-  isBanned?: boolean;
-  scoutedBy?: number;
+  bio?: string | null;
+  githubLogin?: string;
 };
 
 export type PointMetrics = {
@@ -26,8 +19,10 @@ export type PointMetrics = {
 export type BuilderMetrics = {
   scoutedBy: number;
   nftsSold: number;
-  gems: number;
+  gemsCollected: number;
   price: number;
+  builderPoints: number;
+  isBanned?: boolean;
 };
 
-export type BuilderUserInfo = BasicUserInfo & BuilderMetrics;
+export type BuilderInfo = BasicUserInfo & BuilderMetrics;

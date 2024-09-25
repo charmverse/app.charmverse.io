@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/utils';
 import { isTruthy } from '@root/lib/utils/types';
 
-import type { ScoutInfo } from 'components/scout/ScoutCard';
+import type { ScoutInfo } from 'components/common/Card/ScoutCard';
 
 export async function getBuilderScouts(builderId: string) {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
@@ -33,7 +33,7 @@ export async function getBuilderScouts(builderId: string) {
     if (!existingScout) {
       scoutsRecord[event.scout.id] = {
         username: event.scout.username,
-        avatar: event.scout.avatar || '',
+        avatar: event.scout.avatar,
         displayName: event.scout.displayName,
         nfts: 0
       };

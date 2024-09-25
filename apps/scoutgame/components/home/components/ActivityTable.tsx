@@ -7,13 +7,13 @@ import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import { getRelativeTime } from '@packages/scoutgame/utils';
+import { getRelativeTime } from '@packages/utils/dates';
 
 import {
   BuilderActivityDetail,
   BuilderActivityGems,
   BuilderActivityLabel
-} from 'components/builder/BuilderActivitiesList';
+} from 'components/profile/components/BuilderActivitiesList';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
 import { Avatar } from '../../common/Avatar';

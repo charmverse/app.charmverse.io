@@ -1,7 +1,7 @@
 import { Box, Grid2 as Grid } from '@mui/material';
 
-import type { ScoutInfo } from './ScoutCard';
-import { ScoutCard } from './ScoutCard';
+import type { ScoutInfo } from '../Card/ScoutCard';
+import { ScoutCard } from '../Card/ScoutCard';
 
 export function ScoutsGallery({ scouts }: { scouts: ScoutInfo[] }) {
   return (

@@ -65,13 +65,13 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
   return builders.map((builder) => {
     return {
       id: builder.id,
-      nftAvatar: builder.avatar || '',
+      avatar: builder.avatar,
       username: builder.username,
       displayName: builder.displayName,
       builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder ?? 0,
       gems: builder.userWeeklyStats[0]?.gemsCollected ?? 0,
       isBanned: !!builder.bannedAt,
-      nfts: builderNftsPurchasedRecord[builder.id] ?? 0
+      nftsSold: builderNftsPurchasedRecord[builder.id] ?? 0
     };
   });
 }

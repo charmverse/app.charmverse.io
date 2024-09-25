@@ -1,4 +1,4 @@
-import { BuilderSearchPage } from 'components/scout/BuilderSearchPage';
+import { ScoutPage } from 'components/scout/ScoutPage';
 
 export default async function Scout({
   searchParams
@@ -7,5 +7,5 @@ export default async function Scout({
 }) {
   const sort = searchParams.sort as string;
 
-  return <BuilderSearchPage sort={sort || 'top'} />;
+  return <ScoutPage sort={sort || 'top'} />;
 }

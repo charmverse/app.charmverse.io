@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import type { CarouselProps } from 'components/common/Carousel/Carousel';
 import { getTodaysHotBuilders } from 'lib/builders/getTodaysHotBuilders';
 
-import { BuilderCard } from '../Card/BuilderCard';
+import { BuilderCard } from '../../common/Card/BuilderCard/BuilderCard';
 
 const Carousel = dynamic<CarouselProps>(
   () => import('components/common/Carousel/Carousel').then((mod) => mod.Carousel),
@@ -30,7 +30,7 @@ export async function TodaysHotBuildersCarousel() {
       {builders.map((builder) => (
         <BuilderCard
           key={builder.id}
-          builder={{ ...builder, price: Math.round((Number(a.price) / 18) * price!.amount) }}
+          builder={{ ...builder, price: Math.round((Number(builder.price) / 18) * price!.amount) }}
           showPurchaseButton
         />
       ))}

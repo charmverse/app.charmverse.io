@@ -32,15 +32,8 @@ export function BuilderCard({
   return (
     <>
       <Card sx={{ border: 'none' }}>
-        <BuilderCardNftDisplay nftAvatar={builder.nftAvatar} username={builder.username}>
-          {hideDetails ? null : (
-            <BuilderCardStats
-              gemsCollected={builder.gems}
-              builderPoints={builder.builderPoints}
-              scoutedBy={builder.scoutedBy}
-              nfts={builder.nfts}
-            />
-          )}
+        <BuilderCardNftDisplay avatar={builder.avatar} username={builder.username}>
+          {hideDetails ? null : <BuilderCardStats {...builder} />}
         </BuilderCardNftDisplay>
         {typeof builder.price === 'number' && showPurchaseButton && (
           <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>

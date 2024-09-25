@@ -5,9 +5,9 @@ import { Box, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
-import { TodaysHotBuildersCarousel } from 'components/builder/Carousel/TodaysHotBuildersCarousel';
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { HomeTabsMenu } from 'components/home/components/HomeTabsMenu';
+import { TodaysHotBuildersCarousel } from 'components/home/components/TodaysHotBuildersCarousel';
 import { LoadingBanner } from 'components/layout/Loading/LoadingBanner';
 
 import { HomeTab } from './components/HomeTab';

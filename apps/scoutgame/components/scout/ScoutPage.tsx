@@ -2,13 +2,14 @@ import 'server-only';
 
 import { Box } from '@mui/material';
 
-import { BuildersGallery } from 'components/builder/BuildersGallery';
-import { getSortedBuilders, type BuildersSort } from 'lib/builders/getSortedBuilders';
+import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
+import type { BuildersSort } from 'lib/builders/getSortedBuilders';
+import { getSortedBuilders } from 'lib/builders/getSortedBuilders';
 
 import { SearchBuildersInput } from './components/SearchBuildersInput';
 import { SortOptionTabs, sortOptions } from './components/SortOptionTabs';
 
-export async function BuilderSearchPage({ sort }: { sort: string }) {
+export async function ScoutPage({ sort }: { sort: string }) {
   const currentSort = sortOptions.some((t) => t.value === sort) ? sort : 'top';
   const builders = await getSortedBuilders({ sort: currentSort as BuildersSort, limit: 10 });
   return (

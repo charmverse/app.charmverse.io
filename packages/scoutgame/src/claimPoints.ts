@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/utils';
+
+import { currentSeason } from './utils';
 
 export async function claimPoints(userId: string) {
   const pointsReceipts = await prisma.pointsReceipt.findMany({
@@ -54,7 +55,7 @@ export async function claimPoints(userId: string) {
         claimedAt: new Date()
       }
     });
-    await prisma.scout.update({
+    await tx.scout.update({
       where: {
         id: userId
       },
@@ -64,7 +65,7 @@ export async function claimPoints(userId: string) {
         }
       }
     });
-    await prisma.userSeasonStats.upsert({
+    await tx.userSeasonStats.upsert({
       where: {
         userId_season: {
           userId,
@@ -90,7 +91,7 @@ export async function claimPoints(userId: string) {
         }
       }
     });
-    await prisma.userAllTimeStats.upsert({
+    await tx.userAllTimeStats.upsert({
       where: {
         userId
       },

@@ -2,7 +2,7 @@ import { Box, Grid2 as Grid } from '@mui/material';
 
 import type { BuilderInfo } from 'lib/builders/interfaces';
 
-import { BuilderCard } from './Card/BuilderCard';
+import { BuilderCard } from '../Card/BuilderCard/BuilderCard';
 
 export function BuildersGallery({ builders }: { builders: BuilderInfo[] }) {
   return (

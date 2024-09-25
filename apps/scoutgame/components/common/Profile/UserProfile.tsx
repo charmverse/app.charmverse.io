@@ -1,20 +1,13 @@
 import { IconButton, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
+import type { BasicUserInfo } from 'lib/builders/interfaces';
+
 import type { AvatarSize } from '../Avatar';
 import { Avatar } from '../Avatar';
 
-export type UserProfileInfo = {
-  id: string;
-  displayName: string;
-  username: string;
-  bio?: string | null;
-  avatar?: string;
-  githubLogin?: string;
-};
-
 type UserProfileProps = {
-  user: UserProfileInfo;
+  user: BasicUserInfo;
   avatarSize?: AvatarSize;
 };
 

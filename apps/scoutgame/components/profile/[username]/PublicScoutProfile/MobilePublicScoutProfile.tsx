@@ -1,7 +1,7 @@
 import { Box, Paper, Stack, Typography } from '@mui/material';
 
-import { BuildersGallery } from 'components/builder/BuildersGallery';
 import { BackButton } from 'components/common/Button/BackButton';
+import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import { UserProfile } from 'components/common/Profile/UserProfile';
 
 import { PublicProfileTabsMenu } from '../PublicProfileTabsMenu';
@@ -30,7 +30,7 @@ export function MobilePublicScoutProfile({
                 id: scout.id,
                 displayName: scout.displayName,
                 username: scout.username,
-                avatar: scout.avatar || '',
+                avatar: scout.avatar,
                 bio: scout.bio,
                 githubLogin: scout.githubLogin
               }}

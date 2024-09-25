@@ -2,11 +2,11 @@ import { CardActionArea, CardMedia, CardContent, Typography, Box } from '@mui/ma
 import Link from 'next/link';
 
 export function BuilderCardNftDisplay({
-  nftAvatar,
+  avatar,
   username,
   children
 }: {
-  nftAvatar: string;
+  avatar?: string | null;
   username: string;
   children?: React.ReactNode;
 }) {
@@ -23,7 +23,8 @@ export function BuilderCardNftDisplay({
         }}
       >
         <Box position='relative'>
-          <CardMedia component='img' sx={{ aspectRatio: '1 / 1' }} image={nftAvatar} alt={username} />
+          {/** TODO: Add a fallback avatar image */}
+          <CardMedia component='img' sx={{ aspectRatio: '1 / 1' }} image={avatar ?? ''} alt={username} />
           <CardMedia
             component='img'
             width='30px'

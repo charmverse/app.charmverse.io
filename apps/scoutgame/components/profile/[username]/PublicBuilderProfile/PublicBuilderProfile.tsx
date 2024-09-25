@@ -15,6 +15,7 @@ export async function PublicBuilderProfile({ builderId, tab }: { builderId: stri
       id: builderId
     },
     select: {
+      id: true,
       avatar: true,
       username: true,
       displayName: true,
@@ -69,12 +70,9 @@ export async function PublicBuilderProfile({ builderId, tab }: { builderId: stri
       tab={tab}
       scouts={scouts}
       builder={{
-        avatar: builder.avatar || '',
-        username: builder.username,
-        displayName: builder.displayName,
-        price: Number(builder.builderNfts[0]?.currentPrice || 0),
+        ...builder,
+        price: builder.builderNfts[0]?.currentPrice,
         githubLogin: builder.githubUser[0]?.login || '',
-        bio: builder.bio || '',
         isBuilder: builder.builder
       }}
       builderId={builderId}

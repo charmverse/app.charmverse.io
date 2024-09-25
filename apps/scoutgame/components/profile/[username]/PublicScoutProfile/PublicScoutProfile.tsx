@@ -40,7 +40,7 @@ export async function PublicScoutProfile({ scoutId, tab }: { scoutId: string; ta
         id: scout.id,
         displayName: scout.displayName,
         username: scout.username,
-        avatar: scout.avatar || '',
+        avatar: scout.avatar,
         bio: scout.bio,
         githubLogin: scout.githubUser[0]?.login
       }}

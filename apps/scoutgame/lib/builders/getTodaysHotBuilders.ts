@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/utils';
 
 import type { BuilderInfo } from './interfaces';
 import { weeklyQualifiedBuilderWhere } from './queries';
@@ -12,6 +12,7 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
     },
     take: limit,
     select: {
+      gemsCollected: true,
       user: {
         select: {
           id: true,
@@ -19,14 +20,6 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
           avatar: true,
           username: true,
           displayName: true,
-          userWeeklyStats: {
-            select: {
-              gemsCollected: true
-            },
-            where: {
-              week: getCurrentWeek()
-            }
-          },
           userSeasonStats: {
             where: {
               season: currentSeason
@@ -65,12 +58,11 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       id: user.id,
       username: user.username,
       displayName: user.displayName,
-      builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
-      price: Number(user.builderNfts[0]?.currentPrice || 0),
-      nfts: user.nftPurchaseEvents.length,
-      gems: user.userWeeklyStats[0]?.gemsCollected || 0,
-      // TODO: get nft avatar which is guaranteed to exist
-      nftAvatar: user.avatar || '',
+      builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder,
+      price: user.builderNfts[0]?.currentPrice,
+      nftsSold: user.nftPurchaseEvents.length,
+      gems: builder.gemsCollected,
+      avatar: user.avatar,
       scoutedBy: user.nftPurchaseEvents.length,
       isBanned: !!user.bannedAt
     };

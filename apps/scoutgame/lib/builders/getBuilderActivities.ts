@@ -101,7 +101,7 @@ export async function getBuilderActivities({
           type: 'nft_purchase' as const,
           scout: event.nftPurchaseEvent.scout.username,
           username: event.builder.username,
-          avatar: event.builder.avatar || '',
+          avatar: event.builder.avatar,
           displayName: event.builder.displayName
         };
       } else if (event.type === 'merged_pull_request' && event.githubEvent && event.gemsReceipt) {
@@ -113,7 +113,7 @@ export async function getBuilderActivities({
           gems: event.gemsReceipt.value,
           repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`,
           username: event.builder.username,
-          avatar: event.builder.avatar || '',
+          avatar: event.builder.avatar,
           displayName: event.builder.displayName
         };
       } else {

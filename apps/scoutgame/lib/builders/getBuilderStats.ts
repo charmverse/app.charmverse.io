@@ -24,7 +24,7 @@ export async function getBuilderStats(builderId: string) {
   });
 
   return {
-    seasonPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
-    allTimePoints: builder.userAllTimeStats[0]?.pointsEarnedAsBuilder || 0
+    seasonPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder,
+    allTimePoints: builder.userAllTimeStats[0]?.pointsEarnedAsBuilder
   };
 }

@@ -1,11 +1,11 @@
 import { Box, Paper, Stack, Typography } from '@mui/material';
 
-import { BuilderActivitiesList } from 'components/builder/BuilderActivitiesList';
-import { BuilderCard } from 'components/builder/Card/BuilderCard';
 import { BackButton } from 'components/common/Button/BackButton';
+import { BuilderCard } from 'components/common/Card/BuilderCard/BuilderCard';
+import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
 import { UserProfile } from 'components/common/Profile/UserProfile';
+import { BuilderActivitiesList } from 'components/profile/components/BuilderActivitiesList';
 import { BuilderWeeklyStats } from 'components/profile/mine/BuilderProfile/BuilderWeeklyStats';
-import { ScoutsGallery } from 'components/scout/ScoutsGallery';
 
 import { PublicProfileTabsMenu } from '../PublicProfileTabsMenu';
 
@@ -36,7 +36,7 @@ export function DesktopPublicBuilderProfile({
                 id: builderId,
                 displayName: builder.displayName,
                 username: builder.username,
-                avatar: builder.avatar || '',
+                avatar: builder.avatar,
                 bio: builder.bio,
                 githubLogin: builder.githubLogin
               }}
@@ -63,7 +63,7 @@ export function DesktopPublicBuilderProfile({
                     <BuilderCard
                       builder={{
                         id: builderId,
-                        nftAvatar: builder.avatar || '',
+                        avatar: builder.avatar,
                         username: builder.username,
                         displayName: builder.displayName,
                         price: builder.price

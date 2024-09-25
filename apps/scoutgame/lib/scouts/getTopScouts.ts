@@ -7,8 +7,8 @@ export type TopScout = {
   avatar: string | null;
   buildersScouted: number;
   nftsHeld: number;
-  allTimePoints: number;
-  seasonPoints: number;
+  allTimePoints?: number;
+  seasonPoints?: number;
 };
 
 export async function getTopScouts({ limit }: { limit: number }): Promise<TopScout[]> {
@@ -56,7 +56,7 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
       new Set(scout.user.nftPurchaseEvents.map((event) => event.builderNFT.builderId))
     ).length;
     const nftsHeld = scout.user.nftPurchaseEvents.length;
-    const allTimePoints = scout.user.userAllTimeStats[0]?.pointsEarnedAsScout || 0;
+    const allTimePoints = scout.user.userAllTimeStats[0]?.pointsEarnedAsScout;
     const seasonPoints = scout.pointsEarnedAsScout;
 
     return {

@@ -1,21 +1,21 @@
 'use client';
 
-import type { UserProfileInfo } from 'components/common/Profile/UserProfile';
 import { useMdScreen } from 'hooks/useMediaScreens';
+import type { BasicUserInfo } from 'lib/builders/interfaces';
 
 import { DesktopProfilePage } from './DesktopProfilePage';
 import { MobileProfilePage } from './MobileProfilePage';
 
 export type ProfileTab = 'build' | 'scout' | 'win';
 
-export type UserProfileWithPoints = UserProfileInfo & {
+export type UserProfileWithPoints = BasicUserInfo & {
   seasonPoints: {
-    builderPoints: number;
-    scoutPoints: number;
+    builderPoints?: number;
+    scoutPoints?: number;
   };
   allTimePoints: {
-    builderPoints: number;
-    scoutPoints: number;
+    builderPoints?: number;
+    scoutPoints?: number;
   };
   currentBalance: number;
 };

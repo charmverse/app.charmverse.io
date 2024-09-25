@@ -25,9 +25,9 @@ export default async function Profile({
   };
 }) {
   const user = await getUserFromSession();
-  const tab = searchParams.tab || (user?.githubUser ? 'build' : 'scout');
+  const tab = searchParams.tab || (user?.builder ? 'build' : 'scout');
   if (!user) {
-    redirect('/');
+    return null;
   }
 
   if (!user.onboardedAt) {
@@ -64,17 +64,17 @@ export default async function Profile({
         id: user.id,
         displayName: user.displayName,
         username: user.username,
-        avatar: user.avatar || '',
+        avatar: user.avatar,
         githubLogin: user.githubUser?.login,
         currentBalance: user.currentBalance,
         bio: user.bio,
         seasonPoints: {
-          builderPoints: seasonPoints?.pointsEarnedAsBuilder || 0,
-          scoutPoints: seasonPoints?.pointsEarnedAsScout || 0
+          builderPoints: seasonPoints?.pointsEarnedAsBuilder,
+          scoutPoints: seasonPoints?.pointsEarnedAsScout
         },
         allTimePoints: {
-          builderPoints: allTimePoints?.pointsEarnedAsBuilder || 0,
-          scoutPoints: allTimePoints?.pointsEarnedAsScout || 0
+          builderPoints: allTimePoints?.pointsEarnedAsBuilder,
+          scoutPoints: allTimePoints?.pointsEarnedAsScout
         }
       }}
       tab={tab}

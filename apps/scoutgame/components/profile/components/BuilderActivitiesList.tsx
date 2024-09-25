@@ -1,5 +1,5 @@
 import { Paper, Stack, Typography } from '@mui/material';
-import { getRelativeTime } from '@packages/scoutgame/utils';
+import { getRelativeTime } from '@packages/utils/dates';
 import Image from 'next/image';
 import { BiLike } from 'react-icons/bi';
 import { LuBookMarked } from 'react-icons/lu';

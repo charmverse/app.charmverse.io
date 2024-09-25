@@ -1,16 +1,16 @@
 import { Paper, Stack, Typography } from '@mui/material';
-import { currentSeason, getCurrentScoutGameWeek } from '@packages/scoutgame/utils';
+import { currentSeason, getCurrentWeekNumber } from '@packages/scoutgame/utils';
 import Image from 'next/image';
 
 export function BuilderWeeklyStats({ gemsCollected, rank }: { gemsCollected: number; rank: number }) {
-  const scoutgameWeek = getCurrentScoutGameWeek();
+  const weekNumber = getCurrentWeekNumber();
 
   return (
     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'row', gap: 2, justifyContent: 'space-between' }}>
       <Stack gap={1}>
         <Typography variant='h6'>SEASON {currentSeason}</Typography>
         <Typography variant='h5' fontWeight={500}>
-          WEEK {scoutgameWeek}
+          WEEK {weekNumber}
         </Typography>
       </Stack>
       <Stack gap={1}>

@@ -7,13 +7,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-import { ScoutsGallery } from 'components/scout/ScoutsGallery';
+import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
 import { JoinGithubButton } from 'components/welcome/components/github/JoinGithubButton';
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
 
-import { BuilderActivitiesList } from '../../../builder/BuilderActivitiesList';
+import { BuilderActivitiesList } from '../../components/BuilderActivitiesList';
 
 import { BuilderStats } from './BuilderStats';
 import { BuilderWeeklyStats } from './BuilderWeeklyStats';
@@ -87,12 +87,12 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
   return (
     <Stack gap={3}>
       <BuilderStats
-        avatar={builder.avatar || ''}
+        avatar={builder.avatar}
         username={builder.username}
-        builderPoints={builder.userSeasonStats[0]?.pointsEarnedAsBuilder || 0}
+        builderPoints={builder.userSeasonStats[0]?.pointsEarnedAsBuilder}
         totalScouts={totalScouts}
         totalNftsSold={totalNftsSold}
-        currentNftPrice={Number(builder.builderNfts[0]?.currentPrice || 0)}
+        currentNftPrice={builder.builderNfts[0]?.currentPrice}
       />
       <Stack gap={0.5}>
         <Typography color='secondary'>This Week</Typography>

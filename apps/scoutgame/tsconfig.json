@@ -111,8 +111,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    "../../packages/scoutgame/src/claimPoints.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "../../node_modules",

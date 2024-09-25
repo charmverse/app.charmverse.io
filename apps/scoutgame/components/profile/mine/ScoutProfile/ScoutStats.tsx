@@ -6,7 +6,7 @@ export function ScoutStats({
   buildersScouted,
   nftsPurchased
 }: {
-  scoutPoints: number;
+  scoutPoints?: number;
   buildersScouted: number;
   nftsPurchased: number;
 }) {
@@ -17,7 +17,7 @@ export function ScoutStats({
       </Typography>
       <Stack flexDirection='row' justifyContent='space-between'>
         <Stack flexDirection='row' gap={1}>
-          <Typography color='orange.main'>{scoutPoints}</Typography>
+          <Typography color='orange.main'>{scoutPoints || 0}</Typography>
           <Image src='/images/profile/scout-game-orange-icon.svg' width='25' height='25' alt='scout game icon' />
         </Stack>
         <Typography color='orange.main'>{buildersScouted} Builders</Typography>

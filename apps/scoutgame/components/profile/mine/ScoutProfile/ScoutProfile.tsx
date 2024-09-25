@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { Typography, Stack } from '@mui/material';
 import { currentSeason } from '@packages/scoutgame/utils';
 
-import { BuildersGallery } from 'components/builder/BuildersGallery';
+import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
 
 import { ScoutStats } from './ScoutStats';
@@ -32,7 +32,7 @@ export async function ScoutProfile({ userId }: { userId: string }) {
       <ScoutStats
         buildersScouted={buildersScouted}
         nftsPurchased={nftsPurchasedThisSeason}
-        scoutPoints={seasonStats?.pointsEarnedAsScout || 0}
+        scoutPoints={seasonStats?.pointsEarnedAsScout}
       />
       <Stack>
         <Typography variant='subtitle1' my={1} color='secondary' fontWeight='500'>

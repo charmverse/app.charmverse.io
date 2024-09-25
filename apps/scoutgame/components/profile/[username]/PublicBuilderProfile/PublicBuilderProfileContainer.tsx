@@ -1,21 +1,17 @@
 'use client';
 
-import type { ScoutInfo } from 'components/scout/ScoutCard';
+import type { ScoutInfo } from 'components/common/Card/ScoutCard';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
+import type { BasicUserInfo } from 'lib/builders/interfaces';
 
 import { DesktopPublicBuilderProfile } from './DesktopPublicBuilderProfile';
 import { MobilePublicBuilderProfile } from './MobilePublicBuilderProfile';
 
 export type BuilderProfileProps = {
   tab: string;
-  builder: {
-    avatar: string;
-    username: string;
-    displayName: string;
-    price: number;
-    githubLogin: string;
-    bio: string;
+  builder: BasicUserInfo & {
+    price: bigint;
     isBuilder: boolean;
   };
   builderId: string;

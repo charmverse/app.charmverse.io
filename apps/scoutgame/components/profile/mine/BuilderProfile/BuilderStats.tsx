@@ -3,7 +3,7 @@
 import { Paper, Typography, Box, Stack } from '@mui/material';
 import Image from 'next/image';
 
-import { BuilderCardNftDisplay } from 'components/builder/Card/BuilderCardNftDisplay';
+import { BuilderCardNftDisplay } from 'components/common/Card/BuilderCard/BuilderCardNftDisplay';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
 export function BuilderStats({
@@ -34,7 +34,7 @@ export function BuilderStats({
       }}
     >
       <Box width={isDesktop ? 200 : 150}>
-        <BuilderCardNftDisplay nftAvatar={avatar || ''} username={username} />
+        <BuilderCardNftDisplay avatar={avatar} username={username} />
       </Box>
       <Stack justifyContent='space-between' gap={2}>
         <Stack justifyContent='center' gap={0.5}>

@@ -5,12 +5,12 @@ export function BuilderCardStats({
   gemsCollected,
   builderPoints,
   scoutedBy,
-  nfts
+  nftsSold
 }: {
   gemsCollected?: number;
   builderPoints?: number;
   scoutedBy?: number;
-  nfts?: number;
+  nftsSold?: number;
 }) {
   return (
     <Stack flexDirection='row' alignItems='center' justifyContent='space-between' gap={1}>
@@ -38,10 +38,10 @@ export function BuilderCardStats({
           <Image width={15} height={15} src='/images/profile/icons/like-icon.svg' alt='Likes' />
         </Stack>
       )}
-      {typeof nfts === 'number' && (
+      {typeof nftsSold === 'number' && (
         <Stack flexDirection='row' gap={0.2} alignItems='center'>
           <Typography variant='body2' component='span' color='orange.main'>
-            {nfts}
+            {nftsSold}
           </Typography>
           <Image width={12} height={12} src='/images/profile/icons/nft-orange-icon.svg' alt='Nfts' />
         </Stack>
