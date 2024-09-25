@@ -6,56 +6,56 @@ import type { WeeklyReward } from 'lib/points/getClaimablePoints';
 export function QualifiedActionsTable({ weeklyRewards }: { weeklyRewards: WeeklyReward[] }) {
   return (
     <Stack>
-      {weeklyRewards.map((reward) => (
+      {weeklyRewards.map((weeklyReward) => (
         <>
-          <Stack key={reward.week} gap={1.5}>
+          <Stack key={weeklyReward.week} gap={1.5}>
             <Typography variant='h6' fontWeight={600}>
-              {reward.week}
+              Week {weeklyReward.weekNumber}
             </Typography>
             <Stack gap={1.5}>
-              {reward.githubContributionReward ? (
+              {weeklyReward.githubContributionReward ? (
                 <Stack flexDirection='row' gap={1} justifyContent='space-between'>
                   <Stack gap={0.5}>
-                    <Typography>Finished within 100 rank</Typography>
-                    {reward.githubContributionReward.streakCount ? (
+                    <Typography>Finished within {weeklyReward.rank} rank</Typography>
+                    {weeklyReward.githubContributionReward.streakCount ? (
                       <Typography variant='body2'>
-                        {reward.githubContributionReward.streakCount}x contribution streak
+                        {weeklyReward.githubContributionReward.streakCount}x contribution streak
                       </Typography>
                     ) : null}
-                    {reward.githubContributionReward.firstContributionsCount ? (
+                    {weeklyReward.githubContributionReward.firstContributionsCount ? (
                       <Typography variant='body2'>
-                        {reward.githubContributionReward.firstContributionsCount} x first contribution
+                        {weeklyReward.githubContributionReward.firstContributionsCount} x first contribution
                       </Typography>
                     ) : null}
-                    {reward.githubContributionReward.regularContributionsCount ? (
+                    {weeklyReward.githubContributionReward.regularContributionsCount ? (
                       <Typography variant='body2'>
-                        {reward.githubContributionReward.regularContributionsCount} x regular contribution
+                        {weeklyReward.githubContributionReward.regularContributionsCount} x regular contribution
                       </Typography>
                     ) : null}
                   </Stack>
                   <Stack flexDirection='row' gap={1} alignItems='center'>
-                    <Typography>{reward.githubContributionReward.points}</Typography>
+                    <Typography>{weeklyReward.githubContributionReward.points}</Typography>
                     <Image width={20} height={20} src='/images/profile/scout-game-icon.svg' alt='Nfts' />
                   </Stack>
                 </Stack>
               ) : null}
-              {reward.builderReward ? (
+              {weeklyReward.builderReward ? (
                 <Stack flexDirection='row' justifyContent='space-between'>
                   <Typography>Builder Rewards</Typography>
                   <Stack flexDirection='row' gap={1} alignItems='center'>
-                    <Typography>{reward.builderReward.points}</Typography>
+                    <Typography>{weeklyReward.builderReward.points}</Typography>
                     <Image width={20} height={20} src='/images/profile/scout-game-icon.svg' alt='Nfts' />
                   </Stack>
                 </Stack>
               ) : null}
-              {reward.soldNftReward ? (
+              {weeklyReward.soldNftReward ? (
                 <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
                   <Stack flexDirection='row' gap={1} alignItems='center'>
-                    <Typography>Sold {reward.soldNftReward.quantity} NFTs</Typography>
+                    <Typography>Sold {weeklyReward.soldNftReward.quantity} NFTs</Typography>
                     <Image width={20} height={20} src='/images/profile/icons/nft-orange-icon.svg' alt='Nfts' />
                   </Stack>
                   <Stack flexDirection='row' gap={1} alignItems='center'>
-                    <Typography>{reward.soldNftReward.points}</Typography>
+                    <Typography>{weeklyReward.soldNftReward.points}</Typography>
                     <Image width={20} height={20} src='/images/profile/scout-game-icon.svg' alt='Nfts' />
                   </Stack>
                 </Stack>

@@ -1,8 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason, getWeekNumberFromWeek } from '@packages/scoutgame/utils';
 
 export type WeeklyReward = {
   week: string;
+  weekNumber: number;
   builderReward: {
     points: number;
   };
@@ -16,9 +17,12 @@ export type WeeklyReward = {
     points: number;
     quantity: number;
   };
+  rank: number;
 };
 
-export async function getClaimablePoints(userId: string) {
+export async function getClaimablePoints(
+  userId: string
+): Promise<{ totalClaimablePoints: number; weeklyRewards: WeeklyReward[] }> {
   const pointsReceipts = await prisma.pointsReceipt.findMany({
     where: {
       recipientId: userId,
@@ -82,6 +86,24 @@ export async function getClaimablePoints(userId: string) {
       }
     }
   });
+
+  const weeklyRankRecord: Record<string, number> = {};
+  const weeklyStats = await prisma.userWeeklyStats.findMany({
+    where: {
+      week: {
+        in: Array.from(allWeeks)
+      },
+      userId
+    },
+    select: {
+      rank: true,
+      week: true
+    }
+  });
+
+  for (const stat of weeklyStats) {
+    weeklyRankRecord[stat.week] = stat.rank;
+  }
 
   const weeklyGithubContributionRecord: Record<
     string,
@@ -150,11 +172,15 @@ export async function getClaimablePoints(userId: string) {
 
   return {
     totalClaimablePoints,
-    weeklyRewards: Array.from(allWeeks).map((week) => ({
-      week,
-      builderReward: builderRewards[week],
-      githubContributionReward: githubContributionRewards[week],
-      soldNftReward: soldNftRewards[week]
-    }))
+    weeklyRewards: Array.from(allWeeks)
+      .map((week) => ({
+        week,
+        weekNumber: getWeekNumberFromWeek(week),
+        builderReward: builderRewards[week],
+        githubContributionReward: githubContributionRewards[week],
+        soldNftReward: soldNftRewards[week],
+        rank: weeklyRankRecord[week]
+      }))
+      .sort((a, b) => b.weekNumber - a.weekNumber)
   };
 }

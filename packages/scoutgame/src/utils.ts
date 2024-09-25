@@ -87,3 +87,17 @@ export function getCurrentWeekNumber() {
   const weeksDiff = currentDate.diff(seasonStartDate, 'weeks').weeks;
   return Math.floor(weeksDiff) + 1;
 }
+
+export function getWeekNumber(date: Date) {
+  const currentDate = DateTime.fromJSDate(date, { zone: timezone });
+  const weeksDiff = currentDate.diff(seasonStartDate, 'weeks').weeks;
+  return Math.floor(weeksDiff) + 1;
+}
+
+export function getWeekNumberFromWeek(weekString: string) {
+  const [year, week] = weekString.split('-W');
+  const weekNumber = parseInt(week);
+  const startOfYear = DateTime.fromObject({ year: parseInt(year), month: 1, day: 1 }, { zone: timezone });
+  const startOfWeek = startOfYear.plus({ weeks: weekNumber });
+  return getWeekNumber(startOfWeek.toJSDate());
+}
