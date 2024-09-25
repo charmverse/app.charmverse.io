@@ -82,7 +82,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
         ) : tab === 'scout' ? (
           <ScoutProfile userId={user.id} />
         ) : tab === 'build' ? (
-          <BuilderProfile builderId={user.id} />
+          <BuilderProfile builder={user} />
         ) : (
           <Stack flexDirection='row' gap={2}>
             <Paper
@@ -107,7 +107,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
               <Typography variant='h6' color='text.secondary'>
                 Build
               </Typography>
-              <BuilderProfile builderId={user.id} />
+              <BuilderProfile builder={user} />
             </Paper>
           </Stack>
         )}

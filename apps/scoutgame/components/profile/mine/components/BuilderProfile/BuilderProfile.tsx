@@ -2,7 +2,6 @@
 
 import { prisma } from '@charmverse/core/prisma-client';
 import { Stack, Typography } from '@mui/material';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -12,63 +11,29 @@ import { JoinGithubButton } from 'components/common/JoinGithubButton';
 import { BuilderActivitiesList } from 'components/profile/mine/components/BuilderProfile/BuilderActivitiesList';
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
-import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
-import { BasicUserInfoSelect } from 'lib/users/queries';
+import { getBuilderStats } from 'lib/builders/getBuilderStats';
+import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import { BuilderStats } from './BuilderStats';
 import { BuilderWeeklyStats } from './BuilderWeeklyStats';
 
-export async function BuilderProfile({ builderId }: { builderId: string }) {
-  const currentWeek = getCurrentWeek();
-
-  const builder = await prisma.scout.findUniqueOrThrow({
-    where: {
-      id: builderId
-    },
-    select: {
-      ...BasicUserInfoSelect,
-      userSeasonStats: {
-        where: {
-          season: currentSeason
-        },
-        select: {
-          pointsEarnedAsBuilder: true
-        }
-      },
-      builderNfts: {
-        where: {
-          season: currentSeason
-        },
-        select: {
-          currentPrice: true
-        }
-      },
-      userWeeklyStats: {
-        where: {
-          week: currentWeek
-        },
-        select: {
-          gemsCollected: true
-        }
-      }
-    }
-  });
-
-  const builderActivities = builder.builder ? await getBuilderActivities({ builderId, take: 5 }) : [];
-  const builderWeeklyStats = builder.builder
-    ? await getBuilderWeeklyStats(builderId)
-    : {
-        gemsCollected: 0,
-        rank: 0
-      };
-
-  const { totalScouts, totalNftsSold, scouts } = builder.builder
-    ? await getBuilderScouts(builderId)
-    : {
-        totalScouts: 0,
-        totalNftsSold: 0,
-        scouts: []
-      };
+export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
+  const [builderNft, builderStats, builderActivities = [], { scouts = [], totalNftsSold, totalScouts } = {}] =
+    builder.builder
+      ? await Promise.all([
+          prisma.builderNft.findUnique({
+            where: {
+              id: builder.id
+            },
+            select: {
+              currentPrice: true
+            }
+          }),
+          getBuilderStats(builder.id),
+          getBuilderActivities({ builderId: builder.id, take: 5 }),
+          getBuilderScouts(builder.id)
+        ])
+      : [];
 
   if (!builder.builder) {
     return (
@@ -87,14 +52,14 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
       <BuilderStats
         avatar={builder.avatar}
         username={builder.username}
-        builderPoints={builder.userSeasonStats[0]?.pointsEarnedAsBuilder}
+        builderPoints={builderStats?.seasonPoints}
         totalScouts={totalScouts}
         totalNftsSold={totalNftsSold}
-        currentNftPrice={builder.builderNfts[0]?.currentPrice}
+        currentNftPrice={builderNft?.currentPrice}
       />
       <Stack gap={0.5}>
         <Typography color='secondary'>This Week</Typography>
-        <BuilderWeeklyStats gemsCollected={builderWeeklyStats.gemsCollected} rank={builderWeeklyStats.rank} />
+        <BuilderWeeklyStats gemsCollected={builderStats?.gemsCollected} rank={builderStats?.rank} />
       </Stack>
       <Stack gap={0.5}>
         <Stack direction='row' alignItems='center' justifyContent='space-between'>

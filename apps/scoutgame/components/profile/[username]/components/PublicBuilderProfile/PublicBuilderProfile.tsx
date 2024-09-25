@@ -5,64 +5,38 @@ import { notFound } from 'next/navigation';
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderStats } from 'lib/builders/getBuilderStats';
-import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
+import type { BasicUserInfo } from 'lib/users/interfaces';
 import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
 
-export async function PublicBuilderProfile({
-  builderId,
-  tab,
-  user
-}: {
-  builderId: string;
-  tab: string;
-  user?: { username: string } | null;
-}) {
-  const builder = await prisma.scout.findUniqueOrThrow({
-    where: {
-      id: builderId
-    },
-    select: {
-      ...BasicUserInfoSelect,
-      builderNfts: {
-        where: {
-          season: currentSeason
-        },
-        select: {
-          currentPrice: true
-        }
-      }
-    }
-  });
+export async function PublicBuilderProfile({ tab, user }: { tab: string; user: BasicUserInfo }) {
+  const builderId = user.id;
+  const isBuilder = user.builder;
 
-  const isBuilder = builder.builder;
-
-  const builderWeeklyStats = isBuilder
-    ? await getBuilderWeeklyStats(builderId)
-    : {
-        gemsCollected: 0,
-        rank: 0
-      };
-
-  const { allTimePoints, seasonPoints } = isBuilder
-    ? await getBuilderStats(builderId)
-    : {
-        allTimePoints: 0,
-        seasonPoints: 0
-      };
-  const builderActivities = isBuilder ? await getBuilderActivities({ builderId, take: 5 }) : [];
-  const { scouts, totalNftsSold, totalScouts } = isBuilder
-    ? await getBuilderScouts(builderId)
-    : {
-        scouts: [],
-        totalNftsSold: 0,
-        totalScouts: 0
-      };
-
-  if (!builder) {
-    notFound();
-  }
+  const [
+    builderNft,
+    { allTimePoints, seasonPoints, rank, gemsCollected } = {},
+    builderActivities = [],
+    { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}
+  ] = isBuilder
+    ? await Promise.all([
+        prisma.builderNft.findUniqueOrThrow({
+          where: {
+            builderId_season: {
+              builderId: user.id,
+              season: currentSeason
+            }
+          },
+          select: {
+            currentPrice: true
+          }
+        }),
+        getBuilderStats(builderId),
+        getBuilderActivities({ builderId, take: 5 }),
+        getBuilderScouts(builderId)
+      ])
+    : [];
 
   return (
     <PublicBuilderProfileContainer
@@ -70,17 +44,16 @@ export async function PublicBuilderProfile({
       user={user}
       scouts={scouts}
       builder={{
-        ...builder,
-        price: builder.builderNfts[0]?.currentPrice,
-        githubLogin: builder.githubUser[0]?.login || ''
+        ...user,
+        price: builderNft?.currentPrice
       }}
       allTimePoints={allTimePoints}
       seasonPoints={seasonPoints}
       totalScouts={totalScouts}
       totalNftsSold={totalNftsSold}
       builderActivities={builderActivities}
-      gemsCollected={builderWeeklyStats.gemsCollected}
-      rank={builderWeeklyStats.rank}
+      gemsCollected={gemsCollected}
+      rank={rank}
     />
   );
 }

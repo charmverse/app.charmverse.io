@@ -2,7 +2,7 @@ import { Paper, Stack, Typography } from '@mui/material';
 import { currentSeason, getCurrentWeekNumber } from '@packages/scoutgame/utils';
 import Image from 'next/image';
 
-export function BuilderWeeklyStats({ gemsCollected, rank }: { gemsCollected?: number; rank: number }) {
+export function BuilderWeeklyStats({ gemsCollected, rank }: { gemsCollected?: number; rank?: number }) {
   const weekNumber = getCurrentWeekNumber();
 
   return (
@@ -28,7 +28,7 @@ export function BuilderWeeklyStats({ gemsCollected, rank }: { gemsCollected?: nu
         </Typography>
         {/** TODO: Get actual rank for the builder */}
         <Typography variant='h4' align='center'>
-          {rank}
+          {rank || 'N/A'}
         </Typography>
       </Stack>
     </Paper>

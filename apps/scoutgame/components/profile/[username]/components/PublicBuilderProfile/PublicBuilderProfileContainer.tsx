@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Paper, Stack, Typography } from '@mui/material';
+import { Box, Paper, Stack, styled, Typography } from '@mui/material';
 
 import { BackButton } from 'components/common/Button/BackButton';
 import { BuilderCard } from 'components/common/Card/BuilderCard/BuilderCard';
@@ -20,20 +20,35 @@ import { PublicBuilderStats } from './PublicBuilderStats';
 export type BuilderProfileProps = {
   tab: string;
   builder: BasicUserInfo & {
-    price: bigint;
+    price?: bigint;
   };
-  allTimePoints: number;
-  seasonPoints: number;
-  totalScouts: number;
+  allTimePoints?: number;
+  seasonPoints?: number;
+  totalScouts?: number;
   scouts: ScoutInfo[];
-  totalNftsSold: number;
+  totalNftsSold?: number;
   builderActivities: BuilderActivity[];
   gemsCollected?: number;
-  rank: number;
+  rank?: number;
   user?: {
     username: string;
   } | null;
 };
+
+const PaperContainer = styled(Paper)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(2),
+  flex: 1,
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(2),
+    backgroundColor: theme.palette.background.dark
+  },
+  [theme.breakpoints.down('md')]: {
+    padding: 0,
+    backgroundColor: 'transparent'
+  }
+}));
 
 export function PublicBuilderProfileContainer({
   tab,
@@ -65,7 +80,7 @@ export function PublicBuilderProfileContainer({
             <Stack flexDirection='row'>
               <BackButton />
               {isDesktop ? (
-                <Box width='calc(100% - 50px)'>
+                <Box>
                   <UserProfile
                     user={{
                       ...builder,
@@ -86,10 +101,11 @@ export function PublicBuilderProfileContainer({
                       showPurchaseButton
                     />
                   </Box>
-                  <Stack width='calc(100% - 150px)' gap={1}>
+                  <Stack gap={1} pr={1}>
                     <UserProfile
                       user={{
                         ...builder,
+                        avatar: null,
                         githubLogin: builder.githubLogin
                       }}
                     />
@@ -105,25 +121,15 @@ export function PublicBuilderProfileContainer({
             </Stack>
           </Paper>
           {isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
-          <Paper
-            sx={{
-              p: {
-                xs: 0,
-                md: 2
-              },
-              backgroundColor: {
-                xs: 'transparent',
-                md: 'background.dark'
-              }
+
+          <Stack
+            gap={2}
+            flexDirection={{
+              xs: 'column-reverse',
+              md: 'row'
             }}
           >
-            <Stack
-              gap={4}
-              flexDirection={{
-                xs: 'column-reverse',
-                md: 'row'
-              }}
-            >
+            <PaperContainer>
               <Stack gap={2} flex={1}>
                 {isDesktop ? (
                   <Paper
@@ -155,23 +161,23 @@ export function PublicBuilderProfileContainer({
                     />
                   </Paper>
                 ) : null}
-                <Stack gap={0.5}>
-                  <Typography color='secondary'>Scouted By</Typography>
-                  <ScoutsGallery scouts={scouts} />
-                </Stack>
               </Stack>
-              <Stack gap={2} flex={1}>
-                <Stack>
-                  <Typography color='secondary'>This Week</Typography>
-                  <BuilderWeeklyStats gemsCollected={gemsCollected} rank={rank} />
-                </Stack>
-                <Stack>
-                  <Typography color='secondary'>Recent Activity</Typography>
-                  <BuilderActivitiesList activities={builderActivities} />
-                </Stack>
+              <Stack gap={1}>
+                <Typography color='secondary'>Scouted By</Typography>
+                <ScoutsGallery scouts={scouts} />
               </Stack>
-            </Stack>
-          </Paper>
+            </PaperContainer>
+            <PaperContainer>
+              <Stack gap={1}>
+                <Typography color='secondary'>This Week</Typography>
+                <BuilderWeeklyStats gemsCollected={gemsCollected} rank={rank} />
+              </Stack>
+              <Stack gap={1}>
+                <Typography color='secondary'>Recent Activity</Typography>
+                <BuilderActivitiesList activities={builderActivities} />
+              </Stack>
+            </PaperContainer>
+          </Stack>
         </Stack>
       ) : (
         <Paper

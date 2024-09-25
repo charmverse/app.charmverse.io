@@ -1,7 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
 
-export async function getBuilderStats(builderId: string) {
+export type BuilderStats = {
+  seasonPoints?: number;
+  allTimePoints?: number;
+  rank?: number;
+  gemsCollected?: number;
+};
+
+export async function getBuilderStats(builderId: string): Promise<BuilderStats> {
   const builder = await prisma.scout.findUniqueOrThrow({
     where: {
       id: builderId
@@ -19,12 +26,23 @@ export async function getBuilderStats(builderId: string) {
         select: {
           pointsEarnedAsBuilder: true
         }
+      },
+      userWeeklyStats: {
+        where: {
+          week: getCurrentWeek()
+        },
+        select: {
+          rank: true,
+          gemsCollected: true
+        }
       }
     }
   });
 
   return {
     seasonPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder,
-    allTimePoints: builder.userAllTimeStats[0]?.pointsEarnedAsBuilder
+    allTimePoints: builder.userAllTimeStats[0]?.pointsEarnedAsBuilder,
+    rank: builder.userWeeklyStats[0]?.rank,
+    gemsCollected: builder.userWeeklyStats[0]?.gemsCollected
   };
 }

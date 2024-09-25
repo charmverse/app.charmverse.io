@@ -17,31 +17,32 @@ export type ScoutProfileProps = {
   scout: BasicUserInfo;
   allTimePoints: number;
   seasonPoints: number;
-  buildersScouted: number;
   nftsPurchased: number;
   scoutedBuilders: BuilderInfo[];
   tab: string;
 };
 
-export function PublicScoutProfileContainer(props: ScoutProfileProps) {
+export function PublicScoutProfileContainer({
+  scout,
+  allTimePoints,
+  seasonPoints,
+  nftsPurchased,
+  scoutedBuilders,
+  tab
+}: ScoutProfileProps) {
   const isDesktop = useMdScreen();
   return (
     <Box>
-      {!isDesktop ? <PublicProfileTabsMenu tab={props.tab} username={props.scout.username} /> : null}
+      {!isDesktop ? <PublicProfileTabsMenu tab={tab} username={scout.username} /> : null}
       <Paper sx={{ py: 2, my: { xs: 1, md: 2 } }}>
         <Stack flexDirection='row'>
           <BackButton />
           <Box width='calc(100% - 50px)'>
-            <UserProfile
-              user={{
-                ...props.scout,
-                githubLogin: props.scout.githubLogin
-              }}
-            />
+            <UserProfile user={scout} />
           </Box>
         </Stack>
       </Paper>
-      {isDesktop ? <PublicProfileTabsMenu tab={props.tab} username={props.scout.username} /> : null}
+      {isDesktop ? <PublicProfileTabsMenu tab={tab} username={scout.username} /> : null}
       <Paper
         sx={{
           my: 2,
@@ -66,17 +67,17 @@ export function PublicScoutProfileContainer(props: ScoutProfileProps) {
             }}
           >
             <PublicScoutProfileStats
-              allTimePoints={props.allTimePoints}
-              seasonPoints={props.seasonPoints}
-              buildersScouted={props.buildersScouted}
-              nftsPurchased={props.nftsPurchased}
+              allTimePoints={allTimePoints}
+              seasonPoints={seasonPoints}
+              buildersScouted={scoutedBuilders.length}
+              nftsPurchased={nftsPurchased}
             />
           </Stack>
         </Stack>
         <Typography variant='subtitle1' my={1} color='secondary' fontWeight='500'>
           Scouted Builders
         </Typography>
-        <BuildersGallery builders={props.scoutedBuilders} />
+        <BuildersGallery builders={scoutedBuilders} />
       </Paper>
     </Box>
   );

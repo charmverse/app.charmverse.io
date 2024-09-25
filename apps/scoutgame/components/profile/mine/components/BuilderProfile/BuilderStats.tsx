@@ -16,10 +16,10 @@ export function BuilderStats({
 }: {
   avatar?: string | null;
   username: string;
-  builderPoints: number;
-  totalScouts: number;
-  totalNftsSold: number;
-  currentNftPrice?: number | null | bigint;
+  builderPoints?: number;
+  totalScouts?: number;
+  totalNftsSold?: number;
+  currentNftPrice?: number | bigint;
 }) {
   const isDesktop = useMdScreen();
   return (
@@ -43,16 +43,16 @@ export function BuilderStats({
           </Typography>
           <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center'>
             <Typography fontWeight={500} variant='h4' color='green.main'>
-              {builderPoints}
+              {builderPoints || 0}
             </Typography>
             <Image src='/images/profile/scout-game-green-icon.svg' width='25' height='25' alt='scout game icon' />
           </Stack>
           <Typography fontWeight={500} variant='h4' color='green.main' align='center'>
-            {totalScouts} Scouts
+            {totalScouts || 0} Scouts
           </Typography>
           <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center'>
             <Typography fontWeight={500} variant='h4' color='green.main'>
-              {totalNftsSold}
+              {totalNftsSold || 0}
             </Typography>
             <Image src='/images/profile/icons/nft-green-icon.svg' width='25' height='25' alt='nft icon' />
             <Typography fontWeight={500} variant='h4' color='green.main'>

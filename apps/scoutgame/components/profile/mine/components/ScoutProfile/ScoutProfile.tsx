@@ -10,26 +10,27 @@ import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
 import { ScoutStats } from './ScoutStats';
 
 export async function ScoutProfile({ userId }: { userId: string }) {
-  const seasonStats = await prisma.userSeasonStats.findUnique({
-    where: {
-      userId_season: {
-        userId,
-        season: currentSeason
+  const [seasonStats, scoutedBuilders] = await Promise.all([
+    prisma.userSeasonStats.findUnique({
+      where: {
+        userId_season: {
+          userId,
+          season: currentSeason
+        }
+      },
+      select: {
+        pointsEarnedAsScout: true
       }
-    },
-    select: {
-      pointsEarnedAsScout: true
-    }
-  });
+    }),
+    getScoutedBuilders({ scoutId: userId })
+  ]);
 
-  const scoutedBuilders = await getScoutedBuilders({ scoutId: userId });
-  const buildersScouted = scoutedBuilders.length;
   const nftsPurchasedThisSeason = scoutedBuilders.reduce((acc, builder) => acc + (builder.nftsSold || 0), 0);
 
   return (
     <Stack gap={1}>
       <ScoutStats
-        buildersScouted={buildersScouted}
+        buildersScouted={scoutedBuilders.length}
         nftsPurchased={nftsPurchasedThisSeason}
         scoutPoints={seasonStats?.pointsEarnedAsScout}
       />

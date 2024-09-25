@@ -24,5 +24,5 @@ export default async function Profile({
     return notFound();
   }
 
-  return <PublicProfilePage userId={user.id} username={user.username} tab={tab} />;
+  return <PublicProfilePage user={user} tab={tab} />;
 }
