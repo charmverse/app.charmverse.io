@@ -1,7 +1,6 @@
-import type { BuilderEventType, GemsPayoutEvent, GithubRepo, Prisma, BuilderEvent } from '@charmverse/core/prisma';
+import type { BuilderEvent, BuilderEventType, GithubRepo } from '@charmverse/core/prisma';
 import { GithubEventType, prisma } from '@charmverse/core/prisma-client';
-import { connect } from 'cookies';
-import { v4 as uuid, v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import { currentSeason, getCurrentWeek } from '../utils';
 
@@ -15,10 +14,12 @@ type RepoAddress = {
 export async function mockBuilder({
   bannedAt,
   githubUserId = randomLargeInt(),
+  onboardedAt,
   username = uuid()
 }: {
   bannedAt?: Date;
   githubUserId?: number;
+  onboardedAt?: Date;
   username?: string;
 } = {}) {
   const result = await prisma.scout.create({
@@ -26,6 +27,7 @@ export async function mockBuilder({
       username,
       displayName: 'Test User',
       bannedAt,
+      onboardedAt,
       builder: true,
       githubUser: {
         create: {
@@ -306,7 +308,7 @@ export async function mockBuilderNft({
       chainId,
       contractAddress,
       currentPrice: 0,
-      season: 0,
+      season: currentSeason,
       tokenId: Math.round(Math.random() * 10000000)
     }
   });

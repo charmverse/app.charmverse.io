@@ -223,7 +223,6 @@ export function ProposalWorkflowItem({
                         onClick={() => {
                           updatePrivateEvaluations(!workflow.privateEvaluations);
                         }}
-                        disabled={preventDelete}
                       >
                         <ListItemIcon>
                           <VisibilityIcon visible={!workflow.privateEvaluations} size='small' />

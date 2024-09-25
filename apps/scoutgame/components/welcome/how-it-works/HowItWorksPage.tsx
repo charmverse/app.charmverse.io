@@ -1,4 +1,5 @@
 import { Button, List, ListItem, Stack, Typography } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 import Image from 'next/image';
 
 import { SinglePageLayout } from 'components/common/Layout';
@@ -37,7 +38,7 @@ export function HowItWorksPage({ username }: { username: string }) {
         <Stack justifyContent='center' alignItems='center' width='100%'>
           <Image src='/images/purple_binoculars.png' alt='purple binoculars' width={150} height={150} />
         </Stack>
-        <Button fullWidth href='/'>
+        <Button fullWidth href='/' data-test='continue-button'>
           Play Scout Game
         </Button>
       </SinglePageWrapper>

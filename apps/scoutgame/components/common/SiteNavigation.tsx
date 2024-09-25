@@ -20,6 +20,7 @@ export function SiteNavigation({ transparent }: { transparent?: boolean }) {
       <BottomNavigation
         showLabels
         value={value}
+        data-test='site-navigation'
         sx={{
           background: transparent
             ? 'transparent'

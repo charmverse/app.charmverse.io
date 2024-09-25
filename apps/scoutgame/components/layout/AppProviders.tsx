@@ -11,8 +11,10 @@ import theme from 'theme/theme';
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <AppRouterCacheProvider options={{ key: 'css' }}>
-      <CssBaseline enableColorScheme />
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline enableColorScheme />
+        {children}
+      </ThemeProvider>
     </AppRouterCacheProvider>
   );
 }

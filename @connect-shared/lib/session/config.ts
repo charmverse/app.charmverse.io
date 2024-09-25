@@ -3,6 +3,7 @@ import { getIronOptions as getIronOptionsRoot } from '@root/lib/session/getIronO
 export type SessionData = {
   user?: { id: string };
   anonymousUserId?: string;
+  scoutId?: string; // for ScoutGame, users in the scout database
 };
 
 export function getIronOptions() {

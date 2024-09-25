@@ -53,7 +53,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build apps
+    name: Build Scoutgame
     runs-on: ubuntu-latest
     outputs:
       head_commit_message: ${{ steps.setup_variables.outputs.commit_message }}
@@ -92,7 +92,7 @@ jobs:
           app_name: scoutgame
 
   test-scoutgame:
-    name: Test apps
+    name: Test
     runs-on: ubuntu-latest
     needs: build
     if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
@@ -150,11 +150,9 @@ jobs:
         run: npx dotenv -e .env.test.local -- npm run test -w packages/scoutgame
 
   test-scoutgame-e2e:
-    name: Test Scoutgame e2e
+    name: Test e2e
     runs-on: ubuntu-latest
     needs: build
-    # re-enable for launch
-    if: false
     # if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
@@ -191,9 +189,13 @@ jobs:
         with:
           app_name: scoutgame
 
+      # unbuffer insures that we print to the log in realtime
+      - name: Install unbuffer
+        run: sudo apt-get update && sudo apt-get install -y expect-dev
+
       - name: Start scoutgame app
         run: |
-          npm run scoutgame:start:test:ci &> server.log &
+          unbuffer npm run scoutgame:start:test:ci 2>&1 | tee server.log &
           sleep_loop_ct=0
           until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -206,7 +208,6 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         # we have to run docker command ourselves to set network=host so that playwright can access the server
         run: |
-          [[ "${{ runner.debug }}" = "1" ]] && tail -f server.log &
           docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
                       --workdir /github/workspace --rm  \
                       -e "REACT_APP_APP_ENV" -e CI=true \
@@ -218,7 +219,22 @@ jobs:
                       --network "host"  \
                       --ipc=host \
                       mcr.microsoft.com/playwright:v1.47.1-jammy \
-                      npm run scoutgame:test:e2e:ci
+                      npm run scoutgame:e2e:ci -- -- --workers=2 || { echo $'\n👉 Here\'s the server output for debugging:\n' && cat server.log & exit 1; }
+
+      # Upload reporst for Github Actions
+      # Sources:
+      #   https://playwright.dev/docs/ci-intro
+      #   https://playwright.dev/docs/trace-viewer#opening-the-trace
+      # To view playwright-report: download the zip, unpack and run "npx playwright show-report path/to/folder"
+      # To view test-results: download the zip, run "npx playwright show-trace path/to/trace.zip"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright
+          path: |
+            apps/scoutgame/playwright-report/
+            apps/scoutgame/test-results/
+          retention-days: 5
 
   upload-docker:
     name: Upload Docker image

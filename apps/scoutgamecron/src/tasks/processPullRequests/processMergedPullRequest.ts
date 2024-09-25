@@ -27,7 +27,7 @@ export async function processMergedPullRequest({
     throw new Error('Pull request was not merged');
   }
   const week = getFormattedWeek(now);
-  const { start, end } = getWeekStartEnd(now);
+  const { start } = getWeekStartEnd(now);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {

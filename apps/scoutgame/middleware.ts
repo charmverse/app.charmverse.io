@@ -2,25 +2,23 @@ import { getSession } from '@connect-shared/lib/session/getSession';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const privateLinks = ['/profile', '/notifications'];
+const privateLinks = ['/profile', '/notifications', '/welcome'];
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();
-  const user = session.user;
+  const isLoggedIn = !!session.scoutId;
   const path = request.nextUrl.pathname;
-
   // We don't have a '/' page anymore since we need to handle 2 different layouts
   if (path === '/') {
     return NextResponse.redirect(new URL('/home', request.url));
   }
-
   // Redirect to login if anonymous user clicks on private links
-  if (!user && privateLinks.some((url) => path.startsWith(url))) {
+  if (!isLoggedIn && privateLinks.some((url) => path.startsWith(url))) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // In case we have the need to redirect to homepage
-  if (!user && path.startsWith('/example-page')) {
+  // Redirect to home if logged in user clicks on login
+  if (isLoggedIn && path === '/login') {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 

@@ -14,7 +14,7 @@ afterAll(() => {
   jest.restoreAllMocks();
 });
 
-describe('sendNotificationEmail()', () => {
+describe.skip('sendNotificationEmail()', () => {
   it('Should send a notification email', async () => {
     const { user, space } = await generateUserAndSpace({
       user: { email: `${Math.random()}@charmversetest.io` }

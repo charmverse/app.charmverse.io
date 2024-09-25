@@ -7,10 +7,10 @@ export type SessionUser = Pick<Scout, 'id' | 'username' | 'displayName' | 'avata
 
 export async function getUserFromSession(): Promise<Scout | null> {
   const session = await getSession();
-  if (session?.user?.id) {
+  if (session?.scoutId) {
     const user = await prisma.scout.findFirst({
       where: {
-        id: session.user.id
+        id: session.scoutId
       }
     });
 

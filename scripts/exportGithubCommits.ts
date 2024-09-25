@@ -4,6 +4,22 @@ import { prettyPrint } from 'lib/utils/strings';
 import fs from 'fs';
 import path from 'path';
 
+// create a file with headers for the columns
+
+// Append the result to a file
+const filename = `github_commits_${new Date().toISOString().split('T')[0]}.tsv`;
+const filePath = path.join(__dirname, '..', filename);
+
+if (!fs.existsSync(filename)) {
+  fs.writeFileSync(filename, 'login\tjoin date\tlast week\tlast month\tlast three months\trepos\n');
+}
+
+const appendToFile = (data: string) => {
+  fs.appendFileSync(filename, data + '\n');
+};
+// filter githubLogins that have already been processed
+const processedLogins = fs.readFileSync(filePath, 'utf8').split('\n');
+
 async function query() {
   // create repo
   // const repo = await prisma.githubRepo.create({
@@ -58,10 +74,10 @@ async function query() {
   const { Octokit } = require('@octokit/rest');
   const octokit = new Octokit({ auth: process.env.GITHUB_ACCESS_TOKEN });
 
-  const getCommitCounts = async (username: string, since: string) => {
+  const getCommitCountsAndRepos = async (username: string, since: string) => {
     const response = await octokit.search.commits({
       q: `author:${username} author-date:>${since}`,
-      per_page: 1
+      per_page: 100
     });
     if (response.headers['x-ratelimit-remaining'] === '2' && response.headers['x-ratelimit-reset']) {
       const rateLimitReset = new Date(parseInt(response.headers['x-ratelimit-reset']) * 1000);
@@ -71,7 +87,15 @@ async function query() {
       await new Promise((resolve) => setTimeout(resolve, timeUntilReset + 300));
     }
 
-    return response.data.total_count;
+    const repos = new Set<string>();
+    response.data.items.forEach((item: any) => {
+      repos.add(item.repository.full_name);
+    });
+
+    return {
+      commitCount: response.data.total_count,
+      repos: Array.from(repos)
+    };
   };
 
   const getDateXMonthsAgo = (months: number) => {
@@ -79,21 +103,13 @@ async function query() {
     date.setMonth(date.getMonth() - months);
     return date.toISOString().split('T')[0];
   };
-  // Append the result to a file
-  const filename = `github_commits_${new Date().toISOString().split('T')[0]}.tsv`;
-  const filePath = path.join(__dirname, filename);
-  const appendToFile = (data: string) => {
-    fs.appendFileSync(filePath, data + '\n');
-  };
-  // filter githubLogins that have already been processed
-  const processedLogins = fs.readFileSync(filePath, 'utf8').split('\n');
   const unprocessedLogins = githubLogins.filter((login) => !processedLogins.some((row) => row.includes(login!)));
   console.log(`Processing ${unprocessedLogins.length} logins`);
   for (const login of unprocessedLogins) {
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const weekCount = await getCommitCounts(login!, oneWeekAgo);
-    const monthCount = await getCommitCounts(login!, getDateXMonthsAgo(1));
-    const threeMonthCount = await getCommitCounts(login!, getDateXMonthsAgo(3));
+    const weekCount = await getCommitCountsAndRepos(login!, oneWeekAgo);
+    const monthCount = await getCommitCountsAndRepos(login!, getDateXMonthsAgo(1));
+    const threeMonthCount = await getCommitCountsAndRepos(login!, getDateXMonthsAgo(3));
 
     // Get the user's GitHub join date
     const userResponse = await octokit.users.getByUsername({
@@ -110,7 +126,9 @@ async function query() {
     // Format the join date as YYYY-MM-DD
     const formattedJoinDate = new Date(joinDate).toISOString().split('T')[0];
 
-    const logEntry = `${login}\t${weekCount}\t${monthCount}\t${threeMonthCount}\t${formattedJoinDate}`;
+    const logEntry = `${login}\t${formattedJoinDate}\t${weekCount.commitCount}\t${monthCount.commitCount}\t${
+      threeMonthCount.commitCount
+    }\t${threeMonthCount.repos.join(',')}`;
     appendToFile(logEntry);
     if (githubLogins.indexOf(login) % 10 === 0) {
       console.log(`Processed ${githubLogins.indexOf(login)}/${githubLogins.length} logins`);

@@ -1,5 +1,6 @@
-import { createDefaultEsmPreset } from 'ts-jest';
-
 export default {
-  ...createDefaultEsmPreset()
+  transform: {
+    '^.+\\.(t|j)sx?$': '@swc/jest'
+  },
+  extensionsToTreatAsEsm: ['.ts', '.tsx']
 };

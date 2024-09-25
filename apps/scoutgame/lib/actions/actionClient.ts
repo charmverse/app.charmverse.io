@@ -5,18 +5,18 @@ import { actionClient } from '@connect-shared/lib/actions/actionClient';
 export { actionClient };
 
 export const authActionClient = actionClient.use(async ({ next, ctx }) => {
-  const user = ctx.session.user;
+  const scoutId = ctx.session.scoutId;
 
-  if (!user?.id) {
+  if (!scoutId) {
     throw new UnauthorisedActionError('You are not logged in. Please try to login');
   }
 
   await prisma.scout.findUniqueOrThrow({
-    where: { id: user.id },
+    where: { id: scoutId },
     select: { id: true }
   });
 
   return next({
-    ctx: { ...ctx, session: { ...ctx.session, user } }
+    ctx: { ...ctx, session: { ...ctx.session, scoutId } }
   });
 });

@@ -14,7 +14,7 @@ import { OrangeDAOInviteTemplate } from './templates/OrangeDAOInviteTemplate';
 import type { PageInviteEmailProps } from './templates/PageInviteTemplate';
 import { emailSubject, PageInviteTemplate } from './templates/PageInviteTemplate';
 
-export function getPendingNotificationEmail({
+export async function getPendingNotificationEmail({
   notification,
   spaceFeatures,
   user,
@@ -28,7 +28,7 @@ export function getPendingNotificationEmail({
     color: string;
   };
 }) {
-  const html = render(NotificationTemplate({ emailBranding, notification, user, spaceFeatures }));
+  const html = await render(NotificationTemplate({ emailBranding, notification, user, spaceFeatures }));
   const content = getNotificationMetadata({ notification, spaceFeatures }).content;
   const subject =
     typeof content === 'string' ? content : htmlToText(ReactDOMServer.renderToString(content as ReactElement));
@@ -36,7 +36,7 @@ export function getPendingNotificationEmail({
   return { html, subject };
 }
 
-export function getOrangeDaoSpaceInviteEmail({
+export async function getOrangeDaoSpaceInviteEmail({
   pagePath,
   pageTitle,
   spaceDomain,
@@ -49,7 +49,7 @@ export function getOrangeDaoSpaceInviteEmail({
   spaceDomain: string;
   user: Pick<User, 'username' | 'id' | 'avatar'>;
 }) {
-  const html = render(
+  const html = await render(
     OrangeDAOInviteTemplate({
       pagePath,
       pageTitle,
@@ -66,15 +66,15 @@ export function getOrangeDaoSpaceInviteEmail({
   };
 }
 
-export function getPageInviteEmail(props: PageInviteEmailProps) {
-  const html = render(PageInviteTemplate(props));
+export async function getPageInviteEmail(props: PageInviteEmailProps) {
+  const html = await render(PageInviteTemplate(props));
   const subject = emailSubject(props);
 
   return { html, subject };
 }
 
-export function getMagicLinkEmail(props: MagicLinkProps) {
-  const html = render(MagicLinkTemplate(props));
+export async function getMagicLinkEmail(props: MagicLinkProps) {
+  const html = await render(MagicLinkTemplate(props));
   const subject = emailVerificationSubject();
 
   return { html, subject };

@@ -3,7 +3,7 @@ import { currentSeason } from '@packages/scoutgame/builderNfts/constants';
 import { getLastWeek } from '@packages/scoutgame/utils';
 
 import { getBuilders } from './getBuilders';
-import type { BuilderUserInfo } from './interfaces';
+import type { BuilderInfo } from './interfaces';
 
 export type BuildersSort = 'top' | 'hot' | 'new';
 
@@ -13,7 +13,7 @@ export async function getSortedBuilders({
 }: {
   sort: BuildersSort;
   limit: number;
-}): Promise<BuilderUserInfo[]> {
+}): Promise<BuilderInfo[]> {
   // new is based on the most recent builder
   // top is based on the most gems earned in their user week stats
   // hot is based on the most points earned in the previous user week stats
