@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { useMdScreen, useLgScreen } from 'hooks/useMediaScreens';
+import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
 
 import { NextArrow, PrevArrow } from './Arrows';
 

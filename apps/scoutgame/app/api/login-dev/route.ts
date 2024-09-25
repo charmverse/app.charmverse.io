@@ -1,12 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsUser } from '@charmverse/core/test';
 import { getIronOptions } from '@connect-shared/lib/session/config';
-import { cookieName, isDevEnv, isTestEnv } from '@root/config/constants';
-import { randomIntFromInterval } from '@root/lib/utils/random';
+import { cookieName, isDevEnv } from '@root/config/constants';
 import { sealData } from 'iron-session';
 
-const demoAvatar =
-  'https://wrpcd.net/cdn-cgi/image/anim=false,fit=contain,f=auto,w=168/https%3A%2F%2Fapp.charmverse.io%2Ffavicon.png';
+const isTestEnv = process.env.REACT_APP_APP_ENV === 'test';
 
 export async function GET(request: Request) {
   if (!isDevEnv && !isTestEnv) {
@@ -16,58 +13,24 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   const userId = searchParams.get('userId');
-
   if (!userId) {
-    const newUserId = await testUtilsUser.generateUser().then((user) => user.id);
-
-    const randomInt = randomIntFromInterval(1, 1000000);
-
-    await prisma.scout.update({
-      where: {
-        id: newUserId
-      },
-      data: {
-        username: `demo-${randomInt}`,
-        avatar: demoAvatar
-      }
-    });
-
-    await prisma.farcasterUser.create({
-      data: {
-        fid: randomInt,
-        userId: newUserId,
-        account: {
-          username: `example-user-${randomInt}`,
-          displayName: `display-${randomInt}`,
-          bio: 'dev user',
-          pfpUrl: demoAvatar
-        }
-      }
-    });
-
-    const sealedSession = await sealData({ user: { id: newUserId } }, getIronOptions());
-
-    const response = new Response();
-
-    response.headers.set('Set-Cookie', `${cookieName}=${sealedSession}; HttpOnly; Secure; SameSite=Strict; Path=/`);
-
-    return response;
-  } else {
-    const user = await prisma.scout.findFirstOrThrow({
-      where: {
-        id: userId
-      },
-      select: {
-        id: true
-      }
-    });
-
-    const sealedSession = await sealData({ user: { id: user.id } }, getIronOptions());
-
-    const response = new Response();
-
-    response.headers.set('Set-Cookie', `${cookieName}=${sealedSession}; HttpOnly; Secure; SameSite=Strict; Path=/`);
-
-    return response;
+    return new Response('userId is required', { status: 400 });
   }
+
+  const user = await prisma.scout.findFirstOrThrow({
+    where: {
+      id: userId
+    },
+    select: {
+      id: true
+    }
+  });
+
+  const sealedSession = await sealData({ user: { id: user.id } }, getIronOptions());
+
+  const response = new Response();
+
+  response.headers.set('Set-Cookie', `${cookieName}=${sealedSession}; HttpOnly; Secure; SameSite=Strict; Path=/`);
+
+  return response;
 }

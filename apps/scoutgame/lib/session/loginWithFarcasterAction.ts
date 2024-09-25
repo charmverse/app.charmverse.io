@@ -15,7 +15,7 @@ export const loginAction = actionClient
     const { fid } = await verifyFarcasterUser(parsedInput);
     const user = await findOrCreateFarcasterUser({ fid });
 
-    await saveSession(ctx, { user });
+    await saveSession(ctx, { scoutId: user.id });
 
     return { success: true, userId: user.id };
   });

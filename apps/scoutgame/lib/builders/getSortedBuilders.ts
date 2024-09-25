@@ -21,12 +21,12 @@ export async function getSortedBuilders({
     case 'new':
       builders = await prisma.scout
         .findMany({
-          orderBy: {
-            createdAt: 'desc'
-          },
           where: {
             bannedAt: null,
             builder: true
+          },
+          orderBy: {
+            createdAt: 'desc'
           },
           take: limit,
           select: {
@@ -77,15 +77,15 @@ export async function getSortedBuilders({
     case 'top':
       builders = await prisma.userWeeklyStats
         .findMany({
-          orderBy: {
-            gemsCollected: 'desc'
-          },
           where: {
-            week: getCurrentWeek(),
             user: {
               bannedAt: null,
               builder: true
-            }
+            },
+            week: getCurrentWeek()
+          },
+          orderBy: {
+            gemsCollected: 'desc'
           },
           take: limit,
           select: {

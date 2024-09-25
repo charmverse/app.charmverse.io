@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { pricingGetter } from '@root/lib/crypto-price/getters';
 import dynamic from 'next/dynamic';
 
 import type { CarouselProps } from 'components/common/Carousel/Carousel';
@@ -17,10 +18,21 @@ const Carousel = dynamic<CarouselProps>(
 export async function TodaysHotBuildersCarousel() {
   const builders = await getTodaysHotBuilders({ limit: 10 });
 
+  const price = await pricingGetter.getQuote('ETH', 'USD').catch(() => ({
+    base: 'ETH',
+    quote: 'USD',
+    amount: 2544.5,
+    receivedOn: 1726868673193
+  }));
+
   return (
     <Carousel>
       {builders.map((builder) => (
-        <BuilderCard key={builder.id} builder={builder} showPurchaseButton />
+        <BuilderCard
+          key={builder.id}
+          builder={{ ...builder, price: Math.round((Number(a.price) / 18) * price!.amount) }}
+          showPurchaseButton
+        />
       ))}
     </Carousel>
   );

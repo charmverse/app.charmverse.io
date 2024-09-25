@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/utils';
 import type { Metadata } from 'next';
@@ -30,6 +31,7 @@ export default async function Profile({
   }
 
   if (!user.onboardedAt) {
+    log.info('Redirect user to welcome page', { userId: user?.id });
     redirect('/welcome');
   }
 

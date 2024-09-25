@@ -8,6 +8,10 @@ import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
 
 type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
 
+/**
+ *
+ * @isFirstMergedPullRequest Only used for the seed data generator
+ */
 export async function processMergedPullRequest({
   pullRequest,
   repo,

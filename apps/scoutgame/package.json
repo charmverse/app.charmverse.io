@@ -15,6 +15,9 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
+    "@decent.xyz/box-hooks": "^3.2.1",
+    "@decent.xyz/the-box": "^3.1.15",
+    "@decent.xyz/box-common": "^3.1.15",
     "@hookform/resolvers": "^3.6.0",
     "@packages/github": "file:../../packages/github",
     "@packages/scoutgame": "^0.0.0",
