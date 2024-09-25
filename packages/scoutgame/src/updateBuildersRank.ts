@@ -1,12 +1,12 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getTopBuilders } from './getTopBuilders';
+import { getBuildersLeaderboard } from './getBuildersLeaderboard';
 
 export async function updateBuildersRank({ week }: { week: string }) {
-  const topBuilders = await getTopBuilders({ week });
+  const buildersLeaderboard = await getBuildersLeaderboard({ week });
 
-  for (const { builder, rank } of topBuilders) {
+  for (const { builder, rank } of buildersLeaderboard) {
     await prisma.userWeeklyStats.update({
       where: {
         userId_week: {
@@ -20,5 +20,5 @@ export async function updateBuildersRank({ week }: { week: string }) {
     });
   }
 
-  log.info(`Updated ${topBuilders.length} builders rank for week ${week}`);
+  log.info(`Updated ${buildersLeaderboard.length} builders rank for week ${week}`);
 }

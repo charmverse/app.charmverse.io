@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-export async function getTopBuilders({ quantity, week }: { quantity?: number; week: string }) {
+export async function getBuildersLeaderboard({ quantity, week }: { quantity?: number; week: string }) {
   const userWeeklyStats = await prisma.userWeeklyStats.findMany({
     where: {
       week
@@ -42,7 +42,7 @@ export async function getTopBuilders({ quantity, week }: { quantity?: number; we
           return a.user.username.localeCompare(b.user.username);
         }
 
-        return userBEvent - userAEvent;
+        return userAEvent - userBEvent;
       }
       return b.gemsCollected - a.gemsCollected;
     })
