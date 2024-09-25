@@ -53,7 +53,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build apps
+    name: Build Scoutgame
     runs-on: ubuntu-latest
     outputs:
       head_commit_message: ${{ steps.setup_variables.outputs.commit_message }}
@@ -92,7 +92,7 @@ jobs:
           app_name: scoutgame
 
   test-scoutgame:
-    name: Test apps
+    name: Test
     runs-on: ubuntu-latest
     needs: build
     if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
@@ -150,7 +150,7 @@ jobs:
         run: npx dotenv -e .env.test.local -- npm run test -w packages/scoutgame
 
   test-scoutgame-e2e:
-    name: Test Scoutgame e2e
+    name: Test e2e
     runs-on: ubuntu-latest
     needs: build
     # if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
