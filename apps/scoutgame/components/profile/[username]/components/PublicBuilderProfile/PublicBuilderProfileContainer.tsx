@@ -68,60 +68,60 @@ export function PublicBuilderProfileContainer({
   return (
     <Box>
       {!isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
-      {builder.builder ? (
-        <Stack
-          gap={2}
-          my={{
-            xs: 1,
-            md: 2
-          }}
-        >
-          <Paper sx={{ py: 2 }}>
-            <Stack flexDirection='row'>
-              <BackButton />
-              {isDesktop ? (
-                <Box>
+      <Stack
+        gap={2}
+        my={{
+          xs: 1,
+          md: 2
+        }}
+      >
+        <Paper sx={{ py: 2 }}>
+          <Stack flexDirection='row'>
+            <BackButton />
+            {isDesktop ? (
+              <Box>
+                <UserProfile
+                  user={{
+                    ...builder,
+                    githubLogin: builder.githubLogin
+                  }}
+                />
+              </Box>
+            ) : (
+              <Stack flexDirection='row' alignItems='center' gap={2}>
+                <Box width={{ xs: 145, md: 150 }}>
+                  <BuilderCard
+                    user={user}
+                    builder={{
+                      ...builder,
+                      price: builder.price
+                    }}
+                    hideDetails
+                    showPurchaseButton
+                  />
+                </Box>
+                <Stack gap={1} pr={1}>
                   <UserProfile
                     user={{
                       ...builder,
+                      avatar: null,
                       githubLogin: builder.githubLogin
                     }}
                   />
-                </Box>
-              ) : (
-                <Stack flexDirection='row' alignItems='center' gap={2}>
-                  <Box width={{ xs: 145, md: 150 }}>
-                    <BuilderCard
-                      user={user}
-                      builder={{
-                        ...builder,
-                        price: builder.price
-                      }}
-                      hideDetails
-                      showPurchaseButton
-                    />
-                  </Box>
-                  <Stack gap={1} pr={1}>
-                    <UserProfile
-                      user={{
-                        ...builder,
-                        avatar: null,
-                        githubLogin: builder.githubLogin
-                      }}
-                    />
-                    <PublicBuilderStats
-                      allTimePoints={allTimePoints}
-                      seasonPoints={seasonPoints}
-                      totalScouts={totalScouts}
-                      totalNftsSold={totalNftsSold}
-                    />
-                  </Stack>
+                  <PublicBuilderStats
+                    allTimePoints={allTimePoints}
+                    seasonPoints={seasonPoints}
+                    totalScouts={totalScouts}
+                    totalNftsSold={totalNftsSold}
+                  />
                 </Stack>
-              )}
-            </Stack>
-          </Paper>
-          {isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
+              </Stack>
+            )}
+          </Stack>
+        </Paper>
+        {isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
 
+        {builder.builder ? (
           <Stack
             gap={2}
             flexDirection={{
@@ -178,19 +178,19 @@ export function PublicBuilderProfileContainer({
               </Stack>
             </PaperContainer>
           </Stack>
-        </Stack>
-      ) : (
-        <Paper
-          sx={{
-            p: 4,
-            backgroundColor: 'background.dark'
-          }}
-        >
-          <Typography textAlign='center' width='100%' variant='h6'>
-            This user does not have a builder profile
-          </Typography>
-        </Paper>
-      )}
+        ) : (
+          <Paper
+            sx={{
+              p: 4,
+              backgroundColor: 'background.dark'
+            }}
+          >
+            <Typography textAlign='center' width='100%' variant='h6'>
+              This user does not have a builder profile
+            </Typography>
+          </Paper>
+        )}
+      </Stack>
     </Box>
   );
 }

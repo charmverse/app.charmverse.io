@@ -14,7 +14,16 @@ type UserProfileProps = {
 export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
   const { displayName, username, bio, avatar, githubLogin } = user;
   return (
-    <Stack display='flex' gap={2} alignItems='center' flexDirection='row'>
+    <Stack
+      display='flex'
+      gap={2}
+      alignItems='center'
+      flexDirection='row'
+      p={{
+        xs: 0,
+        md: 2
+      }}
+    >
       {user.avatar ? (
         <Stack
           alignItems={{
