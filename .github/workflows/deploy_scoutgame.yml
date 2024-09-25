@@ -217,8 +217,12 @@ jobs:
                       mcr.microsoft.com/playwright:v1.47.1-jammy \
                       npm run scoutgame:e2e:ci -- -- --workers=2 || { echo $'\n👉 Here's the server output for debugging:\n' && tail -f server.log & exit 1; }
 
-      # upload reporst for Github Actions - Source: https://playwright.dev/docs/ci-intro
-      # To view: download the zip, unpack and run "npx playwright show-report <extracted_report_folder>"
+      # Upload reporst for Github Actions
+      # Sources:
+      #   https://playwright.dev/docs/ci-intro
+      #   https://playwright.dev/docs/trace-viewer#opening-the-trace
+      # To view playwright-report: download the zip, unpack and run "npx playwright show-report path/to/folder"
+      # To view test-results: download the zip, run "npx playwright show-trace path/to/trace.zip"
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
