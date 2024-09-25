@@ -1,3 +1,14 @@
-import makeConfig from '../../jest.config.nodejs';
+import { compilerOptions } from './tsconfig.json';
 
-export default makeConfig(__dirname);
+export default {
+  transform: {
+    '^.+\\.(t|j)sx?$': [
+      '@swc/jest',
+      {
+        jsc: { baseUrl: '.', paths: compilerOptions.paths }
+      }
+    ]
+  },
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  modulePathIgnorePatterns: ['__e2e__']
+};

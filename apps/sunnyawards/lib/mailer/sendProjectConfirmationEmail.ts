@@ -47,7 +47,7 @@ export async function sendProjectConfirmationEmail({ userId, projectId }: { user
     }
   });
 
-  const html = render(
+  const html = await render(
     ProjectConfirmation({
       project: {
         ...project,
