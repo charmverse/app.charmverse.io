@@ -16,6 +16,7 @@ export type BuilderProfileProps = {
     price: number;
     githubLogin: string;
     bio: string;
+    isBuilder: boolean;
   };
   builderId: string;
   allTimePoints: number;

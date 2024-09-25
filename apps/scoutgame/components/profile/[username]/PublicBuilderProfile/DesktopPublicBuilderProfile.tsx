@@ -54,51 +54,59 @@ export function DesktopPublicBuilderProfile({
           background: (theme) => theme.palette.background.dark
         }}
       >
-        <Stack gap={2} flexGrow={1}>
-          <Paper sx={{ py: 2, pr: { xs: 1, md: 2 } }}>
-            <Stack flexDirection='row' alignItems='center' gap={2} p={2} justifyContent='center'>
-              <Box width={{ md: 150 }}>
-                <BuilderCard
-                  builder={{
-                    id: builderId,
-                    nftAvatar: builder.avatar || '',
-                    username: builder.username,
-                    displayName: builder.displayName,
-                    price: builder.price
-                  }}
-                  hideDetails
-                  showPurchaseButton
-                />
-              </Box>
-              <PublicBuilderStats
-                seasonPoints={seasonPoints}
-                allTimePoints={allTimePoints}
-                totalScouts={totalScouts}
-                totalNftsSold={totalNftsSold}
-              />
+        {builder.isBuilder ? (
+          <>
+            <Stack gap={2} flexGrow={1}>
+              <Paper sx={{ py: 2, pr: { xs: 1, md: 2 } }}>
+                <Stack flexDirection='row' alignItems='center' gap={2} p={2} justifyContent='center'>
+                  <Box width={{ md: 150 }}>
+                    <BuilderCard
+                      builder={{
+                        id: builderId,
+                        nftAvatar: builder.avatar || '',
+                        username: builder.username,
+                        displayName: builder.displayName,
+                        price: builder.price
+                      }}
+                      hideDetails
+                      showPurchaseButton
+                    />
+                  </Box>
+                  <PublicBuilderStats
+                    seasonPoints={seasonPoints}
+                    allTimePoints={allTimePoints}
+                    totalScouts={totalScouts}
+                    totalNftsSold={totalNftsSold}
+                  />
+                </Stack>
+              </Paper>
+              <Stack gap={0.5}>
+                <Typography color='secondary' variant='h6'>
+                  Scouted By
+                </Typography>
+                <ScoutsGallery scouts={scouts} />
+              </Stack>
             </Stack>
-          </Paper>
-          <Stack gap={0.5}>
-            <Typography color='secondary' variant='h6'>
-              Scouted By
-            </Typography>
-            <ScoutsGallery scouts={scouts} />
-          </Stack>
-        </Stack>
-        <Stack flexGrow={1} gap={2}>
-          <Stack>
-            <Typography color='secondary' variant='h6'>
-              This Week
-            </Typography>
-            <BuilderWeeklyStats gemsCollected={gemsCollected} rank={rank} />
-          </Stack>
-          <Stack>
-            <Typography color='secondary' variant='h6'>
-              Recent Activity
-            </Typography>
-            <BuilderActivitiesList activities={builderActivities} />
-          </Stack>
-        </Stack>
+            <Stack flexGrow={1} gap={2}>
+              <Stack>
+                <Typography color='secondary' variant='h6'>
+                  This Week
+                </Typography>
+                <BuilderWeeklyStats gemsCollected={gemsCollected} rank={rank} />
+              </Stack>
+              <Stack>
+                <Typography color='secondary' variant='h6'>
+                  Recent Activity
+                </Typography>
+                <BuilderActivitiesList activities={builderActivities} />
+              </Stack>
+            </Stack>
+          </>
+        ) : (
+          <Typography textAlign='center' width='100%' variant='h6'>
+            This user does not have a builder profile
+          </Typography>
+        )}
       </Paper>
     </Box>
   );

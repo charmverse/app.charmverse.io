@@ -10,10 +10,6 @@ import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
 import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
 
 export async function PublicBuilderProfile({ builderId, tab }: { builderId: string; tab: string }) {
-  const builderWeeklyStats = await getBuilderWeeklyStats(builderId);
-  const { allTimePoints, seasonPoints } = await getBuilderStats(builderId);
-  const builderActivities = await getBuilderActivities({ builderId, take: 5 });
-  const { scouts, totalNftsSold, totalScouts } = await getBuilderScouts(builderId);
   const builder = await prisma.scout.findUniqueOrThrow({
     where: {
       id: builderId
@@ -23,6 +19,7 @@ export async function PublicBuilderProfile({ builderId, tab }: { builderId: stri
       username: true,
       displayName: true,
       bio: true,
+      builder: true,
       githubUser: {
         select: {
           login: true
@@ -39,6 +36,30 @@ export async function PublicBuilderProfile({ builderId, tab }: { builderId: stri
     }
   });
 
+  const isBuilder = builder.builder;
+
+  const builderWeeklyStats = isBuilder
+    ? await getBuilderWeeklyStats(builderId)
+    : {
+        gemsCollected: 0,
+        rank: 0
+      };
+
+  const { allTimePoints, seasonPoints } = isBuilder
+    ? await getBuilderStats(builderId)
+    : {
+        allTimePoints: 0,
+        seasonPoints: 0
+      };
+  const builderActivities = isBuilder ? await getBuilderActivities({ builderId, take: 5 }) : [];
+  const { scouts, totalNftsSold, totalScouts } = isBuilder
+    ? await getBuilderScouts(builderId)
+    : {
+        scouts: [],
+        totalNftsSold: 0,
+        totalScouts: 0
+      };
+
   if (!builder) {
     notFound();
   }
@@ -51,9 +72,10 @@ export async function PublicBuilderProfile({ builderId, tab }: { builderId: stri
         avatar: builder.avatar || '',
         username: builder.username,
         displayName: builder.displayName,
-        price: Number(builder.builderNfts[0].currentPrice),
+        price: Number(builder.builderNfts[0]?.currentPrice || 0),
         githubLogin: builder.githubUser[0]?.login || '',
-        bio: builder.bio || ''
+        bio: builder.bio || '',
+        isBuilder: builder.builder
       }}
       builderId={builderId}
       allTimePoints={allTimePoints}
