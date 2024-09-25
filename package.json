@@ -69,7 +69,7 @@
     "test:e2e": "npx dotenv -e .env.test.local -- npx playwright test --timeout=0",
     "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local -- npx playwright test",
     "test": "npm run test:ci -- --verbose --watch --config='./lib/jest.config.ts'",
-    "test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- node --experimental-vm-modules ./node_modules/.bin/jest --runInBand",
+    "test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- node --experimental-vm-modules ./node_modules/.bin/jest --maxWorkers=2",
     "test:debug": "dotenv -e .env.test.local --override -- node --inspect-brk --expose-gc ./node_modules/.bin/jest --runInBand --logHeapUsage --config='./__integration-tests__/jest.config.ts' --verbose",
     "test:server": "npm run test:server:ci -- --verbose --watch",
     "test:server:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e .env.test.local --override -- npx jest --config='./__integration-tests__/jest.config.ts' --maxWorkers=2",
