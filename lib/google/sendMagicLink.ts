@@ -52,7 +52,7 @@ export async function sendMagicLink({ to, redirectUrl, spaceId }: MagicLinkDispa
         }
       })
     : null;
-  const template = getMagicLinkEmail({
+  const template = await getMagicLinkEmail({
     magicLink,
     emailBranding: {
       artwork: space?.emailBrandArtwork || '',

@@ -74,7 +74,7 @@ async function sendTestEmail(req: NextApiRequest, res: NextApiResponse) {
 
   const primaryIdentity = await getMemberUsernameBySpaceRole({ spaceRoleId });
 
-  const template = emails.getPendingNotificationEmail({
+  const template = await emails.getPendingNotificationEmail({
     notification: {
       id: v4(),
       archived: false,
