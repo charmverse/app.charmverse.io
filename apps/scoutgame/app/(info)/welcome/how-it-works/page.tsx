@@ -16,5 +16,6 @@ export const metadata: Metadata = {
 export default async function HowItWorks() {
   const user = await getUserFromSession();
 
-  return <HowItWorksPage username={user.username} />;
+  // logic in middleware.ts ensures that user is logged in
+  return <HowItWorksPage username={user!.username} />;
 }
