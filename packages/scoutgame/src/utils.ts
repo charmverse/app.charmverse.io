@@ -4,6 +4,10 @@ export const timezone = 'America/New_York';
 
 export const currentSeason = 1;
 
+// Season 1 started on 2024-09-22
+// TODO: Make sure to update this before the season starts
+export const seasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 22 });
+
 export const streakWindow = 7 * 24 * 60 * 60 * 1000;
 
 // Return the format of week
@@ -76,4 +80,10 @@ export function isSameDay(date: Date) {
 export function getCurrentWeekPoints() {
   // TODO: Get points allocation for the week
   return 100000;
+}
+
+export function getCurrentWeekNumber() {
+  const currentDate = DateTime.now().setZone(timezone);
+  const weeksDiff = currentDate.diff(seasonStartDate, 'weeks').weeks;
+  return Math.floor(weeksDiff) + 1;
 }

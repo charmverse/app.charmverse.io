@@ -30,10 +30,12 @@ const readonlyApiClient = new ContractApiClient({
 
 export type NFTPurchaseProps = {
   builderId: string;
-  scout: Scout;
+  user: {
+    username: string;
+  };
 };
 
-function NFTPurchaseButton({ builderId, scout }: NFTPurchaseProps) {
+function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
   const { address, walletClient } = useWallet();
 
   // const [nftApiClient, setNftApiClient] = useState<ContractApiClient>(null);
@@ -117,7 +119,7 @@ function NFTPurchaseButton({ builderId, scout }: NFTPurchaseProps) {
         tokenAddress: '0x0000000000000000000000000000000000000000'
       },
       signature: 'function buyToken(uint256 tokenId, uint256 amount, string scout)',
-      args: [builderTokenId, tokensToBuy, scout.username]
+      args: [builderTokenId, tokensToBuy, user.username]
     }
   });
 

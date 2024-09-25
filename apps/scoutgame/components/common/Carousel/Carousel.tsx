@@ -1,20 +1,20 @@
 'use client';
 
-import type { Scout } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
-import type { BuilderUserInfo } from 'lib/builders/interfaces';
-
-import { UserCard } from '../Card/UserCard';
 
 import { NextArrow, PrevArrow } from './Arrows';
 
 import 'swiper/css';
 
-export function Carousel({ items, scout }: { items: BuilderUserInfo[]; scout?: Scout | null }) {
+export type CarouselProps = {
+  children: React.ReactNode[];
+};
+
+export function Carousel({ children }: CarouselProps) {
   const isDesktop = useMdScreen();
   const isLarge = useLgScreen();
   const slidesPerView = isDesktop ? 5 : isLarge ? 6 : 2.2;
@@ -23,7 +23,7 @@ export function Carousel({ items, scout }: { items: BuilderUserInfo[]; scout?: S
     <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
       <Box width='95svw' px={isDesktop ? 4 : 0} position='relative'>
         <Swiper
-          className='mySwiper'
+          className='swiper'
           slidesPerView={slidesPerView}
           spaceBetween={isDesktop ? 15 : 5}
           autoHeight={true}
@@ -33,13 +33,11 @@ export function Carousel({ items, scout }: { items: BuilderUserInfo[]; scout?: S
             prevEl: '.swiper-button-prev'
           }}
         >
-          {items.map((_user) => (
-            <SwiperSlide key={_user.username}>
-              <UserCard withDetails user={_user} scout={scout} variant='big' />
-            </SwiperSlide>
+          {children.map((child, index) => (
+            <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>
           ))}
         </Swiper>
-        {isDesktop && items.length > slidesPerView && (
+        {isDesktop && children.length > slidesPerView && (
           <>
             <NextArrow className='swiper-button-next' />
             <PrevArrow className='swiper-button-prev' />

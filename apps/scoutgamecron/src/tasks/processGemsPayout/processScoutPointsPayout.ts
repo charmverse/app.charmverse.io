@@ -17,6 +17,7 @@ export async function processScoutPointsPayout({
     by: ['scoutId'],
     where: {
       builderNFT: {
+        season: currentSeason,
         builderId
       }
     },

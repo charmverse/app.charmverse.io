@@ -7,15 +7,18 @@ import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import { DateTime } from 'luxon';
-import Image from 'next/image';
+import { getRelativeTime } from '@packages/utils/dates';
 
-import type { BuilderEventRow } from 'lib/builders/getAllEvents';
+import {
+  BuilderActivityDetail,
+  BuilderActivityGems,
+  BuilderActivityLabel
+} from 'components/profile/components/BuilderActivitiesList';
+import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
 import { Avatar } from '../../common/Avatar';
-import { iconMap } from '../../common/Tabs/iconMap';
 
-export async function ActivityTable({ rows }: { rows: BuilderEventRow[] }) {
+export async function ActivityTable({ activities }: { activities: BuilderActivity[] }) {
   return (
     <TableContainer component={Paper} sx={{ mt: 2 }}>
       <Table aria-label='Activity table' size='small'>
@@ -38,65 +41,39 @@ export async function ActivityTable({ rows }: { rows: BuilderEventRow[] }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {activities.map((activity) => (
             <TableRow
-              key={row.username}
+              key={activity.id}
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
                 '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
               }}
             >
-              <TableCell component='th' scope='row'>
+              <TableCell component='th' scope='activity'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
-                  <Avatar src={row.avatar} name={row.username} size='small' />
+                  <Avatar src={activity.avatar} name={activity.username} size='small' />
                   <Typography variant='caption' noWrap maxWidth={{ xs: '70px', md: '100%' }}>
-                    {row.username}
+                    {activity.username}
                   </Typography>
                 </Stack>
               </TableCell>
               <TableCell align='right'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
-                  <Stack sx={{ display: { xs: 'flex', md: 'none' } }}>{iconMap[row.type]}</Stack>
-                  <Typography variant='caption' noWrap maxWidth={{ xs: '150px', md: '100%' }}>
-                    {row.message}
-                  </Typography>
+                  <BuilderActivityLabel activity={activity} />
                 </Stack>
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <Stack alignItems='center' flexDirection='row' gap={1}>
-                  {iconMap[row.type]}
-                  <Typography variant='caption' noWrap>
-                    {row.detail}
-                  </Typography>
-                </Stack>
+                <BuilderActivityDetail activity={activity} />
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                  <Typography variant='caption' noWrap>
-                    {row.gemsEarned || 0}
-                  </Typography>
-                  <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
+                <Stack justifyContent='flex-end' flexDirection='row' gap={1}>
+                  <BuilderActivityGems activity={activity} />
                 </Stack>
               </TableCell>
-              <TableCell align='right'>
-                {row.bonus && (
-                  <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                    <Typography variant='caption' noWrap sx={{ display: { xs: 'none', md: 'initial' } }}>
-                      {row.bonus || 0}
-                    </Typography>
-                    <Image width={15} height={15} src='/images/profile/icons/optimism-icon.svg' alt='Bonus icon' />
-                  </Stack>
-                )}
-              </TableCell>
+              <TableCell align='right'>-</TableCell>
               <TableCell align='right'>
                 <Typography variant='caption' noWrap>
-                  {DateTime.fromISO(row.date)
-                    .toRelative({
-                      style: 'narrow',
-                      locale: 'en',
-                      round: true
-                    })
-                    ?.replace(' ago', '')}
+                  {getRelativeTime(activity.createdAt)}
                 </Typography>
               </TableCell>
             </TableRow>

@@ -1,12 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getIronOptions } from '@connect-shared/lib/session/config';
-import { cookieName } from '@root/config/constants';
+import { cookieName, isDevEnv } from '@root/config/constants';
 import { sealData } from 'iron-session';
 
 const isTestEnv = process.env.REACT_APP_APP_ENV === 'test';
 
 export async function GET(request: Request) {
-  if (!isTestEnv) {
+  if (!isDevEnv && !isTestEnv) {
     return new Response('This endpoint is only available in test environment', { status: 403 });
   }
 
@@ -26,9 +26,9 @@ export async function GET(request: Request) {
     }
   });
 
-  const sealedSession = await sealData({ user: { id: user.id } }, getIronOptions());
+  const sealedSession = await sealData({ scoutId: user.id }, getIronOptions());
 
-  const response = new Response();
+  const response = new Response(JSON.stringify({ user }));
 
   response.headers.set('Set-Cookie', `${cookieName}=${sealedSession}; HttpOnly; Secure; SameSite=Strict; Path=/`);
 

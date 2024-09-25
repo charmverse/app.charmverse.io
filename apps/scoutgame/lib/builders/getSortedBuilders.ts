@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek, getLastWeek } from '@packages/scoutgame/utils';
+import { currentSeason, getCurrentWeek, getLastWeek } from '@packages/scoutgame/utils';
 
-import type { BuilderUserInfo } from './interfaces';
+import type { BuilderInfo } from './interfaces';
 
 export type BuildersSort = 'top' | 'hot' | 'new';
 
@@ -11,17 +11,18 @@ export async function getSortedBuilders({
 }: {
   sort: BuildersSort;
   limit: number;
-}): Promise<BuilderUserInfo[]> {
+}): Promise<BuilderInfo[]> {
   // new is based on the most recent builder
   // top is based on the most gems earned in their user week stats
   // hot is based on the most points earned in the previous user week stats
-  let builders: BuilderUserInfo[];
+  let builders: BuilderInfo[];
 
   switch (sort) {
     case 'new':
       builders = await prisma.scout
         .findMany({
           where: {
+            bannedAt: null,
             builder: true
           },
           orderBy: {
@@ -32,16 +33,43 @@ export async function getSortedBuilders({
             id: true,
             username: true,
             avatar: true,
-            createdAt: true
+            createdAt: true,
+            builderNfts: {
+              where: {
+                season: currentSeason
+              },
+              select: {
+                currentPrice: true,
+                nftSoldEvents: {
+                  distinct: 'scoutId'
+                }
+              }
+            },
+            userWeeklyStats: {
+              where: {
+                week: getCurrentWeek()
+              },
+              select: {
+                gemsCollected: true
+              }
+            },
+            userAllTimeStats: {
+              select: {
+                pointsEarnedAsBuilder: true
+              }
+            }
           }
         })
         .then((scouts) =>
           scouts.map((scout) => ({
-            ...scout,
-            gems: 0,
-            scoutedBy: 0,
-            nftsSold: 0,
-            price: 0
+            id: scout.id,
+            avatar: scout.avatar,
+            username: scout.username,
+            displayName: scout.username,
+            builderPoints: scout.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
+            price: scout.builderNfts?.[0]?.currentPrice ?? 0,
+            scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
+            gems: scout.userWeeklyStats[0]?.gemsCollected ?? 0
           }))
         );
       break;
@@ -51,6 +79,7 @@ export async function getSortedBuilders({
         .findMany({
           where: {
             user: {
+              bannedAt: null,
               builder: true
             },
             week: getCurrentWeek()
@@ -64,7 +93,23 @@ export async function getSortedBuilders({
               select: {
                 id: true,
                 username: true,
-                avatar: true
+                avatar: true,
+                builderNfts: {
+                  where: {
+                    season: currentSeason
+                  },
+                  select: {
+                    currentPrice: true,
+                    nftSoldEvents: {
+                      distinct: 'scoutId'
+                    }
+                  }
+                },
+                userAllTimeStats: {
+                  select: {
+                    pointsEarnedAsBuilder: true
+                  }
+                }
               }
             },
             gemsCollected: true
@@ -72,11 +117,14 @@ export async function getSortedBuilders({
         })
         .then((stats) =>
           stats.map((stat) => ({
-            ...stat.user,
-            gems: stat.gemsCollected,
-            nftsSold: 0,
-            scoutedBy: 0,
-            price: 0
+            id: stat.user.id,
+            avatar: stat.user.avatar,
+            username: stat.user.username,
+            displayName: stat.user.username,
+            builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
+            price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
+            scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
+            gems: stat.gemsCollected
           }))
         );
       break;
@@ -87,10 +135,11 @@ export async function getSortedBuilders({
       builders = await prisma.userWeeklyStats
         .findMany({
           where: {
+            week: previousWeek,
             user: {
+              bannedAt: null,
               builder: true
-            },
-            week: previousWeek
+            }
           },
           orderBy: [{ week: 'desc' }, { gemsCollected: 'desc' }],
           take: limit,
@@ -99,7 +148,23 @@ export async function getSortedBuilders({
               select: {
                 id: true,
                 username: true,
-                avatar: true
+                avatar: true,
+                userAllTimeStats: {
+                  select: {
+                    pointsEarnedAsBuilder: true
+                  }
+                },
+                builderNfts: {
+                  where: {
+                    season: currentSeason
+                  },
+                  select: {
+                    currentPrice: true,
+                    nftSoldEvents: {
+                      distinct: 'scoutId'
+                    }
+                  }
+                }
               }
             },
             gemsCollected: true
@@ -107,11 +172,14 @@ export async function getSortedBuilders({
         })
         .then((stats) =>
           stats.map((stat) => ({
-            ...stat.user,
-            gems: stat.gemsCollected,
-            nftsSold: 0,
-            scoutedBy: 0,
-            price: 0
+            id: stat.user.id,
+            avatar: stat.user.avatar,
+            username: stat.user.username,
+            displayName: stat.user.username,
+            builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
+            price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
+            scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
+            gems: stat.gemsCollected
           }))
         );
       break;
