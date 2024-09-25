@@ -3,17 +3,7 @@
 import { log } from '@charmverse/core/log';
 import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  Box,
-  Button,
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  FormLabel,
-  Stack,
-  TextField
-} from '@mui/material';
+import { Box, Button, Checkbox, FormControl, FormControlLabel, FormLabel, Stack, TextField } from '@mui/material';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';

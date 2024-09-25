@@ -5,11 +5,10 @@ import { Box, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
-import { CarouselContainer } from 'components/common/Carousel/CarouselContainer';
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { HomeTabsMenu } from 'components/home/components/HomeTabsMenu';
-import { LoadingBanner } from 'components/layout/Loading/LoadinBanner';
-import { LoadingCards } from 'components/layout/Loading/LoadingCards';
+import { TodaysHotBuildersCarousel } from 'components/home/components/TodaysHotBuildersCarousel';
+import { LoadingBanner } from 'components/layout/Loading/LoadingBanner';
 
 import { HomeTab } from './components/HomeTab';
 import { homeTabs } from './components/HomeTabsMenu';
@@ -28,9 +27,7 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
             Scout Today's HOT Builders
           </Typography>
         </Stack>
-        <Suspense fallback={<LoadingCards />}>
-          <CarouselContainer />
-        </Suspense>
+        <TodaysHotBuildersCarousel />
         <HomeTabsMenu tab={currentTab} />
         <HomeTab tab={currentTab} />
       </Box>

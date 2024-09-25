@@ -21,6 +21,7 @@
     "@hookform/resolvers": "^3.6.0",
     "@packages/github": "file:../../packages/github",
     "@packages/scoutgame": "^0.0.0",
+    "@packages/utils": "file:../../packages/utils",
     "@serwist/next": "^9.0.5",
     "@typeschema/yup": "^0.13.3",
     "framer-motion": "^11.3.17",

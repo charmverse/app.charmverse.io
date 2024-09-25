@@ -22,7 +22,7 @@ const HeaderMenu = dynamic(() => import('./components/HeaderMenu').then((mod) =>
   ssr: false
 });
 
-export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | null }) {
+export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar' | 'currentBalance'> | null }) {
   const router = useRouter();
 
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -71,7 +71,7 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | nu
                   borderRadius='30px'
                   sx={{ borderWidth: '2px', borderStyle: 'solid', pl: 1 }}
                 >
-                  <Typography variant='caption'>500</Typography>
+                  <Typography variant='caption'>{user.currentBalance}</Typography>
                   <Image
                     src='/images/profile/scout-game-icon.svg'
                     width={20}

@@ -1,16 +1,18 @@
-import type { Scout } from '@charmverse/core/prisma-client';
-
 import { BasicModal } from 'components/common/Modal';
 
 import { NFTPurchase } from './NFTPurchase';
 
-export function NFTPurchaseDialog(props: { onClose: VoidFunction; builderId?: string | null; scout?: Scout | null }) {
-  if (!props.scout || !props.builderId) {
+export function NFTPurchaseDialog(props: {
+  onClose: VoidFunction;
+  builderId?: string | null;
+  user?: { username: string } | null;
+}) {
+  if (!props.user || !props.builderId) {
     return null;
   }
   return (
     <BasicModal open onClose={props.onClose} theme='dark'>
-      <NFTPurchase builderId={props.builderId as string} scout={props.scout as Scout} />
+      <NFTPurchase builderId={props.builderId as string} user={props.user} />
     </BasicModal>
   );
 }

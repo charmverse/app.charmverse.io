@@ -1,6 +1,6 @@
 'use client';
 
-import { createTheme, responsiveFontSizes } from '@mui/material';
+import { createTheme, darken, responsiveFontSizes } from '@mui/material';
 import { Inter } from 'next/font/google';
 
 import {
@@ -42,7 +42,8 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       palette: {
         background: {
           default: backgroundColorDarkMode,
-          paper: backgroundLightColorDarkMode
+          paper: backgroundLightColorDarkMode,
+          dark: darken(backgroundColorDarkMode, 0.05)
         },
         text: {
           disabled: disabledTextColorDarkMode,
@@ -77,13 +78,13 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       palette: {
         background: {
           default: backgroundColorDarkMode,
-          paper: backgroundLightColorDarkMode
+          paper: backgroundLightColorDarkMode,
+          dark: darken(backgroundLightColorDarkMode, 0.25)
         },
         text: {
           primary: primaryTextColorDarkMode,
           secondary: secondaryText,
           disabled: disabledTextColorDarkMode
-          // black: blackText
         },
         primary: {
           main: brandColor,

@@ -1,6 +1,8 @@
 import type { GithubRepo } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid, v4 } from 'uuid';
+
+import { currentSeason } from '../utils';
 
 import { randomLargeInt } from './generators';
 
@@ -112,7 +114,7 @@ export async function mockBuilderNft({
       chainId,
       contractAddress,
       currentPrice: 0,
-      season: 0,
+      season: currentSeason,
       tokenId: Math.round(Math.random() * 10000000)
     }
   });

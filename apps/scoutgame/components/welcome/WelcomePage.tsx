@@ -12,7 +12,14 @@ export function WelcomePage({ user }: { user: Scout }) {
     <SinglePageLayout>
       <SinglePageWrapper>
         <Box display='flex' gap={3} flexDirection='column' alignItems='flex-start' data-test='welcome-page'>
-          {user.farcasterId && <UserProfile user={user} />}
+          {user.farcasterId && (
+            <UserProfile
+              user={{
+                ...user,
+                avatar: user.avatar
+              }}
+            />
+          )}
           <ExtraDetailsForm />
         </Box>
       </SinglePageWrapper>

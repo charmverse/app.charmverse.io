@@ -1,16 +1,11 @@
 export type BasicUserInfo = {
   id: string;
   username: string;
-  avatar: string | null;
+  avatar?: string | null;
+  displayName: string;
+  bio?: string | null;
+  githubLogin?: string;
 };
-
-// export type ScontInfo = {
-//   buildersScouted: number;
-
-//   nftsSold: number;
-//   gems: number;
-//   price: number;
-// };
 
 export type PointMetrics = {
   seasonPoints: number;
@@ -22,10 +17,12 @@ export type PointMetrics = {
  * @nftsSold - The total number of tokens issued for this user
  */
 export type BuilderMetrics = {
-  scoutedBy: number;
-  nftsSold: number;
-  gems: number;
-  price: number;
+  scoutedBy?: number;
+  nftsSold?: number;
+  gemsCollected?: number;
+  price?: bigint | number;
+  builderPoints?: number;
+  isBanned?: boolean;
 };
 
-export type BuilderUserInfo = BasicUserInfo & BuilderMetrics;
+export type BuilderInfo = BasicUserInfo & BuilderMetrics;
