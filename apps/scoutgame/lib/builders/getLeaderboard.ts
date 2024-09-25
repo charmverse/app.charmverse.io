@@ -16,7 +16,7 @@ export async function getLeaderboard(): Promise<LeaderBoardRow[]> {
       week: currentWeek
     },
     orderBy: {
-      gemsCollected: 'desc'
+      rank: 'asc'
     },
     take: 10,
     select: {

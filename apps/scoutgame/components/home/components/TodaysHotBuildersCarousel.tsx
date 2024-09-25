@@ -30,7 +30,10 @@ export async function TodaysHotBuildersCarousel({ user }: { user?: { username: s
       {builders.map((builder) => (
         <BuilderCard
           key={builder.id}
-          builder={{ ...builder, price: Math.round((Number(builder.price) / 18) * price!.amount) }}
+          builder={{
+            ...builder,
+            price: Math.round((Number(builder.price) / 18) * price!.amount)
+          }}
           showPurchaseButton
           user={user}
         />

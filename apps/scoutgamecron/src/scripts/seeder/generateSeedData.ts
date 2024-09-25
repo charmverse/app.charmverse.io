@@ -11,6 +11,7 @@ import { getTopBuilders } from '@packages/scoutgame/getTopBuilders';
 import { getFormattedWeek } from '@packages/scoutgame/utils';
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
 import { claimPoints } from '@packages/scoutgame/claimPoints';
+import { updateBuildersRank } from '@packages/scoutgame/updateBuildersRank';
 
 export type BuilderInfo = {
   id: string;
@@ -113,6 +114,8 @@ export async function generateSeedData() {
       )
       totalGithubEvents += dailyGithubEvents;
     }
+
+    await updateBuildersRank({ week });
 
     for (const scout of scouts) {
       // Do not purchase your own nft

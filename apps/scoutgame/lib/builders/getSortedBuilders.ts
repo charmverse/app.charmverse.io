@@ -86,7 +86,7 @@ export async function getSortedBuilders({
             week: getCurrentWeek()
           },
           orderBy: {
-            gemsCollected: 'desc'
+            rank: 'asc'
           },
           take: limit,
           select: {
@@ -143,7 +143,7 @@ export async function getSortedBuilders({
               builder: true
             }
           },
-          orderBy: [{ week: 'desc' }, { gemsCollected: 'desc' }],
+          orderBy: [{ week: 'desc' }, { rank: 'asc' }],
           take: limit,
           select: {
             user: {

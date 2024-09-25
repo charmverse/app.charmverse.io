@@ -1,5 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { updateBuildersRank } from '@packages/scoutgame/updateBuildersRank';
+import { getCurrentWeek } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 
 import { getPullRequests } from './getPullRequests';
@@ -44,6 +46,8 @@ export async function processPullRequests({
       await processMergedPullRequest({ pullRequest, repo });
     }
   }
+
+  await updateBuildersRank({ week: getCurrentWeek() });
 
   log.info(`Processed ${pullRequests.length} pull requests in ${timer.diff(DateTime.now(), 'minutes')} minutes`);
 }
