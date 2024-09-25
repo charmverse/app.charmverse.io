@@ -42,6 +42,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
         maxWidth: '1240px',
         margin: 'auto'
       }}
+      data-test='profile-page'
     >
       <Stack
         gap={2}

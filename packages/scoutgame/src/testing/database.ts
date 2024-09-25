@@ -9,10 +9,12 @@ import { randomLargeInt } from './generators';
 export async function mockBuilder({
   bannedAt,
   githubUserId = randomLargeInt(),
+  onboardedAt,
   username = uuid()
 }: {
   bannedAt?: Date;
   githubUserId?: number;
+  onboardedAt?: Date;
   username?: string;
 } = {}) {
   const result = await prisma.scout.create({
@@ -20,6 +22,7 @@ export async function mockBuilder({
       username,
       displayName: 'Test User',
       bannedAt,
+      onboardedAt,
       builder: true,
       githubUser: {
         create: {

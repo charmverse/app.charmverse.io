@@ -8,8 +8,8 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
+import { JoinGithubButton } from 'components/common/JoinGithubButton';
 import { BuilderActivitiesList } from 'components/profile/components/BuilderActivitiesList';
-import { JoinGithubButton } from 'components/welcome/components/github/JoinGithubButton';
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';

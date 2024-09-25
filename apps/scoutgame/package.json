@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "start": "npx next dev",
-    "start:test": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 dotenv -e ../../.env.test.local npx next dev",
+    "start:test": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 npx react-env --path ../../.env.test.local --dest ./public -- npx next dev",
     "build": "npx next build",
     "start:prod": "npx next start",
     "test": "npx jest --maxWorkers=2 --passWithNoTests",
     "start:test:ci": "DISABLE_PUBLISHED_CREDENTIALS=\"true\" PORT=3337 npx react-env --path ../../.env.test.local --dest ./public -- npx next start",
     "lint": "npx next lint",
-    "debug:e2e": "npx dotenv -e ../../.env.test.local -- npx playwright test --headed --config ./playwright.config.ts",
-    "test:e2e": "NODE_OPTIONS=\"--max_old_space_size=4096\" dotenv -e ../../.env.test.local -- npx playwright test --config ./playwright.config.ts",
+    "debug:e2e": "npx playwright test --config ./playwright.config.ts --headed",
+    "test:e2e": "npx playwright test --config ./playwright.config.ts",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {

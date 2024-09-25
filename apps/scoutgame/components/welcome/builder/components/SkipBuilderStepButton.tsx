@@ -10,13 +10,13 @@ export function SkipBuilderStepButton() {
   const router = useRouter();
   const { executeAsync, isExecuting } = useAction(saveOnboardedAction, {
     onSuccess: () => {
-      router.push('/welcome/how-it-works');
+      router.push('/welcome/spam-policy');
     }
   });
 
   return (
     <Stack direction='row' justifyContent='center'>
-      <Button variant='text' onClick={() => executeAsync()} disabled={isExecuting}>
+      <Button variant='text' onClick={() => executeAsync()} disabled={isExecuting} data-test='continue-button'>
         <Typography color='primary'>Skip for now</Typography>
       </Button>
     </Stack>

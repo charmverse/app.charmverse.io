@@ -8,7 +8,6 @@ export async function middleware(request: NextRequest) {
   const session = await getSession();
   const isLoggedIn = !!session.scoutId;
   const path = request.nextUrl.pathname;
-
   // We don't have a '/' page anymore since we need to handle 2 different layouts
   if (path === '/') {
     return NextResponse.redirect(new URL('/home', request.url));
@@ -16,6 +15,11 @@ export async function middleware(request: NextRequest) {
   // Redirect to login if anonymous user clicks on private links
   if (!isLoggedIn && privateLinks.some((url) => path.startsWith(url))) {
     return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // Redirect to home if logged in user clicks on login
+  if (isLoggedIn && path === '/login') {
+    return NextResponse.redirect(new URL('/home', request.url));
   }
 
   return NextResponse.next();

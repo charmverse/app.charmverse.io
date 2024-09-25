@@ -93,15 +93,8 @@ export function ExtraDetailsForm() {
         />
       </FormControl>
       <Stack display='flex' alignItems='center' gap={1} width='100%'>
-        {!isExecuting && errors?.length ? (
-          <Box flexGrow={1}>
-            <FormErrors errors={errors} />
-          </Box>
-        ) : (
-          <Box flexGrow={1}></Box>
-        )}
         <Button
-          data-test='finish-onboarding'
+          data-test='submit-extra-details'
           size='medium'
           type='submit'
           disabled={isExecuting}
@@ -110,6 +103,7 @@ export function ExtraDetailsForm() {
         >
           Next
         </Button>
+        <FormErrors errors={errors} />
       </Stack>
     </form>
   );

@@ -5,9 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
+import { JoinGithubButton } from 'components/common/JoinGithubButton';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 
-import { JoinGithubButton } from './components/github/JoinGithubButton';
+import { SkipBuilderStepButton } from './components/SkipBuilderStepButton';
 
 export function BuilderPage() {
   return (
@@ -41,7 +42,7 @@ export function BuilderPage() {
           alt='Scout game score'
         />
         <Typography variant='h5' mb={2} fontWeight='700' color='text.secondary'>
-          Sign up as a Builder!
+          Are you a builder?
         </Typography>
         <Typography mb={2}>
           Scout Game rewards Builders for contributing to the onchain ecosystem. You earn more rewards when scouts show
@@ -51,16 +52,15 @@ export function BuilderPage() {
           Sign up as a Builder now, and you will be eligible to earn Scout Points and a share of your NFT sales during
           the first season of Scout Game.
         </Typography>
-        <Typography mb={2}>You will also earn 10 Frame Clicks to help you move up the Waitlist!</Typography>
         <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
         <Typography mb={2}>Connect to GitHub to sign up and verify your code contributions.</Typography>
         <Box width='100%'>
           <Suspense>
-            <JoinGithubButton />
+            <Box display='flex' flexDirection='column' gap={2}>
+              <JoinGithubButton />
+              <SkipBuilderStepButton />
+            </Box>
           </Suspense>
-          <Button component={Link} variant='text' href='/score' sx={{ width: '100%', mt: 1 }}>
-            Cancel
-          </Button>
         </Box>
       </Box>
     </SinglePageWrapper>

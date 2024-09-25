@@ -131,7 +131,6 @@ export async function GET(req: NextRequest) {
       id: scout.id
     },
     data: {
-      builder: true,
       onboardedAt: new Date()
     }
   });
@@ -139,7 +138,7 @@ export async function GET(req: NextRequest) {
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${process.env.DOMAIN}/welcome/how-it-works`
+      Location: `${process.env.DOMAIN}/welcome/spam-policy`
     }
   });
 }
