@@ -7,7 +7,7 @@ import { BuilderCard } from 'components/common/Card/BuilderCard/BuilderCard';
 import type { ScoutInfo } from 'components/common/Card/ScoutCard';
 import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
 import { UserProfile } from 'components/common/Profile/UserProfile';
-import { BuilderActivitiesList } from 'components/profile/components/BuilderActivitiesList';
+import { BuilderActivitiesList } from 'components/profile/mine/components/BuilderProfile/BuilderActivitiesList';
 import { BuilderWeeklyStats } from 'components/profile/mine/components/BuilderProfile/BuilderWeeklyStats';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
@@ -51,17 +51,17 @@ export function PublicBuilderProfileContainer({
   const isDesktop = useMdScreen();
 
   return (
-    <>
+    <Box>
       {!isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
       {builder.builder ? (
         <Stack
           gap={2}
-          mt={{
-            xs: 0,
-            md: 4
+          my={{
+            xs: 1,
+            md: 2
           }}
         >
-          <Paper sx={{ py: 2, pr: { xs: 1, md: 2 } }}>
+          <Paper sx={{ py: 2 }}>
             <Stack flexDirection='row'>
               <BackButton />
               {isDesktop ? (
@@ -177,7 +177,7 @@ export function PublicBuilderProfileContainer({
         <Paper
           sx={{
             p: 4,
-            background: (theme) => theme.palette.background.dark
+            backgroundColor: 'background.dark'
           }}
         >
           <Typography textAlign='center' width='100%' variant='h6'>
@@ -185,6 +185,6 @@ export function PublicBuilderProfileContainer({
           </Typography>
         </Paper>
       )}
-    </>
+    </Box>
   );
 }

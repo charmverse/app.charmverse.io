@@ -7,7 +7,7 @@ import { PublicScoutProfile } from './components/PublicScoutProfile/PublicScoutP
 
 export async function PublicProfilePage({ userId, username, tab }: { userId: string; username: string; tab: string }) {
   return (
-    <Box p={1} gap={2} display='flex' flexDirection='column' maxWidth='1240px' margin='auto'>
+    <Box gap={2} display='flex' flexDirection='column' margin='auto'>
       {tab === 'build' ? (
         <PublicBuilderProfile builderId={userId} tab={tab} user={{ username }} />
       ) : (

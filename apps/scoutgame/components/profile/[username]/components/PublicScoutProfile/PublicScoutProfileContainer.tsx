@@ -28,7 +28,7 @@ export function PublicScoutProfileContainer(props: ScoutProfileProps) {
   return (
     <Box>
       {!isDesktop ? <PublicProfileTabsMenu tab={props.tab} username={props.scout.username} /> : null}
-      <Paper sx={{ py: 1, my: { xs: 1, md: 2 } }}>
+      <Paper sx={{ py: 2, my: { xs: 1, md: 2 } }}>
         <Stack flexDirection='row'>
           <BackButton />
           <Box width='calc(100% - 50px)'>

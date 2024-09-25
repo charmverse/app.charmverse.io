@@ -10,9 +10,7 @@ export function ScoutPage({ sort, user }: { sort: string; user?: { username: str
     <Box p={1}>
       <SearchBuildersInput />
       <SortOptionTabs value={currentSort} />
-      <Box px={10}>
-        <ScoutPageBuildersGallery sort={currentSort} user={user} />
-      </Box>
+      <ScoutPageBuildersGallery sort={currentSort} user={user} />
     </Box>
   );
 }
