@@ -86,7 +86,7 @@
     "scoutgame:start:prod": "npx react-env --path .env.local --dest ./apps/scoutgame/public -- npm run start:prod --workspace=apps/scoutgame",
     "scoutgame:test": "dotenv -e .env.test.local -- npm test -w apps/scoutgame",
     "scoutgame:e2e": "npx dotenv -e .env.test.local -- npm run debug:e2e -w=apps/scoutgame",
-    "scoutgame:e2e:ci": "npx dotenv -e .env.test.local --npm run test:e2e -w=apps/scoutgame",
+    "scoutgame:e2e:ci": "npx dotenv -e .env.test.local -- npm run test:e2e -w=apps/scoutgame",
     "scoutgame:start:test": "npm run start:test -w=apps/scoutgame",
     "scoutgame:start:test:ci": "npm run start:test:ci -w=apps/scoutgame",
     "scoutgame:seed": "dotenv -e .env.local -- npm run seed -w apps/scoutgamecron",
