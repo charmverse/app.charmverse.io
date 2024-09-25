@@ -18,7 +18,7 @@ test.describe('Welcome page - onboarding flow', () => {
     await expect(loginPage.container).toBeVisible();
   });
 
-  test('Save new user preferences and go to welcome page', async ({ welcomePage, page, utils }) => {
+  test('Save new user preferences and get through onboarding', async ({ welcomePage, homePage, page, utils }) => {
     const newUser = await mockScout();
     await utils.loginAsUserId(newUser.id);
 
@@ -43,10 +43,7 @@ test.describe('Welcome page - onboarding flow', () => {
 
     await page.waitForURL('**/welcome/builder');
 
-    await welcomePage.skipGithubIntegration.click();
-
-    await page.waitForURL('**/welcome/spam-policy');
-
+    // make sure we saved onboarding preferences
     const user = await prisma.scout.findFirstOrThrow({
       where: {
         id: newUser.id
@@ -58,5 +55,32 @@ test.describe('Welcome page - onboarding flow', () => {
     });
 
     await expect(user.sendMarketing).toBe(true);
+
+    await welcomePage.continueButton.click();
+
+    await page.waitForURL('**/welcome/spam-policy');
+
+    await welcomePage.continueButton.click();
+
+    await page.waitForURL('**/welcome/how-it-works');
+
+    await welcomePage.continueButton.click();
+
+    await page.waitForURL('**/home');
+
+    await expect(homePage.container).toBeVisible();
+
+    // make sure we saved onboarding preferences
+    const userAfterOnboarding = await prisma.scout.findFirstOrThrow({
+      where: {
+        id: newUser.id
+      },
+      select: {
+        id: true,
+        onboardedAt: true
+      }
+    });
+
+    await expect(!!userAfterOnboarding.onboardedAt).toBe(true);
   });
 });

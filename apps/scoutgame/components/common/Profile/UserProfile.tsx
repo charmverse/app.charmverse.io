@@ -10,11 +10,8 @@ type Props = {
   avatarSize?: AvatarSize;
 };
 
-// @TODO This should be on the user object
-const _description = 'This is my short little bio about how sigma I am. Could add this line too and still look cool.';
-
 export function UserProfile({ user, avatarSize = 'xLarge' }: Props) {
-  const { displayName, username, description = _description, avatar } = user;
+  const { displayName, username, bio, avatar } = user;
   return (
     <Stack display='flex' gap={2} alignItems='center' flexDirection='row'>
       <Stack
@@ -36,7 +33,7 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: Props) {
             <Image src='/images/profile/icons/github-circle-icon.svg' width='25' height='25' alt='github icon' />
           </IconButton>
         </Stack>
-        <Typography variant='body2'>{description}</Typography>
+        <Typography variant='body2'>{bio}</Typography>
       </Stack>
     </Stack>
   );

@@ -8,7 +8,7 @@ export function SinglePageWrapper({ children }: { children: ReactNode }) {
       position='relative'
       borderRadius={{ xs: 0, md: 2 }}
       border={{ xs: 'none', sm: '1px solid var(--charm-palette-divider)' }}
-      maxWidth='700px'
+      maxWidth='600px'
       height='100%'
       textAlign='left'
       mx='auto'

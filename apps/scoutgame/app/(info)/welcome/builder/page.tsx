@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { BuilderPage } from 'components/welcome/BuilderWelcomePage';
+import { BuilderPage } from 'components/welcome/builder/BuilderWelcomePage';
 
 export const dynamic = 'force-dynamic';
 

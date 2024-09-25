@@ -7,7 +7,7 @@ import { Suspense } from 'react';
 
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 
-import { JoinGithubButton } from './components/github/JoinGithubButton';
+import { JoinGithubButton } from './components/JoinGithubButton';
 import { SkipBuilderStepButton } from './components/SkipBuilderStepButton';
 
 export function BuilderPage() {
@@ -56,9 +56,11 @@ export function BuilderPage() {
         <Typography mb={2}>Connect to GitHub to sign up and verify your code contributions.</Typography>
         <Box width='100%'>
           <Suspense>
-            <JoinGithubButton />
+            <Box display='flex' flexDirection='column' gap={2}>
+              <JoinGithubButton />
+              <SkipBuilderStepButton />
+            </Box>
           </Suspense>
-          <SkipBuilderStepButton />
         </Box>
       </Box>
     </SinglePageWrapper>

@@ -10,7 +10,7 @@ export class WelcomePage extends GeneralPageLayout {
     public notifyAboutGrants = page.locator('data-test=onboarding-notify-grants'),
     public acceptTerms = page.locator('data-test=onboarding-accept-terms'),
     public submitExtraDetails = page.locator('data-test=submit-extra-details'),
-    public skipGithubIntegration = page.locator('data-test=skip-builder-step-button')
+    public continueButton = page.locator('data-test=continue-button')
   ) {
     super(page);
   }

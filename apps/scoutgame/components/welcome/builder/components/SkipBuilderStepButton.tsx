@@ -16,7 +16,7 @@ export function SkipBuilderStepButton() {
 
   return (
     <Stack direction='row' justifyContent='center'>
-      <Button variant='text' onClick={() => executeAsync()} disabled={isExecuting} data-test='skip-builder-step-button'>
+      <Button variant='text' onClick={() => executeAsync()} disabled={isExecuting} data-test='continue-button'>
         <Typography color='primary'>Skip for now</Typography>
       </Button>
     </Stack>
