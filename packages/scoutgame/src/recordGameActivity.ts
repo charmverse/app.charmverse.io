@@ -21,9 +21,9 @@ type RelatedEvent = Partial<
   >
 >;
 
-type ActivityToRecord = {
+export type ActivityToRecord = {
   sourceEvent: RelatedEvent;
-  activity: Omit<Required<Pick<ScoutGameActivity, CommonActivityKeys>>, 'type'>;
+  activity: Omit<Required<Pick<ScoutGameActivity, CommonActivityKeys>>, 'type'> & { createdAt?: Date };
 };
 
 export async function recordGameActivity({ activity, sourceEvent }: ActivityToRecord) {
@@ -94,6 +94,7 @@ export async function recordGameActivity({ activity, sourceEvent }: ActivityToRe
       type: parsedType,
       pointsDirection: activity.pointsDirection,
       amount: activity.amount,
+      createdAt: activity.createdAt,
       user: {
         connect: {
           id: activity.userId
