@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 
 import { HowItWorksPage } from 'components/welcome/how-it-works/HowItWorksPage';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
