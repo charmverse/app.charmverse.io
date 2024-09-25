@@ -1,7 +1,9 @@
 // recordGameActivity.test.ts
 
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { prisma, ScoutGameActivityType, PointsDirection } from '@charmverse/core/prisma-client';
+import { jest } from '@jest/globals';
 
 import { recordGameActivity } from '../recordGameActivity';
 import {
@@ -10,7 +12,9 @@ import {
   mockNFTPurchaseEvent,
   ensureGithubUserExists,
   mockScout,
-  ensureMergedGithubPullRequestExists
+  ensureMergedGithubPullRequestExists,
+  mockGemPayoutEvent,
+  mockPointReceipt
 } from '../testing/database';
 import { randomLargeInt } from '../testing/generators';
 
@@ -34,6 +38,153 @@ describe('recordGameActivity', () => {
   afterAll(async () => {
     // Close the Prisma client after all tests
     await prisma.$disconnect();
+  });
+
+  it('should correctly determine activity type from source event', async () => {
+    const builder = await mockBuilder();
+    const builderStrike = await mockBuilderStrike({ builderId: builder.id });
+
+    const prEvent = await ensureMergedGithubPullRequestExists({
+      builderId: builder.id,
+      githubUserId: builder.githubUser.id
+    });
+
+    const nftPurchaseEvent = await mockNFTPurchaseEvent({
+      builderId: builder.id,
+      scoutId: builder.id
+    });
+    const gemsPayoutEvent = await mockGemPayoutEvent({ builderId: builder.id });
+    const pointsReceipt = await mockPointReceipt({ builderId: builder.id });
+
+    // Test for 'strike' type
+    const strikeActivity = await recordGameActivity({
+      activity: {
+        userId: builder.id,
+        amount: 10,
+        pointsDirection: PointsDirection.in
+      },
+      sourceEvent: {
+        builderStrikeId: builderStrike.id
+      }
+    });
+    expect(strikeActivity.type).toBe(ScoutGameActivityType.strike);
+
+    // Test for 'builder_registered' type
+    const builderRegisteredActivity = await recordGameActivity({
+      activity: {
+        userId: builder.id,
+        amount: 20,
+        pointsDirection: PointsDirection.out
+      },
+      sourceEvent: {
+        nftPurchaseEventId: nftPurchaseEvent.id
+      }
+    });
+    expect(builderRegisteredActivity.type).toBe(ScoutGameActivityType.builder_registered);
+
+    // Test for 'gems' type
+    const gemsActivity = await recordGameActivity({
+      activity: {
+        userId: builder.id,
+        amount: 30,
+        pointsDirection: PointsDirection.in
+      },
+      sourceEvent: {
+        gemsPayoutEventId: gemsPayoutEvent.id
+      }
+    });
+    expect(gemsActivity.type).toBe(ScoutGameActivityType.gems);
+
+    // Test for 'points' type
+    const pointsActivity = await recordGameActivity({
+      activity: {
+        userId: builder.id,
+        amount: 40,
+        pointsDirection: PointsDirection.in
+      },
+      sourceEvent: {
+        pointsReceiptId: pointsReceipt.id
+      }
+    });
+    expect(pointsActivity.type).toBe(ScoutGameActivityType.points);
+
+    // Test for 'mint' type (onchain event)
+    const mintActivity = await recordGameActivity({
+      activity: {
+        userId: builder.id,
+        amount: 50,
+        pointsDirection: PointsDirection.out
+      },
+      sourceEvent: {
+        onchainTxHash: 'some-tx-hash',
+        onchainChainId: 1
+      }
+    });
+    expect(mintActivity.type).toBe(ScoutGameActivityType.mint);
+  });
+
+  it('should log a warning and return existing activity when duplicate activity is recorded', async () => {
+    const builder = await mockBuilder();
+    const builderStrike = await mockBuilderStrike({ builderId: builder.id });
+
+    // Create an activity
+    const existingActivity = await recordGameActivity({
+      activity: {
+        userId: builder.id,
+        amount: 10,
+        pointsDirection: PointsDirection.in
+      },
+      sourceEvent: {
+        builderStrikeId: builderStrike.id
+      }
+    });
+
+    // Mock the logger to capture the warning
+    const logWarnMock = jest.spyOn(log, 'warn');
+
+    // Try to create the same activity again
+    const activity = await recordGameActivity({
+      activity: {
+        userId: builder.id,
+        amount: 10,
+        pointsDirection: PointsDirection.in
+      },
+      sourceEvent: {
+        builderStrikeId: builderStrike.id
+      }
+    });
+
+    expect(activity.id).toBe(existingActivity.id);
+    expect(logWarnMock).toHaveBeenCalledWith('Tried to log duplicate activity', {
+      activity: expect.any(Object)
+    });
+
+    // Restore the console.warn mock
+    logWarnMock.mockRestore();
+  });
+
+  it('should create an activity for an on-chain event when valid inputs are provided', async () => {
+    const builder = await mockBuilder();
+
+    const activity = await recordGameActivity({
+      activity: {
+        userId: builder.id,
+        amount: 50,
+        pointsDirection: PointsDirection.out
+      },
+      sourceEvent: {
+        onchainTxHash: '0xabcdef1234567890',
+        onchainChainId: 1
+      }
+    });
+
+    expect(activity).toBeDefined();
+    expect(activity.userId).toBe(builder.id);
+    expect(activity.amount).toBe(50);
+    expect(activity.type).toBe(ScoutGameActivityType.mint);
+    expect(activity.pointsDirection).toBe(PointsDirection.out);
+    expect(activity.onchainTxHash).toBe('0xabcdef1234567890');
+    expect(activity.onchainChainId).toBe(1);
   });
 
   it('should throw an error if no source event is provided', async () => {
@@ -208,165 +359,5 @@ describe('recordGameActivity', () => {
     });
 
     expect(activity.id).toBe(existingActivity.id);
-  });
-
-  it('should correctly determine activity type from source event', async () => {
-    const builder = await mockBuilder();
-    const builderStrike = await mockBuilderStrike({ builderId: builder.id });
-
-    const prEvent = await ensureMergedGithubPullRequestExists({
-      builderId: builder.id,
-      githubUserId: builder.githubUser.id
-    });
-
-    const nftPurchaseEvent = await mockNFTPurchaseEvent({
-      builderId: builder.id,
-      scoutId: builder.id
-    });
-    const gemsPayoutEvent = await prisma.gemsPayoutEvent.create({
-      data: {
-        builderId: builder.id,
-        gems: 100,
-        points: 1000,
-        week: '2021-W01'
-      }
-    });
-    const pointsReceipt = await prisma.pointsReceipt.create({
-      data: {
-        value: 50,
-        eventId: prEvent.id,
-        recipientId: builder.id
-      }
-    });
-
-    // Test for 'strike' type
-    const strikeActivity = await recordGameActivity({
-      activity: {
-        userId: builder.id,
-        amount: 10,
-        pointsDirection: PointsDirection.in
-      },
-      sourceEvent: {
-        builderStrikeId: builderStrike.id
-      }
-    });
-    expect(strikeActivity.type).toBe(ScoutGameActivityType.strike);
-
-    // Test for 'builder_registered' type
-    const builderRegisteredActivity = await recordGameActivity({
-      activity: {
-        userId: builder.id,
-        amount: 20,
-        pointsDirection: PointsDirection.out
-      },
-      sourceEvent: {
-        nftPurchaseEventId: nftPurchaseEvent.id
-      }
-    });
-    expect(builderRegisteredActivity.type).toBe(ScoutGameActivityType.builder_registered);
-
-    // Test for 'gems' type
-    const gemsActivity = await recordGameActivity({
-      activity: {
-        userId: builder.id,
-        amount: 30,
-        pointsDirection: PointsDirection.in
-      },
-      sourceEvent: {
-        gemsPayoutEventId: gemsPayoutEvent.id
-      }
-    });
-    expect(gemsActivity.type).toBe(ScoutGameActivityType.gems);
-
-    // Test for 'points' type
-    const pointsActivity = await recordGameActivity({
-      activity: {
-        userId: builder.id,
-        amount: 40,
-        pointsDirection: PointsDirection.in
-      },
-      sourceEvent: {
-        pointsReceiptId: pointsReceipt.id
-      }
-    });
-    expect(pointsActivity.type).toBe(ScoutGameActivityType.points);
-
-    // Test for 'mint' type (onchain event)
-    const mintActivity = await recordGameActivity({
-      activity: {
-        userId: builder.id,
-        amount: 50,
-        pointsDirection: PointsDirection.out
-      },
-      sourceEvent: {
-        onchainTxHash: 'some-tx-hash',
-        onchainChainId: 1
-      }
-    });
-    expect(mintActivity.type).toBe(ScoutGameActivityType.mint);
-  });
-
-  it('should log a warning and return existing activity when duplicate activity is recorded', async () => {
-    const builder = await mockBuilder();
-    const builderStrike = await mockBuilderStrike({ builderId: builder.id });
-
-    // Create an activity
-    const existingActivity = await recordGameActivity({
-      activity: {
-        userId: builder.id,
-        amount: 10,
-        pointsDirection: PointsDirection.in
-      },
-      sourceEvent: {
-        builderStrikeId: builderStrike.id
-      }
-    });
-
-    // Mock the logger to capture the warning
-    const logWarnMock = jest.spyOn(console, 'warn').mockImplementation();
-
-    // Try to create the same activity again
-    const activity = await recordGameActivity({
-      activity: {
-        userId: builder.id,
-        amount: 10,
-        pointsDirection: PointsDirection.in
-      },
-      sourceEvent: {
-        builderStrikeId: builderStrike.id
-      }
-    });
-
-    expect(activity.id).toBe(existingActivity.id);
-    expect(logWarnMock).toHaveBeenCalledWith('Tried to log duplicate activity', {
-      activity: expect.any(Object)
-    });
-
-    // Restore the console.warn mock
-    logWarnMock.mockRestore();
-  });
-
-  it('should create an activity for an on-chain event when valid inputs are provided', async () => {
-    const builder = await mockBuilder();
-
-    const activity = await recordGameActivity({
-      activity: {
-        userId: builder.id,
-        amount: 50,
-        pointsDirection: PointsDirection.out
-      },
-      sourceEvent: {
-        onchainTxHash: '0xabcdef1234567890',
-        onchainChainId: 1
-      }
-    });
-
-    expect(activity).toBeDefined();
-    expect(activity.userId).toBe(builder.id);
-    expect(activity.amount).toBe(50);
-    expect(activity.type).toBe(ScoutGameActivityType.mint);
-    expect(activity.pointsDirection).toBe(PointsDirection.out);
-    expect(activity.onchainTxHash).toBe('0xabcdef1234567890');
-    expect(activity.onchainChainId).toBe(1);
   });
 });

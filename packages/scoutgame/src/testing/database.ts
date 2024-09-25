@@ -1,6 +1,9 @@
-import type { GithubRepo, Prisma } from '@charmverse/core/prisma';
+import type { BuilderEventType, GemsPayoutEvent, GithubRepo, Prisma, BuilderEvent } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { connect } from 'cookies';
 import { v4 as uuid, v4 } from 'uuid';
+
+import { currentSeason, getCurrentWeek } from '../utils';
 
 import { randomLargeInt } from './generators';
 
@@ -78,6 +81,66 @@ export async function ensureGithubUserExists(
     }
   });
 }
+export async function mockGemPayoutEvent({ builderId, amount = 10 }: { builderId: string; amount?: number }) {
+  return prisma.gemsPayoutEvent.create({
+    data: {
+      gems: amount,
+      points: 0,
+      week: getCurrentWeek(),
+      builder: {
+        connect: {
+          id: builderId
+        }
+      },
+      builderEvent: {
+        create: {
+          season: currentSeason,
+          type: 'gems_payout',
+          week: getCurrentWeek(),
+          builder: {
+            connect: {
+              id: builderId
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+export async function mockBuilderEvent({ builderId, eventType }: { builderId: string; eventType: BuilderEventType }) {
+  return prisma.builderEvent.create({
+    data: {
+      builderId,
+      season: currentSeason,
+      type: eventType,
+      week: getCurrentWeek()
+    }
+  });
+}
+
+export async function mockPointReceipt({
+  builderId,
+  amount = 10,
+  senderId,
+  recipientId
+}: {
+  builderId: string;
+  amount?: number;
+  recipientId?: string;
+  senderId?: string;
+}) {
+  const builderEvent = await mockBuilderEvent({ builderId, eventType: 'gems_payout' });
+
+  return prisma.pointsReceipt.create({
+    data: {
+      value: amount,
+      senderId,
+      recipientId,
+      eventId: builderEvent.id
+    }
+  });
+}
 
 export async function ensureGithubRepoExists({
   repoOwner = `acme-${randomLargeInt()}`,
@@ -116,7 +179,7 @@ export async function ensureMergedGithubPullRequestExists({
   githubUserId: number;
   builderId?: string;
   id?: number;
-} & RepoAddress) {
+} & RepoAddress): Promise<BuilderEvent> {
   builderId = builderId ?? (await mockScout().then((scout) => scout.id));
 
   const builderGithubUser = await ensureGithubUserExists({ builderId });
@@ -132,14 +195,17 @@ export async function ensureMergedGithubPullRequestExists({
         id: builderGithubUser.id
       },
       type: 'merged_pull_request'
+    },
+    select: {
+      builderEvent: true
     }
   });
 
-  if (pullRequest) {
-    return pullRequest;
+  if (pullRequest?.builderEvent) {
+    return pullRequest.builderEvent as BuilderEvent;
   }
 
-  return prisma.githubEvent.create({
+  const githubEvent = await prisma.githubEvent.create({
     data: {
       repoId: repo.id,
       pullRequestNumber,
@@ -149,6 +215,18 @@ export async function ensureMergedGithubPullRequestExists({
       url: ``
     }
   });
+
+  const builderEvent = await prisma.builderEvent.create({
+    data: {
+      builderId: builderGithubUser.builderId as string,
+      season: currentSeason,
+      type: 'merged_pull_request',
+      githubEventId: githubEvent.id,
+      week: getCurrentWeek()
+    }
+  });
+
+  return builderEvent;
 }
 
 export function mockRepo(fields: Partial<GithubRepo> & { owner?: string } = {}) {
@@ -227,7 +305,7 @@ export async function mockBuilderStrike({
 
   const githubUser = await ensureGithubUserExists({ builderId });
 
-  const prNumber = await ensureMergedGithubPullRequestExists({
+  const githubBuilderEvent = await ensureMergedGithubPullRequestExists({
     githubUserId: githubUser.id,
     pullRequestNumber,
     repoName,
@@ -238,7 +316,7 @@ export async function mockBuilderStrike({
   return prisma.builderStrike.create({
     data: {
       builderId,
-      githubEventId: prNumber.id
+      githubEventId: githubBuilderEvent.githubEventId as string
     }
   });
 }
