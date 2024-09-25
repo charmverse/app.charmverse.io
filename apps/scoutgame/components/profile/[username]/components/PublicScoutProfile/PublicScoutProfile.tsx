@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
 import { getScoutStats } from 'lib/scouts/getScoutStats';
+import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import { PublicScoutProfileContainer } from './PublicScoutProfileContainer';
 
@@ -11,19 +12,7 @@ export async function PublicScoutProfile({ scoutId, tab }: { scoutId: string; ta
     where: {
       id: scoutId
     },
-    select: {
-      id: true,
-      displayName: true,
-      username: true,
-      bio: true,
-      avatar: true,
-      githubUser: {
-        select: {
-          id: true,
-          login: true
-        }
-      }
-    }
+    select: BasicUserInfoSelect
   });
 
   if (!scout) {
@@ -37,11 +26,7 @@ export async function PublicScoutProfile({ scoutId, tab }: { scoutId: string; ta
   return (
     <PublicScoutProfileContainer
       scout={{
-        id: scout.id,
-        displayName: scout.displayName,
-        username: scout.username,
-        avatar: scout.avatar,
-        bio: scout.bio,
+        ...scout,
         githubLogin: scout.githubUser[0]?.login
       }}
       tab={tab}

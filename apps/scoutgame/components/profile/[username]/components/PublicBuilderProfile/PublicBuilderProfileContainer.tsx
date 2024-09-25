@@ -11,7 +11,7 @@ import { BuilderActivitiesList } from 'components/profile/components/BuilderActi
 import { BuilderWeeklyStats } from 'components/profile/mine/components/BuilderProfile/BuilderWeeklyStats';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
-import type { BasicUserInfo } from 'lib/builders/interfaces';
+import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import { PublicProfileTabsMenu } from '../../PublicProfileTabsMenu';
 
@@ -21,9 +21,7 @@ export type BuilderProfileProps = {
   tab: string;
   builder: BasicUserInfo & {
     price: bigint;
-    isBuilder: boolean;
   };
-  builderId: string;
   allTimePoints: number;
   seasonPoints: number;
   totalScouts: number;
@@ -40,7 +38,6 @@ export type BuilderProfileProps = {
 export function PublicBuilderProfileContainer({
   tab,
   builder,
-  builderId,
   allTimePoints,
   seasonPoints,
   totalScouts,
@@ -56,7 +53,7 @@ export function PublicBuilderProfileContainer({
   return (
     <>
       {!isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
-      {builder.isBuilder ? (
+      {builder.builder ? (
         <Stack
           gap={2}
           mt={{
@@ -71,11 +68,7 @@ export function PublicBuilderProfileContainer({
                 <Box width='calc(100% - 50px)'>
                   <UserProfile
                     user={{
-                      id: builderId,
-                      displayName: builder.displayName,
-                      username: builder.username,
-                      avatar: builder.avatar,
-                      bio: builder.bio,
+                      ...builder,
                       githubLogin: builder.githubLogin
                     }}
                   />
@@ -86,10 +79,7 @@ export function PublicBuilderProfileContainer({
                     <BuilderCard
                       user={user}
                       builder={{
-                        id: builderId,
-                        avatar: builder.avatar,
-                        username: builder.username,
-                        displayName: builder.displayName,
+                        ...builder,
                         price: builder.price
                       }}
                       hideDetails
@@ -99,11 +89,8 @@ export function PublicBuilderProfileContainer({
                   <Stack width='calc(100% - 150px)' gap={1}>
                     <UserProfile
                       user={{
-                        username: builder.username,
-                        displayName: builder.displayName,
-                        id: builderId,
-                        githubLogin: builder.githubLogin,
-                        bio: builder.bio
+                        ...builder,
+                        githubLogin: builder.githubLogin
                       }}
                     />
                     <PublicBuilderStats
@@ -152,10 +139,7 @@ export function PublicBuilderProfileContainer({
                     <Box width={{ md: 150 }}>
                       <BuilderCard
                         builder={{
-                          id: builderId,
-                          avatar: builder.avatar,
-                          username: builder.username,
-                          displayName: builder.displayName,
+                          ...builder,
                           price: builder.price
                         }}
                         hideDetails

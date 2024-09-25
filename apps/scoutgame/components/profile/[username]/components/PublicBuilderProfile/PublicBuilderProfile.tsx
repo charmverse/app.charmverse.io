@@ -6,6 +6,7 @@ import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderStats } from 'lib/builders/getBuilderStats';
 import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
+import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
 
@@ -23,17 +24,7 @@ export async function PublicBuilderProfile({
       id: builderId
     },
     select: {
-      id: true,
-      avatar: true,
-      username: true,
-      displayName: true,
-      bio: true,
-      builder: true,
-      githubUser: {
-        select: {
-          login: true
-        }
-      },
+      ...BasicUserInfoSelect,
       builderNfts: {
         where: {
           season: currentSeason
@@ -81,10 +72,8 @@ export async function PublicBuilderProfile({
       builder={{
         ...builder,
         price: builder.builderNfts[0]?.currentPrice,
-        githubLogin: builder.githubUser[0]?.login || '',
-        isBuilder: builder.builder
+        githubLogin: builder.githubUser[0]?.login || ''
       }}
-      builderId={builderId}
       allTimePoints={allTimePoints}
       seasonPoints={seasonPoints}
       totalScouts={totalScouts}

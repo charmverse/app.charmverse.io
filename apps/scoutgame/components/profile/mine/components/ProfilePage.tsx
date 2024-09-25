@@ -2,7 +2,7 @@ import { Box, Paper, Stack, Typography } from '@mui/material';
 import { Suspense } from 'react';
 
 import { UserProfile } from 'components/common/Profile/UserProfile';
-import type { BasicUserInfo } from 'lib/builders/interfaces';
+import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import { ProfilePointsCard } from '../ProfilePointsCard';
 

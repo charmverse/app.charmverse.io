@@ -1,7 +1,7 @@
 import { IconButton, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import type { BasicUserInfo } from 'lib/builders/interfaces';
+import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import type { AvatarSize } from '../Avatar';
 import { Avatar } from '../Avatar';

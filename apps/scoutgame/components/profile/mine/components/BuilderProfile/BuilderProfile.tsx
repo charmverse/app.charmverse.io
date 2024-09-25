@@ -13,6 +13,7 @@ import { BuilderActivitiesList } from 'components/profile/components/BuilderActi
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderWeeklyStats } from 'lib/builders/getBuilderWeeklyStats';
+import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import { BuilderStats } from './BuilderStats';
 import { BuilderWeeklyStats } from './BuilderWeeklyStats';
@@ -25,9 +26,7 @@ export async function BuilderProfile({ builderId }: { builderId: string }) {
       id: builderId
     },
     select: {
-      builder: true,
-      username: true,
-      avatar: true,
+      ...BasicUserInfoSelect,
       userSeasonStats: {
         where: {
           season: currentSeason

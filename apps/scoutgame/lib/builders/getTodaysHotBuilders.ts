@@ -36,7 +36,8 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
             },
             distinct: ['scoutId'],
             select: {
-              scoutId: true
+              scoutId: true,
+              tokensPurchased: true
             }
           },
           builderNfts: {
@@ -60,11 +61,12 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       displayName: user.displayName,
       builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder,
       price: user.builderNfts[0]?.currentPrice,
-      nftsSold: user.nftPurchaseEvents.length,
+      nftsSold: user.nftPurchaseEvents.reduce((acc, event) => acc + event.tokensPurchased, 0),
       gems: builder.gemsCollected,
       avatar: user.avatar,
       scoutedBy: user.nftPurchaseEvents.length,
-      isBanned: !!user.bannedAt
+      isBanned: !!user.bannedAt,
+      builder: true
     };
   });
 }

@@ -6,7 +6,8 @@ import { BackButton } from 'components/common/Button/BackButton';
 import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import { UserProfile } from 'components/common/Profile/UserProfile';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { BasicUserInfo, BuilderInfo } from 'lib/builders/interfaces';
+import type { BuilderInfo } from 'lib/builders/interfaces';
+import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import { PublicProfileTabsMenu } from '../../PublicProfileTabsMenu';
 
