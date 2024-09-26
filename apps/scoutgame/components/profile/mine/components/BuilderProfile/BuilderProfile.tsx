@@ -18,7 +18,7 @@ import { BuilderStats } from './BuilderStats';
 import { BuilderWeeklyStats } from './BuilderWeeklyStats';
 
 export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
-  const [builderNft, builderStats, builderActivities = [], { scouts = [], totalNftsSold, totalScouts } = {}] =
+  const [builderNft, builderStats, builderActivities = [], { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}] =
     builder.builder
       ? await Promise.all([
           prisma.builderNft.findUnique({
