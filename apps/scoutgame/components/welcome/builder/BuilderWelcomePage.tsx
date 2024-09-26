@@ -2,7 +2,6 @@ import 'server-only';
 
 import { Box, Button, Typography } from '@mui/material';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { JoinGithubButton } from 'components/common/JoinGithubButton';

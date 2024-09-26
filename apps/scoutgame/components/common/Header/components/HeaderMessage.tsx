@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material';
 import { currentSeasonEndDate } from '@packages/scoutgame/utils';
 import { useEffect, useState } from 'react';
 
-export async function HeaderMessage() {
+export function HeaderMessage() {
   const [timeLeftStr, setTimeStr] = useState(getTimeLeftStr());
 
   useEffect(() => {
