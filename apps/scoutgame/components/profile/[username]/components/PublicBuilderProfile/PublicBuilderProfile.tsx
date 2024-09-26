@@ -14,7 +14,7 @@ export async function PublicBuilderProfile({ tab, user }: { tab: string; user: B
 
   const [
     builderNft,
-    { allTimePoints, seasonPoints, rank, gemsCollected } = {},
+    { allTimePoints = 0, seasonPoints = 0, rank = 0, gemsCollected = 0 } = {},
     builderActivities = [],
     { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}
   ] = isBuilder
