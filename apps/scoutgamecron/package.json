@@ -8,7 +8,7 @@
     "start": "tsx watch src/main.ts",
     "start:prod": "node --import dd-trace/register.js ./dist/main.js",
     "start:prod:node18": "node --loader dd-trace/loader-hook.mjs ./dist/main.js",
-    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.ts",
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.ts --verbose",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit",
     "seed": "tsx src/scripts/generateSeedData.ts"
   },

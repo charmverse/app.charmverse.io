@@ -28,6 +28,30 @@ export type ActivityToRecord = {
   activity: Omit<Required<Pick<ScoutGameActivity, CommonActivityKeys>>, 'type'> & { createdAt?: Date };
 };
 
+function activityTypeFromEvent(sourceEvent: RelatedEvent): ScoutGameActivityType {
+  let parsedType: ScoutGameActivityType;
+
+  if (sourceEvent.builderStrikeId !== undefined) {
+    parsedType = ScoutGameActivityType.strike;
+  } else if (sourceEvent.nftPurchaseEventId !== undefined) {
+    parsedType = ScoutGameActivityType.mint;
+  } else if (sourceEvent.gemsPayoutEventId !== undefined) {
+    parsedType = ScoutGameActivityType.gems;
+  } else if (sourceEvent.pointsReceiptId !== undefined) {
+    parsedType = ScoutGameActivityType.points;
+  } else if (sourceEvent.gemsReceiptId !== undefined) {
+    parsedType = ScoutGameActivityType.gems_from_pr;
+  } else if (sourceEvent.registeredBuilderNftId !== undefined) {
+    parsedType = ScoutGameActivityType.builder_registered;
+  } else if (sourceEvent.onchainTxHash !== undefined && sourceEvent.onchainChainId !== undefined) {
+    parsedType = ScoutGameActivityType.mint;
+  } else {
+    throw new InvalidInputError(`Invalid ScoutGameActivityType: Unable to determine type from source event`);
+  }
+
+  return parsedType;
+}
+
 export async function recordGameActivity({
   activity,
   sourceEvent,
@@ -60,25 +84,7 @@ export async function recordGameActivity({
 
   // Now generate the parsing of scoutgameactviitt event type enum value
   // Parse the ScoutGameActivityType enum value
-  let parsedType: ScoutGameActivityType;
-
-  if (sourceEvent.builderStrikeId !== undefined) {
-    parsedType = ScoutGameActivityType.strike;
-  } else if (sourceEvent.nftPurchaseEventId !== undefined) {
-    parsedType = ScoutGameActivityType.mint;
-  } else if (sourceEvent.gemsPayoutEventId !== undefined) {
-    parsedType = ScoutGameActivityType.gems;
-  } else if (sourceEvent.pointsReceiptId !== undefined) {
-    parsedType = ScoutGameActivityType.points;
-  } else if (sourceEvent.gemsReceiptId !== undefined) {
-    parsedType = ScoutGameActivityType.gems_from_pr;
-  } else if (sourceEvent.registeredBuilderNftId !== undefined) {
-    parsedType = ScoutGameActivityType.builder_registered;
-  } else if (sourceEvent.onchainTxHash !== undefined && sourceEvent.onchainChainId !== undefined) {
-    parsedType = ScoutGameActivityType.mint;
-  } else {
-    throw new InvalidInputError(`Invalid ScoutGameActivityType: Unable to determine type from source event`);
-  }
+  const parsedType = activityTypeFromEvent(sourceEvent);
 
   // Validate the pointsDirection
   if (activity.pointsDirection !== 'in' && activity.pointsDirection !== 'out') {
@@ -130,4 +136,12 @@ export async function recordGameActivity({
       onchainChainId: sourceEvent.onchainChainId
     }
   });
+}
+
+export async function recordGameActivityWithCatchError(activity: ActivityToRecord): Promise<void> {
+  try {
+    await recordGameActivity(activity);
+  } catch (error) {
+    log.error(`Error logging activity for ${activity.activity.userId}`, { error, activity });
+  }
 }

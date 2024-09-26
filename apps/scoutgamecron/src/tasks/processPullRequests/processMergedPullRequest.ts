@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { GemsReceiptType, GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
+import { recordGameActivityWithCatchError } from '@packages/scoutgame/recordGameActivity';
 import { getFormattedWeek, getWeekStartEnd, streakWindow, currentSeason, isToday } from '@packages/scoutgame/utils';
 
 import type { PullRequest } from './getPullRequests';
@@ -193,7 +193,7 @@ export async function processMergedPullRequest({
 
         // It's a new event, we can record notification
         if (!existingBuilderEvent) {
-          await recordGameActivity({
+          await recordGameActivityWithCatchError({
             activity: {
               amount: gemValue,
               userId: githubUser.builderId as string,

@@ -3,7 +3,7 @@ import type { GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { octokit } from '@packages/github/client';
 import { getAllNftOwners } from '@packages/scoutgame/builderNfts/getAllNftOwners';
-import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
+import { recordGameActivityWithCatchError } from '@packages/scoutgame/recordGameActivity';
 import { v4 as uuid } from 'uuid';
 
 import { getClosedPullRequest } from './getClosedPullRequest';
@@ -101,7 +101,7 @@ export async function processClosedPullRequest({
       return;
     }
 
-    await recordGameActivity({
+    await recordGameActivityWithCatchError({
       sourceEvent: {
         builderStrikeId: strikeId
       },
@@ -117,7 +117,7 @@ export async function processClosedPullRequest({
       .then((owners) =>
         Promise.all(
           owners.map((scoutId) =>
-            recordGameActivity({
+            recordGameActivityWithCatchError({
               sourceEvent: {
                 builderStrikeId: strikeId
               },
@@ -130,9 +130,7 @@ export async function processClosedPullRequest({
           )
         )
       )
-      .catch((error) => {
-        log.error(`Error notifying builder NFT owners`, { error });
-      });
+      .catch((error) => log.warn(`Error fetching nft owners`, { error }));
 
     const strikes = await prisma.builderStrike.count({
       where: {
