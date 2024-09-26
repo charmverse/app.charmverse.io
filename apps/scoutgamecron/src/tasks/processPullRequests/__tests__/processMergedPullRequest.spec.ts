@@ -147,7 +147,7 @@ describe('processMergedPullRequest', () => {
     const builder = await mockBuilder();
     const repo = await mockRepo();
 
-    const now = DateTime.fromObject({ weekday: 2 }, { zone: 'utc' });
+    const now = DateTime.fromObject({ weekday: 3 }, { zone: 'utc' }); // 1 is Monday and 7 is Sunday
 
     const lastWeekPr = mockPullRequest({
       createdAt: now.minus({ days: 4 }).toISO(),
