@@ -5,8 +5,9 @@ type SeasonWeek = number; // the week in the season, e.g. 1
 
 // Season start MUST be on a Monday, when isoweek begins
 const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 16 }, { zone: 'utc' }); // Dev Season: 2024-W38
+export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 2 });
 // const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 30 }, { zone: 'utc' }); // Actual launch: 2024-W40
-export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 13 });
+// export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 13 });
 export const currentSeason: ISOWeek = getWeekFromDate(currentSeasonStartDate.toJSDate());
 
 export const streakWindow = 7 * 24 * 60 * 60 * 1000;
