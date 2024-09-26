@@ -2,9 +2,8 @@ import { DateTime } from 'luxon';
 
 export const currentSeason = 1;
 
-// Season 1 started on 2024-09-22
-// TODO: Make sure to update this before the season starts
-export const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 22 }, { zone: 'utc' });
+// Season start MUST be on a Monday, when isoweek begins
+export const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 30 }, { zone: 'utc' });
 export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 13 });
 
 export const streakWindow = 7 * 24 * 60 * 60 * 1000;
@@ -20,11 +19,11 @@ export function getLastWeek() {
 
 // get the number of the current week, with Sunday being the first day of the week in New York time
 export function getFormattedWeek(date: Date): string {
-  return formatWeek(DateTime.fromJSDate(date));
+  return formatWeek(DateTime.fromJSDate(date, { zone: 'utc' }));
 }
 
 export function getWeekStartEnd(date: Date) {
-  const utcDate = DateTime.fromJSDate(date).toUTC();
+  const utcDate = DateTime.fromJSDate(date, { zone: 'utc' });
   const startOfWeek = utcDate.startOf('week');
   const endOfWeek = utcDate.endOf('week');
   return { start: startOfWeek, end: endOfWeek };
@@ -52,10 +51,7 @@ export function getCurrentWeekNumber() {
 }
 
 export function getSeasonWeekNumberFromWeek({ seasonStartDate, week }: { week: string; seasonStartDate: DateTime }) {
-  const [year, weekNumber] = week.split('-W');
-  const date = DateTime.fromObject({ year: parseInt(year), day: 1, month: 1 }, { zone: 'utc' }).plus({
-    weeks: parseInt(weekNumber)
-  });
+  const date = DateTime.fromISO(week, { zone: 'utc' });
   const weeksDiff = date.diff(seasonStartDate, 'weeks').weeks;
-  return Math.round(weeksDiff);
+  return weeksDiff + 1;
 }
