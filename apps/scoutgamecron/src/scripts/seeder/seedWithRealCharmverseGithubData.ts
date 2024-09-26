@@ -1,9 +1,15 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
 import { processPullRequests } from '../../tasks/processPullRequests';
 
-//@ts-ignore
-import {registerBuilderNFT} from '../../../../scoutgame/lib/builderNFTs/registerBuilderNFT'
+import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
+import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
+
+
+function getRandomValue<T>(arr: T[]): T {
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+}
 
 const devUsers = {
   mattcasey: {
@@ -116,10 +122,40 @@ async function seedBuilderNFTs() {
   console.log('githubUser', githubUser);
 
   for (const { builderId } of githubUser) {
-    await registerBuilderNFT({builderId: builderId as string});
+    const nft = await registerBuilderNFT({builderId: builderId as string});
+
+    await generateNftPurchaseEvents({builderId: nft.builderId, amount: 4})
+
+    await refreshUserStats({userId: builderId as string})
   }
 }
 
+async function generateNftPurchaseEvents({builderId, amount = 1}: {builderId: string, amount?: number}): Promise<void> {
+
+  const nft = await prisma.builderNft.findFirstOrThrow({
+    where: {
+      builderId
+    }
+  })
+
+  const scoutId = await prisma.scout.findMany({
+    where: {
+      
+    },
+    take: 5
+  }).then(data => data.map(s => s.id))
+  
+  const inputs: Prisma.NFTPurchaseEventCreateManyInput[] = Array.from({length: amount}).map(idx => ({
+    builderNftId: nft.id,
+    pointsValue: 0,
+    scoutId: getRandomValue(scoutId),
+    tokensPurchased: 10,
+    txHash: `0xabc`,
+  } as Prisma.NFTPurchaseEventCreateManyInput))
+  
+  await prisma.nFTPurchaseEvent.createMany({data: inputs})
+  
+}
 // seedWithRealCharmverseGithubData();
 
 
@@ -140,8 +176,9 @@ async function clearNfts() {
   })
 }
 
-// clearNfts()
-seedBuilderNFTs();
+async function script() {
+  await seedWithRealCharmverseGithubData();
+  await seedBuilderNFTs()
+}
 
-
-// prisma.githubEvent.deleteMany().then(console.log)
+script()

@@ -1,6 +1,6 @@
 'use server';
 
-import { prisma } from '@charmverse/core/prisma-client';
+import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
 import {
   builderContractAddress,
   builderNftChain,
@@ -9,6 +9,7 @@ import {
 } from '@packages/scoutgame/builderNfts/constants';
 import { ContractApiClient } from '@packages/scoutgame/builderNfts/nftContractApiClient';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
+import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
 import { getCurrentWeek } from '@packages/scoutgame/utils';
 import { getWalletClient } from '@root/lib/blockchain/walletClient';
 import { isAddress } from 'viem';
@@ -73,7 +74,7 @@ export const mintNftAction = authActionClient
 
     // TODO - Add the points TX && refresh the points stats for the builder
 
-    await prisma.nFTPurchaseEvent.create({
+    const nftEvent = await prisma.nFTPurchaseEvent.create({
       data: {
         // Assuming constant conversion rate of 4:1, and 6 decimals on USDC
         pointsValue: Number(nextPrice) / 10e6 / 4,
@@ -97,6 +98,32 @@ export const mintNftAction = authActionClient
     });
 
     await refreshBuilderNftPrice({ builderId: parsedInput.builderId });
+
+    await recordGameActivity({
+      sourceEvent: {
+        nftPurchaseEventId: nftEvent.id,
+        onchainTxHash: txResult.transactionHash,
+        onchainChainId: builderNftChain.id
+      },
+      activity: {
+        pointsDirection: PointsDirection.in,
+        userId,
+        amount: parsedInput.amount
+      }
+    });
+
+    await recordGameActivity({
+      sourceEvent: {
+        nftPurchaseEventId: nftEvent.id,
+        onchainTxHash: txResult.transactionHash,
+        onchainChainId: builderNftChain.id
+      },
+      activity: {
+        pointsDirection: PointsDirection.out,
+        userId: builderNft.builderId,
+        amount: parsedInput.amount
+      }
+    });
 
     return { success: true };
   });

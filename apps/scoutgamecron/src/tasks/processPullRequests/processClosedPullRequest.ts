@@ -2,11 +2,19 @@ import { log } from '@charmverse/core/log';
 import type { GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { octokit } from '@packages/github/client';
+import { getAllNftOwners } from '@packages/scoutgame/builderNfts/getAllNftOwners';
+import { recordGameActivityWithCatchError } from '@packages/scoutgame/recordGameActivity';
+import { v4 as uuid } from 'uuid';
 
 import { getClosedPullRequest } from './getClosedPullRequest';
 import type { PullRequest } from './getPullRequests';
 
 type RepoInput = Pick<GithubRepo, 'owner' | 'name'>;
+
+export type ClosedPullRequestMeta = Pick<
+  PullRequest,
+  'author' | 'number' | 'title' | 'repository' | 'url' | 'createdAt' | 'closedAt'
+>;
 
 export async function processClosedPullRequest({
   pullRequest,
@@ -14,7 +22,7 @@ export async function processClosedPullRequest({
   prClosedBy,
   skipSendingComment
 }: {
-  pullRequest: PullRequest;
+  pullRequest: ClosedPullRequestMeta;
   repo: RepoInput;
   prClosedBy?: string;
   skipSendingComment?: boolean;
@@ -66,6 +74,8 @@ export async function processClosedPullRequest({
       return;
     }
 
+    const strikeId = uuid();
+
     await prisma.githubEvent.create({
       data: {
         pullRequestNumber: pullRequest.number,
@@ -78,6 +88,7 @@ export async function processClosedPullRequest({
           ? undefined
           : {
               create: {
+                id: strikeId,
                 builderId: builder.id
               }
             },
@@ -89,6 +100,37 @@ export async function processClosedPullRequest({
     if (ignoreStrike) {
       return;
     }
+
+    await recordGameActivityWithCatchError({
+      sourceEvent: {
+        builderStrikeId: strikeId
+      },
+      activity: {
+        amount: 1,
+        pointsDirection: 'in',
+        userId: builder.id
+      }
+    });
+
+    // Notify NFT buyers that their builder had a strike
+    await getAllNftOwners({ builderId: builder.id })
+      .then((owners) =>
+        Promise.all(
+          owners.map((scoutId) =>
+            recordGameActivityWithCatchError({
+              sourceEvent: {
+                builderStrikeId: strikeId
+              },
+              activity: {
+                amount: 1,
+                pointsDirection: 'in',
+                userId: scoutId
+              }
+            })
+          )
+        )
+      )
+      .catch((error) => log.warn(`Error fetching nft owners`, { error }));
 
     const strikes = await prisma.builderStrike.count({
       where: {

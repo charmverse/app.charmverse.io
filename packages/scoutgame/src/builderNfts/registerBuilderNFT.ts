@@ -2,17 +2,19 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { currentSeason } from '@packages/scoutgame/utils';
-import { getWalletClient } from '@root/lib/blockchain/walletClient';
+import { getScoutGameNftAdminWallet } from '@packages/scoutgame/getScoutGameNftAdminWallet';
 
-import { builderContractAddress, builderNftChain, builderSmartContractOwnerKey } from './constants';
+import { recordGameActivity } from '../recordGameActivity';
+import { currentSeason } from '../utils';
+
+import { builderContractAddress, builderNftChain } from './constants';
 import { ContractApiClient } from './nftContractApiClient';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
 const builderNftWriteApiClient = new ContractApiClient({
   chain: builderNftChain,
   contractAddress: builderContractAddress,
-  walletClient: getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey })
+  walletClient: getScoutGameNftAdminWallet()
 });
 
 export async function registerBuilderNFT({ builderId }: { builderId: string }) {
@@ -61,6 +63,26 @@ export async function registerBuilderNFT({ builderId }: { builderId: string }) {
   }
 
   const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId });
+
+  await prisma.scout.update({
+    where: {
+      id: builderId
+    },
+    data: {
+      builder: true
+    }
+  });
+
+  await recordGameActivity({
+    activity: {
+      amount: 1,
+      pointsDirection: 'in',
+      userId: builderId
+    },
+    sourceEvent: {
+      registeredBuilderNftId: nftWithRefreshedPrice.id
+    }
+  });
 
   log.info(`Last price: ${nftWithRefreshedPrice.currentPrice}`);
 

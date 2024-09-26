@@ -1,8 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
+import { getPublicClient } from '@packages/onchain/getPublicClient';
 import { currentSeason } from '@packages/scoutgame/utils';
-import { getPublicClient } from '@root/lib/blockchain/publicClient';
 
 import { builderContractAddress, builderNftChain } from './constants';
 import { ContractApiClient } from './nftContractApiClient';

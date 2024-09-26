@@ -5,6 +5,11 @@ import { base, baseSepolia } from 'viem/chains';
 
 export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECENT_API_KEY as string);
 
+/**
+ * Currently priced in USDC
+ */
+export const builderTokenDecimals = 6;
+
 export const builderNftChain: Chain = baseSepolia;
 
 if (builderNftChain.id !== baseSepolia.id) {

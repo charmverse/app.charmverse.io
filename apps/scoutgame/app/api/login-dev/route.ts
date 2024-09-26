@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getIronOptions } from '@connect-shared/lib/session/config';
-import { cookieName, isDevEnv } from '@root/config/constants';
+import { isDevEnv } from '@root/config/constants';
 import { sealData } from 'iron-session';
 
 const isTestEnv = process.env.REACT_APP_APP_ENV === 'test';
@@ -26,9 +26,11 @@ export async function GET(request: Request) {
     }
   });
 
-  const sealedSession = await sealData({ scoutId: user.id }, getIronOptions());
+  const sealedSession = await sealData({ ...user, user, scoutId: user.id }, getIronOptions());
 
   const response = new Response(JSON.stringify({ user }));
+
+  const cookieName = process.env.AUTH_COOKIE || getIronOptions().cookieName;
 
   response.headers.set('Set-Cookie', `${cookieName}=${sealedSession}; HttpOnly; Secure; SameSite=Strict; Path=/`);
 
