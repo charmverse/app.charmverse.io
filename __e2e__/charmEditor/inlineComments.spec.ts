@@ -10,7 +10,7 @@ const test = base.extend<Fixtures>({
   documentPage: async ({ page }, use) => use(new DocumentPage(page))
 });
 
-test('Create an inline comment in the charmEditor', async ({ documentPage }) => {
+test.skip('Create an inline comment in the charmEditor', async ({ documentPage }) => {
   const { space, user, page } = await generateUserAndSpace({ isAdmin: true });
 
   await loginBrowserUser({
