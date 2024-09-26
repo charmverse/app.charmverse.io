@@ -102,11 +102,11 @@ function PageLayout({ children }: PageLayoutProps) {
               <Header open={leftSidebarOpen} openSidebar={openLeftSidebar} />
               <BlocksExceededBanner />
               <AnnouncementBanner
-                actionLabel='Check it out'
-                actionHref='https://tiny.charmverse.io/prop2-updates'
-                expiryDate='2024-01-07'
+                actionLabel='Go to Scout Game'
+                actionHref='https://waitlist.scoutgame.xyz'
+                expiryDate='2024-09-30'
               >
-                NEW governance & decision-making workflow launched.
+                Fantasy Sports for Developers. Join waitlist
               </AnnouncementBanner>
             </AppBar>
             <NavigationSidebarDrawer
