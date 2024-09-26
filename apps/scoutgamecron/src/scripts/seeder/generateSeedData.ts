@@ -7,10 +7,11 @@ import { generateGithubRepos } from './generateGithubRepos';
 import { generateNftPurchaseEvents } from './generateNftPurchaseEvents';
 import { generateScout } from './generateScout';
 import { DateTime } from 'luxon';
-import { getTopBuilders } from '@packages/scoutgame/getTopBuilders';
+import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
 import { getFormattedWeek } from '@packages/scoutgame/utils';
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
 import { claimPoints } from '@packages/scoutgame/claimPoints';
+import { updateBuildersRank } from '../../tasks/processPullRequests/updateBuildersRank';
 
 export type BuilderInfo = {
   id: string;
@@ -18,7 +19,7 @@ export type BuilderInfo = {
   nftPrice: number;
   assignedRepos: GithubRepo[];
   githubUser: Pick<GithubUser, 'id' | 'login'>;
-}
+};
 
 async function generateBuilder() {
   const { scout, githubUser, builderNft } = await generateScout({ isBuilder: true });
@@ -27,7 +28,7 @@ async function generateBuilder() {
     builder: scout,
     githubUser: githubUser as GithubUser,
     builderNft: builderNft as Omit<BuilderNft, 'builderId' | 'createdAt' | 'currentPrice'> & {
-      currentPrice: number
+      currentPrice: number;
     }
   };
 }
@@ -48,7 +49,7 @@ export async function generateSeedData() {
   // Total number of github repos
   const totalGithubRepos = faker.number.int({ min: 50, max: 100 });
 
-  const totalScoutBuilders = faker.number.int({min: 25, max: 50});
+  const totalScoutBuilders = faker.number.int({ min: 25, max: 50 });
 
   const totalScouts = faker.number.int({ min: 150, max: 250 });
 
@@ -57,9 +58,10 @@ export async function generateSeedData() {
   const [githubRepos, repoPRCounters] = await generateGithubRepos(totalGithubRepos);
 
   const builders: BuilderInfo[] = [];
-  const scouts: {id: string, assignedBuilders: BuilderInfo[]}[] = [];
+  const scouts: { id: string; assignedBuilders: BuilderInfo[] }[] = [];
 
-  let totalGithubEvents = 0, totalNftsPurchasedEvents = 0;
+  let totalGithubEvents = 0,
+    totalNftsPurchasedEvents = 0;
 
   for (let i = 0; i < totalBuilders + totalScoutBuilders; i++) {
     const { githubUser, builder, builderNft } = await generateBuilder();
@@ -70,7 +72,7 @@ export async function generateSeedData() {
       builderNftId: builderNft.id,
       nftPrice: builderNft.currentPrice,
       assignedRepos,
-      githubUser,
+      githubUser
     });
 
     if (isScout) {
@@ -98,7 +100,7 @@ export async function generateSeedData() {
 
   const days = endDate.diff(startDate, 'days').days;
 
-  const userIds = Array.from(new Set([...builders.map(builder => builder.id), ...scouts.map(scout => scout.id)]));
+  const userIds = Array.from(new Set([...builders.map((builder) => builder.id), ...scouts.map((scout) => scout.id)]));
 
   for (let i = 0; i < days; i++) {
     const date = startDate.plus({ days: i });
@@ -110,19 +112,25 @@ export async function generateSeedData() {
         builder.assignedRepos,
         repoPRCounters,
         date
-      )
+      );
       totalGithubEvents += dailyGithubEvents;
     }
 
+    await updateBuildersRank({ week });
+
     for (const scout of scouts) {
       // Do not purchase your own nft
-      let dailyNftsPurchased = await generateNftPurchaseEvents(scout.id, scout.assignedBuilders.filter(builder => builder.id !== scout.id), date);
+      let dailyNftsPurchased = await generateNftPurchaseEvents(
+        scout.id,
+        scout.assignedBuilders.filter((builder) => builder.id !== scout.id),
+        date
+      );
       totalNftsPurchasedEvents += dailyNftsPurchased;
     }
 
     // Check if we are at the end of the week
     if (date.weekday === 7) {
-      const topWeeklyBuilders = await getTopBuilders({ quantity: 100, week });
+      const topWeeklyBuilders = await getBuildersLeaderboard({ quantity: 100, week });
       for (const { builder, gemsCollected, rank } of topWeeklyBuilders) {
         try {
           await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week });
@@ -131,7 +139,10 @@ export async function generateSeedData() {
         }
       }
       // Randomly pick 80-90% of users to claim their weekly points immediately
-      const usersToClaim = faker.number.int({ min: Math.floor(userIds.length * 0.8), max: Math.floor(userIds.length * 0.9) });
+      const usersToClaim = faker.number.int({
+        min: Math.floor(userIds.length * 0.8),
+        max: Math.floor(userIds.length * 0.9)
+      });
       const newUserIds = faker.helpers.shuffle(userIds).slice(0, usersToClaim);
 
       for (const user of newUserIds) {

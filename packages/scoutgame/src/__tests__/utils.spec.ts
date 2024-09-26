@@ -1,4 +1,6 @@
-import { getWeek, getFormattedWeek, getWeekStartEnd } from '../utils';
+import { DateTime } from 'luxon';
+
+import { getWeek, getFormattedWeek, getWeekStartEnd, getSeasonWeekNumberFromWeek, timezone } from '../utils';
 
 describe('getWeek should return the correct week', () => {
   it('when the first day of the year is a Sunday', () => {
@@ -40,5 +42,31 @@ describe('getWeekStartEnd', () => {
     const result = getWeekStartEnd(dec31);
     expect(result.start.toJSDate().toISOString()).toEqual('2023-01-01T05:00:00.000Z');
     expect(result.end.toJSDate().toISOString()).toEqual('2023-01-08T05:00:00.000Z');
+  });
+});
+
+describe('getSeasonWeekNumberFromWeek', () => {
+  it('should return the season week number from the week when the season is ahead of the current week', () => {
+    const currentSeasonWeek = 3;
+    const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 1 }, { zone: timezone });
+    const currentSeasonDate = currentSeasonStartDate.plus({
+      weeks: currentSeasonWeek
+    });
+    const formattedWeek = getFormattedWeek(currentSeasonDate.toJSDate());
+    expect(getSeasonWeekNumberFromWeek({ week: formattedWeek, seasonStartDate: currentSeasonStartDate })).toEqual(
+      currentSeasonWeek
+    );
+  });
+
+  it('should return the season week number from the week when the season is behind the current week', () => {
+    const currentSeasonWeek = 10;
+    const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 11, day: 1 }, { zone: timezone });
+    const currentSeasonDate = currentSeasonStartDate.plus({
+      weeks: currentSeasonWeek
+    });
+    const formattedWeek = getFormattedWeek(currentSeasonDate.toJSDate());
+    expect(getSeasonWeekNumberFromWeek({ week: formattedWeek, seasonStartDate: currentSeasonStartDate })).toEqual(
+      currentSeasonWeek
+    );
   });
 });

@@ -1,7 +1,7 @@
 import { IconButton, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import type { BasicUserInfo } from 'lib/builders/interfaces';
+import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import type { AvatarSize } from '../Avatar';
 import { Avatar } from '../Avatar';
@@ -14,7 +14,16 @@ type UserProfileProps = {
 export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
   const { displayName, username, bio, avatar, githubLogin } = user;
   return (
-    <Stack display='flex' gap={2} alignItems='center' flexDirection='row'>
+    <Stack
+      display='flex'
+      gap={2}
+      alignItems='center'
+      flexDirection='row'
+      p={{
+        xs: 0,
+        md: 2
+      }}
+    >
       {user.avatar ? (
         <Stack
           alignItems={{
