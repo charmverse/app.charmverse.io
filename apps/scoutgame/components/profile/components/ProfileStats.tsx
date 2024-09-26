@@ -73,7 +73,9 @@ export function ProfileStats({
             </Typography>
             <Stack flexDirection='row' gap={1} alignItems='center'>
               <Typography variant='h4' color='green.main' fontWeight={400}>
-                {selectedDuration === 'season' ? seasonPoints.builderPoints || 0 : allTimePoints.builderPoints || 0}
+                {selectedDuration === 'season'
+                  ? seasonPoints?.pointsEarnedAsBuilder || 0
+                  : allTimePoints?.pointsEarnedAsBuilder || 0}
               </Typography>
               <Image src='/images/profile/scout-game-green-icon.svg' width='25' height='25' alt='build icon' />
             </Stack>
@@ -84,7 +86,9 @@ export function ProfileStats({
             </Typography>
             <Stack flexDirection='row' gap={1} alignItems='center'>
               <Typography variant='h4' color='orange.main' fontWeight={400}>
-                {selectedDuration === 'season' ? seasonPoints.scoutPoints || 0 : allTimePoints.scoutPoints || 0}
+                {selectedDuration === 'season'
+                  ? seasonPoints?.pointsEarnedAsScout || 0
+                  : allTimePoints?.pointsEarnedAsScout || 0}
               </Typography>
               <Image src='/images/profile/scout-game-orange-icon.svg' width='25' height='25' alt='scout icon' />
             </Stack>

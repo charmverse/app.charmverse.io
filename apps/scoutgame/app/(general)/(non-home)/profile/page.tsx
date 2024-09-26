@@ -1,6 +1,4 @@
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/utils';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 

@@ -1,16 +1,11 @@
+import type { UserAllTimeStats, UserSeasonStats } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/utils';
 
 export type UserStats = {
   githubLogin?: string;
-  seasonPoints: {
-    builderPoints?: number;
-    scoutPoints?: number;
-  };
-  allTimePoints: {
-    builderPoints?: number;
-    scoutPoints?: number;
-  };
+  seasonPoints?: Pick<UserSeasonStats, 'pointsEarnedAsBuilder' | 'pointsEarnedAsScout'>;
+  allTimePoints?: Pick<UserAllTimeStats, 'pointsEarnedAsBuilder' | 'pointsEarnedAsScout'>;
 };
 
 export async function getUserStats(userId: string): Promise<UserStats> {
@@ -48,13 +43,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 
   return {
     githubLogin: githubUser?.login,
-    seasonPoints: {
-      builderPoints: seasonPoints?.pointsEarnedAsBuilder,
-      scoutPoints: seasonPoints?.pointsEarnedAsScout
-    },
-    allTimePoints: {
-      builderPoints: allTimePoints?.pointsEarnedAsBuilder,
-      scoutPoints: allTimePoints?.pointsEarnedAsScout
-    }
+    seasonPoints,
+    allTimePoints
   };
 }
