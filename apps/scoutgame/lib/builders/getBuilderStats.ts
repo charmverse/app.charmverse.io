@@ -4,7 +4,7 @@ import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
 export type BuilderStats = {
   seasonPoints?: number;
   allTimePoints?: number;
-  rank?: number;
+  rank: number | null;
   gemsCollected?: number;
 };
 

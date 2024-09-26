@@ -29,7 +29,7 @@ export type BuilderProfileProps = {
   totalNftsSold?: number;
   builderActivities: BuilderActivity[];
   gemsCollected?: number;
-  rank?: number;
+  rank?: number | null;
   user?: {
     username: string;
   } | null;

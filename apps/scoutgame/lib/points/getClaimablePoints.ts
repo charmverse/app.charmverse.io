@@ -22,7 +22,7 @@ export type WeeklyReward = {
     points: number;
     quantity: number;
   };
-  rank: number;
+  rank: number | null;
 };
 
 export async function getClaimablePoints(
@@ -92,7 +92,7 @@ export async function getClaimablePoints(
     }
   });
 
-  const weeklyRankRecord: Record<string, number> = {};
+  const weeklyRankRecord: Record<string, number | null> = {};
   const weeklyStats = await prisma.userWeeklyStats.findMany({
     where: {
       week: {

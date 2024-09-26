@@ -2,7 +2,7 @@ import { Paper, Stack, Typography } from '@mui/material';
 import { currentSeason, getCurrentWeekNumber } from '@packages/scoutgame/utils';
 import Image from 'next/image';
 
-export function BuilderWeeklyStats({ gemsCollected, rank }: { gemsCollected?: number; rank?: number }) {
+export function BuilderWeeklyStats({ gemsCollected, rank }: { gemsCollected?: number; rank?: number | null }) {
   const weekNumber = getCurrentWeekNumber();
 
   return (

@@ -73,7 +73,7 @@ export function getWeek(date: Date): { week: number; year: number } {
   return { week: weekNumber, year: newYorkDate.year };
 }
 
-export function isSameDay(date: Date) {
+export function isToday(date: Date) {
   const dateDay = DateTime.fromJSDate(date, { zone: timezone }).startOf('day');
   return dateDay.equals(DateTime.now().setZone(timezone).startOf('day'));
 }
