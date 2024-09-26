@@ -1,12 +1,18 @@
+import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import EastIcon from '@mui/icons-material/East';
 import { Box, IconButton, Stack, Typography } from '@mui/material';
 import { type ReactNode, useMemo } from 'react';
 import { toHex } from 'viem';
 
-import { StyledBanner } from 'components/common/Banners/Banner';
+import { StyledBanner as _StyledBanner } from 'components/common/Banners/Banner';
 import { Button } from 'components/common/Button';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+
+const StyledBanner = styled(_StyledBanner)`
+  height: 50px;
+  padding: 0;
+`;
 
 export function AnnouncementBanner({
   children,
@@ -41,13 +47,12 @@ export function AnnouncementBanner({
 
   return (
     <StyledBanner errorBackground={errorBackground} top={20}>
-      <Box pr={3} display='flex' alignItems='center'>
+      <Box py={0.5} px={2} display='flex' alignItems='center' justifyContent='center' gap={2} flexGrow={1}>
         {typeof children === 'string' ? <Typography>{children}</Typography> : children}
         {actionLabel && (actionHref || onActionClick) && (
           <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
             <Button
               endIcon={<EastIcon />}
-              sx={{ ml: 1, pb: 0, pt: 0, fontWeight: 600 }}
               color={errorBackground ? 'white' : 'primary'}
               href={actionHref}
               onClick={onActionClick}
@@ -65,9 +70,8 @@ export function AnnouncementBanner({
           onClick={() => setShowAnnouncement(false)}
           size='small'
           sx={{
-            position: 'absolute',
-            right: 5,
-            top: 8
+            opacity: 0.5,
+            mx: 2
           }}
         >
           <CloseIcon fontSize='small' />

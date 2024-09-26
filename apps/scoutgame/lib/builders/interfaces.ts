@@ -1,11 +1,4 @@
-export type BasicUserInfo = {
-  id: string;
-  username: string;
-  avatar?: string | null;
-  displayName: string;
-  bio?: string | null;
-  githubLogin?: string;
-};
+import type { BasicUserInfo } from 'lib/users/interfaces';
 
 export type PointMetrics = {
   seasonPoints: number;

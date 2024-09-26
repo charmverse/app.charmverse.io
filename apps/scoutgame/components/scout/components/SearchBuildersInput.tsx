@@ -1,19 +1,9 @@
 'use client';
 
 import SearchIcon from '@mui/icons-material/Search';
-import {
-  CircularProgress,
-  TextField,
-  InputAdornment,
-  Autocomplete,
-  Box,
-  Typography,
-  styled,
-  Stack
-} from '@mui/material';
-import debounce from 'lodash/debounce';
+import { Autocomplete, Box, CircularProgress, InputAdornment, TextField, Typography, styled } from '@mui/material';
 import Link from 'next/link';
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState } from 'react';
 
 import { Avatar } from 'components/common/Avatar';
 import { useSearchBuilders } from 'hooks/api/builders';

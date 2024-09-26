@@ -8,7 +8,7 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
   const builders = await prisma.userWeeklyStats.findMany({
     where: weeklyQualifiedBuilderWhere,
     orderBy: {
-      gemsCollected: 'desc'
+      rank: 'asc'
     },
     take: limit,
     select: {
@@ -36,7 +36,8 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
             },
             distinct: ['scoutId'],
             select: {
-              scoutId: true
+              scoutId: true,
+              tokensPurchased: true
             }
           },
           builderNfts: {
@@ -58,13 +59,14 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       id: user.id,
       username: user.username,
       displayName: user.displayName,
-      builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder,
+      builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
       price: user.builderNfts[0]?.currentPrice,
-      nftsSold: user.nftPurchaseEvents.length,
+      nftsSold: user.nftPurchaseEvents.reduce((acc, event) => acc + event.tokensPurchased, 0),
       gems: builder.gemsCollected,
       avatar: user.avatar,
       scoutedBy: user.nftPurchaseEvents.length,
-      isBanned: !!user.bannedAt
+      isBanned: !!user.bannedAt,
+      builder: true
     };
   });
 }

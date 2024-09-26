@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { GemsReceiptType, GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
-import { getFormattedWeek, getWeekStartEnd, streakWindow, currentSeason, isSameDay } from '@packages/scoutgame/utils';
+import { getFormattedWeek, getWeekStartEnd, streakWindow, currentSeason, isToday } from '@packages/scoutgame/utils';
 
 import type { PullRequest } from './getPullRequests';
 import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
@@ -66,7 +66,9 @@ export async function processMergedPullRequest({
     }
   });
 
-  const existingGithubEvent = previousGitEvents.some((event) => event.pullRequestNumber === pullRequest.number);
+  const existingGithubEvent = previousGitEvents.some(
+    (event) => event.pullRequestNumber === pullRequest.number && event.repoId === pullRequest.repository.id
+  );
 
   if (existingGithubEvent) {
     // already processed
@@ -100,7 +102,7 @@ export async function processMergedPullRequest({
       return false;
     }
 
-    return isSameDay(event.createdAt);
+    return isToday(event.createdAt);
   });
 
   await prisma.$transaction(async (tx) => {

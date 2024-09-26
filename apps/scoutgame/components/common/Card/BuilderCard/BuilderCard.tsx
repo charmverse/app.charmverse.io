@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Stack } from '@mui/material';
+import { Button, Card, Stack, Typography } from '@mui/material';
 import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
 import { useState } from 'react';
 
@@ -35,9 +35,13 @@ export function BuilderCard({
 
   return (
     <>
-      <Card sx={{ border: 'none' }}>
+      <Card sx={{ border: 'none', opacity: builder.isBanned ? 0.25 : 1 }}>
         <BuilderCardNftDisplay avatar={builder.avatar} username={builder.username}>
-          {hideDetails ? null : <BuilderCardStats {...builder} />}
+          {builder.isBanned ? (
+            <Typography textAlign='center'>BANNED</Typography>
+          ) : hideDetails ? null : (
+            <BuilderCardStats {...builder} />
+          )}
         </BuilderCardNftDisplay>
         {typeof builder.price !== 'undefined' && showPurchaseButton && (
           <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
