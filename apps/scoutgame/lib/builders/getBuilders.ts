@@ -25,6 +25,7 @@ export async function getBuilders(
           id: true,
           avatar: true,
           username: true,
+          builder: true,
           gemsPayoutEvents: {
             select: {
               gems: true
@@ -61,9 +62,10 @@ export async function getBuilders(
       avatar: topNft.builder.avatar,
       username: topNft.builder.username,
       nftsSold: nftMetrics.totalSold,
-      price: Number(topNft.currentPrice),
+      price: topNft.currentPrice,
       displayName: topNft.builder.username,
-      scoutedBy: Object.keys(nftMetrics.scouts).length
+      scoutedBy: Object.keys(nftMetrics.scouts).length,
+      builder: topNft.builder.builder
     };
 
     return builderWithInfo;
