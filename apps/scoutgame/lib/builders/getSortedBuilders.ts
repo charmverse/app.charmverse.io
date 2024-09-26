@@ -48,13 +48,14 @@ export async function getSortedBuilders({
           builderId: {
             in: topUsers.map((userStats) => userStats.userId)
           }
-        },
-        orderBy: {
-          builder: {
-            gemsPayoutEvents: {}
-          }
         }
-      });
+      }).then((_builders) =>
+        _builders.sort((a, b) => {
+          const aIndex = topUsers.findIndex((user) => user.userId === a.id);
+          const bIndex = topUsers.findIndex((user) => user.userId === b.id);
+          return aIndex - bIndex;
+        })
+      );
 
     case 'hot': {
       const previousWeek = getLastWeek();

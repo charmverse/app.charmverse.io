@@ -1,7 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { BuilderUserInfo } from './interfaces';
+import type { BuilderInfo } from './interfaces';
 
 // TODO - Uses nft sale events, but doesn't account for cases where the multiple nfts were purchased at once
 export async function getBuilders(
@@ -12,7 +12,7 @@ export async function getBuilders(
   }: { limit?: number; orderBy?: Prisma.BuilderNftFindManyArgs['orderBy']; where?: Prisma.BuilderNftWhereInput } = {
     limit: 10
   }
-): Promise<BuilderUserInfo[]> {
+): Promise<BuilderInfo[]> {
   const topNfts = await prisma.builderNft.findMany({
     where,
     take: limit,
@@ -56,13 +56,13 @@ export async function getBuilders(
       { scouts: {}, totalSold: 0 } as { scouts: Record<string, number>; totalSold: number }
     );
 
-    const builderWithInfo: BuilderUserInfo = {
+    const builderWithInfo: BuilderInfo = {
       id: topNft.builder.id,
       avatar: topNft.builder.avatar,
       username: topNft.builder.username,
-      gems: 0,
       nftsSold: nftMetrics.totalSold,
       price: Number(topNft.currentPrice),
+      displayName: topNft.builder.username,
       scoutedBy: Object.keys(nftMetrics.scouts).length
     };
 

@@ -5,7 +5,9 @@ import { prettyPrint } from '@root/lib/utils/strings';
 import { builderContractAddress, builderNftChain } from '../builderNfts/constants';
 import type { ActivityToRecord } from '../recordGameActivity';
 import { recordGameActivity } from '../recordGameActivity';
+import { refreshUserStats } from '../refreshUserStats';
 import { createMockEvents, ensureGithubUserExists } from '../testing/database';
+import { getCurrentWeek } from '../utils';
 
 function getRandomDateWithinLast30Days() {
   const now = new Date();
@@ -186,6 +188,23 @@ export async function generateActivities({ userId }: { userId: string }) {
   for (const event of events) {
     await recordGameActivity(event);
   }
+
+  const stats = await prisma.userWeeklyStats.upsert({
+    where: {
+      userId_week: {
+        userId,
+        week: getCurrentWeek()
+      }
+    },
+    create: {
+      userId,
+      week: getCurrentWeek(),
+      gemsCollected: 30
+    },
+    update: {
+      gemsCollected: 30
+    }
+  });
 }
 
 const githubLogin = 'motechFR';
@@ -228,8 +247,6 @@ async function script() {
     }
   });
 
-  prettyPrint({ user });
-
   await createMockEvents({ userId, amount: 7 });
 
   await generateActivities({ userId });
@@ -239,6 +256,8 @@ async function script() {
       userId
     }
   });
+
+  await refreshUserStats({ userId });
 
   log.info(`Created ${newCount - current}`);
 }
