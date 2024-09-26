@@ -45,6 +45,7 @@ export async function processScoutPointsPayout({
       gems: gemsCollected,
       points: earnableScoutPoints,
       week,
+      season: currentSeason,
       builderId,
       builderEvent: {
         create: {

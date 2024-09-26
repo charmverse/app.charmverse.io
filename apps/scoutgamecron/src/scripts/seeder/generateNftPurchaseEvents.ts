@@ -1,12 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
-import { currentSeason, getFormattedWeek } from '@packages/scoutgame/utils';
+import { currentSeason, getWeekFromDate } from '@packages/scoutgame/utils';
 import { BuilderInfo } from './generateSeedData';
 import { DateTime } from 'luxon';
 import { randomTimeOfDay } from './generator';
 
 export async function generateNftPurchaseEvents(scoutId: string, assignedBuilders: BuilderInfo[], date: DateTime) {
-  const week = getFormattedWeek(date.toJSDate());
+  const week = getWeekFromDate(date.toJSDate());
   const totalNftsPurchasedToday = faker.number.int({ min: 0, max: 3 });
   for (let nftCount = 0; nftCount < totalNftsPurchasedToday; nftCount++) {
     const builder = faker.helpers.arrayElement(assignedBuilders);
@@ -25,19 +25,19 @@ export async function generateNftPurchaseEvents(scoutId: string, assignedBuilder
             builderId: builder.id,
             season: currentSeason,
             week,
-            type: "nft_purchase",
+            type: 'nft_purchase',
             createdAt: randomTimeOfDay(date).toJSDate(),
             pointsReceipts: {
               create: {
                 id: faker.string.uuid(),
                 recipientId: builder.id,
-                value: builder.nftPrice,
+                value: builder.nftPrice
               }
             }
           }
         }
       }
-    })
+    });
   }
 
   return totalNftsPurchasedToday;

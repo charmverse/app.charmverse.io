@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { GemsReceiptType, GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { recordGameActivityWithCatchError } from '@packages/scoutgame/recordGameActivity';
-import { getFormattedWeek, getWeekStartEnd, streakWindow, currentSeason, isToday } from '@packages/scoutgame/utils';
+import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday } from '@packages/scoutgame/utils';
 
 import type { PullRequest } from './getPullRequests';
 import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
@@ -20,18 +20,20 @@ export type MergedPullRequestMeta = Pick<
 export async function processMergedPullRequest({
   pullRequest,
   repo,
+  season,
   isFirstMergedPullRequest: _isFirstMergedPullRequest,
   now = new Date()
 }: {
   pullRequest: MergedPullRequestMeta;
   repo: RepoInput;
   isFirstMergedPullRequest?: boolean;
+  season: string;
   now?: Date;
 }) {
   if (!pullRequest.mergedAt) {
     throw new Error('Pull request was not merged');
   }
-  const week = getFormattedWeek(now);
+  const week = getWeekFromDate(now);
   const { start } = getWeekStartEnd(now);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
@@ -176,7 +178,7 @@ export async function processMergedPullRequest({
           create: {
             builderId: githubUser.builderId,
             createdAt: builderEventDate,
-            season: currentSeason,
+            season,
             week,
             type: 'merged_pull_request',
             githubEventId: event.id,
@@ -223,6 +225,7 @@ export async function processMergedPullRequest({
           create: {
             userId: githubUser.builderId,
             week,
+            season,
             gemsCollected
           },
           update: {

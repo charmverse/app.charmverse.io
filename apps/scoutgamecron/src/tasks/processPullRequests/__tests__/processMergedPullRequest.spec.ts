@@ -2,11 +2,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
 import { mockBuilder, mockRepo } from '@packages/scoutgame/testing/database';
 import { randomLargeInt } from '@packages/scoutgame/testing/generators';
-import { timezone } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
 
 import { mockPullRequest } from '@/testing/generators';
+
+const currentSeason = '2024-W38';
 
 jest.unstable_mockModule('../getRecentPullRequestsByUser', () => ({
   getRecentPullRequestsByUser: jest.fn()
@@ -49,7 +50,7 @@ describe('processMergedPullRequest', () => {
 
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
-    await processMergedPullRequest({ pullRequest, repo });
+    await processMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
     const githubEvent = await prisma.githubEvent.findFirst({
       where: {
@@ -104,7 +105,7 @@ describe('processMergedPullRequest', () => {
       mockPullRequest()
     ]);
 
-    await processMergedPullRequest({ pullRequest, repo });
+    await processMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
     const githubEvent = await prisma.githubEvent.findFirst({
       where: {
@@ -146,7 +147,7 @@ describe('processMergedPullRequest', () => {
     const builder = await mockBuilder();
     const repo = await mockRepo();
 
-    const now = DateTime.fromObject({ weekday: 2 }, { zone: timezone });
+    const now = DateTime.fromObject({ weekday: 2 }, { zone: 'utc' });
 
     const lastWeekPr = mockPullRequest({
       createdAt: now.minus({ days: 4 }).toISO(),
@@ -160,7 +161,12 @@ describe('processMergedPullRequest', () => {
     ]);
 
     // record a builder event for the last week PR, use a different date so that it creates a builder event for the last week
-    await processMergedPullRequest({ pullRequest: lastWeekPr, repo, now: new Date(lastWeekPr.createdAt) });
+    await processMergedPullRequest({
+      pullRequest: lastWeekPr,
+      repo,
+      season: currentSeason,
+      now: new Date(lastWeekPr.createdAt)
+    });
 
     const pullRequest3 = mockPullRequest({
       createdAt: now.minus({ days: 2 }).toISO(),
@@ -169,7 +175,7 @@ describe('processMergedPullRequest', () => {
       author: builder.githubUser
     });
 
-    await processMergedPullRequest({ pullRequest: pullRequest3, repo, now: now.toJSDate() });
+    await processMergedPullRequest({ pullRequest: pullRequest3, repo, season: currentSeason, now: now.toJSDate() });
 
     const pullRequest4 = mockPullRequest({
       createdAt: now.toISO(),
@@ -178,7 +184,7 @@ describe('processMergedPullRequest', () => {
       author: builder.githubUser
     });
 
-    await processMergedPullRequest({ pullRequest: pullRequest4, repo, now: now.toJSDate() });
+    await processMergedPullRequest({ pullRequest: pullRequest4, repo, season: currentSeason, now: now.toJSDate() });
 
     const gemsReceipt = await prisma.gemsReceipt.findFirstOrThrow({
       where: {
@@ -207,18 +213,18 @@ describe('processMergedPullRequest', () => {
 
     const pullRequest = mockPullRequest({
       mergedAt: new Date().toISOString(),
-      createdAt: DateTime.fromJSDate(new Date(), { zone: timezone }).minus({ days: 3 }).toISO(),
+      createdAt: DateTime.fromJSDate(new Date(), { zone: 'utc' }).minus({ days: 3 }).toISO(),
       repo,
       state: 'MERGED',
       author: builder.githubUser
     });
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
-    await processMergedPullRequest({ pullRequest, repo });
+    await processMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
-    await processMergedPullRequest({ pullRequest, repo });
+    await processMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
-    await processMergedPullRequest({ pullRequest, repo });
+    await processMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
     const builderEvents = await prisma.builderEvent.count({
       where: {
@@ -246,7 +252,7 @@ describe('processMergedPullRequest', () => {
 
     const pullRequest = mockPullRequest({
       mergedAt: new Date().toISOString(),
-      createdAt: DateTime.fromJSDate(new Date(), { zone: timezone }).minus({ days: 3 }).toISO(),
+      createdAt: DateTime.fromJSDate(new Date(), { zone: 'utc' }).minus({ days: 3 }).toISO(),
       state: 'MERGED',
       author: builder.githubUser,
       repo
@@ -254,7 +260,7 @@ describe('processMergedPullRequest', () => {
 
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
 
-    await processMergedPullRequest({ pullRequest, repo });
+    await processMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
     const builderEvents = await prisma.builderEvent.findMany({
       where: {
