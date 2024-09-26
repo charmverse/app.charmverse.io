@@ -65,13 +65,15 @@ export async function recordGameActivity({
   if (sourceEvent.builderStrikeId !== undefined) {
     parsedType = ScoutGameActivityType.strike;
   } else if (sourceEvent.nftPurchaseEventId !== undefined) {
-    parsedType = ScoutGameActivityType.builder_registered;
+    parsedType = ScoutGameActivityType.mint;
   } else if (sourceEvent.gemsPayoutEventId !== undefined) {
     parsedType = ScoutGameActivityType.gems;
   } else if (sourceEvent.pointsReceiptId !== undefined) {
     parsedType = ScoutGameActivityType.points;
   } else if (sourceEvent.gemsReceiptId !== undefined) {
     parsedType = ScoutGameActivityType.gems_from_pr;
+  } else if (sourceEvent.registeredBuilderNftId !== undefined) {
+    parsedType = ScoutGameActivityType.builder_registered;
   } else if (sourceEvent.onchainTxHash !== undefined && sourceEvent.onchainChainId !== undefined) {
     parsedType = ScoutGameActivityType.mint;
   } else {
