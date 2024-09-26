@@ -106,7 +106,7 @@ function PageLayout({ children }: PageLayoutProps) {
                 actionHref='https://waitlist.scoutgame.xyz'
                 expiryDate='2024-09-30'
               >
-                Scout. Build. Win. Join the waitlist now!
+                Fantasy Sports for Developers. Join waitlist
               </AnnouncementBanner>
             </AppBar>
             <NavigationSidebarDrawer
