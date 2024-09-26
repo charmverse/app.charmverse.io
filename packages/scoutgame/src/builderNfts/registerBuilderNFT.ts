@@ -64,6 +64,15 @@ export async function registerBuilderNFT({ builderId }: { builderId: string }) {
 
   const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId });
 
+  await prisma.scout.update({
+    where: {
+      id: builderId
+    },
+    data: {
+      builder: true
+    }
+  });
+
   await recordGameActivity({
     activity: {
       amount: 1,

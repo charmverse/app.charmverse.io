@@ -186,7 +186,7 @@ export async function generateActivities({ userId }: { userId: string }) {
 
   // Record activities
   for (const event of events) {
-    await recordGameActivity(event);
+    await recordGameActivity(event).catch((error) => log.error(`Error recording activity`, { error }));
   }
 
   const stats = await prisma.userWeeklyStats.upsert({

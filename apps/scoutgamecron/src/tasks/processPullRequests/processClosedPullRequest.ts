@@ -11,13 +11,18 @@ import type { PullRequest } from './getPullRequests';
 
 type RepoInput = Pick<GithubRepo, 'owner' | 'name'>;
 
+export type ClosedPullRequestMeta = Pick<
+  PullRequest,
+  'author' | 'number' | 'title' | 'repository' | 'url' | 'createdAt' | 'closedAt'
+>;
+
 export async function processClosedPullRequest({
   pullRequest,
   repo,
   prClosedBy,
   skipSendingComment
 }: {
-  pullRequest: PullRequest;
+  pullRequest: ClosedPullRequestMeta;
   repo: RepoInput;
   prClosedBy?: string;
   skipSendingComment?: boolean;

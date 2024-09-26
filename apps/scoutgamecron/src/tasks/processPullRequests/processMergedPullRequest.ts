@@ -9,6 +9,10 @@ import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
 
 type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
 
+export type MergedPullRequestMeta = Pick<
+  PullRequest,
+  'author' | 'number' | 'title' | 'repository' | 'url' | 'createdAt' | 'mergedAt'
+>;
 /**
  *
  * @isFirstMergedPullRequest Only used for the seed data generator
@@ -19,7 +23,7 @@ export async function processMergedPullRequest({
   isFirstMergedPullRequest: _isFirstMergedPullRequest,
   now = new Date()
 }: {
-  pullRequest: PullRequest;
+  pullRequest: MergedPullRequestMeta;
   repo: RepoInput;
   isFirstMergedPullRequest?: boolean;
   now?: Date;
