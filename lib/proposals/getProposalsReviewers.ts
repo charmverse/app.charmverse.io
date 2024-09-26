@@ -142,6 +142,8 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
           (reviewer) => reviewer.userId === spaceRole.userId || (reviewer.roleId && userRoles.includes(reviewer.roleId))
         );
 
+        let proposalAdded = false; // in case they are a reviewer and the proposal is not appealed
+
         if (isReviewer && !currentEvaluation.result) {
           totalReviews += 1;
           const currentReview =
@@ -153,6 +155,7 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
           if (hasReviewed) {
             reviewsCompleted += 1;
           } else {
+            proposalAdded = true;
             reviewerProposals.push({
               id: proposal.id,
               title: proposal.page.title,
@@ -167,7 +170,7 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
             });
           }
         }
-        if (isAppealReviewer && !currentEvaluation.result && currentEvaluation.appealedAt) {
+        if (isAppealReviewer && !currentEvaluation.result && currentEvaluation.appealedAt && !proposalAdded) {
           totalReviews += 1;
           const currentAppealReview = currentEvaluation.appealReviews.some(
             (review) => review.reviewerId === spaceRole.userId
