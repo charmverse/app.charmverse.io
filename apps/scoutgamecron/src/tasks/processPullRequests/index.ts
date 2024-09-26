@@ -1,12 +1,12 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { updateBuildersRank } from '@packages/scoutgame/updateBuildersRank';
 import { getCurrentWeek } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 
 import { getPullRequests } from './getPullRequests';
 import { processClosedPullRequest } from './processClosedPullRequest';
 import { processMergedPullRequest } from './processMergedPullRequest';
+import { updateBuildersRank } from './updateBuildersRank';
 
 export async function processPullRequests({
   createdAfter,

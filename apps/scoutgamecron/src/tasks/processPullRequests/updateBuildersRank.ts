@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getBuildersLeaderboard } from './getBuildersLeaderboard';
+import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
 
 export async function updateBuildersRank({ week }: { week: string }) {
   const buildersLeaderboard = await getBuildersLeaderboard({ week });
