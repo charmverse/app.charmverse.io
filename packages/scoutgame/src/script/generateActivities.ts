@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
-import { prettyPrint } from '@root/lib/utils/strings';
 
 import { builderContractAddress, builderNftChain } from '../builderNfts/constants';
 import type { ActivityToRecord } from '../recordGameActivity';
