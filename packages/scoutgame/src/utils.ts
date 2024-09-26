@@ -4,8 +4,8 @@ type ISOWeek = string; // isoweek, e.g. '2024-W01'
 type SeasonWeek = number; // the week in the season, e.g. 1
 
 // Season start MUST be on a Monday, when isoweek begins
-export const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 16 }, { zone: 'utc' }); // Dev Season: 2024-W38
-// export const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 30 }, { zone: 'utc' }); // Actual launch: 2024-W40
+const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 16 }, { zone: 'utc' }); // Dev Season: 2024-W38
+// const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 30 }, { zone: 'utc' }); // Actual launch: 2024-W40
 export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 13 });
 export const currentSeason: ISOWeek = getWeekFromDate(currentSeasonStartDate.toJSDate());
 
@@ -22,6 +22,10 @@ export function getLastWeek(): ISOWeek {
 
 export function getWeekFromDate(date: Date): ISOWeek {
   return _formatWeek(DateTime.fromJSDate(date, { zone: 'utc' }));
+}
+
+export function getDateFromISOWeek(week: ISOWeek): DateTime {
+  return DateTime.fromISO(week, { zone: 'utc' });
 }
 
 export function getWeekStartEnd(date: Date) {
@@ -47,19 +51,12 @@ export function getCurrentWeekPoints() {
 }
 
 export function getCurrentSeasonWeek(): SeasonWeek {
-  const currentDate = DateTime.utc();
-  const weeksDiff = currentDate.diff(currentSeasonStartDate, 'weeks').weeks;
-  return Math.floor(weeksDiff) + 1;
+  return getSeasonWeekFromISOWeek({ season: currentSeason, week: getCurrentWeek() });
 }
 
-export function getSeasonWeekFromISOWeek({
-  seasonStartDate,
-  week
-}: {
-  seasonStartDate: DateTime;
-  week: ISOWeek;
-}): SeasonWeek {
-  const date = DateTime.fromISO(week, { zone: 'utc' });
-  const weeksDiff = date.diff(seasonStartDate, 'weeks').weeks;
+export function getSeasonWeekFromISOWeek({ season, week }: { season: ISOWeek; week: ISOWeek }): SeasonWeek {
+  const weekDate = DateTime.fromISO(week, { zone: 'utc' });
+  const seasonDate = DateTime.fromISO(season, { zone: 'utc' });
+  const weeksDiff = weekDate.diff(seasonDate, 'weeks').weeks;
   return weeksDiff + 1;
 }

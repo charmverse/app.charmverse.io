@@ -30,26 +30,24 @@ describe('getWeekStartEnd', () => {
 
 describe('getSeasonWeekFromISOWeek', () => {
   it('should return the season week number when the season is ahead of the current week', () => {
-    const currentSeasonWeek = 3;
-    const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 2 }, { zone: 'utc' });
-    const currentSeasonDate = currentSeasonStartDate.plus({
-      weeks: currentSeasonWeek - 1
+    const seasonWeek = 3;
+    const seasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 2 }, { zone: 'utc' });
+    const season = getWeekFromDate(seasonStartDate.toJSDate());
+    const currentSeasonDate = seasonStartDate.plus({
+      weeks: seasonWeek - 1
     });
     const formattedWeek = getWeekFromDate(currentSeasonDate.toJSDate());
-    expect(getSeasonWeekFromISOWeek({ week: formattedWeek, seasonStartDate: currentSeasonStartDate })).toEqual(
-      currentSeasonWeek
-    );
+    expect(getSeasonWeekFromISOWeek({ week: formattedWeek, season })).toEqual(seasonWeek);
   });
 
   it('should return the season week number when the season is behind the current week', () => {
-    const currentSeasonWeek = 10;
-    const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 10, day: 28 }, { zone: 'utc' }); // Nov 1, 2024 is a Monday
-    const currentSeasonDate = currentSeasonStartDate.plus({
-      weeks: currentSeasonWeek - 1
+    const seasonWeek = 10;
+    const seasonStartDate = DateTime.fromObject({ year: 2024, month: 10, day: 28 }, { zone: 'utc' }); // Oct 28, 2024 is a Monday
+    const season = getWeekFromDate(seasonStartDate.toJSDate());
+    const currentSeasonDate = seasonStartDate.plus({
+      weeks: seasonWeek - 1
     });
     const formattedWeek = getWeekFromDate(currentSeasonDate.toJSDate());
-    expect(getSeasonWeekFromISOWeek({ week: formattedWeek, seasonStartDate: currentSeasonStartDate })).toEqual(
-      currentSeasonWeek
-    );
+    expect(getSeasonWeekFromISOWeek({ week: formattedWeek, season })).toEqual(seasonWeek);
   });
 });

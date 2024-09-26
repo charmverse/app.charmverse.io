@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, currentSeasonStartDate, getSeasonWeekFromISOWeek } from '@packages/scoutgame/utils';
+import { currentSeason, getDateFromISOWeek, getSeasonWeekFromISOWeek } from '@packages/scoutgame/utils';
 
 export type WeeklyReward = {
   week: string;
@@ -37,6 +37,7 @@ export async function getClaimablePoints(
       event: {
         select: {
           week: true,
+          season: true,
           type: true,
           builderId: true,
           nftPurchaseEvent: {
@@ -66,13 +67,16 @@ export async function getClaimablePoints(
     }
   > = {};
 
-  const allWeeks = new Set<string>(Array.from(pointsReceipts.map((receipt) => receipt.event.week)));
+  const allWeeks = pointsReceipts.reduce<Record<string, string>>((acc, receipt) => {
+    acc[receipt.event.week] = receipt.event.season;
+    return acc;
+  }, {});
 
   const gemsReceipts = await prisma.gemsReceipt.findMany({
     where: {
       event: {
         week: {
-          in: Array.from(allWeeks)
+          in: Object.keys(allWeeks)
         },
         builderId: userId
       }
@@ -91,7 +95,7 @@ export async function getClaimablePoints(
   const weeklyStats = await prisma.userWeeklyStats.findMany({
     where: {
       week: {
-        in: Array.from(allWeeks)
+        in: Object.keys(allWeeks)
       },
       userId
     },
@@ -172,11 +176,11 @@ export async function getClaimablePoints(
 
   return {
     totalClaimablePoints,
-    weeklyRewards: Array.from(allWeeks)
+    weeklyRewards: Object.keys(allWeeks)
       .map((week) => ({
         week,
         weekNumber: getSeasonWeekFromISOWeek({
-          seasonStartDate: currentSeasonStartDate,
+          season: allWeeks[week],
           week
         }),
         builderReward: builderRewards[week],
