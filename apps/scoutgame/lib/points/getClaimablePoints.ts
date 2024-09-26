@@ -1,5 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getWeekNumberFromWeek } from '@packages/scoutgame/utils';
+import {
+  currentSeason,
+  currentSeasonEndDate,
+  currentSeasonStartDate,
+  getSeasonWeekNumberFromWeek
+} from '@packages/scoutgame/utils';
 
 export type WeeklyReward = {
   week: string;
@@ -175,7 +180,10 @@ export async function getClaimablePoints(
     weeklyRewards: Array.from(allWeeks)
       .map((week) => ({
         week,
-        weekNumber: getWeekNumberFromWeek(week),
+        weekNumber: getSeasonWeekNumberFromWeek({
+          seasonStartDate: currentSeasonStartDate,
+          week
+        }),
         builderReward: builderRewards[week],
         githubContributionReward: githubContributionRewards[week],
         soldNftReward: soldNftRewards[week],

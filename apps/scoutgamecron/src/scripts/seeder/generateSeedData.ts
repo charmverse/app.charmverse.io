@@ -11,7 +11,7 @@ import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboa
 import { getFormattedWeek } from '@packages/scoutgame/utils';
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
 import { claimPoints } from '@packages/scoutgame/claimPoints';
-import { updateBuildersRank } from '@packages/scoutgame/updateBuildersRank';
+import { updateBuildersRank } from '../../tasks/processPullRequests/updateBuildersRank';
 
 export type BuilderInfo = {
   id: string;
