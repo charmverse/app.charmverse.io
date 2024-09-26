@@ -1,4 +1,7 @@
 import { Box } from '@mui/material';
+import { Suspense } from 'react';
+
+import { LoadingGallery } from 'components/layout/Loading/LoadingGallery';
 
 import { ScoutPageBuildersGallery } from './components/ScoutPageBuildersGallery';
 import { SearchBuildersInput } from './components/SearchBuildersInput';
@@ -10,7 +13,9 @@ export function ScoutPage({ sort, user }: { sort: string; user?: { username: str
     <Box p={1}>
       <SearchBuildersInput />
       <SortOptionTabs value={currentSort} />
-      <ScoutPageBuildersGallery sort={currentSort} user={user} />
+      <Suspense fallback={<LoadingGallery />}>
+        <ScoutPageBuildersGallery sort={currentSort} user={user} />
+      </Suspense>
     </Box>
   );
 }

@@ -8,7 +8,8 @@ import { Suspense } from 'react';
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { HomeTabsMenu } from 'components/home/components/HomeTabsMenu';
 import { TodaysHotBuildersCarousel } from 'components/home/components/TodaysHotBuildersCarousel';
-import { LoadingBanner } from 'components/layout/Loading/LoadingBanner';
+import { LoadingCards } from 'components/layout/Loading/LoadingCards';
+import { LoadingTable } from 'components/layout/Loading/LoadingTable';
 
 import { HomeTab } from './components/HomeTab';
 import { homeTabs } from './components/HomeTabsMenu';
@@ -17,9 +18,7 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
   const currentTab = homeTabs.some((t) => t.value === tab) ? tab : 'leaderboard';
   return (
     <>
-      <Suspense fallback={<LoadingBanner />}>
-        <HeaderMessage />
-      </Suspense>
+      <HeaderMessage />
       <Box p={1} data-test='home-page'>
         <Stack flexDirection='row' alignItems='center' justifyContent='center' px={2} py={3}>
           <Image src='/images/profile/icons/blue-fire-icon.svg' width='30' height='30' alt='title icon' />
@@ -27,9 +26,13 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
             Scout Today's HOT Builders
           </Typography>
         </Stack>
-        <TodaysHotBuildersCarousel />
+        <Suspense fallback={<LoadingCards />}>
+          <TodaysHotBuildersCarousel />
+        </Suspense>
         <HomeTabsMenu tab={currentTab} />
-        <HomeTab tab={currentTab} />
+        <Suspense fallback={<LoadingTable />}>
+          <HomeTab tab={currentTab} />
+        </Suspense>
       </Box>
     </>
   );

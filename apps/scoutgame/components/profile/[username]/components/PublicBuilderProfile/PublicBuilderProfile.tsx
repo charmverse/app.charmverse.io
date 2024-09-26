@@ -1,12 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/utils';
-import { notFound } from 'next/navigation';
 
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderStats } from 'lib/builders/getBuilderStats';
 import type { BasicUserInfo } from 'lib/users/interfaces';
-import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
 
