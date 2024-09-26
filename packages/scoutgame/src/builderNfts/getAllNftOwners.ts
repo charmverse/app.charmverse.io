@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
 
-import { currentSeason } from './constants';
+import { currentSeason } from '../dates';
 
 export async function getAllNftOwners({ builderId }: { builderId: string }): Promise<string[]> {
   const builderNft = await prisma.builderNft.findUniqueOrThrow({

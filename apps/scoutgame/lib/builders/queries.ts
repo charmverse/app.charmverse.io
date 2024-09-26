@@ -1,5 +1,5 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
 export const seasonQualifiedBuilderWhere: Prisma.UserSeasonStatsWhereInput = {
   season: currentSeason,

@@ -1,12 +1,12 @@
 import { log } from '@charmverse/core/log';
+import { getCurrentWeek } from '@packages/scoutgame/dates';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
-import { getCurrentWeek, timezone } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 
 import { processScoutPointsPayout } from './processScoutPointsPayout';
 
 export async function processGemsPayout() {
-  const now = DateTime.fromJSDate(new Date(), { zone: timezone });
+  const now = DateTime.utc();
   const week = getCurrentWeek();
   if (now.weekday !== 7 || now.hour !== 0) {
     log.info('Not Sunday at 12:00 AM NY timezone, skipping gems payout');

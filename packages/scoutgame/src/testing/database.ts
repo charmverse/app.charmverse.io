@@ -2,7 +2,7 @@ import type { BuilderEvent, BuilderEventType, GithubRepo } from '@charmverse/cor
 import { GithubEventType, prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import { currentSeason, getCurrentWeek } from '../utils';
+import { currentSeason, getCurrentWeek } from '../dates';
 
 import { randomLargeInt } from './generators';
 
@@ -97,6 +97,7 @@ export async function mockGemPayoutEvent({
       gems: amount,
       points: 0,
       week,
+      season: currentSeason,
       builder: {
         connect: {
           id: builderId

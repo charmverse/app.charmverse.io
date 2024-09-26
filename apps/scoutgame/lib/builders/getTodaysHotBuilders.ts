@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 import type { BuilderInfo } from './interfaces';
 import { weeklyQualifiedBuilderWhere } from './queries';

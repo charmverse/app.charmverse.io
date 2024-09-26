@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/calculatePoints';
+import { getCurrentWeek } from '@packages/scoutgame/dates';
 import { mockBuilder, mockNFTPurchaseEvent, mockScout } from '@packages/scoutgame/testing/database';
-import { getCurrentWeek } from '@packages/scoutgame/utils';
 
 import { processScoutPointsPayout } from '../processScoutPointsPayout';
 

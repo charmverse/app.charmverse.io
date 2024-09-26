@@ -142,6 +142,6 @@ export async function recordGameActivityWithCatchError(activity: ActivityToRecor
   try {
     await recordGameActivity(activity);
   } catch (error) {
-    log.error(`Error logging activity for ${activity.activity.userId}`, { error, activity });
+    log.error(`Error saving activity for ${activity.activity.userId}`, { error, activity });
   }
 }

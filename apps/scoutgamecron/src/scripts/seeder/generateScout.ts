@@ -1,20 +1,23 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 export async function generateScout(params: { isBuilder: boolean } = { isBuilder: false }) {
   const { isBuilder } = params;
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
   const displayName = `${firstName} ${lastName}`;
-  const username = faker.internet.userName({
-    firstName,
-    lastName
-  }).toLowerCase();
-  const email = faker.datatype.boolean() ? faker.internet.email({
-    firstName,
-    
-  }) : undefined;
+  const username = faker.internet
+    .userName({
+      firstName,
+      lastName
+    })
+    .toLowerCase();
+  const email = faker.datatype.boolean()
+    ? faker.internet.email({
+        firstName
+      })
+    : undefined;
   const avatar = faker.image.url();
 
   const githubUser = isBuilder
@@ -32,14 +35,16 @@ export async function generateScout(params: { isBuilder: boolean } = { isBuilder
     }
   });
 
-  const builderNft = isBuilder ? {
-    id: faker.string.uuid(),
-    chainId: 1,
-    contractAddress: faker.finance.ethereumAddress(),
-    currentPrice: faker.number.int({ min: 1, max: 100 }),
-    season: currentSeason,
-    tokenId: currentBuilderCount
-  } : undefined;
+  const builderNft = isBuilder
+    ? {
+        id: faker.string.uuid(),
+        chainId: 1,
+        contractAddress: faker.finance.ethereumAddress(),
+        currentPrice: faker.number.int({ min: 1, max: 100 }),
+        season: currentSeason,
+        tokenId: currentBuilderCount
+      }
+    : undefined;
 
   const scout = await prisma.scout.create({
     data: {
@@ -59,9 +64,11 @@ export async function generateScout(params: { isBuilder: boolean } = { isBuilder
             create: githubUser
           }
         : undefined,
-      builderNfts: isBuilder ? {
-        create: builderNft
-      } : undefined
+      builderNfts: isBuilder
+        ? {
+            create: builderNft
+          }
+        : undefined
     }
   });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Typography } from '@mui/material';
-import { currentSeasonEndDate } from '@packages/scoutgame/utils';
+import { currentSeasonEndDate } from '@packages/scoutgame/dates';
 import { useEffect, useState } from 'react';
 
 export function HeaderMessage() {

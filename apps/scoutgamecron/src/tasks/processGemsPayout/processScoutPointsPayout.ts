@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/calculatePoints';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 export async function processScoutPointsPayout({
   builderId,
@@ -45,6 +45,7 @@ export async function processScoutPointsPayout({
       gems: gemsCollected,
       points: earnableScoutPoints,
       week,
+      season: currentSeason,
       builderId,
       builderEvent: {
         create: {

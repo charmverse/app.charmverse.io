@@ -27,8 +27,6 @@ export const usdcBaseSepoliaContractAddress = '0x036CbD53842c5426634e7929541eC23
 
 export const usdcBaseMainnetContractAddress = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 
-export const currentSeason = 1;
-
 export const builderSmartContractOwnerKey = process.env.BUILDER_SMART_CONTRACT_OWNER_PRIVKEY as string;
 
 // const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey });

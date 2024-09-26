@@ -2,10 +2,10 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
+import { currentSeason } from '@packages/scoutgame/dates';
 import { processMergedPullRequest } from '../tasks/processPullRequests/processMergedPullRequest';
 
 export async function approveBuilder({ githubLogin, builderId }: { githubLogin: string; builderId: string }) {
-
   if (githubLogin && builderId) {
     throw new Error('Only provide githubLogin or builderId');
   }
@@ -35,7 +35,7 @@ export async function approveBuilder({ githubLogin, builderId }: { githubLogin: 
     throw new Error(`Builder ${builder.id} : ${builder.displayName} does not have a github user connected`);
   }
 
-  log.info(`Found builder using Github Account ${githubUser.login}`)
+  log.info(`Found builder using Github Account ${githubUser.login}`);
 
   const events = await prisma.githubEvent.findMany({
     where: {
@@ -50,14 +50,24 @@ export async function approveBuilder({ githubLogin, builderId }: { githubLogin: 
 
   for (const pullRequest of events) {
     if (pullRequest.type === 'merged_pull_request') {
-      await processMergedPullRequest({pullRequest: {...pullRequest, createdAt: new Date(pullRequest.createdAt).toDateString(), number: pullRequest.pullRequestNumber, author: {
-        id: githubUser.id,
-        login: githubUser.login
-      }, repository: {id: pullRequest.repo.id, nameWithOwner: `${pullRequest.repo.owner}/${pullRequest.repo.name}`}}, repo: pullRequest.repo})
+      await processMergedPullRequest({
+        season: currentSeason,
+        pullRequest: {
+          ...pullRequest,
+          createdAt: new Date(pullRequest.createdAt).toDateString(),
+          number: pullRequest.pullRequestNumber,
+          author: {
+            id: githubUser.id,
+            login: githubUser.login
+          },
+          repository: { id: pullRequest.repo.id, nameWithOwner: `${pullRequest.repo.owner}/${pullRequest.repo.name}` }
+        },
+        repo: pullRequest.repo
+      });
     }
   }
 
-  await registerBuilderNFT({builderId})
+  await registerBuilderNFT({ builderId });
 
-  await refreshUserStats({userId: builderId})
+  await refreshUserStats({ userId: builderId });
 }

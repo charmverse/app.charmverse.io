@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek } from '@packages/scoutgame/utils';
+import { getCurrentWeek } from '@packages/scoutgame/dates';
 
 export type LeaderBoardRow = {
   avatar: string | null;

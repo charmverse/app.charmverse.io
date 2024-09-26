@@ -2,8 +2,7 @@ import type { Prisma, UserSeasonStats, UserWeeklyStats } from '@charmverse/core/
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
 
-import { currentSeason } from './builderNfts/constants';
-import { getCurrentWeek } from './utils';
+import { currentSeason, getCurrentWeek } from './dates';
 
 export async function refreshUserStats({
   userId
@@ -27,6 +26,7 @@ export async function refreshUserStats({
     },
     create: {
       userId,
+      season: currentSeason,
       week,
       gemsCollected: userGems
     },

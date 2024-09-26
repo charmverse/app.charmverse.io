@@ -20,7 +20,8 @@ describe('getBuildersLeaderboard', () => {
           data: {
             userId: builder.id,
             week: testWeek,
-            gemsCollected: 10 - index
+            gemsCollected: 10 - index,
+            season: 'blah'
           }
         });
 
@@ -29,7 +30,7 @@ describe('getBuildersLeaderboard', () => {
           data: {
             type: 'merged_pull_request',
             builderId: builder.id,
-            season: 1,
+            season: 'blah',
             week: testWeek,
             createdAt: new Date(2023, 4, 15 + index)
           }
@@ -44,6 +45,7 @@ describe('getBuildersLeaderboard', () => {
           data: {
             userId: builder.id,
             week: previousWeek,
+            season: 'blah',
             gemsCollected: 10
           }
         });
@@ -52,7 +54,7 @@ describe('getBuildersLeaderboard', () => {
           data: {
             type: 'merged_pull_request',
             builderId: builder.id,
-            season: 1,
+            season: 'blah',
             week: previousWeek,
             createdAt: new Date(2023, 3, 15 + index)
           }
@@ -107,6 +109,7 @@ describe('getBuildersLeaderboard', () => {
           data: {
             userId: builder.id,
             week: testWeek,
+            season: 'blah',
             gemsCollected: 0
           }
         });

@@ -2,7 +2,7 @@
 
 import { prisma } from '@charmverse/core/prisma-client';
 import { Typography, Stack } from '@mui/material';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';

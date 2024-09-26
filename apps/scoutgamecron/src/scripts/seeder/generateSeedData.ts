@@ -8,7 +8,7 @@ import { generateNftPurchaseEvents } from './generateNftPurchaseEvents';
 import { generateScout } from './generateScout';
 import { DateTime } from 'luxon';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
-import { getFormattedWeek } from '@packages/scoutgame/utils';
+import { getWeekFromDate } from '@packages/scoutgame/dates';
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
 import { claimPoints } from '@packages/scoutgame/claimPoints';
 import { updateBuildersRank } from '../../tasks/processPullRequests/updateBuildersRank';
@@ -104,7 +104,7 @@ export async function generateSeedData() {
 
   for (let i = 0; i < days; i++) {
     const date = startDate.plus({ days: i });
-    const week = getFormattedWeek(date.toJSDate());
+    const week = getWeekFromDate(date.toJSDate());
 
     for (const builder of builders) {
       let dailyGithubEvents = await generateBuilderEvents(
