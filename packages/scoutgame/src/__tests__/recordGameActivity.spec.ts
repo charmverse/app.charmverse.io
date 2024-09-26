@@ -2,21 +2,19 @@
 
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import { prisma, ScoutGameActivityType, PointsDirection } from '@charmverse/core/prisma-client';
+import { PointsDirection, ScoutGameActivityType, prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
 
 import { recordGameActivity } from '../recordGameActivity';
 import {
+  ensureMergedGithubPullRequestExists,
   mockBuilder,
   mockBuilderStrike,
-  mockNFTPurchaseEvent,
-  ensureGithubUserExists,
-  mockScout,
-  ensureMergedGithubPullRequestExists,
   mockGemPayoutEvent,
-  mockPointReceipt
+  mockNFTPurchaseEvent,
+  mockPointReceipt,
+  mockScout
 } from '../testing/database';
-import { randomLargeInt } from '../testing/generators';
 
 describe('recordGameActivity', () => {
   beforeEach(async () => {
@@ -80,7 +78,7 @@ describe('recordGameActivity', () => {
         nftPurchaseEventId: nftPurchaseEvent.id
       }
     });
-    expect(builderRegisteredActivity.type).toBe(ScoutGameActivityType.builder_registered);
+    expect(builderRegisteredActivity.type).toBe(ScoutGameActivityType.mint);
 
     // Test for 'gems' type
     const gemsActivity = await recordGameActivity({
