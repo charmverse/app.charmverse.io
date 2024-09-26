@@ -2,6 +2,9 @@ import { log } from '@charmverse/core/log';
 import type { GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { octokit } from '@packages/github/client';
+import { getAllNftOwners } from '@packages/scoutgame/builderNfts/getAllNftOwners';
+import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
+import { v4 as uuid } from 'uuid';
 
 import { getClosedPullRequest } from './getClosedPullRequest';
 import type { PullRequest } from './getPullRequests';
@@ -66,6 +69,8 @@ export async function processClosedPullRequest({
       return;
     }
 
+    const strikeId = uuid();
+
     await prisma.githubEvent.create({
       data: {
         pullRequestNumber: pullRequest.number,
@@ -78,6 +83,7 @@ export async function processClosedPullRequest({
           ? undefined
           : {
               create: {
+                id: strikeId,
                 builderId: builder.id
               }
             },
@@ -89,6 +95,39 @@ export async function processClosedPullRequest({
     if (ignoreStrike) {
       return;
     }
+
+    await recordGameActivity({
+      sourceEvent: {
+        builderStrikeId: strikeId
+      },
+      activity: {
+        amount: 1,
+        pointsDirection: 'in',
+        userId: builder.id
+      }
+    });
+
+    // Notify NFT buyers that their builder had a strike
+    await getAllNftOwners({ builderId: builder.id })
+      .then((owners) =>
+        Promise.all(
+          owners.map((scoutId) =>
+            recordGameActivity({
+              sourceEvent: {
+                builderStrikeId: strikeId
+              },
+              activity: {
+                amount: 1,
+                pointsDirection: 'in',
+                userId: scoutId
+              }
+            })
+          )
+        )
+      )
+      .catch((error) => {
+        log.error(`Error notifying builder NFT owners`, { error });
+      });
 
     const strikes = await prisma.builderStrike.count({
       where: {

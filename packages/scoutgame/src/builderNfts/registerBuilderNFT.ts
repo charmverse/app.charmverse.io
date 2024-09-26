@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { getScoutGameNftAdminWallet } from '@packages/scoutgame/getScoutGameNftAdminWallet';
 
+import { recordGameActivity } from '../recordGameActivity';
 import { currentSeason } from '../utils';
 
 import { builderContractAddress, builderNftChain } from './constants';
@@ -62,6 +63,17 @@ export async function registerBuilderNFT({ builderId }: { builderId: string }) {
   }
 
   const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId });
+
+  await recordGameActivity({
+    activity: {
+      amount: 1,
+      pointsDirection: 'in',
+      userId: builderId
+    },
+    sourceEvent: {
+      registeredBuilderNftId: nftWithRefreshedPrice.id
+    }
+  });
 
   log.info(`Last price: ${nftWithRefreshedPrice.currentPrice}`);
 

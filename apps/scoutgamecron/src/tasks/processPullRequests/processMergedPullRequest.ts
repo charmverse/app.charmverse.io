@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { GemsReceiptType, GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
 import { getFormattedWeek, getWeekStartEnd, streakWindow, currentSeason, isSameDay } from '@packages/scoutgame/utils';
 
 import type { PullRequest } from './getPullRequests';
@@ -153,7 +154,16 @@ export async function processMergedPullRequest({
       const gemValue = gemReceiptType === 'first_pr' ? 10 : gemReceiptType === 'third_pr_in_streak' ? 3 : 1;
 
       if (builderEventDate >= start.toJSDate()) {
-        await tx.builderEvent.upsert({
+        const existingBuilderEvent = await tx.builderNft.findFirst({
+          where: {
+            id: event.id
+          },
+          select: {
+            id: true
+          }
+        });
+
+        const createdEvent = await tx.builderEvent.upsert({
           where: {
             githubEventId: event.id
           },
@@ -174,6 +184,20 @@ export async function processMergedPullRequest({
           },
           update: {}
         });
+
+        // It's a new event, we can record notification
+        if (!existingBuilderEvent) {
+          await recordGameActivity({
+            activity: {
+              amount: gemValue,
+              userId: githubUser.builderId as string,
+              pointsDirection: 'in'
+            },
+            sourceEvent: {
+              gemsReceiptId: createdEvent.githubEventId as string
+            }
+          });
+        }
         const thisWeekEvents = previousGitEvents.filter((e) => e.createdAt >= start.toJSDate());
 
         const gemsCollected = thisWeekEvents.reduce((acc, e) => {

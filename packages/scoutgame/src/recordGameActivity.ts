@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { PrismaClient, ScoutGameActivityType } from '@charmverse/core/prisma-client';
-import type { ScoutGameActivity, Prisma } from '@charmverse/core/prisma-client';
+import type { ScoutGameActivity, Prisma, OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 
 const prisma = new PrismaClient();
 
@@ -14,10 +14,12 @@ type RelatedEvent = Partial<
     ScoutGameActivity,
     | 'builderStrikeId'
     | 'nftPurchaseEventId'
+    | 'gemsReceiptId'
     | 'gemsPayoutEventId'
     | 'pointsReceiptId'
     | 'onchainTxHash'
     | 'onchainChainId'
+    | 'registeredBuilderNftId'
   >
 >;
 
@@ -26,15 +28,22 @@ export type ActivityToRecord = {
   activity: Omit<Required<Pick<ScoutGameActivity, CommonActivityKeys>>, 'type'> & { createdAt?: Date };
 };
 
-export async function recordGameActivity({ activity, sourceEvent }: ActivityToRecord) {
+export async function recordGameActivity({
+  activity,
+  sourceEvent,
+  tx = prisma
+}: ActivityToRecord & OptionalPrismaTransaction) {
   const totalEvents = Object.keys(sourceEvent).length;
 
   if (totalEvents === 0) {
     throw new InvalidInputError('At least one source event must be provided');
   }
 
-  if (totalEvents > 1 && !(sourceEvent.onchainTxHash && sourceEvent.onchainChainId)) {
-    throw new InvalidInputError('Only one relation must be added');
+  const hasValidOnchainRef = sourceEvent.onchainTxHash && sourceEvent.onchainChainId;
+
+  // We can link to any of 1 database event, plus an optional onchain ref
+  if ((totalEvents >= 2 && !hasValidOnchainRef) || (totalEvents > 3 && hasValidOnchainRef)) {
+    throw new InvalidInputError('Only one relation must be added, along with an optional onchain reference');
   }
 
   if (sourceEvent.onchainTxHash && !sourceEvent.onchainChainId) {
@@ -61,6 +70,8 @@ export async function recordGameActivity({ activity, sourceEvent }: ActivityToRe
     parsedType = ScoutGameActivityType.gems;
   } else if (sourceEvent.pointsReceiptId !== undefined) {
     parsedType = ScoutGameActivityType.points;
+  } else if (sourceEvent.gemsReceiptId !== undefined) {
+    parsedType = ScoutGameActivityType.gems_from_pr;
   } else if (sourceEvent.onchainTxHash !== undefined && sourceEvent.onchainChainId !== undefined) {
     parsedType = ScoutGameActivityType.mint;
   } else {
@@ -82,14 +93,14 @@ export async function recordGameActivity({ activity, sourceEvent }: ActivityToRe
     ...sourceEvent
   };
 
-  const existingActivity = await prisma.scoutGameActivity.findFirst({ where: commonWhere });
+  const existingActivity = await tx.scoutGameActivity.findFirst({ where: commonWhere });
 
   if (existingActivity) {
     log.warn(`Tried to log duplicate activity`, { activity });
     return existingActivity;
   }
 
-  return prisma.scoutGameActivity.create({
+  return tx.scoutGameActivity.create({
     data: {
       type: parsedType,
       pointsDirection: activity.pointsDirection,
@@ -100,12 +111,19 @@ export async function recordGameActivity({ activity, sourceEvent }: ActivityToRe
           id: activity.userId
         }
       },
+
+      // Events we track
       builderStrike: sourceEvent.builderStrikeId ? { connect: { id: sourceEvent.builderStrikeId } } : undefined,
       nftPurchaseEvent: sourceEvent.nftPurchaseEventId
         ? { connect: { id: sourceEvent.nftPurchaseEventId } }
         : undefined,
+      registeredBuilderNft: sourceEvent.registeredBuilderNftId
+        ? { connect: { id: sourceEvent.registeredBuilderNftId } }
+        : undefined,
+      gemsReceipt: sourceEvent.gemsReceiptId ? { connect: { id: sourceEvent.gemsReceiptId } } : undefined,
       gemsPayoutEvent: sourceEvent.gemsPayoutEventId ? { connect: { id: sourceEvent.gemsPayoutEventId } } : undefined,
       pointsReceipt: sourceEvent.pointsReceiptId ? { connect: { id: sourceEvent.pointsReceiptId } } : undefined,
+      // Optional onchain reference
       onchainTxHash: sourceEvent.onchainTxHash,
       onchainChainId: sourceEvent.onchainChainId
     }
