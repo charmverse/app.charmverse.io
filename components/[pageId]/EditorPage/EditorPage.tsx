@@ -110,9 +110,9 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   }, [page?.title]);
 
   if (pageWithContentError === 'access_denied') {
-    return <ErrorPage message={"Sorry, you don't have access to this page"} />;
+    return <ErrorPage message="Sorry, you don't have access to this page" />;
   } else if (pageWithContentError === 'page_not_found') {
-    return <ErrorPage message={"Sorry, that page doesn't exist"} />;
+    return <ErrorPage message="Sorry, that page doesn't exist" />;
   } else if (pageWithContentError === 'system_error') {
     return <ErrorPage message='Sorry, there was an error loading this page' />;
   }
@@ -122,7 +122,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   }
   // Interpret page permission
   else if (page.permissionFlags.read === false) {
-    return <ErrorPage message={"Sorry, you don't have access to this page"} />;
+    return <ErrorPage message="Sorry, you don't have access to this page" />;
   } else if (page.permissionFlags.read === true) {
     if (
       page.type === 'board' ||
