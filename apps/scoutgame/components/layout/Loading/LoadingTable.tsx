@@ -5,7 +5,7 @@ function TableRowSkeleton() {
     <TableRow
       sx={{
         '&:last-child td, &:last-child th': { border: 0 },
-        '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
+        '& .MuiTableCell-root': { p: 2, borderBottom: '1px solid', borderBottomColor: 'background.default' }
       }}
     >
       <TableCell component='th' scope='row'>
@@ -29,7 +29,7 @@ export function LoadingTable() {
     <TableContainer component={Paper} sx={{ py: 2 }}>
       <Table aria-label='Table loading' size='small'>
         <TableBody>
-          {new Array(6).fill('').map(() => (
+          {new Array(10).fill('').map(() => (
             <TableRowSkeleton key={Math.random() * 1000} />
           ))}
         </TableBody>

@@ -3,6 +3,7 @@ import { currentSeason } from '@packages/scoutgame/utils';
 import { isTruthy } from '@root/lib/utils/types';
 
 import type { ScoutInfo } from 'components/common/Card/ScoutCard';
+import { BasicUserInfoSelect } from 'lib/users/queries';
 
 export async function getBuilderScouts(builderId: string) {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
@@ -14,12 +15,7 @@ export async function getBuilderScouts(builderId: string) {
     },
     select: {
       scout: {
-        select: {
-          username: true,
-          avatar: true,
-          displayName: true,
-          id: true
-        }
+        select: BasicUserInfoSelect
       },
       tokensPurchased: true
     }
@@ -32,10 +28,7 @@ export async function getBuilderScouts(builderId: string) {
     const existingScout = scoutsRecord[event.scout.id];
     if (!existingScout) {
       scoutsRecord[event.scout.id] = {
-        id: event.scout.id,
-        username: event.scout.username,
-        avatar: event.scout.avatar,
-        displayName: event.scout.displayName,
+        ...event.scout,
         nfts: 0
       };
     }

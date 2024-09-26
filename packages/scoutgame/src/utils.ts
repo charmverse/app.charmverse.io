@@ -6,7 +6,8 @@ export const currentSeason = 1;
 
 // Season 1 started on 2024-09-22
 // TODO: Make sure to update this before the season starts
-export const seasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 22 });
+export const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 22 }, { zone: timezone });
+export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 13 });
 
 export const streakWindow = 7 * 24 * 60 * 60 * 1000;
 
@@ -72,7 +73,7 @@ export function getWeek(date: Date): { week: number; year: number } {
   return { week: weekNumber, year: newYorkDate.year };
 }
 
-export function isSameDay(date: Date) {
+export function isToday(date: Date) {
   const dateDay = DateTime.fromJSDate(date, { zone: timezone }).startOf('day');
   return dateDay.equals(DateTime.now().setZone(timezone).startOf('day'));
 }
@@ -84,6 +85,15 @@ export function getCurrentWeekPoints() {
 
 export function getCurrentWeekNumber() {
   const currentDate = DateTime.now().setZone(timezone);
-  const weeksDiff = currentDate.diff(seasonStartDate, 'weeks').weeks;
+  const weeksDiff = currentDate.diff(currentSeasonStartDate, 'weeks').weeks;
   return Math.floor(weeksDiff) + 1;
+}
+
+export function getSeasonWeekNumberFromWeek({ seasonStartDate, week }: { week: string; seasonStartDate: DateTime }) {
+  const [year, weekNumber] = week.split('-W');
+  const date = DateTime.fromObject({ year: parseInt(year), day: 1, month: 1 }, { zone: timezone }).plus({
+    weeks: parseInt(weekNumber)
+  });
+  const weeksDiff = date.diff(seasonStartDate, 'weeks').weeks;
+  return Math.round(weeksDiff);
 }

@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/utils';
 import { isTruthy } from '@root/lib/utils/types';
 
-import type { BasicUserInfo } from './interfaces';
+import type { BasicUserInfo } from 'lib/users/interfaces';
 
 export type BuilderActivityType = 'nft_purchase' | 'merged_pull_request';
 
@@ -49,7 +49,8 @@ export async function getBuilderActivities({
           username: true,
           avatar: true,
           displayName: true,
-          id: true
+          id: true,
+          builder: true
         }
       },
       id: true,
@@ -95,25 +96,21 @@ export async function getBuilderActivities({
     .map((event) => {
       if (event.type === 'nft_purchase' && event.nftPurchaseEvent) {
         return {
+          ...event.builder,
           id: event.id,
           createdAt: event.createdAt,
           type: 'nft_purchase' as const,
-          scout: event.nftPurchaseEvent.scout.username,
-          username: event.builder.username,
-          avatar: event.builder.avatar,
-          displayName: event.builder.displayName
+          scout: event.nftPurchaseEvent.scout.username
         };
       } else if (event.type === 'merged_pull_request' && event.githubEvent && event.gemsReceipt) {
         return {
+          ...event.builder,
           id: event.id,
           createdAt: event.createdAt,
           type: 'merged_pull_request' as const,
           contributionType: event.gemsReceipt.type,
           gems: event.gemsReceipt.value,
-          repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`,
-          username: event.builder.username,
-          avatar: event.builder.avatar,
-          displayName: event.builder.displayName
+          repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`
         };
       } else {
         return null;

@@ -1,6 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
 
+import { BasicUserInfoSelect } from 'lib/users/queries';
+
 import type { BuilderInfo } from '../builders/interfaces';
 
 export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Promise<BuilderInfo[]> {
@@ -38,10 +40,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       }
     },
     select: {
-      id: true,
-      avatar: true,
-      username: true,
-      displayName: true,
+      ...BasicUserInfoSelect,
       userSeasonStats: {
         where: {
           season: currentSeason
@@ -68,6 +67,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       avatar: builder.avatar,
       username: builder.username,
       displayName: builder.displayName,
+      builder: builder.builder,
       builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder ?? 0,
       gems: builder.userWeeklyStats[0]?.gemsCollected ?? 0,
       isBanned: !!builder.bannedAt,
