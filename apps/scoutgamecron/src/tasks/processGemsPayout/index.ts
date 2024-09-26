@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { getTopBuilders } from '@packages/scoutgame/getTopBuilders';
+import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
 import { getCurrentWeek, timezone } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 
@@ -13,7 +13,7 @@ export async function processGemsPayout() {
     return;
   }
 
-  const topWeeklyBuilders = await getTopBuilders({ quantity: 100, week });
+  const topWeeklyBuilders = await getBuildersLeaderboard({ quantity: 100, week });
 
   for (const { builder, gemsCollected, rank } of topWeeklyBuilders) {
     try {
