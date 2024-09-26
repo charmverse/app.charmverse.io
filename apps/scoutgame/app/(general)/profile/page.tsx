@@ -4,8 +4,8 @@ import { currentSeason } from '@packages/scoutgame/utils';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import type { ProfileTab } from 'components/profile/mine/ProfilePage';
-import { ProfilePage } from 'components/profile/mine/ProfilePage';
+import type { ProfileTab } from 'components/profile/ProfilePage';
+import { ProfilePage } from 'components/profile/ProfilePage';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 import { getUserStats } from 'lib/users/getUserStats';
 

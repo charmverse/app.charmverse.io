@@ -8,7 +8,7 @@ import { Suspense } from 'react';
 
 import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
 import { JoinGithubButton } from 'components/common/JoinGithubButton';
-import { BuilderActivitiesList } from 'components/profile/mine/components/BuilderProfile/BuilderActivitiesList';
+import { BuilderActivitiesList } from 'components/profile/components/BuilderProfile/BuilderActivitiesList';
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderStats } from 'lib/builders/getBuilderStats';

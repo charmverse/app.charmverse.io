@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { PublicProfilePage } from 'components/profile/[username]/PublicProfilePage';
+import { PublicProfilePage } from 'components/[username]/PublicProfilePage';
 import { getUserByPath } from 'lib/users/getUserByPath';
 
 export const dynamic = 'force-dynamic';

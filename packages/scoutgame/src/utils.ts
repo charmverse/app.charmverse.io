@@ -6,8 +6,8 @@ export const currentSeason = 1;
 
 // Season 1 started on 2024-09-22
 // TODO: Make sure to update this before the season starts
-export const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 22 });
-export const currentSeasonEndDate = DateTime.fromObject({ year: 2025, month: 1, day: 1 });
+export const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 22 }, { zone: timezone });
+export const currentSeasonEndDate = DateTime.fromObject({ year: 2025, month: 1, day: 1 }, { zone: timezone });
 
 export const streakWindow = 7 * 24 * 60 * 60 * 1000;
 

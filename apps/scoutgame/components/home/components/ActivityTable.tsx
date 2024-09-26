@@ -13,7 +13,7 @@ import {
   BuilderActivityDetail,
   BuilderActivityGems,
   BuilderActivityLabel
-} from 'components/profile/mine/components/BuilderProfile/BuilderActivitiesList';
+} from 'components/profile/components/BuilderProfile/BuilderActivitiesList';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
 import { Avatar } from '../../common/Avatar';
