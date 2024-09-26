@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 export type BuilderSearchResult = {
   id: string;

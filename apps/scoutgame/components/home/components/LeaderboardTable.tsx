@@ -8,7 +8,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import { currentSeason, getCurrentSeasonWeek } from '@packages/scoutgame/utils';
+import { currentSeason, getCurrentSeasonWeek } from '@packages/scoutgame/dates';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
 import Link from 'next/link';

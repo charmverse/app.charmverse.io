@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/dates';
 import { processMergedPullRequest } from '../tasks/processPullRequests/processMergedPullRequest';
 
 export async function approveBuilder({ githubLogin, builderId }: { githubLogin: string; builderId: string }) {

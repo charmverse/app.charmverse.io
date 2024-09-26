@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
-import { currentSeason, getWeekFromDate } from '@packages/scoutgame/utils';
+import { currentSeason, getWeekFromDate } from '@packages/scoutgame/dates';
 import { BuilderInfo } from './generateSeedData';
 import { DateTime } from 'luxon';
 import { randomTimeOfDay } from './generator';

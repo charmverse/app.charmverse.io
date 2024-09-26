@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getDateFromISOWeek, getSeasonWeekFromISOWeek } from '@packages/scoutgame/utils';
+import { currentSeason, getDateFromISOWeek, getSeasonWeekFromISOWeek } from '@packages/scoutgame/dates';
 
 export type WeeklyReward = {
   week: string;

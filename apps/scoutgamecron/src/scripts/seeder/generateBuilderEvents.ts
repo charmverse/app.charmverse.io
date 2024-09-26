@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 import type { PullRequest } from '../../tasks/processPullRequests/getPullRequests';
 import { processClosedPullRequest } from '../../tasks/processPullRequests/processClosedPullRequest';
 import { processMergedPullRequest } from '../../tasks/processPullRequests/processMergedPullRequest';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/dates';
 import { generatePullRequest } from './generatePullRequest';
 import { randomTimeOfDay } from './generator';
 

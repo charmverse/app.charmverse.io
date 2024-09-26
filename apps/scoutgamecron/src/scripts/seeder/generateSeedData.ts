@@ -8,7 +8,7 @@ import { generateNftPurchaseEvents } from './generateNftPurchaseEvents';
 import { generateScout } from './generateScout';
 import { DateTime } from 'luxon';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
-import { getWeekFromDate } from '@packages/scoutgame/utils';
+import { getWeekFromDate } from '@packages/scoutgame/dates';
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
 import { claimPoints } from '@packages/scoutgame/claimPoints';
 import { updateBuildersRank } from '../../tasks/processPullRequests/updateBuildersRank';

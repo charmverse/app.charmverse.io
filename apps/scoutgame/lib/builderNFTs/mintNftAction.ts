@@ -8,8 +8,8 @@ import {
 } from '@packages/scoutgame/builderNfts/constants';
 import { ContractApiClient } from '@packages/scoutgame/builderNfts/nftContractApiClient';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
 import { getWalletClient } from '@root/lib/blockchain/walletClient';
 import { isAddress } from 'viem';
 import * as yup from 'yup';

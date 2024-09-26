@@ -4,8 +4,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { getScoutGameNftAdminWallet } from '@packages/scoutgame/getScoutGameNftAdminWallet';
 
+import { currentSeason } from '../dates';
 import { recordGameActivity } from '../recordGameActivity';
-import { currentSeason } from '../utils';
 
 import { builderContractAddress, builderNftChain } from './constants';
 import { ContractApiClient } from './nftContractApiClient';

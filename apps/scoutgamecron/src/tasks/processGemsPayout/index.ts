@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
+import { getCurrentWeek } from '@packages/scoutgame/dates';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
-import { getCurrentWeek } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 
 import { processScoutPointsPayout } from './processScoutPointsPayout';

@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { GemsReceiptType, GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday } from '@packages/scoutgame/dates';
 import { recordGameActivityWithCatchError } from '@packages/scoutgame/recordGameActivity';
-import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday } from '@packages/scoutgame/utils';
 
 import type { PullRequest } from './getPullRequests';
 import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';

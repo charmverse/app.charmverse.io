@@ -6,7 +6,7 @@ import type { ActivityToRecord } from '../recordGameActivity';
 import { recordGameActivity } from '../recordGameActivity';
 import { refreshUserStats } from '../refreshUserStats';
 import { createMockEvents, ensureGithubUserExists } from '../testing/database';
-import { getCurrentWeek } from '../utils';
+import { getCurrentWeek } from '../dates';
 
 function getRandomDateWithinLast30Days() {
   const now = new Date();

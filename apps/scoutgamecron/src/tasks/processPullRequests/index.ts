@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek, currentSeason } from '@packages/scoutgame/utils';
+import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 import { DateTime } from 'luxon';
 
 import { getPullRequests } from './getPullRequests';
