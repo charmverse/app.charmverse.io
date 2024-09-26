@@ -1,21 +1,21 @@
 import { DateTime } from 'luxon';
 
-import { getFormattedWeek, getWeekStartEnd, getSeasonWeekNumberFromWeek } from '../utils';
+import { getWeekFromDate, getWeekStartEnd, getSeasonWeekFromISOWeek } from '../utils';
 
-describe('getFormattedWeek', () => {
+describe('getWeekFromDate', () => {
   it('should return the previous year when the first day of the year is a Sunday', () => {
     const jan1 = DateTime.fromObject({ year: 2023, month: 1, day: 1 }, { zone: 'utc' }).toJSDate();
-    expect(getFormattedWeek(jan1)).toEqual('2022-W52');
+    expect(getWeekFromDate(jan1)).toEqual('2022-W52');
   });
   it('should start on Monday', () => {
     const dec31 = DateTime.fromObject({ year: 2023, month: 1, day: 2 }, { zone: 'utc' }).toJSDate();
-    expect(getFormattedWeek(dec31)).toEqual('2023-W01');
+    expect(getWeekFromDate(dec31)).toEqual('2023-W01');
   });
 
   // leap year date pulled from https://en.wikipedia.org/wiki/ISO_week_date
   it('handle leap years with 53 weeks', () => {
     const dec31 = DateTime.fromObject({ year: 1982, month: 1, day: 3 }, { zone: 'utc' }).toJSDate();
-    expect(getFormattedWeek(dec31)).toEqual('1981-W53');
+    expect(getWeekFromDate(dec31)).toEqual('1981-W53');
   });
 });
 
@@ -28,15 +28,15 @@ describe('getWeekStartEnd', () => {
   });
 });
 
-describe('getSeasonWeekNumberFromWeek', () => {
+describe('getSeasonWeekFromISOWeek', () => {
   it('should return the season week number when the season is ahead of the current week', () => {
     const currentSeasonWeek = 3;
     const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 2 }, { zone: 'utc' });
     const currentSeasonDate = currentSeasonStartDate.plus({
       weeks: currentSeasonWeek - 1
     });
-    const formattedWeek = getFormattedWeek(currentSeasonDate.toJSDate());
-    expect(getSeasonWeekNumberFromWeek({ week: formattedWeek, seasonStartDate: currentSeasonStartDate })).toEqual(
+    const formattedWeek = getWeekFromDate(currentSeasonDate.toJSDate());
+    expect(getSeasonWeekFromISOWeek({ week: formattedWeek, seasonStartDate: currentSeasonStartDate })).toEqual(
       currentSeasonWeek
     );
   });
@@ -47,8 +47,8 @@ describe('getSeasonWeekNumberFromWeek', () => {
     const currentSeasonDate = currentSeasonStartDate.plus({
       weeks: currentSeasonWeek - 1
     });
-    const formattedWeek = getFormattedWeek(currentSeasonDate.toJSDate());
-    expect(getSeasonWeekNumberFromWeek({ week: formattedWeek, seasonStartDate: currentSeasonStartDate })).toEqual(
+    const formattedWeek = getWeekFromDate(currentSeasonDate.toJSDate());
+    expect(getSeasonWeekFromISOWeek({ week: formattedWeek, seasonStartDate: currentSeasonStartDate })).toEqual(
       currentSeasonWeek
     );
   });

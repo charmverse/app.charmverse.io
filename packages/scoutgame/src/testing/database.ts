@@ -97,6 +97,7 @@ export async function mockGemPayoutEvent({
       gems: amount,
       points: 0,
       week,
+      season: currentSeason,
       builder: {
         connect: {
           id: builderId

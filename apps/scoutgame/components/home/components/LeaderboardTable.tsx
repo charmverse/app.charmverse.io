@@ -8,7 +8,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import { currentSeason, getCurrentWeekNumber } from '@packages/scoutgame/utils';
+import { currentSeason, getCurrentSeasonWeek } from '@packages/scoutgame/utils';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -38,14 +38,14 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
           >
             {isMobile ? (
               <TableCell colSpan={4} sx={{ textAlign: 'center' }}>
-                SEASON {currentSeason} WEEK {getCurrentWeekNumber()} DAY {(DateTime.now().weekday % 7) + 1}
+                SEASON {currentSeason} WEEK {getCurrentSeasonWeek()} DAY {(DateTime.now().weekday % 7) + 1}
               </TableCell>
             ) : (
               <>
                 <TableCell align='center'>RANK</TableCell>
                 <TableCell>BUILDER</TableCell>
                 <TableCell>
-                  SEASON {currentSeason} WEEK {getCurrentWeekNumber()} DAY {(DateTime.now().weekday % 7) + 1}
+                  SEASON {currentSeason} WEEK {getCurrentSeasonWeek()} DAY {(DateTime.now().weekday % 7) + 1}
                 </TableCell>
                 <TableCell sx={{ maxWidth: '100px', pr: 0 }} align='right'>
                   Gems this week
