@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { InfoPage } from 'components/info/InfoPage';
+import { InfoPage } from '../../../components/info/InfoPage';
 
 export const metadata: Metadata = {
   other: {

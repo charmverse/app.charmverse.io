@@ -1,6 +1,5 @@
-'use client';
-
 import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
+import { headers } from 'next/headers';
 import { usePathname } from 'next/navigation';
 import { CiBellOn } from 'react-icons/ci';
 import { GoHome } from 'react-icons/go';
@@ -8,8 +7,8 @@ import { MdPersonOutline } from 'react-icons/md';
 import { PiBinoculars } from 'react-icons/pi';
 
 export function SiteNavigation({ transparent }: { transparent?: boolean }) {
-  const pathname = usePathname();
-  const value = getActiveButton(pathname);
+  // const pathname = usePathname();
+  const value = getActiveButton('/home');
 
   return (
     <Paper
@@ -64,5 +63,5 @@ function getActiveButton(pathname: string) {
   } else if (pathname.startsWith('/profile')) {
     return 'profile';
   }
-  return 'home';
+  return null;
 }
