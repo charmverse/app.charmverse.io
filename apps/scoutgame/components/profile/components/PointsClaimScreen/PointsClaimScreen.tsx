@@ -5,11 +5,12 @@ import Image from 'next/image';
 
 import { getClaimablePoints } from 'lib/points/getClaimablePoints';
 
+import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';
 import { QualifiedActionsTable } from './QualifiedActionsTable';
 
 export async function PointsClaimScreen({ userId, username }: { userId: string; username: string }) {
-  const { totalClaimablePoints, weeklyRewards } = await getClaimablePoints(userId);
+  const { totalClaimablePoints, weeklyRewards, bonusPartners } = await getClaimablePoints(userId);
 
   if (!totalClaimablePoints) {
     return (
@@ -29,6 +30,7 @@ export async function PointsClaimScreen({ userId, username }: { userId: string; 
         <Paper
           sx={{
             flex: 1,
+            gap: 2,
             padding: 2,
             borderRadius: 2,
             display: 'flex',
@@ -38,7 +40,8 @@ export async function PointsClaimScreen({ userId, username }: { userId: string; 
             },
             justifyContent: 'space-between',
             alignItems: 'center',
-            width: '100%'
+            width: '100%',
+            height: 'fit-content'
           }}
         >
           <Stack gap={1}>
@@ -49,7 +52,14 @@ export async function PointsClaimScreen({ userId, username }: { userId: string; 
               <Typography variant='h4' fontWeight={500}>
                 {totalClaimablePoints}
               </Typography>
-              <Image width={35} height={35} src='/images/profile/scout-game-icon.svg' alt='Scouts' />
+              <Image
+                width={35}
+                height={35}
+                style={{ marginRight: 10 }}
+                src='/images/profile/scout-game-icon.svg'
+                alt='Scouts'
+              />
+              <BonusPartnersDisplay bonusPartners={bonusPartners} />
             </Stack>
           </Stack>
           <PointsClaimButton />
@@ -66,6 +76,12 @@ export async function PointsClaimScreen({ userId, username }: { userId: string; 
               <Image width={20} height={20} src='/images/profile/scout-game-icon.svg' alt='Nfts' />
             </Stack>
           </Stack>
+          {bonusPartners.length > 0 && (
+            <Stack flexDirection='row' justifyContent='space-between' width='100%' alignItems='center'>
+              <Typography variant='h6'>Bonus</Typography>
+              <BonusPartnersDisplay bonusPartners={bonusPartners} />
+            </Stack>
+          )}
         </Stack>
       </Stack>
     </Stack>
