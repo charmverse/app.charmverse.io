@@ -164,7 +164,7 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
     // @ts-ignore
     actionConfig: {
       amount: purchaseCost,
-      swapDirection: SwapDirection.EXACT_AMOUNT_IN,
+      swapDirection: SwapDirection.EXACT_AMOUNT_OUT,
       receiverAddress: treasuryAddress
     }
   };
