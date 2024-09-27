@@ -195,6 +195,11 @@ export async function processMergedPullRequest({
 
         // It's a new event, we can record notification
         if (!existingBuilderEvent) {
+          const gemsReceipt = await tx.gemsReceipt.findUniqueOrThrow({
+            where: {
+              eventId: createdEvent.id
+            }
+          });
           await recordGameActivityWithCatchError({
             activity: {
               amount: gemValue,
@@ -202,7 +207,7 @@ export async function processMergedPullRequest({
               pointsDirection: 'in'
             },
             sourceEvent: {
-              gemsReceiptId: createdEvent.githubEventId as string
+              gemsReceiptId: gemsReceipt.id
             }
           });
         }
