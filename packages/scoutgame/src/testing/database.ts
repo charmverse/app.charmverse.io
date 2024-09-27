@@ -3,11 +3,9 @@ import type { BuilderEvent, BuilderEventType, BuilderStatus, GithubRepo } from '
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import { getLastWeek, getCurrentWeek } from '../dates';
+import { getCurrentWeek } from '../dates';
 
-import { randomLargeInt } from './generators';
-
-const testSeason = getLastWeek();
+import { randomLargeInt, mockSeason } from './generators';
 
 type RepoAddress = {
   repoOwner?: string;
@@ -98,7 +96,7 @@ export async function mockGemPayoutEvent({
       gems: amount,
       points: 0,
       week,
-      season: testSeason,
+      season: mockSeason,
       builder: {
         connect: {
           id: builderId
@@ -106,7 +104,7 @@ export async function mockGemPayoutEvent({
       },
       builderEvent: {
         create: {
-          season: testSeason,
+          season: mockSeason,
           type: 'gems_payout',
           week: getCurrentWeek(),
           builder: {
@@ -124,7 +122,7 @@ export async function mockBuilderEvent({ builderId, eventType }: { builderId: st
   return prisma.builderEvent.create({
     data: {
       builderId,
-      season: testSeason,
+      season: mockSeason,
       type: eventType,
       week: getCurrentWeek()
     }
@@ -243,7 +241,7 @@ export async function ensureMergedGithubPullRequestExists({
   const builderEvent = await prisma.builderEvent.create({
     data: {
       builderId: builderId as string,
-      season: testSeason,
+      season: mockSeason,
       type: 'merged_pull_request',
       githubEventId: githubEvent.id,
       week: getCurrentWeek()
@@ -312,7 +310,7 @@ export async function mockBuilderNft({
       chainId,
       contractAddress,
       currentPrice: 0,
-      season: testSeason,
+      season: mockSeason,
       tokenId: Math.round(Math.random() * 10000000),
       nftSoldEvents: {
         createMany: {

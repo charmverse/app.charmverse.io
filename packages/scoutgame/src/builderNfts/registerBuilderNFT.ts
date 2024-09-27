@@ -2,19 +2,12 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { getScoutGameNftAdminWallet } from '@packages/scoutgame/getScoutGameNftAdminWallet';
 
 import { recordGameActivity } from '../recordGameActivity';
 
 import { builderContractAddress, builderNftChain } from './constants';
-import { ContractApiClient } from './nftContractApiClient';
+import { contractClient } from './contractClient';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
-
-const builderNftWriteApiClient = new ContractApiClient({
-  chain: builderNftChain,
-  contractAddress: builderContractAddress,
-  walletClient: getScoutGameNftAdminWallet()
-});
 
 export async function registerBuilderNFT({ builderId, season }: { builderId: string; season: string }) {
   if (!stringUtils.isUUID(builderId)) {
@@ -53,12 +46,12 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
     throw new InvalidInputError('Scout profile not marked as a builder');
   }
 
-  let existingTokenId = await builderNftWriteApiClient.getTokenIdForBuilder({ args: { builderId } }).catch(() => null);
+  let existingTokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } }).catch(() => null);
 
   if (!existingTokenId) {
     log.info(`Registering builder token for builderId: ${builderId}`);
-    await builderNftWriteApiClient.registerBuilderToken({ args: { builderId } });
-    existingTokenId = await builderNftWriteApiClient.getTokenIdForBuilder({ args: { builderId } });
+    await contractClient.registerBuilderToken({ args: { builderId } });
+    existingTokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
   }
 
   const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId });
