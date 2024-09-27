@@ -127,6 +127,15 @@ async function seedBuilderNFTs() {
     await generateNftPurchaseEvents({ builderId: nft.builderId, amount: 4 });
 
     await refreshUserStats({ userId: builderId as string });
+
+    await prisma.scout.update({
+      where: {
+        id: builderId as string
+      },
+      data: {
+        builderStatus: 'approved'
+      }
+    })
   }
 }
 
@@ -163,7 +172,6 @@ async function generateNftPurchaseEvents({
 
   await prisma.nFTPurchaseEvent.createMany({ data: inputs });
 }
-// seedWithRealCharmverseGithubData();
 
 async function clearNfts() {
   await prisma.builderNft.deleteMany({
@@ -182,8 +190,9 @@ async function clearNfts() {
 }
 
 async function script() {
+  // await clearNfts()
   await seedWithRealCharmverseGithubData();
   await seedBuilderNFTs();
 }
 
-script();
+// script()

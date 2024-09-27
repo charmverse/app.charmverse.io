@@ -4,16 +4,22 @@
 
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
-import type { Scout } from '@charmverse/core/prisma-client';
-import type { EvmTransaction } from '@decent.xyz/box-common';
-import { ActionType, ChainId } from '@decent.xyz/box-common';
+import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
+import type { UseBoxActionArgs } from '@decent.xyz/box-hooks';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Alert, Button, Typography } from '@mui/material';
-import { builderContractAddress, builderNftChain } from '@packages/scoutgame/builderNfts/constants';
-import { ContractApiClient } from '@packages/scoutgame/builderNfts/nftContractApiClient';
+import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/builderNFTSeasonOneClient';
+import {
+  builderContractAddress,
+  builderNftChain,
+  usdcContractAddress,
+  useTestnets
+} from '@packages/scoutgame/builderNfts/constants';
+import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
+import type { Address } from 'viem';
 import { formatUnits } from 'viem';
 import { useSendTransaction } from 'wagmi';
 
@@ -22,7 +28,10 @@ import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
 
-const readonlyApiClient = new ContractApiClient({
+import type { ChainOption } from './ChainSelector';
+import { BlockchainSelect, getChainOptions } from './ChainSelector';
+
+const readonlyApiClient = new BuilderNFTSeasonOneClient({
   chain: builderNftChain,
   contractAddress: builderContractAddress,
   publicClient: getPublicClient(builderNftChain.id)
@@ -36,9 +45,11 @@ export type NFTPurchaseProps = {
 };
 
 function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
-  const { address, walletClient } = useWallet();
+  const { address, walletClient, chainId } = useWallet();
 
-  // const [nftApiClient, setNftApiClient] = useState<ContractApiClient>(null);
+  const [sourceFundsChain, setSourceFundsChain] = useState(ChainId.OPTIMISM_SEPOLIA);
+
+  // const [nftApiClient, setNftApiClient] = useState<BuilderNFTSeasonOneClient>(null);
 
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
@@ -46,9 +57,12 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
 
   const [tokensToBuy, setTokensToBuy] = useState(1);
 
+  const [balances, setBalances] = useState<{ usdc: bigint; eth: bigint; chainId: number } | null>(null);
+
   // Data from onchain
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
+  const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
 
   const { isExecuting, hasSucceeded, executeAsync, result } = useAction(mintNftAction, {
     onSuccess() {
@@ -59,11 +73,52 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
     }
   });
 
+  useEffect(() => {
+    readonlyApiClient.proceedsReceiver().then(setTreasuryAddress);
+  }, []);
+
+  const refreshBalance = useCallback(async () => {
+    const chainOption = getChainOptions({ useTestnets }).find((opt) => opt.id === sourceFundsChain) as ChainOption;
+
+    const chain = chainOption?.chain;
+
+    const _chainId = chain.id;
+
+    const client = new USDcAbiClient({
+      chain,
+      contractAddress: chainOption.usdcAddress as `0x${string}`,
+      publicClient: getPublicClient(_chainId)
+    });
+
+    const usdcBalance = await client.balanceOf({ args: { account: address as `0x${string}` } });
+    const ethBalance = await getPublicClient(_chainId).getBalance({
+      address: address as `0x${string}`
+    });
+
+    const newBalances = {
+      usdc: usdcBalance,
+      eth: ethBalance,
+      chainId: _chainId
+    };
+
+    setBalances(newBalances);
+
+    return newBalances;
+  }, [address, sourceFundsChain]);
+
+  useEffect(() => {
+    if (sourceFundsChain) {
+      refreshBalance().catch((err) => {
+        log.error('Error refreshing balance', { error: err });
+      });
+    }
+  }, [sourceFundsChain, refreshBalance]);
+
   const { sendTransaction } = useSendTransaction();
 
   const refreshAsk = useCallback(
     async ({ _builderTokenId, amount }: { _builderTokenId: bigint | number; amount: bigint | number }) => {
-      const _price = await readonlyApiClient.getTokenPurchasePrice({
+      const _price = await readonlyApiClient.getTokenQuote({
         args: { amount: BigInt(amount), tokenId: BigInt(_builderTokenId) }
       });
       setPurchaseCost(_price);
@@ -101,25 +156,19 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
   }, [tokensToBuy, builderTokenId, refreshAsk]);
 
   const { error, isLoading, actionResponse } = useBoxAction({
-    enable: !!purchaseCost && !!address && !!builderTokenId && !!tokensToBuy,
-    // actionType: ActionType.EvmCalldataTx,
-    actionType: ActionType.EvmFunction,
-    sender: address as string,
+    enable: !!address && !!treasuryAddress,
+    sender: address as `0x${string}`,
     srcToken: '0x0000000000000000000000000000000000000000',
-    dstToken: '0x0000000000000000000000000000000000000000',
+    dstToken: usdcContractAddress,
+    srcChainId: ChainId.BASE,
+    dstChainId: ChainId.OPTIMISM,
     slippage: 1,
-    srcChainId: ChainId.OPTIMISM,
-    dstChainId: ChainId.BASE,
+    actionType: ActionType.SwapAction,
+    // @ts-ignore
     actionConfig: {
-      chainId: ChainId.BASE,
-      contractAddress: builderContractAddress,
-      cost: {
-        amount: purchaseCost,
-        isNative: true,
-        tokenAddress: '0x0000000000000000000000000000000000000000'
-      },
-      signature: 'function buyToken(uint256 tokenId, uint256 amount, string scout)',
-      args: [builderTokenId, tokensToBuy, user.username]
+      amount: purchaseCost,
+      swapDirection: SwapDirection.EXACT_AMOUNT_OUT,
+      receiverAddress: treasuryAddress as string
     }
   });
 
@@ -128,24 +177,28 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
       return;
     }
 
-    const tx = actionResponse?.tx as EvmTransaction;
-
-    log.info('Executing purchase');
-
-    await executeAsync({
-      address: address as string,
-      tokenId: builderTokenId.toString(),
-      amount: tokensToBuy,
-      builderId
-    });
-
-    log.info('Purchase complete');
-
-    // sendTransaction({
-    //   to: tx.to,
-    //   data: tx.data,
-    //   value: tx.value
-    // });
+    sendTransaction(
+      {
+        to: actionResponse.tx.to as Address,
+        data: actionResponse.tx.data as any,
+        value: (actionResponse.tx as any).value
+      },
+      {
+        onSuccess: async (data) => {
+          await executeAsync({
+            address: address as string,
+            tokenId: builderTokenId.toString(),
+            amount: tokensToBuy,
+            builderId,
+            sourceTxChainId: sourceFundsChain,
+            txHash: data
+          });
+        },
+        onError: (err: any) => {
+          log.error('Mint failed', { error: err });
+        }
+      }
+    );
   };
 
   return (
@@ -164,9 +217,26 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
         <h3>Token ID: {builderTokenId}</h3>
         {purchaseCost && <p>Price: {formatUnits(purchaseCost, 6)} USDC</p>}
         {isFetchingPrice && <p>Fetching price...</p>}
+        <BlockchainSelect
+          // value={sourceFundsChain as any}
+          useTestnets={useTestnets}
+          onSelectChain={(_chainId) => {
+            setSourceFundsChain(_chainId);
+          }}
+        />
+        <Typography>Sending from {address}</Typography>
+        <Typography>Treasury {treasuryAddress}</Typography>
+        {/* {balances?.chainId === sourceFundsChain && !!sourceFundsChain && (
+          <div>
+            <Typography>
+              Your USDC Balance on {getChainById(sourceFundsChain)?.chainName}: ${' '}
+              {(Number(balances.usdc || 0) / 10e6).toFixed(2)}
+            </Typography>
+          </div>
+        )} */}
         {fetchError && <p color='red'>{fetchError.shortMessage || 'Something went wrong'}</p>}
-        <Button onClick={handlePurchase} disabled={!purchaseCost || isLoading || isFetchingPrice}>
-          {isFetchingPrice ? 'Fetching price' : isLoading ? 'Purchasing...' : 'Purchase NFT'}
+        <Button onClick={handlePurchase} disabled={!purchaseCost || isLoading || isFetchingPrice || !treasuryAddress}>
+          {isFetchingPrice ? 'Fetching price' : isLoading ? 'Loading...' : 'Purchase NFT'}
         </Button>
       </div>
 

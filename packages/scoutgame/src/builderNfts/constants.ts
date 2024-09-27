@@ -1,37 +1,46 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import type { Chain } from 'viem/chains';
-import { base, baseSepolia } from 'viem/chains';
+import { optimism, optimismSepolia } from 'viem/chains';
 
 export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECENT_API_KEY as string);
+
+export const useTestnets = false;
 
 /**
  * Currently priced in USDC
  */
 export const builderTokenDecimals = 6;
 
-export const builderNftChain: Chain = baseSepolia;
+export const builderNftChain: Chain = useTestnets ? optimismSepolia : optimism;
 
-if (builderNftChain.id !== baseSepolia.id) {
-  log.warn('Builder NFT chain is not on Base Sepolia');
+if (builderNftChain.id !== optimism.id) {
+  log.warn(`Builder NFT chain is using "${builderNftChain.name}" not Optimism`);
 }
 
-export const builderContractAddress =
-  // @ts-ignore - Leaving for later
-  builderNftChain.id === base.id
-    ? '0x278cc8861cfc93ea47c9e89b1876d0def2037c27'
-    : // New version only on Sepolia for now
-      '0xec66b6a6c2ce744543517776ff9906cd41c50a63';
+// Actual contract for interacting with NFTs
+export const optimismSepoliaBuilderContractAddress = '0xc6534d33bc65e319fb082e82c0b56bd4d9854aaf';
+export const optimismMainnetBuilderContractAddress = '0x7df4d9f54a5cddfef50a032451f694d6345c60af';
 
-export const usdcBaseSepoliaContractAddress = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
+export const builderContractAddress = useTestnets
+  ? optimismSepoliaBuilderContractAddress
+  : optimismMainnetBuilderContractAddress;
 
-export const usdcBaseMainnetContractAddress = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+// USDC Contract we use for payments
+export const usdcOptimismSepoliaContractAddress = '0x5fd84259d66Cd46123540766Be93DFE6D43130D7';
+export const usdcOptimismMainnetContractAddress = '0x0b2c639c533813f4aa9d7837caf62653d097ff85';
+
+export const usdcContractAddress = useTestnets
+  ? usdcOptimismSepoliaContractAddress
+  : usdcOptimismMainnetContractAddress;
 
 export const builderSmartContractOwnerKey = process.env.BUILDER_SMART_CONTRACT_OWNER_PRIVKEY as string;
 
+// Actual target wallet
+export const treasuryAddress = '0x93326D53d1E8EBf0af1Ff1B233c46C67c96e4d8D';
 // const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey });
 
-// const apiClient = new ContractApiClient({
+// const apiClient = new BuilderNFTSeasonOneClient({
 //   chain: builderNftChain,
 //   contractAddress: builderContractAddress,
 //   walletClient: serverClient
