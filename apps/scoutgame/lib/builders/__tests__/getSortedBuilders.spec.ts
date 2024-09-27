@@ -12,12 +12,6 @@ describe('getSortedBuilders', () => {
     await prisma.scout.deleteMany();
   });
 
-  const testCases: [BuildersSort, string][] = [
-    ['new', 'should sort builders by creation date'],
-    ['top', 'should sort builders by gems collected in the current week'],
-    ['hot', 'should sort builders by gems collected in the previous week']
-  ];
-
   it('Should sort builders by new', async () => {
     const builders = await Promise.all([
       mockBuilder({ createdAt: new Date('2024-01-01') }),
