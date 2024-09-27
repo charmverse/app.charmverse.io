@@ -50,7 +50,7 @@ export async function getBuilderActivities({
           avatar: true,
           displayName: true,
           id: true,
-          builder: true
+          builderStatus: true
         }
       },
       id: true,

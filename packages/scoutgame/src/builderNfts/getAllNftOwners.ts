@@ -1,13 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
 
-import { currentSeason } from '../dates';
-
-export async function getAllNftOwners({ builderId }: { builderId: string }): Promise<string[]> {
-  const builderNft = await prisma.builderNft.findUniqueOrThrow({
+export async function getAllNftOwners({ builderId, season }: { builderId: string; season: string }): Promise<string[]> {
+  const builderNft = await prisma.builderNft.findUnique({
     where: {
       builderId_season: {
-        season: currentSeason,
+        season,
         builderId
       }
     },
@@ -20,5 +18,5 @@ export async function getAllNftOwners({ builderId }: { builderId: string }): Pro
     }
   });
 
-  return arrayUtils.uniqueValues(builderNft.nftSoldEvents.map((ev) => ev.scoutId));
+  return arrayUtils.uniqueValues(builderNft?.nftSoldEvents.map((ev) => ev.scoutId) ?? []) || [];
 }

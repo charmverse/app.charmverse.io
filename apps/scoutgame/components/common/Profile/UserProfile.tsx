@@ -54,7 +54,7 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
             ) : null}
           </Stack>
         </Stack>
-        <Typography variant='body2' overflow='hidden' textOverflow='ellipsis'>
+        <Typography variant='body2' overflow='hidden' textOverflow='ellipsis' maxWidth='500px'>
           {bio}
         </Typography>
       </Stack>

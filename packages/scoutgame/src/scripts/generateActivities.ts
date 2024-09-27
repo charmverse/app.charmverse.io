@@ -6,7 +6,7 @@ import type { ActivityToRecord } from '../recordGameActivity';
 import { recordGameActivity } from '../recordGameActivity';
 import { refreshUserStats } from '../refreshUserStats';
 import { createMockEvents, ensureGithubUserExists } from '../testing/database';
-import { getCurrentWeek } from '../dates';
+import { getCurrentWeek, currentSeason } from '../dates';
 
 function getRandomDateWithinLast30Days() {
   const now = new Date();
@@ -197,6 +197,7 @@ export async function generateActivities({ userId }: { userId: string }) {
     },
     create: {
       userId,
+      season: currentSeason,
       week: getCurrentWeek(),
       gemsCollected: 30
     },
@@ -228,7 +229,7 @@ async function script() {
       data: {
         displayName: githubAccount.login as string,
         username: githubAccount.login as string,
-        builder: true,
+        builderStatus: 'approved',
         githubUser: {
           connect: {
             id: githubAccount.id

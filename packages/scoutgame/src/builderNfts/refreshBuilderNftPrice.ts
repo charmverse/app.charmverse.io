@@ -3,10 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { getPublicClient } from '@packages/onchain/getPublicClient';
 
-import { currentSeason } from '../dates';
-
 import { BuilderNFTSeasonOneClient } from './builderNFTSeasonOneClient';
 import { builderContractAddress, builderNftChain } from './constants';
+import { getContractClient } from './contractClient';
 
 const builderApiClient = new BuilderNFTSeasonOneClient({
   chain: builderNftChain,
@@ -14,12 +13,14 @@ const builderApiClient = new BuilderNFTSeasonOneClient({
   publicClient: getPublicClient(builderNftChain.id)
 });
 
-export async function refreshBuilderNftPrice({ builderId }: { builderId: string }) {
+export async function refreshBuilderNftPrice({ builderId, season }: { builderId: string; season: string }) {
   if (!stringUtils.isUUID(builderId)) {
     throw new InvalidInputError('Invalid builderId. Must be a uuid');
   }
 
-  const tokenId = await builderApiClient.getTokenIdForBuilder({ args: { builderId } });
+  const contractClient = getContractClient();
+
+  const tokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
 
   const currentPrice = await builderApiClient.getTokenQuote({
     args: { tokenId, amount: BigInt(1) }
@@ -29,7 +30,7 @@ export async function refreshBuilderNftPrice({ builderId }: { builderId: string 
     where: {
       builderId_season: {
         builderId,
-        season: currentSeason
+        season
       }
     },
     create: {
@@ -37,8 +38,8 @@ export async function refreshBuilderNftPrice({ builderId }: { builderId: string 
       chainId: builderNftChain.id,
       contractAddress: builderContractAddress,
       tokenId: Number(tokenId),
-      season: currentSeason,
-      currentPrice: Number(currentPrice)
+      season,
+      currentPrice
     },
     update: {
       currentPrice: Number(currentPrice)

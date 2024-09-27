@@ -271,7 +271,7 @@ export const mintNftAction = authActionClient
 
     const pointsValue = Number(nextPrice) / 5;
 
-    await refreshBuilderNftPrice({ builderId: parsedInput.builderId });
+    await refreshBuilderNftPrice({ builderId: parsedInput.builderId, season: currentSeason });
 
     await recordGameActivity({
       sourceEvent: {

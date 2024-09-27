@@ -49,7 +49,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           pointsEarnedAsBuilder: true
         }
       },
-      bannedAt: true,
+      builderStatus: true,
       userWeeklyStats: {
         where: {
           week: getCurrentWeek()
@@ -67,10 +67,10 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       avatar: builder.avatar,
       username: builder.username,
       displayName: builder.displayName,
-      builder: builder.builder,
+      builderStatus: builder.builderStatus,
       builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder ?? 0,
       gems: builder.userWeeklyStats[0]?.gemsCollected ?? 0,
-      isBanned: !!builder.bannedAt,
+      isBanned: builder.builderStatus === 'banned',
       nftsSold: builderNftsPurchasedRecord[builder.id] ?? 0
     };
   });

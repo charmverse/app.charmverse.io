@@ -10,34 +10,36 @@ export async function generateNftPurchaseEvents(scoutId: string, assignedBuilder
   const totalNftsPurchasedToday = faker.number.int({ min: 0, max: 3 });
   for (let nftCount = 0; nftCount < totalNftsPurchasedToday; nftCount++) {
     const builder = faker.helpers.arrayElement(assignedBuilders);
-    await prisma.nFTPurchaseEvent.create({
-      data: {
-        id: faker.string.uuid(),
-        scoutId,
-        tokensPurchased: 1,
-        txHash: faker.finance.ethereumAddress(),
-        pointsValue: builder.nftPrice,
-        paidInPoints: false,
-        builderNftId: builder.builderNftId,
-        builderEvent: {
-          create: {
-            id: faker.string.uuid(),
-            builderId: builder.id,
-            season: currentSeason,
-            week,
-            type: 'nft_purchase',
-            createdAt: randomTimeOfDay(date).toJSDate(),
-            pointsReceipts: {
-              create: {
-                id: faker.string.uuid(),
-                recipientId: builder.id,
-                value: builder.nftPrice
+    if (builder.builderNftId && builder.nftPrice) {
+      await prisma.nFTPurchaseEvent.create({
+        data: {
+          id: faker.string.uuid(),
+          scoutId,
+          tokensPurchased: 1,
+          txHash: faker.finance.ethereumAddress(),
+          pointsValue: builder.nftPrice,
+          paidInPoints: false,
+          builderNftId: builder.builderNftId,
+          builderEvent: {
+            create: {
+              id: faker.string.uuid(),
+              builderId: builder.id,
+              season: currentSeason,
+              week,
+              type: 'nft_purchase',
+              createdAt: randomTimeOfDay(date).toJSDate(),
+              pointsReceipts: {
+                create: {
+                  id: faker.string.uuid(),
+                  recipientId: builder.id,
+                  value: builder.nftPrice
+                }
               }
             }
           }
         }
-      }
-    });
+      });
+    }
   }
 
   return totalNftsPurchasedToday;

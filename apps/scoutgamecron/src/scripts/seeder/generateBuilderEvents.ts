@@ -16,6 +16,7 @@ async function processPullRequest(pullRequest: PullRequest, githubRepo: GithubRe
       pullRequest,
       repo: githubRepo,
       prClosedBy: v4(),
+      season: currentSeason,
       skipSendingComment: true
     });
   } else if (pullRequest.state === 'MERGED') {

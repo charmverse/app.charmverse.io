@@ -16,8 +16,8 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       user: {
         select: {
           id: true,
-          bannedAt: true,
           avatar: true,
+          builderStatus: true,
           username: true,
           displayName: true,
           userSeasonStats: {
@@ -65,8 +65,7 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       gems: builder.gemsCollected,
       avatar: user.avatar,
       scoutedBy: user.nftPurchaseEvents.length,
-      isBanned: !!user.bannedAt,
-      builder: true
+      builderStatus: user.builderStatus
     };
   });
 }

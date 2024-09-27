@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default async function AskAreYouABuilder() {
   const user = await getUserFromSession();
 
-  if (user?.builder) {
+  if (user?.builderStatus) {
     log.debug('Redirect existing builder to Spam policy page from Builder page', { userId: user?.id });
     redirect('/spam-policy');
   }
