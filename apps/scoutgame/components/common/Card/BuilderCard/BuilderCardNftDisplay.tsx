@@ -1,3 +1,4 @@
+import PersonIcon from '@mui/icons-material/Person';
 import { CardActionArea, CardMedia, CardContent, Typography, Box } from '@mui/material';
 import Link from 'next/link';
 
@@ -22,9 +23,14 @@ export function BuilderCardNftDisplay({
           borderImage: 'linear-gradient(152.64deg, #69DDFF 2.2%, #85A5EA 48.95%, #A06CD5 95.71%) 1'
         }}
       >
-        <Box position='relative'>
-          {/** TODO: Add a fallback avatar image */}
-          <CardMedia component='img' sx={{ aspectRatio: '1 / 1' }} image={avatar ?? ''} alt={username} />
+        <Box position='relative' minHeight={200}>
+          {avatar ? (
+            <CardMedia component='img' sx={{ aspectRatio: '1 / 1' }} image={avatar ?? ''} alt={username} />
+          ) : (
+            <PersonIcon
+              sx={{ fontSize: 250, position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: -20 }}
+            />
+          )}
           <CardMedia
             component='img'
             width='30px'
@@ -44,7 +50,7 @@ export function BuilderCardNftDisplay({
         </Box>
         <CardContent sx={{ p: 1 }}>
           <Typography gutterBottom variant='body1' textAlign='center' noWrap>
-            {username}
+            {avatar ? username : 'Unavailable'}
           </Typography>
           {children}
         </CardContent>

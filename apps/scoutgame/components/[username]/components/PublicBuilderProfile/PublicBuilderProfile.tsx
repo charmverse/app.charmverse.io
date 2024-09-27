@@ -19,7 +19,7 @@ export async function PublicBuilderProfile({ tab, user }: { tab: string; user: B
     { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}
   ] = isBuilder
     ? await Promise.all([
-        prisma.builderNft.findUniqueOrThrow({
+        prisma.builderNft.findUnique({
           where: {
             builderId_season: {
               builderId: user.id,
