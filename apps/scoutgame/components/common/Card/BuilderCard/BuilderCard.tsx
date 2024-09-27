@@ -25,6 +25,7 @@ export function BuilderCard({
   hideDetails = false
 }: {
   user?: {
+    id: string;
     username: string;
   } | null;
   builder: BuilderInfo;

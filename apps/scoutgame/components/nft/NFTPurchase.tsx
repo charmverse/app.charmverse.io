@@ -155,6 +155,31 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
     }
   }, [tokensToBuy, builderTokenId, refreshAsk]);
 
+  /** TODO - Use this payload when we resume calling the contract directly
+   {
+    enable: !!address && !!purchaseCost,
+    actionType: ActionType.EvmFunction,
+    sender: address as string,
+    srcToken: '0x0000000000000000000000000000000000000000',
+    dstToken: '0x0b2c639c533813f4aa9d7837caf62653d097ff85',
+    slippage: 1,
+
+    srcChainId: ChainId.BASE,
+    dstChainId: ChainId.OPTIMISM,
+    actionConfig: {
+      chainId: ChainId.OPTIMISM,
+      contractAddress: '0x7df4d9f54a5cddfef50a032451f694d6345c60af',
+      cost: {
+        amount: purchaseCost,
+        isNative: false,
+        tokenAddress: '0x0b2c639c533813f4aa9d7837caf62653d097ff85'
+      },
+      signature: 'function mintBuilderNft(uint256 tokenId, uint256 amount, string calldata scout) external',
+      args: [BigInt(1), BigInt(1), 'c42efe4a-b385-488e-a5ca-135ecec0f810']
+    }
+  }
+   */
+
   const { error, isLoading, actionResponse } = useBoxAction({
     enable: !!address && !!treasuryAddress,
     sender: address as `0x${string}`,

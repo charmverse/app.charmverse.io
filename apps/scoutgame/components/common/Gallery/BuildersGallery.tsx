@@ -4,7 +4,13 @@ import type { BuilderInfo } from 'lib/builders/interfaces';
 
 import { BuilderCard } from '../Card/BuilderCard/BuilderCard';
 
-export function BuildersGallery({ builders, user }: { builders: BuilderInfo[]; user?: { username: string } | null }) {
+export function BuildersGallery({
+  builders,
+  user
+}: {
+  builders: BuilderInfo[];
+  user?: { username: string; id: string } | null;
+}) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={{ xs: 1, sm: 2 }} columns={{ xs: 3, sm: 6 }}>

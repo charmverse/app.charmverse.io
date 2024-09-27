@@ -31,6 +31,7 @@ export type BuilderProfileProps = {
   gemsCollected?: number;
   rank?: number | null;
   user?: {
+    id: string;
     username: string;
   } | null;
 };

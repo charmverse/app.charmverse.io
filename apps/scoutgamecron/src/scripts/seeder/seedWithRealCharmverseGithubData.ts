@@ -1,6 +1,5 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
-import { processPullRequests } from '../../tasks/processPullRequests';
 
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
@@ -105,7 +104,7 @@ export async function seedWithRealCharmverseGithubData() {
     }
   }
 
-  await processPullRequests({ createdAfter: new Date('2024-08-01'), skipClosedPrProcessing: true });
+  // await processPullRequests({ createdAfter: new Date('2024-08-01'), skipClosedPrProcessing: true });
 
   await seedBuilderNFTs();
 }
@@ -195,4 +194,4 @@ async function script() {
   await seedBuilderNFTs();
 }
 
-// script()
+script()
