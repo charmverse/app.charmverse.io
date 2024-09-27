@@ -225,14 +225,14 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
           }}
         />
 
-        {balances?.chainId === sourceFundsChain && !!sourceFundsChain && (
+        {/* {balances?.chainId === sourceFundsChain && !!sourceFundsChain && (
           <div>
             <Typography>
               Your USDC Balance on {getChainById(sourceFundsChain)?.chainName}: ${' '}
               {(Number(balances.usdc || 0) / 10e6).toFixed(2)}
             </Typography>
           </div>
-        )}
+        )} */}
         {fetchError && <p color='red'>{fetchError.shortMessage || 'Something went wrong'}</p>}
         <Button onClick={handlePurchase} disabled={!purchaseCost || isLoading || isFetchingPrice}>
           {isFetchingPrice ? 'Fetching price' : isLoading ? 'Loading...' : 'Purchase NFT'}

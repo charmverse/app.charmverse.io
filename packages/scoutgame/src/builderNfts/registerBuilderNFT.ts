@@ -64,7 +64,6 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
       id: builderId
     },
     data: {
-      builder: true,
       builderStatus: 'approved'
     }
   });

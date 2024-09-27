@@ -133,7 +133,6 @@ async function seedBuilderNFTs() {
         id: builderId as string
       },
       data: {
-        builder: true,
         builderStatus: 'approved'
       }
     })
@@ -196,4 +195,4 @@ async function script() {
   await seedBuilderNFTs();
 }
 
-script()
+// script()
