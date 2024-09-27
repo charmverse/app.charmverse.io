@@ -156,8 +156,6 @@ async function generateNftPurchaseEvents({builderId, amount = 1}: {builderId: st
   await prisma.nFTPurchaseEvent.createMany({data: inputs})
   
 }
-// seedWithRealCharmverseGithubData();
-
 
 
 async function clearNfts() {
@@ -177,8 +175,9 @@ async function clearNfts() {
 }
 
 async function script() {
+  // await clearNfts()
   await seedWithRealCharmverseGithubData();
   await seedBuilderNFTs()
 }
 
-script()
+// script()
