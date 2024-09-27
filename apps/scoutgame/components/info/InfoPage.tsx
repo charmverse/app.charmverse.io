@@ -105,9 +105,17 @@ function LearnMore() {
             By accumulating Scout Points, you can exchange them to scout even more builders, boosting your standing
             within the game and increasing your potential rewards.
           </Typography>
-          <Typography fontWeight='bold'>Key Scout Actions:</Typography>
-          <Typography>• Collect NFTs from top builders every season.</Typography>
-          <Typography>• Earn Scout Points when the builders you back succeed in open-source contributions.</Typography>
+          <div>
+            <Typography variant='h5' mt={2}>
+              Key Scout Actions:
+            </Typography>
+            <List sx={{ listStyleType: 'disc', ml: 2 }}>
+              <ListItem sx={{ display: 'list-item' }}>Collect NFTs from top builders every season.</ListItem>
+              <ListItem sx={{ display: 'list-item' }}>
+                Earn Scout Points when the builders you back succeed in open-source contributions.
+              </ListItem>
+            </List>
+          </div>
         </Box>
         <Divider sx={{ borderColor: 'secondary.main' }} />
         <Box display='flex' flexDirection='column' gap={2} my={2}>
@@ -119,10 +127,20 @@ function LearnMore() {
             Builders in the Scout Game gain recognition by actively contributing to approved projects. Each season lasts
             three months, and builders earn Scout Points by completing specific tasks tied to their contributions.
           </Typography>
-          <Typography fontWeight='bold'>Key Builder Actions:</Typography>
-          <Typography>• Contribute to approved open source projects with an accepted Pull Request</Typography>
-          <Typography>• Make your mark with a first-time code contribution to an approved project</Typography>
-          <Typography>• Hit a 3-Pull Request streak within 7 days</Typography>
+          <div>
+            <Typography variant='h5' mt={2}>
+              Key Builder Actions:
+            </Typography>
+            <List sx={{ listStyleType: 'disc', ml: 2 }}>
+              <ListItem sx={{ display: 'list-item' }}>
+                Contribute to approved open source projects with an accepted Pull Request
+              </ListItem>
+              <ListItem sx={{ display: 'list-item' }}>
+                Make your mark with a first-time code contribution to an approved project
+              </ListItem>
+              <ListItem sx={{ display: 'list-item' }}>Hit a 3-Pull Request streak within 7 days</ListItem>
+            </List>
+          </div>
         </Box>
         <Divider sx={{ borderColor: 'secondary.main' }} />
         <Box display='flex' flexDirection='column' gap={2} my={2}>
@@ -134,42 +152,60 @@ function LearnMore() {
           <Typography>
             Scout Points are claimable each week and remain claimable for only the current season and the next season.
           </Typography>
-        </Box>
-        <Divider sx={{ borderColor: 'secondary.main' }} />
-        <Box display='flex' flexDirection='column' gap={2} my={2}>
-          <Typography variant='h4' textAlign='center' color='secondary'>
+          <Typography variant='h5' mt={2}>
             Weekly Builder Ranking & Reward Allocation
           </Typography>
           <Typography>
             Scout Game runs in seasons. Each season is 13 weeks. During each week, Builders collect Scout Gems by
             completing qualified actions.
           </Typography>
-          <Typography>• Accepted PR in an approved repo = 1 Gem</Typography>
-          <Typography>• First PR in an approved repo = 10 Gems</Typography>
-          <Typography>• Third PR in an approved repo within 7 days = 3 Gems</Typography>
-          <Typography>• A Builder may only score Gems for one PR per approved repo per day.</Typography>
-          <Typography>• Gem rewards do not stack. The maximum score for a single PR is 10 Gems.</Typography>
+          <List sx={{ listStyleType: 'disc', ml: 2 }}>
+            <ListItem sx={{ display: 'list-item' }}>
+              <Typography>Accepted PR in an approved repo = 1 Gem</Typography>
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <Typography>First PR in an approved repo = 10 Gems</Typography>
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <Typography>Third PR in an approved repo within 7 days = 3 Gems</Typography>
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <Typography>A Builder may only score Gems for one PR per approved repo per day.</Typography>
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <Typography>Gem rewards do not stack. The maximum score for a single PR is 10 Gems.</Typography>
+            </ListItem>
+          </List>
           <Typography>
             At the end of each week, Builders are ranked by the number of Gems they collected that week. Scout Points
             are allocated to the top-ranking Builders and the Scouts who hold their NFTs according to this formula:
           </Typography>
-          <Typography>RewardR = A X [(1 - D)^(R-1) - (1 - D)^R]</Typography>
+          <Typography align='center' my={1}>
+            <code>
+              Reward<sub>R</sub> = A X [(1 - D)<sup>^(R-1)</sup> - (1 - D)<sup>^R</sup>]
+            </code>
+          </Typography>
           <Typography>Where</Typography>
-          <Typography>A = Total Scout Point Allocation for the Week</Typography>
-          <Typography>R = Rank</Typography>
-          <Typography>D = Decay Rate = 3%</Typography>
+          <Typography>
+            A = Total Scout Point Allocation for the Week
+            <br />R = Rank
+            <br />D = Decay Rate = 3%
+          </Typography>
           <Typography>The reward is split between the Builder and their scouts as follows:</Typography>
-          <Typography>BuilderR Reward = 20% x RewardR</Typography>
-          <Typography>ScoutR Reward = 80% x (H / S) x RewardR</Typography>
+          <Typography>
+            Builder<sub>R</sub> Reward = 20% x Reward<sub>R</sub>
+          </Typography>
+          <Typography>
+            Scout<sub>R</sub> Reward = 80% x (H / S) x Reward<sub>R</sub>
+          </Typography>
           <Typography>Where</Typography>
-          <Typography>R = Builder's rank that week</Typography>
-          <Typography>H = Number of the Builder's NFTs owned by the Scout</Typography>
-          <Typography>S = Total number of the Builder's NFTs minted</Typography>
+          <Typography>
+            R = Builder's rank that week
+            <br />H = Number of the Builder's NFTs owned by the Scout
+            <br />S = Total number of the Builder's NFTs minted
+          </Typography>
           <Typography>A Builder's Gem count resets to zero at the start of each week.</Typography>
-        </Box>
-        <Divider sx={{ borderColor: 'secondary.main' }} />
-        <Box display='flex' flexDirection='column' gap={2} my={2}>
-          <Typography variant='h4' textAlign='center' color='secondary'>
+          <Typography variant='h5' mt={2}>
             Builder NFTs
           </Typography>
           <Typography>
@@ -181,10 +217,15 @@ function LearnMore() {
             The price of a Builder's first NFT mint is $2.00. The price of the next NFT of the same Builder is
             calculated as follows:
           </Typography>
-          <Typography>P = 2 x S + 2</Typography>
+          <Typography align='center' my={1}>
+            <code>P = 2 x S + 2</code>
+          </Typography>
           <Typography>Where:</Typography>
-          <Typography>P: Price of the NFT ($)</Typography>
-          <Typography>S: Current supply (number of NFTs minted)</Typography>
+          <Typography>
+            P: Price of the NFT ($)
+            <br />
+            S: Current supply (number of NFTs minted)
+          </Typography>
           <Typography>Season 1 Builder NFTs are non-transferable.</Typography>
         </Box>
         <Divider sx={{ borderColor: 'secondary.main' }} />
@@ -193,10 +234,22 @@ function LearnMore() {
             Spam Policy
           </Typography>
           <Typography>Scout Game automatically detects REJECTED Pull Requests from Builders.</Typography>
-          <Typography>Each rejected Pull Request is treated as an abuse report.</Typography>
-          <Typography>Qualified GitHub repo owners may report abuse in Scout Game.</Typography>
-          <Typography>CharmVerse core team may also report abuse.</Typography>
-          <Typography>Builders receiving 3 abuse reports will be permanently banned from the Scout Game.</Typography>
+          <List sx={{ listStyleType: 'disc', ml: 2 }}>
+            <ListItem sx={{ display: 'list-item' }}>
+              <Typography>Each rejected Pull Request is treated as an abuse report.</Typography>
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <Typography>Qualified GitHub repo owners may report abuse in Scout Game.</Typography>
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <Typography>CharmVerse core team may also report abuse.</Typography>
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <Typography>
+                Builders receiving 3 abuse reports will be permanently banned from the Scout Game.
+              </Typography>
+            </ListItem>
+          </List>
         </Box>
       </Stack>
       <ScrollButton scrollType='up' sx={{ textAlign: 'center', width: '100%' }}>
