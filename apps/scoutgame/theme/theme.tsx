@@ -1,6 +1,6 @@
 'use client';
 
-import { createTheme, darken, responsiveFontSizes } from '@mui/material';
+import { createTheme, darken, lighten, responsiveFontSizes } from '@mui/material';
 import { Inter } from 'next/font/google';
 
 import {
@@ -43,7 +43,8 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         background: {
           default: backgroundColorDarkMode,
           paper: backgroundLightColorDarkMode,
-          dark: darken(backgroundColorDarkMode, 0.05)
+          dark: darken(backgroundColorDarkMode, 0.05),
+          light: lighten(backgroundColorDarkMode, 0.05)
         },
         text: {
           disabled: disabledTextColorDarkMode,
@@ -79,7 +80,8 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         background: {
           default: backgroundColorDarkMode,
           paper: backgroundLightColorDarkMode,
-          dark: darken(backgroundLightColorDarkMode, 0.25)
+          dark: darken(backgroundLightColorDarkMode, 0.25),
+          light: lighten(backgroundColorDarkMode, 0.125) // this # is based on the background needed for Info pages
         },
         text: {
           primary: primaryTextColorDarkMode,

@@ -5,8 +5,9 @@ export class GeneralPageLayout {
   constructor(
     protected page: Page,
     public signInButton = page.locator('data-test=sign-in-button'),
-    public siteNavigation = page.locator('data-test=site-navigation'),
-    public selectNavigationLink = (link: string) => page.locator(`data-test=site-navigation >> [href*="${link}"]`)
+    public siteNavigation = page.locator('data-test=site-navigation').first(),
+    public selectNavigationLink = (link: string) =>
+      page.locator(`data-test=site-navigation >> [href*="${link}"]`).first()
   ) {
     // silence is golden
   }

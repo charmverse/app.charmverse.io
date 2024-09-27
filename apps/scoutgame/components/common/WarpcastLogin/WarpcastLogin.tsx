@@ -10,7 +10,7 @@ import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
 
 import '@farcaster/auth-kit/styles.css';
-import { LoadingComponent } from 'components/layout/Loading/LoadingComponent';
+import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { authConfig } from 'lib/farcaster/config';
 import { loginAction } from 'lib/session/loginWithFarcasterAction';
 
