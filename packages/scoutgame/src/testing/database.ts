@@ -1,10 +1,11 @@
-import type { BuilderEvent, BuilderEventType, GithubRepo } from '@charmverse/core/prisma';
-import { GithubEventType, prisma } from '@charmverse/core/prisma-client';
+import { GithubEventType } from '@charmverse/core/prisma';
+import type { BuilderEvent, BuilderEventType, BuilderStatus, GithubRepo, Scout } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import { currentSeason, getCurrentWeek } from '../dates';
+import { getCurrentWeek } from '../dates';
 
-import { randomLargeInt } from './generators';
+import { randomLargeInt, mockSeason } from './generators';
 
 type RepoAddress = {
   repoOwner?: string;
@@ -12,23 +13,20 @@ type RepoAddress = {
 };
 
 export async function mockBuilder({
-  bannedAt,
+  createdAt,
+  builderStatus = 'approved',
   githubUserId = randomLargeInt(),
   onboardedAt,
-  username = uuid()
-}: {
-  bannedAt?: Date;
-  githubUserId?: number;
-  onboardedAt?: Date;
-  username?: string;
-} = {}) {
+  username = uuid(),
+  createNft = false
+}: Partial<Scout & { githubUserId?: number; createNft?: boolean }> = {}) {
   const result = await prisma.scout.create({
     data: {
+      createdAt,
       username,
       displayName: 'Test User',
-      bannedAt,
+      builderStatus,
       onboardedAt,
-      builder: true,
       githubUser: {
         create: {
           id: githubUserId,
@@ -40,6 +38,10 @@ export async function mockBuilder({
       githubUser: true
     }
   });
+
+  if (createNft) {
+    await mockBuilderNft({ builderId: result.id });
+  }
   const { githubUser, ...scout } = result;
   return { ...scout, githubUser: githubUser[0]! };
 }
@@ -56,8 +58,7 @@ export async function mockScout({
   return prisma.scout.create({
     data: {
       username,
-      displayName,
-      builder: false
+      displayName
     }
   });
 }
@@ -97,7 +98,7 @@ export async function mockGemPayoutEvent({
       gems: amount,
       points: 0,
       week,
-      season: currentSeason,
+      season: mockSeason,
       builder: {
         connect: {
           id: builderId
@@ -105,7 +106,7 @@ export async function mockGemPayoutEvent({
       },
       builderEvent: {
         create: {
-          season: currentSeason,
+          season: mockSeason,
           type: 'gems_payout',
           week: getCurrentWeek(),
           builder: {
@@ -123,7 +124,7 @@ export async function mockBuilderEvent({ builderId, eventType }: { builderId: st
   return prisma.builderEvent.create({
     data: {
       builderId,
-      season: currentSeason,
+      season: mockSeason,
       type: eventType,
       week: getCurrentWeek()
     }
@@ -242,7 +243,7 @@ export async function ensureMergedGithubPullRequestExists({
   const builderEvent = await prisma.builderEvent.create({
     data: {
       builderId: builderId as string,
-      season: currentSeason,
+      season: mockSeason,
       type: 'merged_pull_request',
       githubEventId: githubEvent.id,
       week: getCurrentWeek()
@@ -297,11 +298,15 @@ export async function mockNFTPurchaseEvent({
 export async function mockBuilderNft({
   builderId,
   chainId = 1,
-  contractAddress = '0x1'
+  contractAddress = '0x1',
+  owners = [],
+  season = mockSeason
 }: {
   builderId: string;
   chainId?: number;
   contractAddress?: string;
+  owners?: (string | { id: string })[];
+  season?: string;
 }) {
   return prisma.builderNft.create({
     data: {
@@ -309,8 +314,18 @@ export async function mockBuilderNft({
       chainId,
       contractAddress,
       currentPrice: 0,
-      season: currentSeason,
-      tokenId: Math.round(Math.random() * 10000000)
+      season,
+      tokenId: Math.round(Math.random() * 10000000),
+      nftSoldEvents: {
+        createMany: {
+          data: owners.map((owner) => ({
+            scoutId: typeof owner === 'string' ? owner : owner.id,
+            pointsValue: 10,
+            txHash: `0x${Math.random().toString(16).substring(2)}`,
+            tokensPurchased: 1
+          }))
+        }
+      }
     }
   });
 }
@@ -390,4 +405,46 @@ export async function createMockEvents({ userId, amount = 5 }: MockEventParams) 
       amount: Math.floor(Math.random() * 10) + 1 // Random points between 1 and 10
     });
   }
+}
+
+export function mockUserAllTimeStats({
+  userId,
+  pointsEarnedAsBuilder = Math.floor(Math.random() * 1000),
+  pointsEarnedAsScout = Math.floor(Math.random() * 1000)
+}: {
+  userId: string;
+  pointsEarnedAsBuilder?: number;
+  pointsEarnedAsScout?: number;
+}) {
+  return prisma.userAllTimeStats.create({
+    data: {
+      userId,
+      pointsEarnedAsBuilder,
+      pointsEarnedAsScout
+    }
+  });
+}
+
+export function mockUserWeeklyStats({
+  gemsCollected = Math.floor(Math.random() * 100),
+  rank,
+  userId,
+  week = getCurrentWeek(),
+  season = mockSeason
+}: {
+  gemsCollected?: number;
+  rank?: number;
+  userId: string;
+  week?: string;
+  season?: string;
+}) {
+  return prisma.userWeeklyStats.create({
+    data: {
+      userId,
+      gemsCollected,
+      rank,
+      week,
+      season
+    }
+  });
 }

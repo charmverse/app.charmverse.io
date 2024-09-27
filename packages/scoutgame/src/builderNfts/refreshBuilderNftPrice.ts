@@ -1,27 +1,20 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { getPublicClient } from '@packages/onchain/getPublicClient';
-
-import { currentSeason } from '../dates';
 
 import { builderContractAddress, builderNftChain } from './constants';
-import { ContractApiClient } from './nftContractApiClient';
+import { getContractClient } from './contractClient';
 
-const builderApiClient = new ContractApiClient({
-  chain: builderNftChain,
-  contractAddress: builderContractAddress,
-  publicClient: getPublicClient(builderNftChain.id)
-});
-
-export async function refreshBuilderNftPrice({ builderId }: { builderId: string }) {
+export async function refreshBuilderNftPrice({ builderId, season }: { builderId: string; season: string }) {
   if (!stringUtils.isUUID(builderId)) {
     throw new InvalidInputError('Invalid builderId. Must be a uuid');
   }
 
-  const tokenId = await builderApiClient.getTokenIdForBuilder({ args: { builderId } });
+  const contractClient = getContractClient();
 
-  const currentPrice = await builderApiClient.getTokenPurchasePrice({
+  const tokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
+
+  const currentPrice = await contractClient.getTokenPurchasePrice({
     args: { tokenId, amount: BigInt(1) }
   });
 
@@ -29,7 +22,7 @@ export async function refreshBuilderNftPrice({ builderId }: { builderId: string 
     where: {
       builderId_season: {
         builderId,
-        season: currentSeason
+        season
       }
     },
     create: {
@@ -37,7 +30,7 @@ export async function refreshBuilderNftPrice({ builderId }: { builderId: string 
       chainId: builderNftChain.id,
       contractAddress: builderContractAddress,
       tokenId: Number(tokenId),
-      season: currentSeason,
+      season,
       currentPrice
     },
     update: {

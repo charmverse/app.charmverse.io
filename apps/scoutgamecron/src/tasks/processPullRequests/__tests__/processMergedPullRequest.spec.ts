@@ -245,7 +245,7 @@ describe('processMergedPullRequest', () => {
 
   it('should not create builder events for banned builders', async () => {
     const builder = await mockBuilder({
-      bannedAt: new Date()
+      builderStatus: 'banned'
     });
 
     const repo = await mockRepo();

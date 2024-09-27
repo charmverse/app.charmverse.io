@@ -9,6 +9,7 @@ export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 2 });
 // const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 30 }, { zone: 'utc' }); // Actual launch: 2024-W40
 // export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 13 });
 export const currentSeason: ISOWeek = getWeekFromDate(currentSeasonStartDate.toJSDate());
+export const currentSeasonNumber = 1;
 
 export const streakWindow = 7 * 24 * 60 * 60 * 1000;
 
@@ -18,7 +19,11 @@ export function getCurrentWeek(): ISOWeek {
 }
 
 export function getLastWeek(): ISOWeek {
-  return _formatWeek(DateTime.utc().minus({ week: 1 }));
+  return getPreviousWeek(getCurrentWeek());
+}
+
+export function getPreviousWeek(week: ISOWeek): ISOWeek {
+  return _formatWeek(getDateFromISOWeek(week).minus({ week: 1 }));
 }
 
 export function getWeekFromDate(date: Date): ISOWeek {
@@ -51,7 +56,7 @@ export function getCurrentWeekPoints() {
   return 100000;
 }
 
-export function getCurrentSeasonWeek(): SeasonWeek {
+export function getCurrentSeasonWeekNumber(): SeasonWeek {
   return getSeasonWeekFromISOWeek({ season: currentSeason, week: getCurrentWeek() });
 }
 

@@ -5,6 +5,7 @@ import { processPullRequests } from '../../tasks/processPullRequests';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
 
+import { currentSeason } from '@packages/scoutgame/dates';
 
 function getRandomValue<T>(arr: T[]): T {
   const randomIndex = Math.floor(Math.random() * arr.length);
@@ -79,7 +80,7 @@ export async function seedWithRealCharmverseGithubData() {
             create: {
               displayName: builder,
               username: builder,
-              builder: true,
+              builderStatus: 'approved',
               avatar
             }
           }
@@ -95,7 +96,7 @@ export async function seedWithRealCharmverseGithubData() {
             create: {
               displayName: builder,
               username: builder,
-              builder: true,
+              builderStatus: 'approved',
               avatar: avatar
             }
           }
@@ -104,10 +105,9 @@ export async function seedWithRealCharmverseGithubData() {
     }
   }
 
-  await processPullRequests({ createdAfter: new Date('2024-08-01'), skipClosedPrProcessing:true });
+  await processPullRequests({ createdAfter: new Date('2024-08-01'), skipClosedPrProcessing: true });
 
   await seedBuilderNFTs();
-
 }
 
 async function seedBuilderNFTs() {
@@ -122,43 +122,48 @@ async function seedBuilderNFTs() {
   console.log('githubUser', githubUser);
 
   for (const { builderId } of githubUser) {
-    const nft = await registerBuilderNFT({builderId: builderId as string});
+    const nft = await registerBuilderNFT({ builderId: builderId as string, season: currentSeason });
 
-    await generateNftPurchaseEvents({builderId: nft.builderId, amount: 4})
+    await generateNftPurchaseEvents({ builderId: nft.builderId, amount: 4 });
 
-    await refreshUserStats({userId: builderId as string})
+    await refreshUserStats({ userId: builderId as string });
   }
 }
 
-async function generateNftPurchaseEvents({builderId, amount = 1}: {builderId: string, amount?: number}): Promise<void> {
-
+async function generateNftPurchaseEvents({
+  builderId,
+  amount = 1
+}: {
+  builderId: string;
+  amount?: number;
+}): Promise<void> {
   const nft = await prisma.builderNft.findFirstOrThrow({
     where: {
       builderId
     }
-  })
+  });
 
-  const scoutId = await prisma.scout.findMany({
-    where: {
-      
-    },
-    take: 5
-  }).then(data => data.map(s => s.id))
-  
-  const inputs: Prisma.NFTPurchaseEventCreateManyInput[] = Array.from({length: amount}).map(idx => ({
-    builderNftId: nft.id,
-    pointsValue: 0,
-    scoutId: getRandomValue(scoutId),
-    tokensPurchased: 10,
-    txHash: `0xabc`,
-  } as Prisma.NFTPurchaseEventCreateManyInput))
-  
-  await prisma.nFTPurchaseEvent.createMany({data: inputs})
-  
+  const scoutId = await prisma.scout
+    .findMany({
+      where: {},
+      take: 5
+    })
+    .then((data) => data.map((s) => s.id));
+
+  const inputs: Prisma.NFTPurchaseEventCreateManyInput[] = Array.from({ length: amount }).map(
+    (idx) =>
+      ({
+        builderNftId: nft.id,
+        pointsValue: 0,
+        scoutId: getRandomValue(scoutId),
+        tokensPurchased: 10,
+        txHash: `0xabc`
+      } as Prisma.NFTPurchaseEventCreateManyInput)
+  );
+
+  await prisma.nFTPurchaseEvent.createMany({ data: inputs });
 }
 // seedWithRealCharmverseGithubData();
-
-
 
 async function clearNfts() {
   await prisma.builderNft.deleteMany({
@@ -173,12 +178,12 @@ async function clearNfts() {
         }
       }
     }
-  })
+  });
 }
 
 async function script() {
   await seedWithRealCharmverseGithubData();
-  await seedBuilderNFTs()
+  await seedBuilderNFTs();
 }
 
-script()
+script();

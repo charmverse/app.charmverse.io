@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
 import { mockBuilder, mockRepo } from '@packages/scoutgame/testing/database';
-import { randomLargeInt } from '@packages/scoutgame/testing/generators';
+import { randomLargeInt, mockSeason } from '@packages/scoutgame/testing/generators';
 import { v4 } from 'uuid';
 
 import { mockPullRequest } from '@/testing/generators';
@@ -46,7 +46,7 @@ describe('processClosedPullRequest', () => {
     });
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
-    await processClosedPullRequest({ pullRequest, repo });
+    await processClosedPullRequest({ pullRequest, repo, season: mockSeason });
 
     const githubEvent = await prisma.githubEvent.findFirstOrThrow({
       where: {
@@ -79,7 +79,7 @@ describe('processClosedPullRequest', () => {
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue(builder.githubUser);
 
-    await processClosedPullRequest({ pullRequest, repo });
+    await processClosedPullRequest({ pullRequest, repo, season: mockSeason });
 
     const githubEvent = await prisma.githubEvent.findFirstOrThrow({
       where: {
@@ -113,7 +113,7 @@ describe('processClosedPullRequest', () => {
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
 
     for (let i = 0; i < 3; i++) {
-      await processClosedPullRequest({ pullRequest: { ...pullRequest, number: i + 1 }, repo });
+      await processClosedPullRequest({ pullRequest: { ...pullRequest, number: i + 1 }, repo, season: mockSeason });
     }
 
     const strikes = await prisma.builderStrike.findMany({
@@ -124,7 +124,7 @@ describe('processClosedPullRequest', () => {
     const bannedBuilder = await prisma.scout.findUniqueOrThrow({
       where: { id: builder.id }
     });
-    expect(bannedBuilder.bannedAt).toBeDefined();
+    expect(bannedBuilder.builderStatus).toEqual('banned');
     expect(octokit.rest.issues.createComment).toHaveBeenCalled();
   });
 
@@ -166,9 +166,9 @@ describe('processClosedPullRequest', () => {
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
 
-    await processClosedPullRequest({ pullRequest, repo });
-    await processClosedPullRequest({ pullRequest, repo });
-    await processClosedPullRequest({ pullRequest, repo });
+    await processClosedPullRequest({ pullRequest, repo, season: mockSeason });
+    await processClosedPullRequest({ pullRequest, repo, season: mockSeason });
+    await processClosedPullRequest({ pullRequest, repo, season: mockSeason });
 
     const githubEventsCount = await prisma.githubEvent.count({
       where: {

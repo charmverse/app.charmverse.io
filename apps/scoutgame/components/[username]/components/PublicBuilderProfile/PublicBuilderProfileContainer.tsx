@@ -121,7 +121,7 @@ export function PublicBuilderProfileContainer({
         </Paper>
         {isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
 
-        {builder.builder ? (
+        {builder.builderStatus === 'approved' ? (
           <Stack
             gap={2}
             flexDirection={{
