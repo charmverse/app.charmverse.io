@@ -8,14 +8,12 @@ import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
 import type { UseBoxActionArgs } from '@decent.xyz/box-hooks';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Alert, Button, Typography } from '@mui/material';
-import { getChainById } from '@packages/onchain/chains';
 import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/builderNFTSeasonOneClient';
 import {
   builderContractAddress,
   builderNftChain,
-  useTestnets,
   usdcContractAddress,
-  treasuryAddress
+  useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
 import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
@@ -64,6 +62,7 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
   // Data from onchain
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
+  const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
 
   const { isExecuting, hasSucceeded, executeAsync, result } = useAction(mintNftAction, {
     onSuccess() {
@@ -73,6 +72,10 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
       log.error('Error minting NFT', { error: err });
     }
   });
+
+  useEffect(() => {
+    readonlyApiClient.proceedsReceiver().then(setTreasuryAddress);
+  }, []);
 
   const refreshBalance = useCallback(async () => {
     const chainOption = getChainOptions({ useTestnets }).find((opt) => opt.id === sourceFundsChain) as ChainOption;
@@ -152,8 +155,8 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
     }
   }, [tokensToBuy, builderTokenId, refreshAsk]);
 
-  const txArgs: UseBoxActionArgs = {
-    enable: !!address,
+  const { error, isLoading, actionResponse } = useBoxAction({
+    enable: !!address && !!treasuryAddress,
     sender: address as `0x${string}`,
     srcToken: '0x0000000000000000000000000000000000000000',
     dstToken: usdcContractAddress,
@@ -165,11 +168,9 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
     actionConfig: {
       amount: purchaseCost,
       swapDirection: SwapDirection.EXACT_AMOUNT_OUT,
-      receiverAddress: treasuryAddress
+      receiverAddress: treasuryAddress as string
     }
-  };
-
-  const { error, isLoading, actionResponse } = useBoxAction(txArgs);
+  });
 
   const handlePurchase = async () => {
     if (!actionResponse?.tx) {
@@ -216,7 +217,6 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
         <h3>Token ID: {builderTokenId}</h3>
         {purchaseCost && <p>Price: {formatUnits(purchaseCost, 6)} USDC</p>}
         {isFetchingPrice && <p>Fetching price...</p>}
-
         <BlockchainSelect
           // value={sourceFundsChain as any}
           useTestnets={useTestnets}
@@ -224,7 +224,8 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
             setSourceFundsChain(_chainId);
           }}
         />
-
+        <Typography>Sending from {address}</Typography>
+        <Typography>Treasury {treasuryAddress}</Typography>
         {/* {balances?.chainId === sourceFundsChain && !!sourceFundsChain && (
           <div>
             <Typography>
@@ -234,7 +235,7 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
           </div>
         )} */}
         {fetchError && <p color='red'>{fetchError.shortMessage || 'Something went wrong'}</p>}
-        <Button onClick={handlePurchase} disabled={!purchaseCost || isLoading || isFetchingPrice}>
+        <Button onClick={handlePurchase} disabled={!purchaseCost || isLoading || isFetchingPrice || !treasuryAddress}>
           {isFetchingPrice ? 'Fetching price' : isLoading ? 'Loading...' : 'Purchase NFT'}
         </Button>
       </div>

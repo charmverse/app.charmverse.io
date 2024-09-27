@@ -36,7 +36,8 @@ export const usdcContractAddress = useTestnets
 
 export const builderSmartContractOwnerKey = process.env.BUILDER_SMART_CONTRACT_OWNER_PRIVKEY as string;
 
-export const treasuryAddress = '0x9b56c451f593e1BF5E458A3ecaDfD3Ef17A36998';
+// Actual target wallet
+export const treasuryAddress = '0x93326D53d1E8EBf0af1Ff1B233c46C67c96e4d8D';
 // const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey });
 
 // const apiClient = new BuilderNFTSeasonOneClient({
