@@ -7,10 +7,7 @@ export const seasonQualifiedBuilderWhere: Prisma.UserSeasonStatsWhereInput = {
     builderStatus: 'approved',
     builderNfts: {
       some: {
-        season: currentSeason,
-        nftSoldEvents: {
-          some: {}
-        }
+        season: currentSeason
       }
     }
   }
@@ -22,10 +19,7 @@ export const weeklyQualifiedBuilderWhere: Prisma.UserWeeklyStatsWhereInput = {
     builderStatus: 'approved',
     builderNfts: {
       some: {
-        season: currentSeason,
-        nftSoldEvents: {
-          some: {}
-        }
+        season: currentSeason
       }
     }
   }

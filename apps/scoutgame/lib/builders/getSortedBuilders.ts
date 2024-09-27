@@ -26,7 +26,12 @@ export async function getSortedBuilders({
       builders = await prisma.scout
         .findMany({
           where: {
-            builderStatus: 'approved'
+            builderStatus: 'approved',
+            builderNfts: {
+              some: {
+                season
+              }
+            }
           },
           orderBy: {
             createdAt: 'desc'
@@ -84,7 +89,12 @@ export async function getSortedBuilders({
         .findMany({
           where: {
             user: {
-              builderStatus: 'approved'
+              builderStatus: 'approved',
+              builderNfts: {
+                some: {
+                  season
+                }
+              }
             },
             week
           },
@@ -143,7 +153,12 @@ export async function getSortedBuilders({
           where: {
             week: previousWeek,
             user: {
-              builderStatus: 'approved'
+              builderStatus: 'approved',
+              builderNfts: {
+                some: {
+                  season
+                }
+              }
             }
           },
           orderBy: { rank: 'asc' },
