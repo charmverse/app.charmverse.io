@@ -18,7 +18,7 @@ export default async function Profile({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const user = await getUserByPath(params.username);
-  const tab = searchParams.tab || (user?.builderStatus ? 'build' : 'scout');
+  const tab = searchParams.tab || (user?.builderStatus === 'approved' ? 'build' : 'scout');
 
   if (!user || typeof tab !== 'string') {
     return notFound();
