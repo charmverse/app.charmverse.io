@@ -8,7 +8,7 @@ import type { Scout } from '@charmverse/core/prisma-client';
 import type { EvmTransaction } from '@decent.xyz/box-common';
 import { ActionType, ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
-import { Button, Typography } from '@mui/material';
+import { Alert, Button, Typography } from '@mui/material';
 import { builderContractAddress, builderNftChain } from '@packages/scoutgame/builderNfts/constants';
 import { ContractApiClient } from '@packages/scoutgame/builderNfts/nftContractApiClient';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
@@ -50,7 +50,7 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
 
-  const { isExecuting, hasSucceeded, executeAsync } = useAction(mintNftAction, {
+  const { isExecuting, hasSucceeded, executeAsync, result } = useAction(mintNftAction, {
     onSuccess() {
       log.info('NFT minted');
     },
@@ -150,7 +150,7 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
 
   return (
     <div>
-      <h1>NFT Purchase on Base Testnet</h1>
+      <h1>NFT Purchase on {builderNftChain.name}</h1>
 
       <label htmlFor='builderId'>Amount of tokens</label>
       <input
@@ -162,13 +162,15 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
 
       <div>
         <h3>Token ID: {builderTokenId}</h3>
-        {purchaseCost && <p>Price: {formatUnits(purchaseCost, 18)} ETH</p>}
+        {purchaseCost && <p>Price: {formatUnits(purchaseCost, 6)} USDC</p>}
         {isFetchingPrice && <p>Fetching price...</p>}
         {fetchError && <p color='red'>{fetchError.shortMessage || 'Something went wrong'}</p>}
         <Button onClick={handlePurchase} disabled={!purchaseCost || isLoading || isFetchingPrice}>
           {isFetchingPrice ? 'Fetching price' : isLoading ? 'Purchasing...' : 'Purchase NFT'}
         </Button>
       </div>
+
+      {result.data && <Alert>Minted {tokensToBuy} tokens</Alert>}
 
       {error instanceof Error ? <Typography color='error'>Error: {(error as Error).message}</Typography> : null}
     </div>

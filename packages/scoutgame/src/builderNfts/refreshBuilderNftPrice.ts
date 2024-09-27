@@ -1,18 +1,19 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { currentSeason } from '@packages/scoutgame/utils';
 
-import { builderApiClient } from './builderApiClient';
+import { getContractClient } from './contractClient';
 
-export async function refreshBuilderNftPrice({ builderId }: { builderId: string }) {
+export async function refreshBuilderNftPrice({ builderId, season }: { builderId: string; season: string }) {
   if (!stringUtils.isUUID(builderId)) {
     throw new InvalidInputError('Invalid builderId. Must be a uuid');
   }
 
-  const tokenId = await builderApiClient.getTokenIdForBuilder({ args: { builderId } });
+  const contractClient = getContractClient();
 
-  const currentPrice = await builderApiClient.getTokenPurchasePrice({
+  const tokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
+
+  const currentPrice = await contractClient.getTokenPurchasePrice({
     args: { tokenId, amount: BigInt(1) }
   });
 
@@ -20,7 +21,7 @@ export async function refreshBuilderNftPrice({ builderId }: { builderId: string 
     where: {
       builderId_season: {
         builderId,
-        season: currentSeason
+        season
       }
     },
     data: {

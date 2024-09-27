@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 import type { PullRequest } from '../../tasks/processPullRequests/getPullRequests';
 import { processClosedPullRequest } from '../../tasks/processPullRequests/processClosedPullRequest';
 import { processMergedPullRequest } from '../../tasks/processPullRequests/processMergedPullRequest';
-
+import { currentSeason } from '@packages/scoutgame/dates';
 import { generatePullRequest } from './generatePullRequest';
 import { randomTimeOfDay } from './generator';
 
@@ -16,11 +16,13 @@ async function processPullRequest(pullRequest: PullRequest, githubRepo: GithubRe
       pullRequest,
       repo: githubRepo,
       prClosedBy: v4(),
-      skipSendingComment: true,
+      season: currentSeason,
+      skipSendingComment: true
     });
   } else if (pullRequest.state === 'MERGED') {
     await processMergedPullRequest({
       pullRequest,
+      season: currentSeason,
       repo: githubRepo,
       isFirstMergedPullRequest: false,
       now: date.toJSDate()

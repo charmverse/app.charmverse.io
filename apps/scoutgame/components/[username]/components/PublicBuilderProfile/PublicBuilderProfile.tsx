@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
@@ -10,7 +10,7 @@ import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
 
 export async function PublicBuilderProfile({ tab, user }: { tab: string; user: BasicUserInfo }) {
   const builderId = user.id;
-  const isBuilder = user.builder;
+  const isBuilder = user.builderStatus === 'approved';
 
   const [
     builderNft,
@@ -19,7 +19,7 @@ export async function PublicBuilderProfile({ tab, user }: { tab: string; user: B
     { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}
   ] = isBuilder
     ? await Promise.all([
-        prisma.builderNft.findUniqueOrThrow({
+        prisma.builderNft.findUnique({
           where: {
             builderId_season: {
               builderId: user.id,

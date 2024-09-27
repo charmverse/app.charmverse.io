@@ -146,14 +146,14 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
             .split(':User')
             .pop();
 
-          if (Number.isNaN(parseInt(parsedAuthorId as string))) {
+          if (!Number.isNaN(parseInt(parsedAuthorId as string))) {
             node.author.id = parseInt(parsedAuthorId as string);
             return true;
           } else {
             return false;
           }
         } catch (e) {
-          log.error(`Could not parse author id for user ${node.author.login} with id ${node.author.id}`);
+          log.error(`Could not parse author id for user ${node.author.login} with id ${node.author.id}`, { error: e });
           return false;
         }
       })

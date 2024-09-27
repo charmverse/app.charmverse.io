@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 import type { BuilderInfo } from './interfaces';
 import { weeklyQualifiedBuilderWhere } from './queries';
@@ -16,8 +16,8 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       user: {
         select: {
           id: true,
-          bannedAt: true,
           avatar: true,
+          builderStatus: true,
           username: true,
           displayName: true,
           userSeasonStats: {
@@ -65,8 +65,7 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       gems: builder.gemsCollected,
       avatar: user.avatar,
       scoutedBy: user.nftPurchaseEvents.length,
-      isBanned: !!user.bannedAt,
-      builder: true
+      builderStatus: user.builderStatus
     };
   });
 }

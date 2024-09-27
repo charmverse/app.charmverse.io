@@ -14,5 +14,10 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
+    "paths": {
+      "@root/lib/*": [
+        "./lib/*"
+      ]
+    }
   },
 }

@@ -24,7 +24,7 @@ export default async function Profile({
   };
 }) {
   const user = await getUserFromSession();
-  const tab = searchParams.tab || (user?.builder ? 'build' : 'scout');
+  const tab = searchParams.tab || (user?.builderStatus ? 'build' : 'scout');
   if (!user) {
     return null;
   }

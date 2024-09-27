@@ -133,27 +133,50 @@ async function exportReviewers() {
     }
   });
 
+  console.log('Found', proposals.length, 'proposals');
+
   // get count of reviews by user
-  const countMap = proposals.reduce<Record<string, { proposals: number; reviewed: number }>>((acc, proposal) => {
-    proposal.evaluations
-      .filter((evaluation) => evaluation.title === 'Rule Violation Check')
-      .forEach((evaluation) => {
-        evaluation.reviewers.forEach((reviewer) => {
-          if (reviewer.userId) {
-            acc[reviewer.userId] = acc[reviewer.userId] || { proposals: 0, reviewed: 0 };
-            acc[reviewer.userId].proposals++;
-            if (evaluation.reviews.some((review) => review.reviewerId === reviewer.userId)) {
-              acc[reviewer.userId].reviewed++;
-            }
+  const countMap = proposals.reduce<
+    Record<string, { proposals: Record<string, boolean>; reviewed: Record<string, boolean> }>
+  >((acc, proposal) => {
+    proposal.evaluations.forEach((evaluation) => {
+      evaluation.reviewers.forEach((reviewer) => {
+        if (reviewer.userId) {
+          if (reviewer.userId === '25135b4b-0b9b-4e4c-aa00-9ba88b82f925') {
+            console.log(' reviewer', proposal.id);
           }
-        });
+          acc[reviewer.userId] = acc[reviewer.userId] || { proposals: {}, reviewed: {} };
+          acc[reviewer.userId].proposals[proposal.id] = true;
+          if (evaluation.reviews.some((review) => review.reviewerId === reviewer.userId)) {
+            acc[reviewer.userId].reviewed[proposal.id] = true;
+          }
+        }
       });
+      evaluation.appealReviewers.forEach((reviewer) => {
+        if (reviewer.userId) {
+          if (reviewer.userId === '25135b4b-0b9b-4e4c-aa00-9ba88b82f925') {
+            console.log('appeal reviewer', proposal.id);
+          }
+          acc[reviewer.userId] = acc[reviewer.userId] || { proposals: {}, reviewed: {} };
+          acc[reviewer.userId].proposals[proposal.id] = true;
+          if (evaluation.appealReviews.some((review) => review.reviewerId === reviewer.userId)) {
+            acc[reviewer.userId].reviewed[proposal.id] = true;
+          }
+        }
+      });
+    });
     return acc;
   }, {});
 
   const userIds = Object.keys(countMap);
   const users = await prisma.user.findMany({
     where: {
+      deletedAt: null,
+      spaceRoles: {
+        some: {
+          spaceId
+        }
+      },
       id: {
         in: userIds
       }
@@ -163,26 +186,34 @@ async function exportReviewers() {
     }
   });
 
+  console.log('Found', users.length, 'users out of ', userIds.length);
+
+  const shanwellsUser = users.find((user) => user.username === 'shanwells.ca@gmail.com');
+  if (shanwellsUser) {
+    console.log('User ID for shanwells.ca@gmail.com:', shanwellsUser);
+  } else {
+    console.log('User with email shanwells.ca@gmail.com not found');
+  }
   const csvData = Object.entries(countMap)
     .map(([key, value]) => {
       const user = users.find((user) => user.id === key);
       return {
-        Reviewer: user?.verifiedEmails[0]?.email || user?.username || 'N/A',
-        Reviews: value.reviewed,
-        'Assigned proposals': value.proposals
+        Reviewer: user?.username || user?.verifiedEmails[0]?.email || 'N/A',
+        Reviewed: Object.keys(value.reviewed).length,
+        Assigned: Object.keys(value.proposals).length
       };
     })
-    .sort((a, b) => b.Reviews - a.Reviews);
+    .sort((a, b) => b.Reviewed - a.Reviewed);
 
   const csvString = stringify(csvData, {
     delimiter: '\t',
     header: true,
-    columns: ['Reviewer', 'Reviews', 'Assigned proposals']
+    columns: ['Reviewer', 'Reviewed', 'Assigned']
   });
   writeFileSync(reviewersFile, csvString);
   console.log('Exported to', reviewersFile);
 }
 
-exportFullReviewSummary().catch(console.error);
+//exportFullReviewSummary().catch(console.error);
 
-// exportReviewers().catch(console.error);
+exportReviewers().catch(console.error);

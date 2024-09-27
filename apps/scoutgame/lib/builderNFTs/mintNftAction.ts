@@ -1,15 +1,15 @@
 'use server';
 
-import { prisma } from '@charmverse/core/prisma-client';
+import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
 import {
   builderContractAddress,
   builderNftChain,
-  builderSmartContractOwnerKey,
-  currentSeason
+  builderSmartContractOwnerKey
 } from '@packages/scoutgame/builderNfts/constants';
 import { ContractApiClient } from '@packages/scoutgame/builderNfts/nftContractApiClient';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
-import { getCurrentWeek } from '@packages/scoutgame/utils';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
 import { getWalletClient } from '@root/lib/blockchain/walletClient';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
@@ -73,7 +73,7 @@ export const mintNftAction = authActionClient
 
     // TODO - Add the points TX && refresh the points stats for the builder
 
-    await prisma.nFTPurchaseEvent.create({
+    const nftEvent = await prisma.nFTPurchaseEvent.create({
       data: {
         // Assuming constant conversion rate of 4:1, and 6 decimals on USDC
         pointsValue: Number(nextPrice) / 10e6 / 4,
@@ -96,7 +96,33 @@ export const mintNftAction = authActionClient
       }
     });
 
-    await refreshBuilderNftPrice({ builderId: parsedInput.builderId });
+    await refreshBuilderNftPrice({ builderId: parsedInput.builderId, season: currentSeason });
+
+    await recordGameActivity({
+      sourceEvent: {
+        nftPurchaseEventId: nftEvent.id,
+        onchainTxHash: txResult.transactionHash,
+        onchainChainId: builderNftChain.id
+      },
+      activity: {
+        pointsDirection: PointsDirection.in,
+        userId,
+        amount: parsedInput.amount
+      }
+    });
+
+    await recordGameActivity({
+      sourceEvent: {
+        nftPurchaseEventId: nftEvent.id,
+        onchainTxHash: txResult.transactionHash,
+        onchainChainId: builderNftChain.id
+      },
+      activity: {
+        pointsDirection: PointsDirection.out,
+        userId: builderNft.builderId,
+        amount: parsedInput.amount
+      }
+    });
 
     return { success: true };
   });

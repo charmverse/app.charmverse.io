@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { currentSeason } from './utils';
+import { currentSeason } from './dates';
 
 export async function claimPoints(userId: string) {
   const pointsReceipts = await prisma.pointsReceipt.findMany({

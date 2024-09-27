@@ -20,7 +20,8 @@ describe('getBuildersLeaderboard', () => {
           data: {
             userId: builder.id,
             week: testWeek,
-            gemsCollected: 10 - index
+            gemsCollected: 10 - index,
+            season: 'blah'
           }
         });
 
@@ -29,7 +30,7 @@ describe('getBuildersLeaderboard', () => {
           data: {
             type: 'merged_pull_request',
             builderId: builder.id,
-            season: 1,
+            season: 'blah',
             week: testWeek,
             createdAt: new Date(2023, 4, 15 + index)
           }
@@ -44,6 +45,7 @@ describe('getBuildersLeaderboard', () => {
           data: {
             userId: builder.id,
             week: previousWeek,
+            season: 'blah',
             gemsCollected: 10
           }
         });
@@ -52,7 +54,7 @@ describe('getBuildersLeaderboard', () => {
           data: {
             type: 'merged_pull_request',
             builderId: builder.id,
-            season: 1,
+            season: 'blah',
             week: previousWeek,
             createdAt: new Date(2023, 3, 15 + index)
           }
@@ -107,6 +109,7 @@ describe('getBuildersLeaderboard', () => {
           data: {
             userId: builder.id,
             week: testWeek,
+            season: 'blah',
             gemsCollected: 0
           }
         });
@@ -131,5 +134,34 @@ describe('getBuildersLeaderboard', () => {
     topBuilders.forEach((item, index) => {
       expect(item.rank).toBe(index + 1);
     });
+  });
+
+  it('should only include builders with approved status', async () => {
+    const testWeek = v4();
+    const builders = await Promise.all([
+      mockBuilder({ username: `charlie-${v4()}`, builderStatus: 'approved' }),
+      mockBuilder({ username: `alice-${v4()}`, builderStatus: 'applied' }),
+      mockBuilder({ username: `bob-${v4()}`, builderStatus: 'rejected' }),
+      mockBuilder({ username: `david-${v4()}`, builderStatus: 'approved' }),
+      mockBuilder({ username: `eve-${v4()}`, builderStatus: 'approved' })
+    ]);
+
+    // Create weekly stats with 0 gems collected for all builders
+    await Promise.all(
+      builders.map(async (builder) => {
+        await prisma.userWeeklyStats.create({
+          data: {
+            userId: builder.id,
+            week: testWeek,
+            season: 'blah',
+            gemsCollected: 0
+          }
+        });
+      })
+    );
+
+    const topBuilders = await getBuildersLeaderboard({ quantity: 5, week: testWeek });
+
+    expect(topBuilders).toHaveLength(3);
   });
 });

@@ -1,3 +1,5 @@
+import type { BuilderStatus } from '@charmverse/core/prisma';
+
 export type MinimalUserInfo = {
   id: string;
   username: string;
@@ -8,5 +10,5 @@ export type MinimalUserInfo = {
 export type BasicUserInfo = MinimalUserInfo & {
   bio?: string | null;
   githubLogin?: string;
-  builder: boolean;
+  builderStatus: BuilderStatus | null;
 };

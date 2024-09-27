@@ -63,10 +63,17 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
         select: {
           id: true,
           index: true,
+          appealedAt: true,
           result: true,
           type: true,
           title: true,
           reviews: {
+            select: {
+              reviewerId: true,
+              completedAt: true
+            }
+          },
+          appealReviews: {
             select: {
               reviewerId: true,
               completedAt: true
@@ -86,6 +93,12 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
                   updatedAt: true
                 }
               }
+            }
+          },
+          appealReviewers: {
+            select: {
+              userId: true,
+              roleId: true
             }
           },
           reviewers: {
@@ -125,20 +138,47 @@ export async function getProposalsReviewers({ spaceId }: { spaceId: string }): P
             reviewer.systemRole === 'space_member' ||
             (reviewer.systemRole === 'author' && isAuthor)
         );
+        const isAppealReviewer = currentEvaluation?.appealReviewers.some(
+          (reviewer) => reviewer.userId === spaceRole.userId || (reviewer.roleId && userRoles.includes(reviewer.roleId))
+        );
+
+        let proposalAdded = false; // in case they are a reviewer and the proposal is not appealed
 
         if (isReviewer && !currentEvaluation.result) {
           totalReviews += 1;
           const currentReview =
-            currentEvaluation.reviews.find((review) => review.reviewerId === spaceRole.userId) ||
-            currentEvaluation.rubricAnswers.find((answer) => answer.userId === spaceRole.userId);
-          const currentVote = currentEvaluation.vote?.userVotes.find((vote) => vote.userId === spaceRole.userId);
+            currentEvaluation.reviews.some((review) => review.reviewerId === spaceRole.userId) ||
+            currentEvaluation.rubricAnswers.some((answer) => answer.userId === spaceRole.userId);
+          const currentVote = currentEvaluation.vote?.userVotes.some((vote) => vote.userId === spaceRole.userId);
           const hasReviewed = currentReview || currentVote;
 
           if (hasReviewed) {
             reviewsCompleted += 1;
+          } else {
+            proposalAdded = true;
+            reviewerProposals.push({
+              id: proposal.id,
+              title: proposal.page.title,
+              updatedAt: proposal.page.updatedAt,
+              currentEvaluation: {
+                id: currentEvaluation.id,
+                type: currentEvaluation.type,
+                title: currentEvaluation.title,
+                result: currentEvaluation.result || null
+              },
+              path: proposal.page.path
+            });
           }
-
-          if (!hasReviewed) {
+        }
+        if (isAppealReviewer && !currentEvaluation.result && currentEvaluation.appealedAt && !proposalAdded) {
+          totalReviews += 1;
+          const currentAppealReview = currentEvaluation.appealReviews.some(
+            (review) => review.reviewerId === spaceRole.userId
+          );
+          const hasReviewed = currentAppealReview;
+          if (hasReviewed) {
+            reviewsCompleted += 1;
+          } else {
             reviewerProposals.push({
               id: proposal.id,
               title: proposal.page.title,

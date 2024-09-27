@@ -1,32 +1,25 @@
-import { pricingGetter } from '@root/lib/crypto-price/getters';
+import 'server-only';
 
-import { Carousel } from 'components/common/Carousel/Carousel';
+import dynamic from 'next/dynamic';
+
 import { getTodaysHotBuilders } from 'lib/builders/getTodaysHotBuilders';
+import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 import { BuilderCard } from '../../common/Card/BuilderCard/BuilderCard';
 
-export async function TodaysHotBuildersCarousel({ user }: { user?: { username: string } | null }) {
+const Carousel = dynamic(() => import('components/common/Carousel/Carousel').then((mod) => mod.Carousel), {
+  ssr: false
+});
+
+export async function TodaysHotBuildersCarousel() {
   const builders = await getTodaysHotBuilders({ limit: 10 });
 
-  const price = await pricingGetter.getQuote('ETH', 'USD').catch(() => ({
-    base: 'ETH',
-    quote: 'USD',
-    amount: 2544.5,
-    receivedOn: 1726868673193
-  }));
+  const user = await getUserFromSession();
 
   return (
     <Carousel>
       {builders.map((builder) => (
-        <BuilderCard
-          key={builder.id}
-          builder={{
-            ...builder,
-            price: Math.round((Number(builder.price) / 18) * price!.amount)
-          }}
-          showPurchaseButton
-          user={user}
-        />
+        <BuilderCard key={builder.id} builder={builder} showPurchaseButton user={user} />
       ))}
     </Carousel>
   );

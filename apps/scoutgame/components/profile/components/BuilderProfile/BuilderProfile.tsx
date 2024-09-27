@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
-import { Stack, Typography } from '@mui/material';
+import { Alert, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -19,7 +19,7 @@ import { BuilderWeeklyStats } from './BuilderWeeklyStats';
 
 export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
   const [builderNft, builderStats, builderActivities = [], { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}] =
-    builder.builder
+    builder.builderStatus === 'approved'
       ? await Promise.all([
           prisma.builderNft.findUnique({
             where: {
@@ -47,17 +47,31 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
     );
   }
 
-  if (!builder.builder) {
+  if (builder.builderStatus === 'applied') {
     return (
       <Stack gap={2} alignItems='center'>
         <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
-        <Typography>Your builder application is under review</Typography>;
+        <Typography>Your builder application is under review</Typography>
+      </Stack>
+    );
+  }
+
+  if (builder.builderStatus === 'rejected') {
+    return (
+      <Stack gap={2} alignItems='center'>
+        <Typography>Your builder application has been rejected</Typography>
       </Stack>
     );
   }
 
   return (
     <Stack gap={3}>
+      {builder.builderStatus === 'banned' ? (
+        <Alert severity='error'>
+          <Typography>Your builder account has been banned</Typography>
+          <Typography>You can appeal this decision by contacting support</Typography>
+        </Alert>
+      ) : null}
       <BuilderStats
         avatar={builder.avatar}
         username={builder.username}

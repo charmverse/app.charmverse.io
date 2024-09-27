@@ -121,75 +121,62 @@ export function PublicBuilderProfileContainer({
         </Paper>
         {isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
 
-        {builder.builder ? (
-          <Stack
-            gap={2}
-            flexDirection={{
-              xs: 'column-reverse',
-              md: 'row'
-            }}
-          >
-            <PaperContainer>
-              <Stack gap={2} flex={1}>
-                {isDesktop ? (
-                  <Paper
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 6,
-                      p: 4,
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <Box width={{ md: 150 }}>
-                      <BuilderCard
-                        builder={{
-                          ...builder,
-                          price: builder.price
-                        }}
-                        hideDetails
-                        showPurchaseButton
-                        user={user}
-                      />
-                    </Box>
-                    <PublicBuilderStats
-                      seasonPoints={seasonPoints}
-                      allTimePoints={allTimePoints}
-                      totalScouts={totalScouts}
-                      totalNftsSold={totalNftsSold}
+        <Stack
+          gap={2}
+          flexDirection={{
+            xs: 'column-reverse',
+            md: 'row'
+          }}
+        >
+          <PaperContainer>
+            <Stack gap={2} flex={1}>
+              {isDesktop ? (
+                <Paper
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6,
+                    p: 4,
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Box width={{ md: 175 }}>
+                    <BuilderCard
+                      builder={{
+                        ...builder,
+                        price: builder.price
+                      }}
+                      hideDetails
+                      showPurchaseButton
+                      user={user}
                     />
-                  </Paper>
-                ) : null}
-              </Stack>
-              <Stack gap={1}>
-                <Typography color='secondary'>Scouted By</Typography>
-                {scouts.length > 0 ? <ScoutsGallery scouts={scouts} /> : <Typography>No scouts yet</Typography>}
-              </Stack>
-            </PaperContainer>
-            <PaperContainer>
-              <Stack gap={1}>
-                <Typography color='secondary'>This Week</Typography>
-                <BuilderWeeklyStats gemsCollected={gemsCollected} rank={rank} />
-              </Stack>
-              <Stack gap={1}>
-                <Typography color='secondary'>Recent Activity</Typography>
-                <BuilderActivitiesList activities={builderActivities} />
-              </Stack>
-            </PaperContainer>
-          </Stack>
-        ) : (
-          <Paper
-            sx={{
-              p: 4,
-              backgroundColor: 'background.dark'
-            }}
-          >
-            <Typography textAlign='center' width='100%' variant='h6'>
-              This user does not have a builder profile
-            </Typography>
-          </Paper>
-        )}
+                  </Box>
+                  <PublicBuilderStats
+                    seasonPoints={seasonPoints}
+                    allTimePoints={allTimePoints}
+                    totalScouts={totalScouts}
+                    totalNftsSold={totalNftsSold}
+                  />
+                </Paper>
+              ) : null}
+            </Stack>
+            <Stack gap={1}>
+              <Typography color='secondary'>Scouted By</Typography>
+              {scouts.length > 0 ? <ScoutsGallery scouts={scouts} /> : <Typography>No scouts yet</Typography>}
+            </Stack>
+          </PaperContainer>
+          <PaperContainer>
+            <Stack gap={1}>
+              <Typography color='secondary'>This Week</Typography>
+              <BuilderWeeklyStats gemsCollected={gemsCollected} rank={rank} />
+            </Stack>
+            <Stack gap={1}>
+              <Typography color='secondary'>Recent Activity</Typography>
+              <BuilderActivitiesList activities={builderActivities} />
+            </Stack>
+          </PaperContainer>
+        </Stack>
       </Stack>
     </Box>
   );

@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { BuilderNft, GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
+import type { GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 
 import { generateBuilderEvents } from './generateBuilderEvents';
@@ -8,30 +8,19 @@ import { generateNftPurchaseEvents } from './generateNftPurchaseEvents';
 import { generateScout } from './generateScout';
 import { DateTime } from 'luxon';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
-import { getFormattedWeek } from '@packages/scoutgame/utils';
+import { getWeekFromDate } from '@packages/scoutgame/dates';
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
 import { claimPoints } from '@packages/scoutgame/claimPoints';
 import { updateBuildersRank } from '../../tasks/processPullRequests/updateBuildersRank';
+import { generateBuilder } from './generateBuilder';
 
 export type BuilderInfo = {
   id: string;
-  builderNftId: string;
-  nftPrice: number;
+  builderNftId?: string;
+  nftPrice?: number;
   assignedRepos: GithubRepo[];
   githubUser: Pick<GithubUser, 'id' | 'login'>;
 };
-
-async function generateBuilder() {
-  const { scout, githubUser, builderNft } = await generateScout({ isBuilder: true });
-
-  return {
-    builder: scout,
-    githubUser: githubUser as GithubUser,
-    builderNft: builderNft as Omit<BuilderNft, 'builderId' | 'createdAt' | 'currentPrice'> & {
-      currentPrice: number;
-    }
-  };
-}
 
 function assignReposToBuilder(githubRepos: GithubRepo[]): GithubRepo[] {
   const repoCount = faker.number.int({ min: 3, max: 5 });
@@ -40,7 +29,7 @@ function assignReposToBuilder(githubRepos: GithubRepo[]): GithubRepo[] {
 
 function assignBuildersToScout(builders: BuilderInfo[]) {
   const builderCount = faker.number.int({ min: 3, max: 5 });
-  return faker.helpers.arrayElements(builders, builderCount);
+  return faker.helpers.arrayElements(builders.filter((builder) => builder.builderNftId), builderCount);
 }
 
 export async function generateSeedData() {
@@ -69,8 +58,8 @@ export async function generateSeedData() {
     const isScout = i >= totalBuilders;
     builders.push({
       id: builder.id,
-      builderNftId: builderNft.id,
-      nftPrice: builderNft.currentPrice,
+      builderNftId: builderNft?.id,
+      nftPrice: builderNft?.currentPrice,
       assignedRepos,
       githubUser
     });
@@ -85,7 +74,7 @@ export async function generateSeedData() {
   }
 
   for (let i = 0; i < totalScouts; i++) {
-    const { scout } = await generateScout();
+    const scout = await generateScout();
     // Realistically a scout will only scout a few builders, by purchasing multiple of their nfts
     const assignedBuilders = assignBuildersToScout(builders);
     scouts.push({
@@ -104,7 +93,7 @@ export async function generateSeedData() {
 
   for (let i = 0; i < days; i++) {
     const date = startDate.plus({ days: i });
-    const week = getFormattedWeek(date.toJSDate());
+    const week = getWeekFromDate(date.toJSDate());
 
     for (const builder of builders) {
       let dailyGithubEvents = await generateBuilderEvents(

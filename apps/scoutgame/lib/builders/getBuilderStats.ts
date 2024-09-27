@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/utils';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
 export type BuilderStats = {
   seasonPoints?: number;

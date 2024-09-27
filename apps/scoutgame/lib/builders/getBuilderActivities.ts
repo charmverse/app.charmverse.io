@@ -1,6 +1,6 @@
 import type { GemsReceiptType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/utils';
+import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
 import type { BasicUserInfo } from 'lib/users/interfaces';

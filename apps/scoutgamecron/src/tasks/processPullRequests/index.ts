@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek } from '@packages/scoutgame/utils';
+import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 import { DateTime } from 'luxon';
 
 import { getPullRequests } from './getPullRequests';
@@ -10,8 +10,9 @@ import { updateBuildersRank } from './updateBuildersRank';
 
 export async function processPullRequests({
   createdAfter,
-  skipClosedPrProcessing = false
-}: { createdAfter?: Date; skipClosedPrProcessing?: boolean } = {}) {
+  skipClosedPrProcessing = false,
+  season = currentSeason
+}: { createdAfter?: Date; skipClosedPrProcessing?: boolean; season?: string } = {}) {
   const repos = await prisma.githubRepo.findMany();
 
   // get Pull requests
@@ -40,10 +41,10 @@ export async function processPullRequests({
     }
     if (pullRequest.state === 'CLOSED') {
       if (!skipClosedPrProcessing) {
-        await processClosedPullRequest({ pullRequest, repo });
+        await processClosedPullRequest({ pullRequest, repo, season });
       }
     } else {
-      await processMergedPullRequest({ pullRequest, repo });
+      await processMergedPullRequest({ pullRequest, repo, season });
     }
   }
 

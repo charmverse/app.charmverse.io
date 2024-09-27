@@ -5,6 +5,11 @@ import { base, baseSepolia } from 'viem/chains';
 
 export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECENT_API_KEY as string);
 
+/**
+ * Currently priced in USDC
+ */
+export const builderTokenDecimals = 6;
+
 export const builderNftChain: Chain = baseSepolia;
 
 if (builderNftChain.id !== baseSepolia.id) {
@@ -21,8 +26,6 @@ export const builderContractAddress =
 export const usdcBaseSepoliaContractAddress = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
 
 export const usdcBaseMainnetContractAddress = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-
-export const currentSeason = 1;
 
 export const builderSmartContractOwnerKey = process.env.BUILDER_SMART_CONTRACT_OWNER_PRIVKEY as string;
 
