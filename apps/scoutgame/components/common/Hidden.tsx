@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { Box } from '@mui/material';
-import type { PropsWithChildren } from '@packages/utils/types';
+import type { PropsWithChildren } from '@packages/utils/react';
 // replace a deprecated Hidden component
 
 // props based on https://mui.com/material-ui/api/hidden/

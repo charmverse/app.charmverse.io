@@ -2,7 +2,7 @@
 
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { Box, Card, CardContent, Container, List, ListItem, Stack, Typography, Divider, styled } from '@mui/material';
-import type { PropsWithChildren } from '@packages/utils/types';
+import type { PropsWithChildren } from '@packages/utils/react';
 import Image from 'next/image';
 
 import { ScrollButton } from './components/ScrollButton';
@@ -20,7 +20,6 @@ export function InfoPage() {
           src='/images/info_banner.png'
           width={854}
           height={285}
-          sizes='100vw'
           style={{
             maxWidth: '100%',
             height: 'auto'

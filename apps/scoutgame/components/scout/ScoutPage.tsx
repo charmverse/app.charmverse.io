@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { Suspense } from 'react';
 
-import { LoadingGallery } from 'components/layout/Loading/LoadingGallery';
+import { LoadingGallery } from 'components/common/Loading/LoadingGallery';
 
 import { PageContainer } from '../layout/PageContainer';
 

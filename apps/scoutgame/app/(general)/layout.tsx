@@ -3,8 +3,7 @@ import dynamic from 'next/dynamic';
 import type { ReactNode } from 'react';
 
 import { Header } from 'components/common/Header/Header';
-import { Hidden } from 'components/common/Hidden';
-import { SiteNavigation } from 'components/common/SiteNavigation';
+import { StickyFooter } from 'components/layout/StickyFooter';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export default async function Layout({
@@ -20,11 +19,7 @@ export default async function Layout({
       <Box component='main' minHeight='100%'>
         {children}
       </Box>
-      <Hidden mdUp>
-        <footer>
-          <SiteNavigation />
-        </footer>
-      </Hidden>
+      <StickyFooter />
     </Box>
   );
 }

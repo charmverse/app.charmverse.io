@@ -8,6 +8,7 @@
   },
   "exports": {
     "./browser": "./src/browser.ts",
+    "./react": "./src/react.ts",
     "./types": "./src/types.ts",
     "./dates": "./src/dates.ts"
   }
