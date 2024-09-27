@@ -28,7 +28,7 @@ export function BuilderCardNftDisplay({
             <CardMedia component='img' sx={{ aspectRatio: '1 / 1' }} image={avatar ?? ''} alt={username} />
           ) : (
             <PersonIcon
-              sx={{ fontSize: 250, position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: -20 }}
+              sx={{ px: 2, fontSize: 250, position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: -20 }}
             />
           )}
           <CardMedia
