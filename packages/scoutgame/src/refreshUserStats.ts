@@ -35,28 +35,6 @@ export async function refreshUserStats({
     }
   });
 
-  const allTimePointsAsScount = await prisma.pointsReceipt.count({
-    where: {
-      recipientId: userId,
-      event: {
-        OR: [
-          {
-            githubEvent: {
-              githubUser: {
-                builderId: {
-                  not: userId
-                }
-              }
-            }
-          }
-        ]
-      }
-    },
-    select: {
-      id: true
-    }
-  });
-
   const allTimeBuilderNftPoints = await prisma.pointsReceipt.findMany({
     where: {
       recipientId: userId,

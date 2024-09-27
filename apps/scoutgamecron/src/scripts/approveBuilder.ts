@@ -78,6 +78,15 @@ export async function approveBuilder({
     }
   }
 
+  await prisma.scout.update({
+    where: {
+      id: builderId
+    },
+    data: {
+      builderStatus: 'approved'
+    }
+  });
+
   await registerBuilderNFT({ builderId, season });
 
   await refreshUserStats({ userId: builderId });

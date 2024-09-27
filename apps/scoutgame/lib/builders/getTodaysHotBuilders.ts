@@ -65,7 +65,6 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       gems: builder.gemsCollected,
       avatar: user.avatar,
       scoutedBy: user.nftPurchaseEvents.length,
-      isBanned: user.builderStatus === 'banned',
       builderStatus: user.builderStatus
     };
   });
