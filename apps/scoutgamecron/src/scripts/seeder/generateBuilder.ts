@@ -41,7 +41,7 @@ export async function generateBuilder() {
     currentPrice: faker.number.int({ min: 1, max: 100 }),
     season: currentSeason,
     tokenId: currentBuilderCount,
-    imageUrl: faker.datatype.boolean() ? avatar : faker.image.avatar()
+    imageUrl: faker.datatype.boolean() ? avatar : faker.image.url()
   };
 
   const builderStatusRandom = faker.number.int({min: 1, max: 10});

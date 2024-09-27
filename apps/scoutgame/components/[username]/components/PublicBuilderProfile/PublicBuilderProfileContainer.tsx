@@ -21,6 +21,7 @@ export type BuilderProfileProps = {
   tab: string;
   builder: BasicUserInfo & {
     price?: bigint;
+    nftImageUrl?: string;
   };
   allTimePoints?: number;
   seasonPoints?: number;

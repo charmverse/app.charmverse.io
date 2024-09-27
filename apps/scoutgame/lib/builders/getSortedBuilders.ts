@@ -72,7 +72,7 @@ export async function getSortedBuilders({
         .then((scouts) => {
           return scouts.map((scout) => ({
             id: scout.id,
-            avatar: scout.builderNfts[0]?.imageUrl,
+            nftImageUrl: scout.builderNfts[0]?.imageUrl,
             username: scout.username,
             displayName: scout.username,
             builderPoints: scout.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
@@ -133,7 +133,7 @@ export async function getSortedBuilders({
         .then((stats) =>
           stats.map((stat) => ({
             id: stat.user.id,
-            avatar: stat.user.builderNfts[0]?.imageUrl,
+            nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             username: stat.user.username,
             displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
@@ -194,7 +194,7 @@ export async function getSortedBuilders({
         .then((stats) =>
           stats.map((stat) => ({
             id: stat.user.id,
-            avatar: stat.user.builderNfts[0]?.imageUrl,
+            nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             username: stat.user.username,
             displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,

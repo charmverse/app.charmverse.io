@@ -44,7 +44,7 @@ export async function PublicBuilderProfile({ tab, user }: { tab: string; user: B
       scouts={scouts}
       builder={{
         ...user,
-        avatar: builderNft?.imageUrl,
+        nftImageUrl: builderNft?.imageUrl,
         price: builderNft?.currentPrice
       }}
       allTimePoints={allTimePoints}

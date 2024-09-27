@@ -40,7 +40,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
             <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
               ALL TIME
             </TableCell>
-            <TableCell align='center' sx={{ whiteSpace: 'nowrap', display: { xs: 'none', md: 'table-cell' } }}>
+            <TableCell align='center' sx={{ whiteSpace: 'nowrap', display: 'table-cell' }}>
               SCOUTED BY
             </TableCell>
             <TableCell align='center'>PRICE</TableCell>
@@ -66,7 +66,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
                   </Typography>
                 </Stack>
               </TableCell>
-              <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+              <TableCell align='right' sx={{ display: 'table-cell' }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <Typography variant='caption' color='green.main' noWrap>
                     {builder.seasonPoints || 0}

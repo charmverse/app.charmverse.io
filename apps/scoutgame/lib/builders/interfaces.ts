@@ -18,4 +18,7 @@ export type BuilderMetrics = {
   isBanned?: boolean;
 };
 
-export type BuilderInfo = BasicUserInfo & BuilderMetrics;
+export type BuilderInfo = BasicUserInfo &
+  BuilderMetrics & {
+    nftImageUrl?: string | null;
+  };

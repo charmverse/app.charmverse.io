@@ -39,7 +39,7 @@ export function BuilderCard({
   return (
     <>
       <Card sx={{ border: 'none', opacity: builder.isBanned ? 0.25 : 1 }}>
-        <BuilderCardNftDisplay avatar={builder.avatar} username={builder.username} showHotIcon={showHotIcon}>
+        <BuilderCardNftDisplay nftImageUrl={builder.nftImageUrl} username={builder.username} showHotIcon={showHotIcon}>
           {builder.isBanned ? (
             <Typography textAlign='center'>BANNED</Typography>
           ) : hideDetails ? null : (

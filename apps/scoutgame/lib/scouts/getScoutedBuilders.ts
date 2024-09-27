@@ -72,7 +72,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
   return builders.map((builder) => {
     return {
       id: builder.id,
-      avatar: builder.builderNfts[0]?.imageUrl,
+      nftImageUrl: builder.builderNfts[0]?.imageUrl,
       username: builder.username,
       displayName: builder.displayName,
       builderStatus: builder.builderStatus,

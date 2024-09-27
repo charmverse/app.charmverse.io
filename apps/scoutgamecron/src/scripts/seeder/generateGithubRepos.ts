@@ -33,16 +33,18 @@ export async function generateGithubRepos(totalGithubRepos: number): Promise<[Gi
     const partnerRepos = bonusPartnersRecord[partner].repos;
     for (const repo of partnerRepos) {
       const [owner, name] = repo.split('/');
-      const githubRepo = await prisma.githubRepo.create({
-        data: {
-          id: githubRepos.length + 1,
-          owner,
-          name,
-          defaultBranch: 'main'
-        }
-      });
-      githubRepos.push(githubRepo);
-      repoPRCounters.set(githubRepo.id, 0);
+      if (name) {
+        const githubRepo = await prisma.githubRepo.create({
+          data: {
+            id: githubRepos.length + 1,
+            owner,
+            name,
+            defaultBranch: 'main'
+          }
+        });
+        githubRepos.push(githubRepo);
+        repoPRCounters.set(githubRepo.id, 0);
+      }
     }
   }
 
