@@ -37,6 +37,10 @@ export async function mockBuilder({
       githubUser: true
     }
   });
+
+  if (builderStatus === 'approved') {
+    await mockBuilderNft({ builderId: result.id });
+  }
   const { githubUser, ...scout } = result;
   return { ...scout, githubUser: githubUser[0]! };
 }
