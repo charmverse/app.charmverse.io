@@ -1,6 +1,7 @@
 import { test as base } from '@playwright/test';
 
 import { HomePage } from './po/HomePage.po';
+import { InfoPage } from './po/InfoPage.po';
 import { LoginPage } from './po/LoginPage.po';
 import { ProfilePage } from './po/ProfilePage.po';
 import { Utilities } from './po/Utilities.po';
@@ -12,6 +13,7 @@ type Fixtures = {
   profilePage: ProfilePage;
   welcomePage: WelcomePage;
   utils: Utilities;
+  infoPage: InfoPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -40,7 +42,8 @@ export const test = base.extend<Fixtures>({
   loginPage: ({ page }, use) => use(new LoginPage(page)),
   profilePage: ({ page }, use) => use(new ProfilePage(page)),
   welcomePage: ({ page }, use) => use(new WelcomePage(page)),
-  utils: ({ page }, use) => use(new Utilities(page))
+  utils: ({ page }, use) => use(new Utilities(page)),
+  infoPage: ({ page }, use) => use(new InfoPage(page))
 });
 
 export { chromium, expect } from '@playwright/test';
