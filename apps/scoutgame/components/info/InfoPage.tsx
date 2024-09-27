@@ -1,48 +1,28 @@
-'use client';
-
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import { Box, Card, CardContent, Container, List, ListItem, Stack, Typography, Divider, styled } from '@mui/material';
-import type { PropsWithChildren } from '@packages/utils/react';
+import { Box, Link, List, ListItem, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import { ScrollButton } from './components/ScrollButton';
-
-const Blockquote = styled('div')`
-  background-color: var(--mui-palette-background-light);
-  padding: calc(2 * var(--mui-spacing));
-`;
+import { Blockquote } from 'components/layout/DocumentPageContainer/components/Blockquote';
+import { InfoCard } from 'components/layout/DocumentPageContainer/components/InfoCard';
+import { DocumentPageContainer } from 'components/layout/DocumentPageContainer/DocumentPageContainer';
 
 export function InfoPage() {
   return (
-    <Container data-test='info-page' maxWidth='md'>
-      <Stack my={10} gap={10} mx='auto' width='854px' maxWidth='100%'>
-        <Image
-          src='/images/info_banner.png'
-          width={854}
-          height={285}
-          style={{
-            maxWidth: '100%',
-            height: 'auto'
-          }}
-          alt=''
-        />
-        <Typography variant='h4' align='center' color='secondary'>
-          All about Scout Game!
-        </Typography>
-        <LearnMore />
-        <ScrollButton scrollType='up' sx={{ textAlign: 'center', width: '100%' }}>
-          back to top <ArrowDropUpIcon fontSize='small' />
-        </ScrollButton>
-      </Stack>
-    </Container>
-  );
-}
-
-function InfoCard({ children }: PropsWithChildren) {
-  return (
-    <Card variant='outlined' color='secondary' sx={{ width: '100%', mx: 'auto' }}>
-      <CardContent>{children}</CardContent>
-    </Card>
+    <DocumentPageContainer>
+      <Image
+        src='/images/info_banner.png'
+        width={854}
+        height={285}
+        style={{
+          maxWidth: '100%',
+          height: 'auto'
+        }}
+        alt=''
+      />
+      <Typography variant='h4' align='center' color='secondary'>
+        All about Scout Game!
+      </Typography>
+      <LearnMore />
+    </DocumentPageContainer>
   );
 }
 
@@ -185,13 +165,9 @@ function LearnMore() {
             <ListItem sx={{ display: 'list-item' }}>
               <Typography>First Pull Request in a Qualified GitHub Repository = 10 Gems</Typography>
             </ListItem>
-            <ListItem sx={{ display: 'list-item' }}>
-              <Typography>A Builder may only score Gems for one PR per approved repo per day.</Typography>
-            </ListItem>
-            <ListItem sx={{ display: 'list-item' }}>
-              <Typography>Gem rewards do not stack. The maximum score for a single PR is 10 Gems.</Typography>
-            </ListItem>
           </List>
+          <Typography>A Builder may only score Gems for one PR per approved repo per day.</Typography>
+          <Typography>Gem rewards do not stack. The maximum score for a single PR is 10 Gems.</Typography>
           <Typography>
             At the end of each week, Builders are ranked by the number of Gems they collected that week. Scout Points
             are allocated to the top-ranking Builders and the Scouts who hold their NFTs according to this formula:
@@ -270,6 +246,15 @@ function LearnMore() {
             <ListItem sx={{ display: 'list-item' }}>
               <Typography>
                 Builders receiving 3 abuse reports will be permanently banned from the Scout Game.
+              </Typography>
+            </ListItem>
+            <ListItem sx={{ display: 'list-item' }}>
+              <Typography>
+                A suspended Builder may appeal to rejoin the Scout Game.
+                <br /> Submit an appeal here:{' '}
+                <Link href='https://appeal.scoutgame.xyz' target='_blank'>
+                  https://appeal.scoutgame.xyz
+                </Link>
               </Typography>
             </ListItem>
           </List>
