@@ -1,5 +1,7 @@
 'use client';
 
+import type { Theme } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -12,11 +14,18 @@ const desktopTabs = ['scout-build', 'win'];
 const mobileTabs = ['scout', 'build', 'win'];
 
 export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
   const isDesktop = useMdScreen();
   const router = useRouter();
 
+  // Initially both mobile and desktop is set to false, without returning early the UI flickers
+
   useEffect(() => {
-    if (isDesktop) {
+    if (!isMobile && !isDesktop) {
+      return;
+    }
+
+    if (!isMobile) {
       const isValidTab = desktopTabs.includes(tab);
       if (!isValidTab) {
         router.push('/profile?tab=scout-build');
@@ -27,9 +36,13 @@ export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
         router.push('/profile?tab=scout');
       }
     }
-  }, [tab, isDesktop]);
+  }, [tab, isMobile, isDesktop, router]);
 
-  if (isDesktop) {
+  if (!isMobile && !isDesktop) {
+    return null;
+  }
+
+  if (!isMobile) {
     return (
       <TabsMenu
         value={tab || 'scout-build'}

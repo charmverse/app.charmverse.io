@@ -7,10 +7,12 @@ import { GoHome } from 'react-icons/go';
 import { MdPersonOutline } from 'react-icons/md';
 import { PiBinoculars } from 'react-icons/pi';
 
+import { useMdScreen } from 'hooks/useMediaScreens';
+
 export function SiteNavigation({ transparent }: { transparent?: boolean }) {
   const pathname = usePathname();
   const value = getActiveButton(pathname);
-
+  const isDesktop = useMdScreen();
   return (
     <Paper
       elevation={3}
@@ -45,7 +47,7 @@ export function SiteNavigation({ transparent }: { transparent?: boolean }) {
         />
         <BottomNavigationAction
           label='Profile'
-          href='/profile'
+          href={isDesktop ? '/profile?tab=scout-build' : '/profile?tab=scout'}
           value='profile'
           icon={<MdPersonOutline size='1.6rem' />}
         />

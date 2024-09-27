@@ -25,7 +25,7 @@ export function BuilderCardNftDisplay({
           borderImage: 'linear-gradient(152.64deg, #69DDFF 2.2%, #85A5EA 48.95%, #A06CD5 95.71%) 1'
         }}
       >
-        <Box position='relative' minHeight={200}>
+        <Box position='relative' minHeight={avatar ? undefined : 200}>
           {avatar ? (
             <CardMedia component='img' sx={{ aspectRatio: '1 / 1' }} image={avatar ?? ''} alt={username} />
           ) : (
