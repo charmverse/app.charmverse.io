@@ -161,9 +161,9 @@ export async function processMergedPullRequest({
       const gemValue = gemReceiptType === 'first_pr' ? 10 : gemReceiptType === 'third_pr_in_streak' ? 3 : 1;
 
       if (builderEventDate >= start.toJSDate()) {
-        const existingBuilderEvent = await tx.builderNft.findFirst({
+        const existingBuilderEvent = await tx.builderEvent.findFirst({
           where: {
-            id: event.id
+            githubEventId: event.id
           },
           select: {
             id: true

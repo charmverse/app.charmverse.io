@@ -6,7 +6,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { recordGameActivity } from '../recordGameActivity';
 
 import { builderContractAddress, builderNftChain } from './constants';
-import { getContractClient } from './contractClient';
+import { getBuilderContractAdminClient } from './contractClient';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
 export async function registerBuilderNFT({ builderId, season }: { builderId: string; season: string }) {
@@ -14,7 +14,7 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
     throw new InvalidInputError('Invalid builderId. Must be a uuid');
   }
 
-  const contractClient = getContractClient();
+  const contractClient = getBuilderContractAdminClient();
 
   const existingBuilderNft = await prisma.builderNft.findFirst({
     where: {
@@ -26,6 +26,7 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
   });
 
   if (existingBuilderNft) {
+    log.info(`Builder already existing with token id ${existingBuilderNft.tokenId}`);
     const updatedBuilderNft = await refreshBuilderNftPrice({ builderId, season });
     return updatedBuilderNft;
   }
@@ -57,6 +58,15 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
   }
 
   const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId, season });
+
+  await prisma.scout.update({
+    where: {
+      id: builderId
+    },
+    data: {
+      builderStatus: 'approved'
+    }
+  });
 
   await recordGameActivity({
     activity: {

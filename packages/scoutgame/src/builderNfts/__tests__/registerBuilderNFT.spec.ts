@@ -7,14 +7,14 @@ import { randomLargeInt } from '../../testing/generators';
 import { builderContractAddress, builderNftChain } from '../constants';
 
 jest.unstable_mockModule('../contractClient', () => ({
-  getContractClient: () => ({
+  getBuilderContractAdminClient: () => ({
     getTokenIdForBuilder: () => Promise.resolve(randomLargeInt()),
     registerBuilderToken: jest.fn(),
     getTokenPurchasePrice: () => Promise.resolve(randomLargeInt())
   })
 }));
 
-const { getContractClient } = await import('../contractClient');
+const { getBuilderContractAdminClient } = await import('../contractClient');
 
 const { registerBuilderNFT } = await import('../registerBuilderNFT');
 
@@ -55,7 +55,7 @@ describe('registerBuilderNFT', () => {
     const result = await registerBuilderNFT({ builderId: builder.id, season: mockSeason });
 
     expect(result.id).toEqual(existingNft.id);
-    expect(getContractClient().registerBuilderToken).not.toHaveBeenCalled();
+    expect(getBuilderContractAdminClient().registerBuilderToken).not.toHaveBeenCalled();
   });
 
   it('should throw an error if scout profile is not marked as a builder', async () => {
