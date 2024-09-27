@@ -5,10 +5,12 @@ import Link from 'next/link';
 export function BuilderCardNftDisplay({
   avatar,
   username,
-  children
+  children,
+  showHotIcon = false
 }: {
   avatar?: string | null;
   username: string;
+  showHotIcon?: boolean;
   children?: React.ReactNode;
 }) {
   return (
@@ -31,14 +33,16 @@ export function BuilderCardNftDisplay({
               sx={{ px: 2, fontSize: 250, position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: -20 }}
             />
           )}
-          <CardMedia
-            component='img'
-            width='30px'
-            height='30px'
-            image='/images/profile/icons/blue-fire-icon.svg'
-            alt='hot icon'
-            sx={{ position: 'absolute', top: 10, right: 10, width: 'initial' }}
-          />
+          {showHotIcon ? (
+            <CardMedia
+              component='img'
+              width='30px'
+              height='30px'
+              image='/images/profile/icons/blue-fire-icon.svg'
+              alt='hot icon'
+              sx={{ position: 'absolute', top: 10, right: 10, width: 'initial' }}
+            />
+          ) : null}
           <CardMedia
             component='img'
             width='40px'

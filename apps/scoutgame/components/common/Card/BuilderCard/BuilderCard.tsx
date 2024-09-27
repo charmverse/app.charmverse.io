@@ -22,7 +22,8 @@ export function BuilderCard({
   builder,
   user,
   showPurchaseButton = false,
-  hideDetails = false
+  hideDetails = false,
+  showHotIcon = false
 }: {
   user?: {
     username: string;
@@ -30,13 +31,14 @@ export function BuilderCard({
   builder: BuilderInfo;
   hideDetails?: boolean;
   showPurchaseButton?: boolean;
+  showHotIcon?: boolean;
 }) {
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
 
   return (
     <>
       <Card sx={{ border: 'none', opacity: builder.isBanned ? 0.25 : 1 }}>
-        <BuilderCardNftDisplay avatar={builder.avatar} username={builder.username}>
+        <BuilderCardNftDisplay avatar={builder.avatar} username={builder.username} showHotIcon={showHotIcon}>
           {builder.isBanned ? (
             <Typography textAlign='center'>BANNED</Typography>
           ) : hideDetails ? null : (

@@ -6,7 +6,15 @@ import { getSortedBuilders } from 'lib/builders/getSortedBuilders';
 
 export const dynamic = 'force-dynamic';
 
-export async function ScoutPageBuildersGallery({ sort, user }: { sort: string; user?: { username: string } | null }) {
+export async function ScoutPageBuildersGallery({
+  sort,
+  user,
+  showHotIcon
+}: {
+  sort: string;
+  user?: { username: string } | null;
+  showHotIcon: boolean;
+}) {
   const builders = await getSortedBuilders({
     sort: sort as BuildersSort,
     limit: 10,
@@ -14,5 +22,5 @@ export async function ScoutPageBuildersGallery({ sort, user }: { sort: string; u
     season: currentSeason
   });
 
-  return <BuildersGallery builders={builders} user={user} />;
+  return <BuildersGallery builders={builders} user={user} showHotIcon={showHotIcon} />;
 }
