@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { GemsReceiptType, GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getBonusPartner } from '@packages/scoutgame/bonus';
 import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday } from '@packages/scoutgame/dates';
 import { recordGameActivityWithCatchError } from '@packages/scoutgame/recordGameActivity';
 
@@ -181,6 +182,7 @@ export async function processMergedPullRequest({
             week,
             type: 'merged_pull_request',
             githubEventId: event.id,
+            bonusPartner: getBonusPartner(pullRequest.repository.nameWithOwner),
             gemsReceipt: {
               create: {
                 type: gemReceiptType,
@@ -197,6 +199,9 @@ export async function processMergedPullRequest({
           const gemsReceipt = await tx.gemsReceipt.findUniqueOrThrow({
             where: {
               eventId: createdEvent.id
+            },
+            select: {
+              id: true
             }
           });
           await recordGameActivityWithCatchError({

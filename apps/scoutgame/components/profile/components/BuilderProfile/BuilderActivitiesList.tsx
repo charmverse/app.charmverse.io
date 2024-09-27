@@ -1,4 +1,5 @@
 import { Paper, Stack, Typography } from '@mui/material';
+import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import { getRelativeTime } from '@packages/utils/dates';
 import Image from 'next/image';
 import { BiLike } from 'react-icons/bi';
@@ -41,19 +42,41 @@ export function BuilderActivityDetail({ activity }: { activity: BuilderActivity 
   );
 }
 
-export function BuilderActivityGems({ activity }: { activity: BuilderActivity }) {
+export function BuilderActivityGems({
+  activity,
+  showEmpty = false
+}: {
+  activity: BuilderActivity;
+  showEmpty?: boolean;
+}) {
   return (
-    <Stack flexDirection='row' gap={1} alignItems='center'>
+    <Stack flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'merged_pull_request' ? (
         <>
           <Typography>+{activity.gems}</Typography>
           <Image width={20} height={20} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
         </>
-      ) : (
+      ) : showEmpty ? (
         '-'
-      )}
+      ) : null}
     </Stack>
   );
+}
+
+export function BuilderActivityBonusPartner({
+  activity,
+  showEmpty = false
+}: {
+  activity: BuilderActivity;
+  showEmpty?: boolean;
+}) {
+  return activity.type === 'merged_pull_request' &&
+    activity.bonusPartner &&
+    bonusPartnersRecord[activity.bonusPartner] ? (
+    <Image width={20} height={20} src={bonusPartnersRecord[activity.bonusPartner].icon} alt='Bonus Partner' />
+  ) : showEmpty ? (
+    '-'
+  ) : null;
 }
 
 export function BuilderActivitiesList({ activities }: { activities: BuilderActivity[] }) {
@@ -65,7 +88,7 @@ export function BuilderActivitiesList({ activities }: { activities: BuilderActiv
             key={activity.id}
             sx={{
               px: {
-                xs: 2,
+                xs: 1,
                 md: 3
               },
               py: {
@@ -79,11 +102,13 @@ export function BuilderActivitiesList({ activities }: { activities: BuilderActiv
                 <BuilderActivityLabel activity={activity} />
                 <BuilderActivityDetail activity={activity} />
               </Stack>
-              <Stack justifyContent='flex-start'>
+              <Stack justifyContent='flex-start' alignItems='flex-end' gap={1}>
                 <BuilderActivityGems activity={activity} />
-                {/** TODO: Add bonus rewards */}
+                <BuilderActivityBonusPartner activity={activity} />
               </Stack>
-              <Typography>{getRelativeTime(activity.createdAt)}</Typography>
+              <Typography width={75} textAlign='right'>
+                {getRelativeTime(activity.createdAt)}
+              </Typography>
             </Stack>
           </Paper>
         );

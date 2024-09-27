@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getDateFromISOWeek, getSeasonWeekFromISOWeek } from '@packages/scoutgame/dates';
+import { currentSeason, getSeasonWeekFromISOWeek } from '@packages/scoutgame/dates';
 
 export type WeeklyReward = {
   week: string;
@@ -12,6 +12,7 @@ export type WeeklyReward = {
     streakCount: number;
     firstContributionsCount: number;
     regularContributionsCount: number;
+    bonusPartners: string[];
   };
   soldNftReward: {
     points: number;
@@ -22,7 +23,7 @@ export type WeeklyReward = {
 
 export async function getClaimablePoints(
   userId: string
-): Promise<{ totalClaimablePoints: number; weeklyRewards: WeeklyReward[] }> {
+): Promise<{ totalClaimablePoints: number; weeklyRewards: WeeklyReward[]; bonusPartners: string[] }> {
   const pointsReceipts = await prisma.pointsReceipt.findMany({
     where: {
       recipientId: userId,
@@ -57,15 +58,7 @@ export async function getClaimablePoints(
 
   const builderRewards: Record<string, { points: number }> = {};
   const soldNftRewards: Record<string, { points: number; quantity: number }> = {};
-  const githubContributionRewards: Record<
-    string,
-    {
-      points: number;
-      streakCount: number;
-      firstContributionsCount: number;
-      regularContributionsCount: number;
-    }
-  > = {};
+  const githubContributionRewards: Record<string, WeeklyReward['githubContributionReward']> = {};
 
   const allWeeks = pointsReceipts.reduce<Record<string, string>>((acc, receipt) => {
     acc[receipt.event.week] = receipt.event.season;
@@ -85,7 +78,8 @@ export async function getClaimablePoints(
       type: true,
       event: {
         select: {
-          week: true
+          week: true,
+          bonusPartner: true
         }
       }
     }
@@ -111,15 +105,16 @@ export async function getClaimablePoints(
 
   const weeklyGithubContributionRecord: Record<
     string,
-    { firstContributionsCount: number; regularContributionsCount: number; streakCount: number }
+    { firstContributionsCount: number; regularContributionsCount: number; streakCount: number; bonusPartners: string[] }
   > = {};
 
-  gemsReceipts.forEach(({ type, event: { week } }) => {
+  gemsReceipts.forEach(({ type, event: { week, bonusPartner } }) => {
     if (!weeklyGithubContributionRecord[week]) {
       weeklyGithubContributionRecord[week] = {
         firstContributionsCount: 0,
         regularContributionsCount: 0,
-        streakCount: 0
+        streakCount: 0,
+        bonusPartners: []
       };
     }
 
@@ -130,7 +125,12 @@ export async function getClaimablePoints(
     } else if (type === 'third_pr_in_streak') {
       weeklyGithubContributionRecord[week].streakCount += 1;
     }
+    if (bonusPartner) {
+      weeklyGithubContributionRecord[week].bonusPartners.push(bonusPartner);
+    }
   });
+
+  const bonusPartners: Set<string> = new Set();
 
   for (const receipt of pointsReceipts) {
     const points = receipt.value;
@@ -162,7 +162,8 @@ export async function getClaimablePoints(
             points: 0,
             firstContributionsCount: 0,
             regularContributionsCount: 0,
-            streakCount: 0
+            streakCount: 0,
+            bonusPartners: []
           };
         }
         const githubContributionReward = githubContributionRewards[week];
@@ -170,6 +171,8 @@ export async function getClaimablePoints(
         githubContributionReward.firstContributionsCount += githubContribution?.firstContributionsCount ?? 0;
         githubContributionReward.regularContributionsCount += githubContribution?.regularContributionsCount ?? 0;
         githubContributionReward.streakCount += githubContribution?.streakCount ?? 0;
+        githubContributionReward.bonusPartners = githubContribution?.bonusPartners ?? [];
+        githubContributionReward.bonusPartners.forEach((partner) => bonusPartners.add(partner));
       }
     }
   }
@@ -186,8 +189,10 @@ export async function getClaimablePoints(
         builderReward: builderRewards[week],
         githubContributionReward: githubContributionRewards[week],
         soldNftReward: soldNftRewards[week],
-        rank: weeklyRankRecord[week]
+        rank: weeklyRankRecord[week],
+        bonusPartners: githubContributionRewards[week]?.bonusPartners ?? []
       }))
-      .sort((a, b) => b.weekNumber - a.weekNumber)
+      .sort((a, b) => b.weekNumber - a.weekNumber),
+    bonusPartners: Array.from(bonusPartners)
   };
 }
