@@ -9,7 +9,7 @@ import { ScrollButton } from './components/ScrollButton';
 export function DocumentPageContainer({ children }: PropsWithChildren) {
   return (
     <Container data-test='info-page' maxWidth='md'>
-      <Stack py={10} gap={10} mx='auto' width='854px' maxWidth='100%'>
+      <Stack py={8} gap={8} mx='auto' width='854px' maxWidth='100%'>
         {children}
         <ScrollButton scrollType='up' sx={{ textAlign: 'center', width: '100%' }}>
           back to top <ArrowDropUpIcon fontSize='small' />

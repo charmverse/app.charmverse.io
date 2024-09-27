@@ -44,7 +44,7 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
           default: backgroundColorDarkMode,
           paper: backgroundLightColorDarkMode,
           dark: darken(backgroundColorDarkMode, 0.05),
-          light: lighten(backgroundColorDarkMode, 0.5)
+          light: lighten(backgroundColorDarkMode, 0.05)
         },
         text: {
           disabled: disabledTextColorDarkMode,
@@ -81,7 +81,7 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
           default: backgroundColorDarkMode,
           paper: backgroundLightColorDarkMode,
           dark: darken(backgroundLightColorDarkMode, 0.25),
-          light: lighten(backgroundColorDarkMode, 0.25)
+          light: lighten(backgroundColorDarkMode, 0.125) // this # is based on the background needed for Info pages
         },
         text: {
           primary: primaryTextColorDarkMode,
