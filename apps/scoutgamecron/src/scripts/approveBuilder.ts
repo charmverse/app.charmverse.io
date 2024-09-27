@@ -2,10 +2,18 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
-import { currentSeason } from '@packages/scoutgame/dates';
+import { getDateFromISOWeek } from '@packages/scoutgame/dates';
 import { processMergedPullRequest } from '../tasks/processPullRequests/processMergedPullRequest';
 
-export async function approveBuilder({ githubLogin, builderId }: { githubLogin: string; builderId: string }) {
+export async function approveBuilder({
+  githubLogin,
+  builderId,
+  season
+}: {
+  githubLogin: string;
+  builderId: string;
+  season: string;
+}) {
   if (githubLogin && builderId) {
     throw new Error('Only provide githubLogin or builderId');
   }
@@ -41,6 +49,9 @@ export async function approveBuilder({ githubLogin, builderId }: { githubLogin: 
     where: {
       githubUser: {
         login: githubUser.login
+      },
+      createdAt: {
+        gte: getDateFromISOWeek(season).toJSDate()
       }
     },
     include: {
@@ -51,7 +62,7 @@ export async function approveBuilder({ githubLogin, builderId }: { githubLogin: 
   for (const pullRequest of events) {
     if (pullRequest.type === 'merged_pull_request') {
       await processMergedPullRequest({
-        season: currentSeason,
+        season,
         pullRequest: {
           ...pullRequest,
           createdAt: new Date(pullRequest.createdAt).toDateString(),
@@ -67,7 +78,7 @@ export async function approveBuilder({ githubLogin, builderId }: { githubLogin: 
     }
   }
 
-  await registerBuilderNFT({ builderId });
+  await registerBuilderNFT({ builderId, season });
 
   await refreshUserStats({ userId: builderId });
 }

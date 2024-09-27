@@ -18,12 +18,14 @@ export type ClosedPullRequestMeta = Pick<
 
 export async function processClosedPullRequest({
   pullRequest,
+  season,
   repo,
   prClosedBy,
   skipSendingComment
 }: {
   pullRequest: ClosedPullRequestMeta;
   repo: RepoInput;
+  season: string;
   prClosedBy?: string;
   skipSendingComment?: boolean;
 }) {
@@ -112,7 +114,7 @@ export async function processClosedPullRequest({
     });
 
     // Notify NFT buyers that their builder had a strike
-    await getAllNftOwners({ builderId: builder.id })
+    await getAllNftOwners({ builderId: builder.id, season })
       .then((owners) =>
         Promise.all(
           owners.map((scoutId) =>

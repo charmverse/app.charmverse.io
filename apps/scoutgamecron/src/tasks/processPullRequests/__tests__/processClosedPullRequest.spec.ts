@@ -1,10 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
+import { getLastWeek } from '@packages/scoutgame/dates';
 import { mockBuilder, mockRepo } from '@packages/scoutgame/testing/database';
 import { randomLargeInt } from '@packages/scoutgame/testing/generators';
 import { v4 } from 'uuid';
 
 import { mockPullRequest } from '@/testing/generators';
+
+const testSeason = getLastWeek();
 
 jest.unstable_mockModule('../getClosedPullRequest', () => ({
   getClosedPullRequest: jest.fn()
@@ -46,7 +49,7 @@ describe('processClosedPullRequest', () => {
     });
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
-    await processClosedPullRequest({ pullRequest, repo });
+    await processClosedPullRequest({ pullRequest, repo, season: testSeason });
 
     const githubEvent = await prisma.githubEvent.findFirstOrThrow({
       where: {
@@ -79,7 +82,7 @@ describe('processClosedPullRequest', () => {
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue(builder.githubUser);
 
-    await processClosedPullRequest({ pullRequest, repo });
+    await processClosedPullRequest({ pullRequest, repo, season: testSeason });
 
     const githubEvent = await prisma.githubEvent.findFirstOrThrow({
       where: {
@@ -113,7 +116,7 @@ describe('processClosedPullRequest', () => {
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
 
     for (let i = 0; i < 3; i++) {
-      await processClosedPullRequest({ pullRequest: { ...pullRequest, number: i + 1 }, repo });
+      await processClosedPullRequest({ pullRequest: { ...pullRequest, number: i + 1 }, repo, season: testSeason });
     }
 
     const strikes = await prisma.builderStrike.findMany({
@@ -166,9 +169,9 @@ describe('processClosedPullRequest', () => {
 
     (getClosedPullRequest as jest.Mock<typeof getClosedPullRequest>).mockResolvedValue({ login: v4() });
 
-    await processClosedPullRequest({ pullRequest, repo });
-    await processClosedPullRequest({ pullRequest, repo });
-    await processClosedPullRequest({ pullRequest, repo });
+    await processClosedPullRequest({ pullRequest, repo, season: testSeason });
+    await processClosedPullRequest({ pullRequest, repo, season: testSeason });
+    await processClosedPullRequest({ pullRequest, repo, season: testSeason });
 
     const githubEventsCount = await prisma.githubEvent.count({
       where: {

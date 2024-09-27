@@ -41,7 +41,7 @@ export async function processPullRequests({
     }
     if (pullRequest.state === 'CLOSED') {
       if (!skipClosedPrProcessing) {
-        await processClosedPullRequest({ pullRequest, repo });
+        await processClosedPullRequest({ pullRequest, repo, season });
       }
     } else {
       await processMergedPullRequest({ pullRequest, repo, season });

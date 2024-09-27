@@ -5,6 +5,8 @@ import { processPullRequests } from '../../tasks/processPullRequests';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
 
+import { currentSeason } from '@packages/scoutgame/dates';
+
 function getRandomValue<T>(arr: T[]): T {
   const randomIndex = Math.floor(Math.random() * arr.length);
   return arr[randomIndex];
@@ -120,7 +122,7 @@ async function seedBuilderNFTs() {
   console.log('githubUser', githubUser);
 
   for (const { builderId } of githubUser) {
-    const nft = await registerBuilderNFT({ builderId: builderId as string });
+    const nft = await registerBuilderNFT({ builderId: builderId as string, season: currentSeason });
 
     await generateNftPurchaseEvents({ builderId: nft.builderId, amount: 4 });
 

@@ -4,7 +4,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { getScoutGameNftAdminWallet } from '@packages/scoutgame/getScoutGameNftAdminWallet';
 
-import { currentSeason } from '../dates';
 import { recordGameActivity } from '../recordGameActivity';
 
 import { builderContractAddress, builderNftChain } from './constants';
@@ -17,7 +16,7 @@ const builderNftWriteApiClient = new ContractApiClient({
   walletClient: getScoutGameNftAdminWallet()
 });
 
-export async function registerBuilderNFT({ builderId }: { builderId: string }) {
+export async function registerBuilderNFT({ builderId, season }: { builderId: string; season: string }) {
   if (!stringUtils.isUUID(builderId)) {
     throw new InvalidInputError('Invalid builderId. Must be a uuid');
   }
@@ -27,7 +26,7 @@ export async function registerBuilderNFT({ builderId }: { builderId: string }) {
       builderId,
       chainId: builderNftChain.id,
       contractAddress: builderContractAddress,
-      season: currentSeason
+      season
     }
   });
 
