@@ -33,12 +33,11 @@ export async function processClosedPullRequest({
         some: {
           id: pullRequest.author.id
         }
-      },
-      builder: true
+      }
     },
     select: {
       id: true,
-      bannedAt: true,
+      builderStatus: true,
       strikes: {
         select: {
           id: true
@@ -143,13 +142,13 @@ export async function processClosedPullRequest({
 
     log.info('Recorded a closed PR', { userId: builder.id, url: pullRequest.url, strikes });
 
-    if (shouldBeBanned && !builder.bannedAt) {
+    if (shouldBeBanned && builder.builderStatus !== 'banned') {
       await prisma.scout.update({
         where: {
           id: builder.id
         },
         data: {
-          bannedAt: new Date()
+          builderStatus: 'banned'
         }
       });
       if (!skipSendingComment) {

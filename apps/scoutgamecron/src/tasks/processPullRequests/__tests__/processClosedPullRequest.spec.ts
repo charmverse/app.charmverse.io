@@ -124,7 +124,7 @@ describe('processClosedPullRequest', () => {
     const bannedBuilder = await prisma.scout.findUniqueOrThrow({
       where: { id: builder.id }
     });
-    expect(bannedBuilder.bannedAt).toBeDefined();
+    expect(bannedBuilder.builderStatus).toEqual('banned');
     expect(octokit.rest.issues.createComment).toHaveBeenCalled();
   });
 

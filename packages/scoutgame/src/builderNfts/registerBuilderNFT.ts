@@ -42,7 +42,7 @@ export async function registerBuilderNFT({ builderId }: { builderId: string }) {
     },
     select: {
       githubUser: true,
-      builder: true
+      builderStatus: true
     }
   });
 
@@ -50,7 +50,7 @@ export async function registerBuilderNFT({ builderId }: { builderId: string }) {
     throw new InvalidInputError('Scout profile does not have a github user');
   }
 
-  if (!builder.builder) {
+  if (builder.builderStatus !== 'approved') {
     throw new InvalidInputError('Scout profile not marked as a builder');
   }
 
@@ -69,7 +69,7 @@ export async function registerBuilderNFT({ builderId }: { builderId: string }) {
       id: builderId
     },
     data: {
-      builder: true
+      builderStatus: 'approved'
     }
   });
 

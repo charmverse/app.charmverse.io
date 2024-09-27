@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import { replaceS3Domain } from '@root/lib/utils/url';
 
-export type SessionUser = Pick<Scout, 'id' | 'username' | 'displayName' | 'avatar' | 'builder'>;
+export type SessionUser = Pick<Scout, 'id' | 'username' | 'displayName' | 'avatar' | 'builderStatus'>;
 
 export async function getUserFromSession(): Promise<Scout | null> {
   const session = await getSession();

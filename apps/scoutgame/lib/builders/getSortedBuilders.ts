@@ -22,8 +22,7 @@ export async function getSortedBuilders({
       builders = await prisma.scout
         .findMany({
           where: {
-            bannedAt: null,
-            builder: true
+            builderStatus: 'approved'
           },
           orderBy: {
             createdAt: 'desc'
@@ -33,6 +32,7 @@ export async function getSortedBuilders({
             id: true,
             username: true,
             avatar: true,
+            builderStatus: true,
             createdAt: true,
             builderNfts: {
               where: {
@@ -70,7 +70,7 @@ export async function getSortedBuilders({
             price: scout.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             gems: scout.userWeeklyStats[0]?.gemsCollected ?? 0,
-            builder: true
+            builderStatus: scout.builderStatus
           }))
         );
       break;
@@ -80,8 +80,7 @@ export async function getSortedBuilders({
         .findMany({
           where: {
             user: {
-              bannedAt: null,
-              builder: true
+              builderStatus: 'approved'
             },
             week: getCurrentWeek()
           },
@@ -95,6 +94,7 @@ export async function getSortedBuilders({
                 id: true,
                 username: true,
                 avatar: true,
+                builderStatus: true,
                 builderNfts: {
                   where: {
                     season: currentSeason
@@ -126,7 +126,7 @@ export async function getSortedBuilders({
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             gems: stat.gemsCollected,
-            builder: true
+            builderStatus: stat.user.builderStatus
           }))
         );
       break;
@@ -139,8 +139,7 @@ export async function getSortedBuilders({
           where: {
             week: previousWeek,
             user: {
-              bannedAt: null,
-              builder: true
+              builderStatus: 'approved'
             }
           },
           orderBy: [{ week: 'desc' }, { rank: 'asc' }],
@@ -150,6 +149,7 @@ export async function getSortedBuilders({
               select: {
                 id: true,
                 username: true,
+                builderStatus: true,
                 avatar: true,
                 userAllTimeStats: {
                   select: {
@@ -182,7 +182,7 @@ export async function getSortedBuilders({
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             gems: stat.gemsCollected,
-            builder: true
+            builderStatus: stat.user.builderStatus
           }))
         );
       break;

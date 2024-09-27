@@ -10,7 +10,7 @@ import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
 
 export async function PublicBuilderProfile({ tab, user }: { tab: string; user: BasicUserInfo }) {
   const builderId = user.id;
-  const isBuilder = user.builder;
+  const isBuilder = user.builderStatus === 'approved';
 
   const [
     builderNft,

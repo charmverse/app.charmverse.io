@@ -1,5 +1,6 @@
-import type { BuilderEvent, BuilderEventType, GithubRepo } from '@charmverse/core/prisma';
-import { GithubEventType, prisma } from '@charmverse/core/prisma-client';
+import { GithubEventType } from '@charmverse/core/prisma';
+import type { BuilderEvent, BuilderEventType, BuilderStatus, GithubRepo } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { currentSeason, getCurrentWeek } from '../dates';
@@ -12,12 +13,12 @@ type RepoAddress = {
 };
 
 export async function mockBuilder({
-  bannedAt,
+  builderStatus = 'approved',
   githubUserId = randomLargeInt(),
   onboardedAt,
   username = uuid()
 }: {
-  bannedAt?: Date;
+  builderStatus?: BuilderStatus;
   githubUserId?: number;
   onboardedAt?: Date;
   username?: string;
@@ -26,9 +27,8 @@ export async function mockBuilder({
     data: {
       username,
       displayName: 'Test User',
-      bannedAt,
+      builderStatus,
       onboardedAt,
-      builder: true,
       githubUser: {
         create: {
           id: githubUserId,
@@ -56,8 +56,7 @@ export async function mockScout({
   return prisma.scout.create({
     data: {
       username,
-      displayName,
-      builder: false
+      displayName
     }
   });
 }
