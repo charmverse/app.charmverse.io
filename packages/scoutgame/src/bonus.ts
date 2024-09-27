@@ -6,6 +6,10 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
   polygon: {
     repos: ['polygon-edge/polygon-edge'],
     icon: 'https://cryptologos.cc/logos/polygon-matic-logo.png'
+  },
+  charmverse: {
+    repos: ['charmverse/test-repo'],
+    icon: 'https://app.charmverse.io/images/logo_black_lightgrey.png'
   }
 };
 

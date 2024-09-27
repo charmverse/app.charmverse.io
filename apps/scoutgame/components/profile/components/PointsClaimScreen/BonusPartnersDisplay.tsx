@@ -4,7 +4,7 @@ import { Stack } from '@mui/material';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import Image from 'next/image';
 
-export function BonusPartnersDisplay({ bonusPartners }: { bonusPartners?: string[] }) {
+export function BonusPartnersDisplay({ bonusPartners, size = 20 }: { bonusPartners?: string[]; size?: number }) {
   const bonusPartnerIcons = (bonusPartners ?? [])
     .filter((partner) => !!bonusPartnersRecord[partner])
     .map((partner) => bonusPartnersRecord[partner].icon);
@@ -16,7 +16,7 @@ export function BonusPartnersDisplay({ bonusPartners }: { bonusPartners?: string
   return (
     <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='flex-end'>
       {bonusPartnerIcons.map((partnerIcon) => (
-        <Image key={partnerIcon} width={20} height={20} src={partnerIcon} alt='Bonus partner' />
+        <Image key={partnerIcon} width={size} height={size} src={partnerIcon} alt='Bonus partner' />
       ))}
     </Stack>
   );
