@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
 
-import { currentSeason } from '../utils';
+import { currentSeason } from '../dates';
 
 import { builderApiClient } from './builderApiClient';
 import { builderContractAddress, builderNftChain } from './constants';
@@ -22,16 +22,14 @@ export async function createBuilderNft({
     args: { tokenId, amount: BigInt(1) }
   });
 
-  // TODO: Use a fallback avatar if none is provided
   const imageBuffer = await generateNftImage({
     avatar,
     username
   });
 
-  const s3Key = `nfts/${builderId}-${avatar?.split('/').pop()}`;
   const { fileUrl: imageUrl } = await uploadFileToS3({
     content: imageBuffer,
-    pathInS3: s3Key,
+    pathInS3: `nfts/seasons/${currentSeason}/${tokenId}/nft.png`,
     contentType: 'image/png'
   });
 
