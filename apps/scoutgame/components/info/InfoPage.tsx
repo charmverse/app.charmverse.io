@@ -8,7 +8,7 @@ import { DocumentPageContainer } from 'components/common/DocumentPageContainer/D
 
 export function InfoPage() {
   return (
-    <DocumentPageContainer>
+    <DocumentPageContainer data-test='info-page'>
       <Image
         src='/images/info_banner.png'
         width={854}

@@ -6,7 +6,7 @@ import { DocumentPageContainer } from 'components/common/DocumentPageContainer/D
 
 export function DataProcessingPage() {
   return (
-    <DocumentPageContainer>
+    <DocumentPageContainer data-test='dpa-page'>
       <Typography variant='h4' align='center' color='secondary'>
         Data Processing Addendum
       </Typography>

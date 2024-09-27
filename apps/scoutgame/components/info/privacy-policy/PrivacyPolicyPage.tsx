@@ -6,7 +6,7 @@ import { DocumentPageContainer } from 'components/common/DocumentPageContainer/D
 
 export function PrivacyPolicyPage() {
   return (
-    <DocumentPageContainer>
+    <DocumentPageContainer data-test='privacy-page'>
       <Typography variant='h4' align='center' color='secondary'>
         Privacy Policy
       </Typography>

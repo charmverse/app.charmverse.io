@@ -6,7 +6,7 @@ import { DocumentPageContainer } from 'components/common/DocumentPageContainer/D
 
 export function TermsPage() {
   return (
-    <DocumentPageContainer>
+    <DocumentPageContainer data-test='terms-page'>
       <Typography variant='h4' align='center' color='secondary'>
         Terms
       </Typography>

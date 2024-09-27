@@ -12,4 +12,25 @@ test.describe('Info page', () => {
 
     await expect(infoPage.container).toBeVisible();
   });
+  test('Open the app to terms page', async ({ page, infoPage }) => {
+    await page.goto('/info/terms');
+    // Logged in user should be redirected
+    await page.waitForURL('**/info/terms');
+
+    await expect(infoPage.termsContainer).toBeVisible();
+  });
+  test('Open the app to privacy page', async ({ page, infoPage }) => {
+    await page.goto('/info/privacy-policy');
+    // Logged in user should be redirected
+    await page.waitForURL('**/info/privacy-policy');
+
+    await expect(infoPage.privacyContainer).toBeVisible();
+  });
+  test('Open the app to dpa page', async ({ page, infoPage }) => {
+    await page.goto('/info/dpa');
+    // Logged in user should be redirected
+    await page.waitForURL('**/info/dpa');
+
+    await expect(infoPage.dpaContainer).toBeVisible();
+  });
 });
