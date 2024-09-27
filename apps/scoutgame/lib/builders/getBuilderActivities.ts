@@ -4,6 +4,7 @@ import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
 import type { BasicUserInfo } from 'lib/users/interfaces';
+import { BasicUserInfoSelect, MinimalScoutInfoSelect } from 'lib/users/queries';
 
 export type BuilderActivityType = 'nft_purchase' | 'merged_pull_request';
 
@@ -17,6 +18,7 @@ type MergedPullRequestActivity = {
   contributionType: GemsReceiptType;
   gems: number;
   repo: string;
+  bonusPartner: string | null;
 };
 
 export type BuilderActivity = BasicUserInfo & {
@@ -45,26 +47,16 @@ export async function getBuilderActivities({
     take,
     select: {
       builder: {
-        select: {
-          username: true,
-          avatar: true,
-          displayName: true,
-          id: true,
-          builderStatus: true
-        }
+        select: BasicUserInfoSelect
       },
+      bonusPartner: true,
       id: true,
       createdAt: true,
       type: true,
       nftPurchaseEvent: {
         select: {
           scout: {
-            select: {
-              username: true,
-              avatar: true,
-              displayName: true,
-              id: true
-            }
+            select: MinimalScoutInfoSelect
           },
           tokensPurchased: true
         }
@@ -110,7 +102,8 @@ export async function getBuilderActivities({
           type: 'merged_pull_request' as const,
           contributionType: event.gemsReceipt.type,
           gems: event.gemsReceipt.value,
-          repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`
+          repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`,
+          bonusPartner: event.bonusPartner
         };
       } else {
         return null;

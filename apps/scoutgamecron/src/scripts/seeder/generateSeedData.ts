@@ -149,7 +149,7 @@ export async function generateSeedData() {
     totalBuilders,
     totalScoutBuilders,
     totalScouts,
-    totalGithubRepos,
+    totalGithubRepos: githubRepos.length,
     totalGithubEvents,
     totalNftsPurchasedEvents
   });

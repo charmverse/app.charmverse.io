@@ -10,6 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import { getRelativeTime } from '@packages/utils/dates';
 
 import {
+  BuilderActivityBonusPartner,
   BuilderActivityDetail,
   BuilderActivityGems,
   BuilderActivityLabel
@@ -67,10 +68,12 @@ export async function ActivityTable({ activities }: { activities: BuilderActivit
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack justifyContent='flex-end' flexDirection='row' gap={1}>
-                  <BuilderActivityGems activity={activity} />
+                  <BuilderActivityGems activity={activity} showEmpty />
                 </Stack>
               </TableCell>
-              <TableCell align='right'>-</TableCell>
+              <TableCell align='right'>
+                <BuilderActivityBonusPartner activity={activity} showEmpty />
+              </TableCell>
               <TableCell align='right'>
                 <Typography variant='caption' noWrap>
                   {getRelativeTime(activity.createdAt)}
