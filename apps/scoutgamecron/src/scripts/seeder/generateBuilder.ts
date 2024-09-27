@@ -28,7 +28,9 @@ export async function generateBuilder() {
 
   const currentBuilderCount = await prisma.scout.count({
     where: {
-      builderStatus: 'approved'
+      builderStatus: {
+        not: null
+      }
     }
   });
 
@@ -42,6 +44,8 @@ export async function generateBuilder() {
   };
 
   const builderStatusRandom = faker.number.int({min: 1, max: 10});
+  // 10% of builders are rejected, 10% of builders are applied, 80% of builders are approved
+  const builderStatus = builderStatusRandom <= 1 ? 'applied' : builderStatusRandom <= 2 ? 'rejected' : 'approved';
 
   const builder = await prisma.scout.create({
     data: {
@@ -55,22 +59,19 @@ export async function generateBuilder() {
       walletAddress: faker.finance.ethereumAddress(),
       farcasterId: faker.number.int({ min: 1, max: 5000 }),
       farcasterName: displayName,
-      // 10% of builders are rejected
-      // 10% of builders are applied
-      // 80% of builders are approved
-      builderStatus: builderStatusRandom <= 1 ? 'applied' : builderStatusRandom <= 2 ? 'rejected' : 'approved',
+      builderStatus,
       githubUser: {
         create: githubUser
       },
-      builderNfts: {
+      builderNfts: builderStatus === "approved" ? {
         create: builderNft
-      }
+      } : undefined
     }
   });
 
   return {
     builder,
     githubUser,
-    builderNft
+    builderNft: builderStatus === "approved" ? builderNft : undefined
   };
 }

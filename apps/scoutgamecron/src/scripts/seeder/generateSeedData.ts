@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { BuilderNft, GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
+import type { GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 
 import { generateBuilderEvents } from './generateBuilderEvents';
@@ -16,8 +16,8 @@ import { generateBuilder } from './generateBuilder';
 
 export type BuilderInfo = {
   id: string;
-  builderNftId: string;
-  nftPrice: number;
+  builderNftId?: string;
+  nftPrice?: number;
   assignedRepos: GithubRepo[];
   githubUser: Pick<GithubUser, 'id' | 'login'>;
 };
@@ -29,7 +29,7 @@ function assignReposToBuilder(githubRepos: GithubRepo[]): GithubRepo[] {
 
 function assignBuildersToScout(builders: BuilderInfo[]) {
   const builderCount = faker.number.int({ min: 3, max: 5 });
-  return faker.helpers.arrayElements(builders, builderCount);
+  return faker.helpers.arrayElements(builders.filter((builder) => builder.builderNftId), builderCount);
 }
 
 export async function generateSeedData() {
@@ -58,8 +58,8 @@ export async function generateSeedData() {
     const isScout = i >= totalBuilders;
     builders.push({
       id: builder.id,
-      builderNftId: builderNft.id,
-      nftPrice: builderNft.currentPrice,
+      builderNftId: builderNft?.id,
+      nftPrice: builderNft?.currentPrice,
       assignedRepos,
       githubUser
     });
