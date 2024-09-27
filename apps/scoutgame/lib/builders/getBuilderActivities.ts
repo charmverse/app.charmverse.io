@@ -4,6 +4,7 @@ import { currentSeason } from '@packages/scoutgame/utils';
 import { isTruthy } from '@root/lib/utils/types';
 
 import type { BasicUserInfo } from 'lib/users/interfaces';
+import { BasicUserInfoSelect } from 'lib/users/queries';
 
 export type BuilderActivityType = 'nft_purchase' | 'merged_pull_request';
 
@@ -45,13 +46,7 @@ export async function getBuilderActivities({
     take,
     select: {
       builder: {
-        select: {
-          username: true,
-          avatar: true,
-          displayName: true,
-          id: true,
-          builder: true
-        }
+        select: BasicUserInfoSelect
       },
       id: true,
       createdAt: true,
@@ -60,13 +55,9 @@ export async function getBuilderActivities({
         select: {
           scout: {
             select: {
-              username: true,
-              avatar: true,
-              displayName: true,
-              id: true
+              username: true
             }
-          },
-          tokensPurchased: true
+          }
         }
       },
       gemsReceipt: {

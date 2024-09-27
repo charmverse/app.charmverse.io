@@ -38,7 +38,8 @@ export async function generateScout(params: { isBuilder: boolean } = { isBuilder
     contractAddress: faker.finance.ethereumAddress(),
     currentPrice: faker.number.int({ min: 1, max: 100 }),
     season: currentSeason,
-    tokenId: currentBuilderCount
+    tokenId: currentBuilderCount,
+    imageUrl: faker.datatype.boolean() ? avatar : faker.image.avatar()
   } : undefined;
 
   const scout = await prisma.scout.create({

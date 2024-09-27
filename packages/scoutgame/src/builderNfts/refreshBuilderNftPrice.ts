@@ -2,16 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { currentSeason } from '@packages/scoutgame/utils';
-import { getPublicClient } from '@root/lib/blockchain/publicClient';
 
-import { builderContractAddress, builderNftChain } from './constants';
-import { ContractApiClient } from './nftContractApiClient';
-
-const builderApiClient = new ContractApiClient({
-  chain: builderNftChain,
-  contractAddress: builderContractAddress,
-  publicClient: getPublicClient(builderNftChain.id)
-});
+import { builderApiClient } from './builderApiClient';
 
 export async function refreshBuilderNftPrice({ builderId }: { builderId: string }) {
   if (!stringUtils.isUUID(builderId)) {
@@ -24,22 +16,14 @@ export async function refreshBuilderNftPrice({ builderId }: { builderId: string 
     args: { tokenId, amount: BigInt(1) }
   });
 
-  return prisma.builderNft.upsert({
+  return prisma.builderNft.update({
     where: {
       builderId_season: {
         builderId,
         season: currentSeason
       }
     },
-    create: {
-      builderId,
-      chainId: builderNftChain.id,
-      contractAddress: builderContractAddress,
-      tokenId: Number(tokenId),
-      season: currentSeason,
-      currentPrice
-    },
-    update: {
+    data: {
       currentPrice
     }
   });

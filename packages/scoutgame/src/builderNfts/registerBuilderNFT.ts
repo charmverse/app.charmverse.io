@@ -2,10 +2,12 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { currentSeason } from '@packages/scoutgame/utils';
 import { getWalletClient } from '@root/lib/blockchain/walletClient';
 
+import { currentSeason } from '../utils';
+
 import { builderContractAddress, builderNftChain, builderSmartContractOwnerKey } from './constants';
+import { createBuilderNft } from './createBuilderNft';
 import { ContractApiClient } from './nftContractApiClient';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
@@ -40,7 +42,9 @@ export async function registerBuilderNFT({ builderId }: { builderId: string }) {
     },
     select: {
       githubUser: true,
-      builder: true
+      builder: true,
+      avatar: true,
+      username: true
     }
   });
 
@@ -60,9 +64,14 @@ export async function registerBuilderNFT({ builderId }: { builderId: string }) {
     existingTokenId = await builderNftWriteApiClient.getTokenIdForBuilder({ args: { builderId } });
   }
 
-  const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId });
+  const builderNft = await createBuilderNft({
+    tokenId: existingTokenId,
+    builderId,
+    avatar: builder.avatar,
+    username: builder.username
+  });
 
-  log.info(`Last price: ${nftWithRefreshedPrice.currentPrice}`);
+  log.info(`Last price: ${builderNft.currentPrice}`);
 
-  return nftWithRefreshedPrice;
+  return builderNft;
 }
