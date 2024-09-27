@@ -16,13 +16,20 @@ describe('getBuildersLeaderboard', () => {
 
     await Promise.all(
       builders.map(async (builder, index) => {
-        await prisma.userWeeklyStats.create({
-          data: {
+        await prisma.userWeeklyStats.upsert({
+          where: {
+            userId_week: {
+              userId: builder.id,
+              week: testWeek
+            }
+          },
+          create: {
             userId: builder.id,
             week: testWeek,
             gemsCollected: 10 - index,
             season: 'blah'
-          }
+          },
+          update: {}
         });
 
         // Create merged pull request event

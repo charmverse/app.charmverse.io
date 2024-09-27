@@ -11,9 +11,9 @@ export function BuildersGallery({
   showHotIcon = false
 }: {
   builders: BuilderInfo[];
-  user?: { username: string } | null;
   columns?: number;
   showHotIcon?: boolean;
+  user?: { username: string; id: string } | null;
 }) {
   return (
     <Box sx={{ flexGrow: 1 }}>

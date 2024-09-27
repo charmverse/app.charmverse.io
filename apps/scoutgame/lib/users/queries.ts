@@ -13,3 +13,10 @@ export const BasicUserInfoSelect = {
   },
   builderStatus: true
 } satisfies Prisma.ScoutSelect;
+
+export const MinimalScoutInfoSelect = {
+  id: true,
+  username: true,
+  avatar: true,
+  displayName: true
+} satisfies Prisma.ScoutSelect;

@@ -26,6 +26,7 @@ export function BuilderCard({
   showHotIcon = false
 }: {
   user?: {
+    id: string;
     username: string;
   } | null;
   builder: BuilderInfo;

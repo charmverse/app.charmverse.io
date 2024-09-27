@@ -1,20 +1,189 @@
 'use server';
 
+import { log } from '@charmverse/core/log';
 import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
+import { sleep } from '@decent.xyz/box-common';
+import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/builderNFTSeasonOneClient';
 import {
   builderContractAddress,
   builderNftChain,
   builderSmartContractOwnerKey
 } from '@packages/scoutgame/builderNfts/constants';
-import { ContractApiClient } from '@packages/scoutgame/builderNfts/nftContractApiClient';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
+import { GET } from '@root/adapters/http';
 import { getWalletClient } from '@root/lib/blockchain/walletClient';
+import { prettyPrint } from '@root/lib/utils/strings';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
 import { authActionClient } from 'lib/actions/actionClient';
+import { getUserFromSession } from 'lib/session/getUserFromSession';
+
+type TransactionStatus = {
+  transaction: {
+    srcTx: {
+      blockHash: string;
+      blockNumber: number;
+      accessList: any[];
+      transactionIndex: number;
+      type: string;
+      nonce: number;
+      input: string;
+      r: string;
+      s: string;
+      chainId: number;
+      v: string;
+      gas: string;
+      maxPriorityFeePerGas: string;
+      from: string;
+      to: string;
+      maxFeePerGas: string;
+      value: string;
+      gasPrice: string;
+      typeHex: string;
+      transactionHash: string;
+      success: boolean;
+      blockExplorer: string;
+      decodedInput: {
+        functionName: string;
+        args: (
+          | {
+              preBridge: {
+                swapperId: number;
+                swapPayload: string;
+              };
+              postBridge: {
+                swapperId: number;
+                swapPayload: string;
+              };
+              bridgeId: number;
+              dstChainId: string;
+              target: string;
+              paymentOperator: string;
+              refund: string;
+              payload: string;
+              additionalArgs: string;
+            }
+          | {
+              appId: string;
+              affiliateId: string;
+              bridgeFee: string;
+              appFees: any[];
+            }
+          | string
+        )[];
+      };
+      org: {
+        appId: string;
+        affiliateId: string;
+        appFees: any[];
+      };
+      method: string;
+      usdValue: number;
+      paymentToken: {
+        src: {
+          name: string;
+          symbol: string;
+          decimals: number;
+          swap: boolean;
+          amount: string;
+        };
+        dst: {
+          name: string;
+          symbol: string;
+          decimals: number;
+          swap: boolean;
+          amount: string;
+        };
+      };
+      timestamp: number;
+    };
+    bridgeTx: {
+      fast: {
+        srcUaAddress: string;
+        dstUaAddress: string;
+        updated: number;
+        created: number;
+        srcChainId: number;
+        dstChainId: number;
+        dstTxHash: string;
+        srcTxHash: string;
+        srcBlockHash: string;
+        srcBlockNumber: string;
+        srcUaNonce: number;
+        status: string;
+      };
+      canonical: null;
+      multiHop: boolean;
+      success: boolean;
+    };
+    dstTx: {
+      fast: {
+        transactionHash: string;
+        blockHash: string;
+        blockNumber: number;
+        l1BlobBaseFeeScalar: string;
+        logsBloom: string;
+        l1GasUsed: string;
+        l1Fee: string;
+        contractAddress: null;
+        transactionIndex: number;
+        l1GasPrice: string;
+        l1BaseFeeScalar: string;
+        type: string;
+        l1BlobBaseFee: string;
+        gasUsed: string;
+        cumulativeGasUsed: string;
+        from: string;
+        to: string;
+        effectiveGasPrice: string;
+        status: string;
+        chainId: number;
+        blockExplorer: string;
+        timestamp: number;
+      };
+      canonical: null;
+      success: boolean;
+    };
+  };
+  status: string;
+};
+
+async function getDestinationTransactionHash(sourceChainTxHash: string, sourceChainId: number): Promise<string> {
+  const startTime = Date.now();
+  const maxWaitTime = 60000; // 45 seconds
+
+  while (Date.now() - startTime < maxWaitTime) {
+    try {
+      const response = await GET<TransactionStatus>(
+        `https://api.decentscan.xyz/getStatus?txHash=${sourceChainTxHash}&chainId=${sourceChainId}`,
+        undefined,
+        {
+          headers: {
+            'x-api-key': process.env.REACT_APP_DECENT_API_KEY
+          }
+        }
+      );
+
+      if (response.transaction?.dstTx?.success === true) {
+        return response.transaction.dstTx.fast.transactionHash;
+      }
+
+      // Optional: Add a small delay before retrying
+      log.info('No success found try again');
+      prettyPrint(response);
+      await sleep(5000);
+    } catch (error) {
+      log.error('Failed to fetch transaction status:', error);
+    }
+  }
+
+  throw new Error(
+    `Transaction status could not be confirmed within 45 seconds for txHash: ${sourceChainTxHash} on chainId: ${sourceChainId}`
+  );
+}
 
 export const mintNftAction = authActionClient
   .metadata({ actionName: 'save-onboarded' })
@@ -29,13 +198,15 @@ export const mintNftAction = authActionClient
           }
           return true;
         }),
+      sourceTxChainId: yup.number().required(),
       tokenId: yup.string().required(),
       amount: yup.number().required(),
-      builderId: yup.string().required()
+      builderId: yup.string().required(),
+      txHash: yup.string().required()
     })
   )
   .action(async ({ ctx, parsedInput }) => {
-    const userId = ctx.session.user?.id;
+    const userId = await getUserFromSession().then((u) => u?.id);
 
     if (!userId) {
       throw new Error('User not found');
@@ -50,33 +221,34 @@ export const mintNftAction = authActionClient
 
     const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey });
 
-    const apiClient = new ContractApiClient({
+    const apiClient = new BuilderNFTSeasonOneClient({
       chain: builderNftChain,
       contractAddress: builderContractAddress,
       walletClient: serverClient
     });
 
-    const nextPrice = await apiClient.getTokenPurchasePrice({
+    const nextPrice = await apiClient.getTokenQuote({
       args: {
         tokenId: BigInt(parsedInput.tokenId),
         amount: BigInt(parsedInput.amount)
       }
     });
 
-    const txResult = await apiClient.mint({
+    const txHash = await getDestinationTransactionHash(parsedInput.txHash, parsedInput.sourceTxChainId);
+
+    const txResult = await apiClient.mintTo({
       args: {
         account: parsedInput.address,
         tokenId: BigInt(parsedInput.tokenId),
-        amount: BigInt(parsedInput.amount)
+        amount: BigInt(parsedInput.amount),
+        scout: userId
       }
     });
-
-    // TODO - Add the points TX && refresh the points stats for the builder
 
     const nftEvent = await prisma.nFTPurchaseEvent.create({
       data: {
         // Assuming constant conversion rate of 4:1, and 6 decimals on USDC
-        pointsValue: Number(nextPrice) / 10e6 / 4,
+        pointsValue: 0,
         tokensPurchased: parsedInput.amount,
         txHash: txResult.transactionHash,
         builderNftId: builderNft.id,
@@ -93,8 +265,11 @@ export const mintNftAction = authActionClient
             }
           }
         }
-      }
+      },
+      include: {}
     });
+
+    const pointsValue = Number(nextPrice) / 5;
 
     await refreshBuilderNftPrice({ builderId: parsedInput.builderId, season: currentSeason });
 

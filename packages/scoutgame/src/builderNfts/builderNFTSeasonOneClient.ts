@@ -28,7 +28,7 @@ type ReadWriteWalletClient<
   PublicActions<transport, chain, account> & WalletActions<chain, account>
 >;
 
-export class ContractApiClient {
+export class BuilderNFTSeasonOneClient {
   private contractAddress: Address;
 
   private publicClient: PublicClient;
@@ -63,26 +63,29 @@ export class ContractApiClient {
       type: 'function'
     },
     {
-      inputs: [
-        {
-          internalType: 'uint256',
-          name: 'tokenId',
-          type: 'uint256'
-        },
-        {
-          internalType: 'uint256',
-          name: 'amount',
-          type: 'uint256'
-        },
+      inputs: [],
+      name: 'baseUrl',
+      outputs: [
         {
           internalType: 'string',
-          name: 'scout',
+          name: '',
           type: 'string'
         }
       ],
-      name: 'buyToken',
-      outputs: [],
-      stateMutability: 'nonpayable',
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'getAllowance',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: '',
+          type: 'uint256'
+        }
+      ],
+      stateMutability: 'view',
       type: 'function'
     },
     {
@@ -99,19 +102,6 @@ export class ContractApiClient {
           internalType: 'string',
           name: '',
           type: 'string'
-        }
-      ],
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      inputs: [],
-      name: 'getPriceIncrement',
-      outputs: [
-        {
-          internalType: 'uint256',
-          name: '',
-          type: 'uint256'
         }
       ],
       stateMutability: 'view',
@@ -149,7 +139,7 @@ export class ContractApiClient {
           type: 'uint256'
         }
       ],
-      name: 'getTokenPurchasePrice',
+      name: 'getTokenQuote',
       outputs: [
         {
           internalType: 'uint256',
@@ -158,6 +148,48 @@ export class ContractApiClient {
         }
       ],
       stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: 'tokenId',
+          type: 'uint256'
+        }
+      ],
+      name: 'getTokenURI',
+      outputs: [
+        {
+          internalType: 'string',
+          name: '',
+          type: 'string'
+        }
+      ],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: 'tokenId',
+          type: 'uint256'
+        },
+        {
+          internalType: 'uint256',
+          name: 'amount',
+          type: 'uint256'
+        },
+        {
+          internalType: 'string',
+          name: 'scout',
+          type: 'string'
+        }
+      ],
+      name: 'mintBuilderNft',
+      outputs: [],
+      stateMutability: 'nonpayable',
       type: 'function'
     },
     {
@@ -176,9 +208,14 @@ export class ContractApiClient {
           internalType: 'uint256',
           name: 'amount',
           type: 'uint256'
+        },
+        {
+          internalType: 'string',
+          name: 'scout',
+          type: 'string'
         }
       ],
-      name: 'mint',
+      name: 'mintTo',
       outputs: [],
       stateMutability: 'nonpayable',
       type: 'function'
@@ -249,19 +286,6 @@ export class ContractApiClient {
       type: 'function'
     },
     {
-      inputs: [],
-      name: 'totalBuilderTokens',
-      outputs: [
-        {
-          internalType: 'uint256',
-          name: '',
-          type: 'uint256'
-        }
-      ],
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
       inputs: [
         {
           internalType: 'uint256',
@@ -284,6 +308,45 @@ export class ContractApiClient {
       inputs: [
         {
           internalType: 'address',
+          name: 'newOwner',
+          type: 'address'
+        }
+      ],
+      name: 'transferOwnership',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: '_newContract',
+          type: 'address'
+        }
+      ],
+      name: 'updateERC20Contract',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: '_newIncrement',
+          type: 'uint256'
+        }
+      ],
+      name: 'updateIncrement',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [
+        {
+          internalType: 'address',
           name: 'newReceiver',
           type: 'address'
         }
@@ -291,6 +354,32 @@ export class ContractApiClient {
       name: 'updateProceedsReceiver',
       outputs: [],
       stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [
+        {
+          internalType: 'string',
+          name: 'newBaseUrl',
+          type: 'string'
+        }
+      ],
+      name: 'updateTokenBaseUri',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'usdcToken',
+      outputs: [
+        {
+          internalType: 'contract IERC20',
+          name: '',
+          type: 'address'
+        }
+      ],
+      stateMutability: 'view',
       type: 'function'
     }
   ];
@@ -352,33 +441,50 @@ export class ContractApiClient {
     return result as bigint;
   }
 
-  async buyToken(params: {
-    args: { tokenId: bigint; amount: bigint; scout: string };
-    value?: bigint;
-    gasPrice?: bigint;
-  }): Promise<TransactionReceipt> {
-    if (!this.walletClient) {
-      throw new Error('Wallet client is required for write operations.');
-    }
-
+  async baseUrl(): Promise<string> {
     const txData = encodeFunctionData({
       abi: this.abi,
-      functionName: 'buyToken',
-      args: [params.args.tokenId, params.args.amount, params.args.scout]
+      functionName: 'baseUrl',
+      args: []
     });
 
-    const txInput: Omit<Parameters<WalletClient['sendTransaction']>[0], 'account' | 'chain'> = {
-      to: getAddress(this.contractAddress),
-      data: txData,
-      value: params.value ?? BigInt(0), // Optional value for payable methods
-      gasPrice: params.gasPrice // Optional gasPrice
-    };
+    const { data } = await this.publicClient.call({
+      to: this.contractAddress,
+      data: txData
+    });
 
-    // This is necessary because the wallet client requires account and chain, which actually cause writes to throw
-    const tx = await this.walletClient.sendTransaction(txInput as any);
+    // Decode the result based on the expected return type
+    const result = decodeFunctionResult({
+      abi: this.abi,
+      functionName: 'baseUrl',
+      data: data as `0x${string}`
+    });
 
-    // Return the transaction receipt
-    return this.walletClient.waitForTransactionReceipt({ hash: tx });
+    // Parse the result based on the return type
+    return result as string;
+  }
+
+  async getAllowance(): Promise<bigint> {
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'getAllowance',
+      args: []
+    });
+
+    const { data } = await this.publicClient.call({
+      to: this.contractAddress,
+      data: txData
+    });
+
+    // Decode the result based on the expected return type
+    const result = decodeFunctionResult({
+      abi: this.abi,
+      functionName: 'getAllowance',
+      data: data as `0x${string}`
+    });
+
+    // Parse the result based on the return type
+    return result as bigint;
   }
 
   async getBuilderIdForToken(params: { args: { tokenId: bigint } }): Promise<string> {
@@ -404,29 +510,6 @@ export class ContractApiClient {
     return result as string;
   }
 
-  async getPriceIncrement(): Promise<bigint> {
-    const txData = encodeFunctionData({
-      abi: this.abi,
-      functionName: 'getPriceIncrement',
-      args: []
-    });
-
-    const { data } = await this.publicClient.call({
-      to: this.contractAddress,
-      data: txData
-    });
-
-    // Decode the result based on the expected return type
-    const result = decodeFunctionResult({
-      abi: this.abi,
-      functionName: 'getPriceIncrement',
-      data: data as `0x${string}`
-    });
-
-    // Parse the result based on the return type
-    return result as bigint;
-  }
-
   async getTokenIdForBuilder(params: { args: { builderId: string } }): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
@@ -450,10 +533,10 @@ export class ContractApiClient {
     return result as bigint;
   }
 
-  async getTokenPurchasePrice(params: { args: { tokenId: bigint; amount: bigint } }): Promise<bigint> {
+  async getTokenQuote(params: { args: { tokenId: bigint; amount: bigint } }): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
-      functionName: 'getTokenPurchasePrice',
+      functionName: 'getTokenQuote',
       args: [params.args.tokenId, params.args.amount]
     });
 
@@ -465,7 +548,7 @@ export class ContractApiClient {
     // Decode the result based on the expected return type
     const result = decodeFunctionResult({
       abi: this.abi,
-      functionName: 'getTokenPurchasePrice',
+      functionName: 'getTokenQuote',
       data: data as `0x${string}`
     });
 
@@ -473,8 +556,31 @@ export class ContractApiClient {
     return result as bigint;
   }
 
-  async mint(params: {
-    args: { account: string; tokenId: bigint; amount: bigint };
+  async getTokenURI(params: { args: { tokenId: bigint } }): Promise<string> {
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'getTokenURI',
+      args: [params.args.tokenId]
+    });
+
+    const { data } = await this.publicClient.call({
+      to: this.contractAddress,
+      data: txData
+    });
+
+    // Decode the result based on the expected return type
+    const result = decodeFunctionResult({
+      abi: this.abi,
+      functionName: 'getTokenURI',
+      data: data as `0x${string}`
+    });
+
+    // Parse the result based on the return type
+    return result as string;
+  }
+
+  async mintBuilderNft(params: {
+    args: { tokenId: bigint; amount: bigint; scout: string };
     value?: bigint;
     gasPrice?: bigint;
   }): Promise<TransactionReceipt> {
@@ -484,8 +590,37 @@ export class ContractApiClient {
 
     const txData = encodeFunctionData({
       abi: this.abi,
-      functionName: 'mint',
-      args: [params.args.account, params.args.tokenId, params.args.amount]
+      functionName: 'mintBuilderNft',
+      args: [params.args.tokenId, params.args.amount, params.args.scout]
+    });
+
+    const txInput: Omit<Parameters<WalletClient['sendTransaction']>[0], 'account' | 'chain'> = {
+      to: getAddress(this.contractAddress),
+      data: txData,
+      value: params.value ?? BigInt(0), // Optional value for payable methods
+      gasPrice: params.gasPrice // Optional gasPrice
+    };
+
+    // This is necessary because the wallet client requires account and chain, which actually cause writes to throw
+    const tx = await this.walletClient.sendTransaction(txInput as any);
+
+    // Return the transaction receipt
+    return this.walletClient.waitForTransactionReceipt({ hash: tx });
+  }
+
+  async mintTo(params: {
+    args: { account: string; tokenId: bigint; amount: bigint; scout: string };
+    value?: bigint;
+    gasPrice?: bigint;
+  }): Promise<TransactionReceipt> {
+    if (!this.walletClient) {
+      throw new Error('Wallet client is required for write operations.');
+    }
+
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'mintTo',
+      args: [params.args.account, params.args.tokenId, params.args.amount, params.args.scout]
     });
 
     const txInput: Omit<Parameters<WalletClient['sendTransaction']>[0], 'account' | 'chain'> = {
@@ -623,29 +758,6 @@ export class ContractApiClient {
     return this.walletClient.waitForTransactionReceipt({ hash: tx });
   }
 
-  async totalBuilderTokens(): Promise<bigint> {
-    const txData = encodeFunctionData({
-      abi: this.abi,
-      functionName: 'totalBuilderTokens',
-      args: []
-    });
-
-    const { data } = await this.publicClient.call({
-      to: this.contractAddress,
-      data: txData
-    });
-
-    // Decode the result based on the expected return type
-    const result = decodeFunctionResult({
-      abi: this.abi,
-      functionName: 'totalBuilderTokens',
-      data: data as `0x${string}`
-    });
-
-    // Parse the result based on the return type
-    return result as bigint;
-  }
-
   async totalSupply(params: { args: { tokenId: bigint } }): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
@@ -667,6 +779,93 @@ export class ContractApiClient {
 
     // Parse the result based on the return type
     return result as bigint;
+  }
+
+  async transferOwnership(params: {
+    args: { newOwner: string };
+    value?: bigint;
+    gasPrice?: bigint;
+  }): Promise<TransactionReceipt> {
+    if (!this.walletClient) {
+      throw new Error('Wallet client is required for write operations.');
+    }
+
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'transferOwnership',
+      args: [params.args.newOwner]
+    });
+
+    const txInput: Omit<Parameters<WalletClient['sendTransaction']>[0], 'account' | 'chain'> = {
+      to: getAddress(this.contractAddress),
+      data: txData,
+      value: params.value ?? BigInt(0), // Optional value for payable methods
+      gasPrice: params.gasPrice // Optional gasPrice
+    };
+
+    // This is necessary because the wallet client requires account and chain, which actually cause writes to throw
+    const tx = await this.walletClient.sendTransaction(txInput as any);
+
+    // Return the transaction receipt
+    return this.walletClient.waitForTransactionReceipt({ hash: tx });
+  }
+
+  async updateERC20Contract(params: {
+    args: { _newContract: string };
+    value?: bigint;
+    gasPrice?: bigint;
+  }): Promise<TransactionReceipt> {
+    if (!this.walletClient) {
+      throw new Error('Wallet client is required for write operations.');
+    }
+
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'updateERC20Contract',
+      args: [params.args._newContract]
+    });
+
+    const txInput: Omit<Parameters<WalletClient['sendTransaction']>[0], 'account' | 'chain'> = {
+      to: getAddress(this.contractAddress),
+      data: txData,
+      value: params.value ?? BigInt(0), // Optional value for payable methods
+      gasPrice: params.gasPrice // Optional gasPrice
+    };
+
+    // This is necessary because the wallet client requires account and chain, which actually cause writes to throw
+    const tx = await this.walletClient.sendTransaction(txInput as any);
+
+    // Return the transaction receipt
+    return this.walletClient.waitForTransactionReceipt({ hash: tx });
+  }
+
+  async updateIncrement(params: {
+    args: { _newIncrement: bigint };
+    value?: bigint;
+    gasPrice?: bigint;
+  }): Promise<TransactionReceipt> {
+    if (!this.walletClient) {
+      throw new Error('Wallet client is required for write operations.');
+    }
+
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'updateIncrement',
+      args: [params.args._newIncrement]
+    });
+
+    const txInput: Omit<Parameters<WalletClient['sendTransaction']>[0], 'account' | 'chain'> = {
+      to: getAddress(this.contractAddress),
+      data: txData,
+      value: params.value ?? BigInt(0), // Optional value for payable methods
+      gasPrice: params.gasPrice // Optional gasPrice
+    };
+
+    // This is necessary because the wallet client requires account and chain, which actually cause writes to throw
+    const tx = await this.walletClient.sendTransaction(txInput as any);
+
+    // Return the transaction receipt
+    return this.walletClient.waitForTransactionReceipt({ hash: tx });
   }
 
   async updateProceedsReceiver(params: {
@@ -696,5 +895,57 @@ export class ContractApiClient {
 
     // Return the transaction receipt
     return this.walletClient.waitForTransactionReceipt({ hash: tx });
+  }
+
+  async updateTokenBaseUri(params: {
+    args: { newBaseUrl: string };
+    value?: bigint;
+    gasPrice?: bigint;
+  }): Promise<TransactionReceipt> {
+    if (!this.walletClient) {
+      throw new Error('Wallet client is required for write operations.');
+    }
+
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'updateTokenBaseUri',
+      args: [params.args.newBaseUrl]
+    });
+
+    const txInput: Omit<Parameters<WalletClient['sendTransaction']>[0], 'account' | 'chain'> = {
+      to: getAddress(this.contractAddress),
+      data: txData,
+      value: params.value ?? BigInt(0), // Optional value for payable methods
+      gasPrice: params.gasPrice // Optional gasPrice
+    };
+
+    // This is necessary because the wallet client requires account and chain, which actually cause writes to throw
+    const tx = await this.walletClient.sendTransaction(txInput as any);
+
+    // Return the transaction receipt
+    return this.walletClient.waitForTransactionReceipt({ hash: tx });
+  }
+
+  async usdcToken(): Promise<string> {
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'usdcToken',
+      args: []
+    });
+
+    const { data } = await this.publicClient.call({
+      to: this.contractAddress,
+      data: txData
+    });
+
+    // Decode the result based on the expected return type
+    const result = decodeFunctionResult({
+      abi: this.abi,
+      functionName: 'usdcToken',
+      data: data as `0x${string}`
+    });
+
+    // Parse the result based on the return type
+    return result as string;
   }
 }

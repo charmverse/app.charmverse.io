@@ -13,6 +13,7 @@ export async function processPullRequests({
   skipClosedPrProcessing = false,
   season = currentSeason
 }: { createdAfter?: Date; skipClosedPrProcessing?: boolean; season?: string } = {}) {
+  log.info('Processing PRs');
   const repos = await prisma.githubRepo.findMany();
 
   // get Pull requests
@@ -34,17 +35,28 @@ export async function processPullRequests({
     )} minutes`
   );
 
+  let i = 0;
+
   for (const pullRequest of pullRequests) {
+    i += 1;
+    log.info(
+      `Processing PR ${i}/${pullRequests.length}  // ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`
+    );
     const repo = repos.find((r) => `${r.owner}/${r.name}` === pullRequest.repository.nameWithOwner);
     if (!repo) {
       throw new Error(`Repo not found: ${pullRequest.repository.nameWithOwner}`);
     }
-    if (pullRequest.state === 'CLOSED') {
-      if (!skipClosedPrProcessing) {
-        await processClosedPullRequest({ pullRequest, repo, season });
+
+    try {
+      if (pullRequest.state === 'CLOSED') {
+        if (!skipClosedPrProcessing) {
+          await processClosedPullRequest({ pullRequest, repo, season });
+        }
+      } else {
+        await processMergedPullRequest({ pullRequest, repo, season });
       }
-    } else {
-      await processMergedPullRequest({ pullRequest, repo, season });
+    } catch (error) {
+      log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, { error });
     }
   }
 

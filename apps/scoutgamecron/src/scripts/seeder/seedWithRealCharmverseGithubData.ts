@@ -1,6 +1,5 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
-import { processPullRequests } from '../../tasks/processPullRequests';
 
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
@@ -105,7 +104,7 @@ export async function seedWithRealCharmverseGithubData() {
     }
   }
 
-  await processPullRequests({ createdAfter: new Date('2024-08-01'), skipClosedPrProcessing: true });
+  // await processPullRequests({ createdAfter: new Date('2024-08-01'), skipClosedPrProcessing: true });
 
   await seedBuilderNFTs();
 }
@@ -127,6 +126,15 @@ async function seedBuilderNFTs() {
     await generateNftPurchaseEvents({ builderId: nft.builderId, amount: 4 });
 
     await refreshUserStats({ userId: builderId as string });
+
+    await prisma.scout.update({
+      where: {
+        id: builderId as string
+      },
+      data: {
+        builderStatus: 'approved'
+      }
+    })
   }
 }
 
@@ -163,7 +171,6 @@ async function generateNftPurchaseEvents({
 
   await prisma.nFTPurchaseEvent.createMany({ data: inputs });
 }
-// seedWithRealCharmverseGithubData();
 
 async function clearNfts() {
   await prisma.builderNft.deleteMany({
@@ -182,8 +189,9 @@ async function clearNfts() {
 }
 
 async function script() {
+  // await clearNfts()
   await seedWithRealCharmverseGithubData();
   await seedBuilderNFTs();
 }
 
-script();
+script()

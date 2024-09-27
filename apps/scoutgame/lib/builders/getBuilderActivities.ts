@@ -18,6 +18,7 @@ type MergedPullRequestActivity = {
   contributionType: GemsReceiptType;
   gems: number;
   repo: string;
+  bonusPartner: string | null;
 };
 
 export type BuilderActivity = BasicUserInfo & {
@@ -48,6 +49,7 @@ export async function getBuilderActivities({
       builder: {
         select: BasicUserInfoSelect
       },
+      bonusPartner: true,
       id: true,
       createdAt: true,
       type: true,
@@ -57,7 +59,8 @@ export async function getBuilderActivities({
             select: {
               username: true
             }
-          }
+          },
+          tokensPurchased: true
         }
       },
       gemsReceipt: {
@@ -101,7 +104,8 @@ export async function getBuilderActivities({
           type: 'merged_pull_request' as const,
           contributionType: event.gemsReceipt.type,
           gems: event.gemsReceipt.value,
-          repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`
+          repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`,
+          bonusPartner: event.bonusPartner
         };
       } else {
         return null;

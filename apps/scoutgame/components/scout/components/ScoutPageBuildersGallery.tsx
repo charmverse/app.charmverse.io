@@ -12,8 +12,8 @@ export async function ScoutPageBuildersGallery({
   showHotIcon
 }: {
   sort: string;
-  user?: { username: string } | null;
   showHotIcon: boolean;
+  user?: { username: string; id: string } | null;
 }) {
   const builders = await getSortedBuilders({
     sort: sort as BuildersSort,
