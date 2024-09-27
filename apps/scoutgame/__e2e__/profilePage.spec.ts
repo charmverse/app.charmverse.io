@@ -20,7 +20,7 @@ test.describe('Profile page', () => {
     await profilePage.selectNavigationLink('/profile').click();
 
     // Logged in user should be redirected
-    await page.waitForURL('**/profile');
+    await page.waitForURL('**/profile*');
     await expect(profilePage.container).toBeVisible();
   });
 });
