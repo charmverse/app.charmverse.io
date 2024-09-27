@@ -31,8 +31,8 @@ export const usdcOptimismSepoliaContractAddress = '0x5fd84259d66Cd46123540766Be9
 export const usdcOptimismMainnetContractAddress = '0x0b2c639c533813f4aa9d7837caf62653d097ff85';
 
 export const usdcContractAddress = useTestnets
-  ? optimismSepoliaBuilderContractAddress
-  : optimismMainnetBuilderContractAddress;
+  ? usdcOptimismSepoliaContractAddress
+  : usdcOptimismMainnetContractAddress;
 
 export const builderSmartContractOwnerKey = process.env.BUILDER_SMART_CONTRACT_OWNER_PRIVKEY as string;
 

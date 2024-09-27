@@ -9,7 +9,7 @@ import type { UseBoxActionArgs } from '@decent.xyz/box-hooks';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Alert, Button, Typography } from '@mui/material';
 import { getChainById } from '@packages/onchain/chains';
-import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/BuilderNFTSeasonOneClient';
+import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/builderNFTSeasonOneClient';
 import {
   builderContractAddress,
   builderNftChain,
@@ -153,9 +153,10 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
   }, [tokensToBuy, builderTokenId, refreshAsk]);
 
   const txArgs: UseBoxActionArgs = {
-    sender: '0xCF1bAA2EE2d3427B4dB2EA5fa4A250E8b44e75d9',
+    enable: !!address,
+    sender: address as `0x${string}`,
     srcToken: '0x0000000000000000000000000000000000000000',
-    dstToken: '0x0b2c639c533813f4aa9d7837caf62653d097ff85',
+    dstToken: usdcContractAddress,
     srcChainId: ChainId.BASE,
     dstChainId: ChainId.OPTIMISM,
     slippage: 1,
@@ -164,7 +165,7 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
     actionConfig: {
       amount: purchaseCost,
       swapDirection: SwapDirection.EXACT_AMOUNT_IN,
-      receiverAddress: '0x9b56c451f593e1BF5E458A3ecaDfD3Ef17A36998'
+      receiverAddress: treasuryAddress
     }
   };
 
