@@ -18,6 +18,10 @@ const StyledBottomNavigation = styled(BottomNavigation, {
     color: topNav ? theme.palette.text.primary : theme.palette.common.black,
     gap: '2px',
     width: topNav ? '110px' : 'auto',
+    transition: 'background-color 0.3s ease',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.1)'
+    },
     '&.Mui-selected': {
       color: theme.palette.text.primary,
       backgroundColor: topNav ? theme.palette.primary.main : 'rgba(44, 0, 90, 0.25)'
