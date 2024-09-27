@@ -42,9 +42,19 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar' | 'cu
   };
 
   return (
-    <AppBar position='static'>
-      <Container maxWidth={false}>
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between', alignItems: 'center' }} variant='dense'>
+    <AppBar
+      position='static'
+      sx={{
+        height: 58,
+        backgroundColor: { xs: 'transparent', md: 'var(--mui-palette-AppBar-darkBg, var(--AppBar-background))' }
+      }}
+    >
+      <Container maxWidth={false} sx={{ height: '100%' }}>
+        <Toolbar
+          disableGutters
+          sx={{ height: '100%', justifyContent: 'space-between', alignItems: 'center' }}
+          variant='dense'
+        >
           <>
             <Link href='/home'>
               <Image
@@ -58,7 +68,7 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar' | 'cu
             </Link>
             <Stack flexDirection='row' gap={2} alignItems='center'>
               <Hidden mdDown>
-                <SiteNavigation transparent />
+                <SiteNavigation topNav />
               </Hidden>
               {user ? (
                 <Box
@@ -67,9 +77,26 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar' | 'cu
                   gap={1}
                   borderColor='secondary.main'
                   borderRadius='30px'
-                  sx={{ borderWidth: '2px', borderStyle: 'solid', pl: 1 }}
+                  sx={{
+                    position: 'relative',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      borderColor: 'secondary.main',
+                      borderRadius: '28px',
+                      borderWidth: '2px',
+                      borderStyle: 'solid',
+                      pointerEvents: 'none'
+                    }
+                  }}
                 >
-                  <Typography variant='caption'>{user.currentBalance}</Typography>
+                  <Typography fontSize='16px' sx={{ pl: 2 }}>
+                    {user.currentBalance}
+                  </Typography>
                   <Image
                     src='/images/profile/scout-game-icon.svg'
                     width={20}

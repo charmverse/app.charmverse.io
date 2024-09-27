@@ -21,7 +21,9 @@ export default async function Layout({
         {children}
       </Box>
       <Hidden mdUp>
-        <SiteNavigation />
+        <footer>
+          <SiteNavigation />
+        </footer>
       </Hidden>
     </Box>
   );
