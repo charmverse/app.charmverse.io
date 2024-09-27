@@ -6,13 +6,15 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { recordGameActivity } from '../recordGameActivity';
 
 import { builderContractAddress, builderNftChain } from './constants';
-import { contractClient } from './contractClient';
+import { getContractClient } from './contractClient';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
 export async function registerBuilderNFT({ builderId, season }: { builderId: string; season: string }) {
   if (!stringUtils.isUUID(builderId)) {
     throw new InvalidInputError('Invalid builderId. Must be a uuid');
   }
+
+  const contractClient = getContractClient();
 
   const existingBuilderNft = await prisma.builderNft.findFirst({
     where: {
@@ -24,7 +26,7 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
   });
 
   if (existingBuilderNft) {
-    const updatedBuilderNft = await refreshBuilderNftPrice({ builderId });
+    const updatedBuilderNft = await refreshBuilderNftPrice({ builderId, season });
     return updatedBuilderNft;
   }
 
@@ -54,7 +56,7 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
     existingTokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
   }
 
-  const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId });
+  const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId, season });
 
   await prisma.scout.update({
     where: {

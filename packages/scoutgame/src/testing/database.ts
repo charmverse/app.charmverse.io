@@ -297,12 +297,14 @@ export async function mockBuilderNft({
   builderId,
   chainId = 1,
   contractAddress = '0x1',
-  owners = []
+  owners = [],
+  season = mockSeason
 }: {
   builderId: string;
   chainId?: number;
   contractAddress?: string;
   owners?: (string | { id: string })[];
+  season?: string;
 }) {
   return prisma.builderNft.create({
     data: {
@@ -310,7 +312,7 @@ export async function mockBuilderNft({
       chainId,
       contractAddress,
       currentPrice: 0,
-      season: mockSeason,
+      season,
       tokenId: Math.round(Math.random() * 10000000),
       nftSoldEvents: {
         createMany: {

@@ -38,5 +38,3 @@ export function getWalletClient({
     })
   }).extend(publicActions);
 }
-
-const client = getWalletClient({ chainId: optimismSepolia.id, privateKey: credentialsWalletPrivateKey as string });

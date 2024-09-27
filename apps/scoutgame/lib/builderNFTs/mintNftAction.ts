@@ -96,7 +96,7 @@ export const mintNftAction = authActionClient
       }
     });
 
-    await refreshBuilderNftPrice({ builderId: parsedInput.builderId });
+    await refreshBuilderNftPrice({ builderId: parsedInput.builderId, season: currentSeason });
 
     await recordGameActivity({
       sourceEvent: {
