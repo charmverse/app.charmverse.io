@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek, getLastWeek } from '@packages/scoutgame/dates';
+import { getPreviousWeek } from '@packages/scoutgame/dates';
 
 import type { BuilderInfo } from './interfaces';
 
@@ -7,10 +7,14 @@ export type BuildersSort = 'top' | 'hot' | 'new';
 
 export async function getSortedBuilders({
   sort,
-  limit
+  limit,
+  week,
+  season
 }: {
   sort: BuildersSort;
   limit: number;
+  week: string;
+  season: string;
 }): Promise<BuilderInfo[]> {
   // new is based on the most recent builder
   // top is based on the most gems earned in their user week stats
@@ -36,7 +40,7 @@ export async function getSortedBuilders({
             createdAt: true,
             builderNfts: {
               where: {
-                season: currentSeason
+                season
               },
               select: {
                 currentPrice: true,
@@ -47,7 +51,7 @@ export async function getSortedBuilders({
             },
             userWeeklyStats: {
               where: {
-                week: getCurrentWeek()
+                week
               },
               select: {
                 gemsCollected: true
@@ -60,8 +64,8 @@ export async function getSortedBuilders({
             }
           }
         })
-        .then((scouts) =>
-          scouts.map((scout) => ({
+        .then((scouts) => {
+          return scouts.map((scout) => ({
             id: scout.id,
             avatar: scout.avatar,
             username: scout.username,
@@ -71,8 +75,8 @@ export async function getSortedBuilders({
             scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             gems: scout.userWeeklyStats[0]?.gemsCollected ?? 0,
             builderStatus: scout.builderStatus
-          }))
-        );
+          }));
+        });
       break;
 
     case 'top':
@@ -82,7 +86,7 @@ export async function getSortedBuilders({
             user: {
               builderStatus: 'approved'
             },
-            week: getCurrentWeek()
+            week
           },
           orderBy: {
             rank: 'asc'
@@ -97,7 +101,7 @@ export async function getSortedBuilders({
                 builderStatus: true,
                 builderNfts: {
                   where: {
-                    season: currentSeason
+                    season
                   },
                   select: {
                     currentPrice: true,
@@ -132,7 +136,7 @@ export async function getSortedBuilders({
       break;
 
     case 'hot': {
-      const previousWeek = getLastWeek();
+      const previousWeek = getPreviousWeek(week);
 
       builders = await prisma.userWeeklyStats
         .findMany({
@@ -142,7 +146,7 @@ export async function getSortedBuilders({
               builderStatus: 'approved'
             }
           },
-          orderBy: [{ week: 'desc' }, { rank: 'asc' }],
+          orderBy: { rank: 'asc' },
           take: limit,
           select: {
             user: {
@@ -158,7 +162,7 @@ export async function getSortedBuilders({
                 },
                 builderNfts: {
                   where: {
-                    season: currentSeason
+                    season
                   },
                   select: {
                     currentPrice: true,

@@ -18,7 +18,11 @@ export function getCurrentWeek(): ISOWeek {
 }
 
 export function getLastWeek(): ISOWeek {
-  return _formatWeek(DateTime.utc().minus({ week: 1 }));
+  return getPreviousWeek(getCurrentWeek());
+}
+
+export function getPreviousWeek(week: ISOWeek): ISOWeek {
+  return _formatWeek(getDateFromISOWeek(week).minus({ week: 1 }));
 }
 
 export function getWeekFromDate(date: Date): ISOWeek {

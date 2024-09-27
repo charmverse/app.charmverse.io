@@ -1,5 +1,5 @@
 import { GithubEventType } from '@charmverse/core/prisma';
-import type { BuilderEvent, BuilderEventType, BuilderStatus, GithubRepo } from '@charmverse/core/prisma';
+import type { BuilderEvent, BuilderEventType, BuilderStatus, GithubRepo, Scout } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
@@ -13,18 +13,15 @@ type RepoAddress = {
 };
 
 export async function mockBuilder({
+  createdAt,
   builderStatus = 'approved',
   githubUserId = randomLargeInt(),
   onboardedAt,
   username = uuid()
-}: {
-  builderStatus?: BuilderStatus;
-  githubUserId?: number;
-  onboardedAt?: Date;
-  username?: string;
-} = {}) {
+}: Partial<Scout & { githubUserId?: number }> = {}) {
   const result = await prisma.scout.create({
     data: {
+      createdAt,
       username,
       displayName: 'Test User',
       builderStatus,
@@ -403,4 +400,46 @@ export async function createMockEvents({ userId, amount = 5 }: MockEventParams) 
       amount: Math.floor(Math.random() * 10) + 1 // Random points between 1 and 10
     });
   }
+}
+
+export function mockUserAllTimeStats({
+  userId,
+  pointsEarnedAsBuilder = Math.floor(Math.random() * 1000),
+  pointsEarnedAsScout = Math.floor(Math.random() * 1000)
+}: {
+  userId: string;
+  pointsEarnedAsBuilder?: number;
+  pointsEarnedAsScout?: number;
+}) {
+  return prisma.userAllTimeStats.create({
+    data: {
+      userId,
+      pointsEarnedAsBuilder,
+      pointsEarnedAsScout
+    }
+  });
+}
+
+export function mockUserWeeklyStats({
+  gemsCollected = Math.floor(Math.random() * 100),
+  rank,
+  userId,
+  week = getCurrentWeek(),
+  season = mockSeason
+}: {
+  gemsCollected?: number;
+  rank?: number;
+  userId: string;
+  week?: string;
+  season?: string;
+}) {
+  return prisma.userWeeklyStats.create({
+    data: {
+      userId,
+      gemsCollected,
+      rank,
+      week,
+      season
+    }
+  });
 }
