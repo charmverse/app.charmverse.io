@@ -130,6 +130,9 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar' | 'cu
                     <MenuItem>
                       <Link href='/profile'>{user.username}</Link>
                     </MenuItem>
+                    <MenuItem>
+                      <Link href='/info'>About Scout Game</Link>
+                    </MenuItem>
                     <MenuItem onClick={() => logoutUser()}>Sign Out</MenuItem>
                     <InstallAppMenuItem>Install</InstallAppMenuItem>
                   </Menu>
