@@ -26,6 +26,7 @@ declare module '@mui/material/styles' {
     default: string;
     paper: string;
     dark: string;
+    light: string;
   }
 }
 
