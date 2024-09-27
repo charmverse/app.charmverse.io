@@ -31,7 +31,7 @@ export async function generateScout(params: { isBuilder: boolean } = { isBuilder
 
   const currentBuilderCount = await prisma.scout.count({
     where: {
-      builder: true
+      builderStatus: 'approved'
     }
   });
 
@@ -58,7 +58,7 @@ export async function generateScout(params: { isBuilder: boolean } = { isBuilder
       walletAddress: faker.finance.ethereumAddress(),
       farcasterId: faker.number.int({ min: 1, max: 5000 }),
       farcasterName: displayName,
-      builder: isBuilder,
+      builderStatus: isBuilder ? 'approved' : null,
       githubUser: isBuilder
         ? {
             create: githubUser
