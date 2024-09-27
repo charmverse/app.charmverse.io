@@ -1,9 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
-import { currentSeason } from '@packages/scoutgame/dates';
 
-export async function generateScout(params: { isBuilder: boolean } = { isBuilder: false }) {
-  const { isBuilder } = params;
+export async function generateScout() {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
   const displayName = `${firstName} ${lastName}`;
@@ -20,32 +18,6 @@ export async function generateScout(params: { isBuilder: boolean } = { isBuilder
     : undefined;
   const avatar = faker.image.url();
 
-  const githubUser = isBuilder
-    ? {
-        id: faker.number.int({ min: 100000, max: 10000000 }),
-        login: username,
-        email,
-        displayName
-      }
-    : undefined;
-
-  const currentBuilderCount = await prisma.scout.count({
-    where: {
-      builderStatus: 'approved'
-    }
-  });
-
-  const builderNft = isBuilder
-    ? {
-        id: faker.string.uuid(),
-        chainId: 1,
-        contractAddress: faker.finance.ethereumAddress(),
-        currentPrice: faker.number.int({ min: 1, max: 100 }),
-        season: currentSeason,
-        tokenId: currentBuilderCount
-      }
-    : undefined;
-
   const scout = await prisma.scout.create({
     data: {
       username,
@@ -58,23 +30,8 @@ export async function generateScout(params: { isBuilder: boolean } = { isBuilder
       walletAddress: faker.finance.ethereumAddress(),
       farcasterId: faker.number.int({ min: 1, max: 5000 }),
       farcasterName: displayName,
-      builderStatus: isBuilder ? 'approved' : null,
-      githubUser: isBuilder
-        ? {
-            create: githubUser
-          }
-        : undefined,
-      builderNfts: isBuilder
-        ? {
-            create: builderNft
-          }
-        : undefined
     }
   });
 
-  return {
-    scout,
-    githubUser,
-    builderNft
-  };
+  return scout;
 }

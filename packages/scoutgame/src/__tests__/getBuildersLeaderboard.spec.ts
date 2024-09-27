@@ -135,4 +135,33 @@ describe('getBuildersLeaderboard', () => {
       expect(item.rank).toBe(index + 1);
     });
   });
+
+  it('should only include builders with approved status', async () => {
+    const testWeek = v4();
+    const builders = await Promise.all([
+      mockBuilder({ username: `charlie-${v4()}`, builderStatus: 'approved' }),
+      mockBuilder({ username: `alice-${v4()}`, builderStatus: 'applied' }),
+      mockBuilder({ username: `bob-${v4()}`, builderStatus: 'rejected' }),
+      mockBuilder({ username: `david-${v4()}`, builderStatus: 'approved' }),
+      mockBuilder({ username: `eve-${v4()}`, builderStatus: 'approved' })
+    ]);
+
+    // Create weekly stats with 0 gems collected for all builders
+    await Promise.all(
+      builders.map(async (builder) => {
+        await prisma.userWeeklyStats.create({
+          data: {
+            userId: builder.id,
+            week: testWeek,
+            season: 'blah',
+            gemsCollected: 0
+          }
+        });
+      })
+    );
+
+    const topBuilders = await getBuildersLeaderboard({ quantity: 5, week: testWeek });
+
+    expect(topBuilders).toHaveLength(3);
+  });
 });

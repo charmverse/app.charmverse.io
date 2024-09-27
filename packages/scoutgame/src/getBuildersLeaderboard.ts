@@ -3,7 +3,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 export async function getBuildersLeaderboard({ quantity, week }: { quantity?: number; week: string }) {
   const userWeeklyStats = await prisma.userWeeklyStats.findMany({
     where: {
-      week
+      week,
+      user: {
+        builderStatus: 'approved'
+      }
     },
     orderBy: {
       gemsCollected: 'desc'

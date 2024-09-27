@@ -12,6 +12,7 @@ import { getWeekFromDate } from '@packages/scoutgame/dates';
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
 import { claimPoints } from '@packages/scoutgame/claimPoints';
 import { updateBuildersRank } from '../../tasks/processPullRequests/updateBuildersRank';
+import { generateBuilder } from './generateBuilder';
 
 export type BuilderInfo = {
   id: string;
@@ -20,18 +21,6 @@ export type BuilderInfo = {
   assignedRepos: GithubRepo[];
   githubUser: Pick<GithubUser, 'id' | 'login'>;
 };
-
-async function generateBuilder() {
-  const { scout, githubUser, builderNft } = await generateScout({ isBuilder: true });
-
-  return {
-    builder: scout,
-    githubUser: githubUser as GithubUser,
-    builderNft: builderNft as Omit<BuilderNft, 'builderId' | 'createdAt' | 'currentPrice'> & {
-      currentPrice: number;
-    }
-  };
-}
 
 function assignReposToBuilder(githubRepos: GithubRepo[]): GithubRepo[] {
   const repoCount = faker.number.int({ min: 3, max: 5 });
@@ -85,7 +74,7 @@ export async function generateSeedData() {
   }
 
   for (let i = 0; i < totalScouts; i++) {
-    const { scout } = await generateScout();
+    const scout = await generateScout();
     // Realistically a scout will only scout a few builders, by purchasing multiple of their nfts
     const assignedBuilders = assignBuildersToScout(builders);
     scouts.push({
