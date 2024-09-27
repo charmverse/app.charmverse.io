@@ -101,7 +101,7 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
     setBalances(newBalances);
 
     return newBalances;
-  }, [address, sourceFundsChain, useTestnets]);
+  }, [address, sourceFundsChain]);
 
   useEffect(() => {
     if (sourceFundsChain) {

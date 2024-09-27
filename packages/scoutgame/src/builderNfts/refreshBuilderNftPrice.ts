@@ -5,7 +5,7 @@ import { getPublicClient } from '@packages/onchain/getPublicClient';
 
 import { BuilderNFTSeasonOneClient } from './builderNFTSeasonOneClient';
 import { builderContractAddress, builderNftChain } from './constants';
-import { getContractClient } from './contractClient';
+import { getBuilderContractAdminClient } from './contractClient';
 
 const builderApiClient = new BuilderNFTSeasonOneClient({
   chain: builderNftChain,
@@ -18,7 +18,7 @@ export async function refreshBuilderNftPrice({ builderId, season }: { builderId:
     throw new InvalidInputError('Invalid builderId. Must be a uuid');
   }
 
-  const contractClient = getContractClient();
+  const contractClient = getBuilderContractAdminClient();
 
   const tokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
 

@@ -127,6 +127,16 @@ async function seedBuilderNFTs() {
     await generateNftPurchaseEvents({ builderId: nft.builderId, amount: 4 });
 
     await refreshUserStats({ userId: builderId as string });
+
+    await prisma.scout.update({
+      where: {
+        id: builderId as string
+      },
+      data: {
+        builder: true,
+        builderStatus: 'approved'
+      }
+    })
   }
 }
 
@@ -186,4 +196,4 @@ async function script() {
   await seedBuilderNFTs();
 }
 
-// script()
+script()

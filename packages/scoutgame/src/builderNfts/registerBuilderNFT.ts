@@ -26,6 +26,7 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
   });
 
   if (existingBuilderNft) {
+    log.info(`Builder already existing with token id ${existingBuilderNft.tokenId}`);
     const updatedBuilderNft = await refreshBuilderNftPrice({ builderId, season });
     return updatedBuilderNft;
   }
@@ -57,6 +58,16 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
   }
 
   const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId, season });
+
+  await prisma.scout.update({
+    where: {
+      id: builderId
+    },
+    data: {
+      builder: true,
+      builderStatus: 'approved'
+    }
+  });
 
   await recordGameActivity({
     activity: {
