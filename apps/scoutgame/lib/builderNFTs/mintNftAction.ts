@@ -1,12 +1,12 @@
 'use server';
 
 import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
+import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/builderNFTSeasonOneClient';
 import {
   builderContractAddress,
   builderNftChain,
   builderSmartContractOwnerKey
 } from '@packages/scoutgame/builderNfts/constants';
-import { ContractApiClient } from '@packages/scoutgame/builderNfts/nftContractApiClient';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
@@ -50,24 +50,25 @@ export const mintNftAction = authActionClient
 
     const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey });
 
-    const apiClient = new ContractApiClient({
+    const apiClient = new BuilderNFTSeasonOneClient({
       chain: builderNftChain,
       contractAddress: builderContractAddress,
       walletClient: serverClient
     });
 
-    const nextPrice = await apiClient.getTokenPurchasePrice({
+    const nextPrice = await apiClient.getTokenQuote({
       args: {
         tokenId: BigInt(parsedInput.tokenId),
         amount: BigInt(parsedInput.amount)
       }
     });
 
-    const txResult = await apiClient.mint({
+    const txResult = await apiClient.mintTo({
       args: {
         account: parsedInput.address,
         tokenId: BigInt(parsedInput.tokenId),
-        amount: BigInt(parsedInput.amount)
+        amount: BigInt(parsedInput.amount),
+        scout: userId
       }
     });
 

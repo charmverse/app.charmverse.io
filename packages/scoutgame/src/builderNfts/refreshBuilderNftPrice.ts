@@ -5,10 +5,10 @@ import { getPublicClient } from '@packages/onchain/getPublicClient';
 
 import { currentSeason } from '../dates';
 
+import { BuilderNFTSeasonOneClient } from './builderNFTSeasonOneClient';
 import { builderContractAddress, builderNftChain } from './constants';
-import { ContractApiClient } from './nftContractApiClient';
 
-const builderApiClient = new ContractApiClient({
+const builderApiClient = new BuilderNFTSeasonOneClient({
   chain: builderNftChain,
   contractAddress: builderContractAddress,
   publicClient: getPublicClient(builderNftChain.id)
@@ -21,7 +21,7 @@ export async function refreshBuilderNftPrice({ builderId }: { builderId: string 
 
   const tokenId = await builderApiClient.getTokenIdForBuilder({ args: { builderId } });
 
-  const currentPrice = await builderApiClient.getTokenPurchasePrice({
+  const currentPrice = await builderApiClient.getTokenQuote({
     args: { tokenId, amount: BigInt(1) }
   });
 
@@ -38,10 +38,10 @@ export async function refreshBuilderNftPrice({ builderId }: { builderId: string 
       contractAddress: builderContractAddress,
       tokenId: Number(tokenId),
       season: currentSeason,
-      currentPrice
+      currentPrice: Number(currentPrice)
     },
     update: {
-      currentPrice
+      currentPrice: Number(currentPrice)
     }
   });
 }

@@ -7,11 +7,11 @@ import { getScoutGameNftAdminWallet } from '@packages/scoutgame/getScoutGameNftA
 import { currentSeason } from '../dates';
 import { recordGameActivity } from '../recordGameActivity';
 
+import { BuilderNFTSeasonOneClient } from './builderNFTSeasonOneClient';
 import { builderContractAddress, builderNftChain } from './constants';
-import { ContractApiClient } from './nftContractApiClient';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
-const builderNftWriteApiClient = new ContractApiClient({
+const builderNftWriteApiClient = new BuilderNFTSeasonOneClient({
   chain: builderNftChain,
   contractAddress: builderContractAddress,
   walletClient: getScoutGameNftAdminWallet()

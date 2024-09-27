@@ -9,8 +9,8 @@ import type { EvmTransaction } from '@decent.xyz/box-common';
 import { ActionType, ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Alert, Button, Typography } from '@mui/material';
+import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/BuilderNFTSeasonOneClient';
 import { builderContractAddress, builderNftChain } from '@packages/scoutgame/builderNfts/constants';
-import { ContractApiClient } from '@packages/scoutgame/builderNfts/nftContractApiClient';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
@@ -22,7 +22,7 @@ import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
 
-const readonlyApiClient = new ContractApiClient({
+const readonlyApiClient = new BuilderNFTSeasonOneClient({
   chain: builderNftChain,
   contractAddress: builderContractAddress,
   publicClient: getPublicClient(builderNftChain.id)
@@ -38,7 +38,7 @@ export type NFTPurchaseProps = {
 function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
   const { address, walletClient } = useWallet();
 
-  // const [nftApiClient, setNftApiClient] = useState<ContractApiClient>(null);
+  // const [nftApiClient, setNftApiClient] = useState<BuilderNFTSeasonOneClient>(null);
 
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
