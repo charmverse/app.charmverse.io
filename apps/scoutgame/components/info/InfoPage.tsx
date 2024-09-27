@@ -1,9 +1,10 @@
-import { Box, Link, List, ListItem, Typography } from '@mui/material';
+import { Link, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import { Blockquote } from 'components/layout/DocumentPageContainer/components/Blockquote';
-import { InfoCard } from 'components/layout/DocumentPageContainer/components/InfoCard';
-import { DocumentPageContainer } from 'components/layout/DocumentPageContainer/DocumentPageContainer';
+import { Blockquote } from 'components/common/DocumentPageContainer/components/Blockquote';
+import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
+import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
+import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
 
 export function InfoPage() {
   return (
@@ -34,24 +35,18 @@ function Document() {
           Think fantasy sports for open-source development. Collect builder NFTs, earn points when they merge Pull
           Requests in approved repositories, and win rewards. Some projects even offer additional crypto incentives.
         </Typography>
-        <List sx={{ listStyleType: 'disc', ml: 2 }}>
-          <ListItem sx={{ display: 'list-item' }}>
-            Anyone can scout a builder by buying NFTs representing that builder
-          </ListItem>
-          <ListItem sx={{ display: 'list-item' }}>
+        <List>
+          <ListItem>Anyone can scout a builder by buying NFTs representing that builder</ListItem>
+          <ListItem>
             A builder can claim Scout Gems after performing Qualified Actions like a merged pull request in a Qualified
             GitHub Repository
           </ListItem>
-          <ListItem sx={{ display: 'list-item' }}>
+          <ListItem>
             At the end of each week, Builders are ranked by the number of Gems they collect. Scout Points are allocated
             to the top-ranking Builders and the Scouts who hold their NFTs
           </ListItem>
-          <ListItem sx={{ display: 'list-item' }}>
-            Scouts and Builders can claim Scout Points at the end of each week
-          </ListItem>
-          <ListItem sx={{ display: 'list-item' }}>
-            Scout Points are only claimable for the last and current seasons (3 months each)
-          </ListItem>
+          <ListItem>Scouts and Builders can claim Scout Points at the end of each week</ListItem>
+          <ListItem>Scout Points are only claimable for the last and current seasons (3 months each)</ListItem>
         </List>
       </InfoCard>
       <InfoCard title='What is Scout Game?'>
@@ -84,11 +79,9 @@ function Document() {
           <Typography variant='h6' color='secondary' mt={2}>
             Key Scout Actions:
           </Typography>
-          <List sx={{ listStyleType: 'disc', ml: 2 }}>
-            <ListItem sx={{ display: 'list-item' }}>Collect NFTs from top builders every season.</ListItem>
-            <ListItem sx={{ display: 'list-item' }}>
-              Earn Scout Points when the builders you back succeed in open-source contributions.
-            </ListItem>
+          <List>
+            <ListItem>Collect NFTs from top builders every season.</ListItem>
+            <ListItem>Earn Scout Points when the builders you back succeed in open-source contributions.</ListItem>
           </List>
         </div>
       </InfoCard>
@@ -104,14 +97,10 @@ function Document() {
         </Typography>
         <div>
           <Typography>Collect Gems for completing qualified actions:</Typography>
-          <List sx={{ listStyleType: 'disc', ml: 2 }}>
-            <ListItem sx={{ display: 'list-item' }}>
-              Contribute to approved open-source projects with an accepted Pull Request
-            </ListItem>
-            <ListItem sx={{ display: 'list-item' }}>
-              Make your mark with a first-time code contribution to an approved project
-            </ListItem>
-            <ListItem sx={{ display: 'list-item' }}>Hit a 3-Pull Request streak within 7 days</ListItem>
+          <List>
+            <ListItem>Contribute to approved open-source projects with an accepted Pull Request</ListItem>
+            <ListItem>Make your mark with a first-time code contribution to an approved project</ListItem>
+            <ListItem>Hit a 3-Pull Request streak within 7 days</ListItem>
           </List>
         </div>
       </InfoCard>
@@ -128,17 +117,17 @@ function Document() {
           Scout Game runs in seasons. Each season is 13 weeks. During each week, Builders collect Scout Gems by
           completing qualified actions.
         </Typography>
-        <List sx={{ listStyleType: 'disc', ml: 2 }}>
-          <ListItem sx={{ display: 'list-item' }}>
+        <List>
+          <ListItem>
             <Typography>One merged Pull Request in a Qualified GitHub Repository = 1 Gem</Typography>
           </ListItem>
-          <ListItem sx={{ display: 'list-item' }}>
+          <ListItem>
             <Typography>
               3rd Pull Request of a streak of 3 Merged Pull Requests in Qualified GitHub Repositories within a 7-day
               window = 3 Gems
             </Typography>
           </ListItem>
-          <ListItem sx={{ display: 'list-item' }}>
+          <ListItem>
             <Typography>First Pull Request in a Qualified GitHub Repository = 10 Gems</Typography>
           </ListItem>
         </List>
@@ -204,20 +193,20 @@ function Document() {
       </InfoCard>
       <InfoCard title='Spam Policy'>
         <Typography>Scout Game automatically detects REJECTED Pull Requests from Builders.</Typography>
-        <List sx={{ listStyleType: 'disc', ml: 2 }}>
-          <ListItem sx={{ display: 'list-item' }}>
+        <List>
+          <ListItem>
             <Typography>Each rejected Pull Request is treated as an abuse report.</Typography>
           </ListItem>
-          <ListItem sx={{ display: 'list-item' }}>
+          <ListItem>
             <Typography>Qualified GitHub repo owners may report abuse in Scout Game.</Typography>
           </ListItem>
-          <ListItem sx={{ display: 'list-item' }}>
+          <ListItem>
             <Typography>CharmVerse core team may also report abuse.</Typography>
           </ListItem>
-          <ListItem sx={{ display: 'list-item' }}>
+          <ListItem>
             <Typography>Builders receiving 3 abuse reports will be permanently banned from the Scout Game.</Typography>
           </ListItem>
-          <ListItem sx={{ display: 'list-item' }}>
+          <ListItem>
             <Typography>
               A suspended Builder may appeal to rejoin the Scout Game.
               <br /> Submit an appeal here:{' '}

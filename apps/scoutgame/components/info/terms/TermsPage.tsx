@@ -1,8 +1,8 @@
 import { Typography } from '@mui/material';
 
-import { InfoCard } from 'components/layout/DocumentPageContainer/components/InfoCard';
-import { List, ListItem } from 'components/layout/DocumentPageContainer/components/List';
-import { DocumentPageContainer } from 'components/layout/DocumentPageContainer/DocumentPageContainer';
+import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
+import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
+import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
 
 export function TermsPage() {
   return (
