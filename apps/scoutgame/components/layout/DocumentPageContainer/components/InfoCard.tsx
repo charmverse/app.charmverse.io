@@ -18,9 +18,11 @@ export function InfoCard({ children, title }: PropsWithChildren<{ title?: string
     >
       <Divider sx={{ borderColor: 'secondary.main', borderWidth: { xs: 1, md: 0 } }} />
       <Box display='flex' flexDirection='column' gap={2} my={2} py={2} px={{ md: 4 }}>
-        <Typography variant='h5' fontWeight={600} textAlign='center' color='secondary'>
-          {title}
-        </Typography>
+        {title && (
+          <Typography variant='h5' fontWeight={600} textAlign='center' color='secondary'>
+            {title}
+          </Typography>
+        )}
         {children}
       </Box>
     </Card>

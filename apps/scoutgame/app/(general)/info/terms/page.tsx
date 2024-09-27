@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
-import { InfoPage } from 'components/info/InfoPage';
+import { TermsPage } from 'components/info/terms/TermsPage';
 
 export const metadata: Metadata = {
-  title: 'Info'
+  title: 'Terms'
 };
 
 export default async function Info() {
-  return <InfoPage />;
+  return <TermsPage />;
 }

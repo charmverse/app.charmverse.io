@@ -21,12 +21,12 @@ export function InfoPage() {
       <Typography variant='h4' align='center' color='secondary'>
         All about Scout Game!
       </Typography>
-      <LearnMore />
+      <Document />
     </DocumentPageContainer>
   );
 }
 
-function LearnMore() {
+function Document() {
   return (
     <>
       <InfoCard title='TL;DR'>
