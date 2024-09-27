@@ -275,6 +275,7 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
 function NFTPurchaseWithLogin(props: NFTPurchaseProps) {
   const { address } = useWallet(); // Hook to access the connected wallet details
 
+  // Waiting for component to render before fetching the API key
   const apiKey = env('DECENT_API_KEY');
 
   if (!apiKey) {
