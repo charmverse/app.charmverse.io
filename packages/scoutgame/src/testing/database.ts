@@ -17,8 +17,9 @@ export async function mockBuilder({
   builderStatus = 'approved',
   githubUserId = randomLargeInt(),
   onboardedAt,
-  username = uuid()
-}: Partial<Scout & { githubUserId?: number }> = {}) {
+  username = uuid(),
+  createNft = false
+}: Partial<Scout & { githubUserId?: number; createNft?: boolean }> = {}) {
   const result = await prisma.scout.create({
     data: {
       createdAt,
@@ -38,7 +39,7 @@ export async function mockBuilder({
     }
   });
 
-  if (builderStatus === 'approved') {
+  if (createNft) {
     await mockBuilderNft({ builderId: result.id });
   }
   const { githubUser, ...scout } = result;
