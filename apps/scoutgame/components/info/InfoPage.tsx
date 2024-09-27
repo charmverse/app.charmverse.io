@@ -1,19 +1,14 @@
 import 'server-only';
 
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { Box, List, ListItem, Typography, Divider, Stack } from '@mui/material';
 import Image from 'next/image';
 
-import { SinglePageLayout } from 'components/common/Layout';
-import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
-
-import { DotsDivider } from './components/DotsDivider';
 import { ScrollButton } from './components/ScrollButton';
 
 export function InfoPage() {
   return (
-    <div>
+    <div data-test='info-page'>
       <Box mt={8} mb={12} gap={2} display='flex' flexDirection='column' alignItems='center' justifyContent='center'>
         <Image
           src='/images/scout-game-logo-square.png'
