@@ -1,5 +1,5 @@
-import { getAllNftOwners } from '../builderNfts/getAllNftOwners';
-import { mockBuilder, mockScout, mockBuilderNft } from '../testing/database';
+import { mockBuilder, mockScout, mockBuilderNft } from '../../testing/database';
+import { getAllNftOwners } from '../getAllNftOwners';
 
 describe('getAllNftOwners', () => {
   it('should return a list of unique scout IDs', async () => {
