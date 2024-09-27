@@ -25,12 +25,22 @@ export function BuilderCardNftDisplay({
           borderImage: 'linear-gradient(152.64deg, #69DDFF 2.2%, #85A5EA 48.95%, #A06CD5 95.71%) 1'
         }}
       >
-        <Box position='relative' minHeight={avatar ? undefined : 200}>
+        <Box position='relative' minHeight={avatar ? undefined : { xs: 150, md: 200 }}>
           {avatar ? (
             <CardMedia component='img' sx={{ aspectRatio: '1 / 1' }} image={avatar ?? ''} alt={username} />
           ) : (
             <PersonIcon
-              sx={{ px: 2, fontSize: 250, position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: -20 }}
+              sx={{
+                px: 2,
+                fontSize: {
+                  xs: 200,
+                  md: 250
+                },
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                top: -20
+              }}
             />
           )}
           {showHotIcon ? (

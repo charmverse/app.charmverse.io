@@ -49,6 +49,14 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           pointsEarnedAsBuilder: true
         }
       },
+      builderNfts: {
+        where: {
+          season: currentSeason
+        },
+        select: {
+          imageUrl: true
+        }
+      },
       builderStatus: true,
       userWeeklyStats: {
         where: {
@@ -64,7 +72,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
   return builders.map((builder) => {
     return {
       id: builder.id,
-      avatar: builder.avatar,
+      avatar: builder.builderNfts[0]?.imageUrl,
       username: builder.username,
       displayName: builder.displayName,
       builderStatus: builder.builderStatus,

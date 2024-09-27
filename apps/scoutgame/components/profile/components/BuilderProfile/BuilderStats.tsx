@@ -33,9 +33,9 @@ export function BuilderStats({
         justifyContent: 'center'
       }}
     >
-      <Box width={isDesktop ? 200 : 150}>
+      <Stack justifyContent='center' width={isDesktop ? 200 : 150}>
         <BuilderCardNftDisplay avatar={avatar} username={username} />
-      </Box>
+      </Stack>
       <Stack justifyContent='space-between' gap={2}>
         <Stack justifyContent='center' gap={0.5}>
           <Typography fontWeight={500} color='secondary' variant='subtitle1' align='center'>
