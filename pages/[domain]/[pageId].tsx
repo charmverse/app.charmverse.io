@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSidePropsContext } from 'next';
 import { useEffect } from 'react';
@@ -79,14 +80,22 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         // strip out parameters from the path
         delete sanitizedQuery.domain;
         delete sanitizedQuery.pageId;
+        const destination = getPagePath({
+          hostName: ctx.req.headers.host,
+          path: page.path,
+          query: sanitizedQuery,
+          spaceDomain: domain
+        });
+        log.info('Redirecting to latest page path', {
+          destination,
+          hostName: ctx.req.headers.host,
+          newPath: page.path,
+          domain,
+          pagePath
+        });
         return {
           redirect: {
-            destination: getPagePath({
-              hostName: ctx.req.headers.host,
-              path: page.path,
-              query: sanitizedQuery,
-              spaceDomain: domain
-            }),
+            destination,
             permanent: false
           }
         };

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -36,6 +37,7 @@ export function WalletLoginWrapper() {
       await executeAsync({ message, signature });
       router.push('/');
     } catch (error) {
+      log.error('Error logging in with wallet', { error });
       // handle sign error or login error
     }
   };

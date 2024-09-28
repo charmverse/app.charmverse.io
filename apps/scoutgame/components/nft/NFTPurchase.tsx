@@ -66,10 +66,10 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
 
   const { isExecuting, hasSucceeded, executeAsync, result } = useAction(mintNftAction, {
     onSuccess() {
-      log.info('NFT minted');
+      log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
     },
     onError(err) {
-      log.error('Error minting NFT', { error: err });
+      log.error('Error minting NFT', { chainId, builderTokenId, purchaseCost, error: err });
     }
   });
 

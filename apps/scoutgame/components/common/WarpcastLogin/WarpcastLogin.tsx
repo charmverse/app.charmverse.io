@@ -41,14 +41,22 @@ function WarpcastLoginButton() {
 
   const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
     if (res.message && res.signature) {
-      await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature! });
+      try {
+        await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature! });
+      } catch (error) {
+        log.error('Error logging in after sign-in with with Warpcast', { error });
+      }
     } else {
-      log.error('Did not receive message or signature from farcaster', res);
+      log.error('Did not receive message or signature from Farcaster', res);
     }
   }, []);
 
   const onErrorCallback = useCallback((err?: AuthClientError) => {
-    log.error('There was an error while logging in with Warpcast', { error: err });
+    if (err?.errCode === 'unavailable') {
+      log.warn('Timed out waiting for Warpcast login', { error: err });
+    } else {
+      log.error('There was an error while logging in with Warpcast', { error: err });
+    }
   }, []);
 
   if (isRevalidatingPath || (isAuthenticated && loginWithFarcasterSuccess && revalidatePathSuccess)) {
