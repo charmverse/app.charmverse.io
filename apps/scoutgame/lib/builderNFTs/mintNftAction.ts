@@ -151,14 +151,14 @@ type TransactionStatus = {
   status: string;
 };
 
-async function getDestinationTransactionHash(sourceChainTxHash: string, sourceChainId: number): Promise<string> {
+async function getDestinationTransactionHash(txHash: string, chainId: number): Promise<string> {
   const startTime = Date.now();
   const maxWaitTime = 60000; // 45 seconds
 
   while (Date.now() - startTime < maxWaitTime) {
     try {
       const response = await GET<TransactionStatus>(
-        `https://api.decentscan.xyz/getStatus?txHash=${sourceChainTxHash}&chainId=${sourceChainId}`,
+        `https://api.decentscan.xyz/getStatus?txHash=${txHash}&chainId=${chainId}`,
         undefined,
         {
           headers: {
@@ -172,16 +172,15 @@ async function getDestinationTransactionHash(sourceChainTxHash: string, sourceCh
       }
 
       // Optional: Add a small delay before retrying
-      log.info('No success found try again');
-      prettyPrint(response);
+      log.debug('No success found try again', { txHash, chainId, response });
       await sleep(5000);
     } catch (error) {
-      log.error('Failed to fetch transaction status:', error);
+      log.error('Failed to fetch transaction status:', { txHash, chainId, error });
     }
   }
 
   throw new Error(
-    `Transaction status could not be confirmed within 45 seconds for txHash: ${sourceChainTxHash} on chainId: ${sourceChainId}`
+    `Transaction status could not be confirmed within 45 seconds for txHash: ${txHash} on chainId: ${sourceChainId}`
   );
 }
 
