@@ -100,7 +100,7 @@ export default function RouteGuard({ children }: { children: ReactNode }) {
         return { authorized: false };
       }
 
-      log.info('[RouteGuard]: redirect to login');
+      log.info('[RouteGuard]: redirect to login', { returnUrl: router.asPath });
 
       // Don't return a redirect if we already have a return url
       if (router.query.returnUrl) {
