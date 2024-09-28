@@ -96,6 +96,11 @@ export class StagingStack extends Stack {
         optionName: 'MaxBatchSize',
         value: '3'
       },
+      {
+        namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
+        optionName: 'minimumPercent',
+        value: '50'
+      },
       /* End graceful deployment settings */
       {
         namespace: 'aws:elasticbeanstalk:environment',
