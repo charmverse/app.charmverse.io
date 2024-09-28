@@ -7,6 +7,7 @@ import { recordGameActivity } from '../recordGameActivity';
 
 import { builderContractAddress, builderNftChain } from './constants';
 import { getBuilderContractAdminClient } from './contractClient';
+import { createBuilderNft } from './createBuilderNft';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
 export async function registerBuilderNFT({ builderId, season }: { builderId: string; season: string }) {
@@ -37,6 +38,8 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
     },
     select: {
       githubUser: true,
+      avatar: true,
+      username: true,
       builderStatus: true
     }
   });
@@ -56,6 +59,13 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
     await contractClient.registerBuilderToken({ args: { builderId } });
     existingTokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
   }
+
+  const builderNft = await createBuilderNft({
+    tokenId: existingTokenId,
+    builderId,
+    avatar: builder.avatar,
+    username: builder.username
+  });
 
   const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId, season });
 
@@ -79,7 +89,7 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
     }
   });
 
-  log.info(`Last price: ${nftWithRefreshedPrice.currentPrice}`);
+  log.info(`Last price: ${builderNft.currentPrice}`);
 
-  return nftWithRefreshedPrice;
+  return builderNft;
 }

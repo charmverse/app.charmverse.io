@@ -315,6 +315,7 @@ export async function mockBuilderNft({
       contractAddress,
       currentPrice: 0,
       season,
+      imageUrl: 'https://placehold.co/600x400',
       tokenId: Math.round(Math.random() * 10000000),
       nftSoldEvents: {
         createMany: {

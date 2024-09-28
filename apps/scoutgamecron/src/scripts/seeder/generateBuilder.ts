@@ -40,7 +40,8 @@ export async function generateBuilder() {
     contractAddress: faker.finance.ethereumAddress(),
     currentPrice: faker.number.int({ min: 1, max: 100 }),
     season: currentSeason,
-    tokenId: currentBuilderCount
+    tokenId: currentBuilderCount,
+    imageUrl: faker.datatype.boolean() ? avatar : faker.image.url()
   };
 
   const builderStatusRandom = faker.number.int({min: 1, max: 10});

@@ -2,6 +2,7 @@
 
 import { prisma } from '@charmverse/core/prisma-client';
 import { Alert, Stack, Typography } from '@mui/material';
+import { currentSeason } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -23,9 +24,13 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
       ? await Promise.all([
           prisma.builderNft.findUnique({
             where: {
-              id: builder.id
+              builderId_season: {
+                builderId: builder.id,
+                season: currentSeason
+              }
             },
             select: {
+              imageUrl: true,
               currentPrice: true
             }
           }),
@@ -73,7 +78,7 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
         </Alert>
       ) : null}
       <BuilderStats
-        avatar={builder.avatar}
+        nftImageUrl={builderNft?.imageUrl}
         username={builder.username}
         builderPoints={builderStats?.seasonPoints}
         totalScouts={totalScouts}

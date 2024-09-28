@@ -1,6 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
+import { v4 } from 'uuid';
 
 import { mockBuilder, mockScout, mockBuilderNft } from '../../testing/database';
 import { randomLargeInt } from '../../testing/generators';
@@ -14,9 +15,15 @@ jest.unstable_mockModule('../contractClient', () => ({
   })
 }));
 
+jest.unstable_mockModule('../createBuilderNft', () => ({
+  createBuilderNft: jest.fn()
+}));
+
 const { getBuilderContractAdminClient } = await import('../contractClient');
 
 const { registerBuilderNFT } = await import('../registerBuilderNFT');
+
+const { createBuilderNft } = await import('../createBuilderNft');
 
 describe('registerBuilderNFT', () => {
   const mockSeason = '1';
@@ -27,6 +34,14 @@ describe('registerBuilderNFT', () => {
 
   it('should create a new builder NFT record in the database', async () => {
     const builder = await mockBuilder();
+    (createBuilderNft as jest.Mock<typeof createBuilderNft>).mockImplementation(async () => {
+      return mockBuilderNft({
+        builderId: builder.id,
+        season: mockSeason,
+        chainId: builderNftChain.id,
+        contractAddress: builderContractAddress
+      });
+    });
 
     // Call the function
     await registerBuilderNFT({ builderId: builder.id, season: mockSeason });
@@ -50,11 +65,19 @@ describe('registerBuilderNFT', () => {
 
   it('should return existing builder NFT if already registered', async () => {
     const builder = await mockBuilder();
-    const existingNft = await mockBuilderNft({ builderId: builder.id, season: mockSeason });
+    const existingNft = await mockBuilderNft({
+      builderId: builder.id,
+      season: mockSeason,
+      chainId: builderNftChain.id,
+      contractAddress: builderContractAddress
+    });
 
-    const result = await registerBuilderNFT({ builderId: builder.id, season: mockSeason });
+    const result = await registerBuilderNFT({
+      builderId: builder.id,
+      season: mockSeason
+    });
 
-    expect(result.id).toEqual(existingNft.id);
+    expect(result?.id).toEqual(existingNft.id);
     expect(getBuilderContractAdminClient().registerBuilderToken).not.toHaveBeenCalled();
   });
 

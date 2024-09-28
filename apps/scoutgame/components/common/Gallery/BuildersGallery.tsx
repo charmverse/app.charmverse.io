@@ -6,17 +6,21 @@ import { BuilderCard } from '../Card/BuilderCard/BuilderCard';
 
 export function BuildersGallery({
   builders,
-  user
+  user,
+  columns = 6,
+  showHotIcon = false
 }: {
   builders: BuilderInfo[];
+  columns?: number;
+  showHotIcon?: boolean;
   user?: { username: string; id: string } | null;
 }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={{ xs: 1, sm: 2 }} columns={{ xs: 3, sm: 6 }}>
+      <Grid container spacing={{ xs: 1, sm: 2 }} columns={{ xs: 3, md: columns }}>
         {builders.map((builder) => (
           <Grid key={builder.username} size={{ xs: 1 }}>
-            <BuilderCard builder={builder} showPurchaseButton user={user} />
+            <BuilderCard builder={builder} showPurchaseButton user={user} showHotIcon={showHotIcon} />
           </Grid>
         ))}
       </Grid>

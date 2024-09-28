@@ -4,7 +4,7 @@ import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
 import type { BasicUserInfo } from 'lib/users/interfaces';
-import { BasicUserInfoSelect, MinimalScoutInfoSelect } from 'lib/users/queries';
+import { BasicUserInfoSelect } from 'lib/users/queries';
 
 export type BuilderActivityType = 'nft_purchase' | 'merged_pull_request';
 
@@ -56,7 +56,9 @@ export async function getBuilderActivities({
       nftPurchaseEvent: {
         select: {
           scout: {
-            select: MinimalScoutInfoSelect
+            select: {
+              username: true
+            }
           },
           tokensPurchased: true
         }

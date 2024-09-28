@@ -8,9 +8,11 @@ export const dynamic = 'force-dynamic';
 
 export async function ScoutPageBuildersGallery({
   sort,
-  user
+  user,
+  showHotIcon
 }: {
   sort: string;
+  showHotIcon: boolean;
   user?: { username: string; id: string } | null;
 }) {
   const builders = await getSortedBuilders({
@@ -20,5 +22,5 @@ export async function ScoutPageBuildersGallery({
     season: currentSeason
   });
 
-  return <BuildersGallery builders={builders} user={user} />;
+  return <BuildersGallery builders={builders} user={user} showHotIcon={showHotIcon} />;
 }

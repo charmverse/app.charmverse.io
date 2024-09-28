@@ -16,7 +16,7 @@ export function ScoutPage({ sort, user }: { sort: string; user?: { username: str
       <SearchBuildersInput />
       <SortOptionTabs value={currentSort} />
       <Suspense fallback={<LoadingGallery />}>
-        <ScoutPageBuildersGallery sort={currentSort} user={user} />
+        <ScoutPageBuildersGallery sort={currentSort} user={user} showHotIcon={currentSort === 'hot'} />
       </Suspense>
     </PageContainer>
   );

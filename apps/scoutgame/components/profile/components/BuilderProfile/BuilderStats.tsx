@@ -7,14 +7,14 @@ import { BuilderCardNftDisplay } from 'components/common/Card/BuilderCard/Builde
 import { useMdScreen } from 'hooks/useMediaScreens';
 
 export function BuilderStats({
-  avatar,
+  nftImageUrl,
   username,
   builderPoints,
   totalScouts,
   totalNftsSold,
   currentNftPrice
 }: {
-  avatar?: string | null;
+  nftImageUrl?: string | null;
   username: string;
   builderPoints?: number;
   totalScouts?: number;
@@ -33,9 +33,9 @@ export function BuilderStats({
         justifyContent: 'center'
       }}
     >
-      <Box width={isDesktop ? 200 : 150}>
-        <BuilderCardNftDisplay avatar={avatar} username={username} />
-      </Box>
+      <Stack justifyContent='center' width={isDesktop ? 200 : 150}>
+        <BuilderCardNftDisplay nftImageUrl={nftImageUrl} username={username} />
+      </Stack>
       <Stack justifyContent='space-between' gap={2}>
         <Stack justifyContent='center' gap={0.5}>
           <Typography fontWeight={500} color='secondary' variant='subtitle1' align='center'>

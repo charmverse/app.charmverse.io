@@ -39,7 +39,7 @@ export async function ScoutProfile({ userId }: { userId: string }) {
           Scouted Builders
         </Typography>
         {scoutedBuilders.length > 0 ? (
-          <BuildersGallery builders={scoutedBuilders} />
+          <BuildersGallery builders={scoutedBuilders} columns={3} />
         ) : (
           <Typography>No builders scouted yet</Typography>
         )}

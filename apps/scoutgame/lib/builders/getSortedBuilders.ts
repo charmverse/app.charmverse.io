@@ -40,7 +40,6 @@ export async function getSortedBuilders({
           select: {
             id: true,
             username: true,
-            avatar: true,
             builderStatus: true,
             createdAt: true,
             builderNfts: {
@@ -48,6 +47,7 @@ export async function getSortedBuilders({
                 season
               },
               select: {
+                imageUrl: true,
                 currentPrice: true,
                 nftSoldEvents: {
                   distinct: 'scoutId'
@@ -72,7 +72,7 @@ export async function getSortedBuilders({
         .then((scouts) => {
           return scouts.map((scout) => ({
             id: scout.id,
-            avatar: scout.avatar,
+            nftImageUrl: scout.builderNfts[0]?.imageUrl,
             username: scout.username,
             displayName: scout.username,
             builderPoints: scout.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
@@ -107,7 +107,6 @@ export async function getSortedBuilders({
               select: {
                 id: true,
                 username: true,
-                avatar: true,
                 builderStatus: true,
                 builderNfts: {
                   where: {
@@ -115,6 +114,7 @@ export async function getSortedBuilders({
                   },
                   select: {
                     currentPrice: true,
+                    imageUrl: true,
                     nftSoldEvents: {
                       distinct: 'scoutId'
                     }
@@ -133,7 +133,7 @@ export async function getSortedBuilders({
         .then((stats) =>
           stats.map((stat) => ({
             id: stat.user.id,
-            avatar: stat.user.avatar,
+            nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             username: stat.user.username,
             displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
@@ -169,7 +169,6 @@ export async function getSortedBuilders({
                 id: true,
                 username: true,
                 builderStatus: true,
-                avatar: true,
                 userAllTimeStats: {
                   select: {
                     pointsEarnedAsBuilder: true
@@ -181,6 +180,7 @@ export async function getSortedBuilders({
                   },
                   select: {
                     currentPrice: true,
+                    imageUrl: true,
                     nftSoldEvents: {
                       distinct: 'scoutId'
                     }
@@ -194,7 +194,7 @@ export async function getSortedBuilders({
         .then((stats) =>
           stats.map((stat) => ({
             id: stat.user.id,
-            avatar: stat.user.avatar,
+            nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             username: stat.user.username,
             displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,

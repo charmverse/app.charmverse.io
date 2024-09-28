@@ -35,7 +35,6 @@ const StyledBottomNavigation = styled(BottomNavigation, {
 export function SiteNavigation({ topNav }: { topNav?: boolean }) {
   const pathname = usePathname();
   const value = getActiveButton(pathname);
-
   return (
     <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
       <BottomNavigationAction label='Home' href='/home' value='home' icon={<GoHome size='1.6rem' />} />

@@ -1,6 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
 
+import { BasicUserInfoSelect } from 'lib/users/queries';
+
 import type { BuilderInfo } from './interfaces';
 import { weeklyQualifiedBuilderWhere } from './queries';
 
@@ -15,11 +17,7 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       gemsCollected: true,
       user: {
         select: {
-          id: true,
-          avatar: true,
-          builderStatus: true,
-          username: true,
-          displayName: true,
+          ...BasicUserInfoSelect,
           userSeasonStats: {
             where: {
               season: currentSeason
@@ -45,7 +43,8 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
               season: currentSeason
             },
             select: {
-              currentPrice: true
+              currentPrice: true,
+              imageUrl: true
             }
           }
         }
@@ -61,9 +60,9 @@ export async function getTodaysHotBuilders({ limit }: { limit: number }): Promis
       displayName: user.displayName,
       builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
       price: user.builderNfts[0]?.currentPrice,
+      nftImageUrl: user.builderNfts[0]?.imageUrl,
       nftsSold: user.nftPurchaseEvents.reduce((acc, event) => acc + event.tokensPurchased, 0),
       gems: builder.gemsCollected,
-      avatar: user.avatar,
       scoutedBy: user.nftPurchaseEvents.length,
       builderStatus: user.builderStatus
     };
