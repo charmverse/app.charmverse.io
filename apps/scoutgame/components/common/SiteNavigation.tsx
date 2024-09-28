@@ -4,9 +4,11 @@ import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { usePathname } from 'next/navigation';
 import { CiBellOn } from 'react-icons/ci';
+import { FaRegUser } from 'react-icons/fa';
 import { GoHome } from 'react-icons/go';
 import { MdPersonOutline } from 'react-icons/md';
-import { PiBinoculars } from 'react-icons/pi';
+import { PiBellLight, PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
+import { SlUser } from 'react-icons/sl';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -37,19 +39,19 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
   const value = getActiveButton(pathname);
   return (
     <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
-      <BottomNavigationAction label='Home' href='/home' value='home' icon={<GoHome size='1.6rem' />} />
-      <BottomNavigationAction label='Scout' href='/scout' value='scout' icon={<PiBinoculars size='1.6rem' />} />
+      <BottomNavigationAction label='Home' href='/home' value='home' icon={<PiHouseLight size='24px' />} />
+      <BottomNavigationAction label='Scout' href='/scout' value='scout' icon={<PiBinocularsLight size='24px' />} />
       <BottomNavigationAction
         label='Notifications'
         href='/notifications'
         value='notifications'
-        icon={<CiBellOn size='1.6rem' />}
+        icon={<CiBellOn size='26px' style={{ margin: '-1px 0' }} />}
       />
       <BottomNavigationAction
         label='Profile'
         href='/profile'
         value='profile'
-        icon={<MdPersonOutline size='1.6rem' />}
+        icon={<SlUser size='19px' style={{ margin: '1px 0' }} />}
       />
     </StyledBottomNavigation>
   );
