@@ -34,16 +34,13 @@ describe('registerBuilderNFT', () => {
 
   it('should create a new builder NFT record in the database', async () => {
     const builder = await mockBuilder();
-    (createBuilderNft as jest.Mock<typeof createBuilderNft>).mockResolvedValue({
-      builderId: builder.id,
-      chainId: builderNftChain.id,
-      contractAddress: builderContractAddress,
-      season: mockSeason,
-      tokenId: randomLargeInt(),
-      imageUrl: 'https://example.com/image.png',
-      createdAt: new Date(),
-      currentPrice: BigInt(0),
-      id: v4()
+    (createBuilderNft as jest.Mock<typeof createBuilderNft>).mockImplementation(async () => {
+      return mockBuilderNft({
+        builderId: builder.id,
+        season: mockSeason,
+        chainId: builderNftChain.id,
+        contractAddress: builderContractAddress
+      });
     });
 
     // Call the function
@@ -68,7 +65,12 @@ describe('registerBuilderNFT', () => {
 
   it('should return existing builder NFT if already registered', async () => {
     const builder = await mockBuilder();
-    const existingNft = await mockBuilderNft({ builderId: builder.id, season: mockSeason });
+    const existingNft = await mockBuilderNft({
+      builderId: builder.id,
+      season: mockSeason,
+      chainId: builderNftChain.id,
+      contractAddress: builderContractAddress
+    });
 
     const result = await registerBuilderNFT({
       builderId: builder.id,
