@@ -25,7 +25,8 @@ export async function GET(req: NextRequest) {
       });
       if (profile) {
         const hasProfileChanged =
-          scout.avatar !== profile.body.avatarUrl ||
+          // Re-enable this once Neynar fixes their caching mechanism
+          // scout.avatar !== profile.body.avatarUrl ||
           scout.bio !== profile.body.bio ||
           scout.displayName !== (profile.body.displayName || profile.body.username) ||
           scout.username !== profile.body.username;
@@ -36,7 +37,8 @@ export async function GET(req: NextRequest) {
               id: userId
             },
             data: {
-              avatar: profile.body.avatarUrl,
+              // Re-enable this once Neynar fixes their caching mechanism
+              // avatar: profile.body.avatarUrl,
               bio: profile.body.bio,
               displayName: profile.body.displayName || profile.body.username,
               username: profile.body.username
