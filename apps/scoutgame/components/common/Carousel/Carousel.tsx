@@ -21,7 +21,7 @@ export function Carousel({ children }: CarouselProps) {
 
   return (
     <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
-      <Box width='95svw' px={isDesktop ? 4 : 0} position='relative'>
+      <Box width='90svw' px={isDesktop ? 4 : 0} position='relative'>
         <Swiper
           className='swiper'
           slidesPerView={slidesPerView}

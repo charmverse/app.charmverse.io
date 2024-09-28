@@ -19,7 +19,7 @@ export async function TodaysHotBuildersCarousel() {
   return (
     <Carousel>
       {builders.map((builder) => (
-        <BuilderCard key={builder.id} builder={builder} showPurchaseButton user={user} showHotIcon />
+        <BuilderCard size='large' key={builder.id} builder={builder} showPurchaseButton user={user} showHotIcon />
       ))}
     </Carousel>
   );

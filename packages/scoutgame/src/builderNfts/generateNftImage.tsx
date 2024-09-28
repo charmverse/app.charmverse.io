@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { ImageResponse } from 'next/og';
+// Must be there otherwise React is not defined error is thrown
 import React from 'react';
 import type { Font } from 'satori';
 import sharp from 'sharp';
@@ -48,49 +49,63 @@ export async function generateNftImage({
 }): Promise<Buffer> {
   const randomOverlay = overlaysBase64[Math.floor(Math.random() * overlaysBase64.length)];
   let avatarBuffer: Buffer | null = null;
+  const cutoutWidth = 300;
+  const cutoutHeight = 400;
+
   if (avatar) {
-    // Get avatar metadata
     const response = await fetch(avatar);
     const arrayBuffer = await response.arrayBuffer();
     const { width, height } = await sharp(Buffer.from(arrayBuffer)).metadata();
 
-    // Calculate new dimensions while maintaining aspect ratio
-    const aspectRatio = width && height ? width / height : 300 / 400;
-    const newHeight = Math.min(400, height || 400);
-    const newWidth = Math.round(newHeight * aspectRatio);
+    const aspectRatio = width && height ? width / height : 3 / 4;
 
-    // Resize the image
-    avatarBuffer = await sharp(Buffer.from(arrayBuffer)).resize(newWidth, newHeight, { fit: 'inside' }).toBuffer();
+    let newHeight = Math.max(cutoutHeight, Math.round(cutoutWidth / aspectRatio));
+    let newWidth = Math.round(newHeight * aspectRatio);
+
+    if (newWidth < cutoutWidth) {
+      newWidth = cutoutWidth;
+      newHeight = Math.round(newWidth / aspectRatio);
+    }
+
+    avatarBuffer = await sharp(Buffer.from(arrayBuffer))
+      .resize({ width: newWidth, height: newHeight, fit: 'cover' })
+      .png()
+      .toBuffer();
   }
 
   const baseImage = new ImageResponse(
     (
       <div
         style={{
-          width: '300px',
-          height: '400px',
+          height: cutoutHeight,
+          width: cutoutWidth,
+          position: 'relative',
           display: 'flex',
-          alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: 'transparent',
-          position: 'relative'
+          alignItems: 'center'
         }}
       >
         <img
           src={avatarBuffer ? `data:image/png;base64,${avatarBuffer.toString('base64')}` : noPfpAvatarBase64}
           style={{
-            maxHeight: '400px',
-            objectFit: 'contain'
+            width: cutoutWidth,
+            height: cutoutHeight,
+            objectFit: 'cover'
           }}
         />
-        <img src={randomOverlay} width={300} height={400} style={{ position: 'absolute', top: 0, left: 0 }} />
+        <img
+          src={randomOverlay}
+          width={cutoutWidth}
+          height={cutoutHeight}
+          style={{ position: 'absolute', top: 0, left: 0 }}
+        />
         <div
           style={{
             width: '100%',
             display: 'flex',
             justifyContent: 'center',
             flexDirection: 'row',
-            bottom: 20,
+            bottom: 40,
             position: 'absolute',
             paddingLeft: 10,
             paddingRight: 10
@@ -112,8 +127,8 @@ export async function generateNftImage({
       </div>
     ),
     {
-      width: 300,
-      height: 400,
+      width: cutoutWidth,
+      height: cutoutHeight,
       fonts: [font]
     }
   );
