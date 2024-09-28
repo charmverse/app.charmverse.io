@@ -153,7 +153,7 @@ type TransactionStatus = {
 
 async function getDestinationTransactionHash(txHash: string, chainId: number): Promise<string> {
   const startTime = Date.now();
-  const maxWaitTime = 60000; // 45 seconds
+  const maxWaitTime = 50000; // 50 seconds
 
   while (Date.now() - startTime < maxWaitTime) {
     try {
@@ -180,7 +180,7 @@ async function getDestinationTransactionHash(txHash: string, chainId: number): P
   }
 
   throw new Error(
-    `Transaction status could not be confirmed within 45 seconds for txHash: ${txHash} on chainId: ${sourceChainId}`
+    `Transaction status could not be confirmed within 45 seconds for txHash: ${txHash} on chainId: ${chainId}`
   );
 }
 
