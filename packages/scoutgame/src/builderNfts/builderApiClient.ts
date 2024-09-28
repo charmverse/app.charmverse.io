@@ -1,9 +1,9 @@
-import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { getPublicClient } from '@packages/onchain/getPublicClient';
 
+import { BuilderNFTSeasonOneClient } from './builderNFTSeasonOneClient';
 import { builderContractAddress, builderNftChain } from './constants';
-import { ContractApiClient } from './nftContractApiClient';
 
-export const builderApiClient = new ContractApiClient({
+export const builderApiClient = new BuilderNFTSeasonOneClient({
   chain: builderNftChain,
   contractAddress: builderContractAddress,
   publicClient: getPublicClient(builderNftChain.id)
