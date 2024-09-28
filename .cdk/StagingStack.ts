@@ -155,7 +155,7 @@ export class StagingStack extends Stack {
       {
         namespace: 'aws:autoscaling:asg',
         optionName: 'MaxSize',
-        value: '1'
+        value: '2'
       },
       {
         namespace: 'aws:autoscaling:asg',
