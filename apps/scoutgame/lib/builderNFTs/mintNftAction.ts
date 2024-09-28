@@ -186,7 +186,7 @@ async function getDestinationTransactionHash(sourceChainTxHash: string, sourceCh
 }
 
 export const mintNftAction = authActionClient
-  .metadata({ actionName: 'save-onboarded' })
+  .metadata({ actionName: 'mint-nft' })
   .schema(
     yup.object().shape({
       address: yup
@@ -280,7 +280,7 @@ export const mintNftAction = authActionClient
         onchainChainId: builderNftChain.id
       },
       activity: {
-        pointsDirection: PointsDirection.in,
+        pointsDirection: PointsDirection.out,
         userId,
         amount: parsedInput.amount
       }
@@ -293,7 +293,7 @@ export const mintNftAction = authActionClient
         onchainChainId: builderNftChain.id
       },
       activity: {
-        pointsDirection: PointsDirection.out,
+        pointsDirection: PointsDirection.in,
         userId: builderNft.builderId,
         amount: parsedInput.amount
       }
