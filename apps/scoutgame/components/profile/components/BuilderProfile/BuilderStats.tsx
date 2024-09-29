@@ -1,6 +1,7 @@
 'use client';
 
 import { Paper, Typography, Stack } from '@mui/material';
+import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
 import Image from 'next/image';
 
 import { BuilderCardNftDisplay } from 'components/common/Card/BuilderCard/BuilderCardNftDisplay';
@@ -63,7 +64,7 @@ export function BuilderStats({
             CURRENT NFT PRICE
           </Typography>
           <Typography fontWeight={500} variant='h4' color='green.main' align='center'>
-            ${currentNftPrice || 0}
+            ${(Number(currentNftPrice || 0) / 10 ** builderTokenDecimals).toFixed(2)}
           </Typography>
         </Stack>
       </Stack>
