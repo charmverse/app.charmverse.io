@@ -20,8 +20,29 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
 
   return (
     <TableContainer component={Paper} sx={{ mt: 2 }}>
+      <Stack
+        width='100%'
+        flexDirection='row'
+        justifyContent='center'
+        sx={{
+          p: 1,
+          display: {
+            xs: 'flex',
+            md: 'none'
+          }
+        }}
+      >
+        SEASON {currentSeasonNumber} WEEK {getCurrentSeasonWeekNumber()} DAY {(DateTime.now().weekday % 7) + 1}
+      </Stack>
       <Table aria-label='Leaderboard table' size='small'>
-        <TableHead>
+        <TableHead
+          sx={{
+            display: {
+              xs: 'none',
+              md: 'table-header-group'
+            }
+          }}
+        >
           <TableRow
             sx={{
               [`& .${tableCellClasses.root}`]: {
@@ -33,25 +54,15 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
               }
             }}
           >
-            <Hidden mdUp>
-              <TableCell colSpan={4} sx={{ textAlign: 'center' }}>
-                SEASON {currentSeasonNumber} WEEK {getCurrentSeasonWeekNumber()} DAY {(DateTime.now().weekday % 7) + 1}
-              </TableCell>
-            </Hidden>
-            <Hidden mdDown>
-              <>
-                <TableCell align='center'>RANK</TableCell>
-                <TableCell>BUILDER</TableCell>
-                <TableCell>
-                  SEASON {currentSeasonNumber} WEEK {getCurrentSeasonWeekNumber()} DAY{' '}
-                  {(DateTime.now().weekday % 7) + 1}
-                </TableCell>
-                <TableCell sx={{ maxWidth: '100px', pr: 0 }} align='right'>
-                  Gems this week
-                </TableCell>
-                <TableCell />
-              </>
-            </Hidden>
+            <TableCell align='center'>RANK</TableCell>
+            <TableCell>BUILDER</TableCell>
+            <TableCell>
+              SEASON {currentSeasonNumber} WEEK {getCurrentSeasonWeekNumber()} DAY {(DateTime.now().weekday % 7) + 1}
+            </TableCell>
+            <TableCell sx={{ maxWidth: '100px', pr: 0 }} align='right'>
+              Gems this week
+            </TableCell>
+            <TableCell />
           </TableRow>
         </TableHead>
         <TableBody>

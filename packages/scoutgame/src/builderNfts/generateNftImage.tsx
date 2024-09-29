@@ -27,7 +27,7 @@ const font: Font = {
 
 // Function to determine font size
 function calculateFontSize(text: string, maxWidth: number, initialFontSize: number): number {
-  const minFontSize = 10;
+  const minFontSize = 12;
   let fontSize = initialFontSize;
 
   while (fontSize > minFontSize) {

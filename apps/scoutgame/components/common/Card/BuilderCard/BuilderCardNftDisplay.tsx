@@ -12,8 +12,8 @@ const nftDisplaySize = {
     height: 250
   },
   large: {
-    width: 200,
-    height: 266.67
+    width: 225,
+    height: 300
   }
 };
 
