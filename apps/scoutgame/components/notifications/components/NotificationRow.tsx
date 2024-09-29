@@ -78,22 +78,25 @@ export function NotificationRow({ activity }: { activity: ScoutGameActivity }) {
   const EventIcon = iconMap[icon];
 
   return (
-    <ListItem>
-      <ListItemIcon>
-        <EventIcon />
-      </ListItemIcon>
+    <ListItem sx={{ bgcolor: 'background.paper', mb: '2px' }}>
       <ListItemText
-        primary={<Typography variant='body1'>{title}</Typography>}
+        primary={
+          <Typography variant='body1' fontSize={{ xs: '12px', md: '14px' }}>
+            {title}
+          </Typography>
+        }
         // secondary={
-        //   <Typography variant='body2' color='textSecondary'>
+        //   <Typography variant='body2' display='flex' alignItems='center' gap={0.5}>
+        //     {' '}
+        //     <EventIcon sx={{ fontSize: '12px' }} />
         //     {subtitle}
         //   </Typography>
         // }
       />
-      <Typography variant='body1' style={{ marginRight: 8, color: amountColor }}>
+      <Typography variant='body1' fontSize={{ xs: '12px', md: '14px' }} style={{ color: amountColor }}>
         {pointsDirection === 'in' ? `+${amount}` : `-${amount}`}
       </Typography>
-      <Typography variant='body2' color='textSecondary'>
+      <Typography sx={{ width: '100px' }} fontSize={{ xs: '12px', md: '14px' }} align='center' variant='body2'>
         {time}
       </Typography>
     </ListItem>
