@@ -25,7 +25,7 @@ export function Carousel({ children }: CarouselProps) {
         <Swiper
           className='swiper'
           slidesPerView={slidesPerView}
-          spaceBetween={isDesktop ? 15 : 5}
+          spaceBetween={isDesktop ? 15 : 25}
           autoHeight={true}
           modules={[Navigation]}
           navigation={{

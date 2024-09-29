@@ -1,5 +1,5 @@
 import PersonIcon from '@mui/icons-material/Person';
-import { CardActionArea, CardMedia, CardContent, Typography, Box } from '@mui/material';
+import { CardActionArea, CardMedia, Typography, Box } from '@mui/material';
 import Link from 'next/link';
 
 const nftDisplaySize = {
@@ -64,25 +64,43 @@ export function BuilderCardNftDisplay({
           {showHotIcon ? (
             <CardMedia
               component='img'
-              width='30px'
-              height='30px'
               image='/images/profile/icons/blue-fire-icon.svg'
               alt='hot icon'
-              sx={{ position: 'absolute', top: 10, right: 15, width: 'initial' }}
+              sx={{
+                position: 'absolute',
+                width: 'initial',
+                height: {
+                  xs: 25,
+                  md: 30
+                },
+                top: {
+                  xs: 7.5,
+                  md: 10
+                },
+                right: {
+                  xs: 10,
+                  md: 15
+                }
+              }}
             />
           ) : null}
         </Box>
         <Box
           sx={{
-            px: 1,
+            px: {
+              xs: 0.5,
+              md: 1
+            },
             backgroundColor: '#000',
             height: 'fit-content',
-            zIndex: 10,
             position: 'absolute',
             width: 'calc(100% - 10px)',
             left: '50%',
             transform: 'translateX(-50%)',
-            bottom: 10
+            bottom: {
+              xs: 7.5,
+              md: 10
+            }
           }}
         >
           {nftImageUrl ? null : (

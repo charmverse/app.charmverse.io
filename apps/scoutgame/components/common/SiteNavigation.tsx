@@ -1,13 +1,10 @@
 'use client';
 
-import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { usePathname } from 'next/navigation';
 import { CiBellOn } from 'react-icons/ci';
-import { FaRegUser } from 'react-icons/fa';
-import { GoHome } from 'react-icons/go';
-import { MdPersonOutline } from 'react-icons/md';
-import { PiBellLight, PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
+import { PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
