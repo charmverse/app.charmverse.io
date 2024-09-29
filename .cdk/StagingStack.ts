@@ -98,7 +98,7 @@ export class StagingStack extends Stack {
       },
       {
         namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
-        optionName: 'minimumPercent',
+        optionName: 'minimumHealthyPercent',
         value: '50'
       },
       /* End graceful deployment settings */
