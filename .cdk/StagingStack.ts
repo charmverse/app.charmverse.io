@@ -77,6 +77,11 @@ export class StagingStack extends Stack {
         value: 'Rolling'
       },
       {
+        namespace: 'aws:elasticbeanstalk:command',
+        optionName: 'BatchSize',
+        value: '50' // percentage of instances to update at a time
+      },
+      {
         namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
         optionName: 'RollingUpdateEnabled',
         value: 'true'
@@ -95,11 +100,6 @@ export class StagingStack extends Stack {
         namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
         optionName: 'MaxBatchSize',
         value: '3'
-      },
-      {
-        namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
-        optionName: 'minimumHealthyPercent',
-        value: '50'
       },
       /* End graceful deployment settings */
       {
