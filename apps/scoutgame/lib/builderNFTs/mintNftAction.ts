@@ -1,27 +1,11 @@
 'use server';
 
-import { log } from '@charmverse/core/log';
-import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
-import { sleep } from '@decent.xyz/box-common';
-import { waitForDecentTransactionSettlement } from '@packages/onchain/waitForDecentTransactionSettlement';
-import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/builderNFTSeasonOneClient';
-import {
-  builderContractAddress,
-  builderNftChain,
-  builderSmartContractOwnerKey
-} from '@packages/scoutgame/builderNfts/constants';
-import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
-import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
-import { GET } from '@root/adapters/http';
-import { getWalletClient } from '@root/lib/blockchain/walletClient';
+import { savePendingTransaction } from '@packages/scoutgame';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
 import { authActionClient } from 'lib/actions/actionClient';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
-
-import { savePendingTransaction } from './savePendingTransaction';
 
 export const mintNftAction = authActionClient
   .metadata({ actionName: 'mint-nft' })

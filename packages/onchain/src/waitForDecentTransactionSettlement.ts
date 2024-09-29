@@ -166,6 +166,23 @@ export async function waitForDecentTransactionSettlement({
     try {
       const response = await getTransactionStatusFromDecent({ sourceTxHash, sourceTxHashChainId });
 
+      if (response.status.toLowerCase().match('fail')) {
+        await prisma.pendingNftTransaction.update({
+          where: {
+            sourceChainTxHash_sourceChainId: {
+              sourceChainTxHash: sourceTxHash,
+              sourceChainId: sourceTxHashChainId
+            }
+          },
+          data: {
+            status: TransactionStatus.failed
+          }
+        });
+
+        log.error('Failed to complete transaction', { error: { sourceTxHashChainId, sourceTxHash } });
+
+        throw new Error('Transaction failed');
+      }
       if (response.transaction?.dstTx?.success === true) {
         await prisma.pendingNftTransaction.update({
           where: {
