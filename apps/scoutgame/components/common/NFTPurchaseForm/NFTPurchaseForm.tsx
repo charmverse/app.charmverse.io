@@ -26,7 +26,6 @@ import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 import type { ChainOption } from './ChainSelector';
 import { BlockchainSelect, getChainOptions } from './ChainSelector';
@@ -297,7 +296,7 @@ function NFTPurchaseWithLogin(props: NFTPurchaseProps) {
   );
 }
 
-export async function NFTPurchase(props: NFTPurchaseProps) {
+export function NFTPurchase(props: NFTPurchaseProps) {
   return (
     <WagmiProvider>
       <NFTPurchaseWithLogin {...props} />

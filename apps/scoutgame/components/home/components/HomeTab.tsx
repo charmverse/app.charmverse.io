@@ -28,7 +28,6 @@ export async function HomeTab({ tab }: { tab: string }) {
 
   if (tab === 'leaderboard') {
     const data = await getLeaderboard();
-
     return <LeaderboardTable data={data} />;
   }
   return null;
