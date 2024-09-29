@@ -8,7 +8,7 @@ import { processScoutPointsPayout } from './processScoutPointsPayout';
 export async function processGemsPayout() {
   const now = DateTime.utc();
   const week = getCurrentWeek();
-  if (now.weekday !== 7 || now.hour !== 0) {
+  if (now.weekday !== 1 || now.hour !== 0) {
     log.info('Not Sunday at 12:00 AM NY timezone, skipping gems payout');
     return;
   }
