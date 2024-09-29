@@ -1,25 +1,21 @@
-'use client';
-
-import type { Theme } from '@mui/material';
-import { Box, Button, Stack, TableHead, Typography, useMediaQuery } from '@mui/material';
+import { Box, Stack, TableHead, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
 import { currentSeasonNumber, getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
-import Link from 'next/link';
 
+import { Hidden } from 'components/common/Hidden';
+import { ScoutButton } from 'components/common/ScoutButton/ScoutButton';
 import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
 
 import { Avatar } from '../../common/Avatar';
 
 export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
-  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
@@ -37,11 +33,12 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
               }
             }}
           >
-            {isMobile ? (
+            <Hidden mdUp>
               <TableCell colSpan={4} sx={{ textAlign: 'center' }}>
                 SEASON {currentSeasonNumber} WEEK {getCurrentSeasonWeekNumber()} DAY {(DateTime.now().weekday % 7) + 1}
               </TableCell>
-            ) : (
+            </Hidden>
+            <Hidden mdDown>
               <>
                 <TableCell align='center'>RANK</TableCell>
                 <TableCell>BUILDER</TableCell>
@@ -54,7 +51,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                 </TableCell>
                 <TableCell />
               </>
-            )}
+            </Hidden>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -95,13 +92,11 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                   <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
                 </Stack>
               </TableCell>
-              {!isMobile && (
+              <Hidden mdDown>
                 <TableCell>
-                  <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${row.username}/checkout`}>
-                    ${(Number(row.price) / 10 ** builderTokenDecimals).toFixed(2)}
-                  </Button>
+                  <ScoutButton price={row.price} builderId={row.builderId} />
                 </TableCell>
-              )}
+              </Hidden>
             </TableRow>
           ))}
         </TableBody>

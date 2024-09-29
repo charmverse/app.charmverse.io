@@ -39,12 +39,9 @@ const readonlyApiClient = new BuilderNFTSeasonOneClient({
 
 export type NFTPurchaseProps = {
   builderId: string;
-  user: {
-    username: string;
-  };
 };
 
-function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
+function NFTPurchaseButton({ builderId }: NFTPurchaseProps) {
   const { address, walletClient, chainId } = useWallet();
 
   const [sourceFundsChain, setSourceFundsChain] = useState(ChainId.OPTIMISM_SEPOLIA);

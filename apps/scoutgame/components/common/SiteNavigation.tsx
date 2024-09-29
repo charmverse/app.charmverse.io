@@ -53,7 +53,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
         // This makes sure the UI doesn't flicker from single column to double column for desktop screens
         href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
         value='profile'
-        icon={<SlUser size='19px' style={{ margin: '1px 0' }} />}
+        icon={<SlUser size='19px' style={{ margin: '2px 0' }} />}
       />
     </StyledBottomNavigation>
   );

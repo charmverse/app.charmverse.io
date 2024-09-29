@@ -68,8 +68,8 @@ export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: strin
 
   // Update permission state if the user changes it manually
   useEffect(() => {
-    if (permission !== 'denied' && permission !== Notification.permission) {
-      setPermission(Notification.permission);
+    if (WindowNotification && permission !== 'denied' && permission !== WindowNotification.permission) {
+      setPermission(WindowNotification.permission);
     }
   }, [permission, setPermission]);
 
