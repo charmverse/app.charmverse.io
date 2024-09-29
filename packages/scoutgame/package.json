@@ -7,7 +7,8 @@
     "test": "node --experimental-vm-modules ../../node_modules/.bin/jest"
   },
   "exports": {
-    "./*": "./src/*.ts"
+    "./*": "./src/*.ts",
+    "./builderNfts/generateNftImage": "./src/builderNfts/generateNftImage.tsx"
   },
   "dependencies": {
     "@packages/onchain": "^0.0.0"

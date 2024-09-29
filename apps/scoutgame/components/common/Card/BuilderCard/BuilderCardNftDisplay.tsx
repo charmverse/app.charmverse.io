@@ -1,7 +1,7 @@
-import PersonIcon from '@mui/icons-material/Person';
 import { CardActionArea, CardMedia, Typography, Box } from '@mui/material';
 import Link from 'next/link';
 
+// Maintain a 3:4 aspect ratio for the NFT display
 const nftDisplaySize = {
   small: {
     width: 150,
@@ -32,8 +32,9 @@ export function BuilderCardNftDisplay({
 }) {
   const width = nftDisplaySize[size].width;
   const height = nftDisplaySize[size].height;
+
   return (
-    <Box overflow='hidden' width={width} height={height}>
+    <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: '#000' }}>
       <CardActionArea
         LinkComponent={Link}
         href={`/u/${username}`}
@@ -47,19 +48,7 @@ export function BuilderCardNftDisplay({
           {nftImageUrl ? (
             <CardMedia component='img' image={nftImageUrl} />
           ) : (
-            <PersonIcon
-              sx={{
-                px: 2,
-                fontSize: {
-                  xs: 200,
-                  md: 250
-                },
-                position: 'absolute',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                top: -20
-              }}
-            />
+            <CardMedia component='img' image='/images/no_nft_person.png' />
           )}
           {showHotIcon ? (
             <CardMedia
@@ -87,20 +76,25 @@ export function BuilderCardNftDisplay({
         </Box>
         <Box
           sx={{
-            px: {
-              xs: 0.5,
-              md: 1
-            },
-            backgroundColor: '#000',
+            px:
+              size === 'small'
+                ? 0.5
+                : {
+                    xs: 0.5,
+                    md: 1
+                  },
             height: 'fit-content',
             position: 'absolute',
             width: 'calc(100% - 10px)',
             left: '50%',
             transform: 'translateX(-50%)',
-            bottom: {
-              xs: 7.5,
-              md: 10
-            }
+            bottom:
+              size === 'small'
+                ? 7.5
+                : {
+                    xs: 7.5,
+                    md: 10
+                  }
           }}
         >
           {nftImageUrl ? null : (

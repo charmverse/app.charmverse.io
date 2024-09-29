@@ -8,6 +8,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
+import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
 import { currentSeasonNumber, getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
@@ -97,7 +98,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
               {!isMobile && (
                 <TableCell>
                   <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${row.username}/checkout`}>
-                    ${row.price || 0}
+                    ${(Number(row.price) / 10 ** builderTokenDecimals).toFixed(2)}
                   </Button>
                 </TableCell>
               )}

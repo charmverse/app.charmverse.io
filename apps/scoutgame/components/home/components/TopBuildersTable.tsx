@@ -11,6 +11,7 @@ import {
   Typography,
   tableCellClasses
 } from '@mui/material';
+import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -102,7 +103,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
               </TableCell>
               <TableCell align='center'>
                 <Button fullWidth variant='buy' LinkComponent={Link} href={`/u/${builder.username}/checkout`}>
-                  ${builder.price || 0}
+                  ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2)}
                 </Button>
               </TableCell>
             </TableRow>

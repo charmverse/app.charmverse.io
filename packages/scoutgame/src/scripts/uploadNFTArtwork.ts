@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { uploadArtwork } from '../builderNfts/uploadArtwork';
 
-async function query() {
+async function uploadNFTArtwork() {
   const scouts = await prisma.scout.findMany({
     where: {
       builderStatus: 'approved'
@@ -41,4 +41,4 @@ async function query() {
   }
 }
 
-query();
+uploadNFTArtwork();

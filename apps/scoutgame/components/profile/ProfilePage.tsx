@@ -81,7 +81,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
           {tab === 'win' ? (
             <PointsClaimScreen userId={user.id} username={user.username} />
           ) : tab === 'scout' ? (
-            <ScoutProfile userId={user.id} />
+            <ScoutProfile userId={user.id} isMobile />
           ) : tab === 'build' ? (
             <BuilderProfile builder={user} />
           ) : (
@@ -96,7 +96,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
                 <Typography variant='h6' color='text.secondary'>
                   Scout
                 </Typography>
-                <ScoutProfile userId={user.id} />
+                <ScoutProfile userId={user.id} isMobile={false} />
               </Paper>
               <Paper
                 sx={{

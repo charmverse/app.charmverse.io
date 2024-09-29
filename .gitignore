@@ -98,4 +98,4 @@ storybook-static
 # Storybook dev server cache folder
 .cache
 
-
+apps/scoutgame/public/builder-nfts
