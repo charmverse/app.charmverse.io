@@ -1,11 +1,10 @@
 'use client';
 
 import { Box, Typography } from '@mui/material';
+import { tierDistribution } from '@packages/scoutgame/waitlist/scoring/constants';
 import { motion, useAnimation } from 'framer-motion';
 import Image from 'next/image';
 import React from 'react';
-
-import { tierDistribution } from 'lib/scoring/constants';
 
 interface ProgressBarProps {
   from: number;

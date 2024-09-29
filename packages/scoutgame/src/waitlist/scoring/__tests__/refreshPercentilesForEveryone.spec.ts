@@ -2,7 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { randomIntFromInterval } from '@root/lib/utils/random';
 
-import { randomFid } from '../../../../../testing/utils/farcaster';
+import { randomFid } from '../../../../../../testing/utils/farcaster';
 import type { ConnectWaitlistTier, TierChange } from '../constants';
 import { refreshPercentilesForEveryone } from '../refreshPercentilesForEveryone'; // Adjust the import to the correct module
 import { refreshUserScore } from '../refreshUserScore';

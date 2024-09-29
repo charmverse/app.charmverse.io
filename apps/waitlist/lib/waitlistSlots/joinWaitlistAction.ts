@@ -1,8 +1,11 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
+import {
+  handleTierChanges,
+  refreshPercentilesForEveryone
+} from '@packages/scoutgame/waitlist/scoring/refreshPercentilesForEveryone';
 
-import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { getSession } from 'lib/session/getSession';
 
 import { authActionClient } from '../actionClient';

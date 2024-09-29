@@ -2,6 +2,10 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 import { status } from '@farcaster/auth-client';
+import {
+  handleTierChanges,
+  refreshPercentilesForEveryone
+} from '@packages/scoutgame/waitlist/scoring/refreshPercentilesForEveryone';
 import { validateFrameInteractionViaAirstackWithErrorCatching } from '@root/lib/farcaster/airstack';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
@@ -11,7 +15,6 @@ import { WaitlistCurrentScoreFrame } from 'components/frame/WaitlistCurrentScore
 import { WaitlistJoinedFrame } from 'components/frame/WaitlistJoinedFrame';
 import { getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
 import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
-import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
 import { joinWaitlist } from 'lib/waitlistSlots/joinWaitlist';
 
 export async function GET(req: Request) {

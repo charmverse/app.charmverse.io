@@ -1,10 +1,10 @@
+import type { TierChange } from '@packages/scoutgame/waitlist/scoring/constants';
+import { getTier } from '@packages/scoutgame/waitlist/scoring/constants';
 import { baseUrl } from '@root/config/constants';
 import { getFrameHtml } from 'frames.js';
 
 import { scoutGameFrameTitle, waitlistGotoHome, waitlistShareMyFrame } from 'lib/frame/actionButtons';
 import type { FrameScreen } from 'lib/mixpanel/trackEventActionSchema';
-import type { TierChange } from 'lib/scoring/constants';
-import { getTier } from 'lib/scoring/constants';
 
 export type LevelChangedFrameProps = {
   referrerFid: number;

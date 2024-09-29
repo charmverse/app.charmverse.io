@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { randomFid } from '../../../../../testing/utils/farcaster';
+import { randomFid } from '../../../../../../testing/utils/farcaster';
 import { refreshUserScore } from '../refreshUserScore';
 
 describe('refreshUserScore', () => {

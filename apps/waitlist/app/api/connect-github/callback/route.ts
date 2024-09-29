@@ -1,5 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
+import {
+  handleTierChanges,
+  refreshPercentilesForEveryone
+} from '@packages/scoutgame/waitlist/scoring/refreshPercentilesForEveryone';
+import { refreshUserScore } from '@packages/scoutgame/waitlist/scoring/refreshUserScore';
 import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
 import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constants';
@@ -7,8 +12,6 @@ import { unsealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 
 import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
-import { handleTierChanges, refreshPercentilesForEveryone } from 'lib/scoring/refreshPercentilesForEveryone';
-import { refreshUserScore } from 'lib/scoring/refreshUserScore';
 import { embedFarcasterUser } from 'lib/session/embedFarcasterUser';
 
 function generateRedirectUrl(errorMessage: string) {
