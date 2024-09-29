@@ -213,7 +213,6 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
         onSuccess: async (data) => {
           await executeAsync({
             user: {
-              scoutId: user!.id,
               walletAddress: address as `0x${string}`
             },
             transactionInfo: {
@@ -303,10 +302,9 @@ function NFTPurchaseWithLogin(props: NFTPurchaseProps) {
 }
 
 export async function NFTPurchase(props: NFTPurchaseProps) {
-  const user = await getUserFromSession();
   return (
     <WagmiProvider>
-      <NFTPurchaseWithLogin {...props} user={{ ...props.user, ...user }} />
+      <NFTPurchaseWithLogin {...props} />
     </WagmiProvider>
   );
 }

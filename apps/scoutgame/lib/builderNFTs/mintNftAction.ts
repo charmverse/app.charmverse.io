@@ -12,7 +12,6 @@ export const mintNftAction = authActionClient
   .schema(
     yup.object().shape({
       user: yup.object().shape({
-        scoutId: yup.string().required(),
         walletAddress: yup
           .string()
           .required()
@@ -40,7 +39,7 @@ export const mintNftAction = authActionClient
     }
 
     // Cron process will handle the tx
-    await savePendingTransaction({ ...parsedInput });
+    await savePendingTransaction({ ...parsedInput, user: { ...(parsedInput.user as any), scoutId: userId } });
 
     return { success: true };
   });
