@@ -7,8 +7,13 @@ import { useLocalStorage } from 'usehooks-ts';
 import { savePushNotificationSubscriptionAction } from 'lib/pwa/savePushNotificationSubscriptionAction';
 
 export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: string }) {
-  const WindowNotification = window.Notification as typeof Notification | undefined;
-  const notificationsSupported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+  const WindowNotification =
+    typeof window !== 'undefined' ? (window.Notification as typeof Notification | undefined) : undefined;
+  const notificationsSupported =
+    typeof window !== 'undefined' &&
+    'Notification' in window &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window;
   const [permission, setPermission] = useLocalStorage<NotificationPermission>(
     'notificationPermission',
     WindowNotification?.permission || 'default'

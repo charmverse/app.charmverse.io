@@ -78,7 +78,7 @@ export function PublicScoutProfileContainer({
           Scouted Builders
         </Typography>
         {scoutedBuilders.length > 0 ? (
-          <BuildersGallery builders={scoutedBuilders} />
+          <BuildersGallery builders={scoutedBuilders} columns={5} />
         ) : (
           <Typography>This Scout hasn't discovered any Builders yet. Check back to see who they find!</Typography>
         )}

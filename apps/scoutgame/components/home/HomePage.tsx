@@ -8,8 +8,8 @@ import { Suspense } from 'react';
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { LoadingCards } from 'components/common/Loading/LoadingCards';
 import { LoadingTable } from 'components/common/Loading/LoadingTable';
+import { TodaysHotBuildersCarousel } from 'components/home/components/BuildersCarousel/TodaysHotBuildersCarousel';
 import { HomeTabsMenu } from 'components/home/components/HomeTabsMenu';
-import { TodaysHotBuildersCarousel } from 'components/home/components/TodaysHotBuildersCarousel';
 
 import { HomeTab } from './components/HomeTab';
 import { homeTabs } from './components/HomeTabsMenu';

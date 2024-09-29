@@ -1,10 +1,13 @@
 'use client';
 
 import { Box } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
+
+import { LoadingCards } from '../Loading/LoadingCards';
 
 import { NextArrow, PrevArrow } from './Arrows';
 
@@ -18,14 +21,23 @@ export function Carousel({ children }: CarouselProps) {
   const isDesktop = useMdScreen();
   const isLarge = useLgScreen();
   const slidesPerView = isDesktop ? 5 : isLarge ? 6 : 2.2;
+  // Use state and effect to skip pre-rendering
+  const [isClientSide, setIsClientSide] = useState(false);
+
+  useEffect(() => {
+    setIsClientSide(true);
+  }, []);
+
+  if (!isClientSide) {
+    return <LoadingCards />;
+  }
 
   return (
     <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
-      <Box width='95svw' px={isDesktop ? 4 : 0} position='relative'>
+      <Box width='90svw' px={isDesktop ? 4 : 0} position='relative'>
         <Swiper
           className='swiper'
           slidesPerView={slidesPerView}
-          spaceBetween={isDesktop ? 15 : 5}
           autoHeight={true}
           modules={[Navigation]}
           navigation={{

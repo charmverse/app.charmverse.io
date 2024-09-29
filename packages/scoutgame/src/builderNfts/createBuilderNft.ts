@@ -1,12 +1,9 @@
-import { S3Client, type PutObjectCommandInput, type S3ClientConfig } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason } from '../dates';
 
 import { builderApiClient } from './builderApiClient';
 import { builderContractAddress, builderNftChain } from './constants';
-import { generateNftImage } from './generateNftImage';
 import { uploadArtwork } from './uploadArtwork';
 
 export async function createBuilderNft({

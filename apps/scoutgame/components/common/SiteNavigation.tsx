@@ -1,14 +1,13 @@
 'use client';
 
-import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { usePathname } from 'next/navigation';
 import { CiBellOn } from 'react-icons/ci';
-import { FaRegUser } from 'react-icons/fa';
-import { GoHome } from 'react-icons/go';
-import { MdPersonOutline } from 'react-icons/md';
-import { PiBellLight, PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
+import { PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
+
+import { useMdScreen } from 'hooks/useMediaScreens';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -37,6 +36,8 @@ const StyledBottomNavigation = styled(BottomNavigation, {
 export function SiteNavigation({ topNav }: { topNav?: boolean }) {
   const pathname = usePathname();
   const value = getActiveButton(pathname);
+  const isDesktop = useMdScreen();
+
   return (
     <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
       <BottomNavigationAction label='Home' href='/home' value='home' icon={<PiHouseLight size='24px' />} />
@@ -49,7 +50,8 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
       />
       <BottomNavigationAction
         label='Profile'
-        href='/profile'
+        // This makes sure the UI doesn't flicker from single column to double column for desktop screens
+        href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
         value='profile'
         icon={<SlUser size='19px' style={{ margin: '2px 0' }} />}
       />
