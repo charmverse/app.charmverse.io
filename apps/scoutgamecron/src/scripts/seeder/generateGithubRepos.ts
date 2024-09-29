@@ -8,6 +8,11 @@ export async function generateGithubRepos(totalGithubRepos: number): Promise<[Gi
   const repoPRCounters = new Map<number, number>();
 
   for (let i = 0; i < totalGithubRepos; i++) {
+    await prisma.githubRepo.deleteMany({
+      where: {
+        id: i + 1
+      }
+    });
     const githubRepo = await prisma.githubRepo.create({
       data: {
         id: i + 1,
@@ -34,6 +39,11 @@ export async function generateGithubRepos(totalGithubRepos: number): Promise<[Gi
     for (const repo of partnerRepos) {
       const [owner, name] = repo.split('/');
       if (name) {
+        await prisma.githubRepo.deleteMany({
+          where: {
+            id: githubRepos.length + 1
+          }
+        });
         const githubRepo = await prisma.githubRepo.create({
           data: {
             id: githubRepos.length + 1,

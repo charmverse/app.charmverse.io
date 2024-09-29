@@ -5,22 +5,21 @@ import Image from 'next/image';
 import { BiLike } from 'react-icons/bi';
 import { LuBookMarked } from 'react-icons/lu';
 
+import { GemsIcon } from 'components/common/Icons';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
+export function getActivityLabel(activity: BuilderActivity) {
+  return activity.type === 'merged_pull_request'
+    ? activity.contributionType === 'first_pr'
+      ? 'First CONTRIBUTION'
+      : activity.contributionType === 'regular_pr'
+      ? 'Contribution ACCEPTED'
+      : 'Contribution STREAK'
+    : activity.type === 'nft_purchase';
+}
+
 export function BuilderActivityLabel({ activity }: { activity: BuilderActivity }) {
-  return (
-    <Typography>
-      {activity.type === 'merged_pull_request'
-        ? activity.contributionType === 'first_pr'
-          ? 'First CONTRIBUTION'
-          : activity.contributionType === 'regular_pr'
-          ? 'Contribution ACCEPTED'
-          : 'Contribution STREAK'
-        : activity.type === 'nft_purchase'
-        ? 'Scouted by'
-        : null}
-    </Typography>
-  );
+  return <Typography>{getActivityLabel(activity)}</Typography>;
 }
 
 export function BuilderActivityDetail({ activity }: { activity: BuilderActivity }) {
@@ -31,13 +30,11 @@ export function BuilderActivityDetail({ activity }: { activity: BuilderActivity 
       ) : activity.type === 'nft_purchase' ? (
         <BiLike size='15px' />
       ) : null}
-      {activity.type === 'nft_purchase' ? (
-        <Typography>{activity.scout}</Typography>
-      ) : activity.type === 'merged_pull_request' ? (
-        <Typography textOverflow='ellipsis' overflow='hidden' whiteSpace='nowrap'>
-          {activity.repo}
-        </Typography>
-      ) : null}
+      {activity.type === 'nft_purchase'
+        ? activity.scout
+        : activity.type === 'merged_pull_request'
+        ? activity.repo
+        : null}
     </Stack>
   );
 }
@@ -54,7 +51,7 @@ export function BuilderActivityGems({
       {activity.type === 'merged_pull_request' ? (
         <>
           <Typography>+{activity.gems}</Typography>
-          <Image width={20} height={20} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
+          <GemsIcon />
         </>
       ) : showEmpty ? (
         '-'

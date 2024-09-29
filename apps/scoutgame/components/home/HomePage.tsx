@@ -9,10 +9,10 @@ import { HeaderMessage } from 'components/common/Header/components/HeaderMessage
 import { LoadingCards } from 'components/common/Loading/LoadingCards';
 import { LoadingTable } from 'components/common/Loading/LoadingTable';
 import { TodaysHotBuildersCarousel } from 'components/home/components/BuildersCarousel/TodaysHotBuildersCarousel';
-import { HomeTabsMenu } from 'components/home/components/HomeTabsMenu';
+import { HomeTabsMenu } from 'components/home/components/HomePageTable/components/HomeTabsMenu';
 
-import { HomeTab } from './components/HomeTab';
-import { homeTabs } from './components/HomeTabsMenu';
+import { homeTabs } from './components/HomePageTable/components/HomeTabsMenu';
+import { HomeTab } from './components/HomePageTable/HomePageTable';
 
 export async function HomePage({ user, tab }: { user: Scout | null; tab: string }) {
   const currentTab = homeTabs.some((t) => t.value === tab) ? tab : 'leaderboard';
@@ -30,9 +30,11 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
           <TodaysHotBuildersCarousel />
         </Suspense>
         <HomeTabsMenu tab={currentTab} />
-        <Suspense fallback={<LoadingTable />}>
-          <HomeTab tab={currentTab} />
-        </Suspense>
+        <Box px={{ xs: 1, md: 0 }}>
+          <Suspense fallback={<LoadingTable />}>
+            <HomeTab tab={currentTab} />
+          </Suspense>
+        </Box>
       </Container>
     </>
   );
