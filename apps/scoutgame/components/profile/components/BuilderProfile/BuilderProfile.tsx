@@ -3,7 +3,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { Alert, Stack, Typography } from '@mui/material';
 import { currentSeason } from '@packages/scoutgame/dates';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -43,8 +42,7 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
   if (!builder.githubLogin) {
     return (
       <Stack gap={2} alignItems='center'>
-        <Typography>Connect to GitHub to sign up and verify your code contributions.</Typography>
-        <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
+        <Typography>Connect your GitHub account to apply as a Builder.</Typography>
         <Suspense>
           <JoinGithubButton />
         </Suspense>
@@ -55,8 +53,7 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
   if (builder.builderStatus === 'applied') {
     return (
       <Stack gap={2} alignItems='center'>
-        <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
-        <Typography>Your builder application is under review</Typography>
+        <Typography>Your Builder account is pending approval. Check back soon!</Typography>
       </Stack>
     );
   }
@@ -64,7 +61,13 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
   if (builder.builderStatus === 'rejected') {
     return (
       <Stack gap={2} alignItems='center'>
-        <Typography>Your builder application has been rejected</Typography>
+        <Typography>
+          Your Builder account was not approved. Submit an appeal for review{' '}
+          <Typography color='secondary' component='span'>
+            <Link href='https://appeal.scoutgame.xyz/'>here</Link>
+          </Typography>{' '}
+          if you think this was a mistake.
+        </Typography>
       </Stack>
     );
   }
@@ -73,8 +76,13 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
     <Stack gap={3}>
       {builder.builderStatus === 'banned' ? (
         <Alert severity='error'>
-          <Typography>Your builder account has been banned</Typography>
-          <Typography>You can appeal this decision by contacting support</Typography>
+          <Typography>
+            Your builder account has been banned. Submit an appeal for review{' '}
+            <Typography color='secondary' component='span'>
+              <Link href='https://appeal.scoutgame.xyz/'>here</Link>
+            </Typography>
+            to get unbanned.
+          </Typography>
         </Alert>
       ) : null}
       <BuilderStats
@@ -96,11 +104,19 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
             <Typography color='primary'>View All</Typography>
           </Link>
         </Stack>
-        <BuilderActivitiesList activities={builderActivities} />
+        {builderActivities.length > 0 ? (
+          <BuilderActivitiesList activities={builderActivities} />
+        ) : (
+          <Typography>No activity yet. Start contributing or scouting to build your profile!</Typography>
+        )}
       </Stack>
       <Stack gap={0.5}>
         <Typography color='secondary'>Scouted By</Typography>
-        {scouts.length > 0 ? <ScoutsGallery scouts={scouts} /> : <Typography>No scouts yet</Typography>}
+        {scouts.length > 0 ? (
+          <ScoutsGallery scouts={scouts} />
+        ) : (
+          <Typography>No Scouts have discovered you yet. Keep building and they'll find you!</Typography>
+        )}
       </Stack>
     </Stack>
   );

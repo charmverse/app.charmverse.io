@@ -80,7 +80,7 @@ export function PublicScoutProfileContainer({
         {scoutedBuilders.length > 0 ? (
           <BuildersGallery builders={scoutedBuilders} />
         ) : (
-          <Typography>No builders scouted yet</Typography>
+          <Typography>This Scout hasn't discovered any Builders yet. Check back to see who they find!</Typography>
         )}
       </Paper>
     </Box>

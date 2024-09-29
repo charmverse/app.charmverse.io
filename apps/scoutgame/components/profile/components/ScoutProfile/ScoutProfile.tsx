@@ -41,7 +41,7 @@ export async function ScoutProfile({ userId }: { userId: string }) {
         {scoutedBuilders.length > 0 ? (
           <BuildersGallery builders={scoutedBuilders} columns={3} />
         ) : (
-          <Typography>No builders scouted yet</Typography>
+          <Typography>You haven't scouted any Builders yet. Start exploring and discover talent!</Typography>
         )}
       </Stack>
     </Stack>
