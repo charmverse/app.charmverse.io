@@ -165,7 +165,13 @@ export function PublicBuilderProfileContainer({
             </Stack>
             <Stack gap={1}>
               <Typography color='secondary'>Scouted By</Typography>
-              {scouts.length > 0 ? <ScoutsGallery scouts={scouts} /> : <Typography>No scouts yet</Typography>}
+              {scouts.length > 0 ? (
+                <ScoutsGallery scouts={scouts} />
+              ) : (
+                <Typography>
+                  No Scouts have discovered this Builder yet. Be the first to support their journey!
+                </Typography>
+              )}
             </Stack>
           </PaperContainer>
           <PaperContainer>
@@ -175,7 +181,11 @@ export function PublicBuilderProfileContainer({
             </Stack>
             <Stack gap={1}>
               <Typography color='secondary'>Recent Activity</Typography>
-              <BuilderActivitiesList activities={builderActivities} />
+              {builderActivities.length > 0 ? (
+                <BuilderActivitiesList activities={builderActivities} />
+              ) : (
+                <Typography>No recent activity by this builder.</Typography>
+              )}
             </Stack>
           </PaperContainer>
         </Stack>

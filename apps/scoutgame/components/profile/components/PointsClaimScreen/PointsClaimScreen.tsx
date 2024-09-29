@@ -15,7 +15,7 @@ export async function PointsClaimScreen({ userId, username }: { userId: string; 
   if (!totalClaimablePoints) {
     return (
       <Typography textAlign='center' variant='h5'>
-        No points to claim
+        No points available to claim. Keep playing and check back next week!
       </Typography>
     );
   }
