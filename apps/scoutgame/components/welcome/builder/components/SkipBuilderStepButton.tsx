@@ -10,7 +10,7 @@ export function SkipBuilderStepButton() {
   const router = useRouter();
   const { executeAsync, isExecuting } = useAction(saveOnboardedAction, {
     onSuccess: () => {
-      router.push('/welcome/spam-policy');
+      router.push('/welcome/how-it-works');
     }
   });
 

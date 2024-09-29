@@ -1,5 +1,4 @@
 import { Button, List, ListItem, Stack, Typography } from '@mui/material';
-import CssBaseline from '@mui/material/CssBaseline';
 import Image from 'next/image';
 
 import { SinglePageLayout } from 'components/common/Layout';

@@ -1,10 +1,9 @@
-import { Button, List, ListItem, Stack, Typography } from '@mui/material';
-import Image from 'next/image';
+import { Button, Typography } from '@mui/material';
 
 import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 
-export function SpamPolicyPage() {
+export function SpamPolicyPage({ onboarding = false }: { onboarding?: boolean }) {
   return (
     <SinglePageLayout>
       <SinglePageWrapper>
@@ -20,7 +19,7 @@ export function SpamPolicyPage() {
           If you are suspended, you may appeal this decision. An appeal link will be included in the suspension
           notification.
         </Typography>
-        <Button fullWidth href='/welcome/how-it-works' data-test='continue-button'>
+        <Button fullWidth href={onboarding ? '/welcome/how-it-works' : '/profile'} data-test='continue-button'>
           Continue
         </Button>
       </SinglePageWrapper>

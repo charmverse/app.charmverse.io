@@ -58,10 +58,6 @@ test.describe('Welcome page - onboarding flow', () => {
 
     await welcomePage.continueButton.click();
 
-    await page.waitForURL('**/welcome/spam-policy');
-
-    await welcomePage.continueButton.click();
-
     await page.waitForURL('**/welcome/how-it-works');
 
     await welcomePage.continueButton.click();

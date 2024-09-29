@@ -11,6 +11,7 @@ function generateRedirectUrl(errorMessage: string) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+  const onboarding = searchParams.get('onboarding');
 
   const error = searchParams.get('error');
 
@@ -93,11 +94,15 @@ export async function GET(req: NextRequest) {
   }
 
   // Fetch the GitHub user's info
-  const userResponse = await httpGET<{ login: string }>('https://api.github.com/user', undefined, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`
+  const userResponse = await httpGET<{ login: string; name: string; email: string; id: number }>(
+    'https://api.github.com/user',
+    undefined,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
     }
-  });
+  );
 
   const githubLogin = userResponse.login;
 
@@ -131,14 +136,22 @@ export async function GET(req: NextRequest) {
       id: scout.id
     },
     data: {
-      onboardedAt: new Date()
+      onboardedAt: new Date(),
+      githubUser: {
+        create: {
+          login: githubLogin,
+          displayName: userResponse.name,
+          email: userResponse.email,
+          id: userResponse.id
+        }
+      }
     }
   });
 
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${process.env.DOMAIN}/welcome/spam-policy`
+      Location: `${process.env.DOMAIN}/welcome/spam-policy?onboarding=${onboarding}`
     }
   });
 }
