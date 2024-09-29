@@ -63,7 +63,10 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
       <Stack gap={2} alignItems='center'>
         <Typography>
           Your Builder account was not approved. Submit an appeal for review{' '}
-          <Link href='https://appeal.scoutgame.xyz/'>here</Link> if you think this was a mistake.
+          <Typography color='secondary' component='span'>
+            <Link href='https://appeal.scoutgame.xyz/'>here</Link>
+          </Typography>{' '}
+          if you think this was a mistake.
         </Typography>
       </Stack>
     );
@@ -75,7 +78,10 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
         <Alert severity='error'>
           <Typography>
             Your builder account has been banned. Submit an appeal for review{' '}
-            <Link href='https://appeal.scoutgame.xyz/'>here</Link> to get unbanned.
+            <Typography color='secondary' component='span'>
+              <Link href='https://appeal.scoutgame.xyz/'>here</Link>
+            </Typography>
+            to get unbanned.
           </Typography>
         </Alert>
       ) : null}
