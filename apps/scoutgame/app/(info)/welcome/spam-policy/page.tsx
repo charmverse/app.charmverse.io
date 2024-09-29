@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 
 import { SpamPolicyPage } from 'components/welcome/spam-policy/SpamPolicyPage';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +11,6 @@ export const metadata: Metadata = {
   title: 'Spam policy'
 };
 
-export default async function SpamPolicy() {
-  return <SpamPolicyPage />;
+export default async function SpamPolicy({ searchParams }: { searchParams: { onboarding: string } }) {
+  return <SpamPolicyPage onboarding={searchParams.onboarding === 'true'} />;
 }

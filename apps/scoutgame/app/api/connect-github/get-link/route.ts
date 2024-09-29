@@ -3,10 +3,11 @@ import { getGithubOAuthCallbackUrl } from '@packages/github/oauth';
 import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID } from '@root/lib/github/constants';
 import { sealData } from 'iron-session';
+import type { NextRequest } from 'next/server';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getSession();
-
+  const onboarding = req.nextUrl.searchParams.get('onboarding');
   if (!session.scoutId) {
     return new Response('Authentication required', { status: 401 });
   }
@@ -20,7 +21,7 @@ export async function GET() {
 
   const redirectUrl = getGithubOAuthCallbackUrl({
     clientId: GITHUB_CLIENT_ID,
-    redirect: `${process.env.DOMAIN}/api/connect-github/callback`,
+    redirect: `${process.env.DOMAIN}/api/connect-github/callback?onboarding=${onboarding}`,
     state: sealedUserId
   });
 

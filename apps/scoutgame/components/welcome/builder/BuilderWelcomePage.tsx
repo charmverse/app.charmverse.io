@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
@@ -56,7 +56,7 @@ export function BuilderPage() {
         <Box width='100%'>
           <Suspense>
             <Box display='flex' flexDirection='column' gap={2}>
-              <JoinGithubButton />
+              <JoinGithubButton onboarding />
               <SkipBuilderStepButton />
             </Box>
           </Suspense>
