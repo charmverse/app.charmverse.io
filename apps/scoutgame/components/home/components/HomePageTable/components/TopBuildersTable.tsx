@@ -99,7 +99,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
                   <Image width={15} height={15} src='/images/profile/icons/like-green-icon.svg' alt='like icon ' />
                 </Stack>
               </TableCell>
-              <TableCell align='center'>
+              <TableCell align='center' width='150px'>
                 <ScoutButton price={builder.price} builderId={builder.id} />
               </TableCell>
             </TableRow>

@@ -86,7 +86,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                   <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
                 </Stack>
               </TableCell>
-              <TableCell sx={getSXProps({ mdDown: true, display: 'table-cell' })}>
+              <TableCell sx={getSXProps({ mdDown: true, display: 'table-cell' })} width='150px'>
                 <ScoutButton price={row.price} builderId={row.builderId} />
               </TableCell>
             </TableRow>
