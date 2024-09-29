@@ -213,7 +213,7 @@ function NFTPurchaseButton({ builderId, user }: NFTPurchaseProps) {
         onSuccess: async (data) => {
           await executeAsync({
             user: {
-              scoutId: user.id,
+              scoutId: user!.id,
               walletAddress: address as `0x${string}`
             },
             transactionInfo: {
