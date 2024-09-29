@@ -1,10 +1,10 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { randomLargeInt, randomIntFromInterval } from '@packages/scoutgame/testing/generators';
+import type { ConnectWaitlistTier, TierChange } from '@packages/scoutgame/waitlist/scoring/constants';
+import { refreshUserScore } from '@packages/scoutgame/waitlist/scoring/refreshUserScore';
 
-import { refreshPercentilesForEveryone } from '../../../../../../apps/waitlist/lib/scoring/refreshPercentilesForEveryone'; // Adjust the import to the correct module
-import type { ConnectWaitlistTier, TierChange } from '../constants';
-import { refreshUserScore } from '../refreshUserScore';
+import { refreshPercentilesForEveryone } from '../refreshPercentilesForEveryone'; // Adjust the import to the correct module
 
 // Function to shuffle an array deterministically using a seeded random number generator
 function seededShuffle(array: number[], seed: number): number[] {
