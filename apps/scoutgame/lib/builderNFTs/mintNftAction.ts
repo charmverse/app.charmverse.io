@@ -1,6 +1,6 @@
 'use server';
 
-import { savePendingTransaction } from '@packages/scoutgame';
+import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
