@@ -1,21 +1,27 @@
 import { log } from '@charmverse/core/log';
 import { Box } from '@mui/material';
 import type { PropsWithChildren } from '@packages/utils/react';
-// replace a deprecated Hidden component
 
 // props based on https://mui.com/material-ui/api/hidden/
 type Props = {
   mdDown?: boolean;
   mdUp?: boolean;
+  display?: 'block' | 'inline' | 'inline-block' | 'flex' | 'grid' | 'table' | 'table-cell';
 };
 
-export function Hidden({ children, mdDown, mdUp }: PropsWithChildren<Props>) {
+// TODO: just use class names?
+export function getSXProps({ display = 'block', mdDown, mdUp }: Props) {
   if (mdDown) {
-    return <Box sx={{ display: { xs: 'none', md: 'block' } }}>{children}</Box>;
+    return { display: { xs: 'none', md: display } };
   }
   if (mdUp) {
-    return <Box sx={{ display: { xs: 'block', md: 'none' } }}>{children}</Box>;
+    return { display: { xs: display, md: 'none' } };
   }
   log.warn('Hidden component must have either mdDown or mdUp prop');
-  return <Box>{children}</Box>;
+  return {};
+}
+
+// replace a deprecated Hidden component
+export function Hidden({ children, mdDown, mdUp }: PropsWithChildren<Props>) {
+  return <Box sx={getSXProps({ mdDown, mdUp })}>{children}</Box>;
 }

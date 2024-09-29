@@ -5,10 +5,10 @@ import { getLeaderboard } from 'lib/builders/getLeaderboard';
 import { getTopBuilders } from 'lib/builders/getTopBuilders';
 import { getTopScouts } from 'lib/scouts/getTopScouts';
 
-import { ActivityTable } from './ActivityTable';
-import { LeaderboardTable } from './LeaderboardTable';
-import { TopBuildersTable } from './TopBuildersTable';
-import { TopScoutsTable } from './TopScoutsTable';
+import { ActivityTable } from './components/ActivityTable';
+import { LeaderboardTable } from './components/LeaderboardTable';
+import { TopBuildersTable } from './components/TopBuildersTable';
+import { TopScoutsTable } from './components/TopScoutsTable';
 
 export async function HomeTab({ tab }: { tab: string }) {
   if (tab === 'activity') {
