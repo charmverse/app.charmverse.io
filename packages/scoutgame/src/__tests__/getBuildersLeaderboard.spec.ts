@@ -11,7 +11,7 @@ describe('getBuildersLeaderboard', () => {
     const builders = await Promise.all(
       Array(10)
         .fill(null)
-        .map(() => mockBuilder({ username: `user-${v4()}` }))
+        .map(() => mockBuilder({ username: `user-${v4()}`, createNft: true }))
     );
 
     await Promise.all(
