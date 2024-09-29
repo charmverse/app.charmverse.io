@@ -5,7 +5,6 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
-import type { UseBoxActionArgs } from '@decent.xyz/box-hooks';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Alert, Button, Typography } from '@mui/material';
 import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/builderNFTSeasonOneClient';
@@ -27,6 +26,7 @@ import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
+import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 import type { ChainOption } from './ChainSelector';
 import { BlockchainSelect, getChainOptions } from './ChainSelector';
@@ -208,12 +208,21 @@ function NFTPurchaseButton({ builderId }: NFTPurchaseProps) {
       {
         onSuccess: async (data) => {
           await executeAsync({
-            address: address as string,
-            tokenId: builderTokenId.toString(),
-            amount: tokensToBuy,
-            builderId,
-            sourceTxChainId: sourceFundsChain,
-            txHash: data
+            user: {
+              walletAddress: address as `0x${string}`
+            },
+            transactionInfo: {
+              destinationChainId: builderNftChain.id,
+              sourceChainId: sourceFundsChain,
+              sourceChainTxHash: data
+            },
+            purchaseInfo: {
+              quotedPrice: Number(purchaseCost),
+              tokenAmount: tokensToBuy,
+              builderContractAddress,
+              tokenId: Number(builderTokenId),
+              quotedPriceCurrency: usdcContractAddress
+            }
           });
         },
         onError: (err: any) => {
@@ -288,7 +297,7 @@ function NFTPurchaseWithLogin(props: NFTPurchaseProps) {
   );
 }
 
-export function NFTPurchase(props: NFTPurchaseProps) {
+export async function NFTPurchase(props: NFTPurchaseProps) {
   return (
     <WagmiProvider>
       <NFTPurchaseWithLogin {...props} />

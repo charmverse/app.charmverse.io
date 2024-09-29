@@ -4,6 +4,7 @@ import Koa from 'koa';
 
 import * as middleware from './middleware';
 import { processGemsPayout } from './tasks/processGemsPayout';
+import { processNftMints } from './tasks/processNftMints';
 import { processPullRequests } from './tasks/processPullRequests';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
 
@@ -37,6 +38,8 @@ addTask('/process-pull-requests', processPullRequests);
 addTask('/send-push-notifications', sendNotifications);
 
 addTask('/process-gems-payout', processGemsPayout);
+
+addTask('/process-nft-mints', processNftMints);
 
 // Standard health check used by Beanstalk
 router.get('/api/health', middleware.healthCheck);
