@@ -65,7 +65,7 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
         username,
         avatar,
         seasonPoints: pointsEarnedAsBuilder,
-        allTimePoints: builder.user.userAllTimeStats[0].pointsEarnedAsBuilder,
+        allTimePoints: builder.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
         scoutedBy: nft.nftSoldEvents.length,
         price: Number(nft.currentPrice)
       };
