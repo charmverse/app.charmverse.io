@@ -3,6 +3,10 @@ import Link from 'next/link';
 
 // Maintain a 3:4 aspect ratio for the NFT display
 const nftDisplaySize = {
+  'x-small': {
+    width: 100,
+    height: 133.33
+  },
   small: {
     width: 150,
     height: 200
@@ -12,8 +16,8 @@ const nftDisplaySize = {
     height: 250
   },
   large: {
-    width: 225,
-    height: 300
+    width: 200,
+    height: 266.67
   }
 };
 
@@ -28,7 +32,7 @@ export function BuilderCardNftDisplay({
   nftImageUrl?: string | null;
   showHotIcon?: boolean;
   children?: React.ReactNode;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'x-small' | 'small' | 'medium' | 'large';
 }) {
   const width = nftDisplaySize[size].width;
   const height = nftDisplaySize[size].height;

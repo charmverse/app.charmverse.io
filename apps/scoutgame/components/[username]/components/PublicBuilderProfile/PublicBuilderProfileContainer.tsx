@@ -78,7 +78,13 @@ export function PublicBuilderProfileContainer({
         }}
       >
         <Paper sx={{ py: 2 }}>
-          <Stack flexDirection='row'>
+          <Stack
+            flexDirection='row'
+            alignItems={{
+              xs: 'flex-start',
+              md: 'center'
+            }}
+          >
             <BackButton />
             {isDesktop ? (
               <Box>
@@ -90,10 +96,9 @@ export function PublicBuilderProfileContainer({
                 />
               </Box>
             ) : (
-              <Stack flexDirection='row' alignItems='center' gap={2}>
+              <Stack flexDirection='column' alignItems='center' gap={2}>
                 <Box minWidth='fit-content'>
                   <BuilderCard
-                    user={user}
                     builder={{
                       ...builder,
                       price: builder.price
@@ -151,7 +156,6 @@ export function PublicBuilderProfileContainer({
                     }}
                     hideDetails
                     showPurchaseButton
-                    user={user}
                   />
                   <PublicBuilderStats
                     seasonPoints={seasonPoints}

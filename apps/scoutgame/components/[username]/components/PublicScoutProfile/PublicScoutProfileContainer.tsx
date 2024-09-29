@@ -38,7 +38,7 @@ export function PublicScoutProfileContainer({
         <Stack flexDirection='row'>
           <BackButton />
           <Box width='calc(100% - 50px)'>
-            <UserProfile user={scout} />
+            <UserProfile user={scout} avatarSize={isDesktop ? 'xLarge' : 'large'} />
           </Box>
         </Stack>
       </Paper>
@@ -78,7 +78,7 @@ export function PublicScoutProfileContainer({
           Scouted Builders
         </Typography>
         {scoutedBuilders.length > 0 ? (
-          <BuildersGallery builders={scoutedBuilders} columns={5} />
+          <BuildersGallery builders={scoutedBuilders} columns={5} size={isDesktop ? 'large' : 'small'} />
         ) : (
           <Typography>This Scout hasn't discovered any Builders yet. Check back to see who they find!</Typography>
         )}
