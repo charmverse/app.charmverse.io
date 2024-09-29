@@ -2,10 +2,10 @@
 
 import type { ConnectWaitlistSlot } from '@charmverse/core/prisma-client';
 import { Box, Stack, Typography } from '@mui/material';
+import { getTier, tierDistributionMap } from '@packages/scoutgame/waitlist/scoring/constants';
 import Image from 'next/image';
 
 import { Counter } from 'components/common/Counter';
-import { getTier, tierDistributionMap } from 'lib/scoring/constants';
 
 export function ScoreTier({ waitlistSlot }: { waitlistSlot: ConnectWaitlistSlot & { clicks: number } }) {
   const tier = getTier(waitlistSlot?.percentile);

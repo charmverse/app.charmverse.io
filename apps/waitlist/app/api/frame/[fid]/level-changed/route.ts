@@ -1,6 +1,7 @@
 /* eslint-disable no-case-declarations */
 import { InvalidInputError } from '@charmverse/core/errors';
 import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
+import type { TierChange } from '@packages/scoutgame/waitlist/scoring/constants';
 import { validateFrameInteractionViaAirstackWithErrorCatching } from '@root/lib/farcaster/airstack';
 import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
 import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
@@ -9,7 +10,6 @@ import { JoinWaitlistFrame } from 'components/frame/JoinWaitlistFrame';
 import { LevelChangedFrame } from 'components/frame/LevelChangedFrame';
 import { getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
 import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
-import type { TierChange } from 'lib/scoring/constants';
 
 export async function GET(req: Request) {
   const reqAsURL = new URL(req.url);

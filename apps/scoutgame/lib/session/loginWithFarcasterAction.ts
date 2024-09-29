@@ -6,6 +6,7 @@ import { verifyFarcasterUser } from 'lib/farcaster/verifyFarcasterUser';
 
 import { authSchema } from '../farcaster/config';
 
+import { authorizeUserByLaunchDate } from './authorizeUserByLaunchDate';
 import { saveSession } from './saveSession';
 
 export const loginAction = actionClient
@@ -13,6 +14,7 @@ export const loginAction = actionClient
   .schema(authSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { fid } = await verifyFarcasterUser(parsedInput);
+    await authorizeUserByLaunchDate({ fid });
     const user = await findOrCreateFarcasterUser({ fid });
 
     await saveSession(ctx, { scoutId: user.id });
