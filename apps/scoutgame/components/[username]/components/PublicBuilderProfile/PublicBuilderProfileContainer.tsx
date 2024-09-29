@@ -99,7 +99,7 @@ export function PublicBuilderProfileContainer({
                     }}
                     hideDetails
                     showPurchaseButton
-                    size='small'
+                    size={isDesktop ? 'small' : 'x-small'}
                   />
                 </Box>
                 <Stack gap={1} pr={1}>
