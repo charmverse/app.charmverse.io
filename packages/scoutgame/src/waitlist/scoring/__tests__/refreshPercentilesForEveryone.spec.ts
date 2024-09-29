@@ -2,8 +2,8 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { randomLargeInt, randomIntFromInterval } from '@packages/scoutgame/testing/generators';
 
+import { refreshPercentilesForEveryone } from '../../../../../../apps/waitlist/lib/scoring/refreshPercentilesForEveryone'; // Adjust the import to the correct module
 import type { ConnectWaitlistTier, TierChange } from '../constants';
-import { refreshPercentilesForEveryone } from '../refreshPercentilesForEveryone'; // Adjust the import to the correct module
 import { refreshUserScore } from '../refreshUserScore';
 
 // Function to shuffle an array deterministically using a seeded random number generator

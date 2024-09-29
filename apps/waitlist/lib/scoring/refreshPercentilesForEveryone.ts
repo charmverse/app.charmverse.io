@@ -1,11 +1,14 @@
 import { log } from '@charmverse/core/log';
 import type { ConnectWaitlistSlot, Prisma } from '@charmverse/core/prisma-client';
-import { PrismaClient, prisma } from '@charmverse/core/prisma-client';
-import { roundNumberInRange } from '@root/lib/utils/numbers';
-import { prettyPrint } from '@root/lib/utils/strings';
+import { prisma } from '@charmverse/core/prisma-client';
+import type {
+  ConnectWaitlistTier,
+  TierChange,
+  TierDistributionType
+} from '@packages/scoutgame/waitlist/scoring/constants';
+import { tierDistribution, getTier } from '@packages/scoutgame/waitlist/scoring/constants';
+import { roundNumberInRange } from '@packages/utils/numbers';
 
-import type { ConnectWaitlistTier, TierChange, TierDistributionType } from './constants';
-import { tierDistribution, getTier } from './constants';
 import { notifyNewScore } from './notifyNewScore';
 
 // const prisma = new PrismaClient({
