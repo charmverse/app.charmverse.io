@@ -74,6 +74,42 @@ export class ProductionStack extends Stack {
         optionName: 'RootVolumeSize',
         value: '24' // example size in GB
       },
+      /* Begin graceful deployment settings */
+      ...(environmentTier === 'WebServer'
+        ? [
+            {
+              namespace: 'aws:elasticbeanstalk:command',
+              optionName: 'DeploymentPolicy',
+              value: 'Rolling'
+            },
+            {
+              namespace: 'aws:elasticbeanstalk:command',
+              optionName: 'BatchSize',
+              value: '50' // percentage of instances to update at a time
+            },
+            {
+              namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
+              optionName: 'RollingUpdateEnabled',
+              value: 'true'
+            },
+            {
+              namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
+              optionName: 'RollingUpdateType',
+              value: 'Health'
+            },
+            {
+              namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
+              optionName: 'MinInstancesInService',
+              value: '1'
+            },
+            {
+              namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
+              optionName: 'MaxBatchSize',
+              value: '3'
+            }
+          ]
+        : []),
+      /* End graceful deployment settings */
       {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
