@@ -82,7 +82,8 @@ export async function generateNftImage({
           position: 'relative',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
+          backgroundColor: 'white'
         }}
       >
         <img
