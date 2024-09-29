@@ -75,7 +75,7 @@ export default async function RootLayout({
         <Script src='/__ENV.js' />
         <AppProviders>
           <ClientGlobals userId={user?.id} />
-          {user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />}
+          {/* {user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />} */}
           {children}
         </AppProviders>
       </body>
