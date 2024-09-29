@@ -23,8 +23,14 @@ export function ProfileStats({
   return (
     <Paper
       sx={{
-        px: 4,
-        py: 1.5,
+        px: {
+          xs: 1,
+          md: 4
+        },
+        py: {
+          xs: 1,
+          md: 1.5
+        },
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',

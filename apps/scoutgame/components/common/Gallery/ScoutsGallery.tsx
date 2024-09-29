@@ -7,7 +7,7 @@ import { ScoutCard } from '../Card/ScoutCard';
 export function ScoutsGallery({ scouts }: { scouts: ScoutInfo[] }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={{ xs: 1, sm: 2 }} columns={{ xs: 3, sm: 6, md: 3 }}>
+      <Grid container spacing={{ xs: 1, sm: 2 }} columns={{ xs: 2, sm: 6, md: 3 }}>
         {scouts.map((scout) => (
           <Grid key={scout.username} size={{ xs: 1 }}>
             <Link href={`/u/${scout.username}`}>
