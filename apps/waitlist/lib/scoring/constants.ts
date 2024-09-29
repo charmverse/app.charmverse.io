@@ -1,6 +1,3 @@
-import { prisma } from '@charmverse/core/prisma-client';
-import { roundNumberInRange } from '@root/lib/utils/numbers';
-
 export const waitlistTiers = ['legendary', 'mythic', 'epic', 'rare', 'common'] as const;
 
 export type ConnectWaitlistTier = (typeof waitlistTiers)[number];
