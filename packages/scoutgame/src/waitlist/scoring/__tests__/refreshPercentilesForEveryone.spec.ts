@@ -1,8 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { randomIntFromInterval } from '@root/lib/utils/random';
+import { randomLargeInt, randomIntFromInterval } from '@packages/scoutgame/testing/generators';
 
-import { randomFid } from '../../../../../../testing/utils/farcaster';
 import type { ConnectWaitlistTier, TierChange } from '../constants';
 import { refreshPercentilesForEveryone } from '../refreshPercentilesForEveryone'; // Adjust the import to the correct module
 import { refreshUserScore } from '../refreshUserScore';
@@ -41,7 +40,7 @@ const scores = Array.from({ length: usersToGenerate }, (_, index) => 1000 - inde
 
 const shuffledScores = seededShuffle(scores, 42); // Seed value can be any number (42 in this case)
 
-const fids = Array.from({ length: usersToGenerate }, () => randomFid());
+const fids = Array.from({ length: usersToGenerate }, () => randomLargeInt());
 
 const additionalFids: number[] = [];
 
@@ -463,12 +462,12 @@ describe('refreshPercentilesForEveryone', () => {
   it('should only take into account users who connected a Github Account, or have at least 1 referral', async () => {
     const listLength = 50;
 
-    const fidsWithReferral = Array.from({ length: listLength }, () => randomFid());
-    const fidsWithGithub = Array.from({ length: listLength }, () => randomFid());
+    const fidsWithReferral = Array.from({ length: listLength }, () => randomLargeInt());
+    const fidsWithGithub = Array.from({ length: listLength }, () => randomLargeInt());
 
     const expectedFids = [...fidsWithReferral, ...fidsWithGithub];
 
-    const fidsWithoutReferralOrGithub = Array.from({ length: listLength }, () => randomFid());
+    const fidsWithoutReferralOrGithub = Array.from({ length: listLength }, () => randomLargeInt());
 
     await prisma.connectWaitlistSlot.createMany({
       data: [
