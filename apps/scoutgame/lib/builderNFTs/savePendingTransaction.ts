@@ -11,29 +11,28 @@ type PendingNftTransactionToSave = {
     destinationChainId: number;
   };
   purchaseInfo: {
-    settlementTokenContractAdress: string;
-    tokenContractAddress: string;
+    builderContractAddress: string;
     tokenAmount: number;
     tokenId: number;
-    quotedPriceForTokenAmount: number;
+    quotedPrice: number;
     quotedPriceCurrency: string;
   };
-  userId: string;
 };
 
 export async function savePendingTransaction(data: PendingNftTransactionToSave) {
   await prisma.pendingNftTransaction.create({
     data: {
-      userId: data.userId,
+      userId: data.user.scoutId,
       senderAddress: data.user.walletAddress,
       sourceChainId: data.transactionInfo.sourceChainId,
       sourceChainTxHash: data.transactionInfo.sourceChainTxHash,
       destinationChainId: data.transactionInfo.destinationChainId,
-      contractAddress: data.purchaseInfo.tokenContractAddress,
+      contractAddress: data.purchaseInfo.builderContractAddress,
       tokenAmount: data.purchaseInfo.tokenAmount,
       tokenId: data.purchaseInfo.tokenId,
-      targetAmountReceived: data.purchaseInfo.quotedPriceForTokenAmount,
-      targetCurrencyContractAddress: data.purchaseInfo.settlementTokenContractAdress
+      targetAmountReceived: data.purchaseInfo.quotedPrice,
+      targetCurrencyContractAddress: data.purchaseInfo.quotedPriceCurrency,
+      status: 'pending'
     }
   });
 }

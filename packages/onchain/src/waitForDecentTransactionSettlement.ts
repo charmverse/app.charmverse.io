@@ -1,5 +1,6 @@
 import { GET } from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
+import { TransactionStatus, prisma } from '@charmverse/core/prisma-client';
 import { sleep } from '@decent.xyz/box-common';
 
 type DecentTransactionStatus = {
@@ -166,6 +167,17 @@ export async function waitForDecentTransactionSettlement({
       const response = await getTransactionStatusFromDecent({ sourceTxHash, sourceTxHashChainId });
 
       if (response.transaction?.dstTx?.success === true) {
+        await prisma.pendingNftTransaction.update({
+          where: {
+            sourceChainTxHash_sourceChainId: {
+              sourceChainId: sourceTxHashChainId,
+              sourceChainTxHash: response.transaction.dstTx.fast.transactionHash
+            }
+          },
+          data: {
+            status: TransactionStatus.completed
+          }
+        });
         return response.transaction.dstTx.fast.transactionHash;
       }
 
