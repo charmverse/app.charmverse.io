@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
-
+import { fileURLToPath } from 'url';
+import path from 'path';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
@@ -43,9 +44,28 @@ export async function generateBuilder({ index }: { index: number }) {
       username
     });
 
-    const scoutgamePublicFolder =
-      '/Users/devorein/Documents/charmverse/app.charmverse.io/apps/scoutgame/public/builder-nfts';
-
+    // images will be hosted by the
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const scoutgamePublicFolder = path.join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      '..',
+      '..',
+      'apps',
+      'scoutgame',
+      'public',
+      'builder-nfts'
+    );
+    try {
+      await fs.mkdir(scoutgamePublicFolder);
+    } catch (e) {
+      if ((e as any).code !== 'EEXIST') {
+        console.error(e);
+      }
+    }
     await fs.writeFile(`${scoutgamePublicFolder}/${currentBuilderCount}.png`, new Uint8Array(nftImageBuffer));
 
     builderNft = {
@@ -58,7 +78,19 @@ export async function generateBuilder({ index }: { index: number }) {
       imageUrl: `http://localhost:3000/builder-nfts/${currentBuilderCount}.png`
     };
   }
-
+  if (builderNft) {
+    await prisma.builderNft
+      .delete({
+        where: {
+          contractAddress_tokenId_chainId: {
+            contractAddress: builderNft.contractAddress,
+            tokenId: builderNft.tokenId,
+            chainId: builderNft.chainId
+          }
+        }
+      })
+      .catch((e) => null);
+  }
   const builder = await prisma.scout.create({
     data: {
       username,
