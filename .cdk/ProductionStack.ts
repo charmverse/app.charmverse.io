@@ -75,7 +75,7 @@ export class ProductionStack extends Stack {
         value: '24' // example size in GB
       },
       /* Begin graceful deployment settings */
-      ...(environmentTier === 'WebServer'
+      ...(environmentType === 'LoadBalanced'
         ? [
             {
               namespace: 'aws:elasticbeanstalk:command',
