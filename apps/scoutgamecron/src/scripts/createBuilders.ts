@@ -51,7 +51,6 @@ async function createBuilders() {
       }
     })
     const fid = waitlistSlot?.fid;
-    console.log(fid)
 
     if (!waitlistSlot || !fid) {
       log.warn(`No waitlist slot or fid found for ${login}`)
@@ -84,7 +83,7 @@ async function createBuilders() {
             username,
             avatar: avatarUrl,
             bio,
-            builderStatus: "approved",
+            builderStatus: "applied",
             farcasterId: fid,
             farcasterName: displayName,
             githubUser: {
