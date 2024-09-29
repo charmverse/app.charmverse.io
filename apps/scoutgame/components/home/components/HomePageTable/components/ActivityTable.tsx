@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { Stack, TableHead, Typography } from '@mui/material';
+import { Box, Stack, TableHead } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -9,35 +9,41 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { getRelativeTime } from '@packages/utils/dates';
 
+import { Avatar } from 'components/common/Avatar';
+import { GemsIcon } from 'components/common/Icons';
 import {
   BuilderActivityBonusPartner,
   BuilderActivityDetail,
   BuilderActivityGems,
-  BuilderActivityLabel
+  getActivityLabel
 } from 'components/profile/components/BuilderProfile/BuilderActivitiesList';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
-import { Avatar } from '../../common/Avatar';
+import { TableCellText } from './TableCellText';
 
 export async function ActivityTable({ activities }: { activities: BuilderActivity[] }) {
   return (
-    <TableContainer component={Paper} sx={{ mt: 2 }}>
+    <TableContainer component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Activity table' size='small'>
         <TableHead sx={{ display: { xs: 'none', md: 'table-header-group' } }}>
           <TableRow
             sx={{
               [`& .${tableCellClasses.root}`]: {
                 borderBottom: 'none',
-                paddingLeft: 0,
-                paddingRight: 0
+                paddingLeft: '6px',
+                paddingRight: '6px'
               }
             }}
           >
             <TableCell />
             <TableCell>ACTION</TableCell>
-            <TableCell>DETAIL</TableCell>
-            <TableCell align='right'>EARNED</TableCell>
-            <TableCell align='right'>BONUS</TableCell>
+            <TableCell width='100px'>DETAIL</TableCell>
+            <TableCell align='right'>
+              <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
+                EARNED <GemsIcon />
+              </Stack>
+            </TableCell>
+            <TableCell align='center'>BONUS</TableCell>
             <TableCell />
           </TableRow>
         </TableHead>
@@ -53,31 +59,27 @@ export async function ActivityTable({ activities }: { activities: BuilderActivit
               <TableCell component='th' scope='activity'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
                   <Avatar src={activity.avatar} name={activity.username} size='small' />
-                  <Typography variant='caption' noWrap maxWidth={{ xs: '70px', md: '100%' }}>
-                    {activity.username}
-                  </Typography>
+                  <TableCellText maxWidth={{ xs: '100px', md: '100%' }}>{activity.username}</TableCellText>
                 </Stack>
               </TableCell>
-              <TableCell align='right'>
-                <Stack alignItems='center' flexDirection='row' gap={1}>
-                  <BuilderActivityLabel activity={activity} />
-                </Stack>
+              <TableCell>
+                <TableCellText>{getActivityLabel(activity)}</TableCellText>
+              </TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                <TableCellText>
+                  <BuilderActivityDetail activity={activity} />
+                </TableCellText>
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <BuilderActivityDetail activity={activity} />
-              </TableCell>
-              <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <Stack justifyContent='flex-end' flexDirection='row' gap={1}>
+                <TableCellText display='inline-flex'>
                   <BuilderActivityGems activity={activity} showEmpty />
-                </Stack>
+                </TableCellText>
+              </TableCell>
+              <TableCell align='center'>
+                <BuilderActivityBonusPartner activity={activity} />
               </TableCell>
               <TableCell align='right'>
-                <BuilderActivityBonusPartner activity={activity} showEmpty />
-              </TableCell>
-              <TableCell align='right'>
-                <Typography variant='caption' noWrap>
-                  {getRelativeTime(activity.createdAt)}
-                </Typography>
+                <TableCellText>{getRelativeTime(activity.createdAt)}</TableCellText>
               </TableCell>
             </TableRow>
           ))}

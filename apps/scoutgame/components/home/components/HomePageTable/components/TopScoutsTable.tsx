@@ -7,40 +7,45 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   tableCellClasses
 } from '@mui/material';
 import Image from 'next/image';
 
+import { Avatar } from 'components/common/Avatar';
+import { PointsIcon } from 'components/common/Icons';
 import type { TopScout } from 'lib/scouts/getTopScouts';
 
-import { Avatar } from '../../common/Avatar';
+import { TableCellText } from './TableCellText';
 
 export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
   return (
-    <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+    <TableContainer component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Top scouts table' size='small'>
         <TableHead>
           <TableRow
             sx={{
               [`& .${tableCellClasses.root}`]: {
                 borderBottom: 'none',
-                paddingLeft: 0,
-                '&:first-child': {
-                  paddingLeft: 1
-                }
+                paddingLeft: '6px',
+                paddingRight: '6px'
               }
             }}
           >
             <TableCell align='center'>RANK</TableCell>
             <TableCell align='left'>SCOUT</TableCell>
-            <TableCell align='right'>SEASON</TableCell>
+            <TableCell align='right'>
+              <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
+                SEASON <PointsIcon />
+              </Stack>
+            </TableCell>
             <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-              ALL TIME
+              <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
+                ALL TIME <PointsIcon />
+              </Stack>
             </TableCell>
             <TableCell align='center'>SCOUTED</TableCell>
             <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-              NFT's HELD
+              NFTs HELD
             </TableCell>
           </TableRow>
         </TableHead>
@@ -54,41 +59,31 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
               }}
             >
               <TableCell align='center'>
-                <Typography>{index + 1}</Typography>
+                <TableCellText>{index + 1}</TableCellText>
               </TableCell>
               <TableCell component='th'>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
                   <Avatar src={scout.avatar} name={scout.username} size='small' />
-                  <Typography variant='caption' noWrap maxWidth={{ xs: '100px', md: '100%' }}>
-                    {scout.username}
-                  </Typography>
+                  <TableCellText maxWidth={{ xs: '100px', md: '100%' }}>{scout.username}</TableCellText>
                 </Stack>
               </TableCell>
               <TableCell align='right'>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                  <Typography variant='caption' color='orange.main' noWrap>
-                    {scout.seasonPoints || 0}
-                  </Typography>
+                  <TableCellText color='orange.main'>{scout.seasonPoints || 0}</TableCellText>
                   <Image width={15} height={15} src='/images/profile/scout-game-orange-icon.svg' alt='season icon ' />
                 </Stack>
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                  <Typography variant='caption' color='orange.main' noWrap>
-                    {scout.allTimePoints || 0}
-                  </Typography>
+                  <TableCellText color='orange.main'>{scout.allTimePoints || 0}</TableCellText>
                   <Image width={15} height={15} src='/images/profile/scout-game-orange-icon.svg' alt='season icon ' />
                 </Stack>
               </TableCell>
               <TableCell align='center'>
-                <Typography variant='caption' color='orange.main' noWrap>
-                  {scout.buildersScouted || 0}
-                </Typography>
+                <TableCellText color='orange.main'>{scout.buildersScouted || 0}</TableCellText>
               </TableCell>
               <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <Typography variant='caption' color='orange.main' noWrap>
-                  {scout.nftsHeld || 0}
-                </Typography>
+                <TableCellText color='orange.main'>{scout.nftsHeld || 0}</TableCellText>
               </TableCell>
             </TableRow>
           ))}

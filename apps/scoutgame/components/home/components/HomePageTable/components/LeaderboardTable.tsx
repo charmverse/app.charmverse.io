@@ -1,4 +1,4 @@
-import { Box, Stack, TableHead, Typography } from '@mui/material';
+import { Box, Stack, TableHead } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -9,31 +9,18 @@ import { currentSeasonNumber, getCurrentSeasonWeekNumber } from '@packages/scout
 import { DateTime } from 'luxon';
 import Image from 'next/image';
 
-import { Hidden } from 'components/common/Hidden';
+import { Avatar } from 'components/common/Avatar';
+import { getSXProps } from 'components/common/Hidden';
 import { ScoutButton } from 'components/common/ScoutButton/ScoutButton';
 import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
 
-import { Avatar } from '../../common/Avatar';
+import { TableCellText } from './TableCellText';
 
 export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
-    <TableContainer component={Paper} sx={{ mt: 2 }}>
-      <Stack
-        width='100%'
-        flexDirection='row'
-        justifyContent='center'
-        sx={{
-          p: 1,
-          display: {
-            xs: 'flex',
-            md: 'none'
-          }
-        }}
-      >
-        SEASON {currentSeasonNumber} WEEK {getCurrentSeasonWeekNumber()} DAY {(DateTime.now().weekday % 7) + 1}
-      </Stack>
+    <TableContainer component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Leaderboard table' size='small'>
         <TableHead
           sx={{
@@ -47,10 +34,8 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
             sx={{
               [`& .${tableCellClasses.root}`]: {
                 borderBottom: 'none',
-                paddingLeft: 0,
-                '&:first-child': {
-                  paddingLeft: 1
-                }
+                paddingLeft: '6px',
+                paddingRight: '6px'
               }
             }}
           >
@@ -59,8 +44,8 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
             <TableCell>
               SEASON {currentSeasonNumber} WEEK {getCurrentSeasonWeekNumber()} DAY {(DateTime.now().weekday % 7) + 1}
             </TableCell>
-            <TableCell sx={{ maxWidth: '100px', pr: 0 }} align='right'>
-              Gems this week
+            <TableCell sx={{ maxWidth: '100px', pr: 0 }} align='center'>
+              GEMS THIS WEEK
             </TableCell>
             <TableCell />
           </TableRow>
@@ -75,14 +60,12 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
               }}
             >
               <TableCell align='center'>
-                <Typography color={index + 1 <= 3 ? 'text.secondary' : undefined}>{index + 1}</Typography>
+                <TableCellText color={index + 1 <= 3 ? 'text.secondary' : undefined}>{index + 1}</TableCellText>
               </TableCell>
               <TableCell component='th' sx={{ maxWidth: { xs: '150px', md: '100%' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1}>
                   <Avatar src={row.avatar} name={row.username} size='small' />
-                  <Typography variant='caption' noWrap>
-                    {row.username}
-                  </Typography>
+                  <TableCellText>{row.username}</TableCellText>
                 </Stack>
               </TableCell>
               <TableCell sx={{ maxWidth: { xs: '100px', sm: '100%' } }}>
@@ -98,16 +81,14 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                 />
               </TableCell>
               <TableCell sx={{ maxWidth: '100px' }}>
-                <Stack flexDirection='row' gap={0.2} alignItems='center' justifyContent='flex-end'>
-                  <Typography variant='caption'>{row.gems}</Typography>
+                <Stack flexDirection='row' gap={0.2} alignItems='center' justifyContent='center'>
+                  <TableCellText>{row.gems}</TableCellText>
                   <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
                 </Stack>
               </TableCell>
-              <Hidden mdDown>
-                <TableCell>
-                  <ScoutButton price={row.price} builderId={row.builderId} />
-                </TableCell>
-              </Hidden>
+              <TableCell sx={getSXProps({ mdDown: true, display: 'table-cell' })}>
+                <ScoutButton price={row.price} builderId={row.builderId} />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

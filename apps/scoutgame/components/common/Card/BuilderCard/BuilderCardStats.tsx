@@ -1,6 +1,8 @@
 import { Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
+import { GemsIcon, PointsIcon } from 'components/common/Icons';
+
 export function BuilderCardStats({
   gemsCollected,
   builderPoints,
@@ -19,7 +21,7 @@ export function BuilderCardStats({
           <Typography variant='body2' component='span' color='text.secondary'>
             {gemsCollected}
           </Typography>
-          <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
+          <GemsIcon size={15} />
         </Stack>
       )}
       {typeof builderPoints === 'number' && (
@@ -27,7 +29,7 @@ export function BuilderCardStats({
           <Typography variant='body2' component='span' color='green.main'>
             {builderPoints}
           </Typography>
-          <Image width={15} height={15} src='/images/profile/icons/scout-icon.svg' alt='Scouts' />
+          <PointsIcon size={15} color='orange' />
         </Stack>
       )}
       {typeof scoutedBy === 'number' && (

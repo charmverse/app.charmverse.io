@@ -1,3 +1,4 @@
+import type { SxProps } from '@mui/material';
 import { Box, Tab, Tabs, tabClasses, tabsClasses } from '@mui/material';
 import Link from 'next/link';
 
@@ -10,12 +11,13 @@ export type TabItem = {
 type TabsMenuProps = {
   value: string;
   tabs: TabItem[];
+  sx?: SxProps;
 };
 
-export function TabsMenu({ value, tabs }: TabsMenuProps) {
+export function TabsMenu({ value, tabs, sx }: TabsMenuProps) {
   const tabValue = tabs.some((t) => t.value === value) ? value : false;
   return (
-    <Box>
+    <Box sx={sx}>
       <Tabs
         value={tabValue}
         aria-label='scout game nav tabs'
@@ -37,7 +39,15 @@ export function TabsMenu({ value, tabs }: TabsMenuProps) {
         }}
       >
         {tabs.map((tab) => (
-          <Tab key={tab.value} component={Link} label={tab.label} href={tab.href} value={tab.value} scroll={false} />
+          <Tab
+            sx={{ fontSize: { xs: '12px', md: '14px' } }}
+            key={tab.value}
+            component={Link}
+            label={tab.label}
+            href={tab.href}
+            value={tab.value}
+            scroll={false}
+          />
         ))}
       </Tabs>
     </Box>
