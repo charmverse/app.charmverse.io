@@ -70,9 +70,10 @@ export async function POST(req: Request) {
     action: 'join_waitlist'
   });
 
-  const percentileChangeResults = await refreshPercentilesForEveryone();
+  // Disabled the level up level down for now.
+  // const percentileChangeResults = await refreshPercentilesForEveryone();
 
-  handleTierChanges(percentileChangeResults);
+  // handleTierChanges(percentileChangeResults);
 
   let html: string = '';
 
