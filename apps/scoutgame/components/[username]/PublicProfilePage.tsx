@@ -13,7 +13,7 @@ export async function PublicProfilePage({ user, tab }: { user: BasicUserInfo; ta
   return (
     <PageContainer>
       <Box gap={2} display='flex' flexDirection='column' margin='auto'>
-        {tab === 'build' ? (
+        {tab === 'builder' && user.builderStatus === 'approved' ? (
           <PublicBuilderProfile tab={tab} user={user} />
         ) : (
           <PublicScoutProfile tab={tab} user={user} />

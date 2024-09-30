@@ -31,10 +31,6 @@ export type BuilderProfileProps = {
   builderActivities: BuilderActivity[];
   gemsCollected?: number;
   rank?: number | null;
-  user?: {
-    id: string;
-    username: string;
-  } | null;
 };
 
 const PaperContainer = styled(Paper)(({ theme }) => ({
@@ -62,14 +58,19 @@ export function PublicBuilderProfileContainer({
   totalNftsSold,
   builderActivities,
   gemsCollected,
-  rank,
-  user
+  rank
 }: BuilderProfileProps) {
   const isDesktop = useMdScreen();
 
   return (
     <Box>
-      {!isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
+      {!isDesktop ? (
+        <PublicProfileTabsMenu
+          tab={tab}
+          username={builder.username}
+          isApprovedBuilder={builder.builderStatus === 'approved'}
+        />
+      ) : null}
       <Stack
         gap={2}
         my={{
@@ -121,7 +122,13 @@ export function PublicBuilderProfileContainer({
             )}
           </Stack>
         </Paper>
-        {isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
+        {isDesktop ? (
+          <PublicProfileTabsMenu
+            tab={tab}
+            username={builder.username}
+            isApprovedBuilder={builder.builderStatus === 'approved'}
+          />
+        ) : null}
 
         <Stack
           gap={2}
