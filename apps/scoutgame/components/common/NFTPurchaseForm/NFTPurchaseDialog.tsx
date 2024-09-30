@@ -3,7 +3,7 @@
 import { BasicModal } from 'components/common/Modal';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
-import { NFTPurchase } from './NFTPurchaseForm';
+import { NFTPurchaseForm } from './NFTPurchaseForm';
 
 export function NFTPurchaseDialog(props: {
   open: boolean;
@@ -12,7 +12,7 @@ export function NFTPurchaseDialog(props: {
 }) {
   return (
     <BasicModal open={props.open} onClose={props.onClose} title={`Scout @${props.builder.username}`} theme='dark'>
-      <NFTPurchase builder={props.builder} />
+      <NFTPurchaseForm builder={props.builder} />
     </BasicModal>
   );
 }

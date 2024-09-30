@@ -1,7 +1,7 @@
 'use client';
 
 import { Box } from '@mui/material';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
@@ -20,7 +20,7 @@ export type CarouselProps = {
 export function Carousel({ children }: CarouselProps) {
   const isDesktop = useMdScreen();
   const isLarge = useLgScreen();
-  const slidesPerView = isDesktop ? 5 : isLarge ? 6 : 2.2;
+  const slidesPerView = isDesktop ? 5 : isLarge ? 6 : 1.75;
   // Use state and effect to skip pre-rendering
   const [isClientSide, setIsClientSide] = useState(false);
 

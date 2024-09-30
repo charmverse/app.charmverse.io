@@ -15,7 +15,9 @@ export function getActivityLabel(activity: BuilderActivity) {
       : activity.contributionType === 'regular_pr'
       ? 'Contribution ACCEPTED'
       : 'Contribution STREAK'
-    : activity.type === 'nft_purchase';
+    : activity.type === 'nft_purchase'
+    ? 'Scouted by'
+    : null;
 }
 
 export function BuilderActivityLabel({ activity }: { activity: BuilderActivity }) {

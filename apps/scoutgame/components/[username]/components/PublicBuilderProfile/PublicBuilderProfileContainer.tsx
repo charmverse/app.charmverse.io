@@ -93,14 +93,13 @@ export function PublicBuilderProfileContainer({
               <Stack flexDirection='row' alignItems='center' gap={2}>
                 <Box minWidth='fit-content'>
                   <BuilderCard
-                    user={user}
                     builder={{
                       ...builder,
                       price: builder.price
                     }}
                     hideDetails
                     showPurchaseButton
-                    size='small'
+                    size={isDesktop ? 'small' : 'x-small'}
                   />
                 </Box>
                 <Stack gap={1} pr={1}>
@@ -151,7 +150,6 @@ export function PublicBuilderProfileContainer({
                     }}
                     hideDetails
                     showPurchaseButton
-                    user={user}
                   />
                   <PublicBuilderStats
                     seasonPoints={seasonPoints}

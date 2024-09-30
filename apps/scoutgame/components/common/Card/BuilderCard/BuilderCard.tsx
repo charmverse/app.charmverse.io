@@ -11,24 +11,19 @@ import { BuilderCardStats } from './BuilderCardStats';
 
 export function BuilderCard({
   builder,
-  user,
   showPurchaseButton = false,
   hideDetails = false,
   showHotIcon = false,
   size = 'medium'
 }: {
-  size?: 'small' | 'medium' | 'large';
-  user?: {
-    id: string;
-    username: string;
-  } | null;
+  size?: 'x-small' | 'small' | 'medium' | 'large';
   builder: BuilderInfo;
   hideDetails?: boolean;
   showPurchaseButton?: boolean;
   showHotIcon?: boolean;
 }) {
   return (
-    <Card sx={{ border: 'none', opacity: builder.isBanned ? 0.25 : 1, width: 'fit-content' }}>
+    <Card sx={{ border: 'none', opacity: builder.isBanned ? 0.25 : 1, width: 'fit-content', height: 'fit-content' }}>
       <BuilderCardNftDisplay
         nftImageUrl={builder.nftImageUrl}
         username={builder.username}

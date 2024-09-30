@@ -100,9 +100,6 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
       <Stack gap={0.5}>
         <Stack direction='row' alignItems='center' justifyContent='space-between'>
           <Typography color='secondary'>Recent Activity</Typography>
-          <Link href='/notifications'>
-            <Typography color='primary'>View All</Typography>
-          </Link>
         </Stack>
         {builderActivities.length > 0 ? (
           <BuilderActivitiesList activities={builderActivities} />

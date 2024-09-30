@@ -39,7 +39,7 @@ export async function ScoutProfile({ userId, isMobile }: { userId: string; isMob
           Scouted Builders
         </Typography>
         {scoutedBuilders.length > 0 ? (
-          <BuildersGallery builders={scoutedBuilders} columns={3} size={isMobile ? 'medium' : 'small'} />
+          <BuildersGallery builders={scoutedBuilders} columns={3} size='small' />
         ) : (
           <Typography>You haven't scouted any Builders yet. Start exploring and discover talent!</Typography>
         )}
