@@ -82,7 +82,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
               </TableCell>
               <TableCell sx={{ maxWidth: '100px' }}>
                 <Stack flexDirection='row' gap={0.2} alignItems='center' justifyContent='center'>
-                  <TableCellText>{row.gems}</TableCellText>
+                  <TableCellText>{row.gemsCollected}</TableCellText>
                   <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
                 </Stack>
               </TableCell>

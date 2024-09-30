@@ -23,14 +23,6 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
     }
   });
 
-  const builderNftsPurchasedRecord: Record<string, number> = {};
-  nftPurchaseEvents.forEach((event) => {
-    const builderId = event.builderNFT.builderId;
-    if (builderId) {
-      builderNftsPurchasedRecord[builderId] = (builderNftsPurchasedRecord[builderId] || 0) + event.tokensPurchased;
-    }
-  });
-
   const uniqueBuilderIds = Array.from(new Set(nftPurchaseEvents.map((event) => event.builderNFT.builderId)));
 
   const builders = await prisma.scout.findMany({
@@ -46,6 +38,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           season: currentSeason
         },
         select: {
+          nftsSold: true,
           pointsEarnedAsBuilder: true
         }
       },
@@ -54,7 +47,8 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           season: currentSeason
         },
         select: {
-          imageUrl: true
+          imageUrl: true,
+          currentPrice: true
         }
       },
       builderStatus: true,
@@ -77,9 +71,11 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       displayName: builder.displayName,
       builderStatus: builder.builderStatus,
       builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder ?? 0,
-      gems: builder.userWeeklyStats[0]?.gemsCollected ?? 0,
+      gemsCollected: builder.userWeeklyStats[0]?.gemsCollected ?? 0,
+      nftsSold: builder.userSeasonStats[0]?.nftsSold ?? 0,
       isBanned: builder.builderStatus === 'banned',
-      nftsSold: builderNftsPurchasedRecord[builder.id] ?? 0
+      price: builder.builderNfts[0]?.currentPrice ?? 0
+      // scoutedBy:
     };
   });
 }

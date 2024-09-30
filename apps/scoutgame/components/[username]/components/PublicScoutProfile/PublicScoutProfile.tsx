@@ -7,7 +7,7 @@ import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import { PublicScoutProfileContainer } from './PublicScoutProfileContainer';
 
-export async function PublicScoutProfile({ user, tab }: { user: BasicUserInfo; tab: string }) {
+export async function PublicScoutProfile({ user }: { user: BasicUserInfo }) {
   const [scout, { allTimePoints, seasonPoints, nftsPurchased }, scoutedBuilders] = await Promise.all([
     prisma.scout.findUniqueOrThrow({
       where: {
@@ -25,7 +25,6 @@ export async function PublicScoutProfile({ user, tab }: { user: BasicUserInfo; t
         ...scout,
         githubLogin: scout.githubUser[0]?.login
       }}
-      tab={tab}
       allTimePoints={allTimePoints}
       seasonPoints={seasonPoints}
       nftsPurchased={nftsPurchased}

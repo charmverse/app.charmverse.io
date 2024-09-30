@@ -37,43 +37,6 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
   cssVariables: true,
   defaultColorScheme: 'dark',
   colorSchemes: {
-    light: {
-      // light mode is the same as dark mode
-      palette: {
-        background: {
-          default: backgroundColorDarkMode,
-          paper: backgroundLightColorDarkMode,
-          dark: darken(backgroundColorDarkMode, 0.05),
-          light: lighten(backgroundColorDarkMode, 0.05)
-        },
-        text: {
-          disabled: disabledTextColorDarkMode,
-          primary: primaryTextColorDarkMode,
-          secondary: secondaryText
-        },
-        primary: {
-          main: brandColor,
-          dark: purpleDisabled
-        },
-        secondary: {
-          main: secondaryText,
-          light: secondaryLightText
-        },
-        inputBackground: {
-          main: inputBackgroundDarkMode
-        },
-        black: {
-          main: blackText,
-          dark: '#000'
-        },
-        orange: {
-          main: '#FFAC81'
-        },
-        green: {
-          main: '#85FF9E'
-        }
-      }
-    },
     dark: {
       // palette for dark mode
       palette: {

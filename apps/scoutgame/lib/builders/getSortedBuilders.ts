@@ -62,6 +62,14 @@ export async function getSortedBuilders({
                 gemsCollected: true
               }
             },
+            userSeasonStats: {
+              where: {
+                season
+              },
+              select: {
+                nftsSold: true
+              }
+            },
             userAllTimeStats: {
               select: {
                 pointsEarnedAsBuilder: true
@@ -78,7 +86,8 @@ export async function getSortedBuilders({
             builderPoints: scout.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: scout.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
-            gems: scout.userWeeklyStats[0]?.gemsCollected ?? 0,
+            gemsCollected: scout.userWeeklyStats[0]?.gemsCollected ?? 0,
+            nftsSold: scout.userSeasonStats[0]?.nftsSold ?? 0,
             builderStatus: scout.builderStatus
           }));
         });
@@ -124,6 +133,14 @@ export async function getSortedBuilders({
                   select: {
                     pointsEarnedAsBuilder: true
                   }
+                },
+                userSeasonStats: {
+                  where: {
+                    season
+                  },
+                  select: {
+                    nftsSold: true
+                  }
                 }
               }
             },
@@ -139,7 +156,8 @@ export async function getSortedBuilders({
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
-            gems: stat.gemsCollected,
+            gemsCollected: stat.gemsCollected,
+            nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
             builderStatus: stat.user.builderStatus
           }))
         );
@@ -174,16 +192,21 @@ export async function getSortedBuilders({
                     pointsEarnedAsBuilder: true
                   }
                 },
+                userSeasonStats: {
+                  where: {
+                    season
+                  },
+                  select: {
+                    nftsSold: true
+                  }
+                },
                 builderNfts: {
                   where: {
                     season
                   },
                   select: {
                     currentPrice: true,
-                    imageUrl: true,
-                    nftSoldEvents: {
-                      distinct: 'scoutId'
-                    }
+                    imageUrl: true
                   }
                 }
               }
@@ -199,8 +222,8 @@ export async function getSortedBuilders({
             displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
-            scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
-            gems: stat.gemsCollected,
+            gemsCollected: stat.gemsCollected,
+            nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
             builderStatus: stat.user.builderStatus
           }))
         );
