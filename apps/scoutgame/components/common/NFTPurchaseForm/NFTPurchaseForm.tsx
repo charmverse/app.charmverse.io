@@ -83,7 +83,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   } = useAction(mintNftAction, {
     async onSuccess(res) {
       if (res.data?.id) {
-        await executeHandleMintNft({ pendingTransactionId: res.data.id });
+        // await executeHandleMintNft({ pendingTransactionId: res.data.id });
       }
       log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
     },
@@ -258,7 +258,8 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
     );
   };
 
-  if (hasHandleMintNftSucceeded) {
+  // Add hasHandleMintNftSucceeded after fixing handleMintNftAction
+  if (hasSucceededMintNftAction) {
     return (
       <Stack gap={2} textAlign='center'>
         <Typography color='secondary' variant='h5' fontWeight={600}>
