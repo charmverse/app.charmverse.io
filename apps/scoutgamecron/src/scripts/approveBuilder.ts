@@ -132,9 +132,12 @@ async function approveAll() {
   const allnames = Object.entries(devUsers);
 
   for (const [name, val] of allnames) {
+    
     await approveBuilder({
       githubLogin: name as string,
       season: currentSeason
+    }).catch(err => {
+      log.error(`Error for ${name}`)
     })
   }
 }
