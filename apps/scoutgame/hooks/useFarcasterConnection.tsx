@@ -9,22 +9,13 @@ export function useFarcasterConnection({
   onSuccess,
   onClick
 }: {
-  onSuccess?: () => Promise<void>;
+  onSuccess?: (res: StatusAPIResponse) => Promise<void>;
   onError?: (error: any) => void;
   onClick?: () => void;
 }) {
-  const onWarpcastSuccessCallback = useCallback(
-    async (res: StatusAPIResponse) => {
-      // const connectApiClient = new ConnectApiClient();
-      // await connectApiClient.loginViaFarcaster(res);
-      onSuccess?.();
-    },
-    [onSuccess]
-  );
-
   const signInProps = useSignIn({
     onError,
-    onSuccess: onWarpcastSuccessCallback
+    onSuccess
   });
 
   const { signIn, connect, reconnect, isError, channelToken } = signInProps;

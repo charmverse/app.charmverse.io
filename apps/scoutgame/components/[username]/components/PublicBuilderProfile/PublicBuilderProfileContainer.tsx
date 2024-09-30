@@ -69,7 +69,13 @@ export function PublicBuilderProfileContainer({
 
   return (
     <Box>
-      {!isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
+      {!isDesktop ? (
+        <PublicProfileTabsMenu
+          tab={tab}
+          username={builder.username}
+          isApprovedBuilder={builder.builderStatus === 'approved'}
+        />
+      ) : null}
       <Stack
         gap={2}
         my={{
@@ -122,7 +128,13 @@ export function PublicBuilderProfileContainer({
             )}
           </Stack>
         </Paper>
-        {isDesktop ? <PublicProfileTabsMenu tab={tab} username={builder.username} /> : null}
+        {isDesktop ? (
+          <PublicProfileTabsMenu
+            tab={tab}
+            username={builder.username}
+            isApprovedBuilder={builder.builderStatus === 'approved'}
+          />
+        ) : null}
 
         <Stack
           gap={2}

@@ -11,7 +11,7 @@ export function InstallAppMenuItem({ children }: { children: ReactNode }) {
   }
 
   return (
-    <Box bgcolor='blue' p={2}>
+    <Box bgcolor='background.dark' p={2}>
       <Typography color='white' variant='body2' mb={1}>
         Enjoy the full experience with our free webapp
       </Typography>

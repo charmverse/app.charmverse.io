@@ -13,7 +13,16 @@ export async function processPullRequests({
   skipClosedPrProcessing = false,
   season = currentSeason
 }: { createdAfter?: Date; skipClosedPrProcessing?: boolean; season?: string } = {}) {
-  const repos = await prisma.githubRepo.findMany();
+  const repos = await prisma.githubRepo.findMany({
+    where: {
+      deletedAt: null
+    },
+    select: {
+      owner: true,
+      name: true,
+      defaultBranch: true
+    }
+  });
   log.info(`Processing PRs from ${repos.length} repos`);
 
   const timer = DateTime.now();
