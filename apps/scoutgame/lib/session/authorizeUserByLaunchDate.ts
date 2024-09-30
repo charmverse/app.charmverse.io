@@ -6,7 +6,7 @@ import { tierDistributionMap } from '@packages/scoutgame/waitlist/scoring/consta
 import { isDevEnv, isStagingEnv } from '@root/config/constants';
 import { DateTime } from 'luxon';
 
-const launchDates: Record<string, ConnectWaitlistTier> = {
+export const launchDates: Record<string, ConnectWaitlistTier> = {
   '2024-10-07': 'legendary',
   '2024-10-14': 'mythic',
   '2024-10-17': 'epic',
