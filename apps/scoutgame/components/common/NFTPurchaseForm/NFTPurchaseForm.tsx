@@ -283,7 +283,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
         >
           {builder.nftImageUrl ? (
             <Image
-              src='/builder-nfts/13.png'
+              src={builder.nftImageUrl}
               alt={builder.username}
               width={200}
               height={300}
