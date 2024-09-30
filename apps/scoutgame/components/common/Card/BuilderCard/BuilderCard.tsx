@@ -43,7 +43,7 @@ export function BuilderCard({
       </BuilderCardNftDisplay>
       {typeof builder.price !== 'undefined' && showPurchaseButton && (
         <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
-          <ScoutButton builderId={builder.id} price={builder.price} />
+          <ScoutButton builder={builder} isAuthenticated={!!user} />
         </Stack>
       )}
     </Card>

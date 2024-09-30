@@ -53,7 +53,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
         <TableBody>
           {sorted.map((row, index) => (
             <TableRow
-              key={row.username}
+              key={row.id}
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
                 '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
@@ -87,7 +87,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                 </Stack>
               </TableCell>
               <TableCell sx={getSXProps({ mdDown: true, display: 'table-cell' })} width='150px'>
-                <ScoutButton price={row.price} builderId={row.builderId} />
+                <ScoutButton builder={row} />
               </TableCell>
             </TableRow>
           ))}

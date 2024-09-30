@@ -1,21 +1,23 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 'use client';
 
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
-import { Alert, Button, Typography } from '@mui/material';
+import { Box, Button, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/builderNFTSeasonOneClient';
 import {
   builderContractAddress,
   builderNftChain,
+  builderTokenDecimals,
   usdcContractAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
 import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
+import { getChainById } from '@root/connectors/chains';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
@@ -25,7 +27,12 @@ import { useSendTransaction } from 'wagmi';
 import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
+import { handleMintNftAction } from 'lib/builderNFTs/handleMintNftAction';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
+import type { MinimalUserInfo } from 'lib/users/interfaces';
+
+import { IconButton } from '../Button/IconButton';
+import { NumberInputField } from '../Fields/NumberField';
 
 import type { ChainOption } from './ChainSelector';
 import { BlockchainSelect, getChainOptions } from './ChainSelector';
@@ -37,11 +44,14 @@ const readonlyApiClient = new BuilderNFTSeasonOneClient({
 });
 
 export type NFTPurchaseProps = {
-  builderId: string;
+  builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
 };
 
-function NFTPurchaseButton({ builderId }: NFTPurchaseProps) {
-  const { address, walletClient, chainId } = useWallet();
+function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
+  const builderId = builder.id;
+  const initialQuantities = [1, 11, 111, 1111];
+  const pricePerNft = (Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2);
+  const { address, chainId } = useWallet();
 
   const [sourceFundsChain, setSourceFundsChain] = useState(ChainId.OPTIMISM_SEPOLIA);
 
@@ -60,8 +70,21 @@ function NFTPurchaseButton({ builderId }: NFTPurchaseProps) {
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
   const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
 
-  const { isExecuting, hasSucceeded, executeAsync, result } = useAction(mintNftAction, {
-    onSuccess() {
+  const {
+    isExecuting: isHandleMintNftExecuting,
+    hasSucceeded: hasHandleMintNftSucceeded,
+    executeAsync: executeHandleMintNft
+  } = useAction(handleMintNftAction, {});
+
+  const {
+    isExecuting: isExecutingMintNftAction,
+    hasSucceeded: hasSucceededMintNftAction,
+    executeAsync
+  } = useAction(mintNftAction, {
+    async onSuccess(res) {
+      if (res.data?.id) {
+        await executeHandleMintNft({ pendingTransactionId: res.data.id });
+      }
       log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
     },
     onError(err) {
@@ -78,7 +101,11 @@ function NFTPurchaseButton({ builderId }: NFTPurchaseProps) {
 
     const chain = chainOption?.chain;
 
-    const _chainId = chain.id;
+    const _chainId = chain?.id;
+
+    if (!_chainId) {
+      return;
+    }
 
     const client = new USDcAbiClient({
       chain,
@@ -108,7 +135,7 @@ function NFTPurchaseButton({ builderId }: NFTPurchaseProps) {
         log.error('Error refreshing balance', { error: err });
       });
     }
-  }, [sourceFundsChain, refreshBalance]);
+  }, [sourceFundsChain]);
 
   const { sendTransaction } = useSendTransaction();
 
@@ -231,49 +258,154 @@ function NFTPurchaseButton({ builderId }: NFTPurchaseProps) {
     );
   };
 
+  if (hasHandleMintNftSucceeded) {
+    return (
+      <Stack gap={2} textAlign='center'>
+        <Typography color='secondary' variant='h5' fontWeight={600}>
+          Congratulations!
+        </Typography>
+        <Typography>You scouted @{builder.username}</Typography>
+        <Box
+          bgcolor='black.dark'
+          width='100%'
+          p={2}
+          display='flex'
+          alignItems='center'
+          flexDirection='column'
+          gap={1}
+          py={12}
+          sx={{
+            background: 'url(/images/nft-mint-bg.png)',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
+            backgroundSize: 'cover'
+          }}
+        >
+          {builder.nftImageUrl ? (
+            <Image
+              src='/builder-nfts/13.png'
+              alt={builder.username}
+              width={200}
+              height={300}
+              style={{ aspectRatio: '1/1.4', width: '50%', height: '50%' }}
+            />
+          ) : (
+            <Image src='/images/no_nft_person.png' alt='no nft image available' width={200} height={200} />
+          )}
+        </Box>
+        <Button
+          LinkComponent={Link}
+          fullWidth
+          href={`https://warpcast.com/~/compose?text=${encodeURI(
+            `I scouted ${builder.username} on Scout Game!`
+          )}&embeds[]=${window.location.origin}/u/${builder.username}`}
+          target='_blank'
+          rel='noopener noreferrer'
+        >
+          Share now
+        </Button>
+      </Stack>
+    );
+  }
+
   return (
-    <div>
-      <h1>NFT Purchase on {builderNftChain.name}</h1>
-
-      <label htmlFor='builderId'>Amount of tokens</label>
-      <input
-        type='number'
-        placeholder='Search NFTs'
-        value={tokensToBuy}
-        onChange={(e) => setTokensToBuy(parseInt(e.target.value))}
-      />
-
-      <div>
-        <h3>Token ID: {builderTokenId}</h3>
+    <Stack gap={3}>
+      <Box bgcolor='black.dark' width='100%' p={2} display='flex' alignItems='center' flexDirection='column' gap={1}>
+        {builder.nftImageUrl ? (
+          <Image
+            src={builder.nftImageUrl}
+            alt={builder.username}
+            width={200}
+            height={300}
+            style={{ aspectRatio: '1/1.4', width: '50%', height: '50%' }}
+          />
+        ) : (
+          <Image src='/images/no_nft_person.png' alt='no nft image available' width={200} height={200} />
+        )}
+        <Typography textAlign='center' fontWeight={600} color='secondary'>
+          ${pricePerNft}
+        </Typography>
+      </Box>
+      <Stack gap={2}>
+        <Typography color='secondary' mb='0'>
+          Select quantity
+        </Typography>
+        <ToggleButtonGroup
+          value={tokensToBuy}
+          onChange={(_: React.MouseEvent<HTMLElement>, n: number) => setTokensToBuy((prevN) => n || prevN)}
+          exclusive
+          fullWidth
+          aria-label='quantity selection'
+        >
+          {initialQuantities.map((q) => (
+            <ToggleButton sx={{ minWidth: 60, minHeight: 40 }} key={q} value={q} aria-label={q.toString()}>
+              {q}
+            </ToggleButton>
+          ))}
+          <ToggleButton value={2} aria-label='custom' onClick={() => setTokensToBuy(2)}>
+            Custom
+          </ToggleButton>
+        </ToggleButtonGroup>
+        {!initialQuantities.includes(tokensToBuy) && (
+          <Stack flexDirection='row' gap={2}>
+            <IconButton color='secondary' onClick={() => setTokensToBuy((prevN) => prevN - 1)}>
+              -
+            </IconButton>
+            <NumberInputField
+              fullWidth
+              color='secondary'
+              id='builderId'
+              type='number'
+              placeholder='Quantity'
+              value={tokensToBuy}
+              onChange={(e) => setTokensToBuy(parseInt(e.target.value))}
+              disableArrows
+              sx={{ '& input': { textAlign: 'center' } }}
+            />
+            <IconButton color='secondary' onClick={() => setTokensToBuy((prevN) => prevN + 1)}>
+              +
+            </IconButton>
+          </Stack>
+        )}
+      </Stack>
+      <Stack gap={1}>
+        <Typography color='secondary'>Total cost</Typography>
+        <Stack flexDirection='row' justifyContent='space-between'>
+          <Typography>
+            {tokensToBuy} NFT x ${pricePerNft}
+          </Typography>
+          <Typography>{(tokensToBuy * Number(pricePerNft)).toFixed(2)}</Typography>
+        </Stack>
+      </Stack>
+      <Stack gap={1}>
         {purchaseCost && <p>Price: {formatUnits(purchaseCost, 6)} USDC</p>}
         {isFetchingPrice && <p>Fetching price...</p>}
+        <Typography color='secondary'>Select payment</Typography>
         <BlockchainSelect
-          // value={sourceFundsChain as any}
+          value={sourceFundsChain as any}
+          balance={(Number(balances?.usdc || 0) / 1e6).toFixed(2)}
           useTestnets={useTestnets}
           onSelectChain={(_chainId) => {
             setSourceFundsChain(_chainId);
           }}
         />
-        <Typography>Sending from {address}</Typography>
-        <Typography>Treasury {treasuryAddress}</Typography>
-        {/* {balances?.chainId === sourceFundsChain && !!sourceFundsChain && (
-          <div>
-            <Typography>
-              Your USDC Balance on {getChainById(sourceFundsChain)?.chainName}: ${' '}
-              {(Number(balances.usdc || 0) / 10e6).toFixed(2)}
-            </Typography>
-          </div>
-        )} */}
-        {fetchError && <p color='red'>{fetchError.shortMessage || 'Something went wrong'}</p>}
-        <Button onClick={handlePurchase} disabled={!purchaseCost || isLoading || isFetchingPrice || !treasuryAddress}>
-          {isFetchingPrice ? 'Fetching price' : isLoading ? 'Loading...' : 'Purchase NFT'}
-        </Button>
-      </div>
-
-      {result.data && <Alert>Minted {tokensToBuy} tokens</Alert>}
-
+      </Stack>
+      {fetchError && <Typography color='red'>{fetchError.shortMessage || 'Something went wrong'}</Typography>}
+      <Button
+        onClick={handlePurchase}
+        disabled={
+          !purchaseCost ||
+          isLoading ||
+          isFetchingPrice ||
+          !treasuryAddress ||
+          isExecutingMintNftAction ||
+          isHandleMintNftExecuting
+        }
+      >
+        {isFetchingPrice ? 'Fetching price' : isLoading ? 'Loading...' : 'Buy'}
+      </Button>
       {error instanceof Error ? <Typography color='error'>Error: {(error as Error).message}</Typography> : null}
-    </div>
+    </Stack>
   );
 }
 

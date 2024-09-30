@@ -1,4 +1,4 @@
-import { ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
+import { ListItemIcon, ListItemText, MenuItem, Select, Stack, Typography } from '@mui/material';
 import type { SelectProps } from '@mui/material/Select';
 import Image from 'next/image';
 import type { ReactNode, Ref } from 'react';
@@ -88,25 +88,49 @@ export function getChainOptions({ useTestnets }: { useTestnets?: boolean } = { u
 }
 
 function SelectField(
-  props: Omit<SelectProps<string>, 'onClick' | 'useTestnets'> & {
+  {
+    useTestnets,
+    balance,
+    onSelectChain,
+    ...props
+  }: Omit<SelectProps<string>, 'onClick'> & {
     helperMessage?: ReactNode;
     onSelectChain: (chainId: number) => void;
-    ref: Ref<unknown>;
     useTestnets?: boolean;
-  }
+    balance?: string;
+  },
+  ref: Ref<unknown>
 ) {
   const { helperMessage, ...restProps } = props;
 
-  const chainOpts = getChainOptions({ useTestnets: props.useTestnets });
+  const chainOpts = getChainOptions({ useTestnets });
 
   return (
-    // @ts-ignore
     <Select<string>
       fullWidth
       displayEmpty
-      renderValue={(selected) =>
-        chainOpts.find(({ id }) => (selected as unknown as number) === id)?.name || 'Select a Chain'
-      }
+      renderValue={(selected) => {
+        const chain = chainOpts.find(({ id }) => (selected as unknown as number) === id);
+
+        if (!chain) {
+          return (
+            <Stack>
+              <Typography variant='body2'>Select a Chain</Typography>
+            </Stack>
+          );
+        }
+
+        return (
+          <Stack flexDirection='row' gap={2} alignItems='center'>
+            <Image height={30} width={30} alt={chain.name} src={chain.icon} />
+            <Stack>
+              <Typography variant='body2'>USDC on {chain.name}</Typography>
+              <Typography variant='body2'>Balance: ${balance}</Typography>
+            </Stack>
+          </Stack>
+        );
+      }}
+      ref={ref}
       {...restProps}
     >
       <MenuItem value='' disabled>
@@ -120,7 +144,7 @@ function SelectField(
             onClick={(ev) => {
               ev.preventDefault();
               ev.stopPropagation();
-              props.onSelectChain(_chain.id);
+              onSelectChain(_chain.id);
             }}
           >
             <ListItemIcon>

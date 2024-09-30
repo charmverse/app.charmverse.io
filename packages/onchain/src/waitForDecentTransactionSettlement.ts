@@ -166,7 +166,7 @@ export async function waitForDecentTransactionSettlement({
     try {
       const response = await getTransactionStatusFromDecent({ sourceTxHash, sourceTxHashChainId });
 
-      if (response.status.toLowerCase().match('fail')) {
+      if (response?.status?.toLowerCase().match('fail')) {
         await prisma.pendingNftTransaction.update({
           where: {
             sourceChainTxHash_sourceChainId: {
