@@ -1,12 +1,199 @@
 import { log } from '@charmverse/core/log';
+import { GithubEventType } from '@charmverse/core/prisma';
 import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
 
+import type { BuilderEvent } from '@charmverse/core/prisma';
 import { builderContractAddress, builderNftChain } from '../builderNfts/constants';
 import type { ActivityToRecord } from '../recordGameActivity';
 import { recordGameActivity } from '../recordGameActivity';
 import { refreshUserStats } from '../refreshUserStats';
-import { createMockEvents, ensureGithubUserExists } from '../testing/database';
+import {
+  mockBuilderStrike,
+  mockPointReceipt,
+  mockGemPayoutEvent,
+  mockNFTPurchaseEvent,
+  mockScout,
+  mockGithubUser
+} from '../testing/database';
+import { randomLargeInt, mockSeason } from '../testing/generators';
 import { getCurrentWeek, currentSeason } from '../dates';
+
+type RepoAddress = {
+  repoOwner?: string;
+  repoName?: string;
+};
+
+type MockEventParams = {
+  userId: string;
+  amount?: number;
+};
+
+async function createMockEvents({ userId, amount = 5 }: MockEventParams) {
+  const scout = await prisma.scout.findFirstOrThrow({
+    where: {
+      id: userId
+    },
+    include: {
+      githubUser: true
+    }
+  });
+  const week = new Date().getUTCDate();
+
+  for (let i = 0; i < amount; i++) {
+    // Frequent NFT Purchase events (occur in every loop)
+    await mockNFTPurchaseEvent({
+      builderId: userId,
+      scoutId: userId,
+      points: Math.floor(Math.random() * 100) + 1 // Random points between 1 and 100
+    });
+
+    // Rare Builder Strike events (10% chance of occurrence)
+    if (Math.random() < 0.1) {
+      await mockBuilderStrike({
+        builderId: userId,
+        pullRequestNumber: i + 1,
+        repoOwner: 'test_owner',
+        repoName: 'test_repo'
+      });
+    }
+
+    // Point Receipt events
+    await mockPointReceipt({
+      builderId: userId,
+      amount: Math.floor(Math.random() * 50) + 1, // Random points between 1 and 50
+      senderId: scout.id,
+      recipientId: undefined
+    });
+
+    // Gems Payout events
+    await mockGemPayoutEvent({
+      builderId: userId,
+      week: `W-${week}-${i}`,
+      amount: Math.floor(Math.random() * 10) + 1 // Random points between 1 and 10
+    });
+  }
+}
+
+async function ensureGithubRepoExists({
+  repoOwner = `acme-${randomLargeInt()}`,
+  repoName = `acme-repo-${randomLargeInt()}`,
+  id
+}: Partial<RepoAddress> & { id?: number }) {
+  const repo = await prisma.githubRepo.findFirst({
+    where: {
+      owner: repoOwner,
+      name: repoName
+    }
+  });
+
+  if (repo) {
+    return repo;
+  }
+
+  return prisma.githubRepo.create({
+    data: {
+      id: id ?? randomLargeInt(),
+      owner: repoOwner,
+      name: repoName,
+      defaultBranch: 'main'
+    }
+  });
+}
+
+async function ensureGithubUserExists(
+  { login, builderId }: { login?: string; builderId?: string } = { login: `github:${randomLargeInt()}` }
+) {
+  const githubUser = await prisma.githubUser.findFirst({ where: { login } });
+
+  if (githubUser) {
+    return githubUser;
+  }
+
+  const id = randomLargeInt();
+
+  const name = `github_user:${id}`;
+  return prisma.githubUser.create({
+    data: {
+      login: name,
+      builderId,
+      displayName: name,
+      id
+    }
+  });
+}
+
+async function ensureMergedGithubPullRequestExists({
+  repoOwner,
+  repoName,
+  pullRequestNumber = randomLargeInt(),
+  githubUserId,
+  builderId
+}: {
+  pullRequestNumber?: number;
+  githubUserId: number;
+  builderId?: string;
+  id?: number;
+} & RepoAddress): Promise<BuilderEvent> {
+  builderId = builderId ?? (await mockScout().then((scout) => scout.id));
+
+  const builderGithubUser = await mockGithubUser({ builderId });
+
+  // Ensure the repository exists
+  const repo = await ensureGithubRepoExists({ repoOwner, repoName });
+
+  const pullRequest = await prisma.githubEvent.findFirst({
+    where: {
+      repoId: repo.id,
+      pullRequestNumber,
+      githubUser: {
+        id: builderGithubUser.id
+      },
+      type: 'merged_pull_request'
+    },
+    select: {
+      builderEvent: true,
+      repoId: true
+    }
+  });
+
+  if (pullRequest?.builderEvent) {
+    return pullRequest.builderEvent as BuilderEvent;
+  }
+
+  const githubEvent = await prisma.githubEvent
+    .findFirstOrThrow({
+      where: {
+        repoId: repo.id,
+        pullRequestNumber,
+        createdBy: githubUserId,
+        type: GithubEventType.merged_pull_request
+      }
+    })
+    .catch((err) => {
+      return prisma.githubEvent.create({
+        data: {
+          repoId: repo.id,
+          pullRequestNumber,
+          title: `Mock Pull Request ${pullRequestNumber}`,
+          type: 'merged_pull_request',
+          createdBy: builderGithubUser.id,
+          url: ``
+        }
+      });
+    });
+
+  const builderEvent = await prisma.builderEvent.create({
+    data: {
+      builderId: builderId as string,
+      season: mockSeason,
+      type: 'merged_pull_request',
+      githubEventId: githubEvent.id,
+      week: getCurrentWeek()
+    }
+  });
+
+  return builderEvent;
+}
 
 function getRandomDateWithinLast30Days() {
   const now = new Date();

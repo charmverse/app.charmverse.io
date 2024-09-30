@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getBonusPartner } from '@packages/scoutgame/bonus';
 import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday } from '@packages/scoutgame/dates';
 import { recordGameActivityWithCatchError } from '@packages/scoutgame/recordGameActivity';
+import { DateTime } from 'luxon';
 
 import type { PullRequest } from './getPullRequests';
 import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
@@ -23,19 +24,19 @@ export async function processMergedPullRequest({
   repo,
   season,
   isFirstMergedPullRequest: _isFirstMergedPullRequest,
-  now = new Date()
+  now = DateTime.utc()
 }: {
   pullRequest: MergedPullRequestMeta;
   repo: RepoInput;
   isFirstMergedPullRequest?: boolean;
   season: string;
-  now?: Date;
+  now?: DateTime;
 }) {
   if (!pullRequest.mergedAt) {
     throw new Error('Pull request was not merged');
   }
-  const week = getWeekFromDate(now);
-  const { start } = getWeekStartEnd(now);
+  const week = getWeekFromDate(now.toJSDate());
+  const { start } = getWeekStartEnd(now.toJSDate());
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
@@ -104,8 +105,7 @@ export async function processMergedPullRequest({
     if (event.repoId !== pullRequest.repository.id) {
       return false;
     }
-
-    return isToday(event.createdAt);
+    return isToday(event.createdAt, now);
   });
 
   await prisma.$transaction(async (tx) => {
@@ -134,7 +134,7 @@ export async function processMergedPullRequest({
       }
     });
 
-    if (githubUser.builderId && !existingGithubEventToday) {
+    if (githubUser.builderId) {
       const builder = await tx.scout.findUniqueOrThrow({
         where: {
           id: githubUser.builderId
@@ -147,7 +147,6 @@ export async function processMergedPullRequest({
       if (builder.builderStatus !== 'approved') {
         return;
       }
-
       const weeklyBuilderEvents = previousGitEvents.filter((e) => e.builderEvent).length;
       const threeDayPrStreak = weeklyBuilderEvents % 3 === 2;
       const gemReceiptType: GemsReceiptType = isFirstMergedPullRequest

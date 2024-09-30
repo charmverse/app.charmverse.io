@@ -11,6 +11,7 @@
     "./numbers": "./src/numbers.ts",
     "./react": "./src/react.ts",
     "./types": "./src/types.ts",
-    "./dates": "./src/dates.ts"
+    "./dates": "./src/dates.ts",
+    "./http": "./src/http.ts"
   }
 }

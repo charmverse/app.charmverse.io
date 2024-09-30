@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 
 import { mockPullRequest } from '@/testing/generators';
 
-const currentSeason = '2024-W38';
+const currentSeason = '2024-W40';
 
 jest.unstable_mockModule('../getRecentPullRequestsByUser', () => ({
   getRecentPullRequestsByUser: jest.fn()
@@ -165,26 +165,35 @@ describe('processMergedPullRequest', () => {
       pullRequest: lastWeekPr,
       repo,
       season: currentSeason,
-      now: new Date(lastWeekPr.createdAt)
+      now: DateTime.fromISO(lastWeekPr.createdAt)
     });
 
-    const pullRequest3 = mockPullRequest({
+    const pullRequest2 = mockPullRequest({
       createdAt: now.minus({ days: 2 }).toISO(),
       state: 'MERGED',
       repo,
       author: builder.githubUser
     });
 
-    await processMergedPullRequest({ pullRequest: pullRequest3, repo, season: currentSeason, now: now.toJSDate() });
+    await processMergedPullRequest({ pullRequest: pullRequest2, repo, season: currentSeason, now });
 
-    const pullRequest4 = mockPullRequest({
+    const pullRequest3 = mockPullRequest({
       createdAt: now.toISO(),
       state: 'MERGED',
       repo,
       author: builder.githubUser
     });
 
-    await processMergedPullRequest({ pullRequest: pullRequest4, repo, season: currentSeason, now: now.toJSDate() });
+    await processMergedPullRequest({ pullRequest: pullRequest3, repo, season: currentSeason, now });
+
+    const gemsReceipts = await prisma.gemsReceipt.findMany({
+      where: {
+        event: {
+          builderId: builder.id
+        }
+      }
+    });
+    expect(gemsReceipts).toHaveLength(3);
 
     const gemsReceipt = await prisma.gemsReceipt.findFirstOrThrow({
       where: {

@@ -2,8 +2,8 @@ version: 1
 cron:
   - name: "process-pull-requests"
     url: "/process-pull-requests"
-    # every 5 minutes
-    schedule: "*/5 * * * *"
+    # every 20 minutes
+    schedule: "*/20 * * * *"
 
   - name: "process-gems-payout"
     url: "/process-gems-payout"
@@ -11,6 +11,6 @@ cron:
     schedule: "0 * * * *"
 
   - name: "process-nft-mints"
-      url: "/process-nft-mints"
-      # Every 5 minutes
-      schedule: "*/5 * * * *"
+    url: "/process-nft-mints"
+    # Every 5 minutes
+    schedule: "*/5 * * * *"
