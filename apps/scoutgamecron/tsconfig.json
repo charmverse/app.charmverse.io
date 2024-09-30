@@ -12,6 +12,7 @@
   },
   "exclude": [
     "jest.config.ts",
-    "esbuild.config.ts"
+    "esbuild.config.ts",
+    "jest.teardown.ts"
   ]
 }

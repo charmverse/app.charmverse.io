@@ -91,19 +91,19 @@ function SelectField(
   props: Omit<SelectProps<string>, 'onClick' | 'useTestnets'> & {
     helperMessage?: ReactNode;
     onSelectChain: (chainId: number) => void;
-    ref: Ref<unknown>;
     useTestnets?: boolean;
-  }
+  },
+  ref: Ref<unknown>
 ) {
   const { helperMessage, ...restProps } = props;
 
   const chainOpts = getChainOptions({ useTestnets: props.useTestnets });
 
   return (
-    // @ts-ignore
     <Select<string>
       fullWidth
       displayEmpty
+      ref={ref}
       renderValue={(selected) =>
         chainOpts.find(({ id }) => (selected as unknown as number) === id)?.name || 'Select a Chain'
       }

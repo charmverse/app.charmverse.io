@@ -12,6 +12,7 @@
     },
   },
   "exclude": [
-    "jest.config.ts"
+    "jest.config.ts",
+    "jest.teardown.ts"
   ]
 }

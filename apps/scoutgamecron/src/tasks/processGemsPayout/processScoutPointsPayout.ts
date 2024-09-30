@@ -1,23 +1,24 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/calculatePoints';
-import { currentSeason } from '@packages/scoutgame/dates';
 
 export async function processScoutPointsPayout({
   builderId,
   rank,
   gemsCollected,
-  week
+  week,
+  season
 }: {
   builderId: string;
   rank: number;
   gemsCollected: number;
   week: string;
+  season: string;
 }) {
   const nftHolders = await prisma.nFTPurchaseEvent.groupBy({
     by: ['scoutId'],
     where: {
       builderNFT: {
-        season: currentSeason,
+        season,
         builderId
       }
     },
@@ -45,12 +46,12 @@ export async function processScoutPointsPayout({
       gems: gemsCollected,
       points: earnableScoutPoints,
       week,
-      season: currentSeason,
+      season,
       builderId,
       builderEvent: {
         create: {
           type: 'gems_payout',
-          season: currentSeason,
+          season,
           week,
           builderId,
           pointsReceipts: {

@@ -137,11 +137,12 @@ export async function recordGameActivity({
     }
   });
 }
-
 export async function recordGameActivityWithCatchError(activity: ActivityToRecord): Promise<void> {
   try {
     await recordGameActivity(activity);
   } catch (error) {
-    log.error(`Error saving activity for ${activity.activity.userId}`, { error, activity });
+    if (process.env.NODE_ENV !== 'test') {
+      log.error(`Error saving activity for ${activity.activity.userId}`, { error, activity });
+    }
   }
 }

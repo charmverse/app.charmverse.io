@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { cookieToInitialState } from 'wagmi';
 
-import { getConfig } from 'lib/blockchain/wagmiConfig';
+import { getConfig } from 'components/common/WalletLogin/wagmiConfig';
 
 import { WagmiProvider } from './WagmiProvider';
 

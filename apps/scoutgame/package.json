@@ -23,6 +23,7 @@
     "@packages/github": "file:../../packages/github",
     "@packages/scoutgame": "^0.0.0",
     "@packages/utils": "file:../../packages/utils",
+    "@rainbow-me/rainbowkit": "^2.1.7",
     "@serwist/next": "^9.0.5",
     "@typeschema/yup": "^0.13.3",
     "framer-motion": "^11.3.17",
