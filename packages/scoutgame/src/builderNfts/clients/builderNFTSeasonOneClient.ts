@@ -228,6 +228,19 @@ export class BuilderNFTSeasonOneImplementation01Client {
       ],
       stateMutability: 'view',
       type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'getProceedsReceiver',
+      outputs: [
+        {
+          internalType: 'address',
+          name: '',
+          type: 'address'
+        }
+      ],
+      stateMutability: 'view',
+      type: 'function'
     }
   ];
 

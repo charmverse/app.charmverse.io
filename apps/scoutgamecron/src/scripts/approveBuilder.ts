@@ -128,18 +128,18 @@ const devUsers = {
 
 } as const;
 
-async function approveAll() {
-  const allnames = Object.entries(devUsers);
+// async function approveAll() {
+//   const allnames = Object.entries(devUsers);
 
-  for (const [name, val] of allnames) {
+//   for (const [name, val] of allnames) {
     
-    await approveBuilder({
-      githubLogin: name as string,
-      season: currentSeason
-    }).catch(err => {
-      log.error(`Error for ${name}`)
-    })
-  }
-}
+//     await approveBuilder({
+//       githubLogin: name as string,
+//       season: currentSeason
+//     }).catch(err => {
+//       log.error(`Error for ${name}`)
+//     })
+//   }
+// }
 
-approveAll()
+// approveAll()
