@@ -39,7 +39,10 @@ export const mintNftAction = authActionClient
     }
 
     // Cron process will handle the tx
-    await savePendingTransaction({ ...parsedInput, user: { ...(parsedInput.user as any), scoutId: userId } });
+    const data = await savePendingTransaction({
+      ...parsedInput,
+      user: { ...(parsedInput.user as any), scoutId: userId }
+    });
 
-    return { success: true };
+    return { id: data.id };
   });

@@ -8,19 +8,21 @@ export function BuildersGallery({
   builders,
   columns = 6,
   showHotIcon = false,
-  size = 'medium'
+  size = 'medium',
+  userId
 }: {
   builders: BuilderInfo[];
   columns?: number;
   showHotIcon?: boolean;
   size?: 'small' | 'medium' | 'large';
+  userId?: string;
 }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container rowSpacing={2} columns={{ xs: 2, md: columns }}>
         {builders.map((builder) => (
           <Grid key={builder.username} size={{ xs: 1 }}>
-            <BuilderCard builder={builder} showPurchaseButton showHotIcon={showHotIcon} size={size} />
+            <BuilderCard builder={builder} showPurchaseButton showHotIcon={showHotIcon} size={size} userId={userId} />
           </Grid>
         ))}
       </Grid>

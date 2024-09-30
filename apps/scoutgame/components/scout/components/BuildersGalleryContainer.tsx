@@ -8,14 +8,22 @@ export const dynamic = 'force-dynamic';
 
 export async function BuildersGalleryContainer({
   builders,
-  showHotIcon
+  showHotIcon,
+  userId
 }: {
   builders: BuilderInfo[];
   showHotIcon: boolean;
+  userId?: string;
 }) {
   const isDesktop = useMdScreen();
 
   return (
-    <BuildersGallery builders={builders} showHotIcon={showHotIcon} size={isDesktop ? 'medium' : 'small'} columns={5} />
+    <BuildersGallery
+      builders={builders}
+      showHotIcon={showHotIcon}
+      size={isDesktop ? 'medium' : 'small'}
+      columns={5}
+      userId={userId}
+    />
   );
 }
