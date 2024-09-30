@@ -15,5 +15,5 @@
       "lib/*": ["../../lib/*"]
     }
   },
-  "exclude": ["jest.config.ts", "esbuild.config.ts"]
+  "exclude": ["jest.config.ts", "esbuild.config.ts", "jest.teardown.ts"]
 }
