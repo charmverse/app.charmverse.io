@@ -14,7 +14,6 @@ import {
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
 import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
-import { getChainById } from '@root/connectors/chains';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -22,11 +21,8 @@ import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
 import { formatUnits } from 'viem';
-import { useSendTransaction } from 'wagmi';
+import { useAccount, useSendTransaction } from 'wagmi';
 
-import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
-import { WalletConnectForm } from 'components/common/WalletLogin/WalletConnect';
-import { useWallet } from 'hooks/useWallet';
 import { handleMintNftAction } from 'lib/builderNFTs/handleMintNftAction';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
@@ -51,7 +47,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111, 1111];
   const pricePerNft = (Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2);
-  const { address, chainId } = useWallet();
+  const { address, chainId } = useAccount();
 
   const [sourceFundsChain, setSourceFundsChain] = useState(ChainId.OPTIMISM_SEPOLIA);
 
@@ -410,29 +406,17 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   );
 }
 
-function NFTPurchaseWithLogin(props: NFTPurchaseProps) {
-  const { address } = useWallet(); // Hook to access the connected wallet details
-
+export function NFTPurchaseForm(props: NFTPurchaseProps) {
   // Waiting for component to render before fetching the API key
   const apiKey = env('DECENT_API_KEY');
-
-  if (!address) {
-    return <WalletConnectForm />;
-  }
 
   if (!apiKey) {
     return <Typography color='error'>Decent API key not found</Typography>;
   }
 
   return (
-    <BoxHooksContextProvider apiKey={apiKey}>{address && <NFTPurchaseButton {...props} />}</BoxHooksContextProvider>
-  );
-}
-
-export function NFTPurchaseForm(props: NFTPurchaseProps) {
-  return (
-    <WagmiProvider>
-      <NFTPurchaseWithLogin {...props} />
-    </WagmiProvider>
+    <BoxHooksContextProvider apiKey={apiKey}>
+      <NFTPurchaseButton {...props} />
+    </BoxHooksContextProvider>
   );
 }
