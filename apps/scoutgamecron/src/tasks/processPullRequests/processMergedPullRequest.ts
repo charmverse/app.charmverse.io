@@ -105,7 +105,7 @@ export async function processMergedPullRequest({
     if (event.repoId !== pullRequest.repository.id) {
       return false;
     }
-    return isToday(event.createdAt, now);
+    return isToday(event.createdAt, DateTime.fromISO(pullRequest.createdAt, { zone: 'utc' }));
   });
 
   await prisma.$transaction(async (tx) => {
