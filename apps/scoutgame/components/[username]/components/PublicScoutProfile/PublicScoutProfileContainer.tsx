@@ -22,7 +22,6 @@ export type ScoutProfileProps = {
   seasonPoints: number;
   nftsPurchased: number;
   scoutedBuilders: BuilderInfo[];
-  tab: string;
   userId?: string;
 };
 
@@ -32,7 +31,6 @@ export function PublicScoutProfileContainer({
   seasonPoints,
   nftsPurchased,
   scoutedBuilders,
-  tab,
   userId
 }: ScoutProfileProps) {
   const isDesktop = useMdScreen();

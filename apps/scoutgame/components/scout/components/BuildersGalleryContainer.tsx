@@ -6,7 +6,7 @@ import type { BuilderInfo } from 'lib/builders/interfaces';
 
 export const dynamic = 'force-dynamic';
 
-export async function BuildersGalleryContainer({
+export function BuildersGalleryContainer({
   builders,
   showHotIcon,
   userId
@@ -16,7 +16,6 @@ export async function BuildersGalleryContainer({
   userId?: string;
 }) {
   const isDesktop = useMdScreen();
-
   return (
     <BuildersGallery
       builders={builders}

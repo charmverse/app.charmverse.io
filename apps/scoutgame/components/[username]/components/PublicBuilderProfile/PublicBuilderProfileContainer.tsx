@@ -13,12 +13,9 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 
-import { PublicProfileTabsMenu } from '../../PublicProfileTabsMenu';
-
 import { PublicBuilderStats } from './PublicBuilderStats';
 
-export type BuilderProfileProps = {
-  tab: string;
+type BuilderProfileProps = {
   builder: BasicUserInfo & {
     price?: bigint;
     nftImageUrl?: string;
@@ -53,7 +50,6 @@ const PaperContainer = styled(Paper)(({ theme }) => ({
 }));
 
 export function PublicBuilderProfileContainer({
-  tab,
   builder,
   allTimePoints,
   seasonPoints,
@@ -85,7 +81,10 @@ export function PublicBuilderProfileContainer({
                   <BuilderCard
                     builder={{
                       ...builder,
-                      price: builder.price
+                      price: builder.price ?? BigInt(0),
+                      nftsSold: 0,
+                      gemsCollected: 0,
+                      builderPoints: 0
                     }}
                     hideDetails
                     showPurchaseButton
@@ -136,7 +135,10 @@ export function PublicBuilderProfileContainer({
                   <BuilderCard
                     builder={{
                       ...builder,
-                      price: builder.price
+                      price: builder.price ?? BigInt(0),
+                      nftsSold: 0,
+                      gemsCollected: 0,
+                      builderPoints: 0
                     }}
                     userId={user?.id}
                     hideDetails

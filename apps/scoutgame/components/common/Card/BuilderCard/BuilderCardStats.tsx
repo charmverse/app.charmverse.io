@@ -6,24 +6,14 @@ import { GemsIcon, PointsIcon } from 'components/common/Icons';
 export function BuilderCardStats({
   gemsCollected,
   builderPoints,
-  scoutedBy,
   nftsSold
 }: {
   gemsCollected?: number;
   builderPoints?: number;
-  scoutedBy?: number;
   nftsSold?: number;
 }) {
   return (
     <Stack flexDirection='row' alignItems='center' justifyContent='space-between' gap={1}>
-      {typeof gemsCollected === 'number' && (
-        <Stack flexDirection='row' gap={0.2} alignItems='center'>
-          <Typography variant='body2' component='span' color='text.secondary'>
-            {gemsCollected}
-          </Typography>
-          <GemsIcon size={15} />
-        </Stack>
-      )}
       {typeof builderPoints === 'number' && (
         <Stack flexDirection='row' gap={0.2} alignItems='center'>
           <Typography variant='body2' component='span' color='green.main'>
@@ -32,12 +22,12 @@ export function BuilderCardStats({
           <PointsIcon size={15} color='green' />
         </Stack>
       )}
-      {typeof scoutedBy === 'number' && (
+      {typeof gemsCollected === 'number' && (
         <Stack flexDirection='row' gap={0.2} alignItems='center'>
-          <Typography variant='body2' component='span' color='orange.main'>
-            {scoutedBy}
+          <Typography variant='body2' component='span' color='text.secondary'>
+            {gemsCollected}
           </Typography>
-          <Image width={15} height={15} src='/images/profile/icons/like-icon.svg' alt='Likes' />
+          <GemsIcon size={15} />
         </Stack>
       )}
       {typeof nftsSold === 'number' && (
