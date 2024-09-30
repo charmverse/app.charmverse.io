@@ -1,12 +1,13 @@
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import type { SxProps } from '@mui/material';
 import { Box, IconButton, Typography } from '@mui/material';
 import type { ModalProps } from '@mui/material/Modal';
 import MuiModal from '@mui/material/Modal';
 import Paper from '@mui/material/Paper';
 import type { ReactNode } from 'react';
 
-const sx = {
-  position: 'absolute' as const,
+const sx: SxProps = {
+  position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
@@ -15,7 +16,9 @@ const sx = {
   bgcolor: 'background.paper',
   p: 4,
   border: 0,
-  borderRadius: 3
+  borderRadius: 3,
+  overflowY: 'auto',
+  maxHeight: '95svh'
 };
 
 export function BasicModal({

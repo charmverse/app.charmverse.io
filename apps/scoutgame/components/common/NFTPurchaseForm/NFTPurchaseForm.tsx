@@ -383,7 +383,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
         {isFetchingPrice && <p>Fetching price...</p>}
         <Typography color='secondary'>Select payment</Typography>
         <BlockchainSelect
-          value={sourceFundsChain as any}
+          value={sourceFundsChain}
           balance={(Number(balances?.usdc || 0) / 1e6).toFixed(2)}
           useTestnets={useTestnets}
           onSelectChain={(_chainId) => {

@@ -1,3 +1,4 @@
+import type { ChainId } from '@decent.xyz/box-common';
 import { ListItemIcon, ListItemText, MenuItem, Select, Stack, Typography } from '@mui/material';
 import type { SelectProps } from '@mui/material/Select';
 import Image from 'next/image';
@@ -92,10 +93,11 @@ function SelectField(
     useTestnets,
     balance,
     onSelectChain,
+    value,
     ...props
-  }: Omit<SelectProps<string>, 'onClick'> & {
+  }: Omit<SelectProps<ChainId>, 'onClick'> & {
     helperMessage?: ReactNode;
-    onSelectChain: (chainId: number) => void;
+    onSelectChain: (chainId: ChainId) => void;
     useTestnets?: boolean;
     balance?: string;
   },
@@ -106,11 +108,11 @@ function SelectField(
   const chainOpts = getChainOptions({ useTestnets });
 
   return (
-    <Select<string>
+    <Select<ChainId>
       fullWidth
       displayEmpty
       renderValue={(selected) => {
-        const chain = chainOpts.find(({ id }) => (selected as unknown as number) === id);
+        const chain = chainOpts.find(({ id }) => selected === id);
 
         if (!chain) {
           return (
@@ -131,6 +133,7 @@ function SelectField(
         );
       }}
       ref={ref}
+      value={chainOpts.map(({ id }) => id).includes(value || 0) ? value : ''}
       {...restProps}
     >
       <MenuItem value='' disabled>
