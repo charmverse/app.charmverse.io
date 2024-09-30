@@ -25,7 +25,7 @@ async function processPullRequest(pullRequest: PullRequest, githubRepo: GithubRe
       season: currentSeason,
       repo: githubRepo,
       isFirstMergedPullRequest: false,
-      now: date.toJSDate()
+      now: date
     });
   }
 }

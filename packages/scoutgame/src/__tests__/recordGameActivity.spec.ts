@@ -7,7 +7,7 @@ import { jest } from '@jest/globals';
 
 import { recordGameActivity } from '../recordGameActivity';
 import {
-  ensureMergedGithubPullRequestExists,
+  mockPullRequestBuilderEvent,
   mockBuilder,
   mockBuilderStrike,
   mockGemPayoutEvent,
@@ -17,32 +17,11 @@ import {
 } from '../testing/database';
 
 describe('recordGameActivity', () => {
-  beforeEach(async () => {
-    // Reset the database before each test
-    await prisma.scoutGameActivity.deleteMany({});
-    await prisma.builderStrike.deleteMany({});
-    await prisma.nFTPurchaseEvent.deleteMany({});
-    await prisma.gemsPayoutEvent.deleteMany({});
-    await prisma.pointsReceipt.deleteMany({});
-    await prisma.builderNft.deleteMany({});
-    await prisma.builderEvent.deleteMany({});
-    await prisma.githubEvent.deleteMany({});
-    await prisma.githubEvent.deleteMany({});
-    await prisma.githubRepo.deleteMany({});
-    await prisma.githubUser.deleteMany({});
-    await prisma.scout.deleteMany({});
-  });
-
-  afterAll(async () => {
-    // Close the Prisma client after all tests
-    await prisma.$disconnect();
-  });
-
   it('should correctly determine activity type from source event', async () => {
     const builder = await mockBuilder();
     const builderStrike = await mockBuilderStrike({ builderId: builder.id });
 
-    const prEvent = await ensureMergedGithubPullRequestExists({
+    const prEvent = await mockPullRequestBuilderEvent({
       builderId: builder.id,
       githubUserId: builder.githubUser.id
     });
@@ -293,6 +272,7 @@ describe('recordGameActivity', () => {
 
     // Create a builder strike with specific IDs
     const pullRequestNumber = 123;
+
     const builderStrike = await mockBuilderStrike({
       builderId: builder.id,
       pullRequestNumber
@@ -317,15 +297,15 @@ describe('recordGameActivity', () => {
     expect(activity.builderStrikeId).toBe(builderStrike.id);
 
     // Verify that the activity is linked to the correct GitHub user and pull request
-    const linkedStrike = await prisma.builderStrike.findUnique({
+    const linkedStrike = await prisma.builderStrike.findUniqueOrThrow({
       where: { id: builderStrike.id },
       include: {
         githubEvent: true
       }
     });
 
-    expect(linkedStrike!.githubEvent!.createdBy).toBe(builder.githubUser.id);
-    expect(linkedStrike!.githubEvent!.pullRequestNumber).toBe(pullRequestNumber);
+    expect(linkedStrike.githubEvent!.createdBy).toBe(builder.githubUser.id);
+    expect(linkedStrike.githubEvent!.pullRequestNumber).toBe(pullRequestNumber);
   });
 
   it('should return existing activity if already exists', async () => {

@@ -1,5 +1,4 @@
-import { GithubEventType } from '@charmverse/core/prisma';
-import type { BuilderEvent, BuilderEventType, BuilderStatus, GithubRepo, Scout } from '@charmverse/core/prisma';
+import type { BuilderEvent, BuilderEventType, GithubRepo, Scout } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
@@ -64,27 +63,6 @@ export async function mockScout({
   });
 }
 
-export async function ensureGithubUserExists(
-  { login, builderId }: { login?: string; builderId?: string } = { login: `github:${randomLargeInt()}` }
-) {
-  const githubUser = await prisma.githubUser.findFirst({ where: { login } });
-
-  if (githubUser) {
-    return githubUser;
-  }
-
-  const id = randomLargeInt();
-
-  const name = `github_user:${id}`;
-  return prisma.githubUser.create({
-    data: {
-      login: name,
-      builderId,
-      displayName: name,
-      id
-    }
-  });
-}
 export async function mockGemPayoutEvent({
   builderId,
   amount = 10,
@@ -155,7 +133,7 @@ export async function mockPointReceipt({
   });
 }
 
-export async function ensureGithubRepoExists({
+export async function mockGithubRepo({
   repoOwner = `acme-${randomLargeInt()}`,
   repoName = `acme-repo-${randomLargeInt()}`,
   id
@@ -181,70 +159,52 @@ export async function ensureGithubRepoExists({
   });
 }
 
-export async function ensureMergedGithubPullRequestExists({
+export async function mockGithubUser({ builderId }: { builderId?: string }) {
+  const id = randomLargeInt();
+
+  const name = `github_user:${id}`;
+  return prisma.githubUser.create({
+    data: {
+      login: name,
+      builderId,
+      displayName: name,
+      id
+    }
+  });
+}
+
+export async function mockPullRequestBuilderEvent({
   repoOwner,
   repoName,
   pullRequestNumber = randomLargeInt(),
-  githubUserId,
+  season = mockSeason,
   builderId
 }: {
   pullRequestNumber?: number;
   githubUserId: number;
-  builderId?: string;
+  builderId: string;
+  season?: string;
   id?: number;
 } & RepoAddress): Promise<BuilderEvent> {
-  builderId = builderId ?? (await mockScout().then((scout) => scout.id));
+  const githubUser = await prisma.githubUser.findFirstOrThrow({ where: { builderId } });
 
-  const builderGithubUser = await ensureGithubUserExists({ builderId });
+  const repo = await mockGithubRepo({ repoOwner, repoName });
 
-  // Ensure the repository exists
-  const repo = await ensureGithubRepoExists({ repoOwner, repoName });
-
-  const pullRequest = await prisma.githubEvent.findFirst({
-    where: {
+  const githubEvent = await prisma.githubEvent.create({
+    data: {
       repoId: repo.id,
       pullRequestNumber,
-      githubUser: {
-        id: builderGithubUser.id
-      },
-      type: 'merged_pull_request'
-    },
-    select: {
-      builderEvent: true,
-      repoId: true
+      title: `Mock Pull Request ${pullRequestNumber}`,
+      type: 'merged_pull_request',
+      createdBy: githubUser.id,
+      url: ``
     }
   });
-
-  if (pullRequest?.builderEvent) {
-    return pullRequest.builderEvent as BuilderEvent;
-  }
-
-  const githubEvent = await prisma.githubEvent
-    .findFirstOrThrow({
-      where: {
-        repoId: repo.id,
-        pullRequestNumber,
-        createdBy: githubUserId,
-        type: GithubEventType.merged_pull_request
-      }
-    })
-    .catch((err) => {
-      return prisma.githubEvent.create({
-        data: {
-          repoId: repo.id,
-          pullRequestNumber,
-          title: `Mock Pull Request ${pullRequestNumber}`,
-          type: 'merged_pull_request',
-          createdBy: builderGithubUser.id,
-          url: ``
-        }
-      });
-    });
 
   const builderEvent = await prisma.builderEvent.create({
     data: {
       builderId: builderId as string,
-      season: mockSeason,
+      season,
       type: 'merged_pull_request',
       githubEventId: githubEvent.id,
       week: getCurrentWeek()
@@ -341,11 +301,8 @@ export async function mockBuilderStrike({
   builderId: string;
   pullRequestNumber?: number;
 } & Partial<RepoAddress>) {
-  builderId = builderId ?? (await mockScout().then((scout) => scout.id));
-
-  const githubUser = await ensureGithubUserExists({ builderId });
-
-  const githubBuilderEvent = await ensureMergedGithubPullRequestExists({
+  const githubUser = await prisma.githubUser.findFirstOrThrow({ where: { builderId } });
+  const githubBuilderEvent = await mockPullRequestBuilderEvent({
     githubUserId: githubUser.id,
     pullRequestNumber,
     repoName,
@@ -359,54 +316,6 @@ export async function mockBuilderStrike({
       githubEventId: githubBuilderEvent.githubEventId as string
     }
   });
-}
-
-interface MockEventParams {
-  userId: string;
-  amount?: number;
-}
-
-export async function createMockEvents({ userId, amount = 5 }: MockEventParams) {
-  const scout = await prisma.scout.findFirstOrThrow({
-    where: {
-      id: userId
-    }
-  });
-  const week = new Date().getUTCDate();
-
-  for (let i = 0; i < amount; i++) {
-    // Frequent NFT Purchase events (occur in every loop)
-    await mockNFTPurchaseEvent({
-      builderId: userId,
-      scoutId: userId,
-      points: Math.floor(Math.random() * 100) + 1 // Random points between 1 and 100
-    });
-
-    // Rare Builder Strike events (10% chance of occurrence)
-    if (Math.random() < 0.1) {
-      await mockBuilderStrike({
-        builderId: userId,
-        pullRequestNumber: i + 1,
-        repoOwner: 'test_owner',
-        repoName: 'test_repo'
-      });
-    }
-
-    // Point Receipt events
-    await mockPointReceipt({
-      builderId: userId,
-      amount: Math.floor(Math.random() * 50) + 1, // Random points between 1 and 50
-      senderId: scout.id,
-      recipientId: undefined
-    });
-
-    // Gems Payout events
-    await mockGemPayoutEvent({
-      builderId: userId,
-      week: `W-${week}-${i}`,
-      amount: Math.floor(Math.random() * 10) + 1 // Random points between 1 and 10
-    });
-  }
 }
 
 export function mockUserAllTimeStats({

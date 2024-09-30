@@ -46,9 +46,9 @@ function _formatWeek(date: DateTime): ISOWeek {
   return date.toFormat(`kkkk-'W'WW`);
 }
 
-export function isToday(date: Date) {
+export function isToday(date: Date, now = DateTime.utc()) {
   const dateDay = DateTime.fromJSDate(date, { zone: 'utc' }).startOf('day');
-  return dateDay.equals(DateTime.utc().startOf('day'));
+  return dateDay.equals(now.startOf('day'));
 }
 
 export function getCurrentWeekPoints() {
