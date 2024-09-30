@@ -1,20 +1,13 @@
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
-import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import type { BuildersSort } from 'lib/builders/getSortedBuilders';
 import { getSortedBuilders } from 'lib/builders/getSortedBuilders';
 
+import { BuildersGalleryContainer } from './BuildersGalleryContainer';
+
 export const dynamic = 'force-dynamic';
 
-export async function ScoutPageBuildersGallery({
-  sort,
-  user,
-  showHotIcon
-}: {
-  sort: string;
-  showHotIcon: boolean;
-  user?: { username: string; id: string } | null;
-}) {
+export async function ScoutPageBuildersGallery({ sort, showHotIcon }: { sort: string; showHotIcon: boolean }) {
   const builders = await getSortedBuilders({
     sort: sort as BuildersSort,
     limit: 10,
@@ -22,5 +15,5 @@ export async function ScoutPageBuildersGallery({
     season: currentSeason
   });
 
-  return <BuildersGallery builders={builders} user={user} showHotIcon={showHotIcon} />;
+  return <BuildersGalleryContainer builders={builders} showHotIcon={showHotIcon} />;
 }

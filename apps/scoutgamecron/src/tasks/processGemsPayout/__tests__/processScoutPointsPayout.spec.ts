@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/calculatePoints';
 import { getCurrentWeek } from '@packages/scoutgame/dates';
 import { mockBuilder, mockNFTPurchaseEvent, mockScout } from '@packages/scoutgame/testing/database';
+import { mockSeason } from '@packages/scoutgame/testing/generators';
 
 import { processScoutPointsPayout } from '../processScoutPointsPayout';
 
@@ -12,7 +13,7 @@ describe('processScoutPointsPayout', () => {
     const gemsCollected = 10;
     const week = getCurrentWeek();
 
-    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week });
+    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: mockSeason });
 
     const gemsPayoutEvent = await prisma.gemsPayoutEvent.findFirst({
       where: {
@@ -59,7 +60,7 @@ describe('processScoutPointsPayout', () => {
 
     const totalPoints = calculateEarnableScoutPointsForRank(rank);
 
-    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week });
+    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: mockSeason });
 
     const scout1PointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
       where: {
@@ -97,9 +98,9 @@ describe('processScoutPointsPayout', () => {
     await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout1.id, points: 0 });
     await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout2.id, points: 0 });
 
-    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week });
-    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week });
-    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week });
+    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: mockSeason });
+    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: mockSeason });
+    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: mockSeason });
 
     const gemsPayoutEventCount = await prisma.gemsPayoutEvent.count({
       where: {

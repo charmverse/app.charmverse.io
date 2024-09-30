@@ -29,7 +29,10 @@ export function TabsMenu({ value, tabs, sx }: TabsMenuProps) {
             justifyContent: 'center'
           },
           [`& .${tabsClasses.indicator}`]: {
-            bottom: 3,
+            bottom: {
+              xs: 8,
+              md: 5
+            },
             height: '1px'
           },
           [`& .${tabClasses.root}`]: {

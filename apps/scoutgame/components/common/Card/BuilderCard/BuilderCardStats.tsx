@@ -29,7 +29,7 @@ export function BuilderCardStats({
           <Typography variant='body2' component='span' color='green.main'>
             {builderPoints}
           </Typography>
-          <PointsIcon size={15} color='orange' />
+          <PointsIcon size={15} color='green' />
         </Stack>
       )}
       {typeof scoutedBy === 'number' && (

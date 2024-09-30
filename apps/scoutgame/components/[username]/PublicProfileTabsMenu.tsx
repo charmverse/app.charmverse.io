@@ -6,7 +6,7 @@ export function PublicProfileTabsMenu({ tab, username }: { tab: string; username
       value={tab}
       tabs={[
         { value: 'scout', label: 'Scout', href: `/u/${username}/?tab=scout` },
-        { value: 'build', label: 'Build', href: `/u/${username}/?tab=build` }
+        { value: 'build', label: 'Builder', href: `/u/${username}/?tab=build` }
       ]}
     />
   );

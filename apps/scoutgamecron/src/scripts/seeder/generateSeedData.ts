@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { claimPoints } from '@packages/scoutgame/claimPoints';
-import { getWeekFromDate } from '@packages/scoutgame/dates';
+import { getWeekFromDate, currentSeason } from '@packages/scoutgame/dates';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
 import { DateTime } from 'luxon';
 
@@ -136,7 +136,7 @@ export async function generateSeedData() {
       const topWeeklyBuilders = await getBuildersLeaderboard({ quantity: 100, week });
       for (const { builder, gemsCollected, rank } of topWeeklyBuilders) {
         try {
-          await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week });
+          await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: currentSeason });
         } catch (error) {
           log.error(`Error processing scout points payout for builder ${builder.id}: ${error}`);
         }

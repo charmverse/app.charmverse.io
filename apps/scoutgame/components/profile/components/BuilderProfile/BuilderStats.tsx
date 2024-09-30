@@ -5,6 +5,7 @@ import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants'
 import Image from 'next/image';
 
 import { BuilderCardNftDisplay } from 'components/common/Card/BuilderCard/BuilderCardNftDisplay';
+import { useMdScreen } from 'hooks/useMediaScreens';
 
 export function BuilderStats({
   nftImageUrl,
@@ -21,6 +22,8 @@ export function BuilderStats({
   totalNftsSold?: number;
   currentNftPrice?: number | bigint;
 }) {
+  const isDesktop = useMdScreen();
+
   return (
     <Paper
       sx={{
@@ -33,7 +36,7 @@ export function BuilderStats({
       }}
     >
       <Stack justifyContent='center'>
-        <BuilderCardNftDisplay nftImageUrl={nftImageUrl} username={username} />
+        <BuilderCardNftDisplay nftImageUrl={nftImageUrl} username={username} size={isDesktop ? 'large' : 'small'} />
       </Stack>
       <Stack justifyContent='space-between' gap={2}>
         <Stack justifyContent='center' gap={0.5}>
