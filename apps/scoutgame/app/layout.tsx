@@ -15,7 +15,7 @@ const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').th
 const appName = 'Scout Game';
 const appTitle = 'Scout. Build. Win.';
 const appTitleTemplate = '%s - Scout Game';
-const appDescription = 'Onchain network for connecting web3 developers, projects, organizations';
+const appDescription = 'Fantasy sports for onchain builders';
 
 export const metadata: Metadata = {
   applicationName: appName,

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: 'scoutgame',
     name: 'Scout Game - Onchain builder network',
     short_name: 'Scout Game',
-    description: 'Onchain network for connecting web3 developers, projects, organizations',
+    description: 'Fantasy sports for onchain builders',
     start_url: '/',
     display: 'standalone',
     background_color: '#191919',
