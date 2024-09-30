@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getSession } from '@connect-shared/lib/session/getSession';
-import { getFarcasterProfileById } from '@root/lib/farcaster/getFarcasterProfile';
+import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import type { NextRequest } from 'next/server';
 
 // This API Route is non-blocking and called on every page load. Use it to refresh things about the current user
@@ -19,17 +19,19 @@ export async function GET(req: NextRequest) {
       session.destroy();
       await session.save();
     } else if (scout.farcasterId) {
-      const profile = await getFarcasterProfileById(scout.farcasterId).catch((error) => {
+      const profile = await getFarcasterUserById(scout.farcasterId).catch((error) => {
         log.error('Error fetching Farcaster profile when refreshing session', { error, userId });
         return null;
       });
       if (profile) {
+        const bio = profile.profile.bio.text;
+        const displayName = profile.display_name || profile.username;
+        const username = profile.username;
+
         const hasProfileChanged =
           // Re-enable this once Neynar fixes their caching mechanism
           // scout.avatar !== profile.body.avatarUrl ||
-          scout.bio !== profile.body.bio ||
-          scout.displayName !== (profile.body.displayName || profile.body.username) ||
-          scout.username !== profile.body.username;
+          scout.bio !== bio || scout.displayName !== displayName || scout.username !== username;
 
         if (hasProfileChanged) {
           await prisma.scout.update({
@@ -39,12 +41,12 @@ export async function GET(req: NextRequest) {
             data: {
               // Re-enable this once Neynar fixes their caching mechanism
               // avatar: profile.body.avatarUrl,
-              bio: profile.body.bio,
-              displayName: profile.body.displayName || profile.body.username,
-              username: profile.body.username
+              bio,
+              displayName,
+              username
             }
           });
-          log.info('Updated Farcaster profile', { userId, body: profile.body });
+          log.info('Updated Farcaster profile', { userId, profile });
         }
       }
     }
