@@ -17,7 +17,7 @@ export async function createBuilderNft({
   tokenId: bigint;
   builderId: string;
 }) {
-  const currentPrice = await builderApiClient.getTokenQuote({
+  const currentPrice = await builderApiClient.getTokenPurchasePrice({
     args: { tokenId, amount: BigInt(1) }
   });
 

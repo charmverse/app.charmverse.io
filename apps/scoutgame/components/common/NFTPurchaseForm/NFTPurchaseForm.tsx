@@ -70,7 +70,7 @@ function NFTPurchaseButton({ builderId }: NFTPurchaseProps) {
   });
 
   useEffect(() => {
-    readonlyApiClient.proceedsReceiver().then(setTreasuryAddress);
+    readonlyApiClient.getProceedsReceiver().then(setTreasuryAddress);
   }, []);
 
   const refreshBalance = useCallback(async () => {
@@ -114,7 +114,7 @@ function NFTPurchaseButton({ builderId }: NFTPurchaseProps) {
 
   const refreshAsk = useCallback(
     async ({ _builderTokenId, amount }: { _builderTokenId: bigint | number; amount: bigint | number }) => {
-      const _price = await readonlyApiClient.getTokenQuote({
+      const _price = await readonlyApiClient.getTokenPurchasePrice({
         args: { amount: BigInt(amount), tokenId: BigInt(_builderTokenId) }
       });
       setPurchaseCost(_price);

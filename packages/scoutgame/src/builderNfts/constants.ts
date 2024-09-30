@@ -19,8 +19,8 @@ if (builderNftChain.id !== optimism.id) {
 }
 
 // Actual contract for interacting with NFTs
-export const optimismSepoliaBuilderContractAddress = '0xc6534d33bc65e319fb082e82c0b56bd4d9854aaf';
-export const optimismMainnetBuilderContractAddress = '0x7df4d9f54a5cddfef50a032451f694d6345c60af';
+export const optimismSepoliaBuilderContractAddress = '0x04ecb09a6fc12d86e3c6354f1bc088807fd45b78';
+export const optimismMainnetBuilderContractAddress = '0x7b3eae98661cc29f7bd6ab399f0f6ddea407a17e';
 
 export const builderContractAddress = useTestnets
   ? optimismSepoliaBuilderContractAddress

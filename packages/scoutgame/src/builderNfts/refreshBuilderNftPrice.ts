@@ -14,7 +14,7 @@ export async function refreshBuilderNftPrice({ builderId, season }: { builderId:
 
   const tokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
 
-  const currentPrice = await builderApiClient.getTokenQuote({
+  const currentPrice = await builderApiClient.getTokenPurchasePrice({
     args: { tokenId, amount: BigInt(1) }
   });
 
