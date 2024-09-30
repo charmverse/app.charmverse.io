@@ -69,33 +69,17 @@ export function PublicBuilderProfileContainer({
 
   return (
     <Box>
-      {!isDesktop ? (
-        <PublicProfileTabsMenu
-          tab={tab}
-          username={builder.username}
-          isApprovedBuilder={builder.builderStatus === 'approved'}
-        />
-      ) : null}
       <Stack
         gap={2}
-        my={{
+        mb={{
           xs: 1,
           md: 2
         }}
       >
-        <Paper sx={{ py: 2 }}>
-          <Stack flexDirection='row'>
-            <BackButton />
-            {isDesktop ? (
-              <Box>
-                <UserProfile
-                  user={{
-                    ...builder,
-                    githubLogin: builder.githubLogin
-                  }}
-                />
-              </Box>
-            ) : (
+        {!isDesktop ? (
+          <Paper sx={{ py: 2 }}>
+            <Stack flexDirection='row'>
+              <BackButton />
               <Stack flexDirection='row' alignItems='center' gap={2}>
                 <Box minWidth='fit-content'>
                   <BuilderCard
@@ -105,7 +89,7 @@ export function PublicBuilderProfileContainer({
                     }}
                     hideDetails
                     showPurchaseButton
-                    size={isDesktop ? 'small' : 'x-small'}
+                    size='small'
                     userId={user?.id}
                   />
                 </Box>
@@ -125,15 +109,8 @@ export function PublicBuilderProfileContainer({
                   />
                 </Stack>
               </Stack>
-            )}
-          </Stack>
-        </Paper>
-        {isDesktop ? (
-          <PublicProfileTabsMenu
-            tab={tab}
-            username={builder.username}
-            isApprovedBuilder={builder.builderStatus === 'approved'}
-          />
+            </Stack>
+          </Paper>
         ) : null}
 
         <Stack

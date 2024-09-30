@@ -39,26 +39,14 @@ export function PublicScoutProfileContainer({
   return (
     <Box>
       {!isDesktop ? (
-        <PublicProfileTabsMenu
-          tab={tab}
-          username={scout.username}
-          isApprovedBuilder={scout.builderStatus === 'approved'}
-        />
-      ) : null}
-      <Paper sx={{ py: 2, my: { xs: 1, md: 2 } }}>
-        <Stack flexDirection='row'>
-          <BackButton />
-          <Box width='calc(100% - 50px)'>
-            <UserProfile user={scout} avatarSize={isDesktop ? 'xLarge' : 'large'} />
-          </Box>
-        </Stack>
-      </Paper>
-      {isDesktop ? (
-        <PublicProfileTabsMenu
-          tab={tab}
-          username={scout.username}
-          isApprovedBuilder={scout.builderStatus === 'approved'}
-        />
+        <Paper sx={{ py: 2, mb: { xs: 1, md: 2 } }}>
+          <Stack flexDirection='row'>
+            <BackButton />
+            <Box width='calc(100% - 50px)'>
+              <UserProfile user={scout} avatarSize={isDesktop ? 'xLarge' : 'large'} />
+            </Box>
+          </Stack>
+        </Paper>
       ) : null}
       <Paper
         sx={{

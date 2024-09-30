@@ -43,7 +43,7 @@ export function TabsMenu({ value, tabs, sx }: TabsMenuProps) {
       >
         {tabs.map((tab) => (
           <Tab
-            sx={{ fontSize: { xs: '12px', md: '14px' } }}
+            sx={{ fontSize: { xs: '12px', sm: '14px' } }}
             key={tab.value}
             component={Link}
             label={tab.label}
