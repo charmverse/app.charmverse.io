@@ -105,7 +105,7 @@ export async function processMergedPullRequest({
     if (event.repoId !== pullRequest.repository.id) {
       return false;
     }
-    return isToday(event.createdAt, now);
+    return isToday(event.createdAt, DateTime.fromISO(pullRequest.createdAt, { zone: 'utc' }));
   });
 
   await prisma.$transaction(async (tx) => {
@@ -134,7 +134,7 @@ export async function processMergedPullRequest({
       }
     });
 
-    if (githubUser.builderId) {
+    if (githubUser.builderId && !existingGithubEventToday) {
       const builder = await tx.scout.findUniqueOrThrow({
         where: {
           id: githubUser.builderId
