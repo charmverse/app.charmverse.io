@@ -1,13 +1,16 @@
 'use client';
 
-import { BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
 import { usePathname } from 'next/navigation';
+import type { MouseEventHandler } from 'react';
+import { useState } from 'react';
 import { CiBellOn } from 'react-icons/ci';
 import { PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
 import { useMdScreen } from 'hooks/useMediaScreens';
+
+import { SignInModalMessage } from './ScoutButton/SignInModalMessage';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -33,29 +36,41 @@ const StyledBottomNavigation = styled(BottomNavigation, {
   }
 }));
 
-export function SiteNavigation({ topNav }: { topNav?: boolean }) {
+export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: boolean; isAuthenticated?: boolean }) {
   const pathname = usePathname();
   const value = getActiveButton(pathname);
   const isDesktop = useMdScreen();
+  const [authPopup, setAuthPopup] = useState(false);
+  const openAuthModal: MouseEventHandler<HTMLAnchorElement> | undefined = isAuthenticated
+    ? undefined
+    : (e) => {
+        e.preventDefault();
+        setAuthPopup(true);
+      };
 
   return (
-    <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
-      <BottomNavigationAction label='Home' href='/home' value='home' icon={<PiHouseLight size='24px' />} />
-      <BottomNavigationAction label='Scout' href='/scout' value='scout' icon={<PiBinocularsLight size='24px' />} />
-      <BottomNavigationAction
-        label='Notifications'
-        href='/notifications'
-        value='notifications'
-        icon={<CiBellOn size='26px' style={{ margin: '-1px 0' }} />}
-      />
-      <BottomNavigationAction
-        label='Profile'
-        // This makes sure the UI doesn't flicker from single column to double column for desktop screens
-        href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
-        value='profile'
-        icon={<SlUser size='19px' style={{ margin: '2px 0' }} />}
-      />
-    </StyledBottomNavigation>
+    <>
+      <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
+        <BottomNavigationAction label='Home' href='/home' value='home' icon={<PiHouseLight size='24px' />} />
+        <BottomNavigationAction label='Scout' href='/scout' value='scout' icon={<PiBinocularsLight size='24px' />} />
+        <BottomNavigationAction
+          label='Notifications'
+          href='/notifications'
+          value='notifications'
+          icon={<CiBellOn size='26px' style={{ margin: '-1px 0' }} />}
+          onClick={openAuthModal}
+        />
+        <BottomNavigationAction
+          label='Profile'
+          // This makes sure the UI doesn't flicker from single column to double column for desktop screens
+          href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
+          value='profile'
+          icon={<SlUser size='19px' style={{ margin: '2px 0' }} />}
+          onClick={openAuthModal}
+        />
+      </StyledBottomNavigation>
+      <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} />
+    </>
   );
 }
 

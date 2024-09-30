@@ -68,7 +68,7 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar' | 'cu
             </Link>
             <Stack flexDirection='row' gap={2} alignItems='center'>
               <Hidden mdDown>
-                <SiteNavigation topNav />
+                <SiteNavigation topNav isAuthenticated={!!user} />
               </Hidden>
               {user ? (
                 <Box

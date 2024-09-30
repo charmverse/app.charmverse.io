@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-import dynamic from 'next/dynamic';
 import type { ReactNode } from 'react';
 
 import { Header } from 'components/common/Header/Header';
@@ -19,7 +18,7 @@ export default async function Layout({
       <Box component='main' minHeight='100%'>
         {children}
       </Box>
-      <StickyFooter />
+      <StickyFooter isAuthenticated={!!user} />
     </Box>
   );
 }
