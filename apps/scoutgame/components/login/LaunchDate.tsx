@@ -1,15 +1,25 @@
+'use client';
+
 import { Box, Stack, Typography } from '@mui/material';
 import { tierDistributionMap } from '@packages/scoutgame/waitlist/scoring/constants';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 import { launchDates } from 'lib/session/authorizeUserByLaunchDate';
 
 export function LaunchDate() {
-  const closestFutureLaunchDate = getClosestFutureLaunchDate(Object.keys(launchDates));
-  const timeUntilLaunch = timeUntilFuture(closestFutureLaunchDate?.timestamp);
+  const closestFutureLaunchDate = getClosestFutureLaunchDate();
+  const tier = closestFutureLaunchDate ? launchDates[closestFutureLaunchDate.dateString] : null;
+  const imageUrl = tier && tierDistributionMap[tier]?.imageText;
+  const [timeUntilLaunch, setTimeStr] = useState(timeUntilFuture(closestFutureLaunchDate?.timestamp));
 
-  const tier = closestFutureLaunchDate ? launchDates[closestFutureLaunchDate.dateString] : 'common';
-  const imageUrl = tierDistributionMap[tier]?.imageText;
+  useEffect(() => {
+    const timeout = setInterval(() => {
+      setTimeStr(timeUntilFuture(closestFutureLaunchDate?.timestamp));
+    }, 1000);
+
+    return () => clearInterval(timeout);
+  }, [setTimeStr, closestFutureLaunchDate?.timestamp]);
 
   if (!timeUntilLaunch) {
     return null;
@@ -17,9 +27,9 @@ export function LaunchDate() {
 
   return (
     <Box>
-      <Stack flexDirection='row' gap={3} alignItems='center'>
+      <Stack flexDirection={{ xs: 'column', sm: 'row' }} gap={1} alignItems='center'>
         <Image
-          src={imageUrl}
+          src={imageUrl ?? ''}
           width={120}
           height={40}
           sizes='100vw'
@@ -29,7 +39,7 @@ export function LaunchDate() {
           }}
           alt={`Current tier is ${tier}`}
         />
-        <Typography variant='h6'>
+        <Typography variant='h6' suppressHydrationWarning sx={{ width: '200px' }}>
           {timeUntilLaunch?.days} days {timeUntilLaunch?.timeString}
         </Typography>
       </Stack>
@@ -37,7 +47,8 @@ export function LaunchDate() {
   );
 }
 
-function getClosestFutureLaunchDate(dates: string[]) {
+function getClosestFutureLaunchDate() {
+  const dates = Object.keys(launchDates);
   const now = new Date().getTime();
   const futureDates = dates
     .map((date) => ({ dateString: date, timestamp: new Date(date).getTime() }))
