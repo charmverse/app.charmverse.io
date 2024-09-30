@@ -19,9 +19,9 @@ export async function processNftMints() {
     try {
       await handlePendingTransaction({ pendingTransactionId: pendingTx.id });
 
-      log.info(`✅ Processed ${i + 1}/`);
+      log.info(`Processed ${i + 1}/${totalPendingTxs} pending txs`);
     } catch (error) {
-      log.error(`Error processing tx`, { error });
+      log.warn(`Error processing pending tx`, { pendingTransactionId: pendingTx.id, error });
     }
   }
 }
