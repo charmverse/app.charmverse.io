@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { builderContractAddress } from '@packages/scoutgame/builderNfts/constants';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
@@ -46,7 +47,8 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
           },
           builderNfts: {
             where: {
-              season: currentSeason
+              season: currentSeason,
+              contractAddress: builderContractAddress
             },
             select: {
               currentPrice: true,
