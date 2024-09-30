@@ -20,6 +20,7 @@
     "@decent.xyz/box-ui": "^3.3.5",
     "@decent.xyz/the-box": "^3.1.15",
     "@hookform/resolvers": "^3.6.0",
+    "@packages/farcaster": "file:../../packages/farcaster",
     "@packages/github": "file:../../packages/github",
     "@packages/scoutgame": "^0.0.0",
     "@packages/utils": "file:../../packages/utils",

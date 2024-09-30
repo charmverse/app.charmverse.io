@@ -1,5 +1,4 @@
 import {
-  Button,
   Paper,
   Stack,
   Table,
@@ -10,9 +9,7 @@ import {
   TableRow,
   tableCellClasses
 } from '@mui/material';
-import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
 import Image from 'next/image';
-import Link from 'next/link';
 
 import { Avatar } from 'components/common/Avatar';
 import { PointsIcon } from 'components/common/Icons';
@@ -100,7 +97,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
                 </Stack>
               </TableCell>
               <TableCell align='center' width='150px'>
-                <ScoutButton price={builder.price} builderId={builder.id} />
+                <ScoutButton builder={builder} />
               </TableCell>
             </TableRow>
           ))}

@@ -9,20 +9,24 @@ import { processMergedPullRequest } from './processMergedPullRequest';
 import { updateBuildersRank } from './updateBuildersRank';
 
 export async function processPullRequests({
-  createdAfter,
+  createdAfter = new Date(Date.now() - 30 * 60 * 1000),
   skipClosedPrProcessing = false,
   season = currentSeason
 }: { createdAfter?: Date; skipClosedPrProcessing?: boolean; season?: string } = {}) {
-  log.info('Processing PRs');
-  const repos = await prisma.githubRepo.findMany();
-
-  // get Pull requests
-  const lastHour = new Date(Date.now() - 1 * 60 * 60 * 1000);
-
-  const fromDateTime = createdAfter ?? lastHour;
+  const repos = await prisma.githubRepo.findMany({
+    where: {
+      deletedAt: null
+    },
+    select: {
+      owner: true,
+      name: true,
+      defaultBranch: true
+    }
+  });
+  log.info(`Processing PRs from ${repos.length} repos`);
 
   const timer = DateTime.now();
-  const pullRequests = await getPullRequests({ repos, after: fromDateTime });
+  const pullRequests = await getPullRequests({ repos, after: createdAfter });
 
   const uniqueRepos = Array.from(new Set(pullRequests.map((pr) => pr.repository.id)));
 

@@ -2,21 +2,31 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
-import { seasonQualifiedBuilderWhere } from './queries';
-
 export type TopBuilderInfo = {
   id: string;
   username: string;
+  displayName: string;
   avatar: string | null;
   seasonPoints: number;
   allTimePoints: number;
   scoutedBy: number;
-  price: number;
+  price: bigint;
+  nftImageUrl: string;
 };
 
 export async function getTopBuilders({ limit }: { limit: number }): Promise<TopBuilderInfo[]> {
   const topBuilders = await prisma.userSeasonStats.findMany({
-    where: seasonQualifiedBuilderWhere,
+    where: {
+      season: currentSeason,
+      user: {
+        builderStatus: 'approved',
+        builderNfts: {
+          some: {
+            season: currentSeason
+          }
+        }
+      }
+    },
     orderBy: {
       pointsEarnedAsBuilder: 'desc'
     },
@@ -27,6 +37,7 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
         select: {
           id: true,
           username: true,
+          displayName: true,
           avatar: true,
           userAllTimeStats: {
             select: {
@@ -39,6 +50,7 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
             },
             select: {
               currentPrice: true,
+              imageUrl: true,
               nftSoldEvents: {
                 select: {
                   id: true
@@ -54,7 +66,7 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
   return topBuilders
     .map((builder) => {
       const { user, pointsEarnedAsBuilder } = builder;
-      const { id, username, avatar } = user;
+      const { id, username, avatar, displayName } = user;
       const nft = user.builderNfts[0];
       if (!nft) {
         return null;
@@ -64,10 +76,12 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
         id,
         username,
         avatar,
+        displayName,
+        nftImageUrl: nft.imageUrl,
         seasonPoints: pointsEarnedAsBuilder,
         allTimePoints: builder.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
         scoutedBy: nft.nftSoldEvents.length,
-        price: Number(nft.currentPrice)
+        price: nft.currentPrice
       };
     })
     .filter(isTruthy);

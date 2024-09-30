@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/dates';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import { isProdEnv } from '@root/config/constants';
 
 import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import type { BuilderInfo } from './interfaces';
-import { weeklyQualifiedBuilderWhere } from './queries';
 
 const preselectedBuilderIds = [
   '9a7d9dd6-298d-4e92-9f71-ff972abd1132',
@@ -88,7 +87,17 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
   }
 
   const builders = await prisma.userWeeklyStats.findMany({
-    where: weeklyQualifiedBuilderWhere,
+    where: {
+      week: getCurrentWeek(),
+      user: {
+        builderStatus: 'approved',
+        builderNfts: {
+          some: {
+            season: currentSeason
+          }
+        }
+      }
+    },
     orderBy: {
       rank: 'asc'
     },

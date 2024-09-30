@@ -27,7 +27,7 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
           </Typography>
         </Stack>
         <Suspense fallback={<LoadingCards />}>
-          <TodaysHotBuildersCarousel />
+          <TodaysHotBuildersCarousel userId={user?.id} />
         </Suspense>
         <HomeTabsMenu tab={currentTab} />
         <Box px={{ xs: 1, md: 0 }}>

@@ -1,0 +1,41 @@
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
+import { getFarcasterUserByUsername } from '@packages/farcaster/getFarcasterUserByUsername';
+
+const farcasterUsernames: string[] = [];
+
+async function createScouts() {
+  for (const farcasterUsername of farcasterUsernames) {
+    try {
+      const profile = await getFarcasterUserByUsername(farcasterUsername);
+      if (!profile) {
+        log.info(`No profile found for ${farcasterUsername}`);
+        continue;
+      }
+      const displayName = profile.display_name;
+      const avatarUrl = profile.pfp_url;
+      const bio = profile.profile.bio.text;
+      const fid = profile.fid;
+
+      const scout = await prisma.scout.upsert({
+        where: {
+          username: farcasterUsername
+        },
+        update: {},
+        create: {
+          displayName,
+          username: farcasterUsername,
+          avatar: avatarUrl,
+          bio,
+          farcasterId: fid,
+          farcasterName: displayName
+        }
+      });
+      log.info(`Created scout for ${farcasterUsername}`, { scoutId: scout.id });
+    } catch (error) {
+      log.error(`Error creating scout for ${farcasterUsername}`, { error });
+    }
+  }
+}
+
+createScouts();

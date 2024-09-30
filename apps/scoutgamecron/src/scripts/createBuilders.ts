@@ -1,38 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client'
 import { octokit } from '@packages/github/client';
-
-import * as http from '@packages/utils/http';
-
-export type FarcasterProfile = {
-  username: string;
-  fid: number;
-  display_name: string;
-  pfp_url: string;
-  profile: {
-    bio: {
-      text: string;
-    }
-  }
-};
-
-const profileApiUrl = 'https://api.neynar.com/v2/farcaster/user/bulk';
-
-export async function getFarcasterProfileById(fid: number) {
-  const {users} = await http
-    .GET<{users: FarcasterProfile[]}>(
-      `${profileApiUrl}?fids=${fid}`,
-      {},
-      {
-        credentials: 'omit',
-        headers: {
-          'X-Api-Key': process.env.NEYNAR_API_KEY as string
-        }
-      }
-    );
-  return users[0] || null;
-}
-
+import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 
 const builderWaitlistLogins: string[] = []
 
@@ -60,7 +29,7 @@ async function createBuilders() {
     if (waitlistSlot && fid) {
       try {
         const githubUser = await octokit.rest.users.getByUsername({ username: login })
-        const profile = await getFarcasterProfileById(fid)
+        const profile = await getFarcasterUserById(fid)
         if (!profile) {
           log.info(`No profile found for ${login}`)
           continue

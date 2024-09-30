@@ -102,6 +102,9 @@ export async function getPullRequests({ repos, after }: { repos: RepoInput[]; af
       after
     });
     pullRequests.push(...repoPullRequests.filter((pr) => pr.baseRefName === repo.defaultBranch));
+    if (repos.indexOf(repo) % 100 === 0) {
+      log.debug(`Processed ${repos.indexOf(repo)}/${repos.length} repos`);
+    }
   }
   return pullRequests;
 }
