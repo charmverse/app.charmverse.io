@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
-import { getDateFromISOWeek } from '@packages/scoutgame/dates';
+import { currentSeason, getDateFromISOWeek } from '@packages/scoutgame/dates';
 import { processMergedPullRequest } from '../tasks/processPullRequests/processMergedPullRequest';
 
 export async function approveBuilder({
@@ -10,8 +10,8 @@ export async function approveBuilder({
   builderId,
   season
 }: {
-  githubLogin: string;
-  builderId: string;
+  githubLogin?: string;
+  builderId?: string;
   season: string;
 }) {
   if (githubLogin && builderId) {
@@ -37,11 +37,14 @@ export async function approveBuilder({
     }
   });
 
+  builderId = builder.id;
+
   const githubUser = builder.githubUser[0];
 
   if (!githubUser) {
     throw new Error(`Builder ${builder.id} : ${builder.displayName} does not have a github user connected`);
   }
+
 
   log.info(`Found builder using Github Account ${githubUser.login}`);
 
@@ -78,7 +81,7 @@ export async function approveBuilder({
     }
   }
 
-  await prisma.scout.update({
+  const scout = await prisma.scout.update({
     where: {
       id: builderId
     },
@@ -87,7 +90,8 @@ export async function approveBuilder({
     }
   });
 
-  await registerBuilderNFT({ builderId, season });
+  await registerBuilderNFT({ builderId: scout.id, season });
 
-  await refreshUserStats({ userId: builderId });
+  await refreshUserStats({ userId: scout.id });
 }
+
