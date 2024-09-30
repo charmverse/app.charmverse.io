@@ -165,7 +165,7 @@ describe('processMergedPullRequest', () => {
       pullRequest: lastWeekPr,
       repo,
       season: currentSeason,
-      now: new Date(lastWeekPr.createdAt)
+      now: DateTime.fromISO(lastWeekPr.createdAt)
     });
 
     const pullRequest2 = mockPullRequest({
@@ -175,7 +175,7 @@ describe('processMergedPullRequest', () => {
       author: builder.githubUser
     });
 
-    await processMergedPullRequest({ pullRequest: pullRequest2, repo, season: currentSeason, now: now.toJSDate() });
+    await processMergedPullRequest({ pullRequest: pullRequest2, repo, season: currentSeason, now });
 
     const pullRequest3 = mockPullRequest({
       createdAt: now.toISO(),
@@ -184,7 +184,7 @@ describe('processMergedPullRequest', () => {
       author: builder.githubUser
     });
 
-    await processMergedPullRequest({ pullRequest: pullRequest3, repo, season: currentSeason, now: now.toJSDate() });
+    await processMergedPullRequest({ pullRequest: pullRequest3, repo, season: currentSeason, now });
 
     const gemsReceipts = await prisma.gemsReceipt.findMany({
       where: {
@@ -193,7 +193,8 @@ describe('processMergedPullRequest', () => {
         }
       }
     });
-    expect(gemsReceipts).toHaveLength(2);
+    expect(gemsReceipts).toHaveLength(3);
+
     const gemsReceipt = await prisma.gemsReceipt.findFirstOrThrow({
       where: {
         type: 'third_pr_in_streak'
