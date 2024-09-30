@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { getCurrentWeek } from '@packages/scoutgame/dates';
+import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
 import { DateTime } from 'luxon';
 
@@ -17,7 +17,7 @@ export async function processGemsPayout() {
 
   for (const { builder, gemsCollected, rank } of topWeeklyBuilders) {
     try {
-      await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week });
+      await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: currentSeason });
     } catch (error) {
       log.error(`Error processing scout points payout for builder ${builder.id}: ${error}`);
     }
