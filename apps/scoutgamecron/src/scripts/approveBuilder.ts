@@ -63,7 +63,7 @@ export async function approveBuilder({
   });
 
   for (const pullRequest of events) {
-    if (pullRequest.type === 'merged_pull_request') {
+    if (pullRequest.type === 'merged_pull_request' && pullRequest) {
       await processMergedPullRequest({
         season,
         pullRequest: {
@@ -77,7 +77,8 @@ export async function approveBuilder({
           repository: { id: pullRequest.repo.id, nameWithOwner: `${pullRequest.repo.owner}/${pullRequest.repo.name}` }
         },
         repo: pullRequest.repo
-      });
+      })
+      .catch(error => log.error('Error processing pull request', {error, pullRequest}));
     }
   }
 
@@ -95,3 +96,47 @@ export async function approveBuilder({
   await refreshUserStats({ userId: scout.id });
 }
 
+
+
+
+
+const devUsers = {
+  mattcasey: {
+    id: 305398,
+    avatar: 'https://app.charmverse.io/favicon.png'
+  },
+  ccarella: {
+    id: 199823,
+    avatar:
+      'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43760426-bca9-406b-4afe-20138acd5f00/rectcrop3'
+  },
+  Devorein: {
+    id: 25636858,
+    avatar:
+      'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg'
+  },
+  valentinludu: {
+    id: 34683631,
+    avatar:
+      'https://cdn.charmverse.io/user-content/f50534c5-22e7-47ee-96cb-54f4ce1a0e3e/42697dc0-35ad-4361-8311-a92702c76062/breaking_wave.jpg'
+  },
+  motechFR: {
+    id: 18669748,
+    avatar:
+      'https://cdn.charmverse.io/user-content/e0ec0ec8-0c1f-4745-833d-52c448482d9c/0dd0e3c0-821c-49fc-bd1a-7589ada03019/1ff23917d3954f92aed4351b9c8caa36.jpg'
+  }
+
+} as const;
+
+async function approveAll() {
+  const allnames = Object.entries(devUsers);
+
+  for (const [name, val] of allnames) {
+    await approveBuilder({
+      githubLogin: name as string,
+      season: currentSeason
+    })
+  }
+}
+
+approveAll()

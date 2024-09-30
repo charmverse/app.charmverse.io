@@ -19,7 +19,7 @@ jest.unstable_mockModule('../createBuilderNft', () => ({
   createBuilderNft: jest.fn()
 }));
 
-const { getBuilderContractAdminClient } = await import('../contractClient');
+const { getBuilderContractAdminClient } = await import('../clients/builderContractWriteClient');
 
 const { registerBuilderNFT } = await import('../registerBuilderNFT');
 

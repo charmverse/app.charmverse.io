@@ -2,12 +2,13 @@
 
 import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
 import { waitForDecentTransactionSettlement } from '@packages/onchain/waitForDecentTransactionSettlement';
-import { BuilderNFTSeasonOneClient } from '@packages/scoutgame/builderNfts/builderNFTSeasonOneClient';
-import { builderContractAddress, builderNftChain } from '@packages/scoutgame/builderNfts/constants';
+import { builderNftChain } from '@packages/scoutgame/builderNfts/constants';
 import { getScoutGameNftAdminWallet } from '@packages/scoutgame/builderNfts/getScoutGameNftAdminWallet';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
+
+import { getBuilderContractAdminClient } from './builderNfts/clients/builderContractAdminWriteClient';
 
 export async function handlePendingTransaction({
   pendingTransactionId
@@ -29,11 +30,7 @@ export async function handlePendingTransaction({
 
   const serverClient = getScoutGameNftAdminWallet();
 
-  const apiClient = new BuilderNFTSeasonOneClient({
-    chain: builderNftChain,
-    contractAddress: builderContractAddress,
-    walletClient: serverClient
-  });
+  const apiClient = getBuilderContractAdminClient();
 
   const txHash = await waitForDecentTransactionSettlement({
     sourceTxHash: pendingTx.sourceChainTxHash,

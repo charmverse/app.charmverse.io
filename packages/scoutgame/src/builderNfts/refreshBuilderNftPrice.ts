@@ -2,8 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { builderApiClient } from './builderApiClient';
-import { getBuilderContractAdminClient } from './contractClient';
+import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
+import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
 
 export async function refreshBuilderNftPrice({ builderId, season }: { builderId: string; season: string }) {
   if (!stringUtils.isUUID(builderId)) {
@@ -14,7 +14,7 @@ export async function refreshBuilderNftPrice({ builderId, season }: { builderId:
 
   const tokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
 
-  const currentPrice = await builderApiClient.getTokenPurchasePrice({
+  const currentPrice = await builderContractReadonlyApiClient.getTokenPurchasePrice({
     args: { tokenId, amount: BigInt(1) }
   });
 

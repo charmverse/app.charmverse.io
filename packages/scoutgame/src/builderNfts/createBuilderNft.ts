@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason } from '../dates';
 
-import { builderApiClient } from './builderApiClient';
+import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
 import { builderContractAddress, builderNftChain } from './constants';
 import { uploadArtwork } from './uploadArtwork';
 
@@ -17,7 +17,7 @@ export async function createBuilderNft({
   tokenId: bigint;
   builderId: string;
 }) {
-  const currentPrice = await builderApiClient.getTokenPurchasePrice({
+  const currentPrice = await builderContractReadonlyApiClient.getTokenPurchasePrice({
     args: { tokenId, amount: BigInt(1) }
   });
 
