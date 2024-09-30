@@ -2,11 +2,15 @@
 
 import { Button } from '@mui/material';
 import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { NFTPurchaseDialog } from 'components/common/NFTPurchaseForm/NFTPurchaseDialog';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
+
+const NFTPurchaseDialog = dynamic(() =>
+  import('components/common/NFTPurchaseForm/NFTPurchaseDialog').then((mod) => mod.NFTPurchaseDialogWithProviders)
+);
 
 export function ScoutButton({
   builder,

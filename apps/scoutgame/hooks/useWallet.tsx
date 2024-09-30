@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import { useMemo } from 'react';
 import type { Connector } from 'wagmi';
 import { useAccount, useConnect, useDisconnect, useWalletClient } from 'wagmi';
 
@@ -21,18 +20,11 @@ export function useWallet() {
     }
   };
 
-  // WalletConnect appears 3 times in dev for some reason
-  const uniqConnectors = useMemo(() => {
-    return connectors.filter((connector, index, self) => {
-      return index === self.findIndex((t) => t.id === connector.id);
-    });
-  }, [connectors]);
-
   return {
     isConnected,
     address,
     chainId,
-    connectors: uniqConnectors,
+    connectors,
     connectError,
     connectWallet,
     disconnectAsync,

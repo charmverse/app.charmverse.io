@@ -1,5 +1,6 @@
 import env from '@beam-australia/react-env';
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { coinbaseWallet, rainbowWallet, metaMaskWallet, walletConnectWallet } from '@rainbow-me/rainbowkit/wallets';
 import type { Chain, Transport } from 'viem';
 import * as chains from 'viem/chains';
 import { http, createConfig, cookieStorage, createStorage } from 'wagmi';
@@ -26,6 +27,12 @@ export function getConfig() {
     projectId: walletConnectProjectId,
     chains: viemChains,
     // connectors,
+    wallets: [
+      {
+        groupName: 'SG List',
+        wallets: [coinbaseWallet, metaMaskWallet, rainbowWallet, walletConnectWallet]
+      }
+    ],
     ssr: true,
     storage: createStorage({ storage: cookieStorage }),
     transports
