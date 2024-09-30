@@ -21,7 +21,7 @@ import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
 import { formatUnits } from 'viem';
-import { useSendTransaction } from 'wagmi';
+import { useAccount, useSendTransaction } from 'wagmi';
 
 import { useWallet } from 'hooks/useWallet';
 import { handleMintNftAction } from 'lib/builderNFTs/handleMintNftAction';
@@ -48,7 +48,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111, 1111];
   const pricePerNft = (Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2);
-  const { address, chainId } = useWallet();
+  const { address, chainId } = useAccount();
 
   const [sourceFundsChain, setSourceFundsChain] = useState(ChainId.OPTIMISM_SEPOLIA);
 

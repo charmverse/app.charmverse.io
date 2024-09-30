@@ -2,10 +2,10 @@
 
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useEffect } from 'react';
+import { useAccount } from 'wagmi';
 
 import { BasicModal } from 'components/common/Modal';
 import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
-import { useWallet } from 'hooks/useWallet';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
 import { NFTPurchaseForm } from './NFTPurchaseForm';
@@ -21,7 +21,7 @@ type NFTPurchaseDialogProps = {
 // This component opens the wallet connect modal if the user is not connected yet
 export function NFTPurchaseDialog(props: NFTPurchaseDialogProps) {
   const { openConnectModal } = useConnectModal();
-  const { address } = useWallet();
+  const { address } = useAccount();
 
   // open Rainbowkit modal if not connected
   useEffect(() => {
