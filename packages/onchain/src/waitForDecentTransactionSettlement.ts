@@ -142,17 +142,19 @@ export async function getTransactionStatusFromDecent({
   sourceTxHash,
   sourceTxHashChainId
 }: DecentTransactionToQuery): Promise<DecentTransactionStatus> {
-  const response = await GET<DecentTransactionStatus>(
-    `https://api.decentscan.xyz/getStatus?sourceTxHash=${sourceTxHash}&sourceTxHashChainId=${sourceTxHashChainId}`,
-    undefined,
+  if (!process.env.REACT_APP_DECENT_API_KEY) {
+    throw new Error('REACT_APP_DECENT_API_KEY is not set');
+  }
+
+  return GET<DecentTransactionStatus>(
+    'https://api.decentscan.xyz/getStatus',
+    { sourceTxHash, sourceTxHashChainId },
     {
       headers: {
         'x-api-key': process.env.REACT_APP_DECENT_API_KEY
       }
     }
   );
-
-  return response;
 }
 
 export async function waitForDecentTransactionSettlement({
