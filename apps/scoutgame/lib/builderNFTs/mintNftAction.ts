@@ -1,5 +1,7 @@
 'use server';
 
+import { log } from '@charmverse/core/log';
+import { handlePendingTransaction } from '@packages/scoutgame/handlePendingTransaction';
 import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
@@ -42,6 +44,10 @@ export const mintNftAction = authActionClient
     const data = await savePendingTransaction({
       ...parsedInput,
       user: { ...(parsedInput.user as any), scoutId: userId }
+    });
+
+    handlePendingTransaction({ pendingTransactionId: data.id }).catch((error) => {
+      log.warn('Couldnt proccess decent transaction in time alotted', { error });
     });
 
     return { id: data.id };

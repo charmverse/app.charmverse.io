@@ -161,23 +161,3 @@ export async function handlePendingTransaction({
     }
   }
 }
-
-// prisma.pendingNftTransaction
-//   .findFirst({
-//     orderBy: {
-//       createdAt: 'desc'
-//     }
-//   })
-//   .then(console.log);
-
-// prisma.pendingNftTransaction
-//   .update({
-//     where: {
-//       id: '4dfe8f6c-f4d3-4296-8eed-5d73d022b55e'
-//     },
-//     data: {
-//       status: 'pending'
-//     }
-//   })
-//   .then((data) => handlePendingTransaction({ pendingTransactionId: data.id }))
-//   .then(console.log);

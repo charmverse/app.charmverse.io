@@ -128,18 +128,29 @@ const devUsers = {
 
 } as const;
 
-// async function approveAll() {
-//   const allnames = Object.entries(devUsers);
+async function approveAll() {
+  const allBuilders = await prisma.scout.findMany({
+    where: {
+      githubUser: {
+        some: {}
+      },
+      builderNfts: {
+        none: {}
+      }
+    }
+  })
 
-//   for (const [name, val] of allnames) {
+  console.log(allBuilders.length);
+
+  for (const builder of allBuilders) {
     
-//     await approveBuilder({
-//       githubLogin: name as string,
-//       season: currentSeason
-//     }).catch(err => {
-//       log.error(`Error for ${name}`)
-//     })
-//   }
-// }
+    await approveBuilder({
+      builderId: builder.id,
+      season: currentSeason
+    }).catch(err => {
+      log.error(`Error for ${builder.displayName}`)
+    })
+  }
+}
 
 // approveAll()
