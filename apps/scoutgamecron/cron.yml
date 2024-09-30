@@ -11,6 +11,6 @@ cron:
     schedule: "0 * * * *"
 
   - name: "process-nft-mints"
-      url: "/process-nft-mints"
-      # Every 5 minutes
-      schedule: "*/5 * * * *"
+    url: "/process-nft-mints"
+    # Every 5 minutes
+    schedule: "*/5 * * * *"
