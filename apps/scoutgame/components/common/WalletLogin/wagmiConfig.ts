@@ -2,19 +2,11 @@ import env from '@beam-australia/react-env';
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import type { Chain, Transport } from 'viem';
 import * as chains from 'viem/chains';
-import { http, createConfig, cookieStorage, createStorage } from 'wagmi';
-import { injected, walletConnect } from 'wagmi/connectors';
+import { http, cookieStorage, createStorage } from 'wagmi';
 
 export function getConfig() {
   const walletConnectProjectId = env('WALLETCONNECT_PROJECTID');
   const viemChains = Object.values(chains) as unknown as [Chain, ...Chain[]];
-
-  // const connectors = [
-  //   injected({
-  //     shimDisconnect: true
-  //   }),
-  //   ...(projectId ? [walletConnect({ projectId })] : [])
-  // ];
 
   const transports = viemChains.reduce<Record<string, Transport>>((acc, chain) => {
     acc[chain.id] = http();
@@ -25,7 +17,6 @@ export function getConfig() {
     appName: 'Scout Game',
     projectId: walletConnectProjectId,
     chains: viemChains,
-    // connectors,
     ssr: true,
     storage: createStorage({ storage: cookieStorage }),
     transports
