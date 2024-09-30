@@ -7,8 +7,9 @@ async function uploadNFTArtwork() {
     where: {
       builderStatus: 'approved'
     },
-    include: {
-      githubUser: true,
+    select: {
+      avatar: true,
+      username: true,
       builderNfts: true
     }
   });

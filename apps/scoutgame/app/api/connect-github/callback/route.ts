@@ -52,13 +52,13 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const scout = await prisma.scout.findUnique({
+  const exists = await prisma.scout.count({
     where: {
       id: unsealedUserId
     }
   });
 
-  if (!scout) {
+  if (!exists) {
     return new Response(null, {
       status: 302,
       headers: {

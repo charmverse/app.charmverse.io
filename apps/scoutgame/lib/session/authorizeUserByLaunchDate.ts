@@ -21,14 +21,14 @@ export async function authorizeUserByLaunchDate({ fid, now = DateTime.now() }: {
     return true;
   }
 
-  const scout = await prisma.scout.findMany({
+  const matches = await prisma.scout.count({
     where: {
       farcasterId: fid
     }
   });
 
   // users who have already been whitelisted
-  if (scout.length > 0) {
+  if (matches > 0) {
     return true;
   }
 
