@@ -104,6 +104,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
     });
 
     const usdcBalance = await client.balanceOf({ args: { account: address as `0x${string}` } });
+
     const ethBalance = await getPublicClient(_chainId).getBalance({
       address: address as `0x${string}`
     });
@@ -374,7 +375,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
         <Typography color='secondary'>Select payment</Typography>
         <BlockchainSelect
           value={sourceFundsChain}
-          balance={(Number(balances?.usdc || 0) / 1e6).toFixed(2)}
+          balance={(Number(balances?.eth || 0) / 1e18).toFixed(4)}
           useTestnets={useTestnets}
           onSelectChain={(_chainId) => {
             setSourceFundsChain(_chainId);

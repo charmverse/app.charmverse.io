@@ -4,6 +4,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
 import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
+import { builderContractAddress } from './constants';
 
 export async function refreshBuilderNftPrice({ builderId, season }: { builderId: string; season: string }) {
   if (!stringUtils.isUUID(builderId)) {
@@ -18,12 +19,17 @@ export async function refreshBuilderNftPrice({ builderId, season }: { builderId:
     args: { tokenId, amount: BigInt(1) }
   });
 
+  const existingNft = await prisma.builderNft.findFirstOrThrow({
+    where: {
+      builderId,
+      season,
+      contractAddress: builderContractAddress
+    }
+  });
+
   return prisma.builderNft.update({
     where: {
-      builderId_season: {
-        builderId,
-        season
-      }
+      id: existingNft.id
     },
     data: {
       currentPrice: Number(currentPrice)
