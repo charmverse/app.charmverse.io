@@ -1,43 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import * as http from '@packages/utils/http';
-
-export type FarcasterProfile = {
-  username: string;
-  fid: number;
-  display_name: string;
-  pfp_url: string;
-  profile: {
-    bio: {
-      text: string;
-    };
-  };
-};
-
-const profileApiUrl = 'https://api.neynar.com/v2/farcaster/user/search';
-
-export async function getFarcasterProfileByUsername(username: string) {
-  const {
-    result: { users }
-  } = await http.GET<{ result: { users: FarcasterProfile[] } }>(
-    `${profileApiUrl}?q=${username}&limit=1`,
-    {},
-    {
-      credentials: 'omit',
-      headers: {
-        'X-Api-Key': process.env.NEYNAR_API_KEY as string
-      }
-    }
-  );
-  return users[0] || null;
-}
+import { getFarcasterUserByUsername } from '@packages/farcaster/getFarcasterUserByUsername';
 
 const farcasterUsernames: string[] = [];
 
 async function createScouts() {
   for (const farcasterUsername of farcasterUsernames) {
     try {
-      const profile = await getFarcasterProfileByUsername(farcasterUsername);
+      const profile = await getFarcasterUserByUsername(farcasterUsername);
       if (!profile) {
         log.info(`No profile found for ${farcasterUsername}`);
         continue;
@@ -58,7 +28,7 @@ async function createScouts() {
           avatar: avatarUrl,
           bio,
           farcasterId: fid,
-          farcasterName: displayName,
+          farcasterName: displayName
         }
       });
       log.info(`Created scout for ${farcasterUsername}`, { scoutId: scout.id });
