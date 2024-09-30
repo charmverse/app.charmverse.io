@@ -16,7 +16,7 @@ import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
 
 import { TableCellText } from './TableCellText';
 
-export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
+export function LeaderboardTable({ data, userId }: { data: LeaderBoardRow[]; userId?: string }) {
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
@@ -87,7 +87,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                 </Stack>
               </TableCell>
               <TableCell sx={getSXProps({ mdDown: true, display: 'table-cell' })} width='150px'>
-                <ScoutButton builder={row} />
+                <ScoutButton builder={row} isAuthenticated={!!userId} />
               </TableCell>
             </TableRow>
           ))}

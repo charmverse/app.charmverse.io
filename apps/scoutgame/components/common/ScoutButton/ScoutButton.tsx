@@ -3,10 +3,11 @@
 import { Button } from '@mui/material';
 import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import type { MinimalUserInfo } from 'lib/users/interfaces';
+
+import { SignInModalMessage } from './SignInModalMessage';
 
 const NFTPurchaseDialog = dynamic(() =>
   import('components/common/NFTPurchaseForm/NFTPurchaseDialog').then((mod) => mod.NFTPurchaseDialogWithProviders)
@@ -19,14 +20,14 @@ export function ScoutButton({
   builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
   isAuthenticated?: boolean;
 }) {
-  const router = useRouter();
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
+  const [authPopup, setAuthPopup] = useState<boolean>(false);
 
   const handleClick = () => {
     if (isAuthenticated) {
       setIsPurchasing(true);
     } else {
-      router.push('/login');
+      setAuthPopup(true);
     }
   };
 
@@ -36,6 +37,7 @@ export function ScoutButton({
         ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2)}
       </Button>
       <NFTPurchaseDialog open={isPurchasing} onClose={() => setIsPurchasing(false)} builder={builder} />
+      <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} />
     </>
   );
 }

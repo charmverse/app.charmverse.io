@@ -32,7 +32,7 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
         <HomeTabsMenu tab={currentTab} />
         <Box px={{ xs: 1, md: 0 }}>
           <Suspense fallback={<LoadingTable />}>
-            <HomeTab tab={currentTab} />
+            <HomeTab tab={currentTab} userId={user?.id} />
           </Suspense>
         </Box>
       </Container>
