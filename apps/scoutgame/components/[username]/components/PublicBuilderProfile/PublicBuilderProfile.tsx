@@ -10,14 +10,14 @@ import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
 
 export async function PublicBuilderProfile({ tab, user }: { tab: string; user: BasicUserInfo }) {
   const builderId = user.id;
-  const isBuilder = user.builderStatus === 'approved';
+  const isApprovedBuilder = user.builderStatus === 'approved';
 
   const [
     builderNft,
     { allTimePoints = 0, seasonPoints = 0, rank = 0, gemsCollected = 0 } = {},
     builderActivities = [],
     { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}
-  ] = isBuilder
+  ] = isApprovedBuilder
     ? await Promise.all([
         prisma.builderNft.findUnique({
           where: {
@@ -40,7 +40,6 @@ export async function PublicBuilderProfile({ tab, user }: { tab: string; user: B
   return (
     <PublicBuilderProfileContainer
       tab={tab}
-      user={user}
       scouts={scouts}
       builder={{
         ...user,

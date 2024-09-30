@@ -1,5 +1,6 @@
 'use client';
 
+import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { Box, Stack, Paper, Typography } from '@mui/material';
 
 import { BackButton } from 'components/common/Button/BackButton';
@@ -14,7 +15,9 @@ import { PublicProfileTabsMenu } from '../../PublicProfileTabsMenu';
 import { PublicScoutProfileStats } from './PublicScoutProfileStats';
 
 export type ScoutProfileProps = {
-  scout: BasicUserInfo;
+  scout: BasicUserInfo & {
+    builderStatus?: BuilderStatus | null;
+  };
   allTimePoints: number;
   seasonPoints: number;
   nftsPurchased: number;
@@ -35,7 +38,13 @@ export function PublicScoutProfileContainer({
   const isDesktop = useMdScreen();
   return (
     <Box>
-      {!isDesktop ? <PublicProfileTabsMenu tab={tab} username={scout.username} /> : null}
+      {!isDesktop ? (
+        <PublicProfileTabsMenu
+          tab={tab}
+          username={scout.username}
+          isApprovedBuilder={scout.builderStatus === 'approved'}
+        />
+      ) : null}
       <Paper sx={{ py: 2, my: { xs: 1, md: 2 } }}>
         <Stack flexDirection='row'>
           <BackButton />
@@ -44,7 +53,13 @@ export function PublicScoutProfileContainer({
           </Box>
         </Stack>
       </Paper>
-      {isDesktop ? <PublicProfileTabsMenu tab={tab} username={scout.username} /> : null}
+      {isDesktop ? (
+        <PublicProfileTabsMenu
+          tab={tab}
+          username={scout.username}
+          isApprovedBuilder={scout.builderStatus === 'approved'}
+        />
+      ) : null}
       <Paper
         sx={{
           my: 2,

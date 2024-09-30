@@ -2,8 +2,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
-import { seasonQualifiedBuilderWhere } from './queries';
-
 export type TopBuilderInfo = {
   id: string;
   username: string;
@@ -18,7 +16,17 @@ export type TopBuilderInfo = {
 
 export async function getTopBuilders({ limit }: { limit: number }): Promise<TopBuilderInfo[]> {
   const topBuilders = await prisma.userSeasonStats.findMany({
-    where: seasonQualifiedBuilderWhere,
+    where: {
+      season: currentSeason,
+      user: {
+        builderStatus: 'approved',
+        builderNfts: {
+          some: {
+            season: currentSeason
+          }
+        }
+      }
+    },
     orderBy: {
       pointsEarnedAsBuilder: 'desc'
     },
