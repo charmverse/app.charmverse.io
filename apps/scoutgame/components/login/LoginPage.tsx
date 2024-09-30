@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 import { InfoWrapper } from 'components/layout/InfoWrapper';
 
+import { LaunchDate } from './LaunchDate';
+
 export function LoginPage() {
   return (
     <InfoWrapper>
@@ -43,6 +45,7 @@ export function LoginPage() {
             Scout. Build. Win.
           </Typography>
         </Box>
+        <LaunchDate />
         <Box display='flex' flexDirection='column' gap={3} width='100%'>
           <WarpcastLogin />
         </Box>
