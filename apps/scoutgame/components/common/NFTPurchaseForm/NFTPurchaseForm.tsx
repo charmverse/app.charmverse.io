@@ -23,7 +23,7 @@ import { formatUnits } from 'viem';
 import { useSendTransaction } from 'wagmi';
 
 import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
-import { WalletConnect } from 'components/common/WalletLogin/WalletConnect';
+import { WalletConnectForm } from 'components/common/WalletLogin/WalletConnect';
 import { useWallet } from 'hooks/useWallet';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
 
@@ -283,20 +283,20 @@ function NFTPurchaseWithLogin(props: NFTPurchaseProps) {
   // Waiting for component to render before fetching the API key
   const apiKey = env('DECENT_API_KEY');
 
+  if (!address) {
+    return <WalletConnectForm />;
+  }
+
   if (!apiKey) {
-    log.warn('No DECENT_API_KEY found');
-    return null;
+    return <Typography color='error'>Decent API key not found</Typography>;
   }
 
   return (
-    <BoxHooksContextProvider apiKey={apiKey}>
-      {address && <NFTPurchaseButton {...props} />}
-      {!address && <WalletConnect />}
-    </BoxHooksContextProvider>
+    <BoxHooksContextProvider apiKey={apiKey}>{address && <NFTPurchaseButton {...props} />}</BoxHooksContextProvider>
   );
 }
 
-export function NFTPurchase(props: NFTPurchaseProps) {
+export function NFTPurchaseForm(props: NFTPurchaseProps) {
   return (
     <WagmiProvider>
       <NFTPurchaseWithLogin {...props} />
