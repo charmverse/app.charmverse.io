@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
 
   await prisma.scout.update({
     where: {
-      id: scout.id
+      id: unsealedUserId
     },
     data: {
       onboardedAt: new Date(),
