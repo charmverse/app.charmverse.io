@@ -134,7 +134,7 @@ export async function processMergedPullRequest({
       }
     });
 
-    if (githubUser.builderId) {
+    if (githubUser.builderId && !existingGithubEventToday) {
       const builder = await tx.scout.findUniqueOrThrow({
         where: {
           id: githubUser.builderId
