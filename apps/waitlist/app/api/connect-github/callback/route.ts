@@ -157,7 +157,7 @@ export async function GET(req: NextRequest) {
 
   await refreshUserScore({ fid: connectWaitlistSlot.fid });
 
-  refreshPercentilesForEveryone().then(handleTierChanges);
+  // refreshPercentilesForEveryone().then(handleTierChanges);
 
   const sealedData = await embedFarcasterUser({
     fid: connectWaitlistSlot.fid.toString(),

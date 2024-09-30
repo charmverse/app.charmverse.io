@@ -4,10 +4,10 @@ type ISOWeek = string; // isoweek, e.g. '2024-W01'
 type SeasonWeek = number; // the week in the season, e.g. 1
 
 // Season start MUST be on a Monday, when isoweek begins
-const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 16 }, { zone: 'utc' }); // Dev Season: 2024-W38
-export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 2 });
-// const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 30 }, { zone: 'utc' }); // Actual launch: 2024-W40
-// export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 13 });
+// const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 16 }, { zone: 'utc' }); // Dev Season: 2024-W38
+// export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 2 });
+const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 30 }, { zone: 'utc' }); // Actual launch: 2024-W40
+export const currentSeasonEndDate = currentSeasonStartDate.plus({ weeks: 13 });
 export const currentSeason: ISOWeek = getWeekFromDate(currentSeasonStartDate.toJSDate());
 export const currentSeasonNumber = 1;
 
@@ -46,9 +46,9 @@ function _formatWeek(date: DateTime): ISOWeek {
   return date.toFormat(`kkkk-'W'WW`);
 }
 
-export function isToday(date: Date) {
+export function isToday(date: Date, now = DateTime.utc()) {
   const dateDay = DateTime.fromJSDate(date, { zone: 'utc' }).startOf('day');
-  return dateDay.equals(DateTime.utc().startOf('day'));
+  return dateDay.equals(now.startOf('day'));
 }
 
 export function getCurrentWeekPoints() {

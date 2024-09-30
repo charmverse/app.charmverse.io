@@ -20,7 +20,7 @@ type PendingNftTransactionToSave = {
 };
 
 export async function savePendingTransaction(data: PendingNftTransactionToSave) {
-  await prisma.pendingNftTransaction.create({
+  return prisma.pendingNftTransaction.create({
     data: {
       userId: data.user.scoutId,
       senderAddress: data.user.walletAddress,

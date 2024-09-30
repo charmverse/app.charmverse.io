@@ -136,37 +136,40 @@ type DecentTransactionStatus = {
 type DecentTransactionToQuery = {
   sourceTxHash: string;
   sourceTxHashChainId: number;
+  maxWaitTime?: number;
 };
 
 export async function getTransactionStatusFromDecent({
   sourceTxHash,
   sourceTxHashChainId
 }: DecentTransactionToQuery): Promise<DecentTransactionStatus> {
-  const response = await GET<DecentTransactionStatus>(
-    `https://api.decentscan.xyz/getStatus?sourceTxHash=${sourceTxHash}&sourceTxHashChainId=${sourceTxHashChainId}`,
-    undefined,
+  if (!process.env.REACT_APP_DECENT_API_KEY) {
+    throw new Error('REACT_APP_DECENT_API_KEY is not set');
+  }
+
+  return GET<DecentTransactionStatus>(
+    'https://api.decentscan.xyz/getStatus',
+    { sourceTxHash, sourceTxHashChainId },
     {
       headers: {
         'x-api-key': process.env.REACT_APP_DECENT_API_KEY
       }
     }
   );
-
-  return response;
 }
 
 export async function waitForDecentTransactionSettlement({
   sourceTxHash,
-  sourceTxHashChainId
+  sourceTxHashChainId,
+  maxWaitTime = 4 * 60000 // 4 minutes, because cron runs every 5 minutes
 }: DecentTransactionToQuery): Promise<string> {
   const startTime = Date.now();
-  const maxWaitTime = 50000; // 50 seconds
 
   while (Date.now() - startTime < maxWaitTime) {
     try {
       const response = await getTransactionStatusFromDecent({ sourceTxHash, sourceTxHashChainId });
 
-      if (response.status.toLowerCase().match('fail')) {
+      if (response?.status?.toLowerCase().match('fail')) {
         await prisma.pendingNftTransaction.update({
           where: {
             sourceChainTxHash_sourceChainId: {
@@ -199,7 +202,7 @@ export async function waitForDecentTransactionSettlement({
       }
 
       // Optional: Add a small delay before retrying
-      log.debug('No success found try again', { sourceTxHash, sourceTxHashChainId, response });
+      log.debug('No success found, try again', { sourceTxHash, sourceTxHashChainId, response });
       await sleep(5000);
     } catch (error) {
       log.error('Failed to fetch transaction status:', { sourceTxHash, sourceTxHashChainId, error });

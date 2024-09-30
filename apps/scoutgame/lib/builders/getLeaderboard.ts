@@ -2,12 +2,14 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 
 export type LeaderBoardRow = {
-  builderId: string;
+  id: string;
   avatar: string | null;
   username: string;
+  displayName: string;
   progress: number;
   gems: number;
-  price: number;
+  price: bigint;
+  nftImageUrl?: string;
 };
 
 export async function getLeaderboard(): Promise<LeaderBoardRow[]> {
@@ -28,10 +30,12 @@ export async function getLeaderboard(): Promise<LeaderBoardRow[]> {
           id: true,
           avatar: true,
           username: true,
+          displayName: true,
           builderNfts: {
             select: {
               currentPrice: true,
-              season: true
+              season: true,
+              imageUrl: true
             }
           }
         }
@@ -43,14 +47,16 @@ export async function getLeaderboard(): Promise<LeaderBoardRow[]> {
     const maxGemsCollected = weeklyTopBuilders[0].gemsCollected;
     const progress = (weeklyTopBuilder.gemsCollected / maxGemsCollected) * 100;
     const nft = weeklyTopBuilder.user.builderNfts.find((n) => n.season === season);
-    const price = nft?.currentPrice ? Number(nft.currentPrice) : 0;
+    const price = nft?.currentPrice ?? BigInt(0);
     return {
-      builderId: weeklyTopBuilder.user.id,
+      id: weeklyTopBuilder.user.id,
       avatar: weeklyTopBuilder.user.avatar,
       username: weeklyTopBuilder.user.username,
+      displayName: weeklyTopBuilder.user.displayName,
       gems: weeklyTopBuilder.gemsCollected,
       progress,
-      price
+      price,
+      nftImageUrl: nft?.imageUrl
     };
   });
 }
