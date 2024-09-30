@@ -30,6 +30,7 @@ export async function PublicScoutProfile({ user, tab }: { user: BasicUserInfo; t
       seasonPoints={seasonPoints}
       nftsPurchased={nftsPurchased}
       scoutedBuilders={scoutedBuilders}
+      userId={user.id}
     />
   );
 }

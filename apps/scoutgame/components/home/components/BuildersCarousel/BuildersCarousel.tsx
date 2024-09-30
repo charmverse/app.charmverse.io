@@ -6,7 +6,7 @@ import type { BuilderInfo } from 'lib/builders/interfaces';
 
 import { BuilderCard } from '../../../common/Card/BuilderCard/BuilderCard';
 
-export function BuildersCarousel({ builders }: { builders: BuilderInfo[] }) {
+export function BuildersCarousel({ builders, userId }: { builders: BuilderInfo[]; userId?: string }) {
   const isMobile = useMdScreen();
 
   return (
@@ -18,6 +18,7 @@ export function BuildersCarousel({ builders }: { builders: BuilderInfo[] }) {
           builder={builder}
           showPurchaseButton
           showHotIcon
+          userId={userId}
         />
       ))}
     </Carousel>

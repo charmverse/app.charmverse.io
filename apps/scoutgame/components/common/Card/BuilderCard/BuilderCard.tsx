@@ -14,13 +14,15 @@ export function BuilderCard({
   showPurchaseButton = false,
   hideDetails = false,
   showHotIcon = false,
-  size = 'medium'
+  size = 'medium',
+  userId
 }: {
   size?: 'x-small' | 'small' | 'medium' | 'large';
   builder: BuilderInfo;
   hideDetails?: boolean;
   showPurchaseButton?: boolean;
   showHotIcon?: boolean;
+  userId?: string;
 }) {
   return (
     <Card sx={{ border: 'none', opacity: builder.isBanned ? 0.25 : 1, width: 'fit-content', height: 'fit-content' }}>
@@ -38,7 +40,7 @@ export function BuilderCard({
       </BuilderCardNftDisplay>
       {typeof builder.price !== 'undefined' && showPurchaseButton && (
         <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
-          <ScoutButton builder={builder} isAuthenticated={!!user} />
+          <ScoutButton builder={builder} isAuthenticated={!!userId} />
         </Stack>
       )}
     </Card>

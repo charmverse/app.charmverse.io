@@ -100,6 +100,7 @@ export function PublicBuilderProfileContainer({
                     hideDetails
                     showPurchaseButton
                     size={isDesktop ? 'small' : 'x-small'}
+                    userId={user?.id}
                   />
                 </Box>
                 <Stack gap={1} pr={1}>
@@ -148,6 +149,7 @@ export function PublicBuilderProfileContainer({
                       ...builder,
                       price: builder.price
                     }}
+                    userId={user?.id}
                     hideDetails
                     showPurchaseButton
                   />
