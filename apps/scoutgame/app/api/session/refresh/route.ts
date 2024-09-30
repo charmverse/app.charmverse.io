@@ -12,6 +12,12 @@ export async function GET(req: NextRequest) {
     const scout = await prisma.scout.findUnique({
       where: {
         id: userId
+      },
+      select: {
+        bio: true,
+        displayName: true,
+        username: true,
+        farcasterId: true
       }
     });
     if (!scout) {

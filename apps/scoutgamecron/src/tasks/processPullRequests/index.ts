@@ -16,6 +16,11 @@ export async function processPullRequests({
   const repos = await prisma.githubRepo.findMany({
     where: {
       deletedAt: null
+    },
+    select: {
+      owner: true,
+      name: true,
+      defaultBranch: true
     }
   });
   log.info(`Processing PRs from ${repos.length} repos`);
