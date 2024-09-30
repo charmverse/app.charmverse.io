@@ -10,11 +10,11 @@ export type PointMetrics = {
  * @nftsSold - The total number of tokens issued for this user
  */
 export type BuilderMetrics = {
-  scoutedBy?: number;
-  nftsSold?: number;
-  gemsCollected?: number;
-  price?: bigint;
-  builderPoints?: number;
+  // scoutedBy: number;
+  nftsSold: number;
+  gemsCollected: number;
+  price: bigint;
+  builderPoints: number;
   isBanned?: boolean;
 };
 

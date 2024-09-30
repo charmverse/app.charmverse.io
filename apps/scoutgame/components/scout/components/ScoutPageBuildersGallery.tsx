@@ -22,6 +22,5 @@ export async function ScoutPageBuildersGallery({
     week: getCurrentWeek(),
     season: currentSeason
   });
-
   return <BuildersGalleryContainer builders={builders} showHotIcon={showHotIcon} userId={userId} />;
 }

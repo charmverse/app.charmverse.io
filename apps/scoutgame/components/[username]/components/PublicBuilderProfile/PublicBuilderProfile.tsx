@@ -8,7 +8,7 @@ import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
 
-export async function PublicBuilderProfile({ tab, user }: { tab: string; user: BasicUserInfo }) {
+export async function PublicBuilderProfile({ user }: { user: BasicUserInfo }) {
   const builderId = user.id;
   const isApprovedBuilder = user.builderStatus === 'approved';
 
@@ -39,12 +39,11 @@ export async function PublicBuilderProfile({ tab, user }: { tab: string; user: B
 
   return (
     <PublicBuilderProfileContainer
-      tab={tab}
       scouts={scouts}
       builder={{
         ...user,
         nftImageUrl: builderNft?.imageUrl,
-        price: builderNft?.currentPrice
+        price: builderNft?.currentPrice ?? BigInt(0)
       }}
       allTimePoints={allTimePoints}
       seasonPoints={seasonPoints}
