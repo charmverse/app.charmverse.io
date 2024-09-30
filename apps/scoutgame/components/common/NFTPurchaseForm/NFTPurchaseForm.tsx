@@ -23,7 +23,6 @@ import type { Address } from 'viem';
 import { formatUnits } from 'viem';
 import { useAccount, useSendTransaction } from 'wagmi';
 
-import { useWallet } from 'hooks/useWallet';
 import { handleMintNftAction } from 'lib/builderNFTs/handleMintNftAction';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
