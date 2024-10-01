@@ -266,7 +266,8 @@ export async function mockNFTPurchaseEvent({
           tokensPurchased: 1
         }
       }
-    }
+    },
+    include: { nftPurchaseEvent: true }
   });
 }
 
