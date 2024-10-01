@@ -55,22 +55,7 @@ export async function generateNftImage({
   if (avatar) {
     const response = await fetch(avatar);
     const arrayBuffer = await response.arrayBuffer();
-    const { width, height } = await sharp(Buffer.from(arrayBuffer)).metadata();
-
-    const aspectRatio = width && height ? width / height : 3 / 4;
-
-    let newHeight = Math.max(cutoutHeight, Math.round(cutoutWidth / aspectRatio));
-    let newWidth = Math.round(newHeight * aspectRatio);
-
-    if (newWidth < cutoutWidth) {
-      newWidth = cutoutWidth;
-      newHeight = Math.round(newWidth / aspectRatio);
-    }
-
-    avatarBuffer = await sharp(Buffer.from(arrayBuffer))
-      .resize({ width: newWidth, height: newHeight, fit: 'cover' })
-      .png()
-      .toBuffer();
+    avatarBuffer = await sharp(Buffer.from(arrayBuffer)).resize(300, 300).png().toBuffer();
   }
 
   const baseImage = new ImageResponse(
@@ -82,16 +67,15 @@ export async function generateNftImage({
           position: 'relative',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           backgroundColor: 'white'
         }}
       >
         <img
           src={avatarBuffer ? `data:image/png;base64,${avatarBuffer.toString('base64')}` : noPfpAvatarBase64}
           style={{
-            width: cutoutWidth,
-            height: cutoutHeight,
-            objectFit: 'cover'
+            width: 300,
+            height: 300
           }}
         />
         <img
