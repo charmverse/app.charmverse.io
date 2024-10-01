@@ -5,11 +5,12 @@ import { log } from '@charmverse/core/log';
 import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Box, Button, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
-import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
+import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/builderNfts/clients/builderNFTSeasonOneClient';
 import {
-  getBuilderContractAddress,
   builderNftChain,
   builderTokenDecimals,
+  getBuilderContractAddress,
+  treasuryAddress,
   usdcContractAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
@@ -43,7 +44,13 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   const pricePerNft = (Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2);
   const { address, chainId } = useAccount();
 
-  const [sourceFundsChain, setSourceFundsChain] = useState(ChainId.OPTIMISM_SEPOLIA);
+  const builderContractReadonlyApiClient = new BuilderNFTSeasonOneImplementation01Client({
+    chain: builderNftChain,
+    contractAddress: getBuilderContractAddress(),
+    publicClient: getPublicClient(builderNftChain.id)
+  });
+
+  const [sourceFundsChain, setSourceFundsChain] = useState(useTestnets ? ChainId.OPTIMISM_SEPOLIA : ChainId.OPTIMISM);
 
   // const [nftApiClient, setNftApiClient] = useState<BuilderNFTSeasonOneClient>(null);
 
@@ -58,7 +65,6 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   // Data from onchain
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
-  const [treasuryAddress, setTreasuryAddress] = useState<string | null>(null);
 
   const {
     isExecuting: isHandleMintNftExecuting,
@@ -81,10 +87,6 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
       log.error('Error minting NFT', { chainId, builderTokenId, purchaseCost, error: err });
     }
   });
-
-  useEffect(() => {
-    builderContractReadonlyApiClient.getProceedsReceiver().then(setTreasuryAddress);
-  }, []);
 
   const refreshBalance = useCallback(async () => {
     const chainOption = getChainOptions({ useTestnets }).find((opt) => opt.id === sourceFundsChain) as ChainOption;
@@ -194,12 +196,16 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   }
    */
 
-  const { error, isLoading, actionResponse } = useBoxAction({
-    enable: !!address && !!treasuryAddress,
+  const {
+    error: decentSdkError,
+    isLoading,
+    actionResponse
+  } = useBoxAction({
+    enable: !!address && !!sourceFundsChain,
     sender: address as `0x${string}`,
     srcToken: '0x0000000000000000000000000000000000000000',
     dstToken: usdcContractAddress,
-    srcChainId: sourceFundsChain,
+    srcChainId: 8453,
     dstChainId: ChainId.OPTIMISM,
     slippage: 1,
     actionType: ActionType.SwapAction,
@@ -396,7 +402,9 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
       >
         {isFetchingPrice ? 'Fetching price' : isLoading ? 'Loading...' : 'Buy'}
       </Button>
-      {error instanceof Error ? <Typography color='error'>Error: {(error as Error).message}</Typography> : null}
+      {decentSdkError instanceof Error ? (
+        <Typography color='error'>Error: {(decentSdkError as Error).message}</Typography>
+      ) : null}
     </Stack>
   );
 }
