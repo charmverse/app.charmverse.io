@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { builderContractAddress } from '@packages/scoutgame/builderNfts/constants';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import { isProdEnv } from '@root/config/constants';
 
@@ -58,7 +59,8 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
         },
         builderNfts: {
           where: {
-            season: currentSeason
+            season: currentSeason,
+            contractAddress: builderContractAddress
           },
           select: {
             currentPrice: true,
@@ -75,10 +77,10 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
           username: builder.username,
           displayName: builder.displayName,
           builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
-          price: builder.builderNfts[0]?.currentPrice,
+          price: builder.builderNfts[0]?.currentPrice ?? 0,
           nftImageUrl: builder.builderNfts[0]?.imageUrl,
           nftsSold: builder.nftPurchaseEvents.reduce((acc, event) => acc + event.tokensPurchased, 0),
-          gems: builder.userWeeklyStats[0]?.gemsCollected || 0,
+          gemsCollected: builder.userWeeklyStats[0]?.gemsCollected || 0,
           scoutedBy: builder.nftPurchaseEvents.length,
           builderStatus: builder.builderStatus
         };
@@ -148,10 +150,10 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       username: user.username,
       displayName: user.displayName,
       builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
-      price: user.builderNfts[0]?.currentPrice,
+      price: user.builderNfts[0]?.currentPrice ?? 0,
       nftImageUrl: user.builderNfts[0]?.imageUrl,
       nftsSold: user.nftPurchaseEvents.reduce((acc, event) => acc + event.tokensPurchased, 0),
-      gems: builder.gemsCollected,
+      gemsCollected: builder.gemsCollected,
       scoutedBy: user.nftPurchaseEvents.length,
       builderStatus: user.builderStatus
     };

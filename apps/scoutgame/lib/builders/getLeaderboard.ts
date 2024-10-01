@@ -7,7 +7,7 @@ export type LeaderBoardRow = {
   username: string;
   displayName: string;
   progress: number;
-  gems: number;
+  gemsCollected: number;
   price: bigint;
   nftImageUrl?: string;
 };
@@ -53,7 +53,7 @@ export async function getLeaderboard(): Promise<LeaderBoardRow[]> {
       avatar: weeklyTopBuilder.user.avatar,
       username: weeklyTopBuilder.user.username,
       displayName: weeklyTopBuilder.user.displayName,
-      gems: weeklyTopBuilder.gemsCollected,
+      gemsCollected: weeklyTopBuilder.gemsCollected,
       progress,
       price,
       nftImageUrl: nft?.imageUrl

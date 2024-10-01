@@ -3,8 +3,8 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
+import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
 import { builderContractAddress, builderNftChain } from './constants';
-import { getBuilderContractAdminClient } from './contractClient';
 import { createBuilderNft } from './createBuilderNft';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 

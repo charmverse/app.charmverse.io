@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { builderContractAddress } from '@packages/scoutgame/builderNfts/constants';
 import { getPreviousWeek } from '@packages/scoutgame/dates';
 
 import type { BuilderInfo } from './interfaces';
@@ -29,7 +30,8 @@ export async function getSortedBuilders({
             builderStatus: 'approved',
             builderNfts: {
               some: {
-                season
+                season,
+                contractAddress: builderContractAddress
               }
             }
           },
@@ -44,7 +46,8 @@ export async function getSortedBuilders({
             createdAt: true,
             builderNfts: {
               where: {
-                season
+                season,
+                contractAddress: builderContractAddress
               },
               select: {
                 imageUrl: true,
@@ -60,6 +63,14 @@ export async function getSortedBuilders({
               },
               select: {
                 gemsCollected: true
+              }
+            },
+            userSeasonStats: {
+              where: {
+                season
+              },
+              select: {
+                nftsSold: true
               }
             },
             userAllTimeStats: {
@@ -78,7 +89,8 @@ export async function getSortedBuilders({
             builderPoints: scout.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: scout.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
-            gems: scout.userWeeklyStats[0]?.gemsCollected ?? 0,
+            gemsCollected: scout.userWeeklyStats[0]?.gemsCollected ?? 0,
+            nftsSold: scout.userSeasonStats[0]?.nftsSold ?? 0,
             builderStatus: scout.builderStatus
           }));
         });
@@ -92,7 +104,8 @@ export async function getSortedBuilders({
               builderStatus: 'approved',
               builderNfts: {
                 some: {
-                  season
+                  season,
+                  contractAddress: builderContractAddress
                 }
               }
             },
@@ -110,7 +123,8 @@ export async function getSortedBuilders({
                 builderStatus: true,
                 builderNfts: {
                   where: {
-                    season
+                    season,
+                    contractAddress: builderContractAddress
                   },
                   select: {
                     currentPrice: true,
@@ -123,6 +137,14 @@ export async function getSortedBuilders({
                 userAllTimeStats: {
                   select: {
                     pointsEarnedAsBuilder: true
+                  }
+                },
+                userSeasonStats: {
+                  where: {
+                    season
+                  },
+                  select: {
+                    nftsSold: true
                   }
                 }
               }
@@ -139,7 +161,8 @@ export async function getSortedBuilders({
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
-            gems: stat.gemsCollected,
+            gemsCollected: stat.gemsCollected,
+            nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
             builderStatus: stat.user.builderStatus
           }))
         );
@@ -156,7 +179,8 @@ export async function getSortedBuilders({
               builderStatus: 'approved',
               builderNfts: {
                 some: {
-                  season
+                  season,
+                  contractAddress: builderContractAddress
                 }
               }
             }
@@ -174,16 +198,22 @@ export async function getSortedBuilders({
                     pointsEarnedAsBuilder: true
                   }
                 },
-                builderNfts: {
+                userSeasonStats: {
                   where: {
                     season
                   },
                   select: {
+                    nftsSold: true
+                  }
+                },
+                builderNfts: {
+                  where: {
+                    season,
+                    contractAddress: builderContractAddress
+                  },
+                  select: {
                     currentPrice: true,
-                    imageUrl: true,
-                    nftSoldEvents: {
-                      distinct: 'scoutId'
-                    }
+                    imageUrl: true
                   }
                 }
               }
@@ -199,8 +229,8 @@ export async function getSortedBuilders({
             displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
-            scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
-            gems: stat.gemsCollected,
+            gemsCollected: stat.gemsCollected,
+            nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
             builderStatus: stat.user.builderStatus
           }))
         );
