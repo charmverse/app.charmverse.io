@@ -39,17 +39,6 @@ export async function uploadArtwork({
 
   const imagePath = getNftFilePath({ season, tokenId: Number(tokenId), type: 'artwork.png' });
 
-  console.log(
-    JSON.stringify(
-      {
-        tokenId: Number(tokenId),
-        imagePath
-      },
-      null,
-      2
-    )
-  );
-
   const params: PutObjectCommandInput = {
     ACL: 'public-read',
     Bucket: process.env.SCOUTGAME_S3_BUCKET,

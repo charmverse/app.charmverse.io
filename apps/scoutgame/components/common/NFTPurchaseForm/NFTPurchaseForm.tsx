@@ -7,7 +7,7 @@ import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { Box, Button, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
 import {
-  builderContractAddress,
+  getBuilderContractAddress,
   builderNftChain,
   builderTokenDecimals,
   usdcContractAddress,
@@ -236,7 +236,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
             purchaseInfo: {
               quotedPrice: Number(purchaseCost),
               tokenAmount: tokensToBuy,
-              builderContractAddress,
+              builderContractAddress: getBuilderContractAddress(),
               tokenId: Number(builderTokenId),
               quotedPriceCurrency: usdcContractAddress
             }

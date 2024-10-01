@@ -5,7 +5,7 @@ import { currentSeason } from '../dates';
 import { uploadArtwork } from './artwork/uploadArtwork';
 import { uploadMetadata } from './artwork/uploadMetadata';
 import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
-import { builderContractAddress, builderNftChain } from './constants';
+import { getBuilderContractAddress, builderNftChain } from './constants';
 
 export async function createBuilderNft({
   avatar,
@@ -39,7 +39,7 @@ export async function createBuilderNft({
     data: {
       builderId,
       chainId: builderNftChain.id,
-      contractAddress: builderContractAddress,
+      contractAddress: getBuilderContractAddress(),
       tokenId: Number(tokenId),
       season: currentSeason,
       currentPrice,

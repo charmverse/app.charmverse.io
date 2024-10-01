@@ -1,3 +1,5 @@
+const prefix = process.env.NFT_ARTWORK_S3_PATH || 'dev-nft-artwork';
+
 export function getNftFilePath({
   season,
   tokenId,
@@ -7,7 +9,7 @@ export function getNftFilePath({
   type: 'artwork.png' | 'metadata.json';
   tokenId: number;
 }) {
-  return `seasons/${season}/beta/${tokenId}/${type}`;
+  return `seasons/${season}/${prefix}/${tokenId}/${type}`;
 }
 
 export const imageDomain = 'https://nft.scoutgame.xyz';

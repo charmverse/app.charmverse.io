@@ -3,7 +3,7 @@ import { GithubEventType } from '@charmverse/core/prisma';
 import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
 
 import type { BuilderEvent } from '@charmverse/core/prisma';
-import { builderContractAddress, builderNftChain } from '../builderNfts/constants';
+import { getBuilderContractAddress, builderNftChain } from '../builderNfts/constants';
 import type { ActivityToRecord } from '../recordGameActivity';
 import { recordGameActivity } from '../recordGameActivity';
 import { refreshUserStats } from '../refreshUserStats';
@@ -237,7 +237,7 @@ export async function generateActivities({ userId }: { userId: string }) {
   const builderTokenEvents = await prisma.builderNft.findFirst({
     where: {
       chainId: builderNftChain.id,
-      contractAddress: builderContractAddress,
+      contractAddress: getBuilderContractAddress(),
       builderId: userId
     },
     include: {
