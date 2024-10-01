@@ -20,7 +20,7 @@ describe('getSortedBuilders', () => {
     expect(result.map((r) => r.id)).toEqual(builders.map((r) => r.id).reverse());
   });
 
-  it('Should sort builders by top', async () => {
+  it('Should sort builders by hot', async () => {
     const mockWeek = v4();
     const mockSeason = v4();
     // include a 3rd builder that has no weekly stats for this week
@@ -40,11 +40,11 @@ describe('getSortedBuilders', () => {
       week: mockWeek,
       rank: 2
     });
-    const result = await getSortedBuilders({ sort: 'top', limit: 3, season: mockSeason, week: mockWeek });
+    const result = await getSortedBuilders({ sort: 'hot', limit: 3, season: mockSeason, week: mockWeek });
     expect(result.map((r) => r.id)).toEqual([builders[0].id, builders[1].id]);
   });
 
-  it('Should sort builders by hot', async () => {
+  it('Should sort builders by top', async () => {
     const mockWeek = v4();
     const mockSeason = v4();
     const builders = await Promise.all([
@@ -62,7 +62,7 @@ describe('getSortedBuilders', () => {
       week: getPreviousWeek(mockWeek),
       rank: 2
     });
-    const result = await getSortedBuilders({ sort: 'hot', limit: 3, season: mockSeason, week: mockWeek });
+    const result = await getSortedBuilders({ sort: 'top', limit: 3, season: mockSeason, week: mockWeek });
     expect(result.map((r) => r.id)).toEqual([builders[1].id, builders[0].id]);
   });
 

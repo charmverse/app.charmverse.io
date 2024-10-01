@@ -93,7 +93,8 @@ export async function getSortedBuilders({
         });
       break;
 
-    case 'top':
+    // show top builders from this week
+    case 'hot':
       builders = await prisma.userWeeklyStats
         .findMany({
           where: {
@@ -163,7 +164,8 @@ export async function getSortedBuilders({
         );
       break;
 
-    case 'hot': {
+    // show top builders from last week
+    case 'top': {
       const previousWeek = getPreviousWeek(week);
 
       builders = await prisma.userWeeklyStats
