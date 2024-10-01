@@ -1,9 +1,7 @@
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import type { SxProps } from '@mui/material';
-import { Box, IconButton, Typography } from '@mui/material';
-import type { ModalProps } from '@mui/material/Modal';
-import MuiModal from '@mui/material/Modal';
-import Paper from '@mui/material/Paper';
+import { Box, IconButton, Typography, Paper, Dialog, DialogContent, DialogTitle } from '@mui/material';
+import type { DialogProps } from '@mui/material/Dialog';
 import type { ReactNode } from 'react';
 
 const sx: SxProps = {
@@ -23,18 +21,16 @@ const sx: SxProps = {
 
 export function BasicModal({
   children,
-  theme = 'light',
   ...props
-}: Omit<ModalProps, 'children' | 'onClose'> & {
-  theme?: 'light' | 'dark' | 'system';
+}: Omit<DialogProps, 'children' | 'onClose'> & {
   children: ReactNode;
   onClose?: () => void;
 }) {
   return (
-    <MuiModal data-mui-color-scheme={theme} {...props}>
-      <Paper sx={sx}>
-        {props.title && (
-          <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='center' mb={2}>
+    <Dialog {...props}>
+      {props.title && (
+        <DialogTitle>
+          <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='center'>
             <Typography variant='h6' color='secondary'>
               {props.title}
             </Typography>
@@ -44,9 +40,9 @@ export function BasicModal({
               </IconButton>
             )}
           </Box>
-        )}
-        {children}
-      </Paper>
-    </MuiModal>
+        </DialogTitle>
+      )}
+      <DialogContent dividers>{children}</DialogContent>
+    </Dialog>
   );
 }

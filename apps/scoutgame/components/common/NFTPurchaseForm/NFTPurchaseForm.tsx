@@ -54,7 +54,7 @@ export type NFTPurchaseProps = {
 function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111, 1111];
-  const pricePerNft = (Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2);
+  const pricePerNft = builder.price ? convertCostToUsd(builder.price) : 'N/A';
   const { address, chainId } = useAccount();
   const { switchChainAsync } = useSwitchChain();
 
@@ -277,71 +277,34 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
 
   // Add hasHandleMintNftSucceeded after fixing handleMintNftAction
   if (hasSucceededMintNftAction) {
-    return (
-      <Stack gap={2} textAlign='center'>
-        <Typography color='secondary' variant='h5' fontWeight={600}>
-          Congratulations!
-        </Typography>
-        <Typography>You scouted @{builder.username}</Typography>
-        <Box
-          bgcolor='black.dark'
-          width='100%'
-          p={2}
-          display='flex'
-          alignItems='center'
-          flexDirection='column'
-          gap={1}
-          py={12}
-          sx={{
-            background: 'url(/images/nft-mint-bg.png)',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center',
-            backgroundSize: 'cover'
-          }}
-        >
-          {builder.nftImageUrl ? (
-            <Image
-              src={builder.nftImageUrl}
-              alt={builder.username}
-              width={200}
-              height={300}
-              style={{ aspectRatio: '1/1.4', width: '50%', height: '50%' }}
-            />
-          ) : (
-            <Image src='/images/no_nft_person.png' alt='no nft image available' width={200} height={200} />
-          )}
-        </Box>
-        <Button
-          LinkComponent={Link}
-          fullWidth
-          href={`https://warpcast.com/~/compose?text=${encodeURI(
-            `I scouted ${builder.username} on Scout Game!`
-          )}&embeds[]=${window.location.origin}/u/${builder.username}`}
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          Share now
-        </Button>
-      </Stack>
-    );
+    return <SuccessView builder={builder} />;
   }
 
   return (
-    <Stack gap={3}>
-      <Box bgcolor='black.dark' width='100%' p={2} display='flex' alignItems='center' flexDirection='column' gap={1}>
+    <Stack gap={3} width='400px'>
+      <Box
+        bgcolor='black.dark'
+        width='100%'
+        pt={2}
+        pb={1}
+        display='flex'
+        alignItems='center'
+        flexDirection='column'
+        gap={1}
+      >
         {builder.nftImageUrl ? (
           <Image
             src={builder.nftImageUrl}
             alt={builder.username}
             width={200}
             height={300}
-            style={{ aspectRatio: '1/1.4', width: '50%', height: '50%' }}
+            style={{ aspectRatio: '1/1.4', width: '40%', height: '50%' }}
           />
         ) : (
           <Image src='/images/no_nft_person.png' alt='no nft image available' width={200} height={200} />
         )}
         <Typography textAlign='center' fontWeight={600} color='secondary'>
-          ${pricePerNft}
+          {pricePerNft}
         </Typography>
       </Box>
       <Stack gap={1}>
@@ -358,7 +321,12 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
               {q}
             </ToggleButton>
           ))}
-          <ToggleButton value={2} aria-label='custom' onClick={() => setTokensToBuy(2)}>
+          <ToggleButton
+            sx={{ fontSize: 14, textTransform: 'none' }}
+            value={2}
+            aria-label='custom'
+            onClick={() => setTokensToBuy(2)}
+          >
             Custom
           </ToggleButton>
         </ToggleButtonGroup>
@@ -483,6 +451,56 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   );
 }
 
+function SuccessView({ builder }: { builder: { nftImageUrl?: string | null; username: string } }) {
+  return (
+    <Stack gap={2} textAlign='center'>
+      <Typography color='secondary' variant='h5' fontWeight={600}>
+        Congratulations!
+      </Typography>
+      <Typography>You scouted @{builder.username}</Typography>
+      <Box
+        bgcolor='black.dark'
+        width='100%'
+        p={2}
+        display='flex'
+        alignItems='center'
+        flexDirection='column'
+        gap={1}
+        py={12}
+        sx={{
+          background: 'url(/images/nft-mint-bg.png)',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover'
+        }}
+      >
+        {builder.nftImageUrl ? (
+          <Image
+            src={builder.nftImageUrl}
+            alt={builder.username}
+            width={200}
+            height={300}
+            style={{ aspectRatio: '1/1.4', width: '50%', height: '50%' }}
+          />
+        ) : (
+          <Image src='/images/no_nft_person.png' alt='no nft image available' width={200} height={200} />
+        )}
+      </Box>
+      <Button
+        LinkComponent={Link}
+        fullWidth
+        href={`https://warpcast.com/~/compose?text=${encodeURI(
+          `I scouted ${builder.username} on Scout Game!`
+        )}&embeds[]=${window.location.origin}/u/${builder.username}`}
+        target='_blank'
+        rel='noopener noreferrer'
+      >
+        Share now
+      </Button>
+    </Stack>
+  );
+}
+
 export function NFTPurchaseForm(props: NFTPurchaseProps) {
   // Waiting for component to render before fetching the API key
   const apiKey = env('DECENT_API_KEY');
@@ -511,5 +529,5 @@ function convertCostToPoints(costWei: bigint) {
 function convertCostToPointsWithDiscount(costWei: bigint) {
   const points = convertCostToPoints(costWei);
   // 50% discount
-  return Math.round(points * 0.5);
+  return Math.round(points * 0.5).toLocaleString();
 }

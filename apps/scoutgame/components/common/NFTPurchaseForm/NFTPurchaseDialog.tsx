@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { useAccount } from 'wagmi';
 
 import { BasicModal } from 'components/common/Modal';
-import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
 import { NFTPurchaseForm } from './NFTPurchaseForm';
@@ -35,7 +34,7 @@ export function NFTPurchaseDialog(props: NFTPurchaseDialogProps) {
       open={props.open && !!address}
       onClose={props.onClose}
       title={`Scout @${props.builder.username}`}
-      theme='dark'
+      maxWidth='md'
     >
       <NFTPurchaseForm builder={props.builder} />
     </BasicModal>
