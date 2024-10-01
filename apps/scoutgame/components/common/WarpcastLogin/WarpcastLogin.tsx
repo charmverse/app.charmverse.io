@@ -1,7 +1,6 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { FarcasterLoginModal } from '@connect-shared/components/common/FarcasterModal';
 import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { AuthKitProvider, useProfile } from '@farcaster/auth-kit';
@@ -18,6 +17,7 @@ import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
 import { authConfig } from 'lib/farcaster/config';
 import { loginAction } from 'lib/session/loginWithFarcasterAction';
 
+import { FarcasterLoginModal } from './FarcasterModal';
 import { WarpcastIcon } from './WarpcastIcon';
 
 function WarpcastLoginButton({ children, ...props }: ButtonProps) {
