@@ -229,11 +229,13 @@ export function mockRepo(fields: Partial<GithubRepo> & { owner?: string } = {}) 
 export async function mockNFTPurchaseEvent({
   builderId,
   scoutId,
-  points
+  points,
+  season = mockSeason
 }: {
   builderId: string;
   scoutId: string;
   points?: number;
+  season?: string;
 }) {
   let builderNft = await prisma.builderNft.findFirst({
     where: {
@@ -245,13 +247,25 @@ export async function mockNFTPurchaseEvent({
     builderNft = await mockBuilderNft({ builderId });
   }
 
-  return prisma.nFTPurchaseEvent.create({
+  return prisma.builderEvent.create({
     data: {
-      builderNftId: builderNft.id,
-      scoutId,
-      pointsValue: points ?? 0,
-      txHash: `0x${Math.random().toString(16).substring(2)}`,
-      tokensPurchased: 1
+      builder: {
+        connect: {
+          id: builderId
+        }
+      },
+      season,
+      type: 'nft_purchase',
+      week: getCurrentWeek(),
+      nftPurchaseEvent: {
+        create: {
+          builderNftId: builderNft.id,
+          scoutId,
+          pointsValue: points ?? 0,
+          txHash: `0x${Math.random().toString(16).substring(2)}`,
+          tokensPurchased: 1
+        }
+      }
     }
   });
 }
