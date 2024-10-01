@@ -10,6 +10,7 @@ import {
   tableCellClasses
 } from '@mui/material';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { Avatar } from 'components/common/Avatar';
 import { PointsIcon } from 'components/common/Icons';
@@ -33,7 +34,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
             }}
           >
             <TableCell align='center'>RANK</TableCell>
-            <TableCell align='left'>SCOUT</TableCell>
+            <TableCell align='left'>BUILDER</TableCell>
             <TableCell align='right'>
               <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
                 SEASON <PointsIcon />
@@ -63,7 +64,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
                 <TableCellText>{index + 1}</TableCellText>
               </TableCell>
               <TableCell component='th'>
-                <Stack alignItems='center' flexDirection='row' gap={1}>
+                <Stack component={Link} href={`/u/${builder.avatar}`} alignItems='center' flexDirection='row' gap={1}>
                   <Avatar src={builder.avatar} name={builder.username} size='small' />
                   <TableCellText maxWidth={{ xs: '100px', md: '100%' }}>{builder.username}</TableCellText>
                 </Stack>

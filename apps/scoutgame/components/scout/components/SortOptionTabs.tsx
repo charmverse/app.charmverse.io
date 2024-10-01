@@ -2,9 +2,9 @@ import type { TabItem } from 'components/common/Tabs/TabsMenu';
 import { TabsMenu } from 'components/common/Tabs/TabsMenu';
 
 export const sortOptions: TabItem[] = [
-  { label: 'Top', href: '?sort=top', value: 'top' },
-  { label: 'Hot', href: '?sort=hot', value: 'hot' },
-  { label: 'New', href: '?sort=new', value: 'new' }
+  { label: 'Top', value: 'top' },
+  { label: 'Hot', value: 'hot' },
+  { label: 'New', value: 'new' }
 ];
 
 export function SortOptionTabs({ value }: { value: string }) {
