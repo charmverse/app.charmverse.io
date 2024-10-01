@@ -49,7 +49,7 @@ export async function handlePendingTransaction({
       }
     });
 
-    if (pendingTx.status !== 'pending') {
+    if (pendingTx.status !== 'processing') {
       log.info(`Skipping processing for tx id ${pendingTx.id}`);
       return;
     }
