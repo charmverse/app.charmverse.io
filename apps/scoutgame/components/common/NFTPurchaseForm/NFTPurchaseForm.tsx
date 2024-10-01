@@ -4,7 +4,18 @@ import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
-import { Box, Button, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { InfoOutlined as InfoIcon } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  RadioGroup,
+  Radio,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography
+} from '@mui/material';
 import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/builderNfts/clients/builderNFTSeasonOneClient';
 import {
   builderNftChain,
@@ -25,6 +36,7 @@ import type { Address } from 'viem';
 import { formatUnits } from 'viem';
 import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 
+import { PointsIcon } from 'components/common/Icons';
 import { handleMintNftAction } from 'lib/builderNFTs/handleMintNftAction';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
@@ -61,6 +73,8 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   const [fetchError, setFetchError] = useState<any>(null);
 
   const [tokensToBuy, setTokensToBuy] = useState(1);
+
+  const [paymentMethod, setPaymentMethod] = useState<'points' | 'wallet'>('points');
 
   const [balances, setBalances] = useState<{ usdc: bigint; eth: bigint; chainId: number } | null>(null);
 
@@ -330,10 +344,8 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
           ${pricePerNft}
         </Typography>
       </Box>
-      <Stack gap={2}>
-        <Typography color='secondary' mb='0'>
-          Select quantity
-        </Typography>
+      <Stack gap={1}>
+        <Typography color='secondary'>Select quantity</Typography>
         <ToggleButtonGroup
           value={tokensToBuy}
           onChange={(_: React.MouseEvent<HTMLElement>, n: number) => setTokensToBuy((prevN) => n || prevN)}
@@ -372,18 +384,75 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
           </Stack>
         )}
       </Stack>
-      <Stack gap={1}>
-        <Typography color='secondary'>Total cost</Typography>
+      <Stack>
+        <Stack flexDirection='row' alignItems='center' gap={1} mb={1}>
+          <Typography color='secondary'>Total cost</Typography>
+          <Link href='/info#builder-nfts' target='_blank' title='Read how Builder NFTs are priced'>
+            <InfoIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+          </Link>
+        </Stack>
         <Stack flexDirection='row' justifyContent='space-between'>
-          <Typography>{tokensToBuy} NFT</Typography>
-          <Typography>
-            {purchaseCost && `$${formatUnits(purchaseCost, 6)}`}
-            {isFetchingPrice && `Fetching price...`}
+          <Typography variant='caption' color='secondary' sx={{ width: '33%' }}>
+            Qty
+          </Typography>
+          <Typography
+            variant='caption'
+            color='secondary'
+            align='center'
+            sx={{ position: 'relative', top: -4, width: '33%' }}
+          >
+            Points{' '}
+            <Box display='inline' position='relative' top={4}>
+              <PointsIcon size={18} color='blue' />
+            </Box>{' '}
+            (50% off)
+          </Typography>
+          <Typography variant='caption' color='secondary' align='right' sx={{ width: '33%' }}>
+            USDC $
+          </Typography>
+        </Stack>
+        <Stack flexDirection='row' justifyContent='space-between'>
+          <Typography sx={{ width: '33%' }}>{tokensToBuy} NFT</Typography>
+          <Typography align='center' sx={{ width: '33%', position: 'relative', top: -4 }}>
+            {purchaseCost && (
+              <>
+                {convertCostToPointsWithDiscount(purchaseCost)}{' '}
+                <Box display='inline' position='relative' top={4}>
+                  <PointsIcon size={18} />
+                </Box>
+              </>
+            )}
+          </Typography>
+          <Typography align='right' sx={{ width: '33%' }}>
+            {purchaseCost && convertCostToUsd(purchaseCost)}
+            {isFetchingPrice && `Fetching...`}
           </Typography>
         </Stack>
       </Stack>
-      <Stack gap={1}>
-        <Typography color='secondary'>Select payment</Typography>
+      <Stack>
+        <Typography color='secondary' mb={1}>
+          Select payment
+        </Typography>
+        <RadioGroup
+          row
+          aria-label='payment method'
+          name='payment-method'
+          value={paymentMethod}
+          onChange={(e) => setPaymentMethod(e.target.value as 'points' | 'wallet')}
+          sx={{ mb: 2, display: 'flex', gap: 2, width: '100%' }}
+        >
+          <FormControlLabel
+            value='points'
+            control={<Radio />}
+            sx={{ width: '50%' }}
+            label={
+              <Stack direction='row' alignItems='center' spacing={0.5}>
+                <Typography>Scout Points</Typography>
+              </Stack>
+            }
+          />
+          <FormControlLabel value='wallet' control={<Radio />} label='Wallet' />
+        </RadioGroup>
         <BlockchainSelect
           value={sourceFundsChain}
           balance={(Number(balances?.eth || 0) / 1e18).toFixed(4)}
@@ -427,4 +496,20 @@ export function NFTPurchaseForm(props: NFTPurchaseProps) {
       <NFTPurchaseButton {...props} />
     </BoxHooksContextProvider>
   );
+}
+
+function convertCostToUsd(cost: bigint) {
+  return `$${parseFloat(formatUnits(cost, 6)).toLocaleString()}`;
+}
+
+// 1 Point is $.10. So $1 is 10 points
+function convertCostToPoints(costWei: bigint) {
+  const costInUsd = Number(formatUnits(costWei, 6));
+  return costInUsd * 10;
+}
+
+function convertCostToPointsWithDiscount(costWei: bigint) {
+  const points = convertCostToPoints(costWei);
+  // 50% discount
+  return Math.round(points * 0.5);
 }
