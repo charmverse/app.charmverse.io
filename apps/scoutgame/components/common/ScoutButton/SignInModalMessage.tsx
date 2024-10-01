@@ -4,12 +4,20 @@ import { useRouter } from 'next/navigation';
 
 import { BasicModal } from 'components/common/Modal';
 
-export function SignInModalMessage({ open, onClose }: { open: boolean; onClose: VoidFunction }) {
+export function SignInModalMessage({
+  open,
+  onClose,
+  path = '/home'
+}: {
+  open: boolean;
+  onClose: VoidFunction;
+  path?: string;
+}) {
   const router = useRouter();
 
   const handleClose = () => {
     onClose();
-    router.push(`/login?redirectUrl=${encodeURIComponent(window.location.pathname)}`);
+    router.push(`/login?redirectUrl=${encodeURIComponent(path)}`);
   };
 
   return (

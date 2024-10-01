@@ -2,7 +2,7 @@
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
 import { usePathname } from 'next/navigation';
-import type { MouseEventHandler } from 'react';
+import type { MouseEvent } from 'react';
 import { useState } from 'react';
 import { CiBellOn } from 'react-icons/ci';
 import { PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
@@ -40,12 +40,16 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
   const pathname = usePathname();
   const value = getActiveButton(pathname);
   const isDesktop = useMdScreen();
-  const [authPopup, setAuthPopup] = useState(false);
-  const openAuthModal: MouseEventHandler<HTMLAnchorElement> | undefined = isAuthenticated
+  const [authPopup, setAuthPopup] = useState({
+    open: false,
+    path: '/home'
+  });
+
+  const openAuthModal = isAuthenticated
     ? undefined
-    : (e) => {
+    : (e: MouseEvent<HTMLAnchorElement>, path: string) => {
         e.preventDefault();
-        setAuthPopup(true);
+        setAuthPopup({ open: true, path });
       };
 
   return (
@@ -58,7 +62,7 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
           href='/notifications'
           value='notifications'
           icon={<CiBellOn size='26px' style={{ margin: '-1px 0' }} />}
-          onClick={openAuthModal}
+          onClick={(e) => openAuthModal?.(e, 'notifications')}
         />
         <BottomNavigationAction
           label='Profile'
@@ -66,10 +70,14 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
           href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
           value='profile'
           icon={<SlUser size='19px' style={{ margin: '2px 0' }} />}
-          onClick={openAuthModal}
+          onClick={(e) => openAuthModal?.(e, 'profile')}
         />
       </StyledBottomNavigation>
-      <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} />
+      <SignInModalMessage
+        open={authPopup.open}
+        onClose={() => setAuthPopup({ open: false, path: '/home' })}
+        path={authPopup.path}
+      />
     </>
   );
 }

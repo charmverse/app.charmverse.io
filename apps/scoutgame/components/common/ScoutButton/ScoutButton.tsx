@@ -37,7 +37,7 @@ export function ScoutButton({
         ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2)}
       </Button>
       <NFTPurchaseDialog open={isPurchasing} onClose={() => setIsPurchasing(false)} builder={builder} />
-      <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} />
+      <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} path={`/u/${builder.username}`} />
     </>
   );
 }
