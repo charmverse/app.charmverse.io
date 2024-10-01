@@ -16,13 +16,14 @@ import {
 } from '@packages/scoutgame/builderNfts/constants';
 import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { switchChain } from '@wagmi/core';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
 import { formatUnits } from 'viem';
-import { useAccount, useSendTransaction } from 'wagmi';
+import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 
 import { handleMintNftAction } from 'lib/builderNFTs/handleMintNftAction';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
@@ -43,6 +44,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111, 1111];
   const pricePerNft = (Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2);
   const { address, chainId } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
 
   const builderContractReadonlyApiClient = new BuilderNFTSeasonOneImplementation01Client({
     chain: builderNftChain,
@@ -220,6 +222,10 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   const handlePurchase = async () => {
     if (!actionResponse?.tx) {
       return;
+    }
+
+    if (chainId !== sourceFundsChain) {
+      await switchChainAsync({ chainId: sourceFundsChain });
     }
 
     sendTransaction(
