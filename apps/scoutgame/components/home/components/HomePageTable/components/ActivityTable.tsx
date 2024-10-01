@@ -24,7 +24,7 @@ import { TableCellText } from './TableCellText';
 
 export async function ActivityTable({ activities }: { activities: BuilderActivity[] }) {
   return (
-    <TableContainer component={Paper} sx={{ px: { md: 6 } }}>
+    <TableContainer data-test='activity-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Activity table' size='small'>
         <TableHead sx={{ display: { xs: 'none', md: 'table-header-group' } }}>
           <TableRow

@@ -1,6 +1,6 @@
 'use client';
 
-import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useConnectModal, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { useEffect } from 'react';
 import { useAccount } from 'wagmi';
 
@@ -44,8 +44,8 @@ export function NFTPurchaseDialog(props: NFTPurchaseDialogProps) {
 
 export function NFTPurchaseDialogWithProviders(props: NFTPurchaseDialogProps) {
   return (
-    <WagmiProvider>
+    <RainbowKitProvider>
       <NFTPurchaseDialog {...props} />
-    </WagmiProvider>
+    </RainbowKitProvider>
   );
 }

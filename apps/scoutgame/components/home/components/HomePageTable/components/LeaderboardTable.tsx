@@ -26,7 +26,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
-    <TableContainer component={Paper} sx={{ px: { md: 6 } }}>
+    <TableContainer data-test='leaderboard-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Leaderboard table' size='small'>
         <LeaderboardTableHead />
         <TableBody>
