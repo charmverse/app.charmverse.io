@@ -7,7 +7,8 @@ export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECE
 
 export const useTestnets = false;
 
-export const useRealContract = process.env.ENABLE_BUILDER_SMART_CONTRACT === 'true';
+export const useRealContract =
+  env('ENABLE_BUILDER_SMART_CONTRACT') === 'true' || process.env.REACT_APP_ENABLE_BUILDER_SMART_CONTRACT === 'true';
 
 /**
  * Currently priced in USDC

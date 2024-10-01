@@ -199,7 +199,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
     sender: address as `0x${string}`,
     srcToken: '0x0000000000000000000000000000000000000000',
     dstToken: usdcContractAddress,
-    srcChainId: ChainId.BASE,
+    srcChainId: sourceFundsChain,
     dstChainId: ChainId.OPTIMISM,
     slippage: 1,
     actionType: ActionType.SwapAction,
