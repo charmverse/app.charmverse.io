@@ -1,13 +1,13 @@
 import 'server-only';
 
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, TableHead, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import dynamic from 'next/dynamic';
+import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -18,17 +18,36 @@ import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
 
 import { TableCellText } from './TableCellText';
 
-const LeaderboardTableHead = dynamic(() => import('./LeaderBoardTableHead').then((mod) => mod.LeaderboardTableHead), {
-  ssr: false
-});
-
 export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
     <TableContainer data-test='leaderboard-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Leaderboard table' size='small'>
-        <LeaderboardTableHead />
+        <TableHead>
+          <TableRow
+            sx={{
+              [`& .${tableCellClasses.root}`]: {
+                borderBottom: 'none',
+                paddingLeft: '6px',
+                paddingRight: '6px'
+              }
+            }}
+          >
+            <TableCell align='center'>RANK</TableCell>
+            <TableCell>BUILDER</TableCell>
+            <TableCell>WEEK {getCurrentSeasonWeekNumber()}</TableCell>
+            <TableCell
+              sx={{ maxWidth: { xs: '100px', sm: '100%' }, display: { xs: 'none', sm: 'block' }, pr: 0 }}
+              align='center'
+            >
+              <Typography component='span'>GEMS</Typography>
+              <br />
+              <Typography component='span'>THIS WEEK</Typography>
+            </TableCell>
+            <TableCell />
+          </TableRow>
+        </TableHead>
         <TableBody>
           {sorted.map((row, index) => (
             <TableRow
@@ -48,7 +67,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                   alignItems='center'
                   flexDirection='row'
                   gap={1}
-                  sx={{ maxWidth: { xs: '150px', md: '200px' } }}
+                  sx={{ maxWidth: { xs: '120px', md: '200px' } }}
                 >
                   <Avatar src={row.avatar} name={row.username} size='small' />
                   <TableCellText noWrap>{row.username}</TableCellText>
@@ -66,7 +85,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                   }}
                 />
               </TableCell>
-              <TableCell width='100px'>
+              <TableCell>
                 <Stack flexDirection='row' gap={0.2} alignItems='center' justifyContent='center'>
                   <TableCellText>{row.gemsCollected}</TableCellText>
                   <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />

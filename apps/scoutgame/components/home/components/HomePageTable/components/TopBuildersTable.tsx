@@ -34,7 +34,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
             }}
           >
             <TableCell align='center'>RANK</TableCell>
-            <TableCell align='left'>SCOUT</TableCell>
+            <TableCell align='left'>BUILDER</TableCell>
             <TableCell align='right'>
               <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
                 SEASON <PointsIcon />
