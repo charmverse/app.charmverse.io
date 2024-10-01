@@ -124,17 +124,6 @@ export async function uploadMetadata({
   // Define the S3 path for metadata
   const metadataPath = getNftFilePath({ season, tokenId: Number(tokenId), type: 'metadata.json' });
 
-  console.log(
-    JSON.stringify(
-      {
-        tokenId: Number(tokenId),
-        metadataPath
-      },
-      null,
-      2
-    )
-  );
-
   // Generate the metadata object
   const metadata: OpenSeaMetadata = {
     name: `ScoutGame Builders NFT #${tokenId}`,
