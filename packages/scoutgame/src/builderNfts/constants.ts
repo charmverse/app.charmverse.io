@@ -7,6 +7,8 @@ export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECE
 
 export const useTestnets = false;
 
+export const useRealContract = process.env.ENABLE_BUILDER_SMART_CONTRACT === 'true';
+
 /**
  * Currently priced in USDC
  */
@@ -18,9 +20,20 @@ if (builderNftChain.id !== optimism.id) {
   log.warn(`Builder NFT chain is using "${builderNftChain.name}" not Optimism`);
 }
 
+// Dev contracts we also deployed for easier use
+const devOptimismSepoliaBuildersContract = '0x2f6093b70562729952bf379633dee3e89922d717';
+const devOptimismMainnetBuildersContract = '0x1d305a06cb9dbdc32e08c3d230889acb9fe8a4dd';
+
+const realOptimismSepoliaBuildersContract = '0x0b7342761a10e1b14df427681b967e67f5e6cef9';
+const realOptimismMainnetBuildersContract = '0x743ec903fe6d05e73b19a6db807271bb66100e83';
+
 // Actual contract for interacting with NFTs
-export const optimismSepoliaBuilderContractAddress = '0xc6534d33bc65e319fb082e82c0b56bd4d9854aaf';
-export const optimismMainnetBuilderContractAddress = '0x7df4d9f54a5cddfef50a032451f694d6345c60af';
+const optimismSepoliaBuilderContractAddress = useRealContract
+  ? realOptimismSepoliaBuildersContract
+  : devOptimismSepoliaBuildersContract;
+const optimismMainnetBuilderContractAddress = useRealContract
+  ? realOptimismMainnetBuildersContract
+  : devOptimismMainnetBuildersContract;
 
 export const builderContractAddress = useTestnets
   ? optimismSepoliaBuilderContractAddress
@@ -36,7 +49,7 @@ export const usdcContractAddress = useTestnets
 
 export const builderSmartContractOwnerKey = process.env.BUILDER_SMART_CONTRACT_OWNER_PRIVKEY as string;
 
-// Actual target wallet
+// Actual target wallet - Scoutgame.eth
 export const treasuryAddress = '0x93326D53d1E8EBf0af1Ff1B233c46C67c96e4d8D';
 // const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey });
 

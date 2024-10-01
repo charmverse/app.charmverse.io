@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { builderContractAddress } from '@packages/scoutgame/builderNfts/constants';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import { isProdEnv } from '@root/config/constants';
 
@@ -58,7 +59,8 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
         },
         builderNfts: {
           where: {
-            season: currentSeason
+            season: currentSeason,
+            contractAddress: builderContractAddress
           },
           select: {
             currentPrice: true,

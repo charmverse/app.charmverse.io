@@ -5,8 +5,8 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { recordGameActivity } from '../recordGameActivity';
 
+import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
 import { builderContractAddress, builderNftChain } from './constants';
-import { getBuilderContractAdminClient } from './contractClient';
 import { createBuilderNft } from './createBuilderNft';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 

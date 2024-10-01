@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { builderContractAddress } from '@packages/scoutgame/builderNfts/constants';
 import { getPreviousWeek } from '@packages/scoutgame/dates';
 
 import type { BuilderInfo } from './interfaces';
@@ -29,7 +30,8 @@ export async function getSortedBuilders({
             builderStatus: 'approved',
             builderNfts: {
               some: {
-                season
+                season,
+                contractAddress: builderContractAddress
               }
             }
           },
@@ -44,7 +46,8 @@ export async function getSortedBuilders({
             createdAt: true,
             builderNfts: {
               where: {
-                season
+                season,
+                contractAddress: builderContractAddress
               },
               select: {
                 imageUrl: true,
@@ -101,7 +104,8 @@ export async function getSortedBuilders({
               builderStatus: 'approved',
               builderNfts: {
                 some: {
-                  season
+                  season,
+                  contractAddress: builderContractAddress
                 }
               }
             },
@@ -119,7 +123,8 @@ export async function getSortedBuilders({
                 builderStatus: true,
                 builderNfts: {
                   where: {
-                    season
+                    season,
+                    contractAddress: builderContractAddress
                   },
                   select: {
                     currentPrice: true,
@@ -174,7 +179,8 @@ export async function getSortedBuilders({
               builderStatus: 'approved',
               builderNfts: {
                 some: {
-                  season
+                  season,
+                  contractAddress: builderContractAddress
                 }
               }
             }
@@ -202,7 +208,8 @@ export async function getSortedBuilders({
                 },
                 builderNfts: {
                   where: {
-                    season
+                    season,
+                    contractAddress: builderContractAddress
                   },
                   select: {
                     currentPrice: true,
