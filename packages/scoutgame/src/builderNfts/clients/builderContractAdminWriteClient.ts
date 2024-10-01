@@ -1,4 +1,4 @@
-import { builderContractAddress, builderNftChain } from '../constants';
+import { getBuilderContractAddress, builderNftChain } from '../constants';
 import { getScoutGameNftAdminWallet } from '../getScoutGameNftAdminWallet';
 
 import { BuilderNFTSeasonOneImplementation01Client } from './builderNFTSeasonOneClient';
@@ -7,7 +7,7 @@ import { BuilderNFTSeasonOneImplementation01Client } from './builderNFTSeasonOne
 export function getBuilderContractAdminClient() {
   return new BuilderNFTSeasonOneImplementation01Client({
     chain: builderNftChain,
-    contractAddress: builderContractAddress,
+    contractAddress: getBuilderContractAddress(),
     walletClient: getScoutGameNftAdminWallet()
   });
 }

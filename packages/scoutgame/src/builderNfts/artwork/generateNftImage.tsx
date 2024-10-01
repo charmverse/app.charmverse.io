@@ -7,16 +7,16 @@ import React from 'react';
 import type { Font } from 'satori';
 import sharp from 'sharp';
 
-const OVERLAY_FOLDER = path.join(path.resolve(__dirname, '../'), 'assets', 'overlays');
+const OVERLAY_FOLDER = path.join(path.resolve(__dirname, '../../'), 'assets', 'overlays');
 const overlayFiles = fs.readdirSync(OVERLAY_FOLDER);
 const overlaysBase64 = overlayFiles.map((file) => {
   const filePath = path.join(OVERLAY_FOLDER, file);
   const data = fs.readFileSync(filePath);
   return `data:image/png;base64,${data.toString('base64')}`;
 });
-const noPfpAvatarFile = path.join(path.resolve(__dirname, '../'), 'assets', 'no_pfp_avatar.png');
+const noPfpAvatarFile = path.join(path.resolve(__dirname, '../../'), 'assets', 'no_pfp_avatar.png');
 const noPfpAvatarBase64 = `data:image/png;base64,${fs.readFileSync(noPfpAvatarFile).toString('base64')}`;
-const fontPath = path.join(path.resolve(__dirname, '../'), 'assets', 'fonts', 'K2D-Medium.ttf');
+const fontPath = path.join(path.resolve(__dirname, '../../'), 'assets', 'fonts', 'K2D-Medium.ttf');
 const fontBuffer = fs.readFileSync(fontPath);
 const font: Font = {
   name: 'K2D',

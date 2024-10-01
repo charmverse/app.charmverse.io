@@ -3,8 +3,7 @@ import type { PutObjectCommandInput, S3ClientConfig } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
 import { generateNftImage } from './generateNftImage';
-
-const imageDomain = 'https://nft.scoutgame.xyz';
+import { getNftFilePath, imageDomain } from './utils';
 
 function getS3ClientConfig() {
   const config: Pick<S3ClientConfig, 'region' | 'credentials'> = {
@@ -38,7 +37,7 @@ export async function uploadArtwork({
     username
   });
 
-  const imagePath = `seasons/${season}/beta/${tokenId}/artwork.png`;
+  const imagePath = getNftFilePath({ season, tokenId: Number(tokenId), type: 'artwork.png' });
 
   const params: PutObjectCommandInput = {
     ACL: 'public-read',

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { uploadArtwork } from '../builderNfts/uploadArtwork';
+import { uploadArtwork } from '../builderNfts/artwork/uploadArtwork';
 
 async function uploadNFTArtwork() {
   const scouts = await prisma.scout.findMany({

@@ -4,8 +4,8 @@ import path from 'path';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
-import { builderContractAddress, builderNftChain } from '@packages/scoutgame/builderNfts/constants';
-import { generateNftImage } from '@packages/scoutgame/builderNfts/generateNftImage';
+import { getBuilderContractAddress, builderNftChain } from '@packages/scoutgame/builderNfts/constants';
+import { generateNftImage } from '@packages/scoutgame/builderNfts/artwork/generateNftImage';
 import { currentSeason } from '@packages/scoutgame/dates';
 
 export async function generateBuilder({ index }: { index: number }) {
@@ -71,7 +71,7 @@ export async function generateBuilder({ index }: { index: number }) {
     builderNft = {
       id: faker.string.uuid(),
       chainId: builderNftChain.id,
-      contractAddress: builderContractAddress,
+      contractAddress: getBuilderContractAddress(),
       currentPrice: faker.number.int({ min: 1000000, max: 10000000 }),
       season: currentSeason,
       tokenId: currentBuilderCount,
