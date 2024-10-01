@@ -5,6 +5,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import type { ReactNode } from 'react';
 
+import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import theme from 'theme/theme';
 
 export function AppProviders({ children }: { children: ReactNode }) {
@@ -12,7 +13,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <AppRouterCacheProvider options={{ key: 'css' }}>
       <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme />
-        {children}
+        <WagmiProvider>{children}</WagmiProvider>
       </ThemeProvider>
     </AppRouterCacheProvider>
   );

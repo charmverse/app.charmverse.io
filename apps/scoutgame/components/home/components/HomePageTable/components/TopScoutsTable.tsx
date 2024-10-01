@@ -19,7 +19,7 @@ import { TableCellText } from './TableCellText';
 
 export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
   return (
-    <TableContainer component={Paper} sx={{ px: { md: 6 } }}>
+    <TableContainer data-test='top-scouts-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Top scouts table' size='small'>
         <TableHead>
           <TableRow

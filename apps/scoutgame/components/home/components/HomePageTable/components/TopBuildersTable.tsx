@@ -20,7 +20,7 @@ import { TableCellText } from './TableCellText';
 
 export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
   return (
-    <TableContainer component={Paper} sx={{ px: { md: 6 } }}>
+    <TableContainer data-test='top-builders-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Top scouts table' size='small'>
         <TableHead>
           <TableRow

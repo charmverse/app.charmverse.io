@@ -7,7 +7,6 @@ import { http, cookieStorage, createStorage } from 'wagmi';
 export function getConfig() {
   const walletConnectProjectId = env('WALLETCONNECT_PROJECTID');
   const viemChains = Object.values(chains) as unknown as [Chain, ...Chain[]];
-
   const transports = viemChains.reduce<Record<string, Transport>>((acc, chain) => {
     acc[chain.id] = http();
     return acc;

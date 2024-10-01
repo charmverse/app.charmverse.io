@@ -50,6 +50,7 @@ export function TabsMenu({ value, tabs, sx }: TabsMenuProps) {
             href={tab.href}
             value={tab.value}
             scroll={false}
+            data-test={`tab-${tab.value}`}
           />
         ))}
       </Tabs>
