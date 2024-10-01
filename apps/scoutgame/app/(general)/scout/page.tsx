@@ -6,8 +6,9 @@ export default async function Scout({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const sort = searchParams.sort as string;
+  const sortParam = searchParams.tab;
+  const sort = sortParam && typeof sortParam === 'string' ? sortParam : 'top';
   const user = await getUserFromSession();
 
-  return <ScoutPage sort={sort || 'top'} user={user} />;
+  return <ScoutPage sort={sort} user={user} />;
 }
