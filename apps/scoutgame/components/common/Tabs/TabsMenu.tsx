@@ -4,7 +4,6 @@ import Link from 'next/link';
 
 export type TabItem = {
   label: string;
-  href: string;
   value: string;
 };
 
@@ -47,7 +46,9 @@ export function TabsMenu({ value, tabs, sx }: TabsMenuProps) {
             key={tab.value}
             component={Link}
             label={tab.label}
-            href={tab.href}
+            href={{
+              query: { tab: tab.value }
+            }}
             value={tab.value}
             scroll={false}
           />
