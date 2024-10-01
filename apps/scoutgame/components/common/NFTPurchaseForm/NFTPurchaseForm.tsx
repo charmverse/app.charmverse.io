@@ -432,6 +432,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
       </Stack>
       {fetchError && <Typography color='red'>{fetchError.shortMessage || 'Something went wrong'}</Typography>}
       <Button
+        size='large'
         onClick={handlePurchase}
         disabled={
           !purchaseCost ||
