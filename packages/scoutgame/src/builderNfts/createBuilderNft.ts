@@ -2,9 +2,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason } from '../dates';
 
+import { uploadArtwork } from './artwork/uploadArtwork';
+import { uploadMetadata } from './artwork/uploadMetadata';
 import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
 import { builderContractAddress, builderNftChain } from './constants';
-import { uploadArtwork } from './uploadArtwork';
 
 export async function createBuilderNft({
   avatar,
@@ -26,6 +27,12 @@ export async function createBuilderNft({
     season: currentSeason,
     avatar,
     tokenId
+  });
+
+  await uploadMetadata({
+    season: currentSeason,
+    tokenId,
+    username
   });
 
   const builderNft = await prisma.builderNft.create({
