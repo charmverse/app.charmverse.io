@@ -33,11 +33,7 @@ export function FarcasterLoginModal({ url, ...props }: Omit<ModalProps, 'childre
         </Typography>
         <Box display='flex' justifyContent='center' flexDirection='column' my={2} gap={2} alignItems='center' pt={2}>
           <CanvasQRCode uri={url || ''} />
-          <Link
-            href={url}
-            sx={{ p: 0, alignItems: 'center', display: 'flex', '&:hover': { color: 'farcaster.main' } }}
-            color='farcaster.main'
-          >
+          <Link href={url}>
             <PhoneAndroidIcon fontSize='small' />
             I'm using my phone →
           </Link>

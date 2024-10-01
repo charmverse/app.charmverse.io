@@ -375,15 +375,14 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
       <Stack gap={1}>
         <Typography color='secondary'>Total cost</Typography>
         <Stack flexDirection='row' justifyContent='space-between'>
+          <Typography>{tokensToBuy} NFT</Typography>
           <Typography>
-            {tokensToBuy} NFT x ${pricePerNft}
+            {purchaseCost && `$${formatUnits(purchaseCost, 6)}`}
+            {isFetchingPrice && `Fetching price...`}
           </Typography>
-          <Typography>{(tokensToBuy * Number(pricePerNft)).toFixed(2)}</Typography>
         </Stack>
       </Stack>
       <Stack gap={1}>
-        {purchaseCost && <p>Price: {formatUnits(purchaseCost, 6)} USDC</p>}
-        {isFetchingPrice && <p>Fetching price...</p>}
         <Typography color='secondary'>Select payment</Typography>
         <BlockchainSelect
           value={sourceFundsChain}
