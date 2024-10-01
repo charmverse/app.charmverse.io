@@ -4,12 +4,15 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { ListItem, ListItemText, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import type { ScoutGameNotification } from '@packages/scoutgame/notifications/getNotifications';
 import { getRelativeTime } from '@packages/utils/dates';
+import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import React from 'react';
+
+import { BonusPartnersDisplay } from 'components/profile/components/PointsClaimScreen/BonusPartnersDisplay';
 
 export const iconMap: Record<ScoutGameActivityType, any> = {
   builder_strike: GavelIcon,
@@ -21,78 +24,143 @@ export const iconMap: Record<ScoutGameActivityType, any> = {
   points: PointOfSaleIcon
 };
 
+function LinkText({ href, text }: { href: string; text: string | ReactNode }) {
+  return (
+    <Link href={href}>
+      <Typography
+        color='secondary'
+        component='span'
+        sx={{
+          fontSize: {
+            xs: 14,
+            md: 16
+          }
+        }}
+      >
+        {text}
+      </Typography>
+    </Link>
+  );
+}
+
 export function mapActivityToRow(notification: ScoutGameNotification) {
-  let title: ReactNode = '';
-  let subtitle: ReactNode = '';
+  let title: ReactNode = null;
+  let subtitle: ReactNode = null;
+  let action: ReactNode = null;
 
   switch (notification.type) {
     case ScoutGameActivityType.gems_first_pr:
     case ScoutGameActivityType.gems_regular_pr:
     case ScoutGameActivityType.gems_third_pr_in_streak:
       title =
-        notification.recipientType === 'builder' ? (
-          'Contribution accepted!'
-        ) : (
-          <>
-            <Link href={`/u/${notification.builderUsername}`}>{notification.builderUsername}</Link> scored
-          </>
-        );
+        notification.recipientType === 'builder'
+          ? notification.type === 'gems_first_pr'
+            ? 'First contribution!'
+            : notification.type === 'gems_third_pr_in_streak'
+            ? 'Contribution streak!'
+            : 'Contribution accepted!'
+          : 'Builder scored!';
       subtitle =
         notification.recipientType === 'builder' ? (
-          <Link href={`https://github.com/${notification.repo}/${notification.pullRequestNumber}`}>
-            {notification.repo}
-          </Link>
+          <Stack flexDirection='row' gap={1} alignItems='center'>
+            <Image width={15} height={15} src='/images/profile/icons/github-circle-icon.svg' alt='Github' />
+            <LinkText
+              href={`https://github.com/${notification.repo}/pull/${notification.pullRequestNumber}`}
+              text={notification.repo}
+            />
+          </Stack>
         ) : (
-          ''
+          <LinkText href={`/u/${notification.builderUsername}`} text={notification.builderUsername} />
         );
+      action = (
+        <Stack gap={0.5} alignItems='flex-end'>
+          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center'>
+            <Typography variant='body1'>{notification.amount || 0}</Typography>
+            <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
+          </Stack>
+          {notification.bonus ? <BonusPartnersDisplay size={15} bonusPartners={[notification.bonus]} /> : null}
+        </Stack>
+      );
       break;
     case ScoutGameActivityType.nft_purchase:
-      title = (
-        <>
-          Scouted by{' '}
-          <Link href={`/u/${notification.scoutUsername}`}>
-            {notification.scoutUsername} (x{notification.tokensPurchased} NFTs)
-          </Link>
-        </>
-      );
+      title = 'Scouted!';
       subtitle = (
-        <>{notification.pointsValue} Scout Points (20% of proceeds in scout points immediately added to balance)</>
+        <Link href={`/u/${notification.scoutUsername}`}>
+          <Typography
+            color='secondary'
+            component='span'
+            sx={{
+              fontSize: {
+                xs: 14,
+                md: 16
+              }
+            }}
+          >
+            {notification.scoutUsername}
+          </Typography>{' '}
+          (purchased x{notification.tokensPurchased} NFTs)
+        </Link>
+      );
+      action = (
+        <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center'>
+          <Typography variant='body1'>{notification.pointsValue}</Typography>
+          <Image width={15} height={15} src='/images/profile/scout-game-icon.svg' alt='Gem' />
+        </Stack>
       );
       break;
-    case ScoutGameActivityType.points:
-      title = `Congratulations! Your season ${notification.season} week ${notification.week} reward are ready to be claimed!`;
-      subtitle = `${notification.amount} Scout Points`;
+    case ScoutGameActivityType.points: {
+      title = `Congratulations! Your season ${notification.season} week ${notification.week} reward are ready!`;
+      const button = (
+        <Button size='medium' variant='outlined' disabled={!notification.claimable} color='secondary' sx={{ my: 1 }}>
+          <Typography variant='caption' color={notification.claimable ? 'secondary' : ''}>
+            {notification.claimable ? `Claim now` : `Claimed`}
+          </Typography>
+        </Button>
+      );
+      subtitle = notification.claimable ? <Link href='/profile?tab=win'>{button}</Link> : button;
+      action = (
+        <Stack gap={0.5} alignItems='flex-end'>
+          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center'>
+            <Typography variant='body1'>{notification.amount || 0}</Typography>
+            <Image width={15} height={15} src='/images/profile/scout-game-icon.svg' alt='Gem' />
+          </Stack>
+          {notification.bonus ? <BonusPartnersDisplay size={15} bonusPartners={[notification.bonus]} /> : null}
+        </Stack>
+      );
       break;
+    }
     case ScoutGameActivityType.builder_strike:
-      title =
+      title = notification.recipientType === 'builder' ? 'PR rejected!' : 'Builder received strike';
+      subtitle =
         notification.recipientType === 'builder' ? (
-          <>
-            PR rejected. Strike {notification.strikeCount} of 3
-            <Link href={`https://github.com/${notification.repo}/${notification.pullRequestNumber}`}>
-              {notification.repo}
-            </Link>
-          </>
+          <Stack flexDirection='row' gap={1} alignItems='center'>
+            <Image width={15} height={15} src='/images/profile/icons/github-circle-icon.svg' alt='Github' />
+            <LinkText
+              href={`https://github.com/${notification.repo}/pull/${notification.pullRequestNumber}`}
+              text={notification.repo}
+            />{' '}
+            (strike {notification.strikeCount} of 3)
+          </Stack>
         ) : (
           <>
-            <Link href={`/u/${notification.builderUsername}`}>{notification.builderUsername}</Link>
-            received strike {notification.strikeCount} of 3
+            <LinkText href={`/u/${notification.builderUsername}`} text={notification.builderUsername} /> (strike{' '}
+            {notification.strikeCount} of 3)
           </>
         );
       break;
     case ScoutGameActivityType.builder_suspended:
-      title =
+      title = notification.recipientType === 'builder' ? 'Suspended' : 'Builder suspended!';
+      subtitle =
         notification.recipientType === 'builder' ? (
-          <>
-            PR rejected. Strike 3 of 3. Suspended
-            <Link href={`https://github.com/${notification.repo}/${notification.pullRequestNumber}`}>
-              {notification.repo}
-            </Link>
-          </>
+          <Stack flexDirection='row' gap={1} alignItems='center'>
+            <Image width={15} height={15} src='/images/profile/icons/github-circle-icon.svg' alt='Github' />
+            <LinkText
+              href={`https://github.com/${notification.repo}/pull/${notification.pullRequestNumber}`}
+              text={notification.repo}
+            />
+          </Stack>
         ) : (
-          <>
-            <Link href={`/u/${notification.builderUsername}`}>{notification.builderUsername}</Link>
-            is suspended
-          </>
+          <LinkText href={`/u/${notification.builderUsername}`} text={notification.builderUsername} />
         );
       break;
     default:
@@ -101,41 +169,69 @@ export function mapActivityToRow(notification: ScoutGameNotification) {
 
   return {
     title,
-    subtitle
+    subtitle,
+    action
   };
 }
 
 export function NotificationRow({ notification }: { notification: ScoutGameNotification }) {
-  const { subtitle, title } = mapActivityToRow(notification);
+  const { subtitle, title, action } = mapActivityToRow(notification);
 
-  const { amount, createdAt } = notification;
+  const { createdAt } = notification;
 
-  const time = getRelativeTime(createdAt);
   const Icon = iconMap[notification.type];
   return (
-    <ListItem sx={{ bgcolor: 'background.paper', mb: '2px' }}>
-      <ListItemText
-        primary={
-          <Stack flexDirection='row' alignItems='center' gap={1}>
-            <Icon sx={{ fontSize: '12px' }} />
-            <Typography variant='body1' fontSize={{ xs: '12px', md: '14px' }}>
-              {title}
-            </Typography>
-          </Stack>
+    <Stack
+      sx={{
+        bgcolor: 'background.paper',
+        justifyContent: 'space-between',
+        mb: '2px',
+        flexDirection: 'row',
+        gap: 1.5,
+        alignItems: 'center',
+        px: {
+          xs: 1,
+          md: 2
+        },
+        py: {
+          xs: 1,
+          md: 1.5
         }
-        secondary={
-          <Typography variant='body2' display='flex' alignItems='center' gap={0.5}>
-            {' '}
-            {subtitle}
+      }}
+    >
+      <Stack
+        sx={{
+          width: '90%'
+        }}
+      >
+        <Stack flexDirection='row' alignItems='center' gap={1} mb={0.5}>
+          <Icon
+            sx={{
+              fontSize: {
+                xs: 14,
+                md: 16
+              }
+            }}
+          />
+          <Typography variant='body1' fontSize={{ xs: '12px', md: '16px' }}>
+            {title}
           </Typography>
-        }
-      />
-      <Typography variant='body1' fontSize={{ xs: '12px', md: '14px' }} style={{ color: 'white' }}>
-        {amount}
-      </Typography>
-      <Typography sx={{ width: '100px' }} fontSize={{ xs: '12px', md: '14px' }} align='center' variant='body2'>
+        </Stack>
+        <Typography
+          sx={{
+            fontSize: {
+              xs: '12px',
+              md: '14px'
+            }
+          }}
+        >
+          {subtitle}
+        </Typography>
+      </Stack>
+      {action ?? <div />}
+      <Typography sx={{ width: '50px' }} fontSize={{ xs: '12px', md: '14px' }} align='right' variant='body2'>
         {getRelativeTime(createdAt)}
       </Typography>
-    </ListItem>
+    </Stack>
   );
 }

@@ -1,10 +1,16 @@
 import { log } from '@charmverse/core/log';
-import type { GemsReceiptType, GithubRepo } from '@charmverse/core/prisma-client';
+import type {
+  ActivityRecipientType,
+  GemsReceiptType,
+  GithubRepo,
+  ScoutGameActivityType
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getBonusPartner } from '@packages/scoutgame/bonus';
-import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday } from '@packages/scoutgame/dates';
-import { recordGameActivityWithCatchError } from '@packages/scoutgame/recordGameActivity';
+import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday, currentSeason } from '@packages/scoutgame/dates';
+import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
+import { v4 } from 'uuid';
 
 import type { PullRequest } from './getPullRequests';
 import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
@@ -170,50 +176,71 @@ export async function processMergedPullRequest({
           }
         });
 
-        const createdEvent = await tx.builderEvent.upsert({
-          where: {
-            githubEventId: event.id
-          },
-          create: {
-            builderId: githubUser.builderId,
-            createdAt: builderEventDate,
-            season,
-            week,
-            type: 'merged_pull_request',
-            githubEventId: event.id,
-            bonusPartner: getBonusPartner(pullRequest.repository.nameWithOwner),
-            gemsReceipt: {
-              create: {
-                type: gemReceiptType,
-                value: gemValue,
-                createdAt: builderEventDate
-              }
-            }
-          },
-          update: {}
-        });
+        const gemsReceiptId = v4();
 
-        // It's a new event, we can record notification
         if (!existingBuilderEvent) {
-          const gemsReceipt = await tx.gemsReceipt.findUniqueOrThrow({
+          const activityType = (
+            gemReceiptType === 'first_pr'
+              ? 'gems_first_pr'
+              : gemReceiptType === 'third_pr_in_streak'
+              ? 'gems_third_pr_in_streak'
+              : 'gems_regular_pr'
+          ) as ScoutGameActivityType;
+
+          // It's a new event, we can record notification
+          const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
             where: {
-              eventId: createdEvent.id
+              builderNFT: {
+                season: currentSeason,
+                builderId: githubUser.builderId
+              }
             },
             select: {
-              id: true
+              scoutId: true
             }
           });
-          await recordGameActivityWithCatchError({
-            activity: {
-              amount: gemValue,
-              userId: githubUser.builderId as string,
-              pointsDirection: 'in'
-            },
-            sourceEvent: {
-              gemsReceiptId: gemsReceipt.id
+          const uniqueScoutIds = Array.from(
+            new Set(nftPurchaseEvents.map((nftPurchaseEvent) => nftPurchaseEvent.scoutId).filter(isTruthy))
+          );
+
+          await tx.builderEvent.create({
+            data: {
+              builderId: githubUser.builderId,
+              createdAt: builderEventDate,
+              season,
+              week,
+              type: 'merged_pull_request',
+              githubEventId: event.id,
+              bonusPartner: getBonusPartner(pullRequest.repository.nameWithOwner),
+              gemsReceipt: {
+                create: {
+                  type: gemReceiptType,
+                  value: gemValue,
+                  createdAt: builderEventDate,
+                  activities: {
+                    createMany: {
+                      data: [
+                        ...uniqueScoutIds.map((scoutId) => ({
+                          recipientType: 'scout' as ActivityRecipientType,
+                          userId: scoutId,
+                          type: activityType,
+                          createdAt: builderEventDate
+                        })),
+                        {
+                          recipientType: 'builder' as ActivityRecipientType,
+                          userId: githubUser.builderId,
+                          type: activityType,
+                          createdAt: builderEventDate
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
             }
           });
         }
+
         const thisWeekEvents = previousGitEvents.filter((e) => e.createdAt >= start.toJSDate());
 
         const gemsCollected = thisWeekEvents.reduce((acc, e) => {

@@ -3,8 +3,6 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { recordGameActivity } from '../recordGameActivity';
-
 import { builderContractAddress, builderNftChain } from './constants';
 import { getBuilderContractAdminClient } from './contractClient';
 import { createBuilderNft } from './createBuilderNft';
@@ -75,17 +73,6 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
     },
     data: {
       builderStatus: 'approved'
-    }
-  });
-
-  await recordGameActivity({
-    activity: {
-      amount: 1,
-      pointsDirection: 'in',
-      userId: builderId
-    },
-    sourceEvent: {
-      registeredBuilderNftId: nftWithRefreshedPrice.id
     }
   });
 

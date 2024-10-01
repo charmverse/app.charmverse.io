@@ -3,6 +3,8 @@ import { ActivityRecipientType, prisma, ScoutGameActivityType } from '@charmvers
 import { stringUtils } from '@charmverse/core/utilities';
 import { isTruthy } from '@packages/utils/types';
 
+import { currentSeason, getSeasonWeekFromISOWeek } from '../dates';
+
 type ScoutGameNotificationCommonProps = {
   id: string;
   createdAt: Date;
@@ -39,8 +41,9 @@ type NftPurchaseNotification = ScoutGameNotificationCommonProps & {
 type PointsReceiptNotification = ScoutGameNotificationCommonProps & {
   type: 'points';
   recipientType: ActivityRecipientType;
-  season: string;
-  week: string;
+  season: number;
+  week: number;
+  claimable: boolean;
 };
 
 type StrikeNotificationType = 'builder_strike' | 'builder_suspended';
@@ -148,6 +151,7 @@ export async function getNotifications({ userId }: { userId: string }): Promise<
       pointsReceipt: {
         select: {
           id: true,
+          claimedAt: true,
           value: true,
           event: {
             select: {
@@ -199,7 +203,7 @@ export async function getNotifications({ userId }: { userId: string }): Promise<
             }
             return {
               ...commonProps,
-              repo: githubEvent.repo.owner,
+              repo: `${githubEvent.repo.owner}/${githubEvent.repo.name}`,
               pullRequestNumber: githubEvent.pullRequestNumber,
               strikeCount: strikeDates.indexOf(strike.createdAt) + 1
             } as BuilderRecipientStrikeNotification;
@@ -236,7 +240,7 @@ export async function getNotifications({ userId }: { userId: string }): Promise<
             return {
               ...commonProps,
               amount: receipt.value,
-              repo: githubEvent.repo.owner,
+              repo: `${githubEvent.repo.owner}/${githubEvent.repo.name}`,
               pullRequestNumber: githubEvent.pullRequestNumber,
               bonus: receipt.event.bonusPartner
             } as BuilderRecipientGemsNotification;
@@ -276,8 +280,12 @@ export async function getNotifications({ userId }: { userId: string }): Promise<
           return {
             ...commonProps,
             amount: receipt.value,
-            season: receipt.event.season,
-            week: receipt.event.week
+            season: 1,
+            claimable: receipt.claimedAt === null,
+            week: getSeasonWeekFromISOWeek({
+              season: currentSeason,
+              week: receipt.event.week
+            })
           } as PointsReceiptNotification;
         }
 

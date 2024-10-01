@@ -38,13 +38,13 @@ function assignBuildersToScout(builders: BuilderInfo[]) {
 
 export async function generateSeedData() {
   // Total number of users that are builders (should be less than totalUsers)
-  const totalBuilders = faker.number.int({ min: 100, max: 150 });
+  const totalBuilders = faker.number.int({ min: 25, max: 50 });
   // Total number of github repos
-  const totalGithubRepos = faker.number.int({ min: 50, max: 100 });
+  const totalGithubRepos = faker.number.int({ min: 10, max: 25 });
 
-  const totalScoutBuilders = faker.number.int({ min: 20, max: 30 });
+  const totalScoutBuilders = faker.number.int({ min: 5, max: 15 });
 
-  const totalScouts = faker.number.int({ min: 150, max: 250 });
+  const totalScouts = faker.number.int({ min: 50, max: 100 });
 
   const totalUsers = totalBuilders + totalScouts + totalScoutBuilders;
 
@@ -136,15 +136,15 @@ export async function generateSeedData() {
       const topWeeklyBuilders = await getBuildersLeaderboard({ quantity: 100, week });
       for (const { builder, gemsCollected, rank } of topWeeklyBuilders) {
         try {
-          await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: currentSeason });
+          await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: currentSeason, createdAt: date.toJSDate() });
         } catch (error) {
           log.error(`Error processing scout points payout for builder ${builder.id}: ${error}`);
         }
       }
-      // Randomly pick 80-90% of users to claim their weekly points immediately
+      // Randomly pick 50-75% of users to claim their weekly points immediately, other users will claim on next cron run
       const usersToClaim = faker.number.int({
-        min: Math.floor(userIds.length * 0.8),
-        max: Math.floor(userIds.length * 0.9)
+        min: Math.floor(userIds.length * 0.5),
+        max: Math.floor(userIds.length * 0.75)
       });
       const newUserIds = faker.helpers.shuffle(userIds).slice(0, usersToClaim);
 
