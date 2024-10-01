@@ -1,6 +1,5 @@
 import { GET } from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
-import { TransactionStatus, prisma } from '@charmverse/core/prisma-client';
 import { sleep } from '@decent.xyz/box-common';
 
 type DecentTransactionStatus = {
@@ -149,7 +148,7 @@ export async function getTransactionStatusFromDecent({
 
   return GET<DecentTransactionStatus>(
     'https://api.decentscan.xyz/getStatus',
-    { sourceTxHash, sourceTxHashChainId },
+    { txHash: sourceTxHash, chainId: sourceTxHashChainId },
     {
       headers: {
         'x-api-key': process.env.REACT_APP_DECENT_API_KEY
@@ -158,58 +157,47 @@ export async function getTransactionStatusFromDecent({
   );
 }
 
+export class DecentTxFailedPermanently extends Error {
+  constructor() {
+    super('Transaction Failed');
+  }
+}
+
+class DecentTimeoutSettlementError extends Error {
+  constructor(sourceTxHash: string, sourceTxHashChainId: number) {
+    super(
+      `Transaction status could not be confirmed within 45 seconds for sourceTxHash: ${sourceTxHash} on sourceTxHashChainId: ${sourceTxHashChainId}`
+    );
+  }
+}
+
 export async function waitForDecentTransactionSettlement({
   sourceTxHash,
   sourceTxHashChainId,
-  maxWaitTime = 4 * 60000 // 4 minutes, because cron runs every 5 minutes
+  maxWaitTime = 4 * 60000 // 4 minutes
 }: DecentTransactionToQuery): Promise<string> {
   const startTime = Date.now();
 
+  const normalisedTxHash = sourceTxHash.toLowerCase();
+
   while (Date.now() - startTime < maxWaitTime) {
     try {
-      const response = await getTransactionStatusFromDecent({ sourceTxHash, sourceTxHashChainId });
+      const response = await getTransactionStatusFromDecent({ sourceTxHash: normalisedTxHash, sourceTxHashChainId });
 
       if (response?.status?.toLowerCase().match('fail')) {
-        await prisma.pendingNftTransaction.update({
-          where: {
-            sourceChainTxHash_sourceChainId: {
-              sourceChainTxHash: sourceTxHash,
-              sourceChainId: sourceTxHashChainId
-            }
-          },
-          data: {
-            status: TransactionStatus.failed
-          }
-        });
-
-        log.error('Failed to complete transaction', { error: { sourceTxHashChainId, sourceTxHash } });
-
-        throw new Error('Transaction failed');
+        throw new DecentTxFailedPermanently();
       }
       if (response.transaction?.dstTx?.success === true) {
-        await prisma.pendingNftTransaction.update({
-          where: {
-            sourceChainTxHash_sourceChainId: {
-              sourceChainId: sourceTxHashChainId,
-              sourceChainTxHash: response.transaction.dstTx.fast.transactionHash
-            }
-          },
-          data: {
-            status: TransactionStatus.completed
-          }
-        });
         return response.transaction.dstTx.fast.transactionHash;
       }
 
-      // Optional: Add a small delay before retrying
-      log.debug('No success found, try again', { sourceTxHash, sourceTxHashChainId, response });
+      // Add a small delay before retrying
       await sleep(5000);
     } catch (error) {
-      log.error('Failed to fetch transaction status:', { sourceTxHash, sourceTxHashChainId, error });
+      log.error('Error fetching status from decent', { error, sourceTxHashChainId, sourceTxHash });
+      throw error;
     }
   }
 
-  throw new Error(
-    `Transaction status could not be confirmed within 45 seconds for sourceTxHash: ${sourceTxHash} on sourceTxHashChainId: ${sourceTxHashChainId}`
-  );
+  throw new DecentTimeoutSettlementError(sourceTxHash, sourceTxHashChainId);
 }

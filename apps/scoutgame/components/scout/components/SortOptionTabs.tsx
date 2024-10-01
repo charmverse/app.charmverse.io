@@ -8,5 +8,5 @@ export const sortOptions: TabItem[] = [
 ];
 
 export function SortOptionTabs({ value }: { value: string }) {
-  return <TabsMenu value={value} tabs={sortOptions} />;
+  return <TabsMenu value={value} tabs={sortOptions} sx={{ mb: 2 }} />;
 }

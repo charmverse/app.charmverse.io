@@ -132,7 +132,7 @@ export async function recordGameActivity({
       gemsPayoutEvent: sourceEvent.gemsPayoutEventId ? { connect: { id: sourceEvent.gemsPayoutEventId } } : undefined,
       pointsReceipt: sourceEvent.pointsReceiptId ? { connect: { id: sourceEvent.pointsReceiptId } } : undefined,
       // Optional onchain reference
-      onchainTxHash: sourceEvent.onchainTxHash,
+      onchainTxHash: sourceEvent.onchainTxHash?.toLowerCase(),
       onchainChainId: sourceEvent.onchainChainId
     }
   });

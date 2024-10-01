@@ -7,7 +7,7 @@ import { mockBuilder, mockScout, mockBuilderNft } from '../../testing/database';
 import { randomLargeInt } from '../../testing/generators';
 import { builderContractAddress, builderNftChain } from '../constants';
 
-jest.unstable_mockModule('../contractClient', () => ({
+jest.unstable_mockModule('../clients/builderContractAdminWriteClient', () => ({
   getBuilderContractAdminClient: () => ({
     getTokenIdForBuilder: () => Promise.resolve(randomLargeInt()),
     registerBuilderToken: jest.fn(),
@@ -15,11 +15,19 @@ jest.unstable_mockModule('../contractClient', () => ({
   })
 }));
 
+jest.unstable_mockModule('../clients/builderContractReadClient', () => ({
+  builderContractReadonlyApiClient: {
+    getTokenIdForBuilder: () => Promise.resolve(randomLargeInt()),
+    registerBuilderToken: jest.fn(),
+    getTokenPurchasePrice: () => Promise.resolve(randomLargeInt())
+  }
+}));
+
 jest.unstable_mockModule('../createBuilderNft', () => ({
   createBuilderNft: jest.fn()
 }));
 
-const { getBuilderContractAdminClient } = await import('../contractClient');
+const { getBuilderContractAdminClient } = await import('../clients/builderContractAdminWriteClient');
 
 const { registerBuilderNFT } = await import('../registerBuilderNFT');
 

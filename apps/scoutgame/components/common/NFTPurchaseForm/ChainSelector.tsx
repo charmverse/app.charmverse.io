@@ -126,8 +126,8 @@ function SelectField(
           <Stack flexDirection='row' gap={2} alignItems='center'>
             <Image height={30} width={30} alt={chain.name} src={chain.icon} />
             <Stack>
-              <Typography variant='body2'>USDC on {chain.name}</Typography>
-              <Typography variant='body2'>Balance: ${balance}</Typography>
+              <Typography variant='body2'>ETH on {chain.name}</Typography>
+              <Typography variant='body2'>Balance: {balance} ETH</Typography>
             </Stack>
           </Stack>
         );
