@@ -176,8 +176,6 @@ export async function processMergedPullRequest({
           }
         });
 
-        const gemsReceiptId = v4();
-
         if (!existingBuilderEvent) {
           const activityType = (
             gemReceiptType === 'first_pr'
@@ -199,6 +197,7 @@ export async function processMergedPullRequest({
               scoutId: true
             }
           });
+
           const uniqueScoutIds = Array.from(
             new Set(nftPurchaseEvents.map((nftPurchaseEvent) => nftPurchaseEvent.scoutId).filter(isTruthy))
           );

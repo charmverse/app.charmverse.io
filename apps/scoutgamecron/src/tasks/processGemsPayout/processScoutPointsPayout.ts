@@ -75,7 +75,7 @@ export async function processScoutPointsPayout({
     });
 
     await Promise.all([
-      nftHolders.map(({ scoutId, _count: { scoutId: nftsPurchased } }) =>
+      ...nftHolders.map(({ scoutId, _count: { scoutId: nftsPurchased } }) =>
         tx.pointsReceipt.create({
           data: {
             value: 0.8 * earnableScoutPoints * (nftsPurchased / totalNftsPurchased),

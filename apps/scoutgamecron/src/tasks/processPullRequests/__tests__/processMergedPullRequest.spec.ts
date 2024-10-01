@@ -1,6 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
-import { mockBuilder, mockRepo } from '@packages/scoutgame/testing/database';
+import {
+  mockBuilder,
+  mockBuilderNft,
+  mockNFTPurchaseEvent,
+  mockRepo,
+  mockScout
+} from '@packages/scoutgame/testing/database';
 import { randomLargeInt } from '@packages/scoutgame/testing/generators';
 import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
@@ -30,6 +36,16 @@ describe('processMergedPullRequest', () => {
     const username = v4();
 
     const builder = await mockBuilder();
+    await mockBuilderNft({
+      builderId: builder.id,
+      season: currentSeason
+    });
+    const scout = await mockScout();
+
+    await mockNFTPurchaseEvent({
+      builderId: builder.id,
+      scoutId: scout.id
+    });
 
     const repo = await prisma.githubRepo.create({
       data: {
@@ -86,6 +102,28 @@ describe('processMergedPullRequest', () => {
     });
 
     expect(builderWeeklyStats.gemsCollected).toBe(10);
+
+    const builderActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        type: 'gems_first_pr',
+        gemsReceiptId: gemsReceipt.id,
+        recipientType: 'builder'
+      }
+    });
+
+    expect(builderActivities).toBe(1);
+
+    const scoutActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout.id,
+        type: 'gems_first_pr',
+        gemsReceiptId: gemsReceipt.id,
+        recipientType: 'scout'
+      }
+    });
+
+    expect(scoutActivities).toBe(1);
   });
 
   it('should create builder events, gems receipts and update weekly stats for a regular merged pull request', async () => {
@@ -99,6 +137,17 @@ describe('processMergedPullRequest', () => {
       repo,
       state: 'MERGED',
       author: builder.githubUser
+    });
+
+    await mockBuilderNft({
+      builderId: builder.id,
+      season: currentSeason
+    });
+    const scout = await mockScout();
+
+    await mockNFTPurchaseEvent({
+      builderId: builder.id,
+      scoutId: scout.id
     });
 
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([
@@ -141,12 +190,40 @@ describe('processMergedPullRequest', () => {
     });
 
     expect(builderWeeklyStats.gemsCollected).toBe(1);
+
+    const builderActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        type: 'gems_regular_pr',
+        gemsReceiptId: gemsReceipt.id,
+        recipientType: 'builder'
+      }
+    });
+    expect(builderActivities).toBe(1);
+
+    const scoutActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout.id,
+        type: 'gems_regular_pr',
+        gemsReceiptId: gemsReceipt.id,
+        recipientType: 'scout'
+      }
+    });
+    expect(scoutActivities).toBe(1);
   });
 
   it('should create builder events, gems receipts and update weekly stats for a 3 merged PR streak', async () => {
     const builder = await mockBuilder();
     const repo = await mockRepo();
-
+    const scout = await mockScout();
+    await mockBuilderNft({
+      builderId: builder.id,
+      season: currentSeason
+    });
+    await mockNFTPurchaseEvent({
+      builderId: builder.id,
+      scoutId: scout.id
+    });
     const now = DateTime.fromObject({ weekday: 3 }, { zone: 'utc' }); // 1 is Monday and 7 is Sunday
 
     const lastWeekPr = mockPullRequest({
@@ -214,11 +291,40 @@ describe('processMergedPullRequest', () => {
 
     // The total is 4 because the first PR is from a previous week, but the 3rd PR counts as a streak, so 3 + 1 = 4
     expect(builderWeeklyStats.gemsCollected).toBe(4);
+
+    const builderActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        type: 'gems_third_pr_in_streak',
+        gemsReceiptId: gemsReceipt.id,
+        recipientType: 'builder'
+      }
+    });
+    expect(builderActivities).toBe(1);
+
+    const scoutActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout.id,
+        type: 'gems_third_pr_in_streak',
+        gemsReceiptId: gemsReceipt.id,
+        recipientType: 'scout'
+      }
+    });
+    expect(scoutActivities).toBe(1);
   });
 
   it('should not create builder events and gems receipts for existing events', async () => {
     const builder = await mockBuilder();
     const repo = await mockRepo();
+    const scout = await mockScout();
+    await mockBuilderNft({
+      builderId: builder.id,
+      season: currentSeason
+    });
+    await mockNFTPurchaseEvent({
+      builderId: builder.id,
+      scoutId: scout.id
+    });
 
     const pullRequest = mockPullRequest({
       mergedAt: new Date().toISOString(),
@@ -242,19 +348,46 @@ describe('processMergedPullRequest', () => {
     });
     expect(builderEvents).toBe(1);
 
-    const gemsReceipts = await prisma.gemsReceipt.count({
+    const gemsReceipts = await prisma.gemsReceipt.findMany({
       where: {
         event: {
           builderId: builder.id
         }
       }
     });
-    expect(gemsReceipts).toBe(1);
+    expect(gemsReceipts).toHaveLength(1);
+
+    const builderActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        gemsReceiptId: gemsReceipts[0].id,
+        recipientType: 'builder'
+      }
+    });
+    expect(builderActivities).toBe(1);
+
+    const scoutActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout.id,
+        gemsReceiptId: gemsReceipts[0].id,
+        recipientType: 'scout'
+      }
+    });
+    expect(scoutActivities).toBe(1);
   });
 
   it('should not create builder events for banned builders', async () => {
     const builder = await mockBuilder({
       builderStatus: 'banned'
+    });
+    const scout = await mockScout();
+    await mockBuilderNft({
+      builderId: builder.id,
+      season: currentSeason
+    });
+    await mockNFTPurchaseEvent({
+      builderId: builder.id,
+      scoutId: scout.id
     });
 
     const repo = await mockRepo();
@@ -286,5 +419,21 @@ describe('processMergedPullRequest', () => {
       }
     });
     expect(gemsReceipts).toHaveLength(0);
+
+    const builderActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        recipientType: 'builder'
+      }
+    });
+    expect(builderActivities).toBe(0);
+
+    const scoutActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout.id,
+        recipientType: 'scout'
+      }
+    });
+    expect(scoutActivities).toBe(0);
   });
 });
