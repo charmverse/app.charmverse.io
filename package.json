@@ -115,9 +115,7 @@
     "sunnyawards:start:test": "npm run start:test -w=apps/sunnyawards",
     "sunnyawards:start:test:ci": "npm run start:test:ci -w=apps/sunnyawards",
     "sunnyawards:debug:e2e": "npm run debug:e2e -w=apps/sunnyawards",
-    "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards",
-    "comingsoon": "npm start -w=apps/comingsoon",
-    "comingsoon:build": "npm run build -w=apps/comingsoon"
+    "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -140,7 +138,7 @@
     "@bangle.dev/pm-commands": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "^0.86.2",
+    "@charmverse/core": "^0.86.3",
     "@column-resizer/core": "^1.0.2",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",

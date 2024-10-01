@@ -20,7 +20,7 @@ export function LeaderboardTable({ data, userId }: { data: LeaderBoardRow[]; use
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
-    <TableContainer component={Paper} sx={{ px: { md: 6 } }}>
+    <TableContainer data-test='leaderboard-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Leaderboard table' size='small'>
         <TableHead
           sx={{
@@ -82,7 +82,7 @@ export function LeaderboardTable({ data, userId }: { data: LeaderBoardRow[]; use
               </TableCell>
               <TableCell sx={{ maxWidth: '100px' }}>
                 <Stack flexDirection='row' gap={0.2} alignItems='center' justifyContent='center'>
-                  <TableCellText>{row.gems}</TableCellText>
+                  <TableCellText>{row.gemsCollected}</TableCellText>
                   <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
                 </Stack>
               </TableCell>

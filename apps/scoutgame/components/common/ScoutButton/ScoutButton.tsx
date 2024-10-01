@@ -33,7 +33,7 @@ export function ScoutButton({
 
   return (
     <>
-      <Button fullWidth onClick={handleClick} variant='buy'>
+      <Button fullWidth onClick={handleClick} variant='buy' data-test='scout-button'>
         ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2)}
       </Button>
       <NFTPurchaseDialog open={isPurchasing} onClose={() => setIsPurchasing(false)} builder={builder} />

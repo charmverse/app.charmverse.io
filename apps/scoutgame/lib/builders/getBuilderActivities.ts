@@ -36,7 +36,6 @@ export async function getBuilderActivities({
   const builderEvents = await prisma.builderEvent.findMany({
     where: {
       builderId,
-      season: currentSeason,
       type: {
         in: ['nft_purchase', 'merged_pull_request']
       }

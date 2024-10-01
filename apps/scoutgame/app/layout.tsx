@@ -15,7 +15,7 @@ const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').th
 const appName = 'Scout Game';
 const appTitle = 'Scout. Build. Win.';
 const appTitleTemplate = '%s - Scout Game';
-const appDescription = 'Onchain network for connecting web3 developers, projects, organizations';
+const appDescription = 'Fantasy sports for onchain builders';
 
 export const metadata: Metadata = {
   applicationName: appName,
@@ -72,7 +72,7 @@ export default async function RootLayout({
     <html lang='en' dir='ltr' suppressHydrationWarning>
       <body>
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
-        <Script src='/__ENV.js' />
+        <Script strategy='beforeInteractive' src='/__ENV.js' />
         <AppProviders>
           <ClientGlobals userId={user?.id} />
           {/* {user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />} */}

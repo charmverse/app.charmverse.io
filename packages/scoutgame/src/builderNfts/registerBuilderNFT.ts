@@ -5,8 +5,8 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { recordGameActivity } from '../recordGameActivity';
 
-import { builderContractAddress, builderNftChain } from './constants';
-import { getBuilderContractAdminClient } from './contractClient';
+import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
+import { getBuilderContractAddress, builderNftChain } from './constants';
 import { createBuilderNft } from './createBuilderNft';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
@@ -21,7 +21,7 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
     where: {
       builderId,
       chainId: builderNftChain.id,
-      contractAddress: builderContractAddress,
+      contractAddress: getBuilderContractAddress(),
       season
     }
   });

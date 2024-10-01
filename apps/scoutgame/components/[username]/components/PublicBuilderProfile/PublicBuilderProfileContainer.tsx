@@ -13,12 +13,9 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 
-import { PublicProfileTabsMenu } from '../../PublicProfileTabsMenu';
-
 import { PublicBuilderStats } from './PublicBuilderStats';
 
-export type BuilderProfileProps = {
-  tab: string;
+type BuilderProfileProps = {
   builder: BasicUserInfo & {
     price?: bigint;
     nftImageUrl?: string;
@@ -53,7 +50,6 @@ const PaperContainer = styled(Paper)(({ theme }) => ({
 }));
 
 export function PublicBuilderProfileContainer({
-  tab,
   builder,
   allTimePoints,
   seasonPoints,
@@ -69,43 +65,30 @@ export function PublicBuilderProfileContainer({
 
   return (
     <Box>
-      {!isDesktop ? (
-        <PublicProfileTabsMenu
-          tab={tab}
-          username={builder.username}
-          isApprovedBuilder={builder.builderStatus === 'approved'}
-        />
-      ) : null}
       <Stack
         gap={2}
-        my={{
+        mb={{
           xs: 1,
           md: 2
         }}
       >
-        <Paper sx={{ py: 2 }}>
-          <Stack flexDirection='row'>
-            <BackButton />
-            {isDesktop ? (
-              <Box>
-                <UserProfile
-                  user={{
-                    ...builder,
-                    githubLogin: builder.githubLogin
-                  }}
-                />
-              </Box>
-            ) : (
+        {!isDesktop ? (
+          <Paper sx={{ py: 2 }}>
+            <Stack flexDirection='row'>
+              <BackButton />
               <Stack flexDirection='row' alignItems='center' gap={2}>
                 <Box minWidth='fit-content'>
                   <BuilderCard
                     builder={{
                       ...builder,
-                      price: builder.price
+                      price: builder.price ?? BigInt(0),
+                      nftsSold: 0,
+                      gemsCollected: 0,
+                      builderPoints: 0
                     }}
                     hideDetails
                     showPurchaseButton
-                    size={isDesktop ? 'small' : 'x-small'}
+                    size='small'
                     userId={user?.id}
                   />
                 </Box>
@@ -125,15 +108,8 @@ export function PublicBuilderProfileContainer({
                   />
                 </Stack>
               </Stack>
-            )}
-          </Stack>
-        </Paper>
-        {isDesktop ? (
-          <PublicProfileTabsMenu
-            tab={tab}
-            username={builder.username}
-            isApprovedBuilder={builder.builderStatus === 'approved'}
-          />
+            </Stack>
+          </Paper>
         ) : null}
 
         <Stack
@@ -159,7 +135,10 @@ export function PublicBuilderProfileContainer({
                   <BuilderCard
                     builder={{
                       ...builder,
-                      price: builder.price
+                      price: builder.price ?? BigInt(0),
+                      nftsSold: 0,
+                      gemsCollected: 0,
+                      builderPoints: 0
                     }}
                     userId={user?.id}
                     hideDetails

@@ -54,7 +54,7 @@ describe('recordGameActivity', () => {
         pointsDirection: PointsDirection.out
       },
       sourceEvent: {
-        nftPurchaseEventId: nftPurchaseEvent.id
+        nftPurchaseEventId: nftPurchaseEvent.nftPurchaseEvent!.id
       }
     });
     expect(builderRegisteredActivity.type).toBe(ScoutGameActivityType.mint);
@@ -196,7 +196,7 @@ describe('recordGameActivity', () => {
         },
         sourceEvent: {
           builderStrikeId: builderStrike.id,
-          nftPurchaseEventId: nftPurchaseEvent.id
+          nftPurchaseEventId: nftPurchaseEvent.nftPurchaseEvent!.id
         }
       })
     ).rejects.toThrow(InvalidInputError);
