@@ -194,7 +194,7 @@ async function clearNfts() {
 }
 
 async function script() {
-  // await clearNfts()
+   await clearNfts()
   await seedWithRealCharmverseGithubData();
   await seedBuilderNFTs();
 }

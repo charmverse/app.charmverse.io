@@ -49,6 +49,11 @@ export async function handlePendingTransaction({
       }
     });
 
+    if (pendingTx.status !== 'pending') {
+      log.info(`Skipping processing for tx id ${pendingTx.id}`);
+      return;
+    }
+
     // Fetch the builder NFT
     const builderNft = await prisma.builderNft.findFirstOrThrow({
       where: {
