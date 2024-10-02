@@ -10,6 +10,7 @@ import {
   Box,
   Button,
   FormControlLabel,
+  Paper,
   RadioGroup,
   Radio,
   Stack,
@@ -435,14 +436,20 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           />
           <FormControlLabel value='wallet' control={<Radio />} label='Wallet' />
         </RadioGroup>
-        <BlockchainSelect
-          value={sourceFundsChain}
-          balance={(Number(balances?.eth || 0) / 1e18).toFixed(4)}
-          useTestnets={useTestnets}
-          onSelectChain={(_chainId) => {
-            setSourceFundsChain(_chainId);
-          }}
-        />
+        {paymentMethod === 'points' ? (
+          <Paper sx={{ backgroundColor: 'background.light', p: 2 }} variant='outlined'>
+            <Typography>You have {convertCostToPoints(purchaseCost)} points</Typography>
+          </Paper>
+        ) : (
+          <BlockchainSelect
+            value={sourceFundsChain}
+            balance={(Number(balances?.eth || 0) / 1e18).toFixed(4)}
+            useTestnets={useTestnets}
+            onSelectChain={(_chainId) => {
+              setSourceFundsChain(_chainId);
+            }}
+          />
+        )}
       </Stack>
       {fetchError && <Typography color='red'>{fetchError.shortMessage || 'Something went wrong'}</Typography>}
       <Button

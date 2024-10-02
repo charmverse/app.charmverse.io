@@ -1,16 +1,23 @@
 'use client';
 
+import type { Scout } from '@charmverse/core/prisma';
 import { IconButton, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import type { AvatarSize } from '../Avatar';
 import { Avatar } from '../Avatar';
 
+// Use a unique type since sometimes this prop comes from the session user, but sometimes it comes from the builder queries
+export type UserProfileData = Pick<Scout, 'id' | 'username' | 'displayName'> & {
+  bio?: string | null;
+  avatar?: string | null;
+  githubLogin?: string;
+};
+
 type UserProfileProps = {
-  user: BasicUserInfo;
+  user: UserProfileData;
   avatarSize?: AvatarSize;
 };
 
