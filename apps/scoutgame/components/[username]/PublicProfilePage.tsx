@@ -18,9 +18,6 @@ export function PublicProfilePage({ user, tab }: { user: BasicUserInfo; tab: str
         <Hidden mdDown>
           <Paper sx={{ py: 2, mt: { xs: 1, md: 2 } }}>
             <Stack flexDirection='row' alignItems='center' pl={0.5}>
-              <div>
-                <BackButton />
-              </div>
               <Box width='calc(100% - 50px)'>
                 <UserProfile user={user} avatarSize='xLarge' />
               </Box>
