@@ -1,3 +1,5 @@
+'use client';
+
 import type { TextFieldProps } from '@mui/material';
 import { TextField, styled } from '@mui/material';
 import { forwardRef } from 'react';
