@@ -475,7 +475,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           onChange={(e) => setPaymentMethod(e.target.value as 'points' | 'wallet')}
           sx={{ mb: 2, display: 'flex', gap: 2, width: '100%' }}
         >
-          <FormControlLabel value='wallet' control={<Radio />} label='Wallet' />
+          <FormControlLabel sx={{ width: '50%' }} value='wallet' control={<Radio />} label='Wallet' />
           <FormControlLabel
             value='points'
             // disabled={Boolean(loadingUser || notEnoughPoints)}
