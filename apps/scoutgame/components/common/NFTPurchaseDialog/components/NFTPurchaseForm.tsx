@@ -34,12 +34,11 @@ import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
-import { formatUnits } from 'viem';
 import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
-import { useGetUser } from 'hooks/api/session';
+import { useUser } from 'components/layout/UserProvider';
 import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransactionAction';
 import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsAction';
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
@@ -70,7 +69,7 @@ export function NFTPurchaseForm(props: NFTPurchaseProps) {
 }
 
 export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
-  const { data: user, isLoading: loadingUser } = useGetUser();
+  const { user } = useUser();
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToUsd(builder.price) : 'N/A';
@@ -94,7 +93,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const [tokensToBuy, setTokensToBuy] = useState(1);
 
-  const [paymentMethod, setPaymentMethod] = useState<'points' | 'wallet'>('points');
+  const [paymentMethod, setPaymentMethod] = useState<'points' | 'wallet'>('wallet');
 
   const [balances, setBalances] = useState<{ usdc: bigint; eth: bigint; chainId: number } | null>(null);
 
@@ -470,6 +469,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           onChange={(e) => setPaymentMethod(e.target.value as 'points' | 'wallet')}
           sx={{ mb: 2, display: 'flex', gap: 2, width: '100%' }}
         >
+          <FormControlLabel value='wallet' control={<Radio />} label='Wallet' />
           <FormControlLabel
             value='points'
             control={<Radio />}
@@ -480,7 +480,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
               </Stack>
             }
           />
-          <FormControlLabel value='wallet' control={<Radio />} label='Wallet' />
         </RadioGroup>
         {paymentMethod === 'points' ? (
           <Stack gap={1}>
@@ -496,7 +495,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
               variant='outlined'
             >
               <PointsIcon size={24} />
-              {!loadingUser && user && (
+              {user && (
                 <>
                   <Typography color={notEnoughPoints ? 'error' : undefined}>Balance: {user?.currentBalance}</Typography>
 
@@ -507,7 +506,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
                   )}
                 </>
               )}
-              {loadingUser && <CircularProgress sx={{ position: 'relative', top: 3 }} size={22} />}
             </Paper>
           </Stack>
         ) : (
