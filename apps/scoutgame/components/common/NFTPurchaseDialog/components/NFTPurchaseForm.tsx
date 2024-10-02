@@ -6,6 +6,7 @@ import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import {
+  Typography,
   Box,
   Button,
   FormControlLabel,
@@ -13,13 +14,11 @@ import {
   Radio,
   Stack,
   ToggleButton,
-  ToggleButtonGroup,
-  Typography
+  ToggleButtonGroup
 } from '@mui/material';
 import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/builderNfts/clients/builderNFTSeasonOneClient';
 import {
   builderNftChain,
-  builderTokenDecimals,
   getBuilderContractAddress,
   treasuryAddress,
   usdcContractAddress,
@@ -36,24 +35,24 @@ import type { Address } from 'viem';
 import { formatUnits } from 'viem';
 import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 
+import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
 import { handleMintNftAction } from 'lib/builderNFTs/handleMintNftAction';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
-import { IconButton } from '../Button/IconButton';
-import { NumberInputField } from '../Fields/NumberField';
-
 import type { ChainOption } from './ChainSelector';
 import { BlockchainSelect, getChainOptions } from './ChainSelector';
+import { NumberInputField } from './NumberField';
+import { SuccessView } from './SuccessView';
 
 export type NFTPurchaseProps = {
   builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
 };
 
-function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
+export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const builderId = builder.id;
-  const initialQuantities = [1, 11, 111, 1111];
+  const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToUsd(builder.price) : 'N/A';
   const { address, chainId } = useAccount();
   const { switchChainAsync } = useSwitchChain();
@@ -281,7 +280,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   }
 
   return (
-    <Stack gap={3} width='400px' maxWidth='100%'>
+    <Stack gap={3} width='400px' maxWidth='100%' mx='auto'>
       <Box
         bgcolor='black.dark'
         width='100%'
@@ -452,71 +451,6 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   );
 }
 
-function SuccessView({ builder }: { builder: { nftImageUrl?: string | null; username: string } }) {
-  return (
-    <Stack gap={2} textAlign='center'>
-      <Typography color='secondary' variant='h5' fontWeight={600}>
-        Congratulations!
-      </Typography>
-      <Typography>You scouted @{builder.username}</Typography>
-      <Box
-        bgcolor='black.dark'
-        width='100%'
-        p={2}
-        display='flex'
-        alignItems='center'
-        flexDirection='column'
-        gap={1}
-        py={12}
-        sx={{
-          background: 'url(/images/nft-mint-bg.png)',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-          backgroundSize: 'cover'
-        }}
-      >
-        {builder.nftImageUrl ? (
-          <Image
-            src={builder.nftImageUrl}
-            alt={builder.username}
-            width={200}
-            height={300}
-            style={{ aspectRatio: '1/1.4', width: '50%', height: '50%' }}
-          />
-        ) : (
-          <Image src='/images/no_nft_person.png' alt='no nft image available' width={200} height={200} />
-        )}
-      </Box>
-      <Button
-        LinkComponent={Link}
-        fullWidth
-        href={`https://warpcast.com/~/compose?text=${encodeURI(
-          `I scouted ${builder.username} on Scout Game!`
-        )}&embeds[]=${window.location.origin}/u/${builder.username}`}
-        target='_blank'
-        rel='noopener noreferrer'
-      >
-        Share now
-      </Button>
-    </Stack>
-  );
-}
-
-export function NFTPurchaseForm(props: NFTPurchaseProps) {
-  // Waiting for component to render before fetching the API key
-  const apiKey = env('DECENT_API_KEY');
-
-  if (!apiKey) {
-    return <Typography color='error'>Decent API key not found</Typography>;
-  }
-
-  return (
-    <BoxHooksContextProvider apiKey={apiKey}>
-      <NFTPurchaseButton {...props} />
-    </BoxHooksContextProvider>
-  );
-}
-
 function convertCostToUsd(cost: bigint) {
   return `$${parseFloat(formatUnits(cost, 6)).toLocaleString()}`;
 }
@@ -531,4 +465,19 @@ function convertCostToPointsWithDiscount(costWei: bigint) {
   const points = convertCostToPoints(costWei);
   // 50% discount
   return Math.round(points * 0.5).toLocaleString();
+}
+
+export function NFTPurchaseForm(props: NFTPurchaseProps) {
+  // Waiting for component to render before fetching the API key
+  const apiKey = env('DECENT_API_KEY');
+
+  if (!apiKey) {
+    return <Typography color='error'>Decent API key not found</Typography>;
+  }
+
+  return (
+    <BoxHooksContextProvider apiKey={apiKey}>
+      <NFTPurchaseFormContent {...props} />
+    </BoxHooksContextProvider>
+  );
 }

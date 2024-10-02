@@ -4,11 +4,11 @@ import { useConnectModal, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { useEffect } from 'react';
 import { useAccount } from 'wagmi';
 
-import { BasicModal } from 'components/common/Modal';
-import { useMdScreen } from 'hooks/useMediaScreens';
+import { Dialog } from 'components/common/Dialog';
+import { useSmScreen } from 'hooks/useMediaScreens';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
-import { NFTPurchaseForm } from './NFTPurchaseForm';
+import { NFTPurchaseForm } from './components/NFTPurchaseForm';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -17,11 +17,12 @@ type NFTPurchaseDialogProps = {
   onClose: VoidFunction;
   builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
 };
+
 // This component opens the wallet connect modal if the user is not connected yet
-export function NFTPurchaseDialog(props: NFTPurchaseDialogProps) {
+function NFTPurchaseDialogComponent(props: NFTPurchaseDialogProps) {
   const { openConnectModal } = useConnectModal();
   const { address } = useAccount();
-  const isDesktop = useMdScreen();
+  const isDesktop = useSmScreen();
 
   // open Rainbowkit modal if not connected
   useEffect(() => {
@@ -31,7 +32,7 @@ export function NFTPurchaseDialog(props: NFTPurchaseDialogProps) {
   }, [props.open, address, openConnectModal]);
 
   return (
-    <BasicModal
+    <Dialog
       fullScreen={!isDesktop}
       open={props.open && !!address}
       onClose={props.onClose}
@@ -39,14 +40,14 @@ export function NFTPurchaseDialog(props: NFTPurchaseDialogProps) {
       maxWidth='md'
     >
       <NFTPurchaseForm builder={props.builder} />
-    </BasicModal>
+    </Dialog>
   );
 }
 
-export function NFTPurchaseDialogWithProviders(props: NFTPurchaseDialogProps) {
+export function NFTPurchaseDialog(props: NFTPurchaseDialogProps) {
   return (
     <RainbowKitProvider>
-      <NFTPurchaseDialog {...props} />
+      <NFTPurchaseDialogComponent {...props} />
     </RainbowKitProvider>
   );
 }
