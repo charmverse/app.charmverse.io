@@ -7,9 +7,16 @@ import { useAction } from 'next-safe-action/hooks';
 
 import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
+import type { SessionUser } from 'lib/session/getUserFromSession';
 import { saveOnboardedAction } from 'lib/users/saveOnboardedAction';
 
-export function SpamPolicyPage({ user, profileGithubConnect }: { user: Scout | null; profileGithubConnect: boolean }) {
+export function SpamPolicyPage({
+  user,
+  profileGithubConnect
+}: {
+  user: SessionUser | null;
+  profileGithubConnect: boolean;
+}) {
   const router = useRouter();
   // programmatically added builders will land here skipping the /welcome/builder page
   // we set the onboardedAt flag on that page, so make sure we set it here too if the user hasn't been onboarded yet
