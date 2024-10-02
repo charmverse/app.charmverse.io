@@ -9,7 +9,7 @@ import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 import { saveOnboardedAction } from 'lib/users/saveOnboardedAction';
 
-export function SpamPolicyPage({ user, profileGithubConnect }: { user: Scout; profileGithubConnect: boolean }) {
+export function SpamPolicyPage({ user, profileGithubConnect }: { user: Scout | null; profileGithubConnect: boolean }) {
   const router = useRouter();
   // programmatically added builders will land here skipping the /welcome/builder page
   // we set the onboardedAt flag on that page, so make sure we set it here too if the user hasn't been onboarded yet
@@ -35,20 +35,22 @@ export function SpamPolicyPage({ user, profileGithubConnect }: { user: Scout; pr
           If you are suspended, you may appeal this decision. An appeal link will be included in the suspension
           notification.
         </Typography>
-        {user.onboardedAt ? (
-          <Button
-            fullWidth
-            href={profileGithubConnect ? '/profile' : '/welcome/how-it-works'}
-            data-test='continue-button'
-            disabled={isExecuting}
-          >
-            Continue
-          </Button>
-        ) : (
-          <Button fullWidth onClick={() => executeAsync()} data-test='continue-button' disabled={isExecuting}>
-            Continue
-          </Button>
-        )}
+        {user ? (
+          user.onboardedAt ? (
+            <Button
+              fullWidth
+              href={profileGithubConnect ? '/profile' : '/welcome/how-it-works'}
+              data-test='continue-button'
+              disabled={isExecuting}
+            >
+              Continue
+            </Button>
+          ) : (
+            <Button fullWidth onClick={() => executeAsync()} data-test='continue-button' disabled={isExecuting}>
+              Continue
+            </Button>
+          )
+        ) : null}
       </SinglePageWrapper>
     </SinglePageLayout>
   );

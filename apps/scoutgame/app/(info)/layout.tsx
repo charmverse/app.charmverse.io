@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 import 'theme/styles.scss';
 
-export default async function Layout({
+export default function Layout({
   children
 }: Readonly<{
   children: ReactNode;
