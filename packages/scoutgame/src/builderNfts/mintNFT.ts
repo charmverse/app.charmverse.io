@@ -14,17 +14,20 @@ type MintNFTParams = {
   recipientAddress: string;
   tokenId: bigint;
   amount: number;
+  pointsValue: number; // total value of purchase, after 50% discount, etc
+  paidWithPoints: boolean; // whether to subtract from the scout's points
   scoutId: string;
 };
 
 export async function mintNFT(params: MintNFTParams) {
-  const { builderNftId, recipientAddress, tokenId, amount, scoutId } = params;
+  const { builderNftId, recipientAddress, tokenId, amount, scoutId, pointsValue, paidWithPoints } = params;
   const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
       id: builderNftId
     }
   });
   const apiClient = getBuilderContractAdminClient();
+
   // Proceed with minting
   const txResult = await apiClient.mintTo({
     args: {
@@ -35,25 +38,48 @@ export async function mintNFT(params: MintNFTParams) {
     }
   });
 
-  const nftEvent = await prisma.nFTPurchaseEvent.create({
+  // The builder receives 20% of the points value, regardless of whether the purchase was paid with points or not
+  const pointsReceipts: { value: number; recipientId?: string; senderId?: string }[] = [
+    {
+      value: Math.round(pointsValue * 0.2),
+      recipientId: builderNft.builderId
+    }
+  ];
+
+  if (paidWithPoints) {
+    pointsReceipts.push({
+      value: pointsValue,
+      senderId: scoutId
+    });
+  }
+
+  const builderEvent = await prisma.builderEvent.create({
     data: {
-      pointsValue: 0,
-      tokensPurchased: amount,
-      txHash: txResult.transactionHash.toLowerCase(),
-      builderNftId,
-      scoutId,
-      builderEvent: {
+      type: 'nft_purchase',
+      season: currentSeason,
+      week: getCurrentWeek(),
+      builder: {
+        connect: {
+          id: builderNft.builderId
+        }
+      },
+      nftPurchaseEvent: {
         create: {
-          type: 'nft_purchase',
-          season: currentSeason,
-          week: getCurrentWeek(),
-          builder: {
-            connect: {
-              id: builderNft.builderId
-            }
-          }
+          pointsValue,
+          tokensPurchased: amount,
+          txHash: txResult.transactionHash.toLowerCase(),
+          builderNftId,
+          scoutId
+        }
+      },
+      pointsReceipts: {
+        createMany: {
+          data: pointsReceipts
         }
       }
+    },
+    select: {
+      nftPurchaseEventId: true
     }
   });
 
@@ -63,7 +89,7 @@ export async function mintNFT(params: MintNFTParams) {
 
   await recordGameActivity({
     sourceEvent: {
-      nftPurchaseEventId: nftEvent.id,
+      nftPurchaseEventId: builderEvent.nftPurchaseEventId,
       onchainTxHash: txResult.transactionHash,
       onchainChainId: builderNftChain.id
     },
@@ -76,7 +102,7 @@ export async function mintNFT(params: MintNFTParams) {
 
   await recordGameActivity({
     sourceEvent: {
-      nftPurchaseEventId: nftEvent.id,
+      nftPurchaseEventId: builderEvent.nftPurchaseEventId,
       onchainTxHash: txResult.transactionHash,
       onchainChainId: builderNftChain.id
     },
