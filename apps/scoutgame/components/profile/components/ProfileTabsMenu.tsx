@@ -47,8 +47,8 @@ export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
       <TabsMenu
         value={tab || 'scout-build'}
         tabs={[
-          { value: 'scout-build', label: 'Scout. Build.', href: '/profile?tab=scout-build' },
-          { value: 'win', label: 'Win', href: '/profile?tab=win' }
+          { value: 'scout-build', label: 'Scout. Build.' },
+          { value: 'win', label: 'Win' }
         ]}
       />
     );
@@ -58,9 +58,9 @@ export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
     <TabsMenu
       value={tab || 'scout'}
       tabs={[
-        { value: 'scout', label: 'Scout', href: '/profile?tab=scout' },
-        { value: 'build', label: 'Build', href: '/profile?tab=build' },
-        { value: 'win', label: 'Win', href: '/profile?tab=win' }
+        { value: 'scout', label: 'Scout' },
+        { value: 'build', label: 'Build' },
+        { value: 'win', label: 'Win' }
       ]}
     />
   );

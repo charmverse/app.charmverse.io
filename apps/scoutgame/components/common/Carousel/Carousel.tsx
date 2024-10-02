@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
+import { useLgScreen, useMdScreen, useSmScreen } from 'hooks/useMediaScreens';
 
 import { LoadingCards } from '../Loading/LoadingCards';
 
@@ -18,9 +18,10 @@ export type CarouselProps = {
 };
 
 export function Carousel({ children }: CarouselProps) {
+  const isSmall = useSmScreen();
   const isDesktop = useMdScreen();
   const isLarge = useLgScreen();
-  const slidesPerView = isDesktop ? 5 : isLarge ? 6 : 1.75;
+  const slidesPerView = isDesktop ? 5 : isLarge ? 6 : isSmall ? 4.2 : 2.2;
   // Use state and effect to skip pre-rendering
   const [isClientSide, setIsClientSide] = useState(false);
 

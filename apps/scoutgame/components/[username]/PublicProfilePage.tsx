@@ -33,9 +33,9 @@ export async function PublicProfilePage({ user, tab }: { user: BasicUserInfo; ta
           isApprovedBuilder={user.builderStatus === 'approved'}
         />
         {tab === 'builder' && user.builderStatus === 'approved' ? (
-          <PublicBuilderProfile user={user} />
+          <PublicBuilderProfile publicUser={user} />
         ) : (
-          <PublicScoutProfile user={user} />
+          <PublicScoutProfile publicUser={user} />
         )}
       </Box>
     </PageContainer>

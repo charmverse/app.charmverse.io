@@ -8,7 +8,7 @@ import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import type { ButtonProps } from '@mui/material';
 import { Box, Button, Link, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
 
@@ -24,6 +24,9 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const router = useRouter();
   const { isAuthenticated } = useProfile();
+  const searchParams = useSearchParams();
+  const redirectUrlEncoded = searchParams.get('redirectUrl');
+  const redirectUrl = redirectUrlEncoded ? decodeURIComponent(redirectUrlEncoded) : '/';
 
   const { executeAsync: revalidatePath, isExecuting: isRevalidatingPath } = useAction(revalidatePathAction);
 
@@ -34,7 +37,7 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     result
   } = useAction(loginAction, {
     onSuccess: async ({ data }) => {
-      const nextPage = data?.onboarded ? '/' : '/welcome';
+      const nextPage = data?.onboarded ? redirectUrl : '/welcome';
 
       if (!data?.success) {
         return;
@@ -96,10 +99,7 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         size='large'
         onClick={signIn}
         disabled={!url}
-        sx={{
-          px: 4,
-          py: 2
-        }}
+        sx={{ px: 4, py: 2 }}
         startIcon={<WarpcastIcon />}
         {...props}
       >
