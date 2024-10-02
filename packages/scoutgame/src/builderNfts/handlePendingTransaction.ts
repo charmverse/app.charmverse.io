@@ -10,8 +10,8 @@ import {
   waitForDecentTransactionSettlement
 } from '@packages/onchain/waitForDecentTransactionSettlement';
 
-import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
 import { mintNFT } from './mintNFT';
+import { convertCostToPoints } from './utils';
 
 export async function handlePendingTransaction({
   pendingTransactionId
@@ -60,8 +60,6 @@ export async function handlePendingTransaction({
       }
     });
 
-    const apiClient = getBuilderContractAdminClient();
-
     if (pendingTx.destinationChainId === pendingTx.sourceChainId) {
       const receipt = await getPublicClient(pendingTx.destinationChainId).waitForTransactionReceipt({
         hash: pendingTx.sourceChainTxHash as `0x${string}`
@@ -92,7 +90,9 @@ export async function handlePendingTransaction({
       recipientAddress: pendingTx.senderAddress,
       tokenId: pendingTx.tokenId,
       amount: pendingTx.tokenAmount,
-      scoutId: pendingTx.userId
+      scoutId: pendingTx.userId,
+      paidWithPoints: false,
+      pointsValue: convertCostToPoints(pendingTx.targetAmountReceived)
     });
 
     // Update the pending transaction status to 'completed' and set destination details

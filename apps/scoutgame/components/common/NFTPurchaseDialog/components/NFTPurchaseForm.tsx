@@ -27,8 +27,8 @@ import {
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
 import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
+import { convertCostToUsd, convertCostToPointsWithDiscount } from '@packages/scoutgame/builderNfts/utils';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
-import { switchChain } from '@wagmi/core';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
@@ -101,7 +101,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
 
-  const purchaseCostInPoints = convertCostToPoints(purchaseCost);
+  const purchaseCostInPoints = convertCostToPointsWithDiscount(purchaseCost);
   const notEnoughPoints = paymentMethod === 'points' && user && user.currentBalance < purchaseCostInPoints;
 
   const {
@@ -524,15 +524,4 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       ) : null}
     </Stack>
   );
-}
-
-function convertCostToUsd(cost: bigint) {
-  return `$${parseFloat(formatUnits(cost, 6)).toLocaleString()}`;
-}
-
-// 1 Point is $.10. So $1 is 10 points
-function convertCostToPoints(costWei: bigint) {
-  const costInUsd = Number(formatUnits(costWei, 6));
-  // 50% discount
-  return Math.round(costInUsd * 10 * 0.5);
 }
