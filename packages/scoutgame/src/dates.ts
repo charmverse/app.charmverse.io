@@ -13,6 +13,9 @@ export const currentSeasonNumber = 1;
 
 export const streakWindow = 7 * 24 * 60 * 60 * 1000;
 
+export const seasonAllocatedPoints = 18_141_850;
+export const weeklyAllocatedPoints = seasonAllocatedPoints / 13;
+
 // Return the format of week
 export function getCurrentWeek(): ISOWeek {
   return _formatWeek(DateTime.utc());
@@ -49,11 +52,6 @@ function _formatWeek(date: DateTime): ISOWeek {
 export function isToday(date: Date, now = DateTime.utc()) {
   const dateDay = DateTime.fromJSDate(date, { zone: 'utc' }).startOf('day');
   return dateDay.equals(now.startOf('day'));
-}
-
-export function getCurrentWeekPoints() {
-  // TODO: Get points allocation for the week
-  return 100000;
 }
 
 export function getCurrentSeasonWeekNumber(): SeasonWeek {
