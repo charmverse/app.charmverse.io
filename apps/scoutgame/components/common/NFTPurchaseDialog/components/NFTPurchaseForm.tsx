@@ -90,7 +90,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
   const [fetchError, setFetchError] = useState<any>(null);
-  const [purchaseWithPointsError, setPurchaseWithPointsError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [tokensToBuy, setTokensToBuy] = useState(1);
 
@@ -111,11 +111,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     executeAsync: purchaseWithPoints
   } = useAction(purchaseWithPointsAction, {
     onError(err) {
-      log.error('Error purchasing with points', { error: err });
-      setPurchaseWithPointsError(err.error.serverError?.message || 'Something went wrong');
+      log.error('Error purchasing with points', { chainId, builderTokenId, purchaseCost, error: err });
+      setSubmitError(err.error.serverError?.message || 'Something went wrong');
     },
     onExecute() {
-      setPurchaseWithPointsError(null);
+      setSubmitError(null);
     }
   });
 
@@ -123,7 +123,15 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     isExecuting: isExecutingTransaction,
     hasSucceeded: transactionHasSucceeded,
     executeAsync: checkDecentTransaction
-  } = useAction(checkDecentTransactionAction, {});
+  } = useAction(checkDecentTransactionAction, {
+    onError(err) {
+      log.error('Error checking Decent transaction', { error: err });
+      setSubmitError(err.error.serverError?.message || 'Something went wrong');
+    },
+    onExecute() {
+      setSubmitError(null);
+    }
+  });
 
   const {
     isExecuting: isSavingDecentTransaction,
@@ -138,6 +146,10 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     },
     onError(err) {
       log.error('Error minting NFT', { chainId, builderTokenId, purchaseCost, error: err });
+      setSubmitError(err.error.serverError?.message || 'Something went wrong');
+    },
+    onExecute() {
+      setSubmitError(null);
     }
   });
 
@@ -535,9 +547,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           {(decentSdkError as Error).message}
         </Typography>
       ) : null}
-      {purchaseWithPointsError && (
+      {submitError && (
         <Typography variant='caption' color='error' align='center'>
-          {purchaseWithPointsError}
+          {submitError}
         </Typography>
       )}
     </Stack>
