@@ -2,7 +2,9 @@ import type { TextFieldProps } from '@mui/material';
 import { TextField, styled } from '@mui/material';
 import { forwardRef } from 'react';
 
-const StyledTextField = styled(TextField)<{ disableArrows?: boolean }>`
+const StyledTextField = styled(TextField, {
+  shouldForwardProp: (prop) => prop !== 'disableArrows'
+})<{ disableArrows?: boolean }>`
   ${({ disableArrows }) =>
     disableArrows
       ? `
