@@ -2,9 +2,10 @@
 
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { builderNftChain } from '@packages/scoutgame/builderNfts/constants';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+
+import { refreshUserStats } from '../refreshUserStats';
 
 import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
 
@@ -66,6 +67,7 @@ export async function mintNFT(params: MintNFTParams) {
           create: {
             pointsValue,
             tokensPurchased: amount,
+            paidInPoints: paidWithPoints,
             txHash: txResult.transactionHash.toLowerCase(),
             builderNftId,
             scoutId,
@@ -89,15 +91,42 @@ export async function mintNFT(params: MintNFTParams) {
       }
     });
 
-    await tx.userSeasonStats.update({
+    await tx.userSeasonStats.upsert({
       where: {
         userId_season: {
           userId: builderNft.builderId,
           season: currentSeason
         }
       },
-      data: {
+      create: {
+        nftsSold: 1,
+        userId: builderNft.builderId,
+        season: currentSeason,
+        pointsEarnedAsBuilder: 0,
+        pointsEarnedAsScout: 0
+      },
+      update: {
         nftsSold: {
+          increment: amount
+        }
+      }
+    });
+    await tx.userSeasonStats.upsert({
+      where: {
+        userId_season: {
+          userId: scoutId,
+          season: currentSeason
+        }
+      },
+      create: {
+        nftsPurchased: 1,
+        userId: scoutId,
+        season: currentSeason,
+        pointsEarnedAsBuilder: 0,
+        pointsEarnedAsScout: 0
+      },
+      update: {
+        nftsPurchased: {
           increment: amount
         }
       }

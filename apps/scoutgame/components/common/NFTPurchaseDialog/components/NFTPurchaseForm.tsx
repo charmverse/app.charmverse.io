@@ -3,6 +3,7 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
+import type { UseBoxActionArgs } from '@decent.xyz/box-hooks';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
@@ -84,8 +85,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const [sourceFundsChain, setSourceFundsChain] = useState(useTestnets ? ChainId.OPTIMISM_SEPOLIA : ChainId.OPTIMISM);
 
-  // const [nftApiClient, setNftApiClient] = useState<BuilderNFTSeasonOneClient>(null);
-
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
   const [fetchError, setFetchError] = useState<any>(null);
@@ -102,7 +101,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
 
   const purchaseCostInPoints = convertCostToPointsWithDiscount(purchaseCost);
-  const notEnoughPoints = paymentMethod === 'points' && user && user.currentBalance < purchaseCostInPoints;
+  const notEnoughPoints = user && user.currentBalance < purchaseCostInPoints;
 
   const {
     isExecuting: isPurchasingWithPoints,
@@ -264,11 +263,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const enableNftButton = !!address && !!sourceFundsChain && !!purchaseCost;
 
-  const {
-    error: decentSdkError,
-    isLoading: isLoadingDecentSdk,
-    actionResponse
-  } = useBoxAction({
+  const decentAPIParams: UseBoxActionArgs = {
     enable: enableNftButton,
     sender: address as `0x${string}`,
     srcToken: '0x0000000000000000000000000000000000000000',
@@ -283,7 +278,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       swapDirection: SwapDirection.EXACT_AMOUNT_OUT,
       receiverAddress: treasuryAddress as string
     }
-  });
+  };
+
+  const { error: decentSdkError, isLoading: isLoadingDecentSdk, actionResponse } = useBoxAction(decentAPIParams);
 
   const handlePurchase = async () => {
     if (paymentMethod === 'points') {
@@ -334,6 +331,15 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       );
     }
   };
+
+  useEffect(() => {
+    if (decentSdkError) {
+      log.error('Error on NFT Purchase calling useBoxAction from Decent SDK', {
+        params: decentAPIParams,
+        error: decentSdkError
+      });
+    }
+  }, [decentSdkError]);
 
   if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
     return <SuccessView builder={builder} />;
@@ -469,11 +475,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           onChange={(e) => setPaymentMethod(e.target.value as 'points' | 'wallet')}
           sx={{ mb: 2, display: 'flex', gap: 2, width: '100%' }}
         >
-          <FormControlLabel value='wallet' control={<Radio />} label='Wallet' />
+          <FormControlLabel sx={{ width: '50%' }} value='wallet' control={<Radio />} label='Wallet' />
           <FormControlLabel
             value='points'
+            // disabled={Boolean(loadingUser || notEnoughPoints)}
             control={<Radio />}
-            sx={{ width: '50%' }}
             label={
               <Stack direction='row' alignItems='center' spacing={0.5}>
                 <Typography>Scout Points</Typography>
@@ -536,7 +542,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           !treasuryAddress ||
           isSavingDecentTransaction ||
           isExecutingTransaction ||
-          notEnoughPoints ||
+          (paymentMethod === 'points' && notEnoughPoints) ||
           isPurchasingWithPoints
         }
       >

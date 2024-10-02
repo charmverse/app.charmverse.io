@@ -1,7 +1,7 @@
 'use client';
 
 import { Carousel } from 'components/common/Carousel/Carousel';
-import { useLgScreen, useMdScreen, useXsmScreen } from 'hooks/useMediaScreens';
+import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderInfo } from 'lib/builders/interfaces';
 
 import { BuilderCard } from '../../../common/Card/BuilderCard/BuilderCard';

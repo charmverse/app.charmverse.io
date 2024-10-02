@@ -85,7 +85,7 @@ export class ProductionStack extends Stack {
             {
               namespace: 'aws:elasticbeanstalk:command',
               optionName: 'BatchSize',
-              value: '50' // percentage of instances to update at a time
+              value: '70' // percentage of instances to update at a time
             },
             {
               namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
