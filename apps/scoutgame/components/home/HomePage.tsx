@@ -1,6 +1,3 @@
-import 'server-only';
-
-import type { Scout } from '@charmverse/core/prisma-client';
 import { Box, Stack, Typography, Container } from '@mui/material';
 import Image from 'next/image';
 import { Suspense } from 'react';
@@ -10,11 +7,12 @@ import { LoadingCards } from 'components/common/Loading/LoadingCards';
 import { LoadingTable } from 'components/common/Loading/LoadingTable';
 import { TodaysHotBuildersCarousel } from 'components/home/components/BuildersCarousel/TodaysHotBuildersCarousel';
 import { HomeTabsMenu } from 'components/home/components/HomePageTable/components/HomeTabsMenu';
+import type { SessionUser } from 'lib/session/getUserFromSession';
 
 import { homeTabs } from './components/HomePageTable/components/HomeTabsMenu';
 import { HomeTab } from './components/HomePageTable/HomePageTable';
 
-export async function HomePage({ user, tab }: { user: Scout | null; tab: string }) {
+export function HomePage({ user, tab }: { user: SessionUser | null; tab: string }) {
   const currentTab = homeTabs.some((t) => t.value === tab) ? tab : 'leaderboard';
   return (
     <>
@@ -32,7 +30,7 @@ export async function HomePage({ user, tab }: { user: Scout | null; tab: string 
         <HomeTabsMenu tab={currentTab} />
         <Box px={{ xs: 1, md: 0 }}>
           <Suspense key={currentTab} fallback={<LoadingTable />}>
-            <HomeTab tab={currentTab} />
+            <HomeTab tab={currentTab} userId={user?.id} />
           </Suspense>
         </Box>
       </Container>

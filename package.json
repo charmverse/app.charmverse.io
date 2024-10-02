@@ -81,7 +81,7 @@
     "upgrade:storybook": "npx storybook@latest upgrade",
     "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes",
     "scoutgame": "npx react-env --path .env.local --dest ./apps/scoutgame/public -- npm run start --workspace=apps/scoutgame",
-    "scoutgame:remote": "npx react-env --path .env.production -- npm run start --workspace=apps/scoutgame",
+    "scoutgame:remote": "npx react-env --path .env.production --dest ./apps/scoutgame/public -- npm run start --workspace=apps/scoutgame",
     "scoutgame:build": "npm run build --w=apps/scoutgame",
     "scoutgame:start:prod": "npx react-env --path .env.local --dest ./apps/scoutgame/public -- npm run start:prod --workspace=apps/scoutgame",
     "scoutgame:test": "dotenv -e .env.test.local -- npm test -w apps/scoutgame",

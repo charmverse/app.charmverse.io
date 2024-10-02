@@ -1,7 +1,8 @@
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import { Button, IconButton, Stack, Typography, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+
+import { Dialog } from '../Dialog';
 
 export function SignInModalMessage({
   open,
@@ -20,36 +21,27 @@ export function SignInModalMessage({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
-      <DialogTitle color='secondary'>Hi there! Have we met?</DialogTitle>
-      <IconButton
-        data-test='close-modal'
-        aria-label='close'
-        onClick={onClose}
-        sx={(theme) => ({
-          position: 'absolute',
-          right: 8,
-          top: 8
-        })}
-      >
-        <HighlightOffIcon color='primary' />
-      </IconButton>
-      <DialogContent>
-        <Stack gap={2} alignItems='center'>
-          <Image
-            src='/images/profile/please-login.png'
-            alt='Please login'
-            width={200}
-            height={200}
-            sizes='100vw'
-            style={{ maxHeight: 200 }}
-          />
-          <Typography fontWeight={600}>Please sign in to continue</Typography>
-          <Button data-test='modal-sign-in-button' fullWidth onClick={handleClose}>
-            Continue
-          </Button>
-        </Stack>
-      </DialogContent>
+    <Dialog
+      title='Hi there! Have we met?'
+      open={open}
+      onClose={onClose}
+      PaperProps={{ sx: { maxWidth: 400 } }}
+      fullWidth
+    >
+      <Stack gap={2} alignItems='center' mt={2}>
+        <Image
+          src='/images/profile/please-login.png'
+          alt='Please login'
+          width={200}
+          height={200}
+          sizes='100vw'
+          style={{ maxHeight: 200 }}
+        />
+        <Typography fontWeight={600}>Please sign in to continue</Typography>
+        <Button data-test='modal-sign-in-button' fullWidth onClick={handleClose}>
+          Continue
+        </Button>
+      </Stack>
     </Dialog>
   );
 }

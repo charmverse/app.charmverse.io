@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { Box, Stack, TableHead } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -22,7 +20,7 @@ import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
 import { TableCellText } from './TableCellText';
 
-export async function ActivityTable({ activities }: { activities: BuilderActivity[] }) {
+export function ActivityTable({ activities }: { activities: BuilderActivity[] }) {
   return (
     <TableContainer data-test='activity-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Activity table' size='small'>

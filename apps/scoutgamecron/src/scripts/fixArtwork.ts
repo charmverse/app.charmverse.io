@@ -1,13 +1,10 @@
-import { log } from "@charmverse/core/log";
-import { prisma } from "@charmverse/core/prisma-client";
-import { uploadMetadata } from "@packages/scoutgame/builderNfts/artwork/uploadMetadata";
-import { builderContractReadonlyApiClient } from "@packages/scoutgame/builderNfts/clients/builderContractReadClient";
-import { getBuilderContractAddress } from "@packages/scoutgame/builderNfts/constants";
-import { uploadArtwork } from "@packages/scoutgame/builderNfts/artwork/uploadArtwork";
-import { currentSeason } from "@packages/scoutgame/dates";
-
-
-
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
+import { uploadMetadata } from '@packages/scoutgame/builderNfts/artwork/uploadMetadata';
+import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
+import { getBuilderContractAddress } from '@packages/scoutgame/builderNfts/constants';
+import { uploadArtwork } from '@packages/scoutgame/builderNfts/artwork/uploadArtwork';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 async function refreshArtworks() {
   const builderNfts = await prisma.builderNft.findMany({
@@ -28,11 +25,11 @@ async function refreshArtworks() {
     }
   });
 
-  console.log('Contract ', getBuilderContractAddress())
+  console.log('Contract ', getBuilderContractAddress());
 
   const totalNfts = builderNfts.length;
 
-  console.log(totalNfts)
+  console.log(totalNfts);
 
   for (let i = 0; i < totalNfts; i++) {
     const nft = builderNfts[i];
@@ -51,7 +48,6 @@ async function refreshArtworks() {
     if (Number(tokenId) !== nft.tokenId) {
       throw new Error(`Token ID mismatch for builder ${nft.builderId} at index ${i}`);
     }
-
 
     const filePath = await uploadArtwork({
       avatar,
@@ -74,10 +70,8 @@ async function refreshArtworks() {
       tokenId: BigInt(tokenId),
       username: nft.builder.username,
       attributes: []
-    })
-    
+    });
   }
 }
 
-
-refreshArtworks().then(console.log)
+refreshArtworks().then(console.log);

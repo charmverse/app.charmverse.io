@@ -1,4 +1,4 @@
-import 'server-only';
+'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';

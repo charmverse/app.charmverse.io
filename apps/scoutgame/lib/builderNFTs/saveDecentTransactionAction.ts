@@ -1,7 +1,7 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
-import { handlePendingTransaction } from '@packages/scoutgame/handlePendingTransaction';
+import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
 import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
@@ -9,8 +9,8 @@ import * as yup from 'yup';
 import { authActionClient } from 'lib/actions/actionClient';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
-export const mintNftAction = authActionClient
-  .metadata({ actionName: 'mint-nft' })
+export const saveDecentTransactionAction = authActionClient
+  .metadata({ actionName: 'save-decent-transaction' })
   .schema(
     yup.object().shape({
       user: yup.object().shape({

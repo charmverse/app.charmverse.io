@@ -1,12 +1,12 @@
 'use server';
 
-import { handlePendingTransaction } from '@packages/scoutgame/handlePendingTransaction';
+import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
 import * as yup from 'yup';
 
 import { authActionClient } from 'lib/actions/actionClient';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
-export const handleMintNftAction = authActionClient
+export const checkDecentTransactionAction = authActionClient
   .metadata({ actionName: 'handle-mint-nft' })
   .schema(
     yup.object().shape({

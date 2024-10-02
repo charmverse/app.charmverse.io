@@ -1,7 +1,7 @@
 import { useGETImmutable } from './helpers';
 
 export function useSearchBuilders(username: string) {
-  return useGETImmutable<[]>('/api/builders/search', {
+  return useGETImmutable<[]>(username ? '/api/builders/search' : null, {
     username
   });
 }

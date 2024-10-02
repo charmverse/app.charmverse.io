@@ -12,7 +12,8 @@ import {
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
-import { getBuilderContractAdminClient } from './builderNfts/clients/builderContractAdminWriteClient';
+import { mintNFT } from './mintNFT';
+import { convertCostToPoints } from './utils';
 
 export async function handlePendingTransaction({
   pendingTransactionId
@@ -61,8 +62,6 @@ export async function handlePendingTransaction({
       }
     });
 
-    const apiClient = getBuilderContractAdminClient();
-
     if (pendingTx.destinationChainId === pendingTx.sourceChainId) {
       const receipt = await getPublicClient(pendingTx.destinationChainId).waitForTransactionReceipt({
         hash: pendingTx.sourceChainTxHash as `0x${string}`
@@ -88,45 +87,14 @@ export async function handlePendingTransaction({
     });
 
     // Proceed with minting
-    const txResult = await apiClient.mintTo({
-      args: {
-        account: pendingTx.senderAddress,
-        tokenId: pendingTx.tokenId,
-        amount: BigInt(pendingTx.tokenAmount),
-        scout: pendingTx.userId
-      }
+    await mintNFT({
+      builderNftId: builderNft.id,
+      recipientAddress: pendingTx.senderAddress,
+      amount: pendingTx.tokenAmount,
+      scoutId: pendingTx.userId,
+      paidWithPoints: false,
+      pointsValue: convertCostToPoints(pendingTx.targetAmountReceived)
     });
-
-    await prisma.nFTPurchaseEvent.create({
-      data: {
-        pointsValue: 0,
-        tokensPurchased: pendingTx.tokenAmount,
-        txHash: txResult.transactionHash.toLowerCase(),
-        builderNftId: builderNft.id,
-        scoutId: pendingTx.userId,
-        builderEvent: {
-          create: {
-            type: 'nft_purchase',
-            season: currentSeason,
-            week: getCurrentWeek(),
-            builder: {
-              connect: {
-                id: pendingTx.userId
-              }
-            }
-          }
-        },
-        activities: {
-          create: {
-            recipientType: 'builder',
-            type: 'nft_purchase',
-            userId: builderNft.builderId
-          }
-        }
-      }
-    });
-
-    await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: currentSeason });
 
     // Update the pending transaction status to 'completed' and set destination details
     await prisma.pendingNftTransaction.update({

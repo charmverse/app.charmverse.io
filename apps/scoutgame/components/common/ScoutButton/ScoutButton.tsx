@@ -12,7 +12,7 @@ import { DynamicLoadingContext, LoadingComponent } from '../DynamicLoading';
 import { SignInModalMessage } from './SignInModalMessage';
 
 const NFTPurchaseDialog = dynamic(
-  () => import('components/common/NFTPurchaseForm/NFTPurchaseDialog').then((mod) => mod.NFTPurchaseDialogWithProviders),
+  () => import('components/common/NFTPurchaseDialog/NFTPurchaseDialog').then((mod) => mod.NFTPurchaseDialog),
   {
     loading: LoadingComponent,
     ssr: false

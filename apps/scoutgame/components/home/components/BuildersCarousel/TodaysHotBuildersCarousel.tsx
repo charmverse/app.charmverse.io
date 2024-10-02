@@ -1,4 +1,4 @@
-import 'server-only';
+'use server';
 
 import { getTodaysHotBuilders } from 'lib/builders/getTodaysHotBuilders';
 

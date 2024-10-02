@@ -19,7 +19,6 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
     where: {
       builderId,
       chainId: builderNftChain.id,
-      contractAddress: getBuilderContractAddress(),
       season
     }
   });
