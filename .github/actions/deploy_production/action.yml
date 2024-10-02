@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |
         build_id=${{ hashFiles('apps/${{ inputs.app_name }}/*.ts', 'apps/${{ inputs.app_name }}/*.tsx') }}
-        echo "REACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/${{ inputs.app_name }}.env
+        echo "\nREACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/${{ inputs.app_name }}.env
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
