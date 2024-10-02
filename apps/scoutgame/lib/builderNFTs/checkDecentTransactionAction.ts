@@ -1,6 +1,6 @@
 'use server';
 
-import { handlePendingTransaction } from '@packages/scoutgame/handlePendingTransaction';
+import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
 import * as yup from 'yup';
 
 import { authActionClient } from 'lib/actions/actionClient';

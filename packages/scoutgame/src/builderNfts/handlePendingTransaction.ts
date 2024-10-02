@@ -2,19 +2,16 @@
 
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import { PointsDirection, prisma, TransactionStatus } from '@charmverse/core/prisma-client';
+import { prisma, TransactionStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { getPublicClient } from '@packages/onchain/getPublicClient';
 import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
 } from '@packages/onchain/waitForDecentTransactionSettlement';
-import { builderNftChain } from '@packages/scoutgame/builderNfts/constants';
-import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
-import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
 
-import { getBuilderContractAdminClient } from './builderNfts/clients/builderContractAdminWriteClient';
+import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
+import { mintNFT } from './mintNFT';
 
 export async function handlePendingTransaction({
   pendingTransactionId
@@ -90,63 +87,12 @@ export async function handlePendingTransaction({
     });
 
     // Proceed with minting
-    const txResult = await apiClient.mintTo({
-      args: {
-        account: pendingTx.senderAddress,
-        tokenId: pendingTx.tokenId,
-        amount: BigInt(pendingTx.tokenAmount),
-        scout: pendingTx.userId
-      }
-    });
-
-    const nftEvent = await prisma.nFTPurchaseEvent.create({
-      data: {
-        pointsValue: 0,
-        tokensPurchased: pendingTx.tokenAmount,
-        txHash: txResult.transactionHash.toLowerCase(),
-        builderNftId: builderNft.id,
-        scoutId: pendingTx.userId,
-        builderEvent: {
-          create: {
-            type: 'nft_purchase',
-            season: currentSeason,
-            week: getCurrentWeek(),
-            builder: {
-              connect: {
-                id: pendingTx.userId
-              }
-            }
-          }
-        }
-      }
-    });
-
-    await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: currentSeason });
-
-    await recordGameActivity({
-      sourceEvent: {
-        nftPurchaseEventId: nftEvent.id,
-        onchainTxHash: txResult.transactionHash,
-        onchainChainId: builderNftChain.id
-      },
-      activity: {
-        pointsDirection: PointsDirection.out,
-        userId: builderNft.builderId,
-        amount: pendingTx.tokenAmount
-      }
-    });
-
-    await recordGameActivity({
-      sourceEvent: {
-        nftPurchaseEventId: nftEvent.id,
-        onchainTxHash: txResult.transactionHash,
-        onchainChainId: builderNftChain.id
-      },
-      activity: {
-        pointsDirection: PointsDirection.in,
-        userId: builderNft.builderId,
-        amount: pendingTx.tokenAmount
-      }
+    await mintNFT({
+      builderNftId: builderNft.id,
+      recipientAddress: pendingTx.senderAddress,
+      tokenId: pendingTx.tokenId,
+      amount: pendingTx.tokenAmount,
+      scoutId: pendingTx.userId
     });
 
     // Update the pending transaction status to 'completed' and set destination details

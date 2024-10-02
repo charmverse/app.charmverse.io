@@ -1,7 +1,7 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
-import { handlePendingTransaction } from '@packages/scoutgame/handlePendingTransaction';
+import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
 import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
