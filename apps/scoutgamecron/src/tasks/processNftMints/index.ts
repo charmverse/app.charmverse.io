@@ -5,7 +5,11 @@ import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handle
 export async function processNftMints() {
   const pending = await prisma.pendingNftTransaction.findMany({
     where: {
-      status: TransactionStatus.pending
+      status: TransactionStatus.pending,
+      createdAt: {
+        // Only process transactions that are at least 1 minute old in the case user is already in the app
+        lte: new Date(Date.now() - 1000 * 65) // 7 days ago
+      }
     }
   });
 
