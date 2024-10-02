@@ -1,18 +1,7 @@
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import {
-  Button,
-  IconButton,
-  Stack,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
-} from '@mui/material';
+import { Button, IconButton, Stack, Typography, Dialog, DialogTitle, DialogContent } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-
-import { BasicModal } from 'components/common/Modal';
 
 export function SignInModalMessage({
   open,
