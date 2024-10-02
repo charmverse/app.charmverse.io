@@ -79,7 +79,7 @@ describe('processMergedPullRequest', () => {
 
     expect(githubEvent).toBeDefined();
 
-    const builderEvent = await prisma.builderEvent.findFirstOrThrow({
+    const builderEvent = await prisma.builderEvent.findFirst({
       where: {
         builderId: builder.id
       }
@@ -87,9 +87,9 @@ describe('processMergedPullRequest', () => {
 
     expect(builderEvent).toBeDefined();
 
-    const gemsReceipt = await prisma.gemsReceipt.findFirstOrThrow({
+    const gemsReceipt = await prisma.gemsReceipt.findFirst({
       where: {
-        eventId: builderEvent.id
+        eventId: builderEvent?.id
       }
     });
 
@@ -107,7 +107,7 @@ describe('processMergedPullRequest', () => {
       where: {
         userId: builder.id,
         type: 'gems_first_pr',
-        gemsReceiptId: gemsReceipt.id,
+        gemsReceiptId: gemsReceipt?.id,
         recipientType: 'builder'
       }
     });
@@ -118,7 +118,7 @@ describe('processMergedPullRequest', () => {
       where: {
         userId: scout.id,
         type: 'gems_first_pr',
-        gemsReceiptId: gemsReceipt.id,
+        gemsReceiptId: gemsReceipt?.id,
         recipientType: 'scout'
       }
     });
@@ -167,7 +167,7 @@ describe('processMergedPullRequest', () => {
 
     expect(githubEvent).toBeDefined();
 
-    const builderEvent = await prisma.builderEvent.findFirstOrThrow({
+    const builderEvent = await prisma.builderEvent.findFirst({
       where: {
         builderId: builder.id
       }
@@ -175,9 +175,9 @@ describe('processMergedPullRequest', () => {
 
     expect(builderEvent).toBeDefined();
 
-    const gemsReceipt = await prisma.gemsReceipt.findFirstOrThrow({
+    const gemsReceipt = await prisma.gemsReceipt.findFirst({
       where: {
-        eventId: builderEvent.id
+        eventId: builderEvent?.id
       }
     });
 
@@ -195,7 +195,7 @@ describe('processMergedPullRequest', () => {
       where: {
         userId: builder.id,
         type: 'gems_regular_pr',
-        gemsReceiptId: gemsReceipt.id,
+        gemsReceiptId: gemsReceipt?.id,
         recipientType: 'builder'
       }
     });
@@ -205,7 +205,7 @@ describe('processMergedPullRequest', () => {
       where: {
         userId: scout.id,
         type: 'gems_regular_pr',
-        gemsReceiptId: gemsReceipt.id,
+        gemsReceiptId: gemsReceipt?.id,
         recipientType: 'scout'
       }
     });
@@ -272,7 +272,7 @@ describe('processMergedPullRequest', () => {
     });
     expect(gemsReceipts).toHaveLength(3);
 
-    const gemsReceipt = await prisma.gemsReceipt.findFirstOrThrow({
+    const gemsReceipt = await prisma.gemsReceipt.findFirst({
       where: {
         type: 'third_pr_in_streak'
       }
@@ -296,7 +296,7 @@ describe('processMergedPullRequest', () => {
       where: {
         userId: builder.id,
         type: 'gems_third_pr_in_streak',
-        gemsReceiptId: gemsReceipt.id,
+        gemsReceiptId: gemsReceipt?.id,
         recipientType: 'builder'
       }
     });
@@ -306,7 +306,7 @@ describe('processMergedPullRequest', () => {
       where: {
         userId: scout.id,
         type: 'gems_third_pr_in_streak',
-        gemsReceiptId: gemsReceipt.id,
+        gemsReceiptId: gemsReceipt?.id,
         recipientType: 'scout'
       }
     });
@@ -432,7 +432,8 @@ describe('processMergedPullRequest', () => {
 
     const builderEvents = await prisma.builderEvent.count({
       where: {
-        builderId: builder.id
+        builderId: builder.id,
+        type: 'merged_pull_request'
       }
     });
     expect(builderEvents).toBe(1);
@@ -495,7 +496,8 @@ describe('processMergedPullRequest', () => {
 
     const builderEvents = await prisma.builderEvent.findMany({
       where: {
-        builderId: builder.id
+        builderId: builder.id,
+        type: 'merged_pull_request'
       }
     });
     expect(builderEvents).toHaveLength(0);

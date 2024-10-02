@@ -10,7 +10,6 @@ import { getBonusPartner } from '@packages/scoutgame/bonus';
 import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday, currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
-import { v4 } from 'uuid';
 
 import type { PullRequest } from './getPullRequests';
 import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
