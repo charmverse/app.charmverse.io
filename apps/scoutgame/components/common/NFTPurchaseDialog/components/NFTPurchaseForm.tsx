@@ -50,6 +50,21 @@ export type NFTPurchaseProps = {
   builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
 };
 
+export function NFTPurchaseForm(props: NFTPurchaseProps) {
+  // Waiting for component to render before fetching the API key
+  const apiKey = env('DECENT_API_KEY');
+
+  if (!apiKey) {
+    return <Typography color='error'>Decent API key not found</Typography>;
+  }
+
+  return (
+    <BoxHooksContextProvider apiKey={apiKey}>
+      <NFTPurchaseFormContent {...props} />
+    </BoxHooksContextProvider>
+  );
+}
+
 export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111];
@@ -465,19 +480,4 @@ function convertCostToPointsWithDiscount(costWei: bigint) {
   const points = convertCostToPoints(costWei);
   // 50% discount
   return Math.round(points * 0.5).toLocaleString();
-}
-
-export function NFTPurchaseForm(props: NFTPurchaseProps) {
-  // Waiting for component to render before fetching the API key
-  const apiKey = env('DECENT_API_KEY');
-
-  if (!apiKey) {
-    return <Typography color='error'>Decent API key not found</Typography>;
-  }
-
-  return (
-    <BoxHooksContextProvider apiKey={apiKey}>
-      <NFTPurchaseFormContent {...props} />
-    </BoxHooksContextProvider>
-  );
 }
