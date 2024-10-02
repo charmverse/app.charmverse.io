@@ -110,9 +110,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     hasSucceeded: hasPurchasedWithPoints,
     executeAsync: purchaseWithPoints
   } = useAction(purchaseWithPointsAction, {
-    onError(err) {
-      log.error('Error purchasing with points', { chainId, builderTokenId, purchaseCost, error: err });
-      setSubmitError(err.error.serverError?.message || 'Something went wrong');
+    onError({ error, input }) {
+      log.error('Error purchasing with points', { input, error });
+      setSubmitError(error.serverError?.message || 'Something went wrong');
     },
     onExecute() {
       setSubmitError(null);
@@ -124,9 +124,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     hasSucceeded: transactionHasSucceeded,
     executeAsync: checkDecentTransaction
   } = useAction(checkDecentTransactionAction, {
-    onError(err) {
-      log.error('Error checking Decent transaction', { error: err });
-      setSubmitError(err.error.serverError?.message || 'Something went wrong');
+    onError({ error, input }) {
+      log.error('Error checking Decent transaction', { error, input });
+      setSubmitError(error.serverError?.message || 'Something went wrong');
     },
     onExecute() {
       setSubmitError(null);
@@ -144,9 +144,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       }
       log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
     },
-    onError(err) {
-      log.error('Error minting NFT', { chainId, builderTokenId, purchaseCost, error: err });
-      setSubmitError(err.error.serverError?.message || 'Something went wrong');
+    onError({ error, input }) {
+      log.error('Error minting NFT', { chainId, input, error });
+      setSubmitError(error.serverError?.message || 'Something went wrong');
     },
     onExecute() {
       setSubmitError(null);

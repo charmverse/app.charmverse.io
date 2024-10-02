@@ -84,7 +84,7 @@ export async function mintNFT(params: MintNFTParams) {
 
   log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
 
-  await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: currentSeason });
+  await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });
 
   await recordGameActivity({
     sourceEvent: {
