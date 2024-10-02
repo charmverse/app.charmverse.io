@@ -101,6 +101,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
 
+  const purchaseCostInPoints = convertCostToPoints(purchaseCost);
+  const notEnoughPoints = paymentMethod === 'points' && user && user.currentBalance < purchaseCostInPoints;
+
   const {
     isExecuting: isPurchasingWithPoints,
     hasSucceeded: hasPurchasedWithPoints,
@@ -412,7 +415,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           <Typography align='center' sx={{ width: '33%' }}>
             {purchaseCost && (
               <>
-                {convertCostToPointsWithDiscount(purchaseCost)}{' '}
+                {purchaseCostInPoints.toLocaleString()}{' '}
                 <Box display='inline' position='relative' top={4}>
                   <PointsIcon size={18} />
                 </Box>
@@ -451,14 +454,33 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           <FormControlLabel value='wallet' control={<Radio />} label='Wallet' />
         </RadioGroup>
         {paymentMethod === 'points' ? (
-          <Paper
-            sx={{ backgroundColor: 'background.light', p: 2, display: 'flex', alignItems: 'center', gap: 2 }}
-            variant='outlined'
-          >
-            <PointsIcon size={24} />
-            {!loadingUser && <Typography>You have {user?.currentBalance} points</Typography>}
-            {loadingUser && <CircularProgress sx={{ position: 'relative', top: 4 }} size={22} />}
-          </Paper>
+          <Stack gap={1}>
+            <Paper
+              sx={{
+                backgroundColor: 'background.light',
+                borderColor: notEnoughPoints ? 'var(--mui-palette-error-main)' : undefined,
+                p: 2,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2
+              }}
+              variant='outlined'
+            >
+              <PointsIcon size={24} />
+              {!loadingUser && user && (
+                <>
+                  <Typography color={notEnoughPoints ? 'error' : undefined}>Balance: {user?.currentBalance}</Typography>
+
+                  {notEnoughPoints && (
+                    <Typography flexGrow={1} variant='caption' color='error' align='right'>
+                      Not enough Points
+                    </Typography>
+                  )}
+                </>
+              )}
+              {loadingUser && <CircularProgress sx={{ position: 'relative', top: 3 }} size={22} />}
+            </Paper>
+          </Stack>
         ) : (
           <BlockchainSelect
             value={sourceFundsChain}
@@ -472,7 +494,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       </Stack>
       {fetchError && <Typography color='red'>{fetchError.shortMessage || 'Something went wrong'}</Typography>}
       <LoadingButton
-        loading={isSavingDecentTransaction || isExecutingTransaction}
+        loading={isSavingDecentTransaction || isExecutingTransaction || isPurchasingWithPoints}
         size='large'
         onClick={handlePurchase}
         variant='contained'
@@ -482,13 +504,17 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           isFetchingPrice ||
           !treasuryAddress ||
           isSavingDecentTransaction ||
-          isExecutingTransaction
+          isExecutingTransaction ||
+          notEnoughPoints ||
+          isPurchasingWithPoints
         }
       >
         Buy
       </LoadingButton>
       {decentSdkError instanceof Error ? (
-        <Typography color='error'>Error: {(decentSdkError as Error).message}</Typography>
+        <Typography variant='caption' color='error' align='center'>
+          {(decentSdkError as Error).message}
+        </Typography>
       ) : null}
     </Stack>
   );
@@ -501,11 +527,6 @@ function convertCostToUsd(cost: bigint) {
 // 1 Point is $.10. So $1 is 10 points
 function convertCostToPoints(costWei: bigint) {
   const costInUsd = Number(formatUnits(costWei, 6));
-  return costInUsd * 10;
-}
-
-function convertCostToPointsWithDiscount(costWei: bigint) {
-  const points = convertCostToPoints(costWei);
   // 50% discount
-  return Math.round(points * 0.5).toLocaleString();
+  return Math.round(costInUsd * 10 * 0.5);
 }
