@@ -188,9 +188,10 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   async function refreshTokenData() {
     setFetchError(null);
+    let _builderTokenId: bigint | undefined;
     try {
       setIsFetchingPrice(true);
-      const _builderTokenId = await builderContractReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } });
+      _builderTokenId = await builderContractReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } });
 
       setBuilderTokenId(_builderTokenId);
 
@@ -198,6 +199,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
       setIsFetchingPrice(false);
     } catch (error) {
+      log.warn('Error fetching token data', { error, builderId, tokenId: _builderTokenId });
       setIsFetchingPrice(false);
       setFetchError(error);
     }
@@ -492,7 +494,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           />
         )}
       </Stack>
-      {fetchError && <Typography color='red'>{fetchError.shortMessage || 'Something went wrong'}</Typography>}
+      {fetchError && (
+        <Typography variant='caption' color='error'>
+          {fetchError.shortMessage || 'Something went wrong'}
+        </Typography>
+      )}
       <LoadingButton
         loading={isSavingDecentTransaction || isExecutingTransaction || isPurchasingWithPoints}
         size='large'
