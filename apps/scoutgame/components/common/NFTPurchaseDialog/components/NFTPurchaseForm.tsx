@@ -5,11 +5,11 @@ import { log } from '@charmverse/core/log';
 import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
 import {
   CircularProgress,
   Typography,
   Box,
-  Button,
   FormControlLabel,
   Paper,
   RadioGroup,
@@ -39,7 +39,6 @@ import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
-import { Loading } from 'components/common/Loading';
 import { useGetUser } from 'hooks/api/session';
 import { handleMintNftAction } from 'lib/builderNFTs/handleMintNftAction';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
@@ -233,7 +232,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const {
     error: decentSdkError,
-    isLoading,
+    isLoading: isLoadingDecentSdk,
     actionResponse
   } = useBoxAction({
     enable: !!address && !!sourceFundsChain,
@@ -443,8 +442,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </RadioGroup>
         {paymentMethod === 'points' ? (
           <Paper sx={{ backgroundColor: 'background.light', p: 2 }} variant='outlined'>
-            <Typography>You have {user?.currentBalance} points</Typography>
-            {loadingUser && <CircularProgress size={24} />}
+            {!loadingUser && <Typography>You have {user?.currentBalance} points</Typography>}
+            {loadingUser && <CircularProgress sx={{ position: 'relative', top: 4 }} size={22} />}
           </Paper>
         ) : (
           <BlockchainSelect
@@ -458,20 +457,22 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         )}
       </Stack>
       {fetchError && <Typography color='red'>{fetchError.shortMessage || 'Something went wrong'}</Typography>}
-      <Button
+      <LoadingButton
+        loading={isExecutingMintNftAction || isHandleMintNftExecuting}
         size='large'
         onClick={handlePurchase}
+        variant='contained'
         disabled={
           !purchaseCost ||
-          isLoading ||
+          isLoadingDecentSdk ||
           isFetchingPrice ||
           !treasuryAddress ||
           isExecutingMintNftAction ||
           isHandleMintNftExecuting
         }
       >
-        {isFetchingPrice ? 'Fetching price' : isLoading ? 'Loading...' : 'Buy'}
-      </Button>
+        Buy
+      </LoadingButton>
       {decentSdkError instanceof Error ? (
         <Typography color='error'>Error: {(decentSdkError as Error).message}</Typography>
       ) : null}
