@@ -25,7 +25,15 @@ export function BuilderCard({
   userId?: string;
 }) {
   return (
-    <Card sx={{ border: 'none', opacity: builder.isBanned ? 0.25 : 1, width: 'fit-content', height: 'fit-content' }}>
+    <Card
+      sx={{
+        border: 'none',
+        opacity: builder.isBanned ? 0.25 : 1,
+        width: 'fit-content',
+        height: 'fit-content',
+        margin: '0 auto'
+      }}
+    >
       <BuilderCardNftDisplay
         nftImageUrl={builder.nftImageUrl}
         username={builder.username}

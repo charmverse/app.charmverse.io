@@ -4,8 +4,8 @@ import Link from 'next/link';
 // Maintain a 3:4 aspect ratio for the NFT display
 const nftDisplaySize = {
   'x-small': {
-    width: 100,
-    height: 133.33
+    width: 140,
+    height: 186
   },
   small: {
     width: 150,

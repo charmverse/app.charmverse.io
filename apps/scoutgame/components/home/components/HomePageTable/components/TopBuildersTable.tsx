@@ -64,7 +64,7 @@ export function TopBuildersTable({ builders, userId }: { builders: TopBuilderInf
                 <TableCellText>{index + 1}</TableCellText>
               </TableCell>
               <TableCell component='th'>
-                <Stack component={Link} href={`/u/${builder.avatar}`} alignItems='center' flexDirection='row' gap={1}>
+                <Stack component={Link} href={`/u/${builder.username}`} alignItems='center' flexDirection='row' gap={1}>
                   <Avatar src={builder.avatar} name={builder.username} size='small' />
                   <TableCellText maxWidth={{ xs: '100px', md: '100%' }}>{builder.username}</TableCellText>
                 </Stack>
