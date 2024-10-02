@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { Box, Stack, Typography, Container } from '@mui/material';
 import Image from 'next/image';
 import { Suspense } from 'react';
@@ -14,7 +12,7 @@ import type { SessionUser } from 'lib/session/getUserFromSession';
 import { homeTabs } from './components/HomePageTable/components/HomeTabsMenu';
 import { HomeTab } from './components/HomePageTable/HomePageTable';
 
-export async function HomePage({ user, tab }: { user: SessionUser | null; tab: string }) {
+export function HomePage({ user, tab }: { user: SessionUser | null; tab: string }) {
   const currentTab = homeTabs.some((t) => t.value === tab) ? tab : 'leaderboard';
   return (
     <>

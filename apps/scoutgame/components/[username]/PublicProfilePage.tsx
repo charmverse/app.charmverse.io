@@ -1,6 +1,4 @@
-import 'server-only';
-
-import { Box, Stack, Paper, Typography } from '@mui/material';
+import { Box, Stack, Paper } from '@mui/material';
 
 import { BackButton } from 'components/common/Button/BackButton';
 import { Hidden } from 'components/common/Hidden';
@@ -13,7 +11,7 @@ import { PublicBuilderProfile } from './components/PublicBuilderProfile/PublicBu
 import { PublicScoutProfile } from './components/PublicScoutProfile/PublicScoutProfile';
 import { PublicProfileTabsMenu } from './PublicProfileTabsMenu';
 
-export async function PublicProfilePage({ user, tab }: { user: BasicUserInfo; tab: string }) {
+export function PublicProfilePage({ user, tab }: { user: BasicUserInfo; tab: string }) {
   return (
     <PageContainer>
       <Box gap={2} display='flex' flexDirection='column' margin='auto'>

@@ -5,7 +5,6 @@ import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
 import { builderNftChain } from '@packages/scoutgame/builderNfts/constants';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
-import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
 
 import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
 
@@ -68,7 +67,14 @@ export async function mintNFT(params: MintNFTParams) {
           tokensPurchased: amount,
           txHash: txResult.transactionHash.toLowerCase(),
           builderNftId,
-          scoutId
+          scoutId,
+          activities: {
+            create: {
+              recipientType: 'builder',
+              type: 'nft_purchase',
+              userId: builderNft.builderId
+            }
+          }
         }
       },
       pointsReceipts: {
@@ -82,10 +88,6 @@ export async function mintNFT(params: MintNFTParams) {
     }
   });
 
-  log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
-
-  await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });
-
   if (paidWithPoints) {
     await prisma.scout.update({
       where: {
@@ -98,30 +100,7 @@ export async function mintNFT(params: MintNFTParams) {
       }
     });
   }
+  log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
 
-  await recordGameActivity({
-    sourceEvent: {
-      nftPurchaseEventId: builderEvent.nftPurchaseEventId,
-      onchainTxHash: txResult.transactionHash,
-      onchainChainId: builderNftChain.id
-    },
-    activity: {
-      pointsDirection: PointsDirection.out,
-      userId: builderNft.builderId,
-      amount
-    }
-  });
-
-  await recordGameActivity({
-    sourceEvent: {
-      nftPurchaseEventId: builderEvent.nftPurchaseEventId,
-      onchainTxHash: txResult.transactionHash,
-      onchainChainId: builderNftChain.id
-    },
-    activity: {
-      pointsDirection: PointsDirection.in,
-      userId: builderNft.builderId,
-      amount
-    }
-  });
+  await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });
 }

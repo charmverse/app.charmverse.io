@@ -6,9 +6,11 @@ import { getUserFromSession } from 'lib/session/getUserFromSession';
 export default async function Page() {
   const user = await getUserFromSession();
 
-  const notifications = await getNotifications({
-    userId: user!.id
-  });
+  const notifications = user
+    ? await getNotifications({
+        userId: user.id
+      })
+    : [];
 
   return <NotificationsPage notifications={notifications} />;
 }
