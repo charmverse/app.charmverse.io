@@ -25,7 +25,7 @@ export function SignInModalMessage({
       <IconButton
         data-test='close-modal'
         aria-label='close'
-        onClick={handleClose}
+        onClick={onClose}
         sx={(theme) => ({
           position: 'absolute',
           right: 8,
