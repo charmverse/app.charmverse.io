@@ -309,7 +309,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     }
   };
 
-  if (savedDecentTransaction && transactionHasSucceeded) {
+  if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
     return <SuccessView builder={builder} />;
   }
 
