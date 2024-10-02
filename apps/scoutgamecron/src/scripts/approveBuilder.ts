@@ -2,8 +2,10 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
-import { currentSeason, getDateFromISOWeek } from '@packages/scoutgame/dates';
+import { currentSeason, getCurrentWeek, getDateFromISOWeek } from '@packages/scoutgame/dates';
 import { processMergedPullRequest } from '../tasks/processPullRequests/processMergedPullRequest';
+
+import { updateBuildersRank } from '../tasks/processPullRequests/updateBuildersRank';
 
 export async function approveBuilder({
   githubLogin,
@@ -45,7 +47,6 @@ export async function approveBuilder({
     throw new Error(`Builder ${builder.id} : ${builder.displayName} does not have a github user connected`);
   }
 
-
   log.info(`Found builder using Github Account ${githubUser.login}`);
 
   const events = await prisma.githubEvent.findMany({
@@ -53,7 +54,7 @@ export async function approveBuilder({
       githubUser: {
         login: githubUser.login
       },
-      createdAt: {
+      completedAt: {
         gte: getDateFromISOWeek(season).toJSDate()
       }
     },
@@ -77,8 +78,7 @@ export async function approveBuilder({
           repository: { id: pullRequest.repo.id, nameWithOwner: `${pullRequest.repo.owner}/${pullRequest.repo.name}` }
         },
         repo: pullRequest.repo
-      })
-      .catch(error => log.error('Error processing pull request', {error, pullRequest}));
+      }).catch((error) => log.error('Error processing pull request', { error, pullRequest }));
     }
   }
 
@@ -96,10 +96,6 @@ export async function approveBuilder({
   await refreshUserStats({ userId: scout.id });
 }
 
-
-
-
-
 const devUsers = {
   mattcasey: {
     id: 305398,
@@ -107,8 +103,7 @@ const devUsers = {
   },
   ccarella: {
     id: 199823,
-    avatar:
-      'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43760426-bca9-406b-4afe-20138acd5f00/rectcrop3'
+    avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43760426-bca9-406b-4afe-20138acd5f00/rectcrop3'
   },
   Devorein: {
     id: 25636858,
@@ -125,7 +120,6 @@ const devUsers = {
     avatar:
       'https://cdn.charmverse.io/user-content/e0ec0ec8-0c1f-4745-833d-52c448482d9c/0dd0e3c0-821c-49fc-bd1a-7589ada03019/1ff23917d3954f92aed4351b9c8caa36.jpg'
   }
-
 } as const;
 
 async function approveAll() {
@@ -138,19 +132,19 @@ async function approveAll() {
         none: {}
       }
     }
-  })
+  });
 
   console.log(allBuilders.length);
 
   for (const builder of allBuilders) {
-    
     await approveBuilder({
       builderId: builder.id,
       season: currentSeason
-    }).catch(err => {
-      log.error(`Error for ${builder.displayName}`)
-    })
+    }).catch((err) => {
+      log.error(`Error for ${builder.displayName}`);
+    });
   }
+  await updateBuildersRank({ week: getCurrentWeek() });
 }
 
 // approveAll()

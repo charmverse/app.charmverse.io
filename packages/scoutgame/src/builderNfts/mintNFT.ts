@@ -1,7 +1,7 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
-import { PointsDirection, prisma } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { builderNftChain } from '@packages/scoutgame/builderNfts/constants';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
@@ -51,55 +51,71 @@ export async function mintNFT(params: MintNFTParams) {
     });
   }
 
-  const builderEvent = await prisma.builderEvent.create({
-    data: {
-      type: 'nft_purchase',
-      season: currentSeason,
-      week: getCurrentWeek(),
-      builder: {
-        connect: {
-          id: builderNft.builderId
-        }
-      },
-      nftPurchaseEvent: {
-        create: {
-          pointsValue,
-          tokensPurchased: amount,
-          txHash: txResult.transactionHash.toLowerCase(),
-          builderNftId,
-          scoutId,
-          activities: {
-            create: {
-              recipientType: 'builder',
-              type: 'nft_purchase',
-              userId: builderNft.builderId
+  await prisma.$transaction(async (tx) => {
+    await tx.builderEvent.create({
+      data: {
+        type: 'nft_purchase',
+        season: currentSeason,
+        week: getCurrentWeek(),
+        builder: {
+          connect: {
+            id: builderNft.builderId
+          }
+        },
+        nftPurchaseEvent: {
+          create: {
+            pointsValue,
+            tokensPurchased: amount,
+            txHash: txResult.transactionHash.toLowerCase(),
+            builderNftId,
+            scoutId,
+            activities: {
+              create: {
+                recipientType: 'builder',
+                type: 'nft_purchase',
+                userId: builderNft.builderId
+              }
             }
+          }
+        },
+        pointsReceipts: {
+          createMany: {
+            data: pointsReceipts
           }
         }
       },
-      pointsReceipts: {
-        createMany: {
-          data: pointsReceipts
-        }
+      select: {
+        nftPurchaseEventId: true
       }
-    },
-    select: {
-      nftPurchaseEventId: true
-    }
-  });
+    });
 
-  if (paidWithPoints) {
-    await prisma.scout.update({
+    await tx.userSeasonStats.update({
       where: {
-        id: scoutId
+        userId_season: {
+          userId: builderNft.builderId,
+          season: currentSeason
+        }
       },
       data: {
-        currentBalance: {
-          decrement: pointsValue
+        nftsSold: {
+          increment: amount
         }
       }
     });
-  }
+
+    if (paidWithPoints) {
+      await tx.scout.update({
+        where: {
+          id: scoutId
+        },
+        data: {
+          currentBalance: {
+            decrement: pointsValue
+          }
+        }
+      });
+    }
+  });
   log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
 
   await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });
