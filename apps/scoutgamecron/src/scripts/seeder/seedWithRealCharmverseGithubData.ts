@@ -46,6 +46,8 @@ const repoId = 444649883;
 const repoName = 'app.charmverse.io';
 
 export async function seedWithRealCharmverseGithubData() {
+
+
   // Initialize the github repo
   let githubRepo = await prisma.githubRepo.findFirst({
     where: {
@@ -199,4 +201,4 @@ async function script() {
   await seedBuilderNFTs();
 }
 
-script()
+// script()

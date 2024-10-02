@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
-import { builderContractAddress, builderNftChain } from './constants';
+import { getBuilderContractAddress, builderNftChain } from './constants';
 import { createBuilderNft } from './createBuilderNft';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
@@ -19,7 +19,7 @@ export async function registerBuilderNFT({ builderId, season }: { builderId: str
     where: {
       builderId,
       chainId: builderNftChain.id,
-      contractAddress: builderContractAddress,
+      contractAddress: getBuilderContractAddress(),
       season
     }
   });

@@ -10,6 +10,7 @@ import {
   tableCellClasses
 } from '@mui/material';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { Avatar } from 'components/common/Avatar';
 import { PointsIcon } from 'components/common/Icons';
@@ -18,9 +19,9 @@ import type { TopBuilderInfo } from 'lib/builders/getTopBuilders';
 
 import { TableCellText } from './TableCellText';
 
-export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
+export function TopBuildersTable({ builders, userId }: { builders: TopBuilderInfo[]; userId?: string }) {
   return (
-    <TableContainer component={Paper} sx={{ px: { md: 6 } }}>
+    <TableContainer data-test='top-builders-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Top scouts table' size='small'>
         <TableHead>
           <TableRow
@@ -33,7 +34,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
             }}
           >
             <TableCell align='center'>RANK</TableCell>
-            <TableCell align='left'>SCOUT</TableCell>
+            <TableCell align='left'>BUILDER</TableCell>
             <TableCell align='right'>
               <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
                 SEASON <PointsIcon />
@@ -63,7 +64,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
                 <TableCellText>{index + 1}</TableCellText>
               </TableCell>
               <TableCell component='th'>
-                <Stack alignItems='center' flexDirection='row' gap={1}>
+                <Stack component={Link} href={`/u/${builder.avatar}`} alignItems='center' flexDirection='row' gap={1}>
                   <Avatar src={builder.avatar} name={builder.username} size='small' />
                   <TableCellText maxWidth={{ xs: '100px', md: '100%' }}>{builder.username}</TableCellText>
                 </Stack>
@@ -97,7 +98,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
                 </Stack>
               </TableCell>
               <TableCell align='center' width='150px'>
-                <ScoutButton builder={builder} />
+                <ScoutButton builder={builder} isAuthenticated={!!userId} />
               </TableCell>
             </TableRow>
           ))}

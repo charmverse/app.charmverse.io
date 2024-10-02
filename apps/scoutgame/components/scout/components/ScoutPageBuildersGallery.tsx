@@ -18,7 +18,7 @@ export async function ScoutPageBuildersGallery({
 }) {
   const builders = await getSortedBuilders({
     sort: sort as BuildersSort,
-    limit: 10,
+    limit: 200,
     week: getCurrentWeek(),
     season: currentSeason
   });

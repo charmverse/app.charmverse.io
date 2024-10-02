@@ -1,12 +1,12 @@
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import type { SxProps } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
 import { Box, IconButton, Typography } from '@mui/material';
 import type { ModalProps } from '@mui/material/Modal';
 import MuiModal from '@mui/material/Modal';
 import Paper from '@mui/material/Paper';
 import type { ReactNode } from 'react';
 
-const sx: SxProps = {
+const defaultSx: SxProps<Theme> = {
   position: 'absolute',
   top: '50%',
   left: '50%',
@@ -24,6 +24,8 @@ const sx: SxProps = {
 export function BasicModal({
   children,
   theme = 'light',
+  sx = {},
+  title,
   ...props
 }: Omit<ModalProps, 'children' | 'onClose'> & {
   theme?: 'light' | 'dark' | 'system';
@@ -32,11 +34,11 @@ export function BasicModal({
 }) {
   return (
     <MuiModal data-mui-color-scheme={theme} {...props}>
-      <Paper sx={sx}>
-        {props.title && (
+      <Paper sx={{ ...defaultSx, ...(sx as any) }}>
+        {title && (
           <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='center' mb={2}>
             <Typography variant='h6' color='secondary'>
-              {props.title}
+              {title}
             </Typography>
             {props.onClose && (
               <IconButton data-test='close-modal' onClick={props.onClose} sx={{ p: 0 }}>

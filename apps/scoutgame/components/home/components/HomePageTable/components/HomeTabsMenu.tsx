@@ -2,10 +2,10 @@ import type { TabItem } from 'components/common/Tabs/TabsMenu';
 import { TabsMenu } from 'components/common/Tabs/TabsMenu';
 
 export const homeTabs: TabItem[] = [
-  { label: 'Leaderboard', href: '?tab=leaderboard', value: 'leaderboard' },
-  { label: 'Activity', href: '?tab=activity', value: 'activity' },
-  { label: 'Top Scouts', href: '?tab=top-scouts', value: 'top-scouts' },
-  { label: 'Top Builders', href: '?tab=top-builders', value: 'top-builders' }
+  { label: 'Leaderboard', value: 'leaderboard' },
+  { label: 'Activity', value: 'activity' },
+  { label: 'Top Scouts', value: 'top-scouts' },
+  { label: 'Top Builders', value: 'top-builders' }
 ];
 
 export function HomeTabsMenu({ tab }: { tab: string }) {

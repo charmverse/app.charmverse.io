@@ -7,8 +7,6 @@ export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECE
 
 export const useTestnets = false;
 
-export const useRealContract = process.env.ENABLE_BUILDER_SMART_CONTRACT === 'true';
-
 /**
  * Currently priced in USDC
  */
@@ -27,17 +25,9 @@ const devOptimismMainnetBuildersContract = '0x1d305a06cb9dbdc32e08c3d230889acb9f
 const realOptimismSepoliaBuildersContract = '0x0b7342761a10e1b14df427681b967e67f5e6cef9';
 const realOptimismMainnetBuildersContract = '0x743ec903fe6d05e73b19a6db807271bb66100e83';
 
-// Actual contract for interacting with NFTs
-const optimismSepoliaBuilderContractAddress = useRealContract
-  ? realOptimismSepoliaBuildersContract
-  : devOptimismSepoliaBuildersContract;
-const optimismMainnetBuilderContractAddress = useRealContract
-  ? realOptimismMainnetBuildersContract
-  : devOptimismMainnetBuildersContract;
-
-export const builderContractAddress = useTestnets
-  ? optimismSepoliaBuilderContractAddress
-  : optimismMainnetBuilderContractAddress;
+export function getBuilderContractAddress(): `0x${string}` {
+  return (env('BUILDER_NFT_CONTRACT_ADDRESS') || process.env.REACT_APP_BUILDER_NFT_CONTRACT_ADDRESS) as `0x${string}`;
+}
 
 // USDC Contract we use for payments
 export const usdcOptimismSepoliaContractAddress = '0x5fd84259d66Cd46123540766Be93DFE6D43130D7';
@@ -55,7 +45,7 @@ export const treasuryAddress = '0x93326D53d1E8EBf0af1Ff1B233c46C67c96e4d8D';
 
 // const apiClient = new BuilderNFTSeasonOneClient({
 //   chain: builderNftChain,
-//   contractAddress: builderContractAddress,
+//   contractAddress: getBuilderContractAddress(),
 //   walletClient: serverClient
 // });
 

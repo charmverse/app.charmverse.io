@@ -4,6 +4,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma, TransactionStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
+import { getPublicClient } from '@packages/onchain/getPublicClient';
 import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
@@ -61,6 +62,24 @@ export async function handlePendingTransaction({
     });
 
     const apiClient = getBuilderContractAdminClient();
+
+    if (pendingTx.destinationChainId === pendingTx.sourceChainId) {
+      const receipt = await getPublicClient(pendingTx.destinationChainId).waitForTransactionReceipt({
+        hash: pendingTx.sourceChainTxHash as `0x${string}`
+      });
+
+      await prisma.pendingNftTransaction.update({
+        where: {
+          id: pendingTransactionId
+        },
+        data: {
+          status: TransactionStatus.completed,
+          destinationChainTxHash: pendingTx.sourceChainTxHash.toLowerCase()
+        }
+      });
+
+      return;
+    }
 
     // Wait for transaction settlement without updating status
     const txHash = await waitForDecentTransactionSettlement({

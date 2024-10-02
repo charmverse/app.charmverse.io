@@ -8,6 +8,7 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { getRelativeTime } from '@packages/utils/dates';
+import Link from 'next/link';
 
 import { Avatar } from 'components/common/Avatar';
 import { GemsIcon } from 'components/common/Icons';
@@ -23,7 +24,7 @@ import { TableCellText } from './TableCellText';
 
 export async function ActivityTable({ activities }: { activities: BuilderActivity[] }) {
   return (
-    <TableContainer component={Paper} sx={{ px: { md: 6 } }}>
+    <TableContainer data-test='activity-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Activity table' size='small'>
         <TableHead sx={{ display: { xs: 'none', md: 'table-header-group' } }}>
           <TableRow
@@ -57,7 +58,13 @@ export async function ActivityTable({ activities }: { activities: BuilderActivit
               }}
             >
               <TableCell component='th' scope='activity'>
-                <Stack alignItems='center' flexDirection='row' gap={1}>
+                <Stack
+                  component={Link}
+                  href={`/u/${activity.username}`}
+                  alignItems='center'
+                  flexDirection='row'
+                  gap={1}
+                >
                   <Avatar src={activity.avatar} name={activity.username} size='small' />
                   <TableCellText maxWidth={{ xs: '100px', md: '100%' }}>{activity.username}</TableCellText>
                 </Stack>
