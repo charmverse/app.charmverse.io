@@ -24,5 +24,23 @@ export default async function Profile({
     return notFound();
   }
 
-  return <PublicProfilePage user={user} tab={tab} />;
+  return (
+    <>
+      {user?.avatar && (
+        <>
+          <meta property='og:title' content={user.username} />
+          <meta property='og:image' content={user.nftImageUrl} />
+          {/* Custom meta tags for farcaster */}
+          <meta name='fc:frame' content='vNext' />
+          <meta name='fc:frame:image' content={user.nftImageUrl} />
+          <meta property='fc:frame:image:aspect_ratio' content='1:1' />
+          {/* Button 1 */}
+          <meta name='fc:frame:button:1' content='Scout Builder' />
+          <meta name='fc:frame:button:1:action' content='link' />
+          <meta name='fc:frame:button:1:target' content={`${process.env.DOMAIN}/u/${user.username}`} />
+        </>
+      )}
+      <PublicProfilePage user={user} tab={tab} />;
+    </>
+  );
 }

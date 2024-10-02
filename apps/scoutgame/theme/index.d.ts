@@ -3,6 +3,8 @@ import type {
   PaletteColorOptions as MuiPaletteColorOptions,
   Palette as MuiPalette,
   PaletteColor as MuiPaletteColor,
+  BreakpointsOptions as MuiBreakpointsOptions,
+  BreakpointOverrides as MuiBreakpointOverrides,
   TypeText,
   PaletteTextChannel
 } from '@mui/material/styles';
@@ -27,6 +29,14 @@ declare module '@mui/material/styles' {
     paper: string;
     dark: string;
     light: string;
+  }
+
+  export interface BreakpointOverrides extends MuiBreakpointOverrides {
+    xsm: true;
+  }
+
+  export interface BreakpointsOptions extends MuiBreakpointsOptions {
+    xsm: number; // adds the `xsm` breakpoint
   }
 }
 
