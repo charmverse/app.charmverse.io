@@ -274,7 +274,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     sender: address as `0x${string}`,
     srcToken: '0x0000000000000000000000000000000000000000',
     dstToken: usdcContractAddress,
-    srcChainId: 8453,
+    srcChainId: sourceFundsChain,
     dstChainId: ChainId.OPTIMISM,
     slippage: 1,
     actionType: ActionType.SwapAction,
