@@ -67,6 +67,7 @@ export async function mintNFT(params: MintNFTParams) {
           create: {
             pointsValue,
             tokensPurchased: amount,
+            paidInPoints: paidWithPoints,
             txHash: txResult.transactionHash.toLowerCase(),
             builderNftId,
             scoutId,
@@ -90,7 +91,32 @@ export async function mintNFT(params: MintNFTParams) {
       }
     });
 
-    await Promise.all([refreshUserStats({ userId: builderNft.builderId }), refreshUserStats({ userId: scoutId })]);
+    await tx.userSeasonStats.update({
+      where: {
+        userId_season: {
+          userId: builderNft.builderId,
+          season: currentSeason
+        }
+      },
+      data: {
+        nftsSold: {
+          increment: amount
+        }
+      }
+    });
+    await tx.userSeasonStats.update({
+      where: {
+        userId_season: {
+          userId: scoutId,
+          season: currentSeason
+        }
+      },
+      data: {
+        nftsPurchased: {
+          increment: amount
+        }
+      }
+    });
 
     if (paidWithPoints) {
       await tx.scout.update({
