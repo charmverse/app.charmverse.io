@@ -265,7 +265,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const handlePurchase = async () => {
     if (paymentMethod === 'points') {
-      await purchaseWithPoints();
+      await purchaseWithPoints({
+        builderId: builder.id,
+        recipientAddress: address as `0x${string}`,
+        amount: tokensToBuy
+      });
     } else {
       if (!actionResponse?.tx) {
         return;

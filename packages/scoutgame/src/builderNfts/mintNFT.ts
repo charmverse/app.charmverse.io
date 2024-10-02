@@ -12,7 +12,6 @@ import { getBuilderContractAdminClient } from './clients/builderContractAdminWri
 type MintNFTParams = {
   builderNftId: string;
   recipientAddress: string;
-  tokenId: bigint;
   amount: number;
   pointsValue: number; // total value of purchase, after 50% discount, etc
   paidWithPoints: boolean; // whether to subtract from the scout's points
@@ -20,7 +19,7 @@ type MintNFTParams = {
 };
 
 export async function mintNFT(params: MintNFTParams) {
-  const { builderNftId, recipientAddress, tokenId, amount, scoutId, pointsValue, paidWithPoints } = params;
+  const { builderNftId, recipientAddress, amount, scoutId, pointsValue, paidWithPoints } = params;
   const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
       id: builderNftId
@@ -32,7 +31,7 @@ export async function mintNFT(params: MintNFTParams) {
   const txResult = await apiClient.mintTo({
     args: {
       account: recipientAddress,
-      tokenId,
+      tokenId: BigInt(builderNft.tokenId),
       amount: BigInt(amount),
       scout: scoutId
     }
@@ -83,7 +82,7 @@ export async function mintNFT(params: MintNFTParams) {
     }
   });
 
-  log.info('Minted NFT', { builderNftId, recipientAddress, tokenId, amount, userId: scoutId });
+  log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
 
   await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: currentSeason });
 

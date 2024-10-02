@@ -88,7 +88,6 @@ export async function handlePendingTransaction({
     await mintNFT({
       builderNftId: builderNft.id,
       recipientAddress: pendingTx.senderAddress,
-      tokenId: pendingTx.tokenId,
       amount: pendingTx.tokenAmount,
       scoutId: pendingTx.userId,
       paidWithPoints: false,
