@@ -99,7 +99,7 @@ describe('processScoutPointsPayout', () => {
         recipientId: builder.id
       }
     });
-    expect(builderPointReceipt.value.toFixed(2)).toEqual((0.2 * totalPoints).toFixed(2));
+    expect(builderPointReceipt.value).toBeCloseTo(Math.floor(0.2 * totalPoints));
 
     const scout1PointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
       where: {
