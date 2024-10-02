@@ -41,9 +41,7 @@ export function LeaderboardTable({ data, userId }: { data: LeaderBoardRow[]; use
               sx={{ maxWidth: { xs: '100px', sm: '100%' }, display: { xs: 'none', sm: 'block' }, pr: 0 }}
               align='center'
             >
-              <Typography component='span'>GEMS</Typography>
-              <br />
-              <Typography component='span'>THIS WEEK</Typography>
+              GEMS
             </TableCell>
             <TableCell />
           </TableRow>
@@ -73,7 +71,7 @@ export function LeaderboardTable({ data, userId }: { data: LeaderBoardRow[]; use
                   <TableCellText noWrap>{row.username}</TableCellText>
                 </Stack>
               </TableCell>
-              <TableCell width='100%'>
+              <TableCell sx={{ width: { xs: '100%', md: '60%' } }}>
                 <Box
                   sx={{
                     background:

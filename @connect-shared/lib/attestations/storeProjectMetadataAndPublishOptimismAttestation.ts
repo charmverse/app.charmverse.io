@@ -1,4 +1,4 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
+import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -42,6 +42,21 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
 
   if (!fcProfile) {
     throw new DataNotFoundError('Farcaster profile not found');
+  }
+
+  if (existingProjectRefUID) {
+    const existingAttestation = await prisma.optimismProjectAttestation.findFirst({
+      where: {
+        projectRefUID: existingProjectRefUID,
+        projectId: {
+          not: null
+        }
+      }
+    });
+
+    if (existingAttestation && existingAttestation.projectId !== projectId) {
+      throw new InvalidInputError('Attestation already made against a different project');
+    }
   }
 
   // Used when importing a project from OP

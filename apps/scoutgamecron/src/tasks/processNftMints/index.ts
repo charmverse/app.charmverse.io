@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { TransactionStatus, prisma } from '@charmverse/core/prisma-client';
-import { handlePendingTransaction } from '@packages/scoutgame/handlePendingTransaction';
+import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
 
 export async function processNftMints() {
   const pending = await prisma.pendingNftTransaction.findMany({

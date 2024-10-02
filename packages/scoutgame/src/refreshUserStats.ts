@@ -11,11 +11,17 @@ export async function refreshUserStats({
 }): Promise<{ weekly: UserWeeklyStats; season: UserSeasonStats }> {
   const week = getCurrentWeek();
 
-  const userGems = await prisma.gemsPayoutEvent.count({
+  const gemsReceipts = await prisma.gemsReceipt.findMany({
     where: {
-      builderId: userId
+      event: {
+        builderId: userId,
+        week
+      }
     }
   });
+  const gemsCollected = gemsReceipts.reduce((acc, e) => {
+    return acc + e.value;
+  }, 0);
 
   const weekly = await prisma.userWeeklyStats.upsert({
     where: {
@@ -28,10 +34,10 @@ export async function refreshUserStats({
       userId,
       season: currentSeason,
       week,
-      gemsCollected: userGems
+      gemsCollected
     },
     update: {
-      gemsCollected: userGems
+      gemsCollected
     }
   });
 

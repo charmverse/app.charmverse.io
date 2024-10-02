@@ -12,11 +12,12 @@ import { useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
+import type { SessionUser } from 'lib/session/getUserFromSession';
 import { saveTermsOfServiceAction } from 'lib/users/saveTermsOfServiceAction';
 import { schema } from 'lib/users/termsOfServiceSchema';
 import type { FormValues } from 'lib/users/termsOfServiceSchema';
 
-export function ExtraDetailsForm({ user }: { user: Scout }) {
+export function ExtraDetailsForm({ user }: { user: SessionUser }) {
   const router = useRouter();
   const [errors, setErrors] = useState<string[] | null>(null);
 

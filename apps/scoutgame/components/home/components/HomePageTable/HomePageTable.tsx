@@ -1,4 +1,4 @@
-import 'server-only';
+'use server';
 
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getLeaderboard } from 'lib/builders/getLeaderboard';

@@ -166,7 +166,8 @@ function Document() {
           </Typography>
         </Blockquote>
         <Typography>A Builder's Gem count resets to zero at the start of each week.</Typography>
-        <Typography variant='h6' color='secondary' mt={2}>
+        {/* the id is used to scroll to the section from checkout  */}
+        <Typography id='builder-nfts' variant='h6' color='secondary' mt={2}>
           Builder NFTs
         </Typography>
         <Typography>

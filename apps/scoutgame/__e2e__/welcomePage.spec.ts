@@ -35,7 +35,7 @@ test.describe('Welcome page - onboarding flow', () => {
     await expect(welcomePage.userEmailInput).toHaveValue(email);
 
     await welcomePage.notifyAboutGrants.focus();
-    await expect(await welcomePage.notifyAboutGrants.isChecked()).toBe(true);
+    expect(await welcomePage.notifyAboutGrants.isChecked()).toBe(true);
 
     await welcomePage.acceptTerms.click();
 
@@ -54,7 +54,7 @@ test.describe('Welcome page - onboarding flow', () => {
       }
     });
 
-    await expect(user.sendMarketing).toBe(true);
+    expect(user.sendMarketing).toBe(true);
 
     await welcomePage.continueButton.click();
 
@@ -77,6 +77,6 @@ test.describe('Welcome page - onboarding flow', () => {
       }
     });
 
-    await expect(!!userAfterOnboarding.onboardedAt).toBe(true);
+    expect(!!userAfterOnboarding.onboardedAt).toBe(true);
   });
 });

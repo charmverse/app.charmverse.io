@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/calculatePoints';
 import { getCurrentWeek } from '@packages/scoutgame/dates';
-import { mockBuilder, mockNFTPurchaseEvent, mockScout } from '@packages/scoutgame/testing/database';
+import { mockBuilder, mockBuilderNft, mockNFTPurchaseEvent, mockScout } from '@packages/scoutgame/testing/database';
 import { mockSeason } from '@packages/scoutgame/testing/generators';
 
 import { processScoutPointsPayout } from '../processScoutPointsPayout';
@@ -9,10 +9,13 @@ import { processScoutPointsPayout } from '../processScoutPointsPayout';
 describe('processScoutPointsPayout', () => {
   it('should not create gems payout event, points receipt and builder event for a builder with no NFT purchases', async () => {
     const builder = await mockBuilder();
+    const scout1 = await mockScout();
+    const scout2 = await mockScout();
     const rank = 1;
     const gemsCollected = 10;
     const week = getCurrentWeek();
 
+    await mockBuilderNft({ builderId: builder.id, season: mockSeason });
     await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: mockSeason });
 
     const gemsPayoutEvent = await prisma.gemsPayoutEvent.findFirst({
@@ -41,6 +44,33 @@ describe('processScoutPointsPayout', () => {
     });
 
     expect(pointsReceipt).toBeNull();
+
+    const builderActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        type: 'points',
+        recipientType: 'builder'
+      }
+    });
+    expect(builderActivities).toBe(0);
+
+    const scout1Activities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout1.id,
+        type: 'points',
+        recipientType: 'scout'
+      }
+    });
+    expect(scout1Activities).toBe(0);
+
+    const scout2Activities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout2.id,
+        type: 'points',
+        recipientType: 'scout'
+      }
+    });
+    expect(scout2Activities).toBe(0);
   });
 
   it('should distribute points correctly among NFT holders and builder', async () => {
@@ -48,6 +78,8 @@ describe('processScoutPointsPayout', () => {
     const rank = 1;
     const gemsCollected = 10;
     const week = getCurrentWeek();
+
+    await mockBuilderNft({ builderId: builder.id, season: mockSeason });
 
     const scout1 = await mockScout();
     const scout2 = await mockScout();
@@ -62,13 +94,20 @@ describe('processScoutPointsPayout', () => {
 
     await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: mockSeason });
 
+    const builderPointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
+      where: {
+        recipientId: builder.id
+      }
+    });
+    expect(builderPointReceipt.value).toBeCloseTo(Math.floor(0.2 * totalPoints));
+
     const scout1PointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
       where: {
         recipientId: scout1.id
       }
     });
 
-    expect(scout1PointReceipt.value.toFixed(2)).toEqual((0.8 * totalPoints * (2 / 3)).toFixed(2));
+    expect(scout1PointReceipt.value).toBeCloseTo(Math.floor(0.8 * totalPoints * (2 / 3)));
 
     const scout2PointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
       where: {
@@ -76,14 +115,41 @@ describe('processScoutPointsPayout', () => {
       }
     });
 
-    expect(scout2PointReceipt.value.toFixed(2)).toEqual((0.8 * totalPoints * (1 / 3)).toFixed(2));
+    expect(scout2PointReceipt.value).toBeCloseTo(Math.floor(0.8 * totalPoints * (1 / 3)));
 
-    const builderPointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
+    const builderActivities = await prisma.scoutGameActivity.count({
       where: {
-        recipientId: builder.id
+        userId: builder.id,
+        type: 'points',
+        recipientType: 'builder',
+        pointsReceiptId: builderPointReceipt.id
       }
     });
-    expect(builderPointReceipt.value.toFixed(2)).toEqual((0.2 * totalPoints).toFixed(2));
+    expect(builderPointReceipt.value).toBeCloseTo(Math.floor(0.2 * totalPoints));
+
+    expect(builderActivities).toBe(1);
+
+    const scout1Activities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout1.id,
+        type: 'points',
+        recipientType: 'scout',
+        pointsReceiptId: scout1PointReceipt.id
+      }
+    });
+
+    expect(scout1Activities).toBe(1);
+
+    const scout2Activities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout2.id,
+        type: 'points',
+        recipientType: 'scout',
+        pointsReceiptId: scout2PointReceipt.id
+      }
+    });
+
+    expect(scout2Activities).toBe(1);
   });
 
   it('should not create gems payout, builder event and points receipt if gems payout event already exists', async () => {
@@ -136,5 +202,35 @@ describe('processScoutPointsPayout', () => {
     });
 
     expect(scout1PointsReceiptCount).toBe(1);
+
+    const builderActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        type: 'points',
+        recipientType: 'builder'
+      }
+    });
+
+    expect(builderActivities).toBe(1);
+
+    const scout1Activities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout1.id,
+        type: 'points',
+        recipientType: 'scout'
+      }
+    });
+
+    expect(scout1Activities).toBe(1);
+
+    const scout2Activities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout2.id,
+        type: 'points',
+        recipientType: 'scout'
+      }
+    });
+
+    expect(scout2Activities).toBe(1);
   });
 });

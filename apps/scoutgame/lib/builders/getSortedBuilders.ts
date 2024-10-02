@@ -229,6 +229,9 @@ export async function getSortedBuilders({
             builderStatus: stat.user.builderStatus
           }))
         );
+      // HACK for week 1 so we have more builders in TOP
+      const hotBuilders = await getSortedBuilders({ sort: 'hot', limit, week, season });
+      builders = builders.concat(hotBuilders.filter((b) => !builders.some((a) => a.id === b.id)));
       break;
     }
 
