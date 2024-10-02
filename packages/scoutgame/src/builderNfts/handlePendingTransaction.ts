@@ -10,7 +10,7 @@ import {
   waitForDecentTransactionSettlement
 } from '@packages/onchain/waitForDecentTransactionSettlement';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 import { mintNFT } from './mintNFT';
 import { convertCostToPoints } from './utils';
@@ -67,6 +67,16 @@ export async function handlePendingTransaction({
         hash: pendingTx.sourceChainTxHash as `0x${string}`
       });
 
+      // Proceed with minting
+      await mintNFT({
+        builderNftId: builderNft.id,
+        recipientAddress: pendingTx.senderAddress,
+        amount: pendingTx.tokenAmount,
+        scoutId: pendingTx.userId,
+        paidWithPoints: false,
+        pointsValue: convertCostToPoints(pendingTx.targetAmountReceived)
+      });
+
       await prisma.pendingNftTransaction.update({
         where: {
           id: pendingTransactionId
@@ -76,6 +86,8 @@ export async function handlePendingTransaction({
           destinationChainTxHash: pendingTx.sourceChainTxHash.toLowerCase()
         }
       });
+
+      await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: currentSeason });
 
       return;
     }
