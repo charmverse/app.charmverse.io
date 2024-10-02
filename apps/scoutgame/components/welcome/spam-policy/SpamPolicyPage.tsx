@@ -1,9 +1,32 @@
+'use client';
+
+import type { Scout } from '@charmverse/core/prisma-client';
 import { Button, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { useAction } from 'next-safe-action/hooks';
 
 import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
+import type { SessionUser } from 'lib/session/getUserFromSession';
+import { saveOnboardedAction } from 'lib/users/saveOnboardedAction';
 
-export function SpamPolicyPage({ onboarding = false }: { onboarding?: boolean }) {
+export function SpamPolicyPage({
+  user,
+  profileGithubConnect
+}: {
+  user: SessionUser | null;
+  profileGithubConnect: boolean;
+}) {
+  const router = useRouter();
+  // programmatically added builders will land here skipping the /welcome/builder page
+  // we set the onboardedAt flag on that page, so make sure we set it here too if the user hasn't been onboarded yet
+  const { executeAsync, isExecuting } = useAction(saveOnboardedAction, {
+    onSuccess: () => {
+      // Redirect the programmatically added builders to the /how-it-works page to continue with the normal flow
+      router.push('/welcome/how-it-works');
+    }
+  });
+
   return (
     <SinglePageLayout>
       <SinglePageWrapper>
@@ -19,9 +42,22 @@ export function SpamPolicyPage({ onboarding = false }: { onboarding?: boolean })
           If you are suspended, you may appeal this decision. An appeal link will be included in the suspension
           notification.
         </Typography>
-        <Button fullWidth href={onboarding ? '/welcome/how-it-works' : '/profile'} data-test='continue-button'>
-          Continue
-        </Button>
+        {user ? (
+          user.onboardedAt ? (
+            <Button
+              fullWidth
+              href={profileGithubConnect ? '/profile' : '/welcome/how-it-works'}
+              data-test='continue-button'
+              disabled={isExecuting}
+            >
+              Continue
+            </Button>
+          ) : (
+            <Button fullWidth onClick={() => executeAsync()} data-test='continue-button' disabled={isExecuting}>
+              Continue
+            </Button>
+          )
+        ) : null}
       </SinglePageWrapper>
     </SinglePageLayout>
   );

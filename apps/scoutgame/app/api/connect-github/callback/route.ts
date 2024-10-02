@@ -11,8 +11,7 @@ function generateRedirectUrl(errorMessage: string) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const onboarding = searchParams.get('onboarding');
-
+  const profileGithubConnect = searchParams.get('profile-github-connect');
   const error = searchParams.get('error');
 
   if (error) {
@@ -136,6 +135,7 @@ export async function GET(req: NextRequest) {
       id: unsealedUserId
     },
     data: {
+      builderStatus: 'applied',
       onboardedAt: new Date(),
       githubUser: {
         create: {
@@ -148,10 +148,12 @@ export async function GET(req: NextRequest) {
     }
   });
 
+  const location = `${process.env.DOMAIN}/welcome/spam-policy`;
+
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `${process.env.DOMAIN}/welcome/spam-policy?onboarding=${onboarding}`
+      Location: profileGithubConnect ? `${location}?profile-github-connect=${profileGithubConnect}` : location
     }
   });
 }
