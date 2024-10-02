@@ -7,10 +7,12 @@ const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 
 const currentSeason = currentSeasonStartDate.toFormat(`kkkk-'W'WW`);
 
 async function query() {
-  const w = await prisma.builderNft.findMany({
+  const w = await prisma.scout.findFirst({
     where: {
-      season: currentSeason,
-      builderId: '5a556b05-8985-4b8a-9421-9992ce15a11f'
+      username: 'mattcasey'
+    },
+    include: {
+      events: true
     }
   });
 

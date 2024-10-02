@@ -86,6 +86,19 @@ export async function mintNFT(params: MintNFTParams) {
 
   await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });
 
+  if (paidWithPoints) {
+    await prisma.scout.update({
+      where: {
+        id: scoutId
+      },
+      data: {
+        currentBalance: {
+          decrement: pointsValue
+        }
+      }
+    });
+  }
+
   await recordGameActivity({
     sourceEvent: {
       nftPurchaseEventId: builderEvent.nftPurchaseEventId,
