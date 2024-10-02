@@ -19,7 +19,7 @@ export default async function AskAreYouABuilder() {
 
   if (user?.builderStatus) {
     log.debug('Redirect existing builder to Spam policy page from Builder page', { userId: user?.id });
-    redirect('/spam-policy');
+    redirect('/welcome/spam-policy');
   }
   return <BuilderPage />;
 }
