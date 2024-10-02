@@ -2,17 +2,15 @@
 
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import { PointsDirection, prisma, TransactionStatus } from '@charmverse/core/prisma-client';
+import { prisma, TransactionStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { getPublicClient } from '@packages/onchain/getPublicClient';
 import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
 } from '@packages/onchain/waitForDecentTransactionSettlement';
-import { builderNftChain } from '@packages/scoutgame/builderNfts/constants';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
-import { recordGameActivity } from '@packages/scoutgame/recordGameActivity';
 
 import { getBuilderContractAdminClient } from './builderNfts/clients/builderContractAdminWriteClient';
 
@@ -99,7 +97,7 @@ export async function handlePendingTransaction({
       }
     });
 
-    const nftEvent = await prisma.nFTPurchaseEvent.create({
+    await prisma.nFTPurchaseEvent.create({
       data: {
         pointsValue: 0,
         tokensPurchased: pendingTx.tokenAmount,
@@ -117,37 +115,18 @@ export async function handlePendingTransaction({
               }
             }
           }
+        },
+        activities: {
+          create: {
+            recipientType: 'builder',
+            type: 'nft_purchase',
+            userId: builderNft.builderId
+          }
         }
       }
     });
 
     await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: currentSeason });
-
-    await recordGameActivity({
-      sourceEvent: {
-        nftPurchaseEventId: nftEvent.id,
-        onchainTxHash: txResult.transactionHash,
-        onchainChainId: builderNftChain.id
-      },
-      activity: {
-        pointsDirection: PointsDirection.out,
-        userId: builderNft.builderId,
-        amount: pendingTx.tokenAmount
-      }
-    });
-
-    await recordGameActivity({
-      sourceEvent: {
-        nftPurchaseEventId: nftEvent.id,
-        onchainTxHash: txResult.transactionHash,
-        onchainChainId: builderNftChain.id
-      },
-      activity: {
-        pointsDirection: PointsDirection.in,
-        userId: builderNft.builderId,
-        amount: pendingTx.tokenAmount
-      }
-    });
 
     // Update the pending transaction status to 'completed' and set destination details
     await prisma.pendingNftTransaction.update({
