@@ -27,8 +27,8 @@ export async function handlePendingTransaction({
   // Atomically set the status to 'processing' only if it's currently 'pending'
   const updatedTx = await prisma.pendingNftTransaction.updateMany({
     where: {
-      id: pendingTransactionId,
-      status: 'pending'
+      id: pendingTransactionId
+      // status: 'pending'
     },
     data: {
       status: 'processing'
