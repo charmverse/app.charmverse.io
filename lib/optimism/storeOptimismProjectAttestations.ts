@@ -124,7 +124,7 @@ export async function storeOptimismProjectAttestations() {
                 .map((teamMember) => {
                   if (teamMember.startsWith('0x')) {
                     return parseInt(teamMember, 16);
-                  } else if (parseInt(teamMember)) {
+                  } else if (!Number.isNaN(parseInt(teamMember))) {
                     return parseInt(teamMember);
                   }
                   return null;
