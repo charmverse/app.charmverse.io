@@ -58,11 +58,11 @@ export async function processScoutPointsPayout({
             createMany: {
               data: [
                 ...nftHolders.map(({ scoutId, _count: { scoutId: nftsPurchased } }) => ({
-                  value: 0.8 * earnableScoutPoints * (nftsPurchased / totalNftsPurchased),
+                  value: Math.floor(0.8 * earnableScoutPoints * (nftsPurchased / totalNftsPurchased)),
                   recipientId: scoutId
                 })),
                 {
-                  value: 0.2 * earnableScoutPoints,
+                  value: Math.floor(0.2 * earnableScoutPoints),
                   recipientId: builderId
                 }
               ]
