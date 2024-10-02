@@ -8,7 +8,7 @@ export async function processNftMints() {
       status: TransactionStatus.pending,
       createdAt: {
         // Only process transactions that are at least 1 minute old in the case user is already in the app
-        lte: new Date(Date.now() - 1000 * 65) // 7 days ago
+        lte: new Date(Date.now() - 1000 * 65) // 65 seconds ago
       }
     }
   });
