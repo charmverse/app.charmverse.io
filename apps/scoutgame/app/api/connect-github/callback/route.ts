@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
 import { authSecret } from '@root/config/constants';
@@ -51,13 +52,13 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const exists = await prisma.scout.count({
+  const scout = await prisma.scout.findUnique({
     where: {
       id: unsealedUserId
     }
   });
 
-  if (!exists) {
+  if (!scout) {
     return new Response(null, {
       status: 302,
       headers: {
@@ -129,24 +130,61 @@ export async function GET(req: NextRequest) {
   //     }
   //   });
   // }
-
-  await prisma.scout.update({
+  const githubUser = await prisma.githubUser.findFirst({
     where: {
-      id: unsealedUserId
-    },
-    data: {
-      builderStatus: 'applied',
-      onboardedAt: new Date(),
-      githubUser: {
-        create: {
-          login: githubLogin,
-          displayName: userResponse.name,
-          email: userResponse.email,
-          id: userResponse.id
-        }
-      }
+      login: githubLogin
     }
   });
+
+  // handle existing github user tied to a different builder
+  if (githubUser?.builderId && githubUser.builderId !== unsealedUserId) {
+    log.warn('Github user already in use', {
+      githubLogin,
+      userId: unsealedUserId
+    });
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: generateRedirectUrl('Account is already in use')
+      }
+    });
+  }
+
+  log.info('Connecting github user', {
+    githubLogin,
+    alreadyExists: !!githubUser,
+    displayName: userResponse.name,
+    id: userResponse.id
+  });
+
+  await prisma.githubUser.upsert({
+    where: {
+      login: githubLogin
+    },
+    create: {
+      builderId: unsealedUserId,
+      login: githubLogin,
+      displayName: userResponse.name,
+      email: userResponse.email,
+      id: userResponse.id
+    },
+    update: {
+      builderId: unsealedUserId
+    }
+  });
+
+  // mark builder as applied if they haven't been marked as such yet
+  if (scout.builderStatus === null) {
+    await prisma.scout.update({
+      where: {
+        id: unsealedUserId
+      },
+      data: {
+        builderStatus: 'applied',
+        onboardedAt: new Date()
+      }
+    });
+  }
 
   const location = `${process.env.DOMAIN}/welcome/spam-policy`;
 
