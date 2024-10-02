@@ -66,6 +66,7 @@ export async function mintNFT(params: MintNFTParams) {
           create: {
             pointsValue,
             tokensPurchased: amount,
+            paidInPoints: paidWithPoints,
             txHash: txResult.transactionHash.toLowerCase(),
             builderNftId,
             scoutId,
