@@ -12,3 +12,7 @@ export function useMdScreen() {
 export function useSmScreen() {
   return useMediaQuery((theme: Theme) => theme.breakpoints.up('sm'));
 }
+
+export function useXsmScreen() {
+  return useMediaQuery((theme: Theme) => theme.breakpoints.up('xsm'));
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { createTheme, alpha, darken, lighten, responsiveFontSizes } from '@mui/material';
+import { createTheme, alpha, darken, lighten, responsiveFontSizes } from '@mui/material/styles';
 import { Inter } from 'next/font/google';
 
 import {
@@ -33,6 +33,9 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
   },
   shape: {
     borderRadius: 5
+  },
+  breakpoints: {
+    xsm: 360
   },
   cssVariables: true,
   defaultColorScheme: 'dark',
