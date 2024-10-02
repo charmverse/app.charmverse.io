@@ -4,6 +4,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
 import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
+import { getBuilderContractAddress } from './constants';
 
 export async function refreshBuilderNftPrice({ builderId, season }: { builderId: string; season: string }) {
   if (!stringUtils.isUUID(builderId)) {
@@ -17,7 +18,6 @@ export async function refreshBuilderNftPrice({ builderId, season }: { builderId:
   const currentPrice = await builderContractReadonlyApiClient.getTokenPurchasePrice({
     args: { tokenId, amount: BigInt(1) }
   });
-
   const existingNft = await prisma.builderNft.findFirstOrThrow({
     where: {
       builderId,
