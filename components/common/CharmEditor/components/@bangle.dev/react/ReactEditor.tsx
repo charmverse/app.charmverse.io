@@ -2,6 +2,7 @@ import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
+import { className as editorClassName } from '@packages/charmeditor/ui';
 import { undo } from 'prosemirror-history';
 import { EditorState } from 'prosemirror-state';
 import type { Plugin, PluginKey } from 'prosemirror-state';
@@ -343,7 +344,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       {editor ? children : null}
       <div
         ref={editorRef}
-        className={`bangle-editor-core ${readOnly ? 'readonly' : ''}${!isLoadingRef.current ? ' content-loaded' : ''}`}
+        className={`bangle-editor-core ${editorClassName} ${readOnly ? 'readonly' : ''}${
+          !isLoadingRef.current ? ' content-loaded' : ''
+        }`}
         data-page-id={pageId}
         data-post-id={postId}
         style={{

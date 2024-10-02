@@ -76,6 +76,7 @@ jobs:
       - name: Run eslint on changed files
         uses: tj-actions/eslint-changed-files@v25
         with:
+          escape_paths: 'false'
           skip_annotations: 'true' # do not annotate code in the PR
           extra_args: '--ignore-pattern apps,packages'
           file_extensions: '**/*.{ts,tsx}'
@@ -303,7 +304,7 @@ jobs:
                       -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
                       --network "host"  \
                       --ipc=host \
-                      mcr.microsoft.com/playwright:v1.42.1-jammy \
+                      mcr.microsoft.com/playwright:v1.47.1-jammy \
                       ${{matrix.test_command}}
         # uses: docker://mcr.microsoft.com/playwright:v1.34.3-jammy
         # with:

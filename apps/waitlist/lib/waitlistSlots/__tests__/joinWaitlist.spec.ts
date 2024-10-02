@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { randomLargeInt } from '@packages/scoutgame/testing/generators';
 
-import { randomFid } from '../../../../../testing/utils/farcaster';
 import { joinWaitlist } from '../joinWaitlist'; // Replace with your actual module
 
 describe('joinWaitlist', () => {
   it('should return existing waitlist slot if user already exists', async () => {
-    const targetFid = randomFid();
+    const targetFid = randomLargeInt();
 
     // Insert a test user into the database
     const existingSlot = await prisma.connectWaitlistSlot.create({
@@ -26,7 +26,7 @@ describe('joinWaitlist', () => {
   });
 
   it('should create a new waitlist slot if user does not exist (no referral)', async () => {
-    const targetFid = randomFid();
+    const targetFid = randomLargeInt();
 
     const result = await joinWaitlist({ fid: targetFid, username: 'newUser' });
 
@@ -43,9 +43,9 @@ describe('joinWaitlist', () => {
   });
 
   it('should create a new waitlist slot and update referred user score', async () => {
-    const targetFid = randomFid();
+    const targetFid = randomLargeInt();
 
-    const referrerFid = randomFid();
+    const referrerFid = randomLargeInt();
 
     // Insert the referrer into the database
     const referrer = await prisma.connectWaitlistSlot.create({
@@ -70,6 +70,8 @@ describe('joinWaitlist', () => {
     });
     expect(newUser).toBeTruthy();
     expect(result.isNew).toBe(true);
+    expect(newUser?.percentile).toBe(1);
+    expect(newUser?.score).toBe(newUser?.initialPosition);
 
     // Verify that the referred user's score was updated (you would define in refreshUserScore)
     const updatedReferrer = await prisma.connectWaitlistSlot.findUniqueOrThrow({
@@ -78,5 +80,26 @@ describe('joinWaitlist', () => {
 
     // Check if referrer score is updated (refreshUserScore should handle this)
     expect(updatedReferrer.score).not.toBe(referrer.score);
+  });
+
+  it('should initialise partner accounts to percentile 100', async () => {
+    const targetFid = randomLargeInt();
+
+    // Call joinWaitlist with a referral
+    const result = await joinWaitlist({
+      fid: targetFid,
+      username: 'newUserWithReferral',
+      isPartnerAccount: true
+    });
+
+    // Verify that the new user was added to the waitlist
+    const newUser = await prisma.connectWaitlistSlot.findUnique({
+      where: { fid: targetFid }
+    });
+    expect(newUser).toBeTruthy();
+    expect(result.isNew).toBe(true);
+    expect(newUser?.percentile).toBe(100);
+    expect(newUser?.score).toBe(newUser?.initialPosition);
+    expect(newUser?.isPartnerAccount).toBe(true);
   });
 });

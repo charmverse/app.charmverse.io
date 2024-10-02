@@ -1,20 +1,38 @@
 import type {
   PaletteOptions as MuiPaletteOptions,
   PaletteColorOptions as MuiPaletteColorOptions,
-  PaletteColor
+  Palette as MuiPalette,
+  PaletteColor as MuiPaletteColor,
+  TypeText,
+  PaletteTextChannel
 } from '@mui/material/styles';
 
 declare module '@mui/material/styles' {
-  export interface PaletteOptions extends MuiPaletteOptions {
-    textPrimary: MuiPaletteOptions['primary'];
-    inputBackground: MuiPaletteOptions['primary'];
-    footerBackground: MuiPaletteOptions['primary'];
-    mainBackground: MuiPaletteOptions['primary'];
+  export interface Palette extends MuiPalette {
+    inputBackground: MuiPalette['primary'];
+    black: MuiPalette['primary'];
+    orange: MuiPalette['primary'];
+    green: MuiPalette['primary'];
   }
-  export interface Palette extends MuiPaletteColorOptions {
-    textPrimary: PaletteColor;
-    inputBackground: PaletteColor;
-    footerBackground: PaletteColor;
-    mainBackground: PaletteColor;
+
+  export interface PaletteOptions extends MuiPaletteOptions {
+    inputBackground: MuiPaletteOptions['primary'];
+    black: MuiPaletteOptions['primary'];
+    orange: MuiPaletteOptions['primary'];
+    green: MuiPaletteOptions['primary'];
+  }
+
+  export interface TypeBackground extends MuiTypeBackground {
+    default: string;
+    paper: string;
+    dark: string;
+    light: string;
+  }
+}
+
+declare module '@mui/material/Button' {
+  interface ButtonPropsVariantOverrides {
+    gradient: true;
+    buy: true;
   }
 }

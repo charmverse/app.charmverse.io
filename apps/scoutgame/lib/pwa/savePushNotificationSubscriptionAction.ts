@@ -16,7 +16,7 @@ export const savePushNotificationSubscriptionAction = authActionClient
       data: {
         subscription,
         source: 'connect',
-        userId: ctx.session.user.id
+        userId: ctx.session.scoutId
       }
     });
   });

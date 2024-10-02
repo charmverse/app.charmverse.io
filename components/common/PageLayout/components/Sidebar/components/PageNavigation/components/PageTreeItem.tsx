@@ -2,13 +2,13 @@ import type { Page, PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import type { TreeItemContentProps } from '@mui/lab/TreeItem';
-import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import Tooltip from '@mui/material/Tooltip';
+import type { TreeItemContentProps } from '@mui/x-tree-view';
+import { TreeItem, treeItemClasses } from '@mui/x-tree-view';
 import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode, DragEvent, SyntheticEvent } from 'react';
@@ -114,19 +114,6 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
     },
     [`& .${treeItemClasses.iconContainer} svg.MuiSvgIcon-fontSizeLarge`]: {
       fontSize: 24
-    }
-  },
-  [`& .${treeItemClasses.group}`]: {
-    marginLeft: 0,
-    [`& .${treeItemClasses.content}`]: {
-      paddingLeft: theme.spacing(3)
-    },
-    // add increasing indentation to children of children
-    [`& .${treeItemClasses.group} .${treeItemClasses.content}`]: {
-      paddingLeft: `calc(${theme.spacing(3)} + 16px)`
-    },
-    [`& .${treeItemClasses.group} .${treeItemClasses.group} .${treeItemClasses.content}`]: {
-      paddingLeft: `calc(${theme.spacing(3)} + 32px)`
     }
   }
 }));
@@ -306,11 +293,11 @@ function EmojiMenu({ popupState, pageId }: { popupState: any; pageId: string }) 
 }
 
 const TreeItemComponent = React.forwardRef<
-  React.Ref<HTMLDivElement>,
+  HTMLDivElement,
   TreeItemContentProps & { isAdjacent?: boolean; hasSelectedChildView?: boolean }
 >(({ isAdjacent, ...props }, ref) => (
-  <div id={`page-navigation-${props.nodeId}`} style={{ position: 'relative' }}>
-    <TreeItemContent {...props} ref={ref as React.Ref<HTMLDivElement>} />
+  <div id={`page-navigation-${props.itemId}`} style={{ position: 'relative' }}>
+    <TreeItemContent {...props} ref={ref} />
     {isAdjacent && <AdjacentDropZone />}
   </div>
 ));
@@ -381,15 +368,18 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
   return (
     <>
       <StyledTreeItem
+        id={pageId}
         data-handler-id={handlerId}
         isActive={isActive}
         label={labelComponent}
-        nodeId={pageId}
+        itemId={pageId}
         // @ts-ignore
         ContentComponent={TreeItemComponent}
         // @ts-ignore
         ContentProps={ContentProps}
-        TransitionProps={TransitionProps}
+        slotProps={{
+          groupTransition: TransitionProps
+        }}
         ref={ref}
         data-test={`page-tree-item-${pageId}`}
       >

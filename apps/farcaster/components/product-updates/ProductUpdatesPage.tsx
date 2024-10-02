@@ -1,7 +1,5 @@
 'use client';
 
-import { FarcasterCard } from '@connect-shared/components/common/FarcasterCard';
-import { Typography, FormLabel } from '@mui/material';
 import { Stack } from '@mui/system';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useState } from 'react';

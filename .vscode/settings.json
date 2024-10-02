@@ -32,7 +32,7 @@
   },
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
-  "jestrunner.jestCommand": "npx dotenv -e .env.test.local -- node 'node_modules/.bin/jest'",
+  "jestrunner.jestCommand": "npx dotenv -e .env.test.local -- node --experimental-vm-modules 'node_modules/.bin/jest'",
   "typescript.tsdk": "node_modules/typescript/lib",
   "[javascript][typescript][typescriptreact]": {
     "editor.codeActionsOnSave": {

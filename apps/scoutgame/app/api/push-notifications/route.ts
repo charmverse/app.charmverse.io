@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
   initWebPush();
   const session = await getSession();
-  const userId = session.user?.id || undefined;
+  const userId = session.scoutId || undefined;
 
   try {
     const subscriptions = await prisma.pushNotificationSubscription.findMany({

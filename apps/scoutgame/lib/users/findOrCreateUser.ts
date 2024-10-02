@@ -46,7 +46,6 @@ export async function findOrCreateUser({
       userProps.avatar = url;
     } catch (e) {
       log.error('Failed to save avatar', { error: e, pathInS3, url: userProps?.avatar, userId });
-      throw new InvalidInputError('Failed to save avatar');
     }
   }
 

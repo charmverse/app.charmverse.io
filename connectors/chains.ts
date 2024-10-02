@@ -159,7 +159,7 @@ export const RPC: Record<string, IChainDetails> = {
     viem: optimismSepolia,
     chainName: 'Optimism - Sepolia',
     alchemyUrl: 'https://opt-sepolia.g.alchemy.com',
-    rpcUrls: optimismSepolia.rpcUrls.default.http,
+    rpcUrls: ['https://opt-sepolia.g.alchemy.com/v2/vTjY0u9L7uoxZQ5GtOw4yKwn7WJelMXp'],
     blockExplorerUrls: [optimismSepolia.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/optimism.svg',
     shortName: 'oeth-sepolia',

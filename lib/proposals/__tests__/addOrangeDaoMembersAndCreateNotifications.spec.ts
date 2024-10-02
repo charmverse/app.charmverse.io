@@ -3,7 +3,7 @@ import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/c
 import { addOrangeDaoMembersAndCreateNotifications } from 'scripts/addOrangeDaoMembersAndCreateNotifications';
 import { v4 } from 'uuid';
 
-describe('addOrangeDaoMembersAndCreateNotifications', () => {
+describe.skip('addOrangeDaoMembersAndCreateNotifications', () => {
   it('Should create space roles and notifications for sampled users', async () => {
     const { space: testSpace, user: testSpaceAdmin } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true

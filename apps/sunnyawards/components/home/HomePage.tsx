@@ -3,6 +3,8 @@ import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
+import { WalletLogin } from 'components/common/WalletLogin/WalletLogin';
+
 import { WarpcastLogin } from '../common/WarpcastLogin/WarpcastLogin';
 
 export function HomePage() {
@@ -50,6 +52,7 @@ export function HomePage() {
         to claim your ticket.
       </Typography>
       <WarpcastLogin />
+      <WalletLogin successPath='/profile' />
     </PageWrapper>
   );
 }

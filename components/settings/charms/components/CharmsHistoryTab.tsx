@@ -41,10 +41,7 @@ export function CharmsHistoryTab() {
             <Stack direction='row' gap={1} alignItems='center' justifyContent='space-between'>
               <Stack direction='row' gap={1} alignItems='center'>
                 <Stack direction='row' alignItems='center' gap={0.5} minWidth='30px'>
-                  <Typography
-                    variant='subtitle1'
-                    color={transaction.metadata.isReceived ? ({ palette }) => palette.primary.main : 'secondary'}
-                  >
+                  <Typography variant='subtitle1' color={transaction.metadata.isReceived ? 'primary' : 'secondary'}>
                     {transaction.metadata.isReceived ? '+' : '-'}
                     {transaction.amount}
                   </Typography>

@@ -23,7 +23,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
               data-testid="DragIndicatorIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -50,7 +50,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
                 data-testid="InsertDriveFileOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -67,11 +67,11 @@ exports[`components/table/TableRow should match snapshot 1`] = `
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1e8l9jl-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
+                    class="MuiInputBase-input Editable octo-propertyvalue css-f5ijlv-MuiInputBase-input"
                     placeholder="Untitled"
                     type="text"
                     value="Page Title"
@@ -85,7 +85,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
             data-test="database-open-button-card-1"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-ihfry6-MuiTypography-root-MuiLink-root"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -133,7 +133,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
               data-testid="DragIndicatorIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -160,7 +160,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
                 data-testid="InsertDriveFileOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -177,11 +177,11 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1e8l9jl-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
+                    class="MuiInputBase-input Editable octo-propertyvalue css-f5ijlv-MuiInputBase-input"
                     placeholder="Untitled"
                     type="text"
                     value="Page Title"
@@ -195,7 +195,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
             data-test="database-open-button-card-1"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-ihfry6-MuiTypography-root-MuiLink-root"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -235,11 +235,11 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
                   data-mui-internal-clone-element="true"
                 >
                   <div
-                    class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                    class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1b9i3vx-MuiChip-root"
                     data-test="select-preview-value-value1"
                   >
                     <span
-                      class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      class="MuiChip-label MuiChip-labelSmall css-3fh3fk-MuiChip-label"
                     >
                       value 1
                     </span>
@@ -310,7 +310,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
               data-testid="DragIndicatorIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -337,7 +337,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
                 data-testid="InsertDriveFileOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -354,11 +354,11 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1e8l9jl-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
+                    class="MuiInputBase-input Editable octo-propertyvalue css-f5ijlv-MuiInputBase-input"
                     placeholder="Untitled"
                     type="text"
                     value="Page Title"
@@ -372,7 +372,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
             data-test="database-open-button-card-1"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-ihfry6-MuiTypography-root-MuiLink-root"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -422,7 +422,7 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
                 data-testid="InsertDriveFileOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -439,11 +439,11 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-readOnly MuiInputBase-readOnly css-t4vlgn-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-readOnly MuiInputBase-readOnly css-1e8l9jl-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Mui-readOnly Editable readonly octo-propertyvalue MuiInputBase-readOnly css-l7ze9l-MuiInputBase-input"
+                    class="MuiInputBase-input Mui-readOnly Editable readonly octo-propertyvalue MuiInputBase-readOnly css-f5ijlv-MuiInputBase-input"
                     placeholder="Untitled"
                     readonly=""
                     type="text"
@@ -458,7 +458,7 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
             data-test="database-open-button-card-1"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-ihfry6-MuiTypography-root-MuiLink-root"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -506,7 +506,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-urm4tf-MuiSvgIcon-root"
               data-testid="DragIndicatorIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -533,7 +533,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
                 data-testid="InsertDriveFileOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -550,11 +550,11 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1e8l9jl-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
+                    class="MuiInputBase-input Editable octo-propertyvalue css-f5ijlv-MuiInputBase-input"
                     placeholder="Untitled"
                     type="text"
                     value="Page Title"
@@ -568,7 +568,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
             data-test="database-open-button-card-1"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-ihfry6-MuiTypography-root-MuiLink-root"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -608,11 +608,11 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
                   data-mui-internal-clone-element="true"
                 >
                   <div
-                    class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                    class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1b9i3vx-MuiChip-root"
                     data-test="select-preview-value-value1"
                   >
                     <span
-                      class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      class="MuiChip-label MuiChip-labelSmall css-3fh3fk-MuiChip-label"
                     >
                       value 1
                     </span>
@@ -692,7 +692,7 @@ exports[`components/table/TableRow should match snapshots with a nested row 1`] 
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
                 data-testid="InsertDriveFileOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -709,11 +709,11 @@ exports[`components/table/TableRow should match snapshots with a nested row 1`] 
                 style="height: 100%;"
               >
                 <div
-                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
+                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1e8l9jl-MuiInputBase-root"
                   spellcheck="true"
                 >
                   <input
-                    class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
+                    class="MuiInputBase-input Editable octo-propertyvalue css-f5ijlv-MuiInputBase-input"
                     placeholder="Untitled"
                     type="text"
                     value="Page Title"
@@ -727,7 +727,7 @@ exports[`components/table/TableRow should match snapshots with a nested row 1`] 
             data-test="database-open-button-card-1"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-6sdz5x-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-ihfry6-MuiTypography-root-MuiLink-root"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -767,11 +767,11 @@ exports[`components/table/TableRow should match snapshots with a nested row 1`] 
                   data-mui-internal-clone-element="true"
                 >
                   <div
-                    class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-1hbiykn-MuiChip-root"
+                    class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-d6lf3r-MuiChip-root"
                     data-test="select-preview-value-value1"
                   >
                     <span
-                      class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
+                      class="MuiChip-label MuiChip-labelSmall css-3fh3fk-MuiChip-label"
                     >
                       value 1
                     </span>

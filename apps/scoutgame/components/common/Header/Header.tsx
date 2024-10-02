@@ -4,20 +4,21 @@ import { log } from '@charmverse/core/log';
 import type { Scout } from '@charmverse/core/prisma';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
-import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar } from '@mui/material';
+import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar, Button, Typography, Stack } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
 import { Avatar } from 'components/common/Avatar';
+import { Hidden } from 'components/common/Hidden';
+import { SiteNavigation } from 'components/common/SiteNavigation';
 
 import { InstallAppMenuItem } from './components/InstallAppMenuItem';
 
-export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | null }) {
-  const path = usePathname();
+export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar' | 'currentBalance'> | null }) {
   const router = useRouter();
 
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -44,49 +45,105 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | nu
     <AppBar
       position='static'
       sx={{
-        backgroundColor: path === '/' ? 'background.default' : { xs: 'background.default', md: 'mainBackground.main' },
-        boxShadow: 'none',
-        pt: 1
+        height: 58,
+        backgroundColor: { xs: 'transparent', md: 'var(--mui-palette-AppBar-darkBg, var(--AppBar-background))' }
       }}
     >
-      <Container maxWidth={false}>
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }} variant='dense'>
-          <Link href='/'>
-            <Image src='/images/cv-connect-logo.png' width={40} height={40} alt='Connect logo' />
-          </Link>
-          {user && (
-            <Box display='flex' gap={1} alignItems='center'>
-              <IconButton disabled={isExecutingLogout} onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar src={user?.avatar || undefined} size='medium' name={user.username} />
-              </IconButton>
-              <Menu
-                sx={{ mt: 5 }}
-                id='menu-appbar'
-                slotProps={{
-                  paper: { sx: { '.MuiList-root': { pb: 0 }, maxWidth: '250px' } }
-                }}
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right'
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right'
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-                onClick={handleCloseUserMenu}
-              >
-                <MenuItem>
-                  <Link href='/profile'>{user.username}</Link>
-                </MenuItem>
-                <MenuItem onClick={() => logoutUser()}>Sign Out</MenuItem>
-                <InstallAppMenuItem>Install</InstallAppMenuItem>
-              </Menu>
-            </Box>
-          )}
+      <Container maxWidth={false} sx={{ height: '100%' }}>
+        <Toolbar
+          disableGutters
+          sx={{ height: '100%', justifyContent: 'space-between', alignItems: 'center' }}
+          variant='dense'
+        >
+          <>
+            <Link href='/home'>
+              <Image
+                src='/images/scout-game-logo.png'
+                width={100}
+                height={45}
+                alt='Scout Game logo'
+                priority={true}
+                style={{ verticalAlign: 'middle' }}
+              />
+            </Link>
+            <Stack flexDirection='row' gap={2} alignItems='center'>
+              <Hidden mdDown>
+                <SiteNavigation topNav isAuthenticated={!!user} />
+              </Hidden>
+              {user ? (
+                <Box
+                  display='flex'
+                  alignItems='center'
+                  gap={1}
+                  borderColor='secondary.main'
+                  borderRadius='30px'
+                  sx={{
+                    position: 'relative',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      borderColor: 'secondary.main',
+                      borderRadius: '28px',
+                      borderWidth: '2px',
+                      borderStyle: 'solid',
+                      pointerEvents: 'none'
+                    }
+                  }}
+                >
+                  <Typography fontSize='16px' sx={{ pl: 2 }}>
+                    {user.currentBalance}
+                  </Typography>
+                  <Image
+                    src='/images/profile/scout-game-icon.svg'
+                    width={20}
+                    height={20}
+                    alt='Scout Game points icon'
+                    priority={true}
+                  />
+                  <IconButton disabled={isExecutingLogout} onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    <Avatar src={user?.avatar || undefined} size='medium' name={user.username} />
+                  </IconButton>
+                  <Menu
+                    sx={{ mt: 5 }}
+                    id='menu-appbar'
+                    slotProps={{
+                      paper: { sx: { '.MuiList-root': { pb: 0 }, maxWidth: '250px' } }
+                    }}
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right'
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right'
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                    onClick={handleCloseUserMenu}
+                  >
+                    <MenuItem>
+                      <Link href='/profile'>{user.username}</Link>
+                    </MenuItem>
+                    <MenuItem>
+                      <Link href='/info'>What is Scout Game?</Link>
+                    </MenuItem>
+                    <MenuItem onClick={() => logoutUser()}>Sign Out</MenuItem>
+                    {/* <InstallAppMenuItem>Install</InstallAppMenuItem> */}
+                  </Menu>
+                </Box>
+              ) : (
+                <Button variant='gradient' LinkComponent={Link} href='/login' data-test='sign-in-button'>
+                  Sign in
+                </Button>
+              )}
+            </Stack>
+          </>
         </Toolbar>
       </Container>
     </AppBar>

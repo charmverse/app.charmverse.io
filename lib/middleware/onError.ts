@@ -20,7 +20,7 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
 
   if (errorAsSystemError.code === 500) {
     // err.error?.message is for errors from @charmverse/core/http
-    log.error(`Server Error: ${err.message || err.error?.message || err.error || err}`, {
+    log.error(`Server Error: ${err.message || err.error?.message || err.error || err.status || err}`, {
       error: err instanceof SystemError === false ? err.message || 'Something went wrong' : errorAsSystemError,
       stack: err.error?.stack || err.stack,
       userId: req.session?.user?.id,

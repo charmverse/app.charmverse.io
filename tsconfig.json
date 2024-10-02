@@ -30,6 +30,8 @@
       "@connect-shared/*": ["./@connect-shared/*"],
       "@packages/charmeditor/*": ["./packages/charmeditor/src/*"],
       "@packages/utils/*": ["./packages/utils/src/*"],
+      "@packages/github/*": ["./packages/github/src/*"],
+      "@packages/onchain/*": ["./packages/onchain/src/*"],
       "@root/abis/*": ["./abis/*"],
       "@root/adapters/*": ["./adapters/*"],
       "@root/connectors/*": ["./connectors/*"],

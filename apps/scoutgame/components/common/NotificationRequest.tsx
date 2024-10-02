@@ -7,9 +7,16 @@ import { useLocalStorage } from 'usehooks-ts';
 import { savePushNotificationSubscriptionAction } from 'lib/pwa/savePushNotificationSubscriptionAction';
 
 export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: string }) {
+  const WindowNotification =
+    typeof window !== 'undefined' ? (window.Notification as typeof Notification | undefined) : undefined;
+  const notificationsSupported =
+    typeof window !== 'undefined' &&
+    'Notification' in window &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window;
   const [permission, setPermission] = useLocalStorage<NotificationPermission>(
     'notificationPermission',
-    typeof window !== 'undefined' ? window?.Notification?.permission : 'default'
+    WindowNotification?.permission || 'default'
   );
 
   const [snackbarState, setSnackbarState] = useState<boolean>(false);
@@ -24,12 +31,15 @@ export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: strin
   };
 
   const requestPermission = useCallback(async () => {
-    const notificationsSupported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
-    const notificationPermission = await Notification.requestPermission();
+    if (!WindowNotification || !notificationsSupported) {
+      return;
+    }
+
+    const notificationPermission = await WindowNotification.requestPermission();
     setPermission(notificationPermission);
 
     if (notificationPermission === 'granted') {
-      if (!notificationsSupported || Notification.permission !== 'granted') {
+      if (WindowNotification.permission !== 'granted') {
         return;
       }
 
@@ -54,12 +64,12 @@ export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: strin
 
       await savePushNotificationSubscriptionAction({ subscription: json });
     }
-  }, [vapidPublicKey, setPermission]);
+  }, [vapidPublicKey, setPermission, notificationsSupported]);
 
   // Update permission state if the user changes it manually
   useEffect(() => {
-    if (permission !== 'denied' && permission !== Notification.permission) {
-      setPermission(Notification.permission);
+    if (WindowNotification && permission !== 'denied' && permission !== WindowNotification.permission) {
+      setPermission(WindowNotification.permission);
     }
   }, [permission, setPermission]);
 
@@ -81,11 +91,11 @@ export function NotificationRequest({ vapidPublicKey }: { vapidPublicKey?: strin
     >
       <Alert severity='info' icon={<div />}>
         <Box display='flex' flexDirection='column' gap={1}>
-          <Typography variant='body2'>Get notified of Grants and Funding Opportunities</Typography>
+          <Typography variant='body2'>Get notified when you score points</Typography>
           <Box display='flex' gap={1}>
             <Button onClick={requestPermission}>Allow</Button>
             <Button onClick={handleDeny} variant='outlined'>
-              Deny
+              No thanks
             </Button>
           </Box>
         </Box>

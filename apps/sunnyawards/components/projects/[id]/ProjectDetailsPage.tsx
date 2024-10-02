@@ -15,8 +15,9 @@ export async function ProjectDetailsPage({ project }: { project: ConnectProjectD
   const session = await getSession();
   const projectMembers = project.projectMembers;
 
-  // Previously used for showing edit buttin
-  const isCurrentUserTeamLead = projectMembers.some((member) => member.teamLead && member.userId === session?.user?.id);
+  const isCurrentUserTeamLead =
+    projectMembers.some((member) => member.teamLead && member.userId === session?.user?.id) ||
+    project.createdBy === session.user?.id;
 
   return (
     <PageWrapper
@@ -24,7 +25,7 @@ export async function ProjectDetailsPage({ project }: { project: ConnectProjectD
       footer={!session?.user?.id && <JoinTheSunnysBanner />}
     >
       {/** Edit button disabled as sunny awards submissions are suspended now */}
-      <ProjectDetails project={project} showEditButton={false} />
+      <ProjectDetails project={project} showEditButton={isCurrentUserTeamLead} />
       <Divider sx={{ my: 2 }} />
       <Typography variant='h6'>Members</Typography>
       <Stack gap={1} mb={2}>

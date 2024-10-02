@@ -14,9 +14,10 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
+    "@mui/material-nextjs": "^6.1.0",
     "@typeschema/yup": "^0.13.3",
-    "framer-motion": "^11.3.17",
-    "next-safe-action": "^7.4.2",
+    "framer-motion": "^11.5.4",
+    "next-safe-action": "~7.4.2",
     "server-only": "^0.0.1"
   }
 }

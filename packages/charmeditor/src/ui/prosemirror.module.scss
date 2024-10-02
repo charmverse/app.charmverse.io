@@ -1,0 +1,70 @@
+/* copied from https://github.com/ProseMirror/prosemirror-view/blob/master/style/prosemirror.css */
+
+.ProseMirror {
+  position: relative;
+
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  white-space: break-spaces;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0; /* the above doesn't seem to work in Edge */
+
+  p, h1, h2, h3, h4, h5, h6, blockquote, pre, figure, dl, dd {
+    margin: 0;
+  }
+
+  pre {
+    white-space: pre-wrap;
+  }
+
+  li {
+    position: relative;
+  }
+
+  :global(&.ProseMirror-hideselection) *::selection { background: transparent; }
+  :global(&.ProseMirror-hideselection) *::-moz-selection { background: transparent; }
+  :global(&.ProseMirror-hideselection) { caret-color: transparent; }
+
+  /* See https://github.com/ProseMirror/prosemirror/issues/1421#issuecomment-1759320191 */
+  [draggable][contenteditable=false] { user-select: text }
+
+  :global(.ProseMirror-selectednode) {
+    outline: 2px solid #8cf;
+  }
+
+  /* Make sure li selections wrap around markers */
+
+  :global(li.ProseMirror-selectednode) {
+    outline: none;
+  }
+
+  :global(li.ProseMirror-selectednode):after {
+    content: "";
+    position: absolute;
+    left: -32px;
+    right: -2px; top: -2px; bottom: -2px;
+    border: 2px solid #8cf;
+    pointer-events: none;
+  }
+
+  /* Protect against generic img rules */
+
+  :global(img.ProseMirror-separator) {
+    display: inline !important;
+    border: none !important;
+    margin: 0 !important;
+  }
+
+  /** Extensions **/
+
+  :global(.charm-link) {
+    color: #009Fb7;
+    text-decoration: underline;
+    &:hover {
+      color: #24659b;
+      text-decoration: underline;
+    }
+  }
+
+}

@@ -74,6 +74,7 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
+          app_name: sunnyawards
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
@@ -111,6 +112,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -128,6 +131,7 @@ jobs:
         with:
           skip_annotations: 'true' # do not annotate code in the PR
           file_extensions: '**/*.{ts,tsx}'
+          escape_paths: 'false'
 
   test-e2e:
     name: Test e2e
@@ -158,6 +162,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -193,7 +199,7 @@ jobs:
                       -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
                       --network "host"  \
                       --ipc=host \
-                      mcr.microsoft.com/playwright:v1.42.1-jammy \
+                      mcr.microsoft.com/playwright:v1.47.1-jammy \
                       npm run sunnyawards:test:e2e:ci
 
   upload-docker:
@@ -211,6 +217,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Restore app from cache
         uses: ./.github/actions/build_app
@@ -232,7 +240,7 @@ jobs:
           ecr_registry: sunnyawards
 
   upload-static-assets:
-    name: Upload assets in production
+    name: Upload static assets
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: |
@@ -246,6 +254,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Restore app from cache
         uses: ./.github/actions/build_app
@@ -300,6 +310,8 @@ jobs:
       # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
@@ -357,6 +369,8 @@ jobs:
       # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: sunnyawards
 
       - name: Replace env_var with staging settings
         run: |

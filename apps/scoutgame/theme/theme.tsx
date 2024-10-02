@@ -1,99 +1,88 @@
 'use client';
 
-import { grey } from '@mui/material/colors';
-import { darken, experimental_extendTheme as extendTheme, responsiveFontSizes } from '@mui/material/styles';
+import { createTheme, alpha, darken, lighten, responsiveFontSizes } from '@mui/material';
+import { Inter } from 'next/font/google';
 
 import {
-  backgroundColor,
   backgroundColorDarkMode,
   backgroundLightColorDarkMode,
   brandColor,
-  inputBackground,
+  disabledTextColorDarkMode,
   inputBackgroundDarkMode,
-  inputBorder,
   inputBorderDarkMode,
-  primaryTextColor,
   primaryTextColorDarkMode,
-  secondaryTextColor,
-  secondaryTextColorDarkMode
+  purpleDisabled,
+  secondaryText,
+  secondaryLightText,
+  blackText
 } from './colors';
 
-export const defaultFont =
-  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
+const interFont = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap'
+});
 
-const contrastText = '#fff'; // mode === 'dark' ? '#fff' : '#000';
-
-const extendedTheme = extendTheme({
-  cssVarPrefix: 'charm',
+const themeOptions: Parameters<typeof createTheme>[0] = {
+  typography: {
+    fontFamily: interFont.style.fontFamily,
+    button: {
+      fontWeight: 600,
+      fontSize: '1rem'
+    }
+  },
+  shape: {
+    borderRadius: 5
+  },
+  cssVariables: true,
+  defaultColorScheme: 'dark',
   colorSchemes: {
-    light: {
-      // palette for light mode
-      palette: {
-        action: {
-          focus: 'rgb(29, 92, 132, 0.1)',
-          hover: 'rgba(22, 52, 71, 0.07)',
-          selected: 'rgba(22, 52, 71, 0.07)'
-        },
-        background: {
-          default: backgroundColor,
-          paper: backgroundColor
-        },
-        text: {
-          disabled: primaryTextColor,
-          primary: primaryTextColor
-        },
-        primary: {
-          main: brandColor
-        },
-        secondary: {
-          main: secondaryTextColor
-        },
-        textPrimary: {
-          main: primaryTextColor
-        },
-        inputBackground: {
-          main: inputBackground
-        },
-        footerBackground: { main: grey[200] },
-        mainBackground: { main: grey[200] }
-      }
-    },
     dark: {
       // palette for dark mode
       palette: {
-        action: {
-          focus: 'rgb(29, 92, 132)',
-          hover: 'rgba(255, 255, 255, 0.055)',
-          selected: 'rgba(255, 255, 255, 0.055)'
-        },
         background: {
           default: backgroundColorDarkMode,
-          paper: backgroundLightColorDarkMode
+          paper: backgroundLightColorDarkMode,
+          dark: darken(backgroundLightColorDarkMode, 0.25),
+          light: lighten(backgroundColorDarkMode, 0.125) // this # is based on the background needed for Info pages
         },
         text: {
-          disabled: primaryTextColor,
-          primary: primaryTextColorDarkMode
+          primary: primaryTextColorDarkMode,
+          secondary: secondaryText,
+          disabled: disabledTextColorDarkMode
         },
         primary: {
           main: brandColor,
-          dark: darken(brandColor, 0.2)
+          dark: purpleDisabled
         },
         secondary: {
-          contrastText,
-          main: secondaryTextColorDarkMode
-        },
-        textPrimary: {
-          main: primaryTextColorDarkMode
+          main: secondaryText,
+          light: secondaryLightText
         },
         inputBackground: {
           main: inputBackgroundDarkMode
         },
-        footerBackground: { main: grey[700] },
-        mainBackground: { main: backgroundColorDarkMode }
+        black: {
+          main: blackText,
+          dark: '#000'
+        },
+        orange: {
+          main: '#FFAC81'
+        },
+        green: {
+          main: '#85FF9E'
+        }
       }
     }
   },
   components: {
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 16 // Adjust this value to increase or decrease the roundness
+        }
+      }
+    },
     MuiPopover: {
       defaultProps: {
         disableRestoreFocus: true
@@ -102,12 +91,11 @@ const extendedTheme = extendTheme({
     MuiFormLabel: {
       styleOverrides: {
         root: ({ theme }) => ({
-          color: theme.vars.palette.text.primary,
+          color: theme.palette.text.primary,
           marginBottom: 5
         })
       }
     },
-    MuiAppBar: {},
     MuiAvatar: {
       styleOverrides: {
         root: ({ ownerState }) => ({
@@ -128,6 +116,16 @@ const extendedTheme = extendTheme({
         }
       }
     },
+    MuiAppBar: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          backgroundColor: theme.palette.background.default,
+          boxShadow: 'none',
+          paddingTop: 1,
+          paddingBottom: 1
+        })
+      }
+    },
     MuiPaper: {
       styleOverrides: {
         // Disable the lightening of the background when elevation is applied
@@ -140,6 +138,13 @@ const extendedTheme = extendTheme({
     MuiButtonBase: {
       defaultProps: {
         disableRipple: true
+      }
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          color: brandColor
+        }
       }
     },
     MuiButtonGroup: {
@@ -155,33 +160,88 @@ const extendedTheme = extendTheme({
         }
       }
     },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          background: 'transparent',
+          borderRadius: '5px',
+          paddingTop: 2,
+          paddingBottom: 2,
+          paddingRight: 2,
+          paddingLeft: 2,
+          fontWeight: '600',
+          color: theme.palette.secondary.main,
+          borderStyle: 'solid',
+          borderWidth: '1px',
+          borderColor: theme.palette.secondary.main,
+          '&.Mui-selected': {
+            backgroundColor: theme.palette.secondary.main,
+            color: theme.palette.black.main
+          },
+          '&:hover': {
+            backgroundColor: theme.palette.secondary.main,
+            color: theme.palette.black.main
+          }
+        })
+      }
+    },
     MuiButton: {
       defaultProps: {
         variant: 'contained',
         disableElevation: true
       },
+      variants: [
+        {
+          props: { variant: 'gradient' },
+          style: ({ theme }) => ({
+            background: 'linear-gradient(90deg, #69DDFF 0%,#A06CD5 100%)',
+            borderRadius: '20px',
+            paddingTop: 2,
+            paddingBottom: 2,
+            paddingRight: 1,
+            paddingLeft: 1,
+            fontSize: '0.9rem',
+            fontWeight: '500',
+            color: theme.palette.black.main
+            // '&:hover': {
+            //   backgroundColor: 'darkpurple'
+            // }
+          })
+        },
+        {
+          props: { variant: 'buy' },
+          style: ({ theme }) => ({
+            background: 'transparent',
+            borderRadius: '5px',
+            paddingTop: 2,
+            paddingBottom: 2,
+            paddingRight: 2,
+            paddingLeft: 2,
+            // fontSize: '0.9rem',
+            fontWeight: '600',
+            color: theme.palette.secondary.main,
+            borderStyle: 'solid',
+            borderWidth: '1px',
+            borderColor: theme.palette.secondary.main,
+            '&:hover': {
+              backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+              transition: 'all 0.3s ease-in-out'
+            }
+          })
+        }
+      ],
       styleOverrides: {
         root: {
+          borderRadius: 10,
+          fontWeight: 600,
+          fontSize: '1rem',
           textTransform: 'none'
-        },
-        text: ({ theme, variant, color }) => ({
-          '&:hover': {
-            backgroundColor: theme.vars.palette.inputBackground.main
-          },
-          color: color || (variant === 'outlined' || variant === 'text' ? theme.vars.palette.primary.main : 'inherit')
-        })
+        }
       }
     },
     MuiIconButton: {
-      styleOverrides: {
-        root: ({ theme }) => ({
-          '&:hover': {
-            backgroundColor: theme.vars.palette.inputBackground.main
-          }
-        })
-      },
       defaultProps: {
-        color: 'inherit' // set to inherit, the default is rgba (0,0,0, .54) which makes icons half-opaque
+        disableRipple: true
       }
     },
     MuiMenuItem: {
@@ -207,7 +267,7 @@ const extendedTheme = extendTheme({
       },
       styleOverrides: {
         root: ({ theme }) => ({
-          // boxShadow: theme.shadows[2]
+          boxShadow: 'none'
         })
       }
     },
@@ -254,21 +314,17 @@ const extendedTheme = extendTheme({
       },
       styleOverrides: {
         root: ({ theme }) => ({
-          backgroundColor: theme.vars.palette.inputBackground.main,
-          '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-            borderColor: inputBorder
-          },
-          '[data-mui-color-scheme="dark"] &': {
+          backgroundColor: inputBackgroundDarkMode,
+          ...theme.applyStyles('dark', {
             '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
               borderColor: inputBorderDarkMode
             }
-          }
+          })
         }),
-        notchedOutline: () => ({
-          borderColor: inputBorder,
-          '[data-mui-color-scheme="dark"] &': {
+        notchedOutline: ({ theme }) => ({
+          ...theme.applyStyles('dark', {
             borderColor: inputBorderDarkMode
-          }
+          })
         })
       }
     },
@@ -284,22 +340,39 @@ const extendedTheme = extendTheme({
         size: 'small'
       }
     },
+    MuiTabs: {
+      defaultProps: {
+        TabIndicatorProps: {
+          sx: (theme) => ({
+            backgroundColor: theme.palette.text.secondary
+          })
+        }
+      },
+      styleOverrides: {
+        root: {}
+      }
+    },
     MuiTab: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           minHeight: 0,
-          textTransform: 'none'
-        }
+          textTransform: 'none',
+          color: theme.palette.text.primary,
+          fontWeight: '400',
+          '&.Mui-selected': {
+            color: theme.palette.text.secondary
+          }
+        })
       }
     },
     MuiLink: {
       styleOverrides: {
         root: ({ theme }) => ({
-          color: theme.vars.palette.primary.main,
+          color: theme.palette.primary.main,
           '&:hover': {
-            color: theme.vars.palette.primary.dark
+            color: theme.palette.primary.dark
           },
-          fontFamily: defaultFont
+          fontFamily: interFont.style.fontFamily
         })
       },
       defaultProps: {
@@ -307,6 +380,8 @@ const extendedTheme = extendTheme({
       }
     }
   }
-});
+};
 
-export default responsiveFontSizes(extendedTheme) as typeof extendedTheme;
+const createdTheme = createTheme(themeOptions);
+
+export default responsiveFontSizes(createdTheme) as typeof createdTheme;

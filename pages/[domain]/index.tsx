@@ -53,6 +53,11 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     }
   });
 
+  log.info('Redirecting user to default page in space', {
+    destination,
+    domain: domainOrCustomDomain
+  });
+
   return {
     redirect: {
       destination,

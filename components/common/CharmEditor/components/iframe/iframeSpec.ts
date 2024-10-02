@@ -4,7 +4,7 @@ import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.
 
 import { embeddedNodeSpec } from '../../specs/embeddedNodeSpec';
 
-import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT } from './config';
+import { MAX_EMBED_WIDTH, MIN_EMBED_HEIGHT } from './constants';
 
 export const name = 'iframe';
 

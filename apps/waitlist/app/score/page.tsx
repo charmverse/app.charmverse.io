@@ -1,5 +1,6 @@
+import { getWaitlistSlotWithClicks } from '@packages/scoutgame/waitlist/scoring/getWaitlistSlotWithClicks';
+
 import { ScorePage } from 'components/score/ScorePage';
-import { getWaitlistSlotWithClicks } from 'lib/scoring/getWaitlistSlotWithClicks';
 import { getSession } from 'lib/session/getSession';
 
 // Dynamic data

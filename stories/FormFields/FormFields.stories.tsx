@@ -1,5 +1,5 @@
 import type { SelectOptionType } from '@root/lib/forms/interfaces';
-import { capitalize } from 'lodash';
+import { capitalize } from '@root/lib/utils/strings';
 import { useState } from 'react';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';

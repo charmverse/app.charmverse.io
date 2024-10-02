@@ -1,10 +1,22 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { syncProposalPermissionsWithWorkflowPermissions } from '@root/lib/proposals/workflows/syncProposalPermissionsWithWorkflowPermissions';
 import { prettyPrint } from 'lib/utils/strings';
+import { DateTime } from 'luxon';
 
-import { redisClient } from '@root/adapters/redis/redisClient';
+const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 30 }, { zone: 'utc' }); // Actual launch: 2024-W40
+const currentSeason = currentSeasonStartDate.toFormat(`kkkk-'W'WW`);
+
 async function query() {
-  await redisClient?.connect();
+  const w = await prisma.scout.findFirst({
+    where: {
+      username: 'mattcasey'
+    },
+    include: {
+      events: true
+    }
+  });
+
+  console.log(w);
 }
 
 query();

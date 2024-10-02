@@ -1,8 +1,6 @@
-import { isUUID } from '@root/lib/utils/strings';
-import { capitalize } from 'lodash';
+import { capitalize, isUUID } from '@root/lib/utils/strings';
 
-import type { MixpanelEventName, MixpanelTrackBase } from './interfaces';
-import type { MixpanelOpEventName } from './opEvents';
+import type { MixpanelTrackBase } from './interfaces';
 
 // format event_name to Event name
 export function eventNameToHumanFormat(eventName: string) {

@@ -32,6 +32,9 @@ on:
       - 'adapters/**'
       - 'config/**'
       - 'lib/**'
+      # include some paths so that we trigger deploy for web app staging
+      - 'components/**'
+      - 'pages/**'
   workflow_dispatch:
     inputs:
       core_pkg_version:
@@ -127,6 +130,7 @@ jobs:
         with:
           skip_annotations: 'true' # do not annotate code in the PR
           file_extensions: '**/*.{ts,tsx}'
+          escape_paths: 'false'
 
       - name: Run tests
         run: npm run sockets:test

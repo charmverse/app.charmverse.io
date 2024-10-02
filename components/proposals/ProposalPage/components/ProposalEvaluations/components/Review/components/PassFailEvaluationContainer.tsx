@@ -176,6 +176,7 @@ export function PassFailEvaluationContainer({
   const passFailProps: PassFailEvaluationProps = {
     confirmationMessage,
     hideReviewer,
+    showReviewerIdentities: evaluation.isReviewer || isAdmin,
     isCurrent,
     isReviewer: evaluation.isReviewer,
     isApprover: evaluation.isApprover,

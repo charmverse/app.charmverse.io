@@ -44,13 +44,13 @@ runs:
           ./node_modules
           ./apps/*/node_modules
           ./packages/*/node_modules
-        key: nodemodule-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{ inputs.app_name || '' }}
+        key: nodemodule-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}-${{ inputs.app_name || 'no-app' }}
 
     - name: Install npm dependencies
       shell: bash
       if: steps.restore_node_modules.outputs.cache-hit != 'true'
       # This is a temporary step while we figure out a way to ensure compatibility with lens protocol which currently needs ethers-v5
-      run: npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w apps/{0}', inputs.app_name) || '' }}
+      run: npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w @connect-shared -w apps/{0}', inputs.app_name) || '' }}
 
     # If installing specific version of core via npmjs
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}

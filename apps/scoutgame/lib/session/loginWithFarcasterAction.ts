@@ -6,18 +6,18 @@ import { verifyFarcasterUser } from 'lib/farcaster/verifyFarcasterUser';
 
 import { authSchema } from '../farcaster/config';
 
+import { authorizeUserByLaunchDate } from './authorizeUserByLaunchDate';
 import { saveSession } from './saveSession';
 
 export const loginAction = actionClient
-  .metadata({ actionName: 'login_with_wallet' })
+  .metadata({ actionName: 'login_with_farcaster' })
   .schema(authSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const newUserId = ctx.session.anonymousUserId;
-
     const { fid } = await verifyFarcasterUser(parsedInput);
-    const user = await findOrCreateFarcasterUser({ fid, newUserId });
+    await authorizeUserByLaunchDate({ fid });
+    const user = await findOrCreateFarcasterUser({ fid });
 
-    await saveSession(ctx, { user });
+    await saveSession(ctx, { scoutId: user.id });
 
-    return { success: true, userId: user.id };
+    return { success: true, userId: user.id, onboarded: !!user.onboardedAt };
   });

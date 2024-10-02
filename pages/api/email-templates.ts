@@ -316,10 +316,12 @@ const templates = {
 };
 
 handler.get(async (req, res) => {
-  const renderedEmails = Object.entries(templates).map(([description, output]) => ({
-    ...output(),
-    description
-  }));
+  const renderedEmails = await Promise.all(
+    Object.entries(templates).map(async ([description, output]) => ({
+      ...(await output()),
+      description
+    }))
+  );
 
   const wrapped = templatesContainer(renderedEmails);
 

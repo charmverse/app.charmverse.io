@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@/testing/*": [
+        "./src/testing/*"
+      ]
+    }
+  },
+  "exclude": [
+    "jest.config.ts",
+    "esbuild.config.ts",
+    "jest.teardown.ts"
+  ]
+}

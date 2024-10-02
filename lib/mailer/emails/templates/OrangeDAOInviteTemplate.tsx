@@ -1,4 +1,4 @@
-import type { User } from '@charmverse/core/prisma-client';
+import type { User } from '@charmverse/core/prisma';
 import { Column } from '@react-email/column';
 import { Hr } from '@react-email/hr';
 import { Row } from '@react-email/row';

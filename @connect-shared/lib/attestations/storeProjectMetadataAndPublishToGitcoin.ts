@@ -21,28 +21,13 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
   userId: string;
   projectId: string;
 }): Promise<GitcoinProjectAttestation> {
-  const farcasterUser = await prisma.farcasterUser.findUniqueOrThrow({
-    where: {
-      userId
-    },
-    select: {
-      account: true,
-      fid: true
-    }
-  });
+  const attestationRecipient = await getUserWallet(userId);
 
   const project = await prisma.project.findFirstOrThrow({
     where: { id: projectId },
     select: { id: true, name: true }
   });
 
-  const fcProfile = await getFarcasterProfile({
-    fid: farcasterUser.fid
-  });
-
-  if (!fcProfile) {
-    throw new DataNotFoundError('Farcaster profile not found');
-  }
   const { staticFilePath } = await storeProjectInS3({
     projectId: project.id,
     storageFormat: 'gitcoin'
@@ -62,47 +47,14 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
   const existingProjectAttestation = existingAttestations.find((a) => a.type === 'application');
   const existingProfileAttestation = existingAttestations.find((a) => a.type === 'profile');
 
-  let attestationRecipient: string | null = fcProfile.connectedAddress;
-
-  if ((attestationRecipient && !isAddress(attestationRecipient)) || !attestationRecipient) {
-    if (attestationRecipient?.endsWith('.eth')) {
-      const resolvedAddress = await resolveENSName(attestationRecipient).catch(() => null);
-
-      if (resolvedAddress) {
-        attestationRecipient = resolvedAddress;
-      }
-    }
-
-    if (!attestationRecipient) {
-      attestationRecipient = fcProfile.connectedAddresses[0];
-    }
-  }
-  if ((attestationRecipient && !isAddress(attestationRecipient)) || !attestationRecipient) {
-    if (attestationRecipient?.endsWith('.eth')) {
-      const resolvedAddress = await resolveENSName(attestationRecipient).catch(() => null);
-
-      if (resolvedAddress) {
-        attestationRecipient = resolvedAddress;
-      }
-    }
-
-    if (!attestationRecipient) {
-      attestationRecipient = fcProfile.body.address;
-    }
-  }
-
-  if (attestationRecipient && !isAddress(attestationRecipient)) {
-    attestationRecipient = null;
-  }
-
   if (!existingProfileAttestation) {
     const profileAttestationUID: string = await attestOnchain({
       type: 'gitcoinProject',
       chainId: gitcoinProjectAttestationChainId,
       credentialInputs: {
-        recipient: attestationRecipient,
+        recipient: attestationRecipient.walletAddress,
         data: {
-          name: fcProfile.body.username || `fid:${fcProfile.body.id.toString()}`,
+          name: attestationRecipient.username,
           metadataPtr: profileFilePath,
           metadataType: 0,
           type: 'profile',
@@ -133,7 +85,7 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
     type: 'gitcoinProject',
     chainId: gitcoinProjectAttestationChainId,
     credentialInputs: {
-      recipient: attestationRecipient,
+      recipient: attestationRecipient.walletAddress,
       data: {
         name: project.name,
         metadataPtr: staticFilePath,
@@ -156,4 +108,71 @@ export async function storeProjectMetadataAndPublishGitcoinAttestation({
       type: 'application'
     }
   });
+}
+
+async function getUserWallet(userId: string) {
+  const { username, farcasterUser, wallets } = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId
+    },
+    select: {
+      username: true,
+      farcasterUser: true,
+      wallets: true
+    }
+  });
+
+  let walletAddress: string | null = null;
+
+  // get wallet from farcaster profile
+  if (farcasterUser) {
+    const fcProfile = await getFarcasterProfile({
+      fid: farcasterUser.fid
+    });
+
+    if (!fcProfile) {
+      throw new DataNotFoundError('Farcaster profile not found');
+    }
+
+    walletAddress = fcProfile.connectedAddress;
+
+    if ((walletAddress && !isAddress(walletAddress)) || !walletAddress) {
+      if (walletAddress?.endsWith('.eth')) {
+        const resolvedAddress = await resolveENSName(walletAddress).catch(() => null);
+
+        if (resolvedAddress) {
+          walletAddress = resolvedAddress;
+        }
+      }
+
+      if (!walletAddress) {
+        walletAddress = fcProfile.connectedAddresses[0];
+      }
+    }
+    if ((walletAddress && !isAddress(walletAddress)) || !walletAddress) {
+      if (walletAddress?.endsWith('.eth')) {
+        const resolvedAddress = await resolveENSName(walletAddress).catch(() => null);
+
+        if (resolvedAddress) {
+          walletAddress = resolvedAddress;
+        }
+      }
+
+      if (!walletAddress) {
+        walletAddress = fcProfile.body.address;
+      }
+    }
+
+    if (walletAddress && !isAddress(walletAddress)) {
+      walletAddress = null;
+    }
+  }
+  // from user's connected wallets
+  else if (wallets.length) {
+    walletAddress = wallets[0].address;
+  }
+  return {
+    username,
+    walletAddress
+  };
 }

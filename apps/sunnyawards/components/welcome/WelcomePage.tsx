@@ -4,12 +4,12 @@ import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-import { FarcasterCard } from '../common/FarcasterCard';
+import { FarcasterCard, getFarcasterCardDisplayDetails } from 'components/common/FarcasterCard';
 
 import { ExtraDetails } from './ExtraDetails';
 
 export function WelcomePage({ user }: { user: LoggedInUser }) {
-  const farcasterDetails = user.farcasterUser?.account as Required<FarcasterBody> | undefined;
+  const profile = getFarcasterCardDisplayDetails(user);
 
   return (
     <PageWrapper bgcolor='transparent'>
@@ -17,14 +17,8 @@ export function WelcomePage({ user }: { user: LoggedInUser }) {
         <Typography align='center' my={2}>
           This is your profile. You can use it to create projects which can be used with Optimism's grant programs.
         </Typography>
-        {farcasterDetails && (
-          <FarcasterCard
-            name={farcasterDetails.displayName}
-            avatar={farcasterDetails.pfpUrl}
-            bio={farcasterDetails.bio}
-            username={farcasterDetails.username}
-          />
-        )}
+        <FarcasterCard {...profile} />
+
         <br />
         <ExtraDetails />
       </Box>

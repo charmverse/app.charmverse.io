@@ -1,6 +1,6 @@
 import type { Page } from '@charmverse/core/prisma';
-import { useTreeItem } from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
+import { useTreeItemState } from '@mui/x-tree-view/TreeItem';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
@@ -159,7 +159,7 @@ function DraggableTreeNode({
   const selectSortedViews = useMemo(makeSelectSortedViews, []);
   const views = useAppSelector((state) => selectSortedViews(state, item.id));
   const hasSelectedChildView = views.some((view) => view.id === selectedNodeId);
-  const { expanded } = useTreeItem(item.id);
+  const { expanded } = useTreeItemState(item.id);
   useEffect(() => {
     if (expanded && loadedViews && item.type.match(/board/) && !loadedViews[item.id]) {
       dispatch(databaseViewsLoad({ pageId: item.id }));
@@ -211,7 +211,7 @@ function DraggableTreeNode({
                   key={view.id}
                   href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
                   label={view.title || formatViewTitle(view)}
-                  nodeId={view.id}
+                  itemId={view.id}
                   viewType={view.fields.viewType}
                   onClick={onClick}
                 />

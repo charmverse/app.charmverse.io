@@ -69,8 +69,6 @@
   ],
   "exclude": [
     "../../node_modules",
-    ".next/",
-    "public/sw.js",
-    "sw.js"
+    ".next/"
   ]
 }

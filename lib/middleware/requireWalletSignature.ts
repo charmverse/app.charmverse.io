@@ -1,5 +1,9 @@
 import type { SignatureVerificationPayloadWithAddress } from '@root/lib/blockchain/signAndVerify';
-import { isValidWalletSignature, verifyEIP1271Signature } from '@root/lib/blockchain/signAndVerify';
+import {
+  isValidWalletSignature,
+  verifyEIP1271Signature,
+  isValidEoaOrGnosisWalletSignature
+} from '@root/lib/blockchain/signAndVerify';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
@@ -9,25 +13,11 @@ export async function requireWalletSignature(req: NextApiRequest, res: NextApiRe
   const domain = req.headers.host as string;
   const { message, signature, address } = req.body as SignatureVerificationPayloadWithAddress;
 
-  const isValidSignature = await isValidWalletSignature({
-    message,
-    signature,
-    domain
-  });
+  const isValidSignature = await isValidEoaOrGnosisWalletSignature({ address, domain, message, signature });
 
-  if (isValidSignature) {
-    return next();
+  if (!isValidSignature) {
+    throw new MissingDataError('Invalid wallet signature');
   }
 
-  const isValidGnosisSignature = await verifyEIP1271Signature({
-    message,
-    signature,
-    address
-  });
-
-  if (isValidGnosisSignature) {
-    return next();
-  }
-
-  throw new MissingDataError('Invalid wallet signature');
+  return next();
 }

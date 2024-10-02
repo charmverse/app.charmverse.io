@@ -115,25 +115,25 @@ services:
     profiles:
       - stg-scoutgame
 
-  prd-comingsoon:
+  prd-scoutgamecron:
     extends:
       service: defaults
     ports:
       - '80:3000'
-    command: ['sh', '-c', 'node_modules/.bin/next start apps/comingsoon --keepAliveTimeout 70000']
+    command: ['npm', 'run', 'scoutgamecron:prod']
     profiles:
-      - prd-comingsoon
+      - prd-scoutgamecron
 
-  stg-comingsoon:
+  stg-scoutgamecron:
     extends:
       service: defaults
     ports:
       - '80:3000'
-    command: ['sh', '-c', 'node_modules/.bin/next start apps/comingsoon --keepAliveTimeout 70000']
+    command: ['npm', 'run', 'scoutgamecron:staging']
     environment:
       - REACT_APP_APP_ENV=staging
     profiles:
-      - stg-comingsoon
+      - stg-scoutgamecron
 
   prd-waitlist:
     extends:
@@ -207,7 +207,7 @@ services:
       service: defaults
     command: ['sh', '-c', 'node ./apps/websockets/dist/initWebsockets.js']
     ports:
-      - '3002:3000'
+      - '80:3000'
     environment:
       - REACT_APP_APP_ENV=staging
       - PERMISSIONS_API_URL=http://permissions-api:3001
@@ -310,5 +310,6 @@ services:
       - prd-sunnyawards
       - prd-sockets
       - prd-scoutgame
+      - prd-scoutgamecron
       - prd-waitlist
       - ddtst

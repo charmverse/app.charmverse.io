@@ -48,16 +48,14 @@ export function BuilderPage() {
           their support by minting your unique NFT.
         </Typography>
         <Typography mb={2}>
-          Sign up as a Builder now, and you will be eligible to earn Charm Points and a share of your NFT sales during
+          Sign up as a Builder now, and you will be eligible to earn Scout Points and a share of your NFT sales during
           the first season of Scout Game.
         </Typography>
         <Typography mb={2}>You will also earn 10 Frame Clicks to help you move up the Waitlist!</Typography>
         <Image src='/images/github-logo.png' width={120} height={30} alt='github' />
         <Typography mb={2}>Connect to GitHub to sign up and verify your code contributions.</Typography>
         <Box width='100%'>
-          <Suspense>
-            <JoinGithubButton />
-          </Suspense>
+          <JoinGithubButton />
           <Button component={Link} variant='text' href='/score' sx={{ width: '100%', mt: 1 }}>
             Cancel
           </Button>

@@ -23,6 +23,7 @@ export async function storeProjectMetadataAndPublishOptimismAttestation({
     log.debug('Skip Agora integration: no API key');
     return null;
   }
+  // Farcaster user required for optimism attestations
   const farcasterUser = await tx.farcasterUser.findUniqueOrThrow({
     where: {
       userId

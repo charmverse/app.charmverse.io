@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 export type Options = {
   healthCheck?: { port: number; path: string };
   sslCert?: string;
+  environmentTier?: 'WebServer' | 'Worker';
   environmentType?: 'SingleInstance' | 'LoadBalanced';
   instanceType?: string;
 };
@@ -20,6 +21,7 @@ export class ProductionStack extends Stack {
     {
       sslCert,
       healthCheck = defaultHealthCheck,
+      environmentTier = 'WebServer',
       environmentType = 'LoadBalanced',
       instanceType = 't3a.small,t3.small'
     }: Options
@@ -72,6 +74,42 @@ export class ProductionStack extends Stack {
         optionName: 'RootVolumeSize',
         value: '24' // example size in GB
       },
+      /* Begin graceful deployment settings */
+      ...(environmentType === 'LoadBalanced'
+        ? [
+            {
+              namespace: 'aws:elasticbeanstalk:command',
+              optionName: 'DeploymentPolicy',
+              value: 'Rolling'
+            },
+            {
+              namespace: 'aws:elasticbeanstalk:command',
+              optionName: 'BatchSize',
+              value: '50' // percentage of instances to update at a time
+            },
+            {
+              namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
+              optionName: 'RollingUpdateEnabled',
+              value: 'true'
+            },
+            {
+              namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
+              optionName: 'RollingUpdateType',
+              value: 'Health'
+            },
+            {
+              namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
+              optionName: 'MinInstancesInService',
+              value: '1'
+            },
+            {
+              namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
+              optionName: 'MaxBatchSize',
+              value: '3'
+            }
+          ]
+        : []),
+      /* End graceful deployment settings */
       {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
@@ -140,7 +178,7 @@ export class ProductionStack extends Stack {
       {
         namespace: 'aws:autoscaling:trigger',
         optionName: 'LowerThreshold',
-        value: '0' // never hit the lower threshold, so that we dont get chaged for scaling Alarms
+        value: '0' // never hit the lower threshold, so that we dont get charged for scaling Alarms
       },
       {
         namespace: 'aws:ec2:instances',
@@ -192,7 +230,14 @@ export class ProductionStack extends Stack {
       solutionStackName: '64bit Amazon Linux 2 v3.5.0 running Docker',
       optionSettings: optionSettingProperties,
       tags: resourceTags,
-      versionLabel: appVersionProps.ref
+      versionLabel: appVersionProps.ref,
+      tier:
+        environmentTier === 'Worker'
+          ? {
+              name: environmentTier,
+              type: environmentTier === 'Worker' ? 'SQS/HTTP' : 'Standard'
+            }
+          : undefined
     });
   }
 }

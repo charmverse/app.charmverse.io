@@ -1,10 +1,9 @@
 'use server';
 
 import { actionClient } from 'lib/actions/actionClient';
+import { authSchema } from 'lib/blockchain/config';
 import { findOrCreateWalletUser } from 'lib/blockchain/findOrCreateWalletUser';
 import { verifyWalletSignature } from 'lib/blockchain/verifyWallet';
-
-import { authSchema } from '../blockchain/config';
 
 import { saveSession } from './saveSession';
 
@@ -17,7 +16,7 @@ export const loginAction = actionClient
     const { walletAddress } = await verifyWalletSignature(parsedInput);
     const user = await findOrCreateWalletUser({ wallet: walletAddress, newUserId });
 
-    await saveSession(ctx, { user });
+    await saveSession(ctx, { scoutId: user.id });
 
     return { success: true, userId: user.id };
   });

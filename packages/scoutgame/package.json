@@ -1,0 +1,16 @@
+{
+  "name": "@packages/scoutgame",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest"
+  },
+  "exports": {
+    "./*": "./src/*.ts",
+    "./builderNfts/artwork/generateNftImage": "./src/builderNfts/artwork/generateNftImage.tsx"
+  },
+  "dependencies": {
+    "@packages/onchain": "^0.0.0"
+  }
+}

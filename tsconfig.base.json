@@ -10,8 +10,14 @@
     // https://www.typescriptlang.org/tsconfig/#moduleResolution
     // Use "bundler" which supports imports and exports, but does not require file extensions
     "moduleResolution": "bundler",
+    "removeComments": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
+    "paths": {
+      "@root/lib/*": [
+        "./lib/*"
+      ]
+    }
   },
 }

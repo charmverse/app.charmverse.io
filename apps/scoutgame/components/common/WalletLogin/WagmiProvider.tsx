@@ -5,8 +5,9 @@ import { useState } from 'react';
 import type { State } from 'wagmi';
 import { WagmiProvider as OriginalWagmiProvider } from 'wagmi';
 
-import { getConfig } from 'lib/blockchain/wagmiConfig';
+import { getConfig } from './wagmiConfig';
 
+// Use this provider for SSR https://wagmi.sh/react/guides/ssr, if we need it
 export function WagmiProvider({ children, initialState }: { children: React.ReactNode; initialState?: State }) {
   const [config] = useState(() => getConfig());
   const [queryClient] = useState(() => new QueryClient());

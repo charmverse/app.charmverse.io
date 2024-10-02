@@ -26,6 +26,12 @@ runs:
       with:
         app_name: ${{ inputs.app_name }}
 
+    - name: Setup cron config
+      shell: bash
+      # Note: "2>/dev/null || :" is a bash idiom that means "if the previous command fails, do nothing"
+      run: |
+        cp apps/${{ inputs.app_name }}/cron.yml cron.yaml 2>/dev/null || :
+
     - name: Set the docker compose env variables
       uses: mikefarah/yq@master
       with:
@@ -35,6 +41,12 @@ runs:
             with(.option_settings."aws:elasticbeanstalk:application:environment";
                   .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
             ' .ebextensions/00_env_vars.config
+
+    - name: Calculate Build ID
+      shell: bash
+      run: |
+        build_id=${{ hashFiles('apps/${{ inputs.app_name }}/*.ts', 'apps/${{ inputs.app_name }}/*.tsx') }}
+        echo "\nREACT_APP_BUILD_ID=$build_id" >> ./.ebstalk.apps.env/${{ inputs.app_name }}.env
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
