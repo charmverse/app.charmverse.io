@@ -85,8 +85,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const [sourceFundsChain, setSourceFundsChain] = useState(useTestnets ? ChainId.OPTIMISM_SEPOLIA : ChainId.OPTIMISM);
 
-  // const [nftApiClient, setNftApiClient] = useState<BuilderNFTSeasonOneClient>(null);
-
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
   const [fetchError, setFetchError] = useState<any>(null);
@@ -94,7 +92,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const [tokensToBuy, setTokensToBuy] = useState(1);
 
-  const [paymentMethod, setPaymentMethod] = useState<'points' | 'wallet'>('points');
+  const [paymentMethod, setPaymentMethod] = useState<'points' | 'wallet'>('wallet');
 
   const [balances, setBalances] = useState<{ usdc: bigint; eth: bigint; chainId: number } | null>(null);
 
@@ -103,7 +101,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
 
   const purchaseCostInPoints = convertCostToPointsWithDiscount(purchaseCost);
-  const notEnoughPoints = paymentMethod === 'points' && user && user.currentBalance < purchaseCostInPoints;
+  const notEnoughPoints = user && user.currentBalance < purchaseCostInPoints;
 
   const {
     isExecuting: isPurchasingWithPoints,
@@ -477,17 +475,17 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           onChange={(e) => setPaymentMethod(e.target.value as 'points' | 'wallet')}
           sx={{ mb: 2, display: 'flex', gap: 2, width: '100%' }}
         >
+          <FormControlLabel sx={{ width: '50%' }} value='wallet' control={<Radio />} label='Wallet' />
           <FormControlLabel
             value='points'
+            // disabled={Boolean(loadingUser || notEnoughPoints)}
             control={<Radio />}
-            sx={{ width: '50%' }}
             label={
               <Stack direction='row' alignItems='center' spacing={0.5}>
                 <Typography>Scout Points</Typography>
               </Stack>
             }
           />
-          <FormControlLabel value='wallet' control={<Radio />} label='Wallet' />
         </RadioGroup>
         {paymentMethod === 'points' ? (
           <Stack gap={1}>
@@ -545,7 +543,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           !treasuryAddress ||
           isSavingDecentTransaction ||
           isExecutingTransaction ||
-          notEnoughPoints ||
+          (paymentMethod === 'points' && notEnoughPoints) ||
           isPurchasingWithPoints
         }
       >
