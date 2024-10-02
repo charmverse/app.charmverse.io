@@ -90,6 +90,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
   const [fetchError, setFetchError] = useState<any>(null);
+  const [purchaseWithPointsError, setPurchaseWithPointsError] = useState<string | null>(null);
 
   const [tokensToBuy, setTokensToBuy] = useState(1);
 
@@ -108,7 +109,15 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     isExecuting: isPurchasingWithPoints,
     hasSucceeded: hasPurchasedWithPoints,
     executeAsync: purchaseWithPoints
-  } = useAction(purchaseWithPointsAction, {});
+  } = useAction(purchaseWithPointsAction, {
+    onError(err) {
+      log.error('Error purchasing with points', { error: err });
+      setPurchaseWithPointsError(err.error.serverError?.message || 'Something went wrong');
+    },
+    onExecute() {
+      setPurchaseWithPointsError(null);
+    }
+  });
 
   const {
     isExecuting: isExecutingTransaction,
@@ -526,6 +535,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           {(decentSdkError as Error).message}
         </Typography>
       ) : null}
+      {purchaseWithPointsError && (
+        <Typography variant='caption' color='error' align='center'>
+          {purchaseWithPointsError}
+        </Typography>
+      )}
     </Stack>
   );
 }

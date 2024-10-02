@@ -32,7 +32,7 @@ export async function HomePage({ user, tab }: { user: SessionUser | null; tab: s
         <HomeTabsMenu tab={currentTab} />
         <Box px={{ xs: 1, md: 0 }}>
           <Suspense key={currentTab} fallback={<LoadingTable />}>
-            <HomeTab tab={currentTab} />
+            <HomeTab tab={currentTab} userId={user?.id} />
           </Suspense>
         </Box>
       </Container>
