@@ -78,7 +78,7 @@ export async function processScoutPointsPayout({
       ...nftHolders.map(({ scoutId, _count: { scoutId: nftsPurchased } }) =>
         tx.pointsReceipt.create({
           data: {
-            value: 0.8 * earnableScoutPoints * (nftsPurchased / totalNftsPurchased),
+            value: Math.floor(0.8 * earnableScoutPoints * (nftsPurchased / totalNftsPurchased)),
             recipientId: scoutId,
             eventId: builderEventId,
             activities: {
@@ -94,7 +94,7 @@ export async function processScoutPointsPayout({
       ),
       tx.pointsReceipt.create({
         data: {
-          value: 0.2 * earnableScoutPoints,
+          value: Math.floor(0.2 * earnableScoutPoints),
           recipientId: builderId,
           eventId: builderEventId,
           activities: {

@@ -99,7 +99,7 @@ describe('processScoutPointsPayout', () => {
         recipientId: builder.id
       }
     });
-    expect(builderPointReceipt.value.toFixed(2)).toEqual((0.2 * totalPoints).toFixed(2));
+    expect(builderPointReceipt.value).toBeCloseTo(Math.floor(0.2 * totalPoints));
 
     const scout1PointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
       where: {
@@ -107,7 +107,7 @@ describe('processScoutPointsPayout', () => {
       }
     });
 
-    expect(scout1PointReceipt.value.toFixed(2)).toEqual((0.8 * totalPoints * (2 / 3)).toFixed(2));
+    expect(scout1PointReceipt.value).toBeCloseTo(Math.floor(0.8 * totalPoints * (2 / 3)));
 
     const scout2PointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
       where: {
@@ -115,7 +115,7 @@ describe('processScoutPointsPayout', () => {
       }
     });
 
-    expect(scout2PointReceipt.value.toFixed(2)).toEqual((0.8 * totalPoints * (1 / 3)).toFixed(2));
+    expect(scout2PointReceipt.value).toBeCloseTo(Math.floor(0.8 * totalPoints * (1 / 3)));
 
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
@@ -125,6 +125,7 @@ describe('processScoutPointsPayout', () => {
         pointsReceiptId: builderPointReceipt.id
       }
     });
+    expect(builderPointReceipt.value).toBeCloseTo(Math.floor(0.2 * totalPoints));
 
     expect(builderActivities).toBe(1);
 
