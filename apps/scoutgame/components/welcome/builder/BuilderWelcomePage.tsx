@@ -56,7 +56,7 @@ export function BuilderPage() {
         <Box width='100%'>
           <Suspense>
             <Box display='flex' flexDirection='column' gap={2}>
-              <JoinGithubButton onboarding />
+              <JoinGithubButton />
               <SkipBuilderStepButton />
             </Box>
           </Suspense>

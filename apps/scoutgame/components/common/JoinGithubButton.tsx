@@ -1,16 +1,19 @@
 'use client';
 
 import { Box, Button, Typography } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import React from 'react';
 
-export function JoinGithubButton({ onboarding = false }: { onboarding?: boolean }) {
+export function JoinGithubButton() {
   const params = useSearchParams();
   const connectError = params.get('connect_error');
-
+  const pathname = usePathname();
+  const isProfilePage = pathname.includes('profile');
+  const href = '/api/connect-github/get-link';
   return (
     <>
       <Button
-        href={`/api/connect-github/get-link?onboarding=${onboarding}`}
+        href={isProfilePage ? `${href}?profile-github-connect=true` : href}
         variant='contained'
         color='primary'
         sx={{ width: '100%' }}

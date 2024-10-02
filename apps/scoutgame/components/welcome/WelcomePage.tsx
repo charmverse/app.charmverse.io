@@ -20,7 +20,7 @@ export function WelcomePage({ user }: { user: Scout }) {
               }}
             />
           )}
-          <ExtraDetailsForm />
+          <ExtraDetailsForm user={user} />
         </Box>
       </SinglePageWrapper>
     </SinglePageLayout>
