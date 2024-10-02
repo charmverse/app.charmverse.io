@@ -9,8 +9,8 @@ import * as yup from 'yup';
 import { authActionClient } from 'lib/actions/actionClient';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
-export const mintNftAction = authActionClient
-  .metadata({ actionName: 'mint-nft' })
+export const saveDecentTransactionAction = authActionClient
+  .metadata({ actionName: 'save-decent-transaction' })
   .schema(
     yup.object().shape({
       user: yup.object().shape({

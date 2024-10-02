@@ -40,8 +40,9 @@ import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
 import { useGetUser } from 'hooks/api/session';
-import { handleMintNftAction } from 'lib/builderNFTs/handleMintNftAction';
-import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
+import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransactionAction';
+import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsAction';
+import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
 import type { ChainOption } from './ChainSelector';
@@ -101,19 +102,25 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
 
   const {
-    isExecuting: isHandleMintNftExecuting,
-    hasSucceeded: hasHandleMintNftSucceeded,
-    executeAsync: executeHandleMintNft
-  } = useAction(handleMintNftAction, {});
+    isExecuting: isPurchasingWithPoints,
+    hasSucceeded: hasPurchasedWithPoints,
+    executeAsync: purchaseWithPoints
+  } = useAction(purchaseWithPointsAction, {});
 
   const {
-    isExecuting: isExecutingMintNftAction,
-    hasSucceeded: hasSucceededMintNftAction,
+    isExecuting: isExecutingTransaction,
+    hasSucceeded: transactionHasSucceeded,
+    executeAsync: checkDecentTransaction
+  } = useAction(checkDecentTransactionAction, {});
+
+  const {
+    isExecuting: isSavingDecentTransaction,
+    hasSucceeded: savedDecentTransaction,
     executeAsync
-  } = useAction(mintNftAction, {
+  } = useAction(saveDecentTransactionAction, {
     async onSuccess(res) {
       if (res.data?.id) {
-        // await executeHandleMintNft({ pendingTransactionId: res.data.id });
+        await checkDecentTransaction({ pendingTransactionId: res.data.id });
       }
       log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
     },
@@ -252,49 +259,52 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   });
 
   const handlePurchase = async () => {
-    if (!actionResponse?.tx) {
-      return;
-    }
-
-    if (chainId !== sourceFundsChain) {
-      await switchChainAsync({ chainId: sourceFundsChain });
-    }
-
-    sendTransaction(
-      {
-        to: actionResponse.tx.to as Address,
-        data: actionResponse.tx.data as any,
-        value: (actionResponse.tx as any).value
-      },
-      {
-        onSuccess: async (data) => {
-          await executeAsync({
-            user: {
-              walletAddress: address as `0x${string}`
-            },
-            transactionInfo: {
-              destinationChainId: builderNftChain.id,
-              sourceChainId: sourceFundsChain,
-              sourceChainTxHash: data
-            },
-            purchaseInfo: {
-              quotedPrice: Number(purchaseCost),
-              tokenAmount: tokensToBuy,
-              builderContractAddress: getBuilderContractAddress(),
-              tokenId: Number(builderTokenId),
-              quotedPriceCurrency: usdcContractAddress
-            }
-          });
-        },
-        onError: (err: any) => {
-          log.error('Mint failed', { error: err });
-        }
+    if (paymentMethod === 'points') {
+      await purchaseWithPoints();
+    } else {
+      if (!actionResponse?.tx) {
+        return;
       }
-    );
+
+      if (chainId !== sourceFundsChain) {
+        await switchChainAsync({ chainId: sourceFundsChain });
+      }
+
+      sendTransaction(
+        {
+          to: actionResponse.tx.to as Address,
+          data: actionResponse.tx.data as any,
+          value: (actionResponse.tx as any).value
+        },
+        {
+          onSuccess: async (data) => {
+            await executeAsync({
+              user: {
+                walletAddress: address as `0x${string}`
+              },
+              transactionInfo: {
+                destinationChainId: builderNftChain.id,
+                sourceChainId: sourceFundsChain,
+                sourceChainTxHash: data
+              },
+              purchaseInfo: {
+                quotedPrice: Number(purchaseCost),
+                tokenAmount: tokensToBuy,
+                builderContractAddress: getBuilderContractAddress(),
+                tokenId: Number(builderTokenId),
+                quotedPriceCurrency: usdcContractAddress
+              }
+            });
+          },
+          onError: (err: any) => {
+            log.error('Mint failed', { error: err });
+          }
+        }
+      );
+    }
   };
 
-  // Add hasHandleMintNftSucceeded after fixing handleMintNftAction
-  if (hasSucceededMintNftAction) {
+  if (savedDecentTransaction && transactionHasSucceeded) {
     return <SuccessView builder={builder} />;
   }
 
@@ -441,7 +451,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           <FormControlLabel value='wallet' control={<Radio />} label='Wallet' />
         </RadioGroup>
         {paymentMethod === 'points' ? (
-          <Paper sx={{ backgroundColor: 'background.light', p: 2 }} variant='outlined'>
+          <Paper
+            sx={{ backgroundColor: 'background.light', p: 2, display: 'flex', alignItems: 'center', gap: 2 }}
+            variant='outlined'
+          >
+            <PointsIcon size={24} />
             {!loadingUser && <Typography>You have {user?.currentBalance} points</Typography>}
             {loadingUser && <CircularProgress sx={{ position: 'relative', top: 4 }} size={22} />}
           </Paper>
@@ -458,7 +472,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       </Stack>
       {fetchError && <Typography color='red'>{fetchError.shortMessage || 'Something went wrong'}</Typography>}
       <LoadingButton
-        loading={isExecutingMintNftAction || isHandleMintNftExecuting}
+        loading={isSavingDecentTransaction || isExecutingTransaction}
         size='large'
         onClick={handlePurchase}
         variant='contained'
@@ -467,8 +481,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           isLoadingDecentSdk ||
           isFetchingPrice ||
           !treasuryAddress ||
-          isExecutingMintNftAction ||
-          isHandleMintNftExecuting
+          isSavingDecentTransaction ||
+          isExecutingTransaction
         }
       >
         Buy

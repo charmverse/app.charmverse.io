@@ -1,6 +1,6 @@
 'use client';
 
-import { createTheme, darken, lighten, responsiveFontSizes } from '@mui/material';
+import { createTheme, alpha, darken, lighten, responsiveFontSizes } from '@mui/material';
 import { Inter } from 'next/font/google';
 
 import {
@@ -222,7 +222,11 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
             color: theme.palette.secondary.main,
             borderStyle: 'solid',
             borderWidth: '1px',
-            borderColor: theme.palette.secondary.main
+            borderColor: theme.palette.secondary.main,
+            '&:hover': {
+              backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+              transition: 'all 0.3s ease-in-out'
+            }
           })
         }
       ],
