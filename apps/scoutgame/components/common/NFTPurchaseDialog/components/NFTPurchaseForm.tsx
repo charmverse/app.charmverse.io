@@ -141,8 +141,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     async onSuccess(res) {
       if (res.data?.id) {
         await checkDecentTransaction({ pendingTransactionId: res.data.id });
+        log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
       }
-      log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
     },
     onError({ error, input }) {
       log.error('Error minting NFT', { chainId, input, error });
@@ -263,16 +263,18 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   }
    */
 
+  const enableNftButton = !!address && !!sourceFundsChain && !!purchaseCost;
+
   const {
     error: decentSdkError,
     isLoading: isLoadingDecentSdk,
     actionResponse
   } = useBoxAction({
-    enable: !!address && !!sourceFundsChain,
+    enable: enableNftButton,
     sender: address as `0x${string}`,
     srcToken: '0x0000000000000000000000000000000000000000',
     dstToken: usdcContractAddress,
-    srcChainId: 8453,
+    srcChainId: sourceFundsChain,
     dstChainId: ChainId.OPTIMISM,
     slippage: 1,
     actionType: ActionType.SwapAction,
@@ -530,7 +532,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         onClick={handlePurchase}
         variant='contained'
         disabled={
-          !purchaseCost ||
+          !enableNftButton ||
           isLoadingDecentSdk ||
           isFetchingPrice ||
           !treasuryAddress ||

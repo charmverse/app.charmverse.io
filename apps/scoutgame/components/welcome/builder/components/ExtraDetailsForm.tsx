@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import type { Scout } from '@charmverse/core/prisma-client';
 import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Checkbox, FormControl, FormControlLabel, FormLabel, Stack, TextField } from '@mui/material';
@@ -11,17 +12,24 @@ import { useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
+import type { SessionUser } from 'lib/session/getUserFromSession';
 import { saveTermsOfServiceAction } from 'lib/users/saveTermsOfServiceAction';
 import { schema } from 'lib/users/termsOfServiceSchema';
 import type { FormValues } from 'lib/users/termsOfServiceSchema';
 
-export function ExtraDetailsForm() {
+export function ExtraDetailsForm({ user }: { user: SessionUser }) {
   const router = useRouter();
   const [errors, setErrors] = useState<string[] | null>(null);
 
   const { execute, isExecuting } = useAction(saveTermsOfServiceAction, {
     onSuccess() {
-      router.push('/welcome/builder');
+      // If builder already has a status, show the spam policy page
+      // Otherwise show the github connection page
+      if (user.builderStatus) {
+        router.push('/welcome/spam-policy');
+      } else {
+        router.push('/welcome/builder');
+      }
     },
     onError(err) {
       const hasValidationErrors = err.error.validationErrors?.fieldErrors;

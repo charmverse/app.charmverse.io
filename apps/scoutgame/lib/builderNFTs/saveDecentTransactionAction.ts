@@ -46,9 +46,5 @@ export const saveDecentTransactionAction = authActionClient
       user: { ...(parsedInput.user as any), scoutId: userId }
     });
 
-    handlePendingTransaction({ pendingTransactionId: data.id }).catch((error) => {
-      log.warn('Couldnt proccess decent transaction in time alotted', { error });
-    });
-
     return { id: data.id };
   });
