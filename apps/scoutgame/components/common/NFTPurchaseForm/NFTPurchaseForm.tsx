@@ -281,7 +281,7 @@ function NFTPurchaseButton({ builder }: NFTPurchaseProps) {
   }
 
   return (
-    <Stack gap={3} width='400px'>
+    <Stack gap={3} width='400px' maxWidth='100%'>
       <Box
         bgcolor='black.dark'
         width='100%'
