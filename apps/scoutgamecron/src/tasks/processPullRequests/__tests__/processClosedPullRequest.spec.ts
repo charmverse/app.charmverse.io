@@ -1,6 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
-import { mockBuilder, mockRepo } from '@packages/scoutgame/testing/database';
+import {
+  mockBuilder,
+  mockBuilderNft,
+  mockNFTPurchaseEvent,
+  mockRepo,
+  mockScout
+} from '@packages/scoutgame/testing/database';
 import { randomLargeInt, mockSeason } from '@packages/scoutgame/testing/generators';
 import { v4 } from 'uuid';
 
@@ -36,6 +42,10 @@ describe('processClosedPullRequest', () => {
   it('should process a closed pull request and create a strike', async () => {
     const builder = await mockBuilder();
     const repo = await mockRepo();
+    const scout = await mockScout();
+
+    await mockBuilderNft({ builderId: builder.id });
+    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout.id });
 
     const pullRequest = mockPullRequest({
       createdAt: new Date().toISOString(),
@@ -62,12 +72,33 @@ describe('processClosedPullRequest', () => {
     });
     expect(strike).toBeDefined();
     expect(octokit.rest.issues.createComment).toHaveBeenCalled();
+
+    const builderActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        type: 'builder_strike',
+        recipientType: 'builder'
+      }
+    });
+    expect(builderActivities).toBe(1);
+
+    const scoutActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout.id,
+        type: 'builder_strike',
+        recipientType: 'scout'
+      }
+    });
+    expect(scoutActivities).toBe(1);
   });
 
   it('should not create a strike if the PR was closed by the author', async () => {
     const builder = await mockBuilder();
-
+    const scout = await mockScout();
     const repo = await mockRepo();
+
+    await mockBuilderNft({ builderId: builder.id });
+    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout.id });
 
     const pullRequest = mockPullRequest({
       state: 'CLOSED',
@@ -95,12 +126,33 @@ describe('processClosedPullRequest', () => {
     });
     expect(strike).toBeNull();
     expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
+
+    const builderActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        type: 'builder_strike',
+        recipientType: 'builder'
+      }
+    });
+    expect(builderActivities).toBe(0);
+
+    const scoutActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout.id,
+        type: 'builder_strike',
+        recipientType: 'scout'
+      }
+    });
+    expect(scoutActivities).toBe(0);
   });
 
   it('should ban a builder after 3 strikes', async () => {
     const builder = await mockBuilder();
-
+    const scout = await mockScout();
     const repo = await mockRepo();
+
+    await mockBuilderNft({ builderId: builder.id });
+    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout.id });
 
     const pullRequest = mockPullRequest({
       createdAt: new Date().toISOString(),
@@ -126,6 +178,42 @@ describe('processClosedPullRequest', () => {
     });
     expect(bannedBuilder.builderStatus).toEqual('banned');
     expect(octokit.rest.issues.createComment).toHaveBeenCalled();
+
+    const builderStrikeActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        type: 'builder_strike',
+        recipientType: 'builder'
+      }
+    });
+
+    const builderSuspendedActivity = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        type: 'builder_suspended',
+        recipientType: 'builder'
+      }
+    });
+    expect(builderSuspendedActivity).toBe(1);
+    expect(builderStrikeActivities).toBe(2);
+
+    const scoutStrikeActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout.id,
+        type: 'builder_strike',
+        recipientType: 'scout'
+      }
+    });
+    expect(scoutStrikeActivities).toBe(2);
+
+    const scoutSuspendedActivity = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout.id,
+        type: 'builder_suspended',
+        recipientType: 'scout'
+      }
+    });
+    expect(scoutSuspendedActivity).toBe(1);
   });
 
   it('should not process a pull request for a non-existent builder', async () => {
@@ -153,8 +241,11 @@ describe('processClosedPullRequest', () => {
 
   it('should not create a new github event if it was processed before', async () => {
     const builder = await mockBuilder();
-
+    const scout = await mockScout();
     const repo = await mockRepo();
+
+    await mockBuilderNft({ builderId: builder.id });
+    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout.id });
 
     const pullRequest = mockPullRequest({
       createdAt: new Date().toISOString(),
@@ -179,5 +270,23 @@ describe('processClosedPullRequest', () => {
     });
     expect(githubEventsCount).toBe(1);
     expect(octokit.rest.issues.createComment).toHaveBeenCalledTimes(1);
+
+    const builderActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: builder.id,
+        type: 'builder_strike',
+        recipientType: 'builder'
+      }
+    });
+    expect(builderActivities).toBe(1);
+
+    const scoutActivities = await prisma.scoutGameActivity.count({
+      where: {
+        userId: scout.id,
+        type: 'builder_strike',
+        recipientType: 'scout'
+      }
+    });
+    expect(scoutActivities).toBe(1);
   });
 });

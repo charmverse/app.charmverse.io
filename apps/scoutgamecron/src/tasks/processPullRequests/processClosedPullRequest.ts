@@ -1,9 +1,8 @@
 import { log } from '@charmverse/core/log';
-import type { GithubRepo } from '@charmverse/core/prisma-client';
+import type { ActivityRecipientType, GithubRepo, ScoutGameActivityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { octokit } from '@packages/github/client';
-import { getAllNftOwners } from '@packages/scoutgame/builderNfts/getAllNftOwners';
-import { recordGameActivityWithCatchError } from '@packages/scoutgame/recordGameActivity';
+import { isTruthy } from '@packages/utils/types';
 import { v4 as uuid } from 'uuid';
 
 import { getClosedPullRequest } from './getClosedPullRequest';
@@ -75,7 +74,32 @@ export async function processClosedPullRequest({
       return;
     }
 
+    const strikesCount = await prisma.builderStrike.count({
+      where: {
+        builderId: builder.id,
+        deletedAt: null
+      }
+    });
+    const currentStrikesCount = strikesCount + 1;
+    const shouldBeBanned = currentStrikesCount >= 3;
     const strikeId = uuid();
+
+    const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
+      where: {
+        builderNFT: {
+          season,
+          builderId: builder.id
+        }
+      },
+      select: {
+        scoutId: true
+      }
+    });
+    const uniqueScoutIds = Array.from(
+      new Set(nftPurchaseEvents.map((nftPurchaseEvent) => nftPurchaseEvent.scoutId).filter(isTruthy))
+    );
+
+    const activityType = (shouldBeBanned ? 'builder_suspended' : 'builder_strike') as ScoutGameActivityType;
 
     await prisma.githubEvent.create({
       data: {
@@ -90,7 +114,25 @@ export async function processClosedPullRequest({
           : {
               create: {
                 id: strikeId,
-                builderId: builder.id
+                builderId: builder.id,
+                activities: {
+                  createMany: {
+                    data: [
+                      ...uniqueScoutIds.map((scoutId) => ({
+                        recipientType: 'scout' as ActivityRecipientType,
+                        userId: scoutId,
+                        type: activityType,
+                        createdAt: pullRequest.closedAt
+                      })),
+                      {
+                        recipientType: 'builder' as ActivityRecipientType,
+                        userId: builder.id,
+                        type: activityType,
+                        createdAt: pullRequest.closedAt
+                      }
+                    ]
+                  }
+                }
               }
             },
         createdAt: pullRequest.createdAt,
@@ -102,47 +144,7 @@ export async function processClosedPullRequest({
       return;
     }
 
-    await recordGameActivityWithCatchError({
-      sourceEvent: {
-        builderStrikeId: strikeId
-      },
-      activity: {
-        amount: 1,
-        pointsDirection: 'in',
-        userId: builder.id
-      }
-    });
-
-    // Notify NFT buyers that their builder had a strike
-    await getAllNftOwners({ builderId: builder.id, season })
-      .then((owners) =>
-        Promise.all(
-          owners.map((scoutId) =>
-            recordGameActivityWithCatchError({
-              sourceEvent: {
-                builderStrikeId: strikeId
-              },
-              activity: {
-                amount: 1,
-                pointsDirection: 'in',
-                userId: scoutId
-              }
-            })
-          )
-        )
-      )
-      .catch((error) => log.warn(`Error fetching nft owners`, { error }));
-
-    const strikes = await prisma.builderStrike.count({
-      where: {
-        builderId: builder.id,
-        deletedAt: null
-      }
-    });
-
-    const shouldBeBanned = strikes >= 3;
-
-    log.info('Recorded a closed PR', { userId: builder.id, url: pullRequest.url, strikes });
+    log.info('Recorded a closed PR', { userId: builder.id, url: pullRequest.url, strikes: currentStrikesCount });
 
     if (shouldBeBanned && builder.builderStatus !== 'banned') {
       await prisma.scout.update({
@@ -166,13 +168,13 @@ If you believe this was a mistake and wish to appeal, you can submit an appeal a
           repo: repo.name
         });
       }
-      log.info('Banned builder', { userId: builder.id, strikes });
+      log.info('Banned builder', { userId: builder.id, strikes: currentStrikesCount });
     } else if (!shouldBeBanned && !skipSendingComment) {
       await octokit.rest.issues.createComment({
         issue_number: pullRequest.number,
         body: `Scout Game Alert: ⚠️
 
-It looks like this Pull Request was closed by the maintainer. As a result, you've received your first strike in the Scout Game. Your current strike count is ${strikes}.
+It looks like this Pull Request was closed by the maintainer. As a result, you've received your first strike in the Scout Game. Your current strike count is ${currentStrikesCount}.
 
 Please note that if you reach 3 strikes, your account will be suspended from the Scout Game.
 
@@ -181,7 +183,11 @@ If you believe this was a mistake and wish to appeal now or after 3 strikes, you
         owner: repo.owner,
         repo: repo.name
       });
-      log.info('Sent a comment to the builder', { userId: builder.id, strikes, url: pullRequest.url });
+      log.info('Sent a comment to the builder', {
+        userId: builder.id,
+        strikes: currentStrikesCount,
+        url: pullRequest.url
+      });
     }
   }
 }
