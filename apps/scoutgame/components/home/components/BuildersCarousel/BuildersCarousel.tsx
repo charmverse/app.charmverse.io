@@ -7,13 +7,13 @@ import type { BuilderInfo } from 'lib/builders/interfaces';
 import { BuilderCard } from '../../../common/Card/BuilderCard/BuilderCard';
 
 export function BuildersCarousel({ builders, userId }: { builders: BuilderInfo[]; userId?: string }) {
-  const isMobile = useMdScreen();
+  const isBigScreen = useMdScreen();
 
   return (
     <Carousel>
       {builders.map((builder) => (
         <BuilderCard
-          size={!isMobile ? 'small' : 'large'}
+          size={!isBigScreen ? 'small' : 'large'}
           key={builder.id}
           builder={builder}
           showPurchaseButton
