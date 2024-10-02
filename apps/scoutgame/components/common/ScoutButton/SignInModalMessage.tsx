@@ -1,4 +1,14 @@
-import { Button, Stack, Typography } from '@mui/material';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import {
+  Button,
+  IconButton,
+  Stack,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
@@ -21,21 +31,36 @@ export function SignInModalMessage({
   };
 
   return (
-    <BasicModal open={open} onClose={onClose} title='Hi there! Have we met?' sx={{ maxWidth: 400 }}>
-      <Stack gap={2} alignItems='center'>
-        <Image
-          src='/images/profile/please-login.png'
-          alt='Please login'
-          width={200}
-          height={200}
-          sizes='100vw'
-          style={{ maxHeight: 200 }}
-        />
-        <Typography fontWeight={600}>Please sign in to continue</Typography>
-        <Button fullWidth onClick={handleClose}>
-          Continue
-        </Button>
-      </Stack>
-    </BasicModal>
+    <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
+      <DialogTitle color='secondary'>Hi there! Have we met?</DialogTitle>
+      <IconButton
+        data-test='close-modal'
+        aria-label='close'
+        onClick={handleClose}
+        sx={(theme) => ({
+          position: 'absolute',
+          right: 8,
+          top: 8
+        })}
+      >
+        <HighlightOffIcon color='primary' />
+      </IconButton>
+      <DialogContent>
+        <Stack gap={2} alignItems='center'>
+          <Image
+            src='/images/profile/please-login.png'
+            alt='Please login'
+            width={200}
+            height={200}
+            sizes='100vw'
+            style={{ maxHeight: 200 }}
+          />
+          <Typography fontWeight={600}>Please sign in to continue</Typography>
+          <Button fullWidth onClick={handleClose}>
+            Continue
+          </Button>
+        </Stack>
+      </DialogContent>
+    </Dialog>
   );
 }

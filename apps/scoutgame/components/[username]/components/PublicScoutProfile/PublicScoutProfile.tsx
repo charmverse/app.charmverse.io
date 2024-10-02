@@ -2,21 +2,23 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
 import { getScoutStats } from 'lib/scouts/getScoutStats';
+import { getUserFromSession } from 'lib/session/getUserFromSession';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import { PublicScoutProfileContainer } from './PublicScoutProfileContainer';
 
-export async function PublicScoutProfile({ user }: { user: BasicUserInfo }) {
-  const [scout, { allTimePoints, seasonPoints, nftsPurchased }, scoutedBuilders] = await Promise.all([
+export async function PublicScoutProfile({ publicUser }: { publicUser: BasicUserInfo }) {
+  const [scout, { allTimePoints, seasonPoints, nftsPurchased }, scoutedBuilders, user] = await Promise.all([
     prisma.scout.findUniqueOrThrow({
       where: {
-        id: user.id
+        id: publicUser.id
       },
       select: BasicUserInfoSelect
     }),
-    getScoutStats(user.id),
-    getScoutedBuilders({ scoutId: user.id })
+    getScoutStats(publicUser.id),
+    getScoutedBuilders({ scoutId: publicUser.id }),
+    getUserFromSession()
   ]);
 
   return (
@@ -29,7 +31,7 @@ export async function PublicScoutProfile({ user }: { user: BasicUserInfo }) {
       seasonPoints={seasonPoints}
       nftsPurchased={nftsPurchased}
       scoutedBuilders={scoutedBuilders}
-      userId={user.id}
+      userId={user?.id}
     />
   );
 }

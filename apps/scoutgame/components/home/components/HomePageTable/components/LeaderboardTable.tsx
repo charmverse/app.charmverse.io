@@ -1,13 +1,15 @@
-import { Box, Stack, TableHead } from '@mui/material';
+import 'server-only';
+
+import { Box, Stack, TableHead, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import { currentSeasonNumber, getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
-import { DateTime } from 'luxon';
+import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { Avatar } from 'components/common/Avatar';
 import { getSXProps } from 'components/common/Hidden';
@@ -22,14 +24,7 @@ export function LeaderboardTable({ data, userId }: { data: LeaderBoardRow[]; use
   return (
     <TableContainer data-test='leaderboard-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Leaderboard table' size='small'>
-        <TableHead
-          sx={{
-            display: {
-              xs: 'none',
-              md: 'table-header-group'
-            }
-          }}
-        >
+        <TableHead>
           <TableRow
             sx={{
               [`& .${tableCellClasses.root}`]: {
@@ -41,11 +36,14 @@ export function LeaderboardTable({ data, userId }: { data: LeaderBoardRow[]; use
           >
             <TableCell align='center'>RANK</TableCell>
             <TableCell>BUILDER</TableCell>
-            <TableCell>
-              SEASON {currentSeasonNumber} WEEK {getCurrentSeasonWeekNumber()} DAY {(DateTime.now().weekday % 7) + 1}
-            </TableCell>
-            <TableCell sx={{ maxWidth: '100px', pr: 0 }} align='center'>
-              GEMS THIS WEEK
+            <TableCell>WEEK {getCurrentSeasonWeekNumber()}</TableCell>
+            <TableCell
+              sx={{ maxWidth: { xs: '100px', sm: '100%' }, display: { xs: 'none', sm: 'block' }, pr: 0 }}
+              align='center'
+            >
+              <Typography component='span'>GEMS</Typography>
+              <br />
+              <Typography component='span'>THIS WEEK</Typography>
             </TableCell>
             <TableCell />
           </TableRow>
@@ -62,13 +60,20 @@ export function LeaderboardTable({ data, userId }: { data: LeaderBoardRow[]; use
               <TableCell align='center'>
                 <TableCellText color={index + 1 <= 3 ? 'text.secondary' : undefined}>{index + 1}</TableCellText>
               </TableCell>
-              <TableCell component='th' sx={{ maxWidth: { xs: '150px', md: '100%' } }}>
-                <Stack alignItems='center' flexDirection='row' gap={1}>
+              <TableCell component='th'>
+                <Stack
+                  href={`/u/${row.username}`}
+                  component={Link}
+                  alignItems='center'
+                  flexDirection='row'
+                  gap={1}
+                  sx={{ maxWidth: { xs: '120px', md: '200px' } }}
+                >
                   <Avatar src={row.avatar} name={row.username} size='small' />
-                  <TableCellText>{row.username}</TableCellText>
+                  <TableCellText noWrap>{row.username}</TableCellText>
                 </Stack>
               </TableCell>
-              <TableCell sx={{ maxWidth: { xs: '100px', sm: '100%' } }}>
+              <TableCell width='100%'>
                 <Box
                   sx={{
                     background:
@@ -76,11 +81,11 @@ export function LeaderboardTable({ data, userId }: { data: LeaderBoardRow[]; use
                     height: '20px',
                     borderTopRightRadius: '10px',
                     borderBottomRightRadius: '10px',
-                    width: { xs: `${row.progress || 0}px`, md: `${row.progress || 0}%` }
+                    clipPath: `inset(0 ${100 - (row.progress || 0)}% 0 0 round 0 15px 15px 0)`
                   }}
                 />
               </TableCell>
-              <TableCell sx={{ maxWidth: '100px' }}>
+              <TableCell>
                 <Stack flexDirection='row' gap={0.2} alignItems='center' justifyContent='center'>
                   <TableCellText>{row.gemsCollected}</TableCellText>
                   <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />

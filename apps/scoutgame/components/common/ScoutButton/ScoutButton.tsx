@@ -1,16 +1,22 @@
 'use client';
 
-import { Button } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
+import { DynamicLoadingContext, LoadingComponent } from '../DynamicLoading';
+
 import { SignInModalMessage } from './SignInModalMessage';
 
-const NFTPurchaseDialog = dynamic(() =>
-  import('components/common/NFTPurchaseForm/NFTPurchaseDialog').then((mod) => mod.NFTPurchaseDialogWithProviders)
+const NFTPurchaseDialog = dynamic(
+  () => import('components/common/NFTPurchaseForm/NFTPurchaseDialog').then((mod) => mod.NFTPurchaseDialogWithProviders),
+  {
+    loading: LoadingComponent,
+    ssr: false
+  }
 );
 
 export function ScoutButton({
@@ -22,6 +28,7 @@ export function ScoutButton({
 }) {
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [authPopup, setAuthPopup] = useState<boolean>(false);
+  const [dialogLoadingStatus, setDialogLoadingStatus] = useState<boolean>(false);
 
   const handleClick = () => {
     if (isAuthenticated) {
@@ -30,14 +37,21 @@ export function ScoutButton({
       setAuthPopup(true);
     }
   };
-
   return (
-    <>
-      <Button fullWidth onClick={handleClick} variant='buy' data-test='scout-button'>
-        ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2)}
-      </Button>
-      <NFTPurchaseDialog open={isPurchasing} onClose={() => setIsPurchasing(false)} builder={builder} />
-      <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} path={`/u/${builder.username}`} />
-    </>
+    <div>
+      <DynamicLoadingContext.Provider value={setDialogLoadingStatus}>
+        <LoadingButton
+          loading={dialogLoadingStatus}
+          fullWidth
+          onClick={handleClick}
+          variant='buy'
+          data-test='scout-button'
+        >
+          ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2)}
+        </LoadingButton>
+        {isPurchasing && <NFTPurchaseDialog open onClose={() => setIsPurchasing(false)} builder={builder} />}
+        <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} path={`/u/${builder.username}`} />
+      </DynamicLoadingContext.Provider>
+    </div>
   );
 }

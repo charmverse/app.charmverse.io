@@ -10,6 +10,7 @@ import {
   tableCellClasses
 } from '@mui/material';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { Avatar } from 'components/common/Avatar';
 import { PointsIcon } from 'components/common/Icons';
@@ -62,7 +63,7 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
                 <TableCellText>{index + 1}</TableCellText>
               </TableCell>
               <TableCell component='th'>
-                <Stack alignItems='center' flexDirection='row' gap={1}>
+                <Stack component={Link} href={`/u/${scout.username}`} alignItems='center' flexDirection='row' gap={1}>
                   <Avatar src={scout.avatar} name={scout.username} size='small' />
                   <TableCellText maxWidth={{ xs: '100px', md: '100%' }}>{scout.username}</TableCellText>
                 </Stack>

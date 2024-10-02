@@ -76,6 +76,13 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
     }
   },
   components: {
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 16 // Adjust this value to increase or decrease the roundness
+        }
+      }
+    },
     MuiPopover: {
       defaultProps: {
         disableRestoreFocus: true
