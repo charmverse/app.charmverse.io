@@ -77,7 +77,7 @@ export async function storeProjectMetadataViaAgora({
 
   return createProjectMetadataAttestation({
     farcasterId,
-    farcasterIds: project.projectMembers.map((pm) => pm.farcasterId as number),
+    farcasterIds: project.projectMembers.map((pm) => pm.farcasterId as number).filter(Boolean),
     projectMetadata,
     projectRefUID,
     projectId
