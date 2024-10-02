@@ -102,6 +102,19 @@ export async function mintNFT(params: MintNFTParams) {
         }
       }
     });
+    await tx.userSeasonStats.update({
+      where: {
+        userId_season: {
+          userId: scoutId,
+          season: currentSeason
+        }
+      },
+      data: {
+        nftsPurchased: {
+          increment: amount
+        }
+      }
+    });
 
     if (paidWithPoints) {
       await tx.scout.update({
