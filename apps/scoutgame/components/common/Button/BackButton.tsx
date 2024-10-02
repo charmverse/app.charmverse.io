@@ -11,7 +11,7 @@ export function BackButton(props: IconButtonProps) {
   const router = useRouter();
 
   return (
-    <IconButton onClick={router.back} {...props}>
+    <IconButton onClick={() => router.back()} {...props}>
       <BoxMotion>
         <KeyboardBackspaceIcon color='primary' />
       </BoxMotion>
