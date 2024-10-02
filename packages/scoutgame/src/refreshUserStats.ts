@@ -1,4 +1,4 @@
-import type { Prisma, UserSeasonStats, UserWeeklyStats } from '@charmverse/core/prisma-client';
+import type { UserSeasonStats, UserWeeklyStats } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
 

@@ -2,9 +2,10 @@
 
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { builderNftChain } from '@packages/scoutgame/builderNfts/constants';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+
+import { refreshUserStats } from '../refreshUserStats';
 
 import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
 
@@ -89,19 +90,7 @@ export async function mintNFT(params: MintNFTParams) {
       }
     });
 
-    await tx.userSeasonStats.update({
-      where: {
-        userId_season: {
-          userId: builderNft.builderId,
-          season: currentSeason
-        }
-      },
-      data: {
-        nftsSold: {
-          increment: amount
-        }
-      }
-    });
+    await Promise.all([refreshUserStats({ userId: builderNft.builderId }), refreshUserStats({ userId: scoutId })]);
 
     if (paidWithPoints) {
       await tx.scout.update({

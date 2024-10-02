@@ -87,8 +87,6 @@ export async function handlePendingTransaction({
         }
       });
 
-      await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: currentSeason });
-
       return;
     }
 
@@ -144,3 +142,5 @@ export async function handlePendingTransaction({
     }
   }
 }
+
+// handlePendingTransaction({ pendingTransactionId: '4aec5524-e633-44c9-8297-6fa0fb691ead' }).then(console.log);
