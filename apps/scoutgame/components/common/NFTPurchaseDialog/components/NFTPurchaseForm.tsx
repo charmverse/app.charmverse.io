@@ -6,6 +6,7 @@ import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import {
+  CircularProgress,
   Typography,
   Box,
   Button,
@@ -38,6 +39,8 @@ import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
+import { Loading } from 'components/common/Loading';
+import { useGetUser } from 'hooks/api/session';
 import { handleMintNftAction } from 'lib/builderNFTs/handleMintNftAction';
 import { mintNftAction } from 'lib/builderNFTs/mintNftAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
@@ -67,6 +70,7 @@ export function NFTPurchaseForm(props: NFTPurchaseProps) {
 }
 
 export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
+  const { data: user, isLoading: loadingUser } = useGetUser();
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToUsd(builder.price) : 'N/A';
@@ -396,7 +400,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Stack>
         <Stack flexDirection='row' justifyContent='space-between'>
           <Typography sx={{ width: '33%' }}>{tokensToBuy} NFT</Typography>
-          <Typography align='center' sx={{ width: '33%', position: 'relative', top: -4 }}>
+          <Typography align='center' sx={{ width: '33%' }}>
             {purchaseCost && (
               <>
                 {convertCostToPointsWithDiscount(purchaseCost)}{' '}
@@ -405,10 +409,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
                 </Box>
               </>
             )}
+            {isFetchingPrice && <CircularProgress size={16} />}
           </Typography>
           <Typography align='right' sx={{ width: '33%' }}>
             {purchaseCost && convertCostToUsd(purchaseCost)}
-            {isFetchingPrice && `Fetching...`}
+            {isFetchingPrice && <CircularProgress size={16} />}
           </Typography>
         </Stack>
       </Stack>
@@ -438,7 +443,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </RadioGroup>
         {paymentMethod === 'points' ? (
           <Paper sx={{ backgroundColor: 'background.light', p: 2 }} variant='outlined'>
-            <Typography>You have {convertCostToPoints(purchaseCost)} points</Typography>
+            <Typography>You have {user?.currentBalance} points</Typography>
+            {loadingUser && <CircularProgress size={24} />}
           </Paper>
         ) : (
           <BlockchainSelect

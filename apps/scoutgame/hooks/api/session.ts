@@ -1,3 +1,5 @@
+import type { SessionUser } from 'lib/session/getUserFromSession';
+
 import { useGETImmutable } from './helpers';
 
 export function useRefreshUser() {
@@ -5,5 +7,5 @@ export function useRefreshUser() {
 }
 
 export function useGetUser() {
-  return useGETImmutable<[]>('/api/session/user');
+  return useGETImmutable<SessionUser | null>('/api/session/user');
 }
