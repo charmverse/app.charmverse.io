@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
-import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
 import { currentSeason, getCurrentWeek, getDateFromISOWeek } from '@packages/scoutgame/dates';
 import { processMergedPullRequest } from '../tasks/processPullRequests/processMergedPullRequest';
 
@@ -92,8 +91,6 @@ export async function approveBuilder({
   });
 
   await registerBuilderNFT({ builderId: scout.id, season });
-
-  await refreshUserStats({ userId: scout.id });
 }
 
 const devUsers = {
