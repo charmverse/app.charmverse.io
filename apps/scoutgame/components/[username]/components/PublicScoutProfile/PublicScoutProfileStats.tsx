@@ -20,19 +20,19 @@ export function PublicScoutProfileStats({
       <Stack flexDirection='row' justifyContent='space-between' gap={2}>
         <Stack flexDirection='row' gap={0.5}>
           <Typography color='orange.main' variant='subtitle2'>
-            {seasonPoints}
+            {seasonPoints || 0}
           </Typography>
           <Image src='/images/profile/scout-game-orange-icon.svg' width='20' height='20' alt='scout game icon' />
           <Typography color='orange.main' variant='subtitle2'>
-            ({allTimePoints})
+            ({allTimePoints || 0})
           </Typography>
         </Stack>
         <Typography color='orange.main' variant='subtitle2'>
-          {buildersScouted} Builders
+          {buildersScouted || 0} Builders
         </Typography>
         <Stack flexDirection='row' gap={0.5}>
           <Typography color='orange.main' variant='subtitle2'>
-            {nftsPurchased}
+            {nftsPurchased || 0}
           </Typography>
           <Image src='/images/profile/icons/nft-orange-icon.svg' width='20' height='20' alt='nft icon' />
           <Typography color='orange.main' variant='subtitle2'>
