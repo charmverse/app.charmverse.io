@@ -553,7 +553,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
                 setSelectedPaymentOption(_paymentOption);
               }}
             />
-            {!hasSufficientBalance && balanceDataFromCorrectChain ? (
+            {!hasSufficientBalance && balanceDataFromCorrectChain && !!amountToPay ? (
               <Typography sx={{ mt: 1 }} variant='caption' color='error' align='center'>
                 Insufficient balance
               </Typography>
