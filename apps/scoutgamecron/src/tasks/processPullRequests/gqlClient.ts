@@ -4,7 +4,8 @@ import { graphql } from '@octokit/graphql';
 export function getClient() {
   return graphql.defaults({
     headers: {
-      Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`
+      Authorization: `bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
+      'X-Github-Next-Global-ID': 0 // force the old style ids which we can parse
     }
   });
 }

@@ -5,8 +5,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
-import { refreshUserStats } from '../refreshUserStats';
-
 import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
 
 type MintNFTParams = {

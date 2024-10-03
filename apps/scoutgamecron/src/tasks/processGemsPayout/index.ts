@@ -9,7 +9,7 @@ export async function processGemsPayout() {
   const now = DateTime.utc();
   const week = getCurrentWeek();
   if (now.weekday !== 1 || now.hour !== 0) {
-    log.info('Not Sunday at 12:00 AM NY timezone, skipping gems payout');
+    log.info('Gems Payout: It is not yet Sunday at 12:00 AM UTC, skipping');
     return;
   }
 

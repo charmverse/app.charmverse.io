@@ -5,9 +5,13 @@ import { BuilderNFTSeasonOneImplementation01Client } from './builderNFTSeasonOne
 
 // lazily create the client to avoid exceptions if the environment is not configured
 export function getBuilderContractAdminClient() {
+  const contractAddress = getBuilderContractAddress();
+  if (!contractAddress) {
+    throw new Error('Builder contract address not set');
+  }
   return new BuilderNFTSeasonOneImplementation01Client({
     chain: builderNftChain,
-    contractAddress: getBuilderContractAddress(),
+    contractAddress,
     walletClient: getScoutGameNftAdminWallet()
   });
 }
