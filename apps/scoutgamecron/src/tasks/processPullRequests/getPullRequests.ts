@@ -143,11 +143,22 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
           return false;
         } else if (typeof node.author.id === 'number') {
           return true;
-        } else if ((node.author.id as string).startsWith('U_')) {
-          log.debug('Ignoring PR from author with unparseable user name', {
-            repo: node.repository.nameWithOwner,
-            author: node.author
-          });
+        }
+
+        // Example: U_kgDOB3Dfgw
+        if (typeof node.author.id === 'string' && (node.author.id as string).startsWith('U_')) {
+          try {
+            const decodedId = atob((node.author.id as string).slice(2));
+            const match = decodedId.match(/(\d+)$/);
+            if (match) {
+              node.author.id = parseInt(match[1], 10);
+              return true;
+            }
+          } catch (e) {
+            log.warn(`Could not decode GitHub user ID for ${node.author.login} with id ${node.author.id}`, {
+              error: e
+            });
+          }
           return false;
         }
 
@@ -163,7 +174,7 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
             return false;
           }
         } catch (e) {
-          log.warn(`Could not parse author id for user ${node.author.login} with id ${node.author.id}`, { error: e });
+          log.warn(`Could not decode GitHub user ID for ${node.author.login} with id ${node.author.id}`, { error: e });
           return false;
         }
       })
