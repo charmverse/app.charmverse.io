@@ -12,7 +12,8 @@ export async function getScoutStats(scoutId: string) {
           season: currentSeason
         },
         select: {
-          pointsEarnedAsScout: true
+          pointsEarnedAsScout: true,
+          nftsPurchased: true
         }
       },
       userAllTimeStats: {
@@ -21,6 +22,7 @@ export async function getScoutStats(scoutId: string) {
         }
       },
       nftPurchaseEvents: {
+        distinct: 'builderNftId',
         where: {
           scoutId,
           builderNFT: {
@@ -28,12 +30,7 @@ export async function getScoutStats(scoutId: string) {
           }
         },
         select: {
-          tokensPurchased: true,
-          builderNFT: {
-            select: {
-              builderId: true
-            }
-          }
+          builderNftId: true
         }
       }
     }
@@ -42,7 +39,7 @@ export async function getScoutStats(scoutId: string) {
   return {
     allTimePoints: scout.userAllTimeStats[0]?.pointsEarnedAsScout,
     seasonPoints: scout.userSeasonStats[0]?.pointsEarnedAsScout,
-    nftsPurchased: scout.nftPurchaseEvents.reduce((acc, curr) => acc + curr.tokensPurchased, 0),
-    buildersScouted: scout.nftPurchaseEvents.map((event) => event.builderNFT.builderId).length
+    nftsPurchased: scout.userSeasonStats[0]?.nftsPurchased,
+    buildersScouted: scout.nftPurchaseEvents.length
   };
 }
