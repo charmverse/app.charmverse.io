@@ -1,10 +1,9 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import type { Scout } from '@charmverse/core/prisma-client';
 import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, Checkbox, FormControl, FormControlLabel, FormLabel, Stack, TextField } from '@mui/material';
+import { Button, Checkbox, FormControl, FormControlLabel, FormLabel, Stack, TextField } from '@mui/material';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -12,6 +11,7 @@ import { useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
+import { useIsMounted } from 'hooks/useIsMounted';
 import type { SessionUser } from 'lib/session/getUserFromSession';
 import { saveTermsOfServiceAction } from 'lib/users/saveTermsOfServiceAction';
 import { schema } from 'lib/users/termsOfServiceSchema';
@@ -55,6 +55,13 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
   function onInvalid(fieldErrors: FieldErrors) {
     setErrors(['The form is invalid. Please check the fields and try again.']);
     log.warn('Invalid form submission', { fieldErrors, values: getValues() });
+  }
+
+  const isMounted = useIsMounted();
+
+  // We are using the mounted flag here because the default form state is different from the client
+  if (!isMounted) {
+    return null;
   }
 
   return (
