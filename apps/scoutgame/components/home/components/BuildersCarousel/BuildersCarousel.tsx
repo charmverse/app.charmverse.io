@@ -1,7 +1,6 @@
 'use client';
 
 import { Carousel } from 'components/common/Carousel/Carousel';
-import { LoadingCards } from 'components/common/Loading/LoadingCards';
 import { useIsMounted } from 'hooks/useIsMounted';
 import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderInfo } from 'lib/builders/interfaces';
@@ -15,7 +14,7 @@ export function BuildersCarousel({ builders, userId }: { builders: BuilderInfo[]
   const isMounted = useIsMounted();
 
   if (!isMounted) {
-    return <LoadingCards />;
+    return null;
   }
 
   return (
