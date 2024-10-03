@@ -180,10 +180,11 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
   return allRecentPRs;
 }
 
-// Examples: U_kgDOB-4rVA, U_kgDOBtmCgw
+// Examples: U_kgDOB-4rVA, U_kgDOBtmCgw, MDQ6VXNlcjQxMjQxMTk0
 export function decodeGithubUserId(id: string, authorLogin: string): number | null {
   try {
     if (id.startsWith('U_')) {
+      // this doesn't seem to work - TODO: maybe we shouldnt try to decode these?
       const decodedId = atob(id.slice(2));
       const match = decodedId.match(/(\d+)$/);
       if (match) {

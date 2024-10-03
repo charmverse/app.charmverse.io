@@ -35,8 +35,8 @@ export async function processPullRequests({
       }
     }
   });
-  const newPullRequests = pullRequests.filter((pr) =>
-    githubEvents.some((e) => e.pullRequestNumber === pr.number && e.repoId === pr.repository.id)
+  const newPullRequests = pullRequests.filter(
+    (pr) => !githubEvents.some((e) => e.pullRequestNumber === pr.number && e.repoId === pr.repository.id)
   );
 
   const uniqueRepos = Array.from(new Set(pullRequests.map((pr) => pr.repository.id)));
@@ -51,10 +51,10 @@ export async function processPullRequests({
 
   let i = 0;
 
-  for (const pullRequest of pullRequests) {
+  for (const pullRequest of newPullRequests) {
     i += 1;
-    log.info(
-      `Processing PR ${i}/${pullRequests.length}  // ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`
+    log.debug(
+      `Processing PR ${i}/${pullRequests.length} -- ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`
     );
     const repo = repos.find((r) => `${r.owner}/${r.name}` === pullRequest.repository.nameWithOwner);
     if (!repo) {
