@@ -72,7 +72,7 @@ export default async function RootLayout({
       <body>
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script strategy='beforeInteractive' src='/__ENV.js' />
-        <AppProviders>
+        <AppProviders user={user}>
           <ClientGlobals userId={user?.id} />
           {/* {user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />} */}
           {children}

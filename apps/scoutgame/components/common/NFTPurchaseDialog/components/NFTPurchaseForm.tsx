@@ -39,7 +39,7 @@ import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
-import { useGetUser } from 'hooks/api/session';
+import { useUser } from 'components/layout/UserProvider';
 import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransactionAction';
 import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsAction';
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
@@ -70,7 +70,7 @@ export function NFTPurchaseForm(props: NFTPurchaseProps) {
 }
 
 export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
-  const { data: user, isLoading: loadingUser } = useGetUser();
+  const { user } = useUser();
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToUsd(builder.price) : 'N/A';
@@ -501,7 +501,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
               variant='outlined'
             >
               <PointsIcon size={24} />
-              {!loadingUser && user && (
+              {user && (
                 <>
                   <Typography color={notEnoughPoints ? 'error' : undefined}>Balance: {user?.currentBalance}</Typography>
 
@@ -512,7 +512,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
                   )}
                 </>
               )}
-              {loadingUser && <CircularProgress sx={{ position: 'relative', top: 3 }} size={22} />}
             </Paper>
           </Stack>
         ) : (

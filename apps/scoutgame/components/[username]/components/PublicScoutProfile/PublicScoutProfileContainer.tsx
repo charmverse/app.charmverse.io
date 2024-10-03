@@ -76,7 +76,7 @@ export function PublicScoutProfileContainer({
             />
           </Stack>
         </Stack>
-        <Typography variant='subtitle1' my={1} color='secondary' fontWeight='500'>
+        <Typography variant='subtitle1' my={1} color='secondary' fontWeight='500' textAlign='center'>
           Scouted Builders
         </Typography>
         {scoutedBuilders.length > 0 ? (

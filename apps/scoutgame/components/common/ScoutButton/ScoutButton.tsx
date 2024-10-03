@@ -2,7 +2,9 @@
 
 import { LoadingButton } from '@mui/lab';
 import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
+import { convertCostToPointsWithDiscount } from '@packages/scoutgame/builderNfts/utils';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { useState } from 'react';
 
 import type { MinimalUserInfo } from 'lib/users/interfaces';
@@ -37,6 +39,9 @@ export function ScoutButton({
       setAuthPopup(true);
     }
   };
+
+  const purchaseCostInPoints = convertCostToPointsWithDiscount(builder?.price || BigInt(0));
+
   return (
     <div>
       <DynamicLoadingContext.Provider value={setDialogLoadingStatus}>
@@ -47,7 +52,15 @@ export function ScoutButton({
           variant='buy'
           data-test='scout-button'
         >
-          ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(2)}
+          ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(0)} ({purchaseCostInPoints}
+          <Image
+            src='/images/profile/scout-game-blue-icon.svg'
+            alt='Scout game points'
+            width={21}
+            height={12}
+            style={{ marginLeft: 2 }}
+          />
+          )
         </LoadingButton>
         {isPurchasing && <NFTPurchaseDialog open onClose={() => setIsPurchasing(false)} builder={builder} />}
         <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} path={`/u/${builder.username}`} />
