@@ -23,7 +23,7 @@ export async function processPullRequests({
       defaultBranch: true
     }
   });
-  log.info(`Processing PRs from ${repos.length} repos`);
+  log.info(`Found ${repos.length} repos to check for PRs`);
 
   const timer = DateTime.now();
   const pullRequests = await getPullRequests({ repos, after: createdAfter });
