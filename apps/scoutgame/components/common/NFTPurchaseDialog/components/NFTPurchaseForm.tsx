@@ -8,27 +8,27 @@ import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
-  CircularProgress,
-  Typography,
   Box,
+  CircularProgress,
   FormControlLabel,
   Paper,
-  RadioGroup,
   Radio,
+  RadioGroup,
   Stack,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  Typography
 } from '@mui/material';
 import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/builderNfts/clients/builderNFTSeasonOneClient';
 import {
   builderNftChain,
   getBuilderContractAddress,
-  treasuryAddress,
   optimismUsdcContractAddress,
+  treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
 import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
-import { convertCostToUsd, convertCostToPointsWithDiscount } from '@packages/scoutgame/builderNfts/utils';
+import { convertCostToPointsWithDiscount, convertCostToUsd } from '@packages/scoutgame/builderNfts/utils';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
 import Link from 'next/link';

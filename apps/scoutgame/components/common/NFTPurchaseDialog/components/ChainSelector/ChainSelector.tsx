@@ -36,6 +36,16 @@ function SelectField(
     <Select<SelectedPaymentOption>
       fullWidth
       displayEmpty
+      MenuProps={{
+        anchorOrigin: {
+          vertical: 'top',
+          horizontal: 'center'
+        },
+        transformOrigin: {
+          vertical: 'bottom',
+          horizontal: 'center'
+        }
+      }}
       renderValue={(selected) => {
         const chain = chainOpts.find(({ id, currency }) => selected.chainId === id && selected.currency === currency);
 
