@@ -24,7 +24,7 @@ import {
   builderNftChain,
   getBuilderContractAddress,
   treasuryAddress,
-  usdcContractAddress,
+  optimismUsdcContractAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
 import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
@@ -45,8 +45,10 @@ import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsActi
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
-import type { ChainOption } from './ChainSelector';
-import { BlockchainSelect, getChainOptions } from './ChainSelector';
+import type { ChainOption } from './ChainSelector/chains';
+import { getChainOptions, getCurrencyContract } from './ChainSelector/chains';
+import type { SelectedPaymentOption } from './ChainSelector/ChainSelector';
+import { BlockchainSelect } from './ChainSelector/ChainSelector';
 import { NumberInputField } from './NumberField';
 import { SuccessView } from './SuccessView';
 
@@ -83,7 +85,10 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     publicClient: getPublicClient(builderNftChain.id)
   });
 
-  const [sourceFundsChain, setSourceFundsChain] = useState(useTestnets ? ChainId.OPTIMISM_SEPOLIA : ChainId.OPTIMISM);
+  const [selectedPaymentOption, setSelectedPaymentOption] = useState<SelectedPaymentOption>({
+    chainId: useTestnets ? ChainId.OPTIMISM_SEPOLIA : ChainId.OPTIMISM,
+    currency: 'ETH'
+  });
 
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
@@ -152,7 +157,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   });
 
   const refreshBalance = useCallback(async () => {
-    const chainOption = getChainOptions({ useTestnets }).find((opt) => opt.id === sourceFundsChain) as ChainOption;
+    const chainOption = getChainOptions({ useTestnets }).find(
+      (opt) => opt.id === selectedPaymentOption.chainId
+    ) as ChainOption;
 
     const chain = chainOption?.chain;
 
@@ -183,15 +190,15 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     setBalances(newBalances);
 
     return newBalances;
-  }, [address, sourceFundsChain]);
+  }, [address, selectedPaymentOption.chainId, selectedPaymentOption.currency]);
 
   useEffect(() => {
-    if (sourceFundsChain) {
+    if (selectedPaymentOption) {
       refreshBalance().catch((err) => {
         log.error('Error refreshing balance', { error: err });
       });
     }
-  }, [sourceFundsChain]);
+  }, [selectedPaymentOption]);
 
   const { sendTransaction } = useSendTransaction();
 
@@ -261,14 +268,14 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   }
    */
 
-  const enableNftButton = !!address && !!sourceFundsChain && !!purchaseCost;
+  const enableNftButton = !!address && !!purchaseCost;
 
   const decentAPIParams: UseBoxActionArgs = {
     enable: enableNftButton,
     sender: address as `0x${string}`,
-    srcToken: '0x0000000000000000000000000000000000000000',
-    dstToken: usdcContractAddress,
-    srcChainId: sourceFundsChain,
+    srcToken: getCurrencyContract(selectedPaymentOption),
+    dstToken: optimismUsdcContractAddress,
+    srcChainId: selectedPaymentOption.chainId,
     dstChainId: ChainId.OPTIMISM,
     slippage: 1,
     actionType: ActionType.SwapAction,
@@ -294,8 +301,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         return;
       }
 
-      if (chainId !== sourceFundsChain) {
-        await switchChainAsync({ chainId: sourceFundsChain });
+      if (chainId !== selectedPaymentOption.chainId) {
+        await switchChainAsync({ chainId: selectedPaymentOption.chainId });
       }
 
       sendTransaction(
@@ -312,7 +319,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
               },
               transactionInfo: {
                 destinationChainId: builderNftChain.id,
-                sourceChainId: sourceFundsChain,
+                sourceChainId: selectedPaymentOption.chainId,
                 sourceChainTxHash: data
               },
               purchaseInfo: {
@@ -320,7 +327,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
                 tokenAmount: tokensToBuy,
                 builderContractAddress: getBuilderContractAddress(),
                 tokenId: Number(builderTokenId),
-                quotedPriceCurrency: usdcContractAddress
+                quotedPriceCurrency: optimismUsdcContractAddress
               }
             });
           },
@@ -340,6 +347,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       });
     }
   }, [decentSdkError]);
+
+  const displayedBalance =
+    balances?.chainId !== selectedPaymentOption.chainId
+      ? undefined
+      : selectedPaymentOption.currency === 'ETH'
+      ? (Number(balances?.eth || 0) / 1e18).toFixed(4)
+      : (Number(balances.usdc || 0) / 1e6).toFixed(2);
 
   if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
     return <SuccessView builder={builder} />;
@@ -517,11 +531,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           </Stack>
         ) : (
           <BlockchainSelect
-            value={sourceFundsChain}
-            balance={(Number(balances?.eth || 0) / 1e18).toFixed(4)}
+            value={selectedPaymentOption}
+            balance={displayedBalance}
             useTestnets={useTestnets}
-            onSelectChain={(_chainId) => {
-              setSourceFundsChain(_chainId);
+            onSelectChain={(_paymentOption) => {
+              setSelectedPaymentOption(_paymentOption);
             }}
           />
         )}
