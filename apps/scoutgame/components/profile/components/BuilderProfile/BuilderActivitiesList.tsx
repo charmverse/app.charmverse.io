@@ -21,12 +21,12 @@ export function getActivityLabel(activity: BuilderActivity) {
 }
 
 export function BuilderActivityLabel({ activity }: { activity: BuilderActivity }) {
-  return <Typography>{getActivityLabel(activity)}</Typography>;
+  return <Typography component='span'>{getActivityLabel(activity)}</Typography>;
 }
 
 export function BuilderActivityDetail({ activity }: { activity: BuilderActivity }) {
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='center'>
+    <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'merged_pull_request' ? (
         <LuBookMarked size='15px' />
       ) : activity.type === 'nft_purchase' ? (
@@ -49,10 +49,10 @@ export function BuilderActivityGems({
   showEmpty?: boolean;
 }) {
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='center'>
+    <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'merged_pull_request' ? (
         <>
-          <Typography>+{activity.gems}</Typography>
+          <Typography component='span'>+{activity.gems}</Typography>
           <GemsIcon />
         </>
       ) : showEmpty ? (
