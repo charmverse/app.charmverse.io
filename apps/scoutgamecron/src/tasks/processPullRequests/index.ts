@@ -55,7 +55,7 @@ export async function processPullRequests({
   for (const pullRequest of newPullRequests) {
     i += 1;
     log.debug(
-      `Processing PR ${i}/${pullRequests.length} -- ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`
+      `Processing PR ${i}/${newPullRequests.length} -- ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`
     );
     const repo = repos.find(
       (r) =>
