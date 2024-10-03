@@ -27,6 +27,7 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
       'Ubeswap/ubeswap-interface-v3',
       'gitcoinco/grants-stack',
       'GoodDollar',
+      'Ubeswap',
       'hypercerts-org'
     ],
     icon: 'https://cryptologos.cc/logos/celo-celo-logo.png'
