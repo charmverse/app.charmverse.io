@@ -18,49 +18,65 @@ export async function processPullRequests({
       deletedAt: null
     },
     select: {
+      id: true,
       owner: true,
       name: true,
       defaultBranch: true
     }
   });
-  log.info(`Processing PRs from ${repos.length} repos`);
+  log.info(`Found ${repos.length} repos to check for PRs`);
 
   const timer = DateTime.now();
   const pullRequests = await getPullRequests({ repos, after: createdAfter });
+
+  const githubEvents = await prisma.githubEvent.findMany({
+    where: {
+      createdAt: {
+        gt: createdAfter
+      }
+    }
+  });
+  const newPullRequests = pullRequests.filter(
+    (pr) => !githubEvents.some((e) => e.pullRequestNumber === pr.number && e.repoId === pr.repository.id)
+  );
 
   const uniqueRepos = Array.from(new Set(pullRequests.map((pr) => pr.repository.id)));
 
   // pullRequests.map((pr) => pr.repository.id);
 
   log.info(
-    `Retrieved ${pullRequests.length} pull requests across ${uniqueRepos.length} repos in ${timer.diff(
-      DateTime.now(),
-      'minutes'
-    )} minutes`
+    `Retrieved ${newPullRequests.length} new PRs (out of ${pullRequests.length}) across ${
+      uniqueRepos.length
+    } repos in ${timer.diff(DateTime.now(), 'minutes')} minutes`
   );
 
   let i = 0;
 
-  for (const pullRequest of pullRequests) {
+  for (const pullRequest of newPullRequests) {
     i += 1;
-    log.info(
-      `Processing PR ${i}/${pullRequests.length}  // ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`
+    log.debug(
+      `Processing PR ${i}/${newPullRequests.length} -- ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`
     );
-    const repo = repos.find((r) => `${r.owner}/${r.name}` === pullRequest.repository.nameWithOwner);
-    if (!repo) {
-      throw new Error(`Repo not found: ${pullRequest.repository.nameWithOwner}`);
-    }
-
-    try {
-      if (pullRequest.state === 'CLOSED') {
-        if (!skipClosedPrProcessing) {
-          await processClosedPullRequest({ pullRequest, repo, season });
+    const repo = repos.find(
+      (r) =>
+        `${r.owner}/${r.name}` === pullRequest.repository.nameWithOwner ||
+        // consider repo id in case it was a fork, in which casethe nameWithOwner may not match the name of the repo for some reason
+        r.id === pullRequest.repository.id
+    );
+    if (repo) {
+      try {
+        if (pullRequest.state === 'CLOSED') {
+          if (!skipClosedPrProcessing) {
+            await processClosedPullRequest({ pullRequest, repo, season });
+          }
+        } else {
+          await processMergedPullRequest({ pullRequest, repo, season });
         }
-      } else {
-        await processMergedPullRequest({ pullRequest, repo, season });
+      } catch (error) {
+        log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, { error });
       }
-    } catch (error) {
-      log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, { error });
+    } else {
+      log.error(`Repo not found for pull request: ${pullRequest.repository.nameWithOwner}`);
     }
   }
 

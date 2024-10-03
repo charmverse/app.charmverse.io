@@ -101,9 +101,10 @@ export async function getPullRequests({ repos, after }: { repos: RepoInput[]; af
       repo: repo.name,
       after
     });
+    // ignore PRs that are not on the default branch
     pullRequests.push(...repoPullRequests.filter((pr) => pr.baseRefName === repo.defaultBranch));
     if (repos.indexOf(repo) % 100 === 0) {
-      log.debug(`Processed ${repos.indexOf(repo)}/${repos.length} repos`);
+      log.debug(`Retrieved Prs from ${repos.indexOf(repo)}/${repos.length} repos`);
     }
   }
   return pullRequests;
@@ -140,25 +141,17 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
 
         if (!node.author.id) {
           return false;
-        } else if (typeof node.author.id === 'number') {
-          return true;
         }
 
-        try {
-          const parsedAuthorId = atob(node.author.id as string)
-            .split(':User')
-            .pop();
-
-          if (!Number.isNaN(parseInt(parsedAuthorId as string))) {
-            node.author.id = parseInt(parsedAuthorId as string);
+        if (typeof node.author.id === 'string') {
+          const decodedId = decodeGithubUserId(node.author.id, node.author.login);
+          if (decodedId) {
+            node.author.id = decodedId;
             return true;
-          } else {
-            return false;
           }
-        } catch (e) {
-          log.error(`Could not parse author id for user ${node.author.login} with id ${node.author.id}`, { error: e });
           return false;
         }
+        return typeof node.author.id === 'number';
       })
       .map(({ node }) => {
         return {
@@ -185,4 +178,31 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
   }
 
   return allRecentPRs;
+}
+
+// Examples: U_kgDOB-4rVA, U_kgDOBtmCgw, MDQ6VXNlcjQxMjQxMTk0
+export function decodeGithubUserId(id: string, authorLogin: string): number | null {
+  try {
+    if (id.startsWith('U_')) {
+      // this doesn't seem to work - TODO: maybe we shouldnt try to decode these?
+      const decodedId = atob(id.slice(2));
+      const match = decodedId.match(/(\d+)$/);
+      if (match) {
+        return parseInt(match[1], 10);
+      }
+      return null;
+    }
+    const parsedAuthorId = atob(id).split(':User').pop();
+    if (!parsedAuthorId) {
+      return null;
+    }
+    if (!Number.isNaN(parseInt(parsedAuthorId as string))) {
+      return parseInt(parsedAuthorId as string);
+    }
+  } catch (e) {
+    log.warn(`Could not decode GitHub user ID for ${authorLogin} with id ${id}`, {
+      error: e
+    });
+  }
+  return null;
 }
