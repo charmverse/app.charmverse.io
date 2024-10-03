@@ -1,6 +1,7 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
@@ -55,9 +56,22 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
   return (
     <>
       <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
-        <BottomNavigationAction label='Home' href='/home' value='home' icon={<PiHouseLight size='24px' />} />
-        <BottomNavigationAction label='Scout' href='/scout' value='scout' icon={<PiBinocularsLight size='24px' />} />
         <BottomNavigationAction
+          label='Home'
+          href='/home'
+          value='home'
+          icon={<PiHouseLight size='24px' />}
+          LinkComponent={Link}
+        />
+        <BottomNavigationAction
+          label='Scout'
+          href='/scout'
+          value='scout'
+          icon={<PiBinocularsLight size='24px' />}
+          LinkComponent={Link}
+        />
+        <BottomNavigationAction
+          LinkComponent={Link}
           label='Notifications'
           href='/notifications'
           value='notifications'
@@ -65,6 +79,7 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
           onClick={(e) => openAuthModal?.(e, 'notifications')}
         />
         <BottomNavigationAction
+          LinkComponent={Link}
           label='Profile'
           // This makes sure the UI doesn't flicker from single column to double column for desktop screens
           href={isDesktop ? '/profile?tab=scout-build' : '/profile'}

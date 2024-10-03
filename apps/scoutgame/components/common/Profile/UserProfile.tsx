@@ -4,6 +4,7 @@ import type { Scout } from '@charmverse/core/prisma';
 import { IconButton, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
+import { useIsMounted } from 'hooks/useIsMounted';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
 import type { AvatarSize } from '../Avatar';
@@ -24,6 +25,13 @@ type UserProfileProps = {
 export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
   const isDesktop = useMdScreen();
   const { displayName, username, bio, avatar, githubLogin } = user;
+  const isMounted = useIsMounted();
+
+  // We are using the mounted flag here because MUI media query returns false on the server and true on the client and it throws warnings
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <Stack
       display='flex'
