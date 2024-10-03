@@ -289,6 +289,17 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const { error: decentSdkError, isLoading: isLoadingDecentSdk, actionResponse } = useBoxAction(decentAPIParams);
 
+  const amountToPay = actionResponse?.tokenPayment?.amount;
+  const isEthPayment = !!actionResponse?.tokenPayment?.isNative;
+  const balanceDataFromCorrectChain = balances?.chainId === selectedPaymentOption.chainId;
+
+  const hasSufficientBalance =
+    !amountToPay || !balanceDataFromCorrectChain
+      ? false
+      : isEthPayment
+      ? balances?.eth >= amountToPay
+      : balances?.usdc >= amountToPay;
+
   const handlePurchase = async () => {
     if (paymentMethod === 'points') {
       await purchaseWithPoints({
@@ -332,6 +343,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             });
           },
           onError: (err: any) => {
+            setSubmitError(
+              err.message || 'Something went wrong. Check your wallet is connected and has a sufficient balance'
+            );
             log.error('Mint failed', { error: err });
           }
         }
@@ -530,14 +544,21 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             </Paper>
           </Stack>
         ) : (
-          <BlockchainSelect
-            value={selectedPaymentOption}
-            balance={displayedBalance}
-            useTestnets={useTestnets}
-            onSelectChain={(_paymentOption) => {
-              setSelectedPaymentOption(_paymentOption);
-            }}
-          />
+          <>
+            <BlockchainSelect
+              value={selectedPaymentOption}
+              balance={displayedBalance}
+              useTestnets={useTestnets}
+              onSelectChain={(_paymentOption) => {
+                setSelectedPaymentOption(_paymentOption);
+              }}
+            />
+            {!hasSufficientBalance && balanceDataFromCorrectChain ? (
+              <Typography sx={{ mt: 1 }} variant='caption' color='error' align='center'>
+                Insufficient balance
+              </Typography>
+            ) : null}
+          </>
         )}
       </Stack>
       {fetchError && (
@@ -558,11 +579,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           isSavingDecentTransaction ||
           isExecutingTransaction ||
           (paymentMethod === 'points' && notEnoughPoints) ||
-          isPurchasingWithPoints
+          isPurchasingWithPoints ||
+          (!hasSufficientBalance && balanceDataFromCorrectChain && !isPurchasingWithPoints)
         }
       >
         Buy
       </LoadingButton>
+
       {decentSdkError instanceof Error ? (
         <Typography variant='caption' color='error' align='center'>
           {(decentSdkError as Error).message}
