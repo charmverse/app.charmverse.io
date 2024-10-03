@@ -2,12 +2,15 @@ import { MenuItem, Select, Stack, Typography } from '@mui/material';
 import type { SelectProps } from '@mui/material/Select';
 import type { ReactNode, Ref } from 'react';
 import { forwardRef } from 'react';
-import { optimism } from 'viem/chains';
 
 import { ChainComponent } from './ChainComponent';
 import { getChainOptions } from './chains';
 
 export type SelectedPaymentOption = { chainId: number; currency: 'ETH' | 'USDC' };
+
+function isSameOption(a: SelectedPaymentOption, b: SelectedPaymentOption) {
+  return a.chainId === b.chainId && a.currency === b.currency;
+}
 
 function SelectField(
   {
@@ -47,11 +50,7 @@ function SelectField(
         return <ChainComponent chain={chain} balance={balance} />;
       }}
       ref={ref}
-      value={
-        chainOpts.map(({ id }) => id).includes(value.chainId)
-          ? value
-          : ({ chainId: optimism.id, currency: 'ETH' } as SelectedPaymentOption)
-      }
+      value={value}
       {...restProps}
     >
       <MenuItem value='' disabled>
@@ -66,9 +65,12 @@ function SelectField(
             ev.stopPropagation();
             onSelectChain({ chainId: _chain.id, currency: _chain.currency });
           }}
-          sx={{ my: 1 }}
+          sx={{ py: 1.5 }}
         >
-          <ChainComponent chain={_chain} />
+          <ChainComponent
+            chain={_chain}
+            selected={isSameOption({ chainId: _chain.id, currency: _chain.currency }, value)}
+          />
         </MenuItem>
       ))}
     </Select>
