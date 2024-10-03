@@ -2,8 +2,8 @@ version: 1
 cron:
   - name: "process-pull-requests"
     url: "/process-pull-requests"
-    # every 20 minutes
-    schedule: "*/20 * * * *"
+    # every hour
+    schedule: "0 * * * *"
 
   - name: "process-gems-payout"
     url: "/process-gems-payout"
