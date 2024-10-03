@@ -18,6 +18,7 @@ export async function processPullRequests({
       deletedAt: null
     },
     select: {
+      id: true,
       owner: true,
       name: true,
       defaultBranch: true
@@ -56,21 +57,26 @@ export async function processPullRequests({
     log.debug(
       `Processing PR ${i}/${pullRequests.length} -- ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`
     );
-    const repo = repos.find((r) => `${r.owner}/${r.name}` === pullRequest.repository.nameWithOwner);
-    if (!repo) {
-      throw new Error(`Repo not found: ${pullRequest.repository.nameWithOwner}`);
-    }
-
-    try {
-      if (pullRequest.state === 'CLOSED') {
-        if (!skipClosedPrProcessing) {
-          await processClosedPullRequest({ pullRequest, repo, season });
+    const repo = repos.find(
+      (r) =>
+        `${r.owner}/${r.name}` === pullRequest.repository.nameWithOwner ||
+        // consider repo id in case it was a fork, in which casethe nameWithOwner may not match the name of the repo for some reason
+        r.id === pullRequest.repository.id
+    );
+    if (repo) {
+      try {
+        if (pullRequest.state === 'CLOSED') {
+          if (!skipClosedPrProcessing) {
+            await processClosedPullRequest({ pullRequest, repo, season });
+          }
+        } else {
+          await processMergedPullRequest({ pullRequest, repo, season });
         }
-      } else {
-        await processMergedPullRequest({ pullRequest, repo, season });
+      } catch (error) {
+        log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, { error });
       }
-    } catch (error) {
-      log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, { error });
+    } else {
+      log.error(`Repo not found for pull request: ${pullRequest.repository.nameWithOwner}`);
     }
   }
 
