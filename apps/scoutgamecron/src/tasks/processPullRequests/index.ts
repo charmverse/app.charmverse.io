@@ -24,7 +24,14 @@ export async function processPullRequests({
 }: Options = {}) {
   const repos = await prisma.githubRepo.findMany({
     where: {
-      deletedAt: null
+      deletedAt: null,
+      id: {
+        gt: 30532948
+      }
+    },
+    // sort the repos in case it fails, so we can resume from the next one
+    orderBy: {
+      id: 'asc'
     },
     select: {
       id: true,
@@ -44,7 +51,7 @@ export async function processPullRequests({
       season,
       onlyProcessNewRepos
     });
-    log.debug(`Processed ${i}/${repos.length} repos`);
+    log.debug(`Processed ${i}/${repos.length} repos, last Id: ${reposBatch[reposBatch.length - 1].id}`);
   }
 
   await updateBuildersRank({ week: getCurrentWeek() });
