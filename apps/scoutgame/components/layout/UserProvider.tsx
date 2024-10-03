@@ -16,7 +16,7 @@ export function UserProvider({ children, userSession }: { children: ReactNode; u
   const [user, setUser] = useState<SessionUser | null>(userSession);
 
   const updateUser = useCallback((_updatedUser: Partial<SessionUser>) => {
-    // TBD
+    throw new Error('updateUser must be implemented first in order to use it');
   }, []);
 
   const value = useMemo(() => ({ user, updateUser }), [user, updateUser]);
