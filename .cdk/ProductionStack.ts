@@ -7,6 +7,7 @@ export type Options = {
   healthCheck?: { port: number; path: string };
   sslCert?: string;
   environmentTier?: 'WebServer' | 'Worker';
+  workerTimeout?: number;
   environmentType?: 'SingleInstance' | 'LoadBalanced';
   instanceType?: string;
 };
@@ -21,6 +22,7 @@ export class ProductionStack extends Stack {
     {
       sslCert,
       healthCheck = defaultHealthCheck,
+      workerTimeout = 1800, // half an hour in seconds, should be enough!
       environmentTier = 'WebServer',
       environmentType = 'LoadBalanced',
       instanceType = 't3a.small,t3.small'
@@ -110,6 +112,29 @@ export class ProductionStack extends Stack {
           ]
         : []),
       /* End graceful deployment settings */
+      // Info on Worker timeouts https://dev.to/rizasaputra/understanding-aws-elastic-beanstalk-worker-timeout-42hi
+      // TODO: update nginx timeouts to match
+      ...(environmentTier === 'Worker'
+        ? [
+            {
+              namespace: 'aws:elasticbeanstalk:sqsd',
+              optionName: 'InactivityTimeout',
+              value: workerTimeout.toString()
+            },
+            {
+              // Visibility timeout higher than the Inactivity timeout
+              namespace: 'aws:elasticbeanstalk:sqsd',
+              optionName: 'VisibilityTimeout',
+              value: `${workerTimeout + 1}`
+            },
+            {
+              // Visibility timeout higher than the Inactivity timeout
+              namespace: 'aws:elasticbeanstalk:sqsd',
+              optionName: 'MaxRetries',
+              value: '1'
+            }
+          ]
+        : []),
       {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
