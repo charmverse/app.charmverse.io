@@ -41,7 +41,7 @@ export function SuccessView({ builder }: { builder: { nftImageUrl?: string | nul
         LinkComponent={Link}
         fullWidth
         href={`https://warpcast.com/~/compose?text=${encodeURI(
-          `I scouted ${builder.username} on Scout Game!`
+          `I scouted @${builder.username} on Scout Game!`
         )}&embeds[]=${window.location.origin}/u/${builder.username}`}
         target='_blank'
         rel='noopener noreferrer'
