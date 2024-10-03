@@ -28,15 +28,25 @@ export async function processPullRequests({
   const timer = DateTime.now();
   const pullRequests = await getPullRequests({ repos, after: createdAfter });
 
+  const githubEvents = await prisma.githubEvent.findMany({
+    where: {
+      createdAt: {
+        gt: createdAfter
+      }
+    }
+  });
+  const newPullRequests = pullRequests.filter((pr) =>
+    githubEvents.some((e) => e.pullRequestNumber === pr.number && e.repoId === pr.repository.id)
+  );
+
   const uniqueRepos = Array.from(new Set(pullRequests.map((pr) => pr.repository.id)));
 
   // pullRequests.map((pr) => pr.repository.id);
 
   log.info(
-    `Retrieved ${pullRequests.length} pull requests across ${uniqueRepos.length} repos in ${timer.diff(
-      DateTime.now(),
-      'minutes'
-    )} minutes`
+    `Retrieved ${newPullRequests.length} new PRs (out of ${pullRequests.length}) across ${
+      uniqueRepos.length
+    } repos in ${timer.diff(DateTime.now(), 'minutes')} minutes`
   );
 
   let i = 0;
