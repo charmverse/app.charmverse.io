@@ -143,6 +143,12 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
           return false;
         } else if (typeof node.author.id === 'number') {
           return true;
+        } else if ((node.author.id as string).startsWith('U_')) {
+          log.debug('Ignoring PR from author with unparseable user name', {
+            repo: node.repository.nameWithOwner,
+            author: node.author
+          });
+          return false;
         }
 
         try {
@@ -157,7 +163,7 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
             return false;
           }
         } catch (e) {
-          log.error(`Could not parse author id for user ${node.author.login} with id ${node.author.id}`, { error: e });
+          log.warn(`Could not parse author id for user ${node.author.login} with id ${node.author.id}`, { error: e });
           return false;
         }
       })
