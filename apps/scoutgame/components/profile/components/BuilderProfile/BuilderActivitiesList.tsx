@@ -2,6 +2,8 @@ import { Paper, Stack, Typography } from '@mui/material';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import { getRelativeTime } from '@packages/utils/dates';
 import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 import { BiLike } from 'react-icons/bi';
 import { LuBookMarked } from 'react-icons/lu';
 
@@ -32,11 +34,11 @@ export function BuilderActivityDetail({ activity }: { activity: BuilderActivity 
       ) : activity.type === 'nft_purchase' ? (
         <BiLike size='15px' />
       ) : null}
-      {activity.type === 'nft_purchase'
-        ? activity.scout
-        : activity.type === 'merged_pull_request'
-        ? activity.repo
-        : null}
+      {activity.type === 'nft_purchase' ? (
+        <Link href={`/u/${activity.scout}`}>{activity.scout}</Link>
+      ) : activity.type === 'merged_pull_request' ? (
+        <Link href={activity.url}>{activity.repo}</Link>
+      ) : null}
     </Stack>
   );
 }
