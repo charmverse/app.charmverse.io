@@ -75,6 +75,7 @@ export function PublicBuilderProfileContainer({
         {!isDesktop ? (
           <Paper sx={{ py: 2 }}>
             <Stack flexDirection='row'>
+              <BackButton />
               <Stack flexDirection='row' alignItems='center' gap={2}>
                 <Box minWidth='fit-content'>
                   <BuilderCard
