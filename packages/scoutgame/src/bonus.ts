@@ -21,7 +21,6 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
       'mento-protocol/reserve-site',
       'mento-protocol/mento-sdk',
       'mento-protocol/mento-web',
-      'mento-protocol/mento-sdk',
       'celo-org/celo-composer',
       'valora-inc/hooks',
       'Glo-Foundation/glo-wallet',
