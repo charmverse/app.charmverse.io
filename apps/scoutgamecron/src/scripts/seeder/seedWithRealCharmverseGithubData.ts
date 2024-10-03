@@ -85,7 +85,7 @@ export async function seedWithRealCharmverseGithubData() {
           builder: {
             create: {
               displayName: builder,
-              username: builder,
+              username: builder + Math.random().toString().replace('.', '').slice(0, 6),
               builderStatus: 'approved',
               avatar
             }
@@ -110,10 +110,6 @@ export async function seedWithRealCharmverseGithubData() {
       });
     }
   }
-
-  // await processPullRequests({ createdAfter: new Date('2024-08-01'), skipClosedPrProcessing: true });
-
-  await seedBuilderNFTs();
 }
 
 async function seedBuilderNFTs() {
@@ -196,9 +192,8 @@ async function clearNfts() {
 }
 
 async function script() {
-   await clearNfts()
   await seedWithRealCharmverseGithubData();
   await seedBuilderNFTs();
 }
 
-// script()
+script()
