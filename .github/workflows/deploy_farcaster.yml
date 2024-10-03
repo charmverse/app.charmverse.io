@@ -78,7 +78,7 @@ jobs:
           core_pkg_version: ${{ inputs.core_pkg_version }}
           commit_core_pkg_upgrade: true
 
-      - name: Build apps
+      - name: Build Farcaster app
         uses: ./.github/actions/build_app
         with:
           app_name: farcaster
