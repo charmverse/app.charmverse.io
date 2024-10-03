@@ -31,6 +31,11 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
       'hypercerts-org'
     ],
     icon: 'https://cryptologos.cc/logos/celo-celo-logo.png'
+  },
+  game7: {
+    name: 'Game7',
+    repos: ['G7DAO/protocol', 'G7DAO/safes', 'G7DAO/seer', 'PermissionlessGames/degen-casino'],
+    icon: 'https://cryptologos.cc/logos/celo-celo-logo.png'
   }
 };
 
