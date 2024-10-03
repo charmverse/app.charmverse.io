@@ -26,7 +26,7 @@ export async function processPullRequests({
     where: {
       deletedAt: null,
       id: {
-        gt: 30532948
+        gt: 208938406
       }
     },
     // sort the repos in case it fails, so we can resume from the next one
