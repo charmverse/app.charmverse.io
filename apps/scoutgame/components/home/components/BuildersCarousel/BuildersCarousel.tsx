@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import { Carousel } from 'components/common/Carousel/Carousel';
 import { LoadingCards } from 'components/common/Loading/LoadingCards';
+import { useIsMounted } from 'hooks/useIsMounted';
 import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderInfo } from 'lib/builders/interfaces';
 
@@ -13,13 +12,9 @@ export function BuildersCarousel({ builders, userId }: { builders: BuilderInfo[]
   const isMdScreen = useMdScreen();
   const isLgScreen = useLgScreen();
   const size = isLgScreen ? 'large' : isMdScreen ? 'small' : 'x-small';
-  const [isClientSide, setIsClientSide] = useState(false);
+  const isMounted = useIsMounted();
 
-  useEffect(() => {
-    setIsClientSide(true);
-  }, []);
-
-  if (!isClientSide) {
+  if (!isMounted) {
     return <LoadingCards />;
   }
 
