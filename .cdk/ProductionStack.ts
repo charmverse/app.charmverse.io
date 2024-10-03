@@ -113,6 +113,7 @@ export class ProductionStack extends Stack {
         : []),
       /* End graceful deployment settings */
       // Info on Worker timeouts https://dev.to/rizasaputra/understanding-aws-elastic-beanstalk-worker-timeout-42hi
+      // Also read https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features-managing-env-tiers.html
       // TODO: update nginx timeouts to match
       ...(environmentTier === 'Worker'
         ? [
