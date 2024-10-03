@@ -24,6 +24,7 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const router = useRouter();
   const { isAuthenticated } = useProfile();
+
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
   const redirectUrl = redirectUrlEncoded ? decodeURIComponent(redirectUrlEncoded) : '/';
@@ -99,7 +100,16 @@ function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         size='large'
         onClick={signIn}
         disabled={!url}
-        sx={{ px: 4, py: 2 }}
+        sx={{
+          px: {
+            xs: 2.5,
+            md: 4
+          },
+          py: {
+            xs: 1.5,
+            md: 2
+          }
+        }}
         startIcon={<WarpcastIcon />}
         {...props}
       >
@@ -131,7 +141,9 @@ export function WarpcastLogin() {
           trackEvent('click_dont_have_farcaster_account');
         }}
       >
-        Join Farcaster
+        <Typography fontWeight={600} color='primary'>
+          Join Farcaster
+        </Typography>
       </Link>
     </AuthKitProvider>
   );

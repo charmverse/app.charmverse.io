@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
-import { NotificationRequest } from 'components/common/NotificationRequest';
 import { AppProviders } from 'components/layout/AppProviders';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 import 'theme/styles.scss';
