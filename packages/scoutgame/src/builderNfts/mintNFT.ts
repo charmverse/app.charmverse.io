@@ -97,7 +97,7 @@ export async function mintNFT(params: MintNFTParams) {
         }
       },
       create: {
-        nftsSold: 1,
+        nftsSold: amount,
         userId: builderNft.builderId,
         season: currentSeason,
         pointsEarnedAsBuilder: 0,
@@ -117,7 +117,7 @@ export async function mintNFT(params: MintNFTParams) {
         }
       },
       create: {
-        nftsPurchased: 1,
+        nftsPurchased: amount,
         userId: scoutId,
         season: currentSeason,
         pointsEarnedAsBuilder: 0,

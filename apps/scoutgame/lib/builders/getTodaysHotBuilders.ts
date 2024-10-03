@@ -34,7 +34,8 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
             season: currentSeason
           },
           select: {
-            pointsEarnedAsBuilder: true
+            pointsEarnedAsBuilder: true,
+            nftsSold: true
           }
         },
         userWeeklyStats: {
@@ -43,18 +44,6 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
           },
           select: {
             gemsCollected: true
-          }
-        },
-        nftPurchaseEvents: {
-          where: {
-            builderNFT: {
-              season: currentSeason
-            }
-          },
-          distinct: ['scoutId'],
-          select: {
-            scoutId: true,
-            tokensPurchased: true
           }
         },
         builderNfts: {
@@ -78,9 +67,8 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
           builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
           price: builder.builderNfts[0]?.currentPrice ?? 0,
           nftImageUrl: builder.builderNfts[0]?.imageUrl,
-          nftsSold: builder.nftPurchaseEvents.reduce((acc, event) => acc + event.tokensPurchased, 0),
+          nftsSold: builder.userSeasonStats[0]?.nftsSold || 0,
           gemsCollected: builder.userWeeklyStats[0]?.gemsCollected || 0,
-          scoutedBy: builder.nftPurchaseEvents.length,
           builderStatus: builder.builderStatus
         };
       })
@@ -113,7 +101,8 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
               season: currentSeason
             },
             select: {
-              pointsEarnedAsBuilder: true
+              pointsEarnedAsBuilder: true,
+              nftsSold: true
             }
           },
           nftPurchaseEvents: {
@@ -124,8 +113,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
             },
             distinct: ['scoutId'],
             select: {
-              scoutId: true,
-              tokensPurchased: true
+              scoutId: true
             }
           },
           builderNfts: {
@@ -151,7 +139,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
       price: user.builderNfts[0]?.currentPrice ?? 0,
       nftImageUrl: user.builderNfts[0]?.imageUrl,
-      nftsSold: user.nftPurchaseEvents.reduce((acc, event) => acc + event.tokensPurchased, 0),
+      nftsSold: user.userSeasonStats[0]?.nftsSold || 0,
       gemsCollected: builder.gemsCollected,
       scoutedBy: user.nftPurchaseEvents.length,
       builderStatus: user.builderStatus
