@@ -17,6 +17,7 @@ type MergedPullRequestActivity = {
   contributionType: GemsReceiptType;
   gems: number;
   repo: string;
+  url: string;
   bonusPartner: string | null;
 };
 
@@ -78,7 +79,8 @@ export async function getBuilderActivities({
               name: true,
               owner: true
             }
-          }
+          },
+          pullRequestNumber: true
         }
       }
     }
@@ -103,6 +105,7 @@ export async function getBuilderActivities({
           contributionType: event.gemsReceipt.type,
           gems: event.gemsReceipt.value,
           repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`,
+          url: `https://github.com/${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}/pull/${event.githubEvent.pullRequestNumber}`,
           bonusPartner: event.bonusPartner
         };
       } else {
