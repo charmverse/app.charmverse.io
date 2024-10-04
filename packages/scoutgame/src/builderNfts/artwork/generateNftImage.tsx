@@ -123,3 +123,57 @@ export async function generateNftImage({
 
   return imageBuffer;
 }
+
+export async function generateNftCongrats({ userImage }: { userImage: string | null }): Promise<Buffer> {
+  let avatarBuffer: Buffer | null = null;
+  const cutoutWidth = 500;
+  const cutoutHeight = 500;
+
+  if (userImage) {
+    const response = await fetch(userImage);
+    const arrayBuffer = await response.arrayBuffer();
+    avatarBuffer = await sharp(Buffer.from(arrayBuffer)).resize(300, 300).png().toBuffer();
+  }
+
+  const baseImage = new ImageResponse(
+    (
+      <div
+        style={{
+          backgroundColor: '#000',
+          width: '500px',
+          height: '500px',
+          padding: '2px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          gap: '8px',
+          backgroundImage: `url(${process.env.DOMAIN}/images/profile/congrats-bg.png)`,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover'
+        }}
+      >
+        {userImage ? (
+          <img
+            src={avatarBuffer ? `data:image/png;base64,${avatarBuffer.toString('base64')}` : noPfpAvatarBase64}
+            alt='user nft'
+            width='35%'
+            height='auto'
+          />
+        ) : (
+          <img src='/images/no_nft_person.png' alt='no nft available' width={200} height={200} />
+        )}
+      </div>
+    ),
+    {
+      width: cutoutWidth,
+      height: cutoutHeight
+    }
+  );
+
+  const baseImageBuffer = await baseImage.arrayBuffer();
+  const imageBuffer = sharp(Buffer.from(baseImageBuffer)).png().toBuffer();
+
+  return imageBuffer;
+}
