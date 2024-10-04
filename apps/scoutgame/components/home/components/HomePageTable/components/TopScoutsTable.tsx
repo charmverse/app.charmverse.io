@@ -63,9 +63,16 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
                 <TableCellText>{index + 1}</TableCellText>
               </TableCell>
               <TableCell component='th'>
-                <Stack component={Link} href={`/u/${scout.username}`} alignItems='center' flexDirection='row' gap={1}>
+                <Stack
+                  component={Link}
+                  href={`/u/${scout.username}`}
+                  alignItems='center'
+                  flexDirection='row'
+                  gap={1}
+                  maxWidth={{ xs: '100px', md: 'initial' }}
+                >
                   <Avatar src={scout.avatar} name={scout.username} size='small' />
-                  <TableCellText maxWidth={{ xs: '100px', md: '100%' }}>{scout.username}</TableCellText>
+                  <TableCellText noWrap>{scout.username}</TableCellText>
                 </Stack>
               </TableCell>
               <TableCell align='right'>
