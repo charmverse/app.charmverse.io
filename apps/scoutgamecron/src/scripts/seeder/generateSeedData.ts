@@ -7,7 +7,7 @@ import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboa
 import { DateTime } from 'luxon';
 
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
-import { updateBuildersRank } from '../../tasks/processPullRequests/updateBuildersRank';
+import { updateBuildersRank } from '../../tasks/processRecentBuilderActivity/updateBuildersRank';
 
 import { generateBuilder } from './generateBuilder';
 import { generateBuilderEvents } from './generateBuilderEvents';
@@ -136,7 +136,14 @@ export async function generateSeedData() {
       const topWeeklyBuilders = await getBuildersLeaderboard({ quantity: 100, week });
       for (const { builder, gemsCollected, rank } of topWeeklyBuilders) {
         try {
-          await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: currentSeason, createdAt: date.toJSDate() });
+          await processScoutPointsPayout({
+            builderId: builder.id,
+            rank,
+            gemsCollected,
+            week,
+            season: currentSeason,
+            createdAt: date.toJSDate()
+          });
         } catch (error) {
           log.error(`Error processing scout points payout for builder ${builder.id}: ${error}`);
         }

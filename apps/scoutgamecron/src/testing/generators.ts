@@ -1,6 +1,6 @@
 import { randomLargeInt } from '@packages/scoutgame/testing/generators';
 
-import type { PullRequest } from '../tasks/processPullRequests/getPullRequests';
+import type { PullRequest } from '../tasks/processRecentBuilderActivity/getPullRequests';
 
 export function mockPullRequest(
   fields: Partial<PullRequest> & {

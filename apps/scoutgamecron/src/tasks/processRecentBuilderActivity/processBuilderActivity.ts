@@ -1,90 +1,46 @@
 import { log } from '@charmverse/core/log';
-import type { GithubRepo } from '@charmverse/core/prisma-client';
+import type {
+  ActivityRecipientType,
+  GemsReceiptType,
+  GithubRepo,
+  ScoutGameActivityType
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
+import { getBonusPartner } from '@packages/scoutgame/bonus';
+import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday, currentSeason } from '@packages/scoutgame/dates';
+import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
+import type { PullRequest } from './getPullRequests';
 import { getPullRequests } from './getPullRequests';
+import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
 import { processClosedPullRequest } from './processClosedPullRequest';
 import { processMergedPullRequest } from './processMergedPullRequest';
 import { updateBuildersRank } from './updateBuildersRank';
 
-type ProcessPullRequestsOptions = {
-  createdAfter?: Date;
-  skipClosedPrProcessing?: boolean;
-  season?: string;
-  onlyProcessNewRepos?: boolean;
-};
+type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
 
-export async function processPullRequests({
-  createdAfter = new Date(Date.now() - 30 * 60 * 1000),
-  skipClosedPrProcessing = false,
-  onlyProcessNewRepos = false,
-  season = currentSeason
-}: ProcessPullRequestsOptions = {}) {
-  const repos = await prisma.githubRepo.findMany({
-    where: {
-      deletedAt: null
-      // id: {
-      //   gt: 760314802
-      // }
-    },
-    // sort the repos in case it fails, so we can resume from the next one
-    orderBy: {
-      id: 'asc'
-    },
-    select: {
-      id: true,
-      owner: true,
-      name: true,
-      defaultBranch: true
-    }
-  });
-  log.info(`Found ${repos.length} repos to check for PRs`);
+export type MergedPullRequestMeta = Pick<
+  PullRequest,
+  'author' | 'number' | 'title' | 'repository' | 'url' | 'createdAt' | 'mergedAt'
+>;
 
-  for (let i = 0; i < repos.length; i += 100) {
-    const reposBatch = repos.slice(i, i + 100);
-    await processPullRequestsForRepos({
-      repos: reposBatch,
-      createdAfter,
-      skipClosedPrProcessing,
-      season,
-      onlyProcessNewRepos
-    });
-    log.debug(`Processed ${i}/${repos.length} repos, last PR id: ${reposBatch[reposBatch.length - 1].id}`);
-  }
-
-  await updateBuildersRank({ week: getCurrentWeek() });
-}
-
-async function processPullRequestsForRepos({
-  repos,
-  createdAfter,
-  skipClosedPrProcessing,
-  onlyProcessNewRepos,
-  season
-}: ProcessPullRequestsOptions & {
+type Props = {
+  builderId: string;
+  githubUser: {
+    id: number;
+    login: string;
+  };
   createdAfter: Date;
   season: string;
-  repos: Pick<GithubRepo, 'id' | 'owner' | 'name' | 'defaultBranch'>[];
-}) {
-  const timer = DateTime.now();
+  now?: DateTime;
+};
 
-  if (onlyProcessNewRepos) {
-    const existingPullRequests = await prisma.githubEvent.findMany({
-      where: {
-        repoId: {
-          in: repos.map((r) => r.id)
-        }
-      }
-    });
-    if (existingPullRequests.length) {
-      log.info(`Skip some repos because they have been processed before`);
-      return;
-    }
-    repos = repos.filter((r) => !existingPullRequests.some((e) => e.repoId === r.id));
-  }
-
+/**
+ *
+ * @isFirstMergedPullRequest Only used for the seed data generator
+ */
+export async function processBuilderActivity({ builderId, githubUser, season, now = DateTime.utc() }: Props) {
   const pullRequests = await getPullRequests({ repos, after: createdAfter });
 
   const githubEvents = await prisma.githubEvent.findMany({

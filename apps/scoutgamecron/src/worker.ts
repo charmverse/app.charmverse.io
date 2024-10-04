@@ -6,7 +6,7 @@ import { DateTime } from 'luxon';
 import * as middleware from './middleware';
 import { processGemsPayout } from './tasks/processGemsPayout';
 import { processNftMints } from './tasks/processNftMints';
-import { processPullRequests } from './tasks/processPullRequests';
+import { processRecentBuilderActivity } from './tasks/processRecentBuilderActivity';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
 
 const app = new Koa();
@@ -38,7 +38,7 @@ addTask('/hello-world', (ctx) => {
   log.info('Hello World triggered', { body: ctx.body, headers: ctx.headers });
 });
 
-addTask('/process-pull-requests', processPullRequests);
+addTask('/process-builder-activity', processRecentBuilderActivity);
 
 addTask('/send-push-notifications', sendNotifications);
 

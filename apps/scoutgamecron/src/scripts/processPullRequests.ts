@@ -1,4 +1,4 @@
-import { processPullRequests } from '../tasks/processPullRequests';
+import { processPullRequests } from '../tasks/processRecentBuilderActivity';
 import { DateTime } from 'luxon';
 import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 

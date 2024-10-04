@@ -2,9 +2,9 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { currentSeason, getCurrentWeek, getDateFromISOWeek } from '@packages/scoutgame/dates';
-import { processMergedPullRequest } from '../tasks/processPullRequests/processMergedPullRequest';
+import { processMergedPullRequest } from '../tasks/processRecentBuilderActivity/processMergedPullRequest';
 
-import { updateBuildersRank } from '../tasks/processPullRequests/updateBuildersRank';
+import { updateBuildersRank } from '../tasks/processRecentBuilderActivity/updateBuildersRank';
 
 export async function approveBuilder({
   githubLogin,
