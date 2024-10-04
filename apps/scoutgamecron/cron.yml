@@ -3,7 +3,7 @@ cron:
   - name: "process-pull-requests"
     url: "/process-pull-requests"
     # every hour
-    schedule: "0 * * * *"
+    schedule: "0 */2 * * *"
 
   - name: "process-gems-payout"
     url: "/process-gems-payout"
