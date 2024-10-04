@@ -111,7 +111,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const notEnoughPoints = user && user.currentBalance < purchaseCostInPoints;
 
   const {
-    isExecuting: isPurchasingWithPoints,
+    isExecuting: isExecutingPointsPurchase,
     hasSucceeded: hasPurchasedWithPoints,
     executeAsync: purchaseWithPoints
   } = useAction(purchaseWithPointsAction, {
@@ -575,7 +575,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Typography>
       )}
       <LoadingButton
-        loading={isSavingDecentTransaction || isExecutingTransaction || isPurchasingWithPoints}
+        loading={isSavingDecentTransaction || isFetchingPrice || isExecutingTransaction || isExecutingPointsPurchase}
         size='large'
         onClick={handlePurchase}
         variant='contained'
@@ -587,8 +587,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           isSavingDecentTransaction ||
           isExecutingTransaction ||
           (paymentMethod === 'points' && notEnoughPoints) ||
-          isPurchasingWithPoints ||
-          (!hasSufficientBalance && balanceDataFromCorrectChain && !isPurchasingWithPoints)
+          isExecutingPointsPurchase
         }
       >
         Buy
