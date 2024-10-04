@@ -9,10 +9,9 @@ import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
 } from '@packages/onchain/waitForDecentTransactionSettlement';
-import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason } from '@packages/scoutgame/dates';
 
-import { mintNFT, recordNftMint } from './mintNFT';
+import { recordNftMint } from './mintNFT';
 import { convertCostToPoints } from './utils';
 
 export async function handlePendingTransaction({

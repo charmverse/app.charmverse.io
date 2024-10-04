@@ -371,6 +371,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     }
   }, [decentSdkError]);
 
+  const isLoading =
+    isSavingDecentTransaction ||
+    isLoadingDecentSdk ||
+    isFetchingPrice ||
+    isExecutingTransaction ||
+    isExecutingPointsPurchase;
+
   const displayedBalance =
     balances?.chainId !== selectedPaymentOption.chainId || balances.address !== address
       ? undefined
@@ -574,8 +581,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           {fetchError.shortMessage || 'Something went wrong'}
         </Typography>
       )}
+
       <LoadingButton
-        loading={isSavingDecentTransaction || isFetchingPrice || isExecutingTransaction || isExecutingPointsPurchase}
+        loading={isLoading}
         size='large'
         onClick={handlePurchase}
         variant='contained'
@@ -587,7 +595,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           isSavingDecentTransaction ||
           isExecutingTransaction ||
           (paymentMethod === 'points' && notEnoughPoints) ||
-          isExecutingPointsPurchase
+          isExecutingPointsPurchase ||
+          (paymentMethod === 'wallet' && !hasSufficientBalance && !!balanceDataFromCorrectChain)
         }
       >
         Buy
