@@ -1,6 +1,6 @@
 import { GET, POST } from '@charmverse/core/http';
 import { getLogger } from '@charmverse/core/log';
-import { isProdEnv } from '@root/config/constants';
+import { isTestEnv } from '@root/config/constants';
 import { COLLABLAND_API_URL, COLLAB_API_KEY } from '@root/lib/collabland/config';
 import type { CollablandUserResult } from '@root/lib/collabland/interfaces';
 import type { ExternalRole } from '@root/lib/roles';
@@ -16,7 +16,7 @@ const DEFAULT_HEADERS = {
 
 log.debug('Using collabland API URL:', COLLABLAND_API_URL);
 
-const rateLimiter = RateLimit(1, { timeUnit: isProdEnv ? 5000 : 1 }); // 1 request per 5s
+const rateLimiter = RateLimit(1, { timeUnit: isTestEnv ? 1 : 5000 });
 
 export interface BountyEventSubject {
   id: string; // discord user id
@@ -124,27 +124,38 @@ export async function getDiscordUserState({
     };
   }
   await rateLimiter();
-  const res = await GET<CollablandUserResult>(
-    `${COLLABLAND_API_URL}/discord/${discordServerId}/member/${discordUserId}`,
-    null,
-    {
-      headers: getHeaders()
-    }
-  );
+  try {
+    const res = await GET<CollablandUserResult>(
+      `${COLLABLAND_API_URL}/discord/${discordServerId}/member/${discordUserId}`,
+      null,
+      {
+        headers: getHeaders()
+      }
+    );
 
-  const serverRoles = await getGuildRoles(discordServerId);
-  const userRoles: ExternalRole[] = [];
-  res.roles?.forEach((roleId) => {
-    const externalRole = serverRoles.find((role) => role.id === roleId);
-    if (externalRole) {
-      userRoles.push({ id: externalRole.id, name: externalRole.name });
-    }
-  });
+    const serverRoles = await getGuildRoles(discordServerId);
+    const userRoles: ExternalRole[] = [];
+    res.roles?.forEach((roleId) => {
+      const externalRole = serverRoles.find((role) => role.id === roleId);
+      if (externalRole) {
+        userRoles.push({ id: externalRole.id, name: externalRole.name });
+      }
+    });
 
-  return {
-    isVerified: !res.is_pending && !res.pending,
-    roles: userRoles || []
-  };
+    return {
+      isVerified: !res.is_pending && !res.pending,
+      roles: userRoles || []
+    };
+  } catch (e) {
+    // 404 means Unknown Member
+    if ((e as any).status === 404) {
+      return {
+        isVerified: false,
+        roles: []
+      };
+    }
+    throw e;
+  }
 }
 
 export async function getGuildRoles(discordServerId: string) {
