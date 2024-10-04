@@ -20,8 +20,15 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
       'mento-protocol/mento-web',
       'mento-protocol/reserve-site',
       'mento-protocol/mento-sdk',
+      'mento-protocol/mento-web',
       'celo-org/celo-composer',
-      'GoodDollar'
+      'valora-inc/hooks',
+      'Glo-Foundation/glo-wallet',
+      'Ubeswap/ubeswap-interface-v3',
+      'gitcoinco/grants-stack',
+      'GoodDollar',
+      'Ubeswap',
+      'hypercerts-org'
     ],
     icon: 'https://cryptologos.cc/logos/celo-celo-logo.png'
   }

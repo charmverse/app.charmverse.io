@@ -23,10 +23,12 @@ const NFTPurchaseDialog = dynamic(
 
 export function ScoutButton({
   builder,
-  isAuthenticated = true
+  isAuthenticated = true,
+  showPoints = false
 }: {
   builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
   isAuthenticated?: boolean;
+  showPoints?: boolean;
 }) {
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [authPopup, setAuthPopup] = useState<boolean>(false);
@@ -52,15 +54,21 @@ export function ScoutButton({
           variant='buy'
           data-test='scout-button'
         >
-          ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(0)} ({purchaseCostInPoints}
-          <Image
-            src='/images/profile/scout-game-blue-icon.svg'
-            alt='Scout game points'
-            width={21}
-            height={12}
-            style={{ marginLeft: 2 }}
-          />
-          )
+          ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(0)}
+          {showPoints && (
+            <>
+              {' '}
+              ({purchaseCostInPoints}
+              <Image
+                src='/images/profile/scout-game-blue-icon.svg'
+                alt='Scout game points'
+                width={21}
+                height={12}
+                style={{ marginLeft: 2 }}
+              />
+              )
+            </>
+          )}
         </LoadingButton>
         {isPurchasing && <NFTPurchaseDialog open onClose={() => setIsPurchasing(false)} builder={builder} />}
         <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} path={`/u/${builder.username}`} />

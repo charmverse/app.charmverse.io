@@ -7,14 +7,14 @@ import { v4 } from 'uuid';
 export async function generateGithubRepos(totalGithubRepos: number): Promise<[GithubRepo[], Map<number, number>]> {
   const repoPRCounters = new Map<number, number>();
 
-  await prisma.githubRepo.deleteMany({})
+  await prisma.githubRepo.deleteMany({});
 
   const githubRepoIds = Array.from({ length: totalGithubRepos }, (_, i) => i + 1);
 
   const githubRepoCreateManyInput: Prisma.GithubRepoCreateManyInput[] = [];
   const githubRepos: GithubRepo[] = [];
 
-  Array.from({length: totalGithubRepos}, (_, i) => {
+  Array.from({ length: totalGithubRepos }, (_, i) => {
     const githubRepoCreateInput = {
       id: githubRepoIds[i],
       owner: faker.word
@@ -28,16 +28,21 @@ export async function generateGithubRepos(totalGithubRepos: number): Promise<[Gi
         .join('-')
         .toLowerCase(),
       name: faker.internet.domainWord(),
+      ownerType: 'org' as const,
       defaultBranch: 'main'
-    }
+    };
 
-    githubRepoCreateManyInput.push(githubRepoCreateInput)
-    repoPRCounters.set(githubRepoIds[i], 0)
+    githubRepoCreateManyInput.push(githubRepoCreateInput);
+    repoPRCounters.set(githubRepoIds[i], 0);
     githubRepos.push({
       ...githubRepoCreateInput,
-      deletedAt: null
-    })
-  })
+      deletedAt: null,
+      ownerType: 'org',
+      handPicked: false,
+      fork: false,
+      createdAt: new Date()
+    });
+  });
 
   await prisma.githubRepo.createMany({
     data: githubRepoCreateManyInput
@@ -52,6 +57,7 @@ export async function generateGithubRepos(totalGithubRepos: number): Promise<[Gi
           data: {
             id: githubRepos.length + 1,
             owner,
+            ownerType: 'org',
             name,
             defaultBranch: 'main'
           }

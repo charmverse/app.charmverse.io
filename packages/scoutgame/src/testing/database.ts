@@ -133,32 +133,6 @@ export async function mockPointReceipt({
   });
 }
 
-export async function mockGithubRepo({
-  repoOwner = `acme-${randomLargeInt()}`,
-  repoName = `acme-repo-${randomLargeInt()}`,
-  id
-}: Partial<RepoAddress> & { id?: number }) {
-  const repo = await prisma.githubRepo.findFirst({
-    where: {
-      owner: repoOwner,
-      name: repoName
-    }
-  });
-
-  if (repo) {
-    return repo;
-  }
-
-  return prisma.githubRepo.create({
-    data: {
-      id: id ?? randomLargeInt(),
-      owner: repoOwner,
-      name: repoName,
-      defaultBranch: 'main'
-    }
-  });
-}
-
 export async function mockGithubUser({ builderId }: { builderId?: string }) {
   const id = randomLargeInt();
 
@@ -188,7 +162,7 @@ export async function mockPullRequestBuilderEvent({
 } & RepoAddress): Promise<BuilderEvent> {
   const githubUser = await prisma.githubUser.findFirstOrThrow({ where: { builderId } });
 
-  const repo = await mockGithubRepo({ repoOwner, repoName });
+  const repo = await mockRepo({ owner: repoOwner, name: repoName });
 
   const githubEvent = await prisma.githubEvent.create({
     data: {
@@ -221,6 +195,7 @@ export function mockRepo(fields: Partial<GithubRepo> & { owner?: string } = {}) 
       id: fields.id ?? randomLargeInt(),
       name: fields.name ?? 'test_repo',
       owner: fields.owner ?? 'test_owner',
+      ownerType: fields.ownerType ?? 'org',
       defaultBranch: fields.defaultBranch ?? 'main'
     }
   });

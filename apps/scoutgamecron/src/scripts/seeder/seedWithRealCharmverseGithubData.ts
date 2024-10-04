@@ -1,6 +1,5 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
-
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
 
@@ -33,8 +32,7 @@ const devUsers = {
   },
   ccarella: {
     id: 199823,
-    avatar:
-      'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43760426-bca9-406b-4afe-20138acd5f00/rectcrop3'
+    avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43760426-bca9-406b-4afe-20138acd5f00/rectcrop3'
   }
 };
 
@@ -46,8 +44,6 @@ const repoId = 444649883;
 const repoName = 'app.charmverse.io';
 
 export async function seedWithRealCharmverseGithubData() {
-
-
   // Initialize the github repo
   let githubRepo = await prisma.githubRepo.findFirst({
     where: {
@@ -62,6 +58,7 @@ export async function seedWithRealCharmverseGithubData() {
         defaultBranch: 'main',
         name: repoName,
         owner: repoOwner,
+        ownerType: 'org',
         id: repoId
       }
     });
@@ -141,7 +138,7 @@ async function seedBuilderNFTs() {
       data: {
         builderStatus: 'approved'
       }
-    })
+    });
   }
 }
 
@@ -196,7 +193,7 @@ async function clearNfts() {
 }
 
 async function script() {
-   await clearNfts()
+  await clearNfts();
   await seedWithRealCharmverseGithubData();
   await seedBuilderNFTs();
 }

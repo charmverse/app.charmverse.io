@@ -22,7 +22,7 @@ export class ProductionStack extends Stack {
     {
       sslCert,
       healthCheck = defaultHealthCheck,
-      workerTimeout = 1800, // half an hour in seconds, should be enough!
+      workerTimeout = 3600, // an hour in seconds, should be enough!
       environmentTier = 'WebServer',
       environmentType = 'LoadBalanced',
       instanceType = 't3a.small,t3.small'

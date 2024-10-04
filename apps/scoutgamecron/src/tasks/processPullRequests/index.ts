@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { GithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 import { DateTime } from 'luxon';
@@ -8,14 +9,29 @@ import { processClosedPullRequest } from './processClosedPullRequest';
 import { processMergedPullRequest } from './processMergedPullRequest';
 import { updateBuildersRank } from './updateBuildersRank';
 
+type ProcessPullRequestsOptions = {
+  createdAfter?: Date;
+  skipClosedPrProcessing?: boolean;
+  season?: string;
+  onlyProcessNewRepos?: boolean;
+};
+
 export async function processPullRequests({
   createdAfter = new Date(Date.now() - 30 * 60 * 1000),
   skipClosedPrProcessing = false,
+  onlyProcessNewRepos = false,
   season = currentSeason
-}: { createdAfter?: Date; skipClosedPrProcessing?: boolean; season?: string } = {}) {
+}: ProcessPullRequestsOptions = {}) {
   const repos = await prisma.githubRepo.findMany({
     where: {
       deletedAt: null
+      // id: {
+      //   gt: 760314802
+      // }
+    },
+    // sort the repos in case it fails, so we can resume from the next one
+    orderBy: {
+      id: 'asc'
     },
     select: {
       id: true,
@@ -26,7 +42,49 @@ export async function processPullRequests({
   });
   log.info(`Found ${repos.length} repos to check for PRs`);
 
+  for (let i = 0; i < repos.length; i += 100) {
+    const reposBatch = repos.slice(i, i + 100);
+    await processPullRequestsForRepos({
+      repos: reposBatch,
+      createdAfter,
+      skipClosedPrProcessing,
+      season,
+      onlyProcessNewRepos
+    });
+    log.debug(`Processed ${i}/${repos.length} repos, last PR id: ${reposBatch[reposBatch.length - 1].id}`);
+  }
+
+  await updateBuildersRank({ week: getCurrentWeek() });
+}
+
+async function processPullRequestsForRepos({
+  repos,
+  createdAfter,
+  skipClosedPrProcessing,
+  onlyProcessNewRepos,
+  season
+}: ProcessPullRequestsOptions & {
+  createdAfter: Date;
+  season: string;
+  repos: Pick<GithubRepo, 'id' | 'owner' | 'name' | 'defaultBranch'>[];
+}) {
   const timer = DateTime.now();
+
+  if (onlyProcessNewRepos) {
+    const existingPullRequests = await prisma.githubEvent.findMany({
+      where: {
+        repoId: {
+          in: repos.map((r) => r.id)
+        }
+      }
+    });
+    if (existingPullRequests.length) {
+      log.info(`Skip some repos because they have been processed before`);
+      return;
+    }
+    repos = repos.filter((r) => !existingPullRequests.some((e) => e.repoId === r.id));
+  }
+
   const pullRequests = await getPullRequests({ repos, after: createdAfter });
 
   const githubEvents = await prisma.githubEvent.findMany({
@@ -79,8 +137,6 @@ export async function processPullRequests({
       log.error(`Repo not found for pull request: ${pullRequest.repository.nameWithOwner}`);
     }
   }
-
-  await updateBuildersRank({ week: getCurrentWeek() });
 
   log.info(`Processed ${pullRequests.length} pull requests in ${timer.diff(DateTime.now(), 'minutes')} minutes`);
 }

@@ -46,7 +46,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build apps
+    name: Build Websockets
     runs-on: ubuntu-latest
     outputs:
       head_commit_message: ${{ steps.setup_variables.outputs.commit_message }}

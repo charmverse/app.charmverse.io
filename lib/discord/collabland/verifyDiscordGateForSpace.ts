@@ -8,9 +8,9 @@ type Props = {
 
 export async function verifyDiscordGateForSpace({ discordUserId, space }: Props) {
   const discordServerId = space.discordServerId;
-
   // this is a hack for now, discordServerId is used for both collab.land and import roles from discord feature
-  if (!discordServerId || !discordUserId || !space.superApiTokenId) {
+  // xpsEngineId implies that we have a discord server id for game7
+  if (!discordUserId || !discordServerId || space.xpsEngineId) {
     return {
       isVerified: false,
       hasDiscordServer: !!(discordServerId && space.superApiTokenId),
