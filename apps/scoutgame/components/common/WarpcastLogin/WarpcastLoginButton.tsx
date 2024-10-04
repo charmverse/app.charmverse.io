@@ -97,7 +97,16 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         size='large'
         onClick={signIn}
         disabled={!url}
-        sx={{ px: 4, py: 2 }}
+        sx={{
+          px: {
+            xs: 2.5,
+            md: 4
+          },
+          py: {
+            xs: 1.5,
+            md: 2
+          }
+        }}
         startIcon={<WarpcastIcon />}
         {...props}
       >

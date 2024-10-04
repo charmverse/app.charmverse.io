@@ -2,7 +2,7 @@
 
 import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import { AuthKitProvider } from '@farcaster/auth-kit';
-import { Link } from '@mui/material';
+import { Link, Typography } from '@mui/material';
 
 import { authConfig } from 'lib/farcaster/config';
 
@@ -24,7 +24,9 @@ export function WarpcastLogin() {
           trackEvent('click_dont_have_farcaster_account');
         }}
       >
-        Join Farcaster
+        <Typography fontWeight={600} color='primary'>
+          Join Farcaster
+        </Typography>
       </Link>
     </AuthKitProvider>
   );
