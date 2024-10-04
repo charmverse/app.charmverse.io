@@ -40,7 +40,7 @@ export default async function Profile({
           <meta name='fc:frame:button:1:target' content={`${process.env.DOMAIN}/u/${user.username}`} />
         </>
       )}
-      <PublicProfilePage user={user} tab={tab} />;
+      <PublicProfilePage user={user} tab={tab} />
     </>
   );
 }
