@@ -24,10 +24,10 @@ export async function processPullRequests({
 }: Options = {}) {
   const repos = await prisma.githubRepo.findMany({
     where: {
-      deletedAt: null,
-      id: {
-        gt: 208938406
-      }
+      deletedAt: null
+      // id: {
+      //   gt: 760314802
+      // }
     },
     // sort the repos in case it fails, so we can resume from the next one
     orderBy: {
