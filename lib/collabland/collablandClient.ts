@@ -123,37 +123,28 @@ export async function getDiscordUserState({
       roles: []
     };
   }
-  try {
-    await rateLimiter();
-    const res = await GET<CollablandUserResult>(
-      `${COLLABLAND_API_URL}/discord/${discordServerId}/member/${discordUserId}`,
-      null,
-      {
-        headers: getHeaders()
-      }
-    );
+  await rateLimiter();
+  const res = await GET<CollablandUserResult>(
+    `${COLLABLAND_API_URL}/discord/${discordServerId}/member/${discordUserId}`,
+    null,
+    {
+      headers: getHeaders()
+    }
+  );
 
-    const serverRoles = await getGuildRoles(discordServerId);
-    const userRoles: ExternalRole[] = [];
-    res.roles?.forEach((roleId) => {
-      const externalRole = serverRoles.find((role) => role.id === roleId);
-      if (externalRole) {
-        userRoles.push({ id: externalRole.id, name: externalRole.name });
-      }
-    });
+  const serverRoles = await getGuildRoles(discordServerId);
+  const userRoles: ExternalRole[] = [];
+  res.roles?.forEach((roleId) => {
+    const externalRole = serverRoles.find((role) => role.id === roleId);
+    if (externalRole) {
+      userRoles.push({ id: externalRole.id, name: externalRole.name });
+    }
+  });
 
-    return {
-      isVerified: !res.is_pending && !res.pending,
-      roles: userRoles || []
-    };
-  } catch (error) {
-    log.error(`Failed to verify user join conditions ${discordServerId}`, { error, apiDomain: COLLABLAND_API_URL });
-
-    return {
-      isVerified: false,
-      roles: []
-    };
-  }
+  return {
+    isVerified: !res.is_pending && !res.pending,
+    roles: userRoles || []
+  };
 }
 
 export async function getGuildRoles(discordServerId: string) {
