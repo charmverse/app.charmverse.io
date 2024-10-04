@@ -72,7 +72,7 @@ export function BuilderActivityBonusPartner({
   return activity.type === 'merged_pull_request' &&
     activity.bonusPartner &&
     bonusPartnersRecord[activity.bonusPartner] ? (
-    <Image width={20} height={20} src={bonusPartnersRecord[activity.bonusPartner].icon} alt='Bonus Partner' />
+    <Image width={20} height={20} src={bonusPartnersRecord[activity.bonusPartner].icon} alt='' />
   ) : showEmpty ? (
     '-'
   ) : null;

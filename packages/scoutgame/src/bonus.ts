@@ -2,17 +2,17 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
   optimism: {
     name: 'Optimism',
     repos: ['optimism-labs/optimism'],
-    icon: 'https://cryptologos.cc/logos/optimism-ethereum-op-logo.png'
+    icon: '/images/crypto/op64.png'
   },
   polygon: {
     name: 'Polygon',
     repos: ['polygon-edge/polygon-edge'],
-    icon: 'https://cryptologos.cc/logos/polygon-matic-logo.png'
+    icon: '/images/crypto/polygon_logo.png'
   },
   charmverse: {
     name: 'Charmverse',
     repos: ['charmverse/test-repo'],
-    icon: 'https://app.charmverse.io/images/logo_black_lightgrey.png'
+    icon: '/images/logos/charmverse_logo.png'
   },
   celo: {
     name: 'Celo',
@@ -30,12 +30,12 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
       'Ubeswap',
       'hypercerts-org'
     ],
-    icon: 'https://cryptologos.cc/logos/celo-celo-logo.png'
+    icon: '/images/crypto/celo_logo.png'
   },
   game7: {
     name: 'Game7',
     repos: ['G7DAO/protocol', 'G7DAO/safes', 'G7DAO/seer', 'PermissionlessGames/degen-casino'],
-    icon: 'https://cryptologos.cc/logos/celo-celo-logo.png'
+    icon: '/images/logos/game7_logo.svg'
   }
 };
 
