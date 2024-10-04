@@ -99,7 +99,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const [paymentMethod, setPaymentMethod] = useState<'points' | 'wallet'>('wallet');
 
-  const [balances, setBalances] = useState<{ usdc: bigint; eth: bigint; chainId: number } | null>(null);
+  const [balances, setBalances] = useState<{ usdc: bigint; eth: bigint; chainId: number; address: string } | null>(
+    null
+  );
 
   // Data from onchain
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
@@ -184,7 +186,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     const newBalances = {
       usdc: usdcBalance,
       eth: ethBalance,
-      chainId: _chainId
+      chainId: _chainId,
+      address: address as `0x${string}`
     };
 
     setBalances(newBalances);
@@ -198,7 +201,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         log.error('Error refreshing balance', { error: err });
       });
     }
-  }, [selectedPaymentOption]);
+  }, [selectedPaymentOption, address]);
 
   const { sendTransaction } = useSendTransaction();
 
@@ -369,7 +372,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   }, [decentSdkError]);
 
   const displayedBalance =
-    balances?.chainId !== selectedPaymentOption.chainId
+    balances?.chainId !== selectedPaymentOption.chainId || balances.address !== address
       ? undefined
       : selectedPaymentOption.currency === 'ETH'
       ? (Number(balances?.eth || 0) / 1e18).toFixed(4)
