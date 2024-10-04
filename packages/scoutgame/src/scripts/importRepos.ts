@@ -3,10 +3,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 import fs from 'fs';
 
 // read list of repos from repos.txt in your CWD
-const repos = fs
-  .readFileSync(process.cwd() + '/repos.txt', 'utf8')
-  .split('\n')
-  .map((repo) => repo.trim());
+// const repos = fs
+//   .readFileSync(process.cwd() + '/repos.txt', 'utf8')
+//   .split('\n')
+//   .map((repo) => repo.trim());
+
+const repos = ['Ubeswap/ubeswap-interface-v3', 'valora-inc/hooks'];
 
 async function importRepos() {
   let added = 0;
@@ -25,6 +27,9 @@ async function importRepos() {
         create: {
           id: data.id,
           owner,
+          ownerType: data.owner.type === 'Organization' ? 'org' : 'user',
+          fork: data.fork,
+          handPicked: true,
           name,
           defaultBranch: data.default_branch
         },

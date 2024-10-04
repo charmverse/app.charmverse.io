@@ -2,6 +2,8 @@ import { Paper, Stack, Typography } from '@mui/material';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import { getRelativeTime } from '@packages/utils/dates';
 import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 import { BiLike } from 'react-icons/bi';
 import { LuBookMarked } from 'react-icons/lu';
 
@@ -21,22 +23,22 @@ export function getActivityLabel(activity: BuilderActivity) {
 }
 
 export function BuilderActivityLabel({ activity }: { activity: BuilderActivity }) {
-  return <Typography>{getActivityLabel(activity)}</Typography>;
+  return <Typography component='span'>{getActivityLabel(activity)}</Typography>;
 }
 
 export function BuilderActivityDetail({ activity }: { activity: BuilderActivity }) {
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='center'>
+    <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'merged_pull_request' ? (
         <LuBookMarked size='15px' />
       ) : activity.type === 'nft_purchase' ? (
         <BiLike size='15px' />
       ) : null}
-      {activity.type === 'nft_purchase'
-        ? activity.scout
-        : activity.type === 'merged_pull_request'
-        ? activity.repo
-        : null}
+      {activity.type === 'nft_purchase' ? (
+        <Link href={`/u/${activity.scout}`}>{activity.scout}</Link>
+      ) : activity.type === 'merged_pull_request' ? (
+        <Link href={activity.url}>{activity.repo}</Link>
+      ) : null}
     </Stack>
   );
 }
@@ -49,10 +51,10 @@ export function BuilderActivityGems({
   showEmpty?: boolean;
 }) {
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='center'>
+    <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'merged_pull_request' ? (
         <>
-          <Typography>+{activity.gems}</Typography>
+          <Typography component='span'>+{activity.gems}</Typography>
           <GemsIcon />
         </>
       ) : showEmpty ? (

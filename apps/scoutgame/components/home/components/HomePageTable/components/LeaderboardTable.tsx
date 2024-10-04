@@ -65,7 +65,7 @@ export function LeaderboardTable({ data, userId }: { data: LeaderBoardRow[]; use
                   alignItems='center'
                   flexDirection='row'
                   gap={1}
-                  sx={{ maxWidth: { xs: '120px', md: '200px' } }}
+                  maxWidth={{ xs: '120px', md: '200px' }}
                 >
                   <Avatar src={row.avatar} name={row.username} size='small' />
                   <TableCellText noWrap>{row.username}</TableCellText>

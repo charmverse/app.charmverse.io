@@ -47,13 +47,11 @@ describe('processMergedPullRequest', () => {
       scoutId: scout.id
     });
 
-    const repo = await prisma.githubRepo.create({
-      data: {
-        id: repoId,
-        owner: username,
-        name: 'Test-Repo',
-        defaultBranch: 'main'
-      }
+    const repo = await mockRepo({
+      id: repoId,
+      owner: username,
+      name: 'Test-Repo',
+      defaultBranch: 'main'
     });
 
     const pullRequest = mockPullRequest({

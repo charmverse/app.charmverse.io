@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
-import { NotificationRequest } from 'components/common/NotificationRequest';
 import { AppProviders } from 'components/layout/AppProviders';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 import 'theme/styles.scss';
@@ -73,7 +72,7 @@ export default async function RootLayout({
       <body>
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script strategy='beforeInteractive' src='/__ENV.js' />
-        <AppProviders>
+        <AppProviders user={user}>
           <ClientGlobals userId={user?.id} />
           {/* {user?.id && <NotificationRequest vapidPublicKey={vapidPublicKey} />} */}
           {children}

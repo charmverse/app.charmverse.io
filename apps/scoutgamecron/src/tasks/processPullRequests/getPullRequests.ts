@@ -103,8 +103,10 @@ export async function getPullRequests({ repos, after }: { repos: RepoInput[]; af
     });
     // ignore PRs that are not on the default branch
     pullRequests.push(...repoPullRequests.filter((pr) => pr.baseRefName === repo.defaultBranch));
-    if (repos.indexOf(repo) % 100 === 0) {
-      log.debug(`Retrieved Prs from ${repos.indexOf(repo)}/${repos.length} repos`);
+    if (repos.length > 100) {
+      if (repos.indexOf(repo) % 100 === 0) {
+        log.debug(`Retrieved Prs from ${repos.indexOf(repo) + 1}/${repos.length} repos`);
+      }
     }
   }
   return pullRequests;

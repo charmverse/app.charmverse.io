@@ -62,9 +62,10 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
                   alignItems='center'
                   flexDirection='row'
                   gap={1}
+                  maxWidth={{ xs: '120px', md: 'initial' }}
                 >
                   <Avatar src={activity.avatar} name={activity.username} size='small' />
-                  <TableCellText maxWidth={{ xs: '100px', md: '100%' }}>{activity.username}</TableCellText>
+                  <TableCellText noWrap>{activity.username}</TableCellText>
                 </Stack>
               </TableCell>
               <TableCell>

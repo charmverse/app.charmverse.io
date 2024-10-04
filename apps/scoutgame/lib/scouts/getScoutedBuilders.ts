@@ -14,7 +14,6 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       scoutId
     },
     select: {
-      tokensPurchased: true,
       builderNFT: {
         select: {
           builderId: true
