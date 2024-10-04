@@ -41,7 +41,6 @@ type GetRecentClosedOrMergedPRsResponse = {
       pageInfo: PageInfo;
     };
   };
-  headers: Record<string, string>;
 };
 
 const getRecentPrs = `

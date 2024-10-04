@@ -9,7 +9,7 @@ import { processClosedPullRequest } from './processClosedPullRequest';
 import { processMergedPullRequest } from './processMergedPullRequest';
 import { updateBuildersRank } from './updateBuildersRank';
 
-type Options = {
+type ProcessPullRequestsOptions = {
   createdAfter?: Date;
   skipClosedPrProcessing?: boolean;
   season?: string;
@@ -21,7 +21,7 @@ export async function processPullRequests({
   skipClosedPrProcessing = false,
   onlyProcessNewRepos = false,
   season = currentSeason
-}: Options = {}) {
+}: ProcessPullRequestsOptions = {}) {
   const repos = await prisma.githubRepo.findMany({
     where: {
       deletedAt: null
@@ -51,7 +51,7 @@ export async function processPullRequests({
       season,
       onlyProcessNewRepos
     });
-    log.debug(`Processed ${i}/${repos.length} repos, last Id: ${reposBatch[reposBatch.length - 1].id}`);
+    log.debug(`Processed ${i}/${repos.length} repos, last PR id: ${reposBatch[reposBatch.length - 1].id}`);
   }
 
   await updateBuildersRank({ week: getCurrentWeek() });
@@ -63,7 +63,7 @@ async function processPullRequestsForRepos({
   skipClosedPrProcessing,
   onlyProcessNewRepos,
   season
-}: Options & {
+}: ProcessPullRequestsOptions & {
   createdAfter: Date;
   season: string;
   repos: Pick<GithubRepo, 'id' | 'owner' | 'name' | 'defaultBranch'>[];
