@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { WebhookMessageProcessResult } from '@root/lib/collabland/webhook/interfaces';
+import type { SynapsEventData } from '@root/lib/kyc/synaps/interfaces';
 
-import type { SynapsEventData } from '../interfaces';
+import type { WebhookMessageProcessResult } from '../../processCollablandWebhookMessages/webhook/interfaces';
 
 export async function processWebhookMessage(payload: {
   body: SynapsEventData;

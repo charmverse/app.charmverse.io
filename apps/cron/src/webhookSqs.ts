@@ -2,7 +2,8 @@ import type { SQSClientConfig } from '@aws-sdk/client-sqs';
 import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 import { getLogger } from '@charmverse/core/log';
 import { AWS_REGION } from '@root/lib/aws/config';
-import type { WebhookMessageProcessResult } from '@root/lib/collabland/webhook/interfaces';
+
+import type { WebhookMessageProcessResult } from './tasks/processCollablandWebhookMessages/webhook/interfaces';
 
 const log = getLogger('sqs');
 
@@ -99,5 +100,5 @@ export async function processMessages<MessageBody>({ processorFn, queueUrl }: Pr
   }
 
   // process next message
-  processMessages({ processorFn, queueUrl });
+  await processMessages({ processorFn, queueUrl });
 }

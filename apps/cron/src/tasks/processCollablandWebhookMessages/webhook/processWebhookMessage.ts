@@ -1,18 +1,20 @@
+import { log } from '@charmverse/core/log';
 import { assignRolesCollabland } from '@root/lib/collabland/assignRolesCollabland';
 import { disconnectSpace } from '@root/lib/collabland/disconnectSpace';
-import type {
-  MemberUpdateWebhookMessageData,
-  MessageType,
-  UninstallWebhookMessageData,
-  WebhookMessage,
-  WebhookMessageProcessResult
-} from '@root/lib/collabland/webhook/interfaces';
 import { getSpacesFromDiscord } from '@root/lib/discord/getSpaceFromDiscord';
 import { removeSpaceMemberDiscord } from '@root/lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from '@root/lib/discord/unassignRolesDiscord';
 import { getRequestApiKey } from '@root/lib/middleware/getRequestApiKey';
 import { verifyApiKeyForSpace } from '@root/lib/middleware/verifyApiKeyForSpace';
 import { isTruthy } from '@root/lib/utils/types';
+
+import type {
+  MemberUpdateWebhookMessageData,
+  MessageType,
+  UninstallWebhookMessageData,
+  WebhookMessage,
+  WebhookMessageProcessResult
+} from './interfaces';
 
 const messageHandlers: Record<MessageType, (message: WebhookMessage<any>) => Promise<WebhookMessageProcessResult>> = {
   guildMemberUpdate: async (message: WebhookMessage<MemberUpdateWebhookMessageData>) => {
@@ -125,13 +127,15 @@ export async function processWebhookMessage(message: WebhookMessage): Promise<We
   }
 
   const handler = messageHandlers[data?.event];
-  const hasPermission = await verifyWebhookMessagePermission(message);
-  if (!hasPermission) {
-    return {
-      success: true,
-      message: 'Webhook message without permission to be parsed.'
-    };
-  }
+  log.debug('Processing webhook message from Collabland', { message, event: data?.event, payload: data?.payload });
+  // API Tokens are not required for Collab.Land
+  // const hasPermission = await verifyWebhookMessagePermission(message);
+  // if (!hasPermission) {
+  //   return {
+  //     success: true,
+  //     message: 'Webhook message from Collab.Land without permission to be parsed.'
+  //   };
+  // }
 
   return handler(message);
 }
