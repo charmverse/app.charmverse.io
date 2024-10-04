@@ -12,7 +12,7 @@ import {
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason } from '@packages/scoutgame/dates';
 
-import { mintNFT } from './mintNFT';
+import { mintNFT, recordNftMint } from './mintNFT';
 import { convertCostToPoints } from './utils';
 
 export async function handlePendingTransaction({
@@ -61,30 +61,17 @@ export async function handlePendingTransaction({
         tokenId: Number(pendingTx.tokenId)
       }
     });
-
-    if (pendingTx.destinationChainId === pendingTx.sourceChainId) {
-      const receipt = await getPublicClient(pendingTx.destinationChainId).waitForTransactionReceipt({
-        hash: pendingTx.sourceChainTxHash as `0x${string}`
-      });
-
-      await prisma.pendingNftTransaction.update({
-        where: {
-          id: pendingTransactionId
-        },
-        data: {
-          status: TransactionStatus.completed,
-          destinationChainTxHash: pendingTx.sourceChainTxHash.toLowerCase()
-        }
-      });
-
-      return;
-    }
-
-    // Wait for transaction settlement without updating status
-    const txHash = await waitForDecentTransactionSettlement({
-      sourceTxHash: pendingTx.sourceChainTxHash.toLowerCase(),
-      sourceTxHashChainId: pendingTx.sourceChainId
-    });
+    const txHash =
+      pendingTx.destinationChainId === pendingTx.sourceChainId
+        ? await getPublicClient(pendingTx.destinationChainId)
+            .waitForTransactionReceipt({
+              hash: pendingTx.sourceChainTxHash as `0x${string}`
+            })
+            .then((_tx) => _tx.transactionHash)
+        : await waitForDecentTransactionSettlement({
+            sourceTxHash: pendingTx.sourceChainTxHash.toLowerCase(),
+            sourceTxHashChainId: pendingTx.sourceChainId
+          });
 
     // Update the pending transaction status to 'completed' and set destination details
     await prisma.pendingNftTransaction.update({
@@ -93,9 +80,18 @@ export async function handlePendingTransaction({
       },
       data: {
         status: TransactionStatus.completed,
-        destinationChainId: pendingTx.destinationChainId,
         destinationChainTxHash: txHash.toLowerCase()
       }
+    });
+
+    await recordNftMint({
+      amount: pendingTx.tokenAmount,
+      builderNftId: builderNft.id,
+      mintTxHash: txHash,
+      paidWithPoints: false,
+      pointsValue: convertCostToPoints(pendingTx.targetAmountReceived),
+      recipientAddress: pendingTx.senderAddress,
+      scoutId: pendingTx.userId
     });
   } catch (error) {
     if (error instanceof DecentTxFailedPermanently) {

@@ -35,6 +35,24 @@ export async function mintNFT(params: MintNFTParams) {
     }
   });
 
+  await recordNftMint({ ...params, mintTxHash: txResult.transactionHash });
+}
+
+export async function recordNftMint({
+  amount,
+  builderNftId,
+  paidWithPoints,
+  pointsValue,
+  recipientAddress,
+  scoutId,
+  mintTxHash
+}: MintNFTParams & { mintTxHash: string }) {
+  const builderNft = await prisma.builderNft.findFirstOrThrow({
+    where: {
+      id: builderNftId
+    }
+  });
+
   // The builder receives 20% of the points value, regardless of whether the purchase was paid with points or not
   const pointsReceipts: { value: number; recipientId?: string; senderId?: string }[] = [
     {
@@ -66,7 +84,7 @@ export async function mintNFT(params: MintNFTParams) {
             pointsValue,
             tokensPurchased: amount,
             paidInPoints: paidWithPoints,
-            txHash: txResult.transactionHash.toLowerCase(),
+            txHash: mintTxHash?.toLowerCase(),
             builderNftId,
             scoutId,
             activities: {
