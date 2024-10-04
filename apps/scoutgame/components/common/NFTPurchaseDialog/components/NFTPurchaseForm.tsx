@@ -139,7 +139,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const {
     isExecuting: isSavingDecentTransaction,
     hasSucceeded: savedDecentTransaction,
-    executeAsync
+    executeAsync: saveDecentTransaction
   } = useAction(saveDecentTransactionAction, {
     async onSuccess(res) {
       if (res.data?.id) {
@@ -278,12 +278,18 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     srcChainId: selectedPaymentOption.chainId,
     dstChainId: ChainId.OPTIMISM,
     slippage: 1,
-    actionType: ActionType.SwapAction,
+    actionType: ActionType.NftMint,
     // @ts-ignore
     actionConfig: {
-      amount: purchaseCost,
-      swapDirection: SwapDirection.EXACT_AMOUNT_OUT,
-      receiverAddress: treasuryAddress as string
+      chainId: ChainId.OPTIMISM,
+      contractAddress: getBuilderContractAddress(),
+      cost: {
+        amount: purchaseCost,
+        isNative: false,
+        tokenAddress: optimismUsdcContractAddress
+      },
+      signature: 'function mint(address account, uint256 tokenId, uint256 amount, string scout)',
+      args: [address, BigInt(builderTokenId), BigInt(tokensToBuy), user?.id]
     }
   };
 
@@ -324,7 +330,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         },
         {
           onSuccess: async (data) => {
-            await executeAsync({
+            await saveDecentTransaction({
               user: {
                 walletAddress: address as `0x${string}`
               },

@@ -67,16 +67,6 @@ export async function handlePendingTransaction({
         hash: pendingTx.sourceChainTxHash as `0x${string}`
       });
 
-      // Proceed with minting
-      await mintNFT({
-        builderNftId: builderNft.id,
-        recipientAddress: pendingTx.senderAddress,
-        amount: pendingTx.tokenAmount,
-        scoutId: pendingTx.userId,
-        paidWithPoints: false,
-        pointsValue: convertCostToPoints(pendingTx.targetAmountReceived)
-      });
-
       await prisma.pendingNftTransaction.update({
         where: {
           id: pendingTransactionId
@@ -94,16 +84,6 @@ export async function handlePendingTransaction({
     const txHash = await waitForDecentTransactionSettlement({
       sourceTxHash: pendingTx.sourceChainTxHash.toLowerCase(),
       sourceTxHashChainId: pendingTx.sourceChainId
-    });
-
-    // Proceed with minting
-    await mintNFT({
-      builderNftId: builderNft.id,
-      recipientAddress: pendingTx.senderAddress,
-      amount: pendingTx.tokenAmount,
-      scoutId: pendingTx.userId,
-      paidWithPoints: false,
-      pointsValue: convertCostToPoints(pendingTx.targetAmountReceived)
     });
 
     // Update the pending transaction status to 'completed' and set destination details
