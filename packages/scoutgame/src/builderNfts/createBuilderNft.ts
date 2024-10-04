@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason } from '../dates';
 
-import { uploadArtwork } from './artwork/uploadArtwork';
+import { uploadArtwork, uploadArtworkCongrats } from './artwork/uploadArtwork';
 import { uploadMetadata } from './artwork/uploadMetadata';
 import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
 import { getBuilderContractAddress, builderNftChain } from './constants';
@@ -29,6 +29,12 @@ export async function createBuilderNft({
     tokenId
   });
 
+  const congratsImageUrl = await uploadArtworkCongrats({
+    season: currentSeason,
+    tokenId,
+    userImage: fileUrl
+  });
+
   await uploadMetadata({
     season: currentSeason,
     tokenId,
@@ -43,7 +49,8 @@ export async function createBuilderNft({
       tokenId: Number(tokenId),
       season: currentSeason,
       currentPrice,
-      imageUrl: fileUrl
+      imageUrl: fileUrl,
+      congratsImageUrl
     }
   });
 

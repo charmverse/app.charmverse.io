@@ -12,4 +12,8 @@ export function getNftFilePath({
   return `seasons/${season}/${prefix}/${tokenId}/${type}`;
 }
 
+export function getNftCongratsFilePath({ season, tokenId }: { season: string; tokenId: number }) {
+  return `seasons/${season}/nft-congrats/${tokenId}/congrats.png`;
+}
+
 export const imageDomain = 'https://nft.scoutgame.xyz';
