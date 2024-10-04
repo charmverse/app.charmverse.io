@@ -69,7 +69,7 @@ export async function approveBuilder({
         pullRequest: {
           ...pullRequest,
           createdAt: new Date(pullRequest.createdAt).toDateString(),
-          number: pullRequest.pullRequestNumber,
+          number: pullRequest.pullRequestNumber!,
           author: {
             id: githubUser.id,
             login: githubUser.login
