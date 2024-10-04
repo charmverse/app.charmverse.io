@@ -1,8 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { SQS_WEBHOOK_MAILGUN_QUEUE_NAME } from '@root/lib/mailer/mailgunClient';
-import { processWebhookMessage } from '@root/lib/mailer/webhook/processWebhookMessage';
 
 import { processMessages } from '../../webhookSqs';
+
+import { processWebhookMessage } from './webhook/processWebhookMessage';
 
 log.info('Mailgun Queue url:', SQS_WEBHOOK_MAILGUN_QUEUE_NAME);
 const queueUrl = SQS_WEBHOOK_MAILGUN_QUEUE_NAME || '';
