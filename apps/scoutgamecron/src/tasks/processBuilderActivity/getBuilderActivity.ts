@@ -2,6 +2,22 @@ import { log } from '@charmverse/core/log';
 
 import { octokit } from './octokit';
 
+export async function getBuilderActivity({ login, after }: { login: string; after: Date }) {
+  const commits = await getCommits({
+    login,
+    after
+  });
+
+  const pullRequests = await getPullRequests({
+    login,
+    after
+  });
+
+  return { pullRequests, commits };
+}
+
+export type Commit = Awaited<ReturnType<typeof getCommits>>[number];
+
 export type PullRequest = {
   author: {
     id: number;
@@ -74,21 +90,7 @@ const prSearchQuery = `
   }
 `;
 
-export async function getBuilderActivity({ login, after }: { login: string; after: Date }) {
-  const commits = await getRecentCommits({
-    login,
-    after
-  });
-
-  const pullRequests = await getPullRequests({
-    login,
-    after
-  });
-
-  return { pullRequests, commits };
-}
-
-async function getRecentCommits({ login, after }: { login: string; after: Date }): Promise<any[]> {
+async function getCommits({ login, after }: { login: string; after: Date }) {
   const query = `author:${login} committer-date:>=${after.toISOString()}`;
 
   const response = await octokit.paginate('GET /search/commits', {
@@ -99,6 +101,7 @@ async function getRecentCommits({ login, after }: { login: string; after: Date }
   });
   return response;
 }
+
 async function getPullRequests({ login, after }: { login: string; after: Date }): Promise<any[]> {
   const queryString = `is:pr author:${login} closed:>=${after.toISOString()}`;
   let allItems: PullRequest[] = [];

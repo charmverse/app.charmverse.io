@@ -11,7 +11,7 @@ type ProcessPullRequestsOptions = {
   season?: string;
 };
 
-export async function processRecentBuilderActivity({
+export async function processAllBuilderActivity({
   createdAfter = new Date(Date.now() - 30 * 60 * 1000),
   season = currentSeason
 }: ProcessPullRequestsOptions = {}) {
@@ -24,6 +24,7 @@ export async function processRecentBuilderActivity({
         }
       }
     },
+    // sort by id so that we can start mid-way if we need to
     orderBy: {
       id: 'asc'
     },
@@ -38,7 +39,7 @@ export async function processRecentBuilderActivity({
     }
   });
 
-  log.info(`Found ${builders.length} builders to check for PRs`);
+  log.info(`Processing activity for ${builders.length} builders`);
 
   for (const builder of builders) {
     await processBuilderActivity({
@@ -48,7 +49,8 @@ export async function processRecentBuilderActivity({
       season
     });
     if (builders.indexOf(builder) % 10 === 0) {
-      log.debug(`Processed ${builders.indexOf(builder)}/${builders.length} builders. Last Id: ${builder.id}`, {
+      log.debug(`Processed ${builders.indexOf(builder)}/${builders.length} builders.`, {
+        lastId: builder.id, // log last id in case we want to start in the middle of the process
         builders: builders
           .slice(builders.indexOf(builder), builders.indexOf(builder) + 10)
           .map((b) => b.githubUser[0].login)

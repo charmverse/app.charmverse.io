@@ -11,59 +11,48 @@ import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday, currentSeason 
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
-import type { PullRequest } from './getBuilderActivity';
-import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
+import { gemsValues } from './config';
+import type { Commit } from './getBuilderActivity';
 
 type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
-
-export type MergedPullRequestMeta = Pick<
-  PullRequest,
-  'author' | 'number' | 'title' | 'repository' | 'url' | 'createdAt' | 'mergedAt' | 'mergeCommit'
->;
-
-const gemsValues: Record<GemsReceiptType, number> = {
-  first_pr: 100,
-  third_pr_in_streak: 30,
-  regular_pr: 10,
-  daily_commit: 1
-};
 
 /**
  *
  * @isFirstMergedPullRequest Only used for the seed data generator
  */
-export async function processMergedPullRequest({
-  pullRequest,
+export async function recordCommit({
+  commit,
   repo,
   season,
-  isFirstMergedPullRequest: _isFirstMergedPullRequest,
   now = DateTime.utc()
 }: {
-  pullRequest: MergedPullRequestMeta;
+  commit: Commit;
   repo: RepoInput;
   isFirstMergedPullRequest?: boolean;
   season: string;
   now?: DateTime;
 }) {
-  if (!pullRequest.mergedAt) {
-    throw new Error('Pull request was not merged');
+  if (!commit.author || !commit.commit.author) {
+    log.warn('No commit author', commit);
+    return null;
   }
+  if (!commit.commit || !commit.commit.committer) {
+    log.warn('No committer found', commit);
+    return null;
+  }
+
   const week = getWeekFromDate(now.toJSDate());
   const { start } = getWeekStartEnd(now.toJSDate());
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
-      createdBy: pullRequest.author.id,
-      // streaks are based on created date
-      createdAt: {
-        gte: new Date(new Date(pullRequest.createdAt).getTime() - streakWindow)
-      },
-      type: 'merged_pull_request'
+      createdBy: commit.author.id,
+      type: 'commit'
     },
     select: {
       id: true,
+      commitHash: true,
       createdAt: true,
-      pullRequestNumber: true,
       repoId: true,
       createdBy: true,
       builderEvent: {
@@ -83,95 +72,47 @@ export async function processMergedPullRequest({
     }
   });
 
-  const existingGithubEvent = previousGitEvents.some(
-    (event) => event.pullRequestNumber === pullRequest.number && event.repoId === pullRequest.repository.id
-  );
+  const existingGithubEvent = previousGitEvents.some((event) => event.commitHash === commit.sha);
 
   if (existingGithubEvent) {
     // already processed
     return;
   }
 
-  // check our data to see if this is the first merged PR, and if so, check the Github API to confirm
-  const totalMergedPullRequests = await prisma.githubEvent.count({
-    where: {
-      createdBy: pullRequest.author.id,
-      repoId: pullRequest.repository.id,
-      type: 'merged_pull_request'
-    }
-  });
-
-  let isFirstMergedPullRequest = _isFirstMergedPullRequest ?? totalMergedPullRequests === 0;
-  if (isFirstMergedPullRequest) {
-    // double-check using Github API in case the previous PR was not recorded by us
-    const prs = await getRecentPullRequestsByUser({
-      defaultBranch: repo.defaultBranch,
-      repoNameWithOwner: pullRequest.repository.nameWithOwner,
-      username: pullRequest.author.login
-    });
-    if (prs.filter((pr) => pr.number !== pullRequest.number).length > 0) {
-      isFirstMergedPullRequest = false;
-    }
-  }
-
   const existingGithubEventToday = previousGitEvents.some((event) => {
-    if (event.repoId !== pullRequest.repository.id) {
-      return false;
-    }
-    return isToday(event.createdAt, DateTime.fromISO(pullRequest.createdAt, { zone: 'utc' }));
+    return isToday(event.createdAt, now);
   });
 
   await prisma.$transaction(async (tx) => {
     const githubUser = await tx.githubUser.upsert({
       where: {
-        id: pullRequest.author.id
+        id: commit.author!.id
       },
       create: {
-        id: pullRequest.author.id,
-        login: pullRequest.author.login
+        id: commit.author!.id,
+        login: commit.author!.login
       },
       update: {}
     });
 
     const event = await tx.githubEvent.create({
       data: {
-        commitHash: pullRequest.mergeCommit?.oid,
-        pullRequestNumber: pullRequest.number,
-        title: pullRequest.title,
-        type: 'merged_pull_request',
-        createdBy: pullRequest.author.id,
-        isFirstPullRequest: isFirstMergedPullRequest,
-        repoId: pullRequest.repository.id,
-        url: pullRequest.url,
-        createdAt: pullRequest.createdAt,
-        completedAt: pullRequest.mergedAt
+        commitHash: commit.sha,
+        title: commit.commit.message,
+        type: 'commit',
+        createdBy: commit.author!.id,
+        repoId: commit.repository.id,
+        url: commit.html_url,
+        createdAt: commit.commit.author.date,
+        completedAt: commit.commit.committer!.date
       }
     });
 
     if (githubUser.builderId && !existingGithubEventToday) {
-      const builder = await tx.scout.findUniqueOrThrow({
-        where: {
-          id: githubUser.builderId
-        },
-        select: {
-          builderStatus: true
-        }
-      });
-
-      if (builder.builderStatus !== 'approved') {
-        return;
-      }
-      const weeklyBuilderEvents = previousGitEvents.filter((e) => e.builderEvent).length;
-      const threeDayPrStreak = weeklyBuilderEvents % 3 === 2;
-      const gemReceiptType: GemsReceiptType = isFirstMergedPullRequest
-        ? 'first_pr'
-        : threeDayPrStreak
-        ? 'third_pr_in_streak'
-        : 'regular_pr';
+      const gemReceiptType: GemsReceiptType = 'daily_commit';
 
       // this is the date the PR was merged, which determines the season/week that it counts as a builder event
-      const pullRequestDate = new Date(pullRequest.mergedAt || 0);
-      const builderEventDate = pullRequestDate;
+      const builderEventDate = new Date(commit.committer!.date!);
       const gemValue = gemsValues[gemReceiptType];
 
       if (builderEventDate >= start.toJSDate()) {
@@ -185,13 +126,7 @@ export async function processMergedPullRequest({
         });
 
         if (!existingBuilderEvent) {
-          const activityType = (
-            gemReceiptType === 'first_pr'
-              ? 'gems_first_pr'
-              : gemReceiptType === 'third_pr_in_streak'
-              ? 'gems_third_pr_in_streak'
-              : 'gems_regular_pr'
-          ) as ScoutGameActivityType;
+          const activityType: ScoutGameActivityType = 'daily_commit';
 
           // It's a new event, we can record notification
           const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
@@ -216,9 +151,9 @@ export async function processMergedPullRequest({
               createdAt: builderEventDate,
               season,
               week,
-              type: 'merged_pull_request',
+              type: 'daily_commit',
               githubEventId: event.id,
-              bonusPartner: getBonusPartner(pullRequest.repository.nameWithOwner),
+              bonusPartner: getBonusPartner(commit.repository.full_name),
               gemsReceipt: {
                 create: {
                   type: gemReceiptType,
@@ -274,11 +209,11 @@ export async function processMergedPullRequest({
             gemsCollected
           }
         });
-        log.info('Recorded a merged PR', {
+        log.info('Recorded a commit', {
           eventId: event.id,
           userId: githubUser.builderId,
           week,
-          url: pullRequest.url,
+          url: commit.html_url,
           eventCount: thisWeekEvents.length + 1,
           gemsCollected
         });

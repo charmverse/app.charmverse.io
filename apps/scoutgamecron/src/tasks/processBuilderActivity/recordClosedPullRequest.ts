@@ -15,7 +15,7 @@ export type ClosedPullRequestMeta = Pick<
   'author' | 'number' | 'title' | 'repository' | 'url' | 'createdAt' | 'closedAt'
 >;
 
-export async function processClosedPullRequest({
+export async function recordClosedPullRequest({
   pullRequest,
   season,
   repo,

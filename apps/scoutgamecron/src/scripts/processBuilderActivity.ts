@@ -1,5 +1,5 @@
-import { processRecentBuilderActivity } from '../tasks/processRecentBuilderActivity';
-import { getBuilderActivity } from '../tasks/processRecentBuilderActivity/getBuilderActivity';
+import { processAllBuilderActivity } from '../tasks/processBuilderActivity';
+import { getBuilderActivity } from '../tasks/processBuilderActivity/getBuilderActivity';
 import { DateTime } from 'luxon';
 import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 

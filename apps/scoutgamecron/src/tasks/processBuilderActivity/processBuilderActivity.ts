@@ -3,8 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { DateTime } from 'luxon';
 
 import { getBuilderActivity } from './getBuilderActivity';
-import { processClosedPullRequest } from './processClosedPullRequest';
-import { processMergedPullRequest } from './processMergedPullRequest';
+import { recordClosedPullRequest } from './recordClosedPullRequest';
+import { recordCommit } from './recordCommit';
+import { recordMergedPullRequest } from './recordMergedPullRequest';
 
 type Props = {
   builderId: string;
@@ -44,7 +45,7 @@ export async function processBuilderActivity({
   });
 
   const newCommits = commits.filter(
-    (commit) => !githubEvents.some((e) => e.commitHash === commit.commitHash && e.repoId === commit.repository.id)
+    (commit) => !githubEvents.some((e) => e.commitHash === commit.sha && e.repoId === commit.repository.id)
   );
 
   const newPullRequests = pullRequests.filter(
@@ -58,12 +59,11 @@ export async function processBuilderActivity({
     )} minutes for ${githubUser.login}`
   );
 
-  let i = 0;
-
   for (const pullRequest of newPullRequests) {
-    i += 1;
     log.debug(
-      `Processing PR ${i}/${newPullRequests.length} -- ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`
+      `Processing PR ${pullRequests.indexOf(pullRequest)}/${newPullRequests.length} -- ${
+        pullRequest.repository.nameWithOwner
+      }/${pullRequest.number}`
     );
     const repo = await prisma.githubRepo.findFirst({
       where: {
@@ -75,16 +75,24 @@ export async function processBuilderActivity({
       try {
         if (pullRequest.state === 'CLOSED') {
           if (!skipClosedPrProcessing) {
-            await processClosedPullRequest({ pullRequest, repo, season });
+            await recordClosedPullRequest({ pullRequest, repo, season });
           }
         } else {
-          await processMergedPullRequest({ pullRequest, repo, season });
+          await recordMergedPullRequest({ pullRequest, repo, season });
         }
       } catch (error) {
         log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, { error });
       }
     } else {
       log.error(`Repo not found for pull request: ${pullRequest.repository.nameWithOwner}`);
+    }
+  }
+
+  for (const commit of newCommits) {
+    try {
+      await recordCommit({ commit });
+    } catch (error) {
+      log.error(`Error processing commit ${commit.sha}`, { error });
     }
   }
 
