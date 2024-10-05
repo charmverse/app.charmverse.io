@@ -25,6 +25,7 @@ export function mockPullRequest(
     mergedAt: state === 'MERGED' ? new Date().toISOString() : undefined,
     createdAt: new Date().toISOString(),
     repository: {
+      databaseId: fields.repo?.id ?? randomLargeInt(),
       id: fields.repo?.id ?? randomLargeInt(),
       name,
       owner: {

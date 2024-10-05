@@ -75,6 +75,7 @@ export async function approveBuilder({
             login: githubUser.login
           },
           repository: {
+            databaseId: pullRequest.repo.id,
             id: pullRequest.repo.id,
             name: pullRequest.repo.name,
             owner: { login: pullRequest.repo.owner },
