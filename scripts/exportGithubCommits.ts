@@ -3,6 +3,37 @@ import { syncProposalPermissionsWithWorkflowPermissions } from '@root/lib/propos
 import { prettyPrint } from 'lib/utils/strings';
 import fs from 'fs';
 import path from 'path';
+import { DateTime } from 'luxon';
+import { throttling } from '@octokit/plugin-throttling';
+import { Octokit } from '@octokit/rest';
+
+Octokit.plugin(throttling);
+
+const octokit = new Octokit({
+  auth: process.env.GITHUB_ACCESS_TOKEN,
+  throttle: {
+    // @ts-ignore
+    onRateLimit: (retryAfter, options, _octokit, retryCount) => {
+      console.log(`[Octokit] Request quota exhausted for request ${options.method} ${options.url}`);
+
+      console.log(`[Octokit] Retrying after ${retryAfter} seconds!`);
+      return true;
+      // if (retryCount < 2) {
+      //   // only retries twice
+      //   return true;
+      // }
+    },
+    // @ts-ignore
+    onSecondaryRateLimit: (retryAfter, options, _octokit) => {
+      // does not retry, only logs a warning
+      console.log(
+        `[Octokit] SecondaryRateLimit detected for request ${options.method} ${options.url}. Retrying after ${retryAfter} seconds!`
+      );
+      // try again
+      return true;
+    }
+  }
+});
 
 // create a file with headers for the columns
 
@@ -20,121 +51,95 @@ const appendToFile = (data: string) => {
 // filter githubLogins that have already been processed
 const processedLogins = fs.readFileSync(filePath, 'utf8').split('\n');
 
+const getCommitCountsAndRepos = async (username: string, since: string) => {
+  const response = await octokit.search.commits({
+    q: `author:${username} author-date:>${since}`,
+    per_page: 100
+  });
+  if (response.headers['x-ratelimit-remaining'] === '2' && response.headers['x-ratelimit-reset']) {
+    const rateLimitReset = new Date(parseInt(response.headers['x-ratelimit-reset']) * 1000);
+    // wait until rate limit reset
+    const timeUntilReset = rateLimitReset.getTime() - Date.now();
+    console.log(`Waiting for rate limit reset: ${timeUntilReset}ms`);
+    await new Promise((resolve) => setTimeout(resolve, timeUntilReset + 2000));
+  }
+
+  const repos = new Set<string>();
+  response.data.items.forEach((item: any) => {
+    repos.add(item.repository.full_name);
+  });
+
+  return {
+    items: response.data.items,
+    commitCount: response.data.total_count,
+    repos: Array.from(repos)
+  };
+};
+
 async function query() {
-  // create repo
-  // const repo = await prisma.githubRepo.create({
-  //   data: {
-  //     id: 860028062,
-  //     name: 'test-repo',
-  //     owner: 'charmverse',
-  //     defaultBranch: 'main'
-  //   }
-  // });
-  // console.log(repo);
-
-  // create scout
-  // const scout = await prisma.scout.create({
-  //   data: {
-  //     username: 'mattbot',
-  //     displayName: 'Mattbot',
-  //     builder: true
-  //   }
-  // });
-  // await prisma.githubUser.update({
-  //   where: {
-  //     login: 'mattcasey'
-  //   },
-  //   data: {
-  //     builderId: scout.id
-  //   }
-  // });
-  // console.log(scout);
-
-  // update scout instead
-  // await prisma.scout.update({
-  //   where: {
-  //     username: 'mattbot'
-  //   },
-  //   data: {
-  //     builder: true
-  //   }
-  // });
-
-  // console.log(await prisma.githubRepo.findMany());
-  // console.log(await prisma.githubUser.findMany());
-  // console.log(await prisma.githubEvent.findMany());
-  const waitlists = await prisma.connectWaitlistSlot.findMany({
+  const builders = await prisma.scout.findMany({
     where: {
-      githubLogin: {
-        not: null
+      builderStatus: 'approved',
+      githubUser: {
+        some: {}
+      }
+    },
+    select: {
+      githubUser: {
+        select: {
+          id: true,
+          login: true
+        }
       }
     }
   });
-  const githubLogins = waitlists.map((waitlist) => waitlist.githubLogin);
-  const { Octokit } = require('@octokit/rest');
-  const octokit = new Octokit({ auth: process.env.GITHUB_ACCESS_TOKEN });
+  // get the commits for each builder since monday this week
 
-  const getCommitCountsAndRepos = async (username: string, since: string) => {
-    const response = await octokit.search.commits({
-      q: `author:${username} author-date:>${since}`,
-      per_page: 100
-    });
-    if (response.headers['x-ratelimit-remaining'] === '2' && response.headers['x-ratelimit-reset']) {
-      const rateLimitReset = new Date(parseInt(response.headers['x-ratelimit-reset']) * 1000);
-      // wait until rate limit reset
-      const timeUntilReset = rateLimitReset.getTime() - Date.now();
-      console.log(`Waiting for rate limit reset: ${timeUntilReset}ms`);
-      await new Promise((resolve) => setTimeout(resolve, timeUntilReset + 300));
+  const mondayThisWeek = '2024-09-29';
+  const results = [];
+
+  for (const builder of builders) {
+    const login = builder.githubUser[0].login;
+    if (processedLogins.includes(login)) {
+      console.log(`Skipping ${login} as it has already been processed.`);
+      continue;
     }
 
-    const repos = new Set<string>();
-    response.data.items.forEach((item: any) => {
-      repos.add(item.repository.full_name);
+    console.log(`Processing ${login}...`);
+
+    // Process commit data
+    const commitData = await getCommitCountsAndRepos(login, mondayThisWeek);
+
+    const dailyCommits: Record<string, number> = {};
+    commitData.items.forEach((commit) => {
+      const commitDate = DateTime.fromISO(commit.commit.author.date, { zone: 'utc' }).toISODate();
+      dailyCommits[commitDate] = (dailyCommits[commitDate] || 0) + 1;
     });
 
-    return {
-      commitCount: response.data.total_count,
-      repos: Array.from(repos)
-    };
-  };
+    results.push({ login, dailyCommits, totalCommits: Object.keys(dailyCommits).length }); //, totalCommits: commitCount, repos });
+    // appendToFile(`${login}\t${JSON.stringify(dailyCommits)}\t${commitCount}\t${repos.join(',')}`);
 
-  const getDateXMonthsAgo = (months: number) => {
-    const date = new Date();
-    date.setMonth(date.getMonth() - months);
-    return date.toISOString().split('T')[0];
-  };
-  const unprocessedLogins = githubLogins.filter((login) => !processedLogins.some((row) => row.includes(login!)));
-  console.log(`Processing ${unprocessedLogins.length} logins`);
-  for (const login of unprocessedLogins) {
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const weekCount = await getCommitCountsAndRepos(login!, oneWeekAgo);
-    const monthCount = await getCommitCountsAndRepos(login!, getDateXMonthsAgo(1));
-    const threeMonthCount = await getCommitCountsAndRepos(login!, getDateXMonthsAgo(3));
-
-    // Get the user's GitHub join date
-    const userResponse = await octokit.users.getByUsername({
-      username: login!
-    });
-    if (userResponse.headers['x-ratelimit-remaining'] === '2' && userResponse.headers['x-ratelimit-reset']) {
-      const rateLimitReset = new Date(parseInt(userResponse.headers['x-ratelimit-reset']) * 1000);
-      const timeUntilReset = rateLimitReset.getTime() - Date.now();
-      console.log(`Waiting for profile rate limit reset: ${timeUntilReset}ms`);
-      await new Promise((resolve) => setTimeout(resolve, timeUntilReset + 300));
-    }
-    const joinDate = userResponse.data.created_at;
-
-    // Format the join date as YYYY-MM-DD
-    const formattedJoinDate = new Date(joinDate).toISOString().split('T')[0];
-
-    const logEntry = `${login}\t${formattedJoinDate}\t${weekCount.commitCount}\t${monthCount.commitCount}\t${
-      threeMonthCount.commitCount
-    }\t${threeMonthCount.repos.join(',')}`;
-    appendToFile(logEntry);
-    if (githubLogins.indexOf(login) % 10 === 0) {
-      console.log(`Processed ${githubLogins.indexOf(login)}/${githubLogins.length} logins`);
+    console.log(
+      `Processed ${login}. Total commits: ${commitData.items.length} // Total gems: ${Object.keys(dailyCommits).length}`
+    );
+    if (builders.indexOf(builder) % 20 === 0) {
+      console.log(
+        'Processed',
+        builders.indexOf(builder),
+        'builders. Builders with commits so far:',
+        results.filter((r) => r.totalCommits > 0).length
+      );
     }
   }
-  console.log('done!');
+  console.log(
+    'Results:',
+    results.sort((a, b) => b.totalCommits - a.totalCommits).filter((a) => a.totalCommits > 0)
+  );
+  console.log('builders with commits', results.filter((r) => r.totalCommits > 0).length);
+  // for (const builder of builders) {
+  //   const { commitCount, repos } = await getCommitCountsAndRepos(builder.githubUser[0].login, '2024-09-29');
+  // }
+  // console.log('done!');
 }
 
 query();
