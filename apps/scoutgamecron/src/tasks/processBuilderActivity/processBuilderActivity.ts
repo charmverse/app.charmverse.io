@@ -90,7 +90,7 @@ export async function processBuilderActivity({
 
   for (const commit of newCommits) {
     try {
-      await recordCommit({ commit });
+      await recordCommit({ commit, season });
     } catch (error) {
       log.error(`Error processing commit ${commit.sha}`, { error });
     }

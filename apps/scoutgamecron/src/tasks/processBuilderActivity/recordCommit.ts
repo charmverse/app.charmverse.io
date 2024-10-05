@@ -1,20 +1,13 @@
 import { log } from '@charmverse/core/log';
-import type {
-  ActivityRecipientType,
-  GemsReceiptType,
-  GithubRepo,
-  ScoutGameActivityType
-} from '@charmverse/core/prisma-client';
+import type { ActivityRecipientType, GemsReceiptType, ScoutGameActivityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getBonusPartner } from '@packages/scoutgame/bonus';
-import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday, currentSeason } from '@packages/scoutgame/dates';
+import { getWeekFromDate, getWeekStartEnd, isToday, currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
 import { gemsValues } from './config';
 import type { Commit } from './getBuilderActivity';
-
-type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
 
 /**
  *
@@ -22,12 +15,10 @@ type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
  */
 export async function recordCommit({
   commit,
-  repo,
   season,
   now = DateTime.utc()
 }: {
   commit: Commit;
-  repo: RepoInput;
   isFirstMergedPullRequest?: boolean;
   season: string;
   now?: DateTime;
