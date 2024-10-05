@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { ActivityRecipientType, GemsReceiptType, ScoutGameActivityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getBonusPartner } from '@packages/scoutgame/bonus';
-import { getWeekFromDate, getWeekStartEnd, isToday, currentSeason } from '@packages/scoutgame/dates';
+import { getWeekFromDate, getStartOfSeason, isToday, currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
@@ -33,7 +33,7 @@ export async function recordCommit({
   }
 
   const week = getWeekFromDate(now.toJSDate());
-  const { start } = getWeekStartEnd(now.toJSDate());
+  const start = getStartOfSeason(season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
@@ -71,7 +71,7 @@ export async function recordCommit({
   }
 
   const existingGithubEventToday = previousGitEvents.some((event) => {
-    return isToday(event.createdAt, now);
+    return isToday(event.createdAt, DateTime.fromISO(commit.commit.author.date, { zone: 'utc' }));
   });
 
   await prisma.$transaction(async (tx) => {
@@ -102,10 +102,9 @@ export async function recordCommit({
     if (githubUser.builderId && !existingGithubEventToday) {
       const gemReceiptType: GemsReceiptType = 'daily_commit';
 
-      // this is the date the PR was merged, which determines the season/week that it counts as a builder event
-      const builderEventDate = new Date(commit.committer!.date!);
+      // this is the date the commit was merged, which determines the season/week that it counts as a builder event
+      const builderEventDate = event.completedAt!;
       const gemValue = gemsValues[gemReceiptType];
-
       if (builderEventDate >= start.toJSDate()) {
         const existingBuilderEvent = await tx.builderEvent.findFirst({
           where: {
@@ -176,37 +175,12 @@ export async function recordCommit({
 
         const thisWeekEvents = previousGitEvents.filter((e) => e.createdAt >= start.toJSDate());
 
-        const gemsCollected = thisWeekEvents.reduce((acc, e) => {
-          if (e.builderEvent?.gemsReceipt?.value && e.builderEvent.createdAt < builderEventDate) {
-            return acc + e.builderEvent.gemsReceipt.value;
-          }
-          return acc;
-        }, gemValue);
-
-        await tx.userWeeklyStats.upsert({
-          where: {
-            userId_week: {
-              userId: githubUser.builderId,
-              week
-            }
-          },
-          create: {
-            userId: githubUser.builderId,
-            week,
-            season,
-            gemsCollected
-          },
-          update: {
-            gemsCollected
-          }
-        });
         log.info('Recorded a commit', {
           eventId: event.id,
           userId: githubUser.builderId,
           week,
           url: commit.html_url,
-          eventCount: thisWeekEvents.length + 1,
-          gemsCollected
+          eventCount: thisWeekEvents.length + 1
         });
       }
     }

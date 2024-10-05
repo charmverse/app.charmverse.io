@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getWeekFromDate } from '@packages/scoutgame/dates';
 import { DateTime } from 'luxon';
 
 import { getBuilderActivity } from './getBuilderActivity';
@@ -32,13 +33,9 @@ export async function processBuilderActivity({
   now = DateTime.utc()
 }: Props) {
   const timer = DateTime.now();
+  const week = getWeekFromDate(now.toJSDate());
 
   const { commits, pullRequests } = await getBuilderActivity({ login: githubUser.login, after: createdAfter });
-
-  log.info(`Processed builder activity in ${timer.diff(DateTime.now(), 'minutes')} minutes`, {
-    commits: commits.length,
-    prs: pullRequests.length
-  });
 
   const githubEvents = await prisma.githubEvent.findMany({
     where: {
@@ -57,22 +54,24 @@ export async function processBuilderActivity({
     (pr) => !githubEvents.some((e) => e.pullRequestNumber === pr.number && e.repoId === pr.repository.id)
   );
 
-  log.info(
-    `Retrieved ${commits.length} commits and ${pullRequests.length} PRs in ${timer.diff(
-      DateTime.now(),
-      'minutes'
-    )} minutes for ${githubUser.login}`
-  );
+  log.info(`Retrieved builder activity in ${timer.diff(DateTime.now(), 'minutes')} minutes`, {
+    commits: commits.length,
+    newCommits: newCommits.length,
+    prs: pullRequests.length,
+    newPrs: newPullRequests.length,
+    userId: builderId
+  });
 
+  // Loop thru new pull requests
   for (const pullRequest of newPullRequests) {
     log.debug(
-      `Processing PR ${pullRequests.indexOf(pullRequest)}/${newPullRequests.length} -- ${
+      `Processing PR ${newPullRequests.indexOf(pullRequest) + 1}/${newPullRequests.length} -- ${
         pullRequest.repository.nameWithOwner
       }/${pullRequest.number}`
     );
     const repo = await prisma.githubRepo.findFirst({
       where: {
-        owner: pullRequest.repository.owner,
+        owner: pullRequest.repository.owner.login,
         name: pullRequest.repository.name
       }
     });
@@ -93,6 +92,7 @@ export async function processBuilderActivity({
     }
   }
 
+  // Loop thru new commits
   for (const commit of newCommits) {
     try {
       await recordCommit({ commit, season });
@@ -104,5 +104,49 @@ export async function processBuilderActivity({
   log.info(`Processed builder activity in ${timer.diff(DateTime.now(), 'minutes')} minutes`, {
     commits: commits.length,
     prs: pullRequests.length
+  });
+
+  const thisWeekEvents = await prisma.builderEvent.findMany({
+    where: {
+      builderId,
+      week
+    },
+    select: {
+      gemsReceipt: {
+        select: {
+          value: true
+        }
+      }
+    }
+  });
+
+  const gemsCollected = thisWeekEvents.reduce((acc, e) => {
+    if (e.gemsReceipt?.value) {
+      return acc + e.gemsReceipt.value;
+    }
+    return acc;
+  }, 0);
+
+  await prisma.userWeeklyStats.upsert({
+    where: {
+      userId_week: {
+        userId: builderId,
+        week
+      }
+    },
+    create: {
+      userId: builderId,
+      week,
+      season,
+      gemsCollected
+    },
+    update: {
+      gemsCollected
+    }
+  });
+  log.debug(`Updated weekly stats for ${builderId}`, {
+    week,
+    events: thisWeekEvents.length,
+    gemsCollected
   });
 }

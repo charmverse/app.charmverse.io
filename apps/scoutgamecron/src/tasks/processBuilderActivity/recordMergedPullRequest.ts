@@ -7,7 +7,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getBonusPartner } from '@packages/scoutgame/bonus';
-import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday, currentSeason } from '@packages/scoutgame/dates';
+import { getWeekFromDate, getStartOfSeason, streakWindow, isToday } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
@@ -43,7 +43,7 @@ export async function recordMergedPullRequest({
     throw new Error('Pull request was not merged');
   }
   const week = getWeekFromDate(now.toJSDate());
-  const { start } = getWeekStartEnd(now.toJSDate());
+  const start = getStartOfSeason(season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
@@ -191,7 +191,7 @@ export async function recordMergedPullRequest({
           const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
             where: {
               builderNFT: {
-                season: currentSeason,
+                season,
                 builderId: githubUser.builderId
               }
             },
@@ -242,39 +242,11 @@ export async function recordMergedPullRequest({
           });
         }
 
-        const thisWeekEvents = previousGitEvents.filter((e) => e.createdAt >= start.toJSDate());
-
-        const gemsCollected = thisWeekEvents.reduce((acc, e) => {
-          if (e.builderEvent?.gemsReceipt?.value && e.builderEvent.createdAt < builderEventDate) {
-            return acc + e.builderEvent.gemsReceipt.value;
-          }
-          return acc;
-        }, gemValue);
-
-        await tx.userWeeklyStats.upsert({
-          where: {
-            userId_week: {
-              userId: githubUser.builderId,
-              week
-            }
-          },
-          create: {
-            userId: githubUser.builderId,
-            week,
-            season,
-            gemsCollected
-          },
-          update: {
-            gemsCollected
-          }
-        });
         log.info('Recorded a merged PR', {
           eventId: event.id,
           userId: githubUser.builderId,
           week,
-          url: pullRequest.url,
-          eventCount: thisWeekEvents.length + 1,
-          gemsCollected
+          url: pullRequest.url
         });
       }
     }

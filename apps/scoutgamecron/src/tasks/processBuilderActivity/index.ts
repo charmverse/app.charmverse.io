@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
+import { getCurrentWeek, currentSeason, getStartOfSeason } from '@packages/scoutgame/dates';
 
 import { processBuilderActivity } from './processBuilderActivity';
 import { updateBuildersRank } from './updateBuildersRank';
