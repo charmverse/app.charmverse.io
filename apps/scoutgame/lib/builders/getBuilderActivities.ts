@@ -37,7 +37,7 @@ export async function getBuilderActivities({
     where: {
       builderId,
       type: {
-        in: ['nft_purchase', 'merged_pull_request']
+        in: ['nft_purchase', 'merged_pull_request', 'daily_commit']
       }
     },
     orderBy: {
