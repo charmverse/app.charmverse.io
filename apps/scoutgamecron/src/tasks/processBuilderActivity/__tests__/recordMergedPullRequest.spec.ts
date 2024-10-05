@@ -99,7 +99,7 @@ describe('recordMergedPullRequest', () => {
       }
     });
 
-    expect(builderWeeklyStats.gemsCollected).toBe(10);
+    expect(builderWeeklyStats.gemsCollected).toBe(100);
 
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
@@ -187,7 +187,7 @@ describe('recordMergedPullRequest', () => {
       }
     });
 
-    expect(builderWeeklyStats.gemsCollected).toBe(1);
+    expect(builderWeeklyStats.gemsCollected).toBe(10);
 
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
@@ -288,7 +288,7 @@ describe('recordMergedPullRequest', () => {
     });
 
     // The total is 4 because the first PR is from a previous week, but the 3rd PR counts as a streak, so 3 + 1 = 4
-    expect(builderWeeklyStats.gemsCollected).toBe(4);
+    expect(builderWeeklyStats.gemsCollected).toBe(40);
 
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
