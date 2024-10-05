@@ -142,7 +142,7 @@ export async function recordCommit({
               createdAt: builderEventDate,
               season,
               week,
-              type: 'daily_commit',
+              type: 'commit',
               githubEventId: event.id,
               bonusPartner: getBonusPartner(commit.repository.full_name),
               gemsReceipt: {

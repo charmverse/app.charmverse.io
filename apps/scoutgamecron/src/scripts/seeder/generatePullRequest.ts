@@ -1,8 +1,8 @@
 import type { GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
-
-import type { PullRequest } from '../../tasks/processRecentBuilderActivity/getPullRequestsByRepo';
+import { mockPullRequest } from '../../testing/generators';
+import type { PullRequest } from '../../tasks/processBuilderActivity/getBuilderActivity';
 
 export function generatePullRequest({
   githubRepo,
@@ -18,7 +18,7 @@ export function generatePullRequest({
   // 0-5% chance of a closed PR
   const closedPullRequestChance = faker.number.int({ min: 0, max: 5 });
   const nameWithOwner = `${githubRepo.owner}/${githubRepo.name}`;
-  return {
+  return mockPullRequest({
     baseRefName: 'main',
     author: {
       id: githubUser.id,
@@ -29,10 +29,7 @@ export function generatePullRequest({
     createdAt: createdAt.toISO(),
     mergedAt: createdAt.toISO(),
     number: pullRequestNumber,
-    repository: {
-      id: githubRepo.id,
-      nameWithOwner
-    },
+    repo: githubRepo,
     state: faker.number.int({ min: 1, max: 100 }) <= closedPullRequestChance ? 'CLOSED' : 'MERGED'
-  };
+  });
 }

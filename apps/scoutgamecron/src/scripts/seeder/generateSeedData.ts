@@ -7,7 +7,7 @@ import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboa
 import { DateTime } from 'luxon';
 
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
-import { updateBuildersRank } from '../../tasks/processRecentBuilderActivity/updateBuildersRank';
+import { updateBuildersRank } from '../../tasks/processBuilderActivity/updateBuildersRank';
 
 import { generateBuilder } from './generateBuilder';
 import { generateBuilderEvents } from './generateBuilderEvents';

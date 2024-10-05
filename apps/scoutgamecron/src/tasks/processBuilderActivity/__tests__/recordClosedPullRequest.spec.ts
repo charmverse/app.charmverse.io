@@ -226,7 +226,7 @@ describe('recordClosedPullRequest', () => {
       title: 'Test PR',
       state: 'CLOSED',
       author: { id: randomLargeInt(), login: username },
-      repo: { id: repoId, name: username, owner: 'testrepo' },
+      repo: { id: repoId, owner: username, name: 'testrepo' },
       url: `https://github.com/${username}/testrepo/pull/${randomLargeInt()}`
     });
 

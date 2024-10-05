@@ -1,9 +1,9 @@
 import { randomLargeInt } from '@packages/scoutgame/testing/generators';
 
-import type { PullRequest } from '../tasks/processRecentBuilderActivity/getPullRequestsByRepo';
+import type { PullRequest } from '../tasks/processBuilderActivity/getBuilderActivity';
 
 export function mockPullRequest(
-  fields: Partial<PullRequest> & {
+  fields: Partial<Omit<PullRequest, 'repository'>> & {
     githubUser?: { id: number; login: string };
     repo?: { id?: number; owner: string; name: string };
   } = {}
@@ -26,6 +26,13 @@ export function mockPullRequest(
     createdAt: new Date().toISOString(),
     repository: {
       id: fields.repo?.id ?? randomLargeInt(),
+      name,
+      owner: {
+        login: owner
+      },
+      defaultBranchRef: {
+        name: 'main'
+      },
       nameWithOwner: `${owner}/${name}`
     },
     ...fields

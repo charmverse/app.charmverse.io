@@ -2,26 +2,32 @@ import { log } from '@charmverse/core/log';
 import type { GithubRepo } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { PullRequest } from './getBuilderActivity';
 import { octokit } from './octokit';
 
-export type PullRequest = {
-  baseRefName: string; // eg "main"
-  title: string;
-  url: string;
-  state: 'CLOSED' | 'MERGED';
-  mergedAt?: string;
-  closedAt?: string;
-  createdAt: string;
-  author: {
-    login: string;
-    id: number;
-  };
-  number: number;
-  repository: {
-    id: number;
-    nameWithOwner: string;
-  };
-};
+// export type PullRequest = {
+//   baseRefName: string; // eg "main"
+//   title: string;
+//   url: string;
+//   state: 'CLOSED' | 'MERGED';
+//   mergedAt?: string;
+//   closedAt?: string;
+//   createdAt: string;
+//   author: {
+//     login: string;
+//     id: number;
+//   };
+//   number: number;
+//   repository: {
+//     id: number;
+//     name: string;
+//     owner: string;
+//     defaultBranchRef: {
+//       name: string;
+//     };
+//     nameWithOwner: string;
+//   };
+// };
 
 type EdgeNode<T> = {
   cursor: string;
@@ -71,6 +77,13 @@ const getRecentPrs = `
             repository {
               id
               nameWithOwner
+              name
+              owner {
+                login
+              }
+              defaultBranchRef {
+                name
+              }
             }
             number
           }
@@ -161,8 +174,8 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
             ...node,
             author: node.author,
             repository: {
-              id: repositoryId,
-              nameWithOwner: node.repository.nameWithOwner
+              ...node.repository,
+              id: repositoryId
             }
           };
         });

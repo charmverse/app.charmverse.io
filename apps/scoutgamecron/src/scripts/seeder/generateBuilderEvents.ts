@@ -3,16 +3,16 @@ import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
 
-import type { PullRequest } from '../../tasks/processRecentBuilderActivity/getPullRequestsByRepo';
-import { processClosedPullRequest } from '../../tasks/processRecentBuilderActivity/processClosedPullRequest';
-import { processMergedPullRequest } from '../../tasks/processRecentBuilderActivity/processMergedPullRequest';
+import { recordMergedPullRequest } from '../../tasks/processBuilderActivity/recordMergedPullRequest';
+import type { PullRequest } from '../../tasks/processBuilderActivity/getBuilderActivity';
+import { recordClosedPullRequest } from '../../tasks/processBuilderActivity/recordClosedPullRequest';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { generatePullRequest } from './generatePullRequest';
 import { randomTimeOfDay } from './generator';
 
 async function processPullRequest(pullRequest: PullRequest, githubRepo: GithubRepo, date: DateTime) {
   if (pullRequest.state === 'CLOSED') {
-    await processClosedPullRequest({
+    await recordClosedPullRequest({
       pullRequest,
       repo: githubRepo,
       prClosedBy: v4(),
@@ -20,7 +20,7 @@ async function processPullRequest(pullRequest: PullRequest, githubRepo: GithubRe
       skipSendingComment: true
     });
   } else if (pullRequest.state === 'MERGED') {
-    await processMergedPullRequest({
+    await recordMergedPullRequest({
       pullRequest,
       season: currentSeason,
       repo: githubRepo,

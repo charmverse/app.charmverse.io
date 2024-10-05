@@ -2,7 +2,7 @@
 import { log } from '@charmverse/core/log';
 import type { GithubRepo } from '@charmverse/core/prisma';
 
-import { getClient } from './octokit';
+import { octokit } from './octokit';
 
 export type PullRequest = {
   baseRefName: string; // eg "main"
@@ -92,7 +92,7 @@ const searchQuery = `
 `;
 
 export async function getPullRequestsByBuilder({ login, after }: { login: string; after: Date }) {
-  const graphqlWithAuth = getClient();
+  const graphqlWithAuth = octokit.graphql.defaults({});
 
   const pullRequests = await getRecentItems({
     login,

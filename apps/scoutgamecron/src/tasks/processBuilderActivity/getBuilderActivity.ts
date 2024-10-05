@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { Endpoints } from '@octokit/types';
 
 import { octokit } from './octokit';
 
@@ -16,7 +17,7 @@ export async function getBuilderActivity({ login, after }: { login: string; afte
   return { pullRequests, commits };
 }
 
-export type Commit = Awaited<ReturnType<typeof getCommits>>[number];
+export type Commit = Endpoints['GET /search/commits']['response']['data']['items'][number];
 
 export type PullRequest = {
   author: {
@@ -76,6 +77,8 @@ const prSearchQuery = `
             oid
           }
           repository {
+            id
+            nameWithOwner
             name
             owner {
               login
@@ -93,7 +96,7 @@ const prSearchQuery = `
 async function getCommits({ login, after }: { login: string; after: Date }) {
   const query = `author:${login} committer-date:>=${after.toISOString()}`;
 
-  const response = await octokit.paginate('GET /search/commits', {
+  const response = await octokit.paginate<Commit>('GET /search/commits', {
     q: query,
     sort: 'committer-date',
     order: 'desc',
