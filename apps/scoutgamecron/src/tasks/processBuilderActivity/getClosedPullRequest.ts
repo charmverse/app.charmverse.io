@@ -1,4 +1,4 @@
-import { getClient } from './octokit';
+import { octokit } from './octokit';
 
 type GetPrCloserResponse = {
   repository: {
@@ -49,7 +49,7 @@ export async function getClosedPullRequest({
   pullRequestNumber: number;
   repo: { name: string; owner: string };
 }) {
-  const graphqlWithAuth = getClient();
+  const graphqlWithAuth = octokit.graphql.defaults({});
   const response = await graphqlWithAuth<GetPrCloserResponse>({
     query: getPrCloser,
     repo: repo.name,
