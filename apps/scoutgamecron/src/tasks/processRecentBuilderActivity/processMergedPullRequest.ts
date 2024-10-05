@@ -20,6 +20,14 @@ export type MergedPullRequestMeta = Pick<
   PullRequest,
   'author' | 'number' | 'title' | 'repository' | 'url' | 'createdAt' | 'mergedAt' | 'mergeCommit'
 >;
+
+const gemsValues: Record<GemsReceiptType, number> = {
+  first_pr: 100,
+  third_pr_in_streak: 30,
+  regular_pr: 10,
+  daily_commit: 1
+};
+
 /**
  *
  * @isFirstMergedPullRequest Only used for the seed data generator
@@ -164,7 +172,7 @@ export async function processMergedPullRequest({
       // this is the date the PR was merged, which determines the season/week that it counts as a builder event
       const pullRequestDate = new Date(pullRequest.mergedAt || 0);
       const builderEventDate = pullRequestDate;
-      const gemValue = gemReceiptType === 'first_pr' ? 10 : gemReceiptType === 'third_pr_in_streak' ? 3 : 1;
+      const gemValue = gemsValues[gemReceiptType];
 
       if (builderEventDate >= start.toJSDate()) {
         const existingBuilderEvent = await tx.builderEvent.findFirst({

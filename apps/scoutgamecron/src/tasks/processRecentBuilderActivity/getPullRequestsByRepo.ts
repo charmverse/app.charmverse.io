@@ -1,6 +1,6 @@
-// import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import type { GithubRepo } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { octokit } from './octokit';
 
@@ -119,63 +119,81 @@ async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promis
   let cursor = null;
   let allRecentPRs: PullRequest[] = [];
 
-  while (hasNextPage) {
-    const response: GetRecentClosedOrMergedPRsResponse = await graphqlWithAuth({
-      query: getRecentPrs,
-      owner,
-      repo,
-      cursor
-    });
-
-    const repositoryId = response.repository.databaseId;
-
-    const pullRequests = response.repository.pullRequests.edges;
-
-    // Filter out PRs closed or merged in the last 24 hours
-    const recentPRs = pullRequests
-      .filter(({ node }) => {
-        const closedOrMergedAt = new Date(node.createdAt);
-        // Some bots such as dependabot do not have an author id
-
-        if (closedOrMergedAt < after) {
-          return false;
-        }
-
-        if (!node.author.id) {
-          return false;
-        }
-
-        if (typeof node.author.id === 'string') {
-          const decodedId = decodeGithubUserId(node.author.id, node.author.login);
-          if (decodedId) {
-            node.author.id = decodedId;
-            return true;
-          }
-          return false;
-        }
-        return typeof node.author.id === 'number';
-      })
-      .map(({ node }) => {
-        return {
-          ...node,
-          author: node.author,
-          repository: {
-            id: repositoryId,
-            nameWithOwner: node.repository.nameWithOwner
-          }
-        };
+  try {
+    while (hasNextPage) {
+      const response: GetRecentClosedOrMergedPRsResponse = await graphqlWithAuth({
+        query: getRecentPrs,
+        owner,
+        repo,
+        cursor
       });
 
-    // console.log(JSON.stringify(recentPRs, null, 2));
+      const repositoryId = response.repository.databaseId;
 
-    allRecentPRs = allRecentPRs.concat(recentPRs);
+      const pullRequests = response.repository.pullRequests.edges;
 
-    // Update pagination info
-    hasNextPage = response.repository.pullRequests.pageInfo.hasNextPage;
-    cursor = response.repository.pullRequests.pageInfo.endCursor;
+      // Filter out PRs closed or merged in the last 24 hours
+      const recentPRs = pullRequests
+        .filter(({ node }) => {
+          const closedOrMergedAt = new Date(node.createdAt);
+          // Some bots such as dependabot do not have an author id
 
-    if (recentPRs.length === 0) {
-      hasNextPage = false;
+          if (closedOrMergedAt < after) {
+            return false;
+          }
+
+          if (!node.author.id) {
+            return false;
+          }
+
+          if (typeof node.author.id === 'string') {
+            const decodedId = decodeGithubUserId(node.author.id, node.author.login);
+            if (decodedId) {
+              node.author.id = decodedId;
+              return true;
+            }
+            return false;
+          }
+          return typeof node.author.id === 'number';
+        })
+        .map(({ node }) => {
+          return {
+            ...node,
+            author: node.author,
+            repository: {
+              id: repositoryId,
+              nameWithOwner: node.repository.nameWithOwner
+            }
+          };
+        });
+
+      // console.log(JSON.stringify(recentPRs, null, 2));
+
+      allRecentPRs = allRecentPRs.concat(recentPRs);
+
+      // Update pagination info
+      hasNextPage = response.repository.pullRequests.pageInfo.hasNextPage;
+      cursor = response.repository.pullRequests.pageInfo.endCursor;
+
+      if (recentPRs.length === 0) {
+        hasNextPage = false;
+      }
+    }
+  } catch (error) {
+    // if repo is not found, for example for DMCA takedown, just mark as deleted
+    if ((error as any).errors?.some((e: any) => e.type === 'NOT_FOUND')) {
+      log.warn('Repo not found. Marking as deleted', { owner, repo });
+      await prisma.githubRepo.updateMany({
+        where: {
+          owner,
+          name: repo
+        },
+        data: {
+          deletedAt: new Date()
+        }
+      });
+    } else {
+      throw error;
     }
   }
 
