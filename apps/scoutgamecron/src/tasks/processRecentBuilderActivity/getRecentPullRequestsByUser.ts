@@ -1,4 +1,4 @@
-import { getClient } from './octokit';
+import { octokit } from './octokit';
 
 type EdgeNode<T> = {
   cursor: string;
@@ -47,7 +47,7 @@ export async function getRecentPullRequestsByUser({
   defaultBranch: string;
   username: string;
 }): Promise<PullRequestByUser[]> {
-  const graphqlWithAuth = getClient();
+  const graphqlWithAuth = octokit.graphql.defaults({});
   const response = await graphqlWithAuth<{
     search: { edges: EdgeNode<PullRequestByUser>[] };
   }>({
