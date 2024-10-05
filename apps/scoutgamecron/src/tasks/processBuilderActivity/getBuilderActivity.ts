@@ -61,10 +61,12 @@ const prSearchQuery = `
       }
       nodes {
         ... on PullRequest {
-        author {
-          id
-        login
-        }
+          author {
+            login
+            ... on User {
+              id
+            }
+          }
           baseRefName
           title
           url

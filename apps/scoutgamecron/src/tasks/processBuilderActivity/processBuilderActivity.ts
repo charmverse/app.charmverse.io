@@ -35,6 +35,11 @@ export async function processBuilderActivity({
 
   const { commits, pullRequests } = await getBuilderActivity({ login: githubUser.login, after: createdAfter });
 
+  log.info(`Processed builder activity in ${timer.diff(DateTime.now(), 'minutes')} minutes`, {
+    commits: commits.length,
+    prs: pullRequests.length
+  });
+
   const githubEvents = await prisma.githubEvent.findMany({
     where: {
       createdBy: githubUser.id,
@@ -96,5 +101,8 @@ export async function processBuilderActivity({
     }
   }
 
-  log.info(`Processed ${pullRequests.length} pull requests in ${timer.diff(DateTime.now(), 'minutes')} minutes`);
+  log.info(`Processed builder activity in ${timer.diff(DateTime.now(), 'minutes')} minutes`, {
+    commits: commits.length,
+    prs: pullRequests.length
+  });
 }

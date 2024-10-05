@@ -5,7 +5,7 @@ import { paginateRest } from '@octokit/plugin-paginate-rest';
 import { throttling } from '@octokit/plugin-throttling';
 // we need to use octokit core to use the throttling plugin
 // ref: https://octokit.github.io/rest.js/v19/#throttling
-const SGOctokit = Octokit.plugin(paginateRest, paginateGraphQL);
+const SGOctokit = Octokit.plugin(throttling, paginateRest, paginateGraphQL);
 
 export const octokit = new SGOctokit({
   auth: process.env.GITHUB_ACCESS_TOKEN,
