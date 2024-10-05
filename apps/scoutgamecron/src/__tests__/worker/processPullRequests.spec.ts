@@ -6,7 +6,7 @@ jest.unstable_mockModule('../../tasks/processPullRequests/getPullRequests', () =
 }));
 
 const worker = await import('../../worker');
-const { getPullRequests } = await import('../../tasks/processRecentBuilderActivity/getPullRequests');
+const { getPullRequests } = await import('../../tasks/processRecentBuilderActivity/getPullRequestsByRepo');
 
 describe('Worker integration: processPullRequests', () => {
   it('Responds with 200 when there is nothing to do', async () => {

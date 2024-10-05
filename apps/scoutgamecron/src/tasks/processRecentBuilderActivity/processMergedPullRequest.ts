@@ -11,14 +11,14 @@ import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday, currentSeason 
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
-import type { PullRequest } from './getPullRequests';
+import type { PullRequest } from './getBuilderActivity';
 import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
 
 type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
 
 export type MergedPullRequestMeta = Pick<
   PullRequest,
-  'author' | 'number' | 'title' | 'repository' | 'url' | 'createdAt' | 'mergedAt'
+  'author' | 'number' | 'title' | 'repository' | 'url' | 'createdAt' | 'mergedAt' | 'mergeCommit'
 >;
 /**
  *
@@ -127,6 +127,7 @@ export async function processMergedPullRequest({
 
     const event = await tx.githubEvent.create({
       data: {
+        commitHash: pullRequest.mergeCommit?.oid,
         pullRequestNumber: pullRequest.number,
         title: pullRequest.title,
         type: 'merged_pull_request',

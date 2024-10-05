@@ -1,4 +1,4 @@
-import { getClient } from './gqlClient';
+import { getClient } from './octokit';
 
 type GetPrCloserResponse = {
   repository: {

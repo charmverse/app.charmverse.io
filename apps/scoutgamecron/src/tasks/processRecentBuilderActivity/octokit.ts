@@ -1,12 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { Octokit } from '@octokit/core';
+import { paginateGraphQL } from '@octokit/plugin-paginate-graphql';
+import { paginateRest } from '@octokit/plugin-paginate-rest';
 import { throttling } from '@octokit/plugin-throttling';
-
 // we need to use octokit core to use the throttling plugin
 // ref: https://octokit.github.io/rest.js/v19/#throttling
-Octokit.plugin(throttling);
+const SGOctokit = Octokit.plugin(paginateRest, paginateGraphQL);
 
-const octokit = new Octokit({
+export const octokit = new SGOctokit({
   auth: process.env.GITHUB_ACCESS_TOKEN,
   throttle: {
     onRateLimit: (retryAfter, options, _octokit, retryCount) => {
@@ -29,7 +30,3 @@ const octokit = new Octokit({
     }
   }
 });
-
-export function getClient() {
-  return octokit.graphql.defaults({});
-}

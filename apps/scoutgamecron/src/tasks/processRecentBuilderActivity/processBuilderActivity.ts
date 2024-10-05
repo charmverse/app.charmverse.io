@@ -1,29 +1,10 @@
 import { log } from '@charmverse/core/log';
-import type {
-  ActivityRecipientType,
-  GemsReceiptType,
-  GithubRepo,
-  ScoutGameActivityType
-} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getBonusPartner } from '@packages/scoutgame/bonus';
-import { getWeekFromDate, getWeekStartEnd, streakWindow, isToday, currentSeason } from '@packages/scoutgame/dates';
-import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
-import type { PullRequest } from './getPullRequests';
-import { getPullRequests } from './getPullRequests';
-import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
+import { getBuilderActivity } from './getBuilderActivity';
 import { processClosedPullRequest } from './processClosedPullRequest';
 import { processMergedPullRequest } from './processMergedPullRequest';
-import { updateBuildersRank } from './updateBuildersRank';
-
-type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
-
-export type MergedPullRequestMeta = Pick<
-  PullRequest,
-  'author' | 'number' | 'title' | 'repository' | 'url' | 'createdAt' | 'mergedAt'
->;
 
 type Props = {
   builderId: string;
@@ -34,34 +15,47 @@ type Props = {
   createdAfter: Date;
   season: string;
   now?: DateTime;
+  skipClosedPrProcessing?: boolean;
 };
 
 /**
  *
  * @isFirstMergedPullRequest Only used for the seed data generator
  */
-export async function processBuilderActivity({ builderId, githubUser, season, now = DateTime.utc() }: Props) {
-  const pullRequests = await getPullRequests({ repos, after: createdAfter });
+export async function processBuilderActivity({
+  builderId,
+  githubUser,
+  skipClosedPrProcessing,
+  createdAfter,
+  season,
+  now = DateTime.utc()
+}: Props) {
+  const timer = DateTime.now();
+
+  const { commits, pullRequests } = await getBuilderActivity({ login: githubUser.login, after: createdAfter });
 
   const githubEvents = await prisma.githubEvent.findMany({
     where: {
+      createdBy: githubUser.id,
       createdAt: {
         gt: createdAfter
       }
     }
   });
+
+  const newCommits = commits.filter(
+    (commit) => !githubEvents.some((e) => e.commitHash === commit.commitHash && e.repoId === commit.repository.id)
+  );
+
   const newPullRequests = pullRequests.filter(
     (pr) => !githubEvents.some((e) => e.pullRequestNumber === pr.number && e.repoId === pr.repository.id)
   );
 
-  const uniqueRepos = Array.from(new Set(pullRequests.map((pr) => pr.repository.id)));
-
-  // pullRequests.map((pr) => pr.repository.id);
-
   log.info(
-    `Retrieved ${newPullRequests.length} new PRs (out of ${pullRequests.length}) across ${
-      uniqueRepos.length
-    } repos in ${timer.diff(DateTime.now(), 'minutes')} minutes`
+    `Retrieved ${commits.length} commits and ${pullRequests.length} PRs in ${timer.diff(
+      DateTime.now(),
+      'minutes'
+    )} minutes for ${githubUser.login}`
   );
 
   let i = 0;
@@ -71,12 +65,12 @@ export async function processBuilderActivity({ builderId, githubUser, season, no
     log.debug(
       `Processing PR ${i}/${newPullRequests.length} -- ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`
     );
-    const repo = repos.find(
-      (r) =>
-        `${r.owner}/${r.name}` === pullRequest.repository.nameWithOwner ||
-        // consider repo id in case it was a fork, in which casethe nameWithOwner may not match the name of the repo for some reason
-        r.id === pullRequest.repository.id
-    );
+    const repo = await prisma.githubRepo.findFirst({
+      where: {
+        owner: pullRequest.repository.owner,
+        name: pullRequest.repository.name
+      }
+    });
     if (repo) {
       try {
         if (pullRequest.state === 'CLOSED') {

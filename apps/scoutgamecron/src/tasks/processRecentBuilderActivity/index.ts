@@ -9,7 +9,6 @@ type ProcessPullRequestsOptions = {
   createdAfter?: Date;
   skipClosedPrProcessing?: boolean;
   season?: string;
-  onlyProcessNewRepos?: boolean;
 };
 
 export async function processRecentBuilderActivity({

@@ -13,6 +13,7 @@
     "seed": "tsx src/scripts/generateSeedData.ts"
   },
   "dependencies": {
+    "@octokit/plugin-paginate-rest": "^11.3.5",
     "@octokit/plugin-throttling": "^9.3.1",
     "@packages/farcaster": "^0.0.0",
     "@packages/github": "^0.0.0",

@@ -2,7 +2,7 @@
 import { log } from '@charmverse/core/log';
 import type { GithubRepo } from '@charmverse/core/prisma';
 
-import { getClient } from './gqlClient';
+import { octokit } from './octokit';
 
 export type PullRequest = {
   baseRefName: string; // eg "main"
@@ -93,7 +93,7 @@ type Input = {
 
 type RepoInput = Pick<GithubRepo, 'name' | 'owner' | 'defaultBranch'>;
 
-export async function getPullRequests({ repos, after }: { repos: RepoInput[]; after: Date }) {
+export async function getPullRequestsByRepo({ repos, after }: { repos: RepoInput[]; after: Date }) {
   const pullRequests: PullRequest[] = [];
   for (const repo of repos) {
     const repoPullRequests = await getRecentClosedOrMergedPRs({
@@ -113,7 +113,7 @@ export async function getPullRequests({ repos, after }: { repos: RepoInput[]; af
 }
 
 async function getRecentClosedOrMergedPRs({ owner, repo, after }: Input): Promise<PullRequest[]> {
-  const graphqlWithAuth = getClient();
+  const graphqlWithAuth = octokit.graphql.defaults({});
 
   let hasNextPage = true;
   let cursor = null;

@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
 
-import type { PullRequest } from '../../tasks/processRecentBuilderActivity/getPullRequests';
+import type { PullRequest } from '../../tasks/processRecentBuilderActivity/getPullRequestsByRepo';
 import { processClosedPullRequest } from '../../tasks/processRecentBuilderActivity/processClosedPullRequest';
 import { processMergedPullRequest } from '../../tasks/processRecentBuilderActivity/processMergedPullRequest';
 import { currentSeason } from '@packages/scoutgame/dates';
