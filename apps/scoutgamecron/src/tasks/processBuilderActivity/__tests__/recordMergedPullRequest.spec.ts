@@ -31,7 +31,7 @@ describe('recordMergedPullRequest', () => {
     jest.resetAllMocks();
   });
 
-  it('should create builder events, gems receipts and update weekly stats for a first merged pull request', async () => {
+  it('should create builder events and gems receipts for a first merged pull request', async () => {
     const repoId = randomLargeInt();
     const username = v4();
 
@@ -93,14 +93,6 @@ describe('recordMergedPullRequest', () => {
 
     expect(gemsReceipt).toBeDefined();
 
-    const builderWeeklyStats = await prisma.userWeeklyStats.findFirstOrThrow({
-      where: {
-        userId: builder.id
-      }
-    });
-
-    expect(builderWeeklyStats.gemsCollected).toBe(100);
-
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
         userId: builder.id,
@@ -124,7 +116,7 @@ describe('recordMergedPullRequest', () => {
     expect(scoutActivities).toBe(1);
   });
 
-  it('should create builder events, gems receipts and update weekly stats for a regular merged pull request', async () => {
+  it('should create builder events and gems receipts for a regular merged pull request', async () => {
     const builder = await mockBuilder();
 
     const repo = await mockRepo();
@@ -181,14 +173,6 @@ describe('recordMergedPullRequest', () => {
 
     expect(gemsReceipt).toBeDefined();
 
-    const builderWeeklyStats = await prisma.userWeeklyStats.findFirstOrThrow({
-      where: {
-        userId: builder.id
-      }
-    });
-
-    expect(builderWeeklyStats.gemsCollected).toBe(10);
-
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
         userId: builder.id,
@@ -210,7 +194,7 @@ describe('recordMergedPullRequest', () => {
     expect(scoutActivities).toBe(1);
   });
 
-  it('should create builder events, gems receipts and update weekly stats for a 3 merged PR streak', async () => {
+  it('should create builder events and gems receipts for a 3 merged PR streak', async () => {
     const builder = await mockBuilder();
     const repo = await mockRepo();
     const scout = await mockScout();
@@ -277,18 +261,6 @@ describe('recordMergedPullRequest', () => {
     });
 
     expect(gemsReceipt).toBeDefined();
-
-    const builderWeeklyStats = await prisma.userWeeklyStats.findFirstOrThrow({
-      where: {
-        userId: builder.id
-      },
-      orderBy: {
-        week: 'desc'
-      }
-    });
-
-    // The total is 4 because the first PR is from a previous week, but the 3rd PR counts as a streak, so 3 + 1 = 4
-    expect(builderWeeklyStats.gemsCollected).toBe(40);
 
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
