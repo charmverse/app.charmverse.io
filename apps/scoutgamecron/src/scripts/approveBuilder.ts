@@ -2,9 +2,9 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { currentSeason, getCurrentWeek, getDateFromISOWeek } from '@packages/scoutgame/dates';
-import { processMergedPullRequest } from '../tasks/processPullRequests/processMergedPullRequest';
+import { recordMergedPullRequest } from '../tasks/processBuilderActivity/recordMergedPullRequest';
 
-import { updateBuildersRank } from '../tasks/processPullRequests/updateBuildersRank';
+import { updateBuildersRank } from '../tasks/processBuilderActivity/updateBuildersRank';
 
 export async function approveBuilder({
   githubLogin,
@@ -64,7 +64,7 @@ export async function approveBuilder({
 
   for (const pullRequest of events) {
     if (pullRequest.type === 'merged_pull_request' && pullRequest) {
-      await processMergedPullRequest({
+      await recordMergedPullRequest({
         season,
         pullRequest: {
           ...pullRequest,
@@ -74,7 +74,14 @@ export async function approveBuilder({
             id: githubUser.id,
             login: githubUser.login
           },
-          repository: { id: pullRequest.repo.id, nameWithOwner: `${pullRequest.repo.owner}/${pullRequest.repo.name}` }
+          repository: {
+            databaseId: pullRequest.repo.id,
+            id: pullRequest.repo.id,
+            name: pullRequest.repo.name,
+            owner: { login: pullRequest.repo.owner },
+            defaultBranchRef: { name: pullRequest.repo.defaultBranch },
+            nameWithOwner: `${pullRequest.repo.owner}/${pullRequest.repo.name}`
+          }
         },
         repo: pullRequest.repo
       }).catch((error) => log.error('Error processing pull request', { error, pullRequest }));
