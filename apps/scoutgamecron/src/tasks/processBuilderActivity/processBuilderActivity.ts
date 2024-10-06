@@ -54,7 +54,7 @@ export async function processBuilderActivity({
     (pr) => !githubEvents.some((e) => e.pullRequestNumber === pr.number && e.repoId === pr.repository.id)
   );
 
-  log.info(`Retrieved builder activity in ${timer.diff(DateTime.now(), 'minutes')} minutes`, {
+  log.debug(`Retrieved builder activity in ${timer.diff(DateTime.now(), 'minutes')} minutes`, {
     commits: commits.length,
     newCommits: newCommits.length,
     prs: pullRequests.length,
@@ -101,11 +101,6 @@ export async function processBuilderActivity({
     }
   }
 
-  log.info(`Processed builder activity in ${timer.diff(DateTime.now(), 'minutes')} minutes`, {
-    commits: commits.length,
-    prs: pullRequests.length
-  });
-
   const thisWeekEvents = await prisma.builderEvent.findMany({
     where: {
       builderId,
@@ -144,9 +139,10 @@ export async function processBuilderActivity({
       gemsCollected
     }
   });
-  log.debug(`Updated weekly stats for ${builderId}`, {
+  log.debug(`Processed activity for builder`, {
+    userId: builderId,
     week,
-    events: thisWeekEvents.length,
+    eventsWithWeek: thisWeekEvents.length,
     gemsCollected
   });
 }
