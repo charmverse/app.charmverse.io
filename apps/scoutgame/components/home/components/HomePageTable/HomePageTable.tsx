@@ -12,7 +12,7 @@ import { TopScoutsTable } from './components/TopScoutsTable';
 
 export async function HomeTab({ tab, userId }: { tab: string; userId?: string }) {
   if (tab === 'activity') {
-    const activities = await getBuilderActivities({ limit: 200 });
+    const activities = await getBuilderActivities({ limit: 100 });
     return <ActivityTable activities={activities} />;
   }
 
