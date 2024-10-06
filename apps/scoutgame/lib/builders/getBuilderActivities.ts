@@ -13,7 +13,7 @@ type NftPurchaseActivity = {
 };
 
 type MergedPullRequestActivity = {
-  type: 'merged_pull_request';
+  type: 'github_event';
   contributionType: GemsReceiptType;
   gems: number;
   repo: string;
@@ -69,18 +69,14 @@ export async function getBuilderActivities({
         }
       },
       githubEvent: {
-        where: {
-          // Skip closed pull requests
-          type: 'merged_pull_request'
-        },
         select: {
+          url: true,
           repo: {
             select: {
               name: true,
               owner: true
             }
-          },
-          pullRequestNumber: true
+          }
         }
       }
     }
@@ -96,16 +92,20 @@ export async function getBuilderActivities({
           type: 'nft_purchase' as const,
           scout: event.nftPurchaseEvent.scout.username
         };
-      } else if (event.type === 'merged_pull_request' && event.githubEvent && event.gemsReceipt) {
+      } else if (
+        (event.type === 'merged_pull_request' || event.type === 'daily_commit') &&
+        event.githubEvent &&
+        event.gemsReceipt
+      ) {
         return {
           ...event.builder,
           id: event.id,
           createdAt: event.createdAt,
-          type: 'merged_pull_request' as const,
+          type: 'github_event' as const,
           contributionType: event.gemsReceipt.type,
           gems: event.gemsReceipt.value,
           repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`,
-          url: `https://github.com/${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}/pull/${event.githubEvent.pullRequestNumber}`,
+          url: event.githubEvent.url,
           bonusPartner: event.bonusPartner
         };
       } else {
