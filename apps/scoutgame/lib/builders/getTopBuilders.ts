@@ -84,5 +84,8 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
         price: nft.currentPrice
       };
     })
+    .filter((builder) => {
+      return builder && (builder.scoutedBy > 0 || builder.seasonPoints > 0 || builder.allTimePoints > 0);
+    })
     .filter(isTruthy);
 }

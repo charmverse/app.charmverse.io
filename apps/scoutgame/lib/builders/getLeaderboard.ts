@@ -12,17 +12,20 @@ export type LeaderBoardRow = {
   nftImageUrl?: string;
 };
 
-export async function getLeaderboard(): Promise<LeaderBoardRow[]> {
+export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise<LeaderBoardRow[]> {
   const currentWeek = getCurrentWeek();
   const season = currentSeason;
   const weeklyTopBuilders = await prisma.userWeeklyStats.findMany({
     where: {
-      week: currentWeek
+      week: currentWeek,
+      rank: {
+        not: null
+      }
     },
     orderBy: {
       rank: 'asc'
     },
-    take: 10,
+    take: limit,
     select: {
       gemsCollected: true,
       user: {
@@ -43,20 +46,22 @@ export async function getLeaderboard(): Promise<LeaderBoardRow[]> {
     }
   });
 
-  return weeklyTopBuilders.map((weeklyTopBuilder) => {
-    const maxGemsCollected = weeklyTopBuilders[0].gemsCollected;
-    const progress = (weeklyTopBuilder.gemsCollected / maxGemsCollected) * 100;
-    const nft = weeklyTopBuilder.user.builderNfts.find((n) => n.season === season);
-    const price = nft?.currentPrice ?? BigInt(0);
-    return {
-      id: weeklyTopBuilder.user.id,
-      avatar: weeklyTopBuilder.user.avatar,
-      username: weeklyTopBuilder.user.username,
-      displayName: weeklyTopBuilder.user.displayName,
-      gemsCollected: weeklyTopBuilder.gemsCollected,
-      progress,
-      price,
-      nftImageUrl: nft?.imageUrl
-    };
-  });
+  return weeklyTopBuilders
+    .map((weeklyTopBuilder) => {
+      const maxGemsCollected = weeklyTopBuilders[0].gemsCollected;
+      const progress = (weeklyTopBuilder.gemsCollected / maxGemsCollected) * 100;
+      const nft = weeklyTopBuilder.user.builderNfts.find((n) => n.season === season);
+      const price = nft?.currentPrice ?? BigInt(0);
+      return {
+        id: weeklyTopBuilder.user.id,
+        avatar: weeklyTopBuilder.user.avatar,
+        username: weeklyTopBuilder.user.username,
+        displayName: weeklyTopBuilder.user.displayName,
+        gemsCollected: weeklyTopBuilder.gemsCollected,
+        progress,
+        price,
+        nftImageUrl: nft?.imageUrl
+      };
+    })
+    .filter((builder) => builder.gemsCollected > 0);
 }

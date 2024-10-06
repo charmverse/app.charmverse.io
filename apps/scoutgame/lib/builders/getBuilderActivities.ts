@@ -28,10 +28,10 @@ export type BuilderActivity = BasicUserInfo & {
 
 export async function getBuilderActivities({
   builderId,
-  take = 5
+  limit = 10
 }: {
   builderId?: string;
-  take: number;
+  limit: number;
 }): Promise<BuilderActivity[]> {
   const builderEvents = await prisma.builderEvent.findMany({
     where: {
@@ -43,7 +43,7 @@ export async function getBuilderActivities({
     orderBy: {
       createdAt: 'desc'
     },
-    take,
+    take: limit,
     select: {
       builder: {
         select: BasicUserInfoSelect
