@@ -17,7 +17,7 @@ describe('getBuilderActivities', () => {
       scoutId: scout.id,
       season: '2023-01'
     });
-    const result = await getBuilderActivities({ builderId: builder.id, take: 5 });
+    const result = await getBuilderActivities({ builderId: builder.id, limit: 5 });
 
     expect(result).toHaveLength(2);
   });

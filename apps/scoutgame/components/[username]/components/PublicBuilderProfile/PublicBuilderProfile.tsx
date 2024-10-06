@@ -36,7 +36,7 @@ export async function PublicBuilderProfile({ publicUser }: { publicUser: BasicUs
           }
         }),
         getBuilderStats(builderId),
-        getBuilderActivities({ builderId, take: 5 }),
+        getBuilderActivities({ builderId, limit: 200 }),
         getBuilderScouts(builderId),
         getUserFromSession()
       ])

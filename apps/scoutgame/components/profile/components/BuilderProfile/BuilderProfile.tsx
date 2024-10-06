@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
-import { Alert, Stack, Typography } from '@mui/material';
+import { Alert, Box, Stack, Typography } from '@mui/material';
 import { currentSeason } from '@packages/scoutgame/dates';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -34,7 +34,7 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
             }
           }),
           getBuilderStats(builder.id),
-          getBuilderActivities({ builderId: builder.id, take: 5 }),
+          getBuilderActivities({ builderId: builder.id, limit: 200 }),
           getBuilderScouts(builder.id)
         ])
       : [];
@@ -101,11 +101,13 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
         <Stack direction='row' alignItems='center' justifyContent='space-between'>
           <Typography color='secondary'>Recent Activity</Typography>
         </Stack>
-        {builderActivities.length > 0 ? (
-          <BuilderActivitiesList activities={builderActivities} />
-        ) : (
-          <Typography>No activity yet. Start contributing or scouting to build your profile!</Typography>
-        )}
+        <Box maxHeight='400px' overflow='auto'>
+          {builderActivities.length > 0 ? (
+            <BuilderActivitiesList activities={builderActivities} />
+          ) : (
+            <Typography>No activity yet. Start contributing or scouting to build your profile!</Typography>
+          )}
+        </Box>
       </Stack>
       <Stack gap={0.5}>
         <Typography color='secondary'>Scouted By</Typography>

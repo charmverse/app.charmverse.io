@@ -50,23 +50,38 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
       }
     }
   });
-
-  return topScouts.map((scout) => {
-    const buildersScouted = Array.from(
-      new Set(scout.user.nftPurchaseEvents.map((event) => event.builderNFT.builderId))
-    ).length;
-    const nftsHeld = scout.user.nftPurchaseEvents.length;
-    const allTimePoints = scout.user.userAllTimeStats[0]?.pointsEarnedAsScout;
-    const seasonPoints = scout.pointsEarnedAsScout;
-
-    return {
-      id: scout.user.id,
-      username: scout.user.username,
-      avatar: scout.user.avatar,
-      buildersScouted,
-      nftsHeld,
-      allTimePoints,
-      seasonPoints
-    };
-  });
+  return topScouts
+    .map((scout) => {
+      const buildersScouted = Array.from(
+        new Set(scout.user.nftPurchaseEvents.map((event) => event.builderNFT.builderId))
+      ).length;
+      const nftsHeld = scout.user.nftPurchaseEvents.length;
+      const allTimePoints = scout.user.userAllTimeStats[0]?.pointsEarnedAsScout || 0;
+      const seasonPoints = scout.pointsEarnedAsScout;
+      return {
+        id: scout.user.id,
+        username: scout.user.username,
+        avatar: scout.user.avatar,
+        buildersScouted,
+        nftsHeld,
+        allTimePoints,
+        seasonPoints
+      };
+    })
+    .sort((a, b) => {
+      const seasonPointsDifference = b.seasonPoints - a.seasonPoints;
+      if (seasonPointsDifference !== 0) {
+        return seasonPointsDifference;
+      }
+      const allTimePointsDifference = b.allTimePoints - a.allTimePoints;
+      if (allTimePointsDifference !== 0) {
+        return allTimePointsDifference;
+      }
+      const nftsHeldDifference = b.nftsHeld - a.nftsHeld;
+      if (nftsHeldDifference !== 0) {
+        return nftsHeldDifference;
+      }
+      return 0;
+    })
+    .filter((scout) => scout.seasonPoints || scout.allTimePoints || scout.nftsHeld);
 }

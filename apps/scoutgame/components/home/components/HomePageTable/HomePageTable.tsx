@@ -12,22 +12,22 @@ import { TopScoutsTable } from './components/TopScoutsTable';
 
 export async function HomeTab({ tab, userId }: { tab: string; userId?: string }) {
   if (tab === 'activity') {
-    const activities = await getBuilderActivities({ take: 10 });
+    const activities = await getBuilderActivities({ limit: 200 });
     return <ActivityTable activities={activities} />;
   }
 
   if (tab === 'top-scouts') {
-    const topScouts = await getTopScouts({ limit: 10 });
+    const topScouts = await getTopScouts({ limit: 200 });
     return <TopScoutsTable scouts={topScouts} />;
   }
 
   if (tab === 'top-builders') {
-    const topBuilders = await getTopBuilders({ limit: 10 });
+    const topBuilders = await getTopBuilders({ limit: 200 });
     return <TopBuildersTable builders={topBuilders} userId={userId} />;
   }
 
   if (tab === 'leaderboard') {
-    const data = await getLeaderboard();
+    const data = await getLeaderboard({ limit: 200 });
     return <LeaderboardTable data={data} userId={userId} />;
   }
   return null;
