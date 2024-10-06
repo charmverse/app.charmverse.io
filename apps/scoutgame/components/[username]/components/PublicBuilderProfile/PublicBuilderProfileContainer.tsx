@@ -171,7 +171,7 @@ export function PublicBuilderProfileContainer({
             </Stack>
             <Stack gap={1}>
               <Typography color='secondary'>Recent Activity</Typography>
-              <Box maxHeight='400px' overflow='auto'>
+              <Box maxHeight={{ md: '400px' }} overflow='auto'>
                 {builderActivities.length > 0 ? (
                   <BuilderActivitiesList activities={builderActivities} />
                 ) : (

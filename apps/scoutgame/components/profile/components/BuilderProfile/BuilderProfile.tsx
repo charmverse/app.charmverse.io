@@ -101,7 +101,7 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
         <Stack direction='row' alignItems='center' justifyContent='space-between'>
           <Typography color='secondary'>Recent Activity</Typography>
         </Stack>
-        <Box maxHeight='400px' overflow='auto'>
+        <Box maxHeight={{ md: '400px' }} overflow='auto'>
           {builderActivities.length > 0 ? (
             <BuilderActivitiesList activities={builderActivities} />
           ) : (
