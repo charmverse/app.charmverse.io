@@ -3,7 +3,7 @@ cron:
   - name: "process-builder-activity"
     url: "/process-builder-activity"
     # every 20 minutes
-    schedule: "0/20 * * * *"
+    schedule: "*/20 * * * *"
 
   - name: "process-gems-payout"
     url: "/process-gems-payout"
