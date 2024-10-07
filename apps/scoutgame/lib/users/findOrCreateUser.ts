@@ -77,9 +77,10 @@ export async function findOrCreateUser({
   });
 
   let points = 0;
+  let tier: ConnectWaitlistTier | undefined;
 
   if (waitlistRecord?.percentile) {
-    const tier = getTier(waitlistRecord.percentile);
+    tier = getTier(waitlistRecord.percentile);
     points = waitlistTierPointsRecord[tier] || 0;
   }
 
@@ -90,20 +91,31 @@ export async function findOrCreateUser({
       walletAddress: lowercaseAddress,
       farcasterId,
       currentBalance: points,
-      pointsReceived: {
-        create: {
-          value: points,
-          claimedAt: new Date(),
-          event: {
-            create: {
-              season: currentSeason,
-              type: 'waitlist_airdrop' as BuilderEventType,
-              week: getCurrentWeek(),
-              builderId: userId
+      pointsReceived:
+        points && tier
+          ? {
+              create: {
+                value: points,
+                claimedAt: new Date(),
+                event: {
+                  create: {
+                    season: currentSeason,
+                    type: 'misc_event' as BuilderEventType,
+                    description: `Received points for achieving ${tier} status on waitlist`,
+                    week: getCurrentWeek(),
+                    builderId: userId
+                  }
+                },
+                activities: {
+                  create: {
+                    type: 'points',
+                    userId,
+                    recipientType: 'scout'
+                  }
+                }
+              }
             }
-          }
-        }
-      }
+          : undefined
     }
   });
 

@@ -55,9 +55,17 @@ export async function distributeWaitlistPoints() {
               event: {
                 create: {
                   season: currentSeason,
-                  type: 'waitlist_airdrop' as BuilderEventType,
+                  type: 'misc_event' as BuilderEventType,
                   week: getCurrentWeek(),
-                  builderId: scout.id
+                  description: 'Received points for participating in pre-season week as a Builder',
+                  builderId: scout.id,
+                }
+              },
+              activities: {
+                create: {
+                  type: "points",
+                  userId: scout.id,
+                  recipientType: "builder"
                 }
               }
             }
