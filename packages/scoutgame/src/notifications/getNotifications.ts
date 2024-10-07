@@ -3,7 +3,7 @@ import { ActivityRecipientType, prisma, ScoutGameActivityType } from '@charmvers
 import { stringUtils } from '@charmverse/core/utilities';
 import { isTruthy } from '@packages/utils/types';
 
-import { currentSeason, getSeasonWeekFromISOWeek } from '../dates';
+import { getSeasonWeekFromISOWeek } from '../dates';
 
 type ScoutGameNotificationCommonProps = {
   id: string;
@@ -41,6 +41,7 @@ type NftPurchaseNotification = ScoutGameNotificationCommonProps & {
 type PointsReceiptNotification = ScoutGameNotificationCommonProps & {
   type: 'points';
   recipientType: ActivityRecipientType;
+  title: string;
   season: number;
   week: number;
   claimable: boolean;
@@ -147,7 +148,6 @@ export async function getNotifications({ userId }: { userId: string }): Promise<
           }
         }
       },
-      // Only fetch points receipts that were gems payout
       pointsReceipt: {
         select: {
           id: true,
@@ -155,14 +155,11 @@ export async function getNotifications({ userId }: { userId: string }): Promise<
           value: true,
           event: {
             select: {
+              type: true,
+              description: true,
               season: true,
               week: true
             }
-          }
-        },
-        where: {
-          event: {
-            type: 'gems_payout'
           }
         }
       },
@@ -277,13 +274,20 @@ export async function getNotifications({ userId }: { userId: string }): Promise<
           if (!receipt) {
             return null;
           }
+          const title =
+            receipt.event.type === 'gems_payout'
+              ? `Congratulations! Your season ${receipt.event.season} week ${receipt.event.week} reward are ready!`
+              : receipt.event.description;
+          if (!title) {
+            return null;
+          }
           return {
             ...commonProps,
             amount: receipt.value,
             season: 1,
             claimable: receipt.claimedAt === null,
             week: getSeasonWeekFromISOWeek({
-              season: currentSeason,
+              season: receipt.event.season,
               week: receipt.event.week
             })
           } as PointsReceiptNotification;
