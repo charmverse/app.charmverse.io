@@ -44,6 +44,10 @@ export function getWeekStartEnd(date: Date) {
   return { start: startOfWeek, end: endOfWeek };
 }
 
+export function getStartOfSeason(week: ISOWeek) {
+  return getDateFromISOWeek(week);
+}
+
 function _formatWeek(date: DateTime): ISOWeek {
   // token reference: https://moment.github.io/luxon/#/formatting?id=table-of-tokens
   return date.toFormat(`kkkk-'W'WW`);

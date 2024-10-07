@@ -21,7 +21,8 @@ export const iconMap: Record<ScoutGameActivityType, any> = {
   gems_regular_pr: DiamondIcon,
   gems_third_pr_in_streak: DiamondIcon,
   nft_purchase: ShoppingCartIcon,
-  points: PointOfSaleIcon
+  points: PointOfSaleIcon,
+  daily_commit: DiamondIcon
 };
 
 function LinkText({ href, text }: { href: string; text: string | ReactNode }) {
@@ -33,6 +34,7 @@ function LinkText({ href, text }: { href: string; text: string | ReactNode }) {
         sx={{
           fontSize: {
             xs: 14,
+
             md: 16
           }
         }}

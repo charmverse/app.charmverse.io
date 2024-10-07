@@ -25,7 +25,7 @@ export async function generateNftPurchaseEvents(scoutId: string, assignedBuilder
             id: builder.builderNftId
           },
           data: {
-            currentPrice: nftPrice + (nftPrice * 0.1)
+            currentPrice: Math.ceil(nftPrice + (nftPrice * 0.1))
           }
         }),
         await tx.nFTPurchaseEvent.create({

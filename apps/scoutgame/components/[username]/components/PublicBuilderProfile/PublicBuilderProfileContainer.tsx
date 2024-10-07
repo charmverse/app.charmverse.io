@@ -75,6 +75,7 @@ export function PublicBuilderProfileContainer({
         {!isDesktop ? (
           <Paper sx={{ py: 2 }}>
             <Stack flexDirection='row'>
+              <BackButton />
               <Stack flexDirection='row' alignItems='center' gap={2}>
                 <Box minWidth='fit-content'>
                   <BuilderCard
@@ -170,11 +171,13 @@ export function PublicBuilderProfileContainer({
             </Stack>
             <Stack gap={1}>
               <Typography color='secondary'>Recent Activity</Typography>
-              {builderActivities.length > 0 ? (
-                <BuilderActivitiesList activities={builderActivities} />
-              ) : (
-                <Typography>No recent activity by this builder.</Typography>
-              )}
+              <Box maxHeight={{ md: '400px' }} overflow='auto'>
+                {builderActivities.length > 0 ? (
+                  <BuilderActivitiesList activities={builderActivities} />
+                ) : (
+                  <Typography>No recent activity by this builder.</Typography>
+                )}
+              </Box>
             </Stack>
           </PaperContainer>
         </Stack>

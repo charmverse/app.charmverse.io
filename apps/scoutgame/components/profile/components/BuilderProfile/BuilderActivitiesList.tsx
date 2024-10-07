@@ -2,6 +2,8 @@ import { Paper, Stack, Typography } from '@mui/material';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import { getRelativeTime } from '@packages/utils/dates';
 import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 import { BiLike } from 'react-icons/bi';
 import { LuBookMarked } from 'react-icons/lu';
 
@@ -9,34 +11,38 @@ import { GemsIcon } from 'components/common/Icons';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
 export function getActivityLabel(activity: BuilderActivity) {
-  return activity.type === 'merged_pull_request'
+  return activity.type === 'github_event'
     ? activity.contributionType === 'first_pr'
       ? 'First CONTRIBUTION'
       : activity.contributionType === 'regular_pr'
       ? 'Contribution ACCEPTED'
-      : 'Contribution STREAK'
+      : activity.contributionType === 'third_pr_in_streak'
+      ? 'Contribution STREAK'
+      : activity.contributionType === 'daily_commit'
+      ? 'Daily COMMIT'
+      : null
     : activity.type === 'nft_purchase'
     ? 'Scouted by'
     : null;
 }
 
 export function BuilderActivityLabel({ activity }: { activity: BuilderActivity }) {
-  return <Typography>{getActivityLabel(activity)}</Typography>;
+  return <Typography component='span'>{getActivityLabel(activity)}</Typography>;
 }
 
 export function BuilderActivityDetail({ activity }: { activity: BuilderActivity }) {
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='center'>
-      {activity.type === 'merged_pull_request' ? (
+    <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
+      {activity.type === 'github_event' ? (
         <LuBookMarked size='15px' />
       ) : activity.type === 'nft_purchase' ? (
         <BiLike size='15px' />
       ) : null}
-      {activity.type === 'nft_purchase'
-        ? activity.scout
-        : activity.type === 'merged_pull_request'
-        ? activity.repo
-        : null}
+      {activity.type === 'nft_purchase' ? (
+        <Link href={`/u/${activity.scout}`}>{activity.scout}</Link>
+      ) : activity.type === 'github_event' ? (
+        <Link href={activity.url}>{activity.repo}</Link>
+      ) : null}
     </Stack>
   );
 }
@@ -49,10 +55,10 @@ export function BuilderActivityGems({
   showEmpty?: boolean;
 }) {
   return (
-    <Stack flexDirection='row' gap={0.5} alignItems='center'>
-      {activity.type === 'merged_pull_request' ? (
+    <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
+      {activity.type === 'github_event' ? (
         <>
-          <Typography>+{activity.gems}</Typography>
+          <Typography component='span'>+{activity.gems}</Typography>
           <GemsIcon />
         </>
       ) : showEmpty ? (
@@ -69,9 +75,7 @@ export function BuilderActivityBonusPartner({
   activity: BuilderActivity;
   showEmpty?: boolean;
 }) {
-  return activity.type === 'merged_pull_request' &&
-    activity.bonusPartner &&
-    bonusPartnersRecord[activity.bonusPartner] ? (
+  return activity.type === 'github_event' && activity.bonusPartner && bonusPartnersRecord[activity.bonusPartner] ? (
     <Image width={20} height={20} src={bonusPartnersRecord[activity.bonusPartner].icon} alt='Bonus Partner' />
   ) : showEmpty ? (
     '-'

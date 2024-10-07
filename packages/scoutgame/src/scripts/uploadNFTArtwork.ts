@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { uploadArtwork } from '../builderNfts/artwork/uploadArtwork';
+import { uploadArtwork, uploadArtworkCongrats } from '../builderNfts/artwork/uploadArtwork';
 
 async function uploadNFTArtwork() {
   const scouts = await prisma.scout.findMany({
@@ -22,10 +22,16 @@ async function uploadNFTArtwork() {
         avatar: scout.avatar,
         tokenId: scout.builderNfts[0].tokenId
       });
+      const congratsImageUrl = await uploadArtworkCongrats({
+        season: scout.builderNfts[0].season,
+        tokenId: scout.builderNfts[0].tokenId,
+        userImage: imageUrl
+      });
       return {
         nft: scout.builderNfts[0],
         scout,
-        imageUrl
+        imageUrl,
+        congratsImageUrl
       };
     })
   );
@@ -36,7 +42,8 @@ async function uploadNFTArtwork() {
         id: image.nft!.id
       },
       data: {
-        imageUrl: image.imageUrl
+        imageUrl: image.imageUrl,
+        congratsImageUrl: image.congratsImageUrl
       }
     });
   }

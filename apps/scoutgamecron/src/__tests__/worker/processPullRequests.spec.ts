@@ -1,17 +1,17 @@
 import { jest } from '@jest/globals';
 import request from 'supertest';
 
-jest.unstable_mockModule('../../tasks/processPullRequests/getPullRequests', () => ({
-  getPullRequests: jest.fn()
+jest.unstable_mockModule('../../tasks/processBuilderActivity/getBuilderActivity', () => ({
+  getBuilderActivity: jest.fn()
 }));
 
 const worker = await import('../../worker');
-const { getPullRequests } = await import('../../tasks/processPullRequests/getPullRequests');
+const { getBuilderActivity } = await import('../../tasks/processBuilderActivity/getBuilderActivity');
 
 describe('Worker integration: processPullRequests', () => {
   it('Responds with 200 when there is nothing to do', async () => {
-    (getPullRequests as jest.Mock<typeof getPullRequests>).mockResolvedValue([]);
+    (getBuilderActivity as jest.Mock<typeof getBuilderActivity>).mockResolvedValue({ commits: [], pullRequests: [] });
 
-    await request(worker.default.callback()).post('/process-pull-requests').expect(200);
+    await request(worker.default.callback()).post('/process-builder-activity').expect(200);
   });
 });

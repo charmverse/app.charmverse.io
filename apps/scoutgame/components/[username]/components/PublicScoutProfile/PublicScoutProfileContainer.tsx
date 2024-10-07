@@ -10,8 +10,6 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderInfo } from 'lib/builders/interfaces';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 
-import { PublicProfileTabsMenu } from '../../PublicProfileTabsMenu';
-
 import { PublicScoutProfileStats } from './PublicScoutProfileStats';
 
 export type ScoutProfileProps = {
@@ -39,6 +37,7 @@ export function PublicScoutProfileContainer({
       {!isDesktop ? (
         <Paper sx={{ py: 2, mb: { xs: 1, md: 2 } }}>
           <Stack flexDirection='row'>
+            <BackButton />
             <Box width='calc(100% - 50px)'>
               <UserProfile user={scout} avatarSize={isDesktop ? 'xLarge' : 'large'} />
             </Box>
