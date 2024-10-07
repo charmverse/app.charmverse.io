@@ -47,7 +47,16 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
         },
         select: {
           imageUrl: true,
-          currentPrice: true
+          currentPrice: true,
+          _count: {
+            select: {
+              nftSoldEvents: {
+                where: {
+                  scoutId
+                }
+              }
+            }
+          }
         }
       },
       builderStatus: true,
@@ -73,8 +82,8 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       gemsCollected: builder.userWeeklyStats[0]?.gemsCollected ?? 0,
       nftsSold: builder.userSeasonStats[0]?.nftsSold ?? 0,
       isBanned: builder.builderStatus === 'banned',
-      price: builder.builderNfts[0]?.currentPrice ?? 0
-      // scoutedBy:
+      price: builder.builderNfts[0]?.currentPrice ?? 0,
+      boughtNftsCount: builder.builderNfts[0]?._count?.nftSoldEvents ?? 0
     };
   });
 }
