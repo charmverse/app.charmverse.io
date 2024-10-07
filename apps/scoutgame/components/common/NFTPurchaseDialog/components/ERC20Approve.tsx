@@ -1,3 +1,4 @@
+import { LoadingButton } from '@mui/lab';
 import { Button, Checkbox, FormControlLabel, Tabs, Tab, Chip, Box, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import React, { useState } from 'react';
@@ -38,9 +39,15 @@ export function ERC20ApproveButton({
   return (
     <div>
       <Stack>
-        <Button variant='contained' color='primary' onClick={approveSpender} disabled={isApprovingSpender}>
+        <LoadingButton
+          loading={isApprovingSpender}
+          variant='contained'
+          color='primary'
+          onClick={approveSpender}
+          disabled={isApprovingSpender}
+        >
           {isApprovingSpender ? 'Approving...' : `Approve ${displayAmount} USDC`}
-        </Button>
+        </LoadingButton>
         {amount && (
           <FormControlLabel
             control={
