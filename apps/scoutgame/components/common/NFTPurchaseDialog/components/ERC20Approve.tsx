@@ -1,11 +1,7 @@
 import { Button, Checkbox, FormControlLabel } from '@mui/material';
-import { getChainById } from '@packages/onchain/chains';
-import { getPublicClient } from '@packages/onchain/getPublicClient';
-import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
+import Stack from '@mui/material/Stack';
 import { useState } from 'react';
-import useSWR from 'swr';
-import type { Address, Chain } from 'viem';
-import { useAccount, useSendTransaction, useSwitchChain, useWalletClient } from 'wagmi';
+import type { Address } from 'viem';
 
 import { MAX_UINT256, useUpdateERC20Allowance } from '../hooks/useUpdateERC20Allowance';
 
@@ -16,34 +12,44 @@ type ERC20ApproveButtonProps = {
   spender: Address;
   chainId: number;
   erc20Address: Address;
+  decimals?: number;
 };
 
-export function ERC20ApproveButton({ onSuccess, amount, chainId, erc20Address, spender }: ERC20ApproveButtonProps) {
-  const [useUnlimited, setUseUnlimited] = useState(true);
+export function ERC20ApproveButton({
+  onSuccess,
+  amount,
+  chainId,
+  erc20Address,
+  spender,
+  // Default to decimals for USDC
+  decimals = 6
+}: ERC20ApproveButtonProps) {
+  const [useUnlimited, setUseUnlimited] = useState(false);
 
-  const { updateAllowance } = useUpdateERC20Allowance({ chainId, erc20Address, spender });
+  const { triggerApproveSpender, isApprovingSpender } = useUpdateERC20Allowance({ chainId, erc20Address, spender });
 
-  const approvalAmount = useUnlimited
-    ? MAX_UINT256 // Max uint256
-    : amount || '0';
+  async function approveSpender() {
+    await triggerApproveSpender({ amount: useUnlimited || !amount ? MAX_UINT256 : amount });
+    onSuccess();
+  }
+
+  const displayAmount = useUnlimited ? 'Unlimited' : (Number(amount || 0) / 10 ** decimals).toFixed(2);
 
   return (
     <div>
-      {amount && (
-        <FormControlLabel
-          control={<Checkbox checked={useUnlimited} onChange={() => setUseUnlimited(!useUnlimited)} color='primary' />}
-          label='Approve Unlimited'
-        />
-      )}
-      <Button
-        variant='contained'
-        color='primary'
-        onClick={() => write?.()}
-        disabled={isWriteLoading || isLoadingAllowance}
-      >
-        {isWriteLoading ? 'Approving...' : `Approve ${useUnlimited ? 'Unlimited' : amount}`}
-      </Button>
-      {allowance && <p>Current Allowance: {parseInt(allowance, 10)}</p>}
+      <Stack>
+        {amount && (
+          <FormControlLabel
+            control={
+              <Checkbox checked={useUnlimited} onChange={() => setUseUnlimited(!useUnlimited)} color='primary' />
+            }
+            label='Approve Unlimited'
+          />
+        )}
+        <Button variant='contained' color='primary' onClick={approveSpender} disabled={isApprovingSpender}>
+          {isApprovingSpender ? 'Approving...' : `Approve ${displayAmount} USDC`}
+        </Button>
+      </Stack>
     </div>
   );
 }

@@ -45,10 +45,13 @@ import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsActi
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
+import { useGetERC20Allowance } from '../hooks/useGetERC20Allowance';
+
 import type { ChainOption } from './ChainSelector/chains';
 import { getChainOptions, getCurrencyContract } from './ChainSelector/chains';
 import type { SelectedPaymentOption } from './ChainSelector/ChainSelector';
 import { BlockchainSelect } from './ChainSelector/ChainSelector';
+import { ERC20ApproveButton } from './ERC20Approve';
 import { NumberInputField } from './NumberField';
 import { SuccessView } from './SuccessView';
 
@@ -299,6 +302,19 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const { error: decentSdkError, isLoading: isLoadingDecentSdk, actionResponse } = useBoxAction(decentAPIParams);
 
+  const { allowance, refreshAllowance, isLoadingAllowance } = useGetERC20Allowance({
+    chainId: selectedPaymentOption.chainId,
+    erc20Address:
+      selectedPaymentOption.currency === 'USDC'
+        ? (getCurrencyContract({
+            chainId: selectedPaymentOption.chainId,
+            currency: 'USDC'
+          }) as Address)
+        : null,
+    owner: address as Address,
+    spender: actionResponse?.tx.to as Address
+  });
+
   const amountToPay = actionResponse?.tokenPayment?.amount;
   const isEthPayment = !!actionResponse?.tokenPayment?.isNative;
   const balanceDataFromCorrectChain = balances?.chainId === selectedPaymentOption.chainId;
@@ -385,6 +401,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       : selectedPaymentOption.currency === 'ETH'
       ? (Number(balances?.eth || 0) / 1e18).toFixed(4)
       : (Number(balances.usdc || 0) / 1e6).toFixed(2);
+
+  const approvalRequired =
+    selectedPaymentOption.currency === 'USDC' &&
+    typeof allowance === 'bigint' &&
+    allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
 
   if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
     return <SuccessView builder={builder} />;
@@ -583,25 +604,39 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Typography>
       )}
 
-      <LoadingButton
-        loading={isLoading}
-        size='large'
-        onClick={handlePurchase}
-        variant='contained'
-        disabled={
-          !enableNftButton ||
-          isLoadingDecentSdk ||
-          isFetchingPrice ||
-          !treasuryAddress ||
-          isSavingDecentTransaction ||
-          isExecutingTransaction ||
-          (paymentMethod === 'points' && notEnoughPoints) ||
-          isExecutingPointsPurchase ||
-          (paymentMethod === 'wallet' && !hasSufficientBalance && !!balanceDataFromCorrectChain)
-        }
-      >
-        Buy
-      </LoadingButton>
+      {!approvalRequired ? (
+        <LoadingButton
+          loading={isLoading}
+          size='large'
+          onClick={handlePurchase}
+          variant='contained'
+          disabled={
+            !enableNftButton ||
+            isLoadingDecentSdk ||
+            isFetchingPrice ||
+            !treasuryAddress ||
+            isSavingDecentTransaction ||
+            isExecutingTransaction ||
+            (paymentMethod === 'points' && notEnoughPoints) ||
+            isExecutingPointsPurchase ||
+            (paymentMethod === 'wallet' && !hasSufficientBalance && !!balanceDataFromCorrectChain) ||
+            (!approvalRequired && isLoadingAllowance)
+          }
+        >
+          Buy
+        </LoadingButton>
+      ) : (
+        <ERC20ApproveButton
+          spender={actionResponse?.tx.to as Address}
+          chainId={selectedPaymentOption.chainId}
+          erc20Address={getCurrencyContract(selectedPaymentOption) as Address}
+          amount={amountToPay}
+          onSuccess={() => refreshAllowance()}
+        />
+      )}
+
+      <p>ALLOWANCE: {String(allowance)}</p>
+      <p>PAY: {String(amountToPay)}</p>
 
       {decentSdkError instanceof Error ? (
         <Typography variant='caption' color='error' align='center'>
