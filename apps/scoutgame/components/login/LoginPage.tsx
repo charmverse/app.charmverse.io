@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
 
+import { SinglePageLayout } from 'components/common/Layout';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
 
@@ -10,22 +11,7 @@ export function LoginPage() {
   return (
     <>
       <InfoBackgroundImage />
-      <Box
-        display='flex'
-        flexDirection='column'
-        alignItems='center'
-        maxWidth='100vw'
-        border='none'
-        borderRadius='0'
-        textAlign='center'
-        bgcolor='transparent'
-        data-test='login-page'
-        position='relative'
-        zIndex='2'
-        justifyContent='space-evenly'
-        gap={4}
-        minHeight='calc(100svh - 48px)'
-      >
+      <SinglePageLayout position='relative' zIndex={2}>
         <Image
           src='/images/scout-game-logo-square.png'
           width={300}
@@ -45,7 +31,7 @@ export function LoginPage() {
         <Box display='flex' flexDirection='column' gap={2} width='100%'>
           <WarpcastLogin />
         </Box>
-      </Box>
+      </SinglePageLayout>
     </>
   );
 }
