@@ -33,7 +33,7 @@ export function getBuilderContractAddress(): `0x${string}` {
 export const usdcOptimismSepoliaContractAddress = '0x5fd84259d66Cd46123540766Be93DFE6D43130D7';
 export const usdcOptimismMainnetContractAddress = '0x0b2c639c533813f4aa9d7837caf62653d097ff85';
 
-export const usdcContractAddress = useTestnets
+export const optimismUsdcContractAddress = useTestnets
   ? usdcOptimismSepoliaContractAddress
   : usdcOptimismMainnetContractAddress;
 

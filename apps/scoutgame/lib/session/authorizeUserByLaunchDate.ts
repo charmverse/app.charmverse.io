@@ -7,11 +7,11 @@ import { isDevEnv, isStagingEnv } from '@root/config/constants';
 import { DateTime } from 'luxon';
 
 export const launchDates: Record<string, ConnectWaitlistTier> = {
-  '2024-10-07': 'legendary',
-  '2024-10-14': 'mythic',
-  '2024-10-17': 'epic',
-  '2024-10-21': 'rare',
-  '2024-10-23': 'common'
+  '2024-10-08': 'legendary',
+  '2024-10-15': 'mythic',
+  '2024-10-18': 'epic',
+  '2024-10-22': 'rare',
+  '2024-10-24': 'common'
 };
 
 // check htat user signed up to the waitlist

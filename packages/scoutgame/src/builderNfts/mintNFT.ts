@@ -1,5 +1,6 @@
 'use server';
 
+import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
@@ -35,6 +36,33 @@ export async function mintNFT(params: MintNFTParams) {
     }
   });
 
+  await recordNftMint({ ...params, mintTxHash: txResult.transactionHash });
+}
+
+export async function recordNftMint(params: MintNFTParams & { mintTxHash: string }): Promise<void> {
+  const { amount, builderNftId, paidWithPoints, pointsValue, recipientAddress, scoutId, mintTxHash } = params;
+
+  if (!mintTxHash.trim().startsWith('0x')) {
+    throw new InvalidInputError(`Mint transaction hash is required`);
+  }
+
+  const existingTx = await prisma.nFTPurchaseEvent.findFirst({
+    where: {
+      txHash: mintTxHash
+    }
+  });
+
+  if (existingTx) {
+    log.warn(`Tried to record duplicate tx ${mintTxHash}`, { params, existingTx });
+    return;
+  }
+
+  const builderNft = await prisma.builderNft.findFirstOrThrow({
+    where: {
+      id: builderNftId
+    }
+  });
+
   // The builder receives 20% of the points value, regardless of whether the purchase was paid with points or not
   const pointsReceipts: { value: number; recipientId?: string; senderId?: string }[] = [
     {
@@ -66,7 +94,7 @@ export async function mintNFT(params: MintNFTParams) {
             pointsValue,
             tokensPurchased: amount,
             paidInPoints: paidWithPoints,
-            txHash: txResult.transactionHash.toLowerCase(),
+            txHash: mintTxHash?.toLowerCase(),
             builderNftId,
             scoutId,
             activities: {
