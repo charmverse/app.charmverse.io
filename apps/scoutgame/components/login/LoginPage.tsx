@@ -1,49 +1,15 @@
 import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import { Hidden } from 'components/common/Hidden';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
-import { InfoWrapper } from 'components/layout/InfoWrapper';
+import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
 
 import { LaunchDate } from './LaunchDate';
 
 export function LoginPage() {
   return (
-    <InfoWrapper>
-      <Hidden mdDown>
-        <Image
-          src='/images/desktop_login_background.png'
-          width={800}
-          height={600}
-          sizes='100vw'
-          alt='ScoutGame'
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 1
-          }}
-        />
-      </Hidden>
-      <Hidden mdUp>
-        <Image
-          src='/images/mobile_login_background.png'
-          width={300}
-          height={300}
-          sizes='100vw'
-          alt='ScoutGame'
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 1
-          }}
-        />
-      </Hidden>
+    <>
+      <InfoBackgroundImage />
       <Box
         display='flex'
         flexDirection='column'
@@ -54,15 +20,11 @@ export function LoginPage() {
         textAlign='center'
         bgcolor='transparent'
         data-test='login-page'
-        sx={{
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          zIndex: 2,
-          gap: 4,
-          alignItems: 'center',
-          minHeight: 'calc(100svh - 100px)'
-        }}
+        position='relative'
+        zIndex='2'
+        justifyContent='space-evenly'
+        gap={4}
+        minHeight='calc(100svh - 48px)'
       >
         <Image
           src='/images/scout-game-logo-square.png'
@@ -84,6 +46,6 @@ export function LoginPage() {
           <WarpcastLogin />
         </Box>
       </Box>
-    </InfoWrapper>
+    </>
   );
 }

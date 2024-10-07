@@ -1,18 +1,18 @@
 import type { BoxProps } from '@mui/material/Box';
 import Box from '@mui/material/Box';
-import type { ReactNode } from 'react';
 
-export function SinglePageWrapper({ children }: { children: ReactNode }) {
+export function SinglePageWrapper({ children, ...props }: BoxProps) {
   return (
     <Box
       position='relative'
       borderRadius={{ xs: 0, md: 2 }}
       border={{ xs: 'none', sm: '1px solid var(--charm-palette-divider)' }}
-      maxWidth='600px'
+      maxWidth='500px'
       height='100%'
       textAlign='left'
       mx='auto'
       p={3}
+      {...props}
     >
       {children}
     </Box>
