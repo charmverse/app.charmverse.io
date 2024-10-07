@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 import { CiBellOn } from 'react-icons/ci';
-import { PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
+import { PiBinocularsLight, PiHouseLight, PiInfoLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
 import { useMdScreen } from 'hooks/useMediaScreens';
@@ -30,6 +30,9 @@ const StyledBottomNavigation = styled(BottomNavigation, {
     '&.Mui-selected': {
       color: theme.palette.text.primary,
       backgroundColor: topNav ? theme.palette.primary.main : 'rgba(44, 0, 90, 0.25)'
+    },
+    '&.MuiButtonBase-root': {
+      minWidth: '60px'
     },
     '& .MuiBottomNavigationAction-label': {
       fontSize: '.75rem'
@@ -84,8 +87,16 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
           // This makes sure the UI doesn't flicker from single column to double column for desktop screens
           href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
           value='profile'
-          icon={<SlUser size='19px' style={{ margin: '2px 0' }} />}
+          icon={<SlUser size='19px' style={{ margin: '2px 0 3px' }} />}
           onClick={(e) => openAuthModal?.(e, 'profile')}
+        />
+        <BottomNavigationAction
+          LinkComponent={Link}
+          label='Info'
+          // This makes sure the UI doesn't flicker from single column to double column for desktop screens
+          href='/info'
+          value='info'
+          icon={<PiInfoLight size='24px' />}
         />
       </StyledBottomNavigation>
       <SignInModalMessage
@@ -106,6 +117,8 @@ function getActiveButton(pathname: string) {
     return 'notifications';
   } else if (pathname.startsWith('/profile')) {
     return 'profile';
+  } else if (pathname.startsWith('/info')) {
+    return 'info';
   }
   return null;
 }

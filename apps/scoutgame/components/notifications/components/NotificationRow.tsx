@@ -111,7 +111,7 @@ export function mapActivityToRow(notification: ScoutGameNotification) {
       );
       break;
     case ScoutGameActivityType.points: {
-      title = `Congratulations! Your season ${notification.season} week ${notification.week} reward are ready!`;
+      title = notification.title;
       const button = (
         <Button size='medium' variant='outlined' disabled={!notification.claimable} color='secondary' sx={{ my: 1 }}>
           <Typography variant='caption' color={notification.claimable ? 'secondary' : ''}>
