@@ -12,15 +12,23 @@ export async function ScoutPageBuildersGallery({
   showHotIcon,
   userId
 }: {
-  sort: string;
+  sort: BuildersSort;
   showHotIcon: boolean;
   userId?: string;
 }) {
-  const builders = await getSortedBuilders({
+  const { builders, nextCursor } = await getSortedBuilders({
     sort: sort as BuildersSort,
-    limit: 200,
+    limit: 15,
     week: getCurrentWeek(),
     season: currentSeason
   });
-  return <BuildersGalleryContainer builders={builders} showHotIcon={showHotIcon} userId={userId} />;
+  return (
+    <BuildersGalleryContainer
+      sort={sort}
+      initialCursor={nextCursor}
+      initialBuilders={builders}
+      showHotIcon={showHotIcon}
+      userId={userId}
+    />
+  );
 }
