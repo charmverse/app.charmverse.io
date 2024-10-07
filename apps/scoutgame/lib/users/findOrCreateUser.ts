@@ -1,7 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { Scout } from '@charmverse/core/prisma-client';
+import type { BuilderEventType, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
 import { getTier } from '@packages/scoutgame/waitlist/scoring/constants';
 import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
@@ -75,27 +76,36 @@ export async function findOrCreateUser({
     }
   });
 
+  let points = 0;
+
+  if (waitlistRecord?.percentile) {
+    const tier = getTier(waitlistRecord.percentile);
+    points = waitlistTierPointsRecord[tier] || 0;
+  }
+
   const newScout = await prisma.scout.create({
     data: {
       ...userProps,
       id: userId,
       walletAddress: lowercaseAddress,
-      farcasterId
-    }
-  });
-  if (waitlistRecord?.percentile) {
-    const tier = getTier(waitlistRecord.percentile);
-    await prisma.scout.update({
-      where: {
-        id: newScout.id
-      },
-      data: {
-        currentBalance: {
-          increment: waitlistTierPointsRecord[tier]
+      farcasterId,
+      currentBalance: points,
+      pointsReceived: {
+        create: {
+          value: points,
+          claimedAt: new Date(),
+          event: {
+            create: {
+              season: currentSeason,
+              type: 'waitlist_airdrop' as BuilderEventType,
+              week: getCurrentWeek(),
+              builderId: userId
+            }
+          }
         }
       }
-    });
-  }
+    }
+  });
 
   return newScout;
 }
