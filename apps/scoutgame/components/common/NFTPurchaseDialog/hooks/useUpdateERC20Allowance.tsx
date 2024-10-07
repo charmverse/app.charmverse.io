@@ -1,7 +1,8 @@
 import { getChainById } from '@packages/onchain/chains';
-import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
+import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
+import { getWalletClient } from '@wagmi/core';
 import useSWRMutation from 'swr/mutation';
-import type { Address, Chain } from 'viem';
+import { publicActions, type Address, type Chain } from 'viem';
 import { useWalletClient } from 'wagmi';
 
 // Define a hook for checking allowances
@@ -17,10 +18,10 @@ export function useUpdateERC20Allowance({ spender, erc20Address, chainId }: UseE
   const { data: walletClient } = useWalletClient();
 
   const mutationFn = async (_url: string, { arg: { amount } }: { arg: { amount: bigint } }) => {
-    const client = new USDcAbiClient({
+    const client = new UsdcErc20ABIClient({
       chain: getChainById(chainId)?.viem as Chain,
       contractAddress: erc20Address,
-      walletClient: walletClient as any
+      walletClient: walletClient?.extend(publicActions)
     });
 
     await client.approve({ args: { spender, value: amount } });

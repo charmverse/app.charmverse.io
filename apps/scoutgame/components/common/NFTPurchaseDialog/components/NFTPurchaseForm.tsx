@@ -2,7 +2,7 @@
 
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
-import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
+import { ActionType, ChainId } from '@decent.xyz/box-common';
 import type { UseBoxActionArgs } from '@decent.xyz/box-hooks';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
@@ -27,7 +27,7 @@ import {
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
-import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
+import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import { convertCostToPointsWithDiscount, convertCostToUsd } from '@packages/scoutgame/builderNfts/utils';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
@@ -35,7 +35,7 @@ import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
-import { useAccount, useSendTransaction, useSwitchChain, useWalletClient } from 'wagmi';
+import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
@@ -175,7 +175,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       return;
     }
 
-    const client = new USDcAbiClient({
+    const client = new UsdcErc20ABIClient({
       chain,
       contractAddress: chainOption.usdcAddress as `0x${string}`,
       publicClient: getPublicClient(_chainId)
@@ -403,6 +403,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       : (Number(balances.usdc || 0) / 1e6).toFixed(2);
 
   const approvalRequired =
+    paymentMethod === 'wallet' &&
     selectedPaymentOption.currency === 'USDC' &&
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
@@ -604,7 +605,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Typography>
       )}
 
-      {!approvalRequired ? (
+      {!approvalRequired || isExecutingTransaction || isExecutingPointsPurchase ? (
         <LoadingButton
           loading={isLoading}
           size='large'
@@ -634,10 +635,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           onSuccess={() => refreshAllowance()}
         />
       )}
-
-      <p>ALLOWANCE: {String(allowance)}</p>
-      <p>PAY: {String(amountToPay)}</p>
-
       {decentSdkError instanceof Error ? (
         <Typography variant='caption' color='error' align='center'>
           {(decentSdkError as Error).message}

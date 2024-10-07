@@ -1,6 +1,6 @@
-import { Button, Checkbox, FormControlLabel } from '@mui/material';
+import { Button, Checkbox, FormControlLabel, Tabs, Tab, Chip, Box, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import type { Address } from 'viem';
 
 import { MAX_UINT256, useUpdateERC20Allowance } from '../hooks/useUpdateERC20Allowance';
@@ -38,6 +38,9 @@ export function ERC20ApproveButton({
   return (
     <div>
       <Stack>
+        <Button variant='contained' color='primary' onClick={approveSpender} disabled={isApprovingSpender}>
+          {isApprovingSpender ? 'Approving...' : `Approve ${displayAmount} USDC`}
+        </Button>
         {amount && (
           <FormControlLabel
             control={
@@ -46,9 +49,11 @@ export function ERC20ApproveButton({
             label='Approve Unlimited'
           />
         )}
-        <Button variant='contained' color='primary' onClick={approveSpender} disabled={isApprovingSpender}>
-          {isApprovingSpender ? 'Approving...' : `Approve ${displayAmount} USDC`}
-        </Button>
+        <Typography sx={{ mb: 1 }} variant='caption'>
+          {useUnlimited
+            ? 'Approving unlimited tokens eliminates the need for repeated approvals. You can revoke this approval anytime.'
+            : 'Approving a specific amount requires a new approval each time you want to mint an NFT.'}
+        </Typography>
       </Stack>
     </div>
   );

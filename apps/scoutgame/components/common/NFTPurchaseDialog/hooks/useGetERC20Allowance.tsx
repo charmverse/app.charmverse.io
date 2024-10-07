@@ -1,6 +1,6 @@
 import { getChainById } from '@packages/onchain/chains';
 import { getPublicClient } from '@packages/onchain/getPublicClient';
-import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
+import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import useSWR from 'swr';
 import type { Address, Chain } from 'viem';
 
@@ -23,7 +23,7 @@ export function useGetERC20Allowance({ owner, spender, erc20Address, chainId }: 
       ? `erc20-allowance-${owner}-${spender}-${erc20Address}-${chainId}`
       : null,
     async () => {
-      const client = new USDcAbiClient({
+      const client = new UsdcErc20ABIClient({
         chain: getChainById(chainId)?.viem as Chain,
         // Shouldn't get triggered unless key is valid
         contractAddress: erc20Address as Address,
