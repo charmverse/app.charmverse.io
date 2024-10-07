@@ -285,6 +285,7 @@ export async function getNotifications({ userId }: { userId: string }): Promise<
             ...commonProps,
             amount: receipt.value,
             season: 1,
+            title,
             claimable: receipt.claimedAt === null,
             week: getSeasonWeekFromISOWeek({
               season: receipt.event.season,
