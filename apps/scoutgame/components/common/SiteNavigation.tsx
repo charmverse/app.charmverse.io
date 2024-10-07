@@ -31,6 +31,9 @@ const StyledBottomNavigation = styled(BottomNavigation, {
       color: theme.palette.text.primary,
       backgroundColor: topNav ? theme.palette.primary.main : 'rgba(44, 0, 90, 0.25)'
     },
+    '&.MuiButtonBase-root': {
+      minWidth: '60px'
+    },
     '& .MuiBottomNavigationAction-label': {
       fontSize: '.75rem'
     }
