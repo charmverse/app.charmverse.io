@@ -29,4 +29,4 @@ export async function refreshCongratsImages() {
   }
 }
 
-refreshCongratsImages();
+// refreshCongratsImages();
