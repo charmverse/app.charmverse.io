@@ -77,3 +77,5 @@ export async function distributeWaitlistPoints() {
     }
   }
 }
+
+distributeWaitlistPoints();

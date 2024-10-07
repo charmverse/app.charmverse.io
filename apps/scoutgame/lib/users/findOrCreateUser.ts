@@ -8,6 +8,7 @@ import { getTier } from '@packages/scoutgame/waitlist/scoring/constants';
 import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
 import { getENSName } from '@root/lib/blockchain/getENSName';
 import { getFilenameWithExtension } from '@root/lib/utils/getFilenameWithExtension';
+import { capitalize } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
 const waitlistTierPointsRecord: Record<ConnectWaitlistTier, number> = {
@@ -101,7 +102,7 @@ export async function findOrCreateUser({
                   create: {
                     season: currentSeason,
                     type: 'misc_event' as BuilderEventType,
-                    description: `Received points for achieving ${tier} status on waitlist`,
+                    description: `Received points for achieving ${capitalize(tier)} status on waitlist`,
                     week: getCurrentWeek(),
                     builderId: userId
                   }
