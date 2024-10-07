@@ -35,7 +35,7 @@ import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
-import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
+import { useAccount, useSendTransaction, useSwitchChain, useWalletClient } from 'wagmi';
 
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
@@ -77,6 +77,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToUsd(builder.price) : 'N/A';
   const { address, chainId } = useAccount();
+
   const { switchChainAsync } = useSwitchChain();
 
   const builderContractReadonlyApiClient = new BuilderNFTSeasonOneImplementation01Client({
