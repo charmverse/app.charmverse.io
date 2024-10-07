@@ -2,6 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
+import { updateUserProfile } from '@packages/mixpanel/updateUserProfile';
 import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
 import { getENSName } from '@root/lib/blockchain/getENSName';
 import { getFilenameWithExtension } from '@root/lib/utils/getFilenameWithExtension';
@@ -33,6 +35,10 @@ export async function findOrCreateUser({
   });
 
   if (scout) {
+    trackUserAction('user_login', {
+      userId: scout.id,
+      fid: farcasterId
+    });
     return scout;
   }
 
@@ -66,6 +72,20 @@ export async function findOrCreateUser({
       walletAddress: lowercaseAddress,
       farcasterId
     }
+  });
+
+  trackUserAction('user_signup', {
+    userId: newScout.id,
+    fid: farcasterId,
+    username: userProps.username,
+    displayName: userProps.displayName
+  });
+
+  await updateUserProfile(newScout.id, {
+    userId: newScout.id,
+    farcasterId,
+    username: userProps.username,
+    displayName: userProps.displayName
   });
 
   return newScout;

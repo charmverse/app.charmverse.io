@@ -3,6 +3,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
@@ -172,6 +173,12 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
     }
   });
   log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
-
+  trackUserAction('nft_purchase', {
+    builderId: builderNft.builderId,
+    amount,
+    scoutId,
+    season: currentSeason,
+    tokenId: builderNft.tokenId
+  });
   await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });
 }

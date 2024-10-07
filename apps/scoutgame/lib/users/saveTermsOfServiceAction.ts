@@ -1,6 +1,7 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
+import { updateUserProfile } from '@packages/mixpanel/updateUserProfile';
 
 import { authActionClient } from 'lib/actions/actionClient';
 
@@ -23,6 +24,12 @@ export const saveTermsOfServiceAction = authActionClient
         sendMarketing: parsedInput.sendMarketing,
         agreedToTermsAt: new Date()
       }
+    });
+
+    await updateUserProfile(userId, {
+      agreedToTermsAt: new Date(),
+      email: parsedInput.email,
+      sendMarketing: parsedInput.sendMarketing
     });
 
     return { success: true };

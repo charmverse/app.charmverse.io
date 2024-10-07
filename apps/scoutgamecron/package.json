@@ -19,6 +19,7 @@
     "@packages/github": "^0.0.0",
     "@packages/onchain": "^0.0.0",
     "@packages/scoutgame": "^0.0.0",
+    "@packages/mixpanel": "^0.0.0",
     "@packages/utils": "^1.0.0",
     "web-push": "^3.6.7"
   },
