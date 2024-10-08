@@ -40,7 +40,7 @@ describe('recordNftMint', () => {
       paidWithPoints: true
     });
 
-    const userSeasonStats = await prisma.userSeasonStats.findUniqueOrThrow({
+    const builderStats = await prisma.userSeasonStats.findUniqueOrThrow({
       where: {
         userId_season: {
           userId: builder.id,
@@ -49,6 +49,18 @@ describe('recordNftMint', () => {
       }
     });
 
-    expect(userSeasonStats?.nftsSold).toBe(amount);
+    expect(builderStats?.nftsSold).toBe(amount);
+    expect(builderStats?.nftOwners).toBe(1);
+
+    const scoutStats = await prisma.userSeasonStats.findUniqueOrThrow({
+      where: {
+        userId_season: {
+          userId: scout.id,
+          season: builderNft.season
+        }
+      }
+    });
+
+    expect(scoutStats?.nftsPurchased).toBe(amount);
   });
 });

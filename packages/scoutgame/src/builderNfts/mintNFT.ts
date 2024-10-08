@@ -79,6 +79,15 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
   }
 
   await prisma.$transaction(async (tx) => {
+    const owners = await tx.nFTPurchaseEvent.findMany({
+      where: {
+        builderNftId
+      },
+      select: {
+        scoutId: true
+      }
+    });
+    const uniqueOwners = Array.from(new Set(owners.map((owner) => owner.scoutId).concat(scoutId))).length;
     await tx.builderEvent.create({
       data: {
         type: 'nft_purchase',
@@ -125,6 +134,7 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
         }
       },
       create: {
+        nftOwners: uniqueOwners,
         nftsSold: amount,
         userId: builderNft.builderId,
         season: builderNft.season,
@@ -132,6 +142,7 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
         pointsEarnedAsScout: 0
       },
       update: {
+        nftOwners: uniqueOwners,
         nftsSold: {
           increment: amount
         }
