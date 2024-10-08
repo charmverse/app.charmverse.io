@@ -1,7 +1,7 @@
 import { authorizeUserByLaunchDate } from '../lib/session/authorizeUserByLaunchDate';
 import { prisma } from '@charmverse/core/prisma-client';
 async function main() {
-  const scout = await prisma.connectWaitlistSlot.findFirst({
+  const scout = await prisma.connectWaitlistSlot.findFirstOrThrow({
     where: {
       username: 'qqsksk12'
     }
