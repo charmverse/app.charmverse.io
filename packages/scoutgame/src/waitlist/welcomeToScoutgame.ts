@@ -60,9 +60,12 @@ export async function welcomeFromWaitlistToScoutgame({ fid }: { fid: number }): 
 //     },
 //     create: {
 //       fid: 4339,
-//       username: 'meb'
+//       username: 'meb',
+//       percentile: 98
 //     },
-//     update: {}
+//     update: {
+//       percentile: 98
+//     }
 //   })
 //   .then(() => welcomeFromWaitlistToScoutgame({ fid: 4339 }).then(console.log))
 //   .catch(console.error);

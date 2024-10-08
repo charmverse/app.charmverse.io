@@ -3,8 +3,9 @@
 import { ExternalServiceError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Cast } from '@neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster';
-import { POST } from '@root/adapters/http';
-import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from '@root/lib/farcaster/constants';
+import { POST } from '@packages/utils/http';
+
+import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from '../constants';
 
 // TBD - https://github.com/neynarxyz/farcaster-examples/tree/main/managed-signers
 

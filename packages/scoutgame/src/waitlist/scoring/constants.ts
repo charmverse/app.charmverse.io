@@ -17,7 +17,7 @@ export const tierDistribution: TierDistributionType[] = [
   {
     tier: 'common',
     threshold: 1,
-    totalPercentSize: 40,
+    totalPercentSize: 30,
     imageText: '/images/levels/common.png',
     badge: '/images/levels/common-badge.png',
     badgeText: '/images/levels/common-badge-text.png'
@@ -25,7 +25,7 @@ export const tierDistribution: TierDistributionType[] = [
   {
     tier: 'rare',
     threshold: 31,
-    totalPercentSize: 20,
+    totalPercentSize: 30,
     imageText: '/images/levels/rare.png',
     badge: '/images/levels/rare-badge.png',
     badgeText: '/images/levels/rare-badge-text.png'
@@ -99,4 +99,16 @@ export function findHighestNumberInArray<Z extends string, T extends Record<Z, n
     }
     return acc;
   }, null as T | null);
+}
+
+export function getWaitlistRange(tier: ConnectWaitlistTier): { min: number; max: number } {
+  const tierInfo = tierDistributionMap[tier];
+  if (!tierInfo) {
+    throw new Error(`Invalid tier: ${tier}`);
+  }
+
+  const min = tierInfo.threshold;
+  const max = min + tierInfo.totalPercentSize - 1; // Calculate max based on totalPercentSize
+
+  return { min, max };
 }
