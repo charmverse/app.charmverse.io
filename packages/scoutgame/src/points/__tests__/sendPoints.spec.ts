@@ -1,43 +1,54 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { jest } from '@jest/globals';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
+import { mockBuilder } from '../../testing/database';
 import { sendPoints } from '../sendPoints';
 
-// Mock prisma
-jest.mock('@charmverse/core/prisma-client', () => ({
-  prisma: {
-    $transaction: jest.fn()
-  }
-}));
-
 describe('sendPoints', () => {
-  const mockBuilderId = 'builder123';
-  const mockPoints = 100;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
+  it('should send points quietly', async () => {
+    const builder = await mockBuilder();
+    const mockPoints = 100;
+    await sendPoints({
+      builderId: builder.id,
+      points: mockPoints,
+      hideFromNotifications: true
+    });
+    const updated = await prisma.scout.findUnique({
+      where: {
+        id: builder.id
+      },
+      select: {
+        currentBalance: true,
+        userSeasonStats: true,
+        activities: true
+      }
+    });
+    expect(updated?.currentBalance).toBe(mockPoints);
+    expect(updated?.userSeasonStats[0]).toBeUndefined();
+    expect(updated?.activities[0]).toBeUndefined();
   });
 
-  it('should send points correctly', async () => {
-    // Mock $transaction
-    (prisma.$transaction as jest.Mock).mockResolvedValue([
-      { id: 'event1' }, // builderEvent.create
-      { id: 'scout1' }, // scout.update
-      { id: 'stats1' } // userSeasonStats.upsert (when earnedAsBuilder is true)
-    ]);
-
+  it('should send points earned as builder', async () => {
+    const builder = await mockBuilder();
+    const mockPoints = 100;
     await sendPoints({
-      builderId: mockBuilderId,
+      builderId: builder.id,
       points: mockPoints,
       earnedAsBuilder: true
     });
-
-    // Add assertions here to check if $transaction was called with the correct parameters
-    // Check if builderEvent.create, scout.update, and userSeasonStats.upsert were called correctly
+    const updated = await prisma.scout.findUnique({
+      where: {
+        id: builder.id
+      },
+      select: {
+        currentBalance: true,
+        userSeasonStats: true,
+        activities: true
+      }
+    });
+    expect(updated?.currentBalance).toBe(mockPoints);
+    expect(updated?.userSeasonStats[0].pointsEarnedAsBuilder).toBe(mockPoints);
+    expect(updated?.activities[0].type).toBe('points');
   });
-
-  // Add more test cases here:
-  // - Test with different combinations of optional parameters (season, week, earnedAsBuilder, hideFromNotifications)
-  // - Test when earnedAsBuilder is false
-  // - Test error handling
 });
