@@ -11,6 +11,15 @@ jest.unstable_mockModule('../clients/builderContractAdminWriteClient', () => ({
     getTokenPurchasePrice: () => Promise.resolve(randomLargeInt())
   })
 }));
+
+jest.unstable_mockModule('../clients/builderContractReadClient', () => ({
+  builderContractReadonlyApiClient: {
+    getTokenIdForBuilder: () => Promise.resolve(randomLargeInt()),
+    registerBuilderToken: jest.fn(),
+    getTokenPurchasePrice: () => Promise.resolve(randomLargeInt())
+  }
+}));
+
 const { recordNftMint } = await import('../mintNFT');
 
 describe('recordNftMint', () => {
