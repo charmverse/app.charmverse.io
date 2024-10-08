@@ -1,7 +1,7 @@
 'use client';
 
 import { useConnectModal, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Dialog } from 'components/common/Dialog';
@@ -20,16 +20,23 @@ type NFTPurchaseDialogProps = {
 
 // This component opens the wallet connect modal if the user is not connected yet
 function NFTPurchaseDialogComponent(props: NFTPurchaseDialogProps) {
-  const { openConnectModal } = useConnectModal();
+  const { openConnectModal, connectModalOpen } = useConnectModal();
   const { address } = useAccount();
   const isDesktop = useSmScreen();
+  // we need to keep track of this so we can close the modal when the user cancels
+  const [isRainbowKitOpen, setIsRainbowKitOpen] = useState(false);
 
   // open Rainbowkit modal if not connected
   useEffect(() => {
-    if (props.open && !address) {
+    // If rainbowkit modal was closed by user, but our state is not updated yet, update it so we reset the parent open state
+    if (!connectModalOpen && isRainbowKitOpen && !address) {
+      setIsRainbowKitOpen(false);
+      props.onClose();
+    } else if (props.open && !address) {
       openConnectModal?.();
+      setIsRainbowKitOpen(true);
     }
-  }, [props.open, address, openConnectModal]);
+  }, [props.open, address, connectModalOpen, openConnectModal, isRainbowKitOpen]);
 
   return (
     <Dialog
