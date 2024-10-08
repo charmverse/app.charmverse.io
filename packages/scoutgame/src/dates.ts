@@ -1,11 +1,11 @@
 import { DateTime } from 'luxon';
 
-type ISOWeek = string; // isoweek, e.g. '2024-W01'
+export type ISOWeek = string; // isoweek, e.g. '2024-W01'
 type WeekOfSeason = number; // the week in the season, e.g. 1
 
 // Season start MUST be on a Monday, when isoweek begins
 
-const seasons = [
+export const seasons = [
   // dev season
   {
     start: '2024-W38',
