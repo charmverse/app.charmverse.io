@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import { getPublicClient } from '@packages/onchain/getPublicClient';
 import { prettyPrint } from '@packages/utils/strings';
 import { createPublicClient, decodeFunctionResult, encodeFunctionData, http, parseEventLogs } from 'viem';
@@ -137,7 +138,24 @@ async function getLogsByUserId({ scoutId }: { scoutId: string }) {
 
   const groupedEvents = groupEventsByTransactionHash(logs as any);
 
-  return groupedEvents.filter((event) => event.scoutId === scoutId);
+  const nftPurchases = await prisma.nFTPurchaseEvent.findMany({
+    where: {
+      scoutId
+    },
+    select: {
+      txHash: true,
+      tokensPurchased: true,
+      paidInPoints: true,
+      pointsValue: true
+    }
+  });
+
+  return groupedEvents
+    .filter((event) => event.scoutId === scoutId)
+    .map((event) => {
+      const nftPurchase = nftPurchases.find((nft) => nft.txHash === event.txHash) ?? null;
+      return { ...event, nftPurchase };
+    });
 }
 
 async function getTokenPurchasePrice(params: {
