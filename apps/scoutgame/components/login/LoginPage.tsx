@@ -11,7 +11,7 @@ export function LoginPage() {
   return (
     <>
       <InfoBackgroundImage />
-      <SinglePageLayout position='relative' zIndex={2}>
+      <SinglePageLayout position='relative' zIndex={2} data-test='login-page'>
         <Image
           src='/images/scout-game-logo-square.png'
           width={300}
