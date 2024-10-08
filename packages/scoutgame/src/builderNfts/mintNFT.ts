@@ -82,7 +82,7 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
     await tx.builderEvent.create({
       data: {
         type: 'nft_purchase',
-        season: currentSeason,
+        season: builderNft.season,
         week: getCurrentWeek(),
         builder: {
           connect: {
@@ -121,13 +121,13 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
       where: {
         userId_season: {
           userId: builderNft.builderId,
-          season: currentSeason
+          season: builderNft.season
         }
       },
       create: {
         nftsSold: amount,
         userId: builderNft.builderId,
-        season: currentSeason,
+        season: builderNft.season,
         pointsEarnedAsBuilder: 0,
         pointsEarnedAsScout: 0
       },
@@ -141,13 +141,13 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
       where: {
         userId_season: {
           userId: scoutId,
-          season: currentSeason
+          season: builderNft.season
         }
       },
       create: {
         nftsPurchased: amount,
         userId: scoutId,
-        season: currentSeason,
+        season: builderNft.season,
         pointsEarnedAsBuilder: 0,
         pointsEarnedAsScout: 0
       },
