@@ -9,6 +9,9 @@ export async function createScoutMixpanelProfiles() {
       displayName: true,
       farcasterId: true,
       builderStatus: true,
+      onboardedAt: true,
+      agreedToTermsAt: true,
+      sendMarketing: true
     }
   });
 
@@ -18,7 +21,9 @@ export async function createScoutMixpanelProfiles() {
       username: scout.username,
       displayName: scout.displayName,
       farcasterId: scout.farcasterId,
-      userId: scout.id,
+      onboarded: !!scout.onboardedAt,
+      agreedToTOS: !!scout.agreedToTermsAt,
+      enableMarketing: scout.sendMarketing
     })
   }
 }

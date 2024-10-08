@@ -35,10 +35,7 @@ export async function findOrCreateUser({
   });
 
   if (scout) {
-    trackUserAction('user_login', {
-      userId: scout.id,
-      fid: farcasterId
-    });
+    trackUserAction('sign_in', { userId: scout.id });
     return scout;
   }
 
@@ -74,15 +71,17 @@ export async function findOrCreateUser({
     }
   });
 
-  trackUserAction('user_signup', {
+  trackUserAction('sign_up', {
     userId: newScout.id,
-    fid: farcasterId,
     username: userProps.username,
+    builderStatus: null,
+    onboarded: false,
+    agreedToTOS: false,
+    enableMarketing: null,
     displayName: userProps.displayName
   });
 
   await updateUserProfile(newScout.id, {
-    userId: newScout.id,
     farcasterId,
     username: userProps.username,
     displayName: userProps.displayName

@@ -61,6 +61,16 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
   const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
       id: builderNftId
+    },
+    select: {
+      season: true,
+      tokenId: true,
+      builderId: true,
+      builder: {
+        select: {
+          displayName: true
+        }
+      }
     }
   });
 
@@ -174,11 +184,11 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
   });
   log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
   trackUserAction('nft_purchase', {
-    builderId: builderNft.builderId,
+    userId: builderNft.builderId,
+    builderName: builderNft.builder.displayName,
     amount,
-    scoutId,
-    season: currentSeason,
-    tokenId: builderNft.tokenId
+    paidWithPoints,
+    season: builderNft.season
   });
   await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });
 }

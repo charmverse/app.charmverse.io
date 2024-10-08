@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 
+import type { MixpanelEventMap, MixpanelEventName } from './interfaces';
 import { mixpanel } from './mixpanel';
 import { eventNameToHumanFormat, paramsToHumanFormat } from './utils';
 
@@ -10,7 +11,7 @@ export interface MixpanelTrackBase {
 }
 
 // a simpler method that is un-opinionated about types or event schema
-export function trackUserAction<T extends string = string>(eventName: T, params: { userId: string } & any) {
+export function trackUserAction<T extends MixpanelEventName>(eventName: T, params: MixpanelEventMap[T]) {
   const { userId, ...restParams } = params;
   // map userId prop to distinct_id required by mixpanel to recognize the user
   const mixpanelTrackParams: MixpanelTrackBase = {
@@ -18,11 +19,11 @@ export function trackUserAction<T extends string = string>(eventName: T, params:
     ...paramsToHumanFormat(restParams)
   };
 
-  const humanReadableEventName = eventNameToHumanFormat(eventName);
+  const humanReadableEventName = eventNameToHumanFormat(eventName as string);
 
   try {
     mixpanel?.track(humanReadableEventName, mixpanelTrackParams);
   } catch (error) {
-    log.warn(`Failed to update mixpanel event ${eventName}`, { error });
+    log.warn(`Failed to update mixpanel event ${eventName as string}`, { error });
   }
 }
