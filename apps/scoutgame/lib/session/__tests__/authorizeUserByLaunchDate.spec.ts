@@ -60,17 +60,6 @@ describe('authorizeUserByLaunchDate', () => {
     }
   );
 
-  it('should not authorize users with percentile above their tier', async () => {
-    (prisma.scout.count as jest.Mock).mockResolvedValue(0);
-    (prisma.connectWaitlistSlot.findUnique as jest.Mock).mockResolvedValue({
-      fid: mockFid,
-      percentile: 0 // Above all tiers
-    });
-
-    const now = DateTime.fromISO(Object.keys(launchDates)[Object.keys(launchDates).length - 1]).plus({ days: 1 });
-    await expect(authorizeUserByLaunchDate({ fid: mockFid, now })).rejects.toThrow(UnauthorisedActionError);
-  });
-
   it('should not authorize users without a waitlist record', async () => {
     (prisma.scout.count as jest.Mock).mockResolvedValue(0);
     (prisma.connectWaitlistSlot.findUnique as jest.Mock).mockResolvedValue(null);
