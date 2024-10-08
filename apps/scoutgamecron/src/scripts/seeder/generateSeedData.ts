@@ -157,7 +157,7 @@ export async function generateSeedData() {
 
       for (const user of newUserIds) {
         try {
-          await claimPoints(user);
+          await claimPoints({ userId: user });
         } catch (error) {
           log.error(`Error claiming points for user ${user}: ${error}`);
         }
