@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
-import { claimPoints } from '@packages/scoutgame/claimPoints';
+import { claimPoints } from '@packages/scoutgame/points/claimPoints';
 import { getWeekFromDate, currentSeason } from '@packages/scoutgame/dates';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
 import { DateTime } from 'luxon';
