@@ -3,8 +3,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
 import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constants';
-import { unsealData } from 'iron-session';
+import { unsealData, sealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
+
+import { saveSession } from 'lib/session/saveSession';
 
 function generateRedirectUrl(errorMessage: string) {
   return `${process.env.DOMAIN}/welcome/builder?connect_error=${encodeURIComponent(errorMessage)}`;
@@ -188,10 +190,21 @@ export async function GET(req: NextRequest) {
 
   const location = `${process.env.DOMAIN}/welcome/spam-policy`;
 
+  const sealedData = await sealData(
+    {
+      scoutId: unsealedUserId
+    },
+    {
+      password: authSecret as string
+    }
+  );
+
   return new Response(null, {
     status: 302,
     headers: {
-      Location: profileGithubConnect ? `${location}?profile-github-connect=${profileGithubConnect}` : location
+      Location: profileGithubConnect
+        ? `${location}?profile-github-connect=${profileGithubConnect}&github_user=${sealedData}`
+        : `${location}?github_user=${sealedData}`
     }
   });
 }
