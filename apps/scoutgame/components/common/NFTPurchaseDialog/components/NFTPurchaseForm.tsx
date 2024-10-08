@@ -282,7 +282,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   }
    */
 
-  const enableNftButton = !!address && !!purchaseCost;
+  const enableNftButton = !!address && !!purchaseCost && !!user;
 
   const decentAPIParams: UseBoxActionArgs = {
     enable: enableNftButton,
