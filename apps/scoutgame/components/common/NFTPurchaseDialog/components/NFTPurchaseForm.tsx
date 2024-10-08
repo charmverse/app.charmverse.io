@@ -151,6 +151,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       if (res.data?.id) {
         await checkDecentTransaction({ pendingTransactionId: res.data.id });
         log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
+      } else {
+        log.warn('NFT minted but no transaction id returned', {
+          chainId,
+          builderTokenId,
+          purchaseCost,
+          responseData: res.data
+        });
       }
     },
     onError({ error, input }) {

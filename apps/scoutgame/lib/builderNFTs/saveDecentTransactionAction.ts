@@ -45,6 +45,12 @@ export const saveDecentTransactionAction = authActionClient
       ...parsedInput,
       user: { ...(parsedInput.user as any), scoutId: userId }
     });
+    log.info('Saved NFT transaction', {
+      transactionInfo: parsedInput.transactionInfo,
+      purchaseInfo: parsedInput.purchaseInfo,
+      pendingTransactionId: data.id,
+      userId
+    });
 
     return { id: data.id };
   });
