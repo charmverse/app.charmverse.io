@@ -605,7 +605,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Typography>
       )}
 
-      {!approvalRequired || isExecutingTransaction || isExecutingPointsPurchase ? (
+      {!approvalRequired ||
+      isExecutingTransaction ||
+      isExecutingPointsPurchase ||
+      // Show disabled buy button if the user has insufficient balance, instead of the approve button
+      (!hasSufficientBalance && balanceDataFromCorrectChain) ? (
         <LoadingButton
           loading={isLoading}
           size='large'
