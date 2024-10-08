@@ -20,7 +20,7 @@ const preselectedBuilderIds = [
 ];
 
 export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
-  if (isProdEnv) {
+  if (true) {
     const builders = await prisma.scout.findMany({
       where: {
         id: {
@@ -40,7 +40,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
         },
         userWeeklyStats: {
           where: {
-            season: currentSeason
+            week: getCurrentWeek()
           },
           select: {
             gemsCollected: true
