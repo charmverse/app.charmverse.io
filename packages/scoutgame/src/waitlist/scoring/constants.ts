@@ -73,16 +73,6 @@ export function getTier(percentile?: number | null): ConnectWaitlistTier {
   return tier;
 }
 
-export function getTierInfo(percentile?: number | null): ConnectWaitlistTier {
-  if (!percentile) {
-    return 'common';
-  }
-
-  const tier = findHighestNumberInArray(tierDistribution, 'threshold', percentile)?.tier || 'common';
-
-  return tier;
-}
-
 export const tierColors: Record<ConnectWaitlistTier, string> = {
   common: '#b2bec0',
   rare: '#ecb366',
