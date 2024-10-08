@@ -16,10 +16,10 @@ export const launchDates: Record<string, ConnectWaitlistTier> = {
 
 // check htat user signed up to the waitlist
 export async function authorizeUserByLaunchDate({ fid, now = DateTime.now() }: { fid: number; now?: DateTime }) {
-  if (isDevEnv || isStagingEnv) {
-    log.debug('Skip whitelist check in dev/staging');
-    return true;
-  }
+  // if (isDevEnv || isStagingEnv) {
+  //   log.debug('Skip whitelist check in dev/staging');
+  //   return true;
+  // }
 
   const matches = await prisma.scout.count({
     where: {
@@ -40,11 +40,10 @@ export async function authorizeUserByLaunchDate({ fid, now = DateTime.now() }: {
   });
 
   const tier = getTier(waitlistRecord?.percentile);
-
   if (waitlistRecord && waitlistRecord.percentile) {
     for (const launchDate of Object.keys(launchDates)) {
       const launchTier = launchDates[launchDate];
-      if (now.toISODate() > launchDate && tier === launchTier) {
+      if (now.toISODate() >= launchDate && tier === launchTier) {
         log.debug(`Authorizing user ${fid} for ${tier} tier`);
         return true;
       }

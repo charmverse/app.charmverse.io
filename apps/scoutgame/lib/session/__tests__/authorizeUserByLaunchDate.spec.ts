@@ -40,7 +40,7 @@ describe('authorizeUserByLaunchDate', () => {
         percentile: tierDistributionMap[tier].threshold
       });
 
-      const now = DateTime.fromISO(launchDate, { zone: 'utc' }).plus({ days: 1 });
+      const now = DateTime.fromISO(launchDate, { zone: 'utc' }).plus({ minutes: 1 });
       const result = await authorizeUserByLaunchDate({ fid: mockFid, now });
       expect(result).toBe(true);
     }
