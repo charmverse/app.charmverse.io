@@ -2,7 +2,7 @@
 
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
-import { ActionType, ChainId, SwapDirection } from '@decent.xyz/box-common';
+import { ActionType, ChainId } from '@decent.xyz/box-common';
 import type { UseBoxActionArgs } from '@decent.xyz/box-hooks';
 import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
@@ -385,6 +385,14 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       ? (Number(balances?.eth || 0) / 1e18).toFixed(4)
       : (Number(balances.usdc || 0) / 1e6).toFixed(2);
 
+  // Update this function to handle potential NaN values
+  const handleTokensToBuyChange = (value: number | string) => {
+    const parsedValue = typeof value === 'string' ? parseInt(value, 10) : value;
+    if (!Number.isNaN(parsedValue) && parsedValue > 0) {
+      setTokensToBuy(parsedValue);
+    }
+  };
+
   if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
     return <SuccessView builder={builder} />;
   }
@@ -420,13 +428,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         <Typography color='secondary'>Select quantity</Typography>
         <ToggleButtonGroup
           value={tokensToBuy}
-          onChange={(_: React.MouseEvent<HTMLElement>, n: number) => setTokensToBuy((prevN) => n || prevN)}
+          onChange={(_, n: number) => handleTokensToBuyChange(n || tokensToBuy)}
           exclusive
           fullWidth
           aria-label='quantity selection'
         >
           {initialQuantities.map((q) => (
-            <ToggleButton sx={{ minWidth: 60, minHeight: 40 }} key={q} value={q} aria-label={q.toString()}>
+            <ToggleButton sx={{ minWidth: 60, minHeight: 40 }} key={q} value={q} aria-label={`${q.toString()}-`}>
               {q}
             </ToggleButton>
           ))}
@@ -441,7 +449,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </ToggleButtonGroup>
         {!initialQuantities.includes(tokensToBuy) && (
           <Stack flexDirection='row' gap={2}>
-            <IconButton color='secondary' onClick={() => setTokensToBuy((prevN) => prevN - 1)}>
+            <IconButton color='secondary' onClick={() => handleTokensToBuyChange(tokensToBuy - 1)}>
               -
             </IconButton>
             <NumberInputField
@@ -451,11 +459,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
               type='number'
               placeholder='Quantity'
               value={tokensToBuy}
-              onChange={(e) => setTokensToBuy(parseInt(e.target.value))}
+              onChange={(e) => handleTokensToBuyChange(e.target.value)}
               disableArrows
               sx={{ '& input': { textAlign: 'center' } }}
             />
-            <IconButton color='secondary' onClick={() => setTokensToBuy((prevN) => prevN + 1)}>
+            <IconButton color='secondary' onClick={() => handleTokensToBuyChange(tokensToBuy + 1)}>
               +
             </IconButton>
           </Stack>
