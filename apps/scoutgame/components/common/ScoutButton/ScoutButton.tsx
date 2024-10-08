@@ -54,20 +54,20 @@ export function ScoutButton({
           variant='buy'
           data-test='scout-button'
         >
-          ${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(0)}
-          {showPoints && (
+          {showPoints ? (
             <>
-              {' '}
-              ({purchaseCostInPoints}
+              {purchaseCostInPoints}
               <Image
                 src='/images/profile/scout-game-blue-icon.svg'
                 alt='Scout game points'
                 width={21}
                 height={12}
-                style={{ marginLeft: 2 }}
+                style={{ marginLeft: 4, marginRight: 4 }}
               />
-              )
+              (${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(0)})
             </>
+          ) : (
+            <>${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(0)}</>
           )}
         </LoadingButton>
         {isPurchasing && <NFTPurchaseDialog open onClose={() => setIsPurchasing(false)} builder={builder} />}
