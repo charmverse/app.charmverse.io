@@ -45,6 +45,7 @@ export async function authorizeUserByLaunchDate({ fid, now = DateTime.now() }: {
     for (const launchDate of Object.keys(launchDates)) {
       const launchTier = launchDates[launchDate];
       if (now.toISODate() > launchDate && tier === launchTier) {
+        log.debug(`Authorizing user ${fid} for ${tier} tier`);
         return true;
       }
     }
