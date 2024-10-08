@@ -1,6 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { jest } from '@jest/globals';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
 import { mockBuilder } from '../../testing/database';
 import { sendPoints } from '../sendPoints';
