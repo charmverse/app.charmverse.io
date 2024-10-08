@@ -151,6 +151,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       if (res.data?.id) {
         await checkDecentTransaction({ pendingTransactionId: res.data.id });
         log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
+      } else {
+        log.warn('NFT minted but no transaction id returned', {
+          chainId,
+          builderTokenId,
+          purchaseCost,
+          responseData: res.data
+        });
       }
     },
     onError({ error, input }) {
@@ -350,6 +357,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         },
         {
           onSuccess: async (data) => {
+            log.info('Successfully sent mint transaction', { data });
             await saveDecentTransaction({
               user: {
                 walletAddress: address as `0x${string}`
@@ -372,7 +380,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             setSubmitError(
               err.message || 'Something went wrong. Check your wallet is connected and has a sufficient balance'
             );
-            log.error('Mint failed', { error: err });
+            log.error('Creating a mint transaction failed', { actionResponse, error: err });
           }
         }
       );
