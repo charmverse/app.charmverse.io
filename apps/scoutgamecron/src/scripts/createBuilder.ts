@@ -29,10 +29,10 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
       id: githubUser.data.id
     }
   });
-  if (githubUserDB?.builderId) {
-    log.info(`Builder already exists for ${githubLogin}`);
-    return;
-  }
+  // if (githubUserDB?.builderId) {
+  //   log.info(`Builder already exists for ${githubLogin}`);
+  //   return;
+  // }
   const builder = await prisma.scout.upsert({
     where: {
       username
@@ -59,34 +59,40 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
     }
   });
   console.log('builder created', builder);
-  await importReposByUser(githubLogin);
-  await approveBuilder({ githubLogin, season: currentSeason });
+  // await importReposByUser(githubLogin);
+  await approveBuilder({ builderId: builder.id, season: currentSeason });
 }
 
 async function importReposByUser(githubLogin: string) {
+  const repos = await getReposForOwner(githubLogin);
   // retrieve a list of all the owners we have in the gitRepo database
-  const reposInDB = await prisma.githubRepo.findMany({
+  const reposInDBByOwner = await prisma.githubRepo.findMany({
     where: {
       owner: githubLogin
     },
     select: {
+      id: true,
       owner: true,
       name: true
     }
   });
-  if (reposInDB.length > 0) {
+  if (reposInDBByOwner.length > 0) {
     console.log(
-      'found existing repos for user',
+      'found existing repos for owner',
       githubLogin,
-      reposInDB.map((r) => r.name)
+      reposInDBByOwner.map((r) => r.name)
     );
   }
-  // return;
-  let totalNotSaved = 0;
-  // Fetch repos for each unique owner
-  const repos = await getReposForOwner(githubLogin);
+  const reposInDBById = await prisma.githubRepo.findMany({
+    where: {
+      id: {
+        in: repos.map((r) => r.id)
+      }
+    }
+  });
+  const reposInDB = [...reposInDBById, ...reposInDBByOwner];
   const isOrg = repos.some((repo: any) => repo.owner.type === 'Organization');
-  const notSaved = repos.filter((repo: any) => !reposInDB.some((r) => r.name === repo.name));
+  const notSaved = repos.filter((repo: any) => !reposInDB.some((r) => r.name === repo.name || r.id === repo.id));
   // save to DB
   if (notSaved.length > 0) {
     await prisma.githubRepo.createMany({
@@ -140,10 +146,16 @@ async function getReposForOwner(owner: string) {
 
   return allRepos;
 }
-// createBuilder({ fid: 409291, githubLogin: '0xTxbi' });
-importReposByUser('apexethdev');
 
+createBuilder({ fid: 4179, githubLogin: 'Maurelian' });
+
+// use this to search farcaster id by username
 // (async () => {
 //   const user = await getFarcasterUserByUsername('txbi');
 //   console.log('user', user);
+// })();
+
+// use this to import repos for an org
+// (async () => {
+//   // await importReposByUser('TogetherCrew');
 // })();
