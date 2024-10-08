@@ -8,36 +8,11 @@ import { realOptimismMainnetBuildersContract } from './constants';
 const transferSingle = {
   anonymous: false,
   inputs: [
-    {
-      indexed: true,
-      internalType: 'address',
-      name: 'operator',
-      type: 'address'
-    },
-    {
-      indexed: true,
-      internalType: 'address',
-      name: 'from',
-      type: 'address'
-    },
-    {
-      indexed: true,
-      internalType: 'address',
-      name: 'to',
-      type: 'address'
-    },
-    {
-      indexed: false,
-      internalType: 'uint256',
-      name: 'id',
-      type: 'uint256'
-    },
-    {
-      indexed: false,
-      internalType: 'uint256',
-      name: 'value',
-      type: 'uint256'
-    }
+    { indexed: true, internalType: 'address', name: 'operator', type: 'address' },
+    { indexed: true, internalType: 'address', name: 'from', type: 'address' },
+    { indexed: true, internalType: 'address', name: 'to', type: 'address' },
+    { indexed: false, internalType: 'uint256', name: 'id', type: 'uint256' },
+    { indexed: false, internalType: 'uint256', name: 'value', type: 'uint256' }
   ],
   name: 'TransferSingle',
   type: 'event'
@@ -46,24 +21,9 @@ const transferSingle = {
 const builderScouted = {
   anonymous: false,
   inputs: [
-    {
-      indexed: false,
-      internalType: 'uint256',
-      name: 'tokenId',
-      type: 'uint256'
-    },
-    {
-      indexed: false,
-      internalType: 'uint256',
-      name: 'amount',
-      type: 'uint256'
-    },
-    {
-      indexed: false,
-      internalType: 'string',
-      name: 'scout',
-      type: 'string'
-    }
+    { indexed: false, internalType: 'uint256', name: 'tokenId', type: 'uint256' },
+    { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    { indexed: false, internalType: 'string', name: 'scout', type: 'string' }
   ],
   name: 'BuilderScouted',
   type: 'event'
@@ -71,24 +31,16 @@ const builderScouted = {
 
 type TransferSingleEvent = {
   eventName: 'TransferSingle';
-  args: {
-    operator: string;
-    from: string;
-    to: string;
-    id: string;
-    value: string;
-  };
+  args: { operator: string; from: string; to: string; id: string; value: string };
   transactionHash: string;
+  blockNumber: string;
 };
 
 type BuilderScoutedEvent = {
   eventName: 'BuilderScouted';
-  args: {
-    tokenId: string;
-    amount: string;
-    scout: string;
-  };
+  args: { tokenId: string; amount: string; scout: string };
   transactionHash: string;
+  blockNumber: string;
 };
 
 const contractAbi = [transferSingle, builderScouted];
@@ -104,15 +56,12 @@ const contractAddress = realOptimismMainnetBuildersContract;
 
 // Function to get logs for the contract and parse them against the ABI
 async function getAndParseLogs() {
-  // Fetch logs for the specified contract
   const logs = await client.getLogs({
     address: contractAddress,
-    // Start date of the contract
     fromBlock: 126062456n,
     toBlock: 'latest'
   });
 
-  // Parse each log using the ABI
   const parsedLogs = parseEventLogs({ abi: contractAbi, logs, eventName: ['BuilderScouted', 'TransferSingle'] });
 
   return parsedLogs;
@@ -120,50 +69,64 @@ async function getAndParseLogs() {
 
 type ParsedLogs = Awaited<ReturnType<typeof getAndParseLogs>>;
 
-type GroupedEvent = {
+type SimplifiedGroupedEvent = {
   scoutId: string;
-  amount: bigint;
-  tokenId: bigint;
+  amount: string;
+  tokenId: string;
   txHash: string;
-  transferEvent: TransferSingleEvent;
-  builderScoutedEvent: BuilderScoutedEvent;
+  blockNumber: string;
+  transferEvent: {
+    from: string;
+    to: string;
+    operator: string;
+    value: string;
+  };
+  builderScoutedEvent: {
+    scout: string;
+    amount: string;
+  };
 };
 
-function groupEventsByTransactionHash(events: ParsedLogs): GroupedEvent[] {
-  // Create a map to hold grouped events by transaction hash
-  const eventMap: Record<string, Partial<GroupedEvent>> = {};
+function groupEventsByTransactionHash(events: ParsedLogs): SimplifiedGroupedEvent[] {
+  const eventMap: Record<string, Partial<SimplifiedGroupedEvent>> = {};
 
-  // Iterate over each event
   for (const baseEvent of events) {
-    const event = baseEvent as ParsedLogs[number] & { eventName: 'TransferSingle' | 'BuilderScouted' } & {
+    const event = baseEvent as ParsedLogs[number] & {
+      eventName: 'TransferSingle' | 'BuilderScouted';
       args: BuilderScoutedEvent['args'] | TransferSingleEvent['args'];
     };
-    const { transactionHash } = event;
+    const { transactionHash, blockNumber } = event;
 
-    // Initialize the object in the map if not already present
     if (!eventMap[transactionHash]) {
-      eventMap[transactionHash] = { txHash: transactionHash };
+      eventMap[transactionHash] = { txHash: transactionHash, blockNumber: blockNumber as any };
     }
 
-    // Add the event to the appropriate property based on its name
     if (event.eventName === 'TransferSingle') {
-      const transferSingleEvent = event as TransferSingleEvent;
-      eventMap[transactionHash].transferEvent = transferSingleEvent;
-      eventMap[transactionHash].tokenId = BigInt(transferSingleEvent.args.id);
+      const transferSingleEvent = event as any as TransferSingleEvent;
+      eventMap[transactionHash].transferEvent = {
+        from: transferSingleEvent.args.from,
+        to: transferSingleEvent.args.to,
+        operator: transferSingleEvent.args.operator,
+        value: transferSingleEvent.args.value
+      };
+      eventMap[transactionHash].tokenId = transferSingleEvent.args.id;
     } else if (event.eventName === 'BuilderScouted') {
-      const builderScoutedEvent = event as BuilderScoutedEvent;
-      eventMap[transactionHash].builderScoutedEvent = builderScoutedEvent;
+      const builderScoutedEvent = event as any as BuilderScoutedEvent;
+      eventMap[transactionHash].builderScoutedEvent = {
+        scout: builderScoutedEvent.args.scout,
+        amount: builderScoutedEvent.args.amount
+      };
       eventMap[transactionHash].scoutId = builderScoutedEvent.args.scout;
-      eventMap[transactionHash].amount = BigInt(builderScoutedEvent.args.amount);
+      eventMap[transactionHash].amount = builderScoutedEvent.args.amount;
     }
   }
 
-  // Convert the map values to an array of fully populated GroupedEvent objects
   return Object.values(eventMap).map((entry) => ({
     scoutId: entry.scoutId!,
     amount: entry.amount!,
     tokenId: entry.tokenId!,
     txHash: entry.txHash!,
+    blockNumber: entry.blockNumber!,
     transferEvent: entry.transferEvent!,
     builderScoutedEvent: entry.builderScoutedEvent!
   }));
@@ -172,7 +135,6 @@ function groupEventsByTransactionHash(events: ParsedLogs): GroupedEvent[] {
 async function getLogsByUserId({ scoutId }: { scoutId: string }) {
   const logs = await getAndParseLogs();
 
-  // Call the grouping function and log the output
   const groupedEvents = groupEventsByTransactionHash(logs as any);
 
   return groupedEvents.filter((event) => event.scoutId === scoutId);
@@ -185,25 +147,11 @@ async function getTokenPurchasePrice(params: {
   const abi = [
     {
       inputs: [
-        {
-          internalType: 'uint256',
-          name: 'tokenId',
-          type: 'uint256'
-        },
-        {
-          internalType: 'uint256',
-          name: 'amount',
-          type: 'uint256'
-        }
+        { internalType: 'uint256', name: 'tokenId', type: 'uint256' },
+        { internalType: 'uint256', name: 'amount', type: 'uint256' }
       ],
       name: 'getTokenPurchasePrice',
-      outputs: [
-        {
-          internalType: 'uint256',
-          name: '',
-          type: 'uint256'
-        }
-      ],
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
       stateMutability: 'view',
       type: 'function'
     }
@@ -221,7 +169,6 @@ async function getTokenPurchasePrice(params: {
     blockNumber: params.blockNumber
   });
 
-  // Decode the result based on the expected return type
   const result = decodeFunctionResult({
     abi,
     functionName: 'getTokenPurchasePrice',
@@ -230,7 +177,6 @@ async function getTokenPurchasePrice(params: {
 
   return result as bigint;
 }
-
 // getTokenPurchasePrice({
 //   args: { tokenId: 97n, amount: 1n },
 //   blockNumber: 126405468n
