@@ -1,5 +1,6 @@
 'use client';
 
+import { Clear as ClearIcon } from '@mui/icons-material';
 import {
   CircularProgress,
   Container,
@@ -16,6 +17,7 @@ import {
   TableRow,
   TextField,
   Box,
+  IconButton,
   TableSortLabel
 } from '@mui/material';
 import React, { useState, useMemo } from 'react';
@@ -79,6 +81,11 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
               endAdornment: (
                 <InputAdornment position='end'>
                   {(isLoading || isValidating) && <CircularProgress size={20} />}
+                  {filterString && (
+                    <IconButton aria-label='clear search' size='small' onClick={() => setFilter('')} edge='end'>
+                      <ClearIcon fontSize='small' />
+                    </IconButton>
+                  )}
                 </InputAdornment>
               )
             }
