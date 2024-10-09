@@ -18,7 +18,27 @@ dist/
 # scoutgame app
 /apps/scoutgame/public/sw*
 /apps/scoutgame/public/swe-worker*
-/apps/scoutgame/public/builder-nfts
+
+# comingsoon app
+/apps/comingsoon/public/sw*
+/apps/comingsoon/public/swe-worker*
+
+# waitlist app
+/apps/waitlist/.next/
+/apps/waitlist/dist/
+/apps/waitlist/node_modules/
+/apps/waitlist/public/sw*
+/apps/waitlist/public/swe-worker*
+
+# farcaster app
+/apps/farcaster/.next/
+/apps/farcaster/dist/
+/apps/farcaster/node_modules/
+
+# sunnyawards
+/apps/sunnyawards/.next/
+/apps/sunnyawards/dist/
+/apps/sunnyawards/node_modules/
 
 # Tests
 /__e2e-dist__/
@@ -77,3 +97,5 @@ playwright/.cache/
 storybook-static
 # Storybook dev server cache folder
 .cache
+
+apps/scoutgame/public/builder-nfts

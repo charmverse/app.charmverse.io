@@ -115,7 +115,9 @@
     "sunnyawards:start:test": "npm run start:test -w=apps/sunnyawards",
     "sunnyawards:start:test:ci": "npm run start:test:ci -w=apps/sunnyawards",
     "sunnyawards:debug:e2e": "npm run debug:e2e -w=apps/sunnyawards",
-    "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards"
+    "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards",
+    "comingsoon": "npm start -w=apps/comingsoon",
+    "comingsoon:build": "npm run build -w=apps/comingsoon"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
