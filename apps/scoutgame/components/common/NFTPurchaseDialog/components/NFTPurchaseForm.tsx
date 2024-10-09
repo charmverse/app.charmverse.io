@@ -392,7 +392,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     if (value === 'custom') {
       setSelectedQuantity('custom');
       setTokensToBuy(customQuantity);
-    } else {
+    } else if (value) {
       setSelectedQuantity(value);
       setTokensToBuy(value);
     }
@@ -449,7 +449,14 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </ToggleButtonGroup>
         {selectedQuantity === 'custom' && (
           <Stack flexDirection='row' gap={2} mt={2}>
-            <IconButton color='secondary' onClick={() => setCustomQuantity((prev) => Math.max(1, prev - 1))}>
+            <IconButton
+              color='secondary'
+              onClick={() => {
+                const newQuantity = Math.max(1, customQuantity - 1);
+                setCustomQuantity(newQuantity);
+                setTokensToBuy(newQuantity);
+              }}
+            >
               -
             </IconButton>
             <NumberInputField
@@ -469,7 +476,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
               disableArrows
               sx={{ '& input': { textAlign: 'center' } }}
             />
-            <IconButton color='secondary' onClick={() => setCustomQuantity((prev) => prev + 1)}>
+            <IconButton
+              color='secondary'
+              onClick={() => {
+                setCustomQuantity((prev) => prev + 1);
+                setTokensToBuy((prev) => prev + 1);
+              }}
+            >
               +
             </IconButton>
           </Stack>
