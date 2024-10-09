@@ -64,7 +64,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
   };
 
   return (
-    <Container maxWidth='lg'>
+    <Container maxWidth='xl'>
       <Typography variant='h4' component='h1' gutterBottom>
         Git Repos Dashboard
       </Typography>
@@ -159,6 +159,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                   Contributors
                 </TableSortLabel>
               </TableCell>
+              <TableCell>Deleted</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -179,6 +180,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                 <TableCell>{repo.prs}</TableCell>
                 <TableCell>{repo.closedPrs}</TableCell>
                 <TableCell>{repo.contributors}</TableCell>
+                <TableCell>{repo.deletedAt ? 'Yes' : 'No'}</TableCell>
               </TableRow>
             ))}
           </TableBody>

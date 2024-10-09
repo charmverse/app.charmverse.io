@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 export type Repo = {
   createdAt: string;
+  deletedAt: string | null;
   id: number;
   name: string;
   owner: string;
@@ -53,6 +54,7 @@ export async function getRepos({ searchString }: { searchString?: string } = {})
   });
   return repos.map((repo) => ({
     createdAt: repo.createdAt.toISOString(),
+    deletedAt: repo.deletedAt?.toISOString() ?? null,
     id: repo.id,
     name: repo.name,
     owner: repo.owner,
