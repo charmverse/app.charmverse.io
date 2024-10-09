@@ -196,7 +196,6 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
   log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
   trackUserAction('nft_purchase', {
     userId: builderNft.builderId,
-    builderName: builderNft.builder.displayName,
     amount,
     paidWithPoints,
     season: builderNft.season
