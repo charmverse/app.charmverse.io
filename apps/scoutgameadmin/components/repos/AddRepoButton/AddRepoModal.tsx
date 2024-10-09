@@ -82,7 +82,7 @@ export function AddRepoModal({ open, onClose, onAdd }: AddRepoModalProps) {
           {!isValidating && reposFromGithub && !error && (
             <>
               <Typography variant='caption'>
-                Found {newRepos.length} new repos
+                Found {newRepos.length} new repo{newRepos.length !== 1 ? 's' : ''}
                 {reposFromGithub.length !== newRepos.length ? ` of ${reposFromGithub.length}` : ''}
               </Typography>
               <Box maxHeight={100} overflow='auto'>
