@@ -7,6 +7,7 @@ import { relativeTime } from '@root/lib/utils/dates';
 import { useState } from 'react';
 
 import Button from 'components/common/DatabaseEditor/widgets/buttons/button';
+import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -128,7 +129,9 @@ export function ProposalsTable({
                     }}
                   >
                     <Typography>{proposal.title || 'Untitled'}</Typography>
-                    <OpenButton />
+                    <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
+                      <OpenButton />
+                    </Link>
                   </TableCell>
                   <TableCell align='center' width={200}>
                     <Chip
