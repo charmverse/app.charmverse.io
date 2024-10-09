@@ -34,8 +34,9 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const debouncedFilterString = useDebouncedValue(filterString);
-  const { data: filteredRepos, isLoading, isValidating } = useSearchRepos(debouncedFilterString);
-  const showFilteredResults = filteredRepos || isValidating;
+  const { data: filteredRepos, isValidating, isLoading } = useSearchRepos(debouncedFilterString);
+  const showFilteredResults = Boolean(debouncedFilterString || filteredRepos || isValidating || isLoading);
+
   const filteredAndSortedRepos = useMemo(() => {
     if (showFilteredResults) {
       return filteredRepos || [];
@@ -47,7 +48,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
       if (a[sortField] === b[sortField]) return a.name.localeCompare(b.name);
       return 0;
     });
-  }, [repos, filteredRepos, filterString, sortField, sortOrder]);
+  }, [repos, filteredRepos, showFilteredResults, sortField, sortOrder]);
 
   const handleSort = (field: SortField) => {
     if (field === sortField) {
