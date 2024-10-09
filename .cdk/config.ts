@@ -41,7 +41,7 @@ export const apps: { [key: string]: { stg?: Options; prd?: Options } } = {
       sslCert: sunnyCert
     }
   },
-  comingsoon: {
+  scoutgameadmin: {
     prd: {
       sslCert: scoutgameCert
     }

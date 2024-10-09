@@ -19,10 +19,6 @@ dist/
 /apps/scoutgame/public/sw*
 /apps/scoutgame/public/swe-worker*
 
-# comingsoon app
-/apps/comingsoon/public/sw*
-/apps/comingsoon/public/swe-worker*
-
 # waitlist app
 /apps/waitlist/.next/
 /apps/waitlist/dist/
