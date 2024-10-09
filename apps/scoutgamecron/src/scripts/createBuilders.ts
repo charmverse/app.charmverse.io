@@ -2,7 +2,6 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client'
 import { octokit } from '@packages/github/client';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
-import { updateUserProfile } from '@packages/mixpanel/updateUserProfile';
 
 const builderWaitlistLogins: string[] = []
 
@@ -66,13 +65,6 @@ async function createBuilders() {
             }
           }
         })
-        await updateUserProfile(builder.id, {
-          userId: builder.id,
-          farcasterId: fid,
-          username: builder.username,
-          displayName: builder.displayName,
-          builderStatus: "applied",
-        });
         log.info(`Created builder for ${login}`, { builderId: builder.id })
       } catch (error) {
         log.error(`Error creating builder for ${login}`, { error })

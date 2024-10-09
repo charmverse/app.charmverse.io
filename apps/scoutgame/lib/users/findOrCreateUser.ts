@@ -3,7 +3,6 @@ import { log } from '@charmverse/core/log';
 import type { Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
-import { updateUserProfile } from '@packages/mixpanel/updateUserProfile';
 import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
 import { getENSName } from '@root/lib/blockchain/getENSName';
 import { getFilenameWithExtension } from '@root/lib/utils/getFilenameWithExtension';
@@ -74,17 +73,7 @@ export async function findOrCreateUser({
   trackUserAction('sign_up', {
     userId: newScout.id,
     username: userProps.username,
-    builderStatus: null,
-    onboarded: false,
-    agreedToTOS: false,
-    enableMarketing: null,
-    displayName: userProps.displayName
-  });
-
-  await updateUserProfile(newScout.id, {
-    farcasterId,
-    username: userProps.username,
-    displayName: userProps.displayName
+    fid: farcasterId
   });
 
   return newScout;

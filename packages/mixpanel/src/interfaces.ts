@@ -12,10 +12,7 @@ export interface BaseEventWithoutGroup {
 
 export type UserSignupEvent = BaseEventWithoutGroup & {
   username: string;
-  onboarded: boolean;
-  agreedToTOS: boolean;
-  enableMarketing: boolean | null;
-  builderStatus: BuilderStatus | null;
+  fid?: number;
 };
 
 export type UserLoginEvent = BaseEventWithoutGroup;

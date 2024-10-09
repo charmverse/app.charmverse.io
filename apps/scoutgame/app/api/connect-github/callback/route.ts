@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { updateUserProfile } from '@packages/mixpanel/updateUserProfile';
 import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
 import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constants';
@@ -184,10 +183,6 @@ export async function GET(req: NextRequest) {
         builderStatus: 'applied',
         onboardedAt: new Date()
       }
-    });
-
-    await updateUserProfile(unsealedUserId, {
-      builderStatus: 'applied'
     });
   }
 
