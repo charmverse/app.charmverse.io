@@ -27,7 +27,7 @@ import {
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
-import { USDcAbiClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
+import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import { convertCostToPointsWithDiscount, convertCostToUsd } from '@packages/scoutgame/builderNfts/utils';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
@@ -45,10 +45,13 @@ import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsActi
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
+import { useGetERC20Allowance } from '../hooks/useGetERC20Allowance';
+
 import type { ChainOption } from './ChainSelector/chains';
 import { getChainOptions, getCurrencyContract } from './ChainSelector/chains';
 import type { SelectedPaymentOption } from './ChainSelector/ChainSelector';
 import { BlockchainSelect } from './ChainSelector/ChainSelector';
+import { ERC20ApproveButton } from './ERC20Approve';
 import { NumberInputField } from './NumberField';
 import { SuccessView } from './SuccessView';
 
@@ -77,6 +80,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToUsd(builder.price) : 'N/A';
   const { address, chainId } = useAccount();
+
   const { switchChainAsync } = useSwitchChain();
 
   const builderContractReadonlyApiClient = new BuilderNFTSeasonOneImplementation01Client({
@@ -147,6 +151,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       if (res.data?.id) {
         await checkDecentTransaction({ pendingTransactionId: res.data.id });
         log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
+      } else {
+        log.warn('NFT minted but no transaction id returned', {
+          chainId,
+          builderTokenId,
+          purchaseCost,
+          responseData: res.data
+        });
       }
     },
     onError({ error, input }) {
@@ -171,7 +182,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       return;
     }
 
-    const client = new USDcAbiClient({
+    const client = new UsdcErc20ABIClient({
       chain,
       contractAddress: chainOption.usdcAddress as `0x${string}`,
       publicClient: getPublicClient(_chainId)
@@ -271,7 +282,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   }
    */
 
-  const enableNftButton = !!address && !!purchaseCost;
+  const enableNftButton = !!address && !!purchaseCost && !!user;
 
   const decentAPIParams: UseBoxActionArgs = {
     enable: enableNftButton,
@@ -297,6 +308,19 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   };
 
   const { error: decentSdkError, isLoading: isLoadingDecentSdk, actionResponse } = useBoxAction(decentAPIParams);
+
+  const { allowance, refreshAllowance, isLoadingAllowance } = useGetERC20Allowance({
+    chainId: selectedPaymentOption.chainId,
+    erc20Address:
+      selectedPaymentOption.currency === 'USDC'
+        ? (getCurrencyContract({
+            chainId: selectedPaymentOption.chainId,
+            currency: 'USDC'
+          }) as Address)
+        : null,
+    owner: address as Address,
+    spender: actionResponse?.tx.to as Address
+  });
 
   const amountToPay = actionResponse?.tokenPayment?.amount;
   const isEthPayment = !!actionResponse?.tokenPayment?.isNative;
@@ -333,6 +357,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         },
         {
           onSuccess: async (data) => {
+            log.info('Successfully sent mint transaction', { data });
             await saveDecentTransaction({
               user: {
                 walletAddress: address as `0x${string}`
@@ -355,7 +380,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             setSubmitError(
               err.message || 'Something went wrong. Check your wallet is connected and has a sufficient balance'
             );
-            log.error('Mint failed', { error: err });
+            log.error('Creating a mint transaction failed', { actionResponse, error: err });
           }
         }
       );
@@ -397,6 +422,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       setTokensToBuy(value);
     }
   };
+  const approvalRequired =
+    paymentMethod === 'wallet' &&
+    selectedPaymentOption.currency === 'USDC' &&
+    typeof allowance === 'bigint' &&
+    allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
 
   if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
     return <SuccessView builder={builder} />;
@@ -609,26 +639,40 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Typography>
       )}
 
-      <LoadingButton
-        loading={isLoading}
-        size='large'
-        onClick={handlePurchase}
-        variant='contained'
-        disabled={
-          !enableNftButton ||
-          isLoadingDecentSdk ||
-          isFetchingPrice ||
-          !treasuryAddress ||
-          isSavingDecentTransaction ||
-          isExecutingTransaction ||
-          (paymentMethod === 'points' && notEnoughPoints) ||
-          isExecutingPointsPurchase ||
-          (paymentMethod === 'wallet' && !hasSufficientBalance && !!balanceDataFromCorrectChain)
-        }
-      >
-        Buy
-      </LoadingButton>
-
+      {!approvalRequired ||
+      isExecutingTransaction ||
+      isExecutingPointsPurchase ||
+      // Show disabled buy button if the user has insufficient balance, instead of the approve button
+      (!hasSufficientBalance && balanceDataFromCorrectChain) ? (
+        <LoadingButton
+          loading={isLoading}
+          size='large'
+          onClick={handlePurchase}
+          variant='contained'
+          disabled={
+            !enableNftButton ||
+            isLoadingDecentSdk ||
+            isFetchingPrice ||
+            !treasuryAddress ||
+            isSavingDecentTransaction ||
+            isExecutingTransaction ||
+            (paymentMethod === 'points' && notEnoughPoints) ||
+            isExecutingPointsPurchase ||
+            (paymentMethod === 'wallet' && !hasSufficientBalance && !!balanceDataFromCorrectChain) ||
+            (!approvalRequired && isLoadingAllowance)
+          }
+        >
+          Buy
+        </LoadingButton>
+      ) : (
+        <ERC20ApproveButton
+          spender={actionResponse?.tx.to as Address}
+          chainId={selectedPaymentOption.chainId}
+          erc20Address={getCurrencyContract(selectedPaymentOption) as Address}
+          amount={amountToPay}
+          onSuccess={() => refreshAllowance()}
+        />
+      )}
       {decentSdkError instanceof Error ? (
         <Typography variant='caption' color='error' align='center'>
           {(decentSdkError as Error).message}

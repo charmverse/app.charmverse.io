@@ -35,7 +35,7 @@ export async function handlePendingTransaction({
   });
 
   if (updatedTx.count === 0) {
-    log.info('Skip processing tx as it is locked');
+    log.info('Skip processing tx as it is locked', { pendingTransactionId });
     // The transaction is already being processed or completed, so exit
     return;
   }

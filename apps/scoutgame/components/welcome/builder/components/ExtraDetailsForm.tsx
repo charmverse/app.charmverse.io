@@ -3,7 +3,17 @@
 import { log } from '@charmverse/core/log';
 import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Checkbox, FormControl, FormControlLabel, FormLabel, Stack, TextField } from '@mui/material';
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Link,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -80,7 +90,7 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
               type='email'
               error={!!error?.message}
               {...field}
-              sx={{ mb: 2.5 }}
+              sx={{ mb: 2 }}
             />
           )}
         />
@@ -90,8 +100,10 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
           render={({ field: { onChange, value } }) => (
             <FormControlLabel
               control={<Checkbox data-test='onboarding-notify-grants' onChange={onChange} checked={!!value} />}
-              label='Notify me of new opportunities (grants, accelerators, etc)'
-              sx={{ mb: 1.5 }}
+              label={
+                <Typography variant='body2'>Notify me of new opportunities (grants, accelerators, etc)</Typography>
+              }
+              sx={{ fontSize: 12 }}
             />
           )}
         />
@@ -101,8 +113,16 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
           render={({ field: { onChange, value } }) => (
             <FormControlLabel
               control={<Checkbox data-test='onboarding-accept-terms' onChange={onChange} checked={!!value} />}
-              label='Terms and Service'
-              sx={{ mb: 1.5 }}
+              label={
+                <Typography variant='body2'>
+                  I agree to the
+                  <Link href='/info/terms' target='_blank'>
+                    {' '}
+                    Terms and Service
+                  </Link>
+                </Typography>
+              }
+              sx={{ mb: 2 }}
             />
           )}
         />
