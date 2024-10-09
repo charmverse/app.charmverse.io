@@ -180,7 +180,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                 <TableCell>{repo.prs}</TableCell>
                 <TableCell>{repo.closedPrs}</TableCell>
                 <TableCell>{repo.contributors}</TableCell>
-                <TableCell>{repo.deletedAt ? 'Yes' : 'No'}</TableCell>
+                <TableCell>{repo.deletedAt ? 'Yes' : ''}</TableCell>
               </TableRow>
             ))}
           </TableBody>
