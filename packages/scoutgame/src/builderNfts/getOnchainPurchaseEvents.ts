@@ -154,10 +154,13 @@ export async function getOnchainPurchaseEvents({ scoutId }: { scoutId: string })
       userId: scoutId
     },
     select: {
+      id: true,
       sourceChainTxHash: true,
       sourceChainId: true,
       destinationChainTxHash: true,
-      destinationChainId: true
+      destinationChainId: true,
+      tokenAmount: true,
+      targetAmountReceived: true
     }
   });
 

@@ -1,11 +1,11 @@
 
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { optimismUsdcContractAddress, realOptimismMainnetBuildersContract } from '@packages/scoutgame/builderNfts/constants'
+import { optimismUsdcContractAddress, realOptimismMainnetBuildersContract } from '@packages/scoutgame/builderNfts/constants';
+import { getOnchainPurchaseEvents } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents';
+import { getTokenPurchasePrice } from '@packages/scoutgame/builderNfts/getTokenPurchasePrice';
 import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
-import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction'
-import { getOnchainPurchaseEvents } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents'
-import {getTokenPurchasePrice} from '@packages/scoutgame/builderNfts/getTokenPurchasePrice';
-import { prettyPrint } from '@packages/utils/strings';
+import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction';
 
 async function syncUserNFTsFromOnchainData({username, scoutId}: {username?: string, scoutId?: string}): Promise<void> {
   if (!username && !scoutId) {
@@ -26,8 +26,11 @@ async function syncUserNFTsFromOnchainData({username, scoutId}: {username?: stri
   const txRequiringReconciliation = userPurchases.filter(p => !p.nftPurchase);
 
   for (let i = 0; i < txRequiringReconciliation.length; i++) {
+
+    log.info(`Processing missing tx ${i+1} / ${txRequiringReconciliation.length}`)
+
     const tx = txRequiringReconciliation[i];
-    const expectedPrice = await getTokenPurchasePrice({
+    const expectedPrice = tx.pendingTransaction?.targetAmountReceived ?? await getTokenPurchasePrice({
       args: {
         amount: BigInt(tx.amount),
         tokenId: BigInt(tx.tokenId)
@@ -35,7 +38,7 @@ async function syncUserNFTsFromOnchainData({username, scoutId}: {username?: stri
       blockNumber: BigInt(tx.blockNumber) - BigInt(1)
     });
 
-    const pendingTx = await savePendingTransaction({
+    const pendingTx = tx.pendingTransaction ?? await savePendingTransaction({
       user: {
         scoutId: scout.id,
         walletAddress: tx.transferEvent.to
@@ -49,7 +52,7 @@ async function syncUserNFTsFromOnchainData({username, scoutId}: {username?: stri
         quotedPriceCurrency: optimismUsdcContractAddress,
         builderContractAddress: realOptimismMainnetBuildersContract,
         tokenId: parseInt(tx.tokenId),
-        quotedPrice: Number(expectedPrice.toString),
+        quotedPrice: Number(expectedPrice.toString()),
         tokenAmount: Number(tx.amount)
       }
     });
@@ -58,7 +61,5 @@ async function syncUserNFTsFromOnchainData({username, scoutId}: {username?: stri
   }
 }
 
-// addAndHandleMissingTransaction().then(console.log)
 
-
-syncUserNFTsFromOnchainData({ username: 'facel11' }).then(console.log)
+// syncUserNFTsFromOnchainData({ username: 'facel11' }).then(console.log)
