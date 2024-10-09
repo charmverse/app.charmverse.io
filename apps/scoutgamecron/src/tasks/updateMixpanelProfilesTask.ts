@@ -6,6 +6,8 @@ const perBatch = 1000;
 
 function getMixpanelUserProfile(user: Scout): MixPanelUserProfile {
   return {
+    $name: user.displayName,
+    $email: user.email,
     username: user.username,
     onboarded: !!user.onboardedAt,
     'Agreed To TOS': !!user.agreedToTermsAt,

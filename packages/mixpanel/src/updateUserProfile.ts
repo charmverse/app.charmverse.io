@@ -4,6 +4,8 @@ import type { BuilderStatus } from '@charmverse/core/prisma';
 import { getApiKey } from './mixpanel';
 
 export type MixPanelUserProfile = {
+  $name: string;
+  $email: string | null;
   username: string;
   onboarded: boolean;
   'Agreed To TOS': boolean;
