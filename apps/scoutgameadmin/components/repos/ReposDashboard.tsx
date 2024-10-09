@@ -1,7 +1,9 @@
 'use client';
 
 import {
+  CircularProgress,
   Container,
+  InputAdornment,
   Link,
   Typography,
   Paper,
@@ -72,6 +74,15 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
           value={filterString}
           onChange={(e) => setFilter(e.target.value)}
           size='small'
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position='end'>
+                  {(isLoading || isValidating) && <CircularProgress size={20} />}
+                </InputAdornment>
+              )
+            }
+          }}
         />
         <Box>
           <AddRepoButton variant='contained' color='primary' sx={{ mr: 2 }}>
