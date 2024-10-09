@@ -1,29 +1,64 @@
 
+import { prisma } from '@charmverse/core/prisma-client';
 import { optimismUsdcContractAddress, realOptimismMainnetBuildersContract } from '@packages/scoutgame/builderNfts/constants'
 import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
 import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction'
+import { getOnchainPurchaseEvents } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents'
+import {getTokenPurchasePrice} from '@packages/scoutgame/builderNfts/getTokenPurchasePrice';
+import { prettyPrint } from '@packages/utils/strings';
 
-async function addAndHandleMissingTransaction() {
-  const tx = await savePendingTransaction({
-    user: {
-      scoutId: 'b9a5b3ac-a67b-4c3b-b1d5-ee59edda3e07',
-      walletAddress: '0x5CF92EFDEb3964C7D5474e2fBA28E72b00463A38'
-    },
-    transactionInfo: {
-      destinationChainId: 10,
-      sourceChainId: 10,
-      sourceChainTxHash: '0x6216fd6c8829b808e8f14f42bde482c639871e8640470d53d7ae58503927bfeb'
-    },
-    purchaseInfo: {
-      quotedPriceCurrency: optimismUsdcContractAddress,
-      builderContractAddress: realOptimismMainnetBuildersContract,
-      tokenId: 97,
-      quotedPrice: 6000000,
-      tokenAmount: 1
+async function syncUserNFTsFromOnchainData({username, scoutId}: {username?: string, scoutId?: string}): Promise<void> {
+  if (!username && !scoutId) {
+    throw new Error('Either username or scoutId must be provided');
+  } else if (username && scoutId) {
+    throw new Error('Only one of username or scoutId can be provided');
+  }
+
+  const scout = await prisma.scout.findFirstOrThrow({
+    where: {
+      id: scoutId,
+      username
     }
   });
 
-  await handlePendingTransaction({ pendingTransactionId: tx.id });
+  const userPurchases = await getOnchainPurchaseEvents({ scoutId: scout.id });
+
+  const txRequiringReconciliation = userPurchases.filter(p => !p.nftPurchase);
+
+  for (let i = 0; i < txRequiringReconciliation.length; i++) {
+    const tx = txRequiringReconciliation[i];
+    const expectedPrice = await getTokenPurchasePrice({
+      args: {
+        amount: BigInt(tx.amount),
+        tokenId: BigInt(tx.tokenId)
+      },
+      blockNumber: BigInt(tx.blockNumber) - BigInt(1)
+    });
+
+    const pendingTx = await savePendingTransaction({
+      user: {
+        scoutId: scout.id,
+        walletAddress: tx.transferEvent.to
+      },
+      transactionInfo: {
+        destinationChainId: 10,
+        sourceChainId: 10,
+        sourceChainTxHash: tx.txHash
+      },
+      purchaseInfo: {
+        quotedPriceCurrency: optimismUsdcContractAddress,
+        builderContractAddress: realOptimismMainnetBuildersContract,
+        tokenId: parseInt(tx.tokenId),
+        quotedPrice: Number(expectedPrice.toString),
+        tokenAmount: Number(tx.amount)
+      }
+    });
+  
+    await handlePendingTransaction({ pendingTransactionId: pendingTx.id });
+  }
 }
 
-addAndHandleMissingTransaction().then(console.log)
+// addAndHandleMissingTransaction().then(console.log)
+
+
+syncUserNFTsFromOnchainData({ username: 'facel11' }).then(console.log)

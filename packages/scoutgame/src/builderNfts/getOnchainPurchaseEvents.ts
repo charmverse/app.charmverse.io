@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getPublicClient } from '@packages/onchain/getPublicClient';
 import { prettyPrint } from '@packages/utils/strings';
-import { createPublicClient, decodeFunctionResult, encodeFunctionData, http, parseEventLogs } from 'viem';
-import { mainnet, optimism } from 'viem/chains';
+import { createPublicClient, http, parseEventLogs } from 'viem';
+import { mainnet } from 'viem/chains';
 
 import { realOptimismMainnetBuildersContract } from './constants';
 
@@ -133,7 +132,7 @@ function groupEventsByTransactionHash(events: ParsedLogs): SimplifiedGroupedEven
   }));
 }
 
-async function getLogsByUserId({ scoutId }: { scoutId: string }) {
+export async function getOnchainPurchaseEvents({ scoutId }: { scoutId: string }) {
   const logs = await getAndParseLogs();
 
   const groupedEvents = groupEventsByTransactionHash(logs as any);
@@ -150,54 +149,28 @@ async function getLogsByUserId({ scoutId }: { scoutId: string }) {
     }
   });
 
-  return groupedEvents
+  const pendingTransactions = await prisma.pendingNftTransaction.findMany({
+    where: {
+      userId: scoutId
+    },
+    select: {
+      sourceChainTxHash: true,
+      sourceChainId: true,
+      destinationChainTxHash: true,
+      destinationChainId: true
+    }
+  });
+
+  const mappedEvents = groupedEvents
     .filter((event) => event.scoutId === scoutId)
     .map((event) => {
       const nftPurchase = nftPurchases.find((nft) => nft.txHash === event.txHash) ?? null;
-      return { ...event, nftPurchase };
+      const pendingTransaction =
+        pendingTransactions.find(
+          (tx) => tx.sourceChainTxHash === event.txHash || tx.destinationChainTxHash === event.txHash
+        ) ?? null;
+      return { ...event, nftPurchase, pendingTransaction };
     });
+
+  return mappedEvents;
 }
-
-async function getTokenPurchasePrice(params: {
-  args: { tokenId: bigint; amount: bigint };
-  blockNumber?: bigint;
-}): Promise<bigint> {
-  const abi = [
-    {
-      inputs: [
-        { internalType: 'uint256', name: 'tokenId', type: 'uint256' },
-        { internalType: 'uint256', name: 'amount', type: 'uint256' }
-      ],
-      name: 'getTokenPurchasePrice',
-      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-      stateMutability: 'view',
-      type: 'function'
-    }
-  ];
-
-  const txData = encodeFunctionData({
-    abi,
-    functionName: 'getTokenPurchasePrice',
-    args: [params.args.tokenId, params.args.amount]
-  });
-
-  const { data } = await getPublicClient(optimism.id).call({
-    to: realOptimismMainnetBuildersContract,
-    data: txData,
-    blockNumber: params.blockNumber
-  });
-
-  const result = decodeFunctionResult({
-    abi,
-    functionName: 'getTokenPurchasePrice',
-    data: data as `0x${string}`
-  });
-
-  return result as bigint;
-}
-// getTokenPurchasePrice({
-//   args: { tokenId: 97n, amount: 1n },
-//   blockNumber: 126405468n
-// }).then(prettyPrint);
-
-// getLogsByUserId({ scoutId: 'b9a5b3ac-a67b-4c3b-b1d5-ee59edda3e07' }).then(prettyPrint);
