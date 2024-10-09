@@ -37,7 +37,7 @@ export function SignInModalMessage({
           width={200}
           height={200}
           sizes='100vw'
-          style={{ maxHeight: 200 }}
+          style={{ height: 200, width: 'auto' }}
         />
         <Typography fontWeight={600}>Please sign in to continue</Typography>
         <Button data-test='modal-sign-in-button' fullWidth onClick={handleClose}>

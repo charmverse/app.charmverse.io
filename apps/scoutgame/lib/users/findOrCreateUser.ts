@@ -1,12 +1,24 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { Scout } from '@charmverse/core/prisma-client';
+import type { BuilderEventType, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
+import { getTier } from '@packages/scoutgame/waitlist/scoring/constants';
 import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
 import { getENSName } from '@root/lib/blockchain/getENSName';
 import { getFilenameWithExtension } from '@root/lib/utils/getFilenameWithExtension';
+import { capitalize } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
+
+const waitlistTierPointsRecord: Record<ConnectWaitlistTier, number> = {
+  legendary: 60,
+  mythic: 30,
+  epic: 20,
+  rare: 15,
+  common: 10
+};
 
 export async function findOrCreateUser({
   newUserId,
@@ -61,12 +73,52 @@ export async function findOrCreateUser({
     userProps.walletENS = ens || undefined;
   }
 
+  const waitlistRecord = await prisma.connectWaitlistSlot.findUnique({
+    where: {
+      fid: farcasterId
+    }
+  });
+
+  let points = 0;
+  let tier: ConnectWaitlistTier | undefined;
+
+  if (waitlistRecord?.percentile) {
+    tier = getTier(waitlistRecord.percentile);
+    points = waitlistTierPointsRecord[tier] || 0;
+  }
+
   const newScout = await prisma.scout.create({
     data: {
       ...userProps,
       id: userId,
       walletAddress: lowercaseAddress,
-      farcasterId
+      farcasterId,
+      currentBalance: points,
+      pointsReceived:
+        points && tier
+          ? {
+              create: {
+                value: points,
+                claimedAt: new Date(),
+                event: {
+                  create: {
+                    season: currentSeason,
+                    type: 'misc_event' as BuilderEventType,
+                    description: `Received points for achieving ${capitalize(tier)} status on waitlist`,
+                    week: getCurrentWeek(),
+                    builderId: userId
+                  }
+                },
+                activities: {
+                  create: {
+                    type: 'points',
+                    userId,
+                    recipientType: 'scout'
+                  }
+                }
+              }
+            }
+          : undefined
     }
   });
 

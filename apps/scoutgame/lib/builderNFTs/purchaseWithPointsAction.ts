@@ -5,6 +5,7 @@ import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNft
 import { mintNFT } from '@packages/scoutgame/builderNfts/mintNFT';
 import { convertCostToPointsWithDiscount } from '@packages/scoutgame/builderNfts/utils';
 import { currentSeason } from '@packages/scoutgame/dates';
+import { revalidatePath } from 'next/cache';
 
 import { authActionClient } from 'lib/actions/actionClient';
 
@@ -42,5 +43,7 @@ export const purchaseWithPointsAction = authActionClient
       paidWithPoints: true,
       pointsValue
     });
+
+    revalidatePath('/', 'layout');
     return { success: true };
   });

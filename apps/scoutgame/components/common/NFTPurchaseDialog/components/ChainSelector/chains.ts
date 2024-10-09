@@ -111,8 +111,8 @@ export function getChainOptions(opts: { useTestnets?: boolean } = { useTestnets:
   }));
 
   // Concatenate USDC options first, followed by ETH options
-  // return [...usdcOptions, ...ethOptions];
+  return [...usdcOptions, ...ethOptions];
 
   // Revert this change once USDC mints work
-  return ethOptions;
+  // return ethOptions;
 }

@@ -1,12 +1,12 @@
 'use client';
 
-import type { Scout } from '@charmverse/core/prisma-client';
 import { Button, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 
 import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
+import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
 import type { SessionUser } from 'lib/session/getUserFromSession';
 import { saveOnboardedAction } from 'lib/users/saveOnboardedAction';
 
@@ -29,8 +29,9 @@ export function SpamPolicyPage({
 
   return (
     <SinglePageLayout>
-      <SinglePageWrapper>
-        <Typography variant='h5' color='secondary' mb={2}>
+      <InfoBackgroundImage />
+      <SinglePageWrapper bgcolor='background.default'>
+        <Typography variant='h5' color='secondary' mb={2} textAlign='center'>
           Spam Policy
         </Typography>
         <Typography mb={2}>The Scout Game has a strict no spam policy.</Typography>
@@ -45,15 +46,20 @@ export function SpamPolicyPage({
         {user ? (
           user.onboardedAt ? (
             <Button
-              fullWidth
               href={profileGithubConnect ? '/profile' : '/welcome/how-it-works'}
               data-test='continue-button'
               disabled={isExecuting}
+              sx={{ margin: '0 auto', display: 'flex' }}
             >
               Continue
             </Button>
           ) : (
-            <Button fullWidth onClick={() => executeAsync()} data-test='continue-button' disabled={isExecuting}>
+            <Button
+              onClick={() => executeAsync()}
+              data-test='continue-button'
+              disabled={isExecuting}
+              sx={{ margin: '0 auto', display: 'flex' }}
+            >
               Continue
             </Button>
           )
