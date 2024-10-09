@@ -1,5 +1,6 @@
-'use client';
+import { Box } from '@mui/material';
+import type { ReactNode } from 'react';
 
-import { Template } from '@connect-shared/components/layout/Template';
-
-export default Template;
+export default function Template({ children }: { children: ReactNode }) {
+  return <Box mt={3}>{children}</Box>;
+}

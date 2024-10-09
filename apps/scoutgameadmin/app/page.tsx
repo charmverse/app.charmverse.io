@@ -1,5 +1,5 @@
-import { ComingSoon } from 'components/home/ComingSoon';
+import { redirect } from 'next/navigation';
 
-export default async function Home() {
-  return <ComingSoon />;
+export default async function Dashboard() {
+  redirect('/repos');
 }

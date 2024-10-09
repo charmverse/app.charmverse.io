@@ -7,7 +7,7 @@ import theme from 'theme/theme';
 
 import 'theme/styles.scss';
 
-const appName = 'Scout Game';
+const appName = 'Scout Game Admin';
 
 export const metadata: Metadata = {
   applicationName: appName,
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   }
 };
 export const viewport: Viewport = {
-  themeColor: '#fff',
+  themeColor: '#000',
   userScalable: false
 };
 export default async function RootLayout({
