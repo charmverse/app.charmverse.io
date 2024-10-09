@@ -62,4 +62,4 @@ async function syncUserNFTsFromOnchainData({username, scoutId}: {username?: stri
 }
 
 
-// syncUserNFTsFromOnchainData({ username: 'facel11' }).then(console.log)
+syncUserNFTsFromOnchainData({ username: 'cryptomobile' }).then(console.log)

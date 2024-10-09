@@ -177,3 +177,5 @@ export async function getOnchainPurchaseEvents({ scoutId }: { scoutId: string })
 
   return mappedEvents;
 }
+
+// getOnchainPurchaseEvents({ scoutId: 'bb2e2785-ebbb-441c-9909-df87f0cac5c4' }).then(prettyPrint);
