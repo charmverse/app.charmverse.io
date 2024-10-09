@@ -346,12 +346,7 @@
     "viem": "^2.17.3",
     "wagmi": "^2.12.10",
     "yup": "^1.4.0",
-    "zksync-web3": "^0.16.0",
-    "@emotion/react": "^11.10.6",
-    "@emotion/styled": "^11.10.6",
-    "@mui/material": "^5.11.14",
-    "axios": "^0.21.1",
-    "json2csv": "^5.0.7"
+    "zksync-web3": "^0.16.0"
   },
   "devDependencies": {
     "@depay/web3-mock": "^13.18.1",
@@ -461,8 +456,7 @@
     "tsc-alias": "^1.8.6",
     "tslib": "^2.6.2",
     "typescript": "^5.4.2",
-    "webpack": "^5.94.0",
-    "@types/json2csv": "^5.0.3"
+    "webpack": "^5.94.0"
   },
   "overrides": {
     "react": "^18.2.0",
