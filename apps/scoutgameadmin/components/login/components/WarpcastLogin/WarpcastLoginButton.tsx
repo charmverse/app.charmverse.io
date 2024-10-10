@@ -2,7 +2,6 @@
 
 import { log } from '@charmverse/core/log';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
-import { useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import { LoadingButton } from '@mui/lab';
 import type { ButtonProps } from '@mui/material';
@@ -21,10 +20,6 @@ import { WarpcastIcon } from './WarpcastIcon';
 export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const router = useRouter();
-  const { isAuthenticated } = useProfile();
-  const searchParams = useSearchParams();
-  const redirectUrlEncoded = searchParams.get('redirectUrl');
-  const redirectUrl = redirectUrlEncoded ? decodeURIComponent(redirectUrlEncoded) : '/';
 
   const { executeAsync: revalidatePath, isExecuting: isRevalidatingPath } = useAction(revalidatePathAction);
 

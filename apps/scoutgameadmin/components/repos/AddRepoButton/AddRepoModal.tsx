@@ -46,8 +46,8 @@ export function AddRepoModal({ open, onClose, onAdd }: AddRepoModalProps) {
     // clear SWR cache
     mutate(
       (key) => true, // which cache keys are updated
-      undefined, // update cache data to `undefined`
-      { revalidate: false } // do not revalidate
+      undefined // update cache data to `undefined`
+      // { revalidate: false } // do not revalidate
     );
   };
 
