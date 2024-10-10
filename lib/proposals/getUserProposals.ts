@@ -21,6 +21,9 @@ export type UserProposal = {
   currentEvaluation?: CurrentEvaluation;
   viewable: boolean;
   reviewedAt?: Date | null;
+  userReviewResult?: ProposalEvaluationResult | null;
+  totalPassedReviewResults?: number;
+  totalFailedReviewResults?: number;
 };
 
 export type GetUserProposalsResponse = {
@@ -181,7 +184,8 @@ export async function getUserProposals({
           reviews: {
             select: {
               reviewerId: true,
-              completedAt: true
+              completedAt: true,
+              result: true
             }
           },
           vote: {
@@ -263,6 +267,10 @@ export async function getUserProposals({
             (reviewer.roleId && userRoles.includes(reviewer.roleId)) ||
             reviewer.systemRole === 'space_member'
         );
+        const userReviewResult = currentEvaluation?.reviews.find((review) => review.reviewerId === userId)?.result;
+        const totalPassedReviewResults = currentEvaluation?.reviews.filter((review) => review.result === 'pass').length;
+        const totalFailedReviewResults = currentEvaluation?.reviews.filter((review) => review.result === 'fail').length;
+
         const isVoter = currentEvaluation?.type === 'vote' && isReviewer;
         const isAppealReviewer = currentEvaluation?.appealReviewers.some(
           (reviewer) => reviewer.userId === userId || (reviewer.roleId && userRoles.includes(reviewer.roleId))
@@ -330,7 +338,10 @@ export async function getUserProposals({
           path: proposal.page.path,
           status: proposal.status,
           viewable: accessibleProposalIds.includes(proposal.id),
-          reviewedAt
+          reviewedAt,
+          userReviewResult,
+          totalPassedReviewResults,
+          totalFailedReviewResults
         };
 
         // needs review/vote
