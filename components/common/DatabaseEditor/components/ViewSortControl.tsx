@@ -1,10 +1,7 @@
 import { Menu } from '@mui/material';
-import { bindMenu, bindTrigger, type PopupState } from 'material-ui-popup-state/hooks';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { TbArrowsSort } from 'react-icons/tb';
-import { FormattedMessage } from 'react-intl';
 
-import { Button } from 'components/common/Button';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';

@@ -7,9 +7,10 @@ const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 
 const currentSeason = currentSeasonStartDate.toFormat(`kkkk-'W'WW`);
 
 async function query() {
-  const w = await prisma.pendingNftTransaction.findFirst({
-    where: {
-      id: '1ef3d83b-b371-4954-8f1c-19f7e662b995'
+  const w = await prisma.proposalMyWorkColumn.create({
+    data: {
+      formFieldId: '36635e9d-d6ad-4341-a4b4-477af32c2eec',
+      spaceId: 'fedf2aab-260c-4540-a8c3-8857dbb5ee40'
     }
   });
 

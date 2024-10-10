@@ -2,15 +2,22 @@ import { ThumbUpOutlined as ApprovedIcon, HighlightOff as RejectedIcon } from '@
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Button, Card, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
-import type { UserProposal } from '@root/lib/proposals/getUserProposals';
+import type { CustomColumn, UserProposal } from '@root/lib/proposals/getUserProposals';
 import { useRouter } from 'next/router';
 
 import Link from 'components/common/Link';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 
+import { CustomColumnTableCells } from './CustomColumnTableCells';
 import { OpenButton, StyledTable, StyledTableRow } from './ProposalsTable';
 
-export function ActionableProposalsTable({ proposals }: { proposals: UserProposal[] }) {
+export function ActionableProposalsTable({
+  proposals,
+  customColumns
+}: {
+  proposals: UserProposal[];
+  customColumns: CustomColumn[];
+}) {
   const router = useRouter();
 
   return (
@@ -57,6 +64,13 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                   Action
                 </Typography>
               </TableCell>
+              {customColumns.map((column) => (
+                <TableCell key={column.formFieldId} align='center'>
+                  <Typography variant='body2' fontWeight='bold'>
+                    {column.title}
+                  </Typography>
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -149,6 +163,7 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                       {buttonText}
                     </Button>
                   </TableCell>
+                  <CustomColumnTableCells customColumns={customColumns} proposal={proposal} />
                 </StyledTableRow>
               );
             })}

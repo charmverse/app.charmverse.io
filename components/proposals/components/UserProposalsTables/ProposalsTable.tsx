@@ -3,7 +3,7 @@ import { ThumbUpOutlined as ApprovedIcon, HighlightOff as RejectedIcon } from '@
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Card, Chip, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
-import type { UserProposal } from '@root/lib/proposals/getUserProposals';
+import type { CustomColumn, UserProposal } from '@root/lib/proposals/getUserProposals';
 import { relativeTime } from '@root/lib/utils/dates';
 import { useState } from 'react';
 
@@ -13,6 +13,8 @@ import Modal from 'components/common/Modal';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+
+import { CustomColumnTableCells } from './CustomColumnTableCells';
 
 export const StyledTable = styled(Table)`
   .MuiTableCell-root {
@@ -60,11 +62,13 @@ export function OpenButton() {
 export function ProposalsTable({
   proposals,
   title,
-  assigned = false
+  assigned = false,
+  customColumns = []
 }: {
   title: string;
   proposals: UserProposal[];
   assigned?: boolean;
+  customColumns?: CustomColumn[];
 }) {
   const { navigateToSpacePath } = useCharmRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -117,6 +121,13 @@ export function ProposalsTable({
                   </Typography>
                 ) : null}
               </TableCell>
+              {customColumns.map((column) => (
+                <TableCell key={column.formFieldId} align='center'>
+                  <Typography variant='body2' fontWeight='bold'>
+                    {column.title}
+                  </Typography>
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -186,6 +197,7 @@ export function ProposalsTable({
                   <TableCell width={150} align='center'>
                     {assigned ? (proposal.reviewedAt ? relativeTime(proposal.reviewedAt) : '-') : null}
                   </TableCell>
+                  <CustomColumnTableCells customColumns={customColumns} proposal={proposal} />
                 </StyledTableRow>
               );
             })}
