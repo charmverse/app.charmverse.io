@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 
-export async function generateScout() {
+export async function generateScout({index}: {index: number}) {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
   const displayName = `${firstName} ${lastName}`;
@@ -28,7 +28,7 @@ export async function generateScout() {
       agreedToTermsAt: new Date(),
       onboardedAt: new Date(),
       walletAddress: faker.finance.ethereumAddress(),
-      farcasterId: faker.number.int({ min: 1, max: 5000 }),
+      farcasterId: faker.number.int({ min: 1, max: 5000 }) + index,
       farcasterName: displayName,
     }
   });
