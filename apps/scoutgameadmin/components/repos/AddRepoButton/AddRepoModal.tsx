@@ -1,4 +1,4 @@
-import { Check as CheckIcon } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
 import {
   Dialog,
   DialogTitle,
@@ -7,15 +7,10 @@ import {
   Button,
   TextField,
   CircularProgress,
-  Container,
   InputAdornment,
   Link,
   Typography,
-  Paper,
-  Stack,
-  Box,
-  IconButton,
-  TableSortLabel
+  Box
 } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -30,7 +25,7 @@ interface AddRepoModalProps {
 
 export function AddRepoModal({ open, onClose, onAdd }: AddRepoModalProps) {
   const [repoInput, setRepoInput] = useState('');
-  const { trigger: addGithubRepo } = useCreateRepo();
+  const { trigger: addGithubRepo, isMutating: isImporting } = useCreateRepo();
   const debouncedFilterString = useDebouncedValue(repoInput);
   const {
     data: reposFromGithub,
@@ -100,9 +95,15 @@ export function AddRepoModal({ open, onClose, onAdd }: AddRepoModalProps) {
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button disabled={error || newRepos.length === 0} type='submit' color='primary' variant='contained'>
+          <LoadingButton
+            loading={isImporting}
+            disabled={error || newRepos.length === 0}
+            type='submit'
+            color='primary'
+            variant='contained'
+          >
             Import
-          </Button>
+          </LoadingButton>
         </DialogActions>
       </form>
     </Dialog>

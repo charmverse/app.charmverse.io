@@ -3,9 +3,8 @@
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
-
-import { useMdScreen } from 'hooks/useMediaScreens';
+import { FaGithubAlt } from 'react-icons/fa';
+import { TbReceiptBitcoin } from 'react-icons/tb';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -33,7 +32,6 @@ const StyledBottomNavigation = styled(BottomNavigation, {
     }
   }
 }));
-
 export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: boolean; isAuthenticated?: boolean }) {
   const pathname = usePathname();
   const value = getActiveButton(pathname);
@@ -43,7 +41,14 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
         label='Repos'
         href='/repos'
         value='repos'
-        icon={<PiHouseLight size='24px' />}
+        icon={<FaGithubAlt size='24px' />}
+        LinkComponent={Link}
+      />
+      <BottomNavigationAction
+        label='Transactions'
+        href='/transactions'
+        value='transactions'
+        icon={<TbReceiptBitcoin size='24px' />}
         LinkComponent={Link}
       />
       {/* <BottomNavigationAction
@@ -58,16 +63,12 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
 }
 
 function getActiveButton(pathname: string) {
-  if (pathname.startsWith('/home')) {
-    return 'home';
-  } else if (pathname.startsWith('/scout') || pathname.startsWith('/u/')) {
-    return 'scout';
-  } else if (pathname.startsWith('/notifications')) {
-    return 'notifications';
-  } else if (pathname.startsWith('/profile')) {
-    return 'profile';
-  } else if (pathname.startsWith('/info')) {
-    return 'info';
+  if (pathname.startsWith('/repos')) {
+    return 'repos';
+  } else if (pathname.startsWith('/transactions')) {
+    return 'transactions';
+  } else if (pathname.startsWith('/users')) {
+    return 'users';
   }
   return null;
 }

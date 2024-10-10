@@ -12,12 +12,12 @@ export type RepoSearchResult = {
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const searchString = searchParams.get('owner');
-  if (!searchString || searchString.length < 2) {
+  const owner = searchParams.get('owner');
+  if (!owner || owner.length < 2) {
     return NextResponse.json([]);
   }
   try {
-    const repos = await getReposByOwner(searchString);
+    const repos = await getReposByOwner(owner);
     const existing = await prisma.githubRepo.findMany({
       where: {
         id: {
