@@ -84,7 +84,14 @@ export function useDecentTransaction({
       }).catch((error) => {
         log.error(`Error preparing decent transaction`, { error, decentAPIParams });
         throw error;
-      })
+      }),
+    {
+      shouldRetryOnError: (error) => {
+        log.info(`Retrying decent tx`, { decentAPIParams, error });
+        return true;
+      },
+      errorRetryInterval: 1000
+    }
   );
 
   return {
