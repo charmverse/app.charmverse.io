@@ -88,8 +88,6 @@ function _appendQuery(path: string, data: Params) {
       const value = data[key];
       return Array.isArray(value)
         ? `${value.map((v: string) => `${key}=${v}`).join('&')}`
-        : typeof value === 'object'
-        ? `${key}=${JSON.stringify(value, (_key, val) => (typeof val === 'bigint' ? `${val.toString()}n` : val))}`
         : `${key}=${encodeURIComponent(value)}`;
     })
     .join('&');
