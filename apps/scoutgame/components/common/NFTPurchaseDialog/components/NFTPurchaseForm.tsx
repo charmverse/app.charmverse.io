@@ -2,9 +2,10 @@
 
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
+import { arrayUtils } from '@charmverse/core/utilities';
 import { ActionType, ChainId } from '@decent.xyz/box-common';
-import type { UseBoxActionArgs } from '@decent.xyz/box-hooks';
-import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
+import type { UseBoxActionArgs, UserBalanceArgs } from '@decent.xyz/box-hooks';
+import { BoxHooksContextProvider, useBoxAction, useUsersBalances } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -29,6 +30,7 @@ import {
 } from '@packages/scoutgame/builderNfts/constants';
 import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import { convertCostToPointsWithDiscount, convertCostToUsd } from '@packages/scoutgame/builderNfts/utils';
+import { prettyPrint } from '@packages/utils/strings';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -48,7 +50,7 @@ import type { MinimalUserInfo } from 'lib/users/interfaces';
 import { useGetERC20Allowance } from '../hooks/useGetERC20Allowance';
 
 import type { ChainOption } from './ChainSelector/chains';
-import { getChainOptions, getCurrencyContract } from './ChainSelector/chains';
+import { chainOptionsMainnet, ETH_NATIVE_ADDRESS, getChainOptions, getCurrencyContract } from './ChainSelector/chains';
 import type { SelectedPaymentOption } from './ChainSelector/ChainSelector';
 import { BlockchainSelect } from './ChainSelector/ChainSelector';
 import { ERC20ApproveButton } from './ERC20Approve';
@@ -93,6 +95,36 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     chainId: useTestnets ? ChainId.OPTIMISM_SEPOLIA : ChainId.OPTIMISM,
     currency: 'ETH'
   });
+
+  const tokenValues = arrayUtils.uniqueValues(
+    chainOptionsMainnet
+      .map((opt) => {
+        if (opt.usdcAddress) {
+          return [ETH_NATIVE_ADDRESS, opt.usdcAddress];
+        }
+        return [ETH_NATIVE_ADDRESS];
+      })
+      .flat()
+  );
+
+  const args: UserBalanceArgs = {
+    chainId: ChainId.OPTIMISM,
+    selectChains: arrayUtils.uniqueValues(getChainOptions().map((opt) => opt.id)),
+    address,
+    enable: !!address,
+    selectTokens: arrayUtils.uniqueValues(
+      chainOptionsMainnet
+        .map((opt) => {
+          if (opt.usdcAddress) {
+            return [ETH_NATIVE_ADDRESS, opt.usdcAddress];
+          }
+          return [ETH_NATIVE_ADDRESS];
+        })
+        .flat()
+    )
+  };
+
+  const { tokens } = useUsersBalances(args);
 
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 

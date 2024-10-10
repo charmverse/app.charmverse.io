@@ -15,6 +15,8 @@ import {
 
 export type ChainOption = { name: string; id: number; icon: string; chain: Chain; usdcAddress: string };
 
+export const ETH_NATIVE_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 export const chainOptionsMainnet: ChainOption[] = [
   {
     name: 'Optimism',
@@ -87,7 +89,7 @@ export type SelectedPaymentOption = { chainId: number; currency: AvailableCurren
 
 export function getCurrencyContract({ currency, chainId }: SelectedPaymentOption): string {
   if (currency === 'ETH') {
-    return '0x0000000000000000000000000000000000000000';
+    return ETH_NATIVE_ADDRESS;
   }
 
   return getChainOptions({ useTestnets }).find((chain) => chain.id === chainId)?.usdcAddress || '';
