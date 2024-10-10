@@ -238,12 +238,10 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const balanceInfo = userTokenBalances?.find(
     (_token) => _token.chainId === selectedPaymentOption.chainId && _token.address === selectedChainCurrency
   );
-  const amountToPay = decentTransactionInfo?.tokenPayment?.amount;
-  const isEthPayment = !!decentTransactionInfo?.tokenPayment?.isNative;
-  const balanceDataFromCorrectChain = balanceInfo?.chainId === selectedPaymentOption.chainId;
 
-  const hasInsufficientBalance =
-    !!amountToPay && !!balanceInfo && balanceDataFromCorrectChain && balanceInfo.balance >= amountToPay;
+  const amountToPay = BigInt(decentTransactionInfo?.tokenPayment?.amount?.toString().replace('n', '') || 0);
+
+  const hasInsufficientBalance = !!amountToPay && !!balanceInfo && balanceInfo.balance < amountToPay;
 
   const handlePurchase = async () => {
     if (paymentMethod === 'points') {
