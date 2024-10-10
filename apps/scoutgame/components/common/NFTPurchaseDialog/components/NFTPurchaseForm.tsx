@@ -658,7 +658,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             isExecutingTransaction ||
             (paymentMethod === 'points' && notEnoughPoints) ||
             isExecutingPointsPurchase ||
-            (paymentMethod === 'wallet' && !hasSufficientBalance && !!balanceDataFromCorrectChain) ||
+            (paymentMethod === 'wallet' && !hasSufficientBalance && balances && !!balanceDataFromCorrectChain) ||
             (!approvalRequired && isLoadingAllowance)
           }
         >
