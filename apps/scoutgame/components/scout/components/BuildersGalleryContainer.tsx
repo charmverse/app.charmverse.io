@@ -1,5 +1,6 @@
 'use client';
 
+import { log } from '@charmverse/core/log';
 import { Box } from '@mui/material';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
@@ -7,7 +8,7 @@ import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import { LoadingCards } from 'components/common/Loading/LoadingCards';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuildersSort } from 'lib/builders/getSortedBuilders';
-import { fetchMoreBuilders } from 'lib/builders/getSortedBuildersAction';
+import { getSortedBuildersAction } from 'lib/builders/getSortedBuildersAction';
 import type { BuilderInfo } from 'lib/builders/interfaces';
 
 export function BuildersGalleryContainer({
@@ -34,13 +35,17 @@ export function BuildersGalleryContainer({
 
     setIsLoading(true);
     try {
-      const actionResponse = await fetchMoreBuilders({ sort, cursor: nextCursor });
+      const actionResponse = await getSortedBuildersAction({ sort, cursor: nextCursor });
       if (actionResponse?.data) {
         const { builders: newBuilders, nextCursor: newCursor } = actionResponse.data;
         setBuilders((prev) => [...prev, ...newBuilders]);
         setNextCursor(newCursor);
       } else if (actionResponse?.serverError) {
-        // TODO: handle server error
+        log.warn('Error fetching more builders', {
+          error: actionResponse.serverError,
+          sort,
+          cursor: nextCursor
+        });
       }
     } catch (error) {
       // TODO: handle error
@@ -63,12 +68,14 @@ export function BuildersGalleryContainer({
       observer.observe(observerTarget.current);
     }
 
+    const current = observerTarget.current;
+
     return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current);
+      if (current) {
+        observer.unobserve(current);
       }
     };
-  }, [loadMoreBuilders]);
+  }, [loadMoreBuilders, observerTarget]);
 
   return (
     <>

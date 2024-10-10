@@ -8,8 +8,8 @@ import { getSortedBuilders } from 'lib/builders/getSortedBuilders';
 
 import type { BuilderInfo } from './interfaces';
 
-export const fetchMoreBuilders = actionClient
-  .metadata({ actionName: 'fetch_builders' })
+export const getSortedBuildersAction = actionClient
+  .metadata({ actionName: 'get_sorted_builders' })
   .schema(
     yup.object({
       sort: yup.string().oneOf(['hot', 'new', 'top']).required(),
