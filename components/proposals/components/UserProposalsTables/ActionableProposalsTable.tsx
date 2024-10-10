@@ -1,11 +1,11 @@
-import styled from '@emotion/styled';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
-import { Box, Button, Card, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Button, Card, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import type { UserProposal } from '@root/lib/proposals/getUserProposals';
 import { relativeTime } from '@root/lib/utils/dates';
 import { useRouter } from 'next/router';
 
+import Link from 'components/common/Link';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 
 import { StyledTable, OpenButton, StyledTableRow } from './ProposalsTable';
@@ -90,7 +90,9 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                 >
                   <TableCell width={400}>
                     <Typography>{proposal.title || 'Untitled'}</Typography>
-                    <OpenButton />
+                    <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
+                      <OpenButton />
+                    </Link>
                   </TableCell>
                   <TableCell align='center' width={200}>
                     <Typography color={isOverdue ? 'error' : 'initial'}>{dueDateText}</Typography>
