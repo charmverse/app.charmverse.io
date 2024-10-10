@@ -4,7 +4,7 @@ import { Box, Card, Chip, Table, TableBody, TableCell, TableHead, TableRow, Typo
 import { Stack } from '@mui/system';
 import type { UserProposal } from '@root/lib/proposals/getUserProposals';
 import { relativeTime } from '@root/lib/utils/dates';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Button from 'components/common/DatabaseEditor/widgets/buttons/button';
 import Modal from 'components/common/Modal';
@@ -68,6 +68,12 @@ export function ProposalsTable({
   const [isOpen, setIsOpen] = useState(false);
   const { getFeatureTitle } = useSpaceFeatures();
 
+  const customColumns = useMemo(() => {
+    return proposals.flatMap(
+      (proposal) => proposal.customColumns?.map((column) => ({ id: column.id, title: column.title })) ?? []
+    );
+  }, [proposals]);
+
   return (
     <Stack gap={1}>
       <Typography variant='h6' fontWeight='bold'>
@@ -104,6 +110,13 @@ export function ProposalsTable({
                   </Typography>
                 ) : null}
               </TableCell>
+              {customColumns.map((column) => (
+                <TableCell key={column.id} align='center'>
+                  <Typography variant='body2' fontWeight='bold'>
+                    {column.title}
+                  </Typography>
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -152,6 +165,21 @@ export function ProposalsTable({
                   <TableCell width={250} align='center'>
                     {assigned ? (proposal.reviewedAt ? relativeTime(proposal.reviewedAt) : '-') : null}
                   </TableCell>
+                  {customColumns.map((column) => {
+                    const customColumn = proposal.customColumns?.find((_column) => _column.id === column.id);
+                    let value = null;
+                    if (customColumn?.type === 'select' || customColumn?.type === 'multiselect') {
+                      value = <Chip label={customColumn?.option?.name} color={customColumn?.option?.color as any} />;
+                    } else {
+                      value = <Typography>{(customColumn?.value as string) || '-'}</Typography>;
+                    }
+
+                    return (
+                      <TableCell key={column.id} align='center' sx={{ minWidth: 100 }}>
+                        {value}
+                      </TableCell>
+                    );
+                  })}
                 </StyledTableRow>
               );
             })}

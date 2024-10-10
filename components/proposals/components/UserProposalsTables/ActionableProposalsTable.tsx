@@ -1,17 +1,22 @@
-import styled from '@emotion/styled';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
-import { Box, Button, Card, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Button, Card, Chip, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import type { UserProposal } from '@root/lib/proposals/getUserProposals';
 import { relativeTime } from '@root/lib/utils/dates';
 import { useRouter } from 'next/router';
+import { useMemo } from 'react';
 
 import { evaluationIcons } from 'components/settings/proposals/constants';
 
-import { StyledTable, OpenButton, StyledTableRow } from './ProposalsTable';
+import { OpenButton, StyledTable, StyledTableRow } from './ProposalsTable';
 
 export function ActionableProposalsTable({ proposals }: { proposals: UserProposal[] }) {
   const router = useRouter();
+  const customColumns = useMemo(() => {
+    return proposals.flatMap(
+      (proposal) => proposal.customColumns?.map((column) => ({ id: column.id, title: column.title })) ?? []
+    );
+  }, [proposals]);
 
   return (
     <Stack gap={1}>
@@ -47,6 +52,13 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                   Action
                 </Typography>
               </TableCell>
+              {customColumns.map((column) => (
+                <TableCell key={column.id} align='center'>
+                  <Typography variant='body2' fontWeight='bold'>
+                    {column.title}
+                  </Typography>
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -119,6 +131,21 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                       {buttonText}
                     </Button>
                   </TableCell>
+                  {customColumns.map((column) => {
+                    const customColumn = proposal.customColumns?.find((_column) => _column.id === column.id);
+                    let value = null;
+                    if (customColumn?.type === 'select' || customColumn?.type === 'multiselect') {
+                      value = <Chip label={customColumn?.option?.name} color={customColumn?.option?.color as any} />;
+                    } else {
+                      value = <Typography>{(customColumn?.value as string) || '-'}</Typography>;
+                    }
+
+                    return (
+                      <TableCell key={column.id} align='center' sx={{ minWidth: 100 }}>
+                        {value}
+                      </TableCell>
+                    );
+                  })}
                 </StyledTableRow>
               );
             })}

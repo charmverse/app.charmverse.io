@@ -32,7 +32,11 @@ export type UserProposal = {
     title: string;
     value: Prisma.JsonValue;
     type: FormFieldType;
-    label?: string;
+    option?: {
+      id: string;
+      name: string;
+      color: string;
+    };
   }[];
 };
 
@@ -102,25 +106,25 @@ export async function getUserProposals({
 
   const proposalFormFieldRecord: Record<
     string,
-    { formFieldId: string; title: string; type: FormFieldType; value: string; label?: string }[]
+    {
+      formFieldId: string;
+      title: string;
+      type: FormFieldType;
+      value: string;
+      option?: { id: string; name: string; color: string };
+    }[]
   > = {};
 
   for (const column of proposalMyTaskColumns) {
     column.formField.answers.forEach((answer) => {
       proposalFormFieldRecord[answer.proposalId] = proposalFormFieldRecord[answer.proposalId] || [];
-      let label;
-      if (column.formField.type === 'select' || column.formField.type === 'multiselect') {
-        const options = column.formField.options as { id: string; name: string; color: string }[];
-        const value = answer.value as string;
-        label = options.find((option) => option.id === value)?.name;
-      }
-
+      const options = column.formField.options as { id: string; name: string; color: string }[];
       proposalFormFieldRecord[answer.proposalId].push({
         formFieldId: column.formField.id,
         title: column.formField.name,
         type: column.formField.type,
         value: answer.value as string,
-        label
+        option: options?.find((option) => option.id === answer.value)
       });
     });
   }
@@ -414,7 +418,7 @@ export async function getUserProposals({
         title: column.title,
         value: column.value,
         type: column.type,
-        label: column.label
+        option: column.option
       })) ?? [];
   });
 
