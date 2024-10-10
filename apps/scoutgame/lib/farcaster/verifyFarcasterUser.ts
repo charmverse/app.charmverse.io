@@ -3,7 +3,7 @@ import { getChainById } from '@root/connectors/chains';
 import { InvalidStateError } from '@root/lib/middleware/errors';
 import { optimism } from 'viem/chains';
 
-import { authConfig } from './config';
+import { getAuthConfig } from './config';
 import type { AuthSchema } from './config';
 
 const appClient = createAppClient({
@@ -13,6 +13,8 @@ const appClient = createAppClient({
 });
 
 export async function verifyFarcasterUser({ nonce, message, signature }: AuthSchema): Promise<{ fid: number }> {
+  const authConfig = getAuthConfig();
+
   const {
     success,
     fid,

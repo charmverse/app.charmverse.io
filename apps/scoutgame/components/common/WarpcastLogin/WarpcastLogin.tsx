@@ -4,12 +4,13 @@ import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import { AuthKitProvider } from '@farcaster/auth-kit';
 import { Link, Typography } from '@mui/material';
 
-import { authConfig } from 'lib/farcaster/config';
+import { getAuthConfig } from 'lib/farcaster/config';
 
 import { WarpcastLoginButton } from './WarpcastLoginButton';
 
 export function WarpcastLogin() {
   const trackEvent = useTrackEvent();
+  const authConfig = getAuthConfig();
 
   return (
     <AuthKitProvider config={authConfig}>
