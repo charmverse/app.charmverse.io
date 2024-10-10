@@ -6,6 +6,7 @@ import { relativeTime } from '@root/lib/utils/dates';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 
+import Link from 'components/common/Link';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 
 import { OpenButton, StyledTable, StyledTableRow } from './ProposalsTable';
@@ -102,7 +103,9 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                 >
                   <TableCell width={400}>
                     <Typography>{proposal.title || 'Untitled'}</Typography>
-                    <OpenButton />
+                    <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
+                      <OpenButton />
+                    </Link>
                   </TableCell>
                   <TableCell align='center' width={200}>
                     <Typography color={isOverdue ? 'error' : 'initial'}>{dueDateText}</Typography>
