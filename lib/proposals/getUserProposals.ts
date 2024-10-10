@@ -1,4 +1,10 @@
-import type { ProposalEvaluationResult, ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma-client';
+import type {
+  FormFieldType,
+  Prisma,
+  ProposalEvaluationResult,
+  ProposalEvaluationType,
+  ProposalStatus
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation, privateEvaluationSteps } from '@charmverse/core/proposals';
 
@@ -21,6 +27,13 @@ export type UserProposal = {
   currentEvaluation?: CurrentEvaluation;
   viewable: boolean;
   reviewedAt?: Date | null;
+  customColumns?: {
+    id: string;
+    title: string;
+    value: Prisma.JsonValue;
+    type: FormFieldType;
+    label?: string;
+  }[];
 };
 
 export type GetUserProposalsResponse = {
@@ -64,6 +77,53 @@ export async function getUserProposals({
       }
     })
     .then((assignedRoles) => assignedRoles.map((role) => role.roleId));
+
+  const proposalMyTaskColumns = await prisma.proposalMyTaskColumn.findMany({
+    where: {
+      spaceId
+    },
+    select: {
+      formField: {
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          options: true,
+          answers: {
+            select: {
+              proposalId: true,
+              value: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const proposalFormFieldRecord: Record<
+    string,
+    { formFieldId: string; title: string; type: FormFieldType; value: string; label?: string }[]
+  > = {};
+
+  for (const column of proposalMyTaskColumns) {
+    column.formField.answers.forEach((answer) => {
+      proposalFormFieldRecord[answer.proposalId] = proposalFormFieldRecord[answer.proposalId] || [];
+      let label;
+      if (column.formField.type === 'select' || column.formField.type === 'multiselect') {
+        const options = column.formField.options as { id: string; name: string; color: string }[];
+        const value = answer.value as string;
+        label = options.find((option) => option.id === value)?.name;
+      }
+
+      proposalFormFieldRecord[answer.proposalId].push({
+        formFieldId: column.formField.id,
+        title: column.formField.name,
+        type: column.formField.type,
+        value: answer.value as string,
+        label
+      });
+    });
+  }
 
   const proposals = await prisma.proposal.findMany({
     where: {
@@ -346,6 +406,17 @@ export async function getUserProposals({
       }
     }
   }
+
+  [...actionableProposals, ...authoredProposals, ...assignedProposals].forEach((proposal) => {
+    proposal.customColumns =
+      proposalFormFieldRecord[proposal.id]?.map((column) => ({
+        id: column.formFieldId,
+        title: column.title,
+        value: column.value,
+        type: column.type,
+        label: column.label
+      })) ?? [];
+  });
 
   return {
     actionable: actionableProposals.sort((a, b) => {
