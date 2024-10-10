@@ -6,10 +6,10 @@ import { useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import type { ButtonProps } from '@mui/material';
 import { Box, Button, Typography } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
@@ -73,7 +73,11 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     popupState.open();
   }, []);
 
-  const { signIn, url } = useFarcasterConnection({
+  const {
+    signIn,
+    url,
+    error: connectionError
+  } = useFarcasterConnection({
     onSuccess: onSuccessCallback,
     onError: onErrorCallback,
     onClick
@@ -87,16 +91,19 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     );
   }
 
-  const errorMessage = result?.serverError?.message?.includes('private beta')
-    ? 'Scout Game is in private beta'
-    : 'There was an error while logging in';
+  const errorMessage =
+    (connectionError && connectionError.message) ||
+    (hasErrored &&
+      (result?.serverError?.message?.includes('private beta')
+        ? 'Scout Game is in private beta'
+        : 'There was an error while logging in'));
 
   return (
     <Box width='100%' data-test='connect-with-farcaster'>
       <Button
         size='large'
         onClick={signIn}
-        disabled={!url}
+        variant='contained'
         sx={{
           px: {
             xs: 2.5,
@@ -108,16 +115,15 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
           }
         }}
         startIcon={<WarpcastIcon />}
-        {...props}
       >
         {children || 'Sign in with Warpcast'}
       </Button>
-      {hasErrored && (
+      {errorMessage && (
         <Typography variant='body2' sx={{ mt: 2 }} color='error'>
           {errorMessage}
         </Typography>
       )}
-      <FarcasterLoginModal open={popupState.isOpen} onClose={() => popupState.close()} url={url} />
+      <FarcasterLoginModal {...bindPopover(popupState)} url={url} />
     </Box>
   );
 }

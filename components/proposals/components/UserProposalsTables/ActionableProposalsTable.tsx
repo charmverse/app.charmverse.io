@@ -1,8 +1,8 @@
+import { ThumbUpOutlined as ApprovedIcon, HighlightOff as RejectedIcon } from '@mui/icons-material';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Button, Card, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import type { CustomColumn, UserProposal } from '@root/lib/proposals/getUserProposals';
-import { relativeTime } from '@root/lib/utils/dates';
 import { useRouter } from 'next/router';
 
 import Link from 'components/common/Link';
@@ -39,14 +39,24 @@ export function ActionableProposalsTable({
                   Due date
                 </Typography>
               </TableCell>
-              <TableCell align='center'>
-                <Typography variant='body2' fontWeight='bold'>
-                  Last updated
-                </Typography>
-              </TableCell>
               <TableCell align='left'>
                 <Typography variant='body2' fontWeight='bold'>
                   Current step
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Your review
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Approved
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Declined
                 </Typography>
               </TableCell>
               <TableCell align='right'>
@@ -102,7 +112,7 @@ export function ActionableProposalsTable({
                     router.push(`/${router.query.domain}/${proposal.path}`);
                   }}
                 >
-                  <TableCell width={400}>
+                  <TableCell width={250}>
                     <Typography>{proposal.title || 'Untitled'}</Typography>
                     <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
                       <OpenButton />
@@ -111,10 +121,7 @@ export function ActionableProposalsTable({
                   <TableCell align='center' width={200}>
                     <Typography color={isOverdue ? 'error' : 'initial'}>{dueDateText}</Typography>
                   </TableCell>
-                  <TableCell align='center' width={250}>
-                    <Typography>{relativeTime(proposal.updatedAt)}</Typography>
-                  </TableCell>
-                  <TableCell width={250}>
+                  <TableCell width={150}>
                     <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
                       {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>
@@ -122,7 +129,28 @@ export function ActionableProposalsTable({
                       </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell align='right' width={250}>
+                  <TableCell align='center' width={150}>
+                    <Typography>
+                      {proposal.userReviewResult === 'pass' ? (
+                        <ApprovedIcon fontSize='small' color='success' />
+                      ) : proposal.userReviewResult === 'fail' ? (
+                        <RejectedIcon fontSize='small' color='error' />
+                      ) : (
+                        '-'
+                      )}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align='center' width={150}>
+                    <Typography color={proposal.totalPassedReviewResults ? 'success' : undefined}>
+                      {proposal.totalPassedReviewResults || '-'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align='center' width={150}>
+                    <Typography color={proposal.totalFailedReviewResults ? 'error' : undefined}>
+                      {proposal.totalFailedReviewResults || '-'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align='right' width={150}>
                     <Button
                       color='primary'
                       size='small'

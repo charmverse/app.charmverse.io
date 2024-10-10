@@ -75,7 +75,8 @@ export function UserAndRoleSelectedOptions({
   readOnly,
   onRemove,
   wrapColumn,
-  errorValues
+  errorValues,
+  hideIdentity
 }: {
   wrapColumn?: boolean;
   readOnly: boolean;
@@ -83,6 +84,7 @@ export function UserAndRoleSelectedOptions({
   isRequiredValue?: (option: SelectOptionPopulated) => boolean;
   onRemove?: (reviewerId: string) => void;
   errorValues?: string[];
+  hideIdentity?: boolean;
 }) {
   return (
     <>
@@ -103,7 +105,13 @@ export function UserAndRoleSelectedOptions({
                     : { overflowX: 'hidden', minWidth: 'fit-content' }
                 }
               >
-                <UserDisplay fontSize={14} avatarSize='xSmall' userId={option.id} wrapName={wrapColumn} />
+                <UserDisplay
+                  fontSize={14}
+                  avatarSize='xSmall'
+                  userId={option.id}
+                  wrapName={wrapColumn}
+                  hideIdentity={hideIdentity}
+                />
                 {!readOnly && !isRequiredValue(option) && (
                   <IconButton size='small' onClick={() => onRemove?.(option.id)}>
                     <CloseIcon
@@ -184,6 +192,7 @@ type Props<T> = {
   required?: boolean;
   errorValues?: string[];
   popupField?: boolean;
+  hideIdentity?: boolean;
 };
 
 export function UserAndRoleSelect<T extends { id: string; group: string } = SelectOption>({
@@ -203,7 +212,8 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
   wrapColumn,
   type = 'roleAndUser',
   required,
-  errorValues
+  errorValues,
+  hideIdentity
 }: Props<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
@@ -326,6 +336,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
               value={populatedValue}
               onRemove={removeOption}
               errorValues={errorValues}
+              hideIdentity={hideIdentity}
             />
           )}
         </Box>
@@ -413,6 +424,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
                 {...(_props as any)}
                 userId={option.id}
                 avatarSize='small'
+                hideIdentity={hideIdentity}
               />
             );
           }}

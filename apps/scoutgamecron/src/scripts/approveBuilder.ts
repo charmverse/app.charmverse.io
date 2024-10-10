@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { currentSeason, getCurrentWeek, getDateFromISOWeek } from '@packages/scoutgame/dates';
 import { recordMergedPullRequest } from '../tasks/processBuilderActivity/recordMergedPullRequest';
-
 import { updateBuildersRank } from '../tasks/processBuilderActivity/updateBuildersRank';
 
 export async function approveBuilder({
