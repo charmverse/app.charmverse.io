@@ -1,14 +1,26 @@
+import { getAlchemyBaseUrl } from '@root/lib/blockchain/provider/alchemy/client';
 import type { Hex } from 'viem';
 import { optimism } from 'viem/chains';
 import * as yup from 'yup';
 
-export const authConfig = {
-  relay: 'https://relay.farcaster.xyz',
-  rpcUrl: 'https://mainnet.optimism.io',
-  domain: 'scoutgame.xyz',
-  siweUri: 'https://scoutgame.xyz/login',
-  provider: optimism
-} as const;
+export function getAuthConfig() {
+  const config = {
+    relay: 'https://relay.farcaster.xyz',
+    rpcUrl: optimism.rpcUrls.default.http[0],
+    domain: 'scoutgame.xyz',
+    siweUri: 'https://scoutgame.xyz/login',
+    provider: optimism
+  };
+  try {
+    const optimismRpc = getAlchemyBaseUrl(optimism.id);
+    return {
+      ...config,
+      rpcUrl: optimismRpc
+    };
+  } catch (_) {
+    return config;
+  }
+}
 
 export const authSchema = yup.object({
   nonce: yup.string().defined(),
