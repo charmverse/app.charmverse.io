@@ -1,0 +1,60 @@
+{
+  "compilerOptions": {
+    "outDir": "../../dist/apps/scoutgame",
+    "rootDir": "../../",
+    "lib": ["dom", "dom.iterable", "esnext", "webworker"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@connect-shared/*": ["../../@connect-shared/*"],
+      "@root/charmClient/*": ["../../charmClient/*"],
+      "apiClient/*": ["./apiClient/*"],
+      "components/*": ["./components/*"],
+      "hooks/*": ["./hooks/*"],
+      "lib/*": ["./lib/*"],
+      "public/*": ["./public/*"],
+      "theme/*": ["./theme/*"],
+      "@root/abis/*": ["../../abis/*"],
+      "@root/adapters/*": ["../../adapters/*"],
+      "@root/config/*": ["../../config/*"],
+      "@root/connectors/*": ["../../connectors/*"],
+      "@root/lib/*": ["../../lib/*"],
+      "@root/hooks/*": ["../../hooks/*"],
+      "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
+      "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
+      "@charmverse/core/shared": ["../../node_modules/@charmverse/core/dist/cjs/shared"],
+      "@charmverse/core/log": ["../../node_modules/@charmverse/core/dist/cjs/lib/log"],
+      "@charmverse/core/http": ["../../node_modules/@charmverse/core/dist/cjs/http"],
+      "@charmverse/core/test": ["../../node_modules/@charmverse/core/dist/cjs/test"],
+      "@charmverse/core/permissions": ["../../node_modules/@charmverse/core/dist/cjs/permissions"],
+      "@charmverse/core/permissions/flags": ["../../node_modules/@charmverse/core/dist/cjs/permissions-flags"],
+      "@charmverse/core/pages": ["../../node_modules/@charmverse/core/dist/cjs/pages"],
+      "@charmverse/core/pages/utilities": ["../../node_modules/@charmverse/core/dist/cjs/pages-utilities"],
+      "@charmverse/core/proposals": ["../../node_modules/@charmverse/core/dist/cjs/proposals"],
+      "@charmverse/core/bounties": ["../../node_modules/@charmverse/core/dist/cjs/bounties"],
+      "@charmverse/core/utilities": ["../../node_modules/@charmverse/core/dist/cjs/utilities"],
+      "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["../../node_modules", ".next/"]
+}

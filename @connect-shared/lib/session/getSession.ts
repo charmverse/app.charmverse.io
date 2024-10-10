@@ -4,6 +4,6 @@ import { cookies } from 'next/headers';
 import type { SessionData } from './config';
 import { getIronOptions } from './config';
 
-export async function getSession() {
-  return getIronSession<SessionData>(cookies(), getIronOptions());
+export async function getSession<T extends object = SessionData>() {
+  return getIronSession<T>(cookies(), getIronOptions());
 }

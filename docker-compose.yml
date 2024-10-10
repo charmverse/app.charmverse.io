@@ -135,6 +135,26 @@ services:
     profiles:
       - stg-scoutgamecron
 
+  prd-scoutgameadmin:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command: ['sh', '-c', 'node_modules/.bin/next start apps/scoutgameadmin --keepAliveTimeout 70000']
+    profiles:
+      - prd-scoutgameadmin
+
+  stg-scoutgameadmin:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command: ['sh', '-c', 'node_modules/.bin/next start apps/scoutgameadmin --keepAliveTimeout 70000']
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-scoutgameadmin
+
   prd-waitlist:
     extends:
       service: defaults
