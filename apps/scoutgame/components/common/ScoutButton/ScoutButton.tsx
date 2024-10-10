@@ -70,7 +70,15 @@ export function ScoutButton({
             <>${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(0)}</>
           )}
         </LoadingButton>
-        {isPurchasing && <NFTPurchaseDialog open onClose={() => setIsPurchasing(false)} builder={builder} />}
+        {isPurchasing && (
+          <NFTPurchaseDialog
+            open
+            onClose={() => {
+              setIsPurchasing(false);
+            }}
+            builder={builder}
+          />
+        )}
         <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} path={`/u/${builder.username}`} />
       </DynamicLoadingContext.Provider>
     </div>

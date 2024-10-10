@@ -410,6 +410,18 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       ? (Number(balances?.eth || 0) / 1e18).toFixed(4)
       : (Number(balances.usdc || 0) / 1e6).toFixed(2);
 
+  const [selectedQuantity, setSelectedQuantity] = useState<number | 'custom'>(1);
+  const [customQuantity, setCustomQuantity] = useState(2);
+
+  const handleTokensToBuyChange = (value: number | 'custom') => {
+    if (value === 'custom') {
+      setSelectedQuantity('custom');
+      setTokensToBuy(customQuantity);
+    } else if (value) {
+      setSelectedQuantity(value);
+      setTokensToBuy(value);
+    }
+  };
   const approvalRequired =
     paymentMethod === 'wallet' &&
     selectedPaymentOption.currency === 'USDC' &&
@@ -450,8 +462,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       <Stack gap={1}>
         <Typography color='secondary'>Select quantity</Typography>
         <ToggleButtonGroup
-          value={tokensToBuy}
-          onChange={(_: React.MouseEvent<HTMLElement>, n: number) => setTokensToBuy((prevN) => n || prevN)}
+          value={selectedQuantity}
+          onChange={(_, newValue) => handleTokensToBuyChange(newValue)}
           exclusive
           fullWidth
           aria-label='quantity selection'
@@ -461,18 +473,20 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
               {q}
             </ToggleButton>
           ))}
-          <ToggleButton
-            sx={{ fontSize: 14, textTransform: 'none' }}
-            value={2}
-            aria-label='custom'
-            onClick={() => setTokensToBuy(2)}
-          >
+          <ToggleButton sx={{ fontSize: 14, textTransform: 'none' }} value='custom' aria-label='custom'>
             Custom
           </ToggleButton>
         </ToggleButtonGroup>
-        {!initialQuantities.includes(tokensToBuy) && (
-          <Stack flexDirection='row' gap={2}>
-            <IconButton color='secondary' onClick={() => setTokensToBuy((prevN) => prevN - 1)}>
+        {selectedQuantity === 'custom' && (
+          <Stack flexDirection='row' gap={2} mt={2}>
+            <IconButton
+              color='secondary'
+              onClick={() => {
+                const newQuantity = Math.max(1, customQuantity - 1);
+                setCustomQuantity(newQuantity);
+                setTokensToBuy(newQuantity);
+              }}
+            >
               -
             </IconButton>
             <NumberInputField
@@ -481,12 +495,24 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
               id='builderId'
               type='number'
               placeholder='Quantity'
-              value={tokensToBuy}
-              onChange={(e) => setTokensToBuy(parseInt(e.target.value))}
+              value={customQuantity}
+              onChange={(e) => {
+                const value = parseInt(e.target.value, 10);
+                if (!Number.isNaN(value) && value > 0) {
+                  setCustomQuantity(value);
+                  setTokensToBuy(value);
+                }
+              }}
               disableArrows
               sx={{ '& input': { textAlign: 'center' } }}
             />
-            <IconButton color='secondary' onClick={() => setTokensToBuy((prevN) => prevN + 1)}>
+            <IconButton
+              color='secondary'
+              onClick={() => {
+                setCustomQuantity((prev) => prev + 1);
+                setTokensToBuy((prev) => prev + 1);
+              }}
+            >
               +
             </IconButton>
           </Stack>

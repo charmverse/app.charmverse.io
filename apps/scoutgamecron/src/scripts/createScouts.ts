@@ -2,9 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUserByUsername } from '@packages/farcaster/getFarcasterUserByUsername';
 
-const farcasterUsernames: string[] = [];
-
-async function createScouts() {
+async function createScouts(farcasterUsernames: string[]) {
   for (const farcasterUsername of farcasterUsernames) {
     try {
       const profile = await getFarcasterUserByUsername(farcasterUsername);
@@ -28,7 +26,8 @@ async function createScouts() {
           avatar: avatarUrl,
           bio,
           farcasterId: fid,
-          farcasterName: displayName
+          farcasterName: displayName,
+          currentBalance: 10
         }
       });
       log.info(`Created scout for ${farcasterUsername}`, { scoutId: scout.id });
@@ -38,4 +37,4 @@ async function createScouts() {
   }
 }
 
-createScouts();
+createScouts(['juampi']);
