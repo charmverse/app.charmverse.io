@@ -9,6 +9,15 @@ export const actionClient = actionClientBase.use(async ({ next }) => {
   const session = await getSession();
   const headerList = headers();
 
+  return next({
+    ctx: { session, headers: headerList }
+  });
+});
+
+export const authActionClient = actionClient.use(async ({ next }) => {
+  const session = await getSession();
+  const headerList = headers();
+
   const adminId = session.adminId;
 
   if (!adminId) {

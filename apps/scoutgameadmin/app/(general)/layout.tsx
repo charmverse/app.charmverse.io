@@ -1,8 +1,8 @@
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import { Header } from 'components/common/Header/Header';
-import { StickyFooter } from 'components/layout/StickyFooter';
+import { Header } from 'components/common/Header';
+import { StickyFooter } from 'components/common/StickyFooter';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export default async function Layout({
@@ -14,7 +14,7 @@ export default async function Layout({
 
   return (
     <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh' bgcolor='background.default'>
-      <Header user={user || null} />
+      <Header user={user!} />
       <Box component='main' minHeight='100%'>
         {children}
       </Box>
