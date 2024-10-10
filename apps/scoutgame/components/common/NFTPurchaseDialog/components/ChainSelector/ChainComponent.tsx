@@ -10,9 +10,11 @@ export function ChainComponent({
   selected
 }: {
   chain: ChainWithCurrency;
-  balance?: string | number;
+  balance?: string | number | bigint;
   selected?: boolean;
 }) {
+  const balanceNormalised = typeof balance === 'bigint' ? balance.toString() : balance;
+
   return (
     <Grid2 width='100%' container flexDirection='row' gap={2} alignItems='center' justifyContent='space-between' pr={2}>
       <Grid2 display='flex' flexDirection='row' alignItems='center' gap={2}>
@@ -21,9 +23,9 @@ export function ChainComponent({
           <Typography variant='body2' fontWeight='bold'>
             {chain.currency} on {chain.name}
           </Typography>
-          {typeof balance !== 'undefined' && (
+          {typeof balanceNormalised !== 'undefined' && (
             <Typography variant='body2'>
-              Balance: {balance} {chain.currency}
+              Balance: {balanceNormalised} {chain.currency}
             </Typography>
           )}
         </Stack>
