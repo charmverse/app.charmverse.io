@@ -521,6 +521,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
               value={selectedPaymentOption}
               balance={displayedBalance}
               useTestnets={useTestnets}
+              address={address}
               onSelectChain={(_paymentOption) => {
                 setSelectedPaymentOption(_paymentOption);
               }}
