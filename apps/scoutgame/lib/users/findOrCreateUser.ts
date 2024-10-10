@@ -2,6 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { BuilderEventType, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
 import { getTier } from '@packages/scoutgame/waitlist/scoring/constants';
@@ -45,6 +46,7 @@ export async function findOrCreateUser({
   });
 
   if (scout) {
+    trackUserAction('sign_in', { userId: scout.id });
     return scout;
   }
 
@@ -118,6 +120,12 @@ export async function findOrCreateUser({
             }
           : undefined
     }
+  });
+
+  trackUserAction('sign_up', {
+    userId: newScout.id,
+    username: userProps.username,
+    fid: farcasterId
   });
 
   return newScout;

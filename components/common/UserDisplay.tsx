@@ -2,14 +2,13 @@ import type { BoxProps } from '@mui/material';
 import { Avatar as AvatarIcon, Box, Typography } from '@mui/material';
 import type { LoggedInUser } from '@root/lib/profile/getUser';
 import type { ReactNode } from 'react';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
 import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useMembers } from 'hooks/useMembers';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { randomName } from 'lib/utils/randomName';
 
 /**
  * @avatarIcon Pass this to override the user avatar with a custom icon
@@ -52,7 +51,7 @@ function BaseComponent({
       }}
     >
       {props.avatarIcon ? (
-        <Box sx={{ ml: 0.5, mt: 1 }}>{props.avatarIcon}</Box>
+        <Box>{props.avatarIcon}</Box>
       ) : (
         <Avatar size={avatarSize} name={username} avatar={avatar} isNft={isNft} />
       )}
@@ -81,7 +80,20 @@ function UserDisplay({ showMiniProfile = false, user, userId, hideIdentity, ...p
   const member = user ?? (userId ? membersRecord[userId] : null);
 
   if (hideIdentity) {
-    return <BaseComponent username='Anonymous' avatarIcon={<AvatarIcon />} {...props} />;
+    return (
+      <BaseComponent
+        username='Anonymous'
+        avatarIcon={
+          <AvatarIcon
+            sx={{
+              width: 20,
+              height: 20
+            }}
+          />
+        }
+        {...props}
+      />
+    );
   }
 
   if (!member) {
