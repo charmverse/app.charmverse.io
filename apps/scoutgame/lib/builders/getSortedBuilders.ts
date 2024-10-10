@@ -9,13 +9,15 @@ export async function getSortedBuilders({
   sort,
   limit,
   week,
-  season
+  season,
+  cursor
 }: {
   sort: BuildersSort;
   limit: number;
   week: string;
   season: string;
-}): Promise<BuilderInfo[]> {
+  cursor?: string;
+}): Promise<{ builders: BuilderInfo[]; nextCursor: string | null; hasMore: boolean }> {
   // new is based on the most recent builder
   // top is based on the most gems earned in their user week stats
   // hot is based on the most points earned in the previous user week stats
@@ -36,7 +38,8 @@ export async function getSortedBuilders({
           orderBy: {
             createdAt: 'desc'
           },
-          take: limit,
+          take: limit + 1,
+          cursor: cursor ? { id: cursor } : undefined,
           select: {
             id: true,
             username: true,
@@ -111,7 +114,15 @@ export async function getSortedBuilders({
           orderBy: {
             rank: 'asc'
           },
-          take: limit,
+          take: limit + 1,
+          cursor: cursor
+            ? {
+                userId_week: {
+                  userId: cursor,
+                  week
+                }
+              }
+            : undefined,
           select: {
             user: {
               select: {
@@ -182,7 +193,15 @@ export async function getSortedBuilders({
             }
           },
           orderBy: { rank: 'asc' },
-          take: limit,
+          take: limit + 1,
+          cursor: cursor
+            ? {
+                userId_week: {
+                  userId: cursor,
+                  week: previousWeek
+                }
+              }
+            : undefined,
           select: {
             user: {
               select: {
@@ -243,5 +262,8 @@ export async function getSortedBuilders({
       throw new Error(`Invalid sort option: ${sort}`);
   }
 
-  return builders;
+  const nextCursor = builders.length > limit ? builders[limit].id : null;
+  const hasMore = builders.length > limit;
+
+  return { builders: builders.slice(0, limit), nextCursor, hasMore };
 }
