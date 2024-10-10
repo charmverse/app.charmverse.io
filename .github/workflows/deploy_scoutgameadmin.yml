@@ -1,4 +1,4 @@
-name: Scoutgame Coming Soon CI
+name: Scoutgame Scout Game Admin CI
 
 on:
   push:
@@ -37,7 +37,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build apps
+    name: Build Scout Game Admin
     runs-on: ubuntu-latest
     outputs:
       head_commit_message: ${{ steps.setup_variables.outputs.commit_message }}
@@ -325,7 +325,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WARNINGS_WEBHOOK }}
           status: 'failure'
           content: 'Hey <@&1027309276454207519>'
-          title: 'Coming Soon deploy workflow failed'
+          title: 'Scout Game Admin deploy workflow failed'
           description: |
             Failed workflow URL: https://github.com/charmverse/app.charmverse.io/actions/runs/${{ github.run_id }}
           color: '16515843'
