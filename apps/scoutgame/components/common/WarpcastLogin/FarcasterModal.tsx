@@ -6,7 +6,7 @@ import { Paper } from '@mui/material';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import type { ModalProps } from '@mui/material/Modal';
-import Modal from '@mui/material/Modal';
+import Dialog from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 
 const sx = {
@@ -21,9 +21,9 @@ const sx = {
   borderRadius: 3
 };
 
-export function FarcasterLoginModal({ url, ...props }: Omit<ModalProps, 'children'> & { url?: string }) {
+export function FarcasterLoginModal({ url, open, onClose }: Omit<ModalProps, 'children'> & { url?: string }) {
   return (
-    <Modal open={props.open && !!url} onClose={props.onClose} data-mui-color-scheme='light' data-test='farcaster-modal'>
+    <Dialog onClose={onClose} open={open && !!url} data-mui-color-scheme='light' data-test='farcaster-modal'>
       <Paper sx={sx}>
         <Typography variant='h6' fontWeight='bold'>
           Sign in with Farcaster
@@ -39,6 +39,6 @@ export function FarcasterLoginModal({ url, ...props }: Omit<ModalProps, 'childre
           </Link>
         </Box>
       </Paper>
-    </Modal>
+    </Dialog>
   );
 }
