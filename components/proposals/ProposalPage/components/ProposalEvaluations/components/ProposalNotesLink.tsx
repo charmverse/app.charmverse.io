@@ -8,6 +8,7 @@ import {
 } from 'components/common/CharmEditor/components/nestedPage/components/NestedPage';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { PageIcon } from 'components/common/PageIcon';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 const StyledPageLink = styled(StyledLink)`
@@ -19,6 +20,7 @@ const StyledPageLink = styled(StyledLink)`
 export function ProposalNotesLink({ proposalId }: { proposalId?: string }) {
   const { showPage } = usePageDialog();
   const { showError } = useSnackbar();
+  const { space } = useCurrentSpace();
 
   const { trigger: getNotesPageId } = useGetOrCreateProposalNotesId();
 
@@ -32,6 +34,11 @@ export function ProposalNotesLink({ proposalId }: { proposalId?: string }) {
     } catch (error) {
       showError(error, 'Failed to load notes');
     }
+  }
+
+  // One off to hide the notes link for the OP retrofunding review space
+  if (space?.domain === 'op-retrofunding-review-process') {
+    return null;
   }
 
   return (

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, IconButton, Menu } from '@mui/material';
+import { Box, Menu } from '@mui/material';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
 
@@ -45,6 +45,23 @@ const CalloutEmoji = styled.div`
   }
 `;
 
+const StyledDiv = styled.div<{ readOnly: boolean }>`
+  width: 35px;
+  height: 35px;
+  font-size: 20px;
+  padding: 0.75px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color ${({ theme }) => theme.transitions.duration.shorter}ms;
+
+  &:hover {
+    transition: background-color ${({ theme }) => theme.transitions.duration.shorter}ms;
+    background-color: ${({ theme, readOnly }) => (readOnly ? 'transparent' : theme.palette.emoji.hoverBackground)};
+  }
+`;
+
 export default function Callout({
   children,
   node,
@@ -69,25 +86,7 @@ export default function Callout({
     <Box py={0.5}>
       <StyledCallout>
         <CalloutEmoji>
-          <IconButton
-            sx={{
-              width: 35,
-              height: 35,
-              fontSize: 20,
-              padding: 0.75,
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              // This is necessary to fix a bug on Macbook, where readonly emojis showed as greyed out
-              '&.Mui-disabled': {
-                color: '#FFFFFFFF'
-              }
-            }}
-            // use onMouseDown - for some reason, onClick gets intercepted by the editor
-            onMouseDown={handleClick}
-            disabled={readOnly}
-          >
+          <StyledDiv readOnly={readOnly} onMouseDown={readOnly ? undefined : handleClick}>
             {twemojiImage ? (
               <img
                 style={{
@@ -109,7 +108,7 @@ export default function Callout({
                 {node.attrs.emoji}
               </div>
             )}
-          </IconButton>
+          </StyledDiv>
           <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
             <CustomEmojiPicker
               onUpdate={(_emoji) => {
