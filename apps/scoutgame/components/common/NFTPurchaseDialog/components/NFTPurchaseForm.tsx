@@ -47,7 +47,9 @@ import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsActi
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
+import { useDecentTransaction } from '../hooks/useDecentTransaction';
 import { useGetERC20Allowance } from '../hooks/useGetERC20Allowance';
+import { useGetTokenBalances } from '../hooks/useGetTokenBalances';
 
 import type { ChainOption } from './ChainSelector/chains';
 import { chainOptionsMainnet, ETH_NATIVE_ADDRESS, getChainOptions, getCurrencyContract } from './ChainSelector/chains';
@@ -96,17 +98,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     currency: 'ETH'
   });
 
-  const tokenValues = arrayUtils.uniqueValues(
-    chainOptionsMainnet
-      .map((opt) => {
-        if (opt.usdcAddress) {
-          return [ETH_NATIVE_ADDRESS, opt.usdcAddress];
-        }
-        return [ETH_NATIVE_ADDRESS];
-      })
-      .flat()
-  );
-
   const args: UserBalanceArgs = {
     chainId: ChainId.OPTIMISM,
     selectChains: arrayUtils.uniqueValues(getChainOptions().map((opt) => opt.id)),
@@ -124,7 +115,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     )
   };
 
-  const { tokens } = useUsersBalances(args);
+  const { tokens } = useGetTokenBalances({ address: address as Address });
 
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
@@ -289,57 +280,17 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     }
   }, [tokensToBuy, builderTokenId, refreshAsk]);
 
-  /** TODO - Use this payload when we resume calling the contract directly
-   {
-    enable: !!address && !!purchaseCost,
-    actionType: ActionType.EvmFunction,
-    sender: address as string,
-    srcToken: '0x0000000000000000000000000000000000000000',
-    dstToken: '0x0b2c639c533813f4aa9d7837caf62653d097ff85',
-    slippage: 1,
-
-    srcChainId: ChainId.BASE,
-    dstChainId: ChainId.OPTIMISM,
-    actionConfig: {
-      chainId: ChainId.OPTIMISM,
-      contractAddress: '0x7df4d9f54a5cddfef50a032451f694d6345c60af',
-      cost: {
-        amount: purchaseCost,
-        isNative: false,
-        tokenAddress: '0x0b2c639c533813f4aa9d7837caf62653d097ff85'
-      },
-      signature: 'function mintBuilderNft(uint256 tokenId, uint256 amount, string calldata scout) external',
-      args: [BigInt(1), BigInt(1), 'c42efe4a-b385-488e-a5ca-135ecec0f810']
-    }
-  }
-   */
-
   const enableNftButton = !!address && !!purchaseCost && !!user;
 
-  const decentAPIParams: UseBoxActionArgs = {
-    enable: enableNftButton,
-    sender: address as `0x${string}`,
-    srcToken: getCurrencyContract(selectedPaymentOption),
-    dstToken: optimismUsdcContractAddress,
-    srcChainId: selectedPaymentOption.chainId,
-    dstChainId: ChainId.OPTIMISM,
-    slippage: 1,
-    actionType: ActionType.NftMint,
-    // @ts-ignore
-    actionConfig: {
-      chainId: ChainId.OPTIMISM,
-      contractAddress: getBuilderContractAddress(),
-      cost: {
-        amount: purchaseCost,
-        isNative: false,
-        tokenAddress: optimismUsdcContractAddress
-      },
-      signature: 'function mint(address account, uint256 tokenId, uint256 amount, string scout)',
-      args: [address, BigInt(builderTokenId), BigInt(tokensToBuy), user?.id]
-    }
-  };
-
-  const { error: decentSdkError, isLoading: isLoadingDecentSdk, actionResponse } = useBoxAction(decentAPIParams);
+  const { decentSdkError, isLoadingDecentSdk, decentTransactionInfo } = useDecentTransaction({
+    address: address as Address,
+    builderTokenId,
+    scoutId: user?.id as string,
+    paymentAmountOut: purchaseCost,
+    sourceChainId: selectedPaymentOption.chainId,
+    sourceToken: getCurrencyContract(selectedPaymentOption),
+    tokensToPurchase: BigInt(tokensToBuy)
+  });
 
   const { allowance, refreshAllowance, isLoadingAllowance } = useGetERC20Allowance({
     chainId: selectedPaymentOption.chainId,
@@ -351,11 +302,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           }) as Address)
         : null,
     owner: address as Address,
-    spender: actionResponse?.tx.to as Address
+    spender: decentTransactionInfo?.tx.to as Address
   });
 
-  const amountToPay = actionResponse?.tokenPayment?.amount;
-  const isEthPayment = !!actionResponse?.tokenPayment?.isNative;
+  const amountToPay = decentTransactionInfo?.tokenPayment?.amount;
+  const isEthPayment = !!decentTransactionInfo?.tokenPayment?.isNative;
   const balanceDataFromCorrectChain = balances?.chainId === selectedPaymentOption.chainId;
 
   const hasSufficientBalance =
@@ -373,7 +324,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         amount: tokensToBuy
       });
     } else {
-      if (!actionResponse?.tx) {
+      if (!decentTransactionInfo?.tx) {
         return;
       }
 
@@ -383,9 +334,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
       sendTransaction(
         {
-          to: actionResponse.tx.to as Address,
-          data: actionResponse.tx.data as any,
-          value: (actionResponse.tx as any).value
+          to: decentTransactionInfo.tx.to as Address,
+          data: decentTransactionInfo.tx.data as any,
+          value: (decentTransactionInfo.tx as any).value
         },
         {
           onSuccess: async (data) => {
@@ -412,21 +363,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             setSubmitError(
               err.message || 'Something went wrong. Check your wallet is connected and has a sufficient balance'
             );
-            log.error('Creating a mint transaction failed', { actionResponse, error: err });
+            log.error('Creating a mint transaction failed', { decentTransactionInfo, error: err });
           }
         }
       );
     }
   };
-
-  useEffect(() => {
-    if (decentSdkError) {
-      log.error('Error on NFT Purchase calling useBoxAction from Decent SDK', {
-        params: decentAPIParams,
-        error: decentSdkError
-      });
-    }
-  }, [decentSdkError]);
 
   const isLoading =
     isSavingDecentTransaction ||
@@ -698,7 +640,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </LoadingButton>
       ) : (
         <ERC20ApproveButton
-          spender={actionResponse?.tx.to as Address}
+          spender={decentTransactionInfo?.tx.to as Address}
           chainId={selectedPaymentOption.chainId}
           erc20Address={getCurrencyContract(selectedPaymentOption) as Address}
           amount={amountToPay}

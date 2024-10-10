@@ -1,4 +1,5 @@
 import { useTestnets } from '@packages/scoutgame/builderNfts/constants';
+import type { Address } from 'viem';
 import type { Chain } from 'viem/chains';
 import {
   arbitrum,
@@ -87,12 +88,12 @@ export type ChainWithCurrency = ChainOption & { currency: AvailableCurrency };
 
 export type SelectedPaymentOption = { chainId: number; currency: AvailableCurrency };
 
-export function getCurrencyContract({ currency, chainId }: SelectedPaymentOption): string {
+export function getCurrencyContract({ currency, chainId }: SelectedPaymentOption): Address {
   if (currency === 'ETH') {
     return ETH_NATIVE_ADDRESS;
   }
 
-  return getChainOptions({ useTestnets }).find((chain) => chain.id === chainId)?.usdcAddress || '';
+  return (getChainOptions({ useTestnets }).find((chain) => chain.id === chainId)?.usdcAddress || '') as Address;
 }
 
 export function getChainOptions(opts: { useTestnets?: boolean } = { useTestnets: false }): ChainWithCurrency[] {
