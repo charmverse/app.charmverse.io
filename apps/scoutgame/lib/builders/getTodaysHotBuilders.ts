@@ -40,7 +40,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
         },
         userWeeklyStats: {
           where: {
-            season: currentSeason
+            week: getCurrentWeek()
           },
           select: {
             gemsCollected: true

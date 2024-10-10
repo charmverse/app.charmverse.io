@@ -1,3 +1,4 @@
+import env from '@beam-australia/react-env';
 import { GET } from '@root/adapters/http';
 import { getChainById } from '@root/connectors/chains';
 import { paginatedCall } from '@root/lib/utils/async';
@@ -64,7 +65,7 @@ export const getAlchemyBaseUrl = (
   apiSuffix: AlchemyApiSuffix = '',
   version: 'v2' | 'v3' = 'v2'
 ): string => {
-  const apiKey = process.env.ALCHEMY_API_KEY;
+  const apiKey = process.env.ALCHEMY_API_KEY || env('ALCHEMY_API_KEY');
 
   if (!apiKey) {
     throw new Error('No api key provided for Alchemy');
