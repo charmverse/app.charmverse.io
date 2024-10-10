@@ -98,24 +98,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     currency: 'ETH'
   });
 
-  const args: UserBalanceArgs = {
-    chainId: ChainId.OPTIMISM,
-    selectChains: arrayUtils.uniqueValues(getChainOptions().map((opt) => opt.id)),
-    address,
-    enable: !!address,
-    selectTokens: arrayUtils.uniqueValues(
-      chainOptionsMainnet
-        .map((opt) => {
-          if (opt.usdcAddress) {
-            return [ETH_NATIVE_ADDRESS, opt.usdcAddress];
-          }
-          return [ETH_NATIVE_ADDRESS];
-        })
-        .flat()
-    )
-  };
-
-  const { tokens } = useGetTokenBalances({ address: address as Address });
+  const { tokens: userTokenBalances } = useGetTokenBalances({ address: address as Address });
 
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
@@ -125,10 +108,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const [tokensToBuy, setTokensToBuy] = useState(1);
 
   const [paymentMethod, setPaymentMethod] = useState<'points' | 'wallet'>('wallet');
-
-  const [balances, setBalances] = useState<{ usdc: bigint; eth: bigint; chainId: number; address: string } | null>(
-    null
-  );
 
   // Data from onchain
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
@@ -192,51 +171,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     }
   });
 
-  const refreshBalance = useCallback(async () => {
-    const chainOption = getChainOptions({ useTestnets }).find(
-      (opt) => opt.id === selectedPaymentOption.chainId
-    ) as ChainOption;
-
-    const chain = chainOption?.chain;
-
-    const _chainId = chain?.id;
-
-    if (!_chainId) {
-      return;
-    }
-
-    const client = new UsdcErc20ABIClient({
-      chain,
-      contractAddress: chainOption.usdcAddress as `0x${string}`,
-      publicClient: getPublicClient(_chainId)
-    });
-
-    const usdcBalance = await client.balanceOf({ args: { account: address as `0x${string}` } });
-
-    const ethBalance = await getPublicClient(_chainId).getBalance({
-      address: address as `0x${string}`
-    });
-
-    const newBalances = {
-      usdc: usdcBalance,
-      eth: ethBalance,
-      chainId: _chainId,
-      address: address as `0x${string}`
-    };
-
-    setBalances(newBalances);
-
-    return newBalances;
-  }, [address, selectedPaymentOption.chainId, selectedPaymentOption.currency]);
-
-  useEffect(() => {
-    if (selectedPaymentOption) {
-      refreshBalance().catch((err) => {
-        log.error('Error refreshing balance', { error: err });
-      });
-    }
-  }, [selectedPaymentOption, address]);
-
   const { sendTransaction } = useSendTransaction();
 
   const refreshAsk = useCallback(
@@ -292,29 +226,24 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     tokensToPurchase: BigInt(tokensToBuy)
   });
 
+  const selectedChainCurrency = getCurrencyContract(selectedPaymentOption) as Address;
+
   const { allowance, refreshAllowance, isLoadingAllowance } = useGetERC20Allowance({
     chainId: selectedPaymentOption.chainId,
-    erc20Address:
-      selectedPaymentOption.currency === 'USDC'
-        ? (getCurrencyContract({
-            chainId: selectedPaymentOption.chainId,
-            currency: 'USDC'
-          }) as Address)
-        : null,
+    erc20Address: selectedPaymentOption.currency === 'USDC' ? selectedChainCurrency : null,
     owner: address as Address,
     spender: decentTransactionInfo?.tx.to as Address
   });
 
+  const balanceInfo = userTokenBalances?.find(
+    (_token) => _token.chainId === selectedPaymentOption.chainId && _token.address === selectedChainCurrency
+  );
   const amountToPay = decentTransactionInfo?.tokenPayment?.amount;
   const isEthPayment = !!decentTransactionInfo?.tokenPayment?.isNative;
-  const balanceDataFromCorrectChain = balances?.chainId === selectedPaymentOption.chainId;
+  const balanceDataFromCorrectChain = balanceInfo?.chainId === selectedPaymentOption.chainId;
 
-  const hasSufficientBalance =
-    !amountToPay || !balanceDataFromCorrectChain
-      ? false
-      : isEthPayment
-      ? balances?.eth >= amountToPay
-      : balances?.usdc >= amountToPay;
+  const hasInsufficientBalance =
+    !!amountToPay && !!balanceInfo && balanceDataFromCorrectChain && balanceInfo.balance >= amountToPay;
 
   const handlePurchase = async () => {
     if (paymentMethod === 'points') {
@@ -377,12 +306,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     isExecutingTransaction ||
     isExecutingPointsPurchase;
 
-  const displayedBalance =
-    balances?.chainId !== selectedPaymentOption.chainId || balances.address !== address
-      ? undefined
-      : selectedPaymentOption.currency === 'ETH'
-      ? (Number(balances?.eth || 0) / 1e18).toFixed(4)
-      : (Number(balances.usdc || 0) / 1e6).toFixed(2);
+  const displayedBalance = !balanceInfo
+    ? undefined
+    : selectedPaymentOption.currency === 'ETH'
+    ? (Number(balanceInfo.balance || 0) / 1e18).toFixed(4)
+    : (Number(balanceInfo.balance || 0) / 1e6).toFixed(2);
 
   const [selectedQuantity, setSelectedQuantity] = useState<number | 'custom'>(1);
   const [customQuantity, setCustomQuantity] = useState(2);
@@ -599,7 +527,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
                 setSelectedPaymentOption(_paymentOption);
               }}
             />
-            {!hasSufficientBalance && balanceDataFromCorrectChain && !!amountToPay ? (
+            {hasInsufficientBalance ? (
               <Typography sx={{ mt: 1 }} variant='caption' color='error' align='center'>
                 Insufficient balance
               </Typography>
@@ -613,11 +541,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Typography>
       )}
 
-      {!approvalRequired ||
-      isExecutingTransaction ||
-      isExecutingPointsPurchase ||
-      // Show disabled buy button if the user has insufficient balance, instead of the approve button
-      (!hasSufficientBalance && balanceDataFromCorrectChain) ? (
+      {!approvalRequired || isExecutingTransaction || isExecutingPointsPurchase ? (
         <LoadingButton
           loading={isLoading}
           size='large'
@@ -631,9 +555,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             isSavingDecentTransaction ||
             isExecutingTransaction ||
             (paymentMethod === 'points' && notEnoughPoints) ||
-            isExecutingPointsPurchase ||
-            (paymentMethod === 'wallet' && !hasSufficientBalance && balances && !!balanceDataFromCorrectChain) ||
-            (!approvalRequired && isLoadingAllowance)
+            isExecutingPointsPurchase
           }
         >
           Buy
