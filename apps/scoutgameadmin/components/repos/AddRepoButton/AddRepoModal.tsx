@@ -13,6 +13,7 @@ import {
   Box
 } from '@mui/material';
 import React, { useState } from 'react';
+import { mutate } from 'swr';
 
 import { useCreateRepo, useSearchReposByOwnerFromGithub } from 'hooks/api/repos';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
@@ -42,6 +43,12 @@ export function AddRepoModal({ open, onClose, onAdd }: AddRepoModalProps) {
     onAdd();
     onClose();
     setRepoInput('');
+    // clear SWR cache
+    mutate(
+      (key) => true, // which cache keys are updated
+      undefined, // update cache data to `undefined`
+      { revalidate: false } // do not revalidate
+    );
   };
 
   return (
