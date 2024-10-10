@@ -2,7 +2,6 @@ import type { GithubRepo, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
-import { v4 } from 'uuid';
 
 export async function generateGithubRepos(totalGithubRepos: number): Promise<[GithubRepo[], Map<number, number>]> {
   const repoPRCounters = new Map<number, number>();

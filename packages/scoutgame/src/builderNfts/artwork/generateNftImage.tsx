@@ -132,7 +132,7 @@ export async function generateNftCongrats({ userImage }: { userImage: string | n
   if (userImage) {
     const response = await fetch(userImage);
     const arrayBuffer = await response.arrayBuffer();
-    avatarBuffer = await sharp(Buffer.from(arrayBuffer)).resize(300, 300).png().toBuffer();
+    avatarBuffer = await sharp(Buffer.from(arrayBuffer)).resize(150, 200).png().toBuffer();
   }
 
   const baseImage = new ImageResponse(
@@ -156,8 +156,8 @@ export async function generateNftCongrats({ userImage }: { userImage: string | n
         <img
           src={avatarBuffer ? `data:image/png;base64,${avatarBuffer.toString('base64')}` : noPfpAvatarBase64}
           alt='user nft'
-          width='35%'
-          height='auto'
+          width={150}
+          height={200}
         />
       </div>
     ),

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/calculatePoints';
 import { getCurrentWeek } from '@packages/scoutgame/dates';
+import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/calculatePoints';
 import { mockBuilder, mockBuilderNft, mockNFTPurchaseEvent, mockScout } from '@packages/scoutgame/testing/database';
 import { mockSeason } from '@packages/scoutgame/testing/generators';
 
@@ -92,14 +92,31 @@ describe('processScoutPointsPayout', () => {
 
     const totalPoints = calculateEarnableScoutPointsForRank(rank);
 
-    await processScoutPointsPayout({ builderId: builder.id, rank, gemsCollected, week, season: mockSeason });
-
-    const builderPointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
+    await prisma.pointsReceipt.deleteMany({
       where: {
         recipientId: builder.id
       }
     });
+    await processScoutPointsPayout({
+      builderId: builder.id,
+      rank,
+      gemsCollected,
+      week,
+      season: mockSeason
+    });
+    const builderPointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
+      where: {
+        recipientId: builder.id
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
     expect(builderPointReceipt.value).toBeCloseTo(Math.floor(0.2 * totalPoints));
+
+    const builderStats = await getStats({ userId: builder.id });
+    expect(builderStats.season?.pointsEarnedAsBuilder).toBe(builderPointReceipt.value);
+    expect(builderStats.allTime?.pointsEarnedAsBuilder).toBe(builderPointReceipt.value);
 
     const scout1PointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
       where: {
@@ -109,6 +126,10 @@ describe('processScoutPointsPayout', () => {
 
     expect(scout1PointReceipt.value).toBeCloseTo(Math.floor(0.8 * totalPoints * (2 / 3)));
 
+    const scout1Stats = await getStats({ userId: scout1.id });
+    expect(scout1Stats.season?.pointsEarnedAsScout).toBe(scout1PointReceipt.value);
+    expect(scout1Stats.allTime?.pointsEarnedAsScout).toBe(scout1PointReceipt.value);
+
     const scout2PointReceipt = await prisma.pointsReceipt.findFirstOrThrow({
       where: {
         recipientId: scout2.id
@@ -116,6 +137,10 @@ describe('processScoutPointsPayout', () => {
     });
 
     expect(scout2PointReceipt.value).toBeCloseTo(Math.floor(0.8 * totalPoints * (1 / 3)));
+
+    const scout2Stats = await getStats({ userId: scout2.id });
+    expect(scout2Stats.season?.pointsEarnedAsScout).toBe(scout2PointReceipt.value);
+    expect(scout2Stats.allTime?.pointsEarnedAsScout).toBe(scout2PointReceipt.value);
 
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
@@ -189,7 +214,10 @@ describe('processScoutPointsPayout', () => {
 
     const builderPointsReceiptCount = await prisma.pointsReceipt.count({
       where: {
-        recipientId: builder.id
+        recipientId: builder.id,
+        event: {
+          type: 'gems_payout'
+        }
       }
     });
 
@@ -234,3 +262,19 @@ describe('processScoutPointsPayout', () => {
     expect(scout2Activities).toBe(1);
   });
 });
+
+async function getStats({ userId }: { userId: string }) {
+  const userSeasonStats = await prisma.userSeasonStats.findFirstOrThrow({
+    where: {
+      userId,
+      season: mockSeason
+    }
+  });
+  const allTimeStats = await prisma.userAllTimeStats.findFirst({
+    where: {
+      userId
+    }
+  });
+
+  return { season: userSeasonStats, allTime: allTimeStats };
+}

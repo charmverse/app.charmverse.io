@@ -221,6 +221,14 @@ export async function getSortedBuilders({
                     nftsSold: true
                   }
                 },
+                userWeeklyStats: {
+                  where: {
+                    week
+                  },
+                  select: {
+                    gemsCollected: true
+                  }
+                },
                 builderNfts: {
                   where: {
                     season
@@ -231,8 +239,7 @@ export async function getSortedBuilders({
                   }
                 }
               }
-            },
-            gemsCollected: true
+            }
           }
         })
         .then((stats) =>
@@ -243,7 +250,7 @@ export async function getSortedBuilders({
             displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
-            gemsCollected: stat.gemsCollected,
+            gemsCollected: stat.user.userWeeklyStats[0]?.gemsCollected ?? 0,
             nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
             builderStatus: stat.user.builderStatus
           }))

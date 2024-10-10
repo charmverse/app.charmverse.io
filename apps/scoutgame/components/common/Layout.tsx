@@ -1,22 +1,20 @@
+import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
-import type { ReactNode } from 'react';
 
-export function SinglePageLayout({ children }: { children: ReactNode }) {
+export function SinglePageLayout({ children, ...props }: BoxProps) {
   return (
     <Box
-      display='grid'
-      gridTemplateRows='auto 1fr auto'
-      minHeight='100vh'
       sx={{
         display: 'flex',
         flexDirection: 'column',
         gap: 4,
-        justifyContent: { xs: 'space-evenly', sm: 'center' },
+        justifyContent: 'space-evenly',
         alignItems: 'center',
         textAlign: 'center',
         height: '100%',
-        maxHeight: '40em'
+        minHeight: 'calc(100svh - 48px)'
       }}
+      {...props}
     >
       {children}
     </Box>

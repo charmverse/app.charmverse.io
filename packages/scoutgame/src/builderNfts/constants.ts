@@ -23,7 +23,7 @@ const devOptimismSepoliaBuildersContract = '0x2f6093b70562729952bf379633dee3e899
 const devOptimismMainnetBuildersContract = '0x1d305a06cb9dbdc32e08c3d230889acb9fe8a4dd';
 
 const realOptimismSepoliaBuildersContract = '0x0b7342761a10e1b14df427681b967e67f5e6cef9';
-const realOptimismMainnetBuildersContract = '0x743ec903fe6d05e73b19a6db807271bb66100e83';
+export const realOptimismMainnetBuildersContract = '0x743ec903fe6d05e73b19a6db807271bb66100e83';
 
 export function getBuilderContractAddress(): `0x${string}` {
   return (env('BUILDER_NFT_CONTRACT_ADDRESS') || process.env.REACT_APP_BUILDER_NFT_CONTRACT_ADDRESS) as `0x${string}`;

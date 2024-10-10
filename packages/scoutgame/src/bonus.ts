@@ -17,7 +17,6 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
   celo: {
     name: 'Celo',
     repos: [
-      'mento-protocol/mento-web',
       'mento-protocol/reserve-site',
       'mento-protocol/mento-sdk',
       'mento-protocol/mento-web',

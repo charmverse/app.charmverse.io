@@ -28,7 +28,7 @@ type ReadWriteWalletClient<
   PublicActions<transport, chain, account> & WalletActions<chain, account>
 >;
 
-export class USDcAbiClient {
+export class UsdcErc20ABIClient {
   private contractAddress: Address;
 
   private publicClient: PublicClient;
@@ -39,19 +39,26 @@ export class USDcAbiClient {
 
   private abi: Abi = [
     {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'account',
-          type: 'address'
-        }
-      ],
-      name: 'balanceOf',
+      inputs: [],
+      name: 'totalSupply',
       outputs: [
         {
           internalType: 'uint256',
           name: '',
           type: 'uint256'
+        }
+      ],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'symbol',
+      outputs: [
+        {
+          internalType: 'string',
+          name: '',
+          type: 'string'
         }
       ],
       stateMutability: 'view',
@@ -111,24 +118,13 @@ export class USDcAbiClient {
       type: 'function'
     },
     {
-      inputs: [
-        {
-          internalType: 'address',
-          name: 'owner',
-          type: 'address'
-        },
-        {
-          internalType: 'address',
-          name: 'spender',
-          type: 'address'
-        }
-      ],
-      name: 'allowance',
+      inputs: [],
+      name: 'decimals',
       outputs: [
         {
-          internalType: 'uint256',
+          internalType: 'uint8',
           name: '',
-          type: 'uint256'
+          type: 'uint8'
         }
       ],
       stateMutability: 'view',
@@ -162,48 +158,43 @@ export class USDcAbiClient {
       inputs: [
         {
           internalType: 'address',
-          name: 'spender',
+          name: 'owner',
           type: 'address'
         },
         {
+          internalType: 'address',
+          name: 'spender',
+          type: 'address'
+        }
+      ],
+      name: 'allowance',
+      outputs: [
+        {
           internalType: 'uint256',
-          name: 'decrement',
+          name: '',
           type: 'uint256'
         }
       ],
-      name: 'decreaseAllowance',
-      outputs: [
-        {
-          internalType: 'bool',
-          name: '',
-          type: 'bool'
-        }
-      ],
-      stateMutability: 'nonpayable',
+      stateMutability: 'view',
       type: 'function'
     },
     {
       inputs: [
         {
           internalType: 'address',
-          name: 'spender',
+          name: 'account',
           type: 'address'
-        },
+        }
+      ],
+      name: 'balanceOf',
+      outputs: [
         {
           internalType: 'uint256',
-          name: 'increment',
+          name: '',
           type: 'uint256'
         }
       ],
-      name: 'increaseAllowance',
-      outputs: [
-        {
-          internalType: 'bool',
-          name: '',
-          type: 'bool'
-        }
-      ],
-      stateMutability: 'nonpayable',
+      stateMutability: 'view',
       type: 'function'
     }
   ];
@@ -242,11 +233,11 @@ export class USDcAbiClient {
     }
   }
 
-  async balanceOf(params: { args: { account: string } }): Promise<bigint> {
+  async totalSupply(): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
-      functionName: 'balanceOf',
-      args: [params.args.account]
+      functionName: 'totalSupply',
+      args: []
     });
 
     const { data } = await this.publicClient.call({
@@ -257,12 +248,35 @@ export class USDcAbiClient {
     // Decode the result based on the expected return type
     const result = decodeFunctionResult({
       abi: this.abi,
-      functionName: 'balanceOf',
+      functionName: 'totalSupply',
       data: data as `0x${string}`
     });
 
     // Parse the result based on the return type
     return result as bigint;
+  }
+
+  async symbol(): Promise<string> {
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'symbol',
+      args: []
+    });
+
+    const { data } = await this.publicClient.call({
+      to: this.contractAddress,
+      data: txData
+    });
+
+    // Decode the result based on the expected return type
+    const result = decodeFunctionResult({
+      abi: this.abi,
+      functionName: 'symbol',
+      data: data as `0x${string}`
+    });
+
+    // Parse the result based on the return type
+    return result as string;
   }
 
   async transfer(params: {
@@ -323,11 +337,11 @@ export class USDcAbiClient {
     return this.walletClient.waitForTransactionReceipt({ hash: tx });
   }
 
-  async allowance(params: { args: { owner: string; spender: string } }): Promise<bigint> {
+  async decimals(): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
-      functionName: 'allowance',
-      args: [params.args.owner, params.args.spender]
+      functionName: 'decimals',
+      args: []
     });
 
     const { data } = await this.publicClient.call({
@@ -338,7 +352,7 @@ export class USDcAbiClient {
     // Decode the result based on the expected return type
     const result = decodeFunctionResult({
       abi: this.abi,
-      functionName: 'allowance',
+      functionName: 'decimals',
       data: data as `0x${string}`
     });
 
@@ -375,61 +389,49 @@ export class USDcAbiClient {
     return this.walletClient.waitForTransactionReceipt({ hash: tx });
   }
 
-  async decreaseAllowance(params: {
-    args: { spender: string; decrement: bigint };
-    value?: bigint;
-    gasPrice?: bigint;
-  }): Promise<TransactionReceipt> {
-    if (!this.walletClient) {
-      throw new Error('Wallet client is required for write operations.');
-    }
-
+  async allowance(params: { args: { owner: string; spender: string } }): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
-      functionName: 'decreaseAllowance',
-      args: [params.args.spender, params.args.decrement]
+      functionName: 'allowance',
+      args: [params.args.owner, params.args.spender]
     });
 
-    const txInput: Omit<Parameters<WalletClient['sendTransaction']>[0], 'account' | 'chain'> = {
-      to: getAddress(this.contractAddress),
-      data: txData,
-      value: params.value ?? BigInt(0), // Optional value for payable methods
-      gasPrice: params.gasPrice // Optional gasPrice
-    };
+    const { data } = await this.publicClient.call({
+      to: this.contractAddress,
+      data: txData
+    });
 
-    // This is necessary because the wallet client requires account and chain, which actually cause writes to throw
-    const tx = await this.walletClient.sendTransaction(txInput as any);
+    // Decode the result based on the expected return type
+    const result = decodeFunctionResult({
+      abi: this.abi,
+      functionName: 'allowance',
+      data: data as `0x${string}`
+    });
 
-    // Return the transaction receipt
-    return this.walletClient.waitForTransactionReceipt({ hash: tx });
+    // Parse the result based on the return type
+    return result as bigint;
   }
 
-  async increaseAllowance(params: {
-    args: { spender: string; increment: bigint };
-    value?: bigint;
-    gasPrice?: bigint;
-  }): Promise<TransactionReceipt> {
-    if (!this.walletClient) {
-      throw new Error('Wallet client is required for write operations.');
-    }
-
+  async balanceOf(params: { args: { account: string } }): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
-      functionName: 'increaseAllowance',
-      args: [params.args.spender, params.args.increment]
+      functionName: 'balanceOf',
+      args: [params.args.account]
     });
 
-    const txInput: Omit<Parameters<WalletClient['sendTransaction']>[0], 'account' | 'chain'> = {
-      to: getAddress(this.contractAddress),
-      data: txData,
-      value: params.value ?? BigInt(0), // Optional value for payable methods
-      gasPrice: params.gasPrice // Optional gasPrice
-    };
+    const { data } = await this.publicClient.call({
+      to: this.contractAddress,
+      data: txData
+    });
 
-    // This is necessary because the wallet client requires account and chain, which actually cause writes to throw
-    const tx = await this.walletClient.sendTransaction(txInput as any);
+    // Decode the result based on the expected return type
+    const result = decodeFunctionResult({
+      abi: this.abi,
+      functionName: 'balanceOf',
+      data: data as `0x${string}`
+    });
 
-    // Return the transaction receipt
-    return this.walletClient.waitForTransactionReceipt({ hash: tx });
+    // Parse the result based on the return type
+    return result as bigint;
   }
 }

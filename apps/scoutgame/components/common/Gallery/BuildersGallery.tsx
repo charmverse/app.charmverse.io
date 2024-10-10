@@ -1,4 +1,4 @@
-import { Box, Grid2 as Grid } from '@mui/material';
+import { Box, Grid2 as Grid, Typography } from '@mui/material';
 
 import type { BuilderInfo } from 'lib/builders/interfaces';
 
@@ -26,7 +26,14 @@ export function BuildersGallery({
       >
         {builders.map((builder) => (
           <Grid key={builder.username} size={{ xs: 1 }} display='flex' justifyContent='center' alignItems='center'>
-            <BuilderCard builder={builder} showPurchaseButton showHotIcon={showHotIcon} size={size} userId={userId} />
+            <Box>
+              {builder.boughtNftsCount !== undefined && builder.boughtNftsCount > 0 && (
+                <Typography color='orange.main' textAlign='right' mb={1}>
+                  X {builder.boughtNftsCount ?? 0}
+                </Typography>
+              )}
+              <BuilderCard builder={builder} showPurchaseButton showHotIcon={showHotIcon} size={size} userId={userId} />
+            </Box>
           </Grid>
         ))}
       </Grid>

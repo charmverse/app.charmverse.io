@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/calculatePoints';
+import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/calculatePoints';
+import { updatePointsEarned } from '@packages/scoutgame/points/updatePointsEarned';
 import { v4 } from 'uuid';
 
 export async function processScoutPointsPayout({
@@ -51,7 +52,7 @@ export async function processScoutPointsPayout({
     return;
   }
 
-  await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
     const builderEventId = v4();
 
     await tx.gemsPayoutEvent.create({
@@ -74,11 +75,13 @@ export async function processScoutPointsPayout({
       }
     });
 
+    const builderPoints = Math.floor(0.2 * earnableScoutPoints);
     await Promise.all([
-      ...nftHolders.map(({ scoutId, _count: { scoutId: nftsPurchased } }) =>
-        tx.pointsReceipt.create({
+      ...nftHolders.map(async ({ scoutId, _count: { scoutId: nftsPurchased } }) => {
+        const scoutPoints = Math.floor(0.8 * earnableScoutPoints * (nftsPurchased / totalNftsPurchased));
+        await tx.pointsReceipt.create({
           data: {
-            value: Math.floor(0.8 * earnableScoutPoints * (nftsPurchased / totalNftsPurchased)),
+            value: scoutPoints,
             recipientId: scoutId,
             eventId: builderEventId,
             activities: {
@@ -90,11 +93,17 @@ export async function processScoutPointsPayout({
               }
             }
           }
-        })
-      ),
+        });
+        await updatePointsEarned({
+          userId: scoutId,
+          season,
+          scoutPoints,
+          tx
+        });
+      }),
       tx.pointsReceipt.create({
         data: {
-          value: Math.floor(0.2 * earnableScoutPoints),
+          value: builderPoints,
           recipientId: builderId,
           eventId: builderEventId,
           activities: {
@@ -106,6 +115,12 @@ export async function processScoutPointsPayout({
             }
           }
         }
+      }),
+      updatePointsEarned({
+        userId: builderId,
+        season,
+        builderPoints,
+        tx
       })
     ]);
   });

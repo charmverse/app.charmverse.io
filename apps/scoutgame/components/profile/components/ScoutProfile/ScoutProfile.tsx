@@ -35,7 +35,7 @@ export async function ScoutProfile({ userId, isMobile }: { userId: string; isMob
         scoutPoints={seasonStats?.pointsEarnedAsScout}
       />
       <Stack>
-        <Typography variant='subtitle1' my={1} color='secondary' fontWeight='500'>
+        <Typography variant='h5' my={2} color='secondary' fontWeight='500'>
           Scouted Builders
         </Typography>
         {scoutedBuilders.length > 0 ? (

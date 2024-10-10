@@ -1,16 +1,16 @@
 import { Button, List, ListItem, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
+import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
 
 export function HowItWorksPage({ username }: { username: string }) {
   return (
     <SinglePageLayout>
-      <SinglePageWrapper>
-        <Typography variant='h5' color='secondary' mb={2}>
-          Welcome {username}
-        </Typography>
+      <InfoBackgroundImage />
+      <SinglePageWrapper bgcolor='background.default'>
         <Typography color='secondary' textAlign='center' width='100%' fontWeight={700} variant='h4'>
           Scout Game in a Nutshell
         </Typography>
@@ -34,10 +34,13 @@ export function HowItWorksPage({ username }: { username: string }) {
             <ListItem sx={{ display: 'list-item', p: 1, pb: 0 }}>Win Grants</ListItem>
           </List>
         </List>
-        <Stack justifyContent='center' alignItems='center' width='100%'>
-          <Image src='/images/purple_binoculars.png' alt='purple binoculars' width={150} height={150} />
-        </Stack>
-        <Button fullWidth href='/' data-test='continue-button'>
+        <Button
+          LinkComponent={Link}
+          variant='contained'
+          href='/'
+          data-test='continue-button'
+          sx={{ margin: '0 auto', display: 'flex', width: 'fit-content' }}
+        >
           Play Scout Game
         </Button>
       </SinglePageWrapper>

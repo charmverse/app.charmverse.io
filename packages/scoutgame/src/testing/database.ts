@@ -65,10 +65,12 @@ export async function mockScout({
 
 export async function mockGemPayoutEvent({
   builderId,
+  recipientId,
   amount = 10,
   week = getCurrentWeek()
 }: {
   builderId: string;
+  recipientId?: string;
   amount?: number;
   week?: string;
 }) {
@@ -92,6 +94,13 @@ export async function mockGemPayoutEvent({
             connect: {
               id: builderId
             }
+          },
+          pointsReceipts: {
+            create: {
+              value: amount,
+              senderId: builderId,
+              recipientId
+            }
           }
         }
       }
@@ -106,29 +115,6 @@ export async function mockBuilderEvent({ builderId, eventType }: { builderId: st
       season: mockSeason,
       type: eventType,
       week: getCurrentWeek()
-    }
-  });
-}
-
-export async function mockPointReceipt({
-  builderId,
-  amount = 10,
-  senderId,
-  recipientId
-}: {
-  builderId: string;
-  amount?: number;
-  recipientId?: string;
-  senderId?: string;
-}) {
-  const builderEvent = await mockBuilderEvent({ builderId, eventType: 'gems_payout' });
-
-  return prisma.pointsReceipt.create({
-    data: {
-      value: amount,
-      senderId,
-      recipientId,
-      eventId: builderEvent.id
     }
   });
 }
@@ -204,7 +190,7 @@ export function mockRepo(fields: Partial<GithubRepo> & { owner?: string } = {}) 
 export async function mockNFTPurchaseEvent({
   builderId,
   scoutId,
-  points,
+  points = 0,
   season = mockSeason
 }: {
   builderId: string;
@@ -236,9 +222,16 @@ export async function mockNFTPurchaseEvent({
         create: {
           builderNftId: builderNft.id,
           scoutId,
-          pointsValue: points ?? 0,
+          pointsValue: points,
           txHash: `0x${Math.random().toString(16).substring(2)}`,
           tokensPurchased: 1
+        }
+      },
+      pointsReceipts: {
+        create: {
+          value: points,
+          recipientId: builderId,
+          senderId: scoutId
         }
       }
     },
