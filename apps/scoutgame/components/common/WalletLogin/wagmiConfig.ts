@@ -21,9 +21,14 @@ export function getConfig() {
     ...Chain[]
   ];
   const transports = wagmiChains.reduce<Record<string, Transport>>((acc, chain) => {
-    const rpcUrl = getAlchemyBaseUrl(chain.id);
-    acc[chain.id] = fallback([http(rpcUrl), http()]);
-    return acc;
+    try {
+      const rpcUrl = getAlchemyBaseUrl(chain.id);
+      acc[chain.id] = fallback([http(rpcUrl), http()]);
+      return acc;
+    } catch (_) {
+      acc[chain.id] = http();
+      return acc;
+    }
   }, {});
 
   const config = getDefaultConfig({
