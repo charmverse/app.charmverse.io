@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
-import { getBuilderContractAddress, builderNftChain } from './constants';
+import { builderNftChain } from './constants';
 import { createBuilderNft } from './createBuilderNft';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
