@@ -23,12 +23,20 @@ export function UserProposalsTables() {
         </Grid>
       ) : (
         <Stack gap={3}>
-          <ActionableProposalsTable proposals={proposals.actionable} />
+          <ActionableProposalsTable proposals={proposals.actionable} customColumns={proposals?.customColumns} />
           {proposals.authored.length ? (
-            <ProposalsTable proposals={proposals.authored} title={`My ${getFeatureTitle('Proposals')}`} />
+            <ProposalsTable
+              proposals={proposals.authored}
+              title={`My ${getFeatureTitle('Proposals')}`}
+              customColumns={proposals?.customColumns}
+            />
           ) : null}
           {proposals.review_completed.length ? (
-            <ProposalsTable proposals={proposals.review_completed} title='Review completed' />
+            <ProposalsTable
+              proposals={proposals.review_completed}
+              title='Review completed'
+              customColumns={proposals?.customColumns}
+            />
           ) : null}
         </Stack>
       )}
