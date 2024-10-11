@@ -90,7 +90,9 @@ export function useDecentTransaction({
     isLoading: isLoadingDecentSdk,
     data: decentTransactionInfo
   } = useSWR(
-    address ? `buy-token-${builderTokenId}-${tokensToPurchase}-${sourceChainId}-${sourceToken}-${scoutId}` : null,
+    address && paymentAmountOut
+      ? `buy-token-${builderTokenId}-${tokensToPurchase}-${sourceChainId}-${sourceToken}-${scoutId}`
+      : null,
     () =>
       prepareDecentTransaction({
         txConfig: decentAPIParams

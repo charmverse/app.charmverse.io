@@ -228,7 +228,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const selectedChainCurrency = getCurrencyContract(selectedPaymentOption) as Address;
 
-  const { allowance, refreshAllowance, isLoadingAllowance } = useGetERC20Allowance({
+  const { allowance, refreshAllowance } = useGetERC20Allowance({
     chainId: selectedPaymentOption.chainId,
     erc20Address: selectedPaymentOption.currency === 'USDC' ? selectedChainCurrency : null,
     owner: address as Address,
@@ -259,11 +259,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         await switchChainAsync({ chainId: selectedPaymentOption.chainId });
       }
 
+      const _value = BigInt(String((decentTransactionInfo.tx as any).value || 0).replace('n', ''));
+
       sendTransaction(
         {
           to: decentTransactionInfo.tx.to as Address,
           data: decentTransactionInfo.tx.data as any,
-          value: (decentTransactionInfo.tx as any).value
+          value: _value
         },
         {
           onSuccess: async (data) => {
