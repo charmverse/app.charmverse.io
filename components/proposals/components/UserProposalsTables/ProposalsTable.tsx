@@ -174,7 +174,13 @@ export function ProposalsTable({
                   </TableCell>
 
                   <TableCell align='center' width={150}>
-                    <Typography>
+                    <Typography
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
                       {proposal.userReviewResult === 'pass' ? (
                         <ApprovedIcon fontSize='small' color='success' />
                       ) : proposal.userReviewResult === 'fail' ? (
