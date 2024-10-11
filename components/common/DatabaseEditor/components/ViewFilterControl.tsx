@@ -1,9 +1,7 @@
 import { FilterList } from '@mui/icons-material';
-import { Popover, Tooltip } from '@mui/material';
+import { Popover } from '@mui/material';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { FormattedMessage } from 'react-intl';
 
-import { Button } from 'components/common/Button';
 import { useViewFilter } from 'hooks/useViewFilter';
 import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
