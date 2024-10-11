@@ -65,7 +65,6 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const user = await getUserFromSession();
-  const vapidPublicKey = process.env.VAPID_PUBLIC_KEY;
 
   return (
     <html lang='en' dir='ltr' suppressHydrationWarning>

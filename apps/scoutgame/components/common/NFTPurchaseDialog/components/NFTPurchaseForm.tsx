@@ -2,10 +2,8 @@
 
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
-import { arrayUtils } from '@charmverse/core/utilities';
-import { ActionType, ChainId } from '@decent.xyz/box-common';
-import type { UseBoxActionArgs, UserBalanceArgs } from '@decent.xyz/box-hooks';
-import { BoxHooksContextProvider, useBoxAction, useUsersBalances } from '@decent.xyz/box-hooks';
+import { ChainId } from '@decent.xyz/box-common';
+import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -28,9 +26,7 @@ import {
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
-import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import { convertCostToPointsWithDiscount, convertCostToUsd } from '@packages/scoutgame/builderNfts/utils';
-import { prettyPrint } from '@packages/utils/strings';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -51,8 +47,7 @@ import { useDecentTransaction } from '../hooks/useDecentTransaction';
 import { useGetERC20Allowance } from '../hooks/useGetERC20Allowance';
 import { useGetTokenBalances } from '../hooks/useGetTokenBalances';
 
-import type { ChainOption } from './ChainSelector/chains';
-import { chainOptionsMainnet, ETH_NATIVE_ADDRESS, getChainOptions, getCurrencyContract } from './ChainSelector/chains';
+import { getCurrencyContract } from './ChainSelector/chains';
 import type { SelectedPaymentOption } from './ChainSelector/ChainSelector';
 import { BlockchainSelect } from './ChainSelector/ChainSelector';
 import { ERC20ApproveButton } from './ERC20Approve';
