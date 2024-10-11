@@ -10,6 +10,7 @@ import {
   optimismUsdcContractAddress
 } from '@packages/scoutgame/builderNfts/constants';
 import { GET } from '@packages/utils/http';
+import { bigIntToString } from '@packages/utils/numbers';
 import useSWR from 'swr';
 import type { Address } from 'viem';
 import { optimism } from 'viem/chains';
@@ -76,12 +77,12 @@ export function useDecentTransaction({
       chainId: optimism.id,
       contractAddress: getBuilderContractAddress(),
       cost: {
-        amount: paymentAmountOut,
+        amount: bigIntToString(paymentAmountOut) as any,
         isNative: false,
         tokenAddress: optimismUsdcContractAddress
       },
       signature: 'function mint(address account, uint256 tokenId, uint256 amount, string scout)',
-      args: [address, builderTokenId, tokensToPurchase, scoutId]
+      args: [address, bigIntToString(builderTokenId), bigIntToString(tokensToPurchase), scoutId]
     }
   };
 

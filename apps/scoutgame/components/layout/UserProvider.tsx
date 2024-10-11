@@ -8,6 +8,7 @@ import type { SessionUser } from 'lib/session/getUserFromSession';
 type UserContext = {
   user: SessionUser | null;
   updateUser: (updatedUser: Partial<SessionUser>) => void;
+  setUser: (user: SessionUser | null) => void;
 };
 
 export const UserContext = createContext<Readonly<UserContext | null>>(null);
@@ -19,7 +20,7 @@ export function UserProvider({ children, userSession }: { children: ReactNode; u
     throw new Error('updateUser must be implemented first in order to use it');
   }, []);
 
-  const value = useMemo(() => ({ user, updateUser }), [user, updateUser]);
+  const value = useMemo(() => ({ user, updateUser, setUser }), [user, updateUser, setUser]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
