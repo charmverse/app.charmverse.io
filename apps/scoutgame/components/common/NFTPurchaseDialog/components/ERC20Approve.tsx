@@ -40,7 +40,7 @@ export function ERC20ApproveButton({
     if (walletClient?.chain.id !== chainId) {
       return switchChainAsync({ chainId });
     }
-    await triggerApproveSpender({ amount: useUnlimited || !amount ? MAX_UINT256 : amountToApprove });
+    await triggerApproveSpender({ amount: useUnlimited || !amountToApprove ? MAX_UINT256 : amountToApprove });
     onSuccess();
   }
 
