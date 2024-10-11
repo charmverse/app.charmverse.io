@@ -26,7 +26,7 @@ export function ERC20ApproveButton({
   // Default to decimals for USDC
   decimals = 6
 }: ERC20ApproveButtonProps) {
-  const amountToApprove = amount ? amount + amount / BigInt(20) : undefined;
+  const amountToApprove = amount ? amount + amount / BigInt(50) : undefined;
 
   const [useUnlimited, setUseUnlimited] = useState(false);
 
