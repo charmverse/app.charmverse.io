@@ -26,6 +26,8 @@ export function ERC20ApproveButton({
   // Default to decimals for USDC
   decimals = 6
 }: ERC20ApproveButtonProps) {
+  const amountToApprove = amount ? amount + amount / BigInt(50) : undefined;
+
   const [useUnlimited, setUseUnlimited] = useState(false);
 
   const { data: walletClient } = useWalletClient();
@@ -38,11 +40,11 @@ export function ERC20ApproveButton({
     if (walletClient?.chain.id !== chainId) {
       return switchChainAsync({ chainId });
     }
-    await triggerApproveSpender({ amount: useUnlimited || !amount ? MAX_UINT256 : amount });
+    await triggerApproveSpender({ amount: useUnlimited || !amountToApprove ? MAX_UINT256 : amountToApprove });
     onSuccess();
   }
 
-  const displayAmount = useUnlimited ? 'Unlimited' : (Number(amount || 0) / 10 ** decimals).toFixed(2);
+  const displayAmount = useUnlimited ? 'Unlimited' : (Number(amountToApprove || 0) / 10 ** decimals).toFixed(2);
 
   return (
     <div>
@@ -56,7 +58,7 @@ export function ERC20ApproveButton({
         >
           {isApprovingSpender ? 'Approving...' : `Approve ${displayAmount} USDC`}
         </LoadingButton>
-        {amount && (
+        {amountToApprove && (
           <FormControlLabel
             control={
               <Checkbox checked={useUnlimited} onChange={() => setUseUnlimited(!useUnlimited)} color='primary' />
