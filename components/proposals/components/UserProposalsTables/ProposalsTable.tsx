@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { ThumbUpOutlined as ApprovedIcon, HighlightOff as RejectedIcon } from '@mui/icons-material';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Card, Chip, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
@@ -88,14 +89,25 @@ export function ProposalsTable({
                   Status
                 </Typography>
               </TableCell>
-              <TableCell align='center'>
-                <Typography variant='body2' fontWeight='bold'>
-                  Last updated
-                </Typography>
-              </TableCell>
               <TableCell align='left'>
                 <Typography variant='body2' fontWeight='bold'>
                   Current step
+                </Typography>
+              </TableCell>
+
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Your review
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Approved
+                </Typography>
+              </TableCell>
+              <TableCell align='center'>
+                <Typography variant='body2' fontWeight='bold'>
+                  Declined
                 </Typography>
               </TableCell>
               <TableCell align='center'>
@@ -123,7 +135,7 @@ export function ProposalsTable({
                   }}
                 >
                   <TableCell
-                    width={400}
+                    width={250}
                     sx={{
                       pl: 0
                     }}
@@ -141,10 +153,7 @@ export function ProposalsTable({
                       size='small'
                     />
                   </TableCell>
-                  <TableCell align='center' width={250}>
-                    <Typography>{relativeTime(proposal.updatedAt)}</Typography>
-                  </TableCell>
-                  <TableCell align='left' width={250}>
+                  <TableCell align='left' width={150}>
                     <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
                       {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>
@@ -152,7 +161,29 @@ export function ProposalsTable({
                       </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell width={250} align='center'>
+
+                  <TableCell align='center' width={150}>
+                    <Typography>
+                      {proposal.userReviewResult === 'pass' ? (
+                        <ApprovedIcon fontSize='small' color='success' />
+                      ) : proposal.userReviewResult === 'fail' ? (
+                        <RejectedIcon fontSize='small' color='error' />
+                      ) : (
+                        '-'
+                      )}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align='center' width={150}>
+                    <Typography color={proposal.totalPassedReviewResults ? 'success' : undefined}>
+                      {proposal.totalPassedReviewResults || '-'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align='center' width={150}>
+                    <Typography color={proposal.totalFailedReviewResults ? 'error' : undefined}>
+                      {proposal.totalFailedReviewResults || '-'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell width={150} align='center'>
                     {assigned ? (proposal.reviewedAt ? relativeTime(proposal.reviewedAt) : '-') : null}
                   </TableCell>
                 </StyledTableRow>
