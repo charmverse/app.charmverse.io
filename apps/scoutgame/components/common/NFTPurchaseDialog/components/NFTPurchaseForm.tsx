@@ -263,7 +263,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         {
           to: decentTransactionInfo.tx.to as Address,
           data: decentTransactionInfo.tx.data as any,
-          value: (decentTransactionInfo.tx as any).value
+          value: BigInt((decentTransactionInfo.tx as any).value.toString().replace('n', ''))
         },
         {
           onSuccess: async (data) => {
