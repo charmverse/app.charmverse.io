@@ -59,11 +59,6 @@ export function ActionableProposalsTable({
                   Declined
                 </Typography>
               </TableCell>
-              <TableCell align='right'>
-                <Typography variant='body2' fontWeight='bold' sx={{ pr: 4 }}>
-                  Action
-                </Typography>
-              </TableCell>
               {customColumns.map((column) => (
                 <TableCell key={column.formFieldId} align='center'>
                   <Typography variant='body2' fontWeight='bold'>
@@ -71,6 +66,11 @@ export function ActionableProposalsTable({
                   </Typography>
                 </TableCell>
               ))}
+              <TableCell align='right'>
+                <Typography variant='body2' fontWeight='bold' sx={{ pr: 4 }}>
+                  Action
+                </Typography>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -112,7 +112,7 @@ export function ActionableProposalsTable({
                     router.push(`/${router.query.domain}/${proposal.path}`);
                   }}
                 >
-                  <TableCell width={250}>
+                  <TableCell sx={{ minWidth: 250 }}>
                     <Typography>{proposal.title || 'Untitled'}</Typography>
                     <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
                       <OpenButton />
@@ -156,6 +156,7 @@ export function ActionableProposalsTable({
                       {proposal.totalFailedReviewResults || '-'}
                     </Typography>
                   </TableCell>
+                  <CustomColumnTableCells customColumns={customColumns} proposal={proposal} />
                   <TableCell align='right' width={150}>
                     <Button
                       color='primary'
@@ -169,7 +170,6 @@ export function ActionableProposalsTable({
                       {buttonText}
                     </Button>
                   </TableCell>
-                  <CustomColumnTableCells customColumns={customColumns} proposal={proposal} />
                 </StyledTableRow>
               );
             })}

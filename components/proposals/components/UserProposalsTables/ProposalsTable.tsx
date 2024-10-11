@@ -146,9 +146,9 @@ export function ProposalsTable({
                   }}
                 >
                   <TableCell
-                    width={250}
                     sx={{
-                      pl: 0
+                      pl: 0,
+                      minWidth: 250
                     }}
                   >
                     <Typography>{proposal.title || 'Untitled'}</Typography>

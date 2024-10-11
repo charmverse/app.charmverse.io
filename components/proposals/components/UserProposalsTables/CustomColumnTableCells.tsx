@@ -23,7 +23,7 @@ export function CustomColumnTableCells({
     }
 
     return (
-      <TableCell key={column.formFieldId} align='center' sx={{ minWidth: 100 }}>
+      <TableCell key={column.formFieldId} align='center' sx={{ minWidth: 150 }}>
         {value}
       </TableCell>
     );
