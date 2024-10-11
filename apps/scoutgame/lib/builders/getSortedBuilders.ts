@@ -5,6 +5,11 @@ import type { BuilderInfo } from './interfaces';
 
 export type BuildersSort = 'top' | 'hot' | 'new';
 
+export type CompositeCursor = {
+  userId: string;
+  rank?: number | null;
+};
+
 export async function getSortedBuilders({
   sort,
   limit,
@@ -16,16 +21,15 @@ export async function getSortedBuilders({
   limit: number;
   week: string;
   season: string;
-  cursor?: string;
-}): Promise<{ builders: BuilderInfo[]; nextCursor: string | null; hasMore: boolean }> {
+  cursor: CompositeCursor | null;
+}): Promise<{ builders: BuilderInfo[]; nextCursor: CompositeCursor | null }> {
   // new is based on the most recent builder
   // top is based on the most gems earned in their user week stats
   // hot is based on the most points earned in the previous user week stats
-  let builders: BuilderInfo[];
 
   switch (sort) {
-    case 'new':
-      builders = await prisma.scout
+    case 'new': {
+      const builders = await prisma.scout
         .findMany({
           where: {
             builderStatus: 'approved',
@@ -38,8 +42,9 @@ export async function getSortedBuilders({
           orderBy: {
             createdAt: 'desc'
           },
-          take: limit + 1,
-          cursor: cursor ? { id: cursor } : undefined,
+          skip: cursor ? 1 : 0,
+          take: limit,
+          cursor: cursor ? { id: cursor.userId } : undefined,
           select: {
             id: true,
             username: true,
@@ -94,11 +99,12 @@ export async function getSortedBuilders({
             builderStatus: scout.builderStatus
           }));
         });
-      break;
-
+      const userId = builders[builders.length - 1]?.id;
+      return { builders, nextCursor: builders.length === limit ? { userId, rank: null } : null };
+    }
     // show top builders from this week
-    case 'hot':
-      builders = await prisma.userWeeklyStats
+    case 'hot': {
+      const builders = await prisma.userWeeklyStats
         .findMany({
           where: {
             user: {
@@ -114,16 +120,19 @@ export async function getSortedBuilders({
           orderBy: {
             rank: 'asc'
           },
-          take: limit + 1,
+          skip: cursor ? 1 : 0,
+          take: limit,
           cursor: cursor
             ? {
+                rank: cursor.rank,
                 userId_week: {
-                  userId: cursor,
+                  userId: cursor.userId,
                   week
                 }
               }
             : undefined,
           select: {
+            rank: true,
             user: {
               select: {
                 id: true,
@@ -162,6 +171,7 @@ export async function getSortedBuilders({
         .then((stats) =>
           stats.map((stat) => ({
             id: stat.user.id,
+            rank: stat.rank,
             nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             username: stat.user.username,
             displayName: stat.user.username,
@@ -173,13 +183,16 @@ export async function getSortedBuilders({
             builderStatus: stat.user.builderStatus
           }))
         );
-      break;
+      const userId = builders[builders.length - 1]?.id;
+      const rank = builders[builders.length - 1]?.rank;
+      return { builders, nextCursor: builders.length === limit ? { userId, rank } : null };
+    }
 
     // show top builders from last week
     case 'top': {
       const previousWeek = getPreviousWeek(week);
 
-      builders = await prisma.userWeeklyStats
+      const builders = await prisma.userWeeklyStats
         .findMany({
           where: {
             week: previousWeek,
@@ -193,16 +206,19 @@ export async function getSortedBuilders({
             }
           },
           orderBy: { rank: 'asc' },
-          take: limit + 1,
+          skip: cursor ? 1 : 0,
+          take: limit,
           cursor: cursor
             ? {
+                rank: cursor.rank,
                 userId_week: {
-                  userId: cursor,
+                  userId: cursor.userId,
                   week: previousWeek
                 }
               }
             : undefined,
           select: {
+            rank: true,
             user: {
               select: {
                 id: true,
@@ -245,6 +261,7 @@ export async function getSortedBuilders({
         .then((stats) =>
           stats.map((stat) => ({
             id: stat.user.id,
+            rank: stat.rank,
             nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             username: stat.user.username,
             displayName: stat.user.username,
@@ -255,15 +272,12 @@ export async function getSortedBuilders({
             builderStatus: stat.user.builderStatus
           }))
         );
-      break;
+      const userId = builders[builders.length - 1]?.id;
+      const rank = builders[builders.length - 1]?.rank;
+      return { builders, nextCursor: builders.length === limit ? { userId, rank } : null };
     }
 
     default:
       throw new Error(`Invalid sort option: ${sort}`);
   }
-
-  const nextCursor = builders.length > limit ? builders[limit].id : null;
-  const hasMore = builders.length > limit;
-
-  return { builders: builders.slice(0, limit), nextCursor, hasMore };
 }

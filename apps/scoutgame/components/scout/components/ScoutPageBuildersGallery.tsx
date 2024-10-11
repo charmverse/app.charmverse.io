@@ -20,7 +20,8 @@ export async function ScoutPageBuildersGallery({
     sort: sort as BuildersSort,
     limit: 15,
     week: getCurrentWeek(),
-    season: currentSeason
+    season: currentSeason,
+    cursor: null
   });
   return (
     <BuildersGalleryContainer

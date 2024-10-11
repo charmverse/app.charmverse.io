@@ -1,13 +1,13 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { Box } from '@mui/material';
+import { Alert, Box } from '@mui/material';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import { LoadingCards } from 'components/common/Loading/LoadingCards';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { BuildersSort } from 'lib/builders/getSortedBuilders';
+import type { BuildersSort, CompositeCursor } from 'lib/builders/getSortedBuilders';
 import { getSortedBuildersAction } from 'lib/builders/getSortedBuildersAction';
 import type { BuilderInfo } from 'lib/builders/interfaces';
 
@@ -18,20 +18,21 @@ export function BuildersGalleryContainer({
   sort,
   initialCursor
 }: {
-  initialCursor: string | null;
+  initialCursor: CompositeCursor | null;
   initialBuilders: BuilderInfo[];
   showHotIcon: boolean;
   userId?: string;
   sort: BuildersSort;
 }) {
+  const [error, setError] = useState<string | null>(null);
   const isDesktop = useMdScreen();
   const [builders, setBuilders] = useState(initialBuilders);
-  const [nextCursor, setNextCursor] = useState<string | null>(initialCursor);
+  const [nextCursor, setNextCursor] = useState<CompositeCursor | null>(initialCursor);
   const [isLoading, setIsLoading] = useState(false);
   const observerTarget = useRef(null);
 
   const loadMoreBuilders = useCallback(async () => {
-    if (isLoading || !nextCursor) return;
+    if (isLoading || error || !nextCursor?.userId) return;
 
     setIsLoading(true);
     try {
@@ -41,14 +42,15 @@ export function BuildersGalleryContainer({
         setBuilders((prev) => [...prev, ...newBuilders]);
         setNextCursor(newCursor);
       } else if (actionResponse?.serverError) {
+        setError(actionResponse.serverError.message);
         log.warn('Error fetching more builders', {
           error: actionResponse.serverError,
           sort,
           cursor: nextCursor
         });
       }
-    } catch (error) {
-      // TODO: handle error
+    } catch (err) {
+      setError((err as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +94,7 @@ export function BuildersGalleryContainer({
           <LoadingCards />
         </Box>
       )}
+      {error && <Alert severity='error'>{error}</Alert>}
     </>
   );
 }

@@ -4,6 +4,7 @@ import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import * as yup from 'yup';
 
 import { actionClient } from 'lib/actions/actionClient';
+import type { CompositeCursor } from 'lib/builders/getSortedBuilders';
 import { getSortedBuilders } from 'lib/builders/getSortedBuilders';
 
 import type { BuilderInfo } from './interfaces';
@@ -13,14 +14,19 @@ export const getSortedBuildersAction = actionClient
   .schema(
     yup.object({
       sort: yup.string().oneOf(['hot', 'new', 'top']).required(),
-      cursor: yup.string().optional()
+      cursor: yup
+        .object({
+          userId: yup.string().required(),
+          rank: yup.number().nullable()
+        })
+        .nullable()
     })
   )
-  .action<{ builders: BuilderInfo[]; nextCursor: string | null }>(async ({ parsedInput }) => {
+  .action<{ builders: BuilderInfo[]; nextCursor: CompositeCursor | null }>(async ({ parsedInput }) => {
     const { sort, cursor } = parsedInput;
     const { builders, nextCursor } = await getSortedBuilders({
       sort,
-      limit: 20,
+      limit: 15,
       week: getCurrentWeek(),
       season: currentSeason,
       cursor
