@@ -11,15 +11,25 @@ import {
   optimismSepolia,
   sepolia,
   zora,
-  zoraSepolia
+  zoraSepolia,
+  base,
+  baseSepolia
 } from 'wagmi/chains';
 
 export function getConfig() {
   const walletConnectProjectId = env('WALLETCONNECT_PROJECTID');
-  const wagmiChains = [mainnet, sepolia, optimism, optimismSepolia, arbitrum, arbitrumSepolia, zora, zoraSepolia] as [
-    Chain,
-    ...Chain[]
-  ];
+  const wagmiChains = [
+    mainnet,
+    sepolia,
+    base,
+    baseSepolia,
+    optimism,
+    optimismSepolia,
+    arbitrum,
+    arbitrumSepolia,
+    zora,
+    zoraSepolia
+  ] as [Chain, ...Chain[]];
   const transports = wagmiChains.reduce<Record<string, Transport>>((acc, chain) => {
     try {
       const rpcUrl = getAlchemyBaseUrl(chain.id);

@@ -1,6 +1,5 @@
 import { getChainById } from '@packages/onchain/chains';
 import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
-import { getWalletClient } from '@wagmi/core';
 import useSWRMutation from 'swr/mutation';
 import { publicActions, type Address, type Chain } from 'viem';
 import { useWalletClient } from 'wagmi';
@@ -17,7 +16,7 @@ export const MAX_UINT256 = BigInt('0xfffffffffffffffffffffffffffffffffffffffffff
 export function useUpdateERC20Allowance({ spender, erc20Address, chainId }: UseERC20AllowanceProps) {
   const { data: walletClient } = useWalletClient();
 
-  const mutationFn = async (_url: string, { arg: { amount } }: { arg: { amount: bigint } }) => {
+  async function mutationFn(_url: string, { arg: { amount } }: { arg: { amount: bigint } }) {
     const client = new UsdcErc20ABIClient({
       chain: getChainById(chainId)?.viem as Chain,
       contractAddress: erc20Address,
@@ -25,7 +24,7 @@ export function useUpdateERC20Allowance({ spender, erc20Address, chainId }: UseE
     });
 
     await client.approve({ args: { spender, value: amount } });
-  };
+  }
 
   const {
     trigger: triggerApproveSpender,

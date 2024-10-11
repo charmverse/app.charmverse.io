@@ -1,8 +1,9 @@
 import { LoadingButton } from '@mui/lab';
-import { Button, Checkbox, FormControlLabel, Tabs, Tab, Chip, Box, Typography } from '@mui/material';
+import { Checkbox, FormControlLabel, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { Address } from 'viem';
+import { useSwitchChain, useWalletClient } from 'wagmi';
 
 import { MAX_UINT256, useUpdateERC20Allowance } from '../hooks/useUpdateERC20Allowance';
 
@@ -27,9 +28,16 @@ export function ERC20ApproveButton({
 }: ERC20ApproveButtonProps) {
   const [useUnlimited, setUseUnlimited] = useState(false);
 
+  const { data: walletClient } = useWalletClient();
+
+  const { switchChainAsync } = useSwitchChain();
+
   const { triggerApproveSpender, isApprovingSpender } = useUpdateERC20Allowance({ chainId, erc20Address, spender });
 
   async function approveSpender() {
+    if (walletClient?.chain.id !== chainId) {
+      return switchChainAsync({ chainId });
+    }
     await triggerApproveSpender({ amount: useUnlimited || !amount ? MAX_UINT256 : amount });
     onSuccess();
   }
