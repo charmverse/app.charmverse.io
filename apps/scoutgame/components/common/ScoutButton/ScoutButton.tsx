@@ -1,7 +1,6 @@
 'use client';
 
 import { LoadingButton } from '@mui/lab';
-import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -23,12 +22,10 @@ const NFTPurchaseDialog = dynamic(
 
 export function ScoutButton({
   builder,
-  isAuthenticated = true,
-  showPoints = false
+  isAuthenticated = true
 }: {
   builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
   isAuthenticated?: boolean;
-  showPoints?: boolean;
 }) {
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [authPopup, setAuthPopup] = useState<boolean>(false);
