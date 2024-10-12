@@ -9,3 +9,7 @@ export function useRefreshUser() {
 export function useGetUser() {
   return useGETImmutable<SessionUser | null>('/api/session/user');
 }
+
+export function useGetClaimablePoints() {
+  return useGETImmutable<{ points: number }>('/api/session/claimable-points');
+}
