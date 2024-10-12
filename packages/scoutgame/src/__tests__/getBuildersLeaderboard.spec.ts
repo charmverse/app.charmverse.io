@@ -170,5 +170,8 @@ describe('getBuildersLeaderboard', () => {
     const topBuilders = await getBuildersLeaderboard({ quantity: 5, week: testWeek });
 
     expect(topBuilders).toHaveLength(3);
+    expect(topBuilders.map((b) => b.builder.id)).toEqual(
+      builders.filter((b) => b.builderStatus === 'approved').map((b) => b.id)
+    );
   });
 });
