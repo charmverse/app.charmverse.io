@@ -26,7 +26,7 @@ import {
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
-import { convertCostToPointsWithDiscount, convertCostToUsd } from '@packages/scoutgame/builderNfts/utils';
+import { convertCostToPoints, convertCostToUsd } from '@packages/scoutgame/builderNfts/utils';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -108,7 +108,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
 
-  const purchaseCostInPoints = convertCostToPointsWithDiscount(purchaseCost);
+  const purchaseCostInPoints = convertCostToPoints(purchaseCost);
   const notEnoughPoints = user && user.currentBalance < purchaseCostInPoints;
 
   const {

@@ -10,8 +10,3 @@ export function convertCostToPoints(costWei: bigint) {
   // 50% discount
   return Math.round(costInUsd * 10);
 }
-
-// 50% discount
-export function convertCostToPointsWithDiscount(costWei: bigint) {
-  return Math.round(convertCostToPoints(costWei) * 0.5);
-}
