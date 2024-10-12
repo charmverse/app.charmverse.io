@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { builderPointsShare, scoutPointsShare } from '@packages/scoutgame/builderNfts/constants';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/calculatePoints';
 import { updatePointsEarned } from '@packages/scoutgame/points/updatePointsEarned';
 import { v4 } from 'uuid';
@@ -18,20 +19,27 @@ export async function processScoutPointsPayout({
   season: string;
   createdAt?: Date;
 }) {
-  const nftHolders = await prisma.nFTPurchaseEvent.groupBy({
-    by: ['scoutId'],
+  const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
       builderNFT: {
         season,
         builderId
       }
-    },
-    _count: {
-      scoutId: true
     }
   });
 
-  const totalNftsPurchased = nftHolders.reduce((acc, { _count: { scoutId: count } }) => acc + count, 0);
+  const { totalNftsPurchased, nftsByScout } = nftPurchaseEvents.reduce(
+    (acc, purchaseEvent) => {
+      acc.totalNftsPurchased += purchaseEvent.tokensPurchased;
+      acc.nftsByScout[purchaseEvent.scoutId] =
+        (acc.nftsByScout[purchaseEvent.scoutId] || 0) + purchaseEvent.tokensPurchased;
+      return acc;
+    },
+    {
+      totalNftsPurchased: 0,
+      nftsByScout: {} as Record<string, number>
+    }
+  );
 
   if (totalNftsPurchased === 0) {
     return;
@@ -75,10 +83,10 @@ export async function processScoutPointsPayout({
       }
     });
 
-    const builderPoints = Math.floor(0.2 * earnableScoutPoints);
+    const builderPoints = Math.floor(builderPointsShare * earnableScoutPoints);
     await Promise.all([
-      ...nftHolders.map(async ({ scoutId, _count: { scoutId: nftsPurchased } }) => {
-        const scoutPoints = Math.floor(0.8 * earnableScoutPoints * (nftsPurchased / totalNftsPurchased));
+      ...Object.entries(nftsByScout).map(async ([scoutId, tokensPurchased]) => {
+        const scoutPoints = Math.floor(scoutPointsShare * earnableScoutPoints * (tokensPurchased / totalNftsPurchased));
         await tx.pointsReceipt.create({
           data: {
             value: scoutPoints,

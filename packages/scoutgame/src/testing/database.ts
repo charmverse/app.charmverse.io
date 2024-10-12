@@ -191,12 +191,14 @@ export async function mockNFTPurchaseEvent({
   builderId,
   scoutId,
   points = 0,
-  season = mockSeason
+  season = mockSeason,
+  tokensPurchased = 1
 }: {
   builderId: string;
   scoutId: string;
   points?: number;
   season?: string;
+  tokensPurchased?: number;
 }) {
   let builderNft = await prisma.builderNft.findFirst({
     where: {
@@ -224,7 +226,7 @@ export async function mockNFTPurchaseEvent({
           scoutId,
           pointsValue: points,
           txHash: `0x${Math.random().toString(16).substring(2)}`,
-          tokensPurchased: 1
+          tokensPurchased
         }
       },
       pointsReceipts: {

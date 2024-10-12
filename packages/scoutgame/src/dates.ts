@@ -31,7 +31,9 @@ export const currentSeasonNumber = 1;
 export const streakWindow = 7 * 24 * 60 * 60 * 1000;
 
 export const seasonAllocatedPoints = 18_141_850;
-export const weeklyAllocatedPoints = seasonAllocatedPoints / 13;
+// Currently, we are hardcoding the value of weekly allocated points to 100,000
+// export const weeklyAllocatedPoints = seasonAllocatedPoints / 13;
+export const weeklyAllocatedPoints = 1e5;
 
 // Return the format of week
 export function getCurrentWeek(): ISOWeek {

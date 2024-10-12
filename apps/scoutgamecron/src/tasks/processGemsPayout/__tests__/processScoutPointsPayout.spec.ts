@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { builderPointsShare, scoutPointsShare } from '@packages/scoutgame/builderNfts/constants';
 import { getCurrentWeek } from '@packages/scoutgame/dates';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/calculatePoints';
 import { mockBuilder, mockBuilderNft, mockNFTPurchaseEvent, mockScout } from '@packages/scoutgame/testing/database';
@@ -73,7 +74,7 @@ describe('processScoutPointsPayout', () => {
     expect(scout2Activities).toBe(0);
   });
 
-  it('should distribute points correctly among NFT holders and builder', async () => {
+  it('should distribute points correctly among NFT holders and builder, respecting scout builder splits, and proportionally to NFTs owned', async () => {
     const builder = await mockBuilder();
     const rank = 1;
     const gemsCollected = 10;
@@ -84,17 +85,20 @@ describe('processScoutPointsPayout', () => {
     const scout1 = await mockScout();
     const scout2 = await mockScout();
 
-    // Scout 1 has 2 NFTs, scout 2 has 1 NFT
-    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout1.id, points: 0 });
+    // Scout 1 has 3 NFTs, scout 2 has 7 NFTs
+    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout1.id, points: 0, tokensPurchased: 2 });
     await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout1.id, points: 0 });
 
     await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout2.id, points: 0 });
+    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout2.id, points: 0, tokensPurchased: 6 });
 
     const totalPoints = calculateEarnableScoutPointsForRank(rank);
 
     await prisma.pointsReceipt.deleteMany({
       where: {
-        recipientId: builder.id
+        recipientId: {
+          in: [builder.id, scout1.id, scout2.id]
+        }
       }
     });
     await processScoutPointsPayout({
@@ -112,7 +116,8 @@ describe('processScoutPointsPayout', () => {
         createdAt: 'desc'
       }
     });
-    expect(builderPointReceipt.value).toBeCloseTo(Math.floor(0.2 * totalPoints));
+
+    expect(Math.floor(builderPointReceipt.value)).toEqual(Math.floor(builderPointsShare * totalPoints));
 
     const builderStats = await getStats({ userId: builder.id });
     expect(builderStats.season?.pointsEarnedAsBuilder).toBe(builderPointReceipt.value);
@@ -124,7 +129,7 @@ describe('processScoutPointsPayout', () => {
       }
     });
 
-    expect(scout1PointReceipt.value).toBeCloseTo(Math.floor(0.8 * totalPoints * (2 / 3)));
+    expect(Math.floor(scout1PointReceipt.value)).toEqual(Math.floor(scoutPointsShare * totalPoints * (3 / 10)));
 
     const scout1Stats = await getStats({ userId: scout1.id });
     expect(scout1Stats.season?.pointsEarnedAsScout).toBe(scout1PointReceipt.value);
@@ -136,7 +141,7 @@ describe('processScoutPointsPayout', () => {
       }
     });
 
-    expect(scout2PointReceipt.value).toBeCloseTo(Math.floor(0.8 * totalPoints * (1 / 3)));
+    expect(Math.floor(scout2PointReceipt.value)).toEqual(Math.floor(scoutPointsShare * totalPoints * (7 / 10)));
 
     const scout2Stats = await getStats({ userId: scout2.id });
     expect(scout2Stats.season?.pointsEarnedAsScout).toBe(scout2PointReceipt.value);
@@ -150,7 +155,7 @@ describe('processScoutPointsPayout', () => {
         pointsReceiptId: builderPointReceipt.id
       }
     });
-    expect(builderPointReceipt.value).toBeCloseTo(Math.floor(0.2 * totalPoints));
+    expect(Math.floor(builderPointReceipt.value)).toEqual(Math.floor(builderPointsShare * totalPoints));
 
     expect(builderActivities).toBe(1);
 

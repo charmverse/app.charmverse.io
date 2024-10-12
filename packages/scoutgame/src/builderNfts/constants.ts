@@ -46,6 +46,10 @@ export function getDecentApiKey() {
   const apiKey = env('DECENT_API_KEY') || process.env.REACT_APP_DECENT_API_KEY;
   return apiKey;
 }
+
+export const scoutPointsShare = 0.8;
+export const builderPointsShare = 0.2;
+
 // const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey });
 
 // const apiClient = new BuilderNFTSeasonOneClient({
