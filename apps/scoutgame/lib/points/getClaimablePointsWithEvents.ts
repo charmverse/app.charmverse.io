@@ -158,10 +158,11 @@ export async function getClaimablePointsWithEvents(
         const builderReward = builderRewards[week];
         if (!builderReward) {
           builderRewards[week] = {
-            points: 0
+            points
           };
+        } else {
+          builderReward.points += points;
         }
-        builderReward.points += points;
       } else {
         const githubContribution = weeklyGithubContributionRecord[week];
         if (!githubContributionRewards[week]) {
