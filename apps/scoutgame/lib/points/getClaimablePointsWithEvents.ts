@@ -4,7 +4,7 @@ import { currentSeason, getPreviousSeason, getSeasonWeekFromISOWeek } from '@pac
 export type WeeklyReward = {
   week: string;
   weekNumber: number;
-  builderReward: {
+  scoutReward: {
     points: number;
   };
   githubContributionReward: {
@@ -63,7 +63,7 @@ export async function getClaimablePointsWithEvents(
 
   const totalClaimablePoints = pointsReceipts.reduce((acc, receipt) => acc + receipt.value, 0);
 
-  const builderRewards: Record<string, { points: number }> = {};
+  const scoutRewards: Record<string, { points: number }> = {};
   const soldNftRewards: Record<string, { points: number; quantity: number }> = {};
   const githubContributionRewards: Record<string, WeeklyReward['githubContributionReward']> = {};
 
@@ -155,13 +155,13 @@ export async function getClaimablePointsWithEvents(
       soldNftReward.quantity += receipt.event.nftPurchaseEvent.tokensPurchased ?? 1;
     } else if (receipt.event.type === 'gems_payout') {
       if (receipt.event.builderId !== receipt.recipientId) {
-        const builderReward = builderRewards[week];
-        if (!builderReward) {
-          builderRewards[week] = {
+        const scoutReward = scoutRewards[week];
+        if (!scoutReward) {
+          scoutRewards[week] = {
             points
           };
         } else {
-          builderReward.points += points;
+          scoutReward.points += points;
         }
       } else {
         const githubContribution = weeklyGithubContributionRecord[week];
@@ -194,7 +194,7 @@ export async function getClaimablePointsWithEvents(
           season: allWeeks[week],
           week
         }),
-        builderReward: builderRewards[week],
+        scoutReward: scoutRewards[week],
         githubContributionReward: githubContributionRewards[week],
         soldNftReward: soldNftRewards[week],
         rank: weeklyRankRecord[week],
