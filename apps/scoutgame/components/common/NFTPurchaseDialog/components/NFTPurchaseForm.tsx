@@ -26,7 +26,7 @@ import {
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
-import { convertCostToPoints, convertCostToUsd } from '@packages/scoutgame/builderNfts/utils';
+import { convertCostToPoints, convertCostToUsdDisplay } from '@packages/scoutgame/builderNfts/utils';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -77,7 +77,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const { user } = useUser();
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111];
-  const pricePerNft = builder.price ? convertCostToUsd(builder.price) : 'N/A';
+  const pricePerNft = builder.price ? convertCostToUsdDisplay(builder.price) : 'N/A';
   const { address, chainId } = useAccount();
 
   const { switchChainAsync } = useSwitchChain();
@@ -456,7 +456,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             {isFetchingPrice && <CircularProgress size={16} />}
           </Typography>
           <Typography align='right' sx={{ width: '33%' }}>
-            {purchaseCost && convertCostToUsd(purchaseCost)}
+            {purchaseCost && convertCostToUsdDisplay(purchaseCost)}
             {isFetchingPrice && <CircularProgress size={16} />}
           </Typography>
         </Stack>
