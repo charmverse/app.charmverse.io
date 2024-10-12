@@ -3,3 +3,7 @@ export function roundNumberInRange({ num, min, max }: { num: number; min: number
 
   return Math.min(max, numberOrMinimum);
 }
+
+export function bigIntToString(input: bigint) {
+  return `${input.toString()}n`;
+}

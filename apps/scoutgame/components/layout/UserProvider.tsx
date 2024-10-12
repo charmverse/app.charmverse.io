@@ -3,23 +3,27 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
+import { useGetUserTrigger } from 'hooks/api/session';
 import type { SessionUser } from 'lib/session/getUserFromSession';
 
 type UserContext = {
   user: SessionUser | null;
-  updateUser: (updatedUser: Partial<SessionUser>) => void;
+  setUser: (user: SessionUser | null) => void;
+  reloadUser: () => Promise<void>;
 };
 
 export const UserContext = createContext<Readonly<UserContext | null>>(null);
 
 export function UserProvider({ children, userSession }: { children: ReactNode; userSession: SessionUser | null }) {
   const [user, setUser] = useState<SessionUser | null>(userSession);
+  const { trigger: triggerReload } = useGetUserTrigger();
 
-  const updateUser = useCallback((_updatedUser: Partial<SessionUser>) => {
-    throw new Error('updateUser must be implemented first in order to use it');
-  }, []);
+  const reloadUser = useCallback(async () => {
+    const updated = await triggerReload();
+    setUser(updated);
+  }, [triggerReload]);
 
-  const value = useMemo(() => ({ user, updateUser }), [user, updateUser]);
+  const value = useMemo(() => ({ user, reloadUser, setUser }), [user, reloadUser, setUser]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

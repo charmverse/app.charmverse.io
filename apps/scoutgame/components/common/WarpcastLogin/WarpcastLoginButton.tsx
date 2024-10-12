@@ -6,14 +6,15 @@ import { useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import type { ButtonProps } from '@mui/material';
 import { Box, Button, Typography } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
+import { useUser } from 'components/layout/UserProvider';
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
-import { loginAction } from 'lib/session/loginWithFarcasterAction';
+import { loginWithFarcasterAction } from 'lib/session/loginWithFarcasterAction';
 
 import { FarcasterLoginModal } from './FarcasterModal';
 import { WarpcastIcon } from './WarpcastIcon';
@@ -21,6 +22,7 @@ import { WarpcastIcon } from './WarpcastIcon';
 export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const router = useRouter();
+  const { setUser } = useUser();
   const { isAuthenticated } = useProfile();
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
@@ -33,13 +35,15 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     hasErrored,
     isExecuting: isLoggingIn,
     result
-  } = useAction(loginAction, {
+  } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
       const nextPage = data?.onboarded ? redirectUrl : '/welcome';
 
       if (!data?.success) {
         return;
       }
+
+      setUser(data.user);
 
       await revalidatePath();
       router.push(nextPage);
@@ -73,7 +77,11 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     popupState.open();
   }, []);
 
-  const { signIn, url } = useFarcasterConnection({
+  const {
+    signIn,
+    url,
+    error: connectionError
+  } = useFarcasterConnection({
     onSuccess: onSuccessCallback,
     onError: onErrorCallback,
     onClick
@@ -87,16 +95,19 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     );
   }
 
-  const errorMessage = result?.serverError?.message?.includes('private beta')
-    ? 'Scout Game is in private beta'
-    : 'There was an error while logging in';
+  const errorMessage =
+    (connectionError && connectionError.message) ||
+    (hasErrored &&
+      (result?.serverError?.message?.includes('private beta')
+        ? 'Scout Game is in private beta'
+        : 'There was an error while logging in'));
 
   return (
     <Box width='100%' data-test='connect-with-farcaster'>
       <Button
         size='large'
         onClick={signIn}
-        disabled={!url}
+        variant='contained'
         sx={{
           px: {
             xs: 2.5,
@@ -108,16 +119,15 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
           }
         }}
         startIcon={<WarpcastIcon />}
-        {...props}
       >
         {children || 'Sign in with Warpcast'}
       </Button>
-      {hasErrored && (
+      {errorMessage && (
         <Typography variant='body2' sx={{ mt: 2 }} color='error'>
           {errorMessage}
         </Typography>
       )}
-      <FarcasterLoginModal open={popupState.isOpen} onClose={() => popupState.close()} url={url} />
+      <FarcasterLoginModal {...bindPopover(popupState)} url={url} />
     </Box>
   );
 }

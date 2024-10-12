@@ -9,7 +9,7 @@ import { authSchema } from '../farcaster/config';
 import { authorizeUserByLaunchDate } from './authorizeUserByLaunchDate';
 import { saveSession } from './saveSession';
 
-export const loginAction = actionClient
+export const loginWithFarcasterAction = actionClient
   .metadata({ actionName: 'login_with_farcaster' })
   .schema(authSchema)
   .action(async ({ ctx, parsedInput }) => {
@@ -19,5 +19,5 @@ export const loginAction = actionClient
 
     await saveSession(ctx, { scoutId: user.id });
 
-    return { success: true, userId: user.id, onboarded: !!user.onboardedAt };
+    return { success: true, userId: user.id, onboarded: !!user.onboardedAt, user };
   });
