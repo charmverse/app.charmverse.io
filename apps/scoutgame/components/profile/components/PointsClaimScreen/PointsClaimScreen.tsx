@@ -12,7 +12,7 @@ import { QualifiedActionsTable } from './QualifiedActionsTable';
 export async function PointsClaimScreen({ userId, username }: { userId: string; username: string }) {
   const { totalClaimablePoints, weeklyRewards, bonusPartners } = await getClaimablePointsWithEvents(userId);
 
-  if (totalClaimablePoints) {
+  if (!totalClaimablePoints) {
     return (
       <Box
         sx={{
