@@ -39,10 +39,26 @@ function Document() {
         Repos:
       </Typography>
       <List>
-        <ListItem>https://github.com/G7DAO/protocol</ListItem>
-        <ListItem>https://github.com/G7DAO/safes </ListItem>
-        <ListItem>https://github.com/PermissionlessGames/degen-casino</ListItem>
-        <ListItem>https://github.com/G7DAO/seer</ListItem>
+        <ListItem>
+          <a href='https://github.com/G7DAO/protocol' target='_blank' rel='noreferrer'>
+            https://github.com/G7DAO/protocol
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/G7DAO/safes' target='_blank' rel='noreferrer'>
+            https://github.com/G7DAO/safes
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/PermissionlessGames/degen-casino' target='_blank' rel='noreferrer'>
+            https://github.com/PermissionlessGames/degen-casino
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/G7DAO/seer' target='_blank' rel='noreferrer'>
+            https://github.com/G7DAO/seer
+          </a>
+        </ListItem>
       </List>
     </InfoCard>
   );

@@ -76,17 +76,61 @@ function Document() {
         Qualified Celo Projects:
       </Typography>
       <List>
-        <ListItem>https://github.com/mento-protocol/mento-web</ListItem>
-        <ListItem>https://github.com/mento-protocol/reserve-site</ListItem>
-        <ListItem>https://github.com/mento-protocol/mento-web</ListItem>
-        <ListItem>https://github.com/mento-protocol/mento-sdk</ListItem>
-        <ListItem>https://github.com/celo-org/celo-composer</ListItem>
-        <ListItem>https://github.com/valora-inc/hooks/issues?q=is%3Aopen+is%3Aissue+label%3A"Scout+Game"</ListItem>
-        <ListItem>https://github.com/GoodDollar</ListItem>
-        <ListItem>https://github.com/orgs/hypercerts-org/projects/15/views/1 </ListItem>
-        <ListItem>https://github.com/Glo-Foundation/glo-wallet/issues </ListItem>
-        <ListItem>https://github.com/Ubeswap/ubeswap-interface-v3</ListItem>
-        <ListItem>https://github.com/gitcoinco/grants-stack/issues</ListItem>
+        <ListItem>
+          <a href='https://github.com/mento-protocol/mento-web' target='_blank' rel='noreferrer'>
+            https://github.com/mento-protocol/mento-web
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/mento-protocol/reserve-site' target='_blank' rel='noreferrer'>
+            https://github.com/mento-protocol/reserve-site
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/mento-protocol/mento-web' target='_blank' rel='noreferrer'>
+            https://github.com/mento-protocol/mento-web
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/mento-protocol/mento-sdk' target='_blank' rel='noreferrer'>
+            https://github.com/mento-protocol/mento-sdk
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/celo-org/celo-composer' target='_blank' rel='noreferrer'>
+            https://github.com/celo-org/celo-composer
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/valora-inc/hooks' target='_blank' rel='noreferrer'>
+            https://github.com/valora-inc/hooks
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/GoodDollar' target='_blank' rel='noreferrer'>
+            https://github.com/GoodDollar
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/orgs/hypercerts-org' target='_blank' rel='noreferrer'>
+            https://github.com/orgs/hypercerts-org
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/Glo-Foundation/glo-wallet/issues' target='_blank' rel='noreferrer'>
+            https://github.com/Glo-Foundation/glo-wallet/issues
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/Ubeswap/ubeswap-interface-v3' target='_blank' rel='noreferrer'>
+            https://github.com/Ubeswap/ubeswap-interface-v3
+          </a>
+        </ListItem>
+        <ListItem>
+          <a href='https://github.com/gitcoinco/grants-stack' target='_blank' rel='noreferrer'>
+            https://github.com/gitcoinco/grants-stack
+          </a>
+        </ListItem>
       </List>
     </InfoCard>
   );
