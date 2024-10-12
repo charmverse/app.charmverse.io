@@ -1,10 +1,11 @@
 import type { SxProps } from '@mui/material';
-import { Box, Tab, Tabs, tabClasses, tabsClasses } from '@mui/material';
+import { Badge, Box, Tab, Tabs, Typography, tabClasses, tabsClasses } from '@mui/material';
 import Link from 'next/link';
 
 export type TabItem = {
   label: string;
   value: string;
+  showBadge?: boolean;
 };
 
 type TabsMenuProps = {
@@ -45,7 +46,11 @@ export function TabsMenu({ value, tabs, sx }: TabsMenuProps) {
             sx={{ fontSize: { xs: '12px', sm: '14px' } }}
             key={tab.value}
             component={Link}
-            label={tab.label}
+            label={
+              <Badge key={tab.value} color='error' variant='dot' invisible={!tab.showBadge}>
+                <Box sx={{ px: 0.5 }}>{tab.label}</Box>
+              </Badge>
+            }
             href={{
               query: { tab: tab.value }
             }}

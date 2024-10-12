@@ -1,6 +1,6 @@
 'use client';
 
-import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
+import { Badge, BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
@@ -9,6 +9,7 @@ import { CiBellOn } from 'react-icons/ci';
 import { PiBinocularsLight, PiHouseLight, PiInfoLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
+import { useGetClaimablePoints } from 'hooks/api/session';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
 import { SignInModalMessage } from './ScoutButton/SignInModalMessage';
@@ -44,6 +45,7 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
   const pathname = usePathname();
   const value = getActiveButton(pathname);
   const isDesktop = useMdScreen();
+  const { data: claimablePoints } = useGetClaimablePoints();
   const [authPopup, setAuthPopup] = useState({
     open: false,
     path: '/home'
@@ -87,7 +89,16 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
           // This makes sure the UI doesn't flicker from single column to double column for desktop screens
           href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
           value='profile'
-          icon={<SlUser size='19px' style={{ margin: '2px 0 3px' }} />}
+          icon={
+            <Badge
+              color='error'
+              variant='dot'
+              overlap={isDesktop ? 'rectangular' : 'circular'}
+              invisible={!claimablePoints || claimablePoints.points === 0}
+            >
+              <SlUser size='19px' style={{ margin: '2px 0 3px' }} />
+            </Badge>
+          }
           onClick={(e) => openAuthModal?.(e, 'profile')}
         />
         <BottomNavigationAction
