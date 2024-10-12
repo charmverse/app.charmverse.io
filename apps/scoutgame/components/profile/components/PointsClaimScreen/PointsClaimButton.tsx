@@ -48,7 +48,7 @@ export function PointsClaimButton() {
           <Image src='/images/trophy_sticker.jpg' alt='Success' width={300} height={300} />
           <div>
             <Button variant='outlined' color='primary' onClick={handleCloseModal}>
-              Confirm
+              Return to app
             </Button>
           </div>
         </Stack>
