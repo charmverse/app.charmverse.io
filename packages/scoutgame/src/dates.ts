@@ -46,6 +46,11 @@ export function getPreviousWeek(week: ISOWeek): ISOWeek {
   return _formatWeek(getDateFromISOWeek(week).minus({ week: 1 }));
 }
 
+export function getPreviousSeason(season: Season): Season {
+  const seasonIndex = seasons.findIndex((s) => s.start === season);
+  return seasons[seasonIndex - 1].start;
+}
+
 export function getWeekFromDate(date: Date): ISOWeek {
   return _formatWeek(DateTime.fromJSDate(date, { zone: 'utc' }));
 }

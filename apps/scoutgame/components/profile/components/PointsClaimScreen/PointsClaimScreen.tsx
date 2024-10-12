@@ -3,14 +3,14 @@
 import { Paper, Typography, Stack } from '@mui/material';
 import Image from 'next/image';
 
-import { getClaimablePoints } from 'lib/points/getClaimablePoints';
+import { getClaimablePointsWithEvents } from 'lib/points/getClaimablePointsWithEvents';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';
 import { QualifiedActionsTable } from './QualifiedActionsTable';
 
 export async function PointsClaimScreen({ userId, username }: { userId: string; username: string }) {
-  const { totalClaimablePoints, weeklyRewards, bonusPartners } = await getClaimablePoints(userId);
+  const { totalClaimablePoints, weeklyRewards, bonusPartners } = await getClaimablePointsWithEvents(userId);
 
   if (!totalClaimablePoints) {
     return (
