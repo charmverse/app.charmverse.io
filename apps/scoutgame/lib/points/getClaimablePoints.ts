@@ -1,27 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getPreviousSeason, getSeasonWeekFromISOWeek } from '@packages/scoutgame/dates';
+import { currentSeason, getPreviousSeason } from '@packages/scoutgame/dates';
 
-export type WeeklyReward = {
-  week: string;
-  weekNumber: number;
-  builderReward: {
-    points: number;
-  };
-  githubContributionReward: {
-    points: number;
-    streakCount: number;
-    firstContributionsCount: number;
-    regularContributionsCount: number;
-    bonusPartners: string[];
-  };
-  soldNftReward: {
-    points: number;
-    quantity: number;
-  };
-  rank: number | null;
-};
-
-export async function getClaimablePointsWithEvents(userId: string): Promise<{ totalClaimablePoints: number }> {
+export async function getClaimablePoints(userId: string): Promise<{ totalClaimablePoints: number }> {
   const previousSeason = getPreviousSeason(currentSeason);
   const claimableSeasons = [previousSeason, currentSeason].filter(Boolean);
   if (claimableSeasons.length === 0) {
