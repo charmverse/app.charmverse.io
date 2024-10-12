@@ -52,9 +52,19 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
 
   if (builder.builderStatus === 'applied') {
     return (
-      <Stack gap={2} alignItems='center'>
-        <Typography>Your Builder account is pending approval. Check back soon!</Typography>
-      </Stack>
+      <Box
+        sx={{
+          minHeight: 150,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <Typography align='center'>Your Builder account is pending approval.</Typography>
+        <Typography align='center'>Check back soon!</Typography>
+      </Box>
     );
   }
 

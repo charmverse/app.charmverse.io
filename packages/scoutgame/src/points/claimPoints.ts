@@ -47,7 +47,7 @@ export async function claimPoints({ season = currentSeason, userId }: { season?:
     }
   }
 
-  return prisma.$transaction([
+  await prisma.$transaction([
     prisma.pointsReceipt.updateMany({
       where: {
         id: {
@@ -69,4 +69,5 @@ export async function claimPoints({ season = currentSeason, userId }: { season?:
       }
     })
   ]);
+  return { total: builderPoints + scoutPoints, builderPoints, scoutPoints };
 }
