@@ -1,0 +1,15 @@
+{
+  "name": "scoutgameadmin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "npx next dev",
+    "build": "npx next build",
+    "start:prod": "npx next start",
+    "lint": "npx next lint",
+    "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
+  },
+  "dependencies": {
+    "@mui/lab": "^6.0.0-beta.11"
+  }
+}

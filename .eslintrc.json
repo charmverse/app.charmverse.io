@@ -82,6 +82,7 @@
           "./apps/cron/",
           "./apps/farcaster/",
           "./apps/scoutgame/",
+          "./apps/scoutgameadmin/",
           "./apps/scoutgamecron/",
           "./apps/sunnyawards/",
           "./apps/waitlist/",
@@ -89,7 +90,8 @@
           "./apps/ceramic/",
           "./packages/charmeditor/",
           "./packages/github/",
-          "./packages/scoutgame/"
+          "./packages/scoutgame/",
+          "./packages/utils/"
         ]
       }
     ],

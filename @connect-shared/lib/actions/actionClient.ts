@@ -15,13 +15,15 @@ export function defineMetadataSchema() {
   });
 }
 
-export const actionClient = createSafeActionClient({
+export const actionClientBase = createSafeActionClient({
   validationAdapter: yupAdapter(),
   defineMetadataSchema,
   handleReturnedServerError,
   handleServerErrorLog,
   defaultValidationErrorsShape: 'flattened'
-})
+});
+
+export const actionClient = actionClientBase
   /**
    * Middleware used for auth purposes.
    * Returns the context with the session object.

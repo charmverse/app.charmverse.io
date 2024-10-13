@@ -1,9 +1,17 @@
 // Function to fetch repos for a given owner
 
-type Repo = { id: number; default_branch: string; name: string; fork: boolean; owner: { login: string; type: string } };
+export type GitHubAPIRepo = {
+  id: number;
+  default_branch: string;
+  full_name: string;
+  html_url: string;
+  name: string;
+  fork: boolean;
+  owner: { login: string; type: string };
+};
 
 export async function getReposByOwner(owner: string) {
-  let allRepos: Repo[] = [];
+  let allRepos: GitHubAPIRepo[] = [];
   let page = 1;
   const perPage = 100; // GitHub's max per page
   let hasNextPage = true;
