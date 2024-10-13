@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server';
 
 const columns = ['id', 'owner', 'name', 'url'];
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const rows = await prisma.githubRepo.findMany();
   const exportString = stringify(rows, { header: true, columns });

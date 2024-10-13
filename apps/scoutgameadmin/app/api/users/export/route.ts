@@ -1,5 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringify } from 'csv-stringify/sync';
+import type { NextRequest } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 
 type ScoutWithGithubUser = {
   id: string;
@@ -12,7 +15,7 @@ type ScoutWithGithubUser = {
   currentBalance: number;
 };
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const users = await prisma.scout.findMany({
     select: {
       id: true,
