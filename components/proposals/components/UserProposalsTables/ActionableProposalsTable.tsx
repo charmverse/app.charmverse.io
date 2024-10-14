@@ -112,7 +112,9 @@ export function ActionableProposalsTable({
                     router.push(`/${router.query.domain}/${proposal.path}`);
                   }}
                 >
-                  <TableCell sx={{ minWidth: 250 }}>
+                  <TableCell
+                    sx={{ minWidth: 250, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                  >
                     <Typography>{proposal.title || 'Untitled'}</Typography>
                     <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
                       <OpenButton />
@@ -121,7 +123,11 @@ export function ActionableProposalsTable({
                   <TableCell align='center' width={200}>
                     <Typography color={isOverdue ? 'error' : 'initial'}>{dueDateText}</Typography>
                   </TableCell>
-                  <TableCell width={150}>
+                  <TableCell
+                    sx={{
+                      minWidth: 250
+                    }}
+                  >
                     <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
                       {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>
