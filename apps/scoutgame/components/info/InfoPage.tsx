@@ -211,11 +211,11 @@ function Document() {
         </Typography>
         <Blockquote>
           <Typography align='center' my={1}>
-            <code>P = 2 x S + 2</code>
+            <code>P = 20 x S + 20</code>
           </Typography>
           <Typography>Where:</Typography>
           <Typography>
-            P: Price of the NFT ($)
+            P: Price of the NFT (Scout Points)
             <br />
             S: Current supply (number of NFTs minted)
           </Typography>
