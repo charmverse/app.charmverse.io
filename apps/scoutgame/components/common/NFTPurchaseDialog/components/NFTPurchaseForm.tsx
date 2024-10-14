@@ -416,35 +416,24 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         )}
       </Stack>
       <Stack>
-        <Stack flexDirection='row' alignItems='center' gap={1} mb={1}>
-          <Typography color='secondary'>Total cost</Typography>
-          <Link href='/info#builder-nfts' target='_blank' title='Read how Builder NFTs are priced'>
-            <InfoIcon sx={{ fontSize: 16, opacity: 0.5 }} />
-          </Link>
-        </Stack>
-        <Stack flexDirection='row' justifyContent='space-between'>
-          <Typography variant='caption' color='secondary' sx={{ width: '33%' }}>
+        <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+          <Stack flexDirection='row' alignItems='center' gap={1} width='40%'>
+            <Typography color='secondary'>Total cost</Typography>
+            <Link href='/info#builder-nfts' target='_blank' title='Read how Builder NFTs are priced'>
+              <InfoIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+            </Link>
+          </Stack>
+          <Typography variant='caption' color='secondary' align='left' sx={{ width: '33%' }}>
             Qty
           </Typography>
-          <Typography
-            variant='caption'
-            color='secondary'
-            align='center'
-            sx={{ position: 'relative', top: -4, width: '33%' }}
-          >
-            Points{' '}
-            <Box display='inline' position='relative' top={4}>
-              <PointsIcon size={18} color='blue' />
-            </Box>{' '}
-            (50% off)
-          </Typography>
-          <Typography variant='caption' color='secondary' align='right' sx={{ width: '33%' }}>
-            USDC $
+          <Typography variant='caption' color='secondary' align='left' flexGrow={1}>
+            Points
           </Typography>
         </Stack>
         <Stack flexDirection='row' justifyContent='space-between'>
+          <Box width='40%'></Box>
           <Typography sx={{ width: '33%' }}>{tokensToBuy} NFT</Typography>
-          <Typography align='center' sx={{ width: '33%' }}>
+          <Typography align='left' flexGrow={1}>
             {purchaseCost && (
               <>
                 {purchaseCostInPoints.toLocaleString()}{' '}
@@ -453,10 +442,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
                 </Box>
               </>
             )}
-            {isFetchingPrice && <CircularProgress size={16} />}
-          </Typography>
-          <Typography align='right' sx={{ width: '33%' }}>
-            {purchaseCost && convertCostToUsdDisplay(purchaseCost)}
             {isFetchingPrice && <CircularProgress size={16} />}
           </Typography>
         </Stack>
