@@ -10,7 +10,8 @@ export async function processScoutPointsPayout({
   gemsCollected,
   week,
   season,
-  createdAt
+  createdAt,
+  normalisationFactor = 1
 }: {
   builderId: string;
   rank: number;
@@ -18,6 +19,7 @@ export async function processScoutPointsPayout({
   week: string;
   season: string;
   createdAt?: Date;
+  normalisationFactor?: number;
 }) {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
@@ -45,7 +47,7 @@ export async function processScoutPointsPayout({
     return;
   }
 
-  const earnableScoutPoints = calculateEarnableScoutPointsForRank(rank);
+  const earnableScoutPoints = Math.floor(calculateEarnableScoutPointsForRank(rank) * normalisationFactor);
 
   const existingGemsPayoutEvent = await prisma.gemsPayoutEvent.findUnique({
     where: {
@@ -60,76 +62,83 @@ export async function processScoutPointsPayout({
     return;
   }
 
-  return prisma.$transaction(async (tx) => {
-    const builderEventId = v4();
+  return prisma.$transaction(
+    async (tx) => {
+      const builderEventId = v4();
 
-    await tx.gemsPayoutEvent.create({
-      data: {
-        gems: gemsCollected,
-        points: earnableScoutPoints,
-        week,
-        season,
-        builderId,
-        builderEvent: {
-          create: {
-            id: builderEventId,
-            type: 'gems_payout',
-            season,
-            week,
-            builderId,
-            createdAt
-          }
-        }
-      }
-    });
-
-    const builderPoints = Math.floor(builderPointsShare * earnableScoutPoints);
-    await Promise.all([
-      ...Object.entries(nftsByScout).map(async ([scoutId, tokensPurchased]) => {
-        const scoutPoints = Math.floor(scoutPointsShare * earnableScoutPoints * (tokensPurchased / totalNftsPurchased));
-        await tx.pointsReceipt.create({
-          data: {
-            value: scoutPoints,
-            recipientId: scoutId,
-            eventId: builderEventId,
-            activities: {
-              create: {
-                recipientType: 'scout',
-                type: 'points',
-                userId: scoutId,
-                createdAt
-              }
-            }
-          }
-        });
-        await updatePointsEarned({
-          userId: scoutId,
-          season,
-          scoutPoints,
-          tx
-        });
-      }),
-      tx.pointsReceipt.create({
+      await tx.gemsPayoutEvent.create({
         data: {
-          value: builderPoints,
-          recipientId: builderId,
-          eventId: builderEventId,
-          activities: {
+          gems: gemsCollected,
+          points: earnableScoutPoints,
+          week,
+          season,
+          builderId,
+          builderEvent: {
             create: {
-              recipientType: 'builder',
-              type: 'points',
-              userId: builderId,
+              id: builderEventId,
+              type: 'gems_payout',
+              season,
+              week,
+              builderId,
               createdAt
             }
           }
         }
-      }),
-      updatePointsEarned({
-        userId: builderId,
-        season,
-        builderPoints,
-        tx
-      })
-    ]);
-  });
+      });
+
+      const builderPoints = Math.floor(builderPointsShare * earnableScoutPoints);
+      await Promise.all([
+        ...Object.entries(nftsByScout).map(async ([scoutId, tokensPurchased]) => {
+          const scoutPoints = Math.floor(
+            scoutPointsShare * earnableScoutPoints * (tokensPurchased / totalNftsPurchased)
+          );
+          await tx.pointsReceipt.create({
+            data: {
+              value: scoutPoints,
+              recipientId: scoutId,
+              eventId: builderEventId,
+              activities: {
+                create: {
+                  recipientType: 'scout',
+                  type: 'points',
+                  userId: scoutId,
+                  createdAt
+                }
+              }
+            }
+          });
+          await updatePointsEarned({
+            userId: scoutId,
+            season,
+            scoutPoints,
+            tx
+          });
+        }),
+        tx.pointsReceipt.create({
+          data: {
+            value: builderPoints,
+            recipientId: builderId,
+            eventId: builderEventId,
+            activities: {
+              create: {
+                recipientType: 'builder',
+                type: 'points',
+                userId: builderId,
+                createdAt
+              }
+            }
+          }
+        }),
+        updatePointsEarned({
+          userId: builderId,
+          season,
+          builderPoints,
+          tx
+        })
+      ]);
+    },
+    {
+      timeout: 100000
+    }
+  );
 }
