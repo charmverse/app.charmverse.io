@@ -13,7 +13,7 @@ cron:
   - name: "process-nft-mints"
     url: "/process-nft-mints"
     # Every 5 minutes
-    schedule: "*/5 * * * *"
+    schedule: "*/20 * * * *"
 
   - name: "update-mixpanel-user-profiles"
     url: "/update-mixpanel-user-profiles"
