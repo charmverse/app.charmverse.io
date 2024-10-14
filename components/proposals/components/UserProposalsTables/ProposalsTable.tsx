@@ -148,7 +148,10 @@ export function ProposalsTable({
                   <TableCell
                     sx={{
                       pl: 0,
-                      minWidth: 250
+                      minWidth: 250,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
                     }}
                   >
                     <Typography>{proposal.title || 'Untitled'}</Typography>

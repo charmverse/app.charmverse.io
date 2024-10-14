@@ -112,7 +112,9 @@ export function ActionableProposalsTable({
                     router.push(`/${router.query.domain}/${proposal.path}`);
                   }}
                 >
-                  <TableCell sx={{ minWidth: 250 }}>
+                  <TableCell
+                    sx={{ minWidth: 250, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                  >
                     <Typography>{proposal.title || 'Untitled'}</Typography>
                     <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
                       <OpenButton />
