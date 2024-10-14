@@ -98,7 +98,6 @@ export function ProposalsTable({
                   Current step
                 </Typography>
               </TableCell>
-
               <TableCell align='center'>
                 <Typography variant='body2' fontWeight='bold'>
                   Your review
@@ -167,7 +166,12 @@ export function ProposalsTable({
                       size='small'
                     />
                   </TableCell>
-                  <TableCell align='left' width={150}>
+                  <TableCell
+                    align='left'
+                    sx={{
+                      minWidth: 250
+                    }}
+                  >
                     <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
                       {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>

@@ -123,7 +123,11 @@ export function ActionableProposalsTable({
                   <TableCell align='center' width={200}>
                     <Typography color={isOverdue ? 'error' : 'initial'}>{dueDateText}</Typography>
                   </TableCell>
-                  <TableCell width={150}>
+                  <TableCell
+                    sx={{
+                      minWidth: 250
+                    }}
+                  >
                     <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
                       {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>
