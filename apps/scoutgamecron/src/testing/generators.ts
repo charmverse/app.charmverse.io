@@ -9,8 +9,8 @@ export function mockPullRequest(
     repo?: { id?: number; owner: string; name: string };
   } = {}
 ): PullRequest {
-  const owner = fields.repo?.owner ?? 'test';
-  const name = fields.repo?.name ?? 'test';
+  const owner = fields.repo?.owner ?? `owner-${Math.random()}`;
+  const name = fields.repo?.name ?? `name-${Math.random()}`;
   const state = fields.state ?? 'MERGED';
   return {
     title: 'Test PR',
@@ -18,7 +18,7 @@ export function mockPullRequest(
     state,
     author: fields.githubUser ?? {
       id: randomLargeInt(),
-      login: 'testuser'
+      login: `testuser-${Math.random()}`
     },
     number: randomLargeInt(),
     baseRefName: 'main',
@@ -51,15 +51,15 @@ export function mockCommit(
     repo?: { id: number; owner: string; name: string };
   } = {}
 ): Commit {
-  const owner = fields.repo?.owner ?? 'test';
-  const name = fields.repo?.name ?? 'test';
+  const owner = fields.repo?.owner ?? `owner-${Math.random()}`;
+  const name = fields.repo?.name ?? `name-${Math.random()}`;
   return {
     sha: fields.sha || Math.random().toString(),
     author:
       fields.author ??
       ({
         id: randomLargeInt(),
-        login: 'testuser'
+        login: `user-${Math.random()}`
       } as Commit['author']),
     commit: {
       author: {

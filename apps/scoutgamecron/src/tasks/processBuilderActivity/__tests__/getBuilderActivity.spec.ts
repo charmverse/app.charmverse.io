@@ -29,7 +29,7 @@ describe('getBuilderActivity', () => {
     const githubUser = await mockGithubUser();
 
     const commit = mockCommit({
-      githubUser,
+      author: githubUser,
       repo
     });
     const pullRequest = mockPullRequest({
@@ -55,7 +55,7 @@ describe('getBuilderActivity', () => {
     const githubUser = await mockGithubUser();
 
     const commit = mockCommit({
-      githubUser
+      author: githubUser
     });
     const pullRequest = mockPullRequest({
       mergedAt: new Date().toISOString(),
@@ -79,14 +79,12 @@ describe('getBuilderActivity', () => {
     const githubUser = await mockGithubUser();
 
     const commit = mockCommit({
-      githubUser,
       repo: {
         id: 666,
         owner: githubUser.login,
         name: 'project-x'
       }
     });
-
     (getCommitsByUser as jest.Mock<typeof getCommitsByUser>).mockResolvedValue([commit]);
     (getPullRequestsByUser as jest.Mock<typeof getPullRequestsByUser>).mockResolvedValue([]);
 

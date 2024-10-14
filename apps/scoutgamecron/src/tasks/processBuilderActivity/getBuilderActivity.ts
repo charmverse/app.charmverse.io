@@ -32,6 +32,7 @@ export async function getBuilderActivity({ login, after }: { login: string; afte
       .filter((repository) => !reposToTrack.some((r) => r.id === repository.id) && repository.owner.login === login),
     'id'
   );
+
   return {
     // Filter out PRs we do not follow
     pullRequests: pullRequests.filter((node) => reposToTrack.some((r) => r.id === node.repository.id)),
