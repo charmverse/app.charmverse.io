@@ -12,15 +12,18 @@ export async function processNftMints() {
         // Only process transactions that are at least 1 minute old in the case user is already in the app
         lte: new Date(Date.now() - 1000 * 65) // 65 seconds ago
       }
-    },
-    include: {
-      user: true
     }
   });
 
   const totalPendingTxs = pending.length;
 
-  log.info(`Found ${totalPendingTxs} mint transactions to process`);
+  log.info(`Found ${totalPendingTxs} mint transactions to process`, {
+    tx: pending.map((tx) => ({
+      createdAt: tx.createdAt,
+      sourceChainTxHash: tx.sourceChainTxHash,
+      id: tx.id
+    }))
+  });
 
   for (let i = 0; i < totalPendingTxs; i++) {
     const pendingTx = pending[i];
