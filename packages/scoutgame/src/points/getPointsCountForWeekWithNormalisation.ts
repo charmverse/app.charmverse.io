@@ -1,9 +1,10 @@
-import { weeklyRewardableBuilders } from '@packages/scoutgame/builderNfts/constants';
-import { weeklyAllocatedPoints } from '@packages/scoutgame/dates';
-import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
-import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/calculatePoints';
+import { weeklyRewardableBuilders } from '../builderNfts/constants';
+import { weeklyAllocatedPoints } from '../dates';
+import { getBuildersLeaderboard } from '../getBuildersLeaderboard';
 
-async function getPointsCountForWeekWithNormalisation({ week }: { week: string }): Promise<{
+import { calculateEarnableScoutPointsForRank } from './calculatePoints';
+
+export async function getPointsCountForWeekWithNormalisation({ week }: { week: string }): Promise<{
   totalPoints: number;
   normalisationFactor: number;
 }> {
