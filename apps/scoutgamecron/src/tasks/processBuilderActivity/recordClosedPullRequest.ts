@@ -5,8 +5,8 @@ import { octokit } from '@packages/github/client';
 import { isTruthy } from '@packages/utils/types';
 import { v4 as uuid } from 'uuid';
 
-import type { PullRequest } from './getBuilderActivity';
-import { getClosedPullRequest } from './getClosedPullRequest';
+import { getClosedPullRequest } from './github/getClosedPullRequest';
+import type { PullRequest } from './github/getPullRequestsByUser';
 
 type RepoInput = Pick<GithubRepo, 'owner' | 'name'>;
 

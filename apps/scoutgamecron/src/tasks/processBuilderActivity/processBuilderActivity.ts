@@ -17,17 +17,11 @@ type Props = {
   createdAfter: Date;
   season: string;
   now?: DateTime;
-  skipClosedPrProcessing?: boolean;
 };
 
-/**
- *
- * @isFirstMergedPullRequest Only used for the seed data generator
- */
 export async function processBuilderActivity({
   builderId,
   githubUser,
-  skipClosedPrProcessing,
   createdAfter,
   season,
   now = DateTime.utc()
@@ -35,7 +29,10 @@ export async function processBuilderActivity({
   const timer = DateTime.now();
   const week = getWeekFromDate(now.toJSDate());
 
-  const { commits, pullRequests } = await getBuilderActivity({ login: githubUser.login, after: createdAfter });
+  const { commits, pullRequests, newOwnerRepos } = await getBuilderActivity({
+    login: githubUser.login,
+    after: createdAfter
+  });
 
   const githubEvents = await prisma.githubEvent.findMany({
     where: {
@@ -59,8 +56,25 @@ export async function processBuilderActivity({
     newCommits: newCommits.length,
     prs: pullRequests.length,
     newPrs: newPullRequests.length,
+    newRepos: newOwnerRepos.map((r) => r.full_name),
     userId: builderId
   });
+
+  if (newOwnerRepos.length) {
+    await prisma.githubRepo.createMany({
+      data: newOwnerRepos.map((repo) => ({
+        id: repo.id,
+        owner: repo.owner.login,
+        name: repo.name,
+        ownerType: 'user',
+        defaultBranch: repo.default_branch || 'main'
+      }))
+    });
+    log.debug('Created new repos based on commit from owner', {
+      newRepos: newOwnerRepos.map((r) => r.full_name),
+      userId: builderId
+    });
+  }
 
   // Loop thru new pull requests
   for (const pullRequest of newPullRequests) {
@@ -78,9 +92,7 @@ export async function processBuilderActivity({
     if (repo) {
       try {
         if (pullRequest.state === 'CLOSED') {
-          if (!skipClosedPrProcessing) {
-            await recordClosedPullRequest({ pullRequest, repo, season });
-          }
+          await recordClosedPullRequest({ pullRequest, repo, season });
         } else {
           await recordMergedPullRequest({ pullRequest, repo, season });
         }

@@ -10,7 +10,11 @@ const { getBuilderActivity } = await import('../../tasks/processBuilderActivity/
 
 describe('Worker integration: processPullRequests', () => {
   it('Responds with 200 when there is nothing to do', async () => {
-    (getBuilderActivity as jest.Mock<typeof getBuilderActivity>).mockResolvedValue({ commits: [], pullRequests: [] });
+    (getBuilderActivity as jest.Mock<typeof getBuilderActivity>).mockResolvedValue({
+      commits: [],
+      pullRequests: [],
+      newOwnerRepos: []
+    });
 
     await request(worker.default.callback()).post('/process-builder-activity').expect(200);
   });
