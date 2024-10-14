@@ -152,7 +152,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.13.0",
-    "@ethereum-attestation-service/eas-sdk": "^2.7.0",
+    "@ethereum-attestation-service/eas-sdk": "^0.29.1",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/bignumber": "^5.5.0",
     "@ethersproject/contracts": "^5.7.0",
