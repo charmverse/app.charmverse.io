@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
 import { mockBuilder, mockBuilderNft, mockRepo, mockScout } from '@packages/scoutgame/testing/database';
-import { randomLargeInt } from '@packages/scoutgame/testing/generators';
 import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
 
@@ -21,7 +20,6 @@ describe('recordCommit', () => {
   });
 
   it('should create builder events and gems receipts for a first commit of the day', async () => {
-    const repoId = randomLargeInt();
     const username = v4();
 
     const builder = await mockBuilder();
@@ -34,7 +32,6 @@ describe('recordCommit', () => {
     });
 
     const repo = await mockRepo({
-      id: repoId,
       owner: username,
       name: 'Test-Repo',
       defaultBranch: 'main'
