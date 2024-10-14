@@ -325,7 +325,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
 
-  if (true || hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
+  if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
     return <SuccessView builder={builder} />;
   }
 
