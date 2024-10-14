@@ -132,7 +132,7 @@ jobs:
         uses: tj-actions/eslint-changed-files@v25
         with:
           escape_paths: 'false'
-          warn_ignored: 'true'
+          warn_ignored: 'false'
           skip_annotations: 'true' # do not annotate code in the PR
           file_extensions: '**/*.{ts,tsx}'
 
