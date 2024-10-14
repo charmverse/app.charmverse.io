@@ -7,6 +7,7 @@ export function mockPullRequest(
   fields: Partial<Omit<PullRequest, 'repository'>> & {
     githubUser?: { id: number; login: string };
     repo?: { id?: number; owner: string; name: string };
+    sha?: string;
   } = {}
 ): PullRequest {
   const owner = fields.repo?.owner ?? `owner-${Math.random()}`;
@@ -25,6 +26,11 @@ export function mockPullRequest(
     closedAt: state === 'CLOSED' ? new Date().toISOString() : undefined,
     mergedAt: state === 'MERGED' ? new Date().toISOString() : undefined,
     createdAt: new Date().toISOString(),
+    mergeCommit: fields.sha
+      ? {
+          oid: fields.sha
+        }
+      : undefined,
     repository: {
       databaseId: fields.repo?.id ?? randomLargeInt(),
       id: fields.repo?.id ?? randomLargeInt(),

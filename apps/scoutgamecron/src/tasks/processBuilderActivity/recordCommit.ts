@@ -32,8 +32,7 @@ export async function recordCommit({
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
-      createdBy: commit.author.id,
-      type: 'commit'
+      createdBy: commit.author.id
     },
     select: {
       id: true,
@@ -41,6 +40,7 @@ export async function recordCommit({
       createdAt: true,
       repoId: true,
       createdBy: true,
+      type: true,
       builderEvent: {
         select: {
           createdAt: true,
@@ -58,12 +58,17 @@ export async function recordCommit({
     }
   });
 
-  const existingGithubEvent = previousGitEvents.some((event) => event.commitHash === commit.sha);
+  const existingGithubEvent = previousGitEvents.some(
+    (event) => event.commitHash === commit.sha && event.type === 'commit'
+  );
 
   if (existingGithubEvent) {
     // already processed
     return;
   }
+  const existingPullRequestEvent = previousGitEvents.some(
+    (event) => event.commitHash === commit.sha && event.type === 'merged_pull_request'
+  );
 
   const existingGithubEventToday = previousGitEvents.some((event) => {
     return isToday(event.createdAt, DateTime.fromISO(commit.commit.author.date, { zone: 'utc' }));
@@ -94,7 +99,7 @@ export async function recordCommit({
       }
     });
 
-    if (githubUser.builderId && !existingGithubEventToday) {
+    if (githubUser.builderId && !existingGithubEventToday && !existingPullRequestEvent) {
       const gemReceiptType: GemsReceiptType = 'daily_commit';
 
       // this is the date the commit was merged, which determines the season/week that it counts as a builder event
@@ -168,14 +173,12 @@ export async function recordCommit({
           });
         }
 
-        const thisWeekEvents = previousGitEvents.filter((e) => e.createdAt >= start.toJSDate());
-
         log.info('Recorded a commit', {
           eventId: event.id,
           userId: githubUser.builderId,
           week,
           url: commit.html_url,
-          eventCount: thisWeekEvents.length + 1
+          sha: commit.sha
         });
       }
     }

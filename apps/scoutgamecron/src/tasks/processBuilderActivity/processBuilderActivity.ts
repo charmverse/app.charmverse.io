@@ -17,17 +17,11 @@ type Props = {
   createdAfter: Date;
   season: string;
   now?: DateTime;
-  skipClosedPrProcessing?: boolean;
 };
 
-/**
- *
- * @isFirstMergedPullRequest Only used for the seed data generator
- */
 export async function processBuilderActivity({
   builderId,
   githubUser,
-  skipClosedPrProcessing,
   createdAfter,
   season,
   now = DateTime.utc()
@@ -76,6 +70,10 @@ export async function processBuilderActivity({
         defaultBranch: repo.default_branch || 'main'
       }))
     });
+    log.debug('Created new repos based on commit from owner', {
+      newRepos: newOwnerRepos.map((r) => r.full_name),
+      userId: builderId
+    });
   }
 
   // Loop thru new pull requests
@@ -94,9 +92,7 @@ export async function processBuilderActivity({
     if (repo) {
       try {
         if (pullRequest.state === 'CLOSED') {
-          if (!skipClosedPrProcessing) {
-            await recordClosedPullRequest({ pullRequest, repo, season });
-          }
+          await recordClosedPullRequest({ pullRequest, repo, season });
         } else {
           await recordMergedPullRequest({ pullRequest, repo, season });
         }

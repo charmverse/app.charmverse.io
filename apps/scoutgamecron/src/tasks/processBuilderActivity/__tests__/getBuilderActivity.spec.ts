@@ -36,7 +36,7 @@ describe('getBuilderActivity', () => {
       mergedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
       state: 'MERGED',
-      githubUser,
+      author: githubUser,
       repo
     });
 
@@ -61,7 +61,7 @@ describe('getBuilderActivity', () => {
       mergedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
       state: 'MERGED',
-      githubUser
+      author: githubUser
     });
 
     (getCommitsByUser as jest.Mock<typeof getCommitsByUser>).mockResolvedValue([commit]);

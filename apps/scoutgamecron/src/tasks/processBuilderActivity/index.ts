@@ -7,7 +7,6 @@ import { updateBuildersRank } from './updateBuildersRank';
 
 type ProcessPullRequestsOptions = {
   createdAfter?: Date;
-  skipClosedPrProcessing?: boolean;
   season?: string;
 };
 
