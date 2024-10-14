@@ -141,7 +141,7 @@ jobs:
         with:
           skip_annotations: 'true' # do not annotate code in the PR
           file_extensions: '**/*.{ts,tsx}'
-          warn_ignored: 'false'
+          warn_ignored: 'true'
           # Flag necessary to avoid issues when using parentheses in the paths
           # https://github.com/tj-actions/eslint-changed-files/issues/1801#issuecomment-2083477324
           escape_paths: 'false'
