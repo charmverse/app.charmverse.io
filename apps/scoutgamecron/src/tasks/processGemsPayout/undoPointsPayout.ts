@@ -37,7 +37,11 @@ export async function undoPointsPayout({ week }: { week: string }) {
 
   log.info(`Found ${affectedUsers.length} users with points earned for week ${week}`);
 
-  for (const [userId, receipts] of affectedUsers) {
+  for (let i = 0; i < affectedUsers.length; i++) {
+    const [userId, receipts] = affectedUsers[i];
+
+    log.info(`Undoing points payout for user ${userId} ${i + 1}/${affectedUsers.length}`);
+
     const totalReceiptsValue = receipts.reduce((acc, val) => acc + val.value, 0);
 
     await prisma.$transaction(async (tx) => {
@@ -104,3 +108,5 @@ export async function undoPointsPayout({ week }: { week: string }) {
   log.info(`Deleted ${deletedBuilderEvents.count} builder events`);
   log.info(`Deleted ${deletedPointReceipts.count} point receipts`);
 }
+
+// undoPointsPayout({ week: '2024-W42' }).then(console.log);
