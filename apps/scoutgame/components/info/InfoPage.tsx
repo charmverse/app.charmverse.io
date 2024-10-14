@@ -206,8 +206,8 @@ function Document() {
           purchase Builder NFTs. Builders receive 20% of the proceeds from their NFT sales in Scout Points.
         </Typography>
         <Typography>
-          The price of a Builder's first NFT mint is $2.00. The price of the next NFT of the same Builder is calculated
-          as follows:
+          The price of a Builder's first NFT mint is 20 Scout Points. The price of the next NFT of the same Builder is
+          calculated as follows:
         </Typography>
         <Blockquote>
           <Typography align='center' my={1}>

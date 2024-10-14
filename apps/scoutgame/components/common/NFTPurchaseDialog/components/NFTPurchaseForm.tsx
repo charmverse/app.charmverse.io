@@ -77,7 +77,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const { user } = useUser();
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111];
-  const pricePerNft = builder.price ? convertCostToUsdDisplay(builder.price) : 'N/A';
+  const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
 
   const { switchChainAsync } = useSwitchChain();
@@ -353,7 +353,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           <Image src='/images/no_nft_person.png' alt='no nft image available' width={200} height={200} />
         )}
         <Typography textAlign='center' fontWeight={600} color='secondary'>
-          {pricePerNft}
+          <>
+            {pricePerNft}{' '}
+            <Box display='inline' position='relative' top={4}>
+              <PointsIcon color='blue' size={18} />
+            </Box>
+          </>
         </Typography>
       </Box>
       <Stack gap={1}>
@@ -416,14 +421,14 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         )}
       </Stack>
       <Stack>
+        <Stack flexDirection='row' alignItems='center' gap={0.5} mb={1}>
+          <Typography color='secondary'>Total cost</Typography>
+          <Link href='/info#builder-nfts' target='_blank' title='Read how Builder NFTs are priced'>
+            <InfoIcon sx={{ color: 'secondary.main', fontSize: 16, opacity: 0.7 }} />
+          </Link>
+        </Stack>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-          <Stack flexDirection='row' alignItems='center' gap={1} width='40%'>
-            <Typography color='secondary'>Total cost</Typography>
-            <Link href='/info#builder-nfts' target='_blank' title='Read how Builder NFTs are priced'>
-              <InfoIcon sx={{ fontSize: 16, opacity: 0.5 }} />
-            </Link>
-          </Stack>
-          <Typography variant='caption' color='secondary' align='left' sx={{ width: '33%' }}>
+          <Typography variant='caption' color='secondary' align='left' sx={{ width: '50%' }}>
             Qty
           </Typography>
           <Typography variant='caption' color='secondary' align='left' flexGrow={1}>
@@ -431,8 +436,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           </Typography>
         </Stack>
         <Stack flexDirection='row' justifyContent='space-between'>
-          <Box width='40%'></Box>
-          <Typography sx={{ width: '33%' }}>{tokensToBuy} NFT</Typography>
+          <Typography sx={{ width: '50%' }}>{tokensToBuy} NFT</Typography>
           <Typography align='left' flexGrow={1}>
             {purchaseCost && (
               <>
@@ -447,18 +451,16 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Stack>
       </Stack>
       <Stack>
-        <Typography color='secondary' mb={1}>
-          Select payment
-        </Typography>
+        <Typography color='secondary'>Select payment</Typography>
         <RadioGroup
           row
           aria-label='payment method'
           name='payment-method'
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value as 'points' | 'wallet')}
-          sx={{ mb: 2, display: 'flex', gap: 2, width: '100%' }}
+          sx={{ mb: 1, display: 'flex', gap: 2, width: '100%' }}
         >
-          <FormControlLabel sx={{ width: '50%' }} value='wallet' control={<Radio />} label='Wallet' />
+          <FormControlLabel sx={{ width: '50%', mr: 0 }} value='wallet' control={<Radio />} label='Wallet' />
           <FormControlLabel
             value='points'
             // disabled={Boolean(loadingUser || notEnoughPoints)}
