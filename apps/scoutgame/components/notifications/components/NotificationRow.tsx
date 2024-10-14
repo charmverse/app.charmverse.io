@@ -59,8 +59,8 @@ export function mapActivityToRow(notification: ScoutGameNotification) {
           ? notification.type === 'gems_first_pr'
             ? 'First contribution!'
             : notification.type === 'gems_third_pr_in_streak'
-            ? 'Contribution streak!'
-            : 'Contribution accepted!'
+              ? 'Contribution streak!'
+              : 'Contribution accepted!'
           : 'Builder scored!';
       subtitle =
         notification.recipientType === 'builder' ? (
