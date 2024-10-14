@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
 
 import { recordMergedPullRequest } from '../../tasks/processBuilderActivity/recordMergedPullRequest';
-import type { PullRequest } from '../../tasks/processBuilderActivity/getBuilderActivity';
+import type { PullRequest } from '../../tasks/processBuilderActivity/github/getPullRequestsByUser';
 import { recordClosedPullRequest } from '../../tasks/processBuilderActivity/recordClosedPullRequest';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { generatePullRequest } from './generatePullRequest';

@@ -2,7 +2,7 @@ import type { GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
 import { mockPullRequest } from '../../testing/generators';
-import type { PullRequest } from '../../tasks/processBuilderActivity/getBuilderActivity';
+import type { PullRequest } from '../../tasks/processBuilderActivity/github/getPullRequestsByUser';
 
 export function generatePullRequest({
   githubRepo,

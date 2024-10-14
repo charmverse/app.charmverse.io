@@ -1,7 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason } from '../../dates';
-import { mockBuilder, mockScout, mockGemPayoutEvent, mockNFTPurchaseEvent } from '../../testing/database';
+import {
+  mockBuilder,
+  mockScout,
+  mockGemPayoutEvent,
+  mockBuilderNft,
+  mockNFTPurchaseEvent
+} from '../../testing/database';
 import { claimPoints } from '../claimPoints';
 
 describe('claimPoints', () => {
@@ -12,6 +18,9 @@ describe('claimPoints', () => {
       builderId: builder.id,
       recipientId: builder.id,
       amount: 10
+    });
+    await mockBuilderNft({
+      builderId: builder.id
     });
     await mockNFTPurchaseEvent({
       builderId: builder.id,
