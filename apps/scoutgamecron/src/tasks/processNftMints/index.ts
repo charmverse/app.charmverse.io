@@ -1,15 +1,20 @@
 import { log } from '@charmverse/core/log';
 import { TransactionStatus, prisma } from '@charmverse/core/prisma-client';
+import { realOptimismMainnetBuildersContract } from '@packages/scoutgame/builderNfts/constants';
 import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
 
 export async function processNftMints() {
   const pending = await prisma.pendingNftTransaction.findMany({
     where: {
       status: TransactionStatus.pending,
+      contractAddress: realOptimismMainnetBuildersContract, // based on the season
       createdAt: {
         // Only process transactions that are at least 1 minute old in the case user is already in the app
         lte: new Date(Date.now() - 1000 * 65) // 65 seconds ago
       }
+    },
+    include: {
+      user: true
     }
   });
 
