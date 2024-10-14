@@ -25,7 +25,7 @@ export async function ScoutProfile({ userId, isMobile }: { userId: string; isMob
     getScoutedBuilders({ scoutId: userId })
   ]);
 
-  const nftsPurchasedThisSeason = scoutedBuilders.reduce((acc, builder) => acc + (builder.nftsSold || 0), 0);
+  const nftsPurchasedThisSeason = scoutedBuilders.reduce((acc, builder) => acc + (builder.nftsSoldToScout || 0), 0);
 
   return (
     <Stack gap={1}>
