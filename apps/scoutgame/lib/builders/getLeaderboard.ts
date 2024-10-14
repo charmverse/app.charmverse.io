@@ -31,7 +31,6 @@ export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise
       user: {
         select: {
           id: true,
-          farcasterId: true,
           avatar: true,
           username: true,
           displayName: true,
