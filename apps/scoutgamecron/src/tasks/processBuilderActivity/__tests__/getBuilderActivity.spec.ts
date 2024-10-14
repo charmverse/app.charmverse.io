@@ -1,16 +1,5 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
-import {
-  mockBuilder,
-  mockBuilderNft,
-  mockNFTPurchaseEvent,
-  mockRepo,
-  mockGithubUser,
-  mockScout
-} from '@packages/scoutgame/testing/database';
-import { randomLargeInt } from '@packages/scoutgame/testing/generators';
-import { DateTime } from 'luxon';
-import { v4 } from 'uuid';
+import { mockRepo, mockGithubUser } from '@packages/scoutgame/testing/database';
 
 import { mockCommit, mockPullRequest } from '@/testing/generators';
 
@@ -21,6 +10,7 @@ jest.unstable_mockModule('../github/getCommitsByUser', () => ({
 jest.unstable_mockModule('../github/getPullRequestsByUser', () => ({
   getPullRequestsByUser: jest.fn()
 }));
+
 const { getCommitsByUser } = await import('../github/getCommitsByUser');
 const { getPullRequestsByUser } = await import('../github/getPullRequestsByUser');
 const { getBuilderActivity } = await import('../getBuilderActivity');
@@ -54,7 +44,7 @@ describe('getBuilderActivity', () => {
     (getPullRequestsByUser as jest.Mock<typeof getPullRequestsByUser>).mockResolvedValue([pullRequest]);
 
     const { commits, pullRequests } = await getBuilderActivity({
-      login: 'test_user',
+      login: githubUser.login,
       after: new Date()
     });
     expect(commits.map((data) => data.sha)).toEqual([commit.sha]);
@@ -78,10 +68,33 @@ describe('getBuilderActivity', () => {
     (getPullRequestsByUser as jest.Mock<typeof getPullRequestsByUser>).mockResolvedValue([pullRequest]);
 
     const { commits, pullRequests } = await getBuilderActivity({
-      login: 'test_user',
+      login: githubUser.login,
       after: new Date()
     });
     expect(commits).toHaveLength(0);
     expect(pullRequests).toHaveLength(0);
+  });
+
+  it('should respond with new repos to save from a builder', async () => {
+    const githubUser = await mockGithubUser();
+
+    const commit = mockCommit({
+      githubUser,
+      repo: {
+        id: 666,
+        owner: githubUser.login,
+        name: 'project-x'
+      }
+    });
+
+    (getCommitsByUser as jest.Mock<typeof getCommitsByUser>).mockResolvedValue([commit]);
+    (getPullRequestsByUser as jest.Mock<typeof getPullRequestsByUser>).mockResolvedValue([]);
+
+    const { commits, newOwnerRepos } = await getBuilderActivity({
+      login: githubUser.login,
+      after: new Date()
+    });
+    expect(commits).toHaveLength(1);
+    expect(newOwnerRepos).toHaveLength(1);
   });
 });

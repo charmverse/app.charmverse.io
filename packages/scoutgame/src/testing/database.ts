@@ -200,15 +200,11 @@ export async function mockNFTPurchaseEvent({
   season?: string;
   tokensPurchased?: number;
 }) {
-  let builderNft = await prisma.builderNft.findFirst({
+  const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
       builderId
     }
   });
-
-  if (!builderNft) {
-    builderNft = await mockBuilderNft({ builderId });
-  }
 
   return prisma.builderEvent.create({
     data: {
@@ -254,7 +250,7 @@ export async function mockBuilderNft({
   owners?: (string | { id: string })[];
   season?: string;
 }) {
-  return prisma.builderNft.create({
+  const nft = await prisma.builderNft.create({
     data: {
       builderId,
       chainId,
@@ -275,6 +271,13 @@ export async function mockBuilderNft({
       }
     }
   });
+  for (const owner of owners) {
+    await mockNFTPurchaseEvent({
+      builderId,
+      scoutId: typeof owner === 'string' ? owner : owner.id
+    });
+  }
+  return nft;
 }
 
 export async function mockBuilderStrike({

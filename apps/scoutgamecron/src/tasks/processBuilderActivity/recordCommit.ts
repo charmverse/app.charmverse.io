@@ -2,24 +2,19 @@ import { log } from '@charmverse/core/log';
 import type { ActivityRecipientType, GemsReceiptType, ScoutGameActivityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getBonusPartner } from '@packages/scoutgame/bonus';
-import { getWeekFromDate, getStartOfSeason, isToday, currentSeason } from '@packages/scoutgame/dates';
+import { getWeekFromDate, getStartOfSeason, isToday } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
 import { gemsValues } from './config';
 import type { Commit } from './github/getCommitsByUser';
 
-/**
- *
- * @isFirstMergedPullRequest Only used for the seed data generator
- */
 export async function recordCommit({
   commit,
   season,
   now = DateTime.utc()
 }: {
   commit: Commit;
-  isFirstMergedPullRequest?: boolean;
   season: string;
   now?: DateTime;
 }) {
@@ -122,7 +117,7 @@ export async function recordCommit({
           const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
             where: {
               builderNFT: {
-                season: currentSeason,
+                season,
                 builderId: githubUser.builderId
               }
             },

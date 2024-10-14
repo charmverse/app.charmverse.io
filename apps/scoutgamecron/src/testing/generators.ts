@@ -43,11 +43,11 @@ export function mockPullRequest(
 
 export function mockCommit(
   fields: {
-    createdAt?: Date;
-    completedAt?: Date;
+    createdAt?: string;
+    completedAt?: string;
     message?: string;
     sha?: string;
-    githubUser?: { id: number; login: string };
+    author?: { id: number; login: string };
     repo?: { id: number; owner: string; name: string };
   } = {}
 ): Commit {
@@ -56,7 +56,7 @@ export function mockCommit(
   return {
     sha: fields.sha || Math.random().toString(),
     author:
-      fields.githubUser ??
+      fields.author ??
       ({
         id: randomLargeInt(),
         login: 'testuser'
@@ -65,15 +65,16 @@ export function mockCommit(
       author: {
         name: '',
         email: '',
-        date: (fields.completedAt ?? new Date()).toISOString()
+        date: fields.createdAt ?? new Date().toISOString()
+      },
+      committer: {
+        date: fields.completedAt ?? new Date().toISOString()
       },
       message: 'some commit message'
     } as Commit['commit'],
-    committer: {
-      date: (fields.completedAt ?? new Date()).toISOString()
-    },
     repository: {
       id: fields.repo?.id ?? randomLargeInt(),
+      full_name: `${name}/${owner}`,
       name,
       owner: {
         login: owner
