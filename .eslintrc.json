@@ -29,25 +29,25 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "react", "react-hooks"],
+  "plugins": ["@typescript-eslint", "@stylistic/ts", "react", "react-hooks"],
   "rules": {
     "react/jsx-key": "error",
     "react/forbid-prop-types": 0,
     "@next/next/no-img-element": "off",
     "@typescript-eslint/array-type": "error",
-    "@typescript-eslint/ban-ts-comment": "off",
+    "@stylistic/ts/ban-ts-comment": "off",
     "@typescript-eslint/consistent-type-imports": [
       "error",
       {
         "prefer": "type-imports"
       }
     ],
-    "@typescript-eslint/no-empty-function": "off",
+    "@stylistic/ts/no-empty-function": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-inferrable-types": "off",
-    "@typescript-eslint/no-empty-interface": "off",
+    "@stylistic/ts/no-inferrable-types": "off",
+    "@stylistic/ts/no-empty-interface": "off",
     "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/member-delimiter-style": [
+    "@stylistic/ts/member-delimiter-style": [
       "error",
       {
         "multiline": {
@@ -61,7 +61,7 @@
         "multilineDetection": "brackets"
       }
     ],
-    "@typescript-eslint/object-curly-spacing": ["error", "always"],
+    "@stylistic/ts/object-curly-spacing": ["error", "always"],
     "object-curly-spacing": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
@@ -78,6 +78,7 @@
         "devDependencies": true,
         "packageDir": [
           "./",
+          "../..",
           "./@connect-shared",
           "./apps/cron/",
           "./apps/farcaster/",
