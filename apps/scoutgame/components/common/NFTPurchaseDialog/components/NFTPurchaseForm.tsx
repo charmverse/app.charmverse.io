@@ -304,8 +304,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const displayedBalance = !balanceInfo
     ? undefined
     : selectedPaymentOption.currency === 'ETH'
-    ? (Number(balanceInfo.balance || 0) / 1e18).toFixed(4)
-    : (Number(balanceInfo.balance || 0) / 1e6).toFixed(2);
+      ? (Number(balanceInfo.balance || 0) / 1e18).toFixed(4)
+      : (Number(balanceInfo.balance || 0) / 1e6).toFixed(2);
 
   const [selectedQuantity, setSelectedQuantity] = useState<number | 'custom'>(1);
   const [customQuantity, setCustomQuantity] = useState(2);
@@ -325,7 +325,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
 
-  if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
+  if (true || hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
     return <SuccessView builder={builder} />;
   }
 
