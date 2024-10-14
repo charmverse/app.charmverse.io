@@ -115,7 +115,7 @@ export function mapActivityToRow(notification: ScoutGameNotification) {
       const button = (
         <Button size='medium' variant='outlined' disabled={!notification.claimable} color='secondary' sx={{ my: 1 }}>
           <Typography variant='caption' color={notification.claimable ? 'secondary' : ''}>
-            {notification.claimable ? `Claim now` : `Claimed`}
+            {notification.claimable ? `Claim` : `Claimed`}
           </Typography>
         </Button>
       );

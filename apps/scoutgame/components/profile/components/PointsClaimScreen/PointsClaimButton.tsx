@@ -37,7 +37,7 @@ export function PointsClaimButton() {
         disabled={isExecuting}
         onClick={handleClaim}
       >
-        Claim now
+        Claim
       </Button>
       <Dialog open={showModal} onClose={handleCloseModal}>
         <Stack gap={2} textAlign='center' my={2}>
