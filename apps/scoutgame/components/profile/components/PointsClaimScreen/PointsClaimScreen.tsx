@@ -73,8 +73,8 @@ export async function PointsClaimScreen({ userId, username }: { userId: string; 
                 src='/images/profile/scout-game-icon.svg'
                 alt='Scouts'
               />{' '}
-              +
-              <BonusPartnersDisplay bonusPartners={['charmverse']} size={35} />
+              {bonusPartners.length > 0 ? '+ ' : ''}
+              <BonusPartnersDisplay bonusPartners={bonusPartners} size={35} />
             </Stack>
           </Stack>
           <PointsClaimButton />
