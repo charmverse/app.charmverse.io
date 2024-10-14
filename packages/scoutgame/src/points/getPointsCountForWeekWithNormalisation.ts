@@ -34,5 +34,3 @@ export async function getPointsCountForWeekWithNormalisation({ week }: { week: s
     }))
   };
 }
-
-// getPointsCountForWeekWithNormalisation({ week: '2024-W41' }).then(console.log);
