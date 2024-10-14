@@ -1,6 +1,21 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-export async function getBuildersLeaderboard({ quantity, week }: { quantity?: number; week: string }) {
+export type LeaderboardBuilder = {
+  builder: {
+    id: string;
+    username: string;
+  };
+  gemsCollected: number;
+  rank: number;
+};
+
+export async function getBuildersLeaderboard({
+  quantity,
+  week
+}: {
+  quantity?: number;
+  week: string;
+}): Promise<LeaderboardBuilder[]> {
   const userWeeklyStats = await prisma.userWeeklyStats.findMany({
     where: {
       week,
