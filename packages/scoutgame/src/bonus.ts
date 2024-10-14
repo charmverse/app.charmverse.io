@@ -20,9 +20,9 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
       'Glo-Foundation/glo-wallet',
       'Ubeswap/ubeswap-interface-v3',
       'gitcoinco/grants-stack',
-      'GoodDollar',
-      'Ubeswap',
-      'hypercerts-org'
+      'GoodDollar/GoodWeb3-Mono',
+      'GoodDollar/GoodCollective',
+      'Ubeswap/ubeswap-interface-v3'
     ],
     icon: 'https://cryptologos.cc/logos/celo-celo-logo.png'
   }

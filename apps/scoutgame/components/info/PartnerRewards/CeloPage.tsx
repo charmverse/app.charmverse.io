@@ -107,17 +107,17 @@ function Document() {
           </a>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/GoodDollar' target='_blank' rel='noreferrer'>
-            https://github.com/GoodDollar
+          <a href='https://github.com/GoodDollar/GoodWeb3-Mono' target='_blank' rel='noreferrer'>
+            https://github.com/GoodDollar/GoodWeb3-Mono
           </a>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/orgs/hypercerts-org' target='_blank' rel='noreferrer'>
-            https://github.com/orgs/hypercerts-org
+          <a href='https://github.com/GoodDollar/GoodCollective' target='_blank' rel='noreferrer'>
+            https://github.com/GoodDollar/GoodCollective
           </a>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/Glo-Foundation/glo-wallet/issues' target='_blank' rel='noreferrer'>
+          <a href='https://github.com/Glo-Foundation/glo-wallet' target='_blank' rel='noreferrer'>
             https://github.com/Glo-Foundation/glo-wallet/issues
           </a>
         </ListItem>
