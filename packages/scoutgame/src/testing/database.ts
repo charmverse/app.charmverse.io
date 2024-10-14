@@ -119,7 +119,7 @@ export async function mockBuilderEvent({ builderId, eventType }: { builderId: st
   });
 }
 
-export async function mockGithubUser({ builderId }: { builderId?: string }) {
+export async function mockGithubUser({ builderId }: { builderId?: string } = {}) {
   const id = randomLargeInt();
 
   const name = `github_user:${id}`;

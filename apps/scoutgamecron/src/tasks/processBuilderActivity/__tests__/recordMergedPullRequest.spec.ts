@@ -15,12 +15,12 @@ import { mockPullRequest } from '@/testing/generators';
 
 const currentSeason = '2024-W40';
 
-jest.unstable_mockModule('../getRecentPullRequestsByUser', () => ({
+jest.unstable_mockModule('../github/getRecentPullRequestsByUser', () => ({
   getRecentPullRequestsByUser: jest.fn()
 }));
 
 const { recordMergedPullRequest } = await import('../recordMergedPullRequest');
-const { getRecentPullRequestsByUser } = await import('../getRecentPullRequestsByUser');
+const { getRecentPullRequestsByUser } = await import('../github/getRecentPullRequestsByUser');
 
 describe('recordMergedPullRequest', () => {
   beforeEach(() => {

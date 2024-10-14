@@ -7,7 +7,7 @@ import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
 import { gemsValues } from './config';
-import type { Commit } from './getBuilderActivity';
+import type { Commit } from './github/getCommitsByUser';
 
 /**
  *

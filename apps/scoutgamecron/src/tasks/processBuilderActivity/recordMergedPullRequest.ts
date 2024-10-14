@@ -12,8 +12,8 @@ import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
 import { gemsValues } from './config';
-import type { PullRequest } from './getBuilderActivity';
-import { getRecentPullRequestsByUser } from './getRecentPullRequestsByUser';
+import type { PullRequest } from './github/getPullRequestsByUser';
+import { getRecentPullRequestsByUser } from './github/getRecentPullRequestsByUser';
 
 type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
 
