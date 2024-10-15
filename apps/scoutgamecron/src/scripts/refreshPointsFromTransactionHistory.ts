@@ -5,7 +5,7 @@ import { prettyPrint } from "@packages/utils/strings";
 
 
 
-async function fixPoints() {
+async function refreshPointsFromTransactionHistory() {
   const scouts = await prisma.scout.findMany({
     select: { id: true, username: true },
     orderBy: {

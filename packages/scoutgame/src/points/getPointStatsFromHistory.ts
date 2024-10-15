@@ -5,10 +5,6 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { validate as isUuid } from 'uuid';
 
-import { currentSeason } from '../dates';
-
-import { setPointsEarnedStats } from './updatePointsEarned';
-
 export type PointStats = {
   userId: string;
   pointsReceivedAsScout: number;

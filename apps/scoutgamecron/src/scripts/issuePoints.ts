@@ -52,5 +52,3 @@ async function issuePoints({points}: {points: number}) {
     }, {timeout: 15000});
   }
 }
-
-issuePoints({points: 50});
