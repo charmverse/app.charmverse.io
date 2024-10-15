@@ -6,7 +6,7 @@ import type { NFTData } from '@root/lib/blockchain/getNFTs';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { lowerCaseEqual } from '@root/lib/utils/strings';
 import { RateLimit } from 'async-sema';
-import { zkSync, zkSyncTestnet } from 'viem/chains';
+import { zkSync, zksyncSepoliaTestnet } from 'viem/chains';
 import { Provider } from 'zksync-web3';
 
 import { supportedNetworks, type SupportedChainId } from './config';
@@ -68,7 +68,7 @@ class ZkSyncApiClient {
 
     const resultSource = result.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
-    const data = result ? await GET<IpfsNft>(resultSource).catch(() => ({} as IpfsNft)) : ({} as IpfsNft);
+    const data = result ? await GET<IpfsNft>(resultSource).catch(() => ({}) as IpfsNft) : ({} as IpfsNft);
 
     return mapNFTData(
       {
@@ -119,7 +119,7 @@ class ZkSyncApiClient {
   }
 }
 const zkMainnetClient = new ZkSyncApiClient({ chainId: zkSync.id });
-const zkTestnetClient = new ZkSyncApiClient({ chainId: zkSyncTestnet.id });
+const zkTestnetClient = new ZkSyncApiClient({ chainId: zksyncSepoliaTestnet.id });
 
 export function getClient({ chainId }: { chainId: SupportedChainId }) {
   if (!supportedNetworks.includes(chainId)) {

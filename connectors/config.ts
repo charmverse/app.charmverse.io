@@ -39,7 +39,7 @@ export const wagmiConfig = createConfig({
 });
 
 // get wagmi config based on env - TODO: do we need a method? or just override the wagmiConfig export?
-export const getWagmiConfig = () => {
+export const getWagmiConfig = (): typeof wagmiConfig => {
   return wagmiConfig;
   if (!isTestEnv) {
     return wagmiConfig;
