@@ -33,7 +33,8 @@ describe('sendPoints', () => {
     await sendPoints({
       builderId: builder.id,
       points: mockPoints,
-      earnedAsBuilder: true
+      earnedAsBuilder: true,
+      description: 'Test description'
     });
     const updated = await prisma.scout.findUnique({
       where: {
@@ -42,11 +43,13 @@ describe('sendPoints', () => {
       select: {
         currentBalance: true,
         userSeasonStats: true,
-        activities: true
+        activities: true,
+        events: true
       }
     });
     expect(updated?.currentBalance).toBe(mockPoints);
     expect(updated?.userSeasonStats[0].pointsEarnedAsBuilder).toBe(mockPoints);
     expect(updated?.activities[0].type).toBe('points');
+    expect(updated?.events[0].description).toBe('Test description');
   });
 });
