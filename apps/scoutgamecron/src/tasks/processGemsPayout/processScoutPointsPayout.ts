@@ -96,6 +96,7 @@ export async function processScoutPointsPayout({
             data: {
               value: scoutPoints,
               recipientId: scoutId,
+
               eventId: builderEventId,
               activities: {
                 create: {
