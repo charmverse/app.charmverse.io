@@ -3,7 +3,11 @@ import { uploadArtworkCongrats } from '../builderNfts/artwork/uploadArtwork';
 import { currentSeason } from '../dates';
 
 export async function refreshCongratsImages() {
-  const builderNfts = await prisma.builderNft.findMany({});
+  const builderNfts = await prisma.builderNft.findMany({
+    where: {
+      season: currentSeason
+    }
+  });
 
   for (const builderNft of builderNfts) {
     if (!builderNft?.tokenId) {
@@ -25,7 +29,12 @@ export async function refreshCongratsImages() {
       }
     });
 
-    console.log('Builder congrats metadata image was created with the link:' + updatedBuilderNft?.congratsImageUrl);
+    console.log(
+      'Builder congrats metadata image was created with the link:' +
+        updatedBuilderNft?.congratsImageUrl +
+        ' for ' +
+        builderNft?.id
+    );
   }
 }
 
