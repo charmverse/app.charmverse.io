@@ -1,10 +1,8 @@
-import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ISOWeek } from '@packages/scoutgame/dates';
-import { currentSeason, getCurrentWeek, getLastWeek } from '@packages/scoutgame/dates';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
-import { refreshPointStatsFromHistory } from './refreshPointStatsFromHistory';
 import { incrementPointsEarnedStats } from './updatePointsEarned';
 
 export async function sendPoints({
@@ -12,9 +10,9 @@ export async function sendPoints({
   season = currentSeason,
   week = getCurrentWeek(),
   points,
-  description = 'Bonus points',
+  description,
   earnedAsBuilder = false,
-  claimed = true,
+  claimed,
   hideFromNotifications = false,
   tx
 }: {
@@ -22,8 +20,8 @@ export async function sendPoints({
   points: number;
   season?: ISOWeek;
   week?: ISOWeek;
-  description?: string;
-  claimed?: boolean;
+  description: string;
+  claimed: boolean;
   earnedAsBuilder?: boolean;
   hideFromNotifications?: boolean;
   tx?: Prisma.TransactionClient;
@@ -77,36 +75,5 @@ export async function sendPoints({
     return txHandler(tx);
   } else {
     return prisma.$transaction(txHandler);
-  }
-}
-
-const fids: number[] = [
-  // Enter FIDs here
-];
-
-async function issuePoints() {
-  for (const fid of fids) {
-    log.info(`Issuing points to fid: ${fid}`);
-
-    const scout = await prisma.scout.findFirstOrThrow({
-      where: {
-        farcasterId: fid
-      }
-    });
-
-    await prisma.$transaction(async (tx) => {
-      await sendPoints({
-        builderId: fid.toString(),
-        points: 60,
-        earnedAsBuilder: false,
-        claimed: true,
-        description: `Received points for participating in Scout Game Waitlist launch`,
-        hideFromNotifications: true,
-        season: currentSeason,
-        week: getLastWeek()
-      });
-
-      await refreshPointStatsFromHistory({ userIdOrUsername: scout.id });
-    });
   }
 }
