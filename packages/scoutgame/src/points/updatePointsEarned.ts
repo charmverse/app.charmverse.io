@@ -10,7 +10,7 @@ export async function incrementPointsEarnedStats({
   userId,
   builderPoints = 0,
   scoutPoints = 0,
-  tx = prisma
+  tx
 }: {
   season: string;
   userId: string;
@@ -18,54 +18,62 @@ export async function incrementPointsEarnedStats({
   scoutPoints?: number;
   tx?: PrismaTransactionClient;
 }) {
-  await tx.userSeasonStats.upsert({
-    where: {
-      userId_season: {
-        userId,
-        season
-      }
-    },
-    create: {
-      pointsEarnedAsBuilder: builderPoints,
-      pointsEarnedAsScout: scoutPoints,
-      season,
-      user: {
-        connect: {
-          id: userId
+  async function txHandler(_tx: PrismaTransactionClient) {
+    await _tx.userSeasonStats.upsert({
+      where: {
+        userId_season: {
+          userId,
+          season
+        }
+      },
+      create: {
+        pointsEarnedAsBuilder: builderPoints,
+        pointsEarnedAsScout: scoutPoints,
+        season,
+        user: {
+          connect: {
+            id: userId
+          }
+        }
+      },
+      update: {
+        pointsEarnedAsBuilder: {
+          increment: builderPoints
+        },
+        pointsEarnedAsScout: {
+          increment: scoutPoints
         }
       }
-    },
-    update: {
-      pointsEarnedAsBuilder: {
-        increment: builderPoints
+    });
+    await _tx.userAllTimeStats.upsert({
+      where: {
+        userId
       },
-      pointsEarnedAsScout: {
-        increment: scoutPoints
-      }
-    }
-  });
-  await tx.userAllTimeStats.upsert({
-    where: {
-      userId
-    },
-    create: {
-      pointsEarnedAsBuilder: builderPoints,
-      pointsEarnedAsScout: scoutPoints,
-      user: {
-        connect: {
-          id: userId
+      create: {
+        pointsEarnedAsBuilder: builderPoints,
+        pointsEarnedAsScout: scoutPoints,
+        user: {
+          connect: {
+            id: userId
+          }
+        }
+      },
+      update: {
+        pointsEarnedAsBuilder: {
+          increment: builderPoints
+        },
+        pointsEarnedAsScout: {
+          increment: scoutPoints
         }
       }
-    },
-    update: {
-      pointsEarnedAsBuilder: {
-        increment: builderPoints
-      },
-      pointsEarnedAsScout: {
-        increment: scoutPoints
-      }
-    }
-  });
+    });
+  }
+
+  if (tx) {
+    return txHandler(tx);
+  } else {
+    return prisma.$transaction(txHandler);
+  }
 }
 
 export async function setPointsEarnedStats({
@@ -73,7 +81,7 @@ export async function setPointsEarnedStats({
   userId,
   builderPoints,
   scoutPoints,
-  tx = prisma
+  tx
 }: {
   season: string;
   userId: string;
