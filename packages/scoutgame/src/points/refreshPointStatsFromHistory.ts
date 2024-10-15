@@ -9,7 +9,7 @@ import { validate as isUuid } from 'uuid';
 
 import { currentSeason } from '../dates';
 
-import { setPointsEarned } from './updatePointsEarned';
+import { setPointsEarnedStats } from './updatePointsEarned';
 
 export type PointStats = {
   userId: string;
@@ -26,10 +26,12 @@ const include: Prisma.PointsReceiptInclude = {
 
 export async function getPointStatsFromHistory({
   userIdOrUsername,
-  season = currentSeason
+  season = currentSeason,
+  tx = prisma
 }: {
   userIdOrUsername: string;
   season?: string;
+  tx?: Prisma.TransactionClient;
 }): Promise<PointStats> {
   if (!userIdOrUsername) {
     throw new InvalidInputError('userIdOrUsername is required');
@@ -37,7 +39,7 @@ export async function getPointStatsFromHistory({
 
   const userId = isUuid(userIdOrUsername)
     ? userIdOrUsername
-    : await prisma.scout
+    : await tx.scout
         .findUniqueOrThrow({
           where: {
             username: userIdOrUsername
@@ -48,7 +50,7 @@ export async function getPointStatsFromHistory({
   const [pointsSpentRecords, pointsReceivedAsBuilderRecords, pointsReceivedAsScoutRecords, allPointsReceivedRecords] =
     await Promise.all([
       // Points spent
-      prisma.pointsReceipt.findMany({
+      tx.pointsReceipt.findMany({
         where: {
           senderId: userId,
           event: {
@@ -57,7 +59,7 @@ export async function getPointStatsFromHistory({
         }
       }),
       // Points received as builder
-      prisma.pointsReceipt.findMany({
+      tx.pointsReceipt.findMany({
         where: {
           recipientId: userId,
           OR: [
@@ -97,7 +99,7 @@ export async function getPointStatsFromHistory({
         include
       }),
       // Points received as scout
-      prisma.pointsReceipt.findMany({
+      tx.pointsReceipt.findMany({
         where: {
           recipientId: userId,
           OR: [
@@ -139,7 +141,7 @@ export async function getPointStatsFromHistory({
         include
       }),
       // All points received
-      prisma.pointsReceipt.findMany({
+      tx.pointsReceipt.findMany({
         where: {
           recipientId: userId
         },
@@ -175,30 +177,41 @@ export async function getPointStatsFromHistory({
 
 export async function refreshPointStatsFromHistory({
   userIdOrUsername,
-  season = currentSeason
+  season = currentSeason,
+  tx
 }: {
   userIdOrUsername: string;
   season?: string;
-}) {
-  const stats = await getPointStatsFromHistory({ userIdOrUsername, season });
+  tx?: Prisma.TransactionClient;
+}): Promise<PointStats> {
+  async function txHandler(_tx: Prisma.TransactionClient) {
+    const stats = await getPointStatsFromHistory({ userIdOrUsername, season, tx });
 
-  await setPointsEarned({
-    season,
-    builderPoints: stats.pointsReceivedAsBuilder,
-    scoutPoints: stats.pointsReceivedAsScout,
-    userId: stats.userId
-  });
+    await setPointsEarnedStats({
+      season,
+      builderPoints: stats.pointsReceivedAsBuilder,
+      scoutPoints: stats.pointsReceivedAsScout,
+      userId: stats.userId,
+      tx: _tx
+    });
 
-  await prisma.scout.update({
-    where: {
-      id: stats.userId
-    },
-    data: {
-      currentBalance: stats.balance
-    }
-  });
+    await _tx.scout.update({
+      where: {
+        id: stats.userId
+      },
+      data: {
+        currentBalance: stats.balance
+      }
+    });
 
-  return stats;
+    return stats;
+  }
+
+  if (tx) {
+    return txHandler(tx);
+  } else {
+    return prisma.$transaction(txHandler);
+  }
 }
 
 async function fixPoints() {

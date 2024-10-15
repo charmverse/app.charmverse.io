@@ -1,11 +1,11 @@
-import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
+import type { PrismaTransactionClient, UserAllTimeStats, UserSeasonStats } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 /**
  * Increments points by specific amount
- * @info Use setPointsEarned to set points to a specific value
+ * @info Use setPointsEarnedStats to set points to a specific value
  * */
-export async function incrementPointsEarned({
+export async function incrementPointsEarnedStats({
   season,
   userId,
   builderPoints = 0,
@@ -68,7 +68,7 @@ export async function incrementPointsEarned({
   });
 }
 
-export async function setPointsEarned({
+export async function setPointsEarnedStats({
   season,
   userId,
   builderPoints,
@@ -80,45 +80,58 @@ export async function setPointsEarned({
   builderPoints: number;
   scoutPoints: number;
   tx?: PrismaTransactionClient;
-}) {
-  await tx.userSeasonStats.upsert({
-    where: {
-      userId_season: {
-        userId,
-        season
-      }
-    },
-    create: {
-      pointsEarnedAsBuilder: builderPoints,
-      pointsEarnedAsScout: scoutPoints,
-      season,
-      user: {
-        connect: {
-          id: userId
+}): Promise<{ seasonStats: UserSeasonStats; allTimeStats: UserAllTimeStats }> {
+  async function txHandler(_tx: PrismaTransactionClient) {
+    const seasonStats = await _tx.userSeasonStats.upsert({
+      where: {
+        userId_season: {
+          userId,
+          season
         }
-      }
-    },
-    update: {
-      pointsEarnedAsBuilder: builderPoints,
-      pointsEarnedAsScout: scoutPoints
-    }
-  });
-  await tx.userAllTimeStats.upsert({
-    where: {
-      userId
-    },
-    create: {
-      pointsEarnedAsBuilder: builderPoints,
-      pointsEarnedAsScout: scoutPoints,
-      user: {
-        connect: {
-          id: userId
+      },
+      create: {
+        pointsEarnedAsBuilder: builderPoints,
+        pointsEarnedAsScout: scoutPoints,
+        season,
+        user: {
+          connect: {
+            id: userId
+          }
         }
+      },
+      update: {
+        pointsEarnedAsBuilder: builderPoints,
+        pointsEarnedAsScout: scoutPoints
       }
-    },
-    update: {
-      pointsEarnedAsBuilder: builderPoints,
-      pointsEarnedAsScout: scoutPoints
-    }
-  });
+    });
+    const allTimeStats = await _tx.userAllTimeStats.upsert({
+      where: {
+        userId
+      },
+      create: {
+        pointsEarnedAsBuilder: builderPoints,
+        pointsEarnedAsScout: scoutPoints,
+        user: {
+          connect: {
+            id: userId
+          }
+        }
+      },
+      update: {
+        pointsEarnedAsBuilder: builderPoints,
+        pointsEarnedAsScout: scoutPoints
+      }
+    });
+
+    return {
+      seasonStats,
+      allTimeStats
+    };
+  }
+
+  if (tx) {
+    return txHandler(tx);
+  } else {
+    return prisma.$transaction(txHandler);
+  }
 }
