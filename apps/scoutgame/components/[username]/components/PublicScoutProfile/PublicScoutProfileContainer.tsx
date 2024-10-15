@@ -58,23 +58,12 @@ export function PublicScoutProfileContainer({
         }}
         elevation={0}
       >
-        <Stack width='100%'>
-          <Stack
-            width='fit-content'
-            margin='0 auto'
-            minWidth={{
-              xs: '100%',
-              md: 500
-            }}
-          >
-            <PublicScoutProfileStats
-              allTimePoints={allTimePoints}
-              seasonPoints={seasonPoints}
-              buildersScouted={scoutedBuilders.length}
-              nftsPurchased={nftsPurchased}
-            />
-          </Stack>
-        </Stack>
+        <PublicScoutProfileStats
+          allTimePoints={allTimePoints}
+          seasonPoints={seasonPoints}
+          buildersScouted={scoutedBuilders.length}
+          nftsPurchased={nftsPurchased}
+        />
         <Typography variant='h6' my={2} color='secondary' fontWeight='500' textAlign='center'>
           Scouted Builders
         </Typography>
