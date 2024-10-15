@@ -16,7 +16,7 @@ function getClientByChain(chainId: number) {
 }
 
 // retrieve the delegations attributed to a given address
-export function getIncomingDelegations(chainId: number, address: `0x${string}`) {
+export async function getIncomingDelegations(chainId: number, address: `0x${string}`) {
   const client = getClientByChain(chainId);
   return client.getIncomingDelegations(address);
 }

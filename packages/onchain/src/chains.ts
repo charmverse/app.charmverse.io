@@ -27,7 +27,7 @@ import {
   zora,
   taikoHekla,
   taiko,
-  zkSyncTestnet
+  zksyncSepoliaTestnet
 } from 'viem/chains';
 
 export interface IChainDetails {
@@ -508,14 +508,14 @@ export const RPC: Record<string, IChainDetails> = {
   },
   ZKSYNC_DEV: {
     ...EVM_DEFAULT,
-    chainId: zkSyncTestnet.id,
-    viem: zkSyncTestnet,
-    chainName: zkSyncTestnet.name,
-    rpcUrls: zkSyncTestnet.rpcUrls.default.http,
-    blockExplorerUrls: [zkSyncTestnet.blockExplorers.default.url],
+    chainId: zksyncSepoliaTestnet.id,
+    viem: zksyncSepoliaTestnet,
+    chainName: zksyncSepoliaTestnet.name,
+    rpcUrls: zksyncSepoliaTestnet.rpcUrls.default.http,
+    blockExplorerUrls: [zksyncSepoliaTestnet.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     testnet: true,
-    shortName: zkSyncTestnet.name
+    shortName: zksyncSepoliaTestnet.name
   }
 } as const;
 

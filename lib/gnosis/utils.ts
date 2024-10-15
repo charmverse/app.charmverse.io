@@ -1,13 +1,22 @@
 import { getChainShortname } from '@root/connectors/chains';
 
 export function getGnosisTransactionQueueUrl(address: string, chainId: number) {
-  return `https://app.safe.global/${getChainShortname(chainId)}:${address}/transactions/queue`;
+  // Safe still has 'matic' in their urls instead of pol
+  const shortName = chainId === 137 ? 'matic' : getChainShortname(chainId);
+
+  return `https://app.safe.global/${shortName}:${address}/transactions/queue`;
 }
 
 export function getGnosisTransactionUrl(address: string, chainId: number, safeTxHash: string) {
-  return `https://app.safe.global/transactions/tx?safe=${getChainShortname(chainId)}:${address}&id=${safeTxHash}`;
+  // Safe still has 'matic' in their urls instead of pol
+  const shortName = chainId === 137 ? 'matic' : getChainShortname(chainId);
+
+  return `https://app.safe.global/transactions/tx?safe=${shortName}:${address}&id=${safeTxHash}`;
 }
 
 export function getGnosisSafeUrl(address: string, chainId: number) {
-  return `https://app.safe.global/${getChainShortname(chainId)}:${address}`;
+  // Safe still has 'matic' in their urls instead of pol
+  const shortName = chainId === 137 ? 'matic' : getChainShortname(chainId);
+
+  return `https://app.safe.global/${shortName}:${address}`;
 }

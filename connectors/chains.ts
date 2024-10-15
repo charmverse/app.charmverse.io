@@ -21,14 +21,14 @@ import {
   optimismSepolia,
   polygon,
   polygonZkEvm,
-  polygonMumbai,
   polygonAmoy,
   sepolia,
   zkSync,
   zora,
   taikoHekla,
   taiko,
-  zkSyncTestnet
+  zksyncSepoliaTestnet,
+  cyber
 } from 'viem/chains';
 
 export interface IChainDetails {
@@ -202,25 +202,24 @@ export const RPC: Record<string, IChainDetails> = {
     rpcUrls: zora.rpcUrls.default.http,
     blockExplorerUrls: [zora.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/zora-logo.svg',
-    shortName: 'zora'
+    shortName: 'zora',
+    hypersubNetwork: true
   },
   POLYGON: {
     chainId: polygon.id,
     viem: polygon,
-    chainName: 'Polygon',
+    chainName: polygon.name,
     nativeCurrency: {
-      name: 'Polygon',
-      symbol: 'MATIC',
-      decimals: 18,
+      ...polygon.nativeCurrency,
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/4713/standard/polygon.png?1698233745'
     },
     alchemyUrl: 'https://polygon-mainnet.g.alchemy.com',
-    rpcUrls: ['https://polygon-rpc.com'],
-    blockExplorerUrls: ['https://polygonscan.com'],
+    rpcUrls: polygon.rpcUrls.default.http,
+    blockExplorerUrls: [polygon.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
-    shortName: 'matic',
+    shortName: 'pol',
     unlockNetwork: true
   },
   POLYGON_ZKEVM: {
@@ -228,9 +227,7 @@ export const RPC: Record<string, IChainDetails> = {
     viem: polygonZkEvm,
     chainName: polygonZkEvm.name,
     nativeCurrency: {
-      name: polygonZkEvm.nativeCurrency.name,
-      symbol: polygonZkEvm.nativeCurrency.symbol,
-      decimals: polygonZkEvm.nativeCurrency.decimals,
+      ...polygonZkEvm.nativeCurrency,
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/asset_platforms/images/122/small/polygonzkevm.jpg'
     },
@@ -241,42 +238,21 @@ export const RPC: Record<string, IChainDetails> = {
     shortName: 'polygon-zkevm',
     unlockNetwork: true
   },
-  MUMBAI: {
-    chainId: polygonMumbai.id,
-    viem: polygonMumbai,
-    chainName: 'Polygon - Mumbai',
-    nativeCurrency: {
-      name: 'Polygon',
-      symbol: 'MATIC',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
-    },
-    alchemyUrl: 'https://polygon-mumbai.g.alchemy.com',
-    rpcUrls: ['https://rpc-mumbai.maticvigil.com', 'https://polygon-mumbai-bor.publicnode.com'],
-    blockExplorerUrls: ['https://mumbai.polygonscan.com'],
-    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
-    testnet: true,
-    shortName: 'maticmum',
-    unlockNetwork: true
-  },
   AMOY: {
     chainId: polygonAmoy.id,
     viem: polygonAmoy,
     chainName: 'Polygon - Amoy',
     nativeCurrency: {
-      name: 'Polygon',
-      symbol: 'MATIC',
-      decimals: 18,
+      ...polygonAmoy.nativeCurrency,
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
     alchemyUrl: 'https://polygon-amoy.g.alchemy.com',
     rpcUrls: polygonAmoy.rpcUrls.default.http,
-    blockExplorerUrls: ['https://amoy.polygonscan.com/'],
+    blockExplorerUrls: [polygonAmoy.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     testnet: true,
-    shortName: 'maticamoy'
+    shortName: 'polamoy'
   },
   ARBITRUM: {
     ...EVM_DEFAULT,
@@ -504,29 +480,39 @@ export const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: [zkSync.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-zksync.safe.global',
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
-    shortName: zkSync.name,
+    shortName: zkSync.network,
     unlockNetwork: true
   },
   ZKSYNC_DEV: {
     ...EVM_DEFAULT,
-    chainId: zkSyncTestnet.id,
-    viem: zkSyncTestnet,
-    chainName: zkSyncTestnet.name,
-    rpcUrls: zkSyncTestnet.rpcUrls.default.http,
-    blockExplorerUrls: [zkSyncTestnet.blockExplorers.default.url],
+    chainId: zksyncSepoliaTestnet.id,
+    viem: zksyncSepoliaTestnet,
+    chainName: zksyncSepoliaTestnet.name,
+    rpcUrls: zksyncSepoliaTestnet.rpcUrls.default.http,
+    blockExplorerUrls: [zksyncSepoliaTestnet.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     testnet: true,
-    shortName: zkSyncTestnet.name
+    shortName: zksyncSepoliaTestnet.network
+  },
+  CYBER: {
+    ...EVM_DEFAULT,
+    chainId: cyber.id,
+    viem: cyber,
+    chainName: cyber.name,
+    rpcUrls: cyber.rpcUrls.default.http,
+    blockExplorerUrls: [cyber.blockExplorers.default.url],
+    iconUrl: '/images/cryptoLogos/cyber.png',
+    shortName: cyber.name.toLowerCase()
   }
 } as const;
 
-export const daoChains: IChainDetails['shortName'][] = ['eth', 'arb1', 'oeth', 'matic', 'gno'];
+export const daoChains: IChainDetails['shortName'][] = ['eth', 'arb1', 'oeth', 'pol', 'gno'];
 
 export const hatsProtocolChains: IChainDetails['shortName'][] = [
   'eth',
   'arb1',
   'oeth',
-  'matic',
+  'pol',
   'gno',
   'sep',
   'celo',
