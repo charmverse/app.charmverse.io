@@ -28,7 +28,8 @@ import {
   zora,
   taikoHekla,
   taiko,
-  zkSyncTestnet
+  zkSyncSepoliaTestnet,
+  cyber
 } from 'viem/chains';
 
 export interface IChainDetails {
@@ -504,19 +505,29 @@ export const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: [zkSync.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-zksync.safe.global',
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
-    shortName: zkSync.name,
+    shortName: zkSync.network,
     unlockNetwork: true
   },
   ZKSYNC_DEV: {
     ...EVM_DEFAULT,
-    chainId: zkSyncTestnet.id,
-    viem: zkSyncTestnet,
-    chainName: zkSyncTestnet.name,
-    rpcUrls: zkSyncTestnet.rpcUrls.default.http,
-    blockExplorerUrls: [zkSyncTestnet.blockExplorers.default.url],
+    chainId: zkSyncSepoliaTestnet.id,
+    viem: zkSyncSepoliaTestnet,
+    chainName: zkSyncSepoliaTestnet.name,
+    rpcUrls: zkSyncSepoliaTestnet.rpcUrls.default.http,
+    blockExplorerUrls: [zkSyncSepoliaTestnet.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     testnet: true,
-    shortName: zkSyncTestnet.name
+    shortName: zkSyncSepoliaTestnet.network
+  },
+  CYBER: {
+    ...EVM_DEFAULT,
+    chainId: cyber.id,
+    viem: cyber,
+    chainName: cyber.name,
+    rpcUrls: cyber.rpcUrls.default.http,
+    blockExplorerUrls: [cyber.blockExplorers.default.url],
+    iconUrl: '/images/cryptoLogos/cyber.png',
+    shortName: cyber.name.toLowerCase()
   }
 } as const;
 
