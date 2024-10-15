@@ -96,7 +96,10 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   }
 
   const errorMessage =
-    (connectionError && connectionError.message) ||
+    (connectionError &&
+      (connectionError.errCode === 'unavailable'
+        ? 'Could not connect to network. Please try again'
+        : connectionError.message)) ||
     (hasErrored &&
       (result?.serverError?.message?.includes('private beta')
         ? 'Scout Game is in private beta'
