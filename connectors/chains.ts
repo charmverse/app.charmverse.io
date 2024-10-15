@@ -219,7 +219,7 @@ export const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: [polygon.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
-    shortName: 'matic',
+    shortName: 'pol',
     unlockNetwork: true
   },
   POLYGON_ZKEVM: {
