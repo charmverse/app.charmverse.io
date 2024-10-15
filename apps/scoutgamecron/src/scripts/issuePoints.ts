@@ -4,9 +4,7 @@ import { currentSeason, getLastWeek } from "@packages/scoutgame/dates";
 import {sendPoints} from '@packages/scoutgame/points/sendPoints'
 import {refreshPointStatsFromHistory} from '@packages/scoutgame/points/refreshPointStatsFromHistory'
 
-const fids: number[] = [
-  // Enter FIDs here
-];
+const fids: number[] = [];
 
 const description = `Friends of Scout Game`;
 
@@ -40,7 +38,7 @@ async function issuePoints({points}: {points: number}) {
     await prisma.$transaction(async (tx) => {
 
       await sendPoints({
-        builderId: fid.toString(),
+        builderId: scout.id,
         points,
         claimed: true,
         description: `Friends of Scout Game`,
@@ -51,6 +49,8 @@ async function issuePoints({points}: {points: number}) {
       });
 
       await refreshPointStatsFromHistory({ userIdOrUsername: scout.id, tx });
-    });
+    }, {timeout: 15000});
   }
 }
+
+issuePoints({points: 50});
