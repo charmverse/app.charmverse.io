@@ -12,6 +12,7 @@ export type PointStats = {
   bonusPointsReceived: number;
   pointsSpent: number;
   claimedPoints: number;
+  unclaimedPoints: number;
   balance: number;
 };
 
@@ -161,6 +162,10 @@ export async function getPointStatsFromHistory({
     .filter((record) => !!record.claimedAt)
     .reduce((acc, { value }) => acc + value, 0);
 
+  const unclaimedPoints = allPointsReceivedRecords
+    .filter((record) => !record.claimedAt)
+    .reduce((acc, { value }) => acc + value, 0);
+
   const balance = claimedPoints - pointsSpent;
 
   const missingPointRecords = allPointsReceivedRecords.filter(
@@ -174,6 +179,7 @@ export async function getPointStatsFromHistory({
   return {
     balance,
     claimedPoints,
+    unclaimedPoints,
     pointsReceivedAsBuilder,
     pointsReceivedAsScout,
     bonusPointsReceived,
