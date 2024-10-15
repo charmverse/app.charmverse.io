@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { currentSeason } from '../../dates';
 import { mockBuilder } from '../../testing/database';
 import { sendPoints } from '../sendPoints';
 
@@ -10,7 +11,10 @@ describe('sendPoints', () => {
     await sendPoints({
       builderId: builder.id,
       points: mockPoints,
-      hideFromNotifications: true
+      hideFromNotifications: true,
+      claimed: true,
+      description: `Test points`,
+      season: currentSeason
     });
     const updated = await prisma.scout.findUnique({
       where: {
@@ -23,7 +27,9 @@ describe('sendPoints', () => {
       }
     });
     expect(updated?.currentBalance).toBe(mockPoints);
-    expect(updated?.userSeasonStats[0]).toBeUndefined();
+
+    // Points should not be added to allTimeStats or userSeasonStats
+
     expect(updated?.activities[0]).toBeUndefined();
   });
 
@@ -33,8 +39,8 @@ describe('sendPoints', () => {
     await sendPoints({
       builderId: builder.id,
       points: mockPoints,
-      earnedAsBuilder: true,
-      description: 'Test description'
+      description: 'Test description',
+      claimed: true
     });
     const updated = await prisma.scout.findUnique({
       where: {

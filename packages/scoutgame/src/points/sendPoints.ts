@@ -11,7 +11,7 @@ export async function sendPoints({
   week = getCurrentWeek(),
   points,
   description,
-  earnedAsBuilder = false,
+  earnedAs,
   claimed,
   hideFromNotifications = false,
   tx
@@ -22,7 +22,7 @@ export async function sendPoints({
   week?: ISOWeek;
   description: string;
   claimed: boolean;
-  earnedAsBuilder?: boolean;
+  earnedAs?: 'builder' | 'scout';
   hideFromNotifications?: boolean;
   tx?: Prisma.TransactionClient;
 }) {
@@ -45,7 +45,7 @@ export async function sendPoints({
                   create: {
                     type: 'points',
                     userId: builderId,
-                    recipientType: earnedAsBuilder ? 'builder' : 'scout'
+                    recipientType: !earnedAs ? 'scout' : earnedAs
                   }
                 }
           }
@@ -62,13 +62,16 @@ export async function sendPoints({
         }
       }
     });
-    await incrementPointsEarnedStats({
-      season,
-      userId: builderId,
-      builderPoints: earnedAsBuilder ? points : 0,
-      scoutPoints: !earnedAsBuilder ? points : 0,
-      tx: _tx
-    });
+
+    if (earnedAs) {
+      await incrementPointsEarnedStats({
+        season,
+        userId: builderId,
+        builderPoints: earnedAs === 'builder' ? points : 0,
+        scoutPoints: earnedAs === 'scout' ? points : 0,
+        tx: _tx
+      });
+    }
   }
 
   if (tx) {

@@ -8,7 +8,7 @@ const fids: number[] = [
   // Enter FIDs here
 ];
 
-async function issuePoints() {
+async function issuePoints({points}: {points: number}) {
   for (const fid of fids) {
     log.info(`Issuing points to fid: ${fid}`);
 
@@ -21,10 +21,9 @@ async function issuePoints() {
     await prisma.$transaction(async (tx) => {
       await sendPoints({
         builderId: fid.toString(),
-        points: 60,
-        earnedAsBuilder: false,
+        points,
         claimed: true,
-        description: `Received points for participating in Scout Game Waitlist launch`,
+        description: `Friends of Scout Game`,
         hideFromNotifications: true,
         season: currentSeason,
         week: getLastWeek(),

@@ -15,6 +15,7 @@ export type PointStats = {
   userId: string;
   pointsReceivedAsScout: number;
   pointsReceivedAsBuilder: number;
+  bonusPointsReceived: number;
   pointsSpent: number;
   balance: number;
 };
@@ -26,11 +27,9 @@ const include: Prisma.PointsReceiptInclude = {
 
 export async function getPointStatsFromHistory({
   userIdOrUsername,
-  season = currentSeason,
   tx = prisma
 }: {
   userIdOrUsername: string;
-  season?: string;
   tx?: Prisma.TransactionClient;
 }): Promise<PointStats> {
   if (!userIdOrUsername) {
@@ -47,116 +46,123 @@ export async function getPointStatsFromHistory({
         })
         .then((user) => user.id);
 
-  const [pointsSpentRecords, pointsReceivedAsBuilderRecords, pointsReceivedAsScoutRecords, allPointsReceivedRecords] =
-    await Promise.all([
-      // Points spent
-      tx.pointsReceipt.findMany({
-        where: {
-          senderId: userId,
-          event: {
-            season
+  const [
+    pointsSpentRecords,
+    pointsReceivedAsBuilderRecords,
+    pointsReceivedAsScoutRecords,
+    bonusPointsReceivedRecords,
+    allPointsReceivedRecords
+  ] = await Promise.all([
+    // Points spent
+    tx.pointsReceipt.findMany({
+      where: {
+        senderId: userId
+      }
+    }),
+    // Points received as builder
+    tx.pointsReceipt.findMany({
+      where: {
+        recipientId: userId,
+        OR: [
+          {
+            event: {
+              type: 'gems_payout'
+            },
+            activities: {
+              some: {
+                userId,
+                recipientType: 'builder'
+              }
+            }
+          },
+          {
+            event: {
+              type: 'nft_purchase',
+              builderId: userId
+            }
           }
-        }
-      }),
-      // Points received as builder
-      tx.pointsReceipt.findMany({
-        where: {
-          recipientId: userId,
-          OR: [
-            {
-              event: {
-                season,
-                type: 'gems_payout'
-              },
-              activities: {
-                some: {
-                  userId,
-                  recipientType: 'builder'
-                }
-              }
+        ]
+      },
+      include
+    }),
+    // Points received as scout
+    tx.pointsReceipt.findMany({
+      where: {
+        recipientId: userId,
+        OR: [
+          {
+            event: {
+              type: 'gems_payout'
             },
-            {
-              event: {
-                season,
-                type: 'misc_event'
-              },
-              activities: {
-                some: {
-                  userId,
-                  recipientType: 'builder'
-                }
-              }
-            },
-            {
-              event: {
-                season,
-                type: 'nft_purchase',
-                builderId: userId
+            activities: {
+              some: {
+                userId,
+                recipientType: 'scout'
               }
             }
-          ]
-        },
-        include
-      }),
-      // Points received as scout
-      tx.pointsReceipt.findMany({
-        where: {
-          recipientId: userId,
-          OR: [
-            {
-              event: {
-                season,
-                type: 'misc_event'
-              },
-              activities: {
-                some: {
-                  userId,
-                  recipientType: 'scout'
-                }
-              }
+          }
+        ]
+      },
+      include
+    }),
+    // Bonus points received
+    tx.pointsReceipt.findMany({
+      where: {
+        recipientId: userId,
+        OR: [
+          {
+            event: {
+              type: 'misc_event'
             },
-            {
-              event: {
-                season,
-                type: 'misc_event'
-              },
-              activities: {
-                none: {}
-              }
-            },
-            {
-              event: {
-                season,
-                type: 'gems_payout'
-              },
-              activities: {
-                some: {
-                  userId,
-                  recipientType: 'scout'
-                }
+            activities: {
+              some: {
+                userId,
+                recipientType: 'builder'
               }
             }
-          ]
-        },
-        include
-      }),
-      // All points received
-      tx.pointsReceipt.findMany({
-        where: {
-          recipientId: userId
-        },
-        include
-      })
-    ]);
+          },
+          {
+            event: {
+              type: 'misc_event'
+            },
+            activities: {
+              some: {
+                userId,
+                recipientType: 'scout'
+              }
+            }
+          },
+          {
+            event: {
+              type: 'misc_event'
+            },
+            activities: {
+              none: {}
+            }
+          }
+        ]
+      }
+    }),
+    // All points received
+    tx.pointsReceipt.findMany({
+      where: {
+        recipientId: userId
+      },
+      include
+    })
+  ]);
 
   const pointsSpent = pointsSpentRecords.reduce((acc, { value }) => acc + value, 0);
 
   const pointsReceivedAsBuilder = pointsReceivedAsBuilderRecords.reduce((acc, { value }) => acc + value, 0);
   const pointsReceivedAsScout = pointsReceivedAsScoutRecords.reduce((acc, { value }) => acc + value, 0);
+  const bonusPointsReceived = bonusPointsReceivedRecords.reduce((acc, { value }) => acc + value, 0);
 
   const allPointsReceived = allPointsReceivedRecords.reduce((acc, { value }) => acc + value, 0);
 
-  const balance = pointsReceivedAsBuilder + pointsReceivedAsScout - pointsSpent;
+  const allPointsReceivedSum = pointsReceivedAsBuilder + pointsReceivedAsScout + bonusPointsReceived;
+
+  const balance = allPointsReceived - pointsSpent;
 
   const missingPointRecords = allPointsReceivedRecords.filter(
     (record) =>
@@ -164,12 +170,13 @@ export async function getPointStatsFromHistory({
       !pointsReceivedAsScoutRecords.some((r) => r.id === record.id)
   );
 
-  assert.equal(allPointsReceived, pointsReceivedAsBuilder + pointsReceivedAsScout);
+  assert.equal(allPointsReceived, allPointsReceivedSum);
 
   return {
     balance,
     pointsReceivedAsBuilder,
     pointsReceivedAsScout,
+    bonusPointsReceived,
     pointsSpent,
     userId
   };
@@ -185,7 +192,7 @@ export async function refreshPointStatsFromHistory({
   tx?: Prisma.TransactionClient;
 }): Promise<PointStats> {
   async function txHandler(_tx: Prisma.TransactionClient) {
-    const stats = await getPointStatsFromHistory({ userIdOrUsername, season, tx });
+    const stats = await getPointStatsFromHistory({ userIdOrUsername, tx });
 
     await setPointsEarnedStats({
       season,
@@ -238,5 +245,3 @@ async function fixPoints() {
     }
   }
 }
-
-// fixPoints().then(console.log);
