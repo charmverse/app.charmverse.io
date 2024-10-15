@@ -8,6 +8,8 @@ const fids: number[] = [
   // Enter FIDs here
 ];
 
+const description = `Friends of Scout Game`;
+
 async function issuePoints({points}: {points: number}) {
   for (const fid of fids) {
     log.info(`Issuing points to fid: ${fid}`);
@@ -15,10 +17,28 @@ async function issuePoints({points}: {points: number}) {
     const scout = await prisma.scout.findFirstOrThrow({
       where: {
         farcasterId: fid
+      },
+      include: {
+        pointsReceived: {
+          where: {
+            event: {
+              description: {
+                contains: description,
+                mode: 'insensitive'
+              }
+            }
+          }
+        }
       }
     });
 
+    if (scout.pointsReceived.length > 0) {
+      log.info(`Points already issued to fid: ${fid}`);
+      continue;
+    }
+
     await prisma.$transaction(async (tx) => {
+
       await sendPoints({
         builderId: fid.toString(),
         points,
