@@ -28,8 +28,7 @@ import {
   taikoHekla,
   taiko,
   zksyncSepoliaTestnet,
-  cyber,
-  polygonMumbai
+  cyber
 } from 'viem/chains';
 
 export interface IChainDetails {
@@ -211,9 +210,7 @@ export const RPC: Record<string, IChainDetails> = {
     viem: polygon,
     chainName: polygon.name,
     nativeCurrency: {
-      name: 'Polygon',
-      symbol: 'MATIC',
-      decimals: 18,
+      ...polygon.nativeCurrency,
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/4713/standard/polygon.png?1698233745'
     },
@@ -239,25 +236,6 @@ export const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-zkevm.safe.global/',
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     shortName: 'polygon-zkevm',
-    unlockNetwork: true
-  },
-  MUMBAI: {
-    chainId: polygonMumbai.id,
-    viem: polygonMumbai,
-    chainName: 'Polygon - Mumbai',
-    nativeCurrency: {
-      name: 'Polygon',
-      symbol: 'MATIC',
-      decimals: 18,
-      address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
-    },
-    alchemyUrl: 'https://polygon-mumbai.g.alchemy.com',
-    rpcUrls: ['https://rpc-mumbai.maticvigil.com', 'https://polygon-mumbai-bor.publicnode.com'],
-    blockExplorerUrls: ['https://mumbai.polygonscan.com'],
-    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
-    testnet: true,
-    shortName: 'maticmum',
     unlockNetwork: true
   },
   AMOY: {
