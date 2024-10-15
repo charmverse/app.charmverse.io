@@ -6,10 +6,6 @@ import { getUserByPath } from 'lib/users/getUserByPath';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'User Profile'
-};
-
 export default async function Profile({
   params,
   searchParams
@@ -28,7 +24,8 @@ export default async function Profile({
     <>
       {user?.avatar && (
         <>
-          <meta property='og:title' content={user.username} />
+          <title>{`${user.username} user profile`}</title>
+          <meta property='og:title' content={`${user.username} user profile`} />
           <meta property='og:image' content={user.congratsImageUrl || user.nftImageUrl || user.avatar} />
           {/* Custom meta tags for farcaster */}
           <meta name='fc:frame' content='vNext' />

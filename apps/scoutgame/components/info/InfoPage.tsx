@@ -1,10 +1,12 @@
-import { Link, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Link, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import Image from 'next/image';
 
 import { Blockquote } from 'components/common/DocumentPageContainer/components/Blockquote';
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
 import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
+
+import { SidebarInfo } from './SidebarInfo';
 
 export function InfoPage() {
   return (
@@ -20,9 +22,11 @@ export function InfoPage() {
         priority={true}
         alt='info banner'
       />
-      <Typography variant='h4' align='center' color='secondary'>
-        All about Scout Game!
-      </Typography>
+      <Stack sx={{ flexDirection: 'row' }}>
+        <Typography variant='h4' align='center' color='secondary'>
+          All about Scout Game!
+        </Typography>
+      </Stack>
       <Document />
     </DocumentPageContainer>
   );

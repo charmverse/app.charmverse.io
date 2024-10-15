@@ -105,7 +105,7 @@ export function BuilderActivitiesList({ activities }: { activities: BuilderActiv
                 <BuilderActivityLabel activity={activity} />
                 <BuilderActivityDetail activity={activity} />
               </Stack>
-              <Stack justifyContent='flex-start' alignItems='flex-end' gap={1}>
+              <Stack justifyContent='center' alignItems='center' gap={1}>
                 <BuilderActivityGems activity={activity} />
                 <BuilderActivityBonusPartner activity={activity} />
               </Stack>

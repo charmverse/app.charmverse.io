@@ -72,9 +72,6 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar' | 'cu
               </Hidden>
               {user ? (
                 <Box
-                  display='flex'
-                  alignItems='center'
-                  gap={1}
                   borderColor='secondary.main'
                   borderRadius='30px'
                   sx={{
@@ -94,19 +91,24 @@ export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar' | 'cu
                     }
                   }}
                 >
-                  <Typography fontSize='16px' sx={{ pl: 2 }}>
-                    {user.currentBalance}
-                  </Typography>
-                  <Image
-                    src='/images/profile/scout-game-icon.svg'
-                    width={20}
-                    height={20}
-                    alt='Scout Game points icon'
-                    priority={true}
-                  />
-                  <IconButton disabled={isExecutingLogout} onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Button
+                    variant='text'
+                    disabled={isExecutingLogout}
+                    onClick={handleOpenUserMenu}
+                    sx={{ p: 0, display: 'flex', alignItems: 'center', gap: 1 }}
+                  >
+                    <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary'>
+                      {user.currentBalance}
+                    </Typography>
+                    <Image
+                      src='/images/profile/scout-game-icon.svg'
+                      width={20}
+                      height={20}
+                      alt='Scout Game points icon'
+                      priority={true}
+                    />
                     <Avatar src={user?.avatar || undefined} size='medium' name={user.username} />
-                  </IconButton>
+                  </Button>
                   <Menu
                     sx={{ mt: 5 }}
                     id='menu-appbar'
