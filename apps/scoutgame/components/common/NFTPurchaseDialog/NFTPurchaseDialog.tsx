@@ -6,8 +6,8 @@ import { useAccount } from 'wagmi';
 
 import { Dialog } from 'components/common/Dialog';
 import { useSmScreen } from 'hooks/useMediaScreens';
-import type { MinimalUserInfo } from 'lib/users/interfaces';
 
+import type { NFTPurchaseProps } from './components/NFTPurchaseForm';
 import { NFTPurchaseForm } from './components/NFTPurchaseForm';
 
 import '@rainbow-me/rainbowkit/styles.css';
@@ -15,7 +15,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 type NFTPurchaseDialogProps = {
   open: boolean;
   onClose: VoidFunction;
-  builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
+  builder: NFTPurchaseProps['builder'];
 };
 
 // This component opens the wallet connect modal if the user is not connected yet
