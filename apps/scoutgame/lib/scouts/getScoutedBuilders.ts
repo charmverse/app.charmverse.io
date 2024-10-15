@@ -88,8 +88,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       nftsSoldToScout,
       isBanned: builder.builderStatus === 'banned',
       price: builder.builderNfts[0]?.currentPrice ?? 0,
-      boughtNftsCount: undefined
-      // boughtNftsCount: builder.builderNfts[0]?._count?.nftSoldEvents ?? 0
+      boughtNftsCount: builder.builderNfts[0]?._count?.nftSoldEvents ?? 0
     };
   });
 }
