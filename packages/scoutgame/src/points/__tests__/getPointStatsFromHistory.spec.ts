@@ -81,7 +81,15 @@ describe('getPointStatsFromHistory', () => {
     jest.spyOn(prisma.pointsReceipt, 'findMany').mockResolvedValueOnce(bonusPointsReceivedRecords as PointsReceipt[]);
 
     jest.spyOn(prisma.pointsReceipt, 'findMany').mockResolvedValueOnce(allPointsReceivedRecords as PointsReceipt[]);
-    await expect(getPointStatsFromHistory({ userIdOrUsername: user.id })).resolves.toEqual<PointStats>({
+
+    const pointStats = await getPointStatsFromHistory({ userIdOrUsername: user.id });
+
+    // Sanity check that the points add up
+    expect(pointStats.claimedPoints + pointStats.unclaimedPoints).toEqual(
+      pointStats.pointsReceivedAsBuilder + pointStats.pointsReceivedAsScout + pointStats.bonusPointsReceived
+    );
+
+    expect(pointStats).toEqual<PointStats>({
       balance: claimedPoints - pointsSpent,
       bonusPointsReceived: 40,
       claimedPoints,
