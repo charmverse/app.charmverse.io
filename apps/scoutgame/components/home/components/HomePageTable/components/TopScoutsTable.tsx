@@ -65,7 +65,7 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
               <TableCell component='th'>
                 <Stack
                   component={Link}
-                  href={`/u/${scout.username}`}
+                  href={`/u/${scout.username}?tab=scout`}
                   alignItems='center'
                   flexDirection='row'
                   gap={1}
