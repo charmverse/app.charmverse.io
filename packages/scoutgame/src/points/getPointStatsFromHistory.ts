@@ -32,15 +32,14 @@ export async function getPointStatsFromHistory({
     throw new InvalidInputError('userIdOrUsername is required');
   }
 
-  const userId = isUuid(userIdOrUsername)
-    ? userIdOrUsername
-    : await tx.scout
-        .findUniqueOrThrow({
-          where: {
-            username: userIdOrUsername
-          }
-        })
-        .then((user) => user.id);
+  const userId = await tx.scout
+    .findUniqueOrThrow({
+      where: isUuid(userIdOrUsername) ? { id: userIdOrUsername } : { username: userIdOrUsername },
+      select: {
+        id: true
+      }
+    })
+    .then((user) => user.id);
 
   const [
     pointsSpentRecords,
