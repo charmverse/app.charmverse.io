@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
-import { prettyPrint } from '@packages/utils/strings';
 
 export type TopScout = {
   id: string;
