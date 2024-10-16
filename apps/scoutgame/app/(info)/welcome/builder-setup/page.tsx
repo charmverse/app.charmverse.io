@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { GithubConnectPage } from 'components/welcome/github-connect/GithubConnectPage';
+import { BuilderSetupPage } from 'components/welcome/builder-setup/BuilderSetupPage';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,10 +11,10 @@ export const metadata: Metadata = {
   title: 'Github Connect'
 };
 
-export default async function GithubConnect({
+export default async function BuilderSetup({
   searchParams: { state, code, error }
 }: {
   searchParams: { state: string; code: string; error: string };
 }) {
-  return <GithubConnectPage state={state} code={code} githubRedirectError={error} />;
+  return <BuilderSetupPage state={state} code={code} githubRedirectError={error} />;
 }

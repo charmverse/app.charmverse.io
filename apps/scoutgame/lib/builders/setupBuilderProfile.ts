@@ -5,7 +5,7 @@ import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constants';
 import { unsealData } from 'iron-session';
 
-export async function githubConnect({ code, state }: { code: string; state: string }) {
+export async function setupBuilderProfile({ code, state }: { code: string; state: string }) {
   // const { searchParams } = new URL(req.url);
   // const profileGithubConnect = searchParams.get('profile-github-connect');
 

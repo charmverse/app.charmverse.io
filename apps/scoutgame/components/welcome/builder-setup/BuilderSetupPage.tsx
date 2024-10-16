@@ -9,9 +9,9 @@ import { SinglePageLayout } from 'components/common/Layout';
 import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
-import { githubConnectAction } from 'lib/github/githubConnectAction';
+import { setupBuilderProfileAction } from 'lib/builders/setupBuilderProfileAction';
 
-export function GithubConnectPage({
+export function BuilderSetupPage({
   state,
   code,
   githubRedirectError
@@ -23,7 +23,7 @@ export function GithubConnectPage({
   const [githubConnectError, setGithubConnectError] = useState<string | null>(null);
   const router = useRouter();
   const ref = useRef(0);
-  const { execute: githubConnect, status } = useAction(githubConnectAction, {
+  const { execute: setupBuilderProfile, status } = useAction(setupBuilderProfileAction, {
     onSuccess: () => {
       router.push('/welcome/spam-policy');
     },
@@ -38,11 +38,11 @@ export function GithubConnectPage({
     }
     ref.current = 1;
     if (state && code) {
-      githubConnect({ state, code });
+      setupBuilderProfile({ state, code });
     } else {
       setGithubConnectError('No state or code provided');
     }
-  }, [state, code, githubConnect]);
+  }, [state, code, setupBuilderProfile]);
 
   const error = githubConnectError || githubRedirectError;
 
