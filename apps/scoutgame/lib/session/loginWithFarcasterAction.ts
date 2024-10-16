@@ -22,11 +22,8 @@ export const loginWithFarcasterAction = actionClient
   .schema(authSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { fid } = await verifyFarcasterUser(parsedInput);
-    const user = await findOrCreateFarcasterUser({ fid });
 
     if (inviteCode && parsedInput.inviteCode === inviteCode) {
-      await saveSession(ctx, { scoutId: user.id });
-
       cookies().set(
         'invite-code',
         await sealData(
@@ -38,10 +35,14 @@ export const loginWithFarcasterAction = actionClient
           }
         )
       );
-      log.info('Builder logged in with invite code', { userId: user.id, fid });
+      log.info('Builder logged in with invite code', { fid });
     } else {
+      // throws an error if user does not have access
       await authorizeUserByLaunchDate({ fid });
     }
+
+    const user = await findOrCreateFarcasterUser({ fid });
+    await saveSession(ctx, { scoutId: user.id });
 
     return { success: true, userId: user.id, onboarded: !!user.onboardedAt, user };
   });
