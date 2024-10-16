@@ -7,23 +7,65 @@ import React from 'react';
 import type { Font } from 'satori';
 import sharp from 'sharp';
 
-const OVERLAY_FOLDER = path.join(path.resolve(__dirname, '../../'), 'assets', 'overlays');
-const overlayFiles = fs.readdirSync(OVERLAY_FOLDER);
-const overlaysBase64 = overlayFiles.map((file) => {
-  const filePath = path.join(OVERLAY_FOLDER, file);
-  const data = fs.readFileSync(filePath);
-  return `data:image/png;base64,${data.toString('base64')}`;
-});
-const noPfpAvatarFile = path.join(path.resolve(__dirname, '../../'), 'assets', 'no_pfp_avatar.png');
-const noPfpAvatarBase64 = `data:image/png;base64,${fs.readFileSync(noPfpAvatarFile).toString('base64')}`;
-const fontPath = path.join(path.resolve(__dirname, '../../'), 'assets', 'fonts', 'K2D-Medium.ttf');
-const fontBuffer = fs.readFileSync(fontPath);
-const font: Font = {
-  name: 'K2D',
-  data: fontBuffer,
-  style: 'normal',
-  weight: 400
-};
+// fails inside of Next.js
+function getAssetsFromDisk() {
+  const OVERLAY_FOLDER = path.join(path.resolve(__dirname, '../../'), 'assets', 'overlays');
+  const overlayFiles = fs.readdirSync(OVERLAY_FOLDER);
+  const overlaysBase64 = overlayFiles.map((file) => {
+    const filePath = path.join(OVERLAY_FOLDER, file);
+    const data = fs.readFileSync(filePath);
+    return `data:image/png;base64,${data.toString('base64')}`;
+  });
+  const noPfpAvatarFile = path.join(path.resolve(__dirname, '../../'), 'assets', 'no_pfp_avatar.png');
+  const noPfpAvatarBase64 = `data:image/png;base64,${fs.readFileSync(noPfpAvatarFile).toString('base64')}`;
+  const fontPath = path.join(path.resolve(__dirname, '../../'), 'assets', 'fonts', 'K2D-Medium.ttf');
+  const fontBuffer = fs.readFileSync(fontPath);
+  const font: Font = {
+    name: 'K2D',
+    data: fontBuffer,
+    style: 'normal',
+    weight: 400
+  };
+  return { font, noPfpAvatarBase64, overlaysBase64 };
+}
+
+async function getAssetsFromServer(baseUrl: string) {
+  const overlaysBase64 = await Promise.all(
+    ['scratch_reveal.png', 'rounded_square.png', 'paint_splatter.png', 'checked_corners.png'].map(async (file) => {
+      const noAvatarResponse = await _getBufferFromUrl(`${baseUrl}/nft-assets/overlays/${file}`);
+      return _getImageDataURI(noAvatarResponse);
+    })
+  );
+
+  const noAvatarResponse = await _getBufferFromUrl(`${baseUrl}/nft-assets/no_pfp_avatar.png`);
+  const noPfpAvatarBase64 = _getImageDataURI(noAvatarResponse);
+  const fontBuffer = await fetch(`${baseUrl}/nft-assets/fonts/K2D-Medium.ttf`).then((res) => res.arrayBuffer());
+  const font: Font = {
+    name: 'K2D',
+    data: fontBuffer,
+    style: 'normal',
+    weight: 400
+  };
+  return { font, noPfpAvatarBase64, overlaysBase64 };
+}
+
+function _getBufferFromUrl(url: string) {
+  return fetch(url)
+    .then((res) => res.blob())
+    .then((blob) => blob.arrayBuffer())
+    .then((buffer) => Buffer.from(buffer));
+}
+
+function _getImageDataURI(buffer: Buffer) {
+  return `data:image/png;base64,${buffer.toString('base64')}`;
+}
+
+async function getAssets(imageHostingBaseUrl?: string) {
+  if (imageHostingBaseUrl) {
+    return getAssetsFromServer(imageHostingBaseUrl);
+  }
+  return getAssetsFromDisk();
+}
 
 // Function to determine font size
 function calculateFontSize(text: string, maxWidth: number, initialFontSize: number): number {
@@ -42,11 +84,14 @@ function calculateFontSize(text: string, maxWidth: number, initialFontSize: numb
 
 export async function generateNftImage({
   avatar,
-  username
+  username,
+  imageHostingBaseUrl
 }: {
   avatar: string | null;
   username: string;
+  imageHostingBaseUrl?: string; // when running inside of next.js, we need to use the server url
 }): Promise<Buffer> {
+  const { overlaysBase64, noPfpAvatarBase64, font } = await getAssets(imageHostingBaseUrl);
   const randomOverlay = overlaysBase64[Math.floor(Math.random() * overlaysBase64.length)];
   let avatarBuffer: Buffer | null = null;
   const cutoutWidth = 300;
@@ -124,10 +169,18 @@ export async function generateNftImage({
   return imageBuffer;
 }
 
-export async function generateNftCongrats({ userImage }: { userImage: string | null }): Promise<Buffer> {
+export async function generateNftCongrats({
+  imageHostingBaseUrl,
+  userImage
+}: {
+  imageHostingBaseUrl?: string;
+  userImage: string | null;
+}): Promise<Buffer> {
   let avatarBuffer: Buffer | null = null;
   const cutoutWidth = 400;
   const cutoutHeight = 400;
+
+  const { noPfpAvatarBase64 } = await getAssets(imageHostingBaseUrl);
 
   if (userImage) {
     const response = await fetch(userImage);

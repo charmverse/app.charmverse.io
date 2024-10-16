@@ -1,6 +1,7 @@
 'use client';
 
-import { Typography } from '@mui/material';
+import { log } from '@charmverse/core/log';
+import { Link, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useRef, useState } from 'react';
@@ -30,6 +31,7 @@ export function BuilderSetupPage({
       router.push(redirectToProfile ? '/welcome/spam-policy?profile-redirect=true' : '/welcome/spam-policy');
     },
     onError: (error) => {
+      log.error('Error setting up builder profile', { error });
       setGithubConnectError(error.error.serverError?.message || 'Something went wrong');
     }
   });
@@ -60,8 +62,12 @@ export function BuilderSetupPage({
         </Typography>
         {!error && <LoadingComponent isLoading={status === 'executing'} />}
         {error && (
-          <Typography variant='body2' sx={{ mt: 2 }} color='error'>
-            {error}
+          <Typography variant='body2' component='em' sx={{ mt: 2 }}>
+            Something went wrong. Please try again or talk to{' '}
+            <Link href='https://warpcast.com/ccarella' target='_blank'>
+              @ccarella
+            </Link>
+            .
           </Typography>
         )}
       </SinglePageWrapper>
