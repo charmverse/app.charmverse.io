@@ -2,7 +2,14 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export function SuccessView({ builder }: { builder: { nftImageUrl?: string | null; username: string } }) {
+import { useGetFarcasterUser } from 'hooks/api/farcaster';
+
+export function SuccessView({ builder }: { builder: { id: string; nftImageUrl?: string | null; username: string } }) {
+  // retrieve the user's latest farcaster profile
+  const { data: farcasterUser } = useGetFarcasterUser({ userId: builder.id });
+
+  const farcasterUsername = farcasterUser?.username || builder.username;
+
   return (
     <Stack gap={2} textAlign='center'>
       <Typography color='secondary' variant='h5' fontWeight={600}>
@@ -42,7 +49,7 @@ export function SuccessView({ builder }: { builder: { nftImageUrl?: string | nul
         fullWidth
         href={`https://warpcast.com/~/compose?text=${encodeURI(
           `I scouted @${builder.username} on Scout Game!`
-        )}&embeds[]=${window.location.origin}/u/${builder.username}`}
+        )}&embeds[]=${window.location.origin}/u/${farcasterUsername}`}
         target='_blank'
         rel='noopener noreferrer'
       >

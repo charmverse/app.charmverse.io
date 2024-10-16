@@ -221,7 +221,7 @@
     "@stripe/react-stripe-js": "^2.1.1",
     "@stripe/stripe-js": "^1.54.1",
     "@synaps-io/verify-sdk": "^4.0.45",
-    "@tanstack/react-query": "^5.28.9",
+    "@tanstack/react-query": "^5.59.14",
     "@typeform/api-client": "^2.3.1",
     "@uauth/js": "^2.4.0",
     "@wagmi/connectors": "^5.1.10",
@@ -342,8 +342,8 @@
     "unique-names-generator": "^4.7.1",
     "usehooks-ts": "^2.14.0",
     "uuid": "^8.3.2",
-    "viem": "^2.17.3",
-    "wagmi": "^2.12.10",
+    "viem": "^2.21.26",
+    "wagmi": "^2.12.17",
     "yup": "^1.4.0",
     "zksync-web3": "^0.16.0"
   },
@@ -354,10 +354,10 @@
     "@next/eslint-plugin-next": "^14.2.15",
     "@playwright/test": "^1.47.1",
     "@spruceid/siwe-parser": "^2.0.2",
-    "@storybook/addon-essentials": "^8.0.9",
+    "@storybook/addon-essentials": "^8.3.5",
     "@storybook/addon-interactions": "^8.0.9",
     "@storybook/addon-links": "^8.0.9",
-    "@storybook/blocks": "^8.0.9",
+    "@storybook/blocks": "^8.3.5",
     "@storybook/manager-api": "^8.0.9",
     "@storybook/nextjs": "^8.3.0",
     "@storybook/react": "^8.0.9",
@@ -463,7 +463,7 @@
     "typescript": "^5.4.2",
     "esbuild": "^0.19.5",
     "serverless": "^4.1.19",
-    "viem": "^2.17.3"
+    "viem": "^2.21.26"
   },
   "msw": {
     "workerDirectory": "public"

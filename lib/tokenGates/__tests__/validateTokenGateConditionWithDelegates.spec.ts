@@ -29,7 +29,7 @@ jest.mock('lib/tokenGates/validateTokenGateCondition', () => ({
 }));
 
 jest.mock('lib/blockchain/delegateXYZ/client', () => ({
-  getIncomingDelegations: () => [
+  getIncomingDelegations: async () => [
     // an example delegation that provides all access to an address
     {
       type: 'ALL',

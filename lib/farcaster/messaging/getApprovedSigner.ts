@@ -220,9 +220,9 @@ export async function getApprovedSignerId(): Promise<{ signerId: string; signerP
       abi: keyGatewayAbi, // ABI of the contract
       functionName: 'addFor', // Function to call
       args: [
-        farcasterDeveloper.custody_address, // fidOwner address
+        farcasterDeveloper.custody_address as `0x${string}`, // fidOwner address
         1, // keyType (uint32)
-        signerPublicKey, // key (bytes)
+        signerPublicKey as `0x${string}`, // key (bytes)
         1, // metadataType (uint8)
         metadata, // metadata (bytes)
         BigInt(deadline), // deadline (uint256)

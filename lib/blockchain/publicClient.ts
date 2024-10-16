@@ -33,8 +33,8 @@ export const getPublicClient = (chainId: number): PublicClient => {
     providerUrl = chainDetails.alchemyUrl
       ? getAlchemyBaseUrl(chainDetails.chainId)
       : isAnkrChain(chainId)
-      ? getAnkrBaseUrl(chainId)
-      : chainDetails.rpcUrls[0];
+        ? getAnkrBaseUrl(chainId)
+        : chainDetails.rpcUrls[0];
   } catch (err) {
     if (!providerUrl && !chainDetails.rpcUrls.length) {
       throw new InvalidInputError('No RPC url available for the chain');

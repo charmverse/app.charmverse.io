@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useState } from 'react';
 
+import type { NFTPurchaseProps } from 'components/common/NFTPurchaseDialog/components/NFTPurchaseForm';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
 import { DynamicLoadingContext, LoadingComponent } from '../DynamicLoading';
@@ -24,7 +25,7 @@ export function ScoutButton({
   builder,
   isAuthenticated = true
 }: {
-  builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
+  builder: NFTPurchaseProps['builder'];
   isAuthenticated?: boolean;
 }) {
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
