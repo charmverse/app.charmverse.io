@@ -463,7 +463,7 @@
     "typescript": "^5.4.2",
     "esbuild": "^0.19.5",
     "serverless": "^4.1.19",
-    "viem": "^2.21.26"
+    "viem": "2.21.26"
   },
   "msw": {
     "workerDirectory": "public"
