@@ -2,6 +2,9 @@
 
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
+import { authSecret } from '@root/config/constants';
+import { sealData } from 'iron-session';
+import { cookies } from 'next/headers';
 
 import { actionClient } from 'lib/actions/actionClient';
 import { findOrCreateFarcasterUser } from 'lib/farcaster/findOrCreateFarcasterUser';
@@ -27,6 +30,18 @@ export const loginWithFarcasterAction = actionClient
     const user = await findOrCreateFarcasterUser({ fid });
 
     await saveSession(ctx, { scoutId: user.id });
+
+    cookies().set(
+      'invite-code',
+      await sealData(
+        {
+          inviteCode
+        },
+        {
+          password: authSecret as string
+        }
+      )
+    );
 
     return { success: true, userId: user.id, onboarded: !!user.onboardedAt, user };
   });

@@ -14,8 +14,10 @@ import { setupBuilderProfileAction } from 'lib/builders/setupBuilderProfileActio
 export function BuilderSetupPage({
   state,
   code,
-  githubRedirectError
+  githubRedirectError,
+  redirectToProfile
 }: {
+  redirectToProfile: string;
   githubRedirectError: string;
   state: string;
   code: string;
@@ -25,7 +27,7 @@ export function BuilderSetupPage({
   const ref = useRef(0);
   const { execute: setupBuilderProfile, status } = useAction(setupBuilderProfileAction, {
     onSuccess: () => {
-      router.push('/welcome/spam-policy');
+      router.push(redirectToProfile ? '/welcome/spam-policy?profile-redirect=true' : '/welcome/spam-policy');
     },
     onError: (error) => {
       setGithubConnectError(error.error.serverError?.message || 'Something went wrong');
