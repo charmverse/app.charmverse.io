@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek, currentSeason, getStartOfSeason } from '@packages/scoutgame/dates';
+import { getCurrentWeek, currentSeason, getDateFromISOWeek } from '@packages/scoutgame/dates';
 
 import { processBuilderActivity } from './processBuilderActivity';
 import { updateBuildersRank } from './updateBuildersRank';
@@ -28,9 +28,16 @@ export async function processAllBuilderActivity({
       id: 'asc'
     },
     select: {
+      createdAt: true,
       id: true,
       githubUser: {
         select: {
+          events: {
+            take: 1,
+            select: {
+              id: true
+            }
+          },
           id: true,
           login: true
         }
@@ -41,12 +48,16 @@ export async function processAllBuilderActivity({
   log.info(`Processing activity for ${builders.length} builders`);
 
   for (const builder of builders) {
+    // If the builder was created less than 10 minutes ago and has no existing events
+    const newBuilder = builder.createdAt > new Date(Date.now() - 10 * 60 * 1000) && !builder.githubUser[0]?.events[0];
+
     await processBuilderActivity({
       builderId: builder.id,
       githubUser: builder.githubUser[0]!,
-      createdAfter,
+      createdAfter: newBuilder ? getDateFromISOWeek(season).toJSDate() : createdAfter,
       season
     });
+
     if (builders.indexOf(builder) % 10 === 0) {
       log.debug(`Processed ${builders.indexOf(builder)}/${builders.length} builders.`, {
         lastId: builder.id, // log last id in case we want to start in the middle of the process
