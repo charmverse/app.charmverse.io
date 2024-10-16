@@ -162,12 +162,28 @@ export function EvaluationsSettings({
               </EvaluationStepSettingsRow>
             );
           })}
-          {showCredentials && (
-            <Box mb={showRewards ? 0 : 8}>
+          {/* reward settings */}
+          {showRewards && (
+            <Box mb={showCredentials ? 0 : 8}>
               <EvaluationStepSettingsRow
                 key={String(expandedSidebar)}
                 expandedSidebar={expandedSidebar}
                 index={proposal ? proposal.evaluations.length + 1 : 0}
+                title={mappedFeatures.rewards.title}
+                expanded={expanded}
+              >
+                {(proposal.fields?.enableRewards || !isStructuredProposal) && (
+                  <RewardSettings value={proposal.fields} onChange={onChangeRewardSettings} />
+                )}
+              </EvaluationStepSettingsRow>
+            </Box>
+          )}
+          {showCredentials && (
+            <Box mb={8}>
+              <EvaluationStepSettingsRow
+                key={String(expandedSidebar)}
+                expandedSidebar={expandedSidebar}
+                index={proposal ? proposal.evaluations.length + (showRewards ? 2 : 1) : 0}
                 title='Credentials'
                 expanded={expanded}
               >
@@ -176,22 +192,6 @@ export function EvaluationsSettings({
                   selectedCredentialTemplates={proposal.selectedCredentialTemplates ?? []}
                   setSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
                 />
-              </EvaluationStepSettingsRow>
-            </Box>
-          )}
-          {/* reward settings */}
-          {showRewards && (
-            <Box mb={8}>
-              <EvaluationStepSettingsRow
-                key={String(expandedSidebar)}
-                expandedSidebar={expandedSidebar}
-                index={proposal ? proposal.evaluations.length + (showCredentials ? 2 : 1) : 0}
-                title={mappedFeatures.rewards.title}
-                expanded={expanded}
-              >
-                {(proposal.fields?.enableRewards || !isStructuredProposal) && (
-                  <RewardSettings value={proposal.fields} onChange={onChangeRewardSettings} />
-                )}
               </EvaluationStepSettingsRow>
             </Box>
           )}
