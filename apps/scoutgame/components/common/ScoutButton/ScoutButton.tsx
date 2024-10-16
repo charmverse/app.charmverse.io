@@ -1,12 +1,12 @@
 'use client';
 
 import { LoadingButton } from '@mui/lab';
-import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
-import { convertCostToPointsWithDiscount } from '@packages/scoutgame/builderNfts/utils';
+import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useState } from 'react';
 
+import type { NFTPurchaseProps } from 'components/common/NFTPurchaseDialog/components/NFTPurchaseForm';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
 import { DynamicLoadingContext, LoadingComponent } from '../DynamicLoading';
@@ -23,12 +23,10 @@ const NFTPurchaseDialog = dynamic(
 
 export function ScoutButton({
   builder,
-  isAuthenticated = true,
-  showPoints = false
+  isAuthenticated = true
 }: {
-  builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
+  builder: NFTPurchaseProps['builder'];
   isAuthenticated?: boolean;
-  showPoints?: boolean;
 }) {
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [authPopup, setAuthPopup] = useState<boolean>(false);
@@ -42,7 +40,7 @@ export function ScoutButton({
     }
   };
 
-  const purchaseCostInPoints = convertCostToPointsWithDiscount(builder?.price || BigInt(0));
+  const purchaseCostInPoints = convertCostToPoints(builder?.price || BigInt(0));
 
   return (
     <div>
@@ -54,21 +52,14 @@ export function ScoutButton({
           variant='buy'
           data-test='scout-button'
         >
-          {showPoints ? (
-            <>
-              {purchaseCostInPoints}
-              <Image
-                src='/images/profile/scout-game-blue-icon.svg'
-                alt='Scout game points'
-                width={21}
-                height={12}
-                style={{ marginLeft: 4, marginRight: 4 }}
-              />
-              (${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(0)})
-            </>
-          ) : (
-            <>${(Number(builder.price) / 10 ** builderTokenDecimals).toFixed(0)}</>
-          )}
+          {purchaseCostInPoints}
+          <Image
+            src='/images/profile/scout-game-blue-icon.svg'
+            alt='Scout game points'
+            width={21}
+            height={12}
+            style={{ marginLeft: 4, marginRight: 4 }}
+          />
         </LoadingButton>
         {isPurchasing && (
           <NFTPurchaseDialog

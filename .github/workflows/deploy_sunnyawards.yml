@@ -129,6 +129,7 @@ jobs:
       - name: Run eslint on changed files
         uses: tj-actions/eslint-changed-files@v25
         with:
+          warn_ignored: 'true'
           skip_annotations: 'true' # do not annotate code in the PR
           file_extensions: '**/*.{ts,tsx}'
           escape_paths: 'false'

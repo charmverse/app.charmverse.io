@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type {
   Abi,
   Account,
@@ -419,7 +420,11 @@ export class BuilderNFTSeasonOneImplementation01Client {
     const tx = await this.walletClient.sendTransaction(txInput as any);
 
     // Return the transaction receipt
-    return this.walletClient.waitForTransactionReceipt({ hash: tx });
+    const receipt = await this.walletClient.waitForTransactionReceipt({ hash: tx });
+
+    log.info('Minted NFT via admin wallet', { params });
+
+    return receipt;
   }
 
   async registerBuilderToken(params: {

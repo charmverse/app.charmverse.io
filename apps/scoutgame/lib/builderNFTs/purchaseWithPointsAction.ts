@@ -1,9 +1,10 @@
 'use server';
 
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
 import { mintNFT } from '@packages/scoutgame/builderNfts/mintNFT';
-import { convertCostToPointsWithDiscount } from '@packages/scoutgame/builderNfts/utils';
+import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { revalidatePath } from 'next/cache';
 
@@ -31,10 +32,18 @@ export const purchaseWithPointsAction = authActionClient
     const currentPrice = await builderContractReadonlyApiClient.getTokenPurchasePrice({
       args: { tokenId: BigInt(builderNft.tokenId), amount: BigInt(parsedInput.amount) }
     });
-    const pointsValue = convertCostToPointsWithDiscount(currentPrice);
+    const pointsValue = convertCostToPoints(currentPrice);
     if (scout.currentBalance < pointsValue) {
       throw new Error('Insufficient points');
     }
+
+    log.info(`Triggering NFT mint via admin wallet`, {
+      builderNftId: builderNft.id,
+      recipientAddress: parsedInput.recipientAddress,
+      amount: parsedInput.amount,
+      scoutId: ctx.session.scoutId,
+      pointsValue
+    });
     await mintNFT({
       builderNftId: builderNft.id,
       recipientAddress: parsedInput.recipientAddress,

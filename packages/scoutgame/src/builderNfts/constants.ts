@@ -41,6 +41,18 @@ export const builderSmartContractOwnerKey = process.env.BUILDER_SMART_CONTRACT_O
 
 // Actual target wallet - Scoutgame.eth
 export const treasuryAddress = '0x93326D53d1E8EBf0af1Ff1B233c46C67c96e4d8D';
+
+export function getDecentApiKey() {
+  const apiKey = env('DECENT_API_KEY') || process.env.REACT_APP_DECENT_API_KEY;
+  return apiKey;
+}
+
+export const scoutPointsShare = 0.8;
+export const builderPointsShare = 0.2;
+
+// Selecting the top 100 builders
+export const weeklyRewardableBuilders = 100;
+
 // const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey });
 
 // const apiClient = new BuilderNFTSeasonOneClient({

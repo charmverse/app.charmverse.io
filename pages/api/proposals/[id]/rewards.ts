@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -27,6 +28,7 @@ async function createProposalRewardsController(req: NextApiRequest, res: NextApi
     proposalId,
     userId
   });
+  log.info('Rewards created for proposal', { userId, pageId: proposalId, proposalId });
 
   return res.status(200).end();
 }

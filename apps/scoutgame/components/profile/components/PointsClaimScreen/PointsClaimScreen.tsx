@@ -1,22 +1,36 @@
 'use server';
 
-import { Paper, Typography, Stack } from '@mui/material';
+import { Box, Paper, Typography, Stack } from '@mui/material';
 import Image from 'next/image';
 
-import { getClaimablePoints } from 'lib/points/getClaimablePoints';
+import { getClaimablePointsWithEvents } from 'lib/points/getClaimablePointsWithEvents';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';
 import { QualifiedActionsTable } from './QualifiedActionsTable';
 
 export async function PointsClaimScreen({ userId, username }: { userId: string; username: string }) {
-  const { totalClaimablePoints, weeklyRewards, bonusPartners } = await getClaimablePoints(userId);
+  const { totalClaimablePoints, weeklyRewards, bonusPartners } = await getClaimablePointsWithEvents(userId);
 
   if (!totalClaimablePoints) {
     return (
-      <Typography textAlign='center' variant='h5'>
-        No points available to claim. Keep playing and check back next week!
-      </Typography>
+      <Box
+        sx={{
+          minHeight: 150,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <Typography textAlign='center' variant='h5'>
+          No points available to claim.
+        </Typography>
+        <Typography textAlign='center' variant='h6'>
+          Keep playing and check back next week!
+        </Typography>
+      </Box>
     );
   }
 
@@ -59,8 +73,8 @@ export async function PointsClaimScreen({ userId, username }: { userId: string; 
                 src='/images/profile/scout-game-icon.svg'
                 alt='Scouts'
               />{' '}
-              +
-              <BonusPartnersDisplay bonusPartners={['charmverse']} size={35} />
+              {bonusPartners.length > 0 ? '+ ' : ''}
+              <BonusPartnersDisplay bonusPartners={bonusPartners} size={35} />
             </Stack>
           </Stack>
           <PointsClaimButton />

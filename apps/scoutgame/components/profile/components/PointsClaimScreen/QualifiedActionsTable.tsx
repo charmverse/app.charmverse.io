@@ -2,7 +2,7 @@ import { Divider, Stack, Typography } from '@mui/material';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import Image from 'next/image';
 
-import type { WeeklyReward } from 'lib/points/getClaimablePoints';
+import type { WeeklyReward } from 'lib/points/getClaimablePointsWithEvents';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 
@@ -48,11 +48,11 @@ export function QualifiedActionsTable({ weeklyRewards }: { weeklyRewards: Weekly
                     </Stack>
                   </Stack>
                 ) : null}
-                {weeklyReward.builderReward ? (
+                {weeklyReward.scoutReward ? (
                   <Stack flexDirection='row' justifyContent='space-between'>
-                    <Typography>Builder Rewards</Typography>
+                    <Typography>Scout Rewards</Typography>
                     <Stack flexDirection='row' gap={1} alignItems='center'>
-                      <Typography>{weeklyReward.builderReward.points}</Typography>
+                      <Typography>{weeklyReward.scoutReward.points}</Typography>
                       <Image width={20} height={20} src='/images/profile/scout-game-icon.svg' alt='Nfts' />
                     </Stack>
                   </Stack>

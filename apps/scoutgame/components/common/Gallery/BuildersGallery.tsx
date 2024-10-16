@@ -27,9 +27,9 @@ export function BuildersGallery({
         {builders.map((builder) => (
           <Grid key={builder.username} size={{ xs: 1 }} display='flex' justifyContent='center' alignItems='center'>
             <Box>
-              {builder.boughtNftsCount !== undefined && builder.boughtNftsCount > 0 && (
+              {builder.nftsSoldToScout !== undefined && builder.nftsSoldToScout > 0 && (
                 <Typography color='orange.main' textAlign='right' mb={1}>
-                  X {builder.boughtNftsCount ?? 0}
+                  X {builder.nftsSoldToScout ?? 0}
                 </Typography>
               )}
               <BuilderCard builder={builder} showPurchaseButton showHotIcon={showHotIcon} size={size} userId={userId} />

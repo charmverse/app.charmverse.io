@@ -2,15 +2,22 @@ import { ThumbUpOutlined as ApprovedIcon, HighlightOff as RejectedIcon } from '@
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Button, Card, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
-import type { UserProposal } from '@root/lib/proposals/getUserProposals';
+import type { CustomColumn, UserProposal } from '@root/lib/proposals/getUserProposals';
 import { useRouter } from 'next/router';
 
 import Link from 'components/common/Link';
 import { evaluationIcons } from 'components/settings/proposals/constants';
 
+import { CustomColumnTableCells } from './CustomColumnTableCells';
 import { OpenButton, StyledTable, StyledTableRow } from './ProposalsTable';
 
-export function ActionableProposalsTable({ proposals }: { proposals: UserProposal[] }) {
+export function ActionableProposalsTable({
+  proposals,
+  customColumns
+}: {
+  proposals: UserProposal[];
+  customColumns: CustomColumn[];
+}) {
   const router = useRouter();
 
   return (
@@ -52,6 +59,13 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                   Declined
                 </Typography>
               </TableCell>
+              {customColumns.map((column) => (
+                <TableCell key={column.formFieldId} align='center'>
+                  <Typography variant='body2' fontWeight='bold'>
+                    {column.title}
+                  </Typography>
+                </TableCell>
+              ))}
               <TableCell align='right'>
                 <Typography variant='body2' fontWeight='bold' sx={{ pr: 4 }}>
                   Action
@@ -65,8 +79,8 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                 proposal.currentEvaluation?.type === 'vote'
                   ? 'Vote'
                   : proposal.currentEvaluation?.type === 'sign_documents'
-                  ? 'Sign'
-                  : 'Review';
+                    ? 'Sign'
+                    : 'Review';
 
               let isOverdue = false;
               let dueDateText = '-';
@@ -98,7 +112,9 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                     router.push(`/${router.query.domain}/${proposal.path}`);
                   }}
                 >
-                  <TableCell width={250}>
+                  <TableCell
+                    sx={{ minWidth: 250, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                  >
                     <Typography>{proposal.title || 'Untitled'}</Typography>
                     <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
                       <OpenButton />
@@ -107,7 +123,11 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                   <TableCell align='center' width={200}>
                     <Typography color={isOverdue ? 'error' : 'initial'}>{dueDateText}</Typography>
                   </TableCell>
-                  <TableCell width={150}>
+                  <TableCell
+                    sx={{
+                      minWidth: 250
+                    }}
+                  >
                     <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
                       {proposal.currentEvaluation && evaluationIcons[proposal.currentEvaluation.type]()}
                       <Typography>
@@ -116,7 +136,13 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                     </Stack>
                   </TableCell>
                   <TableCell align='center' width={150}>
-                    <Typography>
+                    <Typography
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
                       {proposal.userReviewResult === 'pass' ? (
                         <ApprovedIcon fontSize='small' color='success' />
                       ) : proposal.userReviewResult === 'fail' ? (
@@ -136,6 +162,7 @@ export function ActionableProposalsTable({ proposals }: { proposals: UserProposa
                       {proposal.totalFailedReviewResults || '-'}
                     </Typography>
                   </TableCell>
+                  <CustomColumnTableCells customColumns={customColumns} proposal={proposal} />
                   <TableCell align='right' width={150}>
                     <Button
                       color='primary'

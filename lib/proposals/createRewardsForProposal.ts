@@ -105,8 +105,8 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
         const assignee: TargetPermissionGroup | null = reviewer.userId
           ? { group: 'user', id: reviewer.userId }
           : reviewer.roleId
-          ? { group: 'role', id: reviewer.roleId }
-          : null;
+            ? { group: 'role', id: reviewer.roleId }
+            : null;
 
         return assignee;
       })

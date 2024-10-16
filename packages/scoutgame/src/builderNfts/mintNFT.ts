@@ -77,7 +77,7 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
   // The builder receives 20% of the points value, regardless of whether the purchase was paid with points or not
   const pointsReceipts: { value: number; recipientId?: string; senderId?: string }[] = [
     {
-      value: Math.round(pointsValue * 0.2),
+      value: Math.floor(pointsValue * 0.2),
       recipientId: builderNft.builderId
     }
   ];

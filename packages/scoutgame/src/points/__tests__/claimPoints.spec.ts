@@ -1,7 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason } from '../../dates';
-import { mockBuilder, mockScout, mockGemPayoutEvent, mockNFTPurchaseEvent } from '../../testing/database';
+import {
+  mockBuilder,
+  mockScout,
+  mockGemPayoutEvent,
+  mockBuilderNft,
+  mockNFTPurchaseEvent
+} from '../../testing/database';
 import { claimPoints } from '../claimPoints';
 
 describe('claimPoints', () => {
@@ -10,11 +16,16 @@ describe('claimPoints', () => {
     const scout = await mockScout();
     await mockGemPayoutEvent({
       builderId: builder.id,
-      recipientId: builder.id
+      recipientId: builder.id,
+      amount: 10
+    });
+    await mockBuilderNft({
+      builderId: builder.id
     });
     await mockNFTPurchaseEvent({
       builderId: builder.id,
-      scoutId: scout.id
+      scoutId: scout.id,
+      points: 20
     });
 
     await claimPoints({ userId: builder.id, season: currentSeason });
@@ -24,6 +35,7 @@ describe('claimPoints', () => {
         recipientId: builder.id
       }
     });
+
     expect(transactions).toHaveLength(2);
     expect(transactions[0].claimedAt).not.toBeNull();
     expect(transactions[1].claimedAt).not.toBeNull();

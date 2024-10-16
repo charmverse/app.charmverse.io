@@ -144,11 +144,6 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  d="M0 0h24v24H0z"
-                  fill="none"
-                  stroke="none"
-                />
-                <path
                   d="M3 9l4 -4l4 4m-4 -4v14"
                 />
                 <path

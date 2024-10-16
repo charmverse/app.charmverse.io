@@ -12,8 +12,9 @@ import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useState } from 'react';
 
 import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
+import { useUser } from 'components/layout/UserProvider';
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
-import { loginAction } from 'lib/session/loginWithFarcasterAction';
+import { loginWithFarcasterAction } from 'lib/session/loginWithFarcasterAction';
 
 import { FarcasterLoginModal } from './FarcasterModal';
 import { WarpcastIcon } from './WarpcastIcon';
@@ -21,6 +22,7 @@ import { WarpcastIcon } from './WarpcastIcon';
 export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const router = useRouter();
+  const { setUser } = useUser();
   const { isAuthenticated } = useProfile();
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
@@ -33,13 +35,15 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     hasErrored,
     isExecuting: isLoggingIn,
     result
-  } = useAction(loginAction, {
+  } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
       const nextPage = data?.onboarded ? redirectUrl : '/welcome';
 
       if (!data?.success) {
         return;
       }
+
+      setUser(data.user);
 
       await revalidatePath();
       router.push(nextPage);
@@ -92,7 +96,10 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   }
 
   const errorMessage =
-    (connectionError && connectionError.message) ||
+    (connectionError &&
+      (connectionError.errCode === 'unavailable'
+        ? 'Could not connect to network. Please try again'
+        : connectionError.message)) ||
     (hasErrored &&
       (result?.serverError?.message?.includes('private beta')
         ? 'Scout Game is in private beta'

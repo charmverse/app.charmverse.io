@@ -1,8 +1,9 @@
 import { LoadingButton } from '@mui/lab';
-import { Button, Checkbox, FormControlLabel, Tabs, Tab, Chip, Box, Typography } from '@mui/material';
+import { Checkbox, FormControlLabel, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { Address } from 'viem';
+import { useSwitchChain, useWalletClient } from 'wagmi';
 
 import { MAX_UINT256, useUpdateERC20Allowance } from '../hooks/useUpdateERC20Allowance';
 
@@ -25,16 +26,25 @@ export function ERC20ApproveButton({
   // Default to decimals for USDC
   decimals = 6
 }: ERC20ApproveButtonProps) {
+  const amountToApprove = amount ? amount + amount / BigInt(50) : undefined;
+
   const [useUnlimited, setUseUnlimited] = useState(false);
+
+  const { data: walletClient } = useWalletClient();
+
+  const { switchChainAsync } = useSwitchChain();
 
   const { triggerApproveSpender, isApprovingSpender } = useUpdateERC20Allowance({ chainId, erc20Address, spender });
 
   async function approveSpender() {
-    await triggerApproveSpender({ amount: useUnlimited || !amount ? MAX_UINT256 : amount });
+    if (walletClient?.chain.id !== chainId) {
+      return switchChainAsync({ chainId });
+    }
+    await triggerApproveSpender({ amount: useUnlimited || !amountToApprove ? MAX_UINT256 : amountToApprove });
     onSuccess();
   }
 
-  const displayAmount = useUnlimited ? 'Unlimited' : (Number(amount || 0) / 10 ** decimals).toFixed(2);
+  const displayAmount = useUnlimited ? 'Unlimited' : (Number(amountToApprove || 0) / 10 ** decimals).toFixed(2);
 
   return (
     <div>
@@ -48,7 +58,7 @@ export function ERC20ApproveButton({
         >
           {isApprovingSpender ? 'Approving...' : `Approve ${displayAmount} USDC`}
         </LoadingButton>
-        {amount && (
+        {amountToApprove && (
           <FormControlLabel
             control={
               <Checkbox checked={useUnlimited} onChange={() => setUseUnlimited(!useUnlimited)} color='primary' />

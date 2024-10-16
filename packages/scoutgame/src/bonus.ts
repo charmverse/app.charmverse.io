@@ -9,11 +9,6 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
     repos: ['polygon-edge/polygon-edge'],
     icon: 'https://cryptologos.cc/logos/polygon-matic-logo.png'
   },
-  charmverse: {
-    name: 'Charmverse',
-    repos: ['charmverse/test-repo'],
-    icon: 'https://app.charmverse.io/images/logo_black_lightgrey.png'
-  },
   celo: {
     name: 'Celo',
     repos: [
@@ -25,9 +20,9 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
       'Glo-Foundation/glo-wallet',
       'Ubeswap/ubeswap-interface-v3',
       'gitcoinco/grants-stack',
-      'GoodDollar',
-      'Ubeswap',
-      'hypercerts-org'
+      'GoodDollar/GoodWeb3-Mono',
+      'GoodDollar/GoodCollective',
+      'Ubeswap/ubeswap-interface-v3'
     ],
     icon: 'https://cryptologos.cc/logos/celo-celo-logo.png'
   }

@@ -151,11 +151,6 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      d="M0 0h24v24H0z"
-                      fill="none"
-                      stroke="none"
-                    />
-                    <path
                       d="M3 9l4 -4l4 4m-4 -4v14"
                     />
                     <path
@@ -933,11 +928,6 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      d="M0 0h24v24H0z"
-                      fill="none"
-                      stroke="none"
-                    />
-                    <path
                       d="M3 9l4 -4l4 4m-4 -4v14"
                     />
                     <path
@@ -1454,11 +1444,6 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     width="1em"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path
-                      d="M0 0h24v24H0z"
-                      fill="none"
-                      stroke="none"
-                    />
                     <path
                       d="M3 9l4 -4l4 4m-4 -4v14"
                     />
@@ -2236,11 +2221,6 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     width="1em"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path
-                      d="M0 0h24v24H0z"
-                      fill="none"
-                      stroke="none"
-                    />
                     <path
                       d="M3 9l4 -4l4 4m-4 -4v14"
                     />

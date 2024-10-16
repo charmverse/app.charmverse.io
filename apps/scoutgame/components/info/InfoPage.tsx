@@ -1,4 +1,4 @@
-import { Link, Typography } from '@mui/material';
+import { Link, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import Image from 'next/image';
 
 import { Blockquote } from 'components/common/DocumentPageContainer/components/Blockquote';
@@ -10,14 +10,15 @@ export function InfoPage() {
   return (
     <DocumentPageContainer data-test='info-page'>
       <Image
-        src='/images/info_banner.png'
+        src='/images/info/info_banner.png'
         width={854}
         height={285}
         style={{
           maxWidth: '100%',
           height: 'auto'
         }}
-        alt=''
+        priority={true}
+        alt='info banner'
       />
       <Typography variant='h4' align='center' color='secondary'>
         All about Scout Game!
@@ -98,9 +99,24 @@ function Document() {
         <div>
           <Typography>Collect Gems for completing qualified actions:</Typography>
           <List>
+            <ListItem>Commit code to an approved open-source project</ListItem>
             <ListItem>Contribute to approved open-source projects with an accepted Pull Request</ListItem>
             <ListItem>Make your mark with a first-time code contribution to an approved project</ListItem>
             <ListItem>Hit a 3-Pull Request streak within 7 days</ListItem>
+          </List>
+        </div>
+        <div>
+          <Typography>Approved Open-Source Project Owners</Typography>
+          <List>
+            <ListItem>
+              <Link
+                href='https://docs.google.com/spreadsheets/d/1K-p1ekVWzc062Z9xlmObwWSjjt5aWLeZZL3zS0e77DE/edit?usp=sharing'
+                target='_blank'
+                rel='noopener'
+              >
+                https://docs.google.com/spreadsheets/d/1K-p1ekVWzc062Z9xlmObwWSjjt5aWLeZZL3zS0e77DE/edit?usp=sharing
+              </Link>
+            </ListItem>
           </List>
         </div>
       </InfoCard>
@@ -117,22 +133,37 @@ function Document() {
           Scout Game runs in seasons. Each season is 13 weeks. During each week, Builders collect Scout Gems by
           completing qualified actions.
         </Typography>
-        <List>
-          <ListItem>
-            <Typography>One merged Pull Request in a Qualified GitHub Repository = 1 Gem</Typography>
-          </ListItem>
-          <ListItem>
-            <Typography>
-              3rd Pull Request of a streak of 3 Merged Pull Requests in Qualified GitHub Repositories within a 7-day
-              window = 3 Gems
-            </Typography>
-          </ListItem>
-          <ListItem>
-            <Typography>First Pull Request in a Qualified GitHub Repository = 10 Gems</Typography>
-          </ListItem>
-        </List>
+        <Table sx={{ '& *': { px: 0 } }} aria-label='action table'>
+          <TableHead>
+            <TableRow>
+              <TableCell>Action</TableCell>
+              <TableCell align='right'>Reward</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody sx={{ '& td, & th': { border: 0 } }}>
+            <TableRow>
+              <TableCell>One commit to a Qualified GitHub Repository (max 1 gem per day)</TableCell>
+              <TableCell align='center'>1</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>One merged Pull Request in a Qualified GitHub Repository</TableCell>
+              <TableCell align='center'>10</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                3rd Pull Request of a streak of 3 Merged Pull Requests in Qualified GitHub Repositories within a sliding
+                7-day window
+              </TableCell>
+              <TableCell align='center'>30</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>First Pull Request in a Qualified GitHub Repository</TableCell>
+              <TableCell align='center'>100</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
         <Typography>A Builder may only score Gems for one PR per approved repo per day.</Typography>
-        <Typography>Gem rewards do not stack. The maximum score for a single PR is 10 Gems.</Typography>
+        <Typography>Gem rewards do not stack. The maximum score for a single PR is 100 Gems.</Typography>
         <Typography>
           At the end of each week, Builders are ranked by the number of Gems they collected that week. Scout Points are
           allocated to the top-ranking Builders and the Scouts who hold their NFTs according to this formula:
@@ -156,7 +187,7 @@ function Document() {
         </Typography>
         <Blockquote>
           <Typography>
-            Scout<sub>R</sub> Reward = 80% x (H / S) x Reward<sub>R</sub>
+            Scout<sub>R,H</sub> Reward = 80% x (H / S) x Reward<sub>R</sub>
           </Typography>
           <Typography>Where</Typography>
           <Typography>
@@ -172,20 +203,19 @@ function Document() {
         </Typography>
         <Typography>
           Builder NFTs can be purchased with Eth, USDC, or USDT on Base, OP or Arb. Scout Points can also be used to
-          purchase Builder NFTs at 50% discount. Builders receive 20% of the proceeds from their NFT sales in Scout
-          Points.
+          purchase Builder NFTs. Builders receive 20% of the proceeds from their NFT sales in Scout Points.
         </Typography>
         <Typography>
-          The price of a Builder's first NFT mint is $2.00. The price of the next NFT of the same Builder is calculated
-          as follows:
+          The price of a Builder's first NFT mint is 20 Scout Points. The price of the next NFT of the same Builder is
+          calculated as follows:
         </Typography>
         <Blockquote>
           <Typography align='center' my={1}>
-            <code>P = 2 x S + 2</code>
+            <code>P = 20 x S + 20</code>
           </Typography>
           <Typography>Where:</Typography>
           <Typography>
-            P: Price of the NFT ($)
+            P: Price of the NFT (Scout Points)
             <br />
             S: Current supply (number of NFTs minted)
           </Typography>
@@ -202,10 +232,12 @@ function Document() {
             <Typography>Qualified GitHub repo owners may report abuse in Scout Game.</Typography>
           </ListItem>
           <ListItem>
-            <Typography>CharmVerse core team may also report abuse.</Typography>
+            <Typography>Scout Game core team may also report abuse.</Typography>
           </ListItem>
           <ListItem>
-            <Typography>Builders receiving 3 abuse reports will be permanently banned from the Scout Game.</Typography>
+            <Typography>
+              Builders receiving 3 abuse reports will be suspended from the Scout Game and unable to score points
+            </Typography>
           </ListItem>
           <ListItem>
             <Typography>
@@ -215,6 +247,26 @@ function Document() {
                 https://appeal.scoutgame.xyz
               </Link>
             </Typography>
+          </ListItem>
+        </List>
+      </InfoCard>
+      <InfoCard title='Partner Rewards'>
+        <Typography>
+          Scout Game is partnering with Celo, Game7, Moxie and Bountycatser to reward builders for doing what they do
+          best! Find details about each partnership on the following pages:
+        </Typography>
+        <List>
+          <ListItem>
+            <Link href='/info/partner-rewards/celo'>Celo</Link>
+          </ListItem>
+          <ListItem>
+            <Link href='/info/partner-rewards/game7'>Game7</Link>
+          </ListItem>
+          <ListItem>
+            <Link href='/info/partner-rewards/moxie'>Moxie</Link>
+          </ListItem>
+          <ListItem>
+            <Link href='/info/partner-rewards/bountycaster'>BountyCaster</Link>
           </ListItem>
         </List>
       </InfoCard>

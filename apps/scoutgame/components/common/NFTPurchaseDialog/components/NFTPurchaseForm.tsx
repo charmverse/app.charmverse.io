@@ -2,9 +2,8 @@
 
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
-import { ActionType, ChainId } from '@decent.xyz/box-common';
-import type { UseBoxActionArgs } from '@decent.xyz/box-hooks';
-import { BoxHooksContextProvider, useBoxAction } from '@decent.xyz/box-hooks';
+import { ChainId } from '@decent.xyz/box-common';
+import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -27,8 +26,7 @@ import {
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
-import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
-import { convertCostToPointsWithDiscount, convertCostToUsd } from '@packages/scoutgame/builderNfts/utils';
+import { convertCostToPoints, convertCostToUsdDisplay } from '@packages/scoutgame/builderNfts/utils';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -45,10 +43,11 @@ import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsActi
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
+import { useDecentTransaction } from '../hooks/useDecentTransaction';
 import { useGetERC20Allowance } from '../hooks/useGetERC20Allowance';
+import { useGetTokenBalances } from '../hooks/useGetTokenBalances';
 
-import type { ChainOption } from './ChainSelector/chains';
-import { getChainOptions, getCurrencyContract } from './ChainSelector/chains';
+import { getCurrencyContract } from './ChainSelector/chains';
 import type { SelectedPaymentOption } from './ChainSelector/ChainSelector';
 import { BlockchainSelect } from './ChainSelector/ChainSelector';
 import { ERC20ApproveButton } from './ERC20Approve';
@@ -78,7 +77,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const { user } = useUser();
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111];
-  const pricePerNft = builder.price ? convertCostToUsd(builder.price) : 'N/A';
+  const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
 
   const { switchChainAsync } = useSwitchChain();
@@ -94,6 +93,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     currency: 'ETH'
   });
 
+  const { tokens: userTokenBalances } = useGetTokenBalances({ address: address as Address });
+
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
   const [fetchError, setFetchError] = useState<any>(null);
@@ -103,15 +104,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const [paymentMethod, setPaymentMethod] = useState<'points' | 'wallet'>('wallet');
 
-  const [balances, setBalances] = useState<{ usdc: bigint; eth: bigint; chainId: number; address: string } | null>(
-    null
-  );
-
   // Data from onchain
   const [purchaseCost, setPurchaseCost] = useState(BigInt(0));
   const [builderTokenId, setBuilderTokenId] = useState<bigint>(BigInt(0));
 
-  const purchaseCostInPoints = convertCostToPointsWithDiscount(purchaseCost);
+  const purchaseCostInPoints = convertCostToPoints(purchaseCost);
   const notEnoughPoints = user && user.currentBalance < purchaseCostInPoints;
 
   const {
@@ -169,51 +166,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     }
   });
 
-  const refreshBalance = useCallback(async () => {
-    const chainOption = getChainOptions({ useTestnets }).find(
-      (opt) => opt.id === selectedPaymentOption.chainId
-    ) as ChainOption;
-
-    const chain = chainOption?.chain;
-
-    const _chainId = chain?.id;
-
-    if (!_chainId) {
-      return;
-    }
-
-    const client = new UsdcErc20ABIClient({
-      chain,
-      contractAddress: chainOption.usdcAddress as `0x${string}`,
-      publicClient: getPublicClient(_chainId)
-    });
-
-    const usdcBalance = await client.balanceOf({ args: { account: address as `0x${string}` } });
-
-    const ethBalance = await getPublicClient(_chainId).getBalance({
-      address: address as `0x${string}`
-    });
-
-    const newBalances = {
-      usdc: usdcBalance,
-      eth: ethBalance,
-      chainId: _chainId,
-      address: address as `0x${string}`
-    };
-
-    setBalances(newBalances);
-
-    return newBalances;
-  }, [address, selectedPaymentOption.chainId, selectedPaymentOption.currency]);
-
-  useEffect(() => {
-    if (selectedPaymentOption) {
-      refreshBalance().catch((err) => {
-        log.error('Error refreshing balance', { error: err });
-      });
-    }
-  }, [selectedPaymentOption, address]);
-
   const { sendTransaction } = useSendTransaction();
 
   const refreshAsk = useCallback(
@@ -257,81 +209,34 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     }
   }, [tokensToBuy, builderTokenId, refreshAsk]);
 
-  /** TODO - Use this payload when we resume calling the contract directly
-   {
-    enable: !!address && !!purchaseCost,
-    actionType: ActionType.EvmFunction,
-    sender: address as string,
-    srcToken: '0x0000000000000000000000000000000000000000',
-    dstToken: '0x0b2c639c533813f4aa9d7837caf62653d097ff85',
-    slippage: 1,
-
-    srcChainId: ChainId.BASE,
-    dstChainId: ChainId.OPTIMISM,
-    actionConfig: {
-      chainId: ChainId.OPTIMISM,
-      contractAddress: '0x7df4d9f54a5cddfef50a032451f694d6345c60af',
-      cost: {
-        amount: purchaseCost,
-        isNative: false,
-        tokenAddress: '0x0b2c639c533813f4aa9d7837caf62653d097ff85'
-      },
-      signature: 'function mintBuilderNft(uint256 tokenId, uint256 amount, string calldata scout) external',
-      args: [BigInt(1), BigInt(1), 'c42efe4a-b385-488e-a5ca-135ecec0f810']
-    }
-  }
-   */
-
   const enableNftButton = !!address && !!purchaseCost && !!user;
 
-  const decentAPIParams: UseBoxActionArgs = {
-    enable: enableNftButton,
-    sender: address as `0x${string}`,
-    srcToken: getCurrencyContract(selectedPaymentOption),
-    dstToken: optimismUsdcContractAddress,
-    srcChainId: selectedPaymentOption.chainId,
-    dstChainId: ChainId.OPTIMISM,
-    slippage: 1,
-    actionType: ActionType.NftMint,
-    // @ts-ignore
-    actionConfig: {
-      chainId: ChainId.OPTIMISM,
-      contractAddress: getBuilderContractAddress(),
-      cost: {
-        amount: purchaseCost,
-        isNative: false,
-        tokenAddress: optimismUsdcContractAddress
-      },
-      signature: 'function mint(address account, uint256 tokenId, uint256 amount, string scout)',
-      args: [address, BigInt(builderTokenId), BigInt(tokensToBuy), user?.id]
-    }
-  };
-
-  const { error: decentSdkError, isLoading: isLoadingDecentSdk, actionResponse } = useBoxAction(decentAPIParams);
-
-  const { allowance, refreshAllowance, isLoadingAllowance } = useGetERC20Allowance({
-    chainId: selectedPaymentOption.chainId,
-    erc20Address:
-      selectedPaymentOption.currency === 'USDC'
-        ? (getCurrencyContract({
-            chainId: selectedPaymentOption.chainId,
-            currency: 'USDC'
-          }) as Address)
-        : null,
-    owner: address as Address,
-    spender: actionResponse?.tx.to as Address
+  const { decentSdkError, isLoadingDecentSdk, decentTransactionInfo } = useDecentTransaction({
+    address: address as Address,
+    builderTokenId,
+    scoutId: user?.id as string,
+    paymentAmountOut: purchaseCost,
+    sourceChainId: selectedPaymentOption.chainId,
+    sourceToken: getCurrencyContract(selectedPaymentOption),
+    tokensToPurchase: BigInt(tokensToBuy)
   });
 
-  const amountToPay = actionResponse?.tokenPayment?.amount;
-  const isEthPayment = !!actionResponse?.tokenPayment?.isNative;
-  const balanceDataFromCorrectChain = balances?.chainId === selectedPaymentOption.chainId;
+  const selectedChainCurrency = getCurrencyContract(selectedPaymentOption) as Address;
 
-  const hasSufficientBalance =
-    !amountToPay || !balanceDataFromCorrectChain
-      ? false
-      : isEthPayment
-      ? balances?.eth >= amountToPay
-      : balances?.usdc >= amountToPay;
+  const { allowance, refreshAllowance } = useGetERC20Allowance({
+    chainId: selectedPaymentOption.chainId,
+    erc20Address: selectedPaymentOption.currency === 'USDC' ? selectedChainCurrency : null,
+    owner: address as Address,
+    spender: decentTransactionInfo?.tx.to as Address
+  });
+
+  const balanceInfo = userTokenBalances?.find(
+    (_token) => _token.chainId === selectedPaymentOption.chainId && _token.address === selectedChainCurrency
+  );
+
+  const amountToPay = BigInt(decentTransactionInfo?.tokenPayment?.amount?.toString().replace('n', '') || 0);
+
+  const hasInsufficientBalance = !!amountToPay && !!balanceInfo && balanceInfo.balance < amountToPay;
 
   const handlePurchase = async () => {
     if (paymentMethod === 'points') {
@@ -341,7 +246,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         amount: tokensToBuy
       });
     } else {
-      if (!actionResponse?.tx) {
+      if (!decentTransactionInfo?.tx) {
         return;
       }
 
@@ -349,11 +254,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         await switchChainAsync({ chainId: selectedPaymentOption.chainId });
       }
 
+      const _value = BigInt(String((decentTransactionInfo.tx as any).value || 0).replace('n', ''));
+
       sendTransaction(
         {
-          to: actionResponse.tx.to as Address,
-          data: actionResponse.tx.data as any,
-          value: (actionResponse.tx as any).value
+          to: decentTransactionInfo.tx.to as Address,
+          data: decentTransactionInfo.tx.data as any,
+          value: _value
         },
         {
           onSuccess: async (data) => {
@@ -380,21 +287,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             setSubmitError(
               err.message || 'Something went wrong. Check your wallet is connected and has a sufficient balance'
             );
-            log.error('Creating a mint transaction failed', { actionResponse, error: err });
+            log.error('Creating a mint transaction failed', { decentTransactionInfo, error: err });
           }
         }
       );
     }
   };
-
-  useEffect(() => {
-    if (decentSdkError) {
-      log.error('Error on NFT Purchase calling useBoxAction from Decent SDK', {
-        params: decentAPIParams,
-        error: decentSdkError
-      });
-    }
-  }, [decentSdkError]);
 
   const isLoading =
     isSavingDecentTransaction ||
@@ -403,12 +301,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     isExecutingTransaction ||
     isExecutingPointsPurchase;
 
-  const displayedBalance =
-    balances?.chainId !== selectedPaymentOption.chainId || balances.address !== address
-      ? undefined
-      : selectedPaymentOption.currency === 'ETH'
-      ? (Number(balances?.eth || 0) / 1e18).toFixed(4)
-      : (Number(balances.usdc || 0) / 1e6).toFixed(2);
+  const displayedBalance = !balanceInfo
+    ? undefined
+    : selectedPaymentOption.currency === 'ETH'
+      ? (Number(balanceInfo.balance || 0) / 1e18).toFixed(4)
+      : (Number(balanceInfo.balance || 0) / 1e6).toFixed(2);
 
   const [selectedQuantity, setSelectedQuantity] = useState<number | 'custom'>(1);
   const [customQuantity, setCustomQuantity] = useState(2);
@@ -456,7 +353,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           <Image src='/images/no_nft_person.png' alt='no nft image available' width={200} height={200} />
         )}
         <Typography textAlign='center' fontWeight={600} color='secondary'>
-          {pricePerNft}
+          <>
+            {pricePerNft}{' '}
+            <Box display='inline' position='relative' top={4}>
+              <PointsIcon color='blue' size={18} />
+            </Box>
+          </>
         </Typography>
       </Box>
       <Stack gap={1}>
@@ -519,35 +421,23 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         )}
       </Stack>
       <Stack>
-        <Stack flexDirection='row' alignItems='center' gap={1} mb={1}>
+        <Stack flexDirection='row' alignItems='center' gap={0.5} mb={1}>
           <Typography color='secondary'>Total cost</Typography>
           <Link href='/info#builder-nfts' target='_blank' title='Read how Builder NFTs are priced'>
-            <InfoIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+            <InfoIcon sx={{ color: 'secondary.main', fontSize: 16, opacity: 0.7 }} />
           </Link>
         </Stack>
-        <Stack flexDirection='row' justifyContent='space-between'>
-          <Typography variant='caption' color='secondary' sx={{ width: '33%' }}>
+        <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+          <Typography variant='caption' color='secondary' align='left' sx={{ width: '50%' }}>
             Qty
           </Typography>
-          <Typography
-            variant='caption'
-            color='secondary'
-            align='center'
-            sx={{ position: 'relative', top: -4, width: '33%' }}
-          >
-            Points{' '}
-            <Box display='inline' position='relative' top={4}>
-              <PointsIcon size={18} color='blue' />
-            </Box>{' '}
-            (50% off)
-          </Typography>
-          <Typography variant='caption' color='secondary' align='right' sx={{ width: '33%' }}>
-            USDC $
+          <Typography variant='caption' color='secondary' align='left' flexGrow={1}>
+            Points
           </Typography>
         </Stack>
         <Stack flexDirection='row' justifyContent='space-between'>
-          <Typography sx={{ width: '33%' }}>{tokensToBuy} NFT</Typography>
-          <Typography align='center' sx={{ width: '33%' }}>
+          <Typography sx={{ width: '50%' }}>{tokensToBuy} NFT</Typography>
+          <Typography align='left' flexGrow={1}>
             {purchaseCost && (
               <>
                 {purchaseCostInPoints.toLocaleString()}{' '}
@@ -558,25 +448,19 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             )}
             {isFetchingPrice && <CircularProgress size={16} />}
           </Typography>
-          <Typography align='right' sx={{ width: '33%' }}>
-            {purchaseCost && convertCostToUsd(purchaseCost)}
-            {isFetchingPrice && <CircularProgress size={16} />}
-          </Typography>
         </Stack>
       </Stack>
       <Stack>
-        <Typography color='secondary' mb={1}>
-          Select payment
-        </Typography>
+        <Typography color='secondary'>Select payment</Typography>
         <RadioGroup
           row
           aria-label='payment method'
           name='payment-method'
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value as 'points' | 'wallet')}
-          sx={{ mb: 2, display: 'flex', gap: 2, width: '100%' }}
+          sx={{ mb: 1, display: 'flex', gap: 2, width: '100%' }}
         >
-          <FormControlLabel sx={{ width: '50%' }} value='wallet' control={<Radio />} label='Wallet' />
+          <FormControlLabel sx={{ width: '50%', mr: 0 }} value='wallet' control={<Radio />} label='Wallet' />
           <FormControlLabel
             value='points'
             // disabled={Boolean(loadingUser || notEnoughPoints)}
@@ -621,11 +505,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
               value={selectedPaymentOption}
               balance={displayedBalance}
               useTestnets={useTestnets}
+              address={address}
               onSelectChain={(_paymentOption) => {
                 setSelectedPaymentOption(_paymentOption);
               }}
             />
-            {!hasSufficientBalance && balanceDataFromCorrectChain && !!amountToPay ? (
+            {hasInsufficientBalance ? (
               <Typography sx={{ mt: 1 }} variant='caption' color='error' align='center'>
                 Insufficient balance
               </Typography>
@@ -639,11 +524,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Typography>
       )}
 
-      {!approvalRequired ||
-      isExecutingTransaction ||
-      isExecutingPointsPurchase ||
-      // Show disabled buy button if the user has insufficient balance, instead of the approve button
-      (!hasSufficientBalance && balanceDataFromCorrectChain) ? (
+      {!approvalRequired || isExecutingTransaction || isExecutingPointsPurchase ? (
         <LoadingButton
           loading={isLoading}
           size='large'
@@ -657,16 +538,14 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             isSavingDecentTransaction ||
             isExecutingTransaction ||
             (paymentMethod === 'points' && notEnoughPoints) ||
-            isExecutingPointsPurchase ||
-            (paymentMethod === 'wallet' && !hasSufficientBalance && balances && !!balanceDataFromCorrectChain) ||
-            (!approvalRequired && isLoadingAllowance)
+            isExecutingPointsPurchase
           }
         >
           Buy
         </LoadingButton>
       ) : (
         <ERC20ApproveButton
-          spender={actionResponse?.tx.to as Address}
+          spender={decentTransactionInfo?.tx.to as Address}
           chainId={selectedPaymentOption.chainId}
           erc20Address={getCurrencyContract(selectedPaymentOption) as Address}
           amount={amountToPay}

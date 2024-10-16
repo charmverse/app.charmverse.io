@@ -49,7 +49,7 @@ export async function mockBuilder({
 export type MockBuilder = Awaited<ReturnType<typeof mockBuilder>>;
 
 export async function mockScout({
-  username = uuid(),
+  username = `user-${uuid()}`,
   displayName = 'Test Scout'
 }: {
   username?: string;
@@ -119,7 +119,7 @@ export async function mockBuilderEvent({ builderId, eventType }: { builderId: st
   });
 }
 
-export async function mockGithubUser({ builderId }: { builderId?: string }) {
+export async function mockGithubUser({ builderId }: { builderId?: string } = {}) {
   const id = randomLargeInt();
 
   const name = `github_user:${id}`;
@@ -191,22 +191,20 @@ export async function mockNFTPurchaseEvent({
   builderId,
   scoutId,
   points = 0,
-  season = mockSeason
+  season = mockSeason,
+  tokensPurchased = 1
 }: {
   builderId: string;
   scoutId: string;
   points?: number;
   season?: string;
+  tokensPurchased?: number;
 }) {
-  let builderNft = await prisma.builderNft.findFirst({
+  const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
       builderId
     }
   });
-
-  if (!builderNft) {
-    builderNft = await mockBuilderNft({ builderId });
-  }
 
   return prisma.builderEvent.create({
     data: {
@@ -224,7 +222,7 @@ export async function mockNFTPurchaseEvent({
           scoutId,
           pointsValue: points,
           txHash: `0x${Math.random().toString(16).substring(2)}`,
-          tokensPurchased: 1
+          tokensPurchased
         }
       },
       pointsReceipts: {
@@ -252,7 +250,7 @@ export async function mockBuilderNft({
   owners?: (string | { id: string })[];
   season?: string;
 }) {
-  return prisma.builderNft.create({
+  const nft = await prisma.builderNft.create({
     data: {
       builderId,
       chainId,
@@ -273,6 +271,13 @@ export async function mockBuilderNft({
       }
     }
   });
+  for (const owner of owners) {
+    await mockNFTPurchaseEvent({
+      builderId,
+      scoutId: typeof owner === 'string' ? owner : owner.id
+    });
+  }
+  return nft;
 }
 
 export async function mockBuilderStrike({

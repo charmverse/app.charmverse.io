@@ -1,18 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
-import {
-  mockBuilder,
-  mockBuilderNft,
-  mockNFTPurchaseEvent,
-  mockRepo,
-  mockScout
-} from '@packages/scoutgame/testing/database';
+import { mockBuilder, mockBuilderNft, mockRepo, mockScout } from '@packages/scoutgame/testing/database';
 import { randomLargeInt, mockSeason } from '@packages/scoutgame/testing/generators';
 import { v4 } from 'uuid';
 
 import { mockPullRequest } from '@/testing/generators';
 
-jest.unstable_mockModule('../getClosedPullRequest', () => ({
+jest.unstable_mockModule('../github/getClosedPullRequest', () => ({
   getClosedPullRequest: jest.fn()
 }));
 
@@ -26,7 +20,7 @@ jest.unstable_mockModule('@packages/github/client', () => ({
   }
 }));
 
-const { getClosedPullRequest } = await import('../getClosedPullRequest');
+const { getClosedPullRequest } = await import('../github/getClosedPullRequest');
 const { recordClosedPullRequest } = await import('../recordClosedPullRequest');
 const { octokit } = await import('@packages/github/client');
 
@@ -44,8 +38,7 @@ describe('recordClosedPullRequest', () => {
     const repo = await mockRepo();
     const scout = await mockScout();
 
-    await mockBuilderNft({ builderId: builder.id });
-    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout.id });
+    await mockBuilderNft({ builderId: builder.id, owners: [scout] });
 
     const pullRequest = mockPullRequest({
       createdAt: new Date().toISOString(),
@@ -97,8 +90,7 @@ describe('recordClosedPullRequest', () => {
     const scout = await mockScout();
     const repo = await mockRepo();
 
-    await mockBuilderNft({ builderId: builder.id });
-    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout.id });
+    await mockBuilderNft({ builderId: builder.id, owners: [scout] });
 
     const pullRequest = mockPullRequest({
       state: 'CLOSED',
@@ -151,8 +143,7 @@ describe('recordClosedPullRequest', () => {
     const scout = await mockScout();
     const repo = await mockRepo();
 
-    await mockBuilderNft({ builderId: builder.id });
-    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout.id });
+    await mockBuilderNft({ builderId: builder.id, owners: [scout] });
 
     const pullRequest = mockPullRequest({
       createdAt: new Date().toISOString(),
@@ -244,8 +235,7 @@ describe('recordClosedPullRequest', () => {
     const scout = await mockScout();
     const repo = await mockRepo();
 
-    await mockBuilderNft({ builderId: builder.id });
-    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scout.id });
+    await mockBuilderNft({ builderId: builder.id, owners: [scout] });
 
     const pullRequest = mockPullRequest({
       createdAt: new Date().toISOString(),

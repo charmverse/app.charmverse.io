@@ -15,15 +15,15 @@ export function getActivityLabel(activity: BuilderActivity) {
     ? activity.contributionType === 'first_pr'
       ? 'First CONTRIBUTION'
       : activity.contributionType === 'regular_pr'
-      ? 'Contribution ACCEPTED'
-      : activity.contributionType === 'third_pr_in_streak'
-      ? 'Contribution STREAK'
-      : activity.contributionType === 'daily_commit'
-      ? 'Daily COMMIT'
-      : null
+        ? 'Contribution ACCEPTED'
+        : activity.contributionType === 'third_pr_in_streak'
+          ? 'Contribution STREAK'
+          : activity.contributionType === 'daily_commit'
+            ? 'Daily COMMIT'
+            : null
     : activity.type === 'nft_purchase'
-    ? 'Scouted by'
-    : null;
+      ? 'Scouted by'
+      : null;
 }
 
 export function BuilderActivityLabel({ activity }: { activity: BuilderActivity }) {

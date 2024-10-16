@@ -21,5 +21,5 @@ export type BuilderMetrics = {
 export type BuilderInfo = BasicUserInfo &
   BuilderMetrics & {
     nftImageUrl?: string | null;
-    boughtNftsCount?: number;
+    nftsSoldToScout?: number;
   };

@@ -1,4 +1,5 @@
 import { useTestnets } from '@packages/scoutgame/builderNfts/constants';
+import type { Address } from 'viem';
 import type { Chain } from 'viem/chains';
 import {
   arbitrum,
@@ -15,13 +16,15 @@ import {
 
 export type ChainOption = { name: string; id: number; icon: string; chain: Chain; usdcAddress: string };
 
+export const ETH_NATIVE_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 export const chainOptionsMainnet: ChainOption[] = [
   {
     name: 'Optimism',
     id: optimism.id,
     icon: '/images/crypto/op64.png',
     chain: optimism,
-    usdcAddress: '0x0b2c639c533813f4aa9d7837caf62653d097ff85'
+    usdcAddress: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85'
   },
   {
     name: 'Base',
@@ -43,7 +46,7 @@ export const chainOptionsMainnet: ChainOption[] = [
     id: mainnet.id,
     icon: '/images/crypto/ethereum-eth-logo.png',
     chain: mainnet,
-    usdcAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+    usdcAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
   }
 ];
 
@@ -85,12 +88,12 @@ export type ChainWithCurrency = ChainOption & { currency: AvailableCurrency };
 
 export type SelectedPaymentOption = { chainId: number; currency: AvailableCurrency };
 
-export function getCurrencyContract({ currency, chainId }: SelectedPaymentOption): string {
+export function getCurrencyContract({ currency, chainId }: SelectedPaymentOption): Address {
   if (currency === 'ETH') {
-    return '0x0000000000000000000000000000000000000000';
+    return ETH_NATIVE_ADDRESS;
   }
 
-  return getChainOptions({ useTestnets }).find((chain) => chain.id === chainId)?.usdcAddress || '';
+  return (getChainOptions({ useTestnets }).find((chain) => chain.id === chainId)?.usdcAddress || '') as Address;
 }
 
 export function getChainOptions(opts: { useTestnets?: boolean } = { useTestnets: false }): ChainWithCurrency[] {

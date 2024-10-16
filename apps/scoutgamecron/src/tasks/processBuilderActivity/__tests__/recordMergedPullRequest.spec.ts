@@ -15,12 +15,12 @@ import { mockPullRequest } from '@/testing/generators';
 
 const currentSeason = '2024-W40';
 
-jest.unstable_mockModule('../getRecentPullRequestsByUser', () => ({
+jest.unstable_mockModule('../github/getRecentPullRequestsByUser', () => ({
   getRecentPullRequestsByUser: jest.fn()
 }));
 
 const { recordMergedPullRequest } = await import('../recordMergedPullRequest');
-const { getRecentPullRequestsByUser } = await import('../getRecentPullRequestsByUser');
+const { getRecentPullRequestsByUser } = await import('../github/getRecentPullRequestsByUser');
 
 describe('recordMergedPullRequest', () => {
   beforeEach(() => {
@@ -36,15 +36,12 @@ describe('recordMergedPullRequest', () => {
     const username = v4();
 
     const builder = await mockBuilder();
-    await mockBuilderNft({
-      builderId: builder.id,
-      season: currentSeason
-    });
     const scout = await mockScout();
 
-    await mockNFTPurchaseEvent({
+    await mockBuilderNft({
       builderId: builder.id,
-      scoutId: scout.id
+      season: currentSeason,
+      owners: [scout]
     });
 
     const repo = await mockRepo({
@@ -129,15 +126,11 @@ describe('recordMergedPullRequest', () => {
       author: builder.githubUser
     });
 
+    const scout = await mockScout();
     await mockBuilderNft({
       builderId: builder.id,
-      season: currentSeason
-    });
-    const scout = await mockScout();
-
-    await mockNFTPurchaseEvent({
-      builderId: builder.id,
-      scoutId: scout.id
+      season: currentSeason,
+      owners: [scout]
     });
 
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([
@@ -200,12 +193,10 @@ describe('recordMergedPullRequest', () => {
     const scout = await mockScout();
     await mockBuilderNft({
       builderId: builder.id,
-      season: currentSeason
+      season: currentSeason,
+      owners: [scout]
     });
-    await mockNFTPurchaseEvent({
-      builderId: builder.id,
-      scoutId: scout.id
-    });
+
     const now = DateTime.fromObject({ weekday: 3 }, { zone: 'utc' }); // 1 is Monday and 7 is Sunday
 
     const lastWeekPr = mockPullRequest({
@@ -378,11 +369,8 @@ describe('recordMergedPullRequest', () => {
     const scout = await mockScout();
     await mockBuilderNft({
       builderId: builder.id,
-      season: currentSeason
-    });
-    await mockNFTPurchaseEvent({
-      builderId: builder.id,
-      scoutId: scout.id
+      season: currentSeason,
+      owners: [scout]
     });
 
     const pullRequest = mockPullRequest({
@@ -393,8 +381,6 @@ describe('recordMergedPullRequest', () => {
       author: builder.githubUser
     });
     (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
-
-    await recordMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
     await recordMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
@@ -443,11 +429,8 @@ describe('recordMergedPullRequest', () => {
     const scout = await mockScout();
     await mockBuilderNft({
       builderId: builder.id,
-      season: currentSeason
-    });
-    await mockNFTPurchaseEvent({
-      builderId: builder.id,
-      scoutId: scout.id
+      season: currentSeason,
+      owners: [scout]
     });
 
     const repo = await mockRepo();
