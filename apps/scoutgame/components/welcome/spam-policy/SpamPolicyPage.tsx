@@ -10,13 +10,7 @@ import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
 import type { SessionUser } from 'lib/session/getUserFromSession';
 import { saveOnboardedAction } from 'lib/users/saveOnboardedAction';
 
-export function SpamPolicyPage({
-  user,
-  profileGithubConnect
-}: {
-  user: SessionUser | null;
-  profileGithubConnect: boolean;
-}) {
+export function SpamPolicyPage({ user, redirectToProfile }: { user: SessionUser | null; redirectToProfile: boolean }) {
   const router = useRouter();
   // programmatically added builders will land here skipping the /welcome/builder page
   // we set the onboardedAt flag on that page, so make sure we set it here too if the user hasn't been onboarded yet
@@ -46,7 +40,7 @@ export function SpamPolicyPage({
         {user ? (
           user.onboardedAt ? (
             <Button
-              href={profileGithubConnect ? '/profile' : '/welcome/how-it-works'}
+              href={redirectToProfile ? '/profile' : '/welcome/how-it-works'}
               data-test='continue-button'
               disabled={isExecuting}
               sx={{ margin: '0 auto', display: 'flex' }}

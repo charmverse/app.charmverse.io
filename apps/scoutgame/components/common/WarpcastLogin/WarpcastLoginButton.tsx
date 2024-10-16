@@ -9,7 +9,7 @@ import { Box, Button, Typography } from '@mui/material';
 import { usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { useUser } from 'components/layout/UserProvider';
@@ -26,6 +26,7 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const { isAuthenticated } = useProfile();
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
+  const inviteCode = searchParams.get('invite-code');
   const redirectUrl = redirectUrlEncoded ? decodeURIComponent(redirectUrlEncoded) : '/';
 
   const { executeAsync: revalidatePath, isExecuting: isRevalidatingPath } = useAction(revalidatePathAction);
@@ -67,7 +68,7 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
 
   const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
     if (res.message && res.signature) {
-      await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature });
+      await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature, inviteCode });
     } else {
       log.error('Did not receive message or signature from Farcaster', res);
     }
