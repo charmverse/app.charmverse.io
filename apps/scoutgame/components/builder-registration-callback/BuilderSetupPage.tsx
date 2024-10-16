@@ -55,7 +55,9 @@ export function BuilderSetupPage({
         <Typography variant='h5' color='secondary' mb={2} textAlign='center'>
           Setting up your builder profile...
         </Typography>
-        <Typography mb={2}>We are setting up your builder profile. This process takes 1-2 minutes.</Typography>
+        <Typography mb={2}>
+          We are setting up your builder profile. This process usually takes a few seconds.
+        </Typography>
         {!error && <LoadingComponent isLoading={status === 'executing'} />}
         {error && (
           <Typography variant='body2' sx={{ mt: 2 }} color='error'>
