@@ -23,13 +23,17 @@ describe('sendPoints', () => {
       select: {
         currentBalance: true,
         userSeasonStats: true,
+        userAllTimeStats: true,
         activities: true
       }
     });
     expect(updated?.currentBalance).toBe(mockPoints);
 
-    // Points should not be added to allTimeStats or userSeasonStats
+    // Earned as not provided, so stats should not be affected
+    expect(updated?.userSeasonStats[0]).toBeUndefined();
+    expect(updated?.userAllTimeStats[0]).toBeUndefined();
 
+    // No activities should be created so that a notification doesn't happen
     expect(updated?.activities[0]).toBeUndefined();
   });
 
@@ -40,7 +44,8 @@ describe('sendPoints', () => {
       builderId: builder.id,
       points: mockPoints,
       description: 'Test description',
-      claimed: true
+      claimed: true,
+      earnedAs: 'builder'
     });
     const updated = await prisma.scout.findUnique({
       where: {
