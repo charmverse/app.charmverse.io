@@ -50,7 +50,7 @@ export function getCurrentStep({
   const proposalEvaluationStepsCompleted =
     currentEvaluation.id === lastEvaluation?.id && lastEvaluation?.result === 'pass';
   // show Rewards step if the are pending, or if they are published and there are no credentials to publish
-  if (proposalEvaluationStepsCompleted && (hasPendingRewards || (hasPublishedRewards && !credentialsEnabled)) {
+  if (proposalEvaluationStepsCompleted && (hasPendingRewards || (hasPublishedRewards && !credentialsEnabled))) {
     return {
       title: 'Rewards',
       step: 'rewards' as ProposalEvaluationStep,
