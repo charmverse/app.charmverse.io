@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
-import { authSecret } from '@root/config/constants';
+import { authSecret, baseUrl } from '@root/config/constants';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constants';
 import { unsealData } from 'iron-session';
 
@@ -132,6 +132,7 @@ export async function setupBuilderProfile({
 
   if (inviteCode !== null) {
     await registerBuilderNFT({
+      imageHostingBaseUrl: baseUrl,
       builderId: unsealedUserId,
       season: currentSeason
     });
