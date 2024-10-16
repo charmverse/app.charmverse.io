@@ -418,14 +418,14 @@ export async function getUserProposals({
           currentEvaluation: !canSeeEvaluationDetails
             ? undefined
             : currentEvaluation
-            ? {
-                id: currentEvaluation.id,
-                type: currentEvaluation.type,
-                dueDate: currentEvaluation.dueDate || null,
-                title: currentEvaluation.title,
-                result: currentEvaluation.result || null
-              }
-            : undefined,
+              ? {
+                  id: currentEvaluation.id,
+                  type: currentEvaluation.type,
+                  dueDate: currentEvaluation.dueDate || null,
+                  title: currentEvaluation.title,
+                  result: currentEvaluation.result || null
+                }
+              : undefined,
           updatedAt: proposal.page.updatedAt,
           path: proposal.page.path,
           status: proposal.status,

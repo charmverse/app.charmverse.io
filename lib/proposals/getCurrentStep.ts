@@ -50,21 +50,6 @@ export function getCurrentStep({
   const proposalEvaluationStepsCompleted =
     currentEvaluation.id === lastEvaluation?.id && lastEvaluation?.result === 'pass';
 
-  if (proposalEvaluationStepsCompleted && (hasPendingCredentials || (credentialsEnabled && !hasRewards))) {
-    return {
-      title: 'Credentials',
-      step: 'credentials' as ProposalEvaluationStep,
-      result: !hasPendingCredentials ? ProposalEvaluationResult.pass : 'in_progress',
-      id: 'credentials',
-      // Add 1 with total evaluations so that draft step is also included
-      index: evaluations.length + 1,
-      requiredReviews: 1,
-      finalStep: null,
-      appealedAt: null,
-      dueDate: null
-    };
-  }
-
   if (proposalEvaluationStepsCompleted && hasRewards) {
     return {
       title: 'Rewards',
@@ -73,6 +58,21 @@ export function getCurrentStep({
       id: 'rewards',
       // Add 1 with total evaluations so that draft step is also included
       index: evaluations.length + (credentialsEnabled ? 2 : 1),
+      requiredReviews: 1,
+      finalStep: null,
+      appealedAt: null,
+      dueDate: null
+    };
+  }
+
+  if (proposalEvaluationStepsCompleted && (hasPendingCredentials || credentialsEnabled)) {
+    return {
+      title: 'Credentials',
+      step: 'credentials' as ProposalEvaluationStep,
+      result: !hasPendingCredentials ? ProposalEvaluationResult.pass : 'in_progress',
+      id: 'credentials',
+      // Add 1 with total evaluations so that draft step is also included
+      index: evaluations.length + 1,
       requiredReviews: 1,
       finalStep: null,
       appealedAt: null,
