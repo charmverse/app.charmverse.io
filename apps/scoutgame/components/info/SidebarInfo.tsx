@@ -2,7 +2,7 @@
 
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, ListItemText, ListItemButton, Paper, Drawer, IconButton } from '@mui/material';
+import { Collapse, ListItemText, ListItemButton, Paper, IconButton } from '@mui/material';
 import Link from 'next/link';
 import { useState } from 'react';
 
