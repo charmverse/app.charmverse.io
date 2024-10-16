@@ -1,14 +1,15 @@
 'use client';
 
+import CloseIcon from '@mui/icons-material/Close';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, ListItemText, ListItemButton, Paper, IconButton, ListSubheader } from '@mui/material';
+import { Collapse, ListItemText, ListItemButton, Paper, IconButton, ListSubheader, Stack } from '@mui/material';
 import Link from 'next/link';
 import { useState } from 'react';
 
 import { List } from 'components/common/DocumentPageContainer/components/List';
 
-export function SidebarInfo() {
+export function SidebarInfo({ handleClose }: Readonly<{ handleClose?: () => void }>) {
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {
@@ -21,9 +22,16 @@ export function SidebarInfo() {
         component='nav'
         aria-labelledby='info-page-list'
         subheader={
-          <ListSubheader component='h6' id='info-page-list'>
-            Info pages
-          </ListSubheader>
+          <Stack flexDirection='row' justifyContent='space-between'>
+            <ListSubheader component='h6' id='info-page-list'>
+              Info pages
+            </ListSubheader>
+            {handleClose && (
+              <IconButton onClick={handleClose}>
+                <CloseIcon />
+              </IconButton>
+            )}
+          </Stack>
         }
         sx={{ ml: 0 }}
       >

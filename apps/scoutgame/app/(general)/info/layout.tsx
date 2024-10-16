@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { ScrollButton } from 'components/common/DocumentPageContainer/components/ScrollButton';
 import { SidebarInfo } from 'components/info/SidebarInfo';
 
-export default function Layout({
+export default async function Layout({
   children
 }: Readonly<{
   children: ReactNode;
@@ -16,7 +16,7 @@ export default function Layout({
         <Stack sx={{ display: { xs: 'none', md: 'flex' } }}>
           <SidebarInfo />
         </Stack>
-        <Stack maxWidth='854px' width='100%' mx='auto' gap={8}>
+        <Stack maxWidth='854px' width='100%' mx='auto' gap={{ xs: 2, md: 4 }}>
           {children}
           <ScrollButton scrollType='up' sx={{ textAlign: 'center', width: '100%' }}>
             back to top <ArrowDropUpIcon fontSize='small' />

@@ -2,14 +2,14 @@ import { Typography } from '@mui/material';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 
-import { InfoPageContainer } from '../InfoPageContainer';
+import { InfoPageContainer } from '../../InfoPageContainer';
 
 export function BountyCasterPage() {
   return (
     <InfoPageContainer
       data-test='partner-bountycaster-page'
       image='/images/info/rewards-partner-bountycaster.jpg'
-      title='All about Scout Game!'
+      title='BountyCaster'
     >
       <Document />
     </InfoPageContainer>
@@ -18,7 +18,7 @@ export function BountyCasterPage() {
 
 function Document() {
   return (
-    <InfoCard title='BountyCaster'>
+    <InfoCard title=''>
       <Typography>Bountycaster is partnering with Scout Game to offer additional USDC rewards for builders!</Typography>
       <Typography variant='h6' color='secondary' mt={2}>
         How it works

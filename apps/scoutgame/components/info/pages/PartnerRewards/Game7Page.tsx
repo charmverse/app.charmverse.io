@@ -1,32 +1,20 @@
 import { Typography } from '@mui/material';
-import Image from 'next/image';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
-import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
+import { InfoPageContainer } from 'components/info/InfoPageContainer';
 
 export function Game7Page() {
   return (
-    <DocumentPageContainer data-test='parther-game7-page'>
-      <Image
-        src='/images/info/rewards-partner-game7.jpg'
-        width={854}
-        height={285}
-        style={{
-          maxWidth: '100%',
-          height: 'auto'
-        }}
-        alt='rewads partner game7'
-        priority={true}
-      />
+    <InfoPageContainer data-test='partner-game7-page' image='/images/info/rewards-partner-game7.jpg' title='Game7'>
       <Document />
-    </DocumentPageContainer>
+    </InfoPageContainer>
   );
 }
 
 function Document() {
   return (
-    <InfoCard title='Game7'>
+    <InfoCard>
       <Typography>
         Game7 is partnering with Scout Game to support builders who contribute to the ecosystem. Game7 will distribute
         20 rewards of $250 each, from a prize pool of $5000 USD, to Builders!

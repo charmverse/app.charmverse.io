@@ -23,9 +23,15 @@ export function InfoPageContainer({
         priority={true}
         alt='info banner'
       />
-      <Stack flexDirection='row' alignItems='center' justifyContent='space-between' data-test='info-page' {...props}>
+      <Stack
+        flexDirection='row'
+        alignItems='center'
+        justifyContent={{ xs: 'space-between', md: 'center' }}
+        data-test='info-page'
+        {...props}
+      >
         {title && (
-          <Typography variant='h4' align='center' color='secondary'>
+          <Typography variant='h4' textAlign='center' color='secondary'>
             {title}
           </Typography>
         )}

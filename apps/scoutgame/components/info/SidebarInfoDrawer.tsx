@@ -4,12 +4,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Drawer, IconButton } from '@mui/material';
 import { useState } from 'react';
 
-import { useMdScreen } from 'hooks/useMediaScreens';
-
 import { SidebarInfo } from './SidebarInfo';
 
 export function SidebarInfoDrawer() {
-  const isMdScreen = useMdScreen();
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -20,13 +17,9 @@ export function SidebarInfoDrawer() {
     setOpen(false);
   };
 
-  if (typeof isMdScreen === 'undefined' || isMdScreen) {
-    return null;
-  }
-
   return (
     <>
-      <IconButton onClick={handleOpen}>
+      <IconButton onClick={handleOpen} sx={{ display: { xs: 'inline-flex', md: 'none' } }}>
         <MenuIcon />
       </IconButton>
       <Drawer
@@ -37,7 +30,7 @@ export function SidebarInfoDrawer() {
           keepMounted: true
         }}
       >
-        <SidebarInfo />
+        <SidebarInfo handleClose={handleClose} />
       </Drawer>
     </>
   );
