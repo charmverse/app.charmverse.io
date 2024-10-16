@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { prettyPrint } from '@packages/utils/strings';
 import { createPublicClient, http, parseEventLogs } from 'viem';
-import { mainnet } from 'viem/chains';
+import { optimism } from 'viem/chains';
 
 import { realOptimismMainnetBuildersContract } from './constants';
 
@@ -47,8 +46,8 @@ const contractAbi = [transferSingle, builderScouted];
 
 // Set up your client for the desired chain
 const client = createPublicClient({
-  chain: mainnet,
-  transport: http(`https://opt-mainnet.g.alchemy.com/v2/vTjY0u9L7uoxZQ5GtOw4yKwn7WJelMXp`)
+  chain: optimism,
+  transport: http(`https://opt-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`)
 });
 
 // Contract address and the event signature for filtering logs
