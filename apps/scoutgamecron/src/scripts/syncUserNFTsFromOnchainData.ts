@@ -60,6 +60,3 @@ async function syncUserNFTsFromOnchainData({username, scoutId}: {username?: stri
     await handlePendingTransaction({ pendingTransactionId: pendingTx.id });
   }
 }
-
-
-syncUserNFTsFromOnchainData({ username: 'gonna' }).then(console.log)
