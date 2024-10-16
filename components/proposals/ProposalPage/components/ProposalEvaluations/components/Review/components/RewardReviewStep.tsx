@@ -46,8 +46,8 @@ export function RewardReviewStep({
   const disabledTogglePublicTooltip = rewards.length
     ? 'Rewards are already published for this proposal'
     : !isAdmin
-    ? 'Only admins can change public reward settings'
-    : null;
+      ? 'Only admins can change public reward settings'
+      : null;
 
   async function createRewards() {
     try {

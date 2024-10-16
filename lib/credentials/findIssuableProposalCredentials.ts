@@ -268,20 +268,23 @@ export async function findSpaceIssuableProposalCredentials({
     }
   });
 
-  const pendingProposalsInSafe = pendingSafeTransactions.reduce((acc, pendingTx) => {
-    for (const proposalId of pendingTx.proposalIds) {
-      const pendingProposalCredentials =
-        (pendingTx as TypedPendingGnosisSafeTransaction<'proposal'>).credentialContent?.[proposalId] ?? [];
+  const pendingProposalsInSafe = pendingSafeTransactions.reduce(
+    (acc, pendingTx) => {
+      for (const proposalId of pendingTx.proposalIds) {
+        const pendingProposalCredentials =
+          (pendingTx as TypedPendingGnosisSafeTransaction<'proposal'>).credentialContent?.[proposalId] ?? [];
 
-      if (!acc[proposalId]) {
-        acc[proposalId] = [];
+        if (!acc[proposalId]) {
+          acc[proposalId] = [];
+        }
+
+        acc[proposalId].push(...pendingProposalCredentials);
       }
 
-      acc[proposalId].push(...pendingProposalCredentials);
-    }
-
-    return acc;
-  }, {} as Record<string, PartialIssuableProposalCredentialContent[]>);
+      return acc;
+    },
+    {} as Record<string, PartialIssuableProposalCredentialContent[]>
+  );
 
   return proposals
     .map((p) =>

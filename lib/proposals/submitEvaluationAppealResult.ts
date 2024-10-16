@@ -1,6 +1,5 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { issueOffchainProposalCredentialsIfNecessary } from '@root/lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { publishProposalEvent } from '@root/lib/webhookPublisher/publishEvent';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
@@ -57,10 +56,6 @@ export async function updateEvaluationResult({
   if (finalResult === 'pass') {
     await createVoteIfNecessary({
       createdBy: decidedBy,
-      proposalId
-    });
-    await issueOffchainProposalCredentialsIfNecessary({
-      event: 'proposal_approved',
       proposalId
     });
   }
