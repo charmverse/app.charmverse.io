@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     { password: authSecret as string }
   );
 
-  const redirect = `${process.env.DOMAIN}/welcome/builder-setup`;
+  const redirect = `${process.env.DOMAIN}/builder-registration-callback`;
 
   const redirectUrl = getGithubOAuthCallbackUrl({
     clientId: GITHUB_CLIENT_ID,

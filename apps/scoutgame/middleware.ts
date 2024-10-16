@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
   // Redirect to login if anonymous user clicks on private links
   if (!isLoggedIn && privateLinks.some((link) => path.startsWith(link))) {
     // eslint-disable-next-line no-console
-    console.log('Redirecting to login', session);
+    console.log('Redirecting to login', { path, ...session });
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
