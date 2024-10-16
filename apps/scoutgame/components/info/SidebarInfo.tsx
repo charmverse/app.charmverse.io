@@ -2,28 +2,31 @@
 
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, ListItemText, ListItemButton, Paper, IconButton } from '@mui/material';
+import { Collapse, ListItemText, ListItemButton, Paper, IconButton, ListSubheader } from '@mui/material';
 import Link from 'next/link';
 import { useState } from 'react';
 
 import { List } from 'components/common/DocumentPageContainer/components/List';
-import { useMdScreen } from 'hooks/useMediaScreens';
 
 export function SidebarInfo() {
-  const isBigScreen = useMdScreen();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const handleClick = () => {
-    setOpen(!open);
+    setOpen((prevState) => !prevState);
   };
-
-  if (!isBigScreen) {
-    return null;
-  }
 
   return (
     <Paper>
-      <List component='nav'>
+      <List
+        component='nav'
+        aria-labelledby='info-page-list'
+        subheader={
+          <ListSubheader component='h6' id='info-page-list'>
+            Info pages
+          </ListSubheader>
+        }
+        sx={{ ml: 0 }}
+      >
         <ListItemButton LinkComponent={Link} href='/info'>
           <ListItemText>All about Scout Game</ListItemText>
         </ListItemButton>

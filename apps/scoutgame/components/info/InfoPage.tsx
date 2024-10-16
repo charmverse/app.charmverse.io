@@ -1,36 +1,16 @@
-import { Link, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import Image from 'next/image';
+import { Link, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
 import { Blockquote } from 'components/common/DocumentPageContainer/components/Blockquote';
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
-import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
 
-import { SidebarInfo } from './SidebarInfo';
-import { SidebarInfoDrawer } from './SidebarInfoDrawer';
+import { InfoPageContainer } from './InfoPageContainer';
 
 export function InfoPage() {
   return (
-    <DocumentPageContainer data-test='info-page'>
-      <Image
-        src='/images/info/info_banner.png'
-        width={854}
-        height={285}
-        style={{
-          maxWidth: '100%',
-          height: 'auto'
-        }}
-        priority={true}
-        alt='info banner'
-      />
-      <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
-        <Typography variant='h4' align='center' color='secondary'>
-          All about Scout Game!
-        </Typography>
-        <SidebarInfoDrawer />
-      </Stack>
+    <InfoPageContainer data-test='info-page' image='/images/info/info_banner.png' title='All about Scout Game!'>
       <Document />
-    </DocumentPageContainer>
+    </InfoPageContainer>
   );
 }
 

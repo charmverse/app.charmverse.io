@@ -1,18 +1,17 @@
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { Container, Stack } from '@mui/material';
-import type { PropsWithChildren } from '@packages/utils/react';
+import type { ReactNode } from 'react';
 
+import { ScrollButton } from 'components/common/DocumentPageContainer/components/ScrollButton';
 import { SidebarInfo } from 'components/info/SidebarInfo';
 
-import { ScrollButton } from './components/ScrollButton';
-
-// For Info pages
-export function DocumentPageContainer({
-  children,
-  'data-test': dataTest
-}: PropsWithChildren<{ 'data-test'?: string }>) {
+export default function Layout({
+  children
+}: Readonly<{
+  children: ReactNode;
+}>) {
   return (
-    <Container data-test={dataTest} maxWidth='lg'>
+    <Container maxWidth='lg'>
       <Stack py={8} gap={8} maxWidth='100%' flexDirection='row'>
         <Stack sx={{ display: { xs: 'none', md: 'flex' } }}>
           <SidebarInfo />
