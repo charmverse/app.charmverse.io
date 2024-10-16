@@ -26,7 +26,9 @@ async function resetReviewEndpoint(req: NextApiRequest, res: NextApiResponse) {
       id: evaluationId
     },
     select: {
+      index: true,
       result: true,
+      type: true,
       appealedAt: true,
       proposal: {
         select: {
@@ -47,19 +49,39 @@ async function resetReviewEndpoint(req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (evaluation.result) {
-    throw new ActionNotPermittedError(`You cannot reset a review for a completed step.`);
+    const totalEvaluations = await prisma.proposalEvaluation.count({
+      where: {
+        proposalId
+      }
+    });
+
+    const isLastEvaluation = evaluation.index === totalEvaluations - 1;
+
+    if (!isLastEvaluation && evaluation.type !== 'pass_fail') {
+      throw new ActionNotPermittedError(`You cannot reset a review for a completed step.`);
+    }
   }
 
   if (evaluation.appealedAt) {
     throw new ActionNotPermittedError(`You cannot reset a review for a step that has been appealed.`);
   }
 
-  await prisma.proposalEvaluationReview.deleteMany({
-    where: {
-      evaluationId,
-      reviewerId: userId
-    }
-  });
+  await prisma.$transaction([
+    prisma.proposalEvaluationReview.deleteMany({
+      where: {
+        evaluationId,
+        reviewerId: userId
+      }
+    }),
+    prisma.proposalEvaluation.update({
+      where: {
+        id: evaluationId
+      },
+      data: {
+        result: null
+      }
+    })
+  ]);
 
   return res.status(200).end();
 }

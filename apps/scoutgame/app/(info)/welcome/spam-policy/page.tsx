@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   title: 'Spam policy'
 };
 
-export default async function SpamPolicy({ searchParams }: { searchParams: { 'profile-github-connect': string } }) {
+export default async function SpamPolicy({ searchParams }: { searchParams: { 'profile-redirect': string } }) {
   const user = await getUserFromSession();
 
-  return <SpamPolicyPage user={user} profileGithubConnect={searchParams['profile-github-connect'] === 'true'} />;
+  return <SpamPolicyPage user={user} redirectToProfile={searchParams['profile-redirect'] === 'true'} />;
 }

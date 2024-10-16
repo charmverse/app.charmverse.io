@@ -16,6 +16,7 @@ import { publishProposalEventBase } from '@root/lib/webhookPublisher/publishEven
 import { relay } from '@root/lib/websockets/relay';
 import { uniqBy } from 'lodash';
 
+import { issueOffchainProposalCredentialsIfNecessary } from '../credentials/issueOffchainProposalCredentialsIfNecessary';
 import { permissionsApiClient } from '../permissions/api/client';
 
 export async function createRewardsForProposal({ proposalId, userId }: { userId: string; proposalId: string }) {
@@ -193,6 +194,11 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
       userId
     });
   }
+
+  await issueOffchainProposalCredentialsIfNecessary({
+    event: 'proposal_approved',
+    proposalId
+  });
 
   return updatedProposal;
 }

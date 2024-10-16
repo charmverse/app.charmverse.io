@@ -106,8 +106,8 @@ function ProposalStatusSelectBase({
       currentEvaluationStep === 'rewards'
         ? `${rewardLabel} ${statusLabel}`
         : currentEvaluationStep === 'credentials'
-        ? `Credentials ${statusLabel}`
-        : statusLabel;
+          ? `Credentials ${statusLabel}`
+          : statusLabel;
 
     return {
       id: status,
@@ -145,16 +145,16 @@ function ProposalStatusSelectBase({
         proposal.archived
           ? 'archived'
           : hasPublishedRewards
-          ? getProposalEvaluationStatus({
-              result: 'pass',
-              step: 'rewards'
-            })
-          : proposal
-          ? getProposalEvaluationStatus({
-              result: proposal.currentStep.result ?? 'in_progress',
-              step: proposal.currentStep.step
-            })
-          : 'in_progress'
+            ? getProposalEvaluationStatus({
+                result: 'pass',
+                step: 'rewards'
+              })
+            : proposal
+              ? getProposalEvaluationStatus({
+                  result: proposal.currentStep.result ?? 'in_progress',
+                  step: proposal.currentStep.step
+                })
+              : 'in_progress'
       }
       disableClearable
       onChange={(status) => {
@@ -162,8 +162,8 @@ function ProposalStatusSelectBase({
           status === 'complete' || status === 'passed' || status === 'published'
             ? 'pass'
             : status === 'declined' || status === 'unpublished'
-            ? 'fail'
-            : null
+              ? 'fail'
+              : null
         );
       }}
     />
