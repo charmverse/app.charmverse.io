@@ -49,7 +49,7 @@ export async function mockBuilder({
 export type MockBuilder = Awaited<ReturnType<typeof mockBuilder>>;
 
 export async function mockScout({
-  username = uuid(),
+  username = `user-${uuid()}`,
   displayName = 'Test Scout'
 }: {
   username?: string;
