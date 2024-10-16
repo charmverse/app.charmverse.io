@@ -1,6 +1,8 @@
 import { processNftMints } from '../tasks/processNftMints';
 import { prisma } from '@charmverse/core/prisma-client';
 import { syncUserNFTsFromOnchainData } from './syncUserNFTsFromOnchainData';
+import { getOnchainPurchaseEvents } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents';
+import { prettyPrint } from '@packages/utils/strings';
 export async function query() {
   const scouts = await prisma.scout.findMany({
     where: {
@@ -24,10 +26,16 @@ export async function query() {
       id: 'asc'
     }
   });
-  for (const scout of scouts) {
-    await syncUserNFTsFromOnchainData({ scoutId: scout.id });
-    console.log('synced', scout.id, scouts.indexOf(scout), 'of ', scouts.length);
-  }
+
+  const data = await Promise.all(scouts.map(async (scout) => {
+    const userPurchases = await getOnchainPurchaseEvents({ scoutId: scout.id });
+    return {
+      ...scout,
+      userPurchases
+    }
+  }));
+
+  return data;
   // const builderNft = await prisma.builderNft.findMany({
   //   where: {
   //     tokenId: {
@@ -40,4 +48,4 @@ export async function query() {
   // });
   // console.log(builderNft);
 }
-query();
+query().then(prettyPrint);
