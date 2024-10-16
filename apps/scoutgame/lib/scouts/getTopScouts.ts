@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
+import { prettyPrint } from '@packages/utils/strings';
 
 export type TopScout = {
   id: string;
@@ -45,6 +46,14 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
             select: {
               pointsEarnedAsScout: true
             }
+          },
+          userSeasonStats: {
+            where: {
+              season: currentSeason
+            },
+            select: {
+              nftsPurchased: true
+            }
           }
         }
       }
@@ -55,7 +64,7 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
       const buildersScouted = Array.from(
         new Set(scout.user.nftPurchaseEvents.map((event) => event.builderNFT.builderId))
       ).length;
-      const nftsHeld = scout.user.nftPurchaseEvents.length;
+      const nftsHeld = scout.user.userSeasonStats[0]?.nftsPurchased || 0;
       const allTimePoints = scout.user.userAllTimeStats[0]?.pointsEarnedAsScout || 0;
       const seasonPoints = scout.pointsEarnedAsScout;
       return {
