@@ -160,8 +160,8 @@ export async function recordMergedPullRequest({
       const gemReceiptType: GemsReceiptType = isFirstMergedPullRequest
         ? 'first_pr'
         : threeDayPrStreak
-        ? 'third_pr_in_streak'
-        : 'regular_pr';
+          ? 'third_pr_in_streak'
+          : 'regular_pr';
 
       // this is the date the PR was merged, which determines the season/week that it counts as a builder event
       const pullRequestDate = new Date(pullRequest.mergedAt!);
@@ -183,8 +183,8 @@ export async function recordMergedPullRequest({
             gemReceiptType === 'first_pr'
               ? 'gems_first_pr'
               : gemReceiptType === 'third_pr_in_streak'
-              ? 'gems_third_pr_in_streak'
-              : 'gems_regular_pr'
+                ? 'gems_third_pr_in_streak'
+                : 'gems_regular_pr'
           ) as ScoutGameActivityType;
 
           // It's a new event, we can record notification

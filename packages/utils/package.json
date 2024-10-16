@@ -13,6 +13,8 @@
     "./types": "./src/types.ts",
     "./dates": "./src/dates.ts",
     "./http": "./src/http.ts",
+    "./sleep": "./src/sleep.ts",
+    "./env": "./src/env.ts",
     "./strings": "./src/strings.ts"
   }
 }

@@ -79,8 +79,8 @@ export function ActionableProposalsTable({
                 proposal.currentEvaluation?.type === 'vote'
                   ? 'Vote'
                   : proposal.currentEvaluation?.type === 'sign_documents'
-                  ? 'Sign'
-                  : 'Review';
+                    ? 'Sign'
+                    : 'Review';
 
               let isOverdue = false;
               let dueDateText = '-';

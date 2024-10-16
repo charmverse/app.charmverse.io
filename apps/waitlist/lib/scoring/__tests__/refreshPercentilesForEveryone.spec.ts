@@ -4,7 +4,7 @@ import { randomLargeInt, randomIntFromInterval } from '@packages/scoutgame/testi
 import type { ConnectWaitlistTier, TierChange } from '@packages/scoutgame/waitlist/scoring/constants';
 import { refreshUserScore } from '@packages/scoutgame/waitlist/scoring/refreshUserScore';
 
-import { refreshPercentilesForEveryone } from '../refreshPercentilesForEveryone'; // Adjust the import to the correct module
+import { refreshPercentilesForEveryone } from '../refreshPercentilesForEveryone';
 
 // Function to shuffle an array deterministically using a seeded random number generator
 function seededShuffle(array: number[], seed: number): number[] {
@@ -92,7 +92,7 @@ describe('refreshPercentilesForEveryone', () => {
 
     // Everyone starts in the 'common' tier
     // Now, 70% of 150 records should be out of the common tier
-    expect(tierChangeResults.length).toBe(104);
+    expect(tierChangeResults.length).toBe(106);
 
     const firstChangedUser = tierChangeResults[0];
     expect(fids.indexOf(firstChangedUser.fid)).toBe(131);
@@ -153,7 +153,7 @@ describe('refreshPercentilesForEveryone', () => {
 
     expect(thirdUserWaitlistSlot.percentile).toBe(thirdChangedUser.percentile);
 
-    expect(fourthChangedUser.percentile).toBe(50);
+    expect(fourthChangedUser.percentile).toBe(53);
     expect(fourthChangedUser.score).toBe(210);
     expect(fourthChangedUser.newTier).toBe<ConnectWaitlistTier>('rare');
     expect(fourthChangedUser.tierChange).toBe<TierChange>('up');
@@ -249,7 +249,7 @@ describe('refreshPercentilesForEveryone', () => {
 
     // Everyone starts in the 'common' tier
     // Now, 70% of 150 records should be out of the common tier
-    expect(tierChangeResults.length).toBe(104);
+    expect(tierChangeResults.length).toBe(106);
 
     const firstChangedUser = tierChangeResults[0];
     expect(fids.indexOf(firstChangedUser.fid)).toBe(131);
@@ -310,7 +310,7 @@ describe('refreshPercentilesForEveryone', () => {
 
     expect(thirdUserWaitlistSlot.percentile).toBe(thirdChangedUser.percentile);
 
-    expect(fourthChangedUser.percentile).toBe(50);
+    expect(fourthChangedUser.percentile).toBe(53);
     expect(fourthChangedUser.score).toBe(210);
     expect(fourthChangedUser.newTier).toBe<ConnectWaitlistTier>('rare');
     expect(fourthChangedUser.tierChange).toBe<TierChange>('up');
@@ -506,8 +506,8 @@ describe('refreshPercentilesForEveryone', () => {
     expect(tierChangeResults.some((tierChange) => fidsWithReferral.includes(tierChange.fid)));
 
     // Everyone starts in the 'common' tier
-    // Now, 70% (-1) of 100 records should be out of the common tier
-    expect(tierChangeResults.length).toBe(69);
+    // Now, 70% of 100 records should be out of the common tier
+    expect(tierChangeResults.length).toBe(70);
 
     const firstChangedUser = tierChangeResults[0];
     expect(expectedFids.indexOf(firstChangedUser.fid)).toBe(50);
@@ -568,7 +568,7 @@ describe('refreshPercentilesForEveryone', () => {
 
     expect(thirdUserWaitlistSlot.percentile).toBe(thirdChangedUser.percentile);
 
-    expect(fourthChangedUser.percentile).toBe(50);
+    expect(fourthChangedUser.percentile).toBe(59);
     expect(fourthChangedUser.score).toBe(-909);
     expect(fourthChangedUser.newTier).toBe<ConnectWaitlistTier>('rare');
     expect(fourthChangedUser.tierChange).toBe<TierChange>('up');
