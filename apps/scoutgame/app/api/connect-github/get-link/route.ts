@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     { password: authSecret as string }
   );
 
-  const redirect = `${process.env.DOMAIN}/api/connect-github/callback`;
+  const redirect = `${process.env.DOMAIN}/welcome/github-connect`;
 
   const redirectUrl = getGithubOAuthCallbackUrl({
     clientId: GITHUB_CLIENT_ID,
