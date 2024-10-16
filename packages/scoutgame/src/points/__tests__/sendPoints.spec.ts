@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { currentSeason } from '../../dates';
 import { mockBuilder } from '../../testing/database';
 import { sendPoints } from '../sendPoints';
 
@@ -10,7 +11,10 @@ describe('sendPoints', () => {
     await sendPoints({
       builderId: builder.id,
       points: mockPoints,
-      hideFromNotifications: true
+      hideFromNotifications: true,
+      claimed: true,
+      description: `Test points`,
+      season: currentSeason
     });
     const updated = await prisma.scout.findUnique({
       where: {
@@ -19,11 +23,17 @@ describe('sendPoints', () => {
       select: {
         currentBalance: true,
         userSeasonStats: true,
+        userAllTimeStats: true,
         activities: true
       }
     });
     expect(updated?.currentBalance).toBe(mockPoints);
+
+    // Earned as not provided, so stats should not be affected
     expect(updated?.userSeasonStats[0]).toBeUndefined();
+    expect(updated?.userAllTimeStats[0]).toBeUndefined();
+
+    // No activities should be created so that a notification doesn't happen
     expect(updated?.activities[0]).toBeUndefined();
   });
 
@@ -33,7 +43,9 @@ describe('sendPoints', () => {
     await sendPoints({
       builderId: builder.id,
       points: mockPoints,
-      earnedAsBuilder: true
+      description: 'Test description',
+      claimed: true,
+      earnedAs: 'builder'
     });
     const updated = await prisma.scout.findUnique({
       where: {
@@ -42,11 +54,13 @@ describe('sendPoints', () => {
       select: {
         currentBalance: true,
         userSeasonStats: true,
-        activities: true
+        activities: true,
+        events: true
       }
     });
     expect(updated?.currentBalance).toBe(mockPoints);
     expect(updated?.userSeasonStats[0].pointsEarnedAsBuilder).toBe(mockPoints);
     expect(updated?.activities[0].type).toBe('points');
+    expect(updated?.events[0].description).toBe('Test description');
   });
 });

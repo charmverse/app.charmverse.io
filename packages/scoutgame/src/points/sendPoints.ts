@@ -1,33 +1,42 @@
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ISOWeek } from '@packages/scoutgame/dates';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+
+import { incrementPointsEarnedStats } from './updatePointsEarned';
 
 export async function sendPoints({
   builderId,
   season = currentSeason,
   week = getCurrentWeek(),
   points,
-  earnedAsBuilder = false,
-  hideFromNotifications = false
+  description,
+  earnedAs,
+  claimed,
+  hideFromNotifications = false,
+  tx
 }: {
   builderId: string;
   points: number;
   season?: ISOWeek;
   week?: ISOWeek;
-  earnedAsBuilder?: boolean;
+  description: string;
+  claimed: boolean;
+  earnedAs?: 'builder' | 'scout';
   hideFromNotifications?: boolean;
+  tx?: Prisma.TransactionClient;
 }) {
-  return prisma.$transaction([
-    prisma.builderEvent.create({
+  async function txHandler(_tx: Prisma.TransactionClient) {
+    await _tx.builderEvent.create({
       data: {
         builderId,
         type: 'misc_event',
         week,
         season,
-        description: 'Received points for participating in pre-season week as a Builder',
+        description,
         pointsReceipts: {
           create: {
-            claimedAt: new Date(),
+            claimedAt: claimed ? new Date() : null,
             value: points,
             recipientId: builderId,
             activities: hideFromNotifications
@@ -36,45 +45,38 @@ export async function sendPoints({
                   create: {
                     type: 'points',
                     userId: builderId,
-                    recipientType: 'builder'
+                    recipientType: !earnedAs ? 'scout' : earnedAs
                   }
                 }
           }
         }
       }
-    }),
-    prisma.scout.update({
+    });
+    await _tx.scout.update({
       where: {
         id: builderId
       },
       data: {
         currentBalance: {
-          increment: 100
+          increment: points
         }
       }
-    }),
-    ...(earnedAsBuilder
-      ? [
-          prisma.userSeasonStats.upsert({
-            where: {
-              userId_season: {
-                userId: builderId,
-                season
-              }
-            },
-            update: {
-              pointsEarnedAsBuilder: {
-                increment: points
-              }
-            },
-            create: {
-              userId: builderId,
-              season,
-              pointsEarnedAsBuilder: points,
-              pointsEarnedAsScout: 0
-            }
-          })
-        ]
-      : [])
-  ]);
+    });
+
+    if (earnedAs) {
+      await incrementPointsEarnedStats({
+        season,
+        userId: builderId,
+        builderPoints: earnedAs === 'builder' ? points : 0,
+        scoutPoints: earnedAs === 'scout' ? points : 0,
+        tx: _tx
+      });
+    }
+  }
+
+  if (tx) {
+    return txHandler(tx);
+  } else {
+    return prisma.$transaction(txHandler);
+  }
 }

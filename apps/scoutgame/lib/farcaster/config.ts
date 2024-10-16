@@ -25,7 +25,8 @@ export function getAuthConfig() {
 export const authSchema = yup.object({
   nonce: yup.string().defined(),
   message: yup.string().required(),
-  signature: yup.string<Hex>().required()
+  signature: yup.string<Hex>().required(),
+  inviteCode: yup.string().optional().nullable()
   // state: yup.string<'pending' | 'completed'>().defined().oneOf(['pending', 'completed']),
   // custody: yup.string<Hex>().required()
 });

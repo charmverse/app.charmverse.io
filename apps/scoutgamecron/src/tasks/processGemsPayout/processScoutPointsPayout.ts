@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { builderPointsShare, scoutPointsShare } from '@packages/scoutgame/builderNfts/constants';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/calculatePoints';
-import { updatePointsEarned } from '@packages/scoutgame/points/updatePointsEarned';
+import { incrementPointsEarnedStats } from '@packages/scoutgame/points/updatePointsEarned';
 import { v4 } from 'uuid';
 
 export async function processScoutPointsPayout({
@@ -96,6 +96,7 @@ export async function processScoutPointsPayout({
             data: {
               value: scoutPoints,
               recipientId: scoutId,
+
               eventId: builderEventId,
               activities: {
                 create: {
@@ -107,7 +108,7 @@ export async function processScoutPointsPayout({
               }
             }
           });
-          await updatePointsEarned({
+          await incrementPointsEarnedStats({
             userId: scoutId,
             season,
             scoutPoints,
@@ -129,7 +130,7 @@ export async function processScoutPointsPayout({
             }
           }
         }),
-        updatePointsEarned({
+        incrementPointsEarnedStats({
           userId: builderId,
           season,
           builderPoints,
