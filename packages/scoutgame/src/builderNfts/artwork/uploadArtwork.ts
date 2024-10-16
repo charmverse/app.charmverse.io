@@ -22,11 +22,13 @@ function getS3ClientConfig() {
 const client = new S3Client(getS3ClientConfig());
 
 export async function uploadArtwork({
+  imageHostingBaseUrl,
   avatar,
   tokenId,
   season,
   username
 }: {
+  imageHostingBaseUrl?: string;
   username: string;
   season: string;
   avatar: string | null;
@@ -34,7 +36,8 @@ export async function uploadArtwork({
 }) {
   const imageBuffer = await generateNftImage({
     avatar,
-    username
+    username,
+    imageHostingBaseUrl
   });
 
   const imagePath = getNftFilePath({ season, tokenId: Number(tokenId), type: 'artwork.png' });
@@ -58,16 +61,19 @@ export async function uploadArtwork({
 }
 
 export async function uploadArtworkCongrats({
+  imageHostingBaseUrl,
   season,
   tokenId,
   userImage
 }: {
+  imageHostingBaseUrl?: string;
   season: string;
   tokenId: bigint | number;
   userImage: string | null;
 }) {
   const imageBuffer = await generateNftCongrats({
-    userImage
+    userImage,
+    imageHostingBaseUrl
   });
 
   const imagePath = getNftCongratsFilePath({ season, tokenId: Number(tokenId) });

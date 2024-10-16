@@ -13,7 +13,7 @@ export function JoinGithubButton() {
   return (
     <>
       <Button
-        href={isProfilePage ? `${href}?profile-github-connect=true` : href}
+        href={isProfilePage ? `${href}?profile-redirect=true` : href}
         variant='contained'
         color='primary'
         sx={{ width: '100%' }}
