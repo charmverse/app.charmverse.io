@@ -59,6 +59,7 @@ type Props = {
   archived?: boolean;
   // Refers to the step that will be completed when the evaluation is completed
   actionCompletesStep?: boolean;
+  isLastStep?: boolean;
 };
 
 export function PassFailEvaluationContainer({
@@ -71,7 +72,8 @@ export function PassFailEvaluationContainer({
   confirmationMessage,
   archived,
   authors,
-  actionCompletesStep
+  actionCompletesStep,
+  isLastStep
 }: Props) {
   const appealReasonPopupState = usePopupState({
     variant: 'dialog'
@@ -182,6 +184,7 @@ export function PassFailEvaluationContainer({
     isApprover: evaluation.isApprover,
     archived,
     label,
+    isLastStep,
     actionCompletesStep,
     onSubmitEvaluationReview,
     onResetEvaluationReview: evaluation.appealedAt ? undefined : onResetEvaluationReview,

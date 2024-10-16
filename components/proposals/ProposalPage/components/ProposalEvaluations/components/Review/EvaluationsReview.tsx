@@ -275,6 +275,7 @@ export function EvaluationsReview({
                 evaluation={evaluation}
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
+                isLastStep={index === proposal.evaluations.length - 1 && !hasRewardsStep && !hasCredentialsStep}
                 refreshProposal={refreshProposal}
               />
             )}

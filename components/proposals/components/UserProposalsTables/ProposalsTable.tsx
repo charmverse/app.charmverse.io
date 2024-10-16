@@ -45,9 +45,6 @@ export const StyledTableRow = styled(TableRow)`
   }
   .open-button {
     display: none;
-    position: absolute;
-    right: 0;
-    top: 13px;
   }
 `;
 
@@ -146,17 +143,21 @@ export function ProposalsTable({
                 >
                   <TableCell
                     sx={{
-                      pl: 0,
-                      minWidth: 250,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between'
+                      minWidth: 250
                     }}
                   >
-                    <Typography>{proposal.title || 'Untitled'}</Typography>
-                    <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
-                      <OpenButton />
-                    </Link>
+                    <Stack
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexDirection: 'row'
+                      }}
+                    >
+                      <Typography>{proposal.title || 'Untitled'}</Typography>
+                      <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
+                        <OpenButton />
+                      </Link>
+                    </Stack>
                   </TableCell>
                   <TableCell align='center' width={200}>
                     <Chip
@@ -169,7 +170,7 @@ export function ProposalsTable({
                   <TableCell
                     align='left'
                     sx={{
-                      minWidth: 250
+                      minWidth: 150
                     }}
                   >
                     <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
@@ -180,7 +181,7 @@ export function ProposalsTable({
                     </Stack>
                   </TableCell>
 
-                  <TableCell align='center' width={150}>
+                  <TableCell align='center' sx={{ minWidth: 150 }}>
                     <Typography
                       sx={{
                         display: 'flex',
