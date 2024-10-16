@@ -21,6 +21,7 @@ import { getRelativeTimeInThePast } from 'lib/utils/dates';
 export type PassFailEvaluationProps = {
   isAppealProcess?: boolean;
   actionCompletesStep?: boolean;
+  isLastStep?: boolean;
   confirmationMessage?: string;
   hideReviewer?: boolean;
   isCurrent: boolean;
@@ -88,7 +89,8 @@ export function PassFailEvaluation({
   actionLabels: _actionLabels,
   confirmationMessage,
   isAppealProcess,
-  actionCompletesStep
+  actionCompletesStep,
+  isLastStep
 }: PassFailEvaluationProps) {
   const { user } = useUser();
   const currentUserEvaluationReview = evaluationReviews?.find((review) => review.reviewerId === user?.id);
@@ -191,7 +193,8 @@ export function PassFailEvaluation({
                     <Stack direction='row' gap={1.5} alignItems='center'>
                       {onResetEvaluationReview &&
                         evaluationReview.reviewerId === user?.id &&
-                        (!evaluationResult || index === evaluationReviews.length - 1) && (
+                        // Only allow undoing review if its the last step
+                        isLastStep && (
                           <Button
                             size='small'
                             color='secondary'

@@ -186,12 +186,12 @@ export function EvaluationsReview({
   const disabledPublishTooltip = !proposal?.permissions.evaluate
     ? `Only reviewers can publish ${lowercaseRewardsTitle}`
     : proposal?.archived
-    ? `Cannot publish ${lowercaseRewardsTitle} for an archived proposal`
-    : !isRewardsActive
-    ? `Proposal must be in ${lowercaseRewardsTitle} step to publish ${lowercaseRewardsTitle}`
-    : isRewardsComplete
-    ? `${capitalisedRewardsTitle} step is already complete`
-    : null;
+      ? `Cannot publish ${lowercaseRewardsTitle} for an archived proposal`
+      : !isRewardsActive
+        ? `Proposal must be in ${lowercaseRewardsTitle} step to publish ${lowercaseRewardsTitle}`
+        : isRewardsComplete
+          ? `${capitalisedRewardsTitle} step is already complete`
+          : null;
 
   return (
     <LoadingComponent isLoading={!proposal}>
@@ -275,6 +275,7 @@ export function EvaluationsReview({
                 evaluation={evaluation}
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
+                isLastStep={index === proposal.evaluations.length - 1 && !hasRewardsStep && !hasCredentialsStep}
                 refreshProposal={refreshProposal}
               />
             )}
