@@ -57,7 +57,7 @@ export function getCurrentStep({
       result: hasPublishedRewards ? ProposalEvaluationResult.pass : 'in_progress',
       id: 'rewards',
       // Add 1 with total evaluations so that draft step is also included
-      index: evaluations.length + (credentialsEnabled ? 2 : 1),
+      index: evaluations.length + 1,
       requiredReviews: 1,
       finalStep: null,
       appealedAt: null,
@@ -72,7 +72,7 @@ export function getCurrentStep({
       result: !hasPendingCredentials ? ProposalEvaluationResult.pass : 'in_progress',
       id: 'credentials',
       // Add 1 with total evaluations so that draft step is also included
-      index: evaluations.length + 1,
+      index: evaluations.length + (hasRewards ? 2 : 1),
       requiredReviews: 1,
       finalStep: null,
       appealedAt: null,
