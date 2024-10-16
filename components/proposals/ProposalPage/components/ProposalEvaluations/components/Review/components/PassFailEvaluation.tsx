@@ -100,14 +100,14 @@ export function PassFailEvaluation({
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
     : !actionCompletesStep && !isReviewer
-    ? 'You are not a reviewer'
-    : actionCompletesStep && !isApprover
-    ? 'You are not an approver'
-    : isSubmittingReview
-    ? 'Submitting review'
-    : archived
-    ? 'You cannot move an archived proposal'
-    : null;
+      ? 'You are not a reviewer'
+      : actionCompletesStep && !isApprover
+        ? 'You are not an approver'
+        : isSubmittingReview
+          ? 'Submitting review'
+          : archived
+            ? 'You cannot move an archived proposal'
+            : null;
   const completedDate = completedAt ? getRelativeTimeInThePast(new Date(completedAt)) : null;
   const evaluationReviewDeclineInputPopupState = usePopupState({ variant: 'popover' });
 
@@ -174,7 +174,7 @@ export function PassFailEvaluation({
       <Card variant='outlined'>
         {evaluationReviews.length > 0 && (
           <Stack p={2} gap={2.5}>
-            {evaluationReviews.map((evaluationReview) => {
+            {evaluationReviews.map((evaluationReview, index) => {
               return (
                 <Stack key={evaluationReview.id} gap={1.5}>
                   <Stack direction='row' justifyContent='space-between' alignItems='center'>
@@ -189,17 +189,19 @@ export function PassFailEvaluation({
                       </Typography>
                     </Stack>
                     <Stack direction='row' gap={1.5} alignItems='center'>
-                      {onResetEvaluationReview && evaluationReview.reviewerId === user?.id && !evaluationResult && (
-                        <Button
-                          size='small'
-                          color='secondary'
-                          variant='outlined'
-                          loading={isResettingEvaluationReview}
-                          onClick={onResetEvaluationReview}
-                        >
-                          Undo
-                        </Button>
-                      )}
+                      {onResetEvaluationReview &&
+                        evaluationReview.reviewerId === user?.id &&
+                        (!evaluationResult || index === evaluationReviews.length - 1) && (
+                          <Button
+                            size='small'
+                            color='secondary'
+                            variant='outlined'
+                            loading={isResettingEvaluationReview}
+                            onClick={onResetEvaluationReview}
+                          >
+                            Undo
+                          </Button>
+                        )}
                       {evaluationReview.result === 'pass' ? (
                         <ApprovedIcon fontSize='small' color='success' />
                       ) : (
