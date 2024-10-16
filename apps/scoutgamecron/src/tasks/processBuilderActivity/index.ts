@@ -48,8 +48,15 @@ export async function processAllBuilderActivity({
   log.info(`Processing activity for ${builders.length} builders`);
 
   for (const builder of builders) {
-    // If the builder was created less than 10 minutes ago and has no existing events
-    const newBuilder = builder.createdAt > new Date(Date.now() - 10 * 60 * 1000) && !builder.githubUser[0]?.events[0];
+    // If the builder was created less than and hr and has no existing events
+    const newBuilder = builder.createdAt > new Date(Date.now() - 60 * 60 * 1000) && !builder.githubUser[0]?.events[0];
+
+    if (newBuilder) {
+      log.info(`Detected new builder. Pulling in github data for this season`, {
+        builderId: builder.id,
+        githubUserId: builder.githubUser[0]?.id
+      });
+    }
 
     await processBuilderActivity({
       builderId: builder.id,
