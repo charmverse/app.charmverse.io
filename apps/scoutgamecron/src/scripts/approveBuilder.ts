@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
-import { currentSeason, getCurrentWeek, getDateFromISOWeek } from '@packages/scoutgame/dates';
+import { getDateFromISOWeek } from '@packages/scoutgame/dates';
 import { recordMergedPullRequest } from '../tasks/processBuilderActivity/recordMergedPullRequest';
-import { updateBuildersRank } from '../tasks/processBuilderActivity/updateBuildersRank';
+import { recordCommit } from '../tasks/processBuilderActivity/recordCommit';
 
 export async function approveBuilder({
   githubLogin,
@@ -61,29 +61,59 @@ export async function approveBuilder({
     }
   });
 
-  for (const pullRequest of events) {
-    if (pullRequest.type === 'merged_pull_request' && pullRequest) {
+  log.info(`Found ${events.length} Git events for builder ${builderId}`);
+
+  for (const gitEvent of events) {
+    if (gitEvent.type === 'merged_pull_request') {
       await recordMergedPullRequest({
         season,
         pullRequest: {
-          ...pullRequest,
-          createdAt: new Date(pullRequest.createdAt).toDateString(),
-          number: pullRequest.pullRequestNumber!,
+          ...gitEvent,
+          createdAt: new Date(gitEvent.createdAt).toDateString(),
+          number: gitEvent.pullRequestNumber!,
           author: {
             id: githubUser.id,
             login: githubUser.login
           },
           repository: {
-            databaseId: pullRequest.repo.id,
-            id: pullRequest.repo.id,
-            name: pullRequest.repo.name,
-            owner: { login: pullRequest.repo.owner },
-            defaultBranchRef: { name: pullRequest.repo.defaultBranch },
-            nameWithOwner: `${pullRequest.repo.owner}/${pullRequest.repo.name}`
+            databaseId: gitEvent.repo.id,
+            id: gitEvent.repo.id,
+            name: gitEvent.repo.name,
+            owner: { login: gitEvent.repo.owner },
+            defaultBranchRef: { name: gitEvent.repo.defaultBranch },
+            nameWithOwner: `${gitEvent.repo.owner}/${gitEvent.repo.name}`
           }
         },
-        repo: pullRequest.repo
-      }).catch((error) => log.error('Error processing pull request', { error, pullRequest }));
+        repo: gitEvent.repo
+      }).catch((error) => log.error('Error processing pull request', { error, gitEvent }));
+    } else {
+      if (gitEvent.type === 'commit') {
+        await recordCommit({
+          season,
+          commit: {
+            sha: gitEvent.commitHash!,
+            html_url: `https://github.com/${gitEvent.repo.owner}/${gitEvent.repo.name}/commit/${gitEvent.commitHash}`,
+            commit: {
+              author: {
+                date: gitEvent.createdAt.toISOString()
+              },
+              committer: {
+                date: gitEvent.createdAt.toISOString()
+              },
+              message: gitEvent.title
+            },
+            author: {
+              id: githubUser.id,
+              login: githubUser.login
+            },
+            repository: {
+              id: gitEvent.repo.id,
+              name: gitEvent.repo.name,
+              full_name: `${gitEvent.repo.owner}/${gitEvent.repo.name}`
+            }
+          }
+        }).catch((error) => log.error('Error processing commit', { error, gitEvent }));
+      }
     }
   }
 
@@ -98,56 +128,3 @@ export async function approveBuilder({
 
   await registerBuilderNFT({ builderId: scout.id, season });
 }
-
-const devUsers = {
-  mattcasey: {
-    id: 305398,
-    avatar: 'https://app.charmverse.io/favicon.png'
-  },
-  ccarella: {
-    id: 199823,
-    avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43760426-bca9-406b-4afe-20138acd5f00/rectcrop3'
-  },
-  Devorein: {
-    id: 25636858,
-    avatar:
-      'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg'
-  },
-  valentinludu: {
-    id: 34683631,
-    avatar:
-      'https://cdn.charmverse.io/user-content/f50534c5-22e7-47ee-96cb-54f4ce1a0e3e/42697dc0-35ad-4361-8311-a92702c76062/breaking_wave.jpg'
-  },
-  motechFR: {
-    id: 18669748,
-    avatar:
-      'https://cdn.charmverse.io/user-content/e0ec0ec8-0c1f-4745-833d-52c448482d9c/0dd0e3c0-821c-49fc-bd1a-7589ada03019/1ff23917d3954f92aed4351b9c8caa36.jpg'
-  }
-} as const;
-
-async function approveAll() {
-  const allBuilders = await prisma.scout.findMany({
-    where: {
-      githubUser: {
-        some: {}
-      },
-      builderNfts: {
-        none: {}
-      }
-    }
-  });
-
-  console.log(allBuilders.length);
-
-  for (const builder of allBuilders) {
-    await approveBuilder({
-      builderId: builder.id,
-      season: currentSeason
-    }).catch((err) => {
-      log.error(`Error for ${builder.displayName}`);
-    });
-  }
-  await updateBuildersRank({ week: getCurrentWeek() });
-}
-
-// approveAll()

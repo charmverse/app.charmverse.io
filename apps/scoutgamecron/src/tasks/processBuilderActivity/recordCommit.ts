@@ -9,12 +9,21 @@ import { DateTime } from 'luxon';
 import { gemsValues } from './config';
 import type { Commit } from './github/getCommitsByUser';
 
+export type RequiredCommitFields = Pick<Commit, 'sha' | 'html_url'> & {
+  author: Pick<NonNullable<Commit['author']>, 'id' | 'login'> | null;
+  commit: Pick<Commit['commit'], 'message'> & {
+    author: Pick<Commit['commit']['author'], 'date'>;
+    committer: Pick<NonNullable<Commit['commit']['committer']>, 'date'> | null;
+  };
+  repository: Pick<Commit['repository'], 'id' | 'name' | 'full_name'>;
+};
+
 export async function recordCommit({
   commit,
   season,
   now = DateTime.utc()
 }: {
-  commit: Commit;
+  commit: RequiredCommitFields;
   season: string;
   now?: DateTime;
 }) {
