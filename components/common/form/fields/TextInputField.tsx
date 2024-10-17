@@ -22,22 +22,24 @@ const BlueLink = styled(Link)`
 const LinkifiedValue = forwardRef(({ value, className }: { value?: string; className?: string }, ref) => {
   return (
     <ReadOnlyText className={className} ref={ref}>
-      {(value || ' ').split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
-        part.startsWith('http') ? (
-          <BlueLink
-            underline='always' // matches inline charm editor
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
-            href={part}
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            {part}
-          </BlueLink>
-        ) : (
-          part
-        )
-      )}
+      {String(value || ' ')
+        .split(/(https?:\/\/[^\s]+)/g)
+        .map((part, index) =>
+          part?.startsWith('http') ? (
+            <BlueLink
+              underline='always' // matches inline charm editor
+              // eslint-disable-next-line react/no-array-index-key
+              key={index}
+              href={part}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              {part}
+            </BlueLink>
+          ) : (
+            part
+          )
+        )}
     </ReadOnlyText>
   );
 });
