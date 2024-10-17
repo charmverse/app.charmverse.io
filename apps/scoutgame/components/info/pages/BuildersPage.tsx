@@ -42,7 +42,7 @@ function Document() {
               href='https://docs.google.com/spreadsheets/d/1K-p1ekVWzc062Z9xlmObwWSjjt5aWLeZZL3zS0e77DE/edit?usp=sharing'
               target='_blank'
               rel='noopener noreferrer'
-              sx={{ wordBbreak: 'break-word' }}
+              sx={{ wordBreak: 'break-word' }}
             >
               https://docs.google.com/spreadsheets/d/1K-p1ekVWzc062Z9xlmObwWSjjt5aWLeZZL3zS0e77DE/edit?usp=sharing
             </Link>
