@@ -16,12 +16,7 @@ export default async function Layout({
         <Stack sx={{ display: { xs: 'none', md: 'flex' } }}>
           <SidebarInfo />
         </Stack>
-        <Stack maxWidth='854px' width='100%' mx='auto' gap={{ xs: 2, md: 4 }}>
-          {children}
-          <ScrollButton scrollType='up' sx={{ textAlign: 'center', width: '100%' }}>
-            back to top <ArrowDropUpIcon fontSize='small' />
-          </ScrollButton>
-        </Stack>
+        {children}
       </Stack>
     </Container>
   );
