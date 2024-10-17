@@ -68,7 +68,7 @@ export function Header() {
             </Link>
             <Stack flexDirection='row' gap={2} alignItems='center'>
               <Hidden mdDown>
-                <SiteNavigation topNav isAuthenticated={!!user} />
+                <SiteNavigation topNav />
               </Hidden>
               {user ? (
                 <Box
