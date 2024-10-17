@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import LinkIcon from '@mui/icons-material/Link';
 import { Box, IconButton, Link, TextField } from '@mui/material';
@@ -20,26 +21,28 @@ const BlueLink = styled(Link)`
 
 // Convert a string into a React component, and wrap links with anchor tags
 const LinkifiedValue = forwardRef(({ value, className }: { value?: string; className?: string }, ref) => {
+  if (value && typeof value !== 'string') {
+    log.error('Value is not a string', { value });
+    value = (value as any).toString?.();
+  }
   return (
     <ReadOnlyText className={className} ref={ref}>
-      {String(value || ' ')
-        .split(/(https?:\/\/[^\s]+)/g)
-        .map((part, index) =>
-          part?.startsWith('http') ? (
-            <BlueLink
-              underline='always' // matches inline charm editor
-              // eslint-disable-next-line react/no-array-index-key
-              key={index}
-              href={part}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              {part}
-            </BlueLink>
-          ) : (
-            part
-          )
-        )}
+      {(value || ' ').split(/(https?:\/\/[^\s]+)/g).map((part, index) =>
+        part.startsWith('http') ? (
+          <BlueLink
+            underline='always' // matches inline charm editor
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+            href={part}
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            {part}
+          </BlueLink>
+        ) : (
+          part
+        )
+      )}
     </ReadOnlyText>
   );
 });

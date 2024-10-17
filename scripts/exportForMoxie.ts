@@ -23,7 +23,7 @@ async function query() {
   for (const row of parsed.data as any[]) {
     const page = await prisma.page.findFirst({
       where: {
-        title: row.Title,
+        title: (row as any).Title,
         space: {
           domain: 'moxie-grants'
         },
@@ -54,7 +54,7 @@ async function query() {
       console.log('No Farcaster user', page.title, page.path);
     }
     allUsersData.push({
-      ...row,
+      ...(row as any),
       'Author Farcaster': page!.proposal!.authors[0]?.author.farcasterUser?.fid
     });
   }
