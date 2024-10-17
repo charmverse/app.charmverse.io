@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { uniq } from 'lodash';
 import { throttling } from '@octokit/plugin-throttling';
+import { isTruthy } from '@packages/utils/types';
 const { Octokit } = require('@octokit/rest');
 
 const MyOctokit = Octokit.plugin(throttling);
@@ -73,7 +74,7 @@ async function query() {
   const builders = await prisma.githubUser.findMany({
     where: {
       login: {
-        in: waitlistRecords.map((r) => r.githubLogin).filter(Boolean)
+        in: waitlistRecords.map((r) => r.githubLogin).filter(isTruthy)
       }
     }
   });
