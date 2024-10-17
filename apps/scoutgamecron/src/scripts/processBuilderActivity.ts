@@ -37,7 +37,7 @@ import { prisma } from '@charmverse/core/prisma-client';
   //   season: '2024-W40'
   // });
   // return;
-  await processAllBuilderActivity({
+  await processAllBuilderActivity(null, {
     createdAfter: DateTime.fromISO('2024-09-27', { zone: 'utc' }).toJSDate()
   });
   return;
