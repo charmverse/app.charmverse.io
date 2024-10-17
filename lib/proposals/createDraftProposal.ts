@@ -52,6 +52,9 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
                     appealReviewers: true,
                     evaluationApprovers: true,
                     rubricCriteria: true
+                  },
+                  orderBy: {
+                    index: 'asc'
                   }
                 },
                 workflow: true
@@ -135,7 +138,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
           ...item,
           description: item.description ?? '',
           fieldConfig: {}
-        } as any as FormFieldInput)
+        }) as any as FormFieldInput
     );
   } else if (input.contentType === 'structured') {
     formFields = [
