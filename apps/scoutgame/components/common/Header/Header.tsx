@@ -1,10 +1,9 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import type { Scout } from '@charmverse/core/prisma';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
-import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar, Button, Typography, Stack } from '@mui/material';
+import { Box, Container, Menu, MenuItem, Toolbar, AppBar, Button, Typography, Stack } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -15,12 +14,13 @@ import { useState } from 'react';
 import { Avatar } from 'components/common/Avatar';
 import { Hidden } from 'components/common/Hidden';
 import { SiteNavigation } from 'components/common/SiteNavigation';
+import { useUser } from 'components/layout/UserProvider';
 
 import { InstallAppMenuItem } from './components/InstallAppMenuItem';
 
-export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar' | 'currentBalance'> | null }) {
+export function Header() {
   const router = useRouter();
-
+  const { user } = useUser();
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const { execute: logoutUser, isExecuting: isExecutingLogout } = useAction(logoutAction, {
