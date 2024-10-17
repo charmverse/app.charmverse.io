@@ -402,6 +402,6 @@ Start storybook locally:
 
 `npm run storybook`
 
-Build sotrybook dist:
+Build storybook dist:
 
 `npm run storybook:build`
