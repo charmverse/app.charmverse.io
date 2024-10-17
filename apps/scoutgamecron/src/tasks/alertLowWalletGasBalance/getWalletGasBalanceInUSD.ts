@@ -2,7 +2,10 @@ import env from '@beam-australia/react-env';
 import { GET, POST } from '@packages/utils/http';
 
 export async function getWalletGasBalanceInUSD(walletAddress: string) {
-  const apiKey = process.env.ALCHEMY_API_KEY || env('ALCHEMY_API_KEY');
+  const apiKey = process.env.ALCHEMY_API_KEY;
+  if (!apiKey) {
+    throw new Error('No Alchemy API key found');
+  }
   const alchemyApiUrl = `https://opt-mainnet.g.alchemy.com/v2/${apiKey}`;
   const response = await POST<{ result: string }>(alchemyApiUrl, {
     jsonrpc: '2.0',
