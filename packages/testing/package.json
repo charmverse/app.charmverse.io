@@ -1,0 +1,12 @@
+{
+  "name": "@packages/testing",
+  "version": "0.0.0",
+  "type": "module",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "exports": {
+    "./*": "./src/*.ts"
+  }
+}

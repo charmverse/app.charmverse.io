@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { builderCreatorAddress } from '@packages/scoutgame/builderNfts/constants';
 
 jest.unstable_mockModule('@packages/utils/http', () => ({
   POST: jest.fn(),
@@ -9,10 +10,6 @@ const { POST, GET } = await import('@packages/utils/http');
 const { getWalletGasBalanceInUSD } = await import('../getWalletGasBalanceInUSD');
 
 describe('getWalletGasBalanceInUSD', () => {
-  beforeEach(() => {
-    process.env.ALCHEMY_API_KEY = 'test-api-key';
-  });
-
   it('should return $25 when balance and price are set accordingly', async () => {
     // Mock the POST request to Alchemy API
     (POST as jest.Mock<typeof POST>).mockResolvedValue({
@@ -24,8 +21,7 @@ describe('getWalletGasBalanceInUSD', () => {
       ethereum: { usd: 0.025 } // $0.025 per ETH
     });
 
-    const walletAddress = '0x1234567890123456789012345678901234567890';
-    const balance = await getWalletGasBalanceInUSD(walletAddress);
+    const balance = await getWalletGasBalanceInUSD(builderCreatorAddress, 'test-api-key');
 
     expect(balance).toBeCloseTo(25, 2); // $25 with 2 decimal places precision
     expect(POST).toHaveBeenCalledWith(

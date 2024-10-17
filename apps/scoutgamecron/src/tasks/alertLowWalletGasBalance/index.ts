@@ -1,13 +1,16 @@
 import { log } from '@charmverse/core/log';
 import { builderCreatorAddress } from '@packages/scoutgame/builderNfts/constants';
 import { POST } from '@packages/utils/http';
+import type Koa from 'koa';
 
 import { getWalletGasBalanceInUSD } from './getWalletGasBalanceInUSD';
 
 const thresholdUSD = 25;
 
-export async function alertLowWalletGasBalance() {
-  const discordWebhook = process.env.DISCORD_EVENTS_WEBHOOK;
+export async function alertLowWalletGasBalance(
+  ctx: Koa.Context,
+  discordWebhook: string | undefined = process.env.DISCORD_EVENTS_WEBHOOK
+) {
   if (!discordWebhook) {
     throw new Error('No Discord webhook found');
   }
