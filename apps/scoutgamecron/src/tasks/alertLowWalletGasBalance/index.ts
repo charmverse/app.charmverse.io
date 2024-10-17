@@ -9,7 +9,7 @@ const thresholdUSD = 25;
 
 export async function alertLowWalletGasBalance(
   ctx: Koa.Context,
-  discordWebhook: string | undefined = process.env.DISCORD_EVENTS_WEBHOOK
+  discordWebhook: string | undefined = process.env.DISCORD_ALERTS_WEBHOOK
 ) {
   if (!discordWebhook) {
     throw new Error('No Discord webhook found');
