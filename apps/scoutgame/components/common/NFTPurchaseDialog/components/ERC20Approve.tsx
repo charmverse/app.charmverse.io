@@ -28,8 +28,6 @@ export function ERC20ApproveButton({
 }: ERC20ApproveButtonProps) {
   const amountToApprove = amount ? amount + amount / BigInt(50) : undefined;
 
-  const [useUnlimited, setUseUnlimited] = useState(false);
-
   const { data: walletClient } = useWalletClient();
 
   const { switchChainAsync } = useSwitchChain();
@@ -40,11 +38,14 @@ export function ERC20ApproveButton({
     if (walletClient?.chain.id !== chainId) {
       return switchChainAsync({ chainId });
     }
-    await triggerApproveSpender({ amount: useUnlimited || !amountToApprove ? MAX_UINT256 : amountToApprove });
+    if (!amountToApprove) {
+      throw new Error('Amount to approve is required');
+    }
+    await triggerApproveSpender({ amount: amountToApprove });
     onSuccess();
   }
 
-  const displayAmount = useUnlimited ? 'Unlimited' : (Number(amountToApprove || 0) / 10 ** decimals).toFixed(2);
+  const displayAmount = (Number(amountToApprove || 0) / 10 ** decimals).toFixed(2);
 
   return (
     <div>
@@ -58,18 +59,8 @@ export function ERC20ApproveButton({
         >
           {isApprovingSpender ? 'Approving...' : `Approve ${displayAmount} USDC`}
         </LoadingButton>
-        {amountToApprove && (
-          <FormControlLabel
-            control={
-              <Checkbox checked={useUnlimited} onChange={() => setUseUnlimited(!useUnlimited)} color='primary' />
-            }
-            label='Approve Unlimited'
-          />
-        )}
         <Typography sx={{ mb: 1 }} variant='caption'>
-          {useUnlimited
-            ? 'Approving unlimited tokens eliminates the need for repeated approvals. You can revoke this approval anytime.'
-            : 'Approving a specific amount requires a new approval each time you want to mint an NFT.'}
+          You must approve the USDC spend before you can mint an NFT
         </Typography>
       </Stack>
     </div>
