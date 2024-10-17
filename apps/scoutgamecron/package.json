@@ -17,15 +17,16 @@
     "@octokit/plugin-throttling": "^9.3.1",
     "@packages/farcaster": "^0.0.0",
     "@packages/github": "^0.0.0",
+    "@packages/mixpanel": "^0.0.0",
     "@packages/onchain": "^0.0.0",
     "@packages/scoutgame": "^0.0.0",
-    "@packages/mixpanel": "^0.0.0",
     "@packages/utils": "^1.0.0",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.0.1",
     "@jest/globals": "^29.7.0",
+    "@packages/testing": "^1.0.0",
     "@swc/core": "^1.7.26",
     "@types/web-push": "^3.6.3"
   }
