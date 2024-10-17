@@ -4,6 +4,7 @@ import Koa from 'koa';
 import { DateTime } from 'luxon';
 
 import * as middleware from './middleware';
+import { alertLowWalletGasBalance } from './tasks/alertLowWalletGasBalance';
 import { processAllBuilderActivity } from './tasks/processBuilderActivity';
 import { processGemsPayout } from './tasks/processGemsPayout';
 import { processNftMints } from './tasks/processNftMints';
@@ -53,6 +54,8 @@ addTask('/process-gems-payout', processGemsPayout);
 addTask('/process-nft-mints', processNftMints);
 
 addTask('/update-mixpanel-user-profiles', updateMixpanelUserProfilesTask);
+
+addTask('/alert-low-wallet-gas-balance', alertLowWalletGasBalance);
 
 // Standard health check used by Beanstalk
 router.get('/api/health', middleware.healthCheck);
