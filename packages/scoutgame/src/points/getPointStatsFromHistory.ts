@@ -14,7 +14,6 @@ export type PointStats = {
   claimedPoints: number;
   unclaimedPoints: number;
   balance: number;
-  receiptCount: number;
 };
 
 const include: Prisma.PointsReceiptInclude = {
@@ -149,7 +148,6 @@ export async function getPointStatsFromHistory({
 
   return {
     balance,
-    receiptCount: allPointsReceivedRecords.length,
     claimedPoints,
     unclaimedPoints,
     pointsReceivedAsBuilder,
