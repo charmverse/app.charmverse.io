@@ -21,6 +21,8 @@ export function InfoPageContainer({
           height: 'auto'
         }}
         priority={true}
+        placeholder='blur'
+        blurDataURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII='
         alt='info banner'
       />
       <Stack
