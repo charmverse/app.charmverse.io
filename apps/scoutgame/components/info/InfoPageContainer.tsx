@@ -11,7 +11,7 @@ export function InfoPageContainer({
   ...props
 }: { title?: string; image: string } & StackProps) {
   return (
-    <>
+    <Stack maxWidth='854px' width='100%' mx='auto' gap={{ xs: 2, md: 4 }}>
       <Image
         src={image}
         width={854}
@@ -40,6 +40,6 @@ export function InfoPageContainer({
         <SidebarInfoDrawer />
       </Stack>
       {children}
-    </>
+    </Stack>
   );
 }
