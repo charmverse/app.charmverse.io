@@ -15,7 +15,7 @@ const app = new Koa();
 const router = new Router();
 
 // add a task endpoint which will be configured in cron.yml
-function addTask(path: string, handler: (ctx: Koa.DefaultContext) => any) {
+function addTask(path: string, handler: (ctx: Koa.Context) => any) {
   router.post(path, async (ctx) => {
     // just in case we need to disable cron in production
     if (process.env.DISABLE_CRON === 'true') {
