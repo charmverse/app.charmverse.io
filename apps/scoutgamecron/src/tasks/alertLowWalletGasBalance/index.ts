@@ -10,7 +10,7 @@ export async function alertLowWalletGasBalance() {
   try {
     const balanceInUSD = await getWalletGasBalanceInUSD('');
     log.info(`Admin wallet has a balance of ${balanceInUSD} USD`);
-    if (balanceInUSD > 25) {
+    if (balanceInUSD <= 25) {
       await POST(discordWebhook, {
         content: `Admin wallet has a balance of ${balanceInUSD} USD`
       });
