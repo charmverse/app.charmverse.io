@@ -24,6 +24,7 @@ export async function findOrCreateUser({
   newUserId,
   farcasterId,
   walletAddress,
+  tierOverride,
   ...userProps
 }: {
   walletAddress?: string;
@@ -34,6 +35,7 @@ export async function findOrCreateUser({
   bio?: string;
   displayName: string;
   username: string;
+  tierOverride?: ConnectWaitlistTier;
 }): Promise<Scout> {
   if (!farcasterId && !walletAddress) {
     throw new InvalidInputError('Missing required fields for user creation');
@@ -82,11 +84,15 @@ export async function findOrCreateUser({
   let points = 0;
   let tier: ConnectWaitlistTier | undefined;
 
-  if (waitlistRecord?.percentile) {
+  if (tierOverride) {
+    tier = tierOverride;
+    points = waitlistTierPointsRecord[tier] || 0;
+    log.info('Using tier override', { tier, points });
+  } else if (waitlistRecord?.percentile) {
     tier = getTier(waitlistRecord.percentile);
     points = waitlistTierPointsRecord[tier] || 0;
+    log.info('Creating user with waitlist percentile', { percentile: waitlistRecord.percentile, tier, points });
   }
-
   const newScout = await prisma.scout.create({
     data: {
       ...userProps,
