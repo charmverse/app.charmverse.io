@@ -19,7 +19,7 @@ export async function alertLowWalletGasBalance(
   log.info(`Admin wallet has a balance of ${balanceInUSD} USD`);
   if (balanceInUSD <= thresholdUSD) {
     await POST(discordWebhook, {
-      content: `@Developer : Admin wallet "${builderCreatorAddress}" has a low balance: ${balanceInUSD} USD. (Threshold is ${thresholdUSD} USD)`
+      content: `<@&1027309276454207519>: Admin wallet "${builderCreatorAddress}" has a low balance: ${balanceInUSD} USD. (Threshold is ${thresholdUSD} USD)`
     });
   }
 }
