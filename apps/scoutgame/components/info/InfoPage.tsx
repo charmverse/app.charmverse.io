@@ -252,7 +252,7 @@ function Document() {
       </InfoCard>
       <InfoCard title='Partner Rewards'>
         <Typography>
-          Scout Game is partnering with Celo, Game7, Moxie and Bountycatser to reward builders for doing what they do
+          Scout Game is partnering with Celo, Game7, Moxie and Bountycaster to reward builders for doing what they do
           best! Find details about each partnership on the following pages:
         </Typography>
         <List>
