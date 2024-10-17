@@ -1,13 +1,11 @@
-import { processNftMints } from '../tasks/processNftMints';
 import { prisma } from '@charmverse/core/prisma-client';
-import { syncUserNFTsFromOnchainData } from './syncUserNFTsFromOnchainData';
 import { getOnchainPurchaseEvents } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents';
 import { prettyPrint } from '@packages/utils/strings';
 export async function query() {
   const scouts = await prisma.scout.findMany({
     where: {
       username: {
-        in: ['cryptomobile', 'scottrepreneur.eth']
+        in: ['username']
       }
       // id: {
       //   in: [
@@ -24,13 +22,25 @@ export async function query() {
     },
     orderBy: {
       id: 'asc'
+    },
+    include: {
+      builderNfts: {
+        include: {
+          nftSoldEvents: true
+        }
+      },
+      pointsReceived: true,
+      pointsSent: true,
+      activities: true,
     }
   });
 
   const data = await Promise.all(scouts.map(async (scout) => {
     const userPurchases = await getOnchainPurchaseEvents({ scoutId: scout.id });
+    const waitlist = await prisma.connectWaitlistSlot.findUniqueOrThrow({where: {fid: scout.farcasterId as number}})
     return {
       ...scout,
+      waitlist,
       userPurchases
     }
   }));
