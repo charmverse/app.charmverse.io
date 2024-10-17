@@ -19,7 +19,13 @@ export async function alertLowWalletGasBalance(
   log.info(`Admin wallet has a balance of ${balanceInUSD} USD`);
   if (balanceInUSD <= thresholdUSD) {
     await POST(discordWebhook, {
-      content: `<@&1027309276454207519>: Admin wallet "${builderCreatorAddress}" has a low balance: ${balanceInUSD} USD. (Threshold is ${thresholdUSD} USD)`
+      content: `<@&1027309276454207519>: Admin wallet has a low balance: ${balanceInUSD} USD. (Threshold is ${thresholdUSD} USD)`,
+      embeds: [
+        {
+          title: `View wallet: ${builderCreatorAddress}`,
+          url: 'https://optimism.blockscout.com/address/0x518AF6fA5eEC4140e4283f7BDDaB004D45177946'
+        }
+      ]
     });
   }
 }
