@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { uniq } from 'lodash';
 import { throttling } from '@octokit/plugin-throttling';
+import { isTruthy } from '@packages/utils/types';
 const { Octokit } = require('@octokit/rest');
 
 const MyOctokit = Octokit.plugin(throttling);
@@ -12,6 +13,7 @@ const MyOctokit = Octokit.plugin(throttling);
 const octokit = new MyOctokit({
   auth: process.env.GITHUB_ACCESS_TOKEN,
   throttle: {
+    // @ts-ignore
     onRateLimit: (retryAfter, options, _octokit, retryCount) => {
       console.log(`[Octokit] Request quota exhausted for request ${options.method} ${options.url}`);
 
@@ -22,6 +24,7 @@ const octokit = new MyOctokit({
       //   return true;
       // }
     },
+    // @ts-ignore
     onSecondaryRateLimit: (retryAfter, options, _octokit) => {
       // does not retry, only logs a warning
       console.log(
@@ -71,7 +74,7 @@ async function query() {
   const builders = await prisma.githubUser.findMany({
     where: {
       login: {
-        in: waitlistRecords.map((r) => r.githubLogin).filter(Boolean)
+        in: waitlistRecords.map((r) => r.githubLogin).filter(isTruthy)
       }
     }
   });
