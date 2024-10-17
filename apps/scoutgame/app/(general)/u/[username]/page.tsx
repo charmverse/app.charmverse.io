@@ -1,14 +1,9 @@
-import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { PublicProfilePage } from 'components/[username]/PublicProfilePage';
 import { getUserByPath } from 'lib/users/getUserByPath';
 
 export const dynamic = 'force-dynamic';
-
-export const metadata: Metadata = {
-  title: 'User Profile'
-};
 
 export default async function Profile({
   params,
@@ -28,8 +23,12 @@ export default async function Profile({
     <>
       {user?.avatar && (
         <>
-          <meta property='og:title' content={user.username} />
-          <meta property='og:image' content={user.congratsImageUrl || user.nftImageUrl || user.avatar} />
+          <title>{`${user.username} user profile`}</title>
+          <meta property='og:title' content={`${user.username} user profile`} />
+          <meta property='og:image:alt' content={`${user.username} user profile`} />
+          <meta property='og:image' content={user.nftImageUrl || user.avatar} />
+          <meta property='og:image:width' content='800' />
+          <meta property='og:image:height' content='800' />
           {/* Custom meta tags for farcaster */}
           <meta name='fc:frame' content='vNext' />
           <meta name='fc:frame:image' content={user.congratsImageUrl || user.nftImageUrl || user.avatar} />

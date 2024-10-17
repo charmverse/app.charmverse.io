@@ -26,7 +26,7 @@ exports[`should match snapshot on read only 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
                 data-testid="ArrowRightIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -39,7 +39,7 @@ exports[`should match snapshot on read only 1`] = `
           </span>
           <span
             aria-label="Items with an empty {propertyName} property will go here. This column cannot be removed."
-            class="MuiTypography-root MuiTypography-subtitle1 css-xi0xw7-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-subtitle1 css-2u7js8-MuiTypography-root"
             data-mui-internal-clone-element="true"
           >
             No undefined
@@ -97,7 +97,7 @@ exports[`should match snapshot with Group 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
                 data-testid="ArrowRightIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -110,7 +110,7 @@ exports[`should match snapshot with Group 1`] = `
           </span>
           <span
             aria-label="Items with an empty {propertyName} property will go here. This column cannot be removed."
-            class="MuiTypography-root MuiTypography-subtitle1 css-xi0xw7-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-subtitle1 css-2u7js8-MuiTypography-root"
             data-mui-internal-clone-element="true"
           >
             No undefined
@@ -151,7 +151,7 @@ exports[`should match snapshot with Group 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
                 data-testid="MoreHorizIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -173,7 +173,7 @@ exports[`should match snapshot with Group 1`] = `
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
               data-testid="AddIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -216,7 +216,7 @@ exports[`should match snapshot, add new 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
                 data-testid="ArrowRightIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -229,7 +229,7 @@ exports[`should match snapshot, add new 1`] = `
           </span>
           <span
             aria-label="Items with an empty {propertyName} property will go here. This column cannot be removed."
-            class="MuiTypography-root MuiTypography-subtitle1 css-xi0xw7-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-subtitle1 css-2u7js8-MuiTypography-root"
             data-mui-internal-clone-element="true"
           >
             No undefined
@@ -270,7 +270,7 @@ exports[`should match snapshot, add new 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
                 data-testid="MoreHorizIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -292,7 +292,7 @@ exports[`should match snapshot, add new 1`] = `
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
               data-testid="AddIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -335,7 +335,7 @@ exports[`should match snapshot, edit title 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
                 data-testid="ArrowRightIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -348,7 +348,7 @@ exports[`should match snapshot, edit title 1`] = `
           </span>
           <span
             aria-label="Items with an empty {propertyName} property will go here. This column cannot be removed."
-            class="MuiTypography-root MuiTypography-subtitle1 css-xi0xw7-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-subtitle1 css-2u7js8-MuiTypography-root"
             data-mui-internal-clone-element="true"
           >
             No undefined
@@ -389,7 +389,7 @@ exports[`should match snapshot, edit title 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
                 data-testid="MoreHorizIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -411,7 +411,7 @@ exports[`should match snapshot, edit title 1`] = `
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
               data-testid="AddIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -454,7 +454,7 @@ exports[`should match snapshot, no groups 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1yplxme-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
                 data-testid="ArrowRightIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -467,7 +467,7 @@ exports[`should match snapshot, no groups 1`] = `
           </span>
           <span
             aria-label="Items with an empty {propertyName} property will go here. This column cannot be removed."
-            class="MuiTypography-root MuiTypography-subtitle1 css-xi0xw7-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-subtitle1 css-2u7js8-MuiTypography-root"
             data-mui-internal-clone-element="true"
           >
             No Property 1
@@ -497,7 +497,7 @@ exports[`should match snapshot, no groups 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
                 data-testid="MoreHorizIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -519,7 +519,7 @@ exports[`should match snapshot, no groups 1`] = `
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
               data-testid="AddIcon"
               focusable="false"
               viewBox="0 0 24 24"

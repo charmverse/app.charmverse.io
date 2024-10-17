@@ -20,7 +20,7 @@ const parsed = Papa.parse(tsv, {
 
 async function query() {
   const allUsersData = [];
-  for (const row of parsed.data) {
+  for (const row of parsed.data as any[]) {
     const page = await prisma.page.findFirst({
       where: {
         title: (row as any).Title,

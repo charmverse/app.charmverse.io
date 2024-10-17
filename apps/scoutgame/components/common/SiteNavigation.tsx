@@ -9,6 +9,7 @@ import { CiBellOn } from 'react-icons/ci';
 import { PiBinocularsLight, PiHouseLight, PiInfoLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
+import { useUser } from 'components/layout/UserProvider';
 import { useGetClaimablePoints } from 'hooks/api/session';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
@@ -41,8 +42,10 @@ const StyledBottomNavigation = styled(BottomNavigation, {
   }
 }));
 
-export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: boolean; isAuthenticated?: boolean }) {
+export function SiteNavigation({ topNav }: { topNav?: boolean }) {
   const pathname = usePathname();
+  const { user } = useUser();
+  const isAuthenticated = Boolean(user);
   const value = getActiveButton(pathname);
   const isDesktop = useMdScreen();
   const { data: claimablePoints } = useGetClaimablePoints();

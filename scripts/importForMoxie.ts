@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { prettyPrint } from 'lib/utils/strings';
 import { DateTime } from 'luxon';
 
@@ -53,7 +54,7 @@ async function query() {
       }
     });
     const reviewers = [row['Reviewer (1)'], row['Reviewer (2)'], row['Reviewer (3)']].map(
-      (name) => users.find((user) => (user.farcasterUser?.account as any)?.username === name)?.id
+      (name) => users.find((user) => (user.farcasterUser?.account as FarcasterUser | undefined)?.username === name)?.id
     );
     if (!proposal) {
       console.log('No proposal found for', row.Title);

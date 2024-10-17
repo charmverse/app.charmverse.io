@@ -1,31 +1,24 @@
 import { Typography } from '@mui/material';
-import Image from 'next/image';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
-import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
+
+import { InfoPageContainer } from '../../InfoPageContainer';
 
 export function BountyCasterPage() {
   return (
-    <DocumentPageContainer data-test='partner-bountycaster-page'>
-      <Image
-        src='/images/info/rewards-partner-bountycaster.jpg'
-        width={854}
-        height={285}
-        style={{
-          maxWidth: '100%',
-          height: 'auto'
-        }}
-        alt='rewads partner bountycaster'
-        priority={true}
-      />
+    <InfoPageContainer
+      data-test='partner-bountycaster-page'
+      image='/images/info/rewards-partner-bountycaster.jpg'
+      title='BountyCaster'
+    >
       <Document />
-    </DocumentPageContainer>
+    </InfoPageContainer>
   );
 }
 
 function Document() {
   return (
-    <InfoCard title='BountyCaster'>
+    <InfoCard title=''>
       <Typography>Bountycaster is partnering with Scout Game to offer additional USDC rewards for builders!</Typography>
       <Typography variant='h6' color='secondary' mt={2}>
         How it works

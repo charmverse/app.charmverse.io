@@ -1,42 +1,20 @@
-import {
-  Link,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography
-} from '@mui/material';
-import Image from 'next/image';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
-import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
+import { InfoPageContainer } from 'components/info/InfoPageContainer';
 
 export function CeloPage() {
   return (
-    <DocumentPageContainer data-test='parther-celo-page'>
-      <Image
-        src='/images/info/rewards-partner-celo.jpg'
-        width={854}
-        height={285}
-        style={{
-          maxWidth: '100%',
-          height: 'auto'
-        }}
-        alt='rewads partner celo'
-        priority={true}
-      />
+    <InfoPageContainer data-test='partner-celo-page' image='/images/info/rewards-partner-celo.jpg' title='Celo'>
       <Document />
-    </DocumentPageContainer>
+    </InfoPageContainer>
   );
 }
 
 function Document() {
   return (
-    <InfoCard title='Celo'>
+    <InfoCard>
       <Typography>
         Celo is partnering with Scout Game to support builders who contribute to the ecosystem. Celo has a prize pool of
         5000 cUSD to distribute to talented Builders!
