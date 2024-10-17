@@ -53,7 +53,7 @@ async function query() {
       }
     });
     const reviewers = [row['Reviewer (1)'], row['Reviewer (2)'], row['Reviewer (3)']].map(
-      (name) => users.find((user) => user.farcasterUser?.account?.username === name)?.id
+      (name) => users.find((user) => (user.farcasterUser?.account as any)?.username === name)?.id
     );
     if (!proposal) {
       console.log('No proposal found for', row.Title);
