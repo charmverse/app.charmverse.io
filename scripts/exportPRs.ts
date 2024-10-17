@@ -12,6 +12,7 @@ const MyOctokit = Octokit.plugin(throttling);
 const octokit = new MyOctokit({
   auth: process.env.GITHUB_ACCESS_TOKEN,
   throttle: {
+    // @ts-ignore
     onRateLimit: (retryAfter, options, _octokit, retryCount) => {
       console.log(`[Octokit] Request quota exhausted for request ${options.method} ${options.url}`);
 
@@ -22,6 +23,7 @@ const octokit = new MyOctokit({
       //   return true;
       // }
     },
+    // @ts-ignore
     onSecondaryRateLimit: (retryAfter, options, _octokit) => {
       // does not retry, only logs a warning
       console.log(
