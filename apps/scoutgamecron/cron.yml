@@ -19,3 +19,8 @@ cron:
     url: "/update-mixpanel-user-profiles"
     # Every day at midnight
     schedule: "0 0 * * *"
+
+  - name: "alert-low-wallet-gas-balance"
+    url: "/alert-low-wallet-gas-balance"
+    # Every 5 minutes
+    schedule: "*/5 * * * *"
