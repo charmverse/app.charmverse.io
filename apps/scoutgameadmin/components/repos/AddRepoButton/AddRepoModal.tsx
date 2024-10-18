@@ -55,7 +55,7 @@ export function AddRepoModal({ open, onClose, onAdd }: Props) {
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
       <DialogTitle>Add new repos by owner</DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent>
+        <DialogContent sx={{ pt: 0 }}>
           <TextField
             autoFocus
             margin='dense'
@@ -101,7 +101,9 @@ export function AddRepoModal({ open, onClose, onAdd }: Props) {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button variant='outlined' color='secondary' onClick={onClose}>
+            Cancel
+          </Button>
           <LoadingButton
             loading={isImporting}
             disabled={error || newRepos.length === 0}
