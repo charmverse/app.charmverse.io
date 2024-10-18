@@ -22,12 +22,12 @@ import {
 } from '@mui/material';
 import React, { useState, useMemo } from 'react';
 
+import { ExportButton } from 'components/common/ExportButton';
 import { useSearchRepos } from 'hooks/api/repos';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { Repo } from 'lib/repos/getRepos';
 
 import { AddRepoButton } from './AddRepoButton/AddRepoButton';
-import { ExportButton } from './ExportButton';
 
 type SortField = 'commits' | 'prs' | 'closedPrs' | 'contributors' | 'owner' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
@@ -65,13 +65,10 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
 
   return (
     <Container maxWidth='xl'>
-      <Typography variant='h4' component='h1' gutterBottom>
-        Git Repos Dashboard
-      </Typography>
       <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='center' mb={2}>
         <TextField
           label='Search'
-          placeholder='Filter by owner or name'
+          placeholder='Filter by owner'
           variant='outlined'
           value={filterString}
           onChange={(e) => setFilter(e.target.value)}
@@ -93,7 +90,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
         />
         <Box>
           <AddRepoButton variant='contained' color='primary' sx={{ mr: 2 }}>
-            Import Repos
+            Add Repos
           </AddRepoButton>
           <ExportButton variant='outlined' filename='github_repos.tsv' src='/api/repos/export'>
             Export Repos
