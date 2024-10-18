@@ -32,6 +32,8 @@
       "@packages/utils/*": ["./packages/utils/src/*"],
       "@packages/github/*": ["./packages/github/src/*"],
       "@packages/onchain/*": ["./packages/onchain/src/*"],
+      "@packages/scoutgame/*": ["./packages/scoutgame/src/*"],
+      "@packages/testing/*": ["./packages/testing/src/*"],
       "@root/abis/*": ["./abis/*"],
       "@root/adapters/*": ["./adapters/*"],
       "@root/connectors/*": ["./connectors/*"],
