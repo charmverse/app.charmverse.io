@@ -5,9 +5,9 @@ import type { ButtonProps } from '@mui/material';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
-import { AddRepoModal } from './AddRepoModal';
+import { ManageUserModal } from './ManageUserModal';
 
-export function AddRepoButton({
+export function ManageUserButton({
   children,
   ...props
 }: {
@@ -19,7 +19,7 @@ export function AddRepoButton({
       <Button onClick={() => setIsModalOpen(true)} {...props}>
         {children}
       </Button>
-      <AddRepoModal open={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={() => {}} />
+      <ManageUserModal open={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={() => {}} />
     </>
   );
 }

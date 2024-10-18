@@ -8,15 +8,22 @@ export type ScoutGameUser = Pick<
 
 export type UserFilter = 'only-builders';
 
-export async function getUsers({ searchString, filter }: { searchString?: string; filter?: UserFilter } = {}): Promise<
+export type SortField = 'username' | 'builderStatus' | 'currentBalance' | 'nftsPurchased' | 'createdAt';
+export type SortOrder = 'asc' | 'desc';
+
+export async function getUsers({
+  searchString,
+  filter,
+  sortField,
+  sortOrder
+}: { searchString?: string; filter?: UserFilter; sortField?: SortField; sortOrder?: SortOrder } = {}): Promise<
   ScoutGameUser[]
 > {
   if (typeof searchString === 'string' && searchString.length < 2) {
     return [];
   }
   // assume farcaster id if search string is a number
-  const userFidRaw = parseInt(searchString ?? '', 10);
-  const userFid = Number.isNaN(userFidRaw) ? undefined : userFidRaw;
+  const userFid = getNumberFromString(searchString);
 
   const users = await prisma.scout.findMany({
     take: 500,
@@ -29,7 +36,9 @@ export async function getUsers({ searchString, filter }: { searchString?: string
               sort: 'desc'
             }
           }
-        : { createdAt: 'desc' },
+        : sortField
+          ? { [sortField]: sortOrder || 'asc' }
+          : { createdAt: 'desc' },
     where: userFid
       ? { farcasterId: userFid }
       : typeof searchString === 'string'
@@ -50,4 +59,9 @@ export async function getUsers({ searchString, filter }: { searchString?: string
     ...user,
     nftsPurchased: user.userSeasonStats[0]?.nftsPurchased || 0
   }));
+}
+
+export function getNumberFromString(searchString?: string) {
+  const userFidRaw = parseInt(searchString ?? '', 10);
+  return Number.isNaN(userFidRaw) ? undefined : userFidRaw;
 }

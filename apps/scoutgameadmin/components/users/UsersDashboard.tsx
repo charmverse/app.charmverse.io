@@ -25,12 +25,9 @@ import React, { useState, useMemo } from 'react';
 import { ExportButton } from 'components/common/ExportButton';
 import { useSearchUsers } from 'hooks/api/users';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
-import type { ScoutGameUser } from 'lib/users/getUsers';
+import type { SortField, SortOrder, ScoutGameUser } from 'lib/users/getUsers';
 
-import { AddRepoButton } from './AddUserButton/AddRepoButton';
-
-type SortField = 'username' | 'builderStatus' | 'currentBalance' | 'nftsPurchased' | 'createdAt';
-type SortOrder = 'asc' | 'desc';
+import { ManageUserButton } from './AddUserButton/ManageUserButton';
 
 export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
   const [filterString, setFilter] = useState('');
@@ -38,7 +35,11 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const debouncedFilterString = useDebouncedValue(filterString);
-  const { data: filteredUsers, isValidating, isLoading } = useSearchUsers(debouncedFilterString);
+  const {
+    data: filteredUsers,
+    isValidating,
+    isLoading
+  } = useSearchUsers({ searchString: debouncedFilterString, sortField, sortOrder });
   const showFilteredResults = Boolean(debouncedFilterString || filteredUsers || isValidating || isLoading);
 
   const filteredAndSortedUsers = useMemo(() => {
@@ -96,6 +97,9 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
           }}
         />
         <Box>
+          <ManageUserButton variant='contained' color='primary' sx={{ mr: 2 }}>
+            Manage User
+          </ManageUserButton>
           <ExportButton variant='outlined' filename='scoutgame_users.tsv' src='/api/users/export'>
             Export Users
           </ExportButton>
