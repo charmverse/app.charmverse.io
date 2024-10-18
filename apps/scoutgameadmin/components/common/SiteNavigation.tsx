@@ -4,7 +4,8 @@ import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material'
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FaGithubAlt } from 'react-icons/fa';
-import { TbReceiptBitcoin } from 'react-icons/tb';
+import { PiBinocularsLight } from 'react-icons/pi';
+import { SlUser } from 'react-icons/sl';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -44,20 +45,20 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
         icon={<FaGithubAlt size='24px' />}
         LinkComponent={Link}
       />
-      <BottomNavigationAction
+      {/* <BottomNavigationAction
         label='Transactions'
         href='/transactions'
         value='transactions'
         icon={<TbReceiptBitcoin size='24px' />}
         LinkComponent={Link}
-      />
-      {/* <BottomNavigationAction
+      /> */}
+      <BottomNavigationAction
         label='Users'
         href='/users'
         value='users'
-        icon={<PiBinocularsLight size='24px' />}
+        icon={<SlUser size='24px' />}
         LinkComponent={Link}
-      /> */}
+      />
     </StyledBottomNavigation>
   );
 }
