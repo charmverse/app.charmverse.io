@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import { weeklyRewardableBuilders } from '@packages/scoutgame/builderNfts/constants';
-import { currentSeason, getCurrentWeek, weeklyAllocatedPoints } from '@packages/scoutgame/dates';
+import { currentSeason, getLastWeek, weeklyAllocatedPoints } from '@packages/scoutgame/dates';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
 import { getPointsCountForWeekWithNormalisation } from '@packages/scoutgame/points/getPointsCountForWeekWithNormalisation';
 import { DateTime } from 'luxon';
@@ -9,13 +10,25 @@ import { processScoutPointsPayout } from './processScoutPointsPayout';
 
 export async function processGemsPayout() {
   const now = DateTime.utc();
-  const week = getCurrentWeek();
+  const week = getLastWeek();
 
-  if (now.weekday !== 1 || now.hour !== 0) {
+  // run for the first few hours every Monday at midnight UTC
+  if (now.weekday !== 1 || now.hour > 3) {
     log.info('Gems Payout: It is not yet Sunday at 12:00 AM UTC, skipping');
     return;
   }
 
+  const existingPayout = await prisma.scoutGamePayout.findFirst({
+    where: {
+      week,
+      season: currentSeason
+    }
+  });
+
+  if (existingPayout) {
+    log.info('Gems Payout: Payout already exists for this week, skipping');
+    return;
+  }
   const topWeeklyBuilders = await getBuildersLeaderboard({ quantity: weeklyRewardableBuilders, week });
 
   const { normalisationFactor, totalPoints } = await getPointsCountForWeekWithNormalisation({ week });
