@@ -37,8 +37,8 @@ import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
-import { usePurchase } from 'components/layout/PurchaseProvider';
 import { useUser } from 'components/layout/UserProvider';
+import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransactionAction';
 import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsAction';
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
@@ -79,7 +79,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
-  const { checkDecentTransaction, isExecutingTransaction } = usePurchase();
 
   const { switchChainAsync } = useSwitchChain();
 
@@ -119,6 +118,20 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   } = useAction(purchaseWithPointsAction, {
     onError({ error, input }) {
       log.error('Error purchasing with points', { input, error });
+      setSubmitError(error.serverError?.message || 'Something went wrong');
+    },
+    onExecute() {
+      setSubmitError(null);
+    }
+  });
+
+  const {
+    isExecuting: isExecutingTransaction,
+    hasSucceeded: transactionHasSucceeded,
+    executeAsync: checkDecentTransaction
+  } = useAction(checkDecentTransactionAction, {
+    onError({ error, input }) {
+      log.error('Error checking Decent transaction', { error, input });
       setSubmitError(error.serverError?.message || 'Something went wrong');
     },
     onExecute() {
@@ -312,7 +325,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
 
-  if (hasPurchasedWithPoints || savedDecentTransaction) {
+  if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
     return <SuccessView builder={builder} />;
   }
 
