@@ -9,7 +9,7 @@ exports[`src/components/gallery/Gallery return Gallery and click new 1`] = `
       class="Gallery"
     >
       <div
-        class="GalleryCard selected MuiBox-root css-1oaiypi"
+        class="GalleryCard selected MuiBox-root css-1ck4zfx"
         data-test="gallery-card-card1"
         draggable="true"
         style="opacity: 1;"
@@ -18,13 +18,13 @@ exports[`src/components/gallery/Gallery return Gallery and click new 1`] = `
           data-testid="page-actions-context-menu"
         >
           <button
-            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
             tabindex="0"
             type="button"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
               data-testid="MoreHorizIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -37,7 +37,7 @@ exports[`src/components/gallery/Gallery return Gallery and click new 1`] = `
         </div>
       </div>
       <div
-        class="GalleryCard MuiBox-root css-1oaiypi"
+        class="GalleryCard MuiBox-root css-1ck4zfx"
         data-test="gallery-card-card2"
         draggable="true"
         style="opacity: 1;"
@@ -46,13 +46,13 @@ exports[`src/components/gallery/Gallery return Gallery and click new 1`] = `
           data-testid="page-actions-context-menu"
         >
           <button
-            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
             tabindex="0"
             type="button"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
               data-testid="MoreHorizIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -83,13 +83,13 @@ exports[`src/components/gallery/Gallery return Gallery readonly 1`] = `
       class="Gallery"
     >
       <div
-        class="GalleryCard selected MuiBox-root css-1oaiypi"
+        class="GalleryCard selected MuiBox-root css-1ck4zfx"
         data-test="gallery-card-card1"
         draggable="true"
         style="opacity: 1;"
       />
       <div
-        class="GalleryCard MuiBox-root css-1oaiypi"
+        class="GalleryCard MuiBox-root css-1ck4zfx"
         data-test="gallery-card-card2"
         draggable="true"
         style="opacity: 1;"
@@ -108,7 +108,7 @@ exports[`src/components/gallery/Gallery should match snapshot 1`] = `
       class="Gallery"
     >
       <div
-        class="GalleryCard selected MuiBox-root css-1oaiypi"
+        class="GalleryCard selected MuiBox-root css-1ck4zfx"
         data-test="gallery-card-card1"
         draggable="true"
         style="opacity: 1;"
@@ -117,13 +117,13 @@ exports[`src/components/gallery/Gallery should match snapshot 1`] = `
           data-testid="page-actions-context-menu"
         >
           <button
-            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
             tabindex="0"
             type="button"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
               data-testid="MoreHorizIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -136,7 +136,7 @@ exports[`src/components/gallery/Gallery should match snapshot 1`] = `
         </div>
       </div>
       <div
-        class="GalleryCard MuiBox-root css-1oaiypi"
+        class="GalleryCard MuiBox-root css-1ck4zfx"
         data-test="gallery-card-card2"
         draggable="true"
         style="opacity: 1;"
@@ -145,13 +145,13 @@ exports[`src/components/gallery/Gallery should match snapshot 1`] = `
           data-testid="page-actions-context-menu"
         >
           <button
-            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
             tabindex="0"
             type="button"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
               data-testid="MoreHorizIcon"
               focusable="false"
               viewBox="0 0 24 24"

@@ -53,7 +53,7 @@ exports[`src/components/kanban/kanbanColumnHeader return kanbanColumnHeader and 
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
               data-testid="MoreHorizIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -75,7 +75,7 @@ exports[`src/components/kanban/kanbanColumnHeader return kanbanColumnHeader and 
         >
           <svg
             aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
             data-testid="AddIcon"
             focusable="false"
             viewBox="0 0 24 24"
@@ -144,7 +144,7 @@ exports[`src/components/kanban/kanbanColumnHeader should match snapshot 1`] = `
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
               data-testid="MoreHorizIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -166,7 +166,7 @@ exports[`src/components/kanban/kanbanColumnHeader should match snapshot 1`] = `
         >
           <svg
             aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
             data-testid="AddIcon"
             focusable="false"
             viewBox="0 0 24 24"
