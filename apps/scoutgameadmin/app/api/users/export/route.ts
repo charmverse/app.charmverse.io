@@ -13,6 +13,10 @@ type ScoutWithGithubUser = {
   fid?: number;
   farcasterName?: string;
   currentBalance: number;
+  nftsPurchased: number;
+  nftsSold: number;
+  pointsEarned: number;
+  weeklyBuilderRank?: number;
 };
 
 export async function GET(req: NextRequest) {
@@ -25,7 +29,9 @@ export async function GET(req: NextRequest) {
       farcasterId: true,
       farcasterName: true,
       currentBalance: true,
-      githubUser: true
+      githubUser: true,
+      userSeasonStats: true,
+      userWeeklyStats: true
     }
   });
   const rows: ScoutWithGithubUser[] = users.map((user) => ({
@@ -36,7 +42,13 @@ export async function GET(req: NextRequest) {
     githubLogin: user.githubUser[0]?.login,
     fid: user.farcasterId || undefined,
     farcasterName: user.farcasterName || undefined,
-    currentBalance: user.currentBalance
+    currentBalance: user.currentBalance,
+    nftsPurchased: user.userSeasonStats[0]?.nftsPurchased || 0,
+    nftsSold: user.userSeasonStats[0]?.nftsSold || 0,
+    pointsEarned: user.userSeasonStats[0]
+      ? user.userSeasonStats[0].pointsEarnedAsScout + user.userSeasonStats[0].pointsEarnedAsBuilder
+      : 0,
+    weeklyBuilderRank: user.userWeeklyStats[0]?.rank || undefined
   }));
   const exportString = stringify(rows, { header: true, columns: Object.keys(rows[0]) });
 
