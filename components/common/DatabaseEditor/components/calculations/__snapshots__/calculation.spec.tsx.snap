@@ -92,7 +92,7 @@ exports[`components/calculations/Calculation should match snapshot - none 1`] = 
       </span>
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
         data-testid="ExpandMoreIcon"
         focusable="false"
         viewBox="0 0 24 24"
