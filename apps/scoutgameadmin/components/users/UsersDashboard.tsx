@@ -98,7 +98,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
         />
         <Box>
           <ManageUserButton variant='contained' color='primary' sx={{ mr: 2 }}>
-            Manage User
+            Add User
           </ManageUserButton>
           <ExportButton variant='outlined' filename='scoutgame_users.tsv' src='/api/users/export'>
             Export Users

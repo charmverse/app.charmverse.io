@@ -90,7 +90,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
         />
         <Box>
           <AddRepoButton variant='contained' color='primary' sx={{ mr: 2 }}>
-            Import Repos
+            Add Repos
           </AddRepoButton>
           <ExportButton variant='outlined' filename='github_repos.tsv' src='/api/repos/export'>
             Export Repos
