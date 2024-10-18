@@ -6,7 +6,7 @@ import { currentSeason } from '@packages/scoutgame/dates';
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderStats } from 'lib/builders/getBuilderStats';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
+import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';

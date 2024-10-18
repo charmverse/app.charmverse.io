@@ -1,6 +1,6 @@
 import { ScoutPage } from 'components/scout/ScoutPage';
 import type { BuildersSort } from 'lib/builders/getSortedBuilders';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
+import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 export default async function Scout({
   searchParams

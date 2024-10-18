@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { HowItWorksPage } from 'components/welcome/how-it-works/HowItWorksPage';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
+import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
 

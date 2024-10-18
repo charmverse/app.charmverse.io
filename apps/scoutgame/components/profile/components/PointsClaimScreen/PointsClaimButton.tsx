@@ -9,14 +9,14 @@ import { useUser } from 'components/layout/UserProvider';
 import { claimPointsAction } from 'lib/points/claimPointsAction';
 
 export function PointsClaimButton() {
-  const { execute, isExecuting, result } = useAction(claimPointsAction);
+  const { executeAsync, isExecuting, result } = useAction(claimPointsAction);
   const [showModal, setShowModal] = useState(false);
-  const { reloadUser } = useUser();
+  const { refreshUser } = useUser();
 
   const handleClaim = async () => {
-    await execute();
+    await executeAsync();
     setShowModal(true);
-    await reloadUser();
+    await refreshUser();
   };
 
   const handleCloseModal = () => {

@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
 import { getScoutStats } from 'lib/scouts/getScoutStats';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
+import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 import { BasicUserInfoSelect } from 'lib/users/queries';
 
