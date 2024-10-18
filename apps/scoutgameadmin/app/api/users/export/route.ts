@@ -16,7 +16,8 @@ type ScoutWithGithubUser = {
   currentBalance: number;
   nftsPurchased: number;
   nftsSold: number;
-  pointsEarned: number;
+  pointsEarnedAsScout: number;
+  pointsEarnedAsBuilder: number;
   weeklyBuilderRank?: number;
 };
 
@@ -46,9 +47,8 @@ export async function GET(req: NextRequest) {
     farcasterName: user.farcasterName || undefined,
     githubLogin: user.githubUser[0]?.login,
     currentBalance: user.currentBalance,
-    pointsEarned: user.userSeasonStats[0]
-      ? user.userSeasonStats[0].pointsEarnedAsScout + user.userSeasonStats[0].pointsEarnedAsBuilder
-      : 0,
+    pointsEarnedAsScout: user.userSeasonStats[0]?.pointsEarnedAsScout || 0,
+    pointsEarnedAsBuilder: user.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
     nftsPurchased: user.userSeasonStats[0]?.nftsPurchased || 0,
     nftsSold: user.userSeasonStats[0]?.nftsSold || 0,
     weeklyBuilderRank: user.userWeeklyStats[0]?.rank || undefined
