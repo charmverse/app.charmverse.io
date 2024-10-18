@@ -1,7 +1,10 @@
 import type { Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-export type ScoutGameUser = Pick<Scout, 'builderStatus' | 'username' | 'id' | 'avatar' | 'displayName' | 'createdAt'>;
+export type ScoutGameUser = Pick<
+  Scout,
+  'builderStatus' | 'username' | 'id' | 'avatar' | 'displayName' | 'createdAt' | 'farcasterId' | 'currentBalance'
+> & { nftsPurchased: number };
 
 export type UserFilter = 'only-builders';
 
@@ -21,7 +24,7 @@ export async function getUsers({ searchString, filter }: { searchString?: string
       !userFid && typeof searchString === 'string'
         ? {
             _relevance: {
-              fields: ['username', 'walletAddress', 'displayName', 'email'],
+              fields: ['username', 'walletAddress', 'displayName', 'email', 'id'],
               search: searchString,
               sort: 'desc'
             }
@@ -38,7 +41,13 @@ export async function getUsers({ searchString, filter }: { searchString?: string
           }
         : filter === 'only-builders'
           ? { builderStatus: { not: null } }
-          : undefined
+          : undefined,
+    include: {
+      userSeasonStats: true
+    }
   });
-  return users;
+  return users.map((user) => ({
+    ...user,
+    nftsPurchased: user.userSeasonStats[0]?.nftsPurchased || 0
+  }));
 }

@@ -29,7 +29,7 @@ import type { ScoutGameUser } from 'lib/users/getUsers';
 
 import { AddRepoButton } from './AddUserButton/AddRepoButton';
 
-type SortField = 'username' | 'displayName' | 'createdAt';
+type SortField = 'username' | 'builderStatus' | 'currentBalance' | 'nftsPurchased' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
 
 export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
@@ -46,8 +46,17 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
       return filteredUsers || [];
     }
     return users.sort((a, b) => {
-      if (a[sortField] < b[sortField]) return sortOrder === 'asc' ? -1 : 1;
-      if (a[sortField] > b[sortField]) return sortOrder === 'asc' ? 1 : -1;
+      if (!a[sortField] && !b[sortField]) {
+        return 0;
+      }
+      if (!a[sortField]) {
+        return sortOrder === 'asc' ? -1 : 1;
+      }
+      if (!b[sortField]) {
+        return sortOrder === 'asc' ? 1 : -1;
+      }
+      if (a[sortField]! < b[sortField]!) return sortOrder === 'asc' ? -1 : 1;
+      if (a[sortField]! > b[sortField]!) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
   }, [users, filteredUsers, showFilteredResults, sortField, sortOrder]);
@@ -66,7 +75,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
       <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='center' mb={2}>
         <TextField
           label='Search'
-          placeholder='Filter by name, wallet address, email or fid'
+          placeholder='Filter by name, id, wallet address, email or fid'
           variant='outlined'
           value={filterString}
           onChange={(e) => setFilter(e.target.value)}
@@ -105,13 +114,33 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
                   Username
                 </TableSortLabel>
               </TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>Farcaster ID</TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={sortField === 'displayName'}
-                  direction={sortField === 'displayName' ? sortOrder : 'asc'}
-                  onClick={() => handleSort('displayName')}
+                  active={sortField === 'builderStatus'}
+                  direction={sortField === 'builderStatus' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('builderStatus')}
                 >
-                  Display Name
+                  Builder Status
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortField === 'currentBalance'}
+                  direction={sortField === 'currentBalance' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('currentBalance')}
+                >
+                  Points Balance
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortField === 'nftsPurchased'}
+                  direction={sortField === 'nftsPurchased' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('nftsPurchased')}
+                >
+                  NFTs Purchased
                 </TableSortLabel>
               </TableCell>
               <TableCell>
@@ -123,18 +152,18 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
                   Created At
                 </TableSortLabel>
               </TableCell>
-              <TableCell>Builder Status</TableCell>
-              <TableCell>Avatar</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredAndSortedUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.username}</TableCell>
-                <TableCell>{user.displayName}</TableCell>
-                <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>{user.id}</TableCell>
+                <TableCell>{user.farcasterId}</TableCell>
                 <TableCell>{user.builderStatus || 'N/A'}</TableCell>
-                <TableCell>{user.avatar ? 'Yes' : 'No'}</TableCell>
+                <TableCell>{user.currentBalance}</TableCell>
+                <TableCell>{user.nftsPurchased}</TableCell>
+                <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
               </TableRow>
             ))}
           </TableBody>
