@@ -7,8 +7,9 @@ export const dynamic = 'force-dynamic';
 type ScoutWithGithubUser = {
   id: string;
   username: string;
+  createdAt: string;
   // avatar: string;
-  builderStatus: string;
+  builderStatus?: string;
   githubLogin?: string;
   fid?: number;
   farcasterName?: string;
@@ -24,6 +25,7 @@ export async function GET(req: NextRequest) {
     select: {
       id: true,
       username: true,
+      createdAt: true,
       avatar: true,
       builderStatus: true,
       farcasterId: true,
@@ -37,17 +39,18 @@ export async function GET(req: NextRequest) {
   const rows: ScoutWithGithubUser[] = users.map((user) => ({
     id: user.id,
     username: user.username,
+    createdAt: user.createdAt.toDateString(),
     // avatar: user.avatar || '',
-    builderStatus: user.builderStatus || '',
-    githubLogin: user.githubUser[0]?.login,
+    builderStatus: user.builderStatus || undefined,
     fid: user.farcasterId || undefined,
     farcasterName: user.farcasterName || undefined,
+    githubLogin: user.githubUser[0]?.login,
     currentBalance: user.currentBalance,
-    nftsPurchased: user.userSeasonStats[0]?.nftsPurchased || 0,
-    nftsSold: user.userSeasonStats[0]?.nftsSold || 0,
     pointsEarned: user.userSeasonStats[0]
       ? user.userSeasonStats[0].pointsEarnedAsScout + user.userSeasonStats[0].pointsEarnedAsBuilder
       : 0,
+    nftsPurchased: user.userSeasonStats[0]?.nftsPurchased || 0,
+    nftsSold: user.userSeasonStats[0]?.nftsSold || 0,
     weeklyBuilderRank: user.userWeeklyStats[0]?.rank || undefined
   }));
   const exportString = stringify(rows, { header: true, columns: Object.keys(rows[0]) });
