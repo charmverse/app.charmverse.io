@@ -264,6 +264,14 @@ export async function mergeProfiles({
       data: {
         userId: primaryProfileId
       }
+    }),
+    prisma.discordUser.updateMany({
+      where: {
+        userId: secondaryProfileId
+      },
+      data: {
+        userId: primaryProfileId
+      }
     })
   ]);
   log.debug('results', {
@@ -294,6 +302,7 @@ export async function mergeProfiles({
     'space.createdBy': results[24],
     'post.createdBy': results[25],
     'telegramUser.userId': results[26],
-    'userGnosisSafe.userId': results[27]
+    'userGnosisSafe.userId': results[27],
+    'discordUser.userId': results[28]
   });
 }
