@@ -15,10 +15,7 @@ export function SuccessView({ builder }: { builder: { id: string; nftImageUrl?: 
       <Typography color='secondary' variant='h5' fontWeight={600}>
         Congratulations!
       </Typography>
-      <Typography>You are almost done scouting @{builder.username}</Typography>
-      <Typography>
-        We will send you a message when the transaction has been successful. Until then you can close this dialog.
-      </Typography>
+      <Typography>You scouted @{builder.username}</Typography>
       <Box
         bgcolor='black.dark'
         width='100%'
