@@ -1,9 +1,22 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+import { currentSeason } from '@packages/scoutgame/dates';
 import { sendPoints } from '@packages/scoutgame/points/sendPoints';
 
-async function deleteScoutAndRedistributePoints() {
-  const builderUsername = "ccdev5";
+async function deleteBuilderAndRedistributePoints({
+  builderUsername
+}: {
+  builderUsername: string
+}) {
+  const builder = await prisma.scout.findUnique({
+    where: {
+      username: builderUsername
+    }
+  });
+
+  if (!builder) {
+    throw new Error(`Builder with username ${builderUsername} not found`);
+  }
+  
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
       builderNFT: {
@@ -70,5 +83,11 @@ async function deleteScoutAndRedistributePoints() {
         }
       })
     }
+  }, {
+    timeout: 60000
   });
 }
+
+deleteBuilderAndRedistributePoints({
+  builderUsername: ""
+});
