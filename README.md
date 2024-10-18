@@ -339,7 +339,7 @@ Secret names have the following format:
 `/io.cv.app/<env>/<secret name>`
 
 Secret names are namespaced by the running environment. If, for example, you are only using this secret when
-running the app in production, then namespace is `prd`. In staging environment, then secret namespace is `stg`.
+running the app in production, then namespace is `prd`. In staging environment, the secret namespace is `stg`.
 Many secrets are the same regardless of whether you're running the app in production or staging, then the namespace is `shared`.
 
 If you have more than 1 secrets that are from the same vendor, then name the secret after the vendor, and
@@ -396,7 +396,7 @@ Normally datadog agent is not deployed in the staging environment. To run datado
 
 ## Running storybook
 
-Storybook is used to presend base available components to keep consistent design system across the app.
+Storybook is used to present base available components to keep a consistent design system across the app.
 
 Start storybook locally:
 
