@@ -14,7 +14,7 @@ export function useSearchUsers({
   sortOrder?: SortOrder;
   filter?: UserFilter;
 }) {
-  return useGETImmutable<ScoutGameUser[]>(searchString ? '/api/users' : null, {
+  return useGETImmutable<ScoutGameUser[]>(searchString || sortField || filter ? '/api/users' : null, {
     searchString,
     sortField,
     sortOrder,

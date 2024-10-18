@@ -25,7 +25,7 @@ type Props = {
   onAdd: () => void;
 };
 
-export function ManageUserModal({ open, onClose, onAdd }: Props) {
+export function AddUserModal({ open, onClose, onAdd }: Props) {
   const [repoInput, setRepoInput] = useState('');
   const { trigger: createUser, isMutating: isCreating } = useCreateUser();
   const debouncedFilterString = useDebouncedValue(repoInput);

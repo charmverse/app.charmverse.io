@@ -5,13 +5,15 @@ import type { ButtonProps } from '@mui/material';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
-import { ManageUserModal } from './ManageUserModal';
+import { ViewTransactionsModal } from './ViewTransactionsModal';
 
-export function ManageUserButton({
+export function ViewTransactionsButton({
   children,
+  scoutId,
   ...props
 }: {
   children: ReactNode;
+  scoutId: string;
 } & ButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   return (
@@ -19,7 +21,7 @@ export function ManageUserButton({
       <Button onClick={() => setIsModalOpen(true)} {...props}>
         {children}
       </Button>
-      <ManageUserModal open={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={() => {}} />
+      <ViewTransactionsModal open={isModalOpen} onClose={() => setIsModalOpen(false)} scoutId={scoutId} />
     </>
   );
 }

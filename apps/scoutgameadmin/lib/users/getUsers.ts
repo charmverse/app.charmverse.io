@@ -26,7 +26,7 @@ export async function getUsers({
   const userFid = getNumberFromString(searchString);
 
   const users = await prisma.scout.findMany({
-    take: 500,
+    take: sortField === 'nftsPurchased' ? 1000 : 500, // return more for nft sort since we sort in the frontend
     orderBy:
       !userFid && typeof searchString === 'string'
         ? {
@@ -36,9 +36,14 @@ export async function getUsers({
               sort: 'desc'
             }
           }
-        : sortField
-          ? { [sortField]: sortOrder || 'asc' }
-          : { createdAt: 'desc' },
+        : sortField === 'nftsPurchased'
+          ? {
+              /*  TODO - sort by nfts purchased */
+              createdAt: sortOrder || 'desc'
+            }
+          : sortField
+            ? { [sortField]: sortOrder || 'asc' }
+            : { createdAt: sortOrder || 'desc' },
     where: userFid
       ? { farcasterId: userFid }
       : typeof searchString === 'string'

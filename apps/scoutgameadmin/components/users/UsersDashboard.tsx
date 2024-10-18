@@ -27,7 +27,8 @@ import { useSearchUsers } from 'hooks/api/users';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { SortField, SortOrder, ScoutGameUser } from 'lib/users/getUsers';
 
-import { ManageUserButton } from './AddUserButton/ManageUserButton';
+import { AddUserButton } from './AddUserButton/AddUserButton';
+import { ViewTransactionsButton } from './ViewTransactionsButton/ViewTransactionsButton';
 
 export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
   const [filterString, setFilter] = useState('');
@@ -97,9 +98,9 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
           }}
         />
         <Box>
-          <ManageUserButton variant='contained' color='primary' sx={{ mr: 2 }}>
+          <AddUserButton variant='contained' color='primary' sx={{ mr: 2 }}>
             Add User
-          </ManageUserButton>
+          </AddUserButton>
           <ExportButton variant='outlined' filename='scoutgame_users.tsv' src='/api/users/export'>
             Export Users
           </ExportButton>
@@ -166,7 +167,11 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
                 <TableCell>{user.farcasterId}</TableCell>
                 <TableCell>{user.builderStatus || 'N/A'}</TableCell>
                 <TableCell>{user.currentBalance}</TableCell>
-                <TableCell>{user.nftsPurchased}</TableCell>
+                <TableCell>
+                  <ViewTransactionsButton size='small' variant='outlined' scoutId={user.id}>
+                    {user.nftsPurchased}
+                  </ViewTransactionsButton>
+                </TableCell>
                 <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
               </TableRow>
             ))}
